@@ -45,8 +45,8 @@ export default function Home() {
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/customer/dashboard" className="text-sm font-semibold hover:text-[hsl(45,60%,55%)] transition-colors">Log in</Link>
-          <Link href="/customer/dashboard" className="bg-white text-black font-semibold text-xs px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">Sign up</Link>
+          <Link href="/login" className="text-sm font-semibold hover:text-[hsl(45,60%,55%)] transition-colors">Log in</Link>
+          <Link href="/login" className="bg-white text-black font-semibold text-xs px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">Sign up</Link>
         </div>
       </header>
 
@@ -65,7 +65,7 @@ export default function Home() {
             Book trusted beauty and grooming professionals in minutes. Connect with top stylists, makeup artists, and freelancers in Riyadh.
           </p>
           <div className="flex flex-wrap gap-4 pt-4">
-            <Link href="/customer/dashboard" className="px-6 py-3 bg-[hsl(45,60%,55%)] text-black font-bold text-sm rounded-lg hover:bg-[hsl(45,60%,45%)] transition duration-200">
+            <Link href="/login" className="px-6 py-3 bg-[hsl(45,60%,55%)] text-black font-bold text-sm rounded-lg hover:bg-[hsl(45,60%,45%)] transition duration-200">
               Book Now
             </Link>
             <Link href="/provider/dashboard" className="px-6 py-3 bg-transparent border border-white text-white font-bold text-sm rounded-lg hover:bg-white/10 transition duration-200">
