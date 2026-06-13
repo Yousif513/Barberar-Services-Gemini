@@ -54,15 +54,15 @@ export default function HomeScreen() {
   // Mock categories
   const categories = {
     men: [
-      { id: "m1", name: lang === "ar" ? "قص شعر" : "Haircut", icon: "✂️" },
-      { id: "m2", name: lang === "ar" ? "لحية" : "Beard", icon: "🪒" },
-      { id: "m3", name: lang === "ar" ? "عناية ممتازة" : "Facial", icon: "🧖‍♂️" },
+      { id: "m1", name: lang === "ar" ? "قص شعر" : "Haircut" },
+      { id: "m2", name: lang === "ar" ? "لحية" : "Beard" },
+      { id: "m3", name: lang === "ar" ? "عناية ممتازة" : "Facial" },
     ],
     women: [
-      { id: "w1", name: lang === "ar" ? "تصفيف شعر" : "Styling", icon: "💇‍♀️" },
-      { id: "w2", name: lang === "ar" ? "أظافر" : "Nails", icon: "💅" },
-      { id: "w3", name: lang === "ar" ? "مكياج" : "Makeup", icon: "💄" },
-      { id: "w4", name: lang === "ar" ? "حناء" : "Henna", icon: "✨" },
+      { id: "w1", name: lang === "ar" ? "تصفيف شعر" : "Styling" },
+      { id: "w2", name: lang === "ar" ? "أظافر" : "Nails" },
+      { id: "w3", name: lang === "ar" ? "مكياج" : "Makeup" },
+      { id: "w4", name: lang === "ar" ? "حناء" : "Henna" },
     ]
   };
 
@@ -98,7 +98,7 @@ export default function HomeScreen() {
         <View style={[styles.header, lang === "ar" && styles.rtlRow]}>
           <View>
             <Text style={styles.brandText}>{t.brand}</Text>
-            <Text style={styles.subBrandText}>📍 {t.city}</Text>
+            <Text style={styles.subBrandText}>{t.city}</Text>
           </View>
           <TouchableOpacity onPress={toggleLanguage} style={styles.langBtn}>
             <Text style={styles.langBtnText}>{lang === "ar" ? "English" : "العربية"}</Text>
@@ -107,11 +107,10 @@ export default function HomeScreen() {
 
         {/* SEARCH BAR */}
         <View style={[styles.searchContainer, lang === "ar" && styles.rtlRow]}>
-          <Text style={styles.searchIcon}>🔍</Text>
           <TextInput 
             placeholder={t.searchPlaceholder} 
             placeholderTextColor="hsl(210,8%,65%)" 
-            style={[styles.searchInput, lang === "ar" && styles.rtlText]}
+            style={[styles.searchInput, lang === "ar" && styles.rtlText, { paddingHorizontal: 12 }]}
           />
         </View>
 
@@ -136,7 +135,6 @@ export default function HomeScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={[styles.catScroll, lang === "ar" && styles.rtlRow]}>
           {categories.women.map((cat) => (
             <TouchableOpacity key={cat.id} style={styles.catCard}>
-              <Text style={styles.catIcon}>{cat.icon}</Text>
               <Text style={styles.catName}>{cat.name}</Text>
             </TouchableOpacity>
           ))}
@@ -146,7 +144,6 @@ export default function HomeScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={[styles.catScroll, lang === "ar" && styles.rtlRow]}>
           {categories.men.map((cat) => (
             <TouchableOpacity key={cat.id} style={styles.catCard}>
-              <Text style={styles.catIcon}>{cat.icon}</Text>
               <Text style={styles.catName}>{cat.name}</Text>
             </TouchableOpacity>
           ))}
@@ -162,8 +159,8 @@ export default function HomeScreen() {
                 <Image source={{ uri: provider.image }} style={styles.cardImg as any} />
                 <View style={styles.cardDetails}>
                   <Text style={styles.cardName}>{provider.name}</Text>
-                  <Text style={styles.cardLoc}>📍 {provider.district}</Text>
-                  <Text style={styles.cardRating}>⭐ {provider.rating} ({provider.reviewsCount} {t.reviews})</Text>
+                  <Text style={styles.cardLoc}>{provider.district}</Text>
+                  <Text style={styles.cardRating}>★ {provider.rating} ({provider.reviewsCount} {t.reviews})</Text>
                   
                   <View style={[styles.cardFooter, lang === "ar" && styles.rtlRow]}>
                     <Text style={styles.cardPrice}>{t.startingFrom}: <Text style={styles.priceHighlight}>{provider.price}</Text></Text>
@@ -291,8 +288,8 @@ const styles = StyleSheet.create({
     marginBottom: 24
   },
   catCard: {
-    width: 80,
-    height: 90,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     backgroundColor: "hsl(220,12%,14%)",
     borderRadius: 12,
     alignItems: "center",
@@ -300,10 +297,6 @@ const styles = StyleSheet.create({
     marginRight: 12,
     borderWidth: 1,
     borderColor: "hsla(0,0%,100%,0.05)"
-  },
-  catIcon: {
-    fontSize: 26,
-    marginBottom: 8
   },
   catName: {
     fontSize: 11,

@@ -111,7 +111,7 @@ export function BookingSheet({
                   style={[styles.optionCard, selectedStylist === staff.id && styles.optionSelected]}
                 >
                   <Text style={styles.optionName}>{staff.name}</Text>
-                  <Text style={styles.optionSub}>⭐ {staff.rating}</Text>
+                  <Text style={styles.optionSub}>★ {staff.rating}</Text>
                 </TouchableOpacity>
               ))}
             </View>

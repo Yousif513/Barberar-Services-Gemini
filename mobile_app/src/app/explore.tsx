@@ -168,7 +168,7 @@ export default function ExploreScreen() {
                   selectedLocation === item.id && styles.activeLocChipText
                 ]}
               >
-                📍 {item.name_ar}
+                {item.name_ar}
               </Text>
             </TouchableOpacity>
           )}
@@ -190,8 +190,8 @@ export default function ExploreScreen() {
               </View>
               
               <View style={styles.cardFooter}>
-                <Text style={styles.cardLoc}>📍 {item.district}</Text>
-                <Text style={styles.cardRating}>⭐ {item.rating} ({item.reviews} تقييم)</Text>
+                <Text style={styles.cardLoc}>{item.district}</Text>
+                <Text style={styles.cardRating}>★ {item.rating} ({item.reviews} تقييم)</Text>
               </View>
             </View>
           </View>
