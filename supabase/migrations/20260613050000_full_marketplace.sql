@@ -1,8 +1,15 @@
 -- Migration: 20260613050000_full_marketplace.sql
 -- Description: Implement database structures for Phase 4 (Full Service Marketplace) supporting Medical Home Care, Pet Care, Deliveries, and Developer API webhooks.
 
+-- Cleanup pre-existing tables from any previous partial execution to ensure clean run
+DROP TABLE IF EXISTS public.webhook_subscriptions CASCADE;
+DROP TABLE IF EXISTS public.api_tokens CASCADE;
+DROP TABLE IF EXISTS public.developer_profiles CASCADE;
+DROP TABLE IF EXISTS public.delivery_jobs CASCADE;
+DROP TABLE IF EXISTS public.client_profiles CASCADE;
+
 -- 1. DEPENDENTS / CLIENT PROFILES (For Medical Home Care patients, Pet Care pets, etc.)
-CREATE TABLE IF NOT EXISTS public.client_profiles (
+CREATE TABLE public.client_profiles (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     client_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     name VARCHAR(100) NOT NULL,
@@ -18,7 +25,7 @@ CREATE TABLE IF NOT EXISTS public.client_profiles (
 ALTER TABLE public.bookings ADD COLUMN IF NOT EXISTS client_profile_id UUID REFERENCES public.client_profiles(id) ON DELETE SET NULL;
 
 -- 3. LOGISTICS / DELIVERY JOBS
-CREATE TABLE IF NOT EXISTS public.delivery_jobs (
+CREATE TABLE public.delivery_jobs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     booking_id UUID NOT NULL REFERENCES public.bookings(id) ON DELETE CASCADE,
     pickup_address TEXT NOT NULL,
@@ -35,7 +42,7 @@ CREATE TABLE IF NOT EXISTS public.delivery_jobs (
 );
 
 -- 4. DEVELOPER PROFILES (For third-party developer integrations)
-CREATE TABLE IF NOT EXISTS public.developer_profiles (
+CREATE TABLE public.developer_profiles (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     developer_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     app_name VARCHAR(100) NOT NULL,
@@ -44,7 +51,7 @@ CREATE TABLE IF NOT EXISTS public.developer_profiles (
 );
 
 -- 5. API TOKENS (For developer auth credentials)
-CREATE TABLE IF NOT EXISTS public.api_tokens (
+CREATE TABLE public.api_tokens (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     developer_profile_id UUID NOT NULL REFERENCES public.developer_profiles(id) ON DELETE CASCADE,
     token_hash TEXT NOT NULL UNIQUE,
@@ -55,7 +62,7 @@ CREATE TABLE IF NOT EXISTS public.api_tokens (
 );
 
 -- 6. WEBHOOK SUBSCRIPTIONS (For event-driven integrations)
-CREATE TABLE IF NOT EXISTS public.webhook_subscriptions (
+CREATE TABLE public.webhook_subscriptions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     developer_profile_id UUID NOT NULL REFERENCES public.developer_profiles(id) ON DELETE CASCADE,
     target_url TEXT NOT NULL,
