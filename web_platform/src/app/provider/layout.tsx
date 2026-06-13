@@ -20,6 +20,7 @@ const translations = {
     promotions: "Promotions",
     reports: "Reports",
     settings: "Settings",
+    messages: "Messages",
     logout: "Log Out",
     welcome: "Welcome back,",
     searchPlaceholder: "Search...",
@@ -34,6 +35,7 @@ const translations = {
     resources: "الغرف والموارد",
     packages: "باقات العافية",
     jobs: "فرص العمل المتاحة",
+    messages: "الرسائل",
     customers: "العملاء",
     reviews: "التقييمات",
     promotions: "العروض الترويجية",
@@ -72,6 +74,7 @@ export default function ProviderLayout({
     { name: t.resources, path: "/provider/resources", icon: "" },
     { name: t.packages, path: "/provider/packages", icon: "" },
     { name: t.jobs, path: "/provider/jobs", icon: "" },
+    { name: t.messages, path: "/provider/messages", icon: "" },
     { name: t.employees, path: "/provider/team", icon: "" }, // links to team folder
     { name: t.customers, path: "/provider/customers", icon: "" },
     { name: t.reviews, path: "/provider/reviews", icon: "" },
