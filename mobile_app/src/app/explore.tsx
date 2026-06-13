@@ -1,180 +1,356 @@
-import { Image } from 'expo-image';
-import { SymbolView } from 'expo-symbols';
-import { Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, { useState } from "react";
+import { 
+  StyleSheet, 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  ScrollView, 
+  Image, 
+  FlatList, 
+  Dimensions 
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { ExternalLink } from '@/components/external-link';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Collapsible } from '@/components/ui/collapsible';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
+const { width } = Dimensions.get("window");
 
-export default function TabTwoScreen() {
-  const safeAreaInsets = useSafeAreaInsets();
-  const insets = {
-    ...safeAreaInsets,
-    bottom: safeAreaInsets.bottom + BottomTabInset + Spacing.three,
-  };
-  const theme = useTheme();
+export default function ExploreScreen() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState("all");
+  const [selectedLocation, setSelectedLocation] = useState("all");
 
-  const contentPlatformStyle = Platform.select({
-    android: {
-      paddingTop: insets.top,
-      paddingLeft: insets.left,
-      paddingRight: insets.right,
-      paddingBottom: insets.bottom,
+  const categories = [
+    { id: "all", name_ar: "الكل", name_en: "All" },
+    { id: "haircut", name_ar: "قص شعر", name_en: "Haircut" },
+    { id: "makeup", name_ar: "مكياج", name_en: "Makeup" },
+    { id: "nails", name_ar: "أظافر", name_en: "Nails" },
+    { id: "home", name_ar: "خدمة منزلية", name_en: "Home Service" },
+    { id: "salon", name_ar: "صالونات", name_en: "Salons" }
+  ];
+
+  const locations = [
+    { id: "all", name_ar: "كل الرياض", name_en: "All Riyadh" },
+    { id: "malqa", name_ar: "الملقا", name_en: "Al-Malqa" },
+    { id: "olaya", name_ar: "العليا", name_en: "Olaya" },
+    { id: "yasmin", name_ar: "الياسمين", name_en: "Al-Yasmin" },
+    { id: "hamra", name_ar: "الحمراء", name_en: "Al-Hamra" }
+  ];
+
+  const mockProviders = [
+    {
+      id: "p1",
+      name: "Elite Grooming Salon",
+      category: "salon",
+      services: ["haircut", "shave"],
+      district: "Al-Malqa",
+      districtKey: "malqa",
+      rating: 4.9,
+      reviews: 148,
+      price: "150 SAR",
+      image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=600&auto=format&fit=crop"
     },
-    web: {
-      paddingTop: Spacing.six,
-      paddingBottom: Spacing.four,
+    {
+      id: "p2",
+      name: "Sara Beauty Salon & Spa",
+      category: "salon",
+      services: ["makeup", "nails"],
+      district: "Olaya",
+      districtKey: "olaya",
+      rating: 4.8,
+      reviews: 210,
+      price: "350 SAR",
+      image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=600&auto=format&fit=crop"
     },
+    {
+      id: "p3",
+      name: "Elena (Freelance Stylist)",
+      category: "home",
+      services: ["haircut", "makeup"],
+      district: "Al-Yasmin",
+      districtKey: "yasmin",
+      rating: 4.9,
+      reviews: 94,
+      price: "200 SAR",
+      image: "https://images.unsplash.com/photo-1595890833490-cf9b09d62368?q=80&w=600&auto=format&fit=crop"
+    },
+    {
+      id: "p4",
+      name: "Tariq (Independent Barber)",
+      category: "salon",
+      services: ["haircut"],
+      district: "Al-Hamra",
+      districtKey: "hamra",
+      rating: 4.7,
+      reviews: 68,
+      price: "80 SAR",
+      image: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=600&auto=format&fit=crop"
+    }
+  ];
+
+  // Filter logic
+  const filteredProviders = mockProviders.filter(p => {
+    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          p.district.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesCategory = selectedFilter === "all" || 
+                            p.category === selectedFilter || 
+                            p.services.includes(selectedFilter);
+
+    const matchesLocation = selectedLocation === "all" || 
+                            p.districtKey === selectedLocation;
+
+    return matchesSearch && matchesCategory && matchesLocation;
   });
 
   return (
-    <ScrollView
-      style={[styles.scrollView, { backgroundColor: theme.background }]}
-      contentInset={insets}
-      contentContainerStyle={[styles.contentContainer, contentPlatformStyle]}>
-      <ThemedView style={styles.container}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="subtitle">Explore</ThemedText>
-          <ThemedText style={styles.centerText} themeColor="textSecondary">
-            This starter app includes example{'\n'}code to help you get started.
-          </ThemedText>
+    <SafeAreaView style={styles.container}>
+      {/* Search Header */}
+      <View style={styles.searchHeader}>
+        <Text style={styles.title}>البحث والاستكشاف</Text>
+        <Text style={styles.subtitle}>ابحث عن أفضل خدمات التجميل والعناية في الرياض</Text>
+        
+        <View style={styles.searchContainer}>
+          <TextInput
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="البحث عن الصالونات والمصففين والمكياج..."
+            placeholderTextColor="hsl(210,8%,65%)"
+            style={styles.searchInput}
+          />
+        </View>
+      </View>
 
-          <ExternalLink href="https://docs.expo.dev" asChild>
-            <Pressable style={({ pressed }) => pressed && styles.pressed}>
-              <ThemedView type="backgroundElement" style={styles.linkButton}>
-                <ThemedText type="link">Expo documentation</ThemedText>
-                <SymbolView
-                  tintColor={theme.text}
-                  name={{ ios: 'arrow.up.right.square', android: 'link', web: 'link' }}
-                  size={12}
-                />
-              </ThemedView>
-            </Pressable>
-          </ExternalLink>
-        </ThemedView>
+      {/* Quick Filters */}
+      <View style={styles.filterSection}>
+        <FlatList
+          data={categories}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => setSelectedFilter(item.id)}
+              style={[
+                styles.filterChip,
+                selectedFilter === item.id && styles.activeChip
+              ]}
+            >
+              <Text 
+                style={[
+                  styles.chipText,
+                  selectedFilter === item.id && styles.activeChipText
+                ]}
+              >
+                {item.name_ar}
+              </Text>
+            </TouchableOpacity>
+          )}
+          contentContainerStyle={styles.chipList}
+        />
 
-        <ThemedView style={styles.sectionsWrapper}>
-          <Collapsible title="File-based routing">
-            <ThemedText type="small">
-              This app has two screens: <ThemedText type="code">src/app/index.tsx</ThemedText> and{' '}
-              <ThemedText type="code">src/app/explore.tsx</ThemedText>
-            </ThemedText>
-            <ThemedText type="small">
-              The layout file in <ThemedText type="code">src/app/_layout.tsx</ThemedText> sets up
-              the tab navigator.
-            </ThemedText>
-            <ExternalLink href="https://docs.expo.dev/router/introduction">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
+        {/* Location Selectors */}
+        <FlatList
+          data={locations}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => setSelectedLocation(item.id)}
+              style={[
+                styles.locChip,
+                selectedLocation === item.id && styles.activeLocChip
+              ]}
+            >
+              <Text 
+                style={[
+                  styles.locChipText,
+                  selectedLocation === item.id && styles.activeLocChipText
+                ]}
+              >
+                📍 {item.name_ar}
+              </Text>
+            </TouchableOpacity>
+          )}
+          contentContainerStyle={styles.locChipList}
+        />
+      </View>
 
-          <Collapsible title="Android, iOS, and web support">
-            <ThemedView type="backgroundElement" style={styles.collapsibleContent}>
-              <ThemedText type="small">
-                You can open this project on Android, iOS, and the web. To open the web version,
-                press <ThemedText type="smallBold">w</ThemedText> in the terminal running this
-                project.
-              </ThemedText>
-              <Image
-                source={require('@/assets/images/tutorial-web.png')}
-                style={styles.imageTutorial}
-              />
-            </ThemedView>
-          </Collapsible>
-
-          <Collapsible title="Images">
-            <ThemedText type="small">
-              For static images, you can use the <ThemedText type="code">@2x</ThemedText> and{' '}
-              <ThemedText type="code">@3x</ThemedText> suffixes to provide files for different
-              screen densities.
-            </ThemedText>
-            <Image source={require('@/assets/images/react-logo.png')} style={styles.imageReact} />
-            <ExternalLink href="https://reactnative.dev/docs/images">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
-
-          <Collapsible title="Light and dark mode components">
-            <ThemedText type="small">
-              This template has light and dark mode support. The{' '}
-              <ThemedText type="code">useColorScheme()</ThemedText> hook lets you inspect what the
-              user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-            </ThemedText>
-            <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
-
-          <Collapsible title="Animations">
-            <ThemedText type="small">
-              This template includes an example of an animated component. The{' '}
-              <ThemedText type="code">src/components/ui/collapsible.tsx</ThemedText> component uses
-              the powerful <ThemedText type="code">react-native-reanimated</ThemedText> library to
-              animate opening this hint.
-            </ThemedText>
-          </Collapsible>
-        </ThemedView>
-        {Platform.OS === 'web' && <WebBadge />}
-      </ThemedView>
-    </ScrollView>
+      {/* Results List */}
+      <FlatList
+        data={filteredProviders}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Image source={{ uri: item.image }} style={styles.cardImage as any} />
+            <View style={styles.cardContent}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardName}>{item.name}</Text>
+                <Text style={styles.cardPrice}>{item.price}</Text>
+              </View>
+              
+              <View style={styles.cardFooter}>
+                <Text style={styles.cardLoc}>📍 {item.district}</Text>
+                <Text style={styles.cardRating}>⭐ {item.rating} ({item.reviews} تقييم)</Text>
+              </View>
+            </View>
+          </View>
+        )}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>لم يتم العثور على أي نتائج مطابقة</Text>
+          </View>
+        }
+        contentContainerStyle={styles.resultsList}
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-  },
-  contentContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
   container: {
-    maxWidth: MaxContentWidth,
-    flexGrow: 1,
+    flex: 1,
+    backgroundColor: "hsl(220,15%,8%)"
   },
-  titleContainer: {
-    gap: Spacing.three,
-    alignItems: 'center',
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.six,
+  searchHeader: {
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8
   },
-  centerText: {
-    textAlign: 'center',
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "hsl(0,0%,98%)",
+    textAlign: "right"
   },
-  pressed: {
-    opacity: 0.7,
+  subtitle: {
+    fontSize: 12,
+    color: "hsl(210,8%,65%)",
+    marginTop: 6,
+    textAlign: "right",
+    marginBottom: 16
   },
-  linkButton: {
-    flexDirection: 'row',
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.two,
-    borderRadius: Spacing.five,
-    justifyContent: 'center',
-    gap: Spacing.one,
-    alignItems: 'center',
+  searchContainer: {
+    backgroundColor: "hsl(220,12%,14%)",
+    borderWidth: 1,
+    borderColor: "hsla(0,0%,100%,0.05)",
+    borderRadius: 12,
+    height: 48,
+    justifyContent: "center",
+    paddingHorizontal: 16
   },
-  sectionsWrapper: {
-    gap: Spacing.five,
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.three,
+  searchInput: {
+    color: "hsl(0,0%,98%)",
+    fontSize: 14,
+    textAlign: "right"
   },
-  collapsibleContent: {
-    alignItems: 'center',
+  filterSection: {
+    marginVertical: 12
   },
-  imageTutorial: {
-    width: '100%',
-    aspectRatio: 296 / 171,
-    borderRadius: Spacing.three,
-    marginTop: Spacing.two,
+  chipList: {
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    flexDirection: "row-reverse"
   },
-  imageReact: {
-    width: 100,
-    height: 100,
-    alignSelf: 'center',
+  filterChip: {
+    backgroundColor: "hsl(220,12%,14%)",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginLeft: 8,
+    borderWidth: 1,
+    borderColor: "hsla(0,0%,100%,0.05)"
   },
+  activeChip: {
+    backgroundColor: "hsl(45,60%,55%)",
+    borderColor: "hsl(45,60%,55%)"
+  },
+  chipText: {
+    fontSize: 12,
+    color: "hsl(210,8%,65%)",
+    fontWeight: "600"
+  },
+  activeChipText: {
+    color: "hsl(220,15%,8%)"
+  },
+  locChipList: {
+    paddingHorizontal: 16,
+    paddingTop: 4,
+    flexDirection: "row-reverse"
+  },
+  locChip: {
+    backgroundColor: "transparent",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    marginLeft: 8,
+    borderWidth: 1,
+    borderColor: "hsla(0,0%,100%,0.08)"
+  },
+  activeLocChip: {
+    borderColor: "hsl(45,60%,55%)",
+    backgroundColor: "hsla(45,60%,55%,0.08)"
+  },
+  locChipText: {
+    fontSize: 11,
+    color: "hsl(210,8%,65%)"
+  },
+  activeLocChipText: {
+    color: "hsl(45,60%,55%)"
+  },
+  resultsList: {
+    padding: 16
+  },
+  card: {
+    backgroundColor: "hsl(220,12%,14%)",
+    borderRadius: 16,
+    overflow: "hidden",
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "hsla(0,0%,100%,0.05)"
+  },
+  cardImage: {
+    width: "100%",
+    height: 150
+  },
+  cardContent: {
+    padding: 16
+  },
+  cardHeader: {
+    flexDirection: "row-reverse",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  cardName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "hsl(0,0%,98%)"
+  },
+  cardPrice: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "hsl(45,60%,55%)"
+  },
+  cardFooter: {
+    flexDirection: "row-reverse",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 12
+  },
+  cardLoc: {
+    fontSize: 12,
+    color: "hsl(210,8%,65%)"
+  },
+  cardRating: {
+    fontSize: 12,
+    color: "hsl(210,8%,65%)"
+  },
+  emptyContainer: {
+    padding: 40,
+    alignItems: "center"
+  },
+  emptyText: {
+    color: "hsl(210,8%,65%)",
+    fontSize: 14
+  }
 });
