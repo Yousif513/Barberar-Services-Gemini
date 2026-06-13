@@ -130,22 +130,22 @@ export default function Home() {
   const categories = [
     { 
       name: locale === "ar" ? "قص الشعر والحلاقة" : "Haircuts & Barbering", 
-      link: "/customer/search?category=barber", 
+      link: "/categories/barber", 
       image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=400&auto=format&fit=crop" 
     },
     { 
       name: locale === "ar" ? "تصفيف وتلوين الشعر" : "Hair Styling & Color", 
-      link: "/customer/search?category=hair", 
+      link: "/categories/hair", 
       image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=400&auto=format&fit=crop" 
     },
     { 
       name: locale === "ar" ? "غرف السبا والعافية" : "Wellness & Spa Rooms", 
-      link: "/customer/search?category=spa", 
+      link: "/categories/spa", 
       image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=400&auto=format&fit=crop" 
     },
     { 
       name: locale === "ar" ? "المكياج ومستحضرات التجميل" : "Makeup & Cosmetics", 
-      link: "/customer/search?category=makeup", 
+      link: "/categories/makeup", 
       image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=400&auto=format&fit=crop" 
     },
     { 
@@ -215,24 +215,16 @@ export default function Home() {
 
       {/* 2. HEADER */}
       <header className="bg-white border-b border-stone-200/80 py-5 px-6 sm:px-12 flex items-center justify-between sticky top-0 z-50 shadow-sm backdrop-blur-md bg-white/95">
-        <div className="flex items-center gap-12">
-          <Link href="/" className="text-2xl font-serif font-black tracking-widest text-stone-900 hover:opacity-80 transition">
-            PRIMORA
-          </Link>
-          <nav className="hidden lg:flex items-center gap-8 text-xs font-bold uppercase tracking-wider text-stone-500">
-            <Link href="/" className="text-stone-900 hover:text-stone-900 transition-colors">{t.home}</Link>
-            <Link href="/customer/search" className="hover:text-stone-950 transition-colors">{t.discover}</Link>
-            <Link href="/customer/jobs" className="hover:text-stone-950 transition-colors">{t.serviceBoard}</Link>
-            <Link href="/provider/dashboard" className="hover:text-stone-950 transition-colors">{t.becomeProvider}</Link>
-            <Link href="/about" className="hover:text-stone-950 transition-colors">{t.aboutUs}</Link>
-            <button
-              onClick={toggleLanguage}
-              className="text-[hsl(45,60%,45%)] hover:text-stone-950 transition-colors font-extrabold tracking-wider"
-            >
-              {locale === "en" ? "العربية" : "English"}
-            </button>
-          </nav>
-        </div>
+        <Link href="/" className="text-2xl font-serif font-black tracking-widest text-stone-900 hover:opacity-80 transition flex-shrink-0">
+          PRIMORA
+        </Link>
+        <nav className="hidden lg:flex items-center justify-center gap-8 text-xs font-bold uppercase tracking-wider text-stone-500 flex-1 mx-8">
+          <Link href="/" className="text-stone-900 hover:text-stone-900 transition-colors">{t.home}</Link>
+          <Link href="/customer/search" className="hover:text-stone-950 transition-colors">{t.discover}</Link>
+          <Link href="/customer/jobs" className="hover:text-stone-950 transition-colors">{t.serviceBoard}</Link>
+          <Link href="/provider/become" className="hover:text-stone-950 transition-colors">{t.becomeProvider}</Link>
+          <Link href="/about" className="hover:text-stone-950 transition-colors">{t.aboutUs}</Link>
+        </nav>
         
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-4">
@@ -571,18 +563,18 @@ export default function Home() {
           <div>
             <h5 className="text-white text-xs uppercase tracking-widest font-extrabold mb-4">{t.footerDiscover}</h5>
             <ul className="space-y-2 text-xs">
-              <li><Link href="/customer/search" className="hover:text-white transition">{categories[0].name}</Link></li>
-              <li><Link href="/customer/search?category=barber" className="hover:text-white transition">{categories[1].name}</Link></li>
-              <li><Link href="/customer/search?category=spa" className="hover:text-white transition">{categories[2].name}</Link></li>
-              <li><Link href="/customer/search?category=makeup" className="hover:text-white transition">{categories[3].name}</Link></li>
+              <li><Link href="/categories/barber" className="hover:text-white transition">{categories[0].name}</Link></li>
+              <li><Link href="/categories/hair" className="hover:text-white transition">{categories[1].name}</Link></li>
+              <li><Link href="/categories/spa" className="hover:text-white transition">{categories[2].name}</Link></li>
+              <li><Link href="/categories/makeup" className="hover:text-white transition">{categories[3].name}</Link></li>
             </ul>
           </div>
           <div>
             <h5 className="text-white text-xs uppercase tracking-widest font-extrabold mb-4">{t.footerPartners}</h5>
             <ul className="space-y-2 text-xs">
-              <li><Link href="/provider/dashboard" className="hover:text-white transition">{t.becomeProvider}</Link></li>
-              <li><Link href="/provider/dashboard" className="hover:text-white transition">{locale === "ar" ? "إدارة شؤون الموظفين" : "Staff Management"}</Link></li>
-              <li><Link href="/provider/dashboard" className="hover:text-white transition">{locale === "ar" ? "التسعير المشترك" : "Split Ledger Pricing"}</Link></li>
+              <li><Link href="/provider/become" className="hover:text-white transition">{t.becomeProvider}</Link></li>
+              <li><Link href="/provider/staff-management" className="hover:text-white transition">{locale === "ar" ? "إدارة شؤون الموظفين" : "Staff Management"}</Link></li>
+              <li><Link href="/provider/pricing" className="hover:text-white transition">{locale === "ar" ? "التسعير المشترك" : "Split Ledger Pricing"}</Link></li>
             </ul>
           </div>
           <div>
