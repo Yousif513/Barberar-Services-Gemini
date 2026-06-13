@@ -159,7 +159,7 @@ export default function HomeScreen() {
             .filter(p => !isHomeService || p.eligibleForHome)
             .map((provider) => (
               <View key={provider.id} style={styles.providerCard}>
-                <Image source={{ uri: provider.image }} style={styles.cardImg} />
+                <Image source={{ uri: provider.image }} style={styles.cardImg as any} />
                 <View style={styles.cardDetails}>
                   <Text style={styles.cardName}>{provider.name}</Text>
                   <Text style={styles.cardLoc}>📍 {provider.district}</Text>
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    justifyContent: "between",
+    justifyContent: "space-between",
     alignItems: "center",
     marginVertical: 16,
     width: "100%"
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
   },
   cardFooter: {
     flexDirection: "row",
-    justifyContent: "between",
+    justifyContent: "space-between",
     alignItems: "center",
     marginTop: 16,
     width: "100%"

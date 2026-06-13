@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   },
   sheetHeader: {
     flexDirection: "row",
-    justifyContent: "between",
+    justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 24,
     width: "100%"
