@@ -75,7 +75,7 @@ export default function AdminDisputes() {
         ]);
       }
     } catch (err) {
-      console.error(err);
+      console.warn("Offline disputes loader warning:", err);
       setError("Failed to fetch dispute flags.");
     } finally {
       setLoading(false);
@@ -99,7 +99,7 @@ export default function AdminDisputes() {
       setSuccess(`Dispute successfully resolved as ${action}!`);
     } catch (err) {
       setError("Failed to process dispute decision.");
-      console.error(err);
+      console.warn("Offline dispute resolution warning:", err);
     }
   };
 

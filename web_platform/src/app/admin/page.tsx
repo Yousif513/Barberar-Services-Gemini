@@ -37,7 +37,7 @@ export default function AdminDashboard() {
           ]);
         }
       } catch (err) {
-        console.error("Error loading admin stats:", err);
+        console.warn("Offline admin stats fallback warning:", err);
       } finally {
         setLoading(false);
       }

@@ -68,7 +68,7 @@ export default function AdminLedger() {
       }
     } catch (err) {
       setError("Failed to load platform splits ledger.");
-      console.error(err);
+      console.warn("Offline splits ledger warning:", err);
     } finally {
       setLoading(false);
     }
@@ -103,7 +103,7 @@ export default function AdminLedger() {
       loadLedger();
     } catch (err) {
       setError("Failed to release transaction payout split.");
-      console.error(err);
+      console.warn("Offline split release warning:", err);
     }
   };
 

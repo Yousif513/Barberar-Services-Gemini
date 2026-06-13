@@ -33,7 +33,7 @@ export default function AdminProviders() {
       }
     } catch (err: any) {
       setError("Failed to fetch provider registry.");
-      console.error(err);
+      console.warn("Offline fallback registry notice:", err);
     } finally {
       setLoading(false);
     }
@@ -68,7 +68,7 @@ export default function AdminProviders() {
       loadProviders();
     } catch (err: any) {
       setError("Failed to toggle provider verification status.");
-      console.error(err);
+      console.warn("Offline verification update notice:", err);
     }
   };
 
@@ -96,7 +96,7 @@ export default function AdminProviders() {
       loadProviders();
     } catch (err: any) {
       setError("Failed to update commission rate.");
-      console.error(err);
+      console.warn("Offline commission update notice:", err);
     }
   };
 

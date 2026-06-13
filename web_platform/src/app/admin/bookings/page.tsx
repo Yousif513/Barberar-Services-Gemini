@@ -60,7 +60,7 @@ export default function AdminBookings() {
           ]);
         }
       } catch (err) {
-        console.error("Error loading global bookings:", err);
+        console.warn("Offline global bookings warning:", err);
       } finally {
         setLoading(false);
       }
