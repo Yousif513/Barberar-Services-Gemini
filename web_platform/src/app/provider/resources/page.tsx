@@ -147,19 +147,19 @@ export default function ResourcesPage() {
           onClick={() => setShowAddForm(!showAddForm)}
           className="px-4 py-2 bg-black text-white hover:bg-gray-800 rounded-xl text-xs font-bold transition duration-150 flex items-center gap-2"
         >
-          {showAddForm ? "Close Form" : "➕ Add New Resource"}
+          {showAddForm ? "Close Form" : "Add New Resource"}
         </button>
       </div>
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-4">
-          ⚠️ {error}
+          Error: {error}
         </div>
       )}
 
       {success && (
         <div className="bg-green-50 border border-green-200 text-green-700 text-xs rounded-xl p-4">
-          ✅ {success}
+          Success: {success}
         </div>
       )}
 
@@ -239,7 +239,7 @@ export default function ResourcesPage() {
                   </span>
                 </div>
                 <h4 className="font-bold text-sm text-gray-800 mb-1">{res.name}</h4>
-                <p className="text-[10px] text-gray-500 font-semibold mb-6">👤 Max Capacity: {res.capacity} {res.capacity === 1 ? "person" : "people"}</p>
+                <p className="text-[10px] text-gray-500 font-semibold mb-6">Max Capacity: {res.capacity} {res.capacity === 1 ? "person" : "people"}</p>
               </div>
 
               <div className="flex gap-2">

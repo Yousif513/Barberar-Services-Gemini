@@ -96,7 +96,7 @@ export default function LoginPage() {
 
         {error && (
           <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-lg p-3.5 mb-6 text-center leading-relaxed font-semibold">
-            ⚠️ {error}
+            Error: {error}
           </div>
         )}
 
@@ -170,7 +170,7 @@ export default function LoginPage() {
               {/* Dev tip displaying the generated code for testing */}
               {mockCode && (
                 <div className="bg-[hsla(45,60%,55%,0.08)] border border-[hsla(45,60%,55%,0.2)] rounded-lg p-2.5 mt-2 text-xs font-semibold text-[hsl(45,60%,55%)]">
-                  🔑 Dev Test OTP Code: <span className="underline font-bold text-sm">{mockCode}</span>
+                  Dev Test OTP Code: <span className="underline font-bold text-sm">{mockCode}</span>
                 </div>
               )}
             </div>

@@ -147,10 +147,10 @@ export default function ProviderDashboardPage() {
 
   // Fallback lists
   const stats = [
-    { title: "Today's Revenue", value: revenueToday || "0 SAR", change: "+12% from yesterday", icon: "💰", color: "text-green-600 bg-green-50" },
-    { title: "Today's Bookings", value: bookingsTodayCount || "0", change: "+8% from yesterday", icon: "📅", color: "text-blue-600 bg-blue-50" },
-    { title: "Pending Requests", value: pendingCount || "0", change: "+2% from yesterday", icon: "⏳", color: "text-orange-600 bg-orange-50" },
-    { title: "Active Customers", value: activeCustomersCount || "0", change: "+15% from yesterday", icon: "👥", color: "text-indigo-600 bg-indigo-50" }
+    { title: "Today's Revenue", value: revenueToday || "0 SAR", change: "+12% from yesterday", color: "text-green-600 bg-green-50" },
+    { title: "Today's Bookings", value: bookingsTodayCount || "0", change: "+8% from yesterday", color: "text-blue-600 bg-blue-50" },
+    { title: "Pending Requests", value: pendingCount || "0", change: "+2% from yesterday", color: "text-orange-600 bg-orange-50" },
+    { title: "Active Customers", value: activeCustomersCount || "0", change: "+15% from yesterday", color: "text-indigo-600 bg-indigo-50" }
   ];
 
   const scheduleToRender = todaySchedule.length > 0 ? todaySchedule : [
@@ -193,7 +193,6 @@ export default function ProviderDashboardPage() {
               <p className="text-2xl font-bold tracking-tight text-gray-900">{stat.value}</p>
               <p className="text-[10px] text-green-600 font-bold">{stat.change}</p>
             </div>
-            <span className={`text-xl p-3 rounded-xl ${stat.color}`}>{stat.icon}</span>
           </div>
         ))}
       </div>

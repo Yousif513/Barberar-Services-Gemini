@@ -146,7 +146,7 @@ export default function CustomerDashboard() {
     <div className="space-y-8">
       {/* 1. WELCOME HEADER */}
       <div>
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900">Good Morning, {userName} 👋</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-gray-900">Good Morning, {userName}</h2>
         <p className="text-sm text-gray-500 mt-1">What would you like today?</p>
       </div>
 
@@ -247,7 +247,7 @@ export default function CustomerDashboard() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] font-bold text-gray-800">⭐ {rec.rating}</span>
+                  <span className="text-[10px] font-bold text-gray-800">Rating: {rec.rating}</span>
                 </div>
               </div>
             ))}
@@ -310,7 +310,6 @@ export default function CustomerDashboard() {
             <button className="px-4 py-2 bg-[hsl(45,60%,55%)] text-black font-bold text-[10px] rounded-lg hover:bg-[hsl(45,60%,45%)] transition duration-150">
               Refer Now
             </button>
-            <span className="text-4xl select-none">🎁</span>
           </div>
         </div>
 

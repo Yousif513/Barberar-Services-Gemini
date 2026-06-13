@@ -9,14 +9,14 @@ export default function Home() {
   const [date, setDate] = useState("");
 
   const categories = [
-    { name: "Haircuts", icon: "✂️", image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=300&auto=format&fit=crop" },
-    { name: "Barbers", icon: "🪒", image: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=300&auto=format&fit=crop" },
-    { name: "Hair Styling", icon: "💇‍♀️", image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=300&auto=format&fit=crop" },
-    { name: "Makeup", icon: "💄", image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=300&auto=format&fit=crop" },
-    { name: "Nails", icon: "💅", image: "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=300&auto=format&fit=crop" },
-    { name: "Skincare", icon: "🧖‍♀️", image: "https://images.unsplash.com/photo-1590439471364-192aa70c0b53?q=80&w=300&auto=format&fit=crop" },
-    { name: "Spa", icon: "🪔", image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=300&auto=format&fit=crop" },
-    { name: "Home Services", icon: "🏠", image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=300&auto=format&fit=crop" }
+    { name: "Haircuts", icon: "", image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=300&auto=format&fit=crop" },
+    { name: "Barbers", icon: "", image: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=300&auto=format&fit=crop" },
+    { name: "Hair Styling", icon: "", image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=300&auto=format&fit=crop" },
+    { name: "Makeup", icon: "", image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=300&auto=format&fit=crop" },
+    { name: "Nails", icon: "", image: "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=300&auto=format&fit=crop" },
+    { name: "Skincare", icon: "", image: "https://images.unsplash.com/photo-1590439471364-192aa70c0b53?q=80&w=300&auto=format&fit=crop" },
+    { name: "Spa", icon: "", image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=300&auto=format&fit=crop" },
+    { name: "Home Services", icon: "", image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=300&auto=format&fit=crop" }
   ];
 
   const professionals = [
@@ -142,7 +142,6 @@ export default function Home() {
               <div className="h-28 w-full rounded-xl overflow-hidden relative border border-gray-100 mb-3">
                 <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-300" />
-                <span className="absolute bottom-2 left-2 text-xl">{cat.icon}</span>
               </div>
               <h4 className="text-xs font-bold text-gray-800 text-center">{cat.name}</h4>
             </div>
@@ -169,7 +168,7 @@ export default function Home() {
                 <div>
                   <h4 className="font-bold text-sm text-black">{prof.name}</h4>
                   <p className="text-[10px] text-gray-500 font-semibold mt-1">{prof.role}</p>
-                  <p className="text-[10px] font-semibold text-gray-400 mt-2">⭐ {prof.rating}</p>
+                  <p className="text-[10px] font-semibold text-gray-400 mt-2">Rating: {prof.rating}</p>
                   <p className="text-[9px] text-[hsl(150,60%,40%)] bg-[hsla(150,60%,40%,0.05)] border border-[hsla(150,60%,40%,0.15)] rounded-full px-2 py-0.5 inline-block mt-3 font-semibold">
                     {prof.status}
                   </p>
@@ -188,21 +187,18 @@ export default function Home() {
         <h2 className="text-xl sm:text-2xl font-extrabold text-center mb-12">How It Works</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto">
           <div className="flex flex-col items-center text-center space-y-4">
-            <span className="text-3xl p-4 bg-white/5 rounded-full border border-white/10">🔍</span>
             <h4 className="font-bold text-sm">1. Find</h4>
             <p className="text-xs text-gray-400 max-w-xs leading-relaxed">
               Find the perfect service and professional based on reviews, location, and price.
             </p>
           </div>
           <div className="flex flex-col items-center text-center space-y-4">
-            <span className="text-3xl p-4 bg-white/5 rounded-full border border-white/10">📅</span>
             <h4 className="font-bold text-sm">2. Book</h4>
             <p className="text-xs text-gray-400 max-w-xs leading-relaxed">
               Choose your preferred date and time, and book instantly with secure online checkout.
             </p>
           </div>
           <div className="flex flex-col items-center text-center space-y-4">
-            <span className="text-3xl p-4 bg-white/5 rounded-full border border-white/10">✨</span>
             <h4 className="font-bold text-sm">3. Enjoy</h4>
             <p className="text-xs text-gray-400 max-w-xs leading-relaxed">
               Sit back, relax, and enjoy the premium beauty and grooming experience you deserve.

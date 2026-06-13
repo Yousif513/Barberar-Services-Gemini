@@ -156,13 +156,13 @@ export default function ProviderJobsPage() {
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-4">
-          ⚠️ {error}
+          Error: {error}
         </div>
       )}
 
       {success && (
         <div className="bg-green-50 border border-green-200 text-green-700 text-xs rounded-xl p-4">
-          ✅ {success}
+          Success: {success}
         </div>
       )}
 
@@ -182,8 +182,8 @@ export default function ProviderJobsPage() {
                 </div>
                 <p className="text-xs text-gray-500 leading-relaxed">{job.description}</p>
                 <div className="flex flex-wrap gap-x-6 gap-y-1 text-[10px] text-gray-400 font-bold uppercase mt-2">
-                  <span>📍 Area: <strong className="text-gray-600 font-bold">{job.address_text}</strong></span>
-                  <span>📅 Date: <strong className="text-gray-600 font-bold">{new Date(job.target_date).toLocaleString()}</strong></span>
+                  <span>Area: <strong className="text-gray-600 font-bold">{job.address_text}</strong></span>
+                  <span>Date: <strong className="text-gray-600 font-bold">{new Date(job.target_date).toLocaleString()}</strong></span>
                 </div>
               </div>
 
@@ -216,9 +216,11 @@ export default function ProviderJobsPage() {
                 <h3 className="font-extrabold text-sm text-gray-900">{activeJob.title}</h3>
                 <button
                   onClick={() => setActiveJob(null)}
-                  className="text-gray-400 hover:text-gray-600 text-xs font-bold"
+                  className="text-gray-400 hover:text-gray-600"
                 >
-                  ✕
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
               <p className="text-xs text-gray-500 mt-2">{activeJob.description}</p>

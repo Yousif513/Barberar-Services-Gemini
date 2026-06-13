@@ -239,19 +239,19 @@ export default function CustomerJobsPage() {
           onClick={() => setShowAddForm(!showAddForm)}
           className="px-4 py-2 bg-black text-white hover:bg-gray-800 rounded-xl text-xs font-bold transition duration-150 flex items-center gap-2"
         >
-          {showAddForm ? "Close Form" : "🛠️ Post Service Request"}
+          {showAddForm ? "Close Form" : "Post Service Request"}
         </button>
       </div>
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-4">
-          ⚠️ {error}
+          Error: {error}
         </div>
       )}
 
       {success && (
         <div className="bg-green-50 border border-green-200 text-green-700 text-xs rounded-xl p-4">
-          ✅ {success}
+          Success: {success}
         </div>
       )}
 
@@ -366,8 +366,8 @@ export default function CustomerJobsPage() {
                   <p className="text-xs text-gray-500 mt-2 leading-relaxed">{post.description}</p>
                   
                   <div className="flex flex-wrap gap-x-6 gap-y-2 mt-4 text-[10px] text-gray-400 font-bold uppercase">
-                    <span>📍 Address: <strong className="text-gray-600 font-bold">{post.address_text}</strong></span>
-                    <span>📅 Date: <strong className="text-gray-600 font-bold">{new Date(post.target_date).toLocaleString()}</strong></span>
+                    <span>Address: <strong className="text-gray-600 font-bold">{post.address_text}</strong></span>
+                    <span>Date: <strong className="text-gray-600 font-bold">{new Date(post.target_date).toLocaleString()}</strong></span>
                   </div>
                 </div>
 

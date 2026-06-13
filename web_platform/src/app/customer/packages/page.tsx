@@ -111,7 +111,7 @@ export default function CustomerPackagesPage() {
 
       {error && (
         <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl p-4">
-          ℹ️ {error}
+          Notice: {error}
         </div>
       )}
 
@@ -137,7 +137,6 @@ export default function CustomerPackagesPage() {
                       </span>
                       <h3 className="font-bold text-sm text-gray-800 mt-1">{item.packages.name_en}</h3>
                     </div>
-                    <span className="text-lg">🎁</span>
                   </div>
 
                   <p className="text-xs text-gray-500 mb-6">{item.packages.description_en}</p>

@@ -55,7 +55,7 @@ function BookingContent() {
 
   const handleBook = async () => {
     if (!selectedDate || !selectedSlot) {
-      setMessage("⚠️ Please select a date and an available time slot.");
+      setMessage("Error: Please select a date and an available time slot.");
       return;
     }
 
@@ -71,13 +71,13 @@ function BookingContent() {
       if (data?.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else {
-        setMessage("🎉 Booking request received! Redirecting to dashboard...");
+        setMessage("Success: Booking request received! Redirecting to dashboard...");
         setTimeout(() => {
           router.push("/customer/dashboard");
         }, 2000);
       }
     } catch (err: any) {
-      setMessage("🎉 Booking request received! Redirecting to dashboard...");
+      setMessage("Success: Booking request received! Redirecting to dashboard...");
       setTimeout(() => {
         router.push("/customer/dashboard");
       }, 2000);
@@ -101,7 +101,7 @@ function BookingContent() {
       {/* Provider Details Header */}
       <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
         <h2 className="text-xl font-bold text-gray-900">{provider.name}</h2>
-        <p className="text-xs text-gray-400 mt-1">📍 {provider.district}</p>
+        <p className="text-xs text-gray-400 mt-1">Location: {provider.district}</p>
         <p className="text-xs text-gray-500 mt-4 leading-relaxed">{provider.description}</p>
       </div>
 
@@ -150,7 +150,7 @@ function BookingContent() {
               <div className="space-y-3">
                 <h3 className="font-bold text-sm text-gray-800">Available Time Slots</h3>
                 <p className="text-[10px] text-red-500 font-bold leading-relaxed">
-                  ⚠️ Riyadh Prayer Time Slots are blocked automatically (20-minute gap buffers).
+                  Riyadh Prayer Time Slots are blocked automatically (20-minute gap buffers).
                 </p>
                 <div className="grid grid-cols-4 gap-2">
                   {getAvailableSlots().map((slot) => (

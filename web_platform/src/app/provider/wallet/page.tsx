@@ -142,7 +142,10 @@ export default function ProviderWalletPage() {
           <p className="text-xs text-[hsl(210,8%,65%)] mt-1">{t.iban}</p>
         </div>
         <span className="px-3 py-1 bg-[hsla(150,60%,40%,0.08)] text-[hsl(150,60%,40%)] rounded-full text-xs font-bold flex items-center gap-1.5 border border-[hsla(150,60%,40%,0.2)]">
-          ✔ {t.verified}
+          <svg className="w-3 h-3 text-[hsl(150,60%,40%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+          </svg>
+          {t.verified}
         </span>
       </div>
 

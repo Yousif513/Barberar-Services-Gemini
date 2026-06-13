@@ -65,19 +65,19 @@ export default function ProviderLayout({
   }, [locale]);
 
   const navItems = [
-    { name: t.dashboard, path: "/provider/dashboard", icon: "📊" },
-    { name: t.calendar, path: "/provider/calendar", icon: "📅" },
-    { name: t.bookings, path: "/provider/bookings", icon: "📝" },
-    { name: t.services, path: "/provider/services", icon: "✂️" },
-    { name: t.resources, path: "/provider/resources", icon: "🚪" },
-    { name: t.packages, path: "/provider/packages", icon: "🎁" },
-    { name: t.jobs, path: "/provider/jobs", icon: "🛠️" },
-    { name: t.employees, path: "/provider/team", icon: "👥" }, // links to team folder
-    { name: t.customers, path: "/provider/customers", icon: "👤" },
-    { name: t.reviews, path: "/provider/reviews", icon: "⭐" },
-    { name: t.promotions, path: "/provider/promotions", icon: "🏷️" },
-    { name: t.reports, path: "/provider/reports", icon: "📈" },
-    { name: t.settings, path: "/provider/settings", icon: "⚙️" },
+    { name: t.dashboard, path: "/provider/dashboard", icon: "" },
+    { name: t.calendar, path: "/provider/calendar", icon: "" },
+    { name: t.bookings, path: "/provider/bookings", icon: "" },
+    { name: t.services, path: "/provider/services", icon: "" },
+    { name: t.resources, path: "/provider/resources", icon: "" },
+    { name: t.packages, path: "/provider/packages", icon: "" },
+    { name: t.jobs, path: "/provider/jobs", icon: "" },
+    { name: t.employees, path: "/provider/team", icon: "" }, // links to team folder
+    { name: t.customers, path: "/provider/customers", icon: "" },
+    { name: t.reviews, path: "/provider/reviews", icon: "" },
+    { name: t.promotions, path: "/provider/promotions", icon: "" },
+    { name: t.reports, path: "/provider/reports", icon: "" },
+    { name: t.settings, path: "/provider/settings", icon: "" },
   ];
 
   return (
@@ -88,7 +88,6 @@ export default function ProviderLayout({
         <div>
           {/* Logo */}
           <div className="flex items-center gap-3 mb-8 px-2">
-            <span className="text-2xl">✨</span>
             <Link href="/" className="text-xl font-bold tracking-wider text-[hsl(45,60%,55%)]">
               PRIMORA
             </Link>
@@ -108,7 +107,6 @@ export default function ProviderLayout({
                       : "text-gray-400 hover:bg-[hsla(0,0%,100%,0.03)] hover:text-white"
                   }`}
                 >
-                  <span className="text-sm">{item.icon}</span>
                   <span>{item.name}</span>
                 </Link>
               );
@@ -119,7 +117,6 @@ export default function ProviderLayout({
         {/* Sidebar Footer */}
         <div className="pt-6 border-t border-[hsla(0,0%,100%,0.08)]">
           <Link href="/" className="w-full flex items-center gap-4 px-4 py-3 rounded-lg text-xs font-semibold text-red-500 hover:bg-[hsla(0,0%,100%,0.03)] transition-all duration-200">
-            <span>🚪</span>
             <span>{t.logout}</span>
           </Link>
         </div>
@@ -130,7 +127,9 @@ export default function ProviderLayout({
         {/* HEADER */}
         <header className="h-20 bg-white border-b border-gray-200 px-8 flex items-center justify-between">
           <div className="flex items-center gap-4 bg-gray-50 px-4 py-2 rounded-lg border border-gray-100 w-72">
-            <span>🔍</span>
+            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
             <input
               type="text"
               placeholder={t.searchPlaceholder}

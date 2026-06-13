@@ -59,16 +59,16 @@ export default function CustomerLayout({
   }, [locale]);
 
   const navItems = [
-    { name: t.dashboard, path: "/customer/dashboard", icon: "📊" },
-    { name: t.bookings, path: "/customer/bookings", icon: "📅" },
-    { name: t.packages, path: "/customer/packages", icon: "🎁" },
-    { name: t.jobs, path: "/customer/jobs", icon: "🛠️" },
-    { name: t.favorites, path: "/customer/favorites", icon: "❤️" },
-    { name: t.messages, path: "/customer/messages", icon: "💬", badge: 3 },
-    { name: t.reviews, path: "/customer/reviews", icon: "⭐" },
-    { name: t.wallet, path: "/customer/wallet", icon: "💳" },
-    { name: t.notifications, path: "/customer/notifications", icon: "🔔" },
-    { name: t.settings, path: "/customer/settings", icon: "⚙️" },
+    { name: t.dashboard, path: "/customer/dashboard", icon: "" },
+    { name: t.bookings, path: "/customer/bookings", icon: "" },
+    { name: t.packages, path: "/customer/packages", icon: "" },
+    { name: t.jobs, path: "/customer/jobs", icon: "" },
+    { name: t.favorites, path: "/customer/favorites", icon: "" },
+    { name: t.messages, path: "/customer/messages", icon: "", badge: 3 },
+    { name: t.reviews, path: "/customer/reviews", icon: "" },
+    { name: t.wallet, path: "/customer/wallet", icon: "" },
+    { name: t.notifications, path: "/customer/notifications", icon: "" },
+    { name: t.settings, path: "/customer/settings", icon: "" },
   ];
 
   return (
@@ -79,7 +79,6 @@ export default function CustomerLayout({
         <div>
           {/* Logo */}
           <div className="flex items-center gap-3 mb-8 px-2">
-            <span className="text-2xl">✨</span>
             <Link href="/" className="text-xl font-bold tracking-wider text-[hsl(45,60%,55%)]">
               PRIMORA
             </Link>
@@ -100,7 +99,6 @@ export default function CustomerLayout({
                   }`}
                 >
                   <div className="flex items-center gap-4">
-                    <span className="text-sm">{item.icon}</span>
                     <span>{item.name}</span>
                   </div>
                   {item.badge && (
@@ -114,10 +112,9 @@ export default function CustomerLayout({
           </nav>
         </div>
 
-        {/* Sidebar Footer */}
+         {/* Sidebar Footer */}
         <div className="pt-6 border-t border-[hsla(0,0%,100%,0.08)]">
           <Link href="/" className="w-full flex items-center gap-4 px-4 py-3 rounded-lg text-xs font-semibold text-red-500 hover:bg-[hsla(0,0%,100%,0.03)] transition-all duration-200">
-            <span>🚪</span>
             <span>{t.logout}</span>
           </Link>
         </div>
@@ -128,7 +125,9 @@ export default function CustomerLayout({
         {/* HEADER */}
         <header className="h-20 bg-white border-b border-gray-200 px-8 flex items-center justify-between">
           <div className="flex items-center gap-4 bg-gray-50 px-4 py-2 rounded-lg border border-gray-100 w-72">
-            <span>🔍</span>
+            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
             <input
               type="text"
               placeholder={t.searchPlaceholder}

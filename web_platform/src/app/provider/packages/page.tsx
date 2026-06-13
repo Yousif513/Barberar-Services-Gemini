@@ -182,19 +182,19 @@ export default function PackagesPage() {
           onClick={() => setShowAddForm(!showAddForm)}
           className="px-4 py-2 bg-black text-white hover:bg-gray-800 rounded-xl text-xs font-bold transition duration-150 flex items-center gap-2"
         >
-          {showAddForm ? "Close Form" : "➕ Create Wellness Package"}
+          {showAddForm ? "Close Form" : "Create Wellness Package"}
         </button>
       </div>
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-4">
-          ⚠️ {error}
+          Error: {error}
         </div>
       )}
 
       {success && (
         <div className="bg-green-50 border border-green-200 text-green-700 text-xs rounded-xl p-4">
-          ✅ {success}
+          Success: {success}
         </div>
       )}
 
@@ -309,7 +309,7 @@ export default function PackagesPage() {
               <div>
                 <div className="flex justify-between items-start mb-3">
                   <span className="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200 rounded px-2 py-0.5">
-                    🎁 {pkg.session_count} Sessions
+                    {pkg.session_count} Sessions
                   </span>
                   <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${
                     pkg.is_active ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"
