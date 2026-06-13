@@ -8,39 +8,35 @@ import { usePathname } from "next/navigation";
 const translations = {
   en: {
     dashboard: "Dashboard",
-    calendar: "Calendar",
     bookings: "Bookings",
-    services: "Services",
-    employees: "Employees",
-    customers: "Customers",
+    favorites: "Favorites",
+    messages: "Messages",
     reviews: "Reviews",
-    promotions: "Promotions",
-    reports: "Reports",
+    wallet: "Wallet",
+    notifications: "Notifications",
     settings: "Settings",
     logout: "Log Out",
     welcome: "Welcome back,",
-    searchPlaceholder: "Search...",
+    searchPlaceholder: "Search services...",
     langSwitch: "العربية"
   },
   ar: {
     dashboard: "لوحة التحكم",
-    calendar: "التقويم",
     bookings: "الحجوزات",
-    services: "الخدمات",
-    employees: "الموظفين",
-    customers: "العملاء",
+    favorites: "المفضلة",
+    messages: "الرسائل",
     reviews: "التقييمات",
-    promotions: "العروض الترويجية",
-    reports: "التقارير",
+    wallet: "المحفظة",
+    notifications: "التنبيهات",
     settings: "الإعدادات",
     logout: "تسجيل الخروج",
     welcome: "مرحباً بك،",
-    searchPlaceholder: "البحث...",
+    searchPlaceholder: "البحث عن الخدمات...",
     langSwitch: "English"
   }
 };
 
-export default function ProviderLayout({
+export default function CustomerLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -59,16 +55,14 @@ export default function ProviderLayout({
   }, [locale]);
 
   const navItems = [
-    { name: t.dashboard, path: "/provider/dashboard", icon: "📊" },
-    { name: t.calendar, path: "/provider/calendar", icon: "📅" },
-    { name: t.bookings, path: "/provider/bookings", icon: "📝" },
-    { name: t.services, path: "/provider/services", icon: "✂️" },
-    { name: t.employees, path: "/provider/team", icon: "👥" }, // links to team folder
-    { name: t.customers, path: "/provider/customers", icon: "👤" },
-    { name: t.reviews, path: "/provider/reviews", icon: "⭐" },
-    { name: t.promotions, path: "/provider/promotions", icon: "🏷️" },
-    { name: t.reports, path: "/provider/reports", icon: "📈" },
-    { name: t.settings, path: "/provider/settings", icon: "⚙️" },
+    { name: t.dashboard, path: "/customer/dashboard", icon: "📊" },
+    { name: t.bookings, path: "/customer/bookings", icon: "📅" },
+    { name: t.favorites, path: "/customer/favorites", icon: "❤️" },
+    { name: t.messages, path: "/customer/messages", icon: "💬", badge: 3 },
+    { name: t.reviews, path: "/customer/reviews", icon: "⭐" },
+    { name: t.wallet, path: "/customer/wallet", icon: "💳" },
+    { name: t.notifications, path: "/customer/notifications", icon: "🔔" },
+    { name: t.settings, path: "/customer/settings", icon: "⚙️" },
   ];
 
   return (
@@ -93,14 +87,21 @@ export default function ProviderLayout({
                 <Link
                   key={item.path}
                   href={item.path}
-                  className={`flex items-center gap-4 px-4 py-3 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                  className={`flex items-center justify-between px-4 py-3 rounded-lg text-xs font-semibold transition-all duration-200 ${
                     isActive
                       ? "bg-[hsla(0,0%,100%,0.08)] text-[hsl(45,60%,55%)]"
                       : "text-gray-400 hover:bg-[hsla(0,0%,100%,0.03)] hover:text-white"
                   }`}
                 >
-                  <span className="text-sm">{item.icon}</span>
-                  <span>{item.name}</span>
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm">{item.icon}</span>
+                    <span>{item.name}</span>
+                  </div>
+                  {item.badge && (
+                    <span className="bg-[hsl(45,60%,55%)] text-black font-bold text-[9px] w-4 h-4 rounded-full flex items-center justify-center">
+                      {item.badge}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -142,10 +143,10 @@ export default function ProviderLayout({
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
                 <p className="text-[10px] text-gray-400 font-bold">{t.welcome}</p>
-                <p className="text-xs font-bold text-gray-800">Elite Barbershop</p>
+                <p className="text-xs font-bold text-gray-800">Yousif</p>
               </div>
-              <div className="w-10 h-10 rounded-full bg-[hsl(45,60%,55%)] text-black font-bold flex items-center justify-center border border-gray-100">
-                EB
+              <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100">
+                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=200&auto=format&fit=crop" alt="Yousif" className="w-full h-full object-cover" />
               </div>
             </div>
           </div>
