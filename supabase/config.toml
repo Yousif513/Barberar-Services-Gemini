@@ -19,15 +19,17 @@ enabled = true
 port = 54323
 
 [auth]
-enabled = true
 site_url = "http://localhost:3000"
 additional_redirect_urls = ["http://localhost:3000/*", "exp://*"]
 jwt_expiry = 3600
 
 [auth.sms]
-enabled = true
+enable_signup = true
+enable_confirmations = false
+
+[auth.sms.test_otp]
 # SMS/WhatsApp OTP local testing provider
-test_otp = { "+966500000000" = "123456" }
+"+966500000000" = "123456"
 
 [storage]
 enabled = true
