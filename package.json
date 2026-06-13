@@ -16,6 +16,8 @@
     "mobile:start": "npm run start --workspace=mobile_app"
   },
   "devDependencies": {
-    "supabase": "^1.150.0"
+    "supabase": "^1.150.0",
+    "expo": "~56.0.11",
+    "expo-router": "~56.2.10"
   }
 }

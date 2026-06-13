@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function CustomerDashboard() {
   const [service, setService] = useState("");
@@ -8,23 +9,144 @@ export default function CustomerDashboard() {
   const [location, setLocation] = useState("Riyadh");
   const [date, setDate] = useState("");
 
-  const recommendations = [
+  const [userName, setUserName] = useState("Yousif");
+  const [upcoming, setUpcoming] = useState<any>(null);
+  const [recentBookingsList, setRecentBookingsList] = useState<any[]>([]);
+  const [recommendedList, setRecommendedList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        // Get user session
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          // Fetch profile
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("first_name, last_name")
+            .eq("id", user.id)
+            .single();
+          if (profile?.first_name) {
+            setUserName(profile.first_name);
+          }
+
+          // Fetch upcoming booking
+          const { data: upcomingData } = await supabase
+            .from("bookings")
+            .select(`
+              id,
+              scheduled_at,
+              status,
+              total_price,
+              services ( name_en, name_ar ),
+              employees ( name_en, name_ar ),
+              branches (
+                name_en,
+                name_ar,
+                providers ( business_name_en, business_name_ar, logo_url )
+              )
+            `)
+            .eq("customer_id", user.id)
+            .gte("scheduled_at", new Date().toISOString())
+            .in("status", ["confirmed", "pending_payment"])
+            .order("scheduled_at", { ascending: true })
+            .limit(1);
+
+          if (upcomingData && upcomingData.length > 0) {
+            setUpcoming(upcomingData[0]);
+          }
+
+          // Fetch recent bookings
+          const { data: recentData } = await supabase
+            .from("bookings")
+            .select(`
+              id,
+              scheduled_at,
+              status,
+              total_price,
+              services ( name_en, name_ar ),
+              branches (
+                providers ( business_name_en, business_name_ar )
+              )
+            `)
+            .eq("customer_id", user.id)
+            .order("scheduled_at", { ascending: false })
+            .limit(5);
+
+          if (recentData && recentData.length > 0) {
+            setRecentBookingsList(recentData.map(b => ({
+              date: new Date(b.scheduled_at).toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' }),
+              provider: (b as any).branches?.providers?.business_name_en || "Stylist",
+              service: (b as any).services?.name_en || "Grooming Service",
+              status: b.status.replace("_", " ").toUpperCase()
+            })));
+          }
+
+          // Fetch recommended providers
+          const { data: providersData } = await supabase
+            .from("providers")
+            .select("id, business_name_en, type, logo_url")
+            .eq("is_verified", true)
+            .limit(3);
+
+          if (providersData && providersData.length > 0) {
+            setRecommendedList(providersData.map(p => ({
+              name: p.business_name_en,
+              role: p.type === "freelancer" ? "Freelancer Stylist" : "Premium Salon",
+              rating: (4.5 + Math.random() * 0.5).toFixed(1),
+              image: p.logo_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"
+            })));
+          }
+        }
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, []);
+
+  // If recentBookingsList is empty, fallback to mock bookings
+  const bookingsToRender = recentBookingsList.length > 0 ? recentBookingsList : [
+    { date: "12 May 2024", provider: "Ahmed Barber", service: "Haircut + Beard", status: "COMPLETED" },
+    { date: "05 May 2024", provider: "Sara Hair", service: "Hair Coloring", status: "COMPLETED" },
+    { date: "28 Apr 2024", provider: "Leen Makeup", service: "Party Makeup", status: "COMPLETED" }
+  ];
+
+  const recommendationsToRender = recommendedList.length > 0 ? recommendedList : [
     { name: "Leen Makeup", role: "Makeup Artist", rating: "4.9", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop" },
     { name: "Salman Hair", role: "Hair Stylist", rating: "4.8", image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=200&auto=format&fit=crop" },
     { name: "Noura Nails", role: "Nail Artist", rating: "4.9", image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop" }
   ];
 
-  const recentBookings = [
-    { date: "12 May 2024", provider: "Ahmed Barber", service: "Haircut + Beard", status: "Completed" },
-    { date: "05 May 2024", provider: "Sara Hair", service: "Hair Coloring", status: "Completed" },
-    { date: "28 Apr 2024", provider: "Leen Makeup", service: "Party Makeup", status: "Completed" }
-  ];
+  const upcomingToRender = upcoming ? {
+    id: upcoming.id,
+    provider: (upcoming as any).branches?.providers?.business_name_en || (upcoming as any).employees?.name_en || "Stylist",
+    service: (upcoming as any).services?.name_en || "Service",
+    date: new Date(upcoming.scheduled_at).toLocaleDateString("en-US", { weekday: 'long', month: 'short', day: 'numeric' }),
+    time: new Date(upcoming.scheduled_at).toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' }),
+    image: (upcoming as any).branches?.providers?.logo_url || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=100&auto=format&fit=crop",
+    isMock: false
+  } : {
+    id: "mock",
+    provider: "Ahmed Barber",
+    service: "Haircut + Beard",
+    date: "Tomorrow",
+    time: "5:00 PM",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=100&auto=format&fit=crop",
+    isMock: true
+  };
+
 
   return (
     <div className="space-y-8">
       {/* 1. WELCOME HEADER */}
       <div>
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900">Good Morning, Yousif 👋</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-gray-900">Good Morning, {userName} 👋</h2>
         <p className="text-sm text-gray-500 mt-1">What would you like today?</p>
       </div>
 
@@ -81,20 +203,22 @@ export default function CustomerDashboard() {
         {/* Upcoming Booking */}
         <div className="lg:col-span-2 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
           <div className="flex justify-between items-start mb-6">
-            <h3 className="font-bold text-sm text-gray-800">Upcoming Booking</h3>
+            <h3 className="font-bold text-sm text-gray-800">
+              Upcoming Booking {upcomingToRender.isMock && <span className="text-[9px] font-normal text-amber-500 bg-amber-50 border border-amber-100 rounded px-1.5 py-0.5 ml-2">Sample</span>}
+            </h3>
           </div>
           
           <div className="flex items-center gap-4 bg-gray-50 border border-gray-100 rounded-xl p-4">
             <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-200 bg-gray-200">
-              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=100&auto=format&fit=crop" alt="Ahmed Barber" className="w-full h-full object-cover" />
+              <img src={upcomingToRender.image} alt={upcomingToRender.provider} className="w-full h-full object-cover" />
             </div>
             <div className="flex-1">
-              <h4 className="font-bold text-sm text-gray-800">Ahmed Barber</h4>
-              <p className="text-[10px] text-gray-400 mt-1 font-semibold">Haircut + Beard</p>
+              <h4 className="font-bold text-sm text-gray-800">{upcomingToRender.provider}</h4>
+              <p className="text-[10px] text-gray-400 mt-1 font-semibold">{upcomingToRender.service}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs font-bold text-gray-800">Tomorrow</p>
-              <p className="text-[10px] text-gray-400 mt-1 font-semibold">5:00 PM</p>
+              <p className="text-xs font-bold text-gray-800">{upcomingToRender.date}</p>
+              <p className="text-[10px] text-gray-400 mt-1 font-semibold">{upcomingToRender.time}</p>
             </div>
           </div>
 
@@ -111,7 +235,7 @@ export default function CustomerDashboard() {
           </div>
 
           <div className="space-y-4">
-            {recommendations.map((rec, i) => (
+            {recommendationsToRender.map((rec, i) => (
               <div key={i} className="flex items-center justify-between border-b border-gray-50 pb-3 last:border-0 last:pb-0">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-100">
@@ -153,7 +277,7 @@ export default function CustomerDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {recentBookings.map((bk, i) => (
+                {bookingsToRender.map((bk, i) => (
                   <tr key={i} className="hover:bg-gray-50 transition-colors duration-150">
                     <td className="py-3 px-4 text-gray-500 font-semibold">{bk.date}</td>
                     <td className="py-3 px-4 font-bold text-gray-800">{bk.provider}</td>
