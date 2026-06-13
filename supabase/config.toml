@@ -1,0 +1,37 @@
+# Supabase Configuration File (Local Development)
+
+project_id = "beauty_grooming_marketplace"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql", "extensions"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/*", "exp://*"]
+jwt_expiry = 3600
+
+[auth.sms]
+enabled = true
+# SMS/WhatsApp OTP local testing provider
+test_otp = { "+966500000000" = "123456" }
+
+[storage]
+enabled = true
+file_size_limit = "50MB"
+
+[analytics]
+enabled = false

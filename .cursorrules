@@ -1,0 +1,42 @@
+# Beauty & Grooming Marketplace - Cursor & Workspace Rules
+
+This file instructs AI coding assistants on our directory structure, tech stack, database schemas, coding standards, and regional Saudi Arabian localization parameters.
+
+---
+
+## 1. Tech Stack & Architecture
+* **Frontend**: Next.js (TypeScript, React) for Web & Dashboards.
+* **Mobile**: React Native (Expo CLI) or Flutter for B2C native applications.
+* **Backend & DB**: Supabase (PostgreSQL, Edge Functions, Auth, Storage).
+* **Styles**: Vanilla CSS for layouts, custom HSL color tokens.
+* **Payments**: Tap Payments / Moyasar SDK (supporting Mada, Apple Pay).
+* **Notifications**: WhatsApp Business API (Twilio / Unifonic).
+
+---
+
+## 2. Directory Structure
+* `/bmad_framework/`: Business, Product, UX, and Architecture documentation.
+* `/web_platform/`: Next.js web application for consumer landing and dashboards.
+* `/mobile_app/`: React Native Expo mobile application for customers.
+* `/supabase/`: Database migrations, security schemas, and edge functions.
+
+---
+
+## 3. Database Schema Reference
+All data access must respect the following schema and Row-Level Security (RLS) policies:
+* **`profiles`**: User records. Roles: `customer`, `provider_owner`, `provider_employee`, `admin`.
+* **`providers`**: Business profiles. Types: `salon_barber_shop`, `freelancer`.
+* **`branches`**: Geolocation coordinates (latitude, longitude) & geofenced radius.
+* **`employees`**: Staff profiles & branch assignments.
+* **`services`**: Service catalogs & price variants.
+* **`bookings`**: Statuses: `pending_payment`, `confirmed`, `completed`, `cancelled`, `no_show`.
+* **`transactional_ledger`**: Stripe / Tap payments splits.
+
+---
+
+## 4. Coding & Localization Rules (KSA)
+* **Bilingual UI (AR/EN)**: All UI components must support translations. Direct hardcoding of strings is prohibited.
+* **RTL Mirroring**: Enable Right-to-Left (RTL) mirroring when locale is Arabic (`dir="rtl"`). Mirror flex rows, navigation controls, and icons.
+* **Prayer Times calendar Block**: Availability algorithms must automatically block 20 minutes around local prayer times in Riyadh.
+* **Escrow Splits**: Online transactions split captured funds between platform, salon, and freelancer ledgers at the API layer.
+* **No Placeholders**: Never write placeholders, mockup stubs, or "TODO" comments. Implement complete code structures.

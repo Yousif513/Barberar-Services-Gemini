@@ -1,0 +1,21 @@
+{
+  "name": "beauty-grooming-marketplace",
+  "version": "1.0.0",
+  "description": "Beauty & Grooming Marketplace Platform in Saudi Arabia",
+  "private": true,
+  "workspaces": [
+    "web_platform",
+    "mobile_app"
+  ],
+  "scripts": {
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:db-reset": "supabase db reset",
+    "supabase:status": "supabase status",
+    "web:dev": "npm run dev --workspace=web_platform",
+    "mobile:start": "npm run start --workspace=mobile_app"
+  },
+  "devDependencies": {
+    "supabase": "^1.150.0"
+  }
+}
