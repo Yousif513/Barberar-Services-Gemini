@@ -1,36 +1,155 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 
+const translations = {
+  en: {
+    promoText: "Book Premier Home Service & Salon Appointments in Riyadh",
+    promoSub: "Get 15% off your first booking - Use code:",
+    home: "Home",
+    discover: "Discover",
+    serviceBoard: "Service Board",
+    becomeProvider: "Become a Provider",
+    aboutUs: "About Us",
+    login: "Log in",
+    signup: "Sign up",
+    heroBadge: "New Riyadh Collective",
+    heroTitleLine1: "Style Naturally.",
+    heroTitleLine2: "Groom Confidently.",
+    heroDesc: "Riyadh's premier luxury marketplace. Instantly book verified salons, master barbershops, wellness retreats, and certified home-service professionals near you.",
+    shopServices: "Shop Services",
+    exploreCollective: "Explore Collective",
+    verifiedArtists: "Verified Artists",
+    vettedSub: "Top 1% Vetted",
+    escrowSecurity: "Escrow Security",
+    escrowSub: "Pay Post-Checkout",
+    riyadhGeofenced: "Riyadh Geofenced",
+    geofencedSub: "Flexible In-Home",
+    flexibleBookings: "Flexible Bookings",
+    flexibleSub: "Easy Reschedule",
+    featuredSpaceBadge: "Featured Space",
+    featuredSpaceName: "Riyadh Apothecary & Spa",
+    featuredSpacePrice: "Starting from 150 SAR per session",
+    verifiedArtistsProp: "Verified Artists",
+    vettedSubProp: "Top 1% vetted professionals",
+    escrowSecurityProp: "Secure Escrow",
+    escrowSubProp: "Released only after service",
+    hygieneCertifiedProp: "Hygiene Certified",
+    hygieneSubProp: "Strict hygiene protocols",
+    supportProp: "24/7 Dedicated Help",
+    supportSubProp: "Local Riyadh-based support",
+    shopByCategory: "Shop by Category",
+    featuredArtists: "Featured Artists",
+    featuredArtistsSub: "Riyadh's highest-rated salons and professional groomers",
+    howItWorks: "How It Works",
+    how1Title: "Select Service",
+    how1Desc: "Find the perfect grooming, massage, or salon treatment based on reviews, locations, and transparent pricing.",
+    how2Title: "Secure Booking",
+    how2Desc: "Choose your preferred date, time slot, and staff. Secure the booking using our trusted escrow payout system.",
+    how3Title: "Exceptional Care",
+    how3Desc: "Enjoy the premium care you deserve, either at the provider's physical location or in the comfort of your home.",
+    providerAcqBadge: "Join Riyadh's Finest Collective",
+    providerAcqTitle: "Grow Your Business with Primora",
+    providerAcqDesc: "Join thousands of master barbershops, luxury wellness spas, independent hair stylists, and beauty professionals who manage bookings, secure split payments, and acquire loyal customers in Riyadh.",
+    footerDesc: "Luxury Beauty, Grooming & Wellness Marketplace. Connecting premier Riyadh artists with selective clients.",
+    footerDiscover: "Discover",
+    footerPartners: "For Partners",
+    footerLegal: "Legal",
+    allRightsReserved: "All rights reserved. Built for Riyadh, Saudi Arabia."
+  },
+  ar: {
+    promoText: "احجز أفضل خدمات التجميل والعناية المنزلية والصالونات بالرياض",
+    promoSub: "احصل على خصم 15% على حجزك الأول - استخدم الرمز:",
+    home: "الرئيسية",
+    discover: "اكتشف",
+    serviceBoard: "لوحة الخدمات",
+    becomeProvider: "انضم كمزود خدمة",
+    aboutUs: "من نحن",
+    login: "تسجيل الدخول",
+    signup: "تسجيل جديد",
+    heroBadge: "مجموعة الرياض الفاخرة الجديدة",
+    heroTitleLine1: "أناقة طبيعية.",
+    heroTitleLine2: "عناية بثقة.",
+    heroDesc: "منصة الرياض الرائدة للجمال والعناية. احجز فوراً في أرقى الصالونات، ومحلات الحلاقة، والمنتجعات الصحية، ومحترفي الخدمات المنزلية المعتمدين بالقرب منك.",
+    shopServices: "تسوق الخدمات",
+    exploreCollective: "اكتشف المجموعة",
+    verifiedArtists: "فنانون موثوقون",
+    vettedSub: "نخبة مصفاة 1%",
+    escrowSecurity: "أمان الضمان",
+    escrowSub: "الدفع بعد الخدمة",
+    riyadhGeofenced: "تغطية كاملة بالرياض",
+    geofencedSub: "خدمة منزلية مرنة",
+    flexibleBookings: "حجوزات مرنة",
+    flexibleSub: "تعديل سهل للموعد",
+    featuredSpaceBadge: "المساحة المميزة",
+    featuredSpaceName: "سبا وعطارة الرياض الفاخرة",
+    featuredSpacePrice: "تبدأ من 150 ريال لكل جلسة",
+    verifiedArtistsProp: "فنانون معتمدون",
+    vettedSubProp: "أفضل 1% من المحترفين المعتمدين",
+    escrowSecurityProp: "ضمان آمن",
+    escrowSubProp: "يتم تحرير الأموال بعد انتهاء الخدمة",
+    hygieneCertifiedProp: "شهادة النظافة",
+    hygieneSubProp: "بروتوكولات تعقيم صارمة 100%",
+    supportProp: "دعم مخصص 24/7",
+    supportSubProp: "دعم محلي مقره الرياض",
+    shopByCategory: "تسوق حسب الفئة",
+    featuredArtists: "مقدمو الخدمة المتميزون",
+    featuredArtistsSub: "أعلى الصالونات ومصففي الشعر تقييماً في الرياض",
+    howItWorks: "كيف يعمل؟",
+    how1Title: "اختر الخدمة",
+    how1Desc: "ابحث عن العلاج أو الحلاقة أو خدمة الصالون المثالية بناءً على التقييمات والمواقع والأسعار الواضحة.",
+    how2Title: "حجز آمن",
+    how2Desc: "اختر التاريخ والوقت المفضلين لديك والموظف. قم بتأمين حجزك باستخدام نظام الدفع بالضمان الموثوق.",
+    how3Title: "عناية استثنائية",
+    how3Desc: "استمتع بالعناية الفائقة التي تستحقها، سواء في صالون مقدم الخدمة أو في منزلك براحة تامة.",
+    providerAcqBadge: "انضم إلى أرقى المحترفين في الرياض",
+    providerAcqTitle: "نمّ تجارتك مع بريمورا",
+    providerAcqDesc: "انضم إلى آلاف الصالونات ومحلات الحلاقة الفاخرة والمنتجعات الصحية ومصففي الشعر المستقلين ومحترفي العناية بالرياض الذين يعتمدون على بريمورا لإدارة جداولهم وتأمين مدفوعاتهم.",
+    footerDesc: "منصة الجمال الفاخرة، والعناية والعافية. نصل بين أفضل فناني الرياض والعملاء المميزين.",
+    footerDiscover: "استكشف",
+    footerPartners: "للشركاء",
+    footerLegal: "قانوني",
+    allRightsReserved: "جميع الحقوق محفوظة. صمم خصيصاً للرياض، المملكة العربية السعودية."
+  }
+};
+
 export default function Home() {
-  const [service, setService] = useState("Haircut");
-  const [location, setLocation] = useState("Riyadh");
-  const [date, setDate] = useState("");
+  const [locale, setLocale] = useState<"en" | "ar">("en");
+  const t = translations[locale];
+
+  const toggleLanguage = () => {
+    setLocale((prev) => (prev === "en" ? "ar" : "en"));
+  };
+
+  useEffect(() => {
+    document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   const categories = [
     { 
-      name: "Haircuts & Barbering", 
+      name: locale === "ar" ? "قص الشعر والحلاقة" : "Haircuts & Barbering", 
       link: "/customer/search?category=barber", 
       image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=400&auto=format&fit=crop" 
     },
     { 
-      name: "Hair Styling & Color", 
+      name: locale === "ar" ? "تصفيف وتلوين الشعر" : "Hair Styling & Color", 
       link: "/customer/search?category=hair", 
       image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=400&auto=format&fit=crop" 
     },
     { 
-      name: "Wellness & Spa Rooms", 
+      name: locale === "ar" ? "غرف السبا والعافية" : "Wellness & Spa Rooms", 
       link: "/customer/search?category=spa", 
       image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=400&auto=format&fit=crop" 
     },
     { 
-      name: "Makeup & Cosmetics", 
+      name: locale === "ar" ? "المكياج ومستحضرات التجميل" : "Makeup & Cosmetics", 
       link: "/customer/search?category=makeup", 
       image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=400&auto=format&fit=crop" 
     },
     { 
-      name: "On-Demand Home Services", 
+      name: locale === "ar" ? "الخدمات المنزلية عند الطلب" : "On-Demand Home Services", 
       link: "/customer/jobs", 
       image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=400&auto=format&fit=crop" 
     }
@@ -39,8 +158,8 @@ export default function Home() {
   const bestSellers = [
     {
       id: "1",
-      name: "Elite Grooming Lounge",
-      category: "Barbershop",
+      name: locale === "ar" ? "صالون إيليت الرجالي" : "Elite Grooming Lounge",
+      category: locale === "ar" ? "صالون حلاقة" : "Barbershop",
       rating: "4.9",
       reviews: "128",
       price: "120 SAR",
@@ -48,8 +167,8 @@ export default function Home() {
     },
     {
       id: "2",
-      name: "Sara Beauty Salon & Spa",
-      category: "Luxury Spa",
+      name: locale === "ar" ? "صالون وسبا سارة للتجميل" : "Sara Beauty Salon & Spa",
+      category: locale === "ar" ? "صالون وسبا نسائي" : "Luxury Spa",
       rating: "4.8",
       reviews: "96",
       price: "250 SAR",
@@ -57,8 +176,8 @@ export default function Home() {
     },
     {
       id: "3",
-      name: "Riyadh Wellness Retreat",
-      category: "Therapies & Massage",
+      name: locale === "ar" ? "منتجع الرياض الصحي" : "Riyadh Wellness Retreat",
+      category: locale === "ar" ? "مساج وعلاج" : "Therapies & Massage",
       rating: "4.9",
       reviews: "74",
       price: "300 SAR",
@@ -66,8 +185,8 @@ export default function Home() {
     },
     {
       id: "4",
-      name: "The Barberia & Spa",
-      category: "Grooming Combo",
+      name: locale === "ar" ? "صالون الحلاقة والسبا الفاخر" : "The Barberia & Spa",
+      category: locale === "ar" ? "خدمات مدمجة" : "Grooming Combo",
       rating: "4.7",
       reviews: "58",
       price: "180 SAR",
@@ -75,8 +194,8 @@ export default function Home() {
     },
     {
       id: "5",
-      name: "Lumière Glow Studio",
-      category: "Facials & Skincare",
+      name: locale === "ar" ? "استوديو لوميير للتوهج" : "Lumière Glow Studio",
+      category: locale === "ar" ? "عناية بالبشرة" : "Facials & Skincare",
       rating: "4.9",
       reviews: "110",
       price: "150 SAR",
@@ -89,9 +208,9 @@ export default function Home() {
       
       {/* 1. TOP PROMO BAR */}
       <div className="w-full bg-stone-100 border-b border-stone-200 py-2.5 px-4 text-center text-[10px] sm:text-xs font-semibold tracking-wider text-stone-600 uppercase flex items-center justify-center gap-4">
-        <span>Book Premier Home Service & Salon Appointments in Riyadh</span>
+        <span>{t.promoText}</span>
         <span className="hidden md:inline text-stone-300">|</span>
-        <span className="hidden md:inline">Get 15% off your first booking - Use code: <strong className="text-stone-900 font-bold">PRIMORA15</strong></span>
+        <span className="hidden md:inline">{t.promoSub} <strong className="text-stone-900 font-bold">PRIMORA15</strong></span>
       </div>
 
       {/* 2. HEADER */}
@@ -101,11 +220,17 @@ export default function Home() {
             PRIMORA
           </Link>
           <nav className="hidden lg:flex items-center gap-8 text-xs font-bold uppercase tracking-wider text-stone-500">
-            <Link href="/" className="text-stone-900 hover:text-stone-900 transition-colors">Home</Link>
-            <Link href="/customer/search" className="hover:text-stone-950 transition-colors">Discover</Link>
-            <Link href="/customer/jobs" className="hover:text-stone-950 transition-colors">Service Board</Link>
-            <Link href="/provider/dashboard" className="hover:text-stone-950 transition-colors">Become a Provider</Link>
-            <Link href="/about" className="hover:text-stone-950 transition-colors font-medium">About Us</Link>
+            <Link href="/" className="text-stone-900 hover:text-stone-900 transition-colors">{t.home}</Link>
+            <Link href="/customer/search" className="hover:text-stone-950 transition-colors">{t.discover}</Link>
+            <Link href="/customer/jobs" className="hover:text-stone-950 transition-colors">{t.serviceBoard}</Link>
+            <Link href="/provider/dashboard" className="hover:text-stone-950 transition-colors">{t.becomeProvider}</Link>
+            <Link href="/about" className="hover:text-stone-950 transition-colors">{t.aboutUs}</Link>
+            <button
+              onClick={toggleLanguage}
+              className="text-[hsl(45,60%,45%)] hover:text-stone-950 transition-colors font-extrabold tracking-wider"
+            >
+              {locale === "en" ? "العربية" : "English"}
+            </button>
           </nav>
         </div>
         
@@ -125,18 +250,26 @@ export default function Home() {
             </Link>
           </div>
           
-          <div className="h-4 w-px bg-stone-200 hidden sm:block"></div>
-          
+          <div className="h-4 w-px bg-stone-200"></div>
+
+          {/* Lang button & Signin/Signup */}
           <div className="flex items-center gap-4">
+            <button
+              onClick={toggleLanguage}
+              className="px-3 py-1.5 rounded-lg border border-stone-200 bg-stone-50 text-[10px] uppercase tracking-wider font-extrabold hover:border-stone-400 transition"
+            >
+              {locale === "en" ? "العربية" : "English"}
+            </button>
             <Link href="/login" className="text-xs font-bold uppercase tracking-wider text-stone-600 hover:text-stone-950 transition">
-              Log in
+              {t.login}
             </Link>
-            <Link href="/login" className="bg-stone-900 text-stone-50 font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-full hover:bg-stone-800 transition shadow-sm">
-              Sign up
+            <Link href="/login" className="bg-stone-900 text-stone-55 font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-full hover:bg-stone-800 transition shadow-sm text-stone-100">
+              {t.signup}
             </Link>
           </div>
         </div>
       </header>
+
       {/* 3. HERO SLIDER AREA */}
       <section className="relative min-h-[600px] sm:min-h-[700px] flex items-center py-20 px-6 sm:px-12 border-b border-stone-200 overflow-hidden bg-stone-100">
         {/* Full Section Background Image */}
@@ -153,20 +286,20 @@ export default function Home() {
         <div className="max-w-7xl mx-auto w-full relative z-10">
           {/* Hero Left Content */}
           <div className="max-w-2xl space-y-8">
-            <span className="text-[10px] tracking-widest uppercase font-extrabold text-stone-500">New Riyadh Collective</span>
+            <span className="text-[10px] tracking-widest uppercase font-extrabold text-stone-500">{t.heroBadge}</span>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif text-stone-950 leading-[1.15] tracking-tight">
-              Style Naturally.<br />Groom Confidently.
+              {t.heroTitleLine1}<br />{t.heroTitleLine2}
             </h1>
             <p className="text-sm sm:text-base text-stone-600 max-w-lg leading-relaxed font-light">
-              Riyadh's premier luxury marketplace. Instantly book verified salons, master barbershops, wellness retreats, and certified home-service professionals near you.
+              {t.heroDesc}
             </p>
             
             <div className="flex flex-wrap items-center gap-6 pt-4">
               <Link href="/login" className="px-8 py-3.5 bg-stone-900 text-stone-50 font-bold text-xs uppercase tracking-widest rounded-full hover:bg-stone-800 transition shadow-md">
-                Shop Services
+                {t.shopServices}
               </Link>
               <Link href="/customer/search" className="group text-stone-800 hover:text-stone-950 font-bold text-xs uppercase tracking-widest flex items-center gap-1.5 transition">
-                Explore Collective
+                {t.exploreCollective}
                 <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
@@ -176,20 +309,20 @@ export default function Home() {
             {/* Sub-features bar */}
             <div className="pt-10 border-t border-stone-300/60 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center sm:text-left">
               <div>
-                <p className="text-[10px] uppercase font-bold text-stone-400">Verified Artists</p>
-                <p className="text-xs text-stone-700 font-semibold mt-0.5">Top 1% Vetted</p>
+                <p className="text-[10px] uppercase font-bold text-stone-400">{t.verifiedArtists}</p>
+                <p className="text-xs text-stone-700 font-semibold mt-0.5">{t.vettedSub}</p>
               </div>
               <div>
-                <p className="text-[10px] uppercase font-bold text-stone-400">Escrow Security</p>
-                <p className="text-xs text-stone-700 font-semibold mt-0.5">Pay Post-Checkout</p>
+                <p className="text-[10px] uppercase font-bold text-stone-400">{t.escrowSecurity}</p>
+                <p className="text-xs text-stone-700 font-semibold mt-0.5">{t.escrowSub}</p>
               </div>
               <div>
-                <p className="text-[10px] uppercase font-bold text-stone-400">Riyadh Geofenced</p>
-                <p className="text-xs text-stone-700 font-semibold mt-0.5">Flexible In-Home</p>
+                <p className="text-[10px] uppercase font-bold text-stone-400">{t.riyadhGeofenced}</p>
+                <p className="text-xs text-stone-700 font-semibold mt-0.5">{t.geofencedSub}</p>
               </div>
               <div>
-                <p className="text-[10px] uppercase font-bold text-stone-400">Flexible Bookings</p>
-                <p className="text-xs text-stone-700 font-semibold mt-0.5">Easy Reschedule</p>
+                <p className="text-[10px] uppercase font-bold text-stone-400">{t.flexibleBookings}</p>
+                <p className="text-xs text-stone-700 font-semibold mt-0.5">{t.flexibleSub}</p>
               </div>
             </div>
           </div>
@@ -206,8 +339,8 @@ export default function Home() {
               </svg>
             </div>
             <div>
-              <h4 className="text-[11px] uppercase tracking-wider font-extrabold text-stone-900">Verified Artists</h4>
-              <p className="text-[10px] text-stone-500 font-medium mt-0.5">Top 1% vetted professionals</p>
+              <h4 className="text-[11px] uppercase tracking-wider font-extrabold text-stone-900">{t.verifiedArtistsProp}</h4>
+              <p className="text-[10px] text-stone-500 font-medium mt-0.5">{t.vettedSubProp}</p>
             </div>
           </div>
           
@@ -218,8 +351,8 @@ export default function Home() {
               </svg>
             </div>
             <div>
-              <h4 className="text-[11px] uppercase tracking-wider font-extrabold text-stone-900">Secure Escrow</h4>
-              <p className="text-[10px] text-stone-500 font-medium mt-0.5">Released only after service</p>
+              <h4 className="text-[11px] uppercase tracking-wider font-extrabold text-stone-900">{t.escrowSecurityProp}</h4>
+              <p className="text-[10px] text-stone-500 font-medium mt-0.5">{t.escrowSubProp}</p>
             </div>
           </div>
           
@@ -230,8 +363,8 @@ export default function Home() {
               </svg>
             </div>
             <div>
-              <h4 className="text-[11px] uppercase tracking-wider font-extrabold text-stone-900">Hygiene Certified</h4>
-              <p className="text-[10px] text-stone-500 font-medium mt-0.5">Strict hygiene protocols</p>
+              <h4 className="text-[11px] uppercase tracking-wider font-extrabold text-stone-900">{t.hygieneCertifiedProp}</h4>
+              <p className="text-[10px] text-stone-500 font-medium mt-0.5">{t.hygieneSubProp}</p>
             </div>
           </div>
           
@@ -242,8 +375,8 @@ export default function Home() {
               </svg>
             </div>
             <div>
-              <h4 className="text-[11px] uppercase tracking-wider font-extrabold text-stone-900">24/7 Dedicated Help</h4>
-              <p className="text-[10px] text-stone-500 font-medium mt-0.5">Local Riyadh-based support</p>
+              <h4 className="text-[11px] uppercase tracking-wider font-extrabold text-stone-900">{t.supportProp}</h4>
+              <p className="text-[10px] text-stone-500 font-medium mt-0.5">{t.supportSubProp}</p>
             </div>
           </div>
         </div>
@@ -255,7 +388,7 @@ export default function Home() {
           
           {/* Centered Heading */}
           <div className="text-center space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-serif text-stone-950 font-bold tracking-tight">Shop by Category</h2>
+            <h2 className="text-2xl sm:text-3xl font-serif text-stone-950 font-bold tracking-tight">{t.shopByCategory}</h2>
             <div className="w-12 h-0.5 bg-stone-800 mx-auto mt-4"></div>
           </div>
 
@@ -273,7 +406,7 @@ export default function Home() {
                 </div>
                 <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900 mt-1">{cat.name}</h4>
                 <Link href={cat.link} className="text-[10px] font-bold text-stone-400 group-hover:text-stone-950 transition-colors uppercase mt-1 tracking-widest flex items-center gap-1">
-                  Book Now
+                  {locale === "ar" ? "احجز الآن" : "Book Now"}
                   <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" />
                   </svg>
@@ -292,8 +425,8 @@ export default function Home() {
           {/* Header Row */}
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <h2 className="text-2xl sm:text-3xl font-serif text-stone-950 font-bold tracking-tight">Featured Artists</h2>
-              <p className="text-xs text-stone-500">Riyadh's highest-rated salons and professional groomers</p>
+              <h2 className="text-2xl sm:text-3xl font-serif text-stone-950 font-bold tracking-tight">{t.featuredArtists}</h2>
+              <p className="text-xs text-stone-500">{t.featuredArtistsSub}</p>
             </div>
             
             {/* Carousel navigation controls */}
@@ -325,7 +458,7 @@ export default function Home() {
                   />
                   {/* Badge */}
                   <span className="absolute top-2.5 left-2.5 bg-stone-900 text-stone-50 text-[8px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded">
-                    Popular
+                    {locale === "ar" ? "شائع" : "Popular"}
                   </span>
                 </div>
 
@@ -370,32 +503,32 @@ export default function Home() {
       <section className="py-24 px-6 sm:px-12 bg-white border-t border-stone-200">
         <div className="max-w-7xl mx-auto space-y-16">
           <div className="text-center space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-serif text-stone-950 font-bold tracking-tight">How It Works</h2>
+            <h2 className="text-2xl sm:text-3xl font-serif text-stone-950 font-bold tracking-tight">{t.howItWorks}</h2>
             <div className="w-12 h-0.5 bg-stone-800 mx-auto mt-4"></div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-5xl mx-auto">
             <div className="flex flex-col items-center text-center space-y-4 group">
               <span className="text-sm font-serif font-bold text-stone-400 group-hover:text-stone-800 transition duration-300">01</span>
-              <h4 className="font-serif font-bold text-stone-900 text-base">Select Service</h4>
+              <h4 className="font-serif font-bold text-stone-900 text-base">{t.how1Title}</h4>
               <p className="text-xs text-stone-500 max-w-xs leading-relaxed font-light">
-                Find the perfect grooming, massage, or salon treatment based on reviews, locations, and transparent pricing.
+                {t.how1Desc}
               </p>
             </div>
             
             <div className="flex flex-col items-center text-center space-y-4 group">
               <span className="text-sm font-serif font-bold text-stone-400 group-hover:text-stone-800 transition duration-300">02</span>
-              <h4 className="font-serif font-bold text-stone-900 text-base">Secure Booking</h4>
+              <h4 className="font-serif font-bold text-stone-900 text-base">{t.how2Title}</h4>
               <p className="text-xs text-stone-500 max-w-xs leading-relaxed font-light">
-                Choose your preferred date, time slot, and staff. Secure the booking using our trusted escrow payout system.
+                {t.how2Desc}
               </p>
             </div>
             
             <div className="flex flex-col items-center text-center space-y-4 group">
               <span className="text-sm font-serif font-bold text-stone-400 group-hover:text-stone-800 transition duration-300">03</span>
-              <h4 className="font-serif font-bold text-stone-900 text-base">Exceptional Care</h4>
+              <h4 className="font-serif font-bold text-stone-900 text-base">{t.how3Title}</h4>
               <p className="text-xs text-stone-500 max-w-xs leading-relaxed font-light">
-                Enjoy the premium care you deserve, either at the provider's physical location or in the comfort of your home.
+                {t.how3Desc}
               </p>
             </div>
           </div>
@@ -406,13 +539,13 @@ export default function Home() {
       <section className="py-20 px-6 sm:px-12 bg-stone-100 border-t border-stone-200">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12 w-full">
           <div className="space-y-6 max-w-lg">
-            <span className="text-[10px] tracking-widest uppercase font-extrabold text-stone-400">Join Riyadh's Finest Collective</span>
-            <h2 className="text-2xl sm:text-3xl font-serif text-stone-950 font-bold tracking-tight">Grow Your Business with Primora</h2>
+            <span className="text-[10px] tracking-widest uppercase font-extrabold text-stone-400">{t.providerAcqBadge}</span>
+            <h2 className="text-2xl sm:text-3xl font-serif text-stone-950 font-bold tracking-tight">{t.providerAcqTitle}</h2>
             <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-light">
-              Join thousands of master barbershops, luxury wellness spas, independent hair stylists, and beauty professionals who manage bookings, secure split payments, and acquire loyal customers in Riyadh.
+              {t.providerAcqDesc}
             </p>
             <Link href="/provider/dashboard" className="px-6 py-3.5 bg-stone-900 text-stone-50 font-bold text-xs uppercase tracking-widest rounded-full hover:bg-stone-800 transition shadow-md inline-block">
-              Become a Provider
+              {t.becomeProvider}
             </Link>
           </div>
           
@@ -432,37 +565,37 @@ export default function Home() {
           <div className="space-y-4">
             <h4 className="text-white font-serif font-black tracking-widest text-lg">PRIMORA</h4>
             <p className="text-xs text-stone-500 font-light leading-relaxed">
-              Luxury Beauty, Grooming & Wellness Marketplace. Connecting premier Riyadh artists with selective clients.
+              {t.footerDesc}
             </p>
           </div>
           <div>
-            <h5 className="text-white text-xs uppercase tracking-widest font-extrabold mb-4">Discover</h5>
+            <h5 className="text-white text-xs uppercase tracking-widest font-extrabold mb-4">{t.footerDiscover}</h5>
             <ul className="space-y-2 text-xs">
-              <li><Link href="/customer/search" className="hover:text-white transition">Explore Services</Link></li>
-              <li><Link href="/customer/search?category=barber" className="hover:text-white transition">Barbershops</Link></li>
-              <li><Link href="/customer/search?category=spa" className="hover:text-white transition">Spa & Massage</Link></li>
-              <li><Link href="/customer/search?category=makeup" className="hover:text-white transition">Makeup Artists</Link></li>
+              <li><Link href="/customer/search" className="hover:text-white transition">{categories[0].name}</Link></li>
+              <li><Link href="/customer/search?category=barber" className="hover:text-white transition">{categories[1].name}</Link></li>
+              <li><Link href="/customer/search?category=spa" className="hover:text-white transition">{categories[2].name}</Link></li>
+              <li><Link href="/customer/search?category=makeup" className="hover:text-white transition">{categories[3].name}</Link></li>
             </ul>
           </div>
           <div>
-            <h5 className="text-white text-xs uppercase tracking-widest font-extrabold mb-4">For Partners</h5>
+            <h5 className="text-white text-xs uppercase tracking-widest font-extrabold mb-4">{t.footerPartners}</h5>
             <ul className="space-y-2 text-xs">
-              <li><Link href="/provider/dashboard" className="hover:text-white transition">Become a Provider</Link></li>
-              <li><Link href="/provider/dashboard" className="hover:text-white transition">Staff Management</Link></li>
-              <li><Link href="/provider/dashboard" className="hover:text-white transition">Split Ledger Pricing</Link></li>
+              <li><Link href="/provider/dashboard" className="hover:text-white transition">{t.becomeProvider}</Link></li>
+              <li><Link href="/provider/dashboard" className="hover:text-white transition">{locale === "ar" ? "إدارة شؤون الموظفين" : "Staff Management"}</Link></li>
+              <li><Link href="/provider/dashboard" className="hover:text-white transition">{locale === "ar" ? "التسعير المشترك" : "Split Ledger Pricing"}</Link></li>
             </ul>
           </div>
           <div>
-            <h5 className="text-white text-xs uppercase tracking-widest font-extrabold mb-4">Legal</h5>
+            <h5 className="text-white text-xs uppercase tracking-widest font-extrabold mb-4">{t.footerLegal}</h5>
             <ul className="space-y-2 text-xs">
-              <li><Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-white transition">Terms of Service</Link></li>
-              <li><Link href="/security" className="hover:text-white transition">ZATCA & Payments</Link></li>
+              <li><Link href="/privacy" className="hover:text-white transition">{locale === "ar" ? "سياسة الخصوصية" : "Privacy Policy"}</Link></li>
+              <li><Link href="/terms" className="hover:text-white transition">{locale === "ar" ? "شروط الخدمة" : "Terms of Service"}</Link></li>
+              <li><Link href="/security" className="hover:text-white transition">{locale === "ar" ? "هيئة الزكاة والمدفوعات" : "ZATCA & Payments"}</Link></li>
             </ul>
           </div>
         </div>
         <div className="max-w-7xl mx-auto pt-8 border-t border-stone-900 text-center text-xs text-stone-600 font-medium">
-          <p>© {new Date().getFullYear()} PRIMORA. All rights reserved. Built for Riyadh, Saudi Arabia.</p>
+          <p>© {new Date().getFullYear()} PRIMORA. {t.allRightsReserved}</p>
         </div>
       </footer>
 
