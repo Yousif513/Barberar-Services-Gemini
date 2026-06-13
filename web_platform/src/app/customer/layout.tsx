@@ -9,6 +9,7 @@ const translations = {
   en: {
     dashboard: "Dashboard",
     bookings: "Bookings",
+    packages: "My Packages",
     favorites: "Favorites",
     messages: "Messages",
     reviews: "Reviews",
@@ -23,6 +24,7 @@ const translations = {
   ar: {
     dashboard: "لوحة التحكم",
     bookings: "الحجوزات",
+    packages: "باقاتي",
     favorites: "المفضلة",
     messages: "الرسائل",
     reviews: "التقييمات",
@@ -57,6 +59,7 @@ export default function CustomerLayout({
   const navItems = [
     { name: t.dashboard, path: "/customer/dashboard", icon: "📊" },
     { name: t.bookings, path: "/customer/bookings", icon: "📅" },
+    { name: t.packages, path: "/customer/packages", icon: "🎁" },
     { name: t.favorites, path: "/customer/favorites", icon: "❤️" },
     { name: t.messages, path: "/customer/messages", icon: "💬", badge: 3 },
     { name: t.reviews, path: "/customer/reviews", icon: "⭐" },
