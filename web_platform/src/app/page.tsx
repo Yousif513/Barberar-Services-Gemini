@@ -137,19 +137,28 @@ export default function Home() {
           </div>
         </div>
       </header>
-
       {/* 3. HERO SLIDER AREA */}
-      <section className="relative bg-gradient-to-br from-[#f8f8f6] via-[#f3f3ee] to-[#ecece6] py-16 sm:py-24 px-6 sm:px-12 border-b border-stone-200 overflow-hidden">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
+      <section className="relative min-h-[600px] sm:min-h-[700px] flex items-center py-20 px-6 sm:px-12 border-b border-stone-200 overflow-hidden bg-stone-100">
+        {/* Full Section Background Image */}
+        <div className="absolute inset-0">
+          <img 
+            src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=1800&auto=format&fit=crop" 
+            alt="Luxury Unisex Grooming Collective" 
+            className="w-full h-full object-cover" 
+          />
+          {/* Soft premium gradient overlay for maximum text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-stone-50/95 via-stone-50/75 to-transparent"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto w-full relative z-10">
           {/* Hero Left Content */}
-          <div className="lg:col-span-6 space-y-8 relative z-10">
+          <div className="max-w-2xl space-y-8">
             <span className="text-[10px] tracking-widest uppercase font-extrabold text-stone-500">New Riyadh Collective</span>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif text-stone-950 leading-[1.15] tracking-tight">
               Style Naturally.<br />Groom Confidently.
             </h1>
             <p className="text-sm sm:text-base text-stone-600 max-w-lg leading-relaxed font-light">
-              Riyadh's premier luxury marketplace. Instantly book verified salons, master barbershops, wellness retreats, and certified home-service providers near you.
+              Riyadh's premier luxury marketplace. Instantly book verified salons, master barbershops, wellness retreats, and certified home-service professionals near you.
             </p>
             
             <div className="flex flex-wrap items-center gap-6 pt-4">
@@ -184,26 +193,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-
-          {/* Hero Right Visual Column */}
-          <div className="lg:col-span-6 relative flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-lg aspect-[4/3] sm:aspect-video lg:aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-stone-200/50 bg-stone-300">
-              <img 
-                src="https://images.unsplash.com/photo-1608248597481-496100c8c836?q=80&w=800&auto=format&fit=crop" 
-                alt="Luxury Unisex Grooming Collective" 
-                className="w-full h-full object-cover" 
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-stone-950/40 via-transparent to-transparent"></div>
-              
-              {/* Floating Badge */}
-              <div className="absolute bottom-6 left-6 bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/50 max-w-xs shadow-lg">
-                <span className="text-[9px] uppercase font-extrabold text-stone-400 block tracking-wider">Featured Space</span>
-                <h4 className="font-serif font-bold text-stone-900 text-sm mt-0.5">Riyadh Apothecary & Spa</h4>
-                <p className="text-[10px] text-stone-500 mt-1">Starting from 150 SAR per session</p>
-              </div>
-            </div>
-          </div>
-
         </div>
       </section>
 
