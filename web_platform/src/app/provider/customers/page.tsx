@@ -17,7 +17,22 @@ const translations = {
     saveNotes: "Save Notes",
     noClients: "No clients registered in your database yet.",
     notesPlaceholder: "Write specific preferences (e.g. prefers low skin fade, allergic to certain facial creams)...",
-    currency: "SAR"
+    currency: "SAR",
+    statsTotalClients: "Total Clients",
+    statsTotalSpend: "Total Volume",
+    statsTotalBookings: "Total Bookings",
+    statsAverageSpend: "Average Spend",
+    clientSummary: "Client Summary",
+    bookingHistory: "Booking History",
+    actions: "Actions",
+    viewSummary: "View Details",
+    noBookingHistory: "No booking records found.",
+    cancel: "Cancel",
+    phone: "Phone",
+    activeStatus: "Active",
+    loadingClients: "Loading client directory...",
+    localRecordsNotice: "Displaying demo sandbox client records.",
+    completedStatus: "Completed"
   },
   ar: {
     title: "دليل العملاء",
@@ -32,7 +47,22 @@ const translations = {
     saveNotes: "حفظ الملاحظات",
     noClients: "لا يوجد عملاء مسجلون في قاعدة البيانات حالياً.",
     notesPlaceholder: "اكتب تفضيلات العميل (مثل: يفضل قصة شعر معينة، يعاني من حساسية تجاه كريمات معينة)...",
-    currency: "ريال"
+    currency: "ريال",
+    statsTotalClients: "إجمالي العملاء",
+    statsTotalSpend: "حجم المبيعات",
+    statsTotalBookings: "إجمالي الحجوزات",
+    statsAverageSpend: "متوسط الإنفاق",
+    clientSummary: "ملخص العميل",
+    bookingHistory: "سجل الحجوزات",
+    actions: "الإجراءات",
+    viewSummary: "عرض التفاصيل",
+    noBookingHistory: "لا يوجد سجل حجوزات.",
+    cancel: "إلغاء",
+    phone: "الجوال",
+    activeStatus: "نشط",
+    loadingClients: "جاري تحميل دليل العملاء...",
+    localRecordsNotice: "يتم عرض سجلات تجريبية للعملاء.",
+    completedStatus: "مكتمل"
   }
 };
 
@@ -113,12 +143,20 @@ export default function ProviderCustomersPage() {
                 bookingsCount: 0,
                 totalSpend: 0,
                 lastVisit: b.scheduled_at,
-                intakeNotes: ""
+                intakeNotes: "",
+                bookings: []
               };
             }
 
             clientMap[profile.id].bookingsCount += 1;
             clientMap[profile.id].totalSpend += Number(b.total_price);
+            
+            clientMap[profile.id].bookings.push({
+              id: b.id,
+              total_price: Number(b.total_price),
+              scheduled_at: b.scheduled_at
+            });
+
             if (new Date(b.scheduled_at) > new Date(clientMap[profile.id].lastVisit)) {
               clientMap[profile.id].lastVisit = b.scheduled_at;
             }
@@ -136,6 +174,11 @@ export default function ProviderCustomersPage() {
             }
           });
 
+          // Sort each client's bookings
+          Object.values(clientMap).forEach((c: any) => {
+            c.bookings.sort((a: any, b: any) => new Date(b.scheduled_at).getTime() - new Date(a.scheduled_at).getTime());
+          });
+
           setClients(Object.values(clientMap));
           return;
         }
@@ -145,7 +188,8 @@ export default function ProviderCustomersPage() {
       console.warn("Using default CRM clients list due to offline sandbox session:", err.message);
       setError("Displaying local customer records.");
 
-      // Set mock client data
+      // Set mock client data with detailed bookings
+      const now = Date.now();
       setClients([
         {
           id: "cust-1",
@@ -153,8 +197,14 @@ export default function ProviderCustomersPage() {
           phone: "+966 50 123 4567",
           bookingsCount: 4,
           totalSpend: 940,
-          lastVisit: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          intakeNotes: "Prefers low skin fade on beard, hot steam towel, and light styling cream. Highly sensitive to alcohol-based products."
+          lastVisit: new Date(now - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          intakeNotes: "Prefers low skin fade on beard, hot steam towel, and light styling cream. Highly sensitive to alcohol-based products.",
+          bookings: [
+            { id: "b1-1", total_price: 250, scheduled_at: new Date(now - 2 * 24 * 60 * 60 * 1000).toISOString() },
+            { id: "b1-2", total_price: 300, scheduled_at: new Date(now - 10 * 24 * 60 * 60 * 1000).toISOString() },
+            { id: "b1-3", total_price: 190, scheduled_at: new Date(now - 25 * 24 * 60 * 60 * 1000).toISOString() },
+            { id: "b1-4", total_price: 200, scheduled_at: new Date(now - 40 * 24 * 60 * 60 * 1000).toISOString() },
+          ]
         },
         {
           id: "cust-2",
@@ -162,8 +212,12 @@ export default function ProviderCustomersPage() {
           phone: "+966 54 888 1234",
           bookingsCount: 2,
           totalSpend: 300,
-          lastVisit: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-          intakeNotes: "Classic haircut. Prefers scheduling morning appointments."
+          lastVisit: new Date(now - 5 * 24 * 60 * 60 * 1000).toISOString(),
+          intakeNotes: "Classic haircut. Prefers scheduling morning appointments.",
+          bookings: [
+            { id: "b2-1", total_price: 150, scheduled_at: new Date(now - 5 * 24 * 60 * 60 * 1000).toISOString() },
+            { id: "b2-2", total_price: 150, scheduled_at: new Date(now - 18 * 24 * 60 * 60 * 1000).toISOString() },
+          ]
         },
         {
           id: "cust-3",
@@ -171,8 +225,13 @@ export default function ProviderCustomersPage() {
           phone: "+966 53 111 2222",
           bookingsCount: 3,
           totalSpend: 1050,
-          lastVisit: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
-          intakeNotes: "Deep hydration facials, prefers quiet room environments, likes herbal tea service."
+          lastVisit: new Date(now - 12 * 24 * 60 * 60 * 1000).toISOString(),
+          intakeNotes: "Deep hydration facials, prefers quiet room environments, likes herbal tea service.",
+          bookings: [
+            { id: "b3-1", total_price: 400, scheduled_at: new Date(now - 12 * 24 * 60 * 60 * 1000).toISOString() },
+            { id: "b3-2", total_price: 350, scheduled_at: new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString() },
+            { id: "b3-3", total_price: 300, scheduled_at: new Date(now - 50 * 24 * 60 * 60 * 1000).toISOString() },
+          ]
         }
       ]);
     } finally {
@@ -217,146 +276,354 @@ export default function ProviderCustomersPage() {
     return c.name.toLowerCase().includes(search.toLowerCase()) || c.phone.includes(search);
   });
 
+  // Stats calculations based on all clients
+  const totalClientsCount = clients.length;
+  const totalSpendSum = clients.reduce((acc, c) => acc + (c.totalSpend || 0), 0);
+  const totalBookingsCount = clients.reduce((acc, c) => acc + (c.bookingsCount || 0), 0);
+  const avgSpendPerClient = totalClientsCount > 0 ? Math.round(totalSpendSum / totalClientsCount) : 0;
+
   return (
-    <div className="space-y-8 font-sans">
-      {/* HEADER */}
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900">{t.title}</h2>
-        <p className="text-sm text-gray-500 mt-1">{t.subtitle}</p>
+    <div className="space-y-8 font-sans text-white">
+      {/* HEADER WITH GOLD DETAILS */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 pb-6 border-b border-white/[0.06]">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+            <span className="bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] bg-clip-text text-transparent">{t.title}</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47] animate-pulse"></span>
+          </h2>
+          <p className="text-sm text-[#B8C0D4] mt-2 font-medium">{t.subtitle}</p>
+        </div>
+        
+        {/* PREMIUM SEARCH BAR */}
+        <div className="relative w-full md:w-96 flex items-center bg-[#0D1422]/85 backdrop-blur-md border border-white/[0.08] px-5 py-3 rounded-2xl focus-within:border-[#D1AF47]/40 focus-within:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300">
+          <svg className="w-4 h-4 text-[#D1AF47] me-3 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            placeholder={t.searchPlaceholder}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-transparent border-none outline-none text-xs placeholder-[#7B859C]/60 text-white font-medium focus:ring-0"
+          />
+        </div>
       </div>
 
       {error && (
-        <div className="bg-stone-50 border border-stone-200 text-stone-700 text-xs rounded-xl p-4">
-          Notice: {error}
+        <div className="bg-[#111827] border border-[#D1AF47]/20 text-[#D1AF47] text-xs rounded-2xl p-4 flex items-center gap-3 shadow-[0_4px_12px_rgba(0,0,0,0.2)]">
+          <span className="w-2 h-2 rounded-full bg-[#D1AF47] animate-pulse"></span>
+          <span className="font-semibold">{t.localRecordsNotice} ({error})</span>
         </div>
       )}
 
-      {/* SEARCH BAR */}
-      <div className="w-full md:w-80 bg-white border border-gray-200 px-4 py-2 rounded-xl flex items-center gap-3 shadow-sm">
-        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        <input
-          type="text"
-          placeholder={t.searchPlaceholder}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-transparent border-none outline-none text-xs placeholder-gray-400 text-gray-700"
-        />
+      {/* ACTIVE STATISTICS OVERVIEW SECTION */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        {/* STAT 1: Total Clients */}
+        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
+          <div className="space-y-2">
+            <span className="text-[10px] uppercase font-bold text-[#7B859C] tracking-[0.1em] block">{t.statsTotalClients}</span>
+            <span className="text-3xl font-extrabold text-white block tracking-tight">{totalClientsCount}</span>
+          </div>
+          <div className="w-12 h-12 rounded-2xl bg-[#D1AF47]/10 flex items-center justify-center text-[#D1AF47] group-hover:bg-[#D1AF47] group-hover:text-[#070B12] transition-all duration-300">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2M9 11a4 4 0 110-8 4 4 0 010 8zm6 9v-2a3 3 0 00-3-3H9a3 3 0 00-3 3v2" />
+            </svg>
+          </div>
+        </div>
+
+        {/* STAT 2: Total Bookings */}
+        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
+          <div className="space-y-2">
+            <span className="text-[10px] uppercase font-bold text-[#7B859C] tracking-[0.1em] block">{t.statsTotalBookings}</span>
+            <span className="text-3xl font-extrabold text-white block tracking-tight">{totalBookingsCount}</span>
+          </div>
+          <div className="w-12 h-12 rounded-2xl bg-[#D1AF47]/10 flex items-center justify-center text-[#D1AF47] group-hover:bg-[#D1AF47] group-hover:text-[#070B12] transition-all duration-300">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* STAT 3: Total Spend */}
+        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
+          <div className="space-y-2">
+            <span className="text-[10px] uppercase font-bold text-[#7B859C] tracking-[0.1em] block">{t.statsTotalSpend}</span>
+            <span className="text-3xl font-extrabold text-[#D1AF47] block tracking-tight">
+              {totalSpendSum.toLocaleString()} <span className="text-xs font-semibold text-white/70">{t.currency}</span>
+            </span>
+          </div>
+          <div className="w-12 h-12 rounded-2xl bg-[#D1AF47]/10 flex items-center justify-center text-[#D1AF47] group-hover:bg-[#D1AF47] group-hover:text-[#070B12] transition-all duration-300">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* STAT 4: Average Spend */}
+        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
+          <div className="space-y-2">
+            <span className="text-[10px] uppercase font-bold text-[#7B859C] tracking-[0.1em] block">{t.statsAverageSpend}</span>
+            <span className="text-3xl font-extrabold text-[#D1AF47] block tracking-tight">
+              {avgSpendPerClient.toLocaleString()} <span className="text-xs font-semibold text-white/70">{t.currency}</span>
+            </span>
+          </div>
+          <div className="w-12 h-12 rounded-2xl bg-[#D1AF47]/10 flex items-center justify-center text-[#D1AF47] group-hover:bg-[#D1AF47] group-hover:text-[#070B12] transition-all duration-300">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-8a2 2 0 00-2-2H14a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          </div>
+        </div>
+
       </div>
 
-      {/* CLIENTS TABLE */}
+      {/* CRM CLIENT DIRECTORY TABLE */}
       {loading ? (
-        <div className="text-center py-12 text-sm text-gray-400">Loading clients...</div>
+        <div className="flex flex-col items-center justify-center py-24 space-y-4">
+          <div className="w-12 h-12 rounded-full border-4 border-[#D1AF47]/20 border-t-[#D1AF47] animate-spin"></div>
+          <p className="text-sm font-semibold text-[#B8C0D4]">{t.loadingClients}</p>
+        </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-2xl p-12 text-center text-gray-400 shadow-sm">
-          <p className="text-sm font-semibold">{t.noClients}</p>
+        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-16 text-center text-[#7B859C] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+          <svg className="w-12 h-12 mx-auto text-[#7B859C]/40 mb-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.109A2.25 2.25 0 0112.75 21.5h-1.5a2.25 2.25 0 01-2.25-2.263V19.13m4.75-3.07a8.906 8.906 0 00-6-2.225 8.906 8.906 0 00-6 2.225m7.962-3.07a3.95 3.95 0 00-4.924-2.597M16.5 7.75a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 2.25a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+          </svg>
+          <p className="text-base font-bold text-white mb-1">{t.noClients}</p>
         </div>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
           <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left border-collapse">
+            <table className="w-full text-xs text-start border-collapse">
               <thead>
-                <tr className="border-b border-gray-150 text-gray-400 font-bold uppercase text-[9px] bg-gray-50/50">
-                  <th className="py-3.5 px-6">{t.clientName}</th>
-                  <th className="py-3.5 px-6 text-center">{t.bookingsCount}</th>
-                  <th className="py-3.5 px-6 text-center">{t.totalSpend}</th>
-                  <th className="py-3.5 px-6">{t.lastVisit}</th>
-                  <th className="py-3.5 px-6">{t.intakeNotes}</th>
-                  <th className="py-3.5 px-6 text-right">Actions</th>
+                <tr className="border-b border-white/[0.06] text-[#7B859C] font-semibold uppercase text-[10px] tracking-[0.12em] bg-[#0D1422]/50">
+                  <th className="py-4 px-6 text-start">{t.clientName}</th>
+                  <th className="py-4 px-6 text-center">{t.bookingsCount}</th>
+                  <th className="py-4 px-6 text-center">{t.totalSpend}</th>
+                  <th className="py-4 px-6 text-start">{t.lastVisit}</th>
+                  <th className="py-4 px-6 text-start">{t.intakeNotes}</th>
+                  <th className="py-4 px-6 text-end">{t.actions}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
-                {filtered.map((c) => (
-                  <tr key={c.id} className="hover:bg-gray-50/50 transition-colors">
-                    {/* Client Name & Phone */}
-                    <td className="py-4 px-6">
-                      <span className="font-bold text-gray-800 block">{c.name}</span>
-                      <span className="text-[10px] text-gray-400 block mt-0.5">{c.phone}</span>
-                    </td>
+              <tbody className="divide-y divide-white/[0.04]">
+                {filtered.map((c) => {
+                  // Generate Initials
+                  const initials = c.name
+                    ? c.name
+                        .split(" ")
+                        .map((n: string) => n[0])
+                        .join("")
+                        .slice(0, 2)
+                        .toUpperCase()
+                    : "CL";
 
-                    {/* Bookings Count */}
-                    <td className="py-4 px-6 text-center font-bold text-gray-700">
-                      {c.bookingsCount}
-                    </td>
+                  return (
+                    <tr key={c.id} className="hover:bg-white/[0.02] transition-colors duration-200">
+                      
+                      {/* Client Name & Phone */}
+                      <td className="py-4 px-6 text-start">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#D1AF47]/20 to-[#E0C46A]/5 border border-[#D1AF47]/30 flex items-center justify-center text-[#D1AF47] font-bold text-xs tracking-wider shadow-[0_0_10px_rgba(209,175,71,0.05)]">
+                            {initials}
+                          </div>
+                          <div>
+                            <span className="font-bold text-white block text-sm">{c.name}</span>
+                            <span className="text-[10px] text-[#7B859C] block mt-0.5 tracking-wide">{c.phone}</span>
+                          </div>
+                        </div>
+                      </td>
 
-                    {/* Total Spend */}
-                    <td className="py-4 px-6 text-center font-extrabold text-black">
-                      {c.totalSpend.toLocaleString()} {t.currency}
-                    </td>
+                      {/* Bookings Count */}
+                      <td className="py-4 px-6 text-center">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-[#172033] text-[#B8C0D4] border border-white/[0.06]">
+                          {c.bookingsCount}
+                        </span>
+                      </td>
 
-                    {/* Last Visit */}
-                    <td className="py-4 px-6 text-gray-500 font-medium">
-                      {new Date(c.lastVisit).toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
-                    </td>
+                      {/* Total Spend */}
+                      <td className="py-4 px-6 text-center font-extrabold text-[#D1AF47] text-sm">
+                        {c.totalSpend.toLocaleString()} <span className="text-[10px] font-medium text-white/60">{t.currency}</span>
+                      </td>
 
-                    {/* Intake Notes Snippet */}
-                    <td className="py-4 px-6 max-w-xs truncate text-gray-400 font-medium">
-                      {c.intakeNotes || "—"}
-                    </td>
+                      {/* Last Visit */}
+                      <td className="py-4 px-6 text-start text-[#B8C0D4] font-medium">
+                        {new Date(c.lastVisit).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </td>
 
-                    {/* Edit Notes Trigger */}
-                    <td className="py-4 px-6 text-right">
-                      <button
-                        onClick={() => {
-                          setEditingClient(c);
-                          setNoteText(c.intakeNotes);
-                        }}
-                        className="px-3 py-1.5 border border-gray-250 hover:border-black text-[10px] font-bold rounded-lg bg-white text-gray-700 transition"
-                      >
-                        {t.editNotes}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                      {/* Intake Notes Snippet */}
+                      <td className="py-4 px-6 text-start max-w-xs truncate text-[#7B859C] font-medium">
+                        {c.intakeNotes || "—"}
+                      </td>
+
+                      {/* Edit Notes / Summary Trigger */}
+                      <td className="py-4 px-6 text-end">
+                        <button
+                          onClick={() => {
+                            setEditingClient(c);
+                            setNoteText(c.intakeNotes || "");
+                          }}
+                          className="px-4 py-2 border border-[#D1AF47]/30 hover:border-[#D1AF47] text-[#D1AF47] hover:bg-[#D1AF47]/10 text-[10px] font-bold rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(209,175,71,0.02)]"
+                        >
+                          {t.viewSummary}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         </div>
       )}
 
-      {/* EDIT INTAKE NOTES MODAL */}
+      {/* INDIVIDUAL CLIENT SUMMARY & NOTES EDIT POPUP (MODAL) */}
       {editingClient && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-6">
-            <div className="flex justify-between items-start">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#070B12]/80 backdrop-blur-md">
+          <div className="bg-[#111827] border border-white/[0.08] rounded-[28px] w-full max-w-3xl p-8 shadow-[0_12px_40px_rgba(0,0,0,0.6),0_0_40px_rgba(209,175,71,0.05)] text-white space-y-6 relative overflow-hidden">
+            
+            {/* Ambient Background Glow inside Popup */}
+            <div className="absolute -top-20 -right-20 w-48 h-48 bg-[#D1AF47]/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-[#D1AF47]/5 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="flex justify-between items-start border-b border-white/[0.06] pb-4 relative z-10">
               <div>
-                <h3 className="text-base font-bold text-gray-900">{t.editNotes}</h3>
-                <p className="text-xs text-gray-500 mt-1">Client: {editingClient.name}</p>
+                <h3 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                  <span className="bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] bg-clip-text text-transparent">{t.clientSummary}</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47] animate-ping"></span>
+                </h3>
+                <p className="text-xs text-[#B8C0D4] mt-1.5 font-medium">{editingClient.name}</p>
               </div>
               <button
                 onClick={() => setEditingClient(null)}
-                className="text-gray-400 hover:text-gray-600 text-lg font-bold"
+                className="text-[#7B859C] hover:text-white bg-white/[0.04] hover:bg-white/[0.08] p-2 rounded-xl transition duration-200 text-sm font-bold"
               >
-                ×
+                ✕
               </button>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] uppercase font-bold text-gray-400 block">{t.intakeNotes}</label>
+            {/* SPLIT LAYOUT: INFO & HISTORIES */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 relative z-10">
+              
+              {/* LEFT PROFILE & METRICS PANEL (5 Cols) */}
+              <div className="md:col-span-5 space-y-4">
+                <div className="bg-[#172033] border border-white/[0.06] rounded-2xl p-5 space-y-4">
+                  
+                  {/* Name & Phone */}
+                  <div className="space-y-1">
+                    <span className="text-[10px] uppercase font-bold text-[#7B859C] tracking-[0.1em]">{t.clientName}</span>
+                    <p className="text-base font-bold text-white">{editingClient.name}</p>
+                    <p className="text-xs text-[#B8C0D4] mt-0.5">{t.phone}: {editingClient.phone}</p>
+                  </div>
+                  
+                  <div className="h-px bg-white/[0.06]" />
+
+                  {/* Quick stats grid inside modal */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <span className="text-[9px] uppercase font-bold text-[#7B859C] tracking-[0.08em] block">{t.bookingsCount}</span>
+                      <span className="text-base font-bold text-white">{editingClient.bookingsCount}</span>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[9px] uppercase font-bold text-[#7B859C] tracking-[0.08em] block">{t.totalSpend}</span>
+                      <span className="text-base font-bold text-[#D1AF47]">{editingClient.totalSpend.toLocaleString()} <span className="text-[10px] text-white/70">{t.currency}</span></span>
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-white/[0.06]" />
+
+                  {/* Last visit info */}
+                  <div className="space-y-1">
+                    <span className="text-[9px] uppercase font-bold text-[#7B859C] tracking-[0.08em] block">{t.lastVisit}</span>
+                    <p className="text-xs text-[#B8C0D4] font-medium">
+                      {new Date(editingClient.lastVisit).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
+                  </div>
+
+                  <div className="h-px bg-white/[0.06]" />
+
+                  {/* Status Indicator */}
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#3DDC84] shadow-[0_0_8px_rgba(61,220,132,0.4)]"></span>
+                    <span className="text-xs font-bold text-[#3DDC84]">{t.activeStatus}</span>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* RIGHT BOOKING TIMELINE PANEL (7 Cols) */}
+              <div className="md:col-span-7 flex flex-col space-y-3">
+                <span className="text-[10px] uppercase font-bold text-[#7B859C] tracking-[0.1em]">{t.bookingHistory}</span>
+                
+                <div className="flex-1 bg-[#0D1422]/50 border border-white/[0.06] rounded-2xl p-4 overflow-y-auto max-h-[220px] scrollbar-thin scrollbar-thumb-white/[0.08] space-y-4">
+                  {(!editingClient.bookings || editingClient.bookings.length === 0) ? (
+                    <div className="h-full flex items-center justify-center text-center py-6 text-xs text-[#7B859C]">
+                      {t.noBookingHistory}
+                    </div>
+                  ) : (
+                    <div className="relative border-s border-white/[0.06] ms-2.5 py-1 space-y-5">
+                      {editingClient.bookings.map((booking: any) => (
+                        <div key={booking.id} className="relative ps-6">
+                          
+                          {/* Chronological Indicator Dot */}
+                          <span className="absolute -start-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-[#D1AF47] border-2 border-[#111827] shadow-[0_0_8px_rgba(209,175,71,0.5)]"></span>
+                          
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="text-start">
+                              <p className="text-xs font-bold text-white">
+                                {new Date(booking.scheduled_at).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </p>
+                              <p className="text-[10px] text-[#7B859C] mt-0.5">
+                                {new Date(booking.scheduled_at).toLocaleTimeString(locale === "ar" ? "ar-EG" : "en-US", { hour: '2-digit', minute: '2-digit' })}
+                              </p>
+                            </div>
+                            
+                            <div className="text-end">
+                              <span className="text-xs font-extrabold text-[#D1AF47] block">
+                                {Number(booking.total_price).toLocaleString()} {t.currency}
+                              </span>
+                              <span className="inline-flex items-center gap-1 text-[9px] font-bold text-[#3DDC84] mt-0.5">
+                                <span className="w-1 h-1 rounded-full bg-[#3DDC84]"></span>
+                                {t.completedStatus}
+                              </span>
+                            </div>
+
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+            </div>
+
+            {/* INTAKE NOTES TEXTAREA */}
+            <div className="space-y-2 relative z-10">
+              <label className="text-[10px] uppercase font-bold text-[#7B859C] tracking-[0.1em] block">{t.intakeNotes}</label>
               <textarea
-                rows={4}
+                rows={3}
                 value={noteText}
                 onChange={(e) => setNoteText(e.target.value)}
                 placeholder={t.notesPlaceholder}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-700 outline-none focus:border-black placeholder-gray-400 leading-relaxed"
+                className="w-full bg-[#0D1422] border border-white/[0.08] focus:border-[#D1AF47]/50 rounded-2xl p-4 text-xs text-white outline-none placeholder-[#7B859C]/40 leading-relaxed transition-all duration-300 focus:shadow-[0_0_15px_rgba(209,175,71,0.05)] resize-none"
               />
             </div>
 
-            <div className="flex gap-4">
+            {/* MODAL ACTION BUTTONS */}
+            <div className="flex gap-4 pt-2 border-t border-white/[0.06] relative z-10">
               <button
                 onClick={() => setEditingClient(null)}
-                className="flex-1 py-2.5 border border-gray-200 bg-gray-50 text-gray-800 font-bold text-xs rounded-xl hover:bg-gray-100 transition"
+                className="flex-1 py-3 border border-white/[0.08] bg-transparent text-[#B8C0D4] hover:text-white font-bold text-xs rounded-xl hover:bg-white/[0.03] transition-all duration-300"
               >
-                Cancel
+                {t.cancel}
               </button>
               <button
                 onClick={saveNotes}
-                className="flex-1 py-2.5 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl transition"
+                className="flex-1 py-3 bg-gradient-to-r from-[#D1AF47] to-[#B8952E] hover:from-[#E0C46A] hover:to-[#D1AF47] text-[#070B12] font-black text-xs rounded-xl shadow-[0_4px_15px_rgba(209,175,71,0.15)] hover:shadow-[0_4px_25px_rgba(209,175,71,0.25)] hover:scale-[1.01] active:scale-[0.99] transition-all duration-300"
               >
                 {t.saveNotes}
               </button>
             </div>
+
           </div>
         </div>
       )}

@@ -287,52 +287,75 @@ export default function ProviderCalendarPage() {
 
   const isRTL = lang === "ar";
 
+  // Premium Toggle Switch component
+  const ToggleSwitch = ({ checked, onChange }: { checked: boolean; onChange: (val: boolean) => void }) => (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className={`relative inline-flex h-5 w-10 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+        checked ? "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A]" : "bg-white/[0.06]"
+      }`}
+    >
+      <span
+        className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition-transform duration-200 ease-in-out ${
+          checked ? (isRTL ? "-translate-x-5" : "translate-x-5") : "translate-x-0"
+        }`}
+      />
+    </button>
+  );
+
   return (
-    <div className="space-y-8 text-stone-200">
-      {/* Title Header */}
+    <div className="space-y-8 text-[#B8C0D4]">
+      {/* ═══════════════ PAGE HEADER ═══════════════ */}
       <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${isRTL ? "sm:flex-row-reverse text-right" : "text-left"}`}>
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-[hsl(45,60%,55%)]">{t.calendarTitle}</h2>
-          <p className="text-xs text-[hsl(210,8%,65%)] mt-1">{t.subtitle}</p>
+          <h2 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-[#D1AF47] via-[#E0C46A] to-[#D1AF47] bg-clip-text text-transparent">
+            {t.calendarTitle}
+          </h2>
+          <p className="text-xs text-[#7B859C] mt-1.5 tracking-wide">{t.subtitle}</p>
         </div>
         <div className="flex gap-3">
-          <button className="px-4 py-2 bg-[hsla(0,0%,100%,0.03)] border border-[hsla(0,0%,100%,0.08)] text-xs font-bold uppercase rounded-lg hover:border-[hsl(45,60%,55%)] transition duration-200">
+          <button className="px-5 py-2.5 bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] text-xs font-bold uppercase tracking-wider rounded-2xl text-[#B8C0D4] hover:border-[#D1AF47]/30 hover:text-white hover:shadow-[0_0_20px_rgba(209,175,71,0.08)] transition-all duration-300">
             {t.today}
           </button>
-          <button 
+          <button
             onClick={() => {
               setTargetSlotIndex(2); // default to 10:00 AM for quick walkin click
               setShowBookModal(true);
             }}
-            className="px-4 py-2 bg-[hsl(45,60%,55%)] text-[hsl(220,15%,8%)] font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-[hsl(45,60%,45%)] transition duration-200"
+            className="px-5 py-2.5 bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] font-bold text-xs uppercase tracking-widest rounded-2xl hover:shadow-[0_0_25px_rgba(209,175,71,0.35)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
           >
             {t.addAppointment}
           </button>
         </div>
       </div>
 
-      {/* Two Column Control Grid */}
+      {/* ═══════════════ TWO COLUMN CONTROL GRID ═══════════════ */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        
-        {/* LEFT/MID: REDESIGNED SCHEDULE PLANNER */}
+
+        {/* ─────── LEFT/MID: SCHEDULE PLANNER ─────── */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-[hsl(220,12%,14%)] border border-[hsla(0,0%,100%,0.08)] rounded-xl overflow-hidden shadow-lg">
-            <div className={`p-6 border-b border-[hsla(0,0%,100%,0.08)] bg-[hsla(0,0%,100%,0.02)] flex items-center justify-between ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <h3 className="font-semibold text-sm">
+          <div className="bg-[#111827]/80 backdrop-blur-sm border border-white/[0.06] rounded-3xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+            {/* Planner Header */}
+            <div className={`p-6 border-b border-white/[0.04] bg-white/[0.02] rounded-t-3xl flex items-center justify-between ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <h3 className="font-semibold text-sm text-white tracking-wide">
                 {lang === "ar" ? "لوحة التخطيط الفوري للمواعيد" : "Real-time Roster Planner"}
               </h3>
-              <div className="flex bg-[hsl(220,15%,8%)] border border-[hsla(0,0%,100%,0.08)] rounded-lg p-1">
-                <button className="px-3 py-1.5 text-[10px] font-extrabold uppercase rounded-md bg-[hsl(220,12%,14%)] text-[hsl(45,60%,55%)]">
+              {/* Day/Week Glassmorphic Pill Switcher */}
+              <div className="flex bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] rounded-xl p-1 gap-1">
+                <button className="px-4 py-1.5 text-[10px] font-extrabold uppercase rounded-xl bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] shadow-[0_0_12px_rgba(209,175,71,0.2)] transition-all duration-300">
                   {t.dayView}
                 </button>
-                <button className="px-3 py-1.5 text-[10px] font-extrabold uppercase rounded-md text-[hsl(210,8%,65%)] hover:text-[hsl(0,0%,98%)]">
+                <button className="px-4 py-1.5 text-[10px] font-extrabold uppercase rounded-xl text-[#7B859C] hover:text-white hover:bg-white/[0.04] transition-all duration-300">
                   {t.weekView}
                 </button>
               </div>
             </div>
 
             {/* Time Slot Rows */}
-            <div className="divide-y divide-[hsla(0,0%,100%,0.05)]">
+            <div className="divide-y divide-white/[0.04]">
               {timeSlots.map((slot, index) => {
                 const isLocked = isSlotPrayerLocked(slot, index);
                 const isOverridden = slot.isPrayer && overriddenSlots.includes(index);
@@ -341,16 +364,16 @@ export default function ProviderCalendarPage() {
 
                 return (
                   <div key={index} className={`flex min-h-[80px] items-stretch ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                    
-                    {/* Time indicator */}
-                    <div className="w-24 px-4 py-4 border-r border-[hsla(0,0%,100%,0.05)] flex items-center justify-center text-xs font-semibold text-[hsl(210,8%,65%)] bg-[hsla(0,0%,100%,0.01)] select-none">
+
+                    {/* Time indicator column */}
+                    <div className={`w-28 px-4 py-4 flex items-center justify-center text-[11px] font-semibold text-[#7B859C] bg-white/[0.02] select-none tracking-wide ${isRTL ? "border-l" : "border-r"} border-white/[0.04]`}>
                       {slot.label}
                     </div>
 
                     {/* Slot content area */}
-                    <div 
-                      className={`flex-grow p-2 relative flex items-center transition duration-150 ${
-                        draggedOverSlot === index ? "bg-[hsla(45,60%,55%,0.06)] border border-dashed border-[hsl(45,60%,55%)] rounded-lg" : ""
+                    <div
+                      className={`flex-grow p-2.5 relative flex items-center transition-all duration-300 ${
+                        draggedOverSlot === index ? "bg-[#D1AF47]/[0.06] border-2 border-dashed border-[#D1AF47]/40 rounded-2xl" : ""
                       }`}
                       onDragOver={(e) => {
                         e.preventDefault();
@@ -380,112 +403,118 @@ export default function ProviderCalendarPage() {
                     >
                       {isLocked ? (
                         // 1. Prayer Lockout Buffer state
-                        <div className={`w-full h-full bg-[hsla(355,75%,50%,0.05)] border border-[hsla(355,75%,50%,0.15)] rounded-lg flex items-center justify-between px-4 gap-3 text-[hsl(355,75%,60%)] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                        <div className={`w-full h-full bg-[#FF5D73]/[0.04] border border-[#FF5D73]/10 rounded-2xl flex items-center justify-between px-5 gap-3 text-[#FF5D73] shadow-[inset_0_0_20px_rgba(255,93,115,0.03)] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                           <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse text-right" : "text-left"}`}>
-                            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                            </svg>
+                            <div className="w-9 h-9 rounded-xl bg-[#FF5D73]/[0.08] flex items-center justify-center flex-shrink-0">
+                              <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                              </svg>
+                            </div>
                             <div>
                               <p className="text-xs font-bold">{slot.prayerName} - {t.blockedBuffer}</p>
-                              <p className="text-[10px] text-[hsl(355,75%,75%)]">{bufferDuration} mins locked (Geofenced Lockout)</p>
+                              <p className="text-[10px] text-[#FF5D73]/60">{bufferDuration} mins locked (Geofenced Lockout)</p>
                             </div>
                           </div>
-                          
+
                           <button
                             onClick={() => toggleBufferOverride(index)}
-                            className="px-2.5 py-1.5 bg-[hsla(355,75%,50%,0.15)] hover:bg-[hsla(355,75%,50%,0.25)] border border-[hsla(355,75%,50%,0.2)] rounded text-[9px] font-bold uppercase tracking-wider text-[hsl(355,75%,70%)] transition"
+                            className="px-3 py-1.5 bg-[#FF5D73]/[0.08] hover:bg-[#FF5D73]/[0.15] border border-[#FF5D73]/15 rounded-xl text-[9px] font-bold uppercase tracking-wider text-[#FF5D73]/80 hover:text-[#FF5D73] transition-all duration-300"
                           >
                             {t.unblockSlot}
                           </button>
                         </div>
                       ) : isOverridden ? (
                         // 2. Overridden / Unlocked buffer state
-                        <div className={`w-full h-full bg-[hsla(150,60%,40%,0.04)] border border-[hsla(150,60%,40%,0.15)] rounded-lg flex items-center justify-between px-4 gap-3 text-[hsl(150,60%,45%)] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                        <div className={`w-full h-full bg-[#3DDC84]/[0.04] border border-[#3DDC84]/10 rounded-2xl flex items-center justify-between px-5 gap-3 text-[#3DDC84] shadow-[inset_0_0_20px_rgba(61,220,132,0.03)] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                           <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse text-right" : "text-left"}`}>
-                            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                            </svg>
+                            <div className="w-9 h-9 rounded-xl bg-[#3DDC84]/[0.08] flex items-center justify-center flex-shrink-0">
+                              <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                              </svg>
+                            </div>
                             <div>
                               <p className="text-xs font-bold">{slot.prayerName} - {t.unlockedOverride}</p>
-                              <p className="text-[10px] text-[hsl(150,60%,50%)]">Manual buffer bypass allowed</p>
+                              <p className="text-[10px] text-[#3DDC84]/60">Manual buffer bypass allowed</p>
                             </div>
                           </div>
                           <button
                             onClick={() => toggleBufferOverride(index)}
-                            className="px-2.5 py-1.5 bg-[hsla(150,60%,40%,0.1)] border border-[hsla(150,60%,40%,0.2)] rounded text-[9px] font-bold uppercase tracking-wider text-[hsl(150,60%,60%)] transition"
+                            className="px-3 py-1.5 bg-[#3DDC84]/[0.08] hover:bg-[#3DDC84]/[0.15] border border-[#3DDC84]/15 rounded-xl text-[9px] font-bold uppercase tracking-wider text-[#3DDC84]/80 hover:text-[#3DDC84] transition-all duration-300"
                           >
                             Lock Buffer
                           </button>
                         </div>
                       ) : blocked ? (
                         // 3. Manual Blockout state
-                        <div className={`w-full h-full bg-[hsla(210,10%,30%,0.15)] border border-[hsla(210,10%,30%,0.3)] rounded-lg flex items-center justify-between px-4 gap-3 text-stone-400 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                        <div className={`w-full h-full bg-white/[0.02] border border-white/[0.06] rounded-2xl flex items-center justify-between px-5 gap-3 text-[#7B859C] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                           <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse text-right" : "text-left"}`}>
-                            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                            </svg>
+                            <div className="w-9 h-9 rounded-xl bg-white/[0.04] flex items-center justify-center flex-shrink-0">
+                              <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                              </svg>
+                            </div>
                             <div>
-                              <p className="text-xs font-bold">{blocked.reason}</p>
-                              <p className="text-[10px] text-stone-500">Locked out for appointments</p>
+                              <p className="text-xs font-bold text-[#B8C0D4]">{blocked.reason}</p>
+                              <p className="text-[10px] text-[#7B859C]">Locked out for appointments</p>
                             </div>
                           </div>
                           <button
                             onClick={() => handleBlockSlot(index)}
-                            className="px-2.5 py-1.5 bg-stone-800 hover:bg-stone-700 border border-stone-700 rounded text-[9px] font-bold uppercase tracking-wider text-stone-300 transition"
+                            className="px-3 py-1.5 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] rounded-xl text-[9px] font-bold uppercase tracking-wider text-[#B8C0D4] hover:text-white transition-all duration-300"
                           >
                             Unblock
                           </button>
                         </div>
                       ) : appt ? (
                         // 4. Booked Appointment state
-                        <div 
+                        <div
                           onClick={() => setShowDetailsModal(appt)}
                           draggable
                           onDragStart={(e) => {
                             e.dataTransfer.setData("text/plain", appt.id);
                           }}
-                          className="w-full bg-[hsla(45,60%,55%,0.08)] border-l-4 border-[hsl(45,60%,55%)] rounded-r-lg p-3.5 flex flex-wrap gap-4 items-center justify-between group hover:bg-[hsla(45,60%,55%,0.12)] transition duration-200 cursor-pointer active:scale-95"
+                          className={`w-full bg-[#D1AF47]/[0.06] rounded-2xl p-4 flex flex-wrap gap-4 items-center justify-between group hover:bg-[#D1AF47]/[0.10] hover:shadow-[0_0_20px_rgba(209,175,71,0.12)] hover:scale-[1.01] transition-all duration-300 cursor-pointer active:scale-[0.98] ${isRTL ? "border-r-4" : "border-l-4"} border-[#D1AF47]`}
                         >
                           <div className={isRTL ? "text-right" : "text-left"}>
-                            <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                              <h4 className="font-bold text-sm text-stone-50 group-hover:text-[hsl(45,60%,55%)] transition-colors">{appt.customer}</h4>
-                              <span className="text-[10px] bg-[hsla(0,0%,100%,0.05)] text-[hsl(210,8%,65%)] px-2 py-0.5 rounded-full">{appt.duration}</span>
+                            <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                              <h4 className="font-bold text-sm text-white group-hover:text-[#E0C46A] transition-colors duration-300">{appt.customer}</h4>
+                              <span className="text-[10px] bg-white/[0.06] text-[#7B859C] px-2.5 py-0.5 rounded-full font-medium">{appt.duration}</span>
                             </div>
-                            <p className="text-xs text-[hsl(210,8%,65%)] mt-1">
-                              {t.service}: <span className="text-stone-200 font-semibold">{appt.service}</span>
+                            <p className="text-xs text-[#7B859C] mt-1.5">
+                              {t.service}: <span className="text-[#B8C0D4] font-semibold">{appt.service}</span>
                             </p>
                           </div>
 
                           <div className={`flex items-center gap-6 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                             <div className={isRTL ? "text-left" : "text-right"}>
-                              <p className="text-[10px] text-[hsl(210,8%,65%)]">{t.stylist}</p>
-                              <p className="text-xs font-bold text-[hsl(45,60%,55%)]">{appt.staff}</p>
+                              <p className="text-[10px] text-[#7B859C]">{t.stylist}</p>
+                              <p className="text-xs font-bold text-[#D1AF47]">{appt.staff}</p>
                             </div>
                             <div className={isRTL ? "text-left" : "text-right"}>
-                              <p className="text-[10px] text-[hsl(210,8%,65%)]">{t.price}</p>
-                              <p className="text-xs font-black text-stone-100">{appt.price} SAR</p>
+                              <p className="text-[10px] text-[#7B859C]">{t.price}</p>
+                              <p className="text-xs font-black text-white">{appt.price} SAR</p>
                             </div>
                           </div>
                         </div>
                       ) : (
                         // 5. Open empty slot state
-                        <div className={`w-full h-full rounded-lg border border-dashed border-[hsla(0,0%,100%,0.08)] hover:border-[hsl(45,60%,55%)] hover:bg-[hsla(45,60%,55%,0.02)] transition duration-150 cursor-pointer flex items-center justify-between px-6 text-[hsl(210,8%,65%)] hover:text-[hsl(45,60%,55%)] group`}>
-                          <span className="text-xs font-semibold opacity-0 group-hover:opacity-100 transition duration-150">
+                        <div className={`w-full h-full rounded-2xl border border-dashed border-white/[0.06] hover:border-[#D1AF47]/30 hover:bg-[#D1AF47]/[0.02] transition-all duration-300 cursor-pointer flex items-center justify-between px-6 text-[#7B859C] hover:text-[#D1AF47] group`}>
+                          <span className="text-xs font-semibold opacity-0 group-hover:opacity-100 transition-all duration-300">
                             {lang === "ar" ? "جدولة حجز في هذا الوقت" : "Schedule Walk-in / Booking"}
                           </span>
-                          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition duration-150">
+                          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
                             <button
                               onClick={() => {
                                 setTargetSlotIndex(index);
                                 setShowBookModal(true);
                               }}
-                              className="px-2.5 py-1 bg-stone-900 border border-stone-800 rounded text-[9px] font-bold uppercase tracking-wider text-stone-100 hover:bg-stone-850"
+                              className="px-3 py-1.5 bg-white/[0.04] backdrop-blur-sm border border-white/[0.06] rounded-xl text-[9px] font-bold uppercase tracking-wider text-white hover:bg-[#D1AF47]/10 hover:border-[#D1AF47]/20 hover:text-[#D1AF47] transition-all duration-300"
                             >
                               {t.addAppointment}
                             </button>
                             <button
                               onClick={() => handleBlockSlot(index)}
-                              className="px-2.5 py-1 bg-stone-950 border border-stone-850 rounded text-[9px] font-bold uppercase tracking-wider text-stone-400 hover:bg-stone-900"
+                              className="px-3 py-1.5 bg-white/[0.02] backdrop-blur-sm border border-white/[0.06] rounded-xl text-[9px] font-bold uppercase tracking-wider text-[#7B859C] hover:bg-white/[0.04] hover:text-[#B8C0D4] transition-all duration-300"
                             >
                               {t.blockSlot}
                             </button>
@@ -501,30 +530,32 @@ export default function ProviderCalendarPage() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: CONTROL PANELS */}
+        {/* ─────── RIGHT COLUMN: CONTROL PANELS ─────── */}
         <div className="space-y-6">
-          
+
           {/* A. PRAYER LOCK BUFFER CONTROL */}
-          <div className="bg-[hsl(220,12%,14%)] border border-[hsla(0,0%,100%,0.08)] rounded-xl p-6 shadow-lg space-y-4">
-            <div className={`flex items-center gap-2 pb-3 border-b border-[hsla(0,0%,100%,0.05)] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <svg className="w-5 h-5 text-[hsl(45,60%,55%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-              <h3 className="font-bold text-xs uppercase tracking-wider text-stone-100">{t.prayerControlPanel}</h3>
+          <div className="bg-[#111827]/80 backdrop-blur-sm border border-white/[0.06] rounded-3xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.3)] space-y-5">
+            <div className={`flex items-center gap-2.5 pb-4 border-b border-white/[0.04] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <div className="w-8 h-8 rounded-xl bg-[#D1AF47]/10 flex items-center justify-center">
+                <svg className="w-4 h-4 text-[#D1AF47]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-xs uppercase tracking-[0.15em] text-white">{t.prayerControlPanel}</h3>
             </div>
 
             {/* Buffer time length control */}
-            <div className="space-y-2">
-              <label className="text-[10px] text-stone-400 font-bold uppercase tracking-wider block">{t.bufferDurationLabel}</label>
+            <div className="space-y-2.5">
+              <label className="text-[10px] text-[#7B859C] font-bold uppercase tracking-wider block">{t.bufferDurationLabel}</label>
               <div className="flex gap-2">
                 {[15, 20, 30].map(mins => (
                   <button
                     key={mins}
                     onClick={() => setBufferDuration(mins)}
-                    className={`flex-1 py-1.5 rounded text-[10px] font-black tracking-wider transition ${
+                    className={`flex-1 py-2 rounded-xl text-[10px] font-black tracking-wider transition-all duration-300 ${
                       bufferDuration === mins
-                        ? "bg-[hsl(45,60%,55%)] text-[hsl(220,15%,8%)]"
-                        : "bg-[hsla(0,0%,100%,0.04)] hover:bg-[hsla(0,0%,100%,0.08)] text-stone-300"
+                        ? "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] shadow-[0_0_15px_rgba(209,175,71,0.2)]"
+                        : "bg-white/[0.04] hover:bg-white/[0.08] text-[#B8C0D4] backdrop-blur-sm"
                     }`}
                   >
                     {mins}m
@@ -534,79 +565,56 @@ export default function ProviderCalendarPage() {
             </div>
 
             {/* Individual prayer lock toggles */}
-            <div className="space-y-3 pt-2">
+            <div className="space-y-3.5 pt-2">
               {/* Fajr */}
               <div className={`flex items-center justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="font-semibold text-stone-300">{t.fajr}</span>
-                <input
-                  type="checkbox"
-                  checked={fajrActive}
-                  onChange={(e) => setFajrActive(e.target.checked)}
-                  className="w-4 h-4 rounded accent-[hsl(45,60%,55%)]"
-                />
+                <span className="font-semibold text-[#B8C0D4]">{t.fajr}</span>
+                <ToggleSwitch checked={fajrActive} onChange={setFajrActive} />
               </div>
 
               {/* Dhuhr */}
               <div className={`flex items-center justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="font-semibold text-stone-300">{t.dhuhr}</span>
-                <input
-                  type="checkbox"
-                  checked={dhuhrActive}
-                  onChange={(e) => setDhuhrActive(e.target.checked)}
-                  className="w-4 h-4 rounded accent-[hsl(45,60%,55%)]"
-                />
+                <span className="font-semibold text-[#B8C0D4]">{t.dhuhr}</span>
+                <ToggleSwitch checked={dhuhrActive} onChange={setDhuhrActive} />
               </div>
 
               {/* Asr */}
               <div className={`flex items-center justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="font-semibold text-stone-300">{t.asr}</span>
-                <input
-                  type="checkbox"
-                  checked={asrActive}
-                  onChange={(e) => setAsrActive(e.target.checked)}
-                  className="w-4 h-4 rounded accent-[hsl(45,60%,55%)]"
-                />
+                <span className="font-semibold text-[#B8C0D4]">{t.asr}</span>
+                <ToggleSwitch checked={asrActive} onChange={setAsrActive} />
               </div>
 
               {/* Maghrib */}
               <div className={`flex items-center justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="font-semibold text-stone-300">{t.maghrib}</span>
-                <input
-                  type="checkbox"
-                  checked={maghribActive}
-                  onChange={(e) => setMaghribActive(e.target.checked)}
-                  className="w-4 h-4 rounded accent-[hsl(45,60%,55%)]"
-                />
+                <span className="font-semibold text-[#B8C0D4]">{t.maghrib}</span>
+                <ToggleSwitch checked={maghribActive} onChange={setMaghribActive} />
               </div>
 
               {/* Isha */}
               <div className={`flex items-center justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="font-semibold text-stone-300">{t.isha}</span>
-                <input
-                  type="checkbox"
-                  checked={ishaActive}
-                  onChange={(e) => setIshaActive(e.target.checked)}
-                  className="w-4 h-4 rounded accent-[hsl(45,60%,55%)]"
-                />
+                <span className="font-semibold text-[#B8C0D4]">{t.isha}</span>
+                <ToggleSwitch checked={ishaActive} onChange={setIshaActive} />
               </div>
             </div>
           </div>
 
           {/* B. GEOFENCED LOGISTICS / DISPATCH RADIUS */}
-          <div className="bg-[hsl(220,12%,14%)] border border-[hsla(0,0%,100%,0.08)] rounded-xl p-6 shadow-lg space-y-4">
-            <div className={`flex items-center gap-2 pb-3 border-b border-[hsla(0,0%,100%,0.05)] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <svg className="w-5 h-5 text-[hsl(45,60%,55%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <h3 className="font-bold text-xs uppercase tracking-wider text-stone-100">{t.dispatchControlPanel}</h3>
+          <div className="bg-[#111827]/80 backdrop-blur-sm border border-white/[0.06] rounded-3xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.3)] space-y-5">
+            <div className={`flex items-center gap-2.5 pb-4 border-b border-white/[0.04] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <div className="w-8 h-8 rounded-xl bg-[#D1AF47]/10 flex items-center justify-center">
+                <svg className="w-4 h-4 text-[#D1AF47]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-xs uppercase tracking-[0.15em] text-white">{t.dispatchControlPanel}</h3>
             </div>
 
             {/* Travel boundary radius control */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-[10px] text-stone-400 font-bold uppercase tracking-wider">
-                <span>{t.radiusLabel}</span>
-                <span className="text-[hsl(45,60%,55%)]">{travelRadius} km</span>
+            <div className="space-y-3">
+              <div className={`flex justify-between items-center text-[10px] font-bold uppercase tracking-wider ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                <span className="text-[#7B859C]">{t.radiusLabel}</span>
+                <span className="text-[#D1AF47] bg-[#D1AF47]/10 px-3 py-1 rounded-full text-[10px] font-bold">{travelRadius} km</span>
               </div>
               <input
                 type="range"
@@ -614,15 +622,15 @@ export default function ProviderCalendarPage() {
                 max="50"
                 value={travelRadius}
                 onChange={(e) => setTravelRadius(Number(e.target.value))}
-                className="w-full h-1 bg-stone-800 rounded-lg appearance-none cursor-pointer accent-[hsl(45,60%,55%)]"
+                className="w-full h-1.5 bg-white/[0.06] rounded-lg appearance-none cursor-pointer accent-[#D1AF47]"
               />
             </div>
 
             {/* Traffic delay buffer control */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-[10px] text-stone-400 font-bold uppercase tracking-wider">
-                <span>{t.delayBufferLabel}</span>
-                <span className="text-[hsl(45,60%,55%)]">+{trafficDelay} mins</span>
+            <div className="space-y-3">
+              <div className={`flex justify-between items-center text-[10px] font-bold uppercase tracking-wider ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                <span className="text-[#7B859C]">{t.delayBufferLabel}</span>
+                <span className="text-[#D1AF47] bg-[#D1AF47]/10 px-3 py-1 rounded-full text-[10px] font-bold">+{trafficDelay} mins</span>
               </div>
               <input
                 type="range"
@@ -630,39 +638,41 @@ export default function ProviderCalendarPage() {
                 max="60"
                 value={trafficDelay}
                 onChange={(e) => setTrafficDelay(Number(e.target.value))}
-                className="w-full h-1 bg-stone-800 rounded-lg appearance-none cursor-pointer accent-[hsl(45,60%,55%)]"
+                className="w-full h-1.5 bg-white/[0.06] rounded-lg appearance-none cursor-pointer accent-[#D1AF47]"
               />
             </div>
           </div>
 
           {/* C. ROSTER WORKING HOURS */}
-          <div className="bg-[hsl(220,12%,14%)] border border-[hsla(0,0%,100%,0.08)] rounded-xl p-6 shadow-lg space-y-4">
-            <div className={`flex items-center gap-2 pb-3 border-b border-[hsla(0,0%,100%,0.05)] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <svg className="w-5 h-5 text-[hsl(45,60%,55%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <h3 className="font-bold text-xs uppercase tracking-wider text-stone-100">{t.workingHoursPanel}</h3>
+          <div className="bg-[#111827]/80 backdrop-blur-sm border border-white/[0.06] rounded-3xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.3)] space-y-5">
+            <div className={`flex items-center gap-2.5 pb-4 border-b border-white/[0.04] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <div className="w-8 h-8 rounded-xl bg-[#D1AF47]/10 flex items-center justify-center">
+                <svg className="w-4 h-4 text-[#D1AF47]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-xs uppercase tracking-[0.15em] text-white">{t.workingHoursPanel}</h3>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="text-[9px] text-stone-400 font-bold uppercase">Start</label>
+              <div className="space-y-1.5">
+                <label className="text-[9px] text-[#7B859C] font-bold uppercase tracking-wider">Start</label>
                 <select
                   value={shiftStart}
                   onChange={(e) => setShiftStart(e.target.value)}
-                  className="w-full bg-[hsl(220,15%,8%)] border border-[hsla(0,0%,100%,0.08)] text-xs rounded-lg px-2.5 py-1.5 text-stone-200 outline-none"
+                  className="w-full bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] text-xs rounded-xl px-3 py-2 text-[#B8C0D4] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_12px_rgba(209,175,71,0.1)] transition-all duration-300"
                 >
                   <option value="07:00 AM">07:00 AM</option>
                   <option value="08:00 AM">08:00 AM</option>
                   <option value="09:00 AM">09:00 AM</option>
                 </select>
               </div>
-              <div className="space-y-1">
-                <label className="text-[9px] text-stone-400 font-bold uppercase">End</label>
+              <div className="space-y-1.5">
+                <label className="text-[9px] text-[#7B859C] font-bold uppercase tracking-wider">End</label>
                 <select
                   value={shiftEnd}
                   onChange={(e) => setShiftEnd(e.target.value)}
-                  className="w-full bg-[hsl(220,15%,8%)] border border-[hsla(0,0%,100%,0.08)] text-xs rounded-lg px-2.5 py-1.5 text-stone-200 outline-none"
+                  className="w-full bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] text-xs rounded-xl px-3 py-2 text-[#B8C0D4] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_12px_rgba(209,175,71,0.1)] transition-all duration-300"
                 >
                   <option value="07:00 PM">07:00 PM</option>
                   <option value="08:00 PM">08:00 PM</option>
@@ -677,47 +687,51 @@ export default function ProviderCalendarPage() {
 
       </div>
 
-      {/* WALK-IN BOOKING MODAL */}
+      {/* ═══════════════ WALK-IN BOOKING MODAL ═══════════════ */}
       {showBookModal && targetSlotIndex !== null && (
-        <div className="fixed inset-0 bg-stone-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <form onSubmit={handleBookingSubmit} className="bg-[hsl(220,12%,14%)] border border-[hsla(0,0%,100%,0.1)] rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-xl">
-            <h3 className={`font-bold text-base text-stone-100 ${isRTL ? "text-right" : "text-left"}`}>
+        <div className="fixed inset-0 bg-[#070B12]/70 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+          <form
+            onSubmit={handleBookingSubmit}
+            className="bg-[#111827] border border-white/[0.08] rounded-3xl p-7 max-w-sm w-full space-y-5 shadow-[0_24px_80px_rgba(0,0,0,0.5)] animate-[modalIn_0.25s_ease-out]"
+            style={{ animation: "modalIn 0.25s ease-out" }}
+          >
+            <h3 className={`font-bold text-base text-white ${isRTL ? "text-right" : "text-left"}`}>
               {t.addAppointment} ({timeSlots[targetSlotIndex].label})
             </h3>
 
-            <div className="space-y-1">
-              <label className={`block text-[9px] font-bold uppercase text-stone-400 ${isRTL ? "text-right" : "text-left"}`}>{t.clientName}</label>
+            <div className="space-y-1.5">
+              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>{t.clientName}</label>
               <input
                 type="text"
                 required
                 value={bookCustomer}
                 onChange={e => setBookCustomer(e.target.value)}
                 placeholder="Fahad Al-Malki"
-                className={`w-full bg-[hsl(220,15%,8%)] border border-[hsla(0,0%,100%,0.08)] rounded-xl px-4 py-2 text-xs text-stone-200 outline-none focus:border-[hsl(45,60%,55%)] ${isRTL ? "text-right" : "text-left"}`}
+                className={`w-full bg-white/[0.03] border border-white/[0.06] rounded-2xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 placeholder:text-[#7B859C]/50 ${isRTL ? "text-right" : "text-left"}`}
               />
             </div>
 
-            <div className="space-y-1">
-              <label className={`block text-[9px] font-bold uppercase text-stone-400 ${isRTL ? "text-right" : "text-left"}`}>{t.service}</label>
+            <div className="space-y-1.5">
+              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>{t.service}</label>
               <select
                 value={bookService}
                 onChange={e => setBookService(e.target.value)}
-                className="w-full bg-[hsl(220,15%,8%)] border border-[hsla(0,0%,100%,0.08)] text-xs rounded-xl px-4 py-2.5 text-stone-200 outline-none focus:border-[hsl(45,60%,55%)]"
+                className="w-full bg-white/[0.03] border border-white/[0.06] text-xs rounded-2xl px-4 py-2.5 text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300"
               >
                 <option value="Premium Grooming Pack">Premium Grooming Pack (250 SAR)</option>
-                <option value="Haircut & Styling">Haircut & Styling (120 SAR)</option>
+                <option value="Haircut & Styling">Haircut &amp; Styling (120 SAR)</option>
                 <option value="Beard Grooming">Beard Grooming (80 SAR)</option>
                 <option value="Swedish Therapy Massage">Swedish Therapy Massage (300 SAR)</option>
               </select>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className={`block text-[9px] font-bold uppercase text-stone-400 ${isRTL ? "text-right" : "text-left"}`}>{t.assignedStylist}</label>
+              <div className="space-y-1.5">
+                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>{t.assignedStylist}</label>
                 <select
                   value={bookStaff}
                   onChange={e => setBookStaff(e.target.value)}
-                  className="w-full bg-[hsl(220,15%,8%)] border border-[hsla(0,0%,100%,0.08)] text-xs rounded-xl px-3 py-2 text-stone-200 outline-none focus:border-[hsl(45,60%,55%)]"
+                  className="w-full bg-white/[0.03] border border-white/[0.06] text-xs rounded-2xl px-3 py-2.5 text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300"
                 >
                   <option value="Ali Al-Harbi">Ali Al-Harbi</option>
                   <option value="Elena Rostova">Elena Rostova</option>
@@ -725,40 +739,40 @@ export default function ProviderCalendarPage() {
                 </select>
               </div>
 
-              <div className="space-y-1">
-                <label className={`block text-[9px] font-bold uppercase text-stone-400 ${isRTL ? "text-right" : "text-left"}`}>{t.priceLabel}</label>
+              <div className="space-y-1.5">
+                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>{t.priceLabel}</label>
                 <input
                   type="text"
                   required
                   value={bookPrice}
                   onChange={e => setBookPrice(e.target.value)}
-                  className={`w-full bg-[hsl(220,15%,8%)] border border-[hsla(0,0%,100%,0.08)] rounded-xl px-4 py-2 text-xs text-stone-200 outline-none focus:border-[hsl(45,60%,55%)] ${isRTL ? "text-right" : "text-left"}`}
+                  className={`w-full bg-white/[0.03] border border-white/[0.06] rounded-2xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 ${isRTL ? "text-right" : "text-left"}`}
                 />
               </div>
             </div>
 
-            <div className="space-y-1">
-              <label className={`block text-[9px] font-bold uppercase text-stone-400 ${isRTL ? "text-right" : "text-left"}`}>{t.notes}</label>
+            <div className="space-y-1.5">
+              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>{t.notes}</label>
               <input
                 type="text"
                 value={bookNotes}
                 onChange={e => setBookNotes(e.target.value)}
                 placeholder={t.notesPlaceholder}
-                className={`w-full bg-[hsl(220,15%,8%)] border border-[hsla(0,0%,100%,0.08)] rounded-xl px-4 py-2 text-xs text-stone-200 outline-none focus:border-[hsl(45,60%,55%)] ${isRTL ? "text-right" : "text-left"}`}
+                className={`w-full bg-white/[0.03] border border-white/[0.06] rounded-2xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 placeholder:text-[#7B859C]/50 ${isRTL ? "text-right" : "text-left"}`}
               />
             </div>
 
-            <div className={`flex justify-end gap-3 pt-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <div className={`flex justify-end gap-3 pt-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <button
                 type="button"
                 onClick={() => setShowBookModal(false)}
-                className="px-4 py-2 border border-stone-800 hover:bg-stone-850 rounded-lg text-[10px] font-bold uppercase tracking-wider text-stone-300"
+                className="px-5 py-2.5 bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] hover:bg-white/[0.06] rounded-2xl text-[10px] font-bold uppercase tracking-wider text-[#B8C0D4] hover:text-white transition-all duration-300"
               >
                 {t.cancel}
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 bg-[hsl(45,60%,55%)] hover:bg-[hsl(45,60%,45%)] text-[hsl(220,15%,8%)] text-[10px] font-bold uppercase tracking-widest rounded-lg transition"
+                className="px-6 py-2.5 bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] hover:shadow-[0_0_25px_rgba(209,175,71,0.35)] text-[#070B12] text-[10px] font-bold uppercase tracking-widest rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
               >
                 {t.save}
               </button>
@@ -767,51 +781,54 @@ export default function ProviderCalendarPage() {
         </div>
       )}
 
-      {/* APPOINTMENT DETAILS MODAL */}
+      {/* ═══════════════ APPOINTMENT DETAILS MODAL ═══════════════ */}
       {showDetailsModal && (
-        <div className="fixed inset-0 bg-stone-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[hsl(220,12%,14%)] border border-[hsla(0,0%,100%,0.1)] rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-xl">
-            <h3 className={`font-bold text-base text-stone-100 ${isRTL ? "text-right" : "text-left"}`}>{t.detailsTitle}</h3>
+        <div className="fixed inset-0 bg-[#070B12]/70 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+          <div
+            className="bg-[#111827] border border-white/[0.08] rounded-3xl p-7 max-w-sm w-full space-y-5 shadow-[0_24px_80px_rgba(0,0,0,0.5)]"
+            style={{ animation: "modalIn 0.25s ease-out" }}
+          >
+            <h3 className={`font-bold text-base text-white ${isRTL ? "text-right" : "text-left"}`}>{t.detailsTitle}</h3>
 
-            <div className="space-y-3">
+            <div className="space-y-3.5">
               <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-stone-400">{t.customer}:</span>
-                <span className="font-bold text-stone-100">{showDetailsModal.customer}</span>
+                <span className="text-[#7B859C]">{t.customer}:</span>
+                <span className="font-bold text-white">{showDetailsModal.customer}</span>
               </div>
               <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-stone-400">{t.service}:</span>
-                <span className="font-bold text-stone-100">{showDetailsModal.service}</span>
+                <span className="text-[#7B859C]">{t.service}:</span>
+                <span className="font-bold text-white">{showDetailsModal.service}</span>
               </div>
               <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-stone-400">{t.stylist}:</span>
-                <span className="font-bold text-[hsl(45,60%,55%)]">{showDetailsModal.staff}</span>
+                <span className="text-[#7B859C]">{t.stylist}:</span>
+                <span className="font-bold text-[#D1AF47]">{showDetailsModal.staff}</span>
               </div>
               <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-stone-400">{t.time}:</span>
-                <span className="font-bold text-stone-100">{showDetailsModal.time}</span>
+                <span className="text-[#7B859C]">{t.time}:</span>
+                <span className="font-bold text-white">{showDetailsModal.time}</span>
               </div>
               <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-stone-400">{t.priceLabel}:</span>
-                <span className="font-bold text-stone-100">{showDetailsModal.price} SAR</span>
+                <span className="text-[#7B859C]">{t.priceLabel}:</span>
+                <span className="font-bold text-white">{showDetailsModal.price} SAR</span>
               </div>
               {showDetailsModal.notes && (
                 <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                  <span className="text-stone-400">{t.notes}:</span>
-                  <span className="font-semibold text-stone-300">{showDetailsModal.notes}</span>
+                  <span className="text-[#7B859C]">{t.notes}:</span>
+                  <span className="font-semibold text-[#B8C0D4]">{showDetailsModal.notes}</span>
                 </div>
               )}
             </div>
 
-            <div className={`flex flex-col gap-2 pt-4 border-t border-[hsla(0,0%,100%,0.05)]`}>
+            <div className={`flex flex-col gap-2.5 pt-5 border-t border-white/[0.04]`}>
               <button
                 onClick={() => handleCancelBooking(showDetailsModal.id)}
-                className="w-full py-2 bg-[hsla(355,75%,50%,0.15)] hover:bg-[hsla(355,75%,50%,0.25)] border border-[hsla(355,75%,50%,0.2)] text-[hsl(355,75%,70%)] text-[10px] font-bold uppercase tracking-wider rounded-lg transition"
+                className="w-full py-2.5 bg-[#FF5D73]/[0.08] hover:bg-[#FF5D73]/[0.15] border border-[#FF5D73]/15 text-[#FF5D73] text-[10px] font-bold uppercase tracking-wider rounded-2xl hover:shadow-[0_0_15px_rgba(255,93,115,0.1)] transition-all duration-300"
               >
                 {t.cancelBooking}
               </button>
               <button
                 onClick={() => setShowDetailsModal(null)}
-                className="w-full py-2 bg-stone-900 border border-stone-850 text-stone-300 text-[10px] font-bold uppercase tracking-wider rounded-lg hover:bg-stone-850 transition"
+                className="w-full py-2.5 bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] text-[#B8C0D4] text-[10px] font-bold uppercase tracking-wider rounded-2xl hover:bg-white/[0.06] hover:text-white transition-all duration-300"
               >
                 {t.cancel}
               </button>
@@ -819,6 +836,20 @@ export default function ProviderCalendarPage() {
           </div>
         </div>
       )}
+
+      {/* Modal entrance animation keyframes */}
+      <style>{`
+        @keyframes modalIn {
+          from {
+            opacity: 0;
+            transform: scale(0.95) translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+      `}</style>
 
     </div>
   );

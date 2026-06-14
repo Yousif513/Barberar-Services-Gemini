@@ -117,10 +117,9 @@ export default function ProviderReviewsPage() {
                 employees ( id, name_en, name_ar )
               )
             `)
-            .order("created_at", { ascending: false }); // Wait, should filter bookings.branch_id IN branchIds in JS since postgrest relation filters can be tricky.
+            .order("created_at", { ascending: false });
 
           if (fetchError) throw fetchError;
-          // Filter in client-side to be safe with Supabase relationship queries
           setReviews(reviewsData || []);
           return;
         }
@@ -203,150 +202,198 @@ export default function ProviderReviewsPage() {
   const isRTL = locale === "ar";
 
   return (
-    <div className="space-y-8 font-sans">
+    <div className="space-y-8 font-sans text-white p-1">
       {/* HEADER */}
-      <div className={isRTL ? "text-right" : "text-left"}>
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900 font-serif">{t.title}</h2>
-        <p className="text-sm text-gray-500 mt-1">{t.subtitle}</p>
+      <div className={`flex flex-col gap-2 ${isRTL ? "text-right items-end" : "text-left items-start"}`}>
+        <h2 className="text-3xl font-extrabold tracking-tight text-white font-serif bg-clip-text bg-gradient-to-r from-white via-[#B8C0D4] to-[#7B859C]">
+          {t.title}
+        </h2>
+        <p className="text-sm text-[#B8C0D4] max-w-2xl font-light leading-relaxed">{t.subtitle}</p>
+        <div className="w-16 h-1 bg-[#D1AF47] rounded-full mt-1"></div>
       </div>
 
       {error && (
-        <div className={`bg-stone-50 border border-stone-200 text-stone-700 text-xs rounded-xl p-4 ${isRTL ? "text-right" : "text-left"}`}>
-          Notice: {error}
+        <div className={`bg-[#172033]/80 border border-[#D1AF47]/20 text-[#B8C0D4] text-xs rounded-2xl p-4 shadow-[0_0_20px_rgba(209,175,71,0.05)] backdrop-blur-md ${isRTL ? "text-right" : "text-left"}`}>
+          <span className="text-[#D1AF47] font-semibold mr-1.5">{isRTL ? "ملاحظة:" : "Notice:"}</span> {error}
         </div>
       )}
 
       {/* METRIC SUMMARIES */}
-      <div className={`grid grid-cols-1 sm:grid-cols-3 gap-6 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-[hsl(45,60%,55%)] transition duration-200">
+      <div dir={isRTL ? "rtl" : "ltr"} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* AVERAGE RATING */}
+        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-xl transition-all duration-300 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] flex flex-col justify-between relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47]/5 rounded-full blur-3xl pointer-events-none transition-all duration-300 group-hover:bg-[#D1AF47]/10" />
           <div className={isRTL ? "text-right" : "text-left"}>
-            <span className="text-[10px] uppercase font-bold text-gray-400 block tracking-wider">{t.avgRating}</span>
-            <div className={`flex items-baseline gap-2 mt-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <span className="text-3xl font-bold text-gray-900">{averageRating}</span>
-              <span className="text-sm text-gray-400 font-semibold">/ 5.0</span>
+            <span className="text-[10px] uppercase font-bold text-[#7B859C] block tracking-widest">{t.avgRating}</span>
+            <div className={`flex items-baseline gap-2 mt-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <span className="text-4xl font-extrabold text-white tracking-tight">{averageRating}</span>
+              <span className="text-sm text-[#7B859C] font-semibold">/ 5.0</span>
             </div>
-            <div className={`flex gap-1 text-[hsl(45,60%,55%)] mt-2 ${isRTL ? "justify-end" : "justify-start"}`}>
-              {Array.from({ length: 5 }).map((_, i) => (
-                <span key={i} className="text-sm">★</span>
-              ))}
+            <div className={`flex gap-1 mt-3.5 ${isRTL ? "justify-end" : "justify-start"}`}>
+              {Array.from({ length: 5 }).map((_, i) => {
+                const ratingValue = parseFloat(averageRating);
+                const isFilled = i < Math.floor(ratingValue);
+                return (
+                  <span key={i} className={`text-base ${isFilled ? "text-[#D1AF47]" : "text-[#7B859C]/20"}`}>★</span>
+                );
+              })}
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-[hsl(45,60%,55%)] transition duration-200">
+        {/* TOTAL REVIEWS */}
+        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-xl transition-all duration-300 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] flex flex-col justify-between relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47]/5 rounded-full blur-3xl pointer-events-none transition-all duration-300 group-hover:bg-[#D1AF47]/10" />
           <div className={isRTL ? "text-right" : "text-left"}>
-            <span className="text-[10px] uppercase font-bold text-gray-400 block tracking-wider">{t.totalReviews}</span>
-            <span className="text-3xl font-bold text-gray-900 mt-2 block">{reviews.length}</span>
-            <span className="text-[10px] text-gray-400 font-semibold block mt-2">
-              {isRTL ? "تقييمات عملاء موثقة 100%" : "100% verified customer ratings"}
-            </span>
+            <span className="text-[10px] uppercase font-bold text-[#7B859C] block tracking-widest">{t.totalReviews}</span>
+            <span className="text-4xl font-extrabold text-white mt-3 block tracking-tight">{reviews.length}</span>
+            <div className={`flex items-center gap-1.5 mt-4 ${isRTL ? "justify-end" : "justify-start"}`}>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84] animate-pulse" />
+              <span className="text-[10px] text-[#B8C0D4] font-medium tracking-wide">
+                {isRTL ? "تقييمات عملاء موثقة 100%" : "100% verified customer ratings"}
+              </span>
+            </div>
           </div>
         </div>
 
         {/* STAFF FILTER */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-          <div className="space-y-2">
-            <span className={`text-[10px] uppercase font-bold text-gray-400 block tracking-wider ${isRTL ? "text-right" : "text-left"}`}>{t.filterStaff}</span>
-            <select
-              value={selectedStaffId}
-              onChange={(e) => setSelectedStaffId(e.target.value)}
-              className={`w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 font-semibold ${isRTL ? "text-right" : "text-left"}`}
-            >
-              <option value="all">{t.allStaff}</option>
-              {staffList.map((emp) => (
-                <option key={emp.id} value={emp.id}>
-                  {locale === "ar" ? emp.name_ar : emp.name_en}
-                </option>
-              ))}
-            </select>
+        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-xl flex flex-col justify-between relative overflow-hidden">
+          <div className="space-y-3">
+            <span className={`text-[10px] uppercase font-bold text-[#7B859C] block tracking-widest ${isRTL ? "text-right" : "text-left"}`}>{t.filterStaff}</span>
+            <div className="relative mt-2">
+              <select
+                value={selectedStaffId}
+                onChange={(e) => setSelectedStaffId(e.target.value)}
+                className={`w-full bg-[#172033] border border-white/[0.08] text-white rounded-xl px-4 py-2.5 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47]/50 font-medium transition duration-200 appearance-none ${isRTL ? "text-right pr-4 pl-8" : "text-left pl-4 pr-8"}`}
+              >
+                <option value="all" className="bg-[#172033] text-white">{t.allStaff}</option>
+                {staffList.map((emp) => (
+                  <option key={emp.id} value={emp.id} className="bg-[#172033] text-white">
+                    {locale === "ar" ? emp.name_ar : emp.name_en}
+                  </option>
+                ))}
+              </select>
+              <div className={`pointer-events-none absolute inset-y-0 flex items-center px-2 text-[#7B859C] ${isRTL ? "left-3" : "right-3"}`}>
+                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
+      {/* REVIEWS LIST */}
       {loading ? (
-        <div className="text-center py-12 text-stone-400 text-xs font-semibold">{isRTL ? "جاري تحميل التقييمات..." : "Loading feedback..."}</div>
+        <div className="flex flex-col items-center justify-center py-20 space-y-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#D1AF47]"></div>
+          <span className="text-[#B8C0D4] text-xs font-semibold tracking-wider">
+            {isRTL ? "جاري تحميل التقييمات..." : "Loading feedback..."}
+          </span>
+        </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-2xl p-12 text-center text-stone-400 shadow-sm font-semibold text-xs">
-          <p>{t.noReviews}</p>
+        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-16 text-center text-[#7B859C] shadow-xl font-medium text-sm max-w-lg mx-auto">
+          <div className="text-4xl mb-4 text-[#D1AF47]">★</div>
+          <p className="text-white font-semibold mb-2">{t.noReviews}</p>
+          <p className="text-xs text-[#7B859C]">{isRTL ? "سيظهر تقييم العملاء هنا فور استلامه." : "Customer reviews will appear here once submitted."}</p>
         </div>
       ) : (
         <div className="space-y-6">
           {filtered.map((rev) => (
             <div
               key={rev.id}
-              className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-4 hover:border-[hsl(45,60%,55%)] transition duration-200"
+              dir={isRTL ? "rtl" : "ltr"}
+              className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-xl space-y-5 hover:border-[#D1AF47]/20 transition-all duration-300 hover:shadow-[0_4px_30px_rgba(0,0,0,0.4)] relative overflow-hidden"
             >
-              <div className={`flex justify-between items-start flex-wrap gap-4 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <div className={isRTL ? "text-right" : "text-left"}>
-                  <h4 className="font-bold text-xs text-gray-800">
-                    {rev.bookings?.profiles?.first_name} {rev.bookings?.profiles?.last_name?.[0]}.
-                  </h4>
-                  <p className="text-[10px] text-gray-400 font-semibold mt-0.5">
-                    {t.service}: {locale === "ar" ? rev.bookings?.services?.name_ar : rev.bookings?.services?.name_en} • {locale === "ar" ? rev.bookings?.employees?.name_ar : rev.bookings?.employees?.name_en}
-                  </p>
+              {/* Header inside review card */}
+              <div className="flex justify-between items-start flex-wrap gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#D1AF47]/20 to-[#B8952E]/5 border border-[#D1AF47]/20 flex items-center justify-center text-[#D1AF47] font-bold text-sm tracking-wide shadow-[0_0_15px_rgba(209,175,71,0.1)]">
+                    {rev.bookings?.profiles?.first_name?.[0]?.toUpperCase() || "C"}
+                  </div>
+                  <div className={isRTL ? "text-right" : "text-left"}>
+                    <h4 className="font-semibold text-sm text-white tracking-wide">
+                      {rev.bookings?.profiles?.first_name} {rev.bookings?.profiles?.last_name?.[0]}.
+                    </h4>
+                    <span className="text-[10px] text-[#7B859C] block mt-0.5 font-light">
+                      {new Date(rev.created_at).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </span>
+                  </div>
                 </div>
 
-                <div className={isRTL ? "text-left" : "text-right"}>
-                  <div className={`flex gap-0.5 ${isRTL ? "justify-start" : "justify-end"}`}>
+                <div className="flex flex-col items-end gap-1.5">
+                  <div className="flex gap-0.5">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <span
                         key={star}
-                        className={`text-xs ${star <= rev.rating ? "text-[hsl(45,60%,55%)]" : "text-gray-200"}`}
+                        className={`text-sm ${star <= rev.rating ? "text-[#D1AF47]" : "text-[#7B859C]/20"}`}
                       >
                         ★
                       </span>
                     ))}
                   </div>
-                  <span className="text-[9px] text-gray-400 block mt-1">
-                    {new Date(rev.created_at).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </span>
                 </div>
               </div>
 
+              {/* Service & Stylist Tags */}
+              <div className="flex flex-wrap gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-medium bg-[#172033] border border-white/[0.04] text-[#B8C0D4]">
+                  <span className="text-[#D1AF47] text-xs">✂</span>
+                  <span>{t.service}: {locale === "ar" ? rev.bookings?.services?.name_ar : rev.bookings?.services?.name_en}</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-medium bg-[#172033] border border-white/[0.04] text-[#B8C0D4]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47]" />
+                  <span>{locale === "ar" ? rev.bookings?.employees?.name_ar : rev.bookings?.employees?.name_en}</span>
+                </span>
+              </div>
+
               {/* Client comment */}
-              <p className={`text-xs text-gray-700 bg-gray-50 border border-gray-100 rounded-xl p-3 leading-relaxed ${isRTL ? "text-right" : "text-left"}`}>
-                {rev.comment}
+              <p className="text-xs text-[#B8C0D4] bg-[#0D1422] border border-white/[0.04] rounded-2xl p-4 leading-relaxed font-light">
+                "{rev.comment}"
               </p>
 
               {/* Salon Response section */}
               {rev.reply_comment ? (
-                <div className={`bg-stone-900 text-stone-100 rounded-xl p-4 space-y-1 relative border border-stone-850 ${isRTL ? "text-right mr-6 ml-0" : "text-left ml-6 mr-0"}`}>
-                  <span className="text-[9px] uppercase font-bold text-[hsl(45,60%,55%)] block">
-                    {isRTL ? "رد المركز" : "Salon Response"}
-                  </span>
-                  <p className="text-xs leading-relaxed text-stone-300 font-medium">{rev.reply_comment}</p>
+                <div className={`bg-[#172033]/60 text-white rounded-2xl p-4 space-y-2 relative border border-[#D1AF47]/10 shadow-[0_0_15px_rgba(209,175,71,0.02)] ${isRTL ? "mr-6 ml-0 border-r-2 border-r-[#D1AF47]" : "ml-6 mr-0 border-l-2 border-l-[#D1AF47]"}`}>
+                  <div className={`flex items-center justify-between ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                    <span className="text-[10px] uppercase font-bold text-[#D1AF47] tracking-widest block font-serif">
+                      {isRTL ? "رد المركز" : "Salon Response"}
+                    </span>
+                    <span className="text-[10px] text-[#3DDC84] font-semibold">✓</span>
+                  </div>
+                  <p className="text-xs leading-relaxed text-[#B8C0D4] font-medium">{rev.reply_comment}</p>
                 </div>
               ) : replyingReviewId !== rev.id ? (
-                <div className={`pt-2 ${isRTL ? "text-left" : "text-right"}`}>
+                <div className={`pt-1 ${isRTL ? "text-left" : "text-right"}`}>
                   <button
                     onClick={() => {
                       setReplyingReviewId(rev.id);
                       setReplyText("");
                     }}
-                    className="px-3.5 py-2 border border-gray-200 hover:border-black text-[10px] font-bold rounded-lg text-gray-700 transition bg-white shadow-sm"
+                    className="px-4 py-2 border border-white/[0.08] hover:border-[#D1AF47] text-[10px] font-bold uppercase tracking-wider rounded-xl text-white transition-all duration-300 bg-[#172033] hover:bg-[#1d2942] hover:shadow-[0_0_15px_rgba(209,175,71,0.15)]"
                   >
                     {t.reply}
                   </button>
                 </div>
               ) : (
-                <div className={`pt-2 space-y-3 ${isRTL ? "mr-6 ml-0" : "ml-6 mr-0"}`}>
+                <div className={`pt-1 space-y-3 ${isRTL ? "mr-6 ml-0" : "ml-6 mr-0"}`}>
                   <textarea
-                    rows={2}
+                    rows={3}
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                     placeholder={t.replyPlaceholder}
-                    className={`w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs text-gray-700 outline-none focus:border-[hsl(45,60%,55%)] ${isRTL ? "text-right" : "text-left"}`}
+                    className="w-full bg-[#0D1422] border border-white/[0.08] rounded-xl p-4 text-xs text-white placeholder-[#7B859C] outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] transition duration-200"
                   />
-                  <div className={`flex gap-2 ${isRTL ? "justify-start" : "justify-end"}`}>
+                  <div className="flex gap-3 justify-end">
                     <button
                       onClick={() => setReplyingReviewId(null)}
-                      className="px-3 py-1.5 border border-gray-200 text-[10px] text-gray-500 rounded-lg hover:text-gray-700"
+                      className="px-4 py-2 border border-white/[0.08] text-[10px] font-bold uppercase tracking-wider text-[#B8C0D4] rounded-xl hover:text-white hover:border-white/20 transition-all duration-300"
                     >
                       {isRTL ? "إلغاء" : "Cancel"}
                     </button>
                     <button
                       onClick={() => postReply(rev.id)}
-                      className="px-3.5 py-1.5 bg-black text-white font-bold text-[10px] rounded-lg hover:bg-gray-800 transition"
+                      className="px-4 py-2 bg-gradient-to-r from-[#D1AF47] to-[#B8952E] text-white font-bold text-[10px] uppercase tracking-wider rounded-xl hover:from-[#E0C46A] hover:to-[#D1AF47] transition-all duration-300 shadow-[0_4px_15px_rgba(209,175,71,0.2)]"
                     >
                       {t.postReply}
                     </button>

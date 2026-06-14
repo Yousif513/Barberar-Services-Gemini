@@ -303,174 +303,204 @@ export default function PackagesPage() {
   return (
     <div className="space-y-8">
       {/* HEADER */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-gray-900">Wellness Packages & Passes</h2>
-          <p className="text-sm text-gray-500 mt-1">Configure multi-session memberships, passes, and promotional spa/grooming packages.</p>
+          <h2 className="text-2xl font-serif font-bold tracking-wide text-white">Wellness Packages & Passes</h2>
+          <p className="text-sm text-[#B8C0D4] mt-1">Configure multi-session memberships, passes, and promotional spa/grooming packages.</p>
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="px-4 py-2 bg-black text-white hover:bg-gray-800 rounded-xl text-xs font-bold transition duration-150 flex items-center gap-2"
+          className="px-5 py-3 bg-[#D1AF47] hover:bg-[#E0C46A] text-[#070B12] rounded-[18px] text-xs font-bold transition-all duration-300 shadow-[0_0_20px_rgba(209,175,71,0.15)] hover:shadow-[0_0_25px_rgba(224,196,106,0.3)] hover:scale-[1.02] flex items-center justify-center gap-2"
         >
-          {showAddForm ? "Close Form" : "Create Wellness Package"}
+          {showAddForm ? (
+            <>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              <span>Close Form</span>
+            </>
+          ) : (
+            <>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              <span>Create Wellness Package</span>
+            </>
+          )}
         </button>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-4">
-          Error: {error}
+        <div className="bg-red-950/20 border border-[#FF5D73]/30 text-[#FF5D73] text-xs rounded-[20px] p-4 flex items-center gap-3">
+          <span className="w-2 h-2 rounded-full bg-[#FF5D73] animate-pulse" />
+          <span>Error: {error}</span>
         </div>
       )}
 
       {success && (
-        <div className="bg-green-50 border border-green-200 text-green-700 text-xs rounded-xl p-4">
-          Success: {success}
+        <div className="bg-green-950/20 border border-[#3DDC84]/30 text-[#3DDC84] text-xs rounded-[20px] p-4 flex items-center gap-3">
+          <span className="w-2 h-2 rounded-full bg-[#3DDC84] animate-pulse" />
+          <span>Success: {success}</span>
         </div>
       )}
 
       {/* ADD PACKAGE DIALOG */}
       {showAddForm && (
-        <form onSubmit={handleAddPackage} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm max-w-2xl space-y-4">
-          <h3 className="font-bold text-sm text-gray-800">Create Package Template</h3>
+        <form onSubmit={handleAddPackage} className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-8 shadow-[0_8px_32px_rgba(0,0,0,0.4)] max-w-2xl space-y-6">
+          <h3 className="font-bold text-sm text-white tracking-wide uppercase">Create Package Template</h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Package Name (English)</label>
+              <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] block mb-2">Package Name (English)</label>
               <input
                 type="text"
                 placeholder="e.g. Deep Tissue 5-Session Pass"
                 value={nameEn}
                 onChange={(e) => setNameEn(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 font-semibold"
+                className="w-full bg-[#0D1422] border border-white/[0.06] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-white font-semibold transition-all duration-200"
                 required
               />
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Package Name (Arabic)</label>
+              <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] block mb-2">Package Name (Arabic)</label>
               <input
                 type="text"
                 placeholder="مثال: باقة 5 جلسات مساج عميق"
                 value={nameAr}
                 onChange={(e) => setNameAr(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 font-semibold"
+                className="w-full bg-[#0D1422] border border-white/[0.06] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-white font-semibold transition-all duration-200"
                 required
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Description (English)</label>
+              <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] block mb-2">Description (English)</label>
               <textarea
                 placeholder="Specify what services are included and terms..."
                 value={descEn}
                 onChange={(e) => setDescEn(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 min-h-[60px]"
+                className="w-full bg-[#0D1422] border border-white/[0.06] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-white min-h-[80px] transition-all duration-200"
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Description (Arabic)</label>
+              <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] block mb-2">Description (Arabic)</label>
               <textarea
                 placeholder="حدد الخدمات المشمولة والشروط باللغة العربية..."
                 value={descAr}
                 onChange={(e) => setDescAr(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 min-h-[60px]"
+                className="w-full bg-[#0D1422] border border-white/[0.06] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-white min-h-[80px] transition-all duration-200"
               />
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Package Price (SAR)</label>
+              <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] block mb-2">Package Price (SAR)</label>
               <input
                 type="number"
                 min="1"
                 value={price}
                 onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 font-semibold"
+                className="w-full bg-[#0D1422] border border-white/[0.06] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-white font-semibold transition-all duration-200"
                 required
               />
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Sessions Count</label>
+              <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] block mb-2">Sessions Count</label>
               <input
                 type="number"
                 min="1"
                 value={sessionCount}
                 onChange={(e) => setSessionCount(parseInt(e.target.value) || 1)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 font-semibold"
+                className="w-full bg-[#0D1422] border border-white/[0.06] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-white font-semibold transition-all duration-200"
                 required
               />
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Expires After (Days)</label>
+              <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] block mb-2">Expires After (Days)</label>
               <input
                 type="number"
                 min="1"
                 value={expiresInDays}
                 onChange={(e) => setExpiresInDays(parseInt(e.target.value) || 365)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 font-semibold"
+                className="w-full bg-[#0D1422] border border-white/[0.06] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-white font-semibold transition-all duration-200"
                 required
               />
             </div>
           </div>
 
-          <button
-            type="submit"
-            className="px-4 py-2 bg-[hsl(45,60%,55%)] hover:bg-[hsl(45,60%,45%)] text-black font-bold text-xs rounded-xl transition duration-150"
-          >
-            Create Package Template
-          </button>
+          <div className="pt-2">
+            <button
+              type="submit"
+              className="w-full md:w-auto px-6 py-3 bg-[#D1AF47] hover:bg-[#E0C46A] text-[#070B12] font-bold text-xs rounded-[16px] transition-all duration-300 shadow-[0_0_20px_rgba(209,175,71,0.15)] hover:scale-[1.02]"
+            >
+              Create Package Template
+            </button>
+          </div>
         </form>
       )}
 
       {/* PACKAGES GRID */}
       {loading ? (
-        <div className="text-center py-12 text-sm text-gray-400">Loading package templates...</div>
+        <div className="flex flex-col items-center justify-center py-20 space-y-4">
+          <div className="w-8 h-8 rounded-full border-2 border-[#D1AF47] border-t-transparent animate-spin" />
+          <div className="text-sm text-[#7B859C] tracking-wide">Loading package templates...</div>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {packages.map((pkg) => (
             <div
               key={pkg.id}
-              className={`bg-white border rounded-2xl p-6 shadow-sm flex flex-col justify-between transition duration-200 ${
-                pkg.is_active ? "border-gray-200 hover:border-[hsl(45,60%,55%)]" : "border-gray-100 opacity-60"
+              className={`bg-[#111827] border rounded-[24px] p-6 shadow-xl flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] ${
+                pkg.is_active 
+                  ? "border-white/[0.06] hover:border-[#D1AF47]/50 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)]" 
+                  : "border-white/[0.03] opacity-50"
               }`}
             >
               <div>
-                <div className="flex justify-between items-start mb-3">
-                  <span className="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200 rounded px-2 py-0.5">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-[10px] font-bold text-[#D1AF47] bg-[#D1AF47]/10 border border-[#D1AF47]/20 rounded-full px-3 py-1">
                     {pkg.session_count} Sessions
                   </span>
-                  <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${
-                    pkg.is_active ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"
+                  <span className={`px-2.5 py-1 rounded-full text-[9px] font-bold flex items-center gap-1.5 ${
+                    pkg.is_active 
+                      ? "bg-[#3DDC84]/10 text-[#3DDC84] border border-[#3DDC84]/20" 
+                      : "bg-[#FF5D73]/10 text-[#FF5D73] border border-[#FF5D73]/20"
                   }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${pkg.is_active ? "bg-[#3DDC84]" : "bg-[#FF5D73]"}`} />
                     {pkg.is_active ? "Active" : "Inactive"}
                   </span>
                 </div>
-                <h4 className="font-bold text-sm text-gray-800">{pkg.name_en}</h4>
-                <h5 className="font-bold text-xs text-gray-500 mt-0.5">{pkg.name_ar}</h5>
+                <h4 className="font-bold text-base text-white tracking-wide">{pkg.name_en}</h4>
+                <h5 className="font-bold text-xs text-[#7B859C] mt-1">{pkg.name_ar}</h5>
                 
-                <p className="text-xs text-gray-500 mt-3 line-clamp-3 leading-relaxed">{pkg.description_en}</p>
-                <p className="text-xs text-gray-400 mt-1 line-clamp-3 leading-relaxed italic">{pkg.description_ar}</p>
+                <div className="space-y-2.5 mt-4">
+                  <p className="text-xs text-[#B8C0D4] line-clamp-3 leading-relaxed">{pkg.description_en}</p>
+                  {pkg.description_ar && (
+                    <p className="text-xs text-[#7B859C] line-clamp-3 leading-relaxed italic">{pkg.description_ar}</p>
+                  )}
+                </div>
 
-                <div className="mt-6 border-t border-gray-100 pt-4 flex justify-between items-end">
+                <div className="mt-6 border-t border-white/[0.06] pt-4 flex justify-between items-end">
                   <div>
-                    <span className="text-[10px] text-gray-400 block font-bold">PACKAGE PRICE</span>
-                    <span className="text-lg font-extrabold text-gray-900">{pkg.price} SAR</span>
+                    <span className="text-[9px] text-[#7B859C] block font-bold tracking-wider uppercase">Package Price</span>
+                    <span className="text-lg font-extrabold text-[#D1AF47]">{pkg.price} SAR</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] text-gray-400 block font-bold">VALIDITY</span>
-                    <span className="text-xs font-bold text-gray-600">{pkg.expires_in_days} Days</span>
+                    <span className="text-[9px] text-[#7B859C] block font-bold tracking-wider uppercase">Validity</span>
+                    <span className="text-xs font-bold text-white">{pkg.expires_in_days} Days</span>
                   </div>
                 </div>
               </div>
 
               <button
                 onClick={() => togglePackageStatus(pkg.id, pkg.is_active)}
-                className={`w-full py-2.5 rounded-xl text-xs font-bold border transition duration-150 mt-6 ${
+                className={`w-full py-3 rounded-[16px] text-xs font-bold border transition-all duration-300 mt-6 ${
                   pkg.is_active 
-                    ? "bg-gray-50 hover:bg-red-50 hover:text-red-700 hover:border-red-200 text-gray-600 border-gray-200" 
-                    : "bg-green-50 text-green-700 hover:bg-green-100 border-green-200"
+                    ? "bg-[#0D1422] hover:bg-[#FF5D73]/10 hover:text-[#FF5D73] hover:border-[#FF5D73]/30 text-[#B8C0D4] border-white/[0.06]" 
+                    : "bg-[#3DDC84]/10 text-[#3DDC84] hover:bg-[#3DDC84]/20 border-[#3DDC84]/30"
                 }`}
               >
                 {pkg.is_active ? "Deactivate Package" : "Activate Package"}
@@ -481,54 +511,63 @@ export default function PackagesPage() {
       )}
 
       {/* ACTIVE PURCHASED MEMBERSHIPS */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mt-8">
-        <h3 className="text-base font-bold text-gray-900 mb-2">Active Client Memberships</h3>
-        <p className="text-xs text-gray-500 mb-6">Track customer package balances and manually deduct sessions upon client visits.</p>
+      <div className="bg-[#111827] border border-white/[0.06] rounded-[28px] p-8 shadow-xl mt-8">
+        <div className="mb-6">
+          <h3 className="text-base font-bold text-white tracking-wide mb-1">Active Client Memberships</h3>
+          <p className="text-xs text-[#B8C0D4]">Track customer package balances and manually deduct sessions upon client visits.</p>
+        </div>
 
         {loadingMemberships ? (
-          <div className="text-center py-6 text-xs text-gray-400">Loading client memberships...</div>
+          <div className="flex flex-col items-center justify-center py-10 space-y-3">
+            <div className="w-6 h-6 rounded-full border-2 border-[#D1AF47] border-t-transparent animate-spin" />
+            <div className="text-xs text-[#7B859C]">Loading client memberships...</div>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left border-collapse">
               <thead>
-                <tr className="border-b border-gray-200 text-gray-400 font-bold bg-gray-50 uppercase text-[10px]">
-                  <th className="py-3 px-4 text-left">Customer</th>
-                  <th className="py-3 px-4 text-left">Package</th>
-                  <th className="py-3 px-4 text-left">Sessions Remaining</th>
-                  <th className="py-3 px-4 text-left">Expiry Date</th>
-                  <th className="py-3 px-4 text-center">Actions</th>
+                <tr className="border-b border-white/[0.06] text-[#7B859C] font-bold bg-[#0D1422] uppercase text-[10px] tracking-wider">
+                  <th className="py-4 px-5 text-left first:rounded-l-[14px] last:rounded-r-[14px]">Customer</th>
+                  <th className="py-4 px-5 text-left">Package</th>
+                  <th className="py-4 px-5 text-left">Sessions Remaining</th>
+                  <th className="py-4 px-5 text-left">Expiry Date</th>
+                  <th className="py-4 px-5 text-center first:rounded-l-[14px] last:rounded-r-[14px]">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-white/[0.06]">
                 {activeMemberships.map((mem) => (
-                  <tr key={mem.id} className="hover:bg-gray-50 transition">
-                    <td className="py-3 px-4">
-                      <div className="font-bold text-gray-800">{mem.customer_name}</div>
-                      <div className="text-[10px] text-gray-400">{mem.customer_phone}</div>
+                  <tr key={mem.id} className="hover:bg-[#172033]/50 transition-all duration-200">
+                    <td className="py-4 px-5">
+                      <div className="font-bold text-white">{mem.customer_name}</div>
+                      <div className="text-[10px] text-[#7B859C] mt-0.5">{mem.customer_phone}</div>
                     </td>
-                    <td className="py-3 px-4">
-                      <div className="font-semibold text-gray-700">{mem.package_name_en}</div>
-                      <div className="text-[10px] text-gray-400">{mem.package_name_ar}</div>
+                    <td className="py-4 px-5">
+                      <div className="font-semibold text-[#B8C0D4]">{mem.package_name_en}</div>
+                      <div className="text-[10px] text-[#7B859C] mt-0.5">{mem.package_name_ar}</div>
                     </td>
-                    <td className="py-3 px-4 font-bold text-amber-600">{mem.remaining_sessions} sessions</td>
-                    <td className="py-3 px-4 text-gray-500">{mem.expires_at}</td>
-                    <td className="py-3 px-4 text-center">
+                    <td className="py-4 px-5 font-bold text-[#D1AF47]">
+                      {mem.remaining_sessions} sessions
+                    </td>
+                    <td className="py-4 px-5 text-[#B8C0D4]">{mem.expires_at}</td>
+                    <td className="py-4 px-5 text-center">
                       {mem.remaining_sessions > 0 ? (
                         <button
                           onClick={() => handleDeductSession(mem.id, mem.remaining_sessions)}
-                          className="px-3 py-1.5 bg-black hover:bg-gray-800 text-white rounded-lg font-bold text-[10px] transition"
+                          className="px-4 py-2 bg-[#D1AF47] hover:bg-[#E0C46A] text-[#070B12] rounded-[12px] font-bold text-[10px] transition-all duration-300 shadow-[0_0_15px_rgba(209,175,71,0.1)] hover:scale-[1.02]"
                         >
                           Deduct Session
                         </button>
                       ) : (
-                        <span className="text-[10px] font-bold text-gray-400">Consumed</span>
+                        <span className="text-[10px] font-bold text-[#7B859C] bg-white/[0.04] border border-white/[0.06] px-2.5 py-1 rounded-full">
+                          Consumed
+                        </span>
                       )}
                     </td>
                   </tr>
                 ))}
                 {activeMemberships.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="text-center py-6 text-gray-400">
+                    <td colSpan={5} className="text-center py-8 text-[#7B859C]">
                       No active client memberships found.
                     </td>
                   </tr>
