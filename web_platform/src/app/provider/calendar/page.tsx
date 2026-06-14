@@ -166,6 +166,8 @@ export default function ProviderCalendarPage() {
   ]);
 
   // --- 2. CONTROL PANEL STATES ---
+  const [draggedOverSlot, setDraggedOverSlot] = useState<number | null>(null);
+
   // Prayer buffers active state
   const [fajrActive, setFajrActive] = useState(true);
   const [dhuhrActive, setDhuhrActive] = useState(true);
@@ -346,7 +348,36 @@ export default function ProviderCalendarPage() {
                     </div>
 
                     {/* Slot content area */}
-                    <div className="flex-grow p-2 relative flex items-center">
+                    <div 
+                      className={`flex-grow p-2 relative flex items-center transition duration-150 ${
+                        draggedOverSlot === index ? "bg-[hsla(45,60%,55%,0.06)] border border-dashed border-[hsl(45,60%,55%)] rounded-lg" : ""
+                      }`}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        if (!isLocked && !blocked && !appt) {
+                          setDraggedOverSlot(index);
+                        }
+                      }}
+                      onDragLeave={() => setDraggedOverSlot(null)}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        setDraggedOverSlot(null);
+                        const apptId = e.dataTransfer.getData("text/plain");
+                        if (apptId && !isLocked && !blocked && !appt) {
+                          setAppointments(prev => prev.map(a => {
+                            if (a.id === apptId) {
+                              const newLabel = timeSlots[index].label;
+                              return {
+                                ...a,
+                                slotIndex: index,
+                                time: `${newLabel} - ${lang === "ar" ? "تعديل موعد" : "Rescheduled"}`
+                              };
+                            }
+                            return a;
+                          }));
+                        }
+                      }}
+                    >
                       {isLocked ? (
                         // 1. Prayer Lockout Buffer state
                         <div className={`w-full h-full bg-[hsla(355,75%,50%,0.05)] border border-[hsla(355,75%,50%,0.15)] rounded-lg flex items-center justify-between px-4 gap-3 text-[hsl(355,75%,60%)] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
@@ -409,7 +440,11 @@ export default function ProviderCalendarPage() {
                         // 4. Booked Appointment state
                         <div 
                           onClick={() => setShowDetailsModal(appt)}
-                          className="w-full bg-[hsla(45,60%,55%,0.08)] border-l-4 border-[hsl(45,60%,55%)] rounded-r-lg p-3.5 flex flex-wrap gap-4 items-center justify-between group hover:bg-[hsla(45,60%,55%,0.12)] transition duration-200 cursor-pointer"
+                          draggable
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData("text/plain", appt.id);
+                          }}
+                          className="w-full bg-[hsla(45,60%,55%,0.08)] border-l-4 border-[hsl(45,60%,55%)] rounded-r-lg p-3.5 flex flex-wrap gap-4 items-center justify-between group hover:bg-[hsla(45,60%,55%,0.12)] transition duration-200 cursor-pointer active:scale-95"
                         >
                           <div className={isRTL ? "text-right" : "text-left"}>
                             <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>

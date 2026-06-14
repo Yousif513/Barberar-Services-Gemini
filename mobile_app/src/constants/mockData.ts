@@ -430,3 +430,44 @@ export const mockPackages: PackageItem[] = [
   }
 ];
 
+export interface ReviewItem {
+  shopId: string;
+  name: string;
+  date: string;
+  rating: number;
+  text: { en: string; ar: string };
+}
+
+export const mockReviews: ReviewItem[] = [
+  {
+    shopId: "1",
+    name: "Fahad Al-Otaibi",
+    date: "2026-06-12",
+    rating: 5,
+    text: {
+      en: "Outstanding unisex luxury service. The specialist was highly professional, and the prayer buffer block works seamlessly.",
+      ar: "خدمة ممتازة وفاخرة للغاية. الأخصائي كان محترفاً جداً والالتزام التام بوقف الحجوزات وقت الصلاة مريح للغاية."
+    }
+  },
+  {
+    shopId: "1",
+    name: "Sarah Khalid",
+    date: "2026-06-10",
+    rating: 5,
+    text: {
+      en: "The salon is very clean and adheres to premium guidelines. The face skin cleansing session was relaxing.",
+      ar: "المركز نظيف جداً ويتبع أعلى معايير النظافة والتعقيم الفاخرة. جلسة تنظيف البشرة كانت مريحة وممتازة."
+    }
+  },
+  {
+    shopId: "2",
+    name: "Layla Mohammad",
+    date: "2026-06-08",
+    rating: 4,
+    text: {
+      en: "Highly recommend Sara Beauty Salon for anyone looking for premium service. Friendly staff and great manicure work.",
+      ar: "أوصي به بشدة لكل من يبحث عن خدمة راقية. الاستقبال ودود للغاية وشغل الأظافر رائع."
+    }
+  }
+];
+

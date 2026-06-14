@@ -211,26 +211,97 @@ export default function ProviderReportsPage() {
           </div>
         )}
       </div>
+      {/* REVENUE TRENDS (SVG LINE CHART) & SERVICE SHARE (SVG DONUT CHART) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* LINE CHART CARD */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm lg:col-span-2">
+          <h3 className="font-bold text-sm text-gray-800 mb-6">
+            {locale === "ar" ? "اتجاهات الإيرادات (آخر ٦ أشهر)" : "Revenue Trends (Last 6 Months)"}
+          </h3>
+          
+          <div className="relative w-full h-48">
+            <svg viewBox="0 0 500 180" className="w-full h-full overflow-visible">
+              <defs>
+                <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="hsl(45,60%,55%)" stopOpacity="0.25" />
+                  <stop offset="100%" stopColor="hsl(45,60%,55%)" stopOpacity="0.00" />
+                </linearGradient>
+              </defs>
+              {/* Grid Lines */}
+              <line x1="0" y1="30" x2="500" y2="30" stroke="#f3f4f6" strokeWidth="1" />
+              <line x1="0" y1="80" x2="500" y2="80" stroke="#f3f4f6" strokeWidth="1" />
+              <line x1="0" y1="130" x2="500" y2="130" stroke="#f3f4f6" strokeWidth="1" />
+              
+              {/* Area path */}
+              <path
+                d="M 10,130 C 50,110 80,140 100,100 C 150,70 200,120 250,60 C 300,50 350,110 400,70 C 450,55 480,35 490,40 L 490,150 L 10,150 Z"
+                fill="url(#chartGrad)"
+              />
+              
+              {/* Line path */}
+              <path
+                d="M 10,130 C 50,110 80,140 100,100 C 150,70 200,120 250,60 C 300,50 350,110 400,70 C 450,55 480,35 490,40"
+                fill="none"
+                stroke="hsl(45,60%,55%)"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
 
-      {/* SERVICE SHARE */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-        <h3 className="font-bold text-sm text-gray-800 mb-6">{t.servicesDistribution}</h3>
-        
-        <div className="space-y-4">
-          {categoriesShare.map((cat, idx) => (
-            <div key={idx} className="space-y-2">
-              <div className="flex justify-between text-xs font-bold text-gray-700">
-                <span>{locale === "ar" ? cat.name_ar : cat.name_en}</span>
-                <span className="text-gray-900">{cat.amount.toLocaleString()} {t.currency} ({cat.pct}%)</span>
-              </div>
-              <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
-                <div
-                  className="bg-black h-full transition-all duration-300"
-                  style={{ width: `${cat.pct}%` }}
-                />
-              </div>
+              {/* Data points */}
+              <circle cx="10" cy="130" r="4" fill="black" stroke="hsl(45,60%,55%)" strokeWidth="2" />
+              <circle cx="100" cy="100" r="4" fill="black" stroke="hsl(45,60%,55%)" strokeWidth="2" />
+              <circle cx="250" cy="60" r="4" fill="black" stroke="hsl(45,60%,55%)" strokeWidth="2" />
+              <circle cx="400" cy="70" r="4" fill="black" stroke="hsl(45,60%,55%)" strokeWidth="2" />
+              <circle cx="490" cy="40" r="4" fill="black" stroke="hsl(45,60%,55%)" strokeWidth="2" />
+            </svg>
+          </div>
+          
+          <div className={`flex justify-between text-[10px] font-bold text-gray-400 mt-4 ${locale === "ar" ? "flex-row-reverse" : ""}`}>
+            <span>{locale === "ar" ? "يناير" : "Jan"}</span>
+            <span>{locale === "ar" ? "فبراير" : "Feb"}</span>
+            <span>{locale === "ar" ? "مارس" : "Mar"}</span>
+            <span>{locale === "ar" ? "أبريل" : "Apr"}</span>
+            <span>{locale === "ar" ? "مايو" : "May"}</span>
+            <span>{locale === "ar" ? "يونيو" : "Jun"}</span>
+          </div>
+        </div>
+
+        {/* DONUT CHART CARD */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <h3 className="font-bold text-sm text-gray-800 mb-6">{t.servicesDistribution}</h3>
+            
+            {/* SVG Donut */}
+            <div className="flex justify-center mb-6">
+              <svg width="120" height="120" viewBox="0 0 42 42" className="transform -rotate-90">
+                <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#f3f4f6" strokeWidth="4.5" />
+                
+                {/* 55% Segment */}
+                <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="black" strokeWidth="4.5"
+                        strokeDasharray="55 45" strokeDashoffset="0" />
+                {/* 30% Segment */}
+                <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="hsl(45,60%,55%)" strokeWidth="4.5"
+                        strokeDasharray="30 70" strokeDashoffset="-55" />
+                {/* 15% Segment */}
+                <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="hsl(38,20%,50%)" strokeWidth="4.5"
+                        strokeDasharray="15 85" strokeDashoffset="-85" />
+              </svg>
             </div>
-          ))}
+            
+            <div className="space-y-3">
+              {categoriesShare.map((cat, idx) => (
+                <div key={idx} className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2 font-bold text-gray-700">
+                    <span className={`w-2.5 h-2.5 rounded-full ${
+                      idx === 0 ? "bg-black" : idx === 1 ? "bg-[hsl(45,60%,55%)]" : "bg-[hsl(38,20%,50%)]"
+                    }`} />
+                    <span>{locale === "ar" ? cat.name_ar : cat.name_en}</span>
+                  </div>
+                  <span className="font-extrabold text-stone-900">{cat.pct}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

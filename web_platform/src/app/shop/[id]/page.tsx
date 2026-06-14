@@ -1015,6 +1015,76 @@ export default function ShopDetailsPage() {
                 </div>
               </div>
             )}
+
+            {/* CUSTOMER REVIEWS & ATTRIBUTE HIGHLIGHTS */}
+            <div className="space-y-6 mt-12 border-t border-stone-200 pt-10">
+              <h2 className={`text-xl font-serif font-bold tracking-tight text-stone-900 ${isRTL ? "text-right" : "text-left"}`}>
+                {locale === "ar" ? "تقييمات وآراء العملاء" : "Customer Reviews & Highlights"}
+              </h2>
+
+              {/* Gold highlights tags */}
+              <div className={`flex flex-wrap gap-2.5 ${isRTL ? "justify-start" : "justify-start"}`}>
+                {[
+                  { tag: locale === "ar" ? "معقم وآمن" : "Clean & Sanitized", pct: "98%" },
+                  { tag: locale === "ar" ? "طاقم عمل محترف" : "Professional Staff", pct: "95%" },
+                  { tag: locale === "ar" ? "دقة في المواعيد" : "Punctual Slots", pct: "92%" },
+                  { tag: locale === "ar" ? "أجواء فاخرة" : "Premium Ambience", pct: "96%" }
+                ].map((hl, idx) => (
+                  <span key={idx} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold bg-stone-100 border border-stone-200/50 text-stone-850">
+                    <span className="text-[hsl(45,60%,45%)] font-bold">★</span>
+                    {hl.tag} <span className="text-stone-400 font-normal">({hl.pct})</span>
+                  </span>
+                ))}
+              </div>
+
+              {/* Reviews Feed */}
+              <div className="space-y-4 mt-6">
+                {[
+                  {
+                    name: locale === "ar" ? "فهد العتيبي" : "Fahad Al-Otaibi",
+                    date: "2026-06-12",
+                    rating: 5,
+                    text: {
+                      en: "Outstanding unisex luxury service. The specialist was highly professional, and the prayer buffer block works seamlessly.",
+                      ar: "خدمة ممتازة وفاخرة للغاية. الأخصائي كان محترفاً جداً والالتزام التام بوقف الحجوزات وقت الصلاة مريح للغاية."
+                    }
+                  },
+                  {
+                    name: locale === "ar" ? "سارة خالد" : "Sarah Khalid",
+                    date: "2026-06-10",
+                    rating: 5,
+                    text: {
+                      en: "The salon is very clean and adheres to premium guidelines. The face skin cleansing session was relaxing.",
+                      ar: "المركز نظيف جداً ويتبع أعلى معايير النظافة والتعقيم الفاخرة. جلسة تنظيف البشرة كانت مريحة وممتازة."
+                    }
+                  },
+                  {
+                    name: locale === "ar" ? "ليلى محمد" : "Layla Mohammad",
+                    date: "2026-06-08",
+                    rating: 4,
+                    text: {
+                      en: "Highly recommend for anyone looking for premium service. Friendly receptionist and great manicure work.",
+                      ar: "أوصي به بشدة لكل من يبحث عن خدمة راقية. الاستقبال ودود للغاية وشغل الأظافر رائع."
+                    }
+                  }
+                ].map((rev, rIdx) => (
+                  <div key={rIdx} className="bg-stone-50 border border-stone-200/40 rounded-2xl p-5 space-y-2">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-extrabold text-stone-900">{rev.name}</span>
+                      <span className="text-stone-400 font-semibold">{rev.date}</span>
+                    </div>
+                    <div className="flex gap-0.5 text-xs text-[hsl(45,60%,50%)]">
+                      {Array.from({ length: rev.rating }).map((_, i) => (
+                        <span key={i}>★</span>
+                      ))}
+                    </div>
+                    <p className={`text-xs text-stone-600 leading-relaxed font-light ${isRTL ? "text-right" : "text-left"}`}>
+                      {rev.text[locale]}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* RIGHT COLUMN: BOOKING CONTROLS & CHECKOUT */}

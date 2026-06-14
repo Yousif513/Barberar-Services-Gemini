@@ -134,8 +134,28 @@ export default function ProfileScreen() {
     }
   };
 
+  const registerExpoPushToken = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const simulatedToken = `ExponentPushToken[mock-user-device-${user.id.substring(0, 8)}]`;
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({ expo_push_token: simulatedToken })
+        .eq("id", user.id);
+
+      if (error) throw error;
+      console.log("[Push Registration] Successfully registered token:", simulatedToken);
+    } catch (err: any) {
+      console.log("[Push Registration] Token registry skipped or offline:", err.message);
+    }
+  };
+
   useEffect(() => {
     loadUserPackages();
+    registerExpoPushToken();
   }, [lang]);
 
   const handleRedeemSession = async (pkgId: string) => {

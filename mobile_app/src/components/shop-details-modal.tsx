@@ -11,7 +11,7 @@ import {
   Dimensions,
   TextInput
 } from "react-native";
-import { ShopItem, mockServices, ServiceItem, SpecialistItem, mockPackages, PackageItem } from "../constants/mockData";
+import { ShopItem, mockServices, ServiceItem, SpecialistItem, mockPackages, PackageItem, mockReviews } from "../constants/mockData";
 import { supabase } from "../lib/supabase";
 
 const { height, width } = Dimensions.get("window");
@@ -667,6 +667,52 @@ export function ShopDetailsModal({
               </>
             )}
 
+            {/* Customer Reviews & Highlights */}
+            <View style={styles.reviewsSection}>
+              <Text style={[styles.sectionHeading, isAr && styles.rtlText, { marginBottom: 10 }]}>
+                {isAr ? "تقييمات وآراء العملاء" : "Customer Reviews & Highlights"}
+              </Text>
+              
+              {/* Highlight Badges */}
+              <View style={[styles.highlightsRow, isAr && styles.rtlRow]}>
+                {[
+                  { tag: isAr ? "معقم وآمن" : "Clean & Sanitized", pct: "98%" },
+                  { tag: isAr ? "طاقم عمل محترف" : "Professional Staff", pct: "95%" },
+                  { tag: isAr ? "دقة في المواعيد" : "Punctual Slots", pct: "92%" },
+                  { tag: isAr ? "أجواء فاخرة" : "Premium Ambience", pct: "96%" }
+                ].map((hl, idx) => (
+                  <View key={idx} style={[styles.highlightBadge, isAr && styles.rtlRow]}>
+                    <Text style={styles.highlightBadgeText}>★ {hl.tag} ({hl.pct})</Text>
+                  </View>
+                ))}
+              </View>
+
+              {/* Reviews list */}
+              <View style={styles.reviewsList}>
+                {mockReviews.filter(r => r.shopId === shop.id).map((rev, idx) => (
+                  <View key={idx} style={styles.reviewCard}>
+                    <View style={[styles.reviewCardTop, isAr && styles.rtlRow]}>
+                      <Text style={styles.reviewCardName}>{rev.name}</Text>
+                      <Text style={styles.reviewCardDate}>{rev.date}</Text>
+                    </View>
+                    <View style={[styles.reviewStars, isAr && styles.rtlRow]}>
+                      {Array.from({ length: rev.rating }).map((_, sIdx) => (
+                        <Text key={sIdx} style={styles.starText}>★</Text>
+                      ))}
+                    </View>
+                    <Text style={[styles.reviewCardText, isAr && styles.rtlText]}>
+                      {isAr ? rev.text.ar : rev.text.en}
+                    </Text>
+                  </View>
+                ))}
+                {mockReviews.filter(r => r.shopId === shop.id).length === 0 && (
+                  <Text style={[styles.emptyText, { paddingVertical: 12 }]}>
+                    {isAr ? "لا توجد تقييمات مكتوبة لهذا المركز بعد." : "No written reviews for this shop yet."}
+                  </Text>
+                )}
+              </View>
+            </View>
+
             <View style={styles.bottomSpacer} />
           </ScrollView>
         </View>
@@ -1164,5 +1210,70 @@ const styles: any = StyleSheet.create({
   },
   profileChipTextSelected: {
     color: "hsl(220,15%,8%)"
+  },
+  reviewsSection: {
+    marginTop: 24,
+    borderTopWidth: 1,
+    borderTopColor: "hsla(0,0%,100%,0.05)",
+    paddingTop: 16
+  },
+  highlightsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 4,
+    marginBottom: 16
+  },
+  highlightBadge: {
+    backgroundColor: "hsla(0,0%,100%,0.03)",
+    borderWidth: 1,
+    borderColor: "hsla(0,0%,100%,0.05)",
+    borderRadius: 8,
+    paddingVertical: 5,
+    paddingHorizontal: 10
+  },
+  highlightBadgeText: {
+    color: "hsl(45,60%,55%)",
+    fontSize: 9,
+    fontWeight: "bold"
+  },
+  reviewsList: {
+    gap: 12
+  },
+  reviewCard: {
+    backgroundColor: "hsla(0,0%,100%,0.02)",
+    borderWidth: 1,
+    borderColor: "hsla(0,0%,100%,0.04)",
+    borderRadius: 14,
+    padding: 14,
+    gap: 6
+  },
+  reviewCardTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  reviewCardName: {
+    color: "hsl(0,0%,98%)",
+    fontSize: 11,
+    fontWeight: "bold"
+  },
+  reviewCardDate: {
+    color: "hsl(210,8%,45%)",
+    fontSize: 9
+  },
+  reviewStars: {
+    flexDirection: "row",
+    gap: 2
+  },
+  starText: {
+    color: "hsl(45,60%,55%)",
+    fontSize: 10
+  },
+  reviewCardText: {
+    color: "hsl(210,8%,75%)",
+    fontSize: 11,
+    lineHeight: 16,
+    fontWeight: "300"
   }
 });
