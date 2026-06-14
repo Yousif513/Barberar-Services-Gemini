@@ -10,7 +10,8 @@ import {
   Dimensions 
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { BookingSheet } from "@/components/booking-sheet";
+import { ShopDetailsModal } from "@/components/shop-details-modal";
+import { mockShops, mockServices } from "@/constants/mockData";
 
 const { width } = Dimensions.get("window");
 
@@ -66,29 +67,8 @@ export default function HomeScreen() {
     ]
   };
 
-  // Mock Salons / Providers
-  const providers = [
-    {
-      id: "p1",
-      name: lang === "ar" ? "صالون إيليت الرجالي" : "Elite Grooming Lounge",
-      district: lang === "ar" ? "الملقا، الرياض" : "Al-Malqa, Riyadh",
-      rating: "4.9",
-      reviewsCount: "128",
-      image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=300&auto=format&fit=crop",
-      price: "120 SAR",
-      eligibleForHome: true
-    },
-    {
-      id: "p2",
-      name: lang === "ar" ? "مركز ريم لجمال المرأة" : "Reem Beauty & Makeup",
-      district: lang === "ar" ? "العليا، الرياض" : "Al-Olaya, Riyadh",
-      rating: "4.8",
-      reviewsCount: "94",
-      image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=300&auto=format&fit=crop",
-      price: "350 SAR",
-      eligibleForHome: true
-    }
-  ];
+  // Use unified mockShops
+  const providers = mockShops;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -153,17 +133,17 @@ export default function HomeScreen() {
         <Text style={[styles.sectionTitle, lang === "ar" && styles.rtlText]}>{t.topSalons}</Text>
         <View style={styles.providerGrid}>
           {providers
-            .filter(p => !isHomeService || p.eligibleForHome)
+            .filter(p => !isHomeService || mockServices.some(s => s.shopId === p.id && s.serviceType === "mobile"))
             .map((provider) => (
               <View key={provider.id} style={styles.providerCard}>
                 <Image source={{ uri: provider.image }} style={styles.cardImg as any} />
                 <View style={styles.cardDetails}>
-                  <Text style={styles.cardName}>{provider.name}</Text>
-                  <Text style={styles.cardLoc}>{provider.district}</Text>
+                  <Text style={styles.cardName}>{provider.name[lang]}</Text>
+                  <Text style={styles.cardLoc}>{provider.address[lang]}</Text>
                   <Text style={styles.cardRating}>★ {provider.rating} ({provider.reviewsCount} {t.reviews})</Text>
                   
                   <View style={[styles.cardFooter, lang === "ar" && styles.rtlRow]}>
-                    <Text style={styles.cardPrice}>{t.startingFrom}: <Text style={styles.priceHighlight}>{provider.price}</Text></Text>
+                    <Text style={styles.cardPrice}>{t.startingFrom}: <Text style={styles.priceHighlight}>{mockServices.filter(s => s.shopId === provider.id)[0]?.price || 100} SAR</Text></Text>
                     <TouchableOpacity 
                       onPress={() => setSelectedProvider(provider)}
                       style={styles.bookBtn}
@@ -178,14 +158,15 @@ export default function HomeScreen() {
 
       </ScrollView>
 
-      {/* BOOKING BOTTOM SHEET SHEET */}
+      {/* SHOP DETAILS & BOOKING MODAL */}
       {selectedProvider && (
-        <BookingSheet 
-          provider={selectedProvider} 
+        <ShopDetailsModal 
+          shop={selectedProvider} 
           locale={lang} 
           onClose={() => setSelectedProvider(null)} 
         />
       )}
+
     </SafeAreaView>
   );
 }

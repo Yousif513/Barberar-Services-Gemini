@@ -33,7 +33,7 @@ const translations = {
 };
 
 export default function CustomerNotificationsPage() {
-  const [locale, setLocale] = useState<"en" | "ar">("en");
+  const [locale, setLocale] = useState<"en" | "ar">("ar");
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "unread">("all");

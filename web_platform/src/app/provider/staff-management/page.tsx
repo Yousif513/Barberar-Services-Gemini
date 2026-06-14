@@ -35,7 +35,7 @@ const translations = {
 };
 
 export default function StaffManagementPage() {
-  const [locale, setLocale] = useState<"en" | "ar">("en");
+  const [locale, setLocale] = useState<"en" | "ar">("ar");
   const t = translations[locale];
 
   useEffect(() => {

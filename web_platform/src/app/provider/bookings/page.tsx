@@ -53,7 +53,7 @@ const translations = {
 };
 
 export default function ProviderBookingsPage() {
-  const [locale, setLocale] = useState<"en" | "ar">("en");
+  const [locale, setLocale] = useState<"en" | "ar">("ar");
   const [activeTab, setActiveTab] = useState<"all" | "pending" | "confirmed" | "completed" | "cancelled">("all");
   const [bookings, setBookings] = useState<any[]>([]);
   const [search, setSearch] = useState("");

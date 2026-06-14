@@ -49,7 +49,7 @@ const translations = {
 };
 
 export default function ProviderPromotionsPage() {
-  const [locale, setLocale] = useState<"en" | "ar">("en");
+  const [locale, setLocale] = useState<"en" | "ar">("ar");
   const [promos, setPromos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

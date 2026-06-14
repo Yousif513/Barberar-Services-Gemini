@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import Link from "next/link";
 
 const translations = {
   en: {
@@ -20,13 +21,13 @@ const translations = {
     emailNotif: "Receive email billing invoices",
     smsNotif: "Receive booking SMS reminders",
     pushNotif: "Receive in-app chat reminders",
-    dependentsSection: "Family Members & Dependents",
-    dependentsDesc: "Add family members to book grooming sessions on their behalf.",
-    addDependent: "Add Dependent",
-    depName: "Full Name",
-    depRelation: "Relationship (e.g. Son, Daughter, Spouse)",
-    depAge: "Age",
-    noDependents: "No dependents registered yet."
+    advancedSection: "Advanced & Family Profiles",
+    dependentsCardTitle: "Dependents & Pets Manager",
+    dependentsCardDesc: "Add and manage profiles for family members, patients, or pets to book services on their behalf.",
+    dependentsCardBtn: "Manage Profiles",
+    developerCardTitle: "Developer API Console",
+    developerCardDesc: "Register sandbox applications, generate client access tokens, and configure Webhook subscriptions.",
+    developerCardBtn: "Open Console"
   },
   ar: {
     title: "الإعدادات",
@@ -44,18 +45,18 @@ const translations = {
     emailNotif: "استلام الفواتير عبر البريد الإلكتروني",
     smsNotif: "تلقي رسائل الجوال لتذكير المواعيد",
     pushNotif: "تلقي تنبيهات التطبيق للرسائل والدردشة",
-    dependentsSection: "أفراد العائلة والتابعين",
-    dependentsDesc: "أضف أفراد عائلتك لحجز جلسات العناية والجمال لهم.",
-    addDependent: "إضافة تابع",
-    depName: "الاسم الكامل",
-    depRelation: "صلة القرابة (مثال: ابن، ابنة، زوج/زوجة)",
-    depAge: "العمر",
-    noDependents: "لم يتم إضافة تابعين بعد."
+    advancedSection: "الملفات العائلية والخدمات المتقدمة",
+    dependentsCardTitle: "إدارة التابعين والأليفة",
+    dependentsCardDesc: "إضافة وإدارة الملفات الشخصية لأفراد عائلتك أو الحيوانات الأليفة للحجز نيابة عنهم.",
+    dependentsCardBtn: "إدارة الملفات الشخصية",
+    developerCardTitle: "منصة المطورين (API)",
+    developerCardDesc: "تسجيل تطبيقات الاختبار، إنشاء رموز الوصول (Tokens)، وإعداد اشتراكات الويب هوك (Webhooks).",
+    developerCardBtn: "فتح منصة المطورين"
   }
 };
 
 export default function CustomerSettingsPage() {
-  const [locale, setLocale] = useState<"en" | "ar">("en");
+  const [locale, setLocale] = useState<"en" | "ar">("ar");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -340,85 +341,55 @@ export default function CustomerSettingsPage() {
         </div>
       </div>
 
-      {/* FAMILY MEMBERS & DEPENDENTS */}
+      {/* ADVANCED & FAMILY PORTALS */}
       <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-6">
-        <div className="flex justify-between items-center border-b border-gray-100 pb-3 flex-wrap gap-4">
-          <div>
-            <h3 className="font-bold text-sm text-gray-800">{t.dependentsSection}</h3>
-            <p className="text-[10px] text-gray-400 font-semibold mt-1">{t.dependentsDesc}</p>
-          </div>
-          <button
-            onClick={() => setShowAddDepForm(prev => !prev)}
-            className="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl transition"
-          >
-            {t.addDependent}
-          </button>
+        <div>
+          <h3 className={`font-bold text-sm text-gray-800 border-b border-gray-100 pb-3 ${locale === "ar" ? "text-right" : "text-left"}`}>
+            {t.advancedSection}
+          </h3>
         </div>
 
-        {/* Add Dependent Form */}
-        {showAddDepForm && (
-          <form onSubmit={addDependent} className="bg-gray-50 border border-gray-200/60 rounded-xl p-4 grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
-            <div>
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.depName}</label>
-              <input
-                type="text"
-                required
-                value={newDep.name}
-                onChange={(e) => setNewDep(prev => ({ ...prev, name: e.target.value }))}
-                className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 font-semibold"
-              />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* DEPENDENTS MANAGER CARD */}
+          <div className="border border-stone-200 hover:border-[hsl(45,60%,55%)] rounded-xl p-5 bg-stone-50/50 hover:bg-stone-50/20 transition duration-300 flex flex-col justify-between">
+            <div className={locale === "ar" ? "text-right" : "text-left"}>
+              <h4 className="font-bold text-xs text-stone-900 tracking-wide uppercase">
+                {t.dependentsCardTitle}
+              </h4>
+              <p className="text-[10px] text-stone-500 mt-2 font-normal leading-relaxed">
+                {t.dependentsCardDesc}
+              </p>
             </div>
-            <div>
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.depRelation}</label>
-              <input
-                type="text"
-                required
-                value={newDep.relation}
-                onChange={(e) => setNewDep(prev => ({ ...prev, relation: e.target.value }))}
-                className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 font-semibold"
-              />
+            <div className={`mt-6 pt-3 border-t border-stone-100 flex ${locale === "ar" ? "justify-start" : "justify-end"}`}>
+              <Link
+                href="/customer/dependents"
+                className="px-4 py-2 bg-stone-900 hover:bg-stone-850 text-white font-bold text-[10px] uppercase tracking-wider rounded-lg transition"
+              >
+                {t.dependentsCardBtn}
+              </Link>
             </div>
-            <div>
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.depAge}</label>
-              <input
-                type="number"
-                value={newDep.age}
-                onChange={(e) => setNewDep(prev => ({ ...prev, age: e.target.value }))}
-                className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 font-semibold"
-              />
-            </div>
-            <button
-              type="submit"
-              className="py-2.5 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-lg transition"
-            >
-              {t.addDependent}
-            </button>
-          </form>
-        )}
-
-        {/* Dependents Grid */}
-        {dependents.length === 0 ? (
-          <div className="text-center py-6 text-gray-400 text-xs font-semibold">{t.noDependents}</div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {dependents.map((dep) => (
-              <div key={dep.id} className="bg-gray-50 border border-gray-200/60 rounded-xl p-4 flex items-center justify-between hover:border-gray-400 transition duration-150">
-                <div>
-                  <h4 className="font-bold text-xs text-gray-800">{dep.name}</h4>
-                  <p className="text-[10px] text-gray-500 font-semibold mt-0.5">
-                    {dep.relationship} {dep.age ? `• ${dep.age} yrs old` : ""}
-                  </p>
-                </div>
-                <button
-                  onClick={() => removeDependent(dep.id)}
-                  className="text-red-500 hover:text-red-700 font-bold text-xs p-1"
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
           </div>
-        )}
+
+          {/* DEVELOPER API CONSOLE CARD */}
+          <div className="border border-stone-200 hover:border-[hsl(45,60%,55%)] rounded-xl p-5 bg-stone-50/50 hover:bg-stone-50/20 transition duration-300 flex flex-col justify-between">
+            <div className={locale === "ar" ? "text-right" : "text-left"}>
+              <h4 className="font-bold text-xs text-stone-900 tracking-wide uppercase">
+                {t.developerCardTitle}
+              </h4>
+              <p className="text-[10px] text-stone-500 mt-2 font-normal leading-relaxed">
+                {t.developerCardDesc}
+              </p>
+            </div>
+            <div className={`mt-6 pt-3 border-t border-stone-100 flex ${locale === "ar" ? "justify-start" : "justify-end"}`}>
+              <Link
+                href="/developer"
+                className="px-4 py-2 bg-[hsl(45,60%,45%)] hover:bg-[hsl(45,60%,40%)] text-white font-bold text-[10px] uppercase tracking-wider rounded-lg transition"
+              >
+                {t.developerCardBtn}
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

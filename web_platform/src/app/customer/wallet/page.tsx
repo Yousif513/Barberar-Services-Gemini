@@ -43,7 +43,7 @@ const translations = {
 };
 
 export default function CustomerWalletPage() {
-  const [locale, setLocale] = useState<"en" | "ar">("en");
+  const [locale, setLocale] = useState<"en" | "ar">("ar");
   const [balance, setBalance] = useState(150.0);
   const [escrowBalance, setEscrowBalance] = useState(220.0);
   const [transactions, setTransactions] = useState<any[]>([]);

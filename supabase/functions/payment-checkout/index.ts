@@ -98,14 +98,39 @@ serve(async (req) => {
       }
     }
 
-    // Update booking with pending transaction ID
-    await supabase
-      .from("bookings")
-      .update({ status: "pending_payment" })
-      .eq("id", bookingId)
+    if (!apiKey) {
+      // Simulate live webhook payment capture for local testing:
+      // Update booking to confirmed status
+      await supabase
+        .from("bookings")
+        .update({ status: "confirmed" })
+        .eq("id", bookingId);
+
+      const totalCaptured = parseFloat(booking.deposit_required || "0");
+      const commissionVal = parseFloat(booking.platform_commission || (parseFloat(booking.total_price || "0") * 0.15).toFixed(2));
+      const providerShare = totalCaptured - commissionVal;
+
+      // Create transaction ledger record
+      await supabase
+        .from("transactional_ledger")
+        .insert({
+          booking_id: bookingId,
+          payment_intent_id: chargeId,
+          total_captured: totalCaptured,
+          platform_share: commissionVal,
+          provider_share: providerShare,
+          payout_status: "pending"
+        });
+    } else {
+      // Update booking with pending transaction ID
+      await supabase
+        .from("bookings")
+        .update({ status: "pending_payment" })
+        .eq("id", bookingId);
+    }
 
     return new Response(
-      JSON.stringify({ success: true, checkoutUrl, chargeId }),
+      JSON.stringify({ success: true, checkoutUrl, chargeId, simulated: !apiKey }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     )
 

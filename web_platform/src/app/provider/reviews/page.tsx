@@ -41,7 +41,7 @@ const translations = {
 };
 
 export default function ProviderReviewsPage() {
-  const [locale, setLocale] = useState<"en" | "ar">("en");
+  const [locale, setLocale] = useState<"en" | "ar">("ar");
   const [reviews, setReviews] = useState<any[]>([]);
   const [staffList, setStaffList] = useState<any[]>([]);
   const [selectedStaffId, setSelectedStaffId] = useState<string>("all");
@@ -200,30 +200,32 @@ export default function ProviderReviewsPage() {
     ? (reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length).toFixed(1)
     : "5.0";
 
+  const isRTL = locale === "ar";
+
   return (
     <div className="space-y-8 font-sans">
       {/* HEADER */}
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900">{t.title}</h2>
+      <div className={isRTL ? "text-right" : "text-left"}>
+        <h2 className="text-2xl font-bold tracking-tight text-gray-900 font-serif">{t.title}</h2>
         <p className="text-sm text-gray-500 mt-1">{t.subtitle}</p>
       </div>
 
       {error && (
-        <div className="bg-stone-50 border border-stone-200 text-stone-700 text-xs rounded-xl p-4">
+        <div className={`bg-stone-50 border border-stone-200 text-stone-700 text-xs rounded-xl p-4 ${isRTL ? "text-right" : "text-left"}`}>
           Notice: {error}
         </div>
       )}
 
       {/* METRIC SUMMARIES */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-black transition">
-          <div>
+      <div className={`grid grid-cols-1 sm:grid-cols-3 gap-6 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-[hsl(45,60%,55%)] transition duration-200">
+          <div className={isRTL ? "text-right" : "text-left"}>
             <span className="text-[10px] uppercase font-bold text-gray-400 block tracking-wider">{t.avgRating}</span>
-            <div className="flex items-baseline gap-2 mt-2">
+            <div className={`flex items-baseline gap-2 mt-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <span className="text-3xl font-bold text-gray-900">{averageRating}</span>
               <span className="text-sm text-gray-400 font-semibold">/ 5.0</span>
             </div>
-            <div className="flex gap-1 text-[hsl(45,60%,55%)] mt-2">
+            <div className={`flex gap-1 text-[hsl(45,60%,55%)] mt-2 ${isRTL ? "justify-end" : "justify-start"}`}>
               {Array.from({ length: 5 }).map((_, i) => (
                 <span key={i} className="text-sm">★</span>
               ))}
@@ -231,22 +233,24 @@ export default function ProviderReviewsPage() {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-black transition">
-          <div>
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:border-[hsl(45,60%,55%)] transition duration-200">
+          <div className={isRTL ? "text-right" : "text-left"}>
             <span className="text-[10px] uppercase font-bold text-gray-400 block tracking-wider">{t.totalReviews}</span>
             <span className="text-3xl font-bold text-gray-900 mt-2 block">{reviews.length}</span>
-            <span className="text-[10px] text-gray-400 font-semibold block mt-2">100% verified customer ratings</span>
+            <span className="text-[10px] text-gray-400 font-semibold block mt-2">
+              {isRTL ? "تقييمات عملاء موثقة 100%" : "100% verified customer ratings"}
+            </span>
           </div>
         </div>
 
         {/* STAFF FILTER */}
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
           <div className="space-y-2">
-            <span className="text-[10px] uppercase font-bold text-gray-400 block tracking-wider">{t.filterStaff}</span>
+            <span className={`text-[10px] uppercase font-bold text-gray-400 block tracking-wider ${isRTL ? "text-right" : "text-left"}`}>{t.filterStaff}</span>
             <select
               value={selectedStaffId}
               onChange={(e) => setSelectedStaffId(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-black text-gray-700 font-semibold"
+              className={`w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 font-semibold ${isRTL ? "text-right" : "text-left"}`}
             >
               <option value="all">{t.allStaff}</option>
               {staffList.map((emp) => (
@@ -259,12 +263,11 @@ export default function ProviderReviewsPage() {
         </div>
       </div>
 
-      {/* REVIEWS FEED LIST */}
       {loading ? (
-        <div className="text-center py-12 text-sm text-gray-400">Loading feedback...</div>
+        <div className="text-center py-12 text-stone-400 text-xs font-semibold">{isRTL ? "جاري تحميل التقييمات..." : "Loading feedback..."}</div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-2xl p-12 text-center text-gray-400 shadow-sm">
-          <p className="text-sm font-semibold">{t.noReviews}</p>
+        <div className="bg-white border border-gray-200 rounded-2xl p-12 text-center text-stone-400 shadow-sm font-semibold text-xs">
+          <p>{t.noReviews}</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -273,8 +276,8 @@ export default function ProviderReviewsPage() {
               key={rev.id}
               className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-4 hover:border-[hsl(45,60%,55%)] transition duration-200"
             >
-              <div className="flex justify-between items-start flex-wrap gap-4">
-                <div>
+              <div className={`flex justify-between items-start flex-wrap gap-4 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                <div className={isRTL ? "text-right" : "text-left"}>
                   <h4 className="font-bold text-xs text-gray-800">
                     {rev.bookings?.profiles?.first_name} {rev.bookings?.profiles?.last_name?.[0]}.
                   </h4>
@@ -283,36 +286,38 @@ export default function ProviderReviewsPage() {
                   </p>
                 </div>
 
-                <div className="text-right">
-                  <div className="flex gap-0.5 justify-end">
+                <div className={isRTL ? "text-left" : "text-right"}>
+                  <div className={`flex gap-0.5 ${isRTL ? "justify-start" : "justify-end"}`}>
                     {[1, 2, 3, 4, 5].map((star) => (
                       <span
                         key={star}
-                        className={`text-xs ${star <= rev.rating ? "text-[hsl(45,60%,55%)]" : "text-gray-250"}`}
+                        className={`text-xs ${star <= rev.rating ? "text-[hsl(45,60%,55%)]" : "text-gray-200"}`}
                       >
                         ★
                       </span>
                     ))}
                   </div>
                   <span className="text-[9px] text-gray-400 block mt-1">
-                    {new Date(rev.created_at).toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
+                    {new Date(rev.created_at).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
                   </span>
                 </div>
               </div>
 
               {/* Client comment */}
-              <p className="text-xs text-gray-700 bg-gray-50 border border-gray-100 rounded-xl p-3 leading-relaxed">
+              <p className={`text-xs text-gray-700 bg-gray-50 border border-gray-100 rounded-xl p-3 leading-relaxed ${isRTL ? "text-right" : "text-left"}`}>
                 {rev.comment}
               </p>
 
               {/* Salon Response section */}
               {rev.reply_comment ? (
-                <div className="bg-stone-900 text-stone-100 rounded-xl p-4 ml-6 space-y-1 relative border border-stone-850">
-                  <span className="text-[9px] uppercase font-bold text-[hsl(45,60%,55%)] block">Salon Response</span>
+                <div className={`bg-stone-900 text-stone-100 rounded-xl p-4 space-y-1 relative border border-stone-850 ${isRTL ? "text-right mr-6 ml-0" : "text-left ml-6 mr-0"}`}>
+                  <span className="text-[9px] uppercase font-bold text-[hsl(45,60%,55%)] block">
+                    {isRTL ? "رد المركز" : "Salon Response"}
+                  </span>
                   <p className="text-xs leading-relaxed text-stone-300 font-medium">{rev.reply_comment}</p>
                 </div>
               ) : replyingReviewId !== rev.id ? (
-                <div className="pt-2 text-right">
+                <div className={`pt-2 ${isRTL ? "text-left" : "text-right"}`}>
                   <button
                     onClick={() => {
                       setReplyingReviewId(rev.id);
@@ -324,20 +329,20 @@ export default function ProviderReviewsPage() {
                   </button>
                 </div>
               ) : (
-                <div className="pt-2 space-y-3 ml-6">
+                <div className={`pt-2 space-y-3 ${isRTL ? "mr-6 ml-0" : "ml-6 mr-0"}`}>
                   <textarea
                     rows={2}
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                     placeholder={t.replyPlaceholder}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs text-gray-700 outline-none focus:border-black"
+                    className={`w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs text-gray-700 outline-none focus:border-[hsl(45,60%,55%)] ${isRTL ? "text-right" : "text-left"}`}
                   />
-                  <div className="flex justify-end gap-2">
+                  <div className={`flex gap-2 ${isRTL ? "justify-start" : "justify-end"}`}>
                     <button
                       onClick={() => setReplyingReviewId(null)}
                       className="px-3 py-1.5 border border-gray-200 text-[10px] text-gray-500 rounded-lg hover:text-gray-700"
                     >
-                      Cancel
+                      {isRTL ? "إلغاء" : "Cancel"}
                     </button>
                     <button
                       onClick={() => postReply(rev.id)}

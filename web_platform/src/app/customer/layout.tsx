@@ -45,7 +45,7 @@ export default function CustomerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [locale, setLocale] = useState<"en" | "ar">("en"); // Default to English for Yousif's view
+  const [locale, setLocale] = useState<"en" | "ar">("ar"); // Default to English for Yousif's view
   const pathname = usePathname();
   const t = translations[locale];
 

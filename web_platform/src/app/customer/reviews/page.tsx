@@ -41,7 +41,7 @@ const translations = {
 };
 
 export default function CustomerReviewsPage() {
-  const [locale, setLocale] = useState<"en" | "ar">("en");
+  const [locale, setLocale] = useState<"en" | "ar">("ar");
   const [myReviews, setMyReviews] = useState<any[]>([]);
   const [pendingReviews, setPendingReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

@@ -15,6 +15,7 @@ const translations = {
     resources: "Rooms & Resources",
     packages: "Wellness Packages",
     jobs: "Find Job Leads",
+    deliveries: "Logistics Board",
     customers: "Customers",
     reviews: "Reviews",
     promotions: "Promotions",
@@ -24,7 +25,8 @@ const translations = {
     logout: "Log Out",
     welcome: "Welcome back,",
     searchPlaceholder: "Search...",
-    langSwitch: "العربية"
+    langSwitch: "العربية",
+    wallet: "Wallet & Payouts"
   },
   ar: {
     dashboard: "لوحة التحكم",
@@ -35,6 +37,7 @@ const translations = {
     resources: "الغرف والموارد",
     packages: "باقات العافية",
     jobs: "فرص العمل المتاحة",
+    deliveries: "لوحة اللوجستيات والشحن",
     messages: "الرسائل",
     customers: "العملاء",
     reviews: "التقييمات",
@@ -44,7 +47,8 @@ const translations = {
     logout: "تسجيل الخروج",
     welcome: "مرحباً بك،",
     searchPlaceholder: "البحث...",
-    langSwitch: "English"
+    langSwitch: "English",
+    wallet: "المحفظة والمدفوعات"
   }
 };
 
@@ -53,7 +57,7 @@ export default function ProviderLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [locale, setLocale] = useState<"en" | "ar">("en"); // Default to English for Yousif's view
+  const [locale, setLocale] = useState<"en" | "ar">("ar"); // Default to English for Yousif's view
   const pathname = usePathname();
   const t = translations[locale];
 
@@ -74,6 +78,8 @@ export default function ProviderLayout({
     { name: t.resources, path: "/provider/resources", icon: "" },
     { name: t.packages, path: "/provider/packages", icon: "" },
     { name: t.jobs, path: "/provider/jobs", icon: "" },
+    { name: t.deliveries, path: "/provider/deliveries", icon: "" },
+    { name: t.wallet, path: "/provider/wallet", icon: "" },
     { name: t.messages, path: "/provider/messages", icon: "" },
     { name: t.employees, path: "/provider/team", icon: "" }, // links to team folder
     { name: t.customers, path: "/provider/customers", icon: "" },

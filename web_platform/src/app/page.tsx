@@ -115,7 +115,7 @@ const translations = {
 };
 
 export default function Home() {
-  const [locale, setLocale] = useState<"en" | "ar">("en");
+  const [locale, setLocale] = useState<"en" | "ar">("ar");
   const t = translations[locale];
 
   const toggleLanguage = () => {
@@ -219,17 +219,17 @@ export default function Home() {
           PRIMORA
         </Link>
         <nav className="hidden lg:flex items-center justify-center gap-8 text-xs font-bold uppercase tracking-wider text-stone-500 flex-1 mx-8">
-          <Link href="/" className="text-stone-900 hover:text-stone-900 transition-colors">{t.home}</Link>
-          <Link href="/customer/search" className="hover:text-stone-950 transition-colors">{t.discover}</Link>
-          <Link href="/customer/jobs" className="hover:text-stone-950 transition-colors">{t.serviceBoard}</Link>
-          <Link href="/provider/become" className="hover:text-stone-950 transition-colors">{t.becomeProvider}</Link>
+          <Link href="/" className="hover:text-stone-950 transition-colors">{t.home}</Link>
+          <Link href="/store" className="hover:text-stone-950 transition-colors">{t.discover}</Link>
+          <Link href="/service-board" className="hover:text-stone-950 transition-colors">{t.serviceBoard}</Link>
+          <Link href="/become-provider" className="hover:text-stone-950 transition-colors">{t.becomeProvider}</Link>
           <Link href="/about" className="hover:text-stone-950 transition-colors">{t.aboutUs}</Link>
         </nav>
         
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-4">
             {/* Search Icon */}
-            <Link href="/customer/search" className="text-stone-700 hover:text-stone-950 transition">
+            <Link href="/store" className="text-stone-700 hover:text-stone-950 transition">
               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -290,7 +290,7 @@ export default function Home() {
               <Link href="/login" className="px-8 py-3.5 bg-stone-900 text-stone-50 font-bold text-xs uppercase tracking-widest rounded-full hover:bg-stone-800 transition shadow-md">
                 {t.shopServices}
               </Link>
-              <Link href="/customer/search" className="group text-stone-800 hover:text-stone-950 font-bold text-xs uppercase tracking-widest flex items-center gap-1.5 transition">
+              <Link href="/store" className="group text-stone-800 hover:text-stone-950 font-bold text-xs uppercase tracking-widest flex items-center gap-1.5 transition">
                 {t.exploreCollective}
                 <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -572,7 +572,7 @@ export default function Home() {
           <div>
             <h5 className="text-white text-xs uppercase tracking-widest font-extrabold mb-4">{t.footerPartners}</h5>
             <ul className="space-y-2 text-xs">
-              <li><Link href="/provider/become" className="hover:text-white transition">{t.becomeProvider}</Link></li>
+              <li><Link href="/become-provider" className="hover:text-white transition">{t.becomeProvider}</Link></li>
               <li><Link href="/provider/staff-management" className="hover:text-white transition">{locale === "ar" ? "إدارة شؤون الموظفين" : "Staff Management"}</Link></li>
               <li><Link href="/provider/pricing" className="hover:text-white transition">{locale === "ar" ? "التسعير المشترك" : "Split Ledger Pricing"}</Link></li>
             </ul>

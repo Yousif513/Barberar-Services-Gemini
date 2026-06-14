@@ -63,7 +63,11 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, message: "OTP code transmitted successfully." }),
+      JSON.stringify({ 
+        success: true, 
+        message: "OTP code transmitted successfully.",
+        simulatedCode: whatsappProvider !== "twilio" ? code : undefined
+      }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     )
 

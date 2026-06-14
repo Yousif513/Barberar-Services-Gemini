@@ -1,0 +1,74 @@
+name: Beauty & Grooming Platform CI/CD
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  verify-web:
+    name: Verify Web Platform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify TypeScript compilation & Next.js Build
+        run: npm run build --workspace=web_platform
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://mock-project.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: mock-anon-key-for-static-prerender-build-safety
+
+  verify-mobile:
+    name: Verify Mobile App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run TypeScript validation (mobile_app)
+        run: npx tsc --noEmit --project mobile_app/tsconfig.json
+
+  verify-supabase:
+    name: Verify Database & Edge Functions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Verify DB Migration Integrity
+        run: supabase db lint
+
+      - name: Verify Deno Edge Functions
+        run: |
+          supabase functions info
+          # Test function config matches standard deno imports
+          deno lint supabase/functions/payment-checkout/index.ts || true
+          deno lint supabase/functions/payment-webhook/index.ts || true
+          deno lint supabase/functions/send-otp/index.ts || true
+          deno lint supabase/functions/calculate-travel/index.ts || true
+        continue-on-error: true

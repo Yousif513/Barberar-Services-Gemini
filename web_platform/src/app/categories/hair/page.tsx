@@ -29,7 +29,7 @@ const translations = {
 };
 
 export default function HairCategoryPage() {
-  const [locale, setLocale] = useState<"en" | "ar">("en");
+  const [locale, setLocale] = useState<"en" | "ar">("ar");
   const t = translations[locale];
 
   useEffect(() => {

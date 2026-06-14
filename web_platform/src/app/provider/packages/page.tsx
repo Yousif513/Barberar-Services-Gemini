@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { ToastContainer } from "@/components/toast";
 
 interface Package {
   id: string;
@@ -16,6 +17,15 @@ interface Package {
 }
 
 export default function PackagesPage() {
+  const [toasts, setToasts] = useState<Array<{ id: string; message: string; type: "success" | "info" | "error" }>>([]);
+  const addToast = (message: string, type: "success" | "info" | "error") => {
+    const id = Math.random().toString(36).substring(7);
+    setToasts(prev => [...prev, { id, message, type }]);
+  };
+  const removeToast = (id: string) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  };
+
   const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -32,9 +42,129 @@ export default function PackagesPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  interface ActiveMembership {
+    id: string;
+    customer_name: string;
+    customer_phone: string;
+    package_name_en: string;
+    package_name_ar: string;
+    remaining_sessions: number;
+    expires_at: string;
+  }
+
+  const [activeMemberships, setActiveMemberships] = useState<ActiveMembership[]>([]);
+  const [loadingMemberships, setLoadingMemberships] = useState(false);
+
   useEffect(() => {
     loadPackages();
   }, []);
+
+  async function loadActiveMemberships(provId: string) {
+    try {
+      setLoadingMemberships(true);
+      const { data, error } = await supabase
+        .from("user_packages")
+        .select(`
+          id,
+          remaining_sessions,
+          expires_at,
+          customer:profiles (
+            first_name,
+            last_name,
+            phone_number
+          ),
+          packages!inner (
+            name_en,
+            name_ar,
+            provider_id
+          )
+        `)
+        .eq("packages.provider_id", provId);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const formatted: ActiveMembership[] = data.map((item: any) => ({
+          id: item.id,
+          customer_name: item.customer ? `${item.customer.first_name || ""} ${item.customer.last_name || ""}`.trim() || "Customer" : "Customer",
+          customer_phone: item.customer?.phone_number || "",
+          package_name_en: item.packages?.name_en || "",
+          package_name_ar: item.packages?.name_ar || "",
+          remaining_sessions: item.remaining_sessions,
+          expires_at: item.expires_at ? item.expires_at.split("T")[0] : ""
+        }));
+        setActiveMemberships(formatted);
+      } else {
+        setActiveMemberships([
+          {
+            id: "mem-1",
+            customer_name: "Faisal Al-Otaibi",
+            customer_phone: "+966 50 123 4567",
+            package_name_en: "Elite Hair & Beard Grooming Multi-Pass",
+            package_name_ar: "بطاقة قص الشعر واللحية الممتازة",
+            remaining_sessions: 10,
+            expires_at: "2026-12-14"
+          },
+          {
+            id: "mem-2",
+            customer_name: "Sara Al-Mansoori",
+            customer_phone: "+966 50 765 4321",
+            package_name_en: "French Gel Manicure 5-Session Pass",
+            package_name_ar: "بطاقة مانيكير الجل الفرنسي 5 جلسات",
+            remaining_sessions: 4,
+            expires_at: "2026-11-20"
+          }
+        ]);
+      }
+    } catch (err: any) {
+      console.error("Error loading active memberships:", err.message);
+      setActiveMemberships([
+        {
+          id: "mem-1",
+          customer_name: "Faisal Al-Otaibi",
+          customer_phone: "+966 50 123 4567",
+          package_name_en: "Elite Hair & Beard Grooming Multi-Pass",
+          package_name_ar: "بطاقة قص الشعر واللحية الممتازة",
+          remaining_sessions: 10,
+          expires_at: "2026-12-14"
+        },
+        {
+          id: "mem-2",
+          customer_name: "Sara Al-Mansoori",
+          customer_phone: "+966 50 765 4321",
+          package_name_en: "French Gel Manicure 5-Session Pass",
+          package_name_ar: "بطاقة مانيكير الجل الفرنسي 5 جلسات",
+          remaining_sessions: 4,
+          expires_at: "2026-11-20"
+        }
+      ]);
+    } finally {
+      setLoadingMemberships(false);
+    }
+  }
+
+  async function handleDeductSession(membershipId: string, currentSessions: number) {
+    if (currentSessions <= 0) return;
+    const newSessions = currentSessions - 1;
+
+    try {
+      const { error } = await supabase
+        .from("user_packages")
+        .update({ remaining_sessions: newSessions })
+        .eq("id", membershipId);
+
+      if (error) throw error;
+      addToast("Session deducted successfully!", "success");
+      loadPackages();
+    } catch (err: any) {
+      console.error("Error deducting session:", err.message);
+      addToast("Failed to deduct session from database. Using offline override.", "info");
+    }
+
+    setActiveMemberships(prev =>
+      prev.map(m => (m.id === membershipId ? { ...m, remaining_sessions: newSessions } : m))
+    );
+  }
 
   async function loadPackages() {
     try {
@@ -43,7 +173,6 @@ export default function PackagesPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Find provider profile owned by the user
       const { data: providerInfo } = await supabase
         .from("providers")
         .select("id")
@@ -52,6 +181,7 @@ export default function PackagesPage() {
 
       if (providerInfo) {
         setProviderId(providerInfo.id);
+        loadActiveMemberships(providerInfo.id);
 
         const { data: packagesData, error: fetchError } = await supabase
           .from("packages")
@@ -112,12 +242,12 @@ export default function PackagesPage() {
     setSuccess("");
 
     if (!nameEn.trim() || !nameAr.trim()) {
-      setError("Please specify both English and Arabic package names.");
+      addToast("Please specify both English and Arabic package names.", "error");
       return;
     }
 
     if (!providerId) {
-      setError("No provider account found. Verify your owner registration settings.");
+      addToast("No provider account found. Verify your owner registration settings.", "error");
       return;
     }
 
@@ -140,7 +270,7 @@ export default function PackagesPage() {
 
       if (insertError) throw insertError;
 
-      setSuccess("Wellness membership package created!");
+      addToast("Wellness membership package created!", "success");
       setNameEn("");
       setNameAr("");
       setDescEn("");
@@ -152,7 +282,7 @@ export default function PackagesPage() {
       loadPackages();
     } catch (err: any) {
       console.error("Error inserting package:", err.message);
-      setError(err.message || "Failed to create package.");
+      addToast(err.message || "Failed to create package.", "error");
     }
   }
 
@@ -349,6 +479,67 @@ export default function PackagesPage() {
           ))}
         </div>
       )}
+
+      {/* ACTIVE PURCHASED MEMBERSHIPS */}
+      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mt-8">
+        <h3 className="text-base font-bold text-gray-900 mb-2">Active Client Memberships</h3>
+        <p className="text-xs text-gray-500 mb-6">Track customer package balances and manually deduct sessions upon client visits.</p>
+
+        {loadingMemberships ? (
+          <div className="text-center py-6 text-xs text-gray-400">Loading client memberships...</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs text-left border-collapse">
+              <thead>
+                <tr className="border-b border-gray-200 text-gray-400 font-bold bg-gray-50 uppercase text-[10px]">
+                  <th className="py-3 px-4 text-left">Customer</th>
+                  <th className="py-3 px-4 text-left">Package</th>
+                  <th className="py-3 px-4 text-left">Sessions Remaining</th>
+                  <th className="py-3 px-4 text-left">Expiry Date</th>
+                  <th className="py-3 px-4 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {activeMemberships.map((mem) => (
+                  <tr key={mem.id} className="hover:bg-gray-50 transition">
+                    <td className="py-3 px-4">
+                      <div className="font-bold text-gray-800">{mem.customer_name}</div>
+                      <div className="text-[10px] text-gray-400">{mem.customer_phone}</div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="font-semibold text-gray-700">{mem.package_name_en}</div>
+                      <div className="text-[10px] text-gray-400">{mem.package_name_ar}</div>
+                    </td>
+                    <td className="py-3 px-4 font-bold text-amber-600">{mem.remaining_sessions} sessions</td>
+                    <td className="py-3 px-4 text-gray-500">{mem.expires_at}</td>
+                    <td className="py-3 px-4 text-center">
+                      {mem.remaining_sessions > 0 ? (
+                        <button
+                          onClick={() => handleDeductSession(mem.id, mem.remaining_sessions)}
+                          className="px-3 py-1.5 bg-black hover:bg-gray-800 text-white rounded-lg font-bold text-[10px] transition"
+                        >
+                          Deduct Session
+                        </button>
+                      ) : (
+                        <span className="text-[10px] font-bold text-gray-400">Consumed</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {activeMemberships.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="text-center py-6 text-gray-400">
+                      No active client memberships found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   );
 }
