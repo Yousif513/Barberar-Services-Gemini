@@ -73,4 +73,4 @@ BEGIN
         v_slot_time := v_slot_time + interval '15 minutes';
     END LOOP;
 END;
-$$ LANGUAGE plpgsql STABLE;
+$$ LANGUAGE plpgsql STABLE SET search_path = public;

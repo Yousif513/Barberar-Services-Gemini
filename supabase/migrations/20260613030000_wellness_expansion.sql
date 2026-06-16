@@ -3,7 +3,7 @@
 
 -- 1. PHYSICAL SPATIAL RESOURCES (e.g. Massage Room 1, Facial Bed, Sauna Room)
 CREATE TABLE public.resources (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     branch_id UUID NOT NULL REFERENCES public.branches(id) ON DELETE CASCADE,
     name VARCHAR(100) NOT NULL, -- e.g. "Massage Bed A"
     category VARCHAR(100) NOT NULL, -- e.g. "Massage Bed" (used to map services)
@@ -24,7 +24,7 @@ ALTER TABLE public.bookings ADD COLUMN resource_id UUID REFERENCES public.resour
 
 -- 4. MEMBERSHIP/MULTI-SESSION PACKAGES
 CREATE TABLE public.packages (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     provider_id UUID NOT NULL REFERENCES public.providers(id) ON DELETE CASCADE,
     name_en VARCHAR(150) NOT NULL,
     name_ar VARCHAR(150) NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE public.packages (
 
 -- 5. CUSTOMER PURCHASED PACKAGES
 CREATE TABLE public.user_packages (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     package_id UUID NOT NULL REFERENCES public.packages(id) ON DELETE CASCADE,
     remaining_sessions INT NOT NULL,

@@ -10,7 +10,7 @@ CREATE TYPE provider_type AS ENUM ('salon_barber_shop', 'freelancer');
 
 -- 2. DYNAMIC SYSTEM CATEGORIES (Designed to support Future Marketplace scale e.g. Spa, Wellness, Home Cleaning)
 CREATE TABLE categories (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     parent_id UUID REFERENCES categories(id) ON DELETE SET NULL,
     name_en VARCHAR(100) NOT NULL,
     name_ar VARCHAR(100) NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE profiles (
 
 -- 4. PROVIDER PROFILES (Salons and Freelancers)
 CREATE TABLE providers (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     owner_id UUID NOT NULL REFERENCES profiles(id) ON DELETE RESTRICT,
     type provider_type NOT NULL,
     business_name_en VARCHAR(150) NOT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE providers (
 
 -- 5. BRANCHES (Salons/Barber Shops branches. Freelancers have 1 virtual branch)
 CREATE TABLE branches (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     provider_id UUID NOT NULL REFERENCES providers(id) ON DELETE CASCADE,
     name_en VARCHAR(100) NOT NULL,
     name_ar VARCHAR(100) NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE branches (
 
 -- 6. EMPLOYEES / STAFF
 CREATE TABLE employees (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     branch_id UUID REFERENCES branches(id) ON DELETE CASCADE,
     profile_id UUID UNIQUE REFERENCES profiles(id) ON DELETE SET NULL,
     name_en VARCHAR(100) NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE employees (
 
 -- 7. SERVICES
 CREATE TABLE services (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     provider_id UUID NOT NULL REFERENCES providers(id) ON DELETE CASCADE,
     category_id UUID NOT NULL REFERENCES categories(id) ON DELETE RESTRICT,
     name_en VARCHAR(150) NOT NULL,
@@ -102,7 +102,7 @@ CREATE TABLE employee_services (
 
 -- 9. AVAILABILITY SHIFTS (Weekly schedules)
 CREATE TABLE employee_availability (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     employee_id UUID NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
     day_of_week INT NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
     start_time TIME NOT NULL,
@@ -113,7 +113,7 @@ CREATE TABLE employee_availability (
 
 -- 10. BOOKINGS
 CREATE TABLE bookings (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id UUID NOT NULL REFERENCES profiles(id) ON DELETE RESTRICT,
     branch_id UUID NOT NULL REFERENCES branches(id) ON DELETE RESTRICT,
     employee_id UUID NOT NULL REFERENCES employees(id) ON DELETE RESTRICT,
@@ -133,7 +133,7 @@ CREATE TABLE bookings (
 
 -- 11. FINANCIAL TRANSACTIONS LEDGER
 CREATE TABLE transactional_ledger (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     booking_id UUID NOT NULL REFERENCES bookings(id) ON DELETE RESTRICT,
     payment_intent_id VARCHAR(255) NOT NULL,
     total_captured DECIMAL(10,2) NOT NULL,
@@ -146,7 +146,7 @@ CREATE TABLE transactional_ledger (
 
 -- 12. RATINGS & REVIEWS
 CREATE TABLE reviews (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     booking_id UUID UNIQUE NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
     customer_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
     provider_id UUID NOT NULL REFERENCES providers(id) ON DELETE CASCADE,

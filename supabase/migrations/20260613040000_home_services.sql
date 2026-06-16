@@ -3,7 +3,7 @@
 
 -- 1. CUSTOMER JOB POSTINGS (Request for Bids)
 CREATE TABLE public.job_posts (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customer_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     category_id UUID NOT NULL REFERENCES public.categories(id) ON DELETE RESTRICT,
     title VARCHAR(200) NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE public.job_posts (
 
 -- 2. PROVIDER BIDS FOR JOBS
 CREATE TABLE public.job_bids (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     job_post_id UUID NOT NULL REFERENCES public.job_posts(id) ON DELETE CASCADE,
     provider_id UUID NOT NULL REFERENCES public.providers(id) ON DELETE CASCADE,
     employee_id UUID REFERENCES public.employees(id) ON DELETE SET NULL,

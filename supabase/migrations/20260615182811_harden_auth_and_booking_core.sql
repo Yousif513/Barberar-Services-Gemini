@@ -1,6 +1,6 @@
 -- Harden authentication, authorization, and the booking transaction.
 
-CREATE EXTENSION IF NOT EXISTS btree_gist;
+CREATE EXTENSION IF NOT EXISTS btree_gist WITH SCHEMA extensions;
 
 -- New accounts always start as customers. Privileged roles must be assigned by
 -- an administrator through a trusted server-side operation.
@@ -764,10 +764,9 @@ DECLARE
   v_booking public.bookings;
   v_provider_id UUID;
 BEGIN
-  SELECT b, br.provider_id
-  INTO v_booking, v_provider_id
+  SELECT b.*
+  INTO v_booking
   FROM public.bookings b
-  JOIN public.branches br ON br.id = b.branch_id
   WHERE b.id = NEW.booking_id;
 
   IF v_booking.id IS NULL
@@ -776,6 +775,11 @@ BEGIN
     RAISE EXCEPTION 'Only the customer may review a completed booking'
       USING ERRCODE = '42501';
   END IF;
+
+  SELECT br.provider_id
+  INTO v_provider_id
+  FROM public.branches br
+  WHERE br.id = v_booking.branch_id;
 
   NEW.customer_id := v_booking.customer_id;
   NEW.provider_id := v_provider_id;
