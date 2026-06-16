@@ -33,7 +33,7 @@ const translations = {
 };
 
 export default function TermsPage() {
-  const [locale, setLocale] = useState<"en" | "ar">("ar");
+  const [locale, setLocale] = useState<"en" | "ar">("en");
   const t = translations[locale];
 
   useEffect(() => {

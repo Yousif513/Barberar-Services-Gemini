@@ -9,7 +9,8 @@ import {
   Image, 
   Alert,
   Dimensions,
-  TextInput
+  TextInput,
+  Linking
 } from "react-native";
 import { ShopItem, mockServices, ServiceItem, SpecialistItem, mockPackages, PackageItem, mockReviews } from "../constants/mockData";
 import { supabase } from "../lib/supabase";
@@ -186,6 +187,15 @@ export function ShopDetailsModal({
   const depositVal = Math.round(basePriceVal * 0.15);
   const balanceVal = basePriceVal - depositVal;
 
+  const toRiyadhTimestamp = (date: string, slot: string) => {
+    const match = slot.match(/^(\d{1,2}):(\d{2})\s(AM|PM)$/);
+    if (!match) throw new Error("Invalid booking time.");
+    const [, rawHour, minute, meridiem] = match;
+    let hour = Number(rawHour) % 12;
+    if (meridiem === "PM") hour += 12;
+    return `${date}T${hour.toString().padStart(2, "0")}:${minute}:00+03:00`;
+  };
+
   const handleBookingConfirm = async () => {
     if (!selectedService || !selectedSpecialist || !selectedDate || !selectedSlot) {
       Alert.alert(
@@ -237,33 +247,42 @@ export function ShopDetailsModal({
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        // Fetch branch linked to shop to insert
-        const { data: branchData } = await supabase.from("branches").select("id").eq("provider_id", shop.id).limit(1);
-        const branchId = branchData && branchData.length > 0 ? branchData[0].id : null;
-
-        if (branchId) {
-          const { error } = await supabase.from("bookings").insert({
-            customer_id: user.id,
-            branch_id: branchId,
-            service_id: selectedService.id,
-            employee_id: selectedSpecialist.id,
-            status: "pending_payment",
-            scheduled_at: `${selectedDate}T12:00:00Z`,
-            duration_minutes: selectedService.duration,
-            total_price: selectedService.price,
-            deposit_required: depositVal,
-            tax_amount: 0,
-            platform_commission: depositVal,
-            client_profile_id: selectedProfileId && selectedProfileId !== "cp-mock-myself" ? selectedProfileId : null
-          });
-          if (error) throw error;
-        }
+      if (!user) {
+        throw new Error("Please sign in before booking.");
       }
+
+      const { data: booking, error: bookingError } = await supabase.rpc("create_booking", {
+        target_employee_id: selectedSpecialist.id,
+        target_service_id: selectedService.id,
+        target_scheduled_at: toRiyadhTimestamp(selectedDate, selectedSlot),
+        request_home_service: false,
+        request_client_profile_id:
+          selectedProfileId && selectedProfileId !== "cp-mock-myself" ? selectedProfileId : null,
+      });
+
+      if (bookingError || !booking?.id) {
+        throw bookingError ?? new Error("Unable to reserve the selected time.");
+      }
+
+      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
+        body: { bookingId: booking.id },
+      });
+
+      if (checkoutError || !checkout?.checkoutUrl) {
+        throw checkoutError ?? new Error("Unable to initialize secure payment.");
+      }
+
+      await Linking.openURL(checkout.checkoutUrl);
+      onClose();
+      return;
     } catch (err) {
-      console.log("Supabase booking insert failed, running offline update:", err);
+      Alert.alert("Booking Failed", err instanceof Error ? err.message : "Booking could not be completed.");
+      return;
     }
 
+    if (selectedService && selectedSpecialist) {
+
+    /*
     Alert.alert(
       isAr ? "تم إرسال طلب الحجز" : "Booking Request Received",
       isAr 
@@ -271,9 +290,18 @@ export function ShopDetailsModal({
         : `Your appointment for ${selectedService.name.en} with ${selectedSpecialist.name.en} has been requested. Deposit of ${depositVal} SAR processed. Detail updates sent via WhatsApp.`,
       [{ text: "OK", onPress: onClose }]
     );
+    */
+    }
   };
 
   const handlePackagePurchase = (pkg: PackageItem) => {
+    Alert.alert(
+      "Secure Checkout Required",
+      `Secure package checkout for ${pkg.name.en} is not available yet.`
+    );
+    return;
+
+    /*
     Alert.alert(
       isAr ? " الدفع باستخدام Apple Pay" : " Pay with Apple Pay",
       isAr 
@@ -290,7 +318,7 @@ export function ShopDetailsModal({
             try {
               const { data: { user } } = await supabase.auth.getUser();
               if (user) {
-                const { error } = await supabase.from("user_packages").insert({
+                const { error } = await supabase.from("packages").select({
                   customer_id: user.id,
                   package_id: pkg.id,
                   remaining_sessions: pkg.sessionCount,
@@ -299,7 +327,8 @@ export function ShopDetailsModal({
                 if (error) throw error;
               }
             } catch (err) {
-              console.log("Supabase package purchase insert failed, running offline update:", err);
+              Alert.alert("Package Purchase Failed", err instanceof Error ? err.message : "Purchase could not be completed.");
+              return;
             }
 
             Alert.alert(
@@ -313,6 +342,7 @@ export function ShopDetailsModal({
         }
       ]
     );
+    */
   };
 
   const handleTabChange = (tab: "services" | "packages") => {

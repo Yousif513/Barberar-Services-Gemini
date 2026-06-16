@@ -228,7 +228,7 @@ export default function ShopDetailsPage() {
   const router = useRouter();
   const shopId = (params?.id as string) || "1";
 
-  const [locale, setLocale] = useState<"en" | "ar">("ar");
+  const [locale, setLocale] = useState<"en" | "ar">("en");
   const t = translations[locale];
 
   const [selectedService, setSelectedService] = useState<ServiceItem | null>(null);
@@ -253,6 +253,14 @@ export default function ShopDetailsPage() {
 
   // Synchronize direction with locale
   useEffect(() => {
+    const savedLang = localStorage.getItem("primora_lang") as "en" | "ar";
+    if (savedLang === "en" || savedLang === "ar") {
+      setLocale(savedLang);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("primora_lang", locale);
     document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
     document.documentElement.lang = locale;
   }, [locale]);
@@ -290,31 +298,11 @@ export default function ShopDetailsPage() {
     setIsSuccess(false);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (user) {
-        await supabase.from("user_packages").insert({
-          customer_id: user.id,
-          package_id: pkg.id,
-          remaining_sessions: pkg.sessionCount,
-          expires_at: new Date(Date.now() + pkg.expiresInDays * 24 * 60 * 60 * 1000).toISOString()
-        });
-      }
-
-      setIsSuccess(true);
-      setMessage(t.successPackageRedirecting);
-      addToast(t.successPackageRedirecting, "success");
-      setTimeout(() => {
-        router.push("/customer/packages");
-      }, 2500);
-
-    } catch (err: any) {
-      setIsSuccess(true);
-      setMessage(t.successPackageRedirecting);
-      addToast(t.successPackageRedirecting, "success");
-      setTimeout(() => {
-        router.push("/customer/packages");
-      }, 2500);
+      throw new Error(`Secure checkout for ${pkg.name[locale]} packages is not available yet.`);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Package purchase could not be completed.";
+      setMessage(errorMessage);
+      addToast(errorMessage, "error");
     } finally {
       setIsLoading(false);
     }
@@ -673,6 +661,15 @@ export default function ShopDetailsPage() {
 
   const splits = calculateEscrowSplit();
 
+  const toRiyadhTimestamp = (date: string, slot: string) => {
+    const match = slot.match(/^(\d{1,2}):(\d{2})\s(AM|PM)$/);
+    if (!match) throw new Error("Invalid booking time.");
+    const [, rawHour, minute, meridiem] = match;
+    let hour = Number(rawHour) % 12;
+    if (meridiem === "PM") hour += 12;
+    return `${date}T${hour.toString().padStart(2, "0")}:${minute}:00+03:00`;
+  };
+
   const handleBook = async () => {
     if (!selectedService || !selectedSpecialist || !selectedDate || !selectedSlot) {
       setMessage(t.errorSelectDetails);
@@ -708,44 +705,42 @@ export default function ShopDetailsPage() {
     setMessage("");
 
     try {
-      // Create a mock checkout call. If dynamic database schemas exist, let it write to Supabase.
       const { data: { user } } = await supabase.auth.getUser();
-      const bookingId = "mock-booking-id-" + Math.random().toString(36).substring(7);
-
-      if (user) {
-        // Safe insert into Supabase bookings if session is active
-        await supabase.from("bookings").insert({
-          customer_id: user.id,
-          service_id: selectedService.id,
-          employee_id: selectedSpecialist.id,
-          scheduled_at: `${selectedDate}T${selectedSlot === "09:00 AM" ? "09:00:00" : "14:00:00"}`,
-          status: "pending_payment",
-          total_price: selectedService.price,
-          is_home_service: isHomeService,
-          client_profile_id: selectedClientProfileId || null
-        });
+      if (!user) {
+        router.push("/login");
+        return;
       }
 
-      // Simulated edge function payment capture
-      await supabase.functions.invoke("payment-checkout", {
-        body: { bookingId }
+      if (isHomeService) {
+        throw new Error("Home-service address confirmation is required before payment.");
+      }
+
+      const { data: booking, error: bookingError } = await supabase.rpc("create_booking", {
+        target_employee_id: selectedSpecialist.id,
+        target_service_id: selectedService.id,
+        target_scheduled_at: toRiyadhTimestamp(selectedDate, selectedSlot),
+        request_home_service: false,
+        request_client_profile_id: selectedClientProfileId || null,
       });
 
-      setIsSuccess(true);
-      setMessage(t.successRedirecting);
-      addToast(t.successRedirecting, "success");
-      setTimeout(() => {
-        router.push("/customer/dashboard");
-      }, 2500);
+      if (bookingError || !booking?.id) {
+        throw bookingError ?? new Error("Unable to reserve the selected time.");
+      }
 
-    } catch (err: any) {
-      // Fail-safe mock redirection
-      setIsSuccess(true);
-      setMessage(t.successRedirecting);
-      addToast(t.successRedirecting, "success");
-      setTimeout(() => {
-        router.push("/customer/dashboard");
-      }, 2500);
+      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
+        body: { bookingId: booking.id },
+      });
+
+      if (checkoutError || !checkout?.checkoutUrl) {
+        throw checkoutError ?? new Error("Unable to initialize secure payment.");
+      }
+
+      window.location.assign(checkout.checkoutUrl);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Booking could not be completed.";
+      setIsSuccess(false);
+      setMessage(errorMessage);
+      addToast(errorMessage, "error");
     } finally {
       setIsLoading(false);
     }

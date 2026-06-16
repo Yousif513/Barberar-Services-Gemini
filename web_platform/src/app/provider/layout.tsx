@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { AuthGuard } from "@/components/auth-guard";
 
 // Localized Navigation Strings
 const translations = {
@@ -182,7 +183,7 @@ export default function ProviderLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [locale, setLocale] = useState<"en" | "ar">("ar");
+  const [locale, setLocale] = useState<"en" | "ar">("en");
   const pathname = usePathname();
   const t = translations[locale];
   const isRTL = locale === "ar";
@@ -192,6 +193,14 @@ export default function ProviderLayout({
   };
 
   useEffect(() => {
+    const savedLang = localStorage.getItem("primora_lang") as "en" | "ar";
+    if (savedLang === "en" || savedLang === "ar") {
+      setLocale(savedLang);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("primora_lang", locale);
     document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
     document.documentElement.lang = locale;
   }, [locale]);
@@ -216,31 +225,30 @@ export default function ProviderLayout({
   ];
 
   return (
-    <div className="min-h-screen bg-[#070B12] text-white flex flex-col md:flex-row font-sans selection:bg-[#D1AF47] selection:text-[#070B12]">
+    <AuthGuard allowedRoles={["provider_owner", "provider_employee"]}>
+    <div className="min-h-screen bg-[#F7F7F5] text-black flex flex-col md:flex-row font-sans selection:bg-[#D1AF47] selection:text-white">
       
       {/* ═══════════════════════════════════════════════════════ */}
-      {/* SIDEBAR (280px) — Premium Glass with Inner Glow        */}
+      {/* SIDEBAR (280px) — Premium Floating White Sidebar        */}
       {/* ═══════════════════════════════════════════════════════ */}
       <aside
-        className="w-full md:w-[280px] flex flex-col justify-between p-6 flex-shrink-0 relative border-r border-[#D1AF47]/10"
-        style={{
-          background: "linear-gradient(180deg, #221B0F 0%, #0B0904 100%)",
-          boxShadow: "inset 0 0 50px rgba(209,175,71,0.03), 1px 0 0 rgba(209,175,71,0.05)",
-        }}
+        className="w-full md:w-[280px] flex flex-col justify-between p-6 flex-shrink-0 bg-white rounded-[28px] border border-[#E8E8E8] shadow-[0_10px_30px_rgba(0,0,0,0.04)] m-6 relative"
       >
         <div>
           {/* ── Logo & Notifications Bell ── */}
-          <div className={`flex items-center justify-between mb-10 px-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+          <div className={`flex items-center justify-between mb-8 px-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
             <Link
               href="/"
-              className="text-2xl font-serif font-black tracking-[0.25em] text-[#D1AF47] hover:text-[#E0C46A] transition-colors duration-300"
-              style={{
-                textShadow: "0 0 20px rgba(209,175,71,0.35), 0 0 40px rgba(209,175,71,0.15)",
-              }}
+              className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}
             >
-              PRIMORA
+              <svg className="w-5.5 h-5.5 text-[#D1AF47]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+              <span className="text-xl font-serif font-black tracking-[0.2em] text-[#D1AF47] hover:text-[#E0C46A] transition-colors duration-300">
+                PRIMORA
+              </span>
             </Link>
-            <button className="p-2.5 rounded-2xl bg-[#D1AF47]/5 border border-[#D1AF47]/10 hover:border-[#D1AF47]/30 hover:bg-[#D1AF47]/10 transition-all duration-300 text-[#D1AF47] hover:text-[#E0C46A] hover:shadow-[0_0_15px_rgba(209,175,71,0.15)]">
+            <button className="p-2.5 rounded-2xl bg-white border border-[#E8E8E8] hover:border-[#D1AF47]/30 hover:bg-[#F7F7F5] transition-all duration-300 text-[#D1AF47]">
               <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
@@ -248,7 +256,7 @@ export default function ProviderLayout({
           </div>
 
           {/* ── Navigation Links ── */}
-          <nav className="space-y-0.5">
+          <nav className="space-y-0.5 max-h-[50vh] overflow-y-auto pr-1">
             {navItems.map((item, index) => {
               const isActive = pathname.startsWith(item.path);
               const isMessages = item.path.includes("messages");
@@ -257,37 +265,37 @@ export default function ProviderLayout({
                 <React.Fragment key={item.path}>
                   <Link
                     href={item.path}
-                    className={`group relative flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-[13px] font-semibold transition-all duration-300 ${
+                    className={`group relative flex items-center gap-3.5 px-4 py-3 rounded-[18px] text-[13px] font-semibold transition-all duration-300 ${
                       isActive
-                        ? "bg-gradient-to-r from-[#D1AF47]/20 to-[#D1AF47]/5 text-white border border-[#D1AF47]/20 shadow-[0_0_20px_rgba(209,175,71,0.1)]"
-                        : "text-[#B8C0D4]/80 hover:bg-[#D1AF47]/5 hover:text-white"
+                        ? "bg-[#F4E7B6]/30 text-[#B8952E]"
+                        : "text-[#667085] hover:bg-[#F7F7F5] hover:text-[#101828]"
                     } ${isRTL ? "flex-row-reverse text-right" : "flex-row text-left"}`}
                   >
-                    {/* Gold accent bar for active item */}
+                    {/* Gold indicator bar */}
                     {isActive && (
                       <span
-                        className={`absolute top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-full bg-[#D1AF47] shadow-[0_0_8px_rgba(209,175,71,0.4)] ${
+                        className={`absolute top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-[#D1AF47] ${
                           isRTL ? "right-0" : "left-0"
                         }`}
                       />
                     )}
 
-                    <span className={`flex-shrink-0 transition-colors duration-300 ${isActive ? "text-[#D1AF47]" : "text-[#7B859C] group-hover:text-[#B8C0D4]"}`}>
+                    <span className={`flex-shrink-0 transition-colors duration-300 ${isActive ? "text-[#D1AF47]" : "text-[#7B859C] group-hover:text-[#667085]"}`}>
                       {getNavIcon(item.path)}
                     </span>
 
                     <span className="flex-grow">{item.name}</span>
 
-                    {/* Notification badge dot on Messages */}
+                    {/* Notification dot */}
                     {isMessages && (
-                      <span className="w-2 h-2 rounded-full bg-[#FF5D73] shadow-[0_0_6px_rgba(255,93,115,0.4)] flex-shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#FF5D73] flex-shrink-0" />
                     )}
                   </Link>
 
                   {/* Separator lines between nav groups */}
                   {separatorAfterIndices.includes(index) && (
-                    <div className="my-2.5 mx-4">
-                      <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+                    <div className="my-2 mx-4">
+                      <div className="h-px bg-gray-100" />
                     </div>
                   )}
                 </React.Fragment>
@@ -296,40 +304,71 @@ export default function ProviderLayout({
           </nav>
         </div>
 
-        {/* ── Sidebar Footer — Logout ── */}
-        <div className="pt-6 mt-4">
-          <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent mb-5" />
-          <Link 
-            href="/" 
-            className={`w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-[13px] font-semibold text-[#FF5D73] hover:bg-[#FF5D73]/[0.08] hover:shadow-[0_0_20px_rgba(255,93,115,0.08)] transition-all duration-300 ${isRTL ? "flex-row-reverse text-right" : "flex-row text-left"}`}
+        {/* ── Sidebar Footer — Support & Logout ── */}
+        <div className="pt-4 mt-2 border-t border-gray-100 space-y-4">
+          {/* Help Support Card */}
+          <Link
+            href="/provider/settings"
+            className="flex items-center justify-between p-3 bg-[#F7F7F5] border border-[#E8E8E8] rounded-2xl group hover:border-[#D1AF47]/30 transition-all duration-300"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <div className="w-8 h-8 rounded-xl bg-white border border-[#E8E8E8] flex items-center justify-center text-gray-500 group-hover:text-[#D1AF47] transition duration-300">
+                <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 0A5 5 0 1110.12 10.12l3.536-3.536m0 0L20 4M9 15l-3 3m0 0l-3-3m3 3V9" />
+                </svg>
+              </div>
+              <div className={`text-left ${isRTL ? "text-right" : "text-left"}`}>
+                <h5 className="text-[11px] font-bold text-gray-900 leading-none">Need Help?</h5>
+                <p className="text-[9px] text-[#667085] font-semibold mt-0.5">Contact Support</p>
+              </div>
+            </div>
+            <svg className={`w-3 h-3 text-gray-400 group-hover:text-[#D1AF47] transition duration-300 ${isRTL ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
-            <span className="flex-grow">{t.logout}</span>
           </Link>
+
+          {/* User Initials Avatar & Logout */}
+          <div className={`flex items-center justify-between gap-2 px-1 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <div className="w-9 h-9 rounded-full bg-[#F4E7B6]/40 border border-[#D1AF47]/20 flex items-center justify-center text-[#B8952E] font-bold text-sm flex-shrink-0">
+                N
+              </div>
+              <div className={`hidden md:block ${isRTL ? "text-left" : "text-right"}`}>
+                <p className="text-[9px] text-gray-400 uppercase font-bold tracking-widest leading-none mb-0.5">Partner Hub</p>
+                <p className="text-xs font-black text-gray-900 leading-tight truncate max-w-[110px]">Elite Barbershop</p>
+              </div>
+            </div>
+            <Link 
+              href="/" 
+              className="p-2 rounded-xl text-red-500 hover:bg-red-50 transition-all duration-300"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </aside>
 
       {/* ═══════════════════════════════════════════════════════ */}
       {/* MAIN CONTENT AREA                                      */}
       {/* ═══════════════════════════════════════════════════════ */}
-      <div className="flex-grow flex flex-col min-w-0 bg-[#070B12] relative">
+      <div className="flex-grow flex flex-col min-w-0 bg-[#F7F7F5] relative">
 
         {/* ── HEADER (80px) ── */}
         {!(pathname === "/provider/dashboard" || pathname === "/provider/dashboard/") && (
-          <header className="h-20 bg-[#070B12]/60 backdrop-blur-xl border-b border-white/[0.04] px-8 flex items-center justify-between sticky top-0 z-40">
+          <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-[#E8E8E8] px-8 flex items-center justify-between sticky top-0 z-40">
 
           
-          {/* Glass Search Input */}
-          <div className={`flex items-center gap-3 bg-white/[0.04] px-5 py-3 rounded-2xl border border-white/[0.06] w-80 focus-within:border-[#D1AF47]/30 focus-within:shadow-[0_0_20px_rgba(209,175,71,0.06)] transition-all duration-300 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-            <svg className="w-4 h-4 text-[#7B859C] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+          {/* Light Search Input */}
+          <div className={`flex items-center gap-3 bg-[#F7F7F5] border border-[#E8E8E8] px-5 py-3 rounded-2xl w-80 focus-within:border-[#D1AF47]/30 transition-all duration-300 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <svg className="w-4 h-4 text-[#667085] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
               type="text"
               placeholder={t.searchPlaceholder}
-              className={`bg-transparent border-none outline-none text-sm w-full placeholder-[#7B859C]/60 text-white ${isRTL ? "text-right" : "text-left"}`}
+              className={`bg-transparent border-none outline-none text-sm w-full placeholder-[#667085]/60 text-[#101828] ${isRTL ? "text-right" : "text-left"}`}
             />
           </div>
 
@@ -337,7 +376,7 @@ export default function ProviderLayout({
             {/* Language Switcher Button */}
             <button
               onClick={toggleLanguage}
-              className="px-5 py-2.5 rounded-2xl border border-white/[0.06] bg-white/[0.04] text-xs font-bold text-[#B8C0D4] hover:border-[#D1AF47]/40 hover:text-[#D1AF47] hover:shadow-[0_0_20px_rgba(209,175,71,0.1)] transition-all duration-300"
+              className="px-5 py-2.5 rounded-2xl border border-[#E8E8E8] bg-white text-xs font-bold text-[#667085] hover:border-[#D1AF47]/40 hover:text-[#D1AF47] transition-all duration-300"
             >
               {t.langSwitch}
             </button>
@@ -345,11 +384,11 @@ export default function ProviderLayout({
             {/* Profile Menu */}
             <div className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <div className={`hidden sm:block ${isRTL ? "text-left" : "text-right"}`}>
-                <p className="text-[10px] text-[#7B859C] font-semibold uppercase tracking-[0.15em] leading-none mb-1">{t.welcome}</p>
-                <p className="text-sm font-bold text-white tracking-wide">Elite Barbershop</p>
+                <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-[0.15em] leading-none mb-1">{t.welcome}</p>
+                <p className="text-sm font-bold text-gray-900 tracking-wide">Elite Barbershop</p>
               </div>
               <div
-                className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#D1AF47] to-[#E0C46A] text-[#111827] font-black text-sm flex items-center justify-center shadow-[0_0_20px_rgba(209,175,71,0.25)] transition-shadow duration-300 hover:shadow-[0_0_30px_rgba(209,175,71,0.35)]"
+                className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#D1AF47] to-[#E0C46A] text-[#101828] font-black text-sm flex items-center justify-center shadow-[0_0_20px_rgba(209,175,71,0.15)]"
               >
                 EB
               </div>
@@ -357,18 +396,13 @@ export default function ProviderLayout({
           </div>
         </header>
       )}
-
-        {/* ── PAGES WRAPPER — with subtle noise texture ── */}
-        <main
-          className="flex-1 p-10 overflow-y-auto relative"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E")`,
-          }}
-        >
+        {/* ── PAGES WRAPPER ── */}
+        <main className="flex-1 p-8 overflow-y-auto relative">
           {children}
         </main>
       </div>
 
     </div>
+    </AuthGuard>
   );
 }

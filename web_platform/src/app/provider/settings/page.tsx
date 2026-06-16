@@ -399,10 +399,10 @@ export default function ProviderSettingsPage() {
   }
 
   return (
-    <div className="space-y-8 font-sans text-white bg-[#070B12] min-h-screen p-1 sm:p-6 md:p-8 transition-colors duration-300">
+    <div className="space-y-8 font-sans bg-transparent min-h-screen p-1 sm:p-6 md:p-8 transition-colors duration-300">
       
       {/* HEADER SECTION */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 pb-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="w-2 h-2 rounded-full bg-[#D1AF47] shadow-[0_0_8px_#D1AF47]" />
@@ -410,8 +410,8 @@ export default function ProviderSettingsPage() {
               {locale === "en" ? "Partner Hub Platform" : "منصة الشركاء الفاخرة"}
             </span>
           </div>
-          <h2 className="text-3xl font-extrabold tracking-tight text-white">{t.title}</h2>
-          <p className="text-sm text-[#7B859C] mt-1.5 leading-relaxed max-w-2xl">{t.subtitle}</p>
+          <h2 className="text-3xl font-extrabold tracking-tight text-gray-900">{t.title}</h2>
+          <p className="text-sm text-gray-500 mt-1.5 leading-relaxed max-w-2xl">{t.subtitle}</p>
         </div>
         
         {/* Localization Preview Info Badge */}

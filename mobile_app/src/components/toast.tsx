@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Text, View, Animated, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -12,7 +12,15 @@ export interface ToastProps {
 
 export function Toast({ message, type, visible, onClose, duration = 3500 }: ToastProps) {
   const insets = useSafeAreaInsets();
-  const slideAnim = useRef(new Animated.Value(-150)).current;
+  const [slideAnim] = useState(() => new Animated.Value(-150));
+
+  const handleDismiss = useCallback(() => {
+    Animated.timing(slideAnim, {
+      toValue: -150,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(onClose);
+  }, [onClose, slideAnim]);
 
   useEffect(() => {
     if (visible) {
@@ -35,17 +43,7 @@ export function Toast({ message, type, visible, onClose, duration = 3500 }: Toas
         useNativeDriver: true,
       }).start();
     }
-  }, [visible]);
-
-  const handleDismiss = () => {
-    Animated.timing(slideAnim, {
-      toValue: -150,
-      duration: 200,
-      useNativeDriver: true,
-    }).start(() => {
-      onClose();
-    });
-  };
+  }, [duration, handleDismiss, insets.top, slideAnim, visible]);
 
   if (!visible) return null;
 

@@ -28,6 +28,7 @@ dist/
 .env.production.local
 *.env
 *.env.*
+!.env.example
 
 # OS generated files
 .DS_Store

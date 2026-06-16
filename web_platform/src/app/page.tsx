@@ -115,7 +115,7 @@ const translations = {
 };
 
 export default function Home() {
-  const [locale, setLocale] = useState<"en" | "ar">("ar");
+  const [locale, setLocale] = useState<"en" | "ar">("en");
   const t = translations[locale];
 
   const toggleLanguage = () => {
@@ -123,6 +123,14 @@ export default function Home() {
   };
 
   useEffect(() => {
+    const savedLang = localStorage.getItem("primora_lang") as "en" | "ar";
+    if (savedLang === "en" || savedLang === "ar") {
+      setLocale(savedLang);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("primora_lang", locale);
     document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
     document.documentElement.lang = locale;
   }, [locale]);

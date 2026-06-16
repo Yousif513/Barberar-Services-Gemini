@@ -98,7 +98,7 @@ interface WebhookItem {
 }
 
 export default function DeveloperConsolePage() {
-  const [locale, setLocale] = useState<"en" | "ar">("ar");
+  const [locale, setLocale] = useState<"en" | "ar">("en");
   const [activeTab, setActiveTab] = useState<"tokens" | "webhooks">("tokens");
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState("");

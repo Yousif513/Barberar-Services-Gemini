@@ -15,6 +15,15 @@ serve(async (req) => {
   }
 
   try {
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
+    const authorization = req.headers.get("Authorization")
+    if (!serviceKey || authorization !== `Bearer ${serviceKey}`) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized." }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    }
+
     const { title, body, token, data } = await req.json()
 
     if (!token || !title || !body) {
@@ -59,10 +68,11 @@ serve(async (req) => {
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     )
 
-  } catch (error: any) {
-    console.error("[Push Engine] Exception occurred:", error.message)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unexpected push notification error."
+    console.error("[Push Engine] Exception occurred:", message)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     )
   }

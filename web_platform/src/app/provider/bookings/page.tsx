@@ -187,9 +187,8 @@ export default function ProviderBookingsPage() {
       
       if (updateError) throw updateError;
       setBookings(prev => prev.map(b => b.id === id ? { ...b, status: newStatus } : b));
-    } catch (err: any) {
-      console.warn("Updating booking status locally:", err.message);
-      setBookings(prev => prev.map(b => b.id === id ? { ...b, status: newStatus } : b));
+    } catch (err: unknown) {
+      console.warn("Failed to update booking status:", err instanceof Error ? err.message : err);
     }
   }
 

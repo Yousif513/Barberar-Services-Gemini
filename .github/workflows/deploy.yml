@@ -17,17 +17,26 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
+      - name: Reject high-severity dependency vulnerabilities
+        run: npm audit --audit-level=high
+
+      - name: Verify security-critical patterns
+        run: npm run test:security-core
+
+      - name: Lint web platform
+        run: npm run lint --workspace=web_platform
+
       - name: Verify TypeScript compilation & Next.js Build
         run: npm run build --workspace=web_platform
         env:
-          NEXT_PUBLIC_SUPABASE_URL: https://mock-project.supabase.co
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: mock-anon-key-for-static-prerender-build-safety
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiJ9.placeholder
 
   verify-mobile:
     name: Verify Mobile App
@@ -39,14 +48,20 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run TypeScript validation (mobile_app)
-        run: npx tsc --noEmit --project mobile_app/tsconfig.json
+        run: npm run typecheck:mobile
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiJ9.placeholder
+
+      - name: Lint mobile app
+        run: npm run lint --workspace=mobile_app
 
   verify-supabase:
     name: Verify Database & Edge Functions
@@ -60,15 +75,29 @@ jobs:
         with:
           version: latest
 
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Start local Supabase
+        run: supabase start
+
+      - name: Apply migrations
+        run: supabase db reset --no-seed
+
       - name: Verify DB Migration Integrity
         run: supabase db lint
 
       - name: Verify Deno Edge Functions
         run: |
-          supabase functions info
-          # Test function config matches standard deno imports
-          deno lint supabase/functions/payment-checkout/index.ts || true
-          deno lint supabase/functions/payment-webhook/index.ts || true
-          deno lint supabase/functions/send-otp/index.ts || true
-          deno lint supabase/functions/calculate-travel/index.ts || true
-        continue-on-error: true
+          deno lint supabase/functions/payment-checkout/index.ts
+          deno lint supabase/functions/payment-webhook/index.ts
+          deno lint supabase/functions/send-otp/index.ts
+          deno lint supabase/functions/calculate-travel/index.ts
+          deno lint supabase/functions/send-push/index.ts
+          deno check supabase/functions/payment-checkout/index.ts
+          deno check supabase/functions/payment-webhook/index.ts
+          deno check supabase/functions/send-otp/index.ts
+          deno check supabase/functions/calculate-travel/index.ts
+          deno check supabase/functions/send-push/index.ts

@@ -11,7 +11,7 @@ export default function BecomeProviderRedirectPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-[#070B12] text-white flex items-center justify-center font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-transparent text-white flex items-center justify-center font-sans relative overflow-hidden">
       {/* Background Radial Glow */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(209,175,71,0.08)_0%,rgba(7,11,18,0)_70%)] pointer-events-none" />
       

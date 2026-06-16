@@ -222,10 +222,9 @@ export default function CustomerBookingsPage() {
 
   async function cancelBooking(id: string) {
     try {
-      const { error: cancelError } = await supabase
-        .from("bookings")
-        .update({ status: "cancelled" })
-        .eq("id", id);
+      const { error: cancelError } = await supabase.rpc("cancel_booking", {
+        target_booking_id: id,
+      });
       
       if (cancelError) throw cancelError;
       
@@ -233,12 +232,8 @@ export default function CustomerBookingsPage() {
       setBookings(prev => prev.map(b => b.id === id ? { ...b, status: "cancelled" } : b));
       setShowCancelModal(false);
       setSelectedBooking(null);
-    } catch (err: any) {
-      console.warn("Failed to cancel on server, falling back to local simulation:", err.message);
-      // Simulate locally
-      setBookings(prev => prev.map(b => b.id === id ? { ...b, status: "cancelled" } : b));
-      setShowCancelModal(false);
-      setSelectedBooking(null);
+    } catch (err: unknown) {
+      console.warn("Failed to cancel booking:", err instanceof Error ? err.message : err);
     }
   }
 

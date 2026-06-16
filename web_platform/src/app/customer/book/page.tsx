@@ -1,22 +1,34 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+
+type ServiceItem = {
+  id: string;
+  name: string;
+  price: number;
+  duration: number;
+};
+
+type ProviderDetails = {
+  name: string;
+  description: string;
+  district: string;
+  services: ServiceItem[];
+};
 
 function BookingContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const providerId = searchParams.get("id") || "1";
 
-  const [selectedService, setSelectedService] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlot, setSelectedSlot] = useState("");
   const [isHomeService, setIsHomeService] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const mockProviderDetails = {
+  const mockProviderDetails: Record<string, ProviderDetails> = {
     "1": {
       name: "Elite Grooming Salon",
       description: "Riyadh's premier luxury barbershop offering bespoke grooming packages, hair styling, beard detailing, and facial therapies.",
@@ -39,13 +51,8 @@ function BookingContent() {
     }
   };
 
-  const provider = (mockProviderDetails as any)[providerId] || mockProviderDetails["1"];
-
-  useEffect(() => {
-    if (provider.services.length > 0) {
-      setSelectedService(provider.services[0]);
-    }
-  }, [providerId]);
+  const provider = mockProviderDetails[providerId] || mockProviderDetails["1"];
+  const [selectedService, setSelectedService] = useState<ServiceItem>(provider.services[0]);
 
   // Mock slot generator excluding Riyadh prayer buffers
   const getAvailableSlots = () => {
@@ -63,24 +70,10 @@ function BookingContent() {
     setMessage("");
 
     try {
-      // 1. Send checkout request to Edge Function
-      const { data, error } = await supabase.functions.invoke("payment-checkout", {
-        body: { bookingId: "mock-booking-id-" + Math.random().toString(36).substring(7) }
-      });
-
-      if (data?.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
-      } else {
-        setMessage("Success: Booking request received! Redirecting to dashboard...");
-        setTimeout(() => {
-          router.push("/customer/dashboard");
-        }, 2000);
-      }
-    } catch (err: any) {
-      setMessage("Success: Booking request received! Redirecting to dashboard...");
-      setTimeout(() => {
-        router.push("/customer/dashboard");
-      }, 2000);
+      setMessage("Please select a live provider from the store to reserve a verified slot.");
+      setTimeout(() => router.push("/store"), 1500);
+    } catch (err: unknown) {
+      setMessage(err instanceof Error ? err.message : "Booking could not be completed.");
     } finally {
       setIsLoading(false);
     }
@@ -114,7 +107,7 @@ function BookingContent() {
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-4">
             <h3 className="font-bold text-sm text-gray-800">Select Service</h3>
             <div className="space-y-2">
-              {provider.services.map((srv: any) => (
+              {provider.services.map((srv) => (
                 <div
                   key={srv.id}
                   onClick={() => setSelectedService(srv)}

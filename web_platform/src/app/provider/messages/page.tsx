@@ -118,7 +118,7 @@ export default function ProviderMessages() {
   );
 
   return (
-    <div className="bg-[#070B12] border border-white/5 rounded-[28px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex h-[calc(100vh-12rem)] min-h-[550px] text-white">
+    <div className="bg-[#111827] border border-white/5 rounded-[28px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex h-[calc(100vh-12rem)] min-h-[550px] text-white">
       
       {/* 1. CHATS SIDEBAR PANEL */}
       <div className="w-80 border-r border-white/5 flex flex-col justify-between bg-gradient-to-b from-[#1A2236] to-[#0D1422] flex-shrink-0">
@@ -237,7 +237,7 @@ export default function ProviderMessages() {
       </div>
 
       {/* 2. CHAT CONSOLE PANEL */}
-      <div className="flex-1 flex flex-col justify-between bg-[#070B12] min-w-0">
+      <div className="flex-1 flex flex-col justify-between bg-[#111827] min-w-0">
         
         {/* Header */}
         <div className="h-20 px-6 border-b border-white/5 flex items-center justify-between bg-[#0D1422]/30 backdrop-blur-md flex-shrink-0">

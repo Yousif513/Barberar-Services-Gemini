@@ -45,7 +45,7 @@ const translations = {
 };
 
 export default function AboutPage() {
-  const [locale, setLocale] = useState<"en" | "ar">("ar");
+  const [locale, setLocale] = useState<"en" | "ar">("en");
   const t = translations[locale];
 
   useEffect(() => {

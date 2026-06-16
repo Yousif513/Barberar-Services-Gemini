@@ -37,3 +37,8 @@ file_size_limit = "50MB"
 
 [analytics]
 enabled = false
+
+# Payment providers cannot send a Supabase JWT. The function independently
+# verifies every charge against Tap before invoking service-role database work.
+[functions.payment-webhook]
+verify_jwt = false

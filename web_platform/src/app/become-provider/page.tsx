@@ -75,7 +75,7 @@ const translations = {
 };
 
 export default function BecomeProviderRootPage() {
-  const [locale, setLocale] = useState<"en" | "ar">("ar");
+  const [locale, setLocale] = useState<"en" | "ar">("en");
   const t = translations[locale];
 
   const toggleLanguage = () => {
@@ -83,6 +83,14 @@ export default function BecomeProviderRootPage() {
   };
 
   useEffect(() => {
+    const savedLang = localStorage.getItem("primora_lang") as "en" | "ar";
+    if (savedLang === "en" || savedLang === "ar") {
+      setLocale(savedLang);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("primora_lang", locale);
     document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
     document.documentElement.lang = locale;
   }, [locale]);

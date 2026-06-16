@@ -104,7 +104,7 @@ interface Post {
 }
 
 export default function ServiceBoardRootPage() {
-  const [locale, setLocale] = useState<"en" | "ar">("ar");
+  const [locale, setLocale] = useState<"en" | "ar">("en");
   const t = translations[locale];
 
   // Modals state
@@ -127,6 +127,14 @@ export default function ServiceBoardRootPage() {
   };
 
   useEffect(() => {
+    const savedLang = localStorage.getItem("primora_lang") as "en" | "ar";
+    if (savedLang === "en" || savedLang === "ar") {
+      setLocale(savedLang);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("primora_lang", locale);
     document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
     document.documentElement.lang = locale;
   }, [locale]);

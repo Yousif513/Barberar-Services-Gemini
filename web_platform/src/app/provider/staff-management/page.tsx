@@ -52,12 +52,12 @@ export default function StaffManagementPage() {
 
   return (
     <div 
-      className="min-h-screen bg-[#070B12] text-[#FFFFFF] font-sans antialiased flex flex-col justify-between selection:bg-[#D1AF47]/20 selection:text-[#D1AF47]"
+      className="min-h-screen bg-transparent text-[#FFFFFF] font-sans antialiased flex flex-col justify-between selection:bg-[#D1AF47]/20 selection:text-[#D1AF47]"
       dir={locale === "ar" ? "rtl" : "ltr"}
     >
       
       {/* Mini Header */}
-      <header className="bg-[#0D1422]/85 backdrop-blur-md border-b border-white/5 py-5 px-6 sm:px-12 flex items-center justify-between sticky top-0 z-50">
+      <header className="bg-white/85 backdrop-blur-md border-b border-gray-200 py-5 px-6 sm:px-12 flex items-center justify-between sticky top-0 z-50">
         <Link 
           href="/" 
           className="text-xl font-bold tracking-[0.2em] text-[#D1AF47] hover:text-[#E0C46A] transition-all duration-300"
@@ -66,7 +66,7 @@ export default function StaffManagementPage() {
         </Link>
         <Link 
           href="/" 
-          className="text-xs font-semibold uppercase tracking-wider text-[#B8C0D4] hover:text-[#FFFFFF] border border-white/5 bg-white/[0.02] hover:bg-[#D1AF47]/10 hover:border-[#D1AF47]/30 px-4 py-2 rounded-full transition-all duration-300"
+          className="text-xs font-semibold uppercase tracking-wider text-gray-700 hover:text-black border border-gray-200 bg-gray-50 hover:bg-[#D1AF47]/10 hover:border-[#D1AF47]/30 px-4 py-2 rounded-full transition-all duration-300"
         >
           {t.backHome}
         </Link>
@@ -160,7 +160,7 @@ export default function StaffManagementPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#0D1422] border-t border-white/5 py-8 text-center text-xs text-[#7B859C] font-medium">
+      <footer className="bg-white border-t border-gray-200 py-8 text-center text-xs text-[#7B859C] font-medium">
         <p>© {new Date().getFullYear()} PRIMORA. {t.footerText}</p>
       </footer>
 
