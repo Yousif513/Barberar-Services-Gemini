@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { GlobalDevTools } from "@/components/global-dev-tools";
 
 export const metadata: Metadata = {
   title: "PRIMORA - Luxury Beauty & Grooming Marketplace",
@@ -13,7 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" dir="ltr" className="h-full antialiased">
-      <body className="min-h-full flex flex-col font-sans bg-stone-50 text-stone-900">{children}</body>
+      <body className="min-h-full flex flex-col font-sans bg-stone-50 text-stone-900">
+        {children}
+        <GlobalDevTools />
+      </body>
     </html>
   );
 }

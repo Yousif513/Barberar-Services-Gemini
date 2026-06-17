@@ -18,9 +18,14 @@ export function getDevRole(): DevRole | null {
   if (!isLocalDevAccessEnabled()) return null;
 
   const role = window.localStorage.getItem(storageKey);
-  return role === "customer" || role === "provider_owner" || role === "admin"
-    ? role
-    : null;
+  if (role === "customer" || role === "provider_owner" || role === "admin") {
+    return role;
+  }
+
+  // Auto-initialize a default dev role so pages don't get stuck
+  // on "Verifying secure session..." when no role is set yet.
+  window.localStorage.setItem(storageKey, "customer");
+  return "customer";
 }
 
 export function setDevRole(role: DevRole) {

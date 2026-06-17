@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AuthGuard } from "@/components/auth-guard";
 
+
 const translations = {
   en: {
     dashboard: "Dashboard",
@@ -113,15 +114,15 @@ export default function AdminLayout({
 
   return (
     <AuthGuard allowedRoles={["admin"]}>
-    <div className="min-h-screen bg-[#F7F7F5] text-black flex flex-col md:flex-row font-sans selection:bg-[#D1AF47] selection:text-white">
+    <div className="flex flex-col md:flex-row bg-[#F7F7F5] text-black font-sans selection:bg-[#D1AF47] selection:text-white md:h-screen md:overflow-hidden">
       
       {/* ═══════════════════════════════════════════════════════ */}
-      {/* SIDEBAR (280px) — Premium Floating White Sidebar        */}
+      {/* SIDEBAR — Floating white sidebar fixed to window height  */}
       {/* ═══════════════════════════════════════════════════════ */}
-      <aside className="w-full md:w-[280px] flex flex-col justify-between p-6 flex-shrink-0 bg-white rounded-[28px] border border-[#E8E8E8] shadow-[0_10px_30px_rgba(0,0,0,0.04)] m-6 relative">
-        <div>
+      <aside className="flex-shrink-0 p-4 md:h-screen">
+        <div className="flex h-full w-full flex-col rounded-[28px] border border-[#E8E8E8] bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.04)] md:w-[260px]">
           {/* Logo & Admin Indicator */}
-          <div className={`flex items-center justify-between mb-8 px-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+          <div className={`flex items-center justify-between mb-6 px-2 flex-shrink-0 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
             <Link href="/" className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <svg className="w-5.5 h-5.5 text-[#D1AF47]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
@@ -135,8 +136,8 @@ export default function AdminLayout({
             </span>
           </div>
 
-          {/* Navigation Links */}
-          <nav className="space-y-0.5 max-h-[55vh] overflow-y-auto pr-1">
+          {/* Navigation Links (scrolls independently) */}
+          <nav className="mt-4 min-h-0 flex-1 space-y-0.5 overflow-y-auto pe-1">
             {menuItems.map((item) => {
               // Exact match or prefix match for subpages (like providers, ledger, bookings)
               const isActive = item.path === "/admin" 
@@ -167,45 +168,45 @@ export default function AdminLayout({
               );
             })}
           </nav>
-        </div>
 
-        {/* Sidebar Footer — Help & Logged-in Admin Info */}
-        <div className="pt-4 mt-2 border-t border-gray-100 space-y-4">
-          <Link
-            href="/admin"
-            className="flex items-center justify-between p-3 bg-[#F7F7F5] border border-[#E8E8E8] rounded-2xl group hover:border-[#D1AF47]/30 transition-all duration-300"
-          >
-            <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <div className="w-8 h-8 rounded-xl bg-white border border-[#E8E8E8] flex items-center justify-center text-gray-500 group-hover:text-[#D1AF47] transition duration-300">
-                <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 0A5 5 0 1110.12 10.12l3.536-3.536m0 0L20 4M9 15l-3 3m0 0l-3-3m3 3V9" />
-                </svg>
+          {/* Sidebar Footer — Support & Logout */}
+          <div className="mt-3 flex-shrink-0 space-y-3 border-t border-gray-100 pt-3">
+            <Link
+              href="/admin"
+              className="flex items-center justify-between p-3 bg-[#F7F7F5] border border-[#E8E8E8] rounded-2xl group hover:border-[#D1AF47]/30 transition-all duration-300"
+            >
+              <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                <div className="w-8 h-8 rounded-xl bg-white border border-[#E8E8E8] flex items-center justify-center text-gray-500 group-hover:text-[#D1AF47] transition duration-300">
+                  <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 0A5 5 0 1110.12 10.12l3.536-3.536m0 0L20 4M9 15l-3 3m0 0l-3-3m3 3V9" />
+                  </svg>
+                </div>
+                <div className={`text-left ${isRTL ? "text-right" : "text-left"}`}>
+                  <h5 className="text-[11px] font-bold text-gray-900 leading-none">System Status</h5>
+                  <p className="text-[9px] text-[#22C55E] font-semibold mt-0.5">All Systems Operational</p>
+                </div>
               </div>
-              <div className={`text-left ${isRTL ? "text-right" : "text-left"}`}>
-                <h5 className="text-[11px] font-bold text-gray-900 leading-none">System Status</h5>
-                <p className="text-[9px] text-[#22C55E] font-semibold mt-0.5">All Systems Operational</p>
-              </div>
-            </div>
-            <svg className={`w-3 h-3 text-gray-400 group-hover:text-[#D1AF47] transition duration-300 ${isRTL ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
-
-          <div className={`flex items-center justify-between gap-2 px-1 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-            <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <div className="w-9 h-9 rounded-full bg-[#F4E7B6]/40 border border-[#D1AF47]/20 flex items-center justify-center text-[#B8952E] font-bold text-sm flex-shrink-0">
-                A
-              </div>
-              <div className={`hidden md:block ${isRTL ? "text-left" : "text-right"}`}>
-                <p className="text-[9px] text-gray-400 uppercase font-bold tracking-widest leading-none mb-0.5">Root Console</p>
-                <p className="text-xs font-black text-gray-900 leading-tight truncate max-w-[110px]">{t.welcome}</p>
-              </div>
-            </div>
-            <Link href="/" className="p-2 rounded-xl text-red-500 hover:bg-red-50 transition-all duration-300">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              <svg className={`w-3 h-3 text-gray-400 group-hover:text-[#D1AF47] transition duration-300 ${isRTL ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </Link>
+
+            <div className={`flex items-center justify-between gap-2 px-1 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                <div className="w-9 h-9 rounded-full bg-[#F4E7B6]/40 border border-[#D1AF47]/20 flex items-center justify-center text-[#B8952E] font-bold text-sm flex-shrink-0">
+                  A
+                </div>
+                <div className={`hidden md:block ${isRTL ? "text-left" : "text-right"}`}>
+                  <p className="text-[9px] text-gray-400 uppercase font-bold tracking-widest leading-none mb-0.5">Root Console</p>
+                  <p className="text-xs font-black text-gray-900 leading-tight truncate max-w-[110px]">{t.welcome}</p>
+                </div>
+              </div>
+              <Link href="/" className="p-2 rounded-xl text-red-500 hover:bg-red-50 transition-all duration-300">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </Link>
+            </div>
           </div>
         </div>
       </aside>
@@ -213,8 +214,9 @@ export default function AdminLayout({
       {/* ═══════════════════════════════════════════════════════ */}
       {/* MAIN CONTENT AREA                                      */}
       {/* ═══════════════════════════════════════════════════════ */}
-      <div className="flex-1 flex flex-col min-w-0 bg-[#F7F7F5] relative">
-        {/* HEADER */}
+      <div className="flex min-w-0 flex-1 flex-col md:overflow-hidden">
+        {/* HEADER — hidden on the dashboard route, which renders its own CommandHeader */}
+        {!(pathname === "/admin" || pathname === "/admin/") && (
         <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-[#E8E8E8] px-8 flex items-center justify-between sticky top-0 z-40">
           <div className={`flex items-center gap-3 bg-[#F7F7F5] border border-[#E8E8E8] px-5 py-3 rounded-2xl w-80 focus-within:border-[#D1AF47]/30 transition-all duration-300 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
             <svg className="w-4 h-4 text-[#667085]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -246,14 +248,16 @@ export default function AdminLayout({
             </div>
           </div>
         </header>
+        )}
 
         {/* PAGES WRAPPER */}
-        <main className="flex-grow p-8 overflow-y-auto relative">
-          <div className="max-w-[1400px] mx-auto">
+        <main className="flex-grow p-5 md:overflow-y-auto">
+          <div className="max-w-[1400px] mx-auto h-full">
             {children}
           </div>
         </main>
       </div>
+
 
     </div>
     </AuthGuard>

@@ -31,11 +31,9 @@ export function AuthGuard({
     const authorize = async () => {
       const devRole = getDevRole();
       if (devRole) {
-        if (!allowedRolesKey.split(",").includes(devRole)) {
-          router.replace(devRoleHome[devRole]);
-          return;
-        }
-
+        // In dev mode, any active dev role grants access to ALL dashboards.
+        // This allows free navigation between customer, provider, and admin
+        // sections without being redirected away.
         if (active) setIsAuthorized(true);
         return;
       }
