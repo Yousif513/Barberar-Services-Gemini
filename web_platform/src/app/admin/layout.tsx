@@ -41,6 +41,9 @@ const translations = {
     welcome: "Admin Root",
     roleLabel: "Super Administrator",
     searchPlaceholder: "Search for anything...",
+    adminHub: "Admin Hub",
+    helpTitle: "Need Help?",
+    helpSubtitle: "System Support",
     langSwitch: "العربية"
   },
   ar: {
@@ -77,6 +80,9 @@ const translations = {
     welcome: "مدير النظام",
     roleLabel: "مدير عام النظام",
     searchPlaceholder: "البحث عن أي شيء...",
+    adminHub: "مركز الإدارة",
+    helpTitle: "تحتاج مساعدة؟",
+    helpSubtitle: "دعم النظام",
     langSwitch: "English"
   }
 };
@@ -228,28 +234,29 @@ export default function AdminLayout({
         {/* ═══════════════════════════════════════════════════════ */}
         {/* SIDEBAR — Solid dark obsidian sidebar full-height       */}
         {/* ═══════════════════════════════════════════════════════ */}
-        <aside className="primora-dashboard-sidebar w-64 bg-[#111827] text-white flex flex-col h-screen flex-shrink-0 border-e border-gray-800">
+        <aside className="flex-shrink-0 p-4 md:h-screen">
+          <div className="primora-dashboard-sidebar flex h-full w-full flex-col rounded-[28px] border border-[#E0C46A]/60 bg-[#10120F] p-5 text-white shadow-[0_24px_70px_rgba(16,18,15,0.28),0_0_46px_rgba(209,175,71,0.24)] md:w-[280px]">
           
           {/* Logo & ADMN Badge */}
-          <div className={`flex items-center justify-between p-5 border-b border-gray-800 flex-shrink-0 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+          <div className={`flex flex-shrink-0 items-center justify-between gap-3 px-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
             <Link href="/" className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <svg className="w-5.5 h-5.5 text-[#D1AF47]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
               </svg>
-              <span className="text-lg font-serif font-black tracking-[0.15em] text-[#D1AF47] hover:text-[#E0C46A] transition-colors duration-300">
+              <span className="text-xl font-serif font-black tracking-[0.2em] text-[#D1AF47] hover:text-[#E0C46A] transition-colors duration-300">
                 PRIMORA
               </span>
             </Link>
-            <span className="bg-[#D1AF47] text-white text-[8px] font-black uppercase px-1.5 py-0.5 rounded tracking-wide shadow-sm shadow-[#D1AF47]/30">
+            <span className="rounded-full border border-[#D1AF47]/40 bg-[#D1AF47]/15 px-2.5 py-1 text-[8px] font-black uppercase tracking-wide text-[#F4E7B6]">
               ADMN
             </span>
           </div>
 
           {/* Grouped Links (Scrollable) */}
-          <nav className="flex-grow overflow-y-auto py-5 px-3 space-y-6 scrollbar-thin scrollbar-thumb-gray-800 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <nav className="mt-6 min-h-0 flex-1 space-y-3 overflow-y-auto pe-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {navSections.map((sec) => (
               <div key={sec.titleKey} className="space-y-1">
-                <span className={`block px-3 text-[9px] font-bold text-gray-500 uppercase tracking-widest ${isRTL ? "text-right" : "text-left"}`}>
+                <span className={`block px-4 text-[9px] font-bold text-[#9C9688] uppercase tracking-widest ${isRTL ? "text-right" : "text-left"}`}>
                   {t[sec.titleKey as keyof typeof t] || sec.titleKey.toUpperCase()}
                 </span>
                 <div className="space-y-0.5">
@@ -263,13 +270,13 @@ export default function AdminLayout({
                         key={item.path}
                         href={item.path}
                         aria-current={isActive ? "page" : undefined}
-                        className={`group flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] font-semibold transition-all duration-200 ${
+                        className={`group relative flex items-center gap-3.5 px-4 py-3 rounded-[18px] text-[13px] font-semibold transition-all duration-300 ${
                           isActive
-                            ? "border border-[#E0C46A]/50 bg-[#D1AF47]/20 text-[#F4E7B6] font-bold shadow-[0_0_34px_rgba(209,175,71,0.34),inset_0_0_18px_rgba(244,231,182,0.08)]"
-                            : "text-gray-400 hover:text-white hover:bg-gray-800/40"
+                            ? "border border-[#E0C46A]/50 bg-[#D1AF47]/20 text-[#F4E7B6] shadow-[0_0_34px_rgba(209,175,71,0.34),inset_0_0_18px_rgba(244,231,182,0.08)]"
+                            : "text-[#D9D4C8] hover:bg-white/[0.06] hover:text-white"
                         } ${isRTL ? "flex-row-reverse text-right" : "flex-row text-left"}`}
                       >
-                        <span className={`flex-shrink-0 transition-colors duration-200 ${isActive ? "text-[#D1AF47]" : "text-gray-500 group-hover:text-gray-300"}`}>
+                        <span className={`flex-shrink-0 transition-colors duration-300 ${isActive ? "text-[#E0C46A]" : "text-[#8F8A80] group-hover:text-[#D1AF47]"}`}>
                           {getNavIcon(item.nameKey)}
                         </span>
                         <span className="flex-grow">{t[item.nameKey as keyof typeof t] || item.nameKey}</span>
@@ -281,11 +288,31 @@ export default function AdminLayout({
             ))}
           </nav>
 
-          {/* Bottom Profile Section */}
-          <div className="p-4 border-t border-gray-800 flex-shrink-0 bg-gray-900/40">
-            <div className={`flex items-center justify-between gap-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+          {/* Sidebar Footer - Support & Admin Profile */}
+          <div className="mt-3 flex-shrink-0 space-y-3 border-t border-white/10 pt-3">
+            <Link
+              href="/admin/settings"
+              className="flex items-center justify-between p-3 bg-[#14120E]/80 border border-[#E0C46A]/60 rounded-2xl group hover:border-[#E0C46A]/70 transition-all duration-300 shadow-[0_0_38px_rgba(209,175,71,0.24),inset_0_0_18px_rgba(244,231,182,0.08)]"
+            >
+              <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                <div className="w-8 h-8 rounded-xl bg-[#D1AF47]/15 border border-[#D1AF47]/40 flex items-center justify-center text-[#F4E7B6] group-hover:text-[#D1AF47] transition duration-300">
+                  <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 0A5 5 0 1110.12 10.12l3.536-3.536m0 0L20 4M9 15l-3 3m0 0l-3-3m3 3V9" />
+                  </svg>
+                </div>
+                <div className={`${isRTL ? "text-right" : "text-left"}`}>
+                  <h5 className="text-[11px] font-bold text-[#F4E7B6] leading-none">{t.helpTitle}</h5>
+                  <p className="text-[9px] text-[#D9D4C8] font-semibold mt-0.5">{t.helpSubtitle}</p>
+                </div>
+              </div>
+              <svg className={`w-3 h-3 text-[#D9D4C8] group-hover:text-[#D1AF47] transition duration-300 ${isRTL ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+
+            <div className={`flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <div className="w-9 h-9 rounded-full overflow-hidden border border-gray-700 shadow-lg bg-gray-800 flex-shrink-0">
+                <div className="w-9 h-9 rounded-full overflow-hidden border border-[#D1AF47]/25 bg-[#F4E7B6]/15 flex-shrink-0">
                   <img
                     src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"
                     alt="Admin Root"
@@ -294,21 +321,22 @@ export default function AdminLayout({
                       e.currentTarget.style.display = 'none';
                     }}
                   />
-                  <div className="w-full h-full flex items-center justify-center text-[#D1AF47] font-black text-xs">
+                  <div className="w-full h-full flex items-center justify-center text-[#F4E7B6] font-black text-xs">
                     AR
                   </div>
                 </div>
                 <div className={`min-w-0 ${isRTL ? "text-right" : "text-left"}`}>
-                  <p className="text-[11px] font-bold text-white leading-tight truncate">{t.welcome}</p>
-                  <p className="text-[9px] text-gray-500 font-semibold leading-none mt-0.5 truncate">{t.roleLabel}</p>
+                  <p className="text-[9px] text-[#9C9688] uppercase font-bold tracking-widest leading-none mb-0.5">{t.adminHub}</p>
+                  <p className="text-xs font-black text-white leading-tight truncate max-w-[120px]">{t.welcome}</p>
                 </div>
               </div>
-              <button aria-label="Profile actions" className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition">
+              <button aria-label="Profile actions" className="p-2 rounded-xl text-[#D9D4C8] hover:bg-white/[0.06] hover:text-[#F4E7B6] transition-all duration-300">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 8a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z" />
                 </svg>
               </button>
             </div>
+          </div>
           </div>
         </aside>
 
