@@ -19,3 +19,165 @@ body {
   color: var(--foreground);
   font-family: var(--font-outfit);
 }
+
+/* PRIMORA dashboard-wide luxury skin: shared by admin and provider workspaces. */
+.primora-dashboard-skin {
+  --primora-gold: #D1AF47;
+  --primora-gold-soft: #F4E7B6;
+  --primora-gold-bright: #F7E6A6;
+  --primora-obsidian: #10120F;
+  --primora-ink: #15120D;
+  --primora-sand: #F7F3EA;
+  --primora-panel: rgba(255, 255, 255, 0.88);
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 22% 8%, rgba(209, 175, 71, 0.16), transparent 26%),
+    radial-gradient(circle at 84% 22%, rgba(244, 231, 182, 0.42), transparent 24%),
+    linear-gradient(135deg, #F7F3EA 0%, #FBF8F1 48%, #EFE6D1 100%);
+}
+
+.primora-dashboard-skin::before,
+.primora-dashboard-skin::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.primora-dashboard-skin::before {
+  opacity: 0.42;
+  background-image:
+    radial-gradient(circle at 14% 72%, rgba(247, 230, 166, 0.78) 0 2px, transparent 4px),
+    radial-gradient(circle at 19% 60%, rgba(209, 175, 71, 0.70) 0 2px, transparent 5px),
+    radial-gradient(circle at 28% 68%, rgba(247, 230, 166, 0.85) 0 2px, transparent 6px),
+    radial-gradient(circle at 72% 18%, rgba(247, 230, 166, 0.80) 0 2px, transparent 5px),
+    linear-gradient(27deg, transparent 0 18%, rgba(209, 175, 71, 0.24) 18.2% 18.45%, transparent 18.7%),
+    linear-gradient(146deg, transparent 0 35%, rgba(209, 175, 71, 0.22) 35.2% 35.45%, transparent 35.7%),
+    linear-gradient(105deg, transparent 0 61%, rgba(209, 175, 71, 0.18) 61.1% 61.35%, transparent 61.6%);
+}
+
+.primora-dashboard-skin::after {
+  opacity: 0.55;
+  background:
+    radial-gradient(circle at 5% 96%, rgba(209, 175, 71, 0.18), transparent 18%),
+    radial-gradient(circle at 96% 4%, rgba(209, 175, 71, 0.14), transparent 20%);
+}
+
+.primora-dashboard-skin > aside,
+.primora-dashboard-skin > div {
+  position: relative;
+  z-index: 1;
+}
+
+.primora-dashboard-sidebar {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(224, 196, 106, 0.58) !important;
+  background:
+    radial-gradient(circle at 15% 6%, rgba(209, 175, 71, 0.17), transparent 26%),
+    radial-gradient(circle at 100% 72%, rgba(209, 175, 71, 0.24), transparent 26%),
+    #10120F !important;
+  box-shadow:
+    0 0 0 1px rgba(244, 231, 182, 0.14),
+    0 24px 70px rgba(16, 18, 15, 0.30),
+    0 0 46px rgba(209, 175, 71, 0.24) !important;
+}
+
+.primora-dashboard-sidebar::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.62;
+  background-image:
+    radial-gradient(circle at 72% 76%, rgba(247, 230, 166, 0.95) 0 2px, transparent 7px),
+    radial-gradient(circle at 88% 64%, rgba(247, 230, 166, 0.95) 0 2px, transparent 7px),
+    radial-gradient(circle at 50% 82%, rgba(224, 196, 106, 0.80) 0 2px, transparent 6px),
+    linear-gradient(26deg, transparent 0 63%, rgba(209, 175, 71, 0.34) 63.2% 63.5%, transparent 63.8%),
+    linear-gradient(142deg, transparent 0 70%, rgba(209, 175, 71, 0.30) 70.2% 70.5%, transparent 70.8%);
+}
+
+.primora-dashboard-sidebar > * {
+  position: relative;
+  z-index: 1;
+}
+
+.primora-dashboard-sidebar nav a {
+  border: 1px solid transparent;
+}
+
+.primora-dashboard-sidebar nav a:hover,
+.primora-dashboard-sidebar nav a[aria-current="page"] {
+  border-color: rgba(224, 196, 106, 0.46) !important;
+  background: rgba(209, 175, 71, 0.16) !important;
+  color: #F4E7B6 !important;
+  box-shadow: 0 0 34px rgba(209, 175, 71, 0.30), inset 0 0 18px rgba(244, 231, 182, 0.08);
+}
+
+.primora-dashboard-content {
+  position: relative;
+  z-index: 1;
+}
+
+.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea) {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(209, 175, 71, 0.46) !important;
+  background-color: var(--primora-panel) !important;
+  box-shadow:
+    0 0 0 1px rgba(209, 175, 71, 0.16),
+    0 18px 42px rgba(17, 17, 17, 0.08),
+    0 0 34px rgba(209, 175, 71, 0.18) !important;
+}
+
+.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea)::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(209, 175, 71, 0.72), rgba(224, 196, 106, 0.32), transparent) 16px 0 / 58px 1px no-repeat,
+    linear-gradient(180deg, rgba(209, 175, 71, 0.72), rgba(224, 196, 106, 0.32), transparent) 0 16px / 1px 58px no-repeat,
+    linear-gradient(270deg, rgba(209, 175, 71, 0.72), rgba(224, 196, 106, 0.32), transparent) calc(100% - 16px) 0 / 58px 1px no-repeat,
+    linear-gradient(180deg, rgba(209, 175, 71, 0.72), rgba(224, 196, 106, 0.32), transparent) 100% 16px / 1px 58px no-repeat,
+    linear-gradient(90deg, rgba(209, 175, 71, 0.72), rgba(224, 196, 106, 0.32), transparent) 16px 100% / 58px 1px no-repeat,
+    linear-gradient(0deg, rgba(209, 175, 71, 0.72), rgba(224, 196, 106, 0.32), transparent) 0 calc(100% - 16px) / 1px 58px no-repeat,
+    radial-gradient(circle at calc(100% - 12px) 12px, rgba(247, 230, 166, 0.96) 0 2px, transparent 6px),
+    radial-gradient(circle at 12px calc(100% - 12px), rgba(224, 196, 106, 0.92) 0 2px, transparent 6px);
+}
+
+.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea)::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.26;
+  background-image:
+    radial-gradient(circle at 74% 18%, rgba(247, 230, 166, 0.95) 0 2px, transparent 8px),
+    radial-gradient(circle at 87% 34%, rgba(224, 196, 106, 0.85) 0 2px, transparent 7px),
+    radial-gradient(circle at 62% 42%, rgba(209, 175, 71, 0.70) 0 2px, transparent 6px),
+    linear-gradient(132deg, transparent 0 55%, rgba(209, 175, 71, 0.30) 55.1% 55.35%, transparent 55.6%),
+    linear-gradient(34deg, transparent 0 64%, rgba(209, 175, 71, 0.24) 64.1% 64.35%, transparent 64.6%);
+}
+
+.primora-dashboard-content :is(header, h1, h2, h3, h4, p, span, a, button, input, svg, img, ul, ol, li, table, thead, tbody, tr, td, th, label, div) {
+  position: relative;
+}
+
+.primora-dashboard-content button[class*="rounded"],
+.primora-dashboard-content a[class*="rounded"] {
+  border-color: rgba(209, 175, 71, 0.38);
+}
+
+.primora-dashboard-content button[class*="bg-[#D1AF47]"],
+.primora-dashboard-content a[class*="bg-[#D1AF47]"] {
+  box-shadow: 0 0 22px rgba(209, 175, 71, 0.30), 0 10px 22px rgba(209, 175, 71, 0.18) !important;
+}
+
+.primora-dashboard-content [class*="p-0.5"] > button,
+.primora-dashboard-content [class*="p-1"] > button {
+  border-radius: 9999px;
+}

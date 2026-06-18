@@ -223,12 +223,12 @@ export default function AdminLayout({
 
   return (
     <AuthGuard allowedRoles={["admin"]}>
-      <div className="flex flex-col md:flex-row bg-[#F7F6F3] text-black font-sans selection:bg-[#D1AF47] selection:text-white md:h-screen md:overflow-hidden">
+      <div className="primora-dashboard-skin flex flex-col md:flex-row bg-[#F7F6F3] text-black font-sans selection:bg-[#D1AF47] selection:text-white md:h-screen md:overflow-hidden">
         
         {/* ═══════════════════════════════════════════════════════ */}
         {/* SIDEBAR — Solid dark obsidian sidebar full-height       */}
         {/* ═══════════════════════════════════════════════════════ */}
-        <aside className="w-64 bg-[#111827] text-white flex flex-col h-screen flex-shrink-0 border-e border-gray-800">
+        <aside className="primora-dashboard-sidebar w-64 bg-[#111827] text-white flex flex-col h-screen flex-shrink-0 border-e border-gray-800">
           
           {/* Logo & ADMN Badge */}
           <div className={`flex items-center justify-between p-5 border-b border-gray-800 flex-shrink-0 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
@@ -246,7 +246,7 @@ export default function AdminLayout({
           </div>
 
           {/* Grouped Links (Scrollable) */}
-          <nav className="flex-grow overflow-y-auto py-5 px-3 space-y-6 scrollbar-thin scrollbar-thumb-gray-800">
+          <nav className="flex-grow overflow-y-auto py-5 px-3 space-y-6 scrollbar-thin scrollbar-thumb-gray-800 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {navSections.map((sec) => (
               <div key={sec.titleKey} className="space-y-1">
                 <span className={`block px-3 text-[9px] font-bold text-gray-500 uppercase tracking-widest ${isRTL ? "text-right" : "text-left"}`}>
@@ -262,9 +262,10 @@ export default function AdminLayout({
                       <Link
                         key={item.path}
                         href={item.path}
+                        aria-current={isActive ? "page" : undefined}
                         className={`group flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] font-semibold transition-all duration-200 ${
                           isActive
-                            ? "bg-gray-800 text-white font-bold"
+                            ? "border border-[#E0C46A]/50 bg-[#D1AF47]/20 text-[#F4E7B6] font-bold shadow-[0_0_34px_rgba(209,175,71,0.34),inset_0_0_18px_rgba(244,231,182,0.08)]"
                             : "text-gray-400 hover:text-white hover:bg-gray-800/40"
                         } ${isRTL ? "flex-row-reverse text-right" : "flex-row text-left"}`}
                       >
@@ -315,7 +316,7 @@ export default function AdminLayout({
         {/* MAIN PANEL CONTENT                                      */}
         {/* ═══════════════════════════════════════════════════════ */}
         <div className="flex min-w-0 flex-1 flex-col md:overflow-hidden">
-          <main className="flex-grow p-6 md:overflow-y-auto">
+          <main className="primora-dashboard-content flex-grow p-6 md:overflow-y-auto">
             <div className="max-w-[1500px] mx-auto h-full">
               {children}
             </div>
