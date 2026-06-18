@@ -129,23 +129,60 @@ function NeuralMesh({ className = "", dark = false }: { className?: string; dark
   const stroke = dark ? "#F4E7B6" : "#D1AF47";
   const softStroke = dark ? "#E0C46A" : "#B8952E";
   const glow = dark ? "#F7E6A6" : "#E0C46A";
+  const glowId = React.useId();
+  const nodes = [12, 66, 118, 166, 238, 336, 96, 208, 306, 156, 282].map((x, index) => ({
+    x,
+    y: [142, 98, 118, 58, 84, 22, 28, 18, 126, 156, 42][index],
+    hot: index === 3 || index === 4 || index === 5,
+  }));
 
   return (
     <svg className={`pointer-events-none absolute ${className}`} viewBox="0 0 360 180" fill="none" aria-hidden="true">
-      <path d="M12 142L66 98L118 118L166 58L238 84L336 22" stroke={stroke} strokeOpacity=".58" strokeWidth="1.25" />
-      <path d="M42 172L66 98L96 28L166 58L208 18L238 84L306 126" stroke={softStroke} strokeOpacity=".36" strokeWidth="1" />
-      <path d="M118 118L156 156L238 84L282 42L336 22" stroke={stroke} strokeOpacity=".26" strokeWidth=".9" />
-      {[12, 66, 118, 166, 238, 336, 96, 208, 306, 156, 282].map((x, index) => (
-        <circle
-          key={x}
-          cx={x}
-          cy={[142, 98, 118, 58, 84, 22, 28, 18, 126, 156, 42][index]}
-          r={index % 3 === 0 ? "4.2" : "3.1"}
-          fill={glow}
-          fillOpacity={index % 3 === 0 ? ".95" : ".72"}
-        />
+      <defs>
+        <filter id={glowId} x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="4" result="blur" />
+          <feColorMatrix in="blur" values="1 0 0 0 0.97 0 1 0 0 0.70 0 0 1 0 0.22 0 0 0 1 0" />
+          <feMerge>
+            <feMergeNode />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <path d="M12 142L66 98L118 118L166 58L238 84L336 22" stroke={stroke} strokeOpacity=".72" strokeWidth="1.25" filter={`url(#${glowId})`} />
+      <path d="M42 172L66 98L96 28L166 58L208 18L238 84L306 126" stroke={softStroke} strokeOpacity=".46" strokeWidth="1" filter={`url(#${glowId})`} />
+      <path d="M118 118L156 156L238 84L282 42L336 22" stroke={stroke} strokeOpacity=".36" strokeWidth=".9" filter={`url(#${glowId})`} />
+      {nodes.map((node) => (
+        <circle key={`halo-${node.x}`} cx={node.x} cy={node.y} r={node.hot ? "10" : "6.5"} fill={glow} fillOpacity={node.hot ? ".34" : ".18"} filter={`url(#${glowId})`} />
+      ))}
+      {nodes.map((node, index) => (
+        <circle key={node.x} cx={node.x} cy={node.y} r={node.hot ? "4.8" : index % 3 === 0 ? "4" : "3.1"} fill={glow} fillOpacity={node.hot ? "1" : ".78"} filter={`url(#${glowId})`} />
       ))}
     </svg>
+  );
+}
+
+function CornerGlow({ dark = false }: { dark?: boolean }) {
+  const horizontal = dark
+    ? "bg-gradient-to-r from-[#F7E6A6]/95 via-[#E0C46A]/70 to-transparent shadow-[0_0_14px_rgba(244,231,182,0.55)]"
+    : "bg-gradient-to-r from-[#D1AF47]/85 via-[#E0C46A]/50 to-transparent shadow-[0_0_12px_rgba(209,175,71,0.36)]";
+  const vertical = dark
+    ? "bg-gradient-to-b from-[#F7E6A6]/95 via-[#E0C46A]/70 to-transparent shadow-[0_0_14px_rgba(244,231,182,0.55)]"
+    : "bg-gradient-to-b from-[#D1AF47]/85 via-[#E0C46A]/50 to-transparent shadow-[0_0_12px_rgba(209,175,71,0.36)]";
+  const dot = dark ? "bg-[#F7E6A6] shadow-[0_0_18px_rgba(244,231,182,0.80)]" : "bg-[#E0C46A] shadow-[0_0_16px_rgba(209,175,71,0.60)]";
+
+  return (
+    <div className="pointer-events-none absolute inset-0 z-[1]">
+      <span className={`absolute left-4 top-0 h-px w-14 ${horizontal}`} />
+      <span className={`absolute left-0 top-4 h-14 w-px ${vertical}`} />
+      <span className={`absolute right-4 top-0 h-px w-14 rotate-180 ${horizontal}`} />
+      <span className={`absolute right-0 top-4 h-14 w-px ${vertical}`} />
+      <span className={`absolute bottom-0 left-4 h-px w-14 ${horizontal}`} />
+      <span className={`absolute bottom-4 left-0 h-14 w-px rotate-180 ${vertical}`} />
+      <span className={`absolute bottom-0 right-4 h-px w-14 rotate-180 ${horizontal}`} />
+      <span className={`absolute bottom-4 right-0 h-14 w-px rotate-180 ${vertical}`} />
+      <span className={`absolute right-3 top-3 h-1.5 w-1.5 rounded-full ${dot}`} />
+      <span className={`absolute bottom-3 left-3 h-1.5 w-1.5 rounded-full ${dot}`} />
+    </div>
   );
 }
 
@@ -361,6 +398,7 @@ export default function CustomerDashboard() {
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-12" style={{ gridTemplateRows: "minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr) auto" }}>
         {/* ─── ROW 1: Merged Appointment + Timer (8) | Exclusive w/ photo (4) ─── */}
         <article className="relative flex overflow-hidden rounded-[22px] border border-[#E0C46A]/60 bg-[#10100E] text-white shadow-[0_0_0_1px_rgba(244,231,182,0.18),0_26px_70px_rgba(16,16,14,0.34),0_0_48px_rgba(209,175,71,0.32)] lg:col-span-8">
+          <CornerGlow dark />
           <NeuralMesh dark className="-right-10 bottom-0 h-36 w-80 opacity-70" />
           <div className="pointer-events-none absolute inset-0">
             <div className="absolute -left-10 top-0 h-32 w-32 rounded-full bg-[#D1AF47]/20 blur-3xl" />
@@ -379,7 +417,7 @@ export default function CustomerDashboard() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={d.hero} alt={d.appointment.service} className="h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#10100E]/40" />
-            <span className="absolute left-4 top-4 rounded-full border border-[#E0C46A]/70 bg-[#15120D]/85 px-3 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-[#F4E7B6] shadow-[0_0_22px_rgba(209,175,71,0.42)]">AI Match</span>
+            <span className="absolute left-4 top-4 rounded-full border border-[#E0C46A]/70 bg-[#15120D]/90 px-3 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-[#F4E7B6] shadow-[0_0_22px_rgba(209,175,71,0.42)]">AI Match</span>
           </div>
           {/* Appointment details */}
           <div className="relative flex flex-1 flex-col justify-center p-5">
@@ -430,7 +468,8 @@ export default function CustomerDashboard() {
         </article>
 
         {/* Exclusive Offer with attractive photo */}
-        <article className="relative flex flex-col justify-end overflow-hidden rounded-[22px] border border-[#E0C46A]/65 p-5 text-white shadow-[0_0_0_1px_rgba(244,231,182,0.20),0_18px_48px_rgba(16,16,14,0.22),0_0_42px_rgba(209,175,71,0.30)] lg:col-span-4">
+        <article className="relative flex flex-col justify-end overflow-hidden rounded-[22px] border border-[#E0C46A]/70 p-5 text-white shadow-[0_0_0_1px_rgba(244,231,182,0.20),0_18px_48px_rgba(16,16,14,0.22),0_0_42px_rgba(209,175,71,0.30)] lg:col-span-4">
+          <CornerGlow dark />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={d.exclusiveImg} alt="" className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0E0D0C] via-[#0E0D0C]/80 to-[#0E0D0C]/25" />
@@ -454,6 +493,7 @@ export default function CustomerDashboard() {
 
         {/* ─── ROW 2: Recommended (8) | Favorite Providers (4) ─── */}
         <section className={`${cardBase} flex min-h-0 flex-col p-4 lg:col-span-8`}>
+          <CornerGlow />
           <NeuralMesh className="-right-12 -top-4 h-36 w-64 opacity-35" />
           <div className="pointer-events-none absolute inset-0 rounded-[22px] bg-[radial-gradient(circle_at_8%_0%,rgba(209,175,71,0.18),transparent_30%),radial-gradient(circle_at_92%_18%,rgba(244,231,182,0.28),transparent_26%)]" />
           <div className="mb-2.5 flex flex-shrink-0 items-center justify-between">
@@ -485,6 +525,7 @@ export default function CustomerDashboard() {
 
         {/* Favorite Providers */}
         <section className={`${cardBase} flex min-h-0 flex-col p-4 lg:col-span-4`}>
+          <CornerGlow />
           <NeuralMesh className="-right-16 top-2 h-36 w-64 opacity-35" />
           <div className="pointer-events-none absolute inset-0 rounded-[22px] bg-[radial-gradient(circle_at_100%_10%,rgba(209,175,71,0.20),transparent_34%)]" />
           <div className="mb-2 flex flex-shrink-0 items-center justify-between">
@@ -514,6 +555,7 @@ export default function CustomerDashboard() {
 
         {/* ─── ROW 3: Bookings+tabs (5) | Loyalty & Wallet (3) | Insights (4) ─── */}
         <section className={`${cardBase} flex min-h-0 flex-col p-4 lg:col-span-5`}>
+          <CornerGlow />
           <NeuralMesh className="-right-10 -top-6 h-36 w-64 opacity-30" />
           <div className="pointer-events-none absolute inset-0 rounded-[22px] bg-[radial-gradient(circle_at_16%_8%,rgba(244,231,182,0.26),transparent_32%)]" />
           <div className="mb-2 flex flex-shrink-0 items-center justify-between">
@@ -549,6 +591,7 @@ export default function CustomerDashboard() {
 
         {/* Loyalty & Wallet (combined) */}
         <section className={`${cardBase} relative flex min-h-0 flex-col justify-center overflow-hidden p-4 lg:col-span-3`}>
+          <CornerGlow />
           <NeuralMesh className="-right-16 -top-4 h-36 w-60 opacity-35" />
           <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-[#D1AF47]/20 blur-2xl" />
           <div className="pointer-events-none absolute inset-0 rounded-[22px] bg-[radial-gradient(circle_at_88%_6%,rgba(209,175,71,0.24),transparent_34%)]" />
@@ -577,6 +620,7 @@ export default function CustomerDashboard() {
 
         {/* Spending Insights */}
         <section className={`${cardBase} relative flex min-h-0 flex-col overflow-hidden p-4 lg:col-span-4`}>
+          <CornerGlow />
           <NeuralMesh className="-right-12 -top-8 h-40 w-72 opacity-35" />
           <div className="pointer-events-none absolute right-4 top-4 h-28 w-28 rounded-full bg-[#D1AF47]/20 blur-2xl" />
           <div className="pointer-events-none absolute inset-0 rounded-[22px] bg-[radial-gradient(circle_at_100%_10%,rgba(209,175,71,0.22),transparent_34%)]" />
@@ -614,7 +658,8 @@ export default function CustomerDashboard() {
         </section>
 
         {/* ─── Refer banner ─── */}
-        <div className="relative flex items-center justify-between gap-3 overflow-hidden rounded-[22px] border border-[#E0C46A]/65 bg-[#15120D] px-5 py-3 text-white shadow-[0_0_0_1px_rgba(244,231,182,0.16),0_18px_50px_rgba(16,16,14,0.22),0_0_42px_rgba(209,175,71,0.30)] lg:col-span-12">
+        <div className="relative flex items-center justify-between gap-3 overflow-hidden rounded-[22px] border border-[#E0C46A]/70 bg-[#15120D] px-5 py-3 text-white shadow-[0_0_0_1px_rgba(244,231,182,0.16),0_18px_50px_rgba(16,16,14,0.22),0_0_42px_rgba(209,175,71,0.30)] lg:col-span-12">
+          <CornerGlow dark />
           <NeuralMesh dark className="bottom-0 right-44 h-28 w-80 opacity-70" />
           <div className="pointer-events-none absolute inset-0">
             <div className="absolute left-4 top-1/2 h-20 w-20 -translate-y-1/2 rounded-full bg-[#D1AF47]/25 blur-2xl" />

@@ -182,11 +182,24 @@ export default function CustomerLayout({
             <div className="absolute -left-16 top-0 h-44 w-44 rounded-full bg-[#D1AF47]/15 blur-3xl" />
             <div className="absolute -bottom-20 right-0 h-60 w-60 rounded-full bg-[#D1AF47]/25 blur-3xl" />
             <div className="absolute inset-0 rounded-[28px] shadow-[inset_0_0_42px_rgba(244,231,182,0.12)]" />
-            <svg className="absolute bottom-12 right-0 h-48 w-56 opacity-70" viewBox="0 0 220 170" fill="none" aria-hidden="true">
-              <path d="M10 135L64 112L101 128L143 74L205 54" stroke="#D1AF47" strokeOpacity=".72" />
-              <path d="M34 168L64 112L87 45L143 74L179 8" stroke="#D1AF47" strokeOpacity=".42" />
+            <svg className="absolute bottom-12 right-0 h-48 w-56 opacity-80" viewBox="0 0 220 170" fill="none" aria-hidden="true">
+              <defs>
+                <filter id="sidebarMeshGlow" x="-35%" y="-35%" width="170%" height="170%">
+                  <feGaussianBlur stdDeviation="3.5" result="blur" />
+                  <feColorMatrix in="blur" values="1 0 0 0 0.95 0 1 0 0 0.68 0 0 1 0 0.20 0 0 0 0.95 0" />
+                  <feMerge>
+                    <feMergeNode />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              <path d="M10 135L64 112L101 128L143 74L205 54" stroke="#D1AF47" strokeOpacity=".82" filter="url(#sidebarMeshGlow)" />
+              <path d="M34 168L64 112L87 45L143 74L179 8" stroke="#D1AF47" strokeOpacity=".52" filter="url(#sidebarMeshGlow)" />
               {[10, 64, 101, 143, 205, 87, 179].map((x, index) => (
-                <circle key={x} cx={x} cy={[135, 112, 128, 74, 54, 45, 8][index]} r="3" fill="#E0C46A" />
+                <circle key={`halo-${x}`} cx={x} cy={[135, 112, 128, 74, 54, 45, 8][index]} r={index === 4 ? "8" : "6"} fill="#F4E7B6" fillOpacity=".28" filter="url(#sidebarMeshGlow)" />
+              ))}
+              {[10, 64, 101, 143, 205, 87, 179].map((x, index) => (
+                <circle key={x} cx={x} cy={[135, 112, 128, 74, 54, 45, 8][index]} r={index === 4 ? "4.4" : "3.2"} fill="#F7E6A6" filter="url(#sidebarMeshGlow)" />
               ))}
             </svg>
           </div>
@@ -214,11 +227,6 @@ export default function CustomerLayout({
                       : "text-[#D9D4C8] hover:bg-white/[0.06] hover:text-white"
                   } ${isRTL ? "flex-row-reverse text-right" : "flex-row text-left"}`}
                 >
-                  {/* Gold active line indicator */}
-                  {isActive && (
-                    <span className={`absolute top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-[#D1AF47] ${isRTL ? "right-0" : "left-0"}`} />
-                  )}
-
                   <span className={`flex-shrink-0 transition-colors duration-300 ${isActive ? "text-[#E0C46A]" : "text-[#8F8A80] group-hover:text-[#D1AF47]"}`}>
                     {getNavIcon(item.path)}
                   </span>
