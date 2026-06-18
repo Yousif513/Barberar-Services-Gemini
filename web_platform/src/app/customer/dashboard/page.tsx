@@ -84,7 +84,7 @@ const translations = {
     search: "Search services, providers, pages...", lang: "العربية",
     nextAppointment: "Next Appointment", with: "with", viewDetails: "View Details", startsIn: "Starts in",
     day: "Day", hrs: "Hrs", mins: "Mins", secs: "Secs",
-    exclusive: "Exclusive For You", offerTitle: "20% OFF", offerValid: "Valid till 30 Apr, 2024", claimOffer: "Claim Offer",
+    exclusive: "Exclusive For You", offerTitle: "20% OFF", offerValid: "Valid till 30 Apr, 2026", claimOffer: "Claim Offer",
     recommended: "Recommended For You", viewAll: "View All",
     favoriteProviders: "Favorite Providers", viewAllProviders: "View All Providers",
     bookings: "Bookings", upcomingTab: "Upcoming", historyTab: "History",
@@ -100,7 +100,7 @@ const translations = {
     search: "ابحث عن الخدمات، المزودين، الصفحات...", lang: "EN",
     nextAppointment: "الموعد القادم", with: "مع", viewDetails: "عرض التفاصيل", startsIn: "يبدأ خلال",
     day: "يوم", hrs: "ساعة", mins: "دقيقة", secs: "ثانية",
-    exclusive: "حصري لك", offerTitle: "خصم 20%", offerValid: "ساري حتى 30 أبريل 2024", claimOffer: "احصل على العرض",
+    exclusive: "حصري لك", offerTitle: "خصم 20%", offerValid: "ساري حتى 30 أبريل 2026", claimOffer: "احصل على العرض",
     recommended: "موصى به لك", viewAll: "عرض الكل",
     favoriteProviders: "المزودون المفضلون", viewAllProviders: "عرض كل المزودين",
     bookings: "الحجوزات", upcomingTab: "القادمة", historyTab: "السابقة",
@@ -246,11 +246,22 @@ export default function CustomerDashboard() {
     s === "Upcoming" ? "bg-[#F4E7B6]/60 text-[#9A7B1E]" : s === "Completed" ? "bg-[#22C55E]/10 text-[#16A34A]" : "bg-[#EF4444]/10 text-[#DC2626]";
   const statusLabel = (s: Booking["status"]) => (s === "Upcoming" ? t.upcoming : s === "Completed" ? t.completed : t.cancelled);
 
-  const cardBase = "rounded-[20px] border border-[#EFEFEF] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.04)]";
-  const eyebrow = "text-[10px] font-black uppercase tracking-[0.14em] text-[#667085]";
+  const cardBase = "rounded-[22px] border border-white/70 bg-white/80 shadow-[0_14px_38px_rgba(17,17,17,0.07)] backdrop-blur-xl";
+  const eyebrow = "text-[10px] font-black uppercase tracking-[0.16em] text-[#2F332E]";
 
   return (
-    <div dir={isRTL ? "rtl" : "ltr"} className="flex h-full flex-col gap-3 text-[#1A1A1A] font-sans">
+    <div dir={isRTL ? "rtl" : "ltr"} className="relative flex h-full flex-col gap-3 overflow-hidden text-[#1A1A1A] font-sans">
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute left-1/4 top-8 h-56 w-56 rounded-full bg-[#D1AF47]/10 blur-3xl" />
+        <div className="absolute right-4 top-32 h-64 w-64 rounded-full bg-white/70 blur-3xl" />
+        <svg className="absolute right-0 top-0 h-72 w-[520px] opacity-25" viewBox="0 0 520 260" fill="none" aria-hidden="true">
+          <path d="M24 226L118 166L182 190L246 86L356 126L482 42" stroke="#D1AF47" strokeOpacity=".42" />
+          <path d="M82 248L118 166L156 42L246 86L314 18L356 126L456 184" stroke="#D1AF47" strokeOpacity=".24" />
+          {[24, 118, 182, 246, 356, 482, 156, 314, 456].map((x, index) => (
+            <circle key={x} cx={x} cy={[226, 166, 190, 86, 126, 42, 42, 18, 184][index]} r="3.5" fill="#D1AF47" />
+          ))}
+        </svg>
+      </div>
       {/* ══════════ HEADER ══════════ */}
       <header className="flex flex-shrink-0 flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
@@ -323,18 +334,30 @@ export default function CustomerDashboard() {
       {/* ══════════ ONE-PAGE GRID ══════════ */}
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-12" style={{ gridTemplateRows: "minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr) auto" }}>
         {/* ─── ROW 1: Merged Appointment + Timer (8) | Exclusive w/ photo (4) ─── */}
-        <article className={`${cardBase} flex overflow-hidden lg:col-span-8`}>
+        <article className="relative flex overflow-hidden rounded-[22px] border border-[#D1AF47]/25 bg-[#10100E] text-white shadow-[0_22px_60px_rgba(16,16,14,0.24)] lg:col-span-8">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute right-24 top-0 h-28 w-28 rounded-full bg-[#D1AF47]/10 blur-2xl" />
+            <svg className="absolute bottom-0 right-0 h-28 w-60 opacity-35" viewBox="0 0 260 120" fill="none" aria-hidden="true">
+              <path d="M12 92L54 70L98 82L142 34L206 48L248 12" stroke="#D1AF47" strokeOpacity=".45" />
+              <path d="M54 70L76 18L142 34L176 96L206 48" stroke="#D1AF47" strokeOpacity=".22" />
+              {[12, 54, 98, 142, 206, 248, 76, 176].map((x, index) => (
+                <circle key={x} cx={x} cy={[92, 70, 82, 34, 48, 12, 18, 96][index]} r="3" fill="#E0C46A" />
+              ))}
+            </svg>
+          </div>
           {/* Hero image */}
-          <div className="hidden w-44 flex-shrink-0 bg-[#E8DCC8] sm:block">
+          <div className="relative hidden w-52 flex-shrink-0 bg-[#1E1A15] sm:block">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={d.hero} alt={d.appointment.service} className="h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#10100E]/40" />
+            <span className="absolute left-4 top-4 rounded-full border border-[#D1AF47]/40 bg-[#15120D]/80 px-3 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-[#F4E7B6] shadow-[0_0_18px_rgba(209,175,71,0.24)]">AI Match</span>
           </div>
           {/* Appointment details */}
-          <div className="flex flex-1 flex-col justify-center p-5">
-            <span className="text-[9px] font-black uppercase tracking-[0.14em] text-[#B8952E]">{t.nextAppointment}</span>
+          <div className="relative flex flex-1 flex-col justify-center p-5">
+            <span className="text-[9px] font-black uppercase tracking-[0.18em] text-[#E9C765]">{t.nextAppointment}</span>
             <h3 className="mt-1.5 font-serif text-xl font-black leading-tight">{d.appointment.service}</h3>
-            <p className="text-xs font-semibold text-[#8A8F99]">{t.with} {d.appointment.stylist}</p>
-            <div className="mt-3 flex flex-col gap-1.5 text-[11px] font-semibold text-[#667085]">
+            <p className="text-xs font-semibold text-[#D9D4C8]">{t.with} {d.appointment.stylist}</p>
+            <div className="mt-3 flex flex-col gap-1.5 text-[11px] font-semibold text-[#D9D4C8]">
               <div className="flex items-center gap-2">
                 <svg className="h-4 w-4 flex-shrink-0 text-[#C9A24B]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                 <span>{d.appointment.date} · {d.appointment.time}</span>
@@ -344,29 +367,32 @@ export default function CustomerDashboard() {
                 <span>{d.appointment.location}</span>
               </div>
             </div>
-            <Link href="/customer/bookings" className="mt-4 inline-block w-fit rounded-lg bg-[#F4E7B6] px-4 py-2 text-[11px] font-black text-[#9A7B1E] transition hover:bg-[#EDDB9C]">{t.viewDetails}</Link>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <Link href="/customer/bookings" className="inline-flex w-fit rounded-xl bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] px-5 py-2 text-[11px] font-black text-[#15120D] shadow-[0_10px_22px_rgba(209,175,71,0.28)] transition hover:-translate-y-0.5">{t.viewDetails}</Link>
+              <Link href="/customer/bookings" className="inline-flex w-fit rounded-xl border border-[#D1AF47]/40 bg-white/[0.04] px-4 py-2 text-[11px] font-black text-[#F4E7B6] transition hover:bg-white/[0.08]">Add to Calendar</Link>
+            </div>
           </div>
           {/* Timer (merged in, shows the upcoming service name) */}
-          <div className="hidden w-48 flex-shrink-0 flex-col items-center justify-center border-l border-[#F0F0F0] bg-[#FBFBF9] p-4 text-center md:flex">
-            <span className="text-[9px] font-black uppercase tracking-[0.14em] text-[#9CA3AF]">{t.startsIn}</span>
+          <div className="relative hidden w-48 flex-shrink-0 flex-col items-center justify-center border-l border-white/10 bg-white/[0.035] p-4 text-center md:flex">
+            <span className="text-[9px] font-black uppercase tracking-[0.14em] text-[#B9B1A4]">{t.startsIn}</span>
             <div className="relative my-1.5 h-[88px] w-[88px]">
               <svg viewBox="0 0 110 110" className="h-full w-full -rotate-90">
-                <circle cx="55" cy="55" r={ringR} fill="none" stroke="#F0EEE9" strokeWidth="7" />
+                <circle cx="55" cy="55" r={ringR} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="7" />
                 <circle cx="55" cy="55" r={ringR} fill="none" stroke="#D1AF47" strokeWidth="7" strokeLinecap="round" strokeDasharray={ringC} strokeDashoffset={ringC * (1 - 0.73)} />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="font-serif text-2xl font-black">1</span>
-                <span className="text-[8px] font-bold uppercase tracking-wider text-[#9CA3AF]">{t.day}</span>
+                <span className="text-[8px] font-bold uppercase tracking-wider text-[#B9B1A4]">{t.day}</span>
               </div>
             </div>
-            <p className="max-w-[150px] truncate text-[11px] font-black text-[#1A1A1A]">{d.appointment.service}</p>
+            <p className="max-w-[150px] truncate text-[11px] font-black text-white">{d.appointment.service}</p>
             <div className="mt-1.5 flex items-center justify-center gap-1.5">
               {[[pad(hrs), t.hrs], [pad(mins), t.mins], [pad(secs), t.secs]].map(([val, label], i) => (
                 <React.Fragment key={label}>
                   {i > 0 && <span className="font-serif text-sm font-black text-[#D1AF47]">:</span>}
                   <div className="text-center">
                     <span className="block font-serif text-sm font-black leading-none">{val}</span>
-                    <span className="block text-[7px] font-bold uppercase text-[#9CA3AF]">{label}</span>
+                    <span className="block text-[7px] font-bold uppercase text-[#B9B1A4]">{label}</span>
                   </div>
                 </React.Fragment>
               ))}
@@ -375,16 +401,24 @@ export default function CustomerDashboard() {
         </article>
 
         {/* Exclusive Offer with attractive photo */}
-        <article className="relative flex flex-col justify-end overflow-hidden rounded-[20px] p-5 text-white shadow-[0_8px_24px_rgba(0,0,0,0.14)] lg:col-span-4">
+        <article className="relative flex flex-col justify-end overflow-hidden rounded-[22px] border border-[#D1AF47]/40 p-5 text-white shadow-[0_18px_45px_rgba(16,16,14,0.18)] lg:col-span-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={d.exclusiveImg} alt="" className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0E0D0C] via-[#0E0D0C]/80 to-[#0E0D0C]/25" />
+          <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_38px_rgba(209,175,71,0.20)]" />
+          <svg className="absolute bottom-0 right-0 h-28 w-44 opacity-40" viewBox="0 0 180 120" fill="none" aria-hidden="true">
+            <path d="M6 98L52 72L84 86L124 38L170 18" stroke="#E0C46A" strokeOpacity=".45" />
+            <path d="M34 116L52 72L74 22L124 38L148 78" stroke="#E0C46A" strokeOpacity=".25" />
+            {[6, 52, 84, 124, 170, 74, 148].map((x, index) => (
+              <circle key={x} cx={x} cy={[98, 72, 86, 38, 18, 22, 78][index]} r="2.7" fill="#F4E7B6" />
+            ))}
+          </svg>
           <div className="relative">
             <span className="text-[9px] font-black uppercase tracking-[0.16em] text-[#E9C765]">{t.exclusive}</span>
             <h3 className="mt-1 font-serif text-2xl font-black">{t.offerTitle}</h3>
             <p className="text-xs font-semibold text-[#EDE6DA]">{d.exclusiveSub}</p>
             <p className="mt-0.5 text-[10px] font-medium text-[#B9B1A4]">{t.offerValid}</p>
-            <Link href="/customer/wallet" className="mt-3 inline-block w-fit rounded-lg bg-white px-4 py-1.5 text-[11px] font-black text-[#1A1A1A] transition hover:bg-[#F4E7B6]">{t.claimOffer}</Link>
+            <Link href="/customer/wallet" className="mt-3 inline-block w-fit rounded-xl bg-white px-5 py-2 text-[11px] font-black text-[#1A1A1A] shadow-[0_10px_22px_rgba(255,255,255,0.18)] transition hover:-translate-y-0.5 hover:bg-[#F4E7B6]">{t.claimOffer}</Link>
           </div>
         </article>
 
@@ -395,11 +429,17 @@ export default function CustomerDashboard() {
             <Link href="/customer/search" className="text-[10px] font-black text-[#C9A24B] hover:underline">{t.viewAll}</Link>
           </div>
           <div className="grid min-h-0 flex-1 grid-cols-2 gap-3 lg:grid-cols-4">
-            {d.recommendations.map((rec) => (
+            {d.recommendations.map((rec, index) => (
               <Link key={rec.name} href="/customer/search" className="group flex min-h-0 flex-col">
-                <div className="min-h-0 flex-1 overflow-hidden rounded-xl bg-[#E8DCC8]">
+                <div className="relative min-h-0 flex-1 overflow-hidden rounded-xl bg-[#E8DCC8] shadow-[0_10px_24px_rgba(17,17,17,0.08)]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={rec.img} alt={rec.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-70" />
+                  {index < 2 && (
+                    <span className="absolute right-2 top-2 rounded-full border border-[#D1AF47]/40 bg-[#15120D]/80 px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.1em] text-[#F4E7B6]">
+                      {index === 0 ? "AI Pick" : "Smart Match"}
+                    </span>
+                  )}
                 </div>
                 <h4 className="mt-1.5 text-xs font-bold leading-tight">{rec.name}</h4>
                 <div className="flex items-center justify-between">
@@ -450,7 +490,7 @@ export default function CustomerDashboard() {
               ))}
             </div>
           </div>
-          <div className="min-h-0 flex-1 space-y-1 overflow-y-auto pe-0.5">
+          <div className="min-h-0 flex-1 space-y-1 overflow-y-auto pe-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {shownBookings.map((b) => (
               <Link key={b.id} href="/customer/bookings" className="flex items-center gap-2.5 rounded-xl p-1.5 transition hover:bg-[#F7F7F5]">
                 <div className="h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-[#E8DCC8]">
@@ -472,7 +512,8 @@ export default function CustomerDashboard() {
         </section>
 
         {/* Loyalty & Wallet (combined) */}
-        <section className={`${cardBase} flex min-h-0 flex-col justify-center p-4 lg:col-span-3`}>
+        <section className={`${cardBase} relative flex min-h-0 flex-col justify-center overflow-hidden p-4 lg:col-span-3`}>
+          <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#D1AF47]/10 blur-2xl" />
           <div className="mb-2 flex flex-shrink-0 items-center justify-between">
             <h3 className={eyebrow}>{t.loyalty}</h3>
             <Link href="/customer/wallet" className="text-[10px] font-black text-[#C9A24B] hover:underline">{t.details}</Link>
@@ -486,8 +527,8 @@ export default function CustomerDashboard() {
               <p className="text-[10px] font-semibold text-[#9CA3AF]">2,450 / 3,000 {t.points}</p>
             </div>
           </div>
-          <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-[#F0EEE9]">
-            <div className="h-full rounded-full bg-gradient-to-r from-[#D1AF47] to-[#E0C46A]" style={{ width: "81%" }} />
+          <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-[#F0EEE9] shadow-inner">
+            <div className="h-full rounded-full bg-gradient-to-r from-[#B8952E] via-[#D1AF47] to-[#F4E7B6] shadow-[0_0_18px_rgba(209,175,71,0.45)]" style={{ width: "81%" }} />
           </div>
           <div className="mt-2.5 flex items-center justify-between rounded-lg bg-[#F7F7F5] px-2.5 py-1.5">
             <span className="text-[10px] font-bold text-[#667085]">{t.walletBalance}</span>
@@ -497,7 +538,8 @@ export default function CustomerDashboard() {
         </section>
 
         {/* Spending Insights */}
-        <section className={`${cardBase} flex min-h-0 flex-col p-4 lg:col-span-4`}>
+        <section className={`${cardBase} relative flex min-h-0 flex-col overflow-hidden p-4 lg:col-span-4`}>
+          <div className="pointer-events-none absolute right-4 top-4 h-24 w-24 rounded-full bg-[#D1AF47]/10 blur-2xl" />
           <div className="mb-1 flex flex-shrink-0 items-center justify-between">
             <h3 className={eyebrow}>{t.insights}</h3>
             <span className="text-[10px] font-bold text-[#9CA3AF]">{t.thisMonth}</span>
@@ -522,21 +564,45 @@ export default function CustomerDashboard() {
                   <span className="text-[10px] font-black">{seg.amount}</span>
                 </div>
               ))}
-              <div className="mt-1 flex items-center gap-1.5 rounded-lg bg-[#F7F7F5] px-2 py-1.5">
+              <div className="mt-1 flex items-center gap-1.5 rounded-lg border border-[#D1AF47]/15 bg-[#F7F3EA] px-2 py-1.5">
                 <span className="text-[10px] font-medium text-[#9CA3AF]">{t.saved}</span>
                 <span className="font-serif text-sm font-black text-[#C9A24B]">$180</span>
+                <span className="ms-auto rounded-full bg-[#22C55E]/10 px-2 py-0.5 text-[8px] font-black text-[#16A34A]">AI +12%</span>
               </div>
             </div>
           </div>
         </section>
 
         {/* ─── Refer banner ─── */}
-        <div className="flex items-center justify-between gap-3 overflow-hidden rounded-[20px] border border-[#EFEFEF] bg-gradient-to-r from-[#FBF6E9] to-[#F7F7F5] px-4 py-2.5 lg:col-span-12">
-          <div className="flex items-center gap-2.5">
+        <div className="relative flex items-center justify-between gap-3 overflow-hidden rounded-[22px] border border-[#D1AF47]/40 bg-[#15120D] px-5 py-3 text-white shadow-[0_16px_42px_rgba(16,16,14,0.18)] lg:col-span-12">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute left-4 top-1/2 h-16 w-16 -translate-y-1/2 rounded-full bg-[#D1AF47]/20 blur-2xl" />
+            <svg className="absolute bottom-0 right-1/4 h-20 w-72 opacity-30" viewBox="0 0 300 86" fill="none" aria-hidden="true">
+              <path d="M4 70L48 44L92 58L132 18L204 42L286 10" stroke="#D1AF47" strokeOpacity=".46" />
+              <path d="M48 44L72 6L132 18L170 76L204 42" stroke="#D1AF47" strokeOpacity=".22" />
+              {[4, 48, 92, 132, 204, 286, 72, 170].map((x, index) => (
+                <circle key={x} cx={x} cy={[70, 44, 58, 18, 42, 10, 6, 76][index]} r="2.7" fill="#F4E7B6" />
+              ))}
+            </svg>
+          </div>
+          <div className="relative flex min-w-0 items-center gap-3">
+            <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl border border-[#D1AF47]/40 bg-[#D1AF47]/15 text-[#F4E7B6] shadow-[0_0_22px_rgba(209,175,71,0.24)]">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l1.35 4.16L17.5 8.5l-4.15 1.34L12 14l-1.35-4.16L6.5 8.5l4.15-1.34L12 3zM5 14l.8 2.2L8 17l-2.2.8L5 20l-.8-2.2L2 17l2.2-.8L5 14zm14 0l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z" />
+              </svg>
+            </span>
+            <div className="min-w-0">
+              <span className="rounded-full border border-[#D1AF47]/40 bg-[#D1AF47]/10 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-[0.12em] text-[#F4E7B6]">AI Recommendation</span>
+              <p className="mt-1 truncate font-serif text-xs font-black sm:text-sm">Book a Scalp Therapy this week to keep your scalp refreshed.</p>
+              <p className="hidden text-[10px] font-medium text-[#B9B1A4] sm:block">Based on your last visit and routine.</p>
+            </div>
+          </div>
+          <Link href="/customer/book" className="relative flex-shrink-0 rounded-xl border border-[#D1AF47]/40 bg-[#D1AF47]/20 px-5 py-2 text-[11px] font-black text-[#F4E7B6] shadow-[0_0_18px_rgba(209,175,71,0.18)] transition hover:-translate-y-0.5 hover:bg-[#D1AF47]/30">Book Now</Link>
+          <div className="hidden">
             <span className="text-xl">🎁</span>
             <p className="font-serif text-xs font-black sm:text-sm">{t.referText}</p>
           </div>
-          <Link href="/customer/wallet" className="flex-shrink-0 rounded-lg bg-[#1A1A1A] px-4 py-2 text-[11px] font-black text-white transition hover:bg-black">{t.inviteNow}</Link>
+          <Link href="/customer/wallet" className="hidden flex-shrink-0 rounded-lg bg-[#1A1A1A] px-4 py-2 text-[11px] font-black text-white transition hover:bg-black">{t.inviteNow}</Link>
         </div>
       </div>
     </div>

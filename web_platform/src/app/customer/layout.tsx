@@ -171,15 +171,26 @@ export default function CustomerLayout({
 
   return (
     <AuthGuard allowedRoles={["customer"]}>
-    <div className="flex flex-col md:flex-row bg-[#F7F7F5] text-black font-sans selection:bg-[#D1AF47] selection:text-white md:h-screen md:overflow-hidden">
+    <div className="flex flex-col bg-[#F7F3EA] text-black selection:bg-[#D1AF47] selection:text-white md:h-screen md:flex-row md:overflow-hidden">
 
       {/* ═══════════════════════════════════════════════════════ */}
       {/* SIDEBAR — Floating white sidebar fixed to window height  */}
       {/* ═══════════════════════════════════════════════════════ */}
-      <aside className="flex-shrink-0 p-4 md:h-screen">
-        <div className="flex h-full w-full flex-col rounded-[28px] border border-[#E8E8E8] bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.04)] md:w-[260px]">
+      <aside className="flex-shrink-0 p-3 md:h-screen md:p-4">
+        <div className="relative flex h-full w-full flex-col overflow-hidden rounded-[28px] border border-[#D1AF47]/20 bg-[#10120F] p-5 text-white shadow-[0_24px_70px_rgba(16,18,15,0.24)] md:w-[260px]">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute -left-16 top-0 h-40 w-40 rounded-full bg-[#D1AF47]/10 blur-3xl" />
+            <div className="absolute -bottom-20 right-0 h-56 w-56 rounded-full bg-[#D1AF47]/15 blur-3xl" />
+            <svg className="absolute bottom-16 right-0 h-40 w-48 opacity-40" viewBox="0 0 220 170" fill="none" aria-hidden="true">
+              <path d="M10 135L64 112L101 128L143 74L205 54" stroke="#D1AF47" strokeOpacity=".42" />
+              <path d="M34 168L64 112L87 45L143 74L179 8" stroke="#D1AF47" strokeOpacity=".24" />
+              {[10, 64, 101, 143, 205, 87, 179].map((x, index) => (
+                <circle key={x} cx={x} cy={[135, 112, 128, 74, 54, 45, 8][index]} r="3" fill="#E0C46A" />
+              ))}
+            </svg>
+          </div>
           {/* Logo */}
-          <Link href="/" className={`flex flex-shrink-0 items-center gap-2.5 px-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+          <Link href="/" className={`relative z-10 flex flex-shrink-0 items-center gap-2.5 px-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
             <svg className="w-5.5 h-5.5 text-[#D1AF47]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
             </svg>
@@ -189,7 +200,7 @@ export default function CustomerLayout({
           </Link>
 
           {/* Navigation Links (scrolls independently) */}
-          <nav className="mt-6 min-h-0 flex-1 space-y-0.5 overflow-y-auto pe-1">
+          <nav className="relative z-10 mt-6 min-h-0 flex-1 space-y-0.5 overflow-y-auto pe-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {navItems.map((item) => {
               const isActive = pathname.startsWith(item.path);
               return (
@@ -198,8 +209,8 @@ export default function CustomerLayout({
                   href={item.path}
                   className={`group relative flex items-center gap-3.5 px-4 py-3 rounded-[18px] text-[13px] font-semibold transition-all duration-300 ${
                     isActive
-                      ? "bg-[#F4E7B6]/30 text-[#B8952E]"
-                      : "text-[#667085] hover:bg-[#F7F7F5] hover:text-[#101828]"
+                      ? "border border-[#D1AF47]/25 bg-[#D1AF47]/15 text-[#F4E7B6] shadow-[0_0_26px_rgba(209,175,71,0.22)]"
+                      : "text-[#D9D4C8] hover:bg-white/[0.06] hover:text-white"
                   } ${isRTL ? "flex-row-reverse text-right" : "flex-row text-left"}`}
                 >
                   {/* Gold active line indicator */}
@@ -207,14 +218,14 @@ export default function CustomerLayout({
                     <span className={`absolute top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-[#D1AF47] ${isRTL ? "right-0" : "left-0"}`} />
                   )}
 
-                  <span className={`flex-shrink-0 transition-colors duration-300 ${isActive ? "text-[#D1AF47]" : "text-[#7B859C] group-hover:text-[#667085]"}`}>
+                  <span className={`flex-shrink-0 transition-colors duration-300 ${isActive ? "text-[#E0C46A]" : "text-[#8F8A80] group-hover:text-[#D1AF47]"}`}>
                     {getNavIcon(item.path)}
                   </span>
 
                   <span className="flex-grow">{item.name}</span>
 
                   {item.badge && (
-                    <span className="bg-[#FF5D73] text-white font-bold text-[9px] w-4 h-4 rounded-full flex items-center justify-center">
+                    <span className="flex h-4 w-4 items-center justify-center rounded-full border border-[#E0C46A]/60 bg-[#D1AF47] text-[9px] font-bold text-[#10120F]">
                       {item.badge}
                     </span>
                   )}
@@ -224,38 +235,37 @@ export default function CustomerLayout({
           </nav>
 
           {/* Sidebar Footer — Help & Logged-in User */}
-          <div className="mt-3 flex-shrink-0 space-y-3 border-t border-gray-100 pt-3">
+          <div className="relative z-10 mt-3 flex-shrink-0 space-y-3 border-t border-white/10 pt-3">
           <Link
-            href="/customer/settings"
-            className="flex items-center justify-between p-3 bg-[#F7F7F5] border border-[#E8E8E8] rounded-2xl group hover:border-[#D1AF47]/30 transition-all duration-300"
+            href="/customer/search"
+            className="group relative block overflow-hidden rounded-2xl border border-[#D1AF47]/40 bg-[#14120E]/80 p-3 shadow-[0_0_34px_rgba(209,175,71,0.20)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#E0C46A]/60"
           >
-            <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <div className="w-8 h-8 rounded-xl bg-white border border-[#E8E8E8] flex items-center justify-center text-gray-500 group-hover:text-[#D1AF47] transition duration-300">
-                <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 0A5 5 0 1110.12 10.12l3.536-3.536m0 0L20 4M9 15l-3 3m0 0l-3-3m3 3V9" />
+            <div className="pointer-events-none absolute -right-8 -top-8 h-20 w-20 rounded-full bg-[#E0C46A]/15 blur-2xl" />
+            <div className={`relative flex items-start gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <div className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-xl border border-[#D1AF47]/30 bg-[#D1AF47]/15 text-[#F4E7B6] shadow-[0_0_18px_rgba(209,175,71,0.25)]">
+                <svg className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l1.35 4.16L17.5 8.5l-4.15 1.34L12 14l-1.35-4.16L6.5 8.5l4.15-1.34L12 3zM5 14l.8 2.2L8 17l-2.2.8L5 20l-.8-2.2L2 17l2.2-.8L5 14zm14 0l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z" />
                 </svg>
               </div>
-              <div className={`text-left ${isRTL ? "text-right" : "text-left"}`}>
-                <h5 className="text-[11px] font-bold text-gray-900 leading-none">Need Help?</h5>
-                <p className="text-[9px] text-[#667085] font-semibold mt-0.5">Contact Support</p>
+              <div className={`min-w-0 ${isRTL ? "text-right" : "text-left"}`}>
+                <h5 className="text-[11px] font-black leading-none text-[#F4E7B6]">Primora AI Assistant</h5>
+                <p className="mt-1 text-[9.5px] font-semibold leading-relaxed text-[#D9D4C8]">I found 2 slots this week that match your routine.</p>
+                <span className="mt-2 inline-flex rounded-full border border-[#D1AF47]/40 bg-[#D1AF47]/15 px-3 py-1 text-[9px] font-black text-[#F4E7B6]">View Suggestions</span>
               </div>
             </div>
-            <svg className={`w-3 h-3 text-gray-400 group-hover:text-[#D1AF47] transition duration-300 ${isRTL ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
           </Link>
 
-          <div className={`flex items-center justify-between gap-2 px-1 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+          <div className={`flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
             <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <div className="w-9 h-9 rounded-full bg-[#F4E7B6]/40 border border-[#D1AF47]/20 flex items-center justify-center text-[#B8952E] font-bold text-sm flex-shrink-0">
+              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-[#D1AF47]/25 bg-[#F4E7B6]/15 text-sm font-bold text-[#F4E7B6]">
                 Y
               </div>
               <div className={`hidden md:block ${isRTL ? "text-left" : "text-right"}`}>
-                <p className="text-[9px] text-gray-400 uppercase font-bold tracking-widest leading-none mb-0.5">Member Hub</p>
-                <p className="text-xs font-black text-gray-900 leading-tight truncate max-w-[110px]">Yousif</p>
+                <p className="mb-0.5 text-[9px] font-bold uppercase leading-none tracking-widest text-[#9C9688]">Gold Member</p>
+                <p className="max-w-[110px] truncate text-xs font-black leading-tight text-white">Yousif</p>
               </div>
             </div>
-            <Link href="/" className="p-2 rounded-xl text-red-500 hover:bg-red-50 transition-all duration-300">
+            <Link href="/" className="rounded-xl p-2 text-[#D9D4C8] transition-all duration-300 hover:bg-white/[0.06] hover:text-[#F4E7B6]">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
