@@ -40,3 +40,17 @@ All data access must respect the following schema and Row-Level Security (RLS) p
 * **Prayer Times calendar Block**: Availability algorithms must automatically block 20 minutes around local prayer times in Riyadh.
 * **Escrow Splits**: Online transactions split captured funds between platform, salon, and freelancer ledgers at the API layer.
 * **No Placeholders**: Never write placeholders, mockup stubs, or "TODO" comments. Implement complete code structures.
+
+---
+
+## 5. Multi-Agent & Co-Working Branch Strategy
+To prevent overwrites and coordinate seamlessly between **Claude Code** and **Gemini (Antigravity)**:
+* **Branch Separation**:
+  * Claude Code **MUST** work and commit on the **`claude-code`** branch.
+  * Gemini (Antigravity) **MUST** work and commit on the **`gemini`** branch.
+* **Pre-Work Checklist**:
+  1. Verify active branch with `git branch`. If not on your designated branch, run `git checkout <your-branch>` immediately.
+  2. Inspect git status (`git status` / `git diff`) to make sure there are no uncommitted changes from another model before modifying files.
+  3. Pull changes from `master` (`git pull origin master` or merge `master` into your branch) to stay in sync.
+* **Changelog Updates**: Always document files modified and current working commits inside `.coworking_changelog.md` at the end of each session.
+
