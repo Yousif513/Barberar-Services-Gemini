@@ -278,7 +278,12 @@ export default function CustomerDashboard() {
                   <div className="px-3 py-4 text-center text-[11px] font-semibold text-[#9CA3AF]">{t.noResults}</div>
                 ) : (
                   searchResults.map((r) => (
-                    <Link key={`${r.type}-${r.label}`} href={r.href} className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 transition hover:bg-[#F7F7F5]">
+                    <Link
+                      key={`${r.type}-${r.label}`}
+                      href={r.href}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => { setSearchOpen(false); setQuery(""); }}
+                      className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 transition hover:bg-[#F7F7F5]">
                       <div className="min-w-0">
                         <span className="block truncate text-xs font-bold text-[#1A1A1A]">{r.label}</span>
                         <span className="block text-[10px] font-medium text-[#9CA3AF]">{t.in} {r.where}</span>
