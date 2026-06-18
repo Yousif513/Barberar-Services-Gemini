@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { BarChart, CommandHeader, KpiStrip, MetricCard, Panel, ProgressRow } from "@/components/control-center";
+import { BarChart } from "@/components/control-center";
 
 type AuditItem = {
   id: string;
@@ -245,211 +245,161 @@ export default function AdminDashboard() {
   const isRTL = locale === "ar";
   const t = translations[locale];
   const flip = isRTL ? "flex-row-reverse" : "flex-row";
+  const cardBase = "rounded-[20px] border border-[#EFEFEF] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.04)]";
+  const eyebrow = "text-[10px] font-black uppercase tracking-[0.14em] text-[#667085]";
+  const toggleLang = () => {
+    const target = locale === "en" ? "ar" : "en";
+    document.documentElement.lang = target;
+    document.documentElement.dir = target === "ar" ? "rtl" : "ltr";
+    try { localStorage.setItem("primora_lang", target); } catch {}
+    setLocale(target);
+  };
 
   return (
-    <div className={`min-h-screen space-y-8 bg-[#F7F7F5] text-[#101828] ${isRTL ? "text-right" : "text-left"}`} dir={isRTL ? "rtl" : "ltr"}>
-      {/* HEADER CONTROL */}
-      <CommandHeader
-        eyebrow={t.eyebrow}
-        title={t.title}
-        subtitle={t.subtitle}
-        initials="PA"
-        searchPlaceholder={t.searchPlaceholder}
-        searchValue={search}
-        onSearchChange={setSearch}
-        actionLabel={t.actionLabel}
-        actionHref="/admin/providers"
-      />
-
-      {/* LANGUAGE SWITCHER */}
-      <div className={`flex items-center justify-end ${flip}`}>
-        <button
-          onClick={() => {
-            const target = locale === "en" ? "ar" : "en";
-            document.documentElement.lang = target;
-            document.documentElement.dir = target === "ar" ? "rtl" : "ltr";
-            try {
-              localStorage.setItem("primora_lang", target);
-            } catch {}
-            setLocale(target);
-          }}
-          className="rounded-full border border-[#EAEAEA] bg-white px-4 py-1.5 text-xs font-bold text-[#667085] shadow-[0_4px_14px_rgba(0,0,0,0.03)] transition hover:border-[#D1AF47]/40 hover:text-[#D1AF47]"
-        >
-          {locale === "en" ? "العربية" : "English"}
-        </button>
-      </div>
+    <div dir={isRTL ? "rtl" : "ltr"} className={`flex h-full flex-col gap-3 bg-[#F7F7F5] text-[#101828] font-sans ${isRTL ? "text-right" : "text-left"}`}>
+      {/* HEADER */}
+      <header className="flex flex-shrink-0 flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <span className="text-[10px] font-black uppercase tracking-[0.18em] text-[#B8952E]">{t.eyebrow}</span>
+          <h1 className="font-serif text-xl font-black leading-tight lg:text-2xl">{t.title}</h1>
+        </div>
+        <div className={`flex items-center gap-2.5 ${flip}`}>
+          <label className={`flex items-center gap-2 rounded-full border border-[#EAEAEA] bg-white px-3.5 py-2 shadow-[0_4px_14px_rgba(0,0,0,0.03)] md:w-60 ${flip}`}>
+            <svg className="h-4 w-4 flex-shrink-0 text-[#9CA3AF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t.searchPlaceholder} className="w-full border-none bg-transparent text-xs outline-none placeholder:text-[#9CA3AF]" />
+          </label>
+          <button onClick={toggleLang} className="rounded-full border border-[#EAEAEA] bg-white px-3.5 py-2 text-xs font-bold text-[#667085] shadow-[0_4px_14px_rgba(0,0,0,0.03)] transition hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">{locale === "en" ? "العربية" : "EN"}</button>
+          <Link href="/admin/providers" className="hidden rounded-full bg-[#D1AF47] px-4 py-2 text-xs font-black text-white shadow-md shadow-[#D1AF47]/10 transition hover:bg-[#E0C46A] sm:block">{t.actionLabel}</Link>
+          <div className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full bg-[#101828] text-xs font-black text-white">PA</div>
+        </div>
+      </header>
 
       {/* KPI STRIP */}
-      <KpiStrip items={[
-        { label: t.kpiGmv, value: `${stats.gmv.toLocaleString()} SAR`, change: "+12.4%", tone: "green" },
-        { label: t.kpiRevenue, value: `${stats.revenue.toLocaleString()} SAR`, change: "+9.8%", tone: "green" },
-        { label: t.kpiBookings, value: stats.bookings.toLocaleString(), change: "+8.1%", tone: "green" },
-        { label: t.kpiProviders, value: stats.providers.toLocaleString(), change: "+14", tone: "green" },
-        { label: t.kpiAudits, value: String(audits.length), change: t.changeReview, tone: "gold" },
-        { label: t.kpiDisputes, value: String(stats.disputes), change: t.changeAction, tone: "red" },
-        { label: t.kpiSuccess, value: "99.6%", change: "+0.2%", tone: "green" },
-      ]} />
-
-      {/* METRIC CARDS */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard label={t.metricHealth} value="98.4%" detail={t.healthDetail} tone="green" />
-        <MetricCard label={t.metricRisk} value="12,840 SAR" detail={t.riskDetail} tone="red" />
-        <MetricCard label={t.metricSla} value="94.8%" detail={t.slaDetail} tone="blue" />
-        <MetricCard label={t.metricTrust} value="4.86 / 5" detail={t.trustDetail} tone="gold" />
+      <div className={`${cardBase} flex-shrink-0 overflow-x-auto p-3`}>
+        <div className="flex min-w-max divide-x divide-[#EAEAEA] rtl:divide-x-reverse">
+          {[
+            { label: t.kpiGmv, value: `${stats.gmv.toLocaleString()} SAR`, change: "+12.4%", tone: "text-[#22C55E]" },
+            { label: t.kpiRevenue, value: `${stats.revenue.toLocaleString()} SAR`, change: "+9.8%", tone: "text-[#22C55E]" },
+            { label: t.kpiBookings, value: stats.bookings.toLocaleString(), change: "+8.1%", tone: "text-[#22C55E]" },
+            { label: t.kpiProviders, value: stats.providers.toLocaleString(), change: "+14", tone: "text-[#22C55E]" },
+            { label: t.kpiAudits, value: String(audits.length), change: t.changeReview, tone: "text-[#B8952E]" },
+            { label: t.kpiDisputes, value: String(stats.disputes), change: t.changeAction, tone: "text-[#EF4444]" },
+            { label: t.kpiSuccess, value: "99.6%", change: "+0.2%", tone: "text-[#22C55E]" },
+          ].map((k) => (
+            <div key={k.label} className="min-w-[140px] px-4 first:ps-1 last:pe-1">
+              <span className="block text-[8px] font-black uppercase tracking-[0.14em] text-[#667085]">{k.label}</span>
+              <div className="mt-1 flex items-baseline gap-1.5">
+                <strong className="font-serif text-sm font-black">{k.value}</strong>
+                <span className={`text-[9px] font-black ${k.tone}`}>{k.change}</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* ROW 1 PANELS */}
-      <div className="grid grid-cols-1 gap-8 xl:grid-cols-12">
-        <Panel
-          title={t.panelRevenue}
-          badge={t.revenueBadge}
-          className="xl:col-span-7"
-          footer={<div className="flex justify-between"><span>{t.panelRevenueFooter}</span><Link href="/admin/ledger" className="font-black text-[#D1AF47]">{t.panelRevenueLedger}</Link></div>}
-        >
-          <BarChart values={[42, 58, 54, 68, 74, 66, 82, 92, 88, 96, 91, 100]} labels={["Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun"]} />
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {[[t.todayGmv, "24,820 SAR"], [t.settled, "21,640 SAR"], [t.inEscrow, "3,180 SAR"], [t.refundRate, "0.8%"]].map(([label, value]) => (
-              <div key={label} className="rounded-xl border border-[#EAEAEA] bg-[#F7F7F5] p-3">
-                <span className="block text-[8px] font-black uppercase text-[#667085]">{label}</span>
-                <strong className="mt-1 block font-serif text-sm font-black">{value}</strong>
+      {/* GRID — fits one screen */}
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-12" style={{ gridTemplateRows: "minmax(0,1.15fr) minmax(0,1fr)" }}>
+        {/* Revenue Command */}
+        <section className={`${cardBase} flex min-h-0 flex-col p-4 lg:col-span-7`}>
+          <div className={`mb-2 flex flex-shrink-0 items-center justify-between ${flip}`}>
+            <h3 className={eyebrow}>{t.panelRevenue}</h3>
+            <Link href="/admin/ledger" className="text-[10px] font-black text-[#D1AF47] hover:underline">{t.panelRevenueLedger}</Link>
+          </div>
+          <div className="min-h-0 flex-1"><BarChart values={[42, 58, 54, 68, 74, 66, 82, 92, 88, 96, 91, 100]} labels={["Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun"]} /></div>
+          <div className="mt-2 grid flex-shrink-0 grid-cols-4 gap-2">
+            {[[t.todayGmv, "24,820"], [t.settled, "21,640"], [t.inEscrow, "3,180"], [t.refundRate, "0.8%"]].map(([label, value]) => (
+              <div key={label} className="rounded-lg border border-[#EFEFEF] bg-[#F7F7F5] p-2">
+                <span className="block text-[7px] font-black uppercase text-[#667085]">{label}</span>
+                <strong className="mt-0.5 block font-serif text-[11px] font-black">{value}</strong>
               </div>
             ))}
           </div>
-        </Panel>
+        </section>
 
-        <Panel title={t.panelQueue} badge={t.queueBadge} className="xl:col-span-5" footer={<Link href="/admin/bookings" className="font-black text-[#D1AF47]">{t.panelQueueFooter}</Link>}>
-          <div className="space-y-3">
+        {/* Live Operations Queue */}
+        <section className={`${cardBase} flex min-h-0 flex-col p-4 lg:col-span-5`}>
+          <div className={`mb-2 flex flex-shrink-0 items-center justify-between ${flip}`}>
+            <h3 className={eyebrow}>{t.panelQueue}</h3>
+            <Link href="/admin/bookings" className="text-[10px] font-black text-[#D1AF47] hover:underline">{t.panelQueueFooter}</Link>
+          </div>
+          <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto pe-0.5">
             {[
               { title: t.queueItem1, meta: t.queueItem1Meta, status: t.opFinance, tone: "bg-[#D1AF47]/10 text-[#B8952E]" },
               { title: t.queueItem2, meta: t.queueItem2Meta, status: t.opCompliance, tone: "bg-[#3B82F6]/10 text-[#3B82F6]" },
               { title: t.queueItem3, meta: t.queueItem3Meta, status: t.opRisk, tone: "bg-[#EF4444]/10 text-[#EF4444]" },
               { title: t.queueItem4, meta: t.queueItem4Meta, status: t.opTreasury, tone: "bg-[#22C55E]/10 text-[#22C55E]" },
             ].map((item) => (
-              <div key={item.title} className="flex items-center justify-between gap-3 rounded-2xl border border-[#EAEAEA] bg-[#F7F7F5] p-4 transition hover:border-[#D1AF47]/30">
+              <div key={item.title} className={`flex items-center justify-between gap-2 rounded-xl border border-[#EFEFEF] bg-[#F7F7F5] p-2.5 ${flip}`}>
                 <div className="min-w-0">
-                  <strong className="block truncate font-serif text-sm font-black">{item.title}</strong>
-                  <span className="mt-1 block truncate text-[9px] font-semibold text-[#667085]">{item.meta}</span>
+                  <strong className="block truncate text-xs font-bold">{item.title}</strong>
+                  <span className="mt-0.5 block truncate text-[9px] font-semibold text-[#667085]">{item.meta}</span>
                 </div>
-                <span className={`flex-shrink-0 rounded-full px-2 py-1 text-[8px] font-black ${item.tone}`}>{item.status}</span>
+                <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[8px] font-black ${item.tone}`}>{item.status}</span>
               </div>
             ))}
           </div>
-        </Panel>
-      </div>
+        </section>
 
-      {/* ROW 2 PANELS */}
-      <div className="grid grid-cols-1 gap-8 xl:grid-cols-3">
-        <Panel title={t.panelVerify} badge={`${audits.length} ${t.panelVerifyBadge}`} footer={<Link href="/admin/providers" className="font-black text-[#D1AF47]">{t.panelVerifyFooter}</Link>}>
-          <div className="space-y-3">
+        {/* Verification Intelligence */}
+        <section className={`${cardBase} flex min-h-0 flex-col p-4 lg:col-span-4`}>
+          <div className={`mb-2 flex flex-shrink-0 items-center justify-between ${flip}`}>
+            <h3 className={eyebrow}>{t.panelVerify}</h3>
+            <Link href="/admin/providers" className="text-[10px] font-black text-[#D1AF47] hover:underline">{t.panelVerifyFooter}</Link>
+          </div>
+          <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto pe-0.5">
             {audits.slice(0, 4).map((audit) => (
-              <div key={audit.id} className="flex items-center justify-between gap-3 rounded-2xl border border-[#EAEAEA] bg-[#F7F7F5] p-3">
+              <div key={audit.id} className={`flex items-center justify-between gap-2 rounded-xl border border-[#EFEFEF] bg-[#F7F7F5] p-2 ${flip}`}>
                 <div className="min-w-0">
-                  <strong className="block truncate font-serif text-sm font-black">{audit.business_name_en}</strong>
-                  <span className="mt-1 block text-[8px] font-black uppercase tracking-wider text-[#667085]">{audit.type} · {new Date(audit.created_at).toLocaleDateString()}</span>
+                  <strong className="block truncate text-xs font-bold">{audit.business_name_en}</strong>
+                  <span className="block text-[8px] font-black uppercase tracking-wider text-[#667085]">{audit.type}</span>
                 </div>
-                <Link href="/admin/providers" className="rounded-lg bg-[#D1AF47] px-3 py-2 text-[8px] font-black text-white">{t.auditBtn}</Link>
-              </div>
-            ))}
-            {loading && <p className="py-2 text-center text-[9px] font-semibold text-[#667085]">Synchronizing provider queue...</p>}
-          </div>
-        </Panel>
-
-        <Panel title={t.panelTrust} badge={t.panelTrustBadge} footer={<Link href="/admin/disputes" className="font-black text-[#D1AF47]">{t.panelTrustFooter}</Link>}>
-          <div className="space-y-5">
-            <ProgressRow label={t.rowIdentity} value={96} detail="96.2%" />
-            <ProgressRow label={t.rowFreshness} value={88} detail="88.4%" />
-            <ProgressRow label={t.rowFraud} value={99} detail="99.1%" />
-            <ProgressRow label={t.rowResolution} value={82} detail="82.0%" />
-            <div className="grid grid-cols-3 gap-2">
-              {[[t.flagged, "8"], [t.escalated, "3"], [t.resolved, "42"]].map(([label, value]) => (
-                <div key={label} className="rounded-xl border border-[#EAEAEA] bg-[#F7F7F5] p-3 text-center">
-                  <span className="text-[8px] font-black uppercase text-[#667085]">{label}</span>
-                  <strong className="mt-1 block font-serif text-base font-black">{value}</strong>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Panel>
-
-        <Panel title={t.panelMatrix} badge={t.panelMatrixBadge} footer={t.panelMatrixFooter}>
-          <div className="space-y-3">
-            {[
-              { city: "Riyadh", providers: 82, bookings: "4,280", health: 96 },
-              { city: "Jeddah", providers: 54, bookings: "2,940", health: 91 },
-              { city: "Dammam", providers: 31, bookings: "1,426", health: 87 },
-              { city: "Madinah", providers: 19, bookings: "532", health: 78 },
-            ].map((region) => (
-              <div key={region.city} className="rounded-2xl border border-[#EAEAEA] bg-[#F7F7F5] p-3.5">
-                <div className="flex items-center justify-between">
-                  <strong className="font-serif text-sm font-black">{region.city === "Riyadh" && locale === "ar" ? "الرياض" : region.city === "Jeddah" && locale === "ar" ? "جدة" : region.city === "Dammam" && locale === "ar" ? "الدمام" : region.city === "Madinah" && locale === "ar" ? "المدينة المنورة" : region.city}</strong>
-                  <span className="text-[9px] font-black text-[#D1AF47]">{region.health}% {t.regionHealth}</span>
-                </div>
-                <div className="mt-2 flex justify-between text-[8px] font-bold text-[#667085]">
-                  <span>{region.providers} {t.regionProviders}</span><span>{region.bookings} {t.regionBookings}</span>
-                </div>
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#E8E8E8]"><div className="h-full rounded-full bg-[#D1AF47]" style={{ width: `${region.health}%` }} /></div>
+                <Link href="/admin/providers" className="flex-shrink-0 rounded-lg bg-[#D1AF47] px-2.5 py-1.5 text-[8px] font-black text-white">{t.auditBtn}</Link>
               </div>
             ))}
           </div>
-        </Panel>
-      </div>
+        </section>
 
-      {/* ROW 3 PANELS */}
-      <div className="grid grid-cols-1 gap-8 xl:grid-cols-12">
-        <Panel title={t.panelDispatch} badge={t.panelDispatchBadge} className="xl:col-span-8" footer={<Link href="/admin/bookings" className="font-black text-[#D1AF47]">{t.panelDispatchFooter}</Link>}>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px] text-left text-xs rtl:text-right">
-              <thead>
-                <tr className="border-b border-[#EAEAEA] text-[8px] font-black uppercase tracking-wider text-[#667085]">
-                  <th className="px-3 py-3">{t.thBooking}</th>
-                  <th className="px-3 py-3">{t.thProvider}</th>
-                  <th className="px-3 py-3">{t.thRegion}</th>
-                  <th className="px-3 py-3">{t.thStatus}</th>
-                  <th className="px-3 py-3">{t.thValue}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#EAEAEA]">
-                {[
-                  ["#PR-10842", "Elite Salon", "Riyadh", "IN SERVICE", "1,850 SAR"],
-                  ["#PR-10841", "Noura Nails", "Jeddah", "CONFIRMED", "320 SAR"],
-                  ["#PR-10840", "Salman Hair", "Riyadh", "EN ROUTE", "245 SAR"],
-                  ["#PR-10839", "Maha Artist", "Dammam", "COMPLETED", "480 SAR"],
-                ].map((row) => (
-                  <tr key={row[0]} className="transition hover:bg-[#F7F7F5]">
-                    <td className="px-3 py-4 font-black text-[#D1AF47]">{row[0]}</td>
-                    <td className="px-3 py-4 font-serif font-black">{row[1]}</td>
-                    <td className="px-3 py-4 font-semibold text-[#667085]">{row[2]}</td>
-                    <td className="px-3 py-4">
-                      <span className="rounded-full border border-[#22C55E]/20 bg-[#22C55E]/10 px-2 py-1 text-[8px] font-black text-[#22C55E]">
-                        {row[3]}
-                      </span>
-                    </td>
-                    <td className="px-3 py-4 font-black">{row[4]}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* Trust & Risk */}
+        <section className={`${cardBase} flex min-h-0 flex-col justify-center p-4 lg:col-span-4`}>
+          <h3 className={`${eyebrow} mb-2 flex-shrink-0`}>{t.panelTrust}</h3>
+          <div className="space-y-2">
+            {([[t.rowIdentity, 96, "96.2%"], [t.rowFraud, 99, "99.1%"], [t.rowResolution, 82, "82.0%"]] as [string, number, string][]).map(([label, value, detail]) => (
+              <div key={label}>
+                <div className={`mb-1 flex items-center justify-between text-[9px] font-bold ${flip}`}><span>{label}</span><span className="text-[#667085]">{detail}</span></div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-[#F0EEE9]"><div className="h-full rounded-full bg-gradient-to-r from-[#D1AF47] to-[#E0C46A]" style={{ width: `${value}%` }} /></div>
+              </div>
+            ))}
           </div>
-        </Panel>
+          <div className="mt-2.5 grid grid-cols-3 gap-2">
+            {[[t.flagged, "8"], [t.escalated, "3"], [t.resolved, "42"]].map(([label, value]) => (
+              <div key={label} className="rounded-lg border border-[#EFEFEF] bg-[#F7F7F5] p-1.5 text-center">
+                <span className="block text-[8px] font-black uppercase text-[#667085]">{label}</span>
+                <strong className="block font-serif text-sm font-black">{value}</strong>
+              </div>
+            ))}
+          </div>
+        </section>
 
-        <Panel title={t.panelQuickOps} badge={t.panelQuickOpsBadge} className="xl:col-span-4" footer={t.panelQuickOpsFooter}>
-          <div className="space-y-3">
+        {/* Quick Operations */}
+        <section className={`${cardBase} flex min-h-0 flex-col p-4 lg:col-span-4`}>
+          <h3 className={`${eyebrow} mb-2 flex-shrink-0`}>{t.panelQuickOps}</h3>
+          <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto pe-0.5">
             {[
               ["/admin/disputes", t.quickOp1Title, t.quickOp1Detail],
               ["/admin/ledger", t.quickOp2Title, t.quickOp2Detail],
               ["/admin/providers", t.quickOp3Title, t.quickOp3Detail],
               ["/admin/bookings", t.quickOp4Title, t.quickOp4Detail],
             ].map(([href, title, detail]) => (
-              <Link key={href} href={href} className="flex items-center justify-between gap-3 rounded-2xl border border-[#EAEAEA] bg-[#F7F7F5] p-4 transition hover:border-[#D1AF47]/40">
-                <div>
-                  <strong className="block font-serif text-sm font-black">{title}</strong>
-                  <span className="mt-1 block text-[9px] font-semibold text-[#667085]">{detail}</span>
+              <Link key={href} href={href} className={`flex items-center justify-between gap-2 rounded-xl border border-[#EFEFEF] bg-[#F7F7F5] p-2.5 transition hover:border-[#D1AF47]/40 ${flip}`}>
+                <div className="min-w-0">
+                  <strong className="block truncate text-xs font-bold">{title}</strong>
+                  <span className="block truncate text-[9px] font-semibold text-[#667085]">{detail}</span>
                 </div>
-                <span className="text-sm font-black text-[#D1AF47]">→</span>
+                <span className="flex-shrink-0 text-sm font-black text-[#D1AF47]">{isRTL ? "←" : "→"}</span>
               </Link>
             ))}
           </div>
-        </Panel>
+        </section>
       </div>
     </div>
   );
