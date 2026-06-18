@@ -1,6 +1,10 @@
 # Beauty & Grooming Marketplace - Cursor & Workspace Rules
 
+> [!IMPORTANT]
+> **UNIFIED RULES ACTIVE**: Before taking any action or writing any code, all AI models MUST read and verify constraints inside [AGENTS.md](file:///c:/Users/Yousif's%20PC/Desktop/Ai%20Projects/Barberar%20Services-Gemini/AGENTS.md).
+
 This file instructs AI coding assistants on our directory structure, tech stack, database schemas, coding standards, and regional Saudi Arabian localization parameters.
+
 
 ---
 
