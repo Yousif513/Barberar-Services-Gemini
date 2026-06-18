@@ -68,7 +68,12 @@ export default function AdminDisputes() {
     return () => observer.disconnect();
   }, [lang]);
 
-  const t = translations[lang];
+  const t = {
+    ...translations[lang],
+    totalDisputes: lang === "ar" ? "إجمالي النزاعات" : "Total Disputes",
+    pendingDisputes: lang === "ar" ? "النزاعات المعلقة" : "Pending Disputes",
+    refundedTotal: lang === "ar" ? "إجمالي المبالغ المستردة" : "Refunded Total",
+  };
 
   const loadDisputes = async () => {
     try {
@@ -171,85 +176,147 @@ export default function AdminDisputes() {
   };
 
   const isRTL = lang === "ar";
+  const flip = isRTL ? "flex-row-reverse" : "flex-row";
+
+  // Summary KPI values
+  const totalDisputes = disputes.length;
+  const pendingDisputes = disputes.filter(d => d.status === "OPEN" || d.status === "DISPUTED" || d.status === "confirmed").length;
+  const refundedTotal = disputes.filter(d => d.status === "REFUNDED").reduce((sum, d) => sum + (parseFloat(d.amount) || 0), 0);
+
+  const cardBase = "rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] transition-all duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.035)] hover:border-[#D1AF47]/20";
 
   return (
-    <div className="space-y-8">
-      {/* Title */}
-      <div className={isRTL ? "text-right" : "text-left"}>
-        <h2 className="text-2xl font-bold tracking-tight text-stone-900 font-serif">{t.title}</h2>
-        <p className="text-sm text-stone-500 mt-1">{t.subtitle}</p>
+    <div dir={isRTL ? "rtl" : "ltr"} className={`space-y-6 ${isRTL ? "text-right" : "text-left"}`}>
+      
+      {/* Title Header */}
+      <div className={`flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+        <div>
+          <h2 className="text-2xl font-serif font-black tracking-tight text-gray-900 leading-tight">
+            {t.title}
+          </h2>
+          <p className="text-xs text-gray-500 font-semibold mt-1">
+            {t.subtitle}
+          </p>
+        </div>
       </div>
 
       {success && (
-        <div className={`bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl p-4 font-semibold ${isRTL ? "text-right" : "text-left"}`}>
+        <div className={`bg-[#ECFDF3] border border-[#D1FADF] text-[#027A48] text-xs rounded-xl p-4 font-bold ${isRTL ? "text-right" : "text-left"}`}>
           {t.success}: {success}
         </div>
       )}
 
       {error && (
-        <div className={`bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl p-4 font-semibold ${isRTL ? "text-right" : "text-left"}`}>
+        <div className={`bg-[#FEF3F2] border border-[#FECDCA] text-[#B42318] text-xs rounded-xl p-4 font-bold ${isRTL ? "text-right" : "text-left"}`}>
           {t.error}: {error}
         </div>
       )}
 
+      {/* Summary KPI Widgets */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* KPI 1: Total Disputes */}
+        <div className={cardBase}>
+          <div className={`flex items-center justify-between ${flip}`}>
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{t.totalDisputes}</span>
+            <div className="w-8 h-8 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center text-[#D1AF47] font-serif text-xs font-black">
+              #
+            </div>
+          </div>
+          <strong className="block text-2xl font-serif font-black text-gray-900 mt-2.5">
+            {totalDisputes.toLocaleString(lang === "ar" ? "ar-SA" : "en-US")}
+          </strong>
+        </div>
+
+        {/* KPI 2: Pending Disputes */}
+        <div className={cardBase}>
+          <div className={`flex items-center justify-between ${flip}`}>
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{t.pendingDisputes}</span>
+            <div className="w-8 h-8 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center text-amber-700 font-serif text-xs font-black">
+              !
+            </div>
+          </div>
+          <strong className="block text-2xl font-serif font-black text-amber-700 mt-2.5">
+            {pendingDisputes.toLocaleString(lang === "ar" ? "ar-SA" : "en-US")}
+          </strong>
+        </div>
+
+        {/* KPI 3: Refunded Total */}
+        <div className={cardBase}>
+          <div className={`flex items-center justify-between ${flip}`}>
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{t.refundedTotal}</span>
+            <div className="w-8 h-8 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center text-[#101828]">
+              <svg className="w-4 h-4 text-[#D1AF47]" fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
+              </svg>
+            </div>
+          </div>
+          <strong className="block text-2xl font-serif font-black text-gray-900 mt-2.5">
+            {refundedTotal.toLocaleString(lang === "ar" ? "ar-SA" : "en-US")} {lang === "ar" ? "ريال" : "SAR"}
+          </strong>
+        </div>
+      </div>
+
       {/* Disputes List */}
       <div className="grid grid-cols-1 gap-6">
         {loading ? (
-          <div className="bg-white border border-stone-200 rounded-2xl p-8 text-center text-stone-400 text-xs font-semibold">
+          <div className="bg-white border border-[#ECECEC] rounded-2xl p-8 text-center text-gray-400 text-xs font-bold shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
             {t.loading}
           </div>
         ) : (
           disputes.map((d) => (
-            <div key={d.id} className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm space-y-6">
+            <div key={d.id} className="bg-white border border-[#ECECEC] rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] space-y-6 hover:shadow-[0_12px_40px_rgba(0,0,0,0.035)] transition-all duration-300">
               {/* Header Info */}
               <div className={`flex flex-col sm:flex-row justify-between items-start gap-4 ${isRTL ? "sm:flex-row-reverse" : ""}`}>
                 <div className={isRTL ? "text-right" : "text-left"}>
                   <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                    <h3 className="font-extrabold text-sm text-stone-900">{d.customer} vs {d.provider}</h3>
-                    <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider border ${
-                      d.status === "REFUNDED" || d.status === "REFUNDED"
-                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                        : d.status === "DECLINED" || d.status === "DECLINED"
-                        ? "bg-red-50 text-red-700 border-red-200"
-                        : "bg-amber-50 text-amber-700 border-amber-200"
+                    <h3 className="font-extrabold text-sm text-gray-900">{d.customer} vs {d.provider}</h3>
+                    <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-block ${
+                      d.status === "REFUNDED"
+                        ? "bg-[#ECFDF3] text-[#16A34A]"
+                        : d.status === "DECLINED"
+                        ? "bg-[#FEF3F2] text-[#D92D20]"
+                        : "bg-[#FFFAEB] text-[#F59E0B]"
                     }`}>
                       {d.status === "REFUNDED" ? t.statusRefunded : d.status === "DECLINED" ? t.statusDeclined : t.statusOpen}
                     </span>
                   </div>
-                  <p className="text-[9px] text-stone-400 font-bold mt-1 uppercase tracking-wider">
-                    {t.bookingId}: {d.bookingId} | {t.flaggedRating}: {d.rating} ★
+                  <p className="text-[10px] text-gray-500 font-semibold mt-2.5 uppercase tracking-widest">
+                    {t.bookingId}: <span className="font-mono text-gray-900 font-bold">{d.bookingId.substring(0, 8)}...</span> | {t.flaggedRating}: {" "}
+                    <span className="text-[#D1AF47] font-bold tracking-widest">
+                      {"★".repeat(d.rating)}{"☆".repeat(5 - d.rating)}
+                    </span>
                   </p>
                 </div>
                 
                 <div className={isRTL ? "text-right" : "text-left"}>
-                  <span className="text-[9px] text-stone-400 block font-bold uppercase tracking-wider">{t.disputedAmount}</span>
-                  <span className="text-base font-black text-stone-900">{d.amount}</span>
+                  <span className="text-[10px] text-[#667085] block font-extrabold uppercase tracking-widest">{t.disputedAmount}</span>
+                  <span className="text-xl font-serif font-black text-gray-900 mt-1 block">{d.amount}</span>
                 </div>
               </div>
 
               {/* Dispute Reason details */}
-              <div className={`p-4 bg-stone-50 border border-stone-100 rounded-xl text-xs text-stone-600 leading-relaxed font-light ${isRTL ? "text-right" : "text-left"}`}>
-                <p className="font-bold text-stone-800 mb-1">{t.disputeDetail}:</p>
+              <div className={`p-4 bg-gray-50 border border-[#ECECEC] rounded-xl text-xs text-gray-700 leading-relaxed font-semibold ${isRTL ? "text-right" : "text-left"}`}>
+                <p className="font-extrabold text-gray-900 mb-1">{t.disputeDetail}:</p>
                 "{d.reason}"
               </div>
 
               {/* Actions */}
-              <div className={`flex flex-wrap gap-3 pt-2 border-t border-stone-100 items-center justify-between ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <div className="text-[10px] text-stone-400 font-semibold uppercase tracking-wider">
+              <div className={`flex flex-wrap gap-3 pt-4 border-t border-[#F5F5F5] items-center justify-between ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                <div className="text-[10px] text-[#667085] font-extrabold uppercase tracking-widest">
                   {t.selectAction}
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleResolveDispute(d.id, "DECLINED")}
                     disabled={d.status === "REFUNDED" || d.status === "DECLINED"}
-                    className="px-3.5 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 disabled:opacity-50 text-[10px] font-bold uppercase tracking-wider rounded-lg transition"
+                    className="px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 disabled:opacity-50 disabled:text-gray-400 text-[10px] font-black uppercase tracking-wider rounded-lg border border-[#ECECEC] transition duration-150"
                   >
                     {t.declineRefund}
                   </button>
                   <button
                     onClick={() => handleResolveDispute(d.id, "REFUNDED")}
                     disabled={d.status === "REFUNDED" || d.status === "DECLINED"}
-                    className="px-3.5 py-2 bg-stone-900 hover:bg-stone-800 text-white disabled:opacity-50 text-[10px] font-bold uppercase tracking-wider rounded-lg transition"
+                    className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white disabled:opacity-50 disabled:bg-gray-50 disabled:text-gray-400 text-[10px] font-black uppercase tracking-wider rounded-lg border border-[#ECECEC] disabled:border-[#ECECEC] transition duration-150"
                   >
                     {t.approveRefund}
                   </button>

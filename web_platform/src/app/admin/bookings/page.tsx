@@ -52,7 +52,12 @@ export default function AdminBookings() {
     return () => observer.disconnect();
   }, [lang]);
 
-  const t = translations[lang];
+  const t = {
+    ...translations[lang],
+    totalVolume: lang === "ar" ? "إجمالي الحجم المالي" : "Total Volume",
+    platformRevenue: lang === "ar" ? "إيرادات المنصة" : "Platform Revenue",
+    activeBookings: lang === "ar" ? "الحجوزات النشطة" : "Active Bookings"
+  };
 
   useEffect(() => {
     async function loadGlobalBookings() {
@@ -116,33 +121,92 @@ export default function AdminBookings() {
   }, [lang]);
 
   const isRTL = lang === "ar";
+  const flip = isRTL ? "flex-row-reverse" : "flex-row";
+
+  // Calculate summary metrics
+  const totalVolume = bookings.reduce((sum, b) => sum + (parseFloat(b.total_price) || 0), 0);
+  const platformRevenue = bookings.reduce((sum, b) => sum + (parseFloat(b.platform_commission) || (b.total_price * 0.15)), 0);
+  const activeCount = bookings.filter(b => b.status === "confirmed" || b.status === "pending_payment").length;
+
+  const cardBase = "rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] transition-all duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.035)] hover:border-[#D1AF47]/20";
 
   return (
-    <div className="space-y-8">
-      {/* Title */}
-      <div className={isRTL ? "text-right" : "text-left"}>
-        <h2 className="text-2xl font-bold tracking-tight text-stone-900 font-serif">{t.title}</h2>
-        <p className="text-sm text-stone-500 mt-1">{t.subtitle}</p>
+    <div dir={isRTL ? "rtl" : "ltr"} className={`space-y-6 ${isRTL ? "text-right" : "text-left"}`}>
+      
+      {/* Title Header */}
+      <div className={`flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+        <div>
+          <h2 className="text-2xl font-serif font-black tracking-tight text-gray-900 leading-tight">
+            {t.title}
+          </h2>
+          <p className="text-xs text-gray-500 font-semibold mt-1">
+            {t.subtitle}
+          </p>
+        </div>
+      </div>
+
+      {/* Summary KPI Widgets */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* KPI 1: Total Volume */}
+        <div className={cardBase}>
+          <div className={`flex items-center justify-between ${flip}`}>
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{t.totalVolume}</span>
+            <div className="w-8 h-8 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center text-[#D1AF47] font-serif text-xs font-black">
+              $
+            </div>
+          </div>
+          <strong className="block text-2xl font-serif font-black text-gray-900 mt-2.5">
+            {totalVolume.toLocaleString(lang === "ar" ? "ar-SA" : "en-US")} {lang === "ar" ? "ريال" : "SAR"}
+          </strong>
+        </div>
+
+        {/* KPI 2: Platform Commission */}
+        <div className={cardBase}>
+          <div className={`flex items-center justify-between ${flip}`}>
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{t.platformRevenue}</span>
+            <div className="w-8 h-8 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center text-[#D1AF47] font-serif text-xs font-black">
+              %
+            </div>
+          </div>
+          <strong className="block text-2xl font-serif font-black text-amber-700 mt-2.5">
+            {platformRevenue.toLocaleString(lang === "ar" ? "ar-SA" : "en-US")} {lang === "ar" ? "ريال" : "SAR"}
+          </strong>
+        </div>
+
+        {/* KPI 3: Active Bookings */}
+        <div className={cardBase}>
+          <div className={`flex items-center justify-between ${flip}`}>
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{t.activeBookings}</span>
+            <div className="w-8 h-8 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center text-[#D1AF47]">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+          </div>
+          <strong className="block text-2xl font-serif font-black text-gray-900 mt-2.5">
+            {activeCount.toLocaleString(lang === "ar" ? "ar-SA" : "en-US")}
+          </strong>
+        </div>
       </div>
 
       {/* Bookings Table */}
-      <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-[#ECECEC] rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left border-collapse">
             <thead>
-              <tr className={`border-b border-stone-200 text-stone-400 bg-stone-50/50 uppercase tracking-wider font-extrabold text-[10px] ${isRTL ? "text-right" : ""}`}>
-                <th className={`py-4 px-6 ${isRTL ? "text-right" : ""}`}>{t.bookingDetails}</th>
-                <th className={`py-4 px-6 ${isRTL ? "text-right" : ""}`}>{t.clientCustomer}</th>
-                <th className={`py-4 px-6 ${isRTL ? "text-right" : ""}`}>{t.providerBranch}</th>
-                <th className={`py-4 px-6 ${isRTL ? "text-right" : ""}`}>{t.capturedPrice}</th>
-                <th className={`py-4 px-6 ${isRTL ? "text-right" : ""}`}>{t.commShare}</th>
+              <tr className={`border-b border-[#ECECEC] text-[#667085] bg-gray-50/50 uppercase tracking-widest font-extrabold text-[9px] ${isRTL ? "text-right" : ""}`}>
+                <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>{t.bookingDetails}</th>
+                <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>{t.clientCustomer}</th>
+                <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>{t.providerBranch}</th>
+                <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>{t.capturedPrice}</th>
+                <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>{t.commShare}</th>
                 <th className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>{t.status}</th>
               </tr>
             </thead>
-            <tbody className={`divide-y divide-stone-100 font-medium text-stone-700 ${isRTL ? "text-right" : ""}`}>
+            <tbody className={`divide-y divide-[#F5F5F5] font-semibold text-gray-700 ${isRTL ? "text-right" : "text-left"}`}>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-stone-400">{t.loading}</td>
+                  <td colSpan={6} className="py-8 text-center text-gray-400 font-bold">{t.loading}</td>
                 </tr>
               ) : (
                 bookings.map((b: any) => {
@@ -155,39 +219,39 @@ export default function AdminBookings() {
                   });
 
                   return (
-                    <tr key={b.id} className="hover:bg-stone-50/50 transition">
+                    <tr key={b.id} className="hover:bg-gray-50/40 transition duration-150">
                       <td className="py-4 px-6">
-                        <p className="font-bold text-stone-900">{dateStr}</p>
-                        <p className="text-[9px] text-stone-400 font-semibold mt-0.5">UUID: {b.id}</p>
+                        <p className="font-bold text-gray-900">{dateStr}</p>
+                        <p className="text-[9px] text-gray-400 font-semibold mt-1">ID: {b.id.substring(0, 8)}...</p>
                       </td>
                       <td className="py-4 px-6">
-                        <p className="font-bold text-stone-800">
+                        <p className="font-bold text-gray-900">
                           {b.customer?.first_name || t.guest} {b.customer?.last_name || ""}
                         </p>
                       </td>
                       <td className="py-4 px-6">
-                        <p className="font-bold text-stone-800">
+                        <p className="font-bold text-gray-900">
                           {b.branches?.providers?.business_name_en || t.independent}
                         </p>
-                        <p className="text-[9px] text-stone-400 font-semibold">
+                        <p className="text-[9px] text-gray-400 font-semibold mt-0.5">
                           {b.branches?.name_en || t.directStaff}
                         </p>
                       </td>
-                      <td className="py-4 px-6 font-bold text-stone-900">
+                      <td className="py-4 px-6 font-serif font-black text-gray-900">
                         {b.total_price} {lang === "ar" ? "ريال" : "SAR"}
                       </td>
-                      <td className="py-4 px-6 font-bold text-amber-700">
-                        {b.platform_commission || (b.total_price * 0.15).toFixed(2)} {lang === "ar" ? "ريال" : "SAR"}
+                      <td className="py-4 px-6 font-serif font-black text-amber-700">
+                        {(parseFloat(b.platform_commission) || (b.total_price * 0.15)).toFixed(2)} {lang === "ar" ? "ريال" : "SAR"}
                       </td>
                       <td className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>
-                        <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider border inline-block ${
+                        <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-block ${
                           b.status === "confirmed"
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                            ? "bg-[#ECFDF3] text-[#16A34A]"
                             : b.status === "completed"
-                            ? "bg-stone-100 text-stone-700 border-stone-200"
+                            ? "bg-gray-100 text-gray-600"
                             : b.status === "pending_payment"
-                            ? "bg-amber-50 text-amber-700 border-amber-200"
-                            : "bg-red-50 text-red-700 border-red-200"
+                            ? "bg-[#FFFAEB] text-[#F59E0B]"
+                            : "bg-[#FEF3F2] text-[#EF4444]"
                         }`}>
                           {lang === "ar" ? (
                             b.status === "confirmed" ? "مؤكد" : b.status === "completed" ? "مكتمل" : b.status === "pending_payment" ? "انتظار الدفع" : "ملغى / مسترد"

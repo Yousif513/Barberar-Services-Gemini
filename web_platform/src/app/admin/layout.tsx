@@ -190,7 +190,7 @@ export default function AdminLayout({
         { nameKey: "packages", path: "/admin/packages" },
         { nameKey: "orders", path: "/admin/orders" },
         { nameKey: "payments", path: "/admin/payments" },
-        { nameKey: "payouts", path: "/admin/payouts" },
+        { nameKey: "payouts", path: "/admin/ledger" },
         { nameKey: "commissions", path: "/admin/commissions" },
         { nameKey: "reviews", path: "/admin/reviews" },
         { nameKey: "disputes", path: "/admin/disputes" },
