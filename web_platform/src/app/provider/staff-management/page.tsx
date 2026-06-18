@@ -160,7 +160,7 @@ export default function StaffManagementPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-8 text-center text-xs text-[#7B859C] font-medium">
+      <footer className="bg-[#0B0F17] border-t border-white/[0.06] py-8 text-center text-xs text-[#7B859C] font-medium">
         <p>© {new Date().getFullYear()} PRIMORA. {t.footerText}</p>
       </footer>
 

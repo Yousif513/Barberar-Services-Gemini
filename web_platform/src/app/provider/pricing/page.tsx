@@ -935,7 +935,7 @@ export default function PricingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-8 text-center text-xs text-[#7B859C] font-medium z-10 relative">
+      <footer className="bg-[#0B0F17] border-t border-white/[0.06] py-8 text-center text-xs text-[#7B859C] font-medium z-10 relative">
         <p>© {new Date().getFullYear()} PRIMORA. {t.footerText}</p>
       </footer>
 
