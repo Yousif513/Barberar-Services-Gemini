@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { supabase } from "@/lib/supabase";
 
 const translations = {
   en: {
@@ -22,7 +23,21 @@ const translations = {
     inStoreOnly: "In-store Only",
     totalServices: "Total Services",
     activeServices: "Active Services",
-    homeServicesCount: "Home Dispatch Eligible"
+    homeServicesCount: "Home Dispatch Eligible",
+    editService: "Edit Service",
+    nameEnL: "Service name (English)",
+    nameArL: "Service name (Arabic)",
+    priceL: "Base price (SAR)",
+    durationL: "Duration (minutes)",
+    homeEligibleL: "Home service eligible",
+    activeL: "Active (visible to customers)",
+    save: "Save Service",
+    saving: "Saving…",
+    cancel: "Cancel",
+    deleteConfirm: "Delete this service permanently?",
+    noServices: "No services yet. Add your first service item.",
+    selectCategory: "Select category",
+    loadingServices: "Loading services…"
   },
   ar: {
     servicesTitle: "قائمة الخدمات",
@@ -43,9 +58,49 @@ const translations = {
     inStoreOnly: "في الصالون فقط",
     totalServices: "إجمالي الخدمات",
     activeServices: "الخدمات النشطة",
-    homeServicesCount: "متاح للخدمة المنزلية"
+    homeServicesCount: "متاح للخدمة المنزلية",
+    editService: "تعديل الخدمة",
+    nameEnL: "اسم الخدمة (إنجليزي)",
+    nameArL: "اسم الخدمة (عربي)",
+    priceL: "السعر الأساسي (ر.س)",
+    durationL: "المدة (دقائق)",
+    homeEligibleL: "متاحة كخدمة منزلية",
+    activeL: "نشطة (مرئية للعملاء)",
+    save: "حفظ الخدمة",
+    saving: "جارٍ الحفظ…",
+    cancel: "إلغاء",
+    deleteConfirm: "حذف هذه الخدمة نهائياً؟",
+    noServices: "لا توجد خدمات بعد. أضف أول خدمة.",
+    selectCategory: "اختر التصنيف",
+    loadingServices: "جارٍ تحميل الخدمات…"
   }
 };
+
+type ServiceRow = {
+  id: string;
+  name_en: string;
+  name_ar: string;
+  category_en: string;
+  category_ar: string;
+  price: string;
+  duration: string;
+  isHomeService: boolean;
+  isActive: boolean;
+  base_price: number;
+  base_duration_minutes: number;
+  category_id: string;
+};
+
+type Category = { id: string; name_en: string; name_ar: string };
+
+const FALLBACK_SERVICES: ServiceRow[] = [
+  { id: "1", name_en: "Classic Mens Haircut & Wash", name_ar: "قص شعر رجالي كلاسيكي مع غسيل", category_en: "Haircuts & Styling", category_ar: "قص وتصفيف الشعر", price: "120 SAR", duration: "40 min", isHomeService: false, isActive: true, base_price: 120, base_duration_minutes: 40, category_id: "" },
+  { id: "2", name_en: "Premium Beard Grooming & Shave", name_ar: "حلاقة وتحديد اللحية الممتازة", category_en: "Beard Care", category_ar: "العناية باللحية", price: "90 SAR", duration: "30 min", isHomeService: true, isActive: true, base_price: 90, base_duration_minutes: 30, category_id: "" },
+  { id: "3", name_en: "Full Hair Coloring & Balayage", name_ar: "صبغ الشعر بالكامل وبلاياج", category_en: "Hair Coloring", category_ar: "صبغ الشعر", price: "450 SAR", duration: "120 min", isHomeService: true, isActive: true, base_price: 450, base_duration_minutes: 120, category_id: "" },
+  { id: "4", name_en: "Luxury Facial Charcoal Mask", name_ar: "ماسك الفحم الفاخر للوجه", category_en: "Skincare", category_ar: "العناية بالبشرة", price: "180 SAR", duration: "45 min", isHomeService: false, isActive: false, base_price: 180, base_duration_minutes: 45, category_id: "" },
+];
+
+const EMPTY_FORM = { name_en: "", name_ar: "", category_id: "", base_price: "", base_duration_minutes: "", is_home_service_eligible: false, is_active: true };
 
 export default function ProviderServicesPage() {
   const [lang, setLang] = useState<"en" | "ar">("ar");
@@ -65,53 +120,103 @@ export default function ProviderServicesPage() {
 
   const t = translations[lang];
 
-  // Mock service list
-  const servicesList = [
-    {
-      id: "1",
-      name_en: "Classic Mens Haircut & Wash",
-      name_ar: "قص شعر رجالي كلاسيكي مع غسيل",
-      category_en: "Haircuts & Styling",
-      category_ar: "قص وتصفيف الشعر",
-      price: "120 SAR",
-      duration: "40 min",
-      isHomeService: false,
-      isActive: true
-    },
-    {
-      id: "2",
-      name_en: "Premium Beard Grooming & Shave",
-      name_ar: "حلاقة وتحديد اللحية الممتازة",
-      category_en: "Beard Care",
-      category_ar: "العناية باللحية",
-      price: "90 SAR",
-      duration: "30 min",
-      isHomeService: true,
-      isActive: true
-    },
-    {
-      id: "3",
-      name_en: "Full Hair Coloring & Balayage",
-      name_ar: "صبغ الشعر بالكامل وبلاياج",
-      category_en: "Hair Coloring",
-      category_ar: "صبغ الشعر",
-      price: "450 SAR",
-      duration: "120 min",
-      isHomeService: true,
-      isActive: true
-    },
-    {
-      id: "4",
-      name_en: "Luxury Facial Charcoal Mask",
-      name_ar: "ماسك الفحم الفاخر للوجه",
-      category_en: "Skincare",
-      category_ar: "العناية بالبشرة",
-      price: "180 SAR",
-      duration: "45 min",
-      isHomeService: false,
-      isActive: false
+  // ─── Live data: provider's own services (CRUD) ───
+  const [providerId, setProviderId] = useState<string | null>(null);
+  const [services, setServices] = useState<ServiceRow[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editing, setEditing] = useState<ServiceRow | null>(null);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
+
+  const loadServices = useCallback(async (pid: string) => {
+    const { data } = await supabase
+      .from("services")
+      .select("id, name_en, name_ar, base_price, base_duration_minutes, is_home_service_eligible, is_active, category_id, categories(name_en, name_ar)")
+      .eq("provider_id", pid)
+      .order("created_at", { ascending: false });
+    setServices((data ?? []).map((s) => {
+      const cat = s.categories as unknown as { name_en?: string; name_ar?: string } | null;
+      return {
+        id: s.id, name_en: s.name_en, name_ar: s.name_ar,
+        category_en: cat?.name_en ?? "—", category_ar: cat?.name_ar ?? "—",
+        price: `${Number(s.base_price)} SAR`, duration: `${s.base_duration_minutes} min`,
+        isHomeService: !!s.is_home_service_eligible, isActive: !!s.is_active,
+        base_price: Number(s.base_price), base_duration_minutes: Number(s.base_duration_minutes),
+        category_id: s.category_id,
+      };
+    }));
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data: cats } = await supabase.from("categories").select("id, name_en, name_ar").eq("is_active", true).order("name_en");
+        if (cats) setCategories(cats);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data: provider } = await supabase.from("providers").select("id").eq("owner_id", user.id).maybeSingle();
+        if (!provider) return;
+        setProviderId(provider.id);
+        await loadServices(provider.id);
+      } catch (err) {
+        console.warn("Services page using fallback data:", err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [loadServices]);
+
+  const servicesList: ServiceRow[] = providerId ? services : FALLBACK_SERVICES;
+
+  const openAdd = () => { setEditing(null); setForm(EMPTY_FORM); setModalOpen(true); };
+  const openEdit = (s: ServiceRow) => {
+    setEditing(s);
+    setForm({
+      name_en: s.name_en, name_ar: s.name_ar, category_id: s.category_id,
+      base_price: String(s.base_price), base_duration_minutes: String(s.base_duration_minutes),
+      is_home_service_eligible: s.isHomeService, is_active: s.isActive,
+    });
+    setModalOpen(true);
+  };
+
+  const saveService = async () => {
+    if (!providerId || saving) return;
+    if (!form.name_en.trim() || !form.category_id || !form.base_price || !form.base_duration_minutes) return;
+    setSaving(true);
+    const payload = {
+      provider_id: providerId,
+      name_en: form.name_en.trim(),
+      name_ar: (form.name_ar || form.name_en).trim(),
+      category_id: form.category_id,
+      base_price: Number(form.base_price),
+      base_duration_minutes: Number(form.base_duration_minutes),
+      is_home_service_eligible: form.is_home_service_eligible,
+      is_active: form.is_active,
+    };
+    try {
+      if (editing) await supabase.from("services").update(payload).eq("id", editing.id);
+      else await supabase.from("services").insert(payload);
+      setModalOpen(false);
+      await loadServices(providerId);
+    } catch (err) {
+      console.warn("Failed to save service:", err);
+    } finally {
+      setSaving(false);
     }
-  ];
+  };
+
+  const deleteService = async (s: ServiceRow) => {
+    if (!providerId) return;
+    if (typeof window !== "undefined" && !window.confirm(t.deleteConfirm)) return;
+    try {
+      await supabase.from("services").delete().eq("id", s.id);
+      await loadServices(providerId);
+    } catch (err) {
+      console.warn("Failed to delete service:", err);
+    }
+  };
 
   return (
     <div 
@@ -131,7 +236,7 @@ export default function ProviderServicesPage() {
           <p className="text-sm text-[#7B859C] max-w-xl leading-relaxed">{t.subtitle}</p>
         </div>
         
-        <button className="relative group overflow-hidden bg-gradient-to-r from-[#D1AF47] to-[#B8952E] hover:from-[#E0C46A] hover:to-[#D1AF47] text-[#070B12] px-6 py-3 rounded-[16px] text-sm font-bold shadow-[0_4px_20px_rgba(209,175,71,0.25)] hover:shadow-[0_0_30px_rgba(209,175,71,0.4)] transition-all duration-300 flex items-center gap-2 cursor-pointer active:scale-95">
+        <button onClick={openAdd} className="relative group overflow-hidden bg-gradient-to-r from-[#D1AF47] to-[#B8952E] hover:from-[#E0C46A] hover:to-[#D1AF47] text-[#070B12] px-6 py-3 rounded-[16px] text-sm font-bold shadow-[0_4px_20px_rgba(209,175,71,0.25)] hover:shadow-[0_0_30px_rgba(209,175,71,0.4)] transition-all duration-300 flex items-center gap-2 cursor-pointer active:scale-95">
           <span className="text-lg font-light leading-none transition-transform duration-300 group-hover:rotate-90">+</span>
           <span>{t.addService}</span>
           <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
@@ -276,14 +381,14 @@ export default function ProviderServicesPage() {
                   {/* Actions Buttons */}
                   <td className="py-5 px-6 text-center">
                     <div className="flex justify-center items-center gap-3">
-                      <button className="flex items-center gap-1 text-[#D1AF47] hover:text-[#E0C46A] transition-colors duration-300 text-xs font-semibold bg-[#D1AF47]/5 hover:bg-[#D1AF47]/10 px-3 py-1.5 rounded-lg border border-[#D1AF47]/10 hover:border-[#D1AF47]/30 cursor-pointer">
+                      <button onClick={() => openEdit(service)} className="flex items-center gap-1 text-[#D1AF47] hover:text-[#E0C46A] transition-colors duration-300 text-xs font-semibold bg-[#D1AF47]/5 hover:bg-[#D1AF47]/10 px-3 py-1.5 rounded-lg border border-[#D1AF47]/10 hover:border-[#D1AF47]/30 cursor-pointer">
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                         </svg>
                         {t.edit}
                       </button>
                       
-                      <button className="flex items-center gap-1 text-[#FF5D73] hover:text-[#FF8093] transition-colors duration-300 text-xs font-semibold bg-[#FF5D73]/5 hover:bg-[#FF5D73]/10 px-3 py-1.5 rounded-lg border border-[#FF5D73]/10 hover:border-[#FF5D73]/30 cursor-pointer">
+                      <button onClick={() => deleteService(service)} className="flex items-center gap-1 text-[#FF5D73] hover:text-[#FF8093] transition-colors duration-300 text-xs font-semibold bg-[#FF5D73]/5 hover:bg-[#FF5D73]/10 px-3 py-1.5 rounded-lg border border-[#FF5D73]/10 hover:border-[#FF5D73]/30 cursor-pointer">
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                         </svg>
@@ -348,13 +453,13 @@ export default function ProviderServicesPage() {
 
             {/* Actions */}
             <div className="flex justify-end gap-3 pt-1">
-              <button className="flex items-center gap-1 text-[#D1AF47] hover:text-[#E0C46A] transition-colors duration-300 text-xs font-semibold bg-[#D1AF47]/5 px-3 py-1.5 rounded-lg border border-[#D1AF47]/10 cursor-pointer">
+              <button onClick={() => openEdit(service)} className="flex items-center gap-1 text-[#D1AF47] hover:text-[#E0C46A] transition-colors duration-300 text-xs font-semibold bg-[#D1AF47]/5 px-3 py-1.5 rounded-lg border border-[#D1AF47]/10 cursor-pointer">
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                 </svg>
                 {t.edit}
               </button>
-              <button className="flex items-center gap-1 text-[#FF5D73] hover:text-[#FF8093] transition-colors duration-300 text-xs font-semibold bg-[#FF5D73]/5 px-3 py-1.5 rounded-lg border border-[#FF5D73]/10 cursor-pointer">
+              <button onClick={() => deleteService(service)} className="flex items-center gap-1 text-[#FF5D73] hover:text-[#FF8093] transition-colors duration-300 text-xs font-semibold bg-[#FF5D73]/5 px-3 py-1.5 rounded-lg border border-[#FF5D73]/10 cursor-pointer">
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                 </svg>
@@ -364,6 +469,70 @@ export default function ProviderServicesPage() {
           </div>
         ))}
       </div>
+
+      {/* ─── Add / Edit Service Modal ─── */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" dir={lang === "ar" ? "rtl" : "ltr"}>
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setModalOpen(false)} />
+          <div className="relative w-full max-w-lg overflow-hidden rounded-[24px] border border-white/[0.08] bg-[#0D1422] shadow-2xl">
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#D1AF47]/40 to-transparent" />
+            <div className="flex items-center justify-between border-b border-white/[0.06] p-6">
+              <h3 className="flex items-center gap-2.5 text-lg font-extrabold text-white">
+                <span className="h-6 w-1.5 rounded-full bg-[#D1AF47] shadow-[0_0_15px_rgba(209,175,71,0.6)]" />
+                {editing ? t.editService : t.addService}
+              </h3>
+              <button onClick={() => setModalOpen(false)} className="rounded-lg p-1.5 text-[#7B859C] transition hover:bg-white/5 hover:text-white">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="max-h-[70vh] space-y-4 overflow-y-auto p-6">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#7B859C]">{t.nameEnL}</label>
+                  <input value={form.name_en} onChange={(e) => setForm({ ...form, name_en: e.target.value })} dir="ltr" className="w-full rounded-xl border border-white/[0.08] bg-[#070B12] px-4 py-2.5 text-sm text-white outline-none transition focus:border-[#D1AF47]/40" />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#7B859C]">{t.nameArL}</label>
+                  <input value={form.name_ar} onChange={(e) => setForm({ ...form, name_ar: e.target.value })} dir="rtl" className="w-full rounded-xl border border-white/[0.08] bg-[#070B12] px-4 py-2.5 text-sm text-white outline-none transition focus:border-[#D1AF47]/40" />
+                </div>
+              </div>
+              <div>
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#7B859C]">{t.category}</label>
+                <select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })} className="w-full rounded-xl border border-white/[0.08] bg-[#070B12] px-4 py-2.5 text-sm text-white outline-none transition focus:border-[#D1AF47]/40">
+                  <option value="" className="bg-[#0D1422]">{t.selectCategory}</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id} className="bg-[#0D1422]">{lang === "ar" ? c.name_ar : c.name_en}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#7B859C]">{t.priceL}</label>
+                  <input type="number" min="0" value={form.base_price} onChange={(e) => setForm({ ...form, base_price: e.target.value })} className="w-full rounded-xl border border-white/[0.08] bg-[#070B12] px-4 py-2.5 text-sm text-white outline-none transition focus:border-[#D1AF47]/40" />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#7B859C]">{t.durationL}</label>
+                  <input type="number" min="0" value={form.base_duration_minutes} onChange={(e) => setForm({ ...form, base_duration_minutes: e.target.value })} className="w-full rounded-xl border border-white/[0.08] bg-[#070B12] px-4 py-2.5 text-sm text-white outline-none transition focus:border-[#D1AF47]/40" />
+                </div>
+              </div>
+              <div className="space-y-2.5">
+                {([[t.homeEligibleL, form.is_home_service_eligible, (v: boolean) => setForm({ ...form, is_home_service_eligible: v })], [t.activeL, form.is_active, (v: boolean) => setForm({ ...form, is_active: v })]] as [string, boolean, (v: boolean) => void][]).map(([label, checked, onToggle]) => (
+                  <button key={label} type="button" onClick={() => onToggle(!checked)} className="flex w-full items-center justify-between rounded-xl border border-white/[0.06] bg-[#070B12] px-4 py-3">
+                    <span className="text-sm font-medium text-[#B8C0D4]">{label}</span>
+                    <span className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition ${checked ? "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A]" : "bg-white/[0.08]"}`}>
+                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition ${checked ? "translate-x-6" : "translate-x-1"}`} />
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 border-t border-white/[0.06] p-6">
+              <button onClick={() => setModalOpen(false)} className="rounded-xl border border-white/10 px-5 py-2.5 text-sm font-semibold text-[#B8C0D4] transition hover:bg-white/5">{t.cancel}</button>
+              <button onClick={saveService} disabled={saving} className="rounded-xl bg-gradient-to-r from-[#D1AF47] to-[#B8952E] px-6 py-2.5 text-sm font-bold text-[#070B12] shadow-[0_4px_20px_rgba(209,175,71,0.25)] transition hover:from-[#E0C46A] hover:to-[#D1AF47] disabled:opacity-50">{saving ? t.saving : t.save}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
