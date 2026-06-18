@@ -125,6 +125,30 @@ const PAGE_INDEX = [
   { label: "Find Providers", type: "Page", href: "/customer/search", where: "Search" },
 ];
 
+function NeuralMesh({ className = "", dark = false }: { className?: string; dark?: boolean }) {
+  const stroke = dark ? "#F4E7B6" : "#D1AF47";
+  const softStroke = dark ? "#E0C46A" : "#B8952E";
+  const glow = dark ? "#F7E6A6" : "#E0C46A";
+
+  return (
+    <svg className={`pointer-events-none absolute ${className}`} viewBox="0 0 360 180" fill="none" aria-hidden="true">
+      <path d="M12 142L66 98L118 118L166 58L238 84L336 22" stroke={stroke} strokeOpacity=".58" strokeWidth="1.25" />
+      <path d="M42 172L66 98L96 28L166 58L208 18L238 84L306 126" stroke={softStroke} strokeOpacity=".36" strokeWidth="1" />
+      <path d="M118 118L156 156L238 84L282 42L336 22" stroke={stroke} strokeOpacity=".26" strokeWidth=".9" />
+      {[12, 66, 118, 166, 238, 336, 96, 208, 306, 156, 282].map((x, index) => (
+        <circle
+          key={x}
+          cx={x}
+          cy={[142, 98, 118, 58, 84, 22, 28, 18, 126, 156, 42][index]}
+          r={index % 3 === 0 ? "4.2" : "3.1"}
+          fill={glow}
+          fillOpacity={index % 3 === 0 ? ".95" : ".72"}
+        />
+      ))}
+    </svg>
+  );
+}
+
 export default function CustomerDashboard() {
   const [locale, setLocale] = useState<"en" | "ar">("en");
   const [userName, setUserName] = useState("Yousif");
@@ -246,7 +270,7 @@ export default function CustomerDashboard() {
     s === "Upcoming" ? "bg-[#F4E7B6]/60 text-[#9A7B1E]" : s === "Completed" ? "bg-[#22C55E]/10 text-[#16A34A]" : "bg-[#EF4444]/10 text-[#DC2626]";
   const statusLabel = (s: Booking["status"]) => (s === "Upcoming" ? t.upcoming : s === "Completed" ? t.completed : t.cancelled);
 
-  const cardBase = "rounded-[22px] border border-white/70 bg-white/80 shadow-[0_14px_38px_rgba(17,17,17,0.07)] backdrop-blur-xl";
+  const cardBase = "relative overflow-hidden rounded-[22px] border border-[#D1AF47]/50 bg-white/90 shadow-[0_0_0_1px_rgba(209,175,71,0.18),0_18px_42px_rgba(17,17,17,0.08),0_0_34px_rgba(209,175,71,0.18)] ring-1 ring-white/80 backdrop-blur-xl";
   const eyebrow = "text-[10px] font-black uppercase tracking-[0.16em] text-[#2F332E]";
 
   return (
@@ -254,6 +278,8 @@ export default function CustomerDashboard() {
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute left-1/4 top-8 h-56 w-56 rounded-full bg-[#D1AF47]/10 blur-3xl" />
         <div className="absolute right-4 top-32 h-64 w-64 rounded-full bg-white/70 blur-3xl" />
+        <NeuralMesh className="-left-16 top-20 h-[380px] w-[760px] opacity-35" />
+        <NeuralMesh className="bottom-0 right-0 h-[320px] w-[680px] opacity-30" />
         <svg className="absolute right-0 top-0 h-72 w-[520px] opacity-25" viewBox="0 0 520 260" fill="none" aria-hidden="true">
           <path d="M24 226L118 166L182 190L246 86L356 126L482 42" stroke="#D1AF47" strokeOpacity=".42" />
           <path d="M82 248L118 166L156 42L246 86L314 18L356 126L456 184" stroke="#D1AF47" strokeOpacity=".24" />
@@ -334,12 +360,15 @@ export default function CustomerDashboard() {
       {/* ══════════ ONE-PAGE GRID ══════════ */}
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-12" style={{ gridTemplateRows: "minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr) auto" }}>
         {/* ─── ROW 1: Merged Appointment + Timer (8) | Exclusive w/ photo (4) ─── */}
-        <article className="relative flex overflow-hidden rounded-[22px] border border-[#D1AF47]/25 bg-[#10100E] text-white shadow-[0_22px_60px_rgba(16,16,14,0.24)] lg:col-span-8">
+        <article className="relative flex overflow-hidden rounded-[22px] border border-[#E0C46A]/60 bg-[#10100E] text-white shadow-[0_0_0_1px_rgba(244,231,182,0.18),0_26px_70px_rgba(16,16,14,0.34),0_0_48px_rgba(209,175,71,0.32)] lg:col-span-8">
+          <NeuralMesh dark className="-right-10 bottom-0 h-36 w-80 opacity-70" />
           <div className="pointer-events-none absolute inset-0">
-            <div className="absolute right-24 top-0 h-28 w-28 rounded-full bg-[#D1AF47]/10 blur-2xl" />
-            <svg className="absolute bottom-0 right-0 h-28 w-60 opacity-35" viewBox="0 0 260 120" fill="none" aria-hidden="true">
-              <path d="M12 92L54 70L98 82L142 34L206 48L248 12" stroke="#D1AF47" strokeOpacity=".45" />
-              <path d="M54 70L76 18L142 34L176 96L206 48" stroke="#D1AF47" strokeOpacity=".22" />
+            <div className="absolute -left-10 top-0 h-32 w-32 rounded-full bg-[#D1AF47]/20 blur-3xl" />
+            <div className="absolute right-24 top-0 h-36 w-36 rounded-full bg-[#D1AF47]/20 blur-2xl" />
+            <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_0_38px_rgba(244,231,182,0.16)]" />
+            <svg className="absolute bottom-0 right-0 h-32 w-72 opacity-70" viewBox="0 0 260 120" fill="none" aria-hidden="true">
+              <path d="M12 92L54 70L98 82L142 34L206 48L248 12" stroke="#D1AF47" strokeOpacity=".7" />
+              <path d="M54 70L76 18L142 34L176 96L206 48" stroke="#D1AF47" strokeOpacity=".42" />
               {[12, 54, 98, 142, 206, 248, 76, 176].map((x, index) => (
                 <circle key={x} cx={x} cy={[92, 70, 82, 34, 48, 12, 18, 96][index]} r="3" fill="#E0C46A" />
               ))}
@@ -350,7 +379,7 @@ export default function CustomerDashboard() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={d.hero} alt={d.appointment.service} className="h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#10100E]/40" />
-            <span className="absolute left-4 top-4 rounded-full border border-[#D1AF47]/40 bg-[#15120D]/80 px-3 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-[#F4E7B6] shadow-[0_0_18px_rgba(209,175,71,0.24)]">AI Match</span>
+            <span className="absolute left-4 top-4 rounded-full border border-[#E0C46A]/70 bg-[#15120D]/85 px-3 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-[#F4E7B6] shadow-[0_0_22px_rgba(209,175,71,0.42)]">AI Match</span>
           </div>
           {/* Appointment details */}
           <div className="relative flex flex-1 flex-col justify-center p-5">
@@ -368,8 +397,8 @@ export default function CustomerDashboard() {
               </div>
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-2">
-              <Link href="/customer/bookings" className="inline-flex w-fit rounded-xl bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] px-5 py-2 text-[11px] font-black text-[#15120D] shadow-[0_10px_22px_rgba(209,175,71,0.28)] transition hover:-translate-y-0.5">{t.viewDetails}</Link>
-              <Link href="/customer/bookings" className="inline-flex w-fit rounded-xl border border-[#D1AF47]/40 bg-white/[0.04] px-4 py-2 text-[11px] font-black text-[#F4E7B6] transition hover:bg-white/[0.08]">Add to Calendar</Link>
+              <Link href="/customer/bookings" className="inline-flex w-fit rounded-xl bg-gradient-to-r from-[#D1AF47] to-[#F4E7B6] px-5 py-2 text-[11px] font-black text-[#15120D] shadow-[0_0_22px_rgba(209,175,71,0.42),0_10px_22px_rgba(209,175,71,0.28)] transition hover:-translate-y-0.5">{t.viewDetails}</Link>
+              <Link href="/customer/bookings" className="inline-flex w-fit rounded-xl border border-[#E0C46A]/60 bg-white/[0.04] px-4 py-2 text-[11px] font-black text-[#F4E7B6] shadow-[0_0_18px_rgba(209,175,71,0.16)] transition hover:bg-white/[0.08]">Add to Calendar</Link>
             </div>
           </div>
           {/* Timer (merged in, shows the upcoming service name) */}
@@ -401,14 +430,15 @@ export default function CustomerDashboard() {
         </article>
 
         {/* Exclusive Offer with attractive photo */}
-        <article className="relative flex flex-col justify-end overflow-hidden rounded-[22px] border border-[#D1AF47]/40 p-5 text-white shadow-[0_18px_45px_rgba(16,16,14,0.18)] lg:col-span-4">
+        <article className="relative flex flex-col justify-end overflow-hidden rounded-[22px] border border-[#E0C46A]/65 p-5 text-white shadow-[0_0_0_1px_rgba(244,231,182,0.20),0_18px_48px_rgba(16,16,14,0.22),0_0_42px_rgba(209,175,71,0.30)] lg:col-span-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={d.exclusiveImg} alt="" className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0E0D0C] via-[#0E0D0C]/80 to-[#0E0D0C]/25" />
-          <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_38px_rgba(209,175,71,0.20)]" />
-          <svg className="absolute bottom-0 right-0 h-28 w-44 opacity-40" viewBox="0 0 180 120" fill="none" aria-hidden="true">
-            <path d="M6 98L52 72L84 86L124 38L170 18" stroke="#E0C46A" strokeOpacity=".45" />
-            <path d="M34 116L52 72L74 22L124 38L148 78" stroke="#E0C46A" strokeOpacity=".25" />
+          <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_46px_rgba(244,231,182,0.24)]" />
+          <NeuralMesh dark className="-right-12 bottom-0 h-36 w-64 opacity-75" />
+          <svg className="absolute bottom-0 right-0 h-32 w-52 opacity-75" viewBox="0 0 180 120" fill="none" aria-hidden="true">
+            <path d="M6 98L52 72L84 86L124 38L170 18" stroke="#E0C46A" strokeOpacity=".72" />
+            <path d="M34 116L52 72L74 22L124 38L148 78" stroke="#E0C46A" strokeOpacity=".42" />
             {[6, 52, 84, 124, 170, 74, 148].map((x, index) => (
               <circle key={x} cx={x} cy={[98, 72, 86, 38, 18, 22, 78][index]} r="2.7" fill="#F4E7B6" />
             ))}
@@ -424,6 +454,8 @@ export default function CustomerDashboard() {
 
         {/* ─── ROW 2: Recommended (8) | Favorite Providers (4) ─── */}
         <section className={`${cardBase} flex min-h-0 flex-col p-4 lg:col-span-8`}>
+          <NeuralMesh className="-right-12 -top-4 h-36 w-64 opacity-35" />
+          <div className="pointer-events-none absolute inset-0 rounded-[22px] bg-[radial-gradient(circle_at_8%_0%,rgba(209,175,71,0.18),transparent_30%),radial-gradient(circle_at_92%_18%,rgba(244,231,182,0.28),transparent_26%)]" />
           <div className="mb-2.5 flex flex-shrink-0 items-center justify-between">
             <h3 className={eyebrow}>{t.recommended}</h3>
             <Link href="/customer/search" className="text-[10px] font-black text-[#C9A24B] hover:underline">{t.viewAll}</Link>
@@ -453,6 +485,8 @@ export default function CustomerDashboard() {
 
         {/* Favorite Providers */}
         <section className={`${cardBase} flex min-h-0 flex-col p-4 lg:col-span-4`}>
+          <NeuralMesh className="-right-16 top-2 h-36 w-64 opacity-35" />
+          <div className="pointer-events-none absolute inset-0 rounded-[22px] bg-[radial-gradient(circle_at_100%_10%,rgba(209,175,71,0.20),transparent_34%)]" />
           <div className="mb-2 flex flex-shrink-0 items-center justify-between">
             <h3 className={eyebrow}>{t.favoriteProviders}</h3>
             <Link href="/customer/favorites" className="text-[10px] font-black text-[#C9A24B] hover:underline">{t.viewAll}</Link>
@@ -480,6 +514,8 @@ export default function CustomerDashboard() {
 
         {/* ─── ROW 3: Bookings+tabs (5) | Loyalty & Wallet (3) | Insights (4) ─── */}
         <section className={`${cardBase} flex min-h-0 flex-col p-4 lg:col-span-5`}>
+          <NeuralMesh className="-right-10 -top-6 h-36 w-64 opacity-30" />
+          <div className="pointer-events-none absolute inset-0 rounded-[22px] bg-[radial-gradient(circle_at_16%_8%,rgba(244,231,182,0.26),transparent_32%)]" />
           <div className="mb-2 flex flex-shrink-0 items-center justify-between">
             <h3 className={eyebrow}>{t.bookings}</h3>
             <div className="flex items-center gap-1 rounded-full bg-[#F4F4F2] p-0.5">
@@ -513,7 +549,9 @@ export default function CustomerDashboard() {
 
         {/* Loyalty & Wallet (combined) */}
         <section className={`${cardBase} relative flex min-h-0 flex-col justify-center overflow-hidden p-4 lg:col-span-3`}>
-          <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#D1AF47]/10 blur-2xl" />
+          <NeuralMesh className="-right-16 -top-4 h-36 w-60 opacity-35" />
+          <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-[#D1AF47]/20 blur-2xl" />
+          <div className="pointer-events-none absolute inset-0 rounded-[22px] bg-[radial-gradient(circle_at_88%_6%,rgba(209,175,71,0.24),transparent_34%)]" />
           <div className="mb-2 flex flex-shrink-0 items-center justify-between">
             <h3 className={eyebrow}>{t.loyalty}</h3>
             <Link href="/customer/wallet" className="text-[10px] font-black text-[#C9A24B] hover:underline">{t.details}</Link>
@@ -528,7 +566,7 @@ export default function CustomerDashboard() {
             </div>
           </div>
           <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-[#F0EEE9] shadow-inner">
-            <div className="h-full rounded-full bg-gradient-to-r from-[#B8952E] via-[#D1AF47] to-[#F4E7B6] shadow-[0_0_18px_rgba(209,175,71,0.45)]" style={{ width: "81%" }} />
+            <div className="h-full rounded-full bg-gradient-to-r from-[#B8952E] via-[#D1AF47] to-[#F4E7B6] shadow-[0_0_24px_rgba(209,175,71,0.72)]" style={{ width: "81%" }} />
           </div>
           <div className="mt-2.5 flex items-center justify-between rounded-lg bg-[#F7F7F5] px-2.5 py-1.5">
             <span className="text-[10px] font-bold text-[#667085]">{t.walletBalance}</span>
@@ -539,7 +577,9 @@ export default function CustomerDashboard() {
 
         {/* Spending Insights */}
         <section className={`${cardBase} relative flex min-h-0 flex-col overflow-hidden p-4 lg:col-span-4`}>
-          <div className="pointer-events-none absolute right-4 top-4 h-24 w-24 rounded-full bg-[#D1AF47]/10 blur-2xl" />
+          <NeuralMesh className="-right-12 -top-8 h-40 w-72 opacity-35" />
+          <div className="pointer-events-none absolute right-4 top-4 h-28 w-28 rounded-full bg-[#D1AF47]/20 blur-2xl" />
+          <div className="pointer-events-none absolute inset-0 rounded-[22px] bg-[radial-gradient(circle_at_100%_10%,rgba(209,175,71,0.22),transparent_34%)]" />
           <div className="mb-1 flex flex-shrink-0 items-center justify-between">
             <h3 className={eyebrow}>{t.insights}</h3>
             <span className="text-[10px] font-bold text-[#9CA3AF]">{t.thisMonth}</span>
@@ -574,12 +614,14 @@ export default function CustomerDashboard() {
         </section>
 
         {/* ─── Refer banner ─── */}
-        <div className="relative flex items-center justify-between gap-3 overflow-hidden rounded-[22px] border border-[#D1AF47]/40 bg-[#15120D] px-5 py-3 text-white shadow-[0_16px_42px_rgba(16,16,14,0.18)] lg:col-span-12">
+        <div className="relative flex items-center justify-between gap-3 overflow-hidden rounded-[22px] border border-[#E0C46A]/65 bg-[#15120D] px-5 py-3 text-white shadow-[0_0_0_1px_rgba(244,231,182,0.16),0_18px_50px_rgba(16,16,14,0.22),0_0_42px_rgba(209,175,71,0.30)] lg:col-span-12">
+          <NeuralMesh dark className="bottom-0 right-44 h-28 w-80 opacity-70" />
           <div className="pointer-events-none absolute inset-0">
-            <div className="absolute left-4 top-1/2 h-16 w-16 -translate-y-1/2 rounded-full bg-[#D1AF47]/20 blur-2xl" />
-            <svg className="absolute bottom-0 right-1/4 h-20 w-72 opacity-30" viewBox="0 0 300 86" fill="none" aria-hidden="true">
-              <path d="M4 70L48 44L92 58L132 18L204 42L286 10" stroke="#D1AF47" strokeOpacity=".46" />
-              <path d="M48 44L72 6L132 18L170 76L204 42" stroke="#D1AF47" strokeOpacity=".22" />
+            <div className="absolute left-4 top-1/2 h-20 w-20 -translate-y-1/2 rounded-full bg-[#D1AF47]/25 blur-2xl" />
+            <div className="absolute inset-0 rounded-[22px] shadow-[inset_0_0_32px_rgba(244,231,182,0.16)]" />
+            <svg className="absolute bottom-0 right-1/4 h-24 w-80 opacity-70" viewBox="0 0 300 86" fill="none" aria-hidden="true">
+              <path d="M4 70L48 44L92 58L132 18L204 42L286 10" stroke="#D1AF47" strokeOpacity=".72" />
+              <path d="M48 44L72 6L132 18L170 76L204 42" stroke="#D1AF47" strokeOpacity=".40" />
               {[4, 48, 92, 132, 204, 286, 72, 170].map((x, index) => (
                 <circle key={x} cx={x} cy={[70, 44, 58, 18, 42, 10, 6, 76][index]} r="2.7" fill="#F4E7B6" />
               ))}

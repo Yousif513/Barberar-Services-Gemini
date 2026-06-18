@@ -177,13 +177,14 @@ export default function CustomerLayout({
       {/* SIDEBAR — Floating white sidebar fixed to window height  */}
       {/* ═══════════════════════════════════════════════════════ */}
       <aside className="flex-shrink-0 p-3 md:h-screen md:p-4">
-        <div className="relative flex h-full w-full flex-col overflow-hidden rounded-[28px] border border-[#D1AF47]/20 bg-[#10120F] p-5 text-white shadow-[0_24px_70px_rgba(16,18,15,0.24)] md:w-[260px]">
+        <div className="relative flex h-full w-full flex-col overflow-hidden rounded-[28px] border border-[#E0C46A]/60 bg-[#10120F] p-5 text-white shadow-[0_0_0_1px_rgba(244,231,182,0.14),0_24px_70px_rgba(16,18,15,0.28),0_0_46px_rgba(209,175,71,0.24)] md:w-[260px]">
           <div className="pointer-events-none absolute inset-0">
-            <div className="absolute -left-16 top-0 h-40 w-40 rounded-full bg-[#D1AF47]/10 blur-3xl" />
-            <div className="absolute -bottom-20 right-0 h-56 w-56 rounded-full bg-[#D1AF47]/15 blur-3xl" />
-            <svg className="absolute bottom-16 right-0 h-40 w-48 opacity-40" viewBox="0 0 220 170" fill="none" aria-hidden="true">
-              <path d="M10 135L64 112L101 128L143 74L205 54" stroke="#D1AF47" strokeOpacity=".42" />
-              <path d="M34 168L64 112L87 45L143 74L179 8" stroke="#D1AF47" strokeOpacity=".24" />
+            <div className="absolute -left-16 top-0 h-44 w-44 rounded-full bg-[#D1AF47]/15 blur-3xl" />
+            <div className="absolute -bottom-20 right-0 h-60 w-60 rounded-full bg-[#D1AF47]/25 blur-3xl" />
+            <div className="absolute inset-0 rounded-[28px] shadow-[inset_0_0_42px_rgba(244,231,182,0.12)]" />
+            <svg className="absolute bottom-12 right-0 h-48 w-56 opacity-70" viewBox="0 0 220 170" fill="none" aria-hidden="true">
+              <path d="M10 135L64 112L101 128L143 74L205 54" stroke="#D1AF47" strokeOpacity=".72" />
+              <path d="M34 168L64 112L87 45L143 74L179 8" stroke="#D1AF47" strokeOpacity=".42" />
               {[10, 64, 101, 143, 205, 87, 179].map((x, index) => (
                 <circle key={x} cx={x} cy={[135, 112, 128, 74, 54, 45, 8][index]} r="3" fill="#E0C46A" />
               ))}
@@ -209,7 +210,7 @@ export default function CustomerLayout({
                   href={item.path}
                   className={`group relative flex items-center gap-3.5 px-4 py-3 rounded-[18px] text-[13px] font-semibold transition-all duration-300 ${
                     isActive
-                      ? "border border-[#D1AF47]/25 bg-[#D1AF47]/15 text-[#F4E7B6] shadow-[0_0_26px_rgba(209,175,71,0.22)]"
+                      ? "border border-[#E0C46A]/50 bg-[#D1AF47]/20 text-[#F4E7B6] shadow-[0_0_34px_rgba(209,175,71,0.34),inset_0_0_18px_rgba(244,231,182,0.08)]"
                       : "text-[#D9D4C8] hover:bg-white/[0.06] hover:text-white"
                   } ${isRTL ? "flex-row-reverse text-right" : "flex-row text-left"}`}
                 >
@@ -238,7 +239,7 @@ export default function CustomerLayout({
           <div className="relative z-10 mt-3 flex-shrink-0 space-y-3 border-t border-white/10 pt-3">
           <Link
             href="/customer/search"
-            className="group relative block overflow-hidden rounded-2xl border border-[#D1AF47]/40 bg-[#14120E]/80 p-3 shadow-[0_0_34px_rgba(209,175,71,0.20)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#E0C46A]/60"
+            className="group relative block overflow-hidden rounded-2xl border border-[#E0C46A]/60 bg-[#14120E]/80 p-3 shadow-[0_0_38px_rgba(209,175,71,0.34),inset_0_0_18px_rgba(244,231,182,0.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#E0C46A]/70"
           >
             <div className="pointer-events-none absolute -right-8 -top-8 h-20 w-20 rounded-full bg-[#E0C46A]/15 blur-2xl" />
             <div className={`relative flex items-start gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
