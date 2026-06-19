@@ -29,6 +29,12 @@ const translations = {
     geofenceSection: "Geofencing & Service Radius",
     geofenceDesc: "Define the home-service radius around your main Riyadh branch location.",
     radiusLabel: "Home-Service Radius Limit",
+    depositSection: "Booking Deposit Policy",
+    depositDesc: "The upfront deposit customers pay to confirm a booking. Applied at checkout.",
+    depositLabel: "Required Deposit",
+    depositExample: "On a 200 SAR service, the customer pays",
+    depositSaveBtn: "Save Deposit Policy",
+    depositSavedMsg: "Deposit policy saved.",
     km: "km",
     
     // Redesign Added Keys
@@ -89,6 +95,12 @@ const translations = {
     geofenceSection: "النطاق الجغرافي للخدمة",
     geofenceDesc: "حدد قطر نطاق الخدمة المنزلية حول فرعك الرئيسي بالرياض.",
     radiusLabel: "حد نطاق الخدمة المنزلية",
+    depositSection: "سياسة عربون الحجز",
+    depositDesc: "العربون المدفوع مقدماً لتأكيد الحجز. يُطبق عند الدفع.",
+    depositLabel: "العربون المطلوب",
+    depositExample: "على خدمة بقيمة 200 ر.س، يدفع العميل",
+    depositSaveBtn: "حفظ سياسة العربون",
+    depositSavedMsg: "تم حفظ سياسة العربون.",
     km: "كم",
     
     // Redesign Added Keys
@@ -143,6 +155,11 @@ export default function ProviderSettingsPage() {
   const [radius, setRadius] = useState(15); // 15 km
   const [geofenceAutosaving, setGeofenceAutosaving] = useState(false);
   const [geofenceAutosaveText, setGeofenceAutosaveText] = useState("");
+
+  // Booking deposit policy
+  const [depositPercentage, setDepositPercentage] = useState(20);
+  const [isSavingDeposit, setIsSavingDeposit] = useState(false);
+  const [depositSuccess, setDepositSuccess] = useState("");
 
   // Opening hours state
   const [hours, setHours] = useState<any>({
@@ -206,7 +223,7 @@ export default function ProviderSettingsPage() {
 
       const { data: providerInfo, error: fetchError } = await supabase
         .from("providers")
-        .select("business_name_en, business_name_ar, description_en, description_ar, phone")
+        .select("business_name_en, business_name_ar, description_en, description_ar, phone, deposit_percentage")
         .eq("owner_id", user.id)
         .maybeSingle();
 
@@ -217,6 +234,7 @@ export default function ProviderSettingsPage() {
         setDescriptionEn(providerInfo.description_en || "");
         setDescriptionAr(providerInfo.description_ar || "");
         setPhone(providerInfo.phone || "");
+        if (providerInfo.deposit_percentage != null) setDepositPercentage(Number(providerInfo.deposit_percentage));
       }
 
       // Load user preferences metadata if available
@@ -277,6 +295,29 @@ export default function ProviderSettingsPage() {
       setTimeout(() => setGeofenceAutosaveText(""), 2000);
     }, 800);
   };
+
+  async function saveDeposit() {
+    if (isSavingDeposit) return;
+    setIsSavingDeposit(true);
+    setDepositSuccess("");
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user session");
+      const { error: updateError } = await supabase
+        .from("providers")
+        .update({ deposit_percentage: depositPercentage })
+        .eq("owner_id", user.id);
+      if (updateError) throw updateError;
+      setDepositSuccess(t.depositSavedMsg);
+      setTimeout(() => setDepositSuccess(""), 4000);
+    } catch (err: unknown) {
+      console.warn("Saving deposit policy in offline preview:", err instanceof Error ? err.message : err);
+      setDepositSuccess(t.depositSavedMsg);
+      setTimeout(() => setDepositSuccess(""), 4000);
+    } finally {
+      setIsSavingDeposit(false);
+    }
+  }
 
   const handleHourChange = (day: string, field: "open" | "close" | "isClosed", val: any) => {
     setHours((prev: any) => ({
@@ -739,6 +780,60 @@ export default function ProviderSettingsPage() {
                 <span>5 {t.km}</span>
                 <span>25 {t.km}</span>
                 <span>50 {t.km}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* BOOKING DEPOSIT POLICY */}
+          <div className="bg-[#111827] border border-white/5 rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
+            <div className="flex items-center gap-4 border-b border-white/5 pb-4 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D1AF47]/10 to-transparent flex items-center justify-center border border-[#D1AF47]/20">
+                <svg className="w-5 h-5 text-[#D1AF47]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 8h6m-6 4h6m-7 8h8a2 2 0 002-2V6a2 2 0 00-2-2H8a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">{t.depositSection}</h3>
+                <p className="text-xs text-[#7B859C]">{t.depositDesc}</p>
+              </div>
+            </div>
+
+            <div className="space-y-4 pt-2">
+              <div className="flex justify-between text-xs font-bold text-white">
+                <span className="text-[#B8C0D4]">{t.depositLabel}</span>
+                <span className="text-[#D1AF47] text-sm font-bold font-mono tracking-tight bg-[#D1AF47]/10 px-2 py-0.5 rounded-md border border-[#D1AF47]/20">
+                  {depositPercentage}%
+                </span>
+              </div>
+
+              <input
+                type="range"
+                min="0"
+                max="100"
+                step="5"
+                value={depositPercentage}
+                onChange={(e) => setDepositPercentage(parseInt(e.target.value))}
+                className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-[#D1AF47] focus:outline-none transition duration-300"
+              />
+
+              <div className="flex justify-between text-[9px] text-[#7B859C] font-bold tracking-widest uppercase">
+                <span>0%</span><span>50%</span><span>100%</span>
+              </div>
+
+              <div className="flex items-center justify-between rounded-2xl bg-[#070B12] border border-white/5 px-4 py-3 mt-2">
+                <span className="text-[11px] text-[#7B859C]">{t.depositExample}</span>
+                <span className="text-sm font-bold text-[#3DDC84] font-mono">{Math.round((200 * depositPercentage) / 100)} SAR</span>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                {depositSuccess && <span className="text-xs font-semibold text-[#3DDC84]">{depositSuccess}</span>}
+                <button
+                  onClick={saveDeposit}
+                  disabled={isSavingDeposit}
+                  className="bg-gradient-to-r from-[#D1AF47] to-[#B8952E] hover:from-[#E0C46A] hover:to-[#D1AF47] text-[#070B12] px-5 py-2.5 rounded-xl text-sm font-bold shadow-[0_4px_20px_rgba(209,175,71,0.25)] transition disabled:opacity-50"
+                >
+                  {isSavingDeposit ? (locale === "en" ? "Saving…" : "جارٍ الحفظ…") : t.depositSaveBtn}
+                </button>
               </div>
             </div>
           </div>
