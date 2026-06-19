@@ -48,13 +48,16 @@ All data access must respect the following schema and Row-Level Security (RLS) p
 ---
 
 ## 5. Multi-Agent & Co-Working Branch Strategy
-To prevent overwrites and coordinate seamlessly between **Claude Code** and **Gemini (Antigravity)**:
-* **Branch Separation**:
-  * Claude Code **MUST** work and commit on the **`claude-code`** branch.
-  * Gemini (Antigravity) **MUST** work and commit on the **`gemini`** branch.
-* **Pre-Work Checklist**:
-  1. Verify active branch with `git branch`. If not on your designated branch, run `git checkout <your-branch>` immediately.
-  2. Inspect git status (`git status` / `git diff`) to make sure there are no uncommitted changes from another model before modifying files.
-  3. Pull changes from `master` (`git pull origin master` or merge `master` into your branch) to stay in sync.
-* **Changelog Updates**: Always document files modified and current working commits inside `.coworking_changelog.md` at the end of each session.
+
+### 🔒 Golden Rules (MANDATORY — read before any git action)
+> Added 2026-06-19 after an incident: an agent switched branches with `git checkout`, which swapped the working tree to another branch and looked like deleted work (nothing was actually lost, but it disrupted the human).
+1. **NEVER switch the active branch or rewrite history.** Do not run `git checkout <branch>` / `git switch`, `git reset --hard`, `git rebase`, force-push, or cross-branch `git cherry-pick`. **Work on whatever branch is already checked out.** Branch management is the human's job.
+2. **NEVER overwrite another agent's files.** Use small, targeted edits. If a file appears in another agent's recent `.coworking_changelog.md` entry, coordinate before touching it heavily.
+3. **Commit on the active branch** with clear agent attribution and append a `.coworking_changelog.md` entry. **Do not push another agent's branch** unless the human asks.
+4. **To move work between branches, ASK THE HUMAN.** Never merge or cherry-pick across agent branches on your own.
+5. **If you find you are on an unexpected branch, STOP and tell the human — do not "fix" it by switching.**
+
+### Branch preference (secondary to the Golden Rules)
+* Preferred homes: Claude Code → `claude-code`; Gemini → `gemini`; Codex/Cursor → the active feature branch or the one the human is on. **But never switch to reach your preferred branch** — if the human has you on a different branch, work there and note it in the changelog.
+* **Changelog Updates**: Always document files modified and current working commits inside `.coworking_changelog.md`.
 
