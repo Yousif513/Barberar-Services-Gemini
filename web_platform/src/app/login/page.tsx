@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useSyncExternalStore } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -18,11 +18,11 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const devAccessEnabled = useSyncExternalStore(
-    () => () => undefined,
-    isLocalDevAccessEnabled,
-    () => false
-  );
+  const [devAccessEnabled, setDevAccessEnabled] = useState(false);
+
+  useEffect(() => {
+    setDevAccessEnabled(isLocalDevAccessEnabled());
+  }, []);
 
   const routeAuthenticatedUser = async (userId: string) => {
     const { data: profile, error: profileError } = await supabase
@@ -83,14 +83,20 @@ export default function LoginPage() {
       }
 
       if (!data.session) {
-        setMessage("Account created. Check your email to confirm it, then sign in.");
+        setMessage(devAccessEnabled
+          ? "Account created. Email confirmation is still required for real auth, or use Local development access on this page while building."
+          : "Account created. Check your email to confirm it, then sign in.");
         setMode("signin");
         return;
       }
 
       await routeAuthenticatedUser(data.user.id);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Unable to authenticate. Please try again.");
+      const authMessage = err instanceof Error ? err.message : "Unable to authenticate. Please try again.";
+      const isConfirmationIssue = authMessage.toLowerCase().includes("confirm");
+      setError(isConfirmationIssue && devAccessEnabled
+        ? `${authMessage} Use the Local development access buttons on this page to keep building without email verification.`
+        : authMessage);
     } finally {
       setIsLoading(false);
     }

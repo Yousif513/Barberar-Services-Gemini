@@ -3,15 +3,14 @@ export type DevRole = "customer" | "provider_owner" | "admin";
 const storageKey = "barberar_dev_role";
 
 export function isLocalDevAccessEnabled() {
-  if (
-    process.env.NODE_ENV !== "development" ||
-    process.env.NEXT_PUBLIC_ENABLE_DEV_ACCESS !== "true" ||
-    typeof window === "undefined"
-  ) {
+  if (typeof window === "undefined") {
     return false;
   }
 
-  return window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const isLocalHost = ["localhost", "127.0.0.1", "::1", "[::1]"].includes(window.location.hostname);
+  const explicitlyDisabled = process.env.NEXT_PUBLIC_ENABLE_DEV_ACCESS === "false";
+
+  return isLocalHost && !explicitlyDisabled;
 }
 
 export function getDevRole(): DevRole | null {
