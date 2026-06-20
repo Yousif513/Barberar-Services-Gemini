@@ -55,6 +55,7 @@ export default function AdminServices() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
   const [lang, setLang] = useState<"en" | "ar">("ar");
 
   useEffect(() => {
@@ -73,10 +74,11 @@ export default function AdminServices() {
   const loadServices = async () => {
     try {
       setLoading(true);
-      // Query baseline services or load fallback registry
+      setError("");
       const { data, error } = await supabase
         .from("services")
-        .select("id, name_en, name_ar, description_en, description_ar, price, duration, category");
+        .select("id, name_en, name_ar, base_price, base_duration_minutes, is_active, categories(name_en, name_ar)")
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
 
@@ -85,16 +87,17 @@ export default function AdminServices() {
           id: s.id,
           nameEn: s.name_en,
           nameAr: s.name_ar,
-          category: s.category || "Hair",
-          price: s.price || 120,
-          providersCount: (idx * 3) + 4,
-          is_active: true
+          category: (s.categories as any)?.name_en || (s.categories as any)?.name_ar || "Uncategorized",
+          price: Number(s.base_price) || 0,
+          duration: Number(s.base_duration_minutes) || 0,
+          providersCount: 1,
+          is_active: !!s.is_active
         })));
       } else {
         throw new Error("No data");
       }
     } catch (err) {
-      // Offline fallback registry
+      setError(translations[lang].errorMsg);
       setServices([
         { id: "s-mock-1", nameEn: "Classic Beard Shave", nameAr: "حلاقة ذقن كلاسيكية", category: "Barber", price: 60, providersCount: 24, is_active: true },
         { id: "s-mock-2", nameEn: "Royal Moroccan Bath", nameAr: "حمام مغربي ملكي", category: "Spa", price: 250, providersCount: 12, is_active: true },
@@ -111,19 +114,53 @@ export default function AdminServices() {
     loadServices();
   }, [lang]);
 
-  const handleToggleActive = (id: string, currentStatus: boolean) => {
+  const handleToggleActive = async (id: string, currentStatus: boolean) => {
     setSuccess("");
-    setServices((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, is_active: !currentStatus } : s))
-    );
+    setError("");
+    const nextStatus = !currentStatus;
+    setServices((prev) => prev.map((s) => (s.id === id ? { ...s, is_active: nextStatus } : s)));
+
+    if (id.startsWith("s-mock-")) {
+      setSuccess(translations[lang].successMsg);
+      return;
+    }
+
+    const { error: updateError } = await supabase
+      .from("services")
+      .update({ is_active: nextStatus })
+      .eq("id", id);
+
+    if (updateError) {
+      setServices((prev) => prev.map((s) => (s.id === id ? { ...s, is_active: currentStatus } : s)));
+      setError(translations[lang].errorMsg);
+      return;
+    }
+
     setSuccess(translations[lang].successMsg);
   };
 
-  const handlePriceChange = (id: string, newPrice: number) => {
+  const handlePriceChange = async (id: string, newPrice: number) => {
     setSuccess("");
-    setServices((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, price: newPrice } : s))
-    );
+    setError("");
+    const previous = services.find((s) => s.id === id)?.price ?? 0;
+    setServices((prev) => prev.map((s) => (s.id === id ? { ...s, price: newPrice } : s)));
+
+    if (id.startsWith("s-mock-")) {
+      setSuccess(translations[lang].successMsg);
+      return;
+    }
+
+    const { error: updateError } = await supabase
+      .from("services")
+      .update({ base_price: newPrice })
+      .eq("id", id);
+
+    if (updateError) {
+      setServices((prev) => prev.map((s) => (s.id === id ? { ...s, price: previous } : s)));
+      setError(translations[lang].errorMsg);
+      return;
+    }
+
     setSuccess(translations[lang].successMsg);
   };
 
@@ -163,6 +200,12 @@ export default function AdminServices() {
       {success && (
         <div className={`bg-[#ECFDF3] border border-[#D1FADF] text-[#027A48] text-xs rounded-xl p-4 font-bold ${isRTL ? "text-right" : "text-left"}`}>
           {t.successMsg}
+        </div>
+      )}
+
+      {error && (
+        <div className={`bg-[#FEF3F2] border border-[#FECDCA] text-[#B42318] text-xs rounded-xl p-4 font-bold ${isRTL ? "text-right" : "text-left"}`}>
+          {error}
         </div>
       )}
 

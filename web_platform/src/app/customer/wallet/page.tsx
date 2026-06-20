@@ -20,6 +20,9 @@ const translations = {
     statusRefunded: "REFUNDED",
     statusHeld: "HELD IN ESCROW",
     topUp: "Top Up",
+    bookingDeposit: "Booking Deposit",
+    cardNotice: "Cards are added securely during checkout.",
+    topUpNotice: "Wallet top-up is not enabled yet. Booking deposits are paid during checkout.",
     currency: "SAR"
   },
   ar: {
@@ -44,13 +47,22 @@ const translations = {
 
 export default function CustomerWalletPage() {
   const [locale, setLocale] = useState<"en" | "ar">("ar");
-  const [balance, setBalance] = useState(150.0);
-  const [escrowBalance, setEscrowBalance] = useState(220.0);
+  const [balance, setBalance] = useState(0.0);
+  const [escrowBalance, setEscrowBalance] = useState(0.0);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const t = translations[locale];
+  const walletActions = {
+    bookingDeposit: locale === "ar" ? "Ø¹Ø±Ø¨ÙˆÙ† Ø­Ø¬Ø²" : "Booking Deposit",
+    cardNotice: locale === "ar"
+      ? "ØªØªÙ… Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ø¨Ø·Ø§Ù‚Ø§Øª Ø¨Ø£Ù…Ø§Ù† Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ø¯ÙØ¹."
+      : "Cards are added securely during checkout.",
+    topUpNotice: locale === "ar"
+      ? "Ø´Ø­Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø© ØºÙŠØ± Ù…ÙØ¹Ù„ Ø­Ø§Ù„ÙŠØ§Ù‹. ØªØ¯ÙØ¹ Ø¹Ø±Ø¨ÙˆÙ†Ø§Øª Ø§Ù„Ø­Ø¬Ø² Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ø¯ÙØ¹."
+      : "Wallet top-up is not enabled yet. Booking deposits are paid during checkout."
+  };
 
   // Sync language with document root
   useEffect(() => {
@@ -76,72 +88,66 @@ export default function CustomerWalletPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Let's attempt to fetch transactions from ledger / wallet table if they exist
       const { data, error: txError } = await supabase
-        .from("ledger_entries")
+        .from("transactional_ledger")
         .select(`
           id,
-          amount,
-          type,
-          status,
+          total_captured,
+          payout_status,
           created_at,
-          bookings (
+          bookings!inner (
             id,
+            customer_id,
+            status,
             scheduled_at,
             services ( name_en, name_ar )
           )
         `)
-        .eq("booking_id", user.id); // Or customer wallet logs
+        .eq("bookings.customer_id", user.id)
+        .order("created_at", { ascending: false });
 
       if (txError) throw txError;
-      if (data && data.length > 0) {
-        setTransactions(data);
-      } else {
-        throw new Error("No entries");
-      }
-    } catch (err: any) {
-      console.warn("Using mock transactions for luxury fidelity display:", err.message);
-      setError("Displaying local transaction cache.");
 
-      // Set mock transactions
-      setTransactions([
-        {
-          id: "tx-501",
-          amount: 220.0,
-          type: "Escrow Booking Hold",
-          status: "held",
-          created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-          description: "Luxury Beard Grooming hold (Booking #bk-100)"
-        },
-        {
-          id: "tx-499",
-          amount: -350.0,
-          type: "Service Payment Outflow",
-          status: "completed",
-          created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-          description: "Deep Hydrating Facial & Scalp Therapy"
-        },
-        {
-          id: "tx-488",
-          amount: 20.0,
-          type: "Referral Bonus Credit",
-          status: "completed",
-          created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-          description: "Referred customer register credit"
-        },
-        {
-          id: "tx-472",
-          amount: -180.0,
-          type: "Refund Credit Outflow",
-          status: "refunded",
-          created_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
-          description: "Cancelled haircut refund (Booking #bk-300)"
-        }
-      ]);
+      const formatted = (data || []).map((entry: any) => {
+        const booking = Array.isArray(entry.bookings) ? entry.bookings[0] : entry.bookings;
+        const serviceName = locale === "ar"
+          ? booking?.services?.name_ar || booking?.services?.name_en
+          : booking?.services?.name_en || booking?.services?.name_ar;
+        const status = booking?.status === "cancelled"
+          ? "refunded"
+          : entry.payout_status === "released"
+            ? "completed"
+            : "held";
+
+        return {
+          id: entry.id,
+          amount: Number(entry.total_captured) || 0,
+          type: walletActions.bookingDeposit,
+          status,
+          created_at: entry.created_at,
+          description: serviceName || `Booking #${booking?.id?.slice(0, 8) || entry.id.slice(0, 8)}`
+        };
+      });
+
+      setTransactions(formatted);
+      setEscrowBalance(formatted
+        .filter((entry) => entry.status === "held")
+        .reduce((sum, entry) => sum + entry.amount, 0));
+      setBalance(0);
+    } catch (err: any) {
+      console.warn("Failed to load customer wallet ledger:", err.message);
+      setError(err.message || "Failed to load wallet ledger.");
+      setTransactions([]);
+      setEscrowBalance(0);
+      setBalance(0);
     } finally {
       setLoading(false);
     }
   }
+
+  const showWalletNotice = (message: string) => {
+    setError(message);
+  };
 
   const getStatusStyle = (status: string) => {
     switch (status.toLowerCase()) {
@@ -188,7 +194,10 @@ export default function CustomerWalletPage() {
             </h3>
           </div>
           <div className="flex gap-3 mt-6">
-            <button className="flex-1 py-2.5 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl transition">
+            <button
+              onClick={() => showWalletNotice(walletActions.topUpNotice)}
+              className="flex-1 py-2.5 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl transition"
+            >
               {t.topUp}
             </button>
           </div>
@@ -214,7 +223,12 @@ export default function CustomerWalletPage() {
       <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
         <div className="flex justify-between items-center mb-6">
           <h3 className="font-bold text-sm text-gray-800">{t.linkedCards}</h3>
-          <button className="text-xs font-bold text-[hsl(45,60%,55%)] hover:underline">{t.addCard}</button>
+          <button
+            onClick={() => showWalletNotice(walletActions.cardNotice)}
+            className="text-xs font-bold text-[hsl(45,60%,55%)] hover:underline"
+          >
+            {t.addCard}
+          </button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

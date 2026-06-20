@@ -223,18 +223,30 @@ export default function ProviderSettingsPage() {
 
       const { data: providerInfo, error: fetchError } = await supabase
         .from("providers")
-        .select("business_name_en, business_name_ar, description_en, description_ar, phone, deposit_percentage")
+        .select("business_name_en, business_name_ar, description_en, description_ar, deposit_percentage")
         .eq("owner_id", user.id)
         .maybeSingle();
 
       if (fetchError) throw fetchError;
+
+      const { data: profileInfo, error: profileError } = await supabase
+        .from("profiles")
+        .select("phone_number")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (profileError) throw profileError;
+
       if (providerInfo) {
         setBusinessNameEn(providerInfo.business_name_en || "");
         setBusinessNameAr(providerInfo.business_name_ar || "");
         setDescriptionEn(providerInfo.description_en || "");
         setDescriptionAr(providerInfo.description_ar || "");
-        setPhone(providerInfo.phone || "");
         if (providerInfo.deposit_percentage != null) setDepositPercentage(Number(providerInfo.deposit_percentage));
+      }
+
+      if (profileInfo?.phone_number) {
+        setPhone(profileInfo.phone_number);
       }
 
       // Load user preferences metadata if available
@@ -268,18 +280,24 @@ export default function ProviderSettingsPage() {
           business_name_en: businessNameEn,
           business_name_ar: businessNameAr,
           description_en: descriptionEn,
-          description_ar: descriptionAr,
-          phone
+          description_ar: descriptionAr
         })
         .eq("owner_id", user.id);
 
       if (updateError) throw updateError;
+
+      const { error: phoneError } = await supabase
+        .from("profiles")
+        .update({ phone_number: phone })
+        .eq("id", user.id);
+
+      if (phoneError) throw phoneError;
+
       setSuccess(t.savedMsg);
       setTimeout(() => setSuccess(""), 4000);
     } catch (err: any) {
-      console.warn("Saving configurations locally in offline preview:", err.message);
-      setSuccess(t.savedMsg);
-      setTimeout(() => setSuccess(""), 4000);
+      console.warn("Failed to save provider settings:", err.message);
+      setError(err.message || "Failed to save provider settings.");
     } finally {
       setIsSavingProfile(false);
     }

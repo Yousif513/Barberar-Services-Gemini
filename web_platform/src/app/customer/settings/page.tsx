@@ -111,7 +111,7 @@ export default function CustomerSettingsPage() {
 
       const { data, error: fetchError } = await supabase
         .from("profiles")
-        .select("first_name, last_name, phone")
+        .select("first_name, last_name, phone_number")
         .eq("id", user.id)
         .single();
 
@@ -121,18 +121,23 @@ export default function CustomerSettingsPage() {
           firstName: data.first_name || "",
           lastName: data.last_name || "",
           email: user.email || "",
-          phone: data.phone || ""
+          phone: data.phone_number || ""
         });
       }
 
       // Load Dependents
       const { data: depData } = await supabase
-        .from("dependents")
-        .select("*")
-        .eq("customer_id", user.id);
+        .from("client_profiles")
+        .select("id, name, type, metadata")
+        .eq("client_id", user.id);
       
       if (depData && depData.length > 0) {
-        setDependents(depData);
+        setDependents(depData.map((dep: any) => ({
+          id: dep.id,
+          name: dep.name,
+          relation: dep.type,
+          age: dep.metadata?.age ?? ""
+        })));
       }
     } catch (err: any) {
       console.warn("Using default settings profile due to local sandbox session:", err.message);
@@ -156,7 +161,7 @@ export default function CustomerSettingsPage() {
         .update({
           first_name: profile.firstName,
           last_name: profile.lastName,
-          phone: profile.phone
+          phone_number: profile.phone
         })
         .eq("id", user.id);
 
@@ -164,9 +169,8 @@ export default function CustomerSettingsPage() {
       setSuccess(t.savedMsg);
       setTimeout(() => setSuccess(""), 4000);
     } catch (err: any) {
-      console.warn("Simulating profile save locally:", err.message);
-      setSuccess(t.savedMsg);
-      setTimeout(() => setSuccess(""), 4000);
+      console.warn("Failed to save profile settings:", err.message);
+      setError(err.message || "Failed to update settings.");
     }
   }
 
@@ -179,36 +183,46 @@ export default function CustomerSettingsPage() {
       if (!user) throw new Error("No user");
 
       const { data, error: depError } = await supabase
-        .from("dependents")
+        .from("client_profiles")
         .insert({
-          customer_id: user.id,
+          client_id: user.id,
           name: newDep.name,
-          relationship: newDep.relation,
-          age: parseInt(newDep.age) || null
+          type: newDep.relation,
+          metadata: { age: parseInt(newDep.age) || null }
         })
-        .select()
+        .select("id, name, type, metadata")
         .single();
 
       if (depError) throw depError;
-      setDependents(prev => [...prev, data]);
+      setDependents(prev => [...prev, {
+        id: data.id,
+        name: data.name,
+        relation: data.type,
+        age: data.metadata?.age ?? ""
+      }]);
       setNewDep({ name: "", relation: "", age: "" });
       setShowAddDepForm(false);
     } catch (err: any) {
-      console.warn("Adding dependent locally for simulator:", err.message);
-      const simulatedDep = {
-        id: `dep-${Date.now()}`,
-        name: newDep.name,
-        relationship: newDep.relation,
-        age: parseInt(newDep.age) || null
-      };
-      setDependents(prev => [...prev, simulatedDep]);
-      setNewDep({ name: "", relation: "", age: "" });
-      setShowAddDepForm(false);
+      console.warn("Failed to add dependent profile:", err.message);
+      setError(err.message || "Failed to add dependent profile.");
     }
   }
 
-  function removeDependent(id: string) {
+  async function removeDependent(id: string) {
+    setError("");
     setDependents(prev => prev.filter(d => d.id !== id));
+
+    if (id === "1" || id === "2") return;
+
+    const { error: deleteError } = await supabase
+      .from("client_profiles")
+      .delete()
+      .eq("id", id);
+
+    if (deleteError) {
+      setError(deleteError.message);
+      await loadProfile();
+    }
   }
 
   return (
@@ -222,6 +236,12 @@ export default function CustomerSettingsPage() {
       {success && (
         <div className="bg-green-50 border border-green-200 text-green-800 text-xs rounded-xl p-4 font-bold">
           {success}
+        </div>
+      )}
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl p-4 font-bold">
+          {error}
         </div>
       )}
 
