@@ -30,6 +30,22 @@ const translations = {
     bankNameLabel: "Select Your Bank",
     ibanLabel: "IBAN (KSA Bank Account)",
     confirmPayoutBtn: "Process Payout Split",
+    payoutRequests: "Payout Requests",
+    payoutRequestsSubtitle: "Track withdrawal requests awaiting admin settlement.",
+    payoutRequestId: "Request ID",
+    payoutRequestedAt: "Requested",
+    payoutAmount: "Amount",
+    payoutBankColumn: "Bank",
+    payoutStatusRequested: "Requested",
+    payoutStatusProcessing: "Processing",
+    payoutStatusPaid: "Paid",
+    payoutStatusRejected: "Rejected",
+    noPayoutRequests: "No payout requests yet",
+    requestSubmitted: "Payout request submitted for admin review.",
+    requestFailed: "Unable to submit payout request.",
+    noProviderAccount: "No provider account was found for this session.",
+    signInRequired: "Sign in with a provider account to request a payout.",
+    submitting: "Submitting...",
     close: "Close",
     errorFill: "Please fill out all bank fields.",
     currency: "SAR"
@@ -59,6 +75,22 @@ const translations = {
     bankNameLabel: "اختر البنك الخاص بك",
     ibanLabel: "رقم الآيبان البنكي (SA)",
     confirmPayoutBtn: "تأكيد ومعالجة التحويل",
+    payoutRequests: "طلبات التحويل",
+    payoutRequestsSubtitle: "متابعة طلبات السحب بانتظار تسوية الإدارة.",
+    payoutRequestId: "رقم الطلب",
+    payoutRequestedAt: "تاريخ الطلب",
+    payoutAmount: "المبلغ",
+    payoutBankColumn: "البنك",
+    payoutStatusRequested: "تم الطلب",
+    payoutStatusProcessing: "قيد المعالجة",
+    payoutStatusPaid: "مدفوع",
+    payoutStatusRejected: "مرفوض",
+    noPayoutRequests: "لا توجد طلبات تحويل بعد",
+    requestSubmitted: "تم إرسال طلب التحويل لمراجعة الإدارة.",
+    requestFailed: "تعذر إرسال طلب التحويل.",
+    noProviderAccount: "لم يتم العثور على حساب مزود لهذه الجلسة.",
+    signInRequired: "سجل الدخول بحساب مزود لطلب التحويل.",
+    submitting: "جار الإرسال...",
     close: "إغلاق",
     errorFill: "يرجى تعبئة جميع الحقول البنكية المطلوبة.",
     currency: "ريال"
@@ -68,12 +100,14 @@ const translations = {
 export default function ProviderWalletPage() {
   const [lang, setLang] = useState<"en" | "ar">("ar");
 
-  const [availableBalance, setAvailableBalance] = useState(6240);
-  const [pendingPayout, setPendingPayout] = useState(1820);
+  const [availableBalance, setAvailableBalance] = useState(0);
+  const [pendingPayout, setPendingPayout] = useState(0);
   const [showPayoutModal, setShowPayoutModal] = useState(false);
   const [payoutAmount, setPayoutAmount] = useState("");
   const [payoutBank, setPayoutBank] = useState("");
   const [payoutIban, setPayoutIban] = useState("");
+  const [providerId, setProviderId] = useState("");
+  const [submittingPayout, setSubmittingPayout] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [toasts, setToasts] = useState<Array<{ id: string; message: string; type: "success" | "info" | "error" }>>([]);
@@ -95,7 +129,17 @@ export default function ProviderWalletPage() {
     status: string;
     statusColor: string;
   }
+  interface PayoutRequest {
+    id: string;
+    requestedAt: string;
+    amount: string;
+    bankName: string;
+    iban: string;
+    status: string;
+    statusClass: string;
+  }
   const [ledgerEntries, setLedgerEntries] = useState<LedgerEntry[]>([]);
+  const [payoutRequests, setPayoutRequests] = useState<PayoutRequest[]>([]);
   const [loadingLedger, setLoadingLedger] = useState(false);
 
   useEffect(() => {
@@ -113,155 +157,157 @@ export default function ProviderWalletPage() {
 
   const t = translations[lang];
 
-  const loadLedger = async () => {
+  const formatSar = (value: unknown) => `${Number(value || 0).toFixed(2)} SAR`;
+
+  const maskIban = (iban: string) => {
+    const clean = iban.replace(/\s/g, "").toUpperCase();
+    if (clean.length <= 8) return clean;
+    return `${clean.slice(0, 4)} **** **** ${clean.slice(-4)}`;
+  };
+
+  const payoutStatusLabel = (status: string) => {
+    if (status === "processing") return t.payoutStatusProcessing;
+    if (status === "paid") return t.payoutStatusPaid;
+    if (status === "rejected") return t.payoutStatusRejected;
+    return t.payoutStatusRequested;
+  };
+
+  const payoutStatusClass = (status: string) => {
+    if (status === "paid") return "bg-[#3DDC84]/10 text-[#3DDC84] border-[#3DDC84]/20";
+    if (status === "rejected") return "bg-[#FF5D73]/10 text-[#FF5D73] border-[#FF5D73]/20";
+    if (status === "processing") return "bg-[#D1AF47]/10 text-[#D1AF47] border-[#D1AF47]/20";
+    return "bg-[#F5B041]/10 text-[#F5B041] border-[#F5B041]/20";
+  };
+
+  const loadWalletData = async () => {
     try {
       setLoadingLedger(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      setError("");
 
-      const { data: provider } = await supabase
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        setProviderId("");
+        setLedgerEntries([]);
+        setPayoutRequests([]);
+        setAvailableBalance(0);
+        setPendingPayout(0);
+        return;
+      }
+
+      const { data: provider, error: providerError } = await supabase
         .from("providers")
         .select("id")
         .eq("owner_id", user.id)
         .maybeSingle();
 
-      if (provider) {
-        const { data, error } = await supabase
-          .from("transactional_ledger")
-          .select(`
-            id,
-            booking_id,
-            payment_intent_id,
-            total_captured,
-            platform_share,
-            provider_share,
-            payout_status,
-            created_at,
-            bookings!inner (
-              branch_id,
-              branches!inner (
-                provider_id
-              )
-            )
-          `)
-          .eq("bookings.branches.provider_id", provider.id)
-          .order("created_at", { ascending: false });
-
-        if (error) throw error;
-
-        if (data && data.length > 0) {
-          const formatted: LedgerEntry[] = data.map((item: any) => ({
-            id: item.payment_intent_id || item.id,
-            booking_id: item.booking_id,
-            date: new Date(item.created_at).toLocaleString("en-US", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit"
-            }),
-            total: `${item.total_captured.toFixed(2)} SAR`,
-            platform: `${item.platform_share.toFixed(2)} SAR`,
-            salon: `${item.provider_share.toFixed(2)} SAR`,
-            status: item.payout_status === "released" ? t.statusPaid : t.statusPending,
-            statusColor: item.payout_status === "released" 
-              ? "text-[hsl(150,60%,40%)] bg-[hsla(150,60%,40%,0.08)]" 
-              : "text-[hsl(45,60%,55%)] bg-[hsla(45,60%,55%,0.08)]"
-          }));
-          setLedgerEntries(formatted);
-          
-          let available = 0;
-          let pending = 0;
-          data.forEach((item: any) => {
-            if (item.payout_status === "pending") {
-              pending += parseFloat(item.provider_share || "0");
-            } else {
-              available += parseFloat(item.provider_share || "0");
-            }
-          });
-          setAvailableBalance(available);
-          setPendingPayout(pending);
-        } else {
-          // Fallback mock items
-          setLedgerEntries([
-            {
-              id: "BK-8891",
-              booking_id: "b-mock-1",
-              date: "2026-06-13 03:30 PM",
-              total: "250.00 SAR",
-              platform: "37.50 SAR",
-              salon: "212.50 SAR",
-              status: t.statusPaid,
-              statusColor: "text-[hsl(150,60%,40%)] bg-[hsla(150,60%,40%,0.08)]"
-            },
-            {
-              id: "BK-8892",
-              booking_id: "b-mock-2",
-              date: "2026-06-13 04:15 PM",
-              total: "450.00 SAR",
-              platform: "67.50 SAR",
-              salon: "382.50 SAR",
-              status: t.statusPaid,
-              statusColor: "text-[hsl(150,60%,40%)] bg-[hsla(150,60%,40%,0.08)]"
-            },
-            {
-              id: "BK-8893",
-              booking_id: "b-mock-3",
-              date: "2026-06-13 06:00 PM",
-              total: "80.00 SAR",
-              platform: "12.00 SAR",
-              salon: "68.00 SAR",
-              status: t.statusPending,
-              statusColor: "text-[hsl(45,60%,55%)] bg-[hsla(45,60%,55%,0.08)]"
-            }
-          ]);
-        }
+      if (providerError) throw providerError;
+      if (!provider) {
+        setProviderId("");
+        setLedgerEntries([]);
+        setPayoutRequests([]);
+        setAvailableBalance(0);
+        setPendingPayout(0);
+        setError(t.noProviderAccount);
+        return;
       }
+
+      setProviderId(provider.id);
+
+      const { data: ledgerData, error: ledgerError } = await supabase
+        .from("transactional_ledger")
+        .select(`
+          id,
+          booking_id,
+          payment_intent_id,
+          total_captured,
+          platform_share,
+          provider_share,
+          payout_status,
+          created_at,
+          bookings!inner (
+            branch_id,
+            branches!inner (
+              provider_id
+            )
+          )
+        `)
+        .eq("bookings.branches.provider_id", provider.id)
+        .order("created_at", { ascending: false });
+
+      if (ledgerError) throw ledgerError;
+
+      const { data: requestData, error: requestError } = await supabase
+        .from("payout_requests")
+        .select("id, amount, bank_name, iban, status, requested_at")
+        .eq("provider_id", provider.id)
+        .order("requested_at", { ascending: false });
+
+      if (requestError) throw requestError;
+
+      const formattedLedger: LedgerEntry[] = (ledgerData || []).map((item: any) => ({
+        id: item.payment_intent_id || item.id,
+        booking_id: item.booking_id,
+        date: new Date(item.created_at).toLocaleString("en-US", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        }),
+        total: formatSar(item.total_captured),
+        platform: formatSar(item.platform_share),
+        salon: formatSar(item.provider_share),
+        status: item.payout_status === "released" ? t.statusPaid : t.statusPending,
+        statusColor: item.payout_status === "released"
+          ? "text-[hsl(150,60%,40%)] bg-[hsla(150,60%,40%,0.08)]"
+          : "text-[hsl(45,60%,55%)] bg-[hsla(45,60%,55%,0.08)]"
+      }));
+
+      const formattedRequests: PayoutRequest[] = (requestData || []).map((item: any) => ({
+        id: item.id,
+        requestedAt: new Date(item.requested_at).toLocaleString("en-US", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        }),
+        amount: formatSar(item.amount),
+        bankName: item.bank_name,
+        iban: maskIban(item.iban),
+        status: payoutStatusLabel(item.status),
+        statusClass: payoutStatusClass(item.status)
+      }));
+
+      const openRequestedAmount = (requestData || [])
+        .filter((item: any) => item.status === "requested" || item.status === "processing")
+        .reduce((sum: number, item: any) => sum + Number(item.amount || 0), 0);
+
+      const withdrawableLedgerAmount = (ledgerData || [])
+        .filter((item: any) => item.payout_status === "pending")
+        .reduce((sum: number, item: any) => sum + Number(item.provider_share || 0), 0);
+
+      setLedgerEntries(formattedLedger);
+      setPayoutRequests(formattedRequests);
+      setAvailableBalance(Math.max(withdrawableLedgerAmount - openRequestedAmount, 0));
+      setPendingPayout(openRequestedAmount);
     } catch (err) {
-      console.log("Failed to load live ledger splits, using mock fallbacks:", err);
-      // Fallback
-      setLedgerEntries([
-        {
-          id: "BK-8891",
-          booking_id: "b-mock-1",
-          date: "2026-06-13 03:30 PM",
-          total: "250.00 SAR",
-          platform: "37.50 SAR",
-          salon: "212.50 SAR",
-          status: t.statusPaid,
-          statusColor: "text-[hsl(150,60%,40%)] bg-[hsla(150,60%,40%,0.08)]"
-        },
-        {
-          id: "BK-8892",
-          booking_id: "b-mock-2",
-          date: "2026-06-13 04:15 PM",
-          total: "450.00 SAR",
-          platform: "67.50 SAR",
-          salon: "382.50 SAR",
-          status: t.statusPaid,
-          statusColor: "text-[hsl(150,60%,40%)] bg-[hsla(150,60%,40%,0.08)]"
-        },
-        {
-          id: "BK-8893",
-          booking_id: "b-mock-3",
-          date: "2026-06-13 06:00 PM",
-          total: "80.00 SAR",
-          platform: "12.00 SAR",
-          salon: "68.00 SAR",
-          status: t.statusPending,
-          statusColor: "text-[hsl(45,60%,55%)] bg-[hsla(45,60%,55%,0.08)]"
-        }
-      ]);
+      console.error("Failed to load provider wallet data:", err);
+      setLedgerEntries([]);
+      setPayoutRequests([]);
+      setAvailableBalance(0);
+      setPendingPayout(0);
+      setError(lang === "ar" ? "تعذر تحميل بيانات المحفظة." : "Unable to load wallet data.");
     } finally {
       setLoadingLedger(false);
     }
   };
 
   useEffect(() => {
-    loadLedger();
+    loadWalletData();
   }, [lang]);
 
-  const handleRequestPayout = (e: React.FormEvent) => {
+  const handleRequestPayout = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -288,13 +334,43 @@ export default function ProviderWalletPage() {
       return;
     }
 
-    setAvailableBalance(prev => prev - amt);
-    setPendingPayout(prev => prev + amt);
-    addToast(lang === "ar" ? `تم تقديم طلب التحويل بقيمة ${amt} ريال بنجاح. سيتم إيداعه في حسابك البنكي.` : `Payout request of ${amt} SAR submitted successfully. It will be deposited to your bank account.`, "success");
-    
-    setPayoutAmount("");
-    setPayoutIban("");
-    setShowPayoutModal(false);
+    if (!providerId) {
+      addToast(t.signInRequired, "error");
+      return;
+    }
+
+    try {
+      setSubmittingPayout(true);
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        addToast(t.signInRequired, "error");
+        return;
+      }
+
+      const { error: insertError } = await supabase
+        .from("payout_requests")
+        .insert({
+          provider_id: providerId,
+          requested_by: user.id,
+          amount: amt,
+          bank_name: payoutBank.trim(),
+          iban: cleanIban,
+          status: "requested"
+        });
+
+      if (insertError) throw insertError;
+
+      addToast(t.requestSubmitted, "success");
+      setPayoutAmount("");
+      setPayoutIban("");
+      setShowPayoutModal(false);
+      await loadWalletData();
+    } catch (err) {
+      console.error("Failed to submit payout request:", err);
+      addToast(t.requestFailed, "error");
+    } finally {
+      setSubmittingPayout(false);
+    }
   };
 
 
@@ -310,6 +386,12 @@ export default function ProviderWalletPage() {
           {t.subtitle}
         </p>
       </div>
+
+      {error && (
+        <div className="rounded-2xl border border-[#FF5D73]/20 bg-[#FF5D73]/10 px-4 py-3 text-xs font-bold text-[#FFB3BE]">
+          {error}
+        </div>
+      )}
 
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-white">
@@ -357,7 +439,8 @@ export default function ProviderWalletPage() {
           {/* Request Payout trigger */}
           <button 
             onClick={() => setShowPayoutModal(true)}
-            className="w-full py-3 bg-gradient-to-r from-[#D1AF47] to-[#B8952E] hover:from-[#E0C46A] hover:to-[#D1AF47] text-[#070B12] font-bold text-xs uppercase tracking-wider rounded-xl shadow-[0_4px_12px_rgba(209,175,71,0.25)] hover:shadow-[0_4px_25px_rgba(209,175,71,0.45)] transition-all duration-300 transform active:scale-[0.98] select-none"
+            disabled={availableBalance <= 0 || !providerId}
+            className="w-full py-3 bg-gradient-to-r from-[#D1AF47] to-[#B8952E] hover:from-[#E0C46A] hover:to-[#D1AF47] text-[#070B12] font-bold text-xs uppercase tracking-wider rounded-xl shadow-[0_4px_12px_rgba(209,175,71,0.25)] hover:shadow-[0_4px_25px_rgba(209,175,71,0.45)] transition-all duration-300 transform active:scale-[0.98] select-none disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:shadow-[0_4px_12px_rgba(209,175,71,0.25)]"
           >
             {t.requestPayout}
           </button>
@@ -460,6 +543,74 @@ export default function ProviderWalletPage() {
           <span className="w-2 h-2 rounded-full bg-[#3DDC84] animate-pulse"></span>
           {t.verified}
         </span>
+      </div>
+
+      {/* Payout Requests */}
+      <div className="bg-[#111827] border border-white/5 rounded-[24px] p-8 shadow-xl text-white">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div>
+            <h3 className="text-lg font-bold tracking-tight text-[#FFFFFF]">{t.payoutRequests}</h3>
+            <p className="text-xs text-[#7B859C] mt-1">{t.payoutRequestsSubtitle}</p>
+          </div>
+          <span className="rounded-full border border-[#D1AF47]/20 bg-[#D1AF47]/10 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-[#D1AF47]">
+            {payoutRequests.length} {t.statusPending}
+          </span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left border-collapse">
+            <thead>
+              <tr className="border-b border-white/5 text-[#7B859C] text-[10px] uppercase tracking-wider bg-[#0D1422]/30">
+                <th className="py-4 px-6 text-start font-bold">{t.payoutRequestId}</th>
+                <th className="py-4 px-6 text-start font-bold">{t.payoutRequestedAt}</th>
+                <th className="py-4 px-6 text-start font-bold">{t.payoutAmount}</th>
+                <th className="py-4 px-6 text-start font-bold">{t.payoutBankColumn}</th>
+                <th className="py-4 px-6 text-start font-bold">{t.ibanLabel}</th>
+                <th className="py-4 px-6 text-center font-bold">{t.status}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {loadingLedger ? (
+                <tr>
+                  <td colSpan={6} className="py-10 text-center text-[#7B859C]">
+                    {lang === "ar" ? "جاري تحميل طلبات التحويل..." : "Loading payout requests..."}
+                  </td>
+                </tr>
+              ) : payoutRequests.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-10 text-center text-[#7B859C]">
+                    {t.noPayoutRequests}
+                  </td>
+                </tr>
+              ) : (
+                payoutRequests.map((request) => (
+                  <tr key={request.id} className="hover:bg-white/[0.01] transition-all duration-300">
+                    <td className="py-4 px-6 font-mono font-bold text-xs tracking-wider text-white">
+                      {request.id.slice(0, 8).toUpperCase()}
+                    </td>
+                    <td className="py-4 px-6 text-[#B8C0D4] text-xs font-medium">
+                      {request.requestedAt}
+                    </td>
+                    <td className="py-4 px-6 font-bold text-white">
+                      {request.amount}
+                    </td>
+                    <td className="py-4 px-6 text-[#B8C0D4] text-xs font-semibold">
+                      {request.bankName}
+                    </td>
+                    <td className="py-4 px-6 text-[#B8C0D4] text-xs font-mono">
+                      {request.iban}
+                    </td>
+                    <td className="py-4 px-6 text-center">
+                      <span className={`inline-flex items-center justify-center rounded-full border px-3 py-1 text-[10px] font-bold ${request.statusClass}`}>
+                        {request.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Transactions Splits Ledger */}
@@ -649,9 +800,10 @@ export default function ProviderWalletPage() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-3 bg-gradient-to-r from-[#D1AF47] to-[#B8952E] hover:from-[#E0C46A] hover:to-[#D1AF47] text-[#070B12] rounded-xl font-bold text-xs uppercase tracking-wider shadow-[0_4px_12px_rgba(209,175,71,0.2)] hover:shadow-[0_4px_20px_rgba(209,175,71,0.35)] transition duration-300"
+                  disabled={submittingPayout}
+                  className="flex-1 py-3 bg-gradient-to-r from-[#D1AF47] to-[#B8952E] hover:from-[#E0C46A] hover:to-[#D1AF47] text-[#070B12] rounded-xl font-bold text-xs uppercase tracking-wider shadow-[0_4px_12px_rgba(209,175,71,0.2)] hover:shadow-[0_4px_20px_rgba(209,175,71,0.35)] transition duration-300 disabled:cursor-wait disabled:opacity-60"
                 >
-                  {t.confirmPayoutBtn}
+                  {submittingPayout ? t.submitting : t.confirmPayoutBtn}
                 </button>
               </div>
             </form>
