@@ -316,7 +316,7 @@ export default function PricingPage() {
       <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] bg-[#D1AF47]/5 blur-[120px] rounded-full pointer-events-none z-0" />
 
       {/* Mini Luxury Header */}
-      <header className="border-b border-gray-200 bg-white/80 backdrop-blur-md py-5 px-6 sm:px-12 flex items-center justify-between sticky top-0 z-50 transition-all duration-300">
+      <header className="border-b border-white/[0.06] bg-[#070B12]/80 backdrop-blur-md py-5 px-6 sm:px-12 flex items-center justify-between sticky top-0 z-50 transition-all duration-300">
         <Link 
           href="/" 
           className="text-xl font-serif font-black tracking-[0.2em] text-[#D1AF47] hover:opacity-95 transition-opacity"
@@ -935,7 +935,7 @@ export default function PricingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-8 text-center text-xs text-[#7B859C] font-medium z-10 relative">
+      <footer className="bg-[#070B12]/80 border-t border-white/[0.06] py-8 text-center text-xs text-[#7B859C] font-medium z-10 relative">
         <p>© {new Date().getFullYear()} PRIMORA. {t.footerText}</p>
       </footer>
 

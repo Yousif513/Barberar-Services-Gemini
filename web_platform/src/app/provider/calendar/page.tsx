@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 const translations = {
   en: {
@@ -124,46 +125,32 @@ export default function ProviderCalendarPage() {
 
   const t = translations[lang];
 
-  // --- 1. SCHEDULER STATES ---
-  const [appointments, setAppointments] = useState<Appointment[]>([
-    {
-      id: "1",
-      customer: "Faisal Al-Otaibi",
-      service: "Premium Grooming Pack",
-      time: "03:00 PM - 04:00 PM",
-      slotIndex: 6, // 03:00 PM
-      staff: "Ali Al-Harbi",
-      price: "250",
-      duration: "60 mins",
-      notes: "In-salon VIP chair"
-    },
-    {
-      id: "2",
-      customer: "Sara Al-Mansoori",
-      service: "Hair Styling & Silk Treatment",
-      time: "04:15 PM - 05:15 PM",
-      slotIndex: 8, // 04:00 PM
-      staff: "Elena Rostova",
-      price: "450",
-      duration: "60 mins",
-      notes: "Requires organic oils"
-    },
-    {
-      id: "3",
-      customer: "Bandar Bin-Khalid",
-      service: "Kids Haircut & Styling",
-      time: "06:00 PM - 06:40 PM",
-      slotIndex: 10, // 06:00 PM
-      staff: "Tariq Mahmood",
-      price: "80",
-      duration: "40 mins",
-      notes: "Tablet for cartoons"
-    }
-  ]);
+  // --- 1. DB & CORE SCHEDULER STATES ---
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [providerId, setProviderId] = useState("");
+  const [branches, setBranches] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [blockouts, setBlockouts] = useState<Blockout[]>([
     { slotIndex: 1, reason: "Stylist Break & Sanitation" }
   ]);
+
+  // Weekly availability shifts (0 to 6)
+  const [availabilityShifts, setAvailabilityShifts] = useState<Array<{
+    day_of_week: number;
+    start_time: string;
+    end_time: string;
+    is_working_day: boolean;
+  }>>([]);
+  const [selectedDayToEdit, setSelectedDayToEdit] = useState<number>(new Date().getDay());
 
   // --- 2. CONTROL PANEL STATES ---
   const [draggedOverSlot, setDraggedOverSlot] = useState<number | null>(null);
@@ -183,20 +170,19 @@ export default function ProviderCalendarPage() {
   const [travelRadius, setTravelRadius] = useState(15); // in km
   const [trafficDelay, setTrafficDelay] = useState(25); // in mins
 
-  // Roster shift range
+  // Roster shift range (shown for editing the selected day)
   const [shiftStart, setShiftStart] = useState("08:00 AM");
   const [shiftEnd, setShiftEnd] = useState("09:00 PM");
 
   // --- 3. MODALS STATES ---
   const [showBookModal, setShowBookModal] = useState(false);
   const [targetSlotIndex, setTargetSlotIndex] = useState<number | null>(null);
-
   const [showDetailsModal, setShowDetailsModal] = useState<Appointment | null>(null);
 
   // Form states for booking
   const [bookCustomer, setBookCustomer] = useState("");
-  const [bookService, setBookService] = useState("Premium Grooming Pack");
-  const [bookStaff, setBookStaff] = useState("Ali Al-Harbi");
+  const [bookService, setBookService] = useState("");
+  const [bookStaff, setBookStaff] = useState("");
   const [bookPrice, setBookPrice] = useState("150");
   const [bookDuration, setBookDuration] = useState("45 mins");
   const [bookNotes, setBookNotes] = useState("");
@@ -220,6 +206,34 @@ export default function ProviderCalendarPage() {
     { label: "09:00 PM", isPrayer: false }
   ];
 
+  // Helper to convert time format from "08:00 AM" to "08:00:00"
+  const timeTo24Hour = (time12: string): string => {
+    if (!time12) return "08:00:00";
+    const [time, modifier] = time12.split(" ");
+    let [hoursStr, minutesStr] = time.split(":");
+    let hours = parseInt(hoursStr, 10);
+    const minutes = minutesStr ? minutesStr.slice(0, 2) : "00";
+    if (hours === 12) {
+      hours = 0;
+    }
+    if (modifier === "PM") {
+      hours += 12;
+    }
+    return `${String(hours).padStart(2, "0")}:${minutes}:00`;
+  };
+
+  // Helper to convert time format from "08:00:00" to "08:00 AM"
+  const timeTo12Hour = (time24: string): string => {
+    if (!time24) return "08:00 AM";
+    const [hoursStr, minutesStr] = time24.split(":");
+    let hours = parseInt(hoursStr, 10);
+    const minutes = minutesStr ? minutesStr.slice(0, 2) : "00";
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    if (hours === 0) hours = 12;
+    return `${String(hours).padStart(2, "0")}:${minutes} ${ampm}`;
+  };
+
   // Helper to determine if a slot is locked by a prayer buffer
   const isSlotPrayerLocked = (slot: typeof timeSlots[0], index: number) => {
     if (!slot.isPrayer) return false;
@@ -234,36 +248,359 @@ export default function ProviderCalendarPage() {
     return false;
   };
 
+  // Convert time to slot index
+  const getSlotIndexForTime = (date: Date): number => {
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    
+    let displayHour = hours % 12;
+    if (displayHour === 0) displayHour = 12;
+    const ampm = hours >= 12 ? "PM" : "AM";
+    const formattedTime = `${String(displayHour).padStart(2, "0")}:${String(minutes).padStart(2, "0")} ${ampm}`;
+    
+    const idx = timeSlots.findIndex(slot => slot.label === formattedTime);
+    if (idx !== -1) return idx;
+    
+    let closestIdx = 0;
+    let minDiff = Infinity;
+    const targetMinutes = hours * 60 + minutes;
+    
+    timeSlots.forEach((slot, index) => {
+      const [timePart, ampmPart] = slot.label.split(" ");
+      let [h, m] = timePart.split(":").map(Number);
+      if (ampmPart === "PM" && h !== 12) h += 12;
+      if (ampmPart === "AM" && h === 12) h = 0;
+      const slotMinutes = h * 60 + m;
+      
+      const diff = Math.abs(targetMinutes - slotMinutes);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIdx = index;
+      }
+    });
+    
+    return closestIdx;
+  };
+
+  // Fetch initial context data
+  const loadCalendarData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError("");
+      
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError) {
+        console.warn("Auth session missing or error:", userError.message);
+        return;
+      }
+      if (!user) return;
+      
+      // Get provider details
+      const { data: providerInfo, error: providerError } = await supabase
+        .from("providers")
+        .select("id")
+        .eq("owner_id", user.id)
+        .maybeSingle();
+      if (providerError) throw providerError;
+      if (!providerInfo) {
+        setError(lang === "ar" ? "لم يتم العثور على مزود خدمة نشط." : "No active provider profile found.");
+        return;
+      }
+      setProviderId(providerInfo.id);
+      
+      // Get branches
+      const { data: branchesData, error: branchesError } = await supabase
+        .from("branches")
+        .select("id, name_en, name_ar")
+        .eq("provider_id", providerInfo.id);
+      if (branchesError) throw branchesError;
+      setBranches(branchesData || []);
+      
+      // Get services
+      const { data: servicesData, error: servicesError } = await supabase
+        .from("services")
+        .select("id, name_en, name_ar, base_price, base_duration_minutes")
+        .eq("provider_id", providerInfo.id)
+        .eq("is_active", true);
+      if (servicesError) throw servicesError;
+      setServices(servicesData || []);
+      
+      // Get customers
+      const { data: customersData } = await supabase
+        .from("profiles")
+        .select("id, first_name, last_name, phone_number")
+        .eq("role", "customer")
+        .limit(100);
+      setCustomers(customersData || []);
+      if (customersData && customersData.length > 0) {
+        setSelectedCustomerId(customersData[0].id);
+        setBookCustomer(`${customersData[0].first_name || ""} ${customersData[0].last_name || ""}`.trim() || customersData[0].phone_number);
+      }
+      
+      const branchIds = (branchesData || []).map(b => b.id);
+      if (branchIds.length === 0) return;
+      
+      // Get employees
+      const { data: staffData, error: staffError } = await supabase
+        .from("employees")
+        .select("id, name_en, name_ar, title_en, title_ar, is_active")
+        .in("branch_id", branchIds)
+        .eq("is_active", true);
+      if (staffError) throw staffError;
+      setEmployees(staffData || []);
+      
+      if (staffData && staffData.length > 0) {
+        setSelectedEmployeeId(prev => prev || staffData[0].id);
+        setBookStaff(staffData[0].id);
+      }
+    } catch (err: any) {
+      console.error("Error loading calendar context:", err);
+      setError(lang === "ar" ? "فشل تحميل بيانات الجدولة" : "Failed to load calendar scheduling context.");
+    } finally {
+      setLoading(false);
+    }
+  }, [lang]);
+
+  // Fetch shifts & bookings for the selected employee
+  const loadEmployeeSchedule = useCallback(async () => {
+    if (!selectedEmployeeId) return;
+    try {
+      setError("");
+      
+      // 1. Fetch weekly availability shifts
+      const { data: shiftsData, error: shiftsError } = await supabase
+        .from("employee_availability")
+        .select("day_of_week, start_time, end_time, is_working_day")
+        .eq("employee_id", selectedEmployeeId);
+      
+      if (shiftsError) throw shiftsError;
+      
+      const fullWeekShifts = Array.from({ length: 7 }, (_, index) => {
+        const existing = (shiftsData || []).find(s => s.day_of_week === index);
+        return existing || {
+          day_of_week: index,
+          start_time: "08:00:00",
+          end_time: "21:00:00",
+          is_working_day: true
+        };
+      });
+      setAvailabilityShifts(fullWeekShifts);
+      
+      const currentDayShift = fullWeekShifts.find(s => s.day_of_week === selectedDayToEdit);
+      if (currentDayShift) {
+        setShiftStart(timeTo12Hour(currentDayShift.start_time));
+        setShiftEnd(timeTo12Hour(currentDayShift.end_time));
+      }
+      
+      // 2. Fetch bookings
+      const startOfDay = new Date(selectedDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(selectedDate);
+      endOfDay.setHours(23, 59, 59, 999);
+      
+      const { data: bookingsData, error: bookingsError } = await supabase
+        .from("bookings")
+        .select(`
+          id,
+          scheduled_at,
+          duration_minutes,
+          total_price,
+          status,
+          services ( name_en, name_ar ),
+          profiles ( first_name, last_name, phone_number )
+        `)
+        .eq("employee_id", selectedEmployeeId)
+        .neq("status", "cancelled")
+        .gte("scheduled_at", startOfDay.toISOString())
+        .lte("scheduled_at", endOfDay.toISOString())
+        .order("scheduled_at", { ascending: true });
+        
+      if (bookingsError) throw bookingsError;
+      
+      const mapped: Appointment[] = (bookingsData || []).map((bk: any) => {
+        const scheduledTime = new Date(bk.scheduled_at);
+        const serviceName = lang === "ar" ? bk.services?.name_ar || bk.services?.name_en : bk.services?.name_en || bk.services?.name_ar;
+        const customerName = bk.profiles 
+          ? `${bk.profiles.first_name || ""} ${bk.profiles.last_name || ""}`.trim() || bk.profiles.phone_number
+          : "Walk-in Customer";
+        
+        const startStr = scheduledTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const endTimeVal = new Date(scheduledTime.getTime() + (bk.duration_minutes || 60) * 60 * 1000);
+        const endStr = endTimeVal.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        return {
+          id: bk.id,
+          customer: customerName,
+          service: serviceName || "Styling Service",
+          time: `${startStr} - ${endStr}`,
+          slotIndex: getSlotIndexForTime(scheduledTime),
+          staff: employees.find(e => e.id === selectedEmployeeId)?.name_en || "Stylist",
+          price: String(bk.total_price || 0),
+          duration: `${bk.duration_minutes || 60} mins`,
+          notes: ""
+        };
+      });
+      
+      setAppointments(mapped);
+    } catch (err: any) {
+      console.error("Error loading employee shifts/bookings:", err);
+      setError(lang === "ar" ? "فشل تحميل جدول مناوبات الموظف" : "Failed to load employee schedule and shifts.");
+    }
+  }, [selectedEmployeeId, selectedDate, selectedDayToEdit, employees, lang]);
+
+  useEffect(() => {
+    void loadCalendarData();
+  }, [loadCalendarData]);
+
+  useEffect(() => {
+    if (selectedEmployeeId) {
+      void loadEmployeeSchedule();
+    }
+  }, [selectedEmployeeId, selectedDate, selectedDayToEdit, loadEmployeeSchedule]);
+
+  useEffect(() => {
+    if (services.length > 0) {
+      setBookService(services[0].id);
+      setBookPrice(String(services[0].base_price || 0));
+      setBookDuration(`${services[0].base_duration_minutes || 60} mins`);
+    }
+  }, [services]);
+
   // Handle Walk-in Booking Submission
-  const handleBookingSubmit = (e: React.FormEvent) => {
+  const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (targetSlotIndex === null || !bookCustomer.trim()) return;
+    const targetEmployeeId = bookStaff || selectedEmployeeId;
+    if (targetSlotIndex === null || !targetEmployeeId) return;
 
-    const slotLabel = timeSlots[targetSlotIndex].label;
+    try {
+      setLoading(true);
+      setError("");
+      setSuccess("");
 
-    const newAppt: Appointment = {
-      id: `walk-${Date.now()}`,
-      customer: bookCustomer,
-      service: bookService,
-      time: `${slotLabel} - Forward`,
-      slotIndex: targetSlotIndex,
-      staff: bookStaff,
-      price: bookPrice,
-      duration: bookDuration,
-      notes: bookNotes
-    };
+      const selectedService = services.find(s => s.id === bookService);
+      const basePrice = selectedService ? selectedService.base_price : 100;
+      const baseDuration = selectedService ? selectedService.base_duration_minutes : 60;
 
-    setAppointments(prev => [...prev, newAppt]);
-    setShowBookModal(false);
-    setBookCustomer("");
-    setBookNotes("");
-    setTargetSlotIndex(null);
+      const slotLabel = timeSlots[targetSlotIndex].label;
+      const [timePart, ampm] = slotLabel.split(" ");
+      let [hoursStr, minutesStr] = timePart.split(":");
+      let hours = parseInt(hoursStr, 10);
+      const minutes = parseInt(minutesStr, 10) || 0;
+      if (ampm === "PM" && hours !== 12) hours += 12;
+      if (ampm === "AM" && hours === 12) hours = 0;
+
+      const bookingTime = new Date(selectedDate);
+      bookingTime.setHours(hours, minutes, 0, 0);
+
+      let customerIdVal = selectedCustomerId;
+      if (!customerIdVal) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) customerIdVal = user.id;
+      }
+
+      const employeeObj = employees.find(e => e.id === targetEmployeeId);
+      const { data: empData } = await supabase
+        .from("employees")
+        .select("branch_id")
+        .eq("id", selectedEmployeeId)
+        .maybeSingle();
+
+      const branchIdVal = empData?.branch_id || (branches.length > 0 ? branches[0].id : null);
+      if (!branchIdVal) {
+        throw new Error("No branch associated with employee.");
+      }
+
+      const payload = {
+        customer_id: customerIdVal,
+        branch_id: branchIdVal,
+        employee_id: selectedEmployeeId,
+        service_id: bookService,
+        status: "confirmed",
+        is_home_service: false,
+        scheduled_at: bookingTime.toISOString(),
+        duration_minutes: baseDuration,
+        total_price: Number(bookPrice || basePrice),
+        deposit_required: 0,
+        tax_amount: Number((Number(bookPrice || basePrice) * 0.15).toFixed(2)),
+        platform_commission: Number((Number(bookPrice || basePrice) * 0.15).toFixed(2))
+      };
+
+      const { error: insertError } = await supabase
+        .from("bookings")
+        .insert(payload);
+
+      if (insertError) throw insertError;
+
+      setSuccess(lang === "ar" ? "تم تسجيل الحجز بنجاح" : "Walk-in booking created successfully.");
+      setShowBookModal(false);
+      setBookCustomer("");
+      setBookNotes("");
+      setTargetSlotIndex(null);
+      await loadEmployeeSchedule();
+    } catch (err: any) {
+      console.error("Error creating walk-in booking:", err);
+      setError(lang === "ar" ? "فشل إنشاء الحجز" : `Failed to create walk-in: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Cancel Appointment
-  const handleCancelBooking = (id: string) => {
-    setAppointments(prev => prev.filter(a => a.id !== id));
-    setShowDetailsModal(null);
+  const handleCancelBooking = async (id: string) => {
+    try {
+      setLoading(true);
+      setError("");
+      setSuccess("");
+
+      const { error: cancelError } = await supabase
+        .from("bookings")
+        .update({ status: "cancelled" })
+        .eq("id", id);
+
+      if (cancelError) throw cancelError;
+
+      setSuccess(lang === "ar" ? "تم إلغاء الموعد" : "Appointment cancelled successfully.");
+      setShowDetailsModal(null);
+      await loadEmployeeSchedule();
+    } catch (err: any) {
+      console.error("Error cancelling booking:", err);
+      setError(lang === "ar" ? "فشل إلغاء الموعد" : "Failed to cancel appointment.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Save employee working shifts Roster
+  const handleSaveShift = async () => {
+    if (!selectedEmployeeId) return;
+    try {
+      setLoading(true);
+      setSuccess("");
+      setError("");
+
+      const shiftConfig = availabilityShifts.find(s => s.day_of_week === selectedDayToEdit);
+      const payload = {
+        employee_id: selectedEmployeeId,
+        day_of_week: selectedDayToEdit,
+        start_time: timeTo24Hour(shiftStart),
+        end_time: timeTo24Hour(shiftEnd),
+        is_working_day: shiftConfig ? shiftConfig.is_working_day : true
+      };
+
+      const { error: saveError } = await supabase
+        .from("employee_availability")
+        .upsert(payload, { onConflict: "employee_id,day_of_week" });
+
+      if (saveError) throw saveError;
+
+      setSuccess(lang === "ar" ? "تم حفظ ساعات العمل بنجاح" : "Working hours updated successfully.");
+      await loadEmployeeSchedule();
+    } catch (err: any) {
+      console.error("Error saving shift:", err);
+      setError(lang === "ar" ? "فشل حفظ ساعات العمل" : "Failed to save working hours.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Toggle Override
@@ -286,6 +623,9 @@ export default function ProviderCalendarPage() {
   };
 
   const isRTL = lang === "ar";
+  const currentDayOfWeekVal = selectedDate.getDay();
+  const currentDayShiftInfo = availabilityShifts.find(s => s.day_of_week === currentDayOfWeekVal);
+  const isOffDutyToday = currentDayShiftInfo ? !currentDayShiftInfo.is_working_day : false;
 
   // Premium Toggle Switch component
   const ToggleSwitch = ({ checked, onChange }: { checked: boolean; onChange: (val: boolean) => void }) => (
@@ -309,20 +649,56 @@ export default function ProviderCalendarPage() {
   return (
     <div className="space-y-8 text-[#B8C0D4]">
       {/* ═══════════════ PAGE HEADER ═══════════════ */}
-      <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${isRTL ? "sm:flex-row-reverse text-right" : "text-left"}`}>
+      <div className={`flex flex-col md:flex-row md:items-center md:justify-between gap-6 ${isRTL ? "md:flex-row-reverse text-right" : "text-left"}`}>
         <div>
           <h2 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-[#D1AF47] via-[#E0C46A] to-[#D1AF47] bg-clip-text text-transparent">
             {t.calendarTitle}
           </h2>
           <p className="text-xs text-[#7B859C] mt-1.5 tracking-wide">{t.subtitle}</p>
         </div>
-        <div className="flex gap-3">
-          <button className="px-5 py-2.5 bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] text-xs font-bold uppercase tracking-wider rounded-2xl text-[#B8C0D4] hover:border-[#D1AF47]/30 hover:text-white hover:shadow-[0_0_20px_rgba(209,175,71,0.08)] transition-all duration-300">
+
+        <div className={`flex flex-wrap gap-3 items-center ${isRTL ? "justify-end flex-row-reverse" : "justify-start"}`}>
+          {/* Employee/Stylist Dropdown */}
+          {employees.length > 0 && (
+            <div className="relative">
+              <select
+                value={selectedEmployeeId}
+                onChange={(e) => setSelectedEmployeeId(e.target.value)}
+                className="pl-4 pr-10 py-2.5 bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] text-xs font-bold rounded-2xl text-[#B8C0D4] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_12px_rgba(209,175,71,0.1)] transition-all duration-300 appearance-none cursor-pointer"
+              >
+                {employees.map((emp) => (
+                  <option key={emp.id} value={emp.id} className="bg-[#111827] text-white">
+                    {lang === "ar" ? emp.name_ar || emp.name_en : emp.name_en || emp.name_ar}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#7B859C]">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          )}
+
+          {/* Date Picker */}
+          <input
+            type="date"
+            value={selectedDate.toISOString().split("T")[0]}
+            onChange={(e) => setSelectedDate(new Date(e.target.value))}
+            className="px-4 py-2.5 bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] text-xs font-bold rounded-2xl text-[#B8C0D4] outline-none focus:border-[#D1AF47]/40 transition-all duration-300 cursor-pointer"
+          />
+
+          <button 
+            onClick={() => setSelectedDate(new Date())}
+            className="px-5 py-2.5 bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] text-xs font-bold uppercase tracking-wider rounded-2xl text-[#B8C0D4] hover:border-[#D1AF47]/30 hover:text-white transition-all duration-300"
+          >
             {t.today}
           </button>
+          
           <button
             onClick={() => {
               setTargetSlotIndex(2); // default to 10:00 AM for quick walkin click
+              setBookStaff(selectedEmployeeId);
               setShowBookModal(true);
             }}
             className="px-5 py-2.5 bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] font-bold text-xs uppercase tracking-widest rounded-2xl hover:shadow-[0_0_25px_rgba(209,175,71,0.35)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
@@ -354,8 +730,27 @@ export default function ProviderCalendarPage() {
               </div>
             </div>
 
+            {/* Off-duty banner */}
+            {isOffDutyToday && (
+              <div className="m-6 p-6 bg-[#FF5D73]/[0.04] border border-[#FF5D73]/10 rounded-2xl text-center text-[#FF5D73] space-y-3">
+                <svg className="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <p className="text-sm font-bold">
+                    {lang === "ar" ? "الأخصائي في إجازة اليوم" : "Stylist is Off-Duty Today"}
+                  </p>
+                  <p className="text-xs text-[#FF5D73]/60 mt-1">
+                    {lang === "ar" 
+                      ? "تم وضع هذا اليوم كإجازة أسبوعية في مناوبات العمل." 
+                      : "This day is configured as off-duty in their weekly working roster."}
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Time Slot Rows */}
-            <div className="divide-y divide-white/[0.04]">
+            <div className={`divide-y divide-white/[0.04] ${isOffDutyToday ? "opacity-40 pointer-events-none" : ""}`}>
               {timeSlots.map((slot, index) => {
                 const isLocked = isSlotPrayerLocked(slot, index);
                 const isOverridden = slot.isPrayer && overriddenSlots.includes(index);
@@ -506,6 +901,7 @@ export default function ProviderCalendarPage() {
                             <button
                               onClick={() => {
                                 setTargetSlotIndex(index);
+                                setBookStaff(selectedEmployeeId);
                                 setShowBookModal(true);
                               }}
                               className="px-3 py-1.5 bg-white/[0.04] backdrop-blur-sm border border-white/[0.06] rounded-xl text-[9px] font-bold uppercase tracking-wider text-white hover:bg-[#D1AF47]/10 hover:border-[#D1AF47]/20 hover:text-[#D1AF47] transition-all duration-300"
@@ -654,21 +1050,67 @@ export default function ProviderCalendarPage() {
               <h3 className="font-bold text-xs uppercase tracking-[0.15em] text-white">{t.workingHoursPanel}</h3>
             </div>
 
+            {/* Day Selector */}
+            <div className="space-y-1.5">
+              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>
+                {lang === "ar" ? "اليوم المراد تعديله" : "Day to Edit"}
+              </label>
+              <select
+                value={selectedDayToEdit}
+                onChange={(e) => setSelectedDayToEdit(Number(e.target.value))}
+                className="w-full bg-white/[0.03] border border-white/[0.06] text-xs rounded-2xl px-4 py-2.5 text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300"
+              >
+                <option value={0} className="bg-[#111827] text-white">{lang === "ar" ? "الأحد" : "Sunday"}</option>
+                <option value={1} className="bg-[#111827] text-white">{lang === "ar" ? "الاثنين" : "Monday"}</option>
+                <option value={2} className="bg-[#111827] text-white">{lang === "ar" ? "الثلاثاء" : "Tuesday"}</option>
+                <option value={3} className="bg-[#111827] text-white">{lang === "ar" ? "الأربعاء" : "Wednesday"}</option>
+                <option value={4} className="bg-[#111827] text-white">{lang === "ar" ? "الخميس" : "Thursday"}</option>
+                <option value={5} className="bg-[#111827] text-white">{lang === "ar" ? "الجمعة" : "Friday"}</option>
+                <option value={6} className="bg-[#111827] text-white">{lang === "ar" ? "السبت" : "Saturday"}</option>
+              </select>
+            </div>
+
+            {/* Working Day Toggle */}
+            <div className={`flex items-center justify-between text-xs py-1 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <span className="font-semibold text-[#B8C0D4]">
+                {lang === "ar" ? "يوم عمل نشط" : "Active Work Day"}
+              </span>
+              <ToggleSwitch
+                checked={availabilityShifts.find(s => s.day_of_week === selectedDayToEdit)?.is_working_day ?? true}
+                onChange={(val) => {
+                  setAvailabilityShifts(prev => prev.map(s =>
+                    s.day_of_week === selectedDayToEdit ? { ...s, is_working_day: val } : s
+                  ));
+                }}
+              />
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[9px] text-[#7B859C] font-bold uppercase tracking-wider">Start</label>
+                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>
+                  {lang === "ar" ? "بداية المناوبة" : "Shift Start"}
+                </label>
                 <select
                   value={shiftStart}
                   onChange={(e) => setShiftStart(e.target.value)}
                   className="w-full bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] text-xs rounded-xl px-3 py-2 text-[#B8C0D4] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_12px_rgba(209,175,71,0.1)] transition-all duration-300"
                 >
-                  <option value="07:00 AM">07:00 AM</option>
-                  <option value="08:00 AM">08:00 AM</option>
-                  <option value="09:00 AM">09:00 AM</option>
+                  <option value="05:00 AM" className="bg-[#111827] text-white">05:00 AM</option>
+                  <option value="06:00 AM" className="bg-[#111827] text-white">06:00 AM</option>
+                  <option value="07:00 AM" className="bg-[#111827] text-white">07:00 AM</option>
+                  <option value="08:00 AM" className="bg-[#111827] text-white">08:00 AM</option>
+                  <option value="09:00 AM" className="bg-[#111827] text-white">09:00 AM</option>
+                  <option value="10:00 AM" className="bg-[#111827] text-white">10:00 AM</option>
+                  <option value="11:00 AM" className="bg-[#111827] text-white">11:00 AM</option>
+                  <option value="12:00 PM" className="bg-[#111827] text-white">12:00 PM</option>
+                  <option value="01:00 PM" className="bg-[#111827] text-white">01:00 PM</option>
+                  <option value="02:00 PM" className="bg-[#111827] text-white">02:00 PM</option>
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-[9px] text-[#7B859C] font-bold uppercase tracking-wider">End</label>
+                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>
+                  {lang === "ar" ? "نهاية المناوبة" : "Shift End"}
+                </label>
                 <select
                   value={shiftEnd}
                   onChange={(e) => setShiftEnd(e.target.value)}
@@ -701,27 +1143,57 @@ export default function ProviderCalendarPage() {
 
             <div className="space-y-1.5">
               <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>{t.clientName}</label>
-              <input
-                type="text"
-                required
-                value={bookCustomer}
-                onChange={e => setBookCustomer(e.target.value)}
-                placeholder="Fahad Al-Malki"
-                className={`w-full bg-white/[0.03] border border-white/[0.06] rounded-2xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 placeholder:text-[#7B859C]/50 ${isRTL ? "text-right" : "text-left"}`}
-              />
+              {customers.length > 0 ? (
+                <select
+                  value={selectedCustomerId}
+                  onChange={(e) => {
+                    const custId = e.target.value;
+                    setSelectedCustomerId(custId);
+                    const selectedCust = customers.find(c => c.id === custId);
+                    if (selectedCust) {
+                      setBookCustomer(`${selectedCust.first_name || ""} ${selectedCust.last_name || ""}`.trim() || selectedCust.phone_number);
+                    }
+                  }}
+                  className="w-full bg-white/[0.03] border border-white/[0.06] text-xs rounded-2xl px-4 py-2.5 text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 cursor-pointer"
+                >
+                  {customers.map((c) => (
+                    <option key={c.id} value={c.id} className="bg-[#111827] text-white">
+                      {`${c.first_name || ""} ${c.last_name || ""}`.trim() || c.phone_number}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  required
+                  value={bookCustomer}
+                  onChange={e => setBookCustomer(e.target.value)}
+                  placeholder="Fahad Al-Malki"
+                  className={`w-full bg-white/[0.03] border border-white/[0.06] rounded-2xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 placeholder:text-[#7B859C]/50 ${isRTL ? "text-right" : "text-left"}`}
+                />
+              )}
             </div>
 
             <div className="space-y-1.5">
               <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>{t.service}</label>
               <select
                 value={bookService}
-                onChange={e => setBookService(e.target.value)}
-                className="w-full bg-white/[0.03] border border-white/[0.06] text-xs rounded-2xl px-4 py-2.5 text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300"
+                onChange={(e) => {
+                  const servId = e.target.value;
+                  setBookService(servId);
+                  const selectedServ = services.find(s => s.id === servId);
+                  if (selectedServ) {
+                    setBookPrice(String(selectedServ.base_price || 0));
+                    setBookDuration(`${selectedServ.base_duration_minutes || 60} mins`);
+                  }
+                }}
+                className="w-full bg-white/[0.03] border border-white/[0.06] text-xs rounded-2xl px-4 py-2.5 text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 cursor-pointer"
               >
-                <option value="Premium Grooming Pack">Premium Grooming Pack (250 SAR)</option>
-                <option value="Haircut & Styling">Haircut &amp; Styling (120 SAR)</option>
-                <option value="Beard Grooming">Beard Grooming (80 SAR)</option>
-                <option value="Swedish Therapy Massage">Swedish Therapy Massage (300 SAR)</option>
+                {services.map((s) => (
+                  <option key={s.id} value={s.id} className="bg-[#111827] text-white">
+                    {lang === "ar" ? s.name_ar || s.name_en : s.name_en || s.name_ar} ({s.base_price} SAR)
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -731,11 +1203,13 @@ export default function ProviderCalendarPage() {
                 <select
                   value={bookStaff}
                   onChange={e => setBookStaff(e.target.value)}
-                  className="w-full bg-white/[0.03] border border-white/[0.06] text-xs rounded-2xl px-3 py-2.5 text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300"
+                  className="w-full bg-white/[0.03] border border-white/[0.06] text-xs rounded-2xl px-3 py-2.5 text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 cursor-pointer"
                 >
-                  <option value="Ali Al-Harbi">Ali Al-Harbi</option>
-                  <option value="Elena Rostova">Elena Rostova</option>
-                  <option value="Tariq Mahmood">Tariq Mahmood</option>
+                  {employees.map((emp) => (
+                    <option key={emp.id} value={emp.id} className="bg-[#111827] text-white">
+                      {lang === "ar" ? emp.name_ar || emp.name_en : emp.name_en || emp.name_ar}
+                    </option>
+                  ))}
                 </select>
               </div>
 

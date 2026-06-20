@@ -170,8 +170,8 @@ export default function ProviderWalletPage() {
           }));
           setLedgerEntries(formatted);
           
-          let available = 6240;
-          let pending = 1820;
+          let available = 0;
+          let pending = 0;
           data.forEach((item: any) => {
             if (item.payout_status === "pending") {
               pending += parseFloat(item.provider_share || "0");
