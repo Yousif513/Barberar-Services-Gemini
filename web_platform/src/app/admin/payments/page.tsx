@@ -21,7 +21,10 @@ const translations = {
     error: "Error",
     info: "Info",
     errorLoad: "Failed to load captured payment ledger.",
-    refundUnavailable: "Gateway refunds are not configured in this dashboard yet. Review this payment in the Tap/Moyasar merchant console before refunding funds."
+    refundUnavailable: "Gateway refunds are not configured in this dashboard yet. Review this payment in the Tap/Moyasar merchant console before refunding funds.",
+    refundQueued: "Refund review request created for gateway processing.",
+    refundDuplicate: "A refund review request already exists for this payment.",
+    refundError: "Failed to create refund review request."
   },
   ar: {
     title: "سجل المدفوعات والعمليات المالية",
@@ -51,6 +54,7 @@ export default function AdminPayments() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [processingRefundId, setProcessingRefundId] = useState("");
   const [lang, setLang] = useState<"en" | "ar">("ar");
 
   useEffect(() => {
@@ -114,9 +118,37 @@ export default function AdminPayments() {
     loadPayments();
   }, [lang]);
 
-  const handleRefund = (_id?: string) => {
-    setSuccess("");
-    setError(t.refundUnavailable);
+  const handleRefund = async (payment: any) => {
+    try {
+      setSuccess("");
+      setError("");
+      setProcessingRefundId(payment.id);
+
+      const { error: dbError } = await supabase
+        .from("payment_refund_requests")
+        .insert({
+          ledger_id: payment.id,
+          payment_intent_id: payment.payment_intent_id || payment.id,
+          amount: Number(payment.total_captured || 0),
+          status: "requested",
+          admin_note: "Created from admin payment ledger manual review."
+        });
+
+      if (dbError) {
+        if (dbError.code === "23505") {
+          setError(t.refundDuplicate);
+          return;
+        }
+        throw dbError;
+      }
+
+      setSuccess(`${t.refundQueued} ${t.refundUnavailable}`);
+    } catch (err) {
+      setError(t.refundError);
+      console.warn("Admin refund request warning:", err);
+    } finally {
+      setProcessingRefundId("");
+    }
   };
 
   const isRTL = lang === "ar";
@@ -190,7 +222,7 @@ export default function AdminPayments() {
                       <span className="mt-1 block text-[10px] font-bold text-gray-400">{formatDate(p.created_at)} - {p.payout_status}</span>
                     </td>
                     <td className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>
-                      <button onClick={() => handleRefund()} className="px-3 py-1.5 bg-gray-900 text-white rounded-lg text-[10px] uppercase font-black tracking-wider hover:bg-gray-800 transition">{t.refundBtn}</button>
+                      <button onClick={() => handleRefund(p)} disabled={processingRefundId === p.id} className="px-3 py-1.5 bg-gray-900 text-white rounded-lg text-[10px] uppercase font-black tracking-wider hover:bg-gray-800 transition disabled:opacity-50">{t.refundBtn}</button>
                     </td>
                   </tr>
                 ))

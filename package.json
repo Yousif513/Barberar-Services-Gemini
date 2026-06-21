@@ -17,7 +17,8 @@
     "lint": "npm run lint --workspace=web_platform && npm run lint --workspace=mobile_app",
     "typecheck:mobile": "tsc --noEmit --incremental false --project mobile_app/tsconfig.json",
     "test:security-core": "node scripts/verify-security-core.mjs",
-    "test:quality": "npm run test:security-core && npm run lint && npm run typecheck:mobile && npm run build --workspace=web_platform"
+    "test:admin-controls": "node scripts/verify-admin-controls.mjs",
+    "test:quality": "npm run test:security-core && npm run test:admin-controls && npm run lint && npm run typecheck:mobile && npm run build --workspace=web_platform"
   },
   "devDependencies": {
     "expo": "~56.0.11",
