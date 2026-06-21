@@ -260,6 +260,14 @@ export default function ProviderLayout({
                         : "text-[#D9D4C8] hover:bg-white/[0.06] hover:text-white"
                     } ${isRTL ? "flex-row-reverse text-right" : "flex-row text-left"}`}
                   >
+                    {isActive && (
+                      <span
+                        className={`absolute top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-[#D1AF47] ${
+                          isRTL ? "right-0" : "left-0"
+                        }`}
+                      />
+                    )}
+
                     <span className={`flex-shrink-0 transition-colors duration-300 ${isActive ? "text-[#E0C46A]" : "text-[#8F8A80] group-hover:text-[#D1AF47]"}`}>
                       {getNavIcon(item.path)}
                     </span>
@@ -337,18 +345,18 @@ export default function ProviderLayout({
 
         {/* ── HEADER (80px) ── */}
         {!(pathname === "/provider/dashboard" || pathname === "/provider/dashboard/") && (
-          <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-[#E8E8E8] px-8 flex items-center justify-between sticky top-0 z-40">
+          <header className="h-20 bg-[#0B0F17]/80 backdrop-blur-xl border-b border-[#1C2433] px-8 flex items-center justify-between sticky top-0 z-40">
 
           
           {/* Light Search Input */}
-          <div className={`flex items-center gap-3 bg-[#F7F7F5] border border-[#E8E8E8] px-5 py-3 rounded-2xl w-80 focus-within:border-[#D1AF47]/30 transition-all duration-300 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-            <svg className="w-4 h-4 text-[#667085] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+          <div className={`flex items-center gap-3 bg-[#131C2B] border border-[#1C2433] px-5 py-3 rounded-2xl w-80 focus-within:border-[#D1AF47]/30 transition-all duration-300 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <svg className="w-4 h-4 text-[#94A3B8] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
               type="text"
               placeholder={t.searchPlaceholder}
-              className={`bg-transparent border-none outline-none text-sm w-full placeholder-[#667085]/60 text-[#101828] ${isRTL ? "text-right" : "text-left"}`}
+              className={`bg-transparent border-none outline-none text-sm w-full placeholder-[#94A3B8]/60 text-[#F5F7FA] ${isRTL ? "text-right" : "text-left"}`}
             />
           </div>
 
@@ -356,7 +364,7 @@ export default function ProviderLayout({
             {/* Language Switcher Button */}
             <button
               onClick={toggleLanguage}
-              className="px-5 py-2.5 rounded-2xl border border-[#E8E8E8] bg-white text-xs font-bold text-[#667085] hover:border-[#D1AF47]/40 hover:text-[#D1AF47] transition-all duration-300"
+              className="px-5 py-2.5 rounded-2xl border border-[#1C2433] bg-[#131C2B] text-xs font-bold text-[#94A3B8] hover:border-[#D1AF47]/40 hover:text-[#D1AF47] transition-all duration-300"
             >
               {t.langSwitch}
             </button>
@@ -364,8 +372,8 @@ export default function ProviderLayout({
             {/* Profile Menu */}
             <div className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <div className={`hidden sm:block ${isRTL ? "text-left" : "text-right"}`}>
-                <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-[0.15em] leading-none mb-1">{t.welcome}</p>
-                <p className="text-sm font-bold text-gray-900 tracking-wide">Elite Barbershop</p>
+                <p className="text-[10px] text-[#64748B] font-semibold uppercase tracking-[0.15em] leading-none mb-1">{t.welcome}</p>
+                <p className="text-sm font-bold text-[#F5F7FA] tracking-wide">Elite Barbershop</p>
               </div>
               <div
                 className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#D1AF47] to-[#E0C46A] text-[#101828] font-black text-sm flex items-center justify-center shadow-[0_0_20px_rgba(209,175,71,0.15)]"

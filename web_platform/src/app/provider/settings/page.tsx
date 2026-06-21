@@ -223,7 +223,7 @@ export default function ProviderSettingsPage() {
 
       const { data: providerInfo, error: fetchError } = await supabase
         .from("providers")
-        .select("business_name_en, business_name_ar, description_en, description_ar, deposit_percentage")
+        .select("business_name_en, business_name_ar, description_en, description_ar, phone, deposit_percentage")
         .eq("owner_id", user.id)
         .maybeSingle();
 
@@ -247,6 +247,8 @@ export default function ProviderSettingsPage() {
 
       if (profileInfo?.phone_number) {
         setPhone(profileInfo.phone_number);
+      } else if (providerInfo?.phone) {
+        setPhone(providerInfo.phone);
       }
 
       // Load user preferences metadata if available

@@ -23,7 +23,21 @@ const translations = {
     inStoreOnly: "In-store Only",
     totalServices: "Total Services",
     activeServices: "Active Services",
-    homeServicesCount: "Home Dispatch Eligible"
+    homeServicesCount: "Home Dispatch Eligible",
+    editService: "Edit Service",
+    nameEnL: "Service name (English)",
+    nameArL: "Service name (Arabic)",
+    priceL: "Base price (SAR)",
+    durationL: "Duration (minutes)",
+    homeEligibleL: "Home service eligible",
+    activeL: "Active (visible to customers)",
+    save: "Save Service",
+    saving: "Saving...",
+    cancel: "Cancel",
+    deleteConfirm: "Delete this service permanently?",
+    noServices: "No services yet. Add your first service item.",
+    selectCategory: "Select category",
+    loadingServices: "Loading services..."
   },
   ar: {
     servicesTitle: "قائمة الخدمات",
@@ -44,7 +58,21 @@ const translations = {
     inStoreOnly: "في الصالون فقط",
     totalServices: "إجمالي الخدمات",
     activeServices: "الخدمات النشطة",
-    homeServicesCount: "متاح للخدمة المنزلية"
+    homeServicesCount: "متاح للخدمة المنزلية",
+    editService: "تعديل الخدمة",
+    nameEnL: "اسم الخدمة (إنجليزي)",
+    nameArL: "اسم الخدمة (عربي)",
+    priceL: "السعر الأساسي (ر.س)",
+    durationL: "المدة (دقائق)",
+    homeEligibleL: "متاحة كخدمة منزلية",
+    activeL: "نشطة (مرئية للعملاء)",
+    save: "حفظ الخدمة",
+    saving: "جاري الحفظ...",
+    cancel: "إلغاء",
+    deleteConfirm: "حذف هذه الخدمة نهائيا؟",
+    noServices: "لا توجد خدمات بعد. أضف أول خدمة.",
+    selectCategory: "اختر التصنيف",
+    loadingServices: "جاري تحميل الخدمات..."
   }
 };
 
@@ -378,54 +406,6 @@ export default function ProviderServicesPage() {
       setSaving(false);
     }
   };
-
-  const legacyServicesList = [
-    {
-      id: "1",
-      name_en: "Classic Mens Haircut & Wash",
-      name_ar: "قص شعر رجالي كلاسيكي مع غسيل",
-      category_en: "Haircuts & Styling",
-      category_ar: "قص وتصفيف الشعر",
-      price: "120 SAR",
-      duration: "40 min",
-      isHomeService: false,
-      isActive: true
-    },
-    {
-      id: "2",
-      name_en: "Premium Beard Grooming & Shave",
-      name_ar: "حلاقة وتحديد اللحية الممتازة",
-      category_en: "Beard Care",
-      category_ar: "العناية باللحية",
-      price: "90 SAR",
-      duration: "30 min",
-      isHomeService: true,
-      isActive: true
-    },
-    {
-      id: "3",
-      name_en: "Full Hair Coloring & Balayage",
-      name_ar: "صبغ الشعر بالكامل وبلاياج",
-      category_en: "Hair Coloring",
-      category_ar: "صبغ الشعر",
-      price: "450 SAR",
-      duration: "120 min",
-      isHomeService: true,
-      isActive: true
-    },
-    {
-      id: "4",
-      name_en: "Luxury Facial Charcoal Mask",
-      name_ar: "ماسك الفحم الفاخر للوجه",
-      category_en: "Skincare",
-      category_ar: "العناية بالبشرة",
-      price: "180 SAR",
-      duration: "45 min",
-      isHomeService: false,
-      isActive: false
-    }
-  ];
-  void legacyServicesList;
 
   return (
     <div 
