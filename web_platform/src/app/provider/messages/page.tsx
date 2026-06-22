@@ -173,11 +173,6 @@ export default function ProviderMessages() {
                       : "border-transparent bg-transparent hover:bg-white/[0.02] hover:border-white/5"
                   }`}
                 >
-                  {/* Left accent indicator */}
-                  {isSelected && (
-                    <div className="absolute left-0 top-1/4 bottom-1/4 w-[3px] bg-[#D1AF47] rounded-r-md" />
-                  )}
-                  
                   {/* Avatar wrapper */}
                   <div className="relative flex-shrink-0">
                     <div className={`p-[2px] rounded-full transition-all duration-300 ${

@@ -57,7 +57,7 @@ export default function StaffManagementPage() {
     >
       
       {/* Mini Header */}
-      <header className="bg-white/85 backdrop-blur-md border-b border-gray-200 py-5 px-6 sm:px-12 flex items-center justify-between sticky top-0 z-50">
+      <header className="bg-[#0B0F17]/90 backdrop-blur-md border-b border-white/[0.06] py-5 px-6 sm:px-12 flex items-center justify-between sticky top-0 z-50">
         <Link 
           href="/" 
           className="text-xl font-bold tracking-[0.2em] text-[#D1AF47] hover:text-[#E0C46A] transition-all duration-300"
@@ -66,7 +66,7 @@ export default function StaffManagementPage() {
         </Link>
         <Link 
           href="/" 
-          className="text-xs font-semibold uppercase tracking-wider text-gray-700 hover:text-black border border-gray-200 bg-gray-50 hover:bg-[#D1AF47]/10 hover:border-[#D1AF47]/30 px-4 py-2 rounded-full transition-all duration-300"
+          className="text-xs font-semibold uppercase tracking-wider text-[#B8C0D4] hover:text-[#F4E7B6] border border-white/[0.08] bg-white/[0.03] hover:bg-[#D1AF47]/10 hover:border-[#D1AF47]/30 px-4 py-2 rounded-full transition-all duration-300"
         >
           {t.backHome}
         </Link>

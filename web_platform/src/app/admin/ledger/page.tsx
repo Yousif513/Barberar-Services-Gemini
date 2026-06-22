@@ -432,7 +432,7 @@ export default function AdminLedger() {
                       </td>
                       <td className="py-4 px-6 text-gray-500">{formatDate(request.requested_at)}</td>
                       <td className="py-4 px-6 font-serif font-black text-gray-900">
-                        {formatMoney(request.amount)} {lang === "ar" ? "Ø±ÙŠØ§Ù„" : "SAR"}
+                        {formatMoney(request.amount)} {lang === "ar" ? "ريال" : "SAR"}
                       </td>
                       <td className="py-4 px-6">
                         <p className="font-bold text-gray-900">{request.bank_name}</p>

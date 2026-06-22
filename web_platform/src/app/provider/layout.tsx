@@ -260,14 +260,6 @@ export default function ProviderLayout({
                         : "text-[#D9D4C8] hover:bg-white/[0.06] hover:text-white"
                     } ${isRTL ? "flex-row-reverse text-right" : "flex-row text-left"}`}
                   >
-                    {isActive && (
-                      <span
-                        className={`absolute top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-[#D1AF47] ${
-                          isRTL ? "right-0" : "left-0"
-                        }`}
-                      />
-                    )}
-
                     <span className={`flex-shrink-0 transition-colors duration-300 ${isActive ? "text-[#E0C46A]" : "text-[#8F8A80] group-hover:text-[#D1AF47]"}`}>
                       {getNavIcon(item.path)}
                     </span>

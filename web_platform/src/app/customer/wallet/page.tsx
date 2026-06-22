@@ -55,12 +55,12 @@ export default function CustomerWalletPage() {
 
   const t = translations[locale];
   const walletActions = {
-    bookingDeposit: locale === "ar" ? "Ø¹Ø±Ø¨ÙˆÙ† Ø­Ø¬Ø²" : "Booking Deposit",
+    bookingDeposit: locale === "ar" ? "عربون حجز" : "Booking Deposit",
     cardNotice: locale === "ar"
-      ? "ØªØªÙ… Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ø¨Ø·Ø§Ù‚Ø§Øª Ø¨Ø£Ù…Ø§Ù† Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ø¯ÙØ¹."
+      ? "تتم إضافة البطاقات بأمان أثناء الدفع."
       : "Cards are added securely during checkout.",
     topUpNotice: locale === "ar"
-      ? "Ø´Ø­Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø© ØºÙŠØ± Ù…ÙØ¹Ù„ Ø­Ø§Ù„ÙŠØ§Ù‹. ØªØ¯ÙØ¹ Ø¹Ø±Ø¨ÙˆÙ†Ø§Øª Ø§Ù„Ø­Ø¬Ø² Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ø¯ÙØ¹."
+      ? "شحن المحفظة غير مفعل حاليا. تدفع عربونات الحجز أثناء الدفع."
       : "Wallet top-up is not enabled yet. Booking deposits are paid during checkout."
   };
 

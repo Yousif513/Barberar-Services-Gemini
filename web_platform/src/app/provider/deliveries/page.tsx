@@ -395,13 +395,13 @@ export default function CourierDeliveriesPage() {
       <div className="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] bg-blue-500/5 rounded-full blur-[140px] pointer-events-none" />
 
       {/* Top Header Section */}
-      <div className={`flex justify-between items-center flex-wrap gap-4 pb-6 border-b border-gray-200`}>
+      <div className="flex justify-between items-center flex-wrap gap-4 pb-6 border-b border-white/[0.06]">
         <div className={isRTL ? "text-right" : "text-left"}>
-          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900 font-serif flex items-center gap-2">
+          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white font-serif flex items-center gap-2">
             <span className="w-1.5 h-6 bg-[#D1AF47] rounded-full inline-block" />
             {t.title}
           </h2>
-          <p className="text-xs md:text-sm text-gray-500 mt-2 max-w-xl leading-relaxed">{t.subtitle}</p>
+          <p className="text-xs md:text-sm text-[#7B859C] mt-2 max-w-xl leading-relaxed">{t.subtitle}</p>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-[10px] uppercase font-extrabold text-[#D1AF47] bg-[#D1AF47]/10 px-3.5 py-1.5 border border-[#D1AF47]/20 rounded-full shadow-[0_0_15px_rgba(209,175,71,0.08)]">
