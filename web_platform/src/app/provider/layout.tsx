@@ -232,7 +232,7 @@ export default function ProviderLayout({
       {/* SIDEBAR — Floating white sidebar fixed to window height  */}
       {/* ═══════════════════════════════════════════════════════ */}
       <aside className="flex-shrink-0 p-4 md:h-screen">
-        <div className="primora-dashboard-sidebar relative flex h-full w-full flex-col overflow-hidden rounded-[28px] border border-[#E0C46A]/60 bg-[radial-gradient(circle_at_22%_0%,rgba(224,196,106,0.22),transparent_36%),linear-gradient(160deg,#221C12_0%,#171814_46%,#2B2417_100%)] p-5 text-white shadow-[0_24px_70px_rgba(16,18,15,0.22),0_0_46px_rgba(209,175,71,0.24)] md:w-[280px]">
+        <div className="primora-dashboard-sidebar relative flex h-full w-full flex-col overflow-hidden rounded-[28px] border border-[#E0C46A]/60 bg-[radial-gradient(circle_at_22%_0%,rgba(224,196,106,0.22),transparent_36%),linear-gradient(160deg,#221C12_0%,#171814_46%,#2B2417_100%)] p-5 text-[#F8F5EA] shadow-[0_24px_70px_rgba(16,18,15,0.22),0_0_46px_rgba(209,175,71,0.24)] md:w-[280px]">
           {/* Logo */}
           <Link href="/" className={`flex flex-shrink-0 items-center gap-2.5 px-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
             <svg className="w-5.5 h-5.5 text-[#D1AF47]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -257,10 +257,10 @@ export default function ProviderLayout({
                     className={`group relative flex items-center gap-3.5 px-4 py-3 rounded-[18px] text-[13px] font-semibold transition-all duration-300 ${
                       isActive
                         ? "border border-[#E0C46A]/50 bg-[#D1AF47]/20 text-[#F4E7B6] shadow-[0_0_34px_rgba(209,175,71,0.34),inset_0_0_18px_rgba(244,231,182,0.08)]"
-                        : "text-[#D9D4C8] hover:bg-white/[0.06] hover:text-white"
+                        : "text-[#EFE7D8] hover:bg-white/[0.08] hover:text-white"
                     } ${isRTL ? "flex-row-reverse text-right" : "flex-row text-left"}`}
                   >
-                    <span className={`flex-shrink-0 transition-colors duration-300 ${isActive ? "text-[#E0C46A]" : "text-[#8F8A80] group-hover:text-[#D1AF47]"}`}>
+                    <span className={`flex-shrink-0 transition-colors duration-300 ${isActive ? "text-[#E0C46A]" : "text-[#C8BFAE] group-hover:text-[#E0C46A]"}`}>
                       {getNavIcon(item.path)}
                     </span>
 
@@ -298,10 +298,10 @@ export default function ProviderLayout({
                 </div>
                 <div className={`text-left ${isRTL ? "text-right" : "text-left"}`}>
                   <h5 className="text-[11px] font-bold text-[#F4E7B6] leading-none">Need Help?</h5>
-                  <p className="text-[9px] text-[#D9D4C8] font-semibold mt-0.5">Contact Support</p>
+                  <p className="text-[9px] text-[#EFE7D8] font-semibold mt-0.5">Contact Support</p>
                 </div>
               </div>
-              <svg className={`w-3 h-3 text-[#D9D4C8] group-hover:text-[#D1AF47] transition duration-300 ${isRTL ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <svg className={`w-3 h-3 text-[#EFE7D8] group-hover:text-[#E0C46A] transition duration-300 ${isRTL ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </Link>
@@ -313,13 +313,13 @@ export default function ProviderLayout({
                   N
                 </div>
                 <div className={`hidden md:block ${isRTL ? "text-left" : "text-right"}`}>
-                  <p className="text-[9px] text-[#9C9688] uppercase font-bold tracking-widest leading-none mb-0.5">Partner Hub</p>
+                  <p className="text-[9px] text-[#D0C5AF] uppercase font-bold tracking-widest leading-none mb-0.5">Partner Hub</p>
                   <p className="text-xs font-black text-white leading-tight truncate max-w-[110px]">Elite Barbershop</p>
                 </div>
               </div>
               <Link 
                 href="/" 
-                className="p-2 rounded-xl text-[#D9D4C8] hover:bg-white/[0.06] hover:text-[#F4E7B6] transition-all duration-300"
+                className="p-2 rounded-xl text-[#EFE7D8] hover:bg-white/[0.08] hover:text-[#F4E7B6] transition-all duration-300"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -341,14 +341,14 @@ export default function ProviderLayout({
 
           
           {/* Light Search Input */}
-          <div className={`flex items-center gap-3 bg-[#131C2B] border border-[#1C2433] px-5 py-3 rounded-2xl w-80 focus-within:border-[#D1AF47]/30 transition-all duration-300 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-            <svg className="w-4 h-4 text-[#94A3B8] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+          <div className={`flex items-center gap-3 bg-[#101722]/95 border border-[#E0C46A]/20 px-5 py-3 rounded-2xl w-80 focus-within:border-[#D1AF47]/45 transition-all duration-300 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <svg className="w-4 h-4 text-[#D8DEE9] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
               type="text"
               placeholder={t.searchPlaceholder}
-              className={`bg-transparent border-none outline-none text-sm w-full placeholder-[#94A3B8]/60 text-[#F5F7FA] ${isRTL ? "text-right" : "text-left"}`}
+              className={`bg-transparent border-none outline-none text-sm w-full placeholder:text-[#CBD5E1]/80 text-[#F8FAFC] ${isRTL ? "text-right" : "text-left"}`}
             />
           </div>
 
@@ -356,7 +356,7 @@ export default function ProviderLayout({
             {/* Language Switcher Button */}
             <button
               onClick={toggleLanguage}
-              className="px-5 py-2.5 rounded-2xl border border-[#1C2433] bg-[#131C2B] text-xs font-bold text-[#94A3B8] hover:border-[#D1AF47]/40 hover:text-[#D1AF47] transition-all duration-300"
+              className="px-5 py-2.5 rounded-2xl border border-[#E0C46A]/20 bg-[#101722]/95 text-xs font-bold text-[#F4E7B6] hover:border-[#D1AF47]/45 hover:text-[#E0C46A] transition-all duration-300"
             >
               {t.langSwitch}
             </button>
@@ -364,7 +364,7 @@ export default function ProviderLayout({
             {/* Profile Menu */}
             <div className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <div className={`hidden sm:block ${isRTL ? "text-left" : "text-right"}`}>
-                <p className="text-[10px] text-[#64748B] font-semibold uppercase tracking-[0.15em] leading-none mb-1">{t.welcome}</p>
+                <p className="text-[10px] text-[#D0C5AF] font-semibold uppercase tracking-[0.15em] leading-none mb-1">{t.welcome}</p>
                 <p className="text-sm font-bold text-[#F5F7FA] tracking-wide">Elite Barbershop</p>
               </div>
               <div
