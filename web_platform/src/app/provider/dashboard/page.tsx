@@ -87,7 +87,7 @@ export default function ProviderDashboardPage() {
   };
   const lockSeconds = Math.max(0, secondsLeft - 1200);
 
-  const cardBase = "rounded-[20px] border border-[#1C2433] bg-[#0F1623] shadow-[0_8px_24px_rgba(0,0,0,0.04)]";
+  const cardBase = "rounded-[20px] border border-[#E0C46A]/15 bg-[#0F1623]/88 shadow-[0_8px_24px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-sm";
   const eyebrow = "text-[10px] font-black uppercase tracking-[0.14em] text-[#94A3B8]";
 
   const kpis = [
@@ -102,7 +102,7 @@ export default function ProviderDashboardPage() {
   ];
 
   return (
-    <div dir={isRTL ? "rtl" : "ltr"} className={`flex h-full flex-col gap-3 bg-[#070B12] text-[#F5F7FA] font-sans ${isRTL ? "text-right" : "text-left"}`}>
+    <div dir={isRTL ? "rtl" : "ltr"} className={`relative flex h-full min-h-0 flex-col gap-3 overflow-hidden rounded-[30px] border border-[#E0C46A]/25 bg-[radial-gradient(circle_at_12%_0%,rgba(209,175,71,0.18),transparent_32%),radial-gradient(circle_at_96%_14%,rgba(244,231,182,0.10),transparent_28%),linear-gradient(145deg,rgba(13,16,20,0.96)_0%,rgba(24,25,20,0.92)_46%,rgba(41,34,20,0.88)_100%)] p-4 text-[#F5F7FA] shadow-[0_24px_70px_rgba(16,18,15,0.18),inset_0_1px_0_rgba(255,255,255,0.05)] font-sans ${isRTL ? "text-right" : "text-left"}`}>
       {/* HEADER */}
       <header className="flex flex-shrink-0 flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className={`flex items-center gap-3 ${flip}`}>

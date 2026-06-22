@@ -226,13 +226,13 @@ export default function ProviderLayout({
 
   return (
     <AuthGuard allowedRoles={["provider_owner", "provider_employee"]}>
-    <div className="primora-dashboard-skin flex flex-col md:flex-row bg-[#F7F7F5] text-black font-sans selection:bg-[#D1AF47] selection:text-white md:h-screen md:overflow-hidden">
+    <div className="primora-dashboard-skin flex flex-col md:flex-row bg-[radial-gradient(circle_at_20%_10%,rgba(209,175,71,0.13),transparent_32%),linear-gradient(135deg,#F8F6EF_0%,#F2EEE4_46%,#E9E2D2_100%)] text-black font-sans selection:bg-[#D1AF47] selection:text-white md:h-screen md:overflow-hidden">
       
       {/* ═══════════════════════════════════════════════════════ */}
       {/* SIDEBAR — Floating white sidebar fixed to window height  */}
       {/* ═══════════════════════════════════════════════════════ */}
       <aside className="flex-shrink-0 p-4 md:h-screen">
-        <div className="primora-dashboard-sidebar flex h-full w-full flex-col rounded-[28px] border border-[#E0C46A]/60 bg-[#10120F] p-5 text-white shadow-[0_24px_70px_rgba(16,18,15,0.28),0_0_46px_rgba(209,175,71,0.24)] md:w-[280px]">
+        <div className="primora-dashboard-sidebar relative flex h-full w-full flex-col overflow-hidden rounded-[28px] border border-[#E0C46A]/60 bg-[radial-gradient(circle_at_22%_0%,rgba(224,196,106,0.22),transparent_36%),linear-gradient(160deg,#221C12_0%,#171814_46%,#2B2417_100%)] p-5 text-white shadow-[0_24px_70px_rgba(16,18,15,0.22),0_0_46px_rgba(209,175,71,0.24)] md:w-[280px]">
           {/* Logo */}
           <Link href="/" className={`flex flex-shrink-0 items-center gap-2.5 px-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
             <svg className="w-5.5 h-5.5 text-[#D1AF47]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -337,7 +337,7 @@ export default function ProviderLayout({
 
         {/* ── HEADER (80px) ── */}
         {!(pathname === "/provider/dashboard" || pathname === "/provider/dashboard/") && (
-          <header className="h-20 bg-[#0B0F17]/80 backdrop-blur-xl border-b border-[#1C2433] px-8 flex items-center justify-between sticky top-0 z-40">
+          <header className="mx-5 mt-5 h-[72px] rounded-[26px] border border-[#E0C46A]/25 bg-[linear-gradient(135deg,rgba(31,28,20,0.90),rgba(19,28,43,0.78))] px-6 flex items-center justify-between sticky top-5 z-40 shadow-[0_18px_42px_rgba(16,18,15,0.14),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
 
           
           {/* Light Search Input */}
