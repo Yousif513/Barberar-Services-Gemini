@@ -87,8 +87,8 @@ export default function ProviderDashboardPage() {
   };
   const lockSeconds = Math.max(0, secondsLeft - 1200);
 
-  const cardBase = "rounded-[20px] border border-[#E0C46A]/25 bg-[#101722]/96 shadow-[0_8px_24px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-sm";
-  const eyebrow = "text-[10px] font-black uppercase tracking-[0.14em] text-[#D8DEE9]";
+  const cardBase = "rounded-2xl border border-[#ECECEC] bg-white shadow-[0_8px_30px_rgb(0,0,0,0.015)] transition-all duration-300 hover:border-[#D1AF47]/20 hover:shadow-[0_12px_40px_rgba(0,0,0,0.035)]";
+  const eyebrow = "text-xs font-extrabold uppercase tracking-widest text-[#667085]";
 
   const kpis = [
     { label: t.revenue, value: "128,450 SAR", change: "+12%", tone: "text-[#22C55E]" },
@@ -98,11 +98,11 @@ export default function ProviderDashboardPage() {
     { label: t.staffOnline, value: "4 / 6", change: t.live, tone: "text-[#22C55E]" },
     { label: t.reviews, value: "4.8 ★", change: "+0.2", tone: "text-[#22C55E]" },
     { label: t.walkins, value: "12", change: "+4", tone: "text-[#22C55E]" },
-    { label: t.avgTicket, value: "138 SAR", change: locale === "ar" ? "مستقر" : "Stable", tone: "text-[#F4D47B]" },
+    { label: t.avgTicket, value: "138 SAR", change: locale === "ar" ? "مستقر" : "Stable", tone: "text-[#D1AF47]" },
   ];
 
   return (
-    <div dir={isRTL ? "rtl" : "ltr"} className={`relative flex h-full min-h-0 flex-col gap-3 overflow-hidden rounded-[30px] border border-[#E0C46A]/25 bg-[radial-gradient(circle_at_12%_0%,rgba(209,175,71,0.18),transparent_32%),radial-gradient(circle_at_96%_14%,rgba(244,231,182,0.10),transparent_28%),linear-gradient(145deg,rgba(13,16,20,0.96)_0%,rgba(24,25,20,0.92)_46%,rgba(41,34,20,0.88)_100%)] p-4 text-[#F5F7FA] shadow-[0_24px_70px_rgba(16,18,15,0.18),inset_0_1px_0_rgba(255,255,255,0.05)] font-sans ${isRTL ? "text-right" : "text-left"}`}>
+    <div dir={isRTL ? "rtl" : "ltr"} className={`relative flex h-full min-h-0 flex-col gap-3 overflow-hidden p-1 text-[#101828] font-sans ${isRTL ? "text-right" : "text-left"}`}>
       {/* HEADER */}
       <header className="flex flex-shrink-0 flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className={`flex items-center gap-3 ${flip}`}>
@@ -111,28 +111,28 @@ export default function ProviderDashboardPage() {
             <h1 className="font-serif text-lg font-black leading-tight lg:text-xl">{businessName}</h1>
             <div className={`flex items-center gap-1.5 ${flip}`}>
               <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
-              <span className="text-[10px] font-bold text-[#D8DEE9]">{t.branch}</span>
+              <span className="text-[10px] font-bold text-gray-500">{t.branch}</span>
             </div>
           </div>
         </div>
         <div className={`flex items-center gap-2.5 ${flip}`}>
-          <label className={`flex items-center gap-2 rounded-full border border-[#E0C46A]/20 bg-[#101722]/95 px-3.5 py-2 shadow-[0_4px_14px_rgba(0,0,0,0.03)] md:w-56 ${flip}`}>
-            <svg className="h-4 w-4 flex-shrink-0 text-[#D8DEE9]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            <input placeholder={t.search} className="w-full border-none bg-transparent text-xs text-[#F8FAFC] outline-none placeholder:text-[#CBD5E1]/80" />
+          <label className={`flex items-center gap-2 rounded-full border border-[#ECECEC] bg-white px-3.5 py-2 shadow-sm md:w-56 ${flip}`}>
+            <svg className="h-4 w-4 flex-shrink-0 text-[#667085]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            <input placeholder={t.search} className="w-full border-none bg-transparent text-xs text-[#101828] outline-none placeholder:text-[#667085]/60" />
           </label>
-          <button onClick={toggleLang} className="rounded-full border border-[#E0C46A]/20 bg-[#101722]/95 px-3.5 py-2 text-xs font-bold text-[#F4E7B6] shadow-[0_4px_14px_rgba(0,0,0,0.03)] transition hover:border-[#D1AF47]/45 hover:text-[#E0C46A]">{t.lang}</button>
+          <button onClick={toggleLang} className="rounded-full border border-[#ECECEC] bg-white px-3.5 py-2 text-xs font-bold text-gray-700 shadow-sm transition hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">{t.lang}</button>
           <Link href="/provider/calendar" className="rounded-full bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] px-4 py-2 text-xs font-black text-[#101828] shadow-md shadow-[#D1AF47]/10 transition hover:brightness-105">+ {t.bookWalkIn}</Link>
         </div>
       </header>
 
       {/* KPI STRIP */}
       <div className={`${cardBase} flex-shrink-0 overflow-x-auto p-3`}>
-        <div className="flex min-w-max divide-x divide-[#E0C46A]/15 rtl:divide-x-reverse">
+        <div className="flex min-w-max divide-x divide-[#ECECEC] rtl:divide-x-reverse">
           {kpis.map((k) => (
             <div key={k.label} className="min-w-[130px] px-4 first:ps-1 last:pe-1">
-              <span className="block text-[8px] font-black uppercase tracking-[0.14em] text-[#CBD5E1]">{k.label}</span>
+              <span className="block text-[8px] font-black uppercase tracking-[0.14em] text-[#667085]">{k.label}</span>
               <div className="mt-1 flex items-baseline gap-1.5">
-                <strong className="font-serif text-sm font-black">{k.value}</strong>
+                <strong className="font-serif text-sm font-black text-[#101828]">{k.value}</strong>
                 <span className={`text-[9px] font-black ${k.tone}`}>{k.change}</span>
               </div>
             </div>
@@ -147,9 +147,9 @@ export default function ProviderDashboardPage() {
           <div className={`mb-1 flex flex-shrink-0 items-center justify-between ${flip}`}>
             <div>
               <h3 className="font-serif text-base font-black">{t.revenueForecast}</h3>
-              <p className="text-[10px] font-medium text-[#CBD5E1]">{t.forecastSub}</p>
+              <p className="text-[10px] font-medium text-gray-500">{t.forecastSub}</p>
             </div>
-            <span className="rounded-lg border border-[#E0C46A]/15 bg-[#131C2B]/95 px-2.5 py-1 text-[10px] font-bold text-[#CBD5E1]">{t.monthly}</span>
+            <span className="rounded-full border border-[#ECECEC] bg-white px-3 py-1 text-[10px] font-bold text-gray-700 shadow-sm">{t.monthly}</span>
           </div>
           <div className="relative min-h-0 w-full flex-1">
             <svg viewBox="0 0 600 150" preserveAspectRatio="none" className="h-full w-full overflow-visible">
@@ -159,14 +159,14 @@ export default function ProviderDashboardPage() {
                   <stop offset="100%" stopColor="#D1AF47" stopOpacity="0" />
                 </linearGradient>
               </defs>
-              <line x1="0" y1="40" x2="600" y2="40" stroke="rgba(224,196,106,0.18)" strokeWidth="1" />
-              <line x1="0" y1="95" x2="600" y2="95" stroke="rgba(224,196,106,0.18)" strokeWidth="1" />
+              <line x1="0" y1="40" x2="600" y2="40" stroke="#ECECEC" strokeWidth="1" strokeDasharray="3 4" />
+              <line x1="0" y1="95" x2="600" y2="95" stroke="#ECECEC" strokeWidth="1" strokeDasharray="3 4" />
               <path d="M 10,110 C 100,90 150,135 230,55 C 310,15 380,85 450,45 C 520,15 550,65 600,50 L 600,150 L 10,150 Z" fill="url(#chartGlow)" />
               <path d="M 10,110 C 100,90 150,135 230,55 C 310,15 380,85 450,45 C 520,15 550,65 600,50" fill="none" stroke="#D1AF47" strokeWidth="3" strokeLinecap="round" />
               <path d="M 10,125 C 80,110 160,85 230,75 C 300,65 380,105 450,65 C 520,35 550,45 600,20" fill="none" stroke="#22C55E" strokeWidth="2" strokeDasharray="4 4" strokeLinecap="round" />
             </svg>
           </div>
-          <div className={`mt-1 flex flex-shrink-0 justify-between px-1 text-[9px] font-black uppercase tracking-wider text-[#CBD5E1] ${flip}`}>
+          <div className={`mt-1 flex flex-shrink-0 justify-between px-1 text-[9px] font-black uppercase tracking-wider text-[#667085] ${flip}`}>
             <span>Jan</span><span>Feb</span><span>Mar</span><span className="text-[#D1AF47]">Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span>
           </div>
         </section>
@@ -178,25 +178,25 @@ export default function ProviderDashboardPage() {
             <span className="rounded-full bg-[#22C55E]/10 px-2 py-0.5 text-[8px] font-black uppercase text-[#22C55E]">{t.live}</span>
           </div>
           <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto pe-0.5">
-            <div className="rounded-xl border border-[#E0C46A]/15 bg-[#131C2B]/95 p-2.5">
+            <div className="rounded-xl border border-[#ECECEC] bg-[#F7F6F3] p-2.5">
               <span className="text-[8px] font-black uppercase text-[#22C55E]">{t.ongoing}</span>
               <h4 className="text-xs font-bold">Max Stone — Chair 1</h4>
-              <p className="text-[10px] font-semibold text-[#CBD5E1]">Haircut + Beard · 12m left</p>
+              <p className="text-[10px] font-semibold text-gray-500">Haircut + Beard · 12m left</p>
             </div>
-            <div className="rounded-xl border border-[#E0C46A]/15 bg-[#131C2B]/95 p-2.5">
-              <span className="text-[8px] font-black uppercase text-[#CBD5E1]">{t.nextUp}</span>
+            <div className="rounded-xl border border-[#ECECEC] bg-[#F7F6F3] p-2.5">
+              <span className="text-[8px] font-black uppercase text-[#667085]">{t.nextUp}</span>
               <h4 className="text-xs font-bold">Grisha Jack — Room 2</h4>
-              <p className="text-[10px] font-semibold text-[#CBD5E1]">Moroccan Bath · in 18m</p>
+              <p className="text-[10px] font-semibold text-gray-500">Moroccan Bath · in 18m</p>
             </div>
-            <div className="rounded-xl border border-[#E0C46A]/15 bg-[#131C2B]/95 p-2.5">
+            <div className="rounded-xl border border-[#ECECEC] bg-[#F7F6F3] p-2.5">
               <div className={`flex items-center justify-between ${flip}`}>
-                <span className="text-[8px] font-black uppercase text-[#CBD5E1]">{t.walkInQueue}</span>
+                <span className="text-[8px] font-black uppercase text-[#667085]">{t.walkInQueue}</span>
                 <span className="text-[9px] font-bold text-[#D1AF47]">3 {t.waiting}</span>
               </div>
               <p className="mt-1 text-[10px] font-bold">1. Khalid Yasin · 2. Fahad Al-Qahtani</p>
             </div>
           </div>
-          <Link href="/provider/calendar" className={`mt-2 flex flex-shrink-0 items-center justify-between border-t border-[#E0C46A]/15 pt-2 text-[10px] font-bold text-[#CBD5E1] ${flip}`}>
+          <Link href="/provider/calendar" className={`mt-2 flex flex-shrink-0 items-center justify-between border-t border-[#ECECEC] pt-2 text-[10px] font-bold text-gray-500 ${flip}`}>
             <span>12 walk-ins today</span><span className="text-[#D1AF47]">{t.manageQueue} →</span>
           </Link>
         </section>
@@ -213,13 +213,13 @@ export default function ProviderDashboardPage() {
               { name: "Levi Patrick", bookings: 36, rating: "4.8", rev: "14,200", util: "92%" },
               { name: "Grisha Jack", bookings: 28, rating: "4.7", rev: "11,800", util: "88%" },
             ].map((s) => (
-              <div key={s.name} className={`flex items-center justify-between rounded-xl border border-[#E0C46A]/15 bg-[#131C2B]/95 p-2 ${flip}`}>
+              <div key={s.name} className={`flex items-center justify-between rounded-xl border border-[#ECECEC] bg-[#F7F6F3] p-2 ${flip}`}>
                 <div>
                   <h5 className="text-xs font-bold">{s.name}</h5>
-                  <p className="text-[9px] font-semibold text-[#CBD5E1]">{s.bookings} bk · {s.rating} ★</p>
+                  <p className="text-[9px] font-semibold text-gray-500">{s.bookings} bk · {s.rating} ★</p>
                 </div>
                 <div className={isRTL ? "text-left" : "text-right"}>
-                  <span className="block font-serif text-xs font-black">{s.rev} SAR</span>
+                  <span className="block font-serif text-xs font-black text-[#101828]">{s.rev} SAR</span>
                   <span className="block text-[9px] font-bold text-[#22C55E]">{t.util}: {s.util}</span>
                 </div>
               </div>
@@ -231,7 +231,7 @@ export default function ProviderDashboardPage() {
         <section className={`${cardBase} flex min-h-0 flex-col p-4 lg:col-span-4`}>
           <div className={`mb-2 flex flex-shrink-0 items-center justify-between ${flip}`}>
             <h3 className={eyebrow}>{t.serviceIntel}</h3>
-            <span className="text-[10px] font-bold text-[#CBD5E1]">{t.avgLoad}: 72%</span>
+            <span className="text-[10px] font-bold text-gray-500">{t.avgLoad}: 72%</span>
           </div>
           <div className="flex min-h-0 flex-1 flex-col justify-center gap-2.5">
             {[
@@ -244,11 +244,11 @@ export default function ProviderDashboardPage() {
                   <span className="font-serif">{s.name}</span>
                   <span className="text-[#D1AF47]">{s.count} · {s.val}%</span>
                 </div>
-                <div className="h-1.5 overflow-hidden rounded-full bg-[#E0C46A]/15"><div className="h-full rounded-full bg-gradient-to-r from-[#D1AF47] to-[#E0C46A]" style={{ width: `${s.val}%` }} /></div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-[#F5F5F5]"><div className="h-full rounded-full bg-gradient-to-r from-[#D1AF47] to-[#E0C46A]" style={{ width: `${s.val}%` }} /></div>
               </div>
             ))}
           </div>
-          <Link href="/provider/services" className={`mt-2 flex flex-shrink-0 items-center justify-end border-t border-[#E0C46A]/15 pt-2 text-[10px] font-bold text-[#F4D47B] ${flip}`}>{t.manageServices} →</Link>
+          <Link href="/provider/services" className={`mt-2 flex flex-shrink-0 items-center justify-end border-t border-[#ECECEC] pt-2 text-[10px] font-bold text-[#D1AF47] ${flip}`}>{t.manageServices} →</Link>
         </section>
 
         {/* Prayer Operations Control */}
@@ -257,29 +257,29 @@ export default function ProviderDashboardPage() {
             <h3 className={eyebrow}>{t.prayerControl}</h3>
             <span className="rounded-full border border-[#EF4444]/20 bg-[#EF4444]/10 px-2 py-0.5 text-[8px] font-black uppercase text-[#EF4444]">{t.lockPending}</span>
           </div>
-          <div className="rounded-xl border border-[#E0C46A]/15 bg-[#131C2B]/95 p-3">
+          <div className="rounded-xl border border-[#ECECEC] bg-[#F7F6F3] p-3">
             <div className={`flex items-center justify-between ${flip}`}>
               <div>
-                <span className="block text-[8px] font-black uppercase text-[#CBD5E1]">{t.nextPrayer}</span>
+                <span className="block text-[8px] font-black uppercase text-[#667085]">{t.nextPrayer}</span>
                 <span className="font-serif text-base font-black">Asr</span>
               </div>
               <div className={isRTL ? "text-left" : "text-right"}>
-                <span className="block text-[8px] font-black uppercase text-[#CBD5E1]">{t.prayerIn}</span>
+                <span className="block text-[8px] font-black uppercase text-[#667085]">{t.prayerIn}</span>
                 <span className="font-serif text-base font-black text-[#EF4444]">{fmt(secondsLeft)}</span>
               </div>
             </div>
-            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#E0C46A]/15">
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#F5F5F5]">
               <div className="h-full rounded-full bg-gradient-to-r from-[#D1AF47] to-[#EF4444]" style={{ width: `${((4354 - secondsLeft) / 4354) * 100}%` }} />
             </div>
-            <div className="mt-2 grid grid-cols-2 gap-2 border-t border-[#E0C46A]/15 pt-2">
-              <div><span className="block text-[8px] font-black uppercase text-[#CBD5E1]">{t.lockIn}</span><span className="font-serif text-xs font-black text-[#FACC15]">{fmt(lockSeconds)}</span></div>
-              <div><span className="block text-[8px] font-black uppercase text-[#CBD5E1]">{t.autoResume}</span><span className="font-serif text-xs font-black text-[#4ADE80]">04:15 PM</span></div>
+            <div className="mt-2 grid grid-cols-2 gap-2 border-t border-[#ECECEC] pt-2">
+              <div><span className="block text-[8px] font-black uppercase text-[#667085]">{t.lockIn}</span><span className="font-serif text-xs font-black text-[#D1AF47]">{fmt(lockSeconds)}</span></div>
+              <div><span className="block text-[8px] font-black uppercase text-[#667085]">{t.autoResume}</span><span className="font-serif text-xs font-black text-[#16A34A]">04:15 PM</span></div>
             </div>
           </div>
           <div className="mt-2 grid flex-shrink-0 grid-cols-3 gap-2">
-            {([[t.bookingsAffected, "3", "text-[#EF4444]"], [t.staffAffected, "2", "text-[#F59E0B]"], [t.roomsAffected, "1", "text-[#F5F7FA]"]] as [string, string, string][]).map(([l, v, c]) => (
-              <div key={l} className="rounded-lg border border-[#E0C46A]/15 bg-[#131C2B]/95 p-1.5 text-center">
-                <span className="block text-[7px] font-black uppercase text-[#CBD5E1]">{l}</span>
+            {([[t.bookingsAffected, "3", "text-[#EF4444]"], [t.staffAffected, "2", "text-[#F59E0B]"], [t.roomsAffected, "1", "text-[#101828]"]] as [string, string, string][]).map(([l, v, c]) => (
+              <div key={l} className="rounded-lg border border-[#ECECEC] bg-white p-1.5 text-center">
+                <span className="block text-[7px] font-black uppercase text-[#667085]">{l}</span>
                 <span className={`font-serif text-sm font-black ${c}`}>{v}</span>
               </div>
             ))}
