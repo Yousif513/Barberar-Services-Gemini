@@ -337,18 +337,18 @@ export default function ProviderLayout({
 
         {/* ── HEADER (80px) ── */}
         {!(pathname === "/provider/dashboard" || pathname === "/provider/dashboard/") && (
-          <header className="mx-5 mt-5 h-[72px] rounded-[26px] border border-[#E0C46A]/25 bg-[linear-gradient(135deg,rgba(31,28,20,0.90),rgba(19,28,43,0.78))] px-6 flex items-center justify-between sticky top-5 z-40 shadow-[0_18px_42px_rgba(16,18,15,0.14),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
+          <header className="mx-5 mt-5 h-[72px] rounded-[26px] border border-[#ECECEC] bg-white px-6 flex items-center justify-between sticky top-5 z-40 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
 
           
           {/* Light Search Input */}
-          <div className={`flex items-center gap-3 bg-[#101722]/95 border border-[#E0C46A]/20 px-5 py-3 rounded-2xl w-80 focus-within:border-[#D1AF47]/45 transition-all duration-300 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-            <svg className="w-4 h-4 text-[#D8DEE9] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+          <div className={`flex items-center gap-3 bg-white border border-[#ECECEC] px-5 py-3 rounded-2xl w-80 focus-within:border-[#D1AF47]/40 transition-all duration-300 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <svg className="w-4 h-4 text-[#667085] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
               type="text"
               placeholder={t.searchPlaceholder}
-              className={`bg-transparent border-none outline-none text-sm w-full placeholder:text-[#CBD5E1]/80 text-[#F8FAFC] ${isRTL ? "text-right" : "text-left"}`}
+              className={`bg-transparent border-none outline-none text-sm w-full placeholder:text-[#667085]/60 text-[#101828] ${isRTL ? "text-right" : "text-left"}`}
             />
           </div>
 
@@ -356,7 +356,7 @@ export default function ProviderLayout({
             {/* Language Switcher Button */}
             <button
               onClick={toggleLanguage}
-              className="px-5 py-2.5 rounded-2xl border border-[#E0C46A]/20 bg-[#101722]/95 text-xs font-bold text-[#F4E7B6] hover:border-[#D1AF47]/45 hover:text-[#E0C46A] transition-all duration-300"
+              className="px-5 py-2.5 rounded-2xl border border-[#ECECEC] bg-white text-xs font-bold text-gray-700 hover:border-[#D1AF47]/40 hover:text-[#D1AF47] transition-all duration-300"
             >
               {t.langSwitch}
             </button>
@@ -364,8 +364,8 @@ export default function ProviderLayout({
             {/* Profile Menu */}
             <div className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <div className={`hidden sm:block ${isRTL ? "text-left" : "text-right"}`}>
-                <p className="text-[10px] text-[#D0C5AF] font-semibold uppercase tracking-[0.15em] leading-none mb-1">{t.welcome}</p>
-                <p className="text-sm font-bold text-[#F5F7FA] tracking-wide">Elite Barbershop</p>
+                <p className="text-[10px] text-[#667085] font-semibold uppercase tracking-[0.15em] leading-none mb-1">{t.welcome}</p>
+                <p className="text-sm font-bold text-[#101828] tracking-wide">Elite Barbershop</p>
               </div>
               <div
                 className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#D1AF47] to-[#E0C46A] text-[#101828] font-black text-sm flex items-center justify-center shadow-[0_0_20px_rgba(209,175,71,0.15)]"
