@@ -418,10 +418,11 @@ export default function PricingPage() {
                 </div>
               </div>
             </div>
-            <button 
+            <button
+              onClick={() => setSelectedPlan("basic")}
               className={`w-full py-2.5 mt-8 rounded-xl text-xs font-bold tracking-wider transition-all duration-300 ${
-                selectedPlan === "basic" 
-                  ? "bg-[#D1AF47] text-[#070B12]" 
+                selectedPlan === "basic"
+                  ? "bg-[#D1AF47] text-[#070B12]"
                   : "bg-white/5 hover:bg-white/10 text-white border border-[rgba(255,255,255,0.08)]"
               }`}
             >
@@ -476,10 +477,11 @@ export default function PricingPage() {
                 </div>
               </div>
             </div>
-            <button 
+            <button
+              onClick={() => setSelectedPlan("growth")}
               className={`w-full py-2.5 mt-8 rounded-xl text-xs font-bold tracking-wider transition-all duration-300 ${
-                selectedPlan === "growth" 
-                  ? "bg-[#D1AF47] text-[#070B12] shadow-[0_0_15px_rgba(209,175,71,0.3)]" 
+                selectedPlan === "growth"
+                  ? "bg-[#D1AF47] text-[#070B12] shadow-[0_0_15px_rgba(209,175,71,0.3)]"
                   : "bg-[#D1AF47]/10 hover:bg-[#D1AF47]/20 text-[#D1AF47] border border-[#D1AF47]/20"
               }`}
             >
@@ -534,10 +536,11 @@ export default function PricingPage() {
                 </div>
               </div>
             </div>
-            <button 
+            <button
+              onClick={() => setSelectedPlan("elite")}
               className={`w-full py-2.5 mt-8 rounded-xl text-xs font-bold tracking-wider transition-all duration-300 ${
-                selectedPlan === "elite" 
-                  ? "bg-[#D1AF47] text-[#070B12]" 
+                selectedPlan === "elite"
+                  ? "bg-[#D1AF47] text-[#070B12]"
                   : "bg-white/5 hover:bg-white/10 text-white border border-[rgba(255,255,255,0.08)]"
               }`}
             >

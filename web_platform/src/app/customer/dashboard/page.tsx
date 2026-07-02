@@ -384,10 +384,10 @@ export default function CustomerDashboard() {
             {gender === "male" ? "♂" : "♀"}
           </button>
 
-          <button aria-label="Notifications" className="relative rounded-full border border-[#EAEAEA] bg-white p-2.5 text-[#667085] shadow-[0_4px_14px_rgba(0,0,0,0.03)] transition hover:text-[#C9A24B]">
+          <Link href="/customer/notifications" aria-label="Notifications" className="relative rounded-full border border-[#EAEAEA] bg-white p-2.5 text-[#667085] shadow-[0_4px_14px_rgba(0,0,0,0.03)] transition hover:text-[#C9A24B]">
             <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#D1AF47] text-[8px] font-black text-white">2</span>
             <svg className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-          </button>
+          </Link>
 
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={d.avatar} alt={userName} className="h-10 w-10 flex-shrink-0 rounded-full border-2 border-white object-cover shadow-[0_4px_14px_rgba(0,0,0,0.1)]" />

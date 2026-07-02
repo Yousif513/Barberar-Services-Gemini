@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 export default function CustomerMessages() {
@@ -149,9 +150,9 @@ export default function CustomerMessages() {
             </div>
           </div>
           
-          <button className="px-3.5 py-1.5 border border-stone-200 hover:border-stone-400 rounded-lg text-[10px] font-bold uppercase tracking-wider transition">
+          <Link href="/customer/bookings" className="px-3.5 py-1.5 border border-stone-200 hover:border-stone-400 rounded-lg text-[10px] font-bold uppercase tracking-wider transition">
             View Details
-          </button>
+          </Link>
         </div>
 
         {/* Message stream */}

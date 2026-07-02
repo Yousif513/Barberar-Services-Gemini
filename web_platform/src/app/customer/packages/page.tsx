@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 interface UserPackage {
@@ -163,9 +164,9 @@ export default function CustomerPackagesPage() {
                       {new Date(item.expires_at).toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
                     </span>
                   </div>
-                  <button className="px-4 py-2 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl transition duration-150">
-                    Redeem Code
-                  </button>
+                  <Link href="/customer/book" className="px-4 py-2 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl transition duration-150">
+                    Book a Session
+                  </Link>
                 </div>
               </div>
             );

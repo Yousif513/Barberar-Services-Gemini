@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { supabase } from "@/lib/supabase";
 
@@ -258,12 +259,12 @@ export default function ProviderMessages() {
             </div>
           </div>
           
-          <button className="flex items-center gap-2 px-4 py-2 border border-[#D1AF47]/30 hover:border-[#D1AF47] text-[#D1AF47] hover:bg-[#D1AF47]/10 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 bg-transparent shadow-[0_0_15px_rgba(209,175,71,0.03)] hover:shadow-[0_0_20px_rgba(209,175,71,0.1)] cursor-pointer">
+          <Link href="/provider/customers" className="flex items-center gap-2 px-4 py-2 border border-[#D1AF47]/30 hover:border-[#D1AF47] text-[#D1AF47] hover:bg-[#D1AF47]/10 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 bg-transparent shadow-[0_0_15px_rgba(209,175,71,0.03)] hover:shadow-[0_0_20px_rgba(209,175,71,0.1)] cursor-pointer">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
             Client Profile
-          </button>
+          </Link>
         </div>
 
         {/* Message stream */}
