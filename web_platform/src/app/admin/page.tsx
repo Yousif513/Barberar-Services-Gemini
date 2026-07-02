@@ -235,17 +235,17 @@ export default function AdminDashboardPage() {
       ],
 
       quickActions: [
-        { label: "Add Provider", icon: "user-plus" },
-        { label: "Add Service", icon: "shield" },
-        { label: "Create Offer", icon: "gift" },
-        { label: "Send Notification", icon: "bell-ring" }
+        { label: "Add Provider", icon: "user-plus", href: "/admin/providers" },
+        { label: "Add Service", icon: "shield", href: "/admin/services" },
+        { label: "Create Offer", icon: "gift", href: "/admin/coupons" },
+        { label: "Send Notification", icon: "bell-ring", href: "/admin/notifications" }
       ],
 
       reportsList: [
-        { label: "Sales Report", icon: "file-chart" },
-        { label: "Booking Report", icon: "file-calendar" },
-        { label: "Provider Report", icon: "file-users" },
-        { label: "Payout Report", icon: "file-wallet" }
+        { label: "Sales Report", icon: "file-chart", href: "/admin/reports" },
+        { label: "Booking Report", icon: "file-calendar", href: "/admin/reports" },
+        { label: "Provider Report", icon: "file-users", href: "/admin/reports" },
+        { label: "Payout Report", icon: "file-wallet", href: "/admin/ledger" }
       ],
 
       insights: [
@@ -340,17 +340,17 @@ export default function AdminDashboardPage() {
       ],
 
       quickActions: [
-        { label: "إضافة مزود", icon: "user-plus" },
-        { label: "إضافة خدمة", icon: "shield" },
-        { label: "إنشاء عرض", icon: "gift" },
-        { label: "إرسال إشعار", icon: "bell-ring" }
+        { label: "إضافة مزود", icon: "user-plus", href: "/admin/providers" },
+        { label: "إضافة خدمة", icon: "shield", href: "/admin/services" },
+        { label: "إنشاء عرض", icon: "gift", href: "/admin/coupons" },
+        { label: "إرسال إشعار", icon: "bell-ring", href: "/admin/notifications" }
       ],
 
       reportsList: [
-        { label: "تقرير المبيعات", icon: "file-chart" },
-        { label: "تقرير الحجوزات", icon: "file-calendar" },
-        { label: "تقرير المزودين", icon: "file-users" },
-        { label: "تقرير المدفوعات", icon: "file-wallet" }
+        { label: "تقرير المبيعات", icon: "file-chart", href: "/admin/reports" },
+        { label: "تقرير الحجوزات", icon: "file-calendar", href: "/admin/reports" },
+        { label: "تقرير المزودين", icon: "file-users", href: "/admin/reports" },
+        { label: "تقرير المدفوعات", icon: "file-wallet", href: "/admin/ledger" }
       ],
 
       insights: [
@@ -467,12 +467,12 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Notification Bell */}
-          <button aria-label="Notifications" className="relative rounded-full border border-[#ECECEC] bg-white p-2.5 text-[#667085] shadow-sm hover:bg-gray-50 transition">
+          <Link href="/admin/activity" aria-label="Notifications" className="relative rounded-full border border-[#ECECEC] bg-white p-2.5 text-[#667085] shadow-sm hover:bg-gray-50 transition">
             <span className="absolute right-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-[#D1AF47] ring-2 ring-white" />
             <svg className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M18 8a6 6 0 10-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
             </svg>
-          </button>
+          </Link>
 
           {/* Help Center */}
           <Link href="/admin/help" className={`flex items-center gap-1.5 border border-[#ECECEC] bg-white rounded-full px-4 py-2.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
@@ -740,9 +740,9 @@ export default function AdminDashboardPage() {
             })}
           </div>
 
-          <button className="w-full bg-[#F7F6F3] border border-[#ECECEC] text-gray-700 hover:bg-gray-100/60 rounded-xl py-2 mt-4 text-[10px] font-black uppercase tracking-wider transition">
+          <Link href="/admin/system-logs" className="block w-full bg-[#F7F6F3] border border-[#ECECEC] text-gray-700 hover:bg-gray-100/60 rounded-xl py-2 mt-4 text-[10px] font-black uppercase tracking-wider transition text-center">
             {currentData.viewStatusText}
-          </button>
+          </Link>
         </section>
 
         {/* Recent Activity (span-3) */}
@@ -1002,8 +1002,9 @@ export default function AdminDashboardPage() {
             </h3>
             <div className="grid grid-cols-2 gap-2">
               {currentData.quickActions.map((act) => (
-                <button
+                <Link
                   key={act.label}
+                  href={act.href}
                   className="flex flex-col items-center justify-center p-3 rounded-xl border border-[#ECECEC] hover:border-[#D1AF47]/40 hover:bg-gray-50/50 transition group"
                 >
                   <div className="w-9 h-9 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center mb-2 group-hover:bg-white transition flex-shrink-0">
@@ -1012,7 +1013,7 @@ export default function AdminDashboardPage() {
                   <span className="text-[10px] font-bold text-gray-700 text-center leading-tight truncate w-full">
                     {act.label}
                   </span>
-                </button>
+                </Link>
               ))}
             </div>
           </div>
@@ -1024,8 +1025,9 @@ export default function AdminDashboardPage() {
             </h3>
             <div className="grid grid-cols-2 gap-2">
               {currentData.reportsList.map((rpt) => (
-                <button
+                <Link
                   key={rpt.label}
+                  href={rpt.href}
                   className="flex flex-col items-center justify-center p-3 rounded-xl border border-[#ECECEC] hover:border-[#D1AF47]/40 hover:bg-gray-50/50 transition group"
                 >
                   <div className="w-9 h-9 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center mb-2 group-hover:bg-white transition flex-shrink-0">
@@ -1034,7 +1036,7 @@ export default function AdminDashboardPage() {
                   <span className="text-[10px] font-bold text-gray-700 text-center leading-tight truncate w-full">
                     {rpt.label}
                   </span>
-                </button>
+                </Link>
               ))}
             </div>
           </div>

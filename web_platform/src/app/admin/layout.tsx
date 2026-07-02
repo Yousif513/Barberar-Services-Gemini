@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AuthGuard } from "@/components/auth-guard";
+import { supabase } from "@/lib/supabase";
+import { clearDevRole } from "@/lib/dev-access";
 
 
 const translations = {
@@ -330,9 +332,18 @@ export default function AdminLayout({
                   <p className="text-xs font-black text-white leading-tight truncate max-w-[120px]">{t.welcome}</p>
                 </div>
               </div>
-              <button aria-label="Profile actions" className="p-2 rounded-xl text-[#D9D4C8] hover:bg-white/[0.06] hover:text-[#F4E7B6] transition-all duration-300">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 8a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z" />
+              <button
+                aria-label={t.logout}
+                title={t.logout}
+                onClick={async () => {
+                  try { await supabase.auth.signOut(); } catch {}
+                  clearDevRole();
+                  window.location.href = "/login";
+                }}
+                className="p-2 rounded-xl text-[#D9D4C8] hover:bg-[#EF4444]/15 hover:text-[#F87171] transition-all duration-300"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
               </button>
             </div>
