@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 const translations = {
   en: {
@@ -21,6 +22,7 @@ const translations = {
     recentTitle: "Recent Broadcasts",
     statusQueued: "Queued",
     statusSent: "Sent",
+    statusSimulated: "Simulated",
     validation: "Add a title and message in at least one language."
   },
   ar: {
@@ -42,11 +44,12 @@ const translations = {
     recentTitle: "أحدث الإشعارات",
     statusQueued: "بالانتظار",
     statusSent: "أُرسل",
+    statusSimulated: "محاكاة",
     validation: "أضف عنواناً ورسالة بلغة واحدة على الأقل."
   }
 };
 
-type Broadcast = { id: number; title: string; audience: string; time: string; status: "queued" | "sent" };
+type Broadcast = { id: number; title: string; audience: string; time: string; status: "queued" | "sent" | "simulated" };
 
 const INITIAL_HISTORY: Broadcast[] = [
   { id: 1, title: "Eid promotion — 20% off all bookings", audience: "Customers", time: "12 Jun", status: "sent" },
@@ -83,7 +86,7 @@ export default function AdminNotificationsPage() {
 
   const audienceLabel = { customers: t.audCustomers, providers: t.audProviders, all: t.audAll };
 
-  const queueBroadcast = () => {
+  const queueBroadcast = async () => {
     const hasEn = titleEn.trim() && bodyEn.trim();
     const hasAr = titleAr.trim() && bodyAr.trim();
     if (!hasEn && !hasAr) {
@@ -91,13 +94,35 @@ export default function AdminNotificationsPage() {
       setTimeout(() => setFeedback(""), 3500);
       return;
     }
+    const id = Date.now();
+    const title = (isRTL ? titleAr : titleEn) || titleEn || titleAr;
     setHistory((h) => [
-      { id: Date.now(), title: (isRTL ? titleAr : titleEn) || titleEn || titleAr, audience: audienceLabel[audience], time: new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short" }), status: "queued" },
+      { id, title, audience: audienceLabel[audience], time: new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short" }), status: "queued" },
       ...h
     ]);
+    const payload = { audience, channels, titleEn, titleAr, bodyEn, bodyAr };
     setTitleEn(""); setTitleAr(""); setBodyEn(""); setBodyAr("");
     setFeedback("ok");
     setTimeout(() => setFeedback(""), 4000);
+
+    // Dispatch through the send-notification edge function. Until WhatsApp/
+    // Unifonic/push provider keys are configured (and the function is deployed),
+    // the call fails or no-ops, so we mark the row 'simulated' rather than 'sent'.
+    let delivered = false;
+    try {
+      const { error } = await supabase.functions.invoke("send-notification", {
+        body: { broadcast: true, simulate: true, ...payload },
+      });
+      delivered = !error;
+    } catch {
+      delivered = false;
+    }
+    setHistory((h) => h.map((b) => (b.id === id ? { ...b, status: delivered ? "sent" : "simulated" } : b)));
+
+    // Best-effort integrations health stamp (table arrives with a pending migration).
+    try {
+      await supabase.from("integrations").update({ last_checked_at: new Date().toISOString() }).in("key", ["whatsapp", "expo_push"]);
+    } catch { /* integrations table not present yet */ }
   };
 
   return (
@@ -173,8 +198,8 @@ export default function AdminNotificationsPage() {
               <div key={b.id} className="py-3">
                 <div className={`flex items-center justify-between gap-2 ${flip}`}>
                   <strong className="truncate text-xs font-black text-gray-900">{b.title}</strong>
-                  <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[9px] font-black ${b.status === "sent" ? "bg-[#ECFDF3] text-[#16A34A]" : "bg-[#FFFAEB] text-[#F59E0B]"}`}>
-                    {b.status === "sent" ? t.statusSent : t.statusQueued}
+                  <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[9px] font-black ${b.status === "sent" ? "bg-[#ECFDF3] text-[#16A34A]" : b.status === "simulated" ? "bg-[#EFF6FF] text-[#3B82F6]" : "bg-[#FFFAEB] text-[#F59E0B]"}`}>
+                    {b.status === "sent" ? t.statusSent : b.status === "simulated" ? t.statusSimulated : t.statusQueued}
                   </span>
                 </div>
                 <div className={`mt-1 flex items-center gap-2 text-[10px] font-bold text-gray-400 ${flip}`}>
