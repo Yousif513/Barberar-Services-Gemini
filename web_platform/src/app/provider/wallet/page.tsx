@@ -40,6 +40,13 @@ const translations = {
     payoutStatusProcessing: "Processing",
     payoutStatusPaid: "Paid",
     payoutStatusRejected: "Rejected",
+    employeeEarnings: "Employee Earnings",
+    employeeEarningsSubtitle: "Stylist share statements from completed bookings.",
+    employeeName: "Employee",
+    month: "Month",
+    employeeCompleted: "Completed",
+    totalEarnings: "Total Earnings",
+    noEmployeeEarnings: "No employee earnings rows yet.",
     noPayoutRequests: "No payout requests yet",
     requestSubmitted: "Payout request submitted for admin review.",
     requestFailed: "Unable to submit payout request.",
@@ -85,6 +92,13 @@ const translations = {
     payoutStatusProcessing: "قيد المعالجة",
     payoutStatusPaid: "مدفوع",
     payoutStatusRejected: "مرفوض",
+    employeeEarnings: "أرباح الموظفين",
+    employeeEarningsSubtitle: "كشوف حصة الأخصائيين من الحجوزات المكتملة.",
+    employeeName: "الموظف",
+    month: "الشهر",
+    employeeCompleted: "المكتملة",
+    totalEarnings: "إجمالي الأرباح",
+    noEmployeeEarnings: "لا توجد سجلات أرباح موظفين بعد.",
     noPayoutRequests: "لا توجد طلبات تحويل بعد",
     requestSubmitted: "تم إرسال طلب التحويل لمراجعة الإدارة.",
     requestFailed: "تعذر إرسال طلب التحويل.",
@@ -138,8 +152,26 @@ export default function ProviderWalletPage() {
     status: string;
     statusClass: string;
   }
+  interface EmployeeEarning {
+    id: string;
+    employeeName: string;
+    month: string;
+    completedBookings: number;
+    earnings: string;
+  }
+  type EmployeeEarningsRow = {
+    employee_id?: string | null;
+    month_start?: string | null;
+    total_completed_bookings?: number | string | null;
+    total_employee_earnings?: number | string | null;
+    employees?: {
+      name_en?: string | null;
+      name_ar?: string | null;
+    } | null;
+  };
   const [ledgerEntries, setLedgerEntries] = useState<LedgerEntry[]>([]);
   const [payoutRequests, setPayoutRequests] = useState<PayoutRequest[]>([]);
+  const [employeeEarnings, setEmployeeEarnings] = useState<EmployeeEarning[]>([]);
   const [loadingLedger, setLoadingLedger] = useState(false);
 
   useEffect(() => {
@@ -189,6 +221,7 @@ export default function ProviderWalletPage() {
         setProviderId("");
         setLedgerEntries([]);
         setPayoutRequests([]);
+        setEmployeeEarnings([]);
         setAvailableBalance(0);
         setPendingPayout(0);
         return;
@@ -205,6 +238,7 @@ export default function ProviderWalletPage() {
         setProviderId("");
         setLedgerEntries([]);
         setPayoutRequests([]);
+        setEmployeeEarnings([]);
         setAvailableBalance(0);
         setPendingPayout(0);
         setError(t.noProviderAccount);
@@ -244,6 +278,19 @@ export default function ProviderWalletPage() {
 
       if (requestError) throw requestError;
 
+      let earningsRows: EmployeeEarningsRow[] = [];
+      try {
+        const { data: earningsData, error: earningsError } = await supabase
+          .from("employee_earnings_summary")
+          .select("employee_id, month_start, total_completed_bookings, total_employee_earnings, employees!inner(name_en, name_ar, branch_id, branches!inner(provider_id))")
+          .eq("employees.branches.provider_id", provider.id)
+          .order("month_start", { ascending: false });
+        if (earningsError) throw earningsError;
+        earningsRows = (earningsData as EmployeeEarningsRow[] | null) ?? [];
+      } catch (earningsError) {
+        console.warn("Employee earnings summary unavailable, hiding wallet section rows:", earningsError);
+      }
+
       const formattedLedger: LedgerEntry[] = (ledgerData || []).map((item: any) => ({
         id: item.payment_intent_id || item.id,
         booking_id: item.booking_id,
@@ -279,6 +326,18 @@ export default function ProviderWalletPage() {
         statusClass: payoutStatusClass(item.status)
       }));
 
+      const formattedEmployeeEarnings: EmployeeEarning[] = earningsRows.map((item) => ({
+        id: `${item.employee_id ?? "employee"}-${item.month_start ?? "month"}`,
+        employeeName: lang === "ar"
+          ? item.employees?.name_ar || item.employees?.name_en || "موظف"
+          : item.employees?.name_en || item.employees?.name_ar || "Employee",
+        month: item.month_start
+          ? new Date(item.month_start).toLocaleDateString(lang === "ar" ? "ar-SA" : "en-US", { month: "short", year: "numeric" })
+          : "—",
+        completedBookings: Number(item.total_completed_bookings || 0),
+        earnings: formatSar(item.total_employee_earnings)
+      }));
+
       const openRequestedAmount = (requestData || [])
         .filter((item: any) => item.status === "requested" || item.status === "processing")
         .reduce((sum: number, item: any) => sum + Number(item.amount || 0), 0);
@@ -289,12 +348,14 @@ export default function ProviderWalletPage() {
 
       setLedgerEntries(formattedLedger);
       setPayoutRequests(formattedRequests);
+      setEmployeeEarnings(formattedEmployeeEarnings);
       setAvailableBalance(Math.max(withdrawableLedgerAmount - openRequestedAmount, 0));
       setPendingPayout(openRequestedAmount);
     } catch (err) {
       console.error("Failed to load provider wallet data:", err);
       setLedgerEntries([]);
       setPayoutRequests([]);
+      setEmployeeEarnings([]);
       setAvailableBalance(0);
       setPendingPayout(0);
       setError(lang === "ar" ? "تعذر تحميل بيانات المحفظة." : "Unable to load wallet data.");
@@ -605,6 +666,56 @@ export default function ProviderWalletPage() {
                         {request.status}
                       </span>
                     </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Employee Earnings Summary */}
+      <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-[24px] p-8 text-[#101828]">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div>
+            <h3 className="text-lg font-bold tracking-tight text-[#101828]">{t.employeeEarnings}</h3>
+            <p className="text-xs text-[#667085] mt-1">{t.employeeEarningsSubtitle}</p>
+          </div>
+          <span className="rounded-full border border-[#D1AF47]/20 bg-[#D1AF47]/10 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-[#9A741F]">
+            employee_earnings_summary
+          </span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left border-collapse">
+            <thead>
+              <tr className="border-b border-[#ECECEC] text-[#667085] text-[10px] uppercase tracking-wider">
+                <th className="py-4 px-6 text-start font-bold">{t.employeeName}</th>
+                <th className="py-4 px-6 text-start font-bold">{t.month}</th>
+                <th className="py-4 px-6 text-start font-bold">{t.employeeCompleted}</th>
+                <th className="py-4 px-6 text-start font-bold">{t.totalEarnings}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#ECECEC]">
+              {loadingLedger ? (
+                <tr>
+                  <td colSpan={4} className="py-10 text-center text-[#667085]">
+                    {lang === "ar" ? "جاري تحميل أرباح الموظفين..." : "Loading employee earnings..."}
+                  </td>
+                </tr>
+              ) : employeeEarnings.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-10 text-center text-[#667085]">
+                    {t.noEmployeeEarnings}
+                  </td>
+                </tr>
+              ) : (
+                employeeEarnings.map((entry) => (
+                  <tr key={entry.id} className="hover:bg-gray-50/50 transition-all duration-300">
+                    <td className="py-4 px-6 font-bold text-[#101828]">{entry.employeeName}</td>
+                    <td className="py-4 px-6 text-[#344054] text-xs font-medium">{entry.month}</td>
+                    <td className="py-4 px-6 text-[#344054] text-xs font-bold">{entry.completedBookings.toLocaleString(lang === "ar" ? "ar-SA" : "en-US")}</td>
+                    <td className="py-4 px-6 font-bold text-[#9A741F]">{entry.earnings}</td>
                   </tr>
                 ))
               )}

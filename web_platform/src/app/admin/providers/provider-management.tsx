@@ -112,6 +112,20 @@ type ShopMetrics = {
   cancellationRate: number;
 };
 
+type EmployeeEarningsSummary = {
+  employeeId: string;
+  completedBookings: number;
+  totalEarnings: number;
+  monthStart?: string;
+};
+
+type EmployeeEarningsRow = {
+  employee_id?: string | null;
+  month_start?: string | null;
+  total_completed_bookings?: number | string | null;
+  total_employee_earnings?: number | string | null;
+};
+
 type ProviderServiceRow = {
   id: string;
   slug?: string | null;
@@ -258,6 +272,10 @@ const copy = {
     topEmployees: "Top employees",
     lowEmployees: "Needs attention",
     employeePerformance: "Employee performance",
+    employeeEarningsSummary: "Employee earnings summary",
+    statementEarnings: "Statement earnings",
+    statementCompleted: "Statement completed",
+    noEmployeeEarnings: "No employee earnings statement rows yet.",
     adminNotes: "Admin notes",
     adminNotesHint: "Internal notes about this shop (visible to admins only).",
     saveNotes: "Save notes",
@@ -359,6 +377,10 @@ const copy = {
     topEmployees: "الأفضل أداءً",
     lowEmployees: "يحتاج متابعة",
     employeePerformance: "أداء الموظفين",
+    employeeEarningsSummary: "ملخص أرباح الموظفين",
+    statementEarnings: "أرباح الكشف",
+    statementCompleted: "الحجوزات المكتملة",
+    noEmployeeEarnings: "لا توجد سجلات أرباح موظفين بعد.",
     adminNotes: "ملاحظات الإدارة",
     adminNotesHint: "ملاحظات داخلية عن هذا المتجر (تظهر للإدارة فقط).",
     saveNotes: "حفظ الملاحظات",
@@ -657,6 +679,7 @@ export default function AdminProviderManagement() {
   const [sortMode, setSortMode] = useState<"recent" | "revenue" | "rating">("recent");
   const [detail, setDetail] = useState<ProviderRecord | null>(null);
   const [notesDraft, setNotesDraft] = useState("");
+  const [employeeEarningsById, setEmployeeEarningsById] = useState<Record<string, EmployeeEarningsSummary>>({});
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState<ProviderRecord>(() => blankProvider());
   const idCounterRef = useRef(0);
@@ -839,6 +862,29 @@ export default function AdminProviderManagement() {
         }
       } catch (err) {
         console.warn("Could not query admin_provider_performance, using local rollups:", err);
+      }
+
+      try {
+        const { data: earningsData, error: earningsError } = await supabase
+          .from("employee_earnings_summary")
+          .select("employee_id, month_start, total_completed_bookings, total_employee_earnings")
+          .order("month_start", { ascending: false });
+        if (earningsError) throw earningsError;
+        const earningsMap = (earningsData as EmployeeEarningsRow[] | null ?? []).reduce<Record<string, EmployeeEarningsSummary>>((map, row) => {
+          if (!row.employee_id) return map;
+          const existing = map[row.employee_id] ?? { employeeId: row.employee_id, completedBookings: 0, totalEarnings: 0, monthStart: row.month_start ?? undefined };
+          map[row.employee_id] = {
+            employeeId: row.employee_id,
+            completedBookings: existing.completedBookings + Number(row.total_completed_bookings || 0),
+            totalEarnings: existing.totalEarnings + Number(row.total_employee_earnings || 0),
+            monthStart: existing.monthStart || row.month_start || undefined
+          };
+          return map;
+        }, {});
+        setEmployeeEarningsById(earningsMap);
+      } catch (err) {
+        console.warn("Could not query employee_earnings_summary, using employee card fallbacks:", err);
+        setEmployeeEarningsById({});
       }
 
       if (data?.length) {
@@ -1096,6 +1142,14 @@ export default function AdminProviderManagement() {
   const cardBase = "rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]";
   const portalTarget = typeof document !== "undefined" ? document.body : null;
   const detailPerf = detail ? computeProviderPerformance(detail, metricsByShop) : null;
+  const detailEmployeeEarnings = useMemo(() => {
+    if (!detail) return [];
+    return detail.shops.flatMap((shop) => shop.employees.map((employee) => ({
+      employee,
+      shop,
+      summary: employeeEarningsById[employee.id]
+    }))).filter((item) => item.summary);
+  }, [detail, employeeEarningsById]);
   const pct = (value: number) => `${value}%`;
 
   return (
@@ -1341,6 +1395,40 @@ export default function AdminProviderManagement() {
                 </section>
               )}
 
+              <section className="rounded-[24px] border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
+                <div className={`mb-4 flex items-center justify-between gap-3 ${rowDir}`}>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D1AF47]">{t.employeeEarningsSummary}</p>
+                    <p className="mt-1 text-xs font-semibold text-[#667085]">employee_earnings_summary</p>
+                  </div>
+                  <strong className="font-serif text-xl font-black text-gray-900">
+                    {money(detailEmployeeEarnings.reduce((sum, item) => sum + (item.summary?.totalEarnings ?? 0), 0))}
+                  </strong>
+                </div>
+                {detailEmployeeEarnings.length === 0 ? (
+                  <p className="rounded-2xl border border-[#ECECEC] bg-[#FBFAF7] px-4 py-5 text-center text-xs font-bold text-[#667085]">{t.noEmployeeEarnings}</p>
+                ) : (
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    {detailEmployeeEarnings.map(({ employee, shop, summary }) => (
+                      <div key={`${employee.id}-${summary?.monthStart ?? "all"}`} className="rounded-2xl border border-[#F0F0F0] bg-[#FBFAF7] p-4">
+                        <p className="font-black text-gray-900">{displayEmployeeName(employee)}</p>
+                        <p className="mt-1 text-[10px] font-bold text-[#667085]">{displayShopName(shop)}</p>
+                        <div className="mt-3 grid grid-cols-2 gap-2">
+                          <div className="rounded-xl bg-white p-3">
+                            <span className="block text-[8px] font-black uppercase tracking-wider text-[#667085]">{t.statementEarnings}</span>
+                            <strong className="mt-1 block text-xs font-black text-[#9A741F]">{money(summary?.totalEarnings ?? 0)}</strong>
+                          </div>
+                          <div className="rounded-xl bg-white p-3">
+                            <span className="block text-[8px] font-black uppercase tracking-wider text-[#667085]">{t.statementCompleted}</span>
+                            <strong className="mt-1 block text-xs font-black text-gray-900">{(summary?.completedBookings ?? 0).toLocaleString(isRTL ? "ar-SA" : "en-US")}</strong>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+
               <div className={`flex items-center justify-between gap-3 ${rowDir}`}>
                 <h4 className="font-serif text-xl font-black text-gray-900">{t.shops}</h4>
                 <button onClick={() => addShop(detail)} className="rounded-xl bg-[#101828] px-4 py-2 text-xs font-black text-[#F4E7B6]">{t.addShop}</button>
@@ -1363,7 +1451,28 @@ export default function AdminProviderManagement() {
 
                   {/* Per-shop performance metrics */}
                   {(() => {
-                    const m = metricsByShop[shop.id];
+                    const localM = metricsByShop[shop.id];
+                    const performance = detail.performance;
+                    const shopCount = Math.max(detail.shops.length, 1);
+                    const totalBookings = performance ? Math.round(performance.totalBookings / shopCount) : 0;
+                    const completedBookings = performance ? Math.round(performance.completedBookings / shopCount) : 0;
+                    const cancelledBookings = performance ? Math.round(performance.cancelledBookings / shopCount) : 0;
+                    const noShowBookings = performance ? Math.round(performance.noShowBookings / shopCount) : 0;
+                    const m = performance ? {
+                      revenue: performance.revenue / shopCount,
+                      totalBookings,
+                      completedBookings,
+                      cancelledBookings,
+                      noShowBookings,
+                      rating: performance.rating,
+                      reviewCount: Math.round(performance.reviewCount / shopCount),
+                      profileCompletion: localM?.profileCompletion ?? 100,
+                      commissionAmount: performance.commissionAmount / shopCount,
+                      avgServiceValue: performance.completedBookings ? Math.round(performance.revenue / performance.completedBookings) : 0,
+                      conversionRate: localM?.conversionRate ?? 0,
+                      completedRate: totalBookings ? Math.round((completedBookings / totalBookings) * 100) : 0,
+                      cancellationRate: totalBookings ? Math.round(((cancelledBookings + noShowBookings) / totalBookings) * 100) : 0
+                    } : localM;
                     if (!m) return null;
                     return (
                       <div className="mb-5 grid grid-cols-2 gap-2.5 md:grid-cols-4 xl:grid-cols-7">
@@ -1404,7 +1513,11 @@ export default function AdminProviderManagement() {
                     <div className="rounded-2xl border border-[#F2F2F2] bg-gray-50/60 p-4">
                       <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.employees}</p>
                       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                        {shop.employees.map((employee) => (
+                        {shop.employees.map((employee) => {
+                          const statement = employeeEarningsById[employee.id];
+                          const displayEarnings = statement?.totalEarnings ?? employee.earnings;
+                          const displayCompleted = statement?.completedBookings ?? employee.completedBookings;
+                          return (
                           <div key={employee.id} className="rounded-2xl border border-[#ECECEC] bg-white p-4">
                             <div className={`flex items-start gap-3 ${rowDir}`}>
                               <img src={employee.photoUrl} alt={displayEmployeeName(employee)} className="h-12 w-12 rounded-2xl object-cover" />
@@ -1415,9 +1528,9 @@ export default function AdminProviderManagement() {
                               <button onClick={() => removeEmployee(detail, shop, employee)} className="text-[10px] font-black text-[#B42318]">{t.delete}</button>
                             </div>
                             <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.earnings}</span><strong className="text-[10px] text-[#9A741F]">{money(employee.earnings)}</strong></div>
+                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{statement ? t.statementEarnings : t.earnings}</span><strong className="text-[10px] text-[#9A741F]">{money(displayEarnings)}</strong></div>
                               <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.rating}</span><strong className="text-[10px] text-gray-900">★ {employee.rating}</strong></div>
-                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.completed}</span><strong className="text-[10px] text-gray-900">{employee.completedBookings}</strong></div>
+                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{statement ? t.statementCompleted : t.completed}</span><strong className="text-[10px] text-gray-900">{displayCompleted}</strong></div>
                               <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.cancelled}</span><strong className="text-[10px] text-gray-900">{employee.cancelledBookings}</strong></div>
                               <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.noShow}</span><strong className="text-[10px] text-gray-900">{employee.noShowBookings}</strong></div>
                               <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.reviews}</span><strong className="text-[10px] text-gray-900">{employee.reviewCount}</strong></div>
@@ -1437,7 +1550,8 @@ export default function AdminProviderManagement() {
                               ))}
                             </div>
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   </div>

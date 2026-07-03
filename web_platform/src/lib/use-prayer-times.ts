@@ -119,6 +119,29 @@ export function usePrayerTimes(
     lockStartsIn = secondsUntilNext;
   }
 
+  const isTimeInLockWindow = (candidate: Date) => {
+    const candidateDay = new Date(candidate);
+    const candidateTomorrow = new Date(candidate);
+    candidateTomorrow.setDate(candidateTomorrow.getDate() + 1);
+    const dayPrayers = new PrayerTimes(coordinates, candidateDay, params);
+    const nextDayPrayers = new PrayerTimes(coordinates, candidateTomorrow, params);
+    const prayerChecks = [
+      { time: dayPrayers.fajr, key: "fajr" },
+      { time: dayPrayers.dhuhr, key: "dhuhr" },
+      { time: dayPrayers.asr, key: "asr" },
+      { time: dayPrayers.maghrib, key: "maghrib" },
+      { time: dayPrayers.isha, key: "isha" },
+      { time: nextDayPrayers.fajr, key: "fajr" }
+    ];
+
+    return prayerChecks.some((prayer) => {
+      const config = buffers[prayer.key] || defaultBuffers[prayer.key];
+      const lockStart = new Date(prayer.time.getTime() - config.before * 60 * 1000);
+      const lockEnd = new Date(prayer.time.getTime() + config.after * 60 * 1000);
+      return candidate >= lockStart && candidate <= lockEnd;
+    });
+  };
+
   return {
     todayTimes: todayList,
     tomorrowTimes: tomorrowList,
@@ -131,6 +154,7 @@ export function usePrayerTimes(
     activeLockPrayerKey,
     activeLockPrayerNameEn,
     activeLockPrayerNameAr,
-    currentTime: now
+    currentTime: now,
+    isTimeInLockWindow
   };
 }

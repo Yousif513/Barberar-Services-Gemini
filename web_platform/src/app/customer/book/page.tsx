@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { usePrayerTimes } from "@/lib/use-prayer-times";
 
 // Accepted payment methods come from the admin registry (payment_methods):
 // only rows that are enabled AND available to customers appear here.
@@ -40,6 +41,7 @@ function BookingContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [payMethods, setPayMethods] = useState<CheckoutMethod[]>(FALLBACK_CHECKOUT_METHODS);
+  const { isTimeInLockWindow } = usePrayerTimes();
 
   useEffect(() => {
     (async () => {
@@ -83,10 +85,24 @@ function BookingContent() {
   const provider = mockProviderDetails[providerId] || mockProviderDetails["1"];
   const [selectedService, setSelectedService] = useState<ServiceItem>(provider.services[0]);
 
-  // Mock slot generator excluding Riyadh prayer buffers
+  const slotToDate = (dateValue: string, slot: string) => {
+    const [timePart, modifier] = slot.split(" ");
+    const [hourPart, minutePart] = timePart.split(":");
+    let hours = Number(hourPart);
+    const minutes = Number(minutePart);
+    if (modifier === "PM" && hours !== 12) hours += 12;
+    if (modifier === "AM" && hours === 12) hours = 0;
+    const candidate = new Date(`${dateValue}T00:00:00`);
+    candidate.setHours(hours, minutes, 0, 0);
+    return candidate;
+  };
+
+  // Client-side mirror of the prayer lock windows; move this into the
+  // get_available_slots RPC once the backend slot API accepts branch windows.
   const getAvailableSlots = () => {
     const slots = ["09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM", "03:00 PM", "04:00 PM", "04:30 PM", "05:00 PM", "07:30 PM", "08:00 PM"];
-    return slots;
+    if (!selectedDate) return slots;
+    return slots.filter((slot) => !isTimeInLockWindow(slotToDate(selectedDate, slot)));
   };
 
   const handleBook = async () => {
