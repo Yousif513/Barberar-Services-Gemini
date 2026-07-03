@@ -164,6 +164,7 @@ export default function ProviderCalendarPage() {
   const [maghribActive, setMaghribActive] = useState(true);
   const [ishaActive, setIshaActive] = useState(true);
   const [bufferDuration, setBufferDuration] = useState(20); // default 20 mins
+  const [viewMode, setViewMode] = useState<"day" | "week">("day");
 
   // Unlocked / overridden slots trackers
   const [overriddenSlots, setOverriddenSlots] = useState<number[]>([]);
@@ -771,17 +772,33 @@ export default function ProviderCalendarPage() {
               <h3 className="font-semibold text-sm text-[#101828] tracking-wide">
                 {lang === "ar" ? "لوحة التخطيط الفوري للمواعيد" : "Real-time Roster Planner"}
               </h3>
-              {/* Day/Week Glassmorphic Pill Switcher */}
+              {/* Day/Week Pill Switcher */}
               <div className="flex bg-[#F3F4F6] border border-[#ECECEC] rounded-xl p-1 gap-1">
-                <button className="px-4 py-1.5 text-[10px] font-extrabold uppercase rounded-xl bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] shadow-[0_0_12px_rgba(209,175,71,0.2)] transition-all duration-300">
+                <button
+                  onClick={() => setViewMode("day")}
+                  className={`px-4 py-1.5 text-[10px] font-extrabold uppercase rounded-xl transition-all duration-300 ${
+                    viewMode === "day"
+                      ? "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] shadow-[0_0_12px_rgba(209,175,71,0.2)]"
+                      : "text-[#667085] hover:text-[#101828] hover:bg-[#E5E7EB]"
+                  }`}
+                >
                   {t.dayView}
                 </button>
-                <button className="px-4 py-1.5 text-[10px] font-extrabold uppercase rounded-xl text-[#667085] hover:text-[#101828] hover:bg-[#E5E7EB] transition-all duration-300">
+                <button
+                  onClick={() => setViewMode("week")}
+                  className={`px-4 py-1.5 text-[10px] font-extrabold uppercase rounded-xl transition-all duration-300 ${
+                    viewMode === "week"
+                      ? "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] shadow-[0_0_12px_rgba(209,175,71,0.2)]"
+                      : "text-[#667085] hover:text-[#101828] hover:bg-[#E5E7EB]"
+                  }`}
+                >
                   {t.weekView}
                 </button>
               </div>
             </div>
 
+            {viewMode === "day" ? (
+            <>
             {/* Off-duty banner */}
             {isOffDutyToday && (
               <div className="m-6 p-6 bg-[#FEF3F2] border border-[#FEE4E2] rounded-2xl text-center text-[#EF4444] space-y-3">
@@ -977,6 +994,93 @@ export default function ProviderCalendarPage() {
                 );
               })}
             </div>
+            </>
+            ) : (
+            /* ═══ WEEK VIEW ═══ 7-day grid. Appointments load per selected day,
+               so booked blocks appear in that day's column; prayer-lock rows are
+               shaded across all days (prayer windows are ~constant for the
+               branch location across the week). Click a day header to focus it. */
+            (() => {
+              const weekStart = new Date(selectedDate);
+              weekStart.setDate(selectedDate.getDate() - selectedDate.getDay());
+              const weekDays = Array.from({ length: 7 }, (_, i) => {
+                const d = new Date(weekStart);
+                d.setDate(weekStart.getDate() + i);
+                return d;
+              });
+              const now = new Date();
+              const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
+              const dayNames = isRTL
+                ? ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"]
+                : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+              return (
+                <div className="overflow-x-auto">
+                  <div className="min-w-[720px]">
+                    {/* Day header row */}
+                    <div className={`flex border-b border-[#ECECEC] bg-[#F9FAFB] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                      <div className={`w-20 flex-shrink-0 ${isRTL ? "border-l" : "border-r"} border-[#ECECEC]`} />
+                      {weekDays.map((d, i) => {
+                        const isToday = sameDay(d, now);
+                        const isSelected = sameDay(d, selectedDate);
+                        return (
+                          <button
+                            key={i}
+                            onClick={() => setSelectedDate(new Date(d))}
+                            className={`flex-1 px-2 py-3 text-center transition-all duration-200 ${isRTL ? "border-l" : "border-r"} border-[#ECECEC] last:border-0 ${
+                              isSelected ? "bg-[#D1AF47]/10" : "hover:bg-[#F3F4F6]"
+                            }`}
+                          >
+                            <span className="block text-[10px] font-bold uppercase tracking-wider text-[#667085]">{dayNames[i]}</span>
+                            <span className={`mt-1 inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-black ${
+                              isToday ? "bg-[#D1AF47] text-[#070B12]" : "text-[#101828]"
+                            }`}>{d.getDate()}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {/* Time rows */}
+                    <div className="divide-y divide-[#ECECEC]">
+                      {timeSlots.map((slot, index) => {
+                        const isLocked = isSlotPrayerLocked(slot, index);
+                        const lockRaw = getSlotPrayerLockInfoRaw(slot);
+                        const prayerName = lockRaw ? (isRTL ? lockRaw.nameAr : lockRaw.nameEn) : "";
+                        return (
+                          <div key={index} className={`flex min-h-[52px] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                            <div className={`w-20 flex-shrink-0 px-2 py-2 text-[10px] font-semibold text-[#667085] bg-[#F9FAFB] flex items-center justify-center ${isRTL ? "border-l" : "border-r"} border-[#ECECEC]`}>
+                              {slot.label}
+                            </div>
+                            {weekDays.map((d, di) => {
+                              const isSelectedCol = sameDay(d, selectedDate);
+                              const appt = isSelectedCol ? appointments.find((a) => a.slotIndex === index) : undefined;
+                              return (
+                                <div
+                                  key={di}
+                                  className={`flex-1 p-1 ${isRTL ? "border-l" : "border-r"} border-[#ECECEC] last:border-0 ${
+                                    isLocked ? "bg-[#FEF3F2]" : sameDay(d, now) ? "bg-[#D1AF47]/[0.02]" : ""
+                                  }`}
+                                >
+                                  {isLocked ? (
+                                    <div className="flex h-full min-h-[44px] items-center justify-center rounded-lg text-[8px] font-bold uppercase tracking-wider text-[#EF4444]/70">
+                                      {prayerName}
+                                    </div>
+                                  ) : appt ? (
+                                    <div className="flex h-full min-h-[44px] flex-col justify-center rounded-lg bg-gradient-to-br from-[#D1AF47]/15 to-[#E0C46A]/10 border border-[#D1AF47]/30 px-2 py-1">
+                                      <span className="truncate text-[10px] font-black text-[#101828]">{appt.customer}</span>
+                                      <span className="truncate text-[9px] font-semibold text-[#667085]">{appt.service}</span>
+                                    </div>
+                                  ) : null}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()
+            )}
           </div>
         </div>
 
