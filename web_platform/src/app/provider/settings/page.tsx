@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 const translations = {
@@ -484,6 +485,17 @@ export default function ProviderSettingsPage() {
             {locale === "en" ? "Language: English (LTR)" : "اللغة: العربية (RTL)"}
           </span>
         </div>
+
+        {/* Subscription / plans entry point (makes /provider/pricing reachable) */}
+        <Link
+          href="/provider/pricing"
+          className="flex items-center gap-2 self-start rounded-2xl bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] px-4 py-2.5 text-xs font-black text-[#070B12] shadow-[0_8px_24px_rgba(209,175,71,0.25)] transition hover:brightness-105 md:self-auto"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+          </svg>
+          {locale === "en" ? "Subscription & Plans" : "الاشتراك والباقات"}
+        </Link>
       </div>
 
       {/* MAIN LAYOUT GRID */}

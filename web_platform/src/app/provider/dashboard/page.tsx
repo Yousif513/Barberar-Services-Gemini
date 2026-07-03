@@ -1,9 +1,26 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePrayerTimes } from "@/lib/use-prayer-times";
+
+// Destinations the provider header search can jump to.
+const SEARCH_TARGETS: { en: string; ar: string; href: string }[] = [
+  { en: "Bookings", ar: "الحجوزات", href: "/provider/bookings" },
+  { en: "Calendar", ar: "التقويم", href: "/provider/calendar" },
+  { en: "Employees & Staff", ar: "الموظفون والفريق", href: "/provider/team" },
+  { en: "Services", ar: "الخدمات", href: "/provider/services" },
+  { en: "Customers", ar: "العملاء", href: "/provider/customers" },
+  { en: "Wallet & Payouts", ar: "المحفظة والمستحقات", href: "/provider/wallet" },
+  { en: "Reports", ar: "التقارير", href: "/provider/reports" },
+  { en: "Reviews", ar: "التقييمات", href: "/provider/reviews" },
+  { en: "Promotions", ar: "العروض", href: "/provider/promotions" },
+  { en: "Messages", ar: "الرسائل", href: "/provider/messages" },
+  { en: "Packages", ar: "الباقات", href: "/provider/packages" },
+  { en: "Settings", ar: "الإعدادات", href: "/provider/settings" },
+];
 
 const translations = {
   en: {
@@ -33,13 +50,28 @@ const translations = {
 };
 
 export default function ProviderDashboardPage() {
+  const router = useRouter();
   const [locale, setLocale] = useState<"en" | "ar">("en");
   const [businessName, setBusinessName] = useState("Elite Barbershop");
   const [coords, setCoords] = useState({ lat: 24.7136, lng: 46.6753 });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const isRTL = locale === "ar";
   const t = translations[locale];
   const flip = isRTL ? "flex-row-reverse" : "flex-row";
+
+  const searchResults = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return [];
+    return SEARCH_TARGETS.filter((item) =>
+      item.en.toLowerCase().includes(q) || item.ar.includes(searchQuery.trim())
+    );
+  }, [searchQuery]);
+
+  const goToFirstResult = () => {
+    if (searchResults.length) router.push(searchResults[0].href);
+  };
 
   useEffect(() => {
     const sync = () => setLocale(document.documentElement.lang === "ar" ? "ar" : "en");
@@ -150,10 +182,34 @@ export default function ProviderDashboardPage() {
           </div>
         </div>
         <div className={`flex items-center gap-2.5 ${flip}`}>
-          <label className={`flex items-center gap-2 rounded-full border border-[#ECECEC] bg-white px-3.5 py-2 shadow-sm md:w-56 ${flip}`}>
-            <svg className="h-4 w-4 flex-shrink-0 text-[#667085]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            <input placeholder={t.search} className="w-full border-none bg-transparent text-xs text-[#101828] outline-none placeholder:text-[#667085]/60" />
-          </label>
+          <div className="relative md:w-56">
+            <label className={`flex items-center gap-2 rounded-full border border-[#ECECEC] bg-white px-3.5 py-2 shadow-sm ${flip}`}>
+              <svg className="h-4 w-4 flex-shrink-0 text-[#667085]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              <input
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setSearchOpen(true); }}
+                onFocus={() => setSearchOpen(true)}
+                onBlur={() => setTimeout(() => setSearchOpen(false), 150)}
+                onKeyDown={(e) => { if (e.key === "Enter") { goToFirstResult(); setSearchOpen(false); } }}
+                placeholder={t.search}
+                className="w-full border-none bg-transparent text-xs text-[#101828] outline-none placeholder:text-[#667085]/60"
+              />
+            </label>
+            {searchOpen && searchResults.length > 0 && (
+              <div className={`absolute top-full z-50 mt-2 w-full overflow-hidden rounded-2xl border border-[#ECECEC] bg-white shadow-[0_12px_40px_rgba(0,0,0,0.08)] ${isRTL ? "text-right" : "text-left"}`}>
+                {searchResults.map((item) => (
+                  <button
+                    key={item.href}
+                    onMouseDown={() => router.push(item.href)}
+                    className={`flex w-full items-center gap-2 px-3.5 py-2.5 text-xs font-bold text-[#101828] transition hover:bg-[#F9FAFB] ${flip}`}
+                  >
+                    <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#D1AF47]" />
+                    {isRTL ? item.ar : item.en}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <button onClick={toggleLang} className="rounded-full border border-[#ECECEC] bg-white px-3.5 py-2 text-xs font-bold text-gray-700 shadow-sm transition hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">{t.lang}</button>
           <Link href="/provider/calendar" className="rounded-full bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] px-4 py-2 text-xs font-black text-[#101828] shadow-md shadow-[#D1AF47]/10 transition hover:brightness-105">+ {t.bookWalkIn}</Link>
         </div>
