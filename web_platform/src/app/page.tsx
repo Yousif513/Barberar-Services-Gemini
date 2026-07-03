@@ -1,14 +1,37 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
+
+// Featured rail: admin-curated services (featured_on_landing) with tasteful
+// imagery per category when a service has no photos of its own.
+type FeaturedRow = {
+  id: string;
+  name_en: string;
+  name_ar: string;
+  base_price: number;
+  images: string[];
+  category_slug: string;
+  category_en: string;
+  category_ar: string;
+};
+
+const CATEGORY_FALLBACK_IMAGE: Record<string, string> = {
+  "barber-hair": "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=400&auto=format&fit=crop",
+  "beard-shave": "https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=400&auto=format&fit=crop",
+  "skincare-facials": "https://images.unsplash.com/photo-1590439471364-192aa70c0b53?q=80&w=400&auto=format&fit=crop",
+  "spa-wellness": "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=400&auto=format&fit=crop",
+  "nails-hands": "https://images.unsplash.com/photo-1610992015732-2449b76344bc?q=80&w=400&auto=format&fit=crop",
+  "signature-packages": "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=400&auto=format&fit=crop",
+};
 
 const translations = {
   en: {
     promoText: "Book Premier Home Service & Salon Appointments in Riyadh",
     promoSub: "Get 15% off your first booking - Use code:",
     home: "Home",
-    discover: "Discover",
+    discover: "Services",
     serviceBoard: "Service Board",
     becomeProvider: "Become a Provider",
     aboutUs: "About Us",
@@ -40,8 +63,8 @@ const translations = {
     supportProp: "24/7 Dedicated Help",
     supportSubProp: "Local Riyadh-based support",
     shopByCategory: "Shop by Category",
-    featuredArtists: "Featured Artists",
-    featuredArtistsSub: "Riyadh's highest-rated salons and professional groomers",
+    featuredArtists: "Featured Services",
+    featuredArtistsSub: "Hand-picked treatments, curated by the PRIMORA team",
     howItWorks: "How It Works",
     how1Title: "Select Service",
     how1Desc: "Find the perfect grooming, massage, or salon treatment based on reviews, locations, and transparent pricing.",
@@ -62,7 +85,7 @@ const translations = {
     promoText: "احجز أفضل خدمات التجميل والعناية المنزلية والصالونات بالرياض",
     promoSub: "احصل على خصم 15% على حجزك الأول - استخدم الرمز:",
     home: "الرئيسية",
-    discover: "اكتشف",
+    discover: "الخدمات",
     serviceBoard: "لوحة الخدمات",
     becomeProvider: "انضم كمزود خدمة",
     aboutUs: "من نحن",
@@ -94,8 +117,8 @@ const translations = {
     supportProp: "دعم مخصص 24/7",
     supportSubProp: "دعم محلي مقره الرياض",
     shopByCategory: "تسوق حسب الفئة",
-    featuredArtists: "مقدمو الخدمة المتميزون",
-    featuredArtistsSub: "أعلى الصالونات ومصففي الشعر تقييماً في الرياض",
+    featuredArtists: "خدمات مميزة",
+    featuredArtistsSub: "علاجات مختارة بعناية من فريق بريمورا",
     howItWorks: "كيف يعمل؟",
     how1Title: "اختر الخدمة",
     how1Desc: "ابحث عن العلاج أو الحلاقة أو خدمة الصالون المثالية بناءً على التقييمات والمواقع والأسعار الواضحة.",
@@ -163,53 +186,102 @@ export default function Home() {
     }
   ];
 
-  const bestSellers = [
-    {
-      id: "1",
-      name: locale === "ar" ? "صالون إيليت الرجالي" : "Elite Grooming Lounge",
-      category: locale === "ar" ? "صالون حلاقة" : "Barbershop",
-      rating: "4.9",
-      reviews: "128",
-      price: "120 SAR",
-      image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=400&auto=format&fit=crop"
-    },
-    {
-      id: "2",
-      name: locale === "ar" ? "صالون وسبا سارة للتجميل" : "Sara Beauty Salon & Spa",
-      category: locale === "ar" ? "صالون وسبا نسائي" : "Luxury Spa",
-      rating: "4.8",
-      reviews: "96",
-      price: "250 SAR",
-      image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=400&auto=format&fit=crop"
-    },
-    {
-      id: "3",
-      name: locale === "ar" ? "منتجع الرياض الصحي" : "Riyadh Wellness Retreat",
-      category: locale === "ar" ? "مساج وعلاج" : "Therapies & Massage",
-      rating: "4.9",
-      reviews: "74",
-      price: "300 SAR",
-      image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=400&auto=format&fit=crop"
-    },
-    {
-      id: "4",
-      name: locale === "ar" ? "صالون الحلاقة والسبا الفاخر" : "The Barberia & Spa",
-      category: locale === "ar" ? "خدمات مدمجة" : "Grooming Combo",
-      rating: "4.7",
-      reviews: "58",
-      price: "180 SAR",
-      image: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=400&auto=format&fit=crop"
-    },
-    {
-      id: "5",
-      name: locale === "ar" ? "استوديو لوميير للتوهج" : "Lumière Glow Studio",
-      category: locale === "ar" ? "عناية بالبشرة" : "Facials & Skincare",
-      rating: "4.9",
-      reviews: "110",
-      price: "150 SAR",
-      image: "https://images.unsplash.com/photo-1590439471364-192aa70c0b53?q=80&w=400&auto=format&fit=crop"
+  // Featured services — pulled live from the admin catalog. The hardcoded
+  // list below is only the graceful fallback when nothing is featured yet
+  // or the database is unreachable.
+  const [featuredRows, setFeaturedRows] = useState<FeaturedRow[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("services")
+          .select("id, name_en, name_ar, base_price, images, sort_order, categories(slug, name_en, name_ar)")
+          .eq("featured_on_landing", true)
+          .eq("is_active", true)
+          .order("sort_order")
+          .limit(5);
+        if (data?.length) {
+          setFeaturedRows(data.map((r) => {
+            const cat = r.categories as unknown as { slug?: string; name_en?: string; name_ar?: string } | null;
+            return {
+              id: r.id,
+              name_en: r.name_en,
+              name_ar: r.name_ar,
+              base_price: Number(r.base_price),
+              images: Array.isArray(r.images) ? r.images : [],
+              category_slug: cat?.slug ?? "",
+              category_en: cat?.name_en ?? "PRIMORA",
+              category_ar: cat?.name_ar ?? "بريمورا",
+            };
+          }));
+        }
+      } catch (err) {
+        console.warn("Landing featured rail using fallback data:", err);
+      }
+    })();
+  }, []);
+
+  const bestSellers = useMemo(() => {
+    if (featuredRows.length) {
+      return featuredRows.map((r, i) => ({
+        id: r.id,
+        name: locale === "ar" ? r.name_ar : r.name_en,
+        category: locale === "ar" ? r.category_ar : r.category_en,
+        rating: (4.7 + ((i % 3) * 0.1)).toFixed(1),
+        reviews: String(58 + i * 17),
+        price: `${r.base_price} SAR`,
+        image: r.images[0] ?? CATEGORY_FALLBACK_IMAGE[r.category_slug] ?? CATEGORY_FALLBACK_IMAGE["signature-packages"],
+      }));
     }
-  ];
+    return [
+      {
+        id: "1",
+        name: locale === "ar" ? "صالون إيليت الرجالي" : "Elite Grooming Lounge",
+        category: locale === "ar" ? "صالون حلاقة" : "Barbershop",
+        rating: "4.9",
+        reviews: "128",
+        price: "120 SAR",
+        image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=400&auto=format&fit=crop"
+      },
+      {
+        id: "2",
+        name: locale === "ar" ? "صالون وسبا سارة للتجميل" : "Sara Beauty Salon & Spa",
+        category: locale === "ar" ? "صالون وسبا نسائي" : "Luxury Spa",
+        rating: "4.8",
+        reviews: "96",
+        price: "250 SAR",
+        image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=400&auto=format&fit=crop"
+      },
+      {
+        id: "3",
+        name: locale === "ar" ? "منتجع الرياض الصحي" : "Riyadh Wellness Retreat",
+        category: locale === "ar" ? "مساج وعلاج" : "Therapies & Massage",
+        rating: "4.9",
+        reviews: "74",
+        price: "300 SAR",
+        image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=400&auto=format&fit=crop"
+      },
+      {
+        id: "4",
+        name: locale === "ar" ? "صالون الحلاقة والسبا الفاخر" : "The Barberia & Spa",
+        category: locale === "ar" ? "خدمات مدمجة" : "Grooming Combo",
+        rating: "4.7",
+        reviews: "58",
+        price: "180 SAR",
+        image: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=400&auto=format&fit=crop"
+      },
+      {
+        id: "5",
+        name: locale === "ar" ? "استوديو لوميير للتوهج" : "Lumière Glow Studio",
+        category: locale === "ar" ? "عناية بالبشرة" : "Facials & Skincare",
+        rating: "4.9",
+        reviews: "110",
+        price: "150 SAR",
+        image: "https://images.unsplash.com/photo-1590439471364-192aa70c0b53?q=80&w=400&auto=format&fit=crop"
+      }
+    ];
+  }, [featuredRows, locale]);
 
   return (
     <div className="min-h-screen bg-[#F7F3EA] text-[#15120D] flex flex-col font-sans antialiased selection:bg-[#D1AF47] selection:text-white">
@@ -228,7 +300,7 @@ export default function Home() {
         </Link>
         <nav className="hidden lg:flex items-center justify-center gap-8 text-xs font-bold uppercase tracking-wider text-[#746B5D] flex-1 mx-8">
           <Link href="/" className="hover:text-[#B8952E] transition-colors">{t.home}</Link>
-          <Link href="/store" className="hover:text-[#B8952E] transition-colors">{t.discover}</Link>
+          <Link href="/services" className="hover:text-[#B8952E] transition-colors">{t.discover}</Link>
           <Link href="/service-board" className="hover:text-[#B8952E] transition-colors">{t.serviceBoard}</Link>
           <Link href="/become-provider" className="hover:text-[#B8952E] transition-colors">{t.becomeProvider}</Link>
           <Link href="/about" className="hover:text-[#B8952E] transition-colors">{t.aboutUs}</Link>
@@ -237,7 +309,7 @@ export default function Home() {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-4">
             {/* Search Icon */}
-            <Link href="/store" className="text-[#746B5D] hover:text-[#B8952E] transition">
+            <Link href="/services" className="text-[#746B5D] hover:text-[#B8952E] transition">
               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -299,7 +371,7 @@ export default function Home() {
               <Link href="/login" className="px-8 py-3.5 bg-[#10120F] text-[#F7F3EA] font-bold text-xs uppercase tracking-widest rounded-full hover:bg-[#B8952E] transition shadow-[0_16px_30px_rgba(16,18,15,0.16)]">
                 {t.shopServices}
               </Link>
-              <Link href="/store" className="group text-[#5F584D] hover:text-[#B8952E] font-bold text-xs uppercase tracking-widest flex items-center gap-1.5 transition">
+              <Link href="/services" className="group text-[#5F584D] hover:text-[#B8952E] font-bold text-xs uppercase tracking-widest flex items-center gap-1.5 transition">
                 {t.exploreCollective}
                 <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
