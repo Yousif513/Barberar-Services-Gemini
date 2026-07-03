@@ -28,7 +28,33 @@ const translations = {
     featured: "Featured",
     featLanding: "Landing",
     featServices: "Services",
-    featuredHint: "Featured on the landing page rail / at the top of the Services page."
+    featuredHint: "Featured on the landing page rail / at the top of the Services page.",
+    addBtn: "+ Add service",
+    editBtn: "Edit",
+    deleteBtn: "Delete",
+    confirmDelete: "Delete service \"{name}\"? This cannot be undone.",
+    newService: "New service",
+    editService: "Edit service",
+    nameEnLabel: "Name (EN)",
+    nameArLabel: "Name (AR)",
+    categorySel: "Category",
+    priceLabel: "Price (SAR)",
+    durationLabel: "Duration (min)",
+    descEnLabel: "Description (EN)",
+    descArLabel: "Description (AR)",
+    imageLabel: "Image URL",
+    assignProvider: "Assign to provider / shop",
+    unassigned: "Unassigned (platform catalog)",
+    statusLabel: "Status",
+    activeOpt: "Active",
+    draftOpt: "Draft / inactive",
+    allCategories: "All categories",
+    allStatuses: "All statuses",
+    createdMsg: "Service created.",
+    deletedMsg: "Service deleted.",
+    saving: "Saving...",
+    required: "Name and category are required.",
+    filterBy: "Filter"
   },
   ar: {
     title: "سجل الخدمات العام",
@@ -54,17 +80,74 @@ const translations = {
     featured: "مميزة",
     featLanding: "الرئيسية",
     featServices: "الخدمات",
-    featuredHint: "تظهر في شريط الصفحة الرئيسية / أعلى صفحة الخدمات."
+    featuredHint: "تظهر في شريط الصفحة الرئيسية / أعلى صفحة الخدمات.",
+    addBtn: "+ إضافة خدمة",
+    editBtn: "تعديل",
+    deleteBtn: "حذف",
+    confirmDelete: "حذف الخدمة \"{name}\"؟ لا يمكن التراجع.",
+    newService: "خدمة جديدة",
+    editService: "تعديل الخدمة",
+    nameEnLabel: "الاسم (إنجليزي)",
+    nameArLabel: "الاسم (عربي)",
+    categorySel: "الفئة",
+    priceLabel: "السعر (ريال)",
+    durationLabel: "المدة (دقيقة)",
+    descEnLabel: "الوصف (إنجليزي)",
+    descArLabel: "الوصف (عربي)",
+    imageLabel: "رابط الصورة",
+    assignProvider: "إسناد لمزود / متجر",
+    unassigned: "غير مُسند (كتالوج المنصة)",
+    statusLabel: "الحالة",
+    activeOpt: "نشط",
+    draftOpt: "مسودة / غير نشط",
+    allCategories: "كل الفئات",
+    allStatuses: "كل الحالات",
+    createdMsg: "تم إنشاء الخدمة.",
+    deletedMsg: "تم حذف الخدمة.",
+    saving: "جارٍ الحفظ...",
+    required: "الاسم والفئة مطلوبان.",
+    filterBy: "تصفية"
   }
 };
 
+type EditableService = {
+  id: string;
+  nameEn: string;
+  nameAr: string;
+  categoryId: string;
+  category: string;
+  price: number;
+  duration: number;
+  descriptionEn: string;
+  descriptionAr: string;
+  image: string;
+  providerId: string;
+  providersCount: number;
+  is_active: boolean;
+  featured_on_landing: boolean;
+  featured_in_services: boolean;
+};
+
+const blankService = (): EditableService => ({
+  id: "", nameEn: "", nameAr: "", categoryId: "", category: "", price: 0, duration: 30,
+  descriptionEn: "", descriptionAr: "", image: "", providerId: "", providersCount: 0,
+  is_active: true, featured_on_landing: false, featured_in_services: false
+});
+
 export default function AdminServices() {
   const [services, setServices] = useState<any[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name_en: string; name_ar: string }[]>([]);
+  const [providersList, setProvidersList] = useState<{ id: string; name_en: string; name_ar: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [catFilter, setCatFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [lang, setLang] = useState<"en" | "ar">("ar");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState<EditableService>(() => blankService());
 
   useEffect(() => {
     const checkLang = () => {
@@ -85,7 +168,7 @@ export default function AdminServices() {
       setError("");
       const { data, error } = await supabase
         .from("services")
-        .select("id, name_en, name_ar, base_price, base_duration_minutes, is_active, featured_on_landing, featured_in_services, categories(name_en, name_ar)")
+        .select("id, name_en, name_ar, base_price, base_duration_minutes, description_en, description_ar, images, is_active, provider_id, category_id, featured_on_landing, featured_in_services, categories(name_en, name_ar)")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -95,10 +178,15 @@ export default function AdminServices() {
           id: s.id,
           nameEn: s.name_en,
           nameAr: s.name_ar,
+          categoryId: (s as any).category_id || "",
           category: (s.categories as any)?.name_en || (s.categories as any)?.name_ar || "Uncategorized",
           price: Number(s.base_price) || 0,
           duration: Number(s.base_duration_minutes) || 0,
-          providersCount: 1,
+          descriptionEn: (s as any).description_en || "",
+          descriptionAr: (s as any).description_ar || "",
+          image: Array.isArray((s as any).images) && (s as any).images.length ? (s as any).images[0] : "",
+          providerId: (s as any).provider_id || "",
+          providersCount: (s as any).provider_id ? 1 : 0,
           is_active: !!s.is_active,
           featured_on_landing: !!s.featured_on_landing,
           featured_in_services: !!s.featured_in_services
@@ -123,6 +211,94 @@ export default function AdminServices() {
   useEffect(() => {
     loadServices();
   }, [lang]);
+
+  // Load categories + providers for the create/edit form dropdowns.
+  useEffect(() => {
+    (async () => {
+      try {
+        const [{ data: cats }, { data: provs }] = await Promise.all([
+          supabase.from("categories").select("id, name_en, name_ar").eq("is_active", true).order("sort_order"),
+          supabase.from("providers").select("id, business_name_en, business_name_ar").order("created_at", { ascending: false }),
+        ]);
+        if (cats?.length) setCategories(cats);
+        if (provs?.length) setProvidersList(provs.map((p: any) => ({ id: p.id, name_en: p.business_name_en, name_ar: p.business_name_ar })));
+      } catch (err) {
+        console.warn("Service form dropdowns using empty lists:", err);
+      }
+    })();
+  }, []);
+
+  const openNew = () => { setForm(blankService()); setModalOpen(true); };
+
+  const openEdit = (item: any) => {
+    setForm({
+      id: item.id,
+      nameEn: item.nameEn || "",
+      nameAr: item.nameAr || "",
+      categoryId: item.categoryId || "",
+      category: item.category || "",
+      price: Number(item.price) || 0,
+      duration: Number(item.duration) || 30,
+      descriptionEn: item.descriptionEn || "",
+      descriptionAr: item.descriptionAr || "",
+      image: item.image || "",
+      providerId: item.providerId || "",
+      providersCount: item.providersCount || 0,
+      is_active: item.is_active !== false,
+      featured_on_landing: !!item.featured_on_landing,
+      featured_in_services: !!item.featured_in_services,
+    });
+    setModalOpen(true);
+  };
+
+  const saveService = async () => {
+    setSuccess(""); setError("");
+    if (!form.nameEn.trim() || !form.categoryId) { setError(translations[lang].required); return; }
+    setSaving(true);
+    const payload: Record<string, unknown> = {
+      name_en: form.nameEn.trim(),
+      name_ar: (form.nameAr || form.nameEn).trim(),
+      category_id: form.categoryId,
+      base_price: form.price,
+      base_duration_minutes: form.duration,
+      description_en: form.descriptionEn || null,
+      description_ar: form.descriptionAr || null,
+      images: form.image ? [form.image] : [],
+      provider_id: form.providerId || null,
+      status: form.is_active ? "active" : "draft",
+      featured_on_landing: form.featured_on_landing,
+      featured_in_services: form.featured_in_services,
+    };
+    try {
+      if (form.id) {
+        const { error: upErr } = await supabase.from("services").update(payload).eq("id", form.id);
+        if (upErr) throw upErr;
+      } else {
+        const { error: insErr } = await supabase.from("services").insert(payload);
+        if (insErr) throw insErr;
+      }
+      setModalOpen(false);
+      setSuccess(form.id ? translations[lang].successMsg : translations[lang].createdMsg);
+      await loadServices();
+    } catch (err: any) {
+      console.warn("Service save failed:", err?.message || err);
+      setError(translations[lang].errorMsg);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteService = async (item: any) => {
+    const name = lang === "ar" ? item.nameAr : item.nameEn;
+    if (!window.confirm(translations[lang].confirmDelete.replace("{name}", name))) return;
+    setSuccess(""); setError("");
+    // Optimistic removal from the list.
+    setServices((prev) => prev.filter((s) => s.id !== item.id));
+    if (String(item.id).startsWith("s-mock-")) { setSuccess(translations[lang].deletedMsg); return; }
+    const { error: delErr } = await supabase.from("services").delete().eq("id", item.id);
+    if (delErr) { setError(translations[lang].errorMsg); await loadServices(); return; }
+    setSuccess(translations[lang].deletedMsg);
+  };
 
   const handleToggleActive = async (id: string, currentStatus: boolean) => {
     setSuccess("");
@@ -206,7 +382,10 @@ export default function AdminServices() {
   const filtered = services.filter((s) => {
     const term = search.toLowerCase();
     const name = (lang === "ar" ? s.nameAr : s.nameEn).toLowerCase();
-    return name.includes(term) || s.category.toLowerCase().includes(term);
+    const matchesSearch = name.includes(term) || String(s.category).toLowerCase().includes(term);
+    const matchesCat = catFilter === "all" || s.categoryId === catFilter || s.category === catFilter;
+    const matchesStatus = statusFilter === "all" || (statusFilter === "active" ? s.is_active : !s.is_active);
+    return matchesSearch && matchesCat && matchesStatus;
   });
 
   // KPI Calculations
@@ -230,6 +409,9 @@ export default function AdminServices() {
             {t.subtitle}
           </p>
         </div>
+        <button onClick={openNew} className="rounded-2xl bg-[#D1AF47] px-5 py-3 text-sm font-black text-[#101828] shadow-[0_14px_34px_rgba(209,175,71,0.24)] hover:bg-[#E0C46A] transition">
+          {t.addBtn}
+        </button>
       </div>
 
       {success && (
@@ -278,7 +460,7 @@ export default function AdminServices() {
       </div>
 
       {/* Controls Grid */}
-      <div className={`flex items-center gap-4 ${flip}`}>
+      <div className={`flex flex-col gap-3 sm:flex-row sm:items-center ${flip}`}>
         <div className="relative flex-grow">
           <input
             type="text"
@@ -288,6 +470,15 @@ export default function AdminServices() {
             className={`w-full bg-white border border-[#ECECEC] rounded-xl px-4 py-2.5 text-xs text-gray-900 outline-none focus:border-[#D1AF47] transition duration-150 ${isRTL ? "text-right" : "text-left"}`}
           />
         </div>
+        <select value={catFilter} onChange={(e) => setCatFilter(e.target.value)} className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-xs font-bold text-gray-700 outline-none focus:border-[#D1AF47]">
+          <option value="all">{t.allCategories}</option>
+          {categories.map((c) => <option key={c.id} value={c.id}>{lang === "ar" ? c.name_ar : c.name_en}</option>)}
+        </select>
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)} className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-xs font-bold text-gray-700 outline-none focus:border-[#D1AF47]">
+          <option value="all">{t.allStatuses}</option>
+          <option value="active">{t.active}</option>
+          <option value="inactive">{t.inactive}</option>
+        </select>
       </div>
 
       {/* Data Table */}
@@ -309,6 +500,12 @@ export default function AdminServices() {
               {loading ? (
                 <tr>
                   <td colSpan={7} className="py-8 text-center text-gray-400 font-bold">{t.loading}</td>
+                </tr>
+              ) : filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center text-gray-400 font-bold">
+                    {lang === "ar" ? "لا توجد خدمات مطابقة. أضف خدمة جديدة للبدء." : "No matching services. Add a new service to get started."}
+                  </td>
                 </tr>
               ) : (
                 filtered.map((item) => (
@@ -370,16 +567,30 @@ export default function AdminServices() {
                       </div>
                     </td>
                     <td className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>
-                      <button
-                        onClick={() => handleToggleActive(item.id, item.is_active)}
-                        className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition duration-150 border ${
-                          item.is_active 
-                            ? "bg-white hover:bg-gray-50 text-gray-700 border-[#ECECEC]" 
-                            : "bg-gray-900 hover:bg-gray-800 text-white border-transparent"
-                        }`}
-                      >
-                        {item.is_active ? t.inactive : t.active}
-                      </button>
+                      <div className={`flex flex-wrap gap-1.5 ${isRTL ? "justify-start" : "justify-end"}`}>
+                        <button
+                          onClick={() => openEdit(item)}
+                          className="px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition duration-150 border border-[#D1AF47]/30 bg-[#D1AF47]/10 text-[#9A741F] hover:border-[#D1AF47]/50"
+                        >
+                          {t.editBtn}
+                        </button>
+                        <button
+                          onClick={() => handleToggleActive(item.id, item.is_active)}
+                          className={`px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition duration-150 border ${
+                            item.is_active
+                              ? "bg-white hover:bg-gray-50 text-gray-700 border-[#ECECEC]"
+                              : "bg-gray-900 hover:bg-gray-800 text-white border-transparent"
+                          }`}
+                        >
+                          {item.is_active ? t.inactive : t.active}
+                        </button>
+                        <button
+                          onClick={() => deleteService(item)}
+                          className="px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition duration-150 border border-[#FECDCA] bg-[#FEF3F2] text-[#B42318] hover:border-[#F97066]"
+                        >
+                          {t.deleteBtn}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -388,6 +599,80 @@ export default function AdminServices() {
           </table>
         </div>
       </div>
+
+      {/* Create / Edit service modal */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-start justify-center overflow-y-auto bg-[#101828]/55 px-4 py-8 backdrop-blur-sm" onClick={() => setModalOpen(false)}>
+          <div dir={isRTL ? "rtl" : "ltr"} onClick={(e) => e.stopPropagation()} className={`w-full max-w-2xl rounded-[24px] border border-[#D1AF47]/25 bg-[#F9F7F1] p-6 shadow-2xl ${isRTL ? "text-right" : "text-left"}`}>
+            <div className={`mb-5 flex items-center justify-between gap-4 ${flip}`}>
+              <h3 className="font-serif text-xl font-black text-gray-900">{form.id ? t.editService : t.newService}</h3>
+              <button onClick={() => setModalOpen(false)} className="rounded-full border border-[#ECECEC] px-3 py-1 text-xs font-black text-[#667085]">{t.cancelBtn}</button>
+            </div>
+
+            {error && <div className="mb-4 rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-4 py-2.5 text-xs font-bold text-[#B42318]">{error}</div>}
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.nameEnLabel}
+                <input value={form.nameEn} onChange={(e) => setForm((f) => ({ ...f, nameEn: e.target.value }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]" />
+              </label>
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.nameArLabel}
+                <input value={form.nameAr} onChange={(e) => setForm((f) => ({ ...f, nameAr: e.target.value }))} dir="rtl" className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]" />
+              </label>
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.categorySel}
+                <select value={form.categoryId} onChange={(e) => setForm((f) => ({ ...f, categoryId: e.target.value }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]">
+                  <option value="">{t.categorySel}…</option>
+                  {categories.map((c) => <option key={c.id} value={c.id}>{lang === "ar" ? c.name_ar : c.name_en}</option>)}
+                </select>
+              </label>
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.assignProvider}
+                <select value={form.providerId} onChange={(e) => setForm((f) => ({ ...f, providerId: e.target.value }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]">
+                  <option value="">{t.unassigned}</option>
+                  {providersList.map((p) => <option key={p.id} value={p.id}>{lang === "ar" ? p.name_ar : p.name_en}</option>)}
+                </select>
+              </label>
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.priceLabel}
+                <input type="number" min={0} value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: Number(e.target.value) || 0 }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]" />
+              </label>
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.durationLabel}
+                <input type="number" min={0} value={form.duration} onChange={(e) => setForm((f) => ({ ...f, duration: Number(e.target.value) || 0 }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]" />
+              </label>
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085] sm:col-span-2">{t.imageLabel}
+                <input value={form.image} onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))} placeholder="https://…" dir="ltr" className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]" />
+              </label>
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085] sm:col-span-2">{t.descEnLabel}
+                <textarea rows={2} value={form.descriptionEn} onChange={(e) => setForm((f) => ({ ...f, descriptionEn: e.target.value }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]" />
+              </label>
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085] sm:col-span-2">{t.descArLabel}
+                <textarea rows={2} value={form.descriptionAr} onChange={(e) => setForm((f) => ({ ...f, descriptionAr: e.target.value }))} dir="rtl" className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]" />
+              </label>
+            </div>
+
+            <div className={`mt-4 flex flex-wrap items-center gap-2 ${flip}`}>
+              {([
+                ["is_active", t.activeOpt],
+                ["featured_on_landing", t.featLanding],
+                ["featured_in_services", t.featServices],
+              ] as const).map(([key, label]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setForm((f) => ({ ...f, [key]: !f[key] }))}
+                  className={`rounded-full border px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition ${
+                    form[key] ? "border-[#D1AF47]/40 bg-[#FFFAEB] text-[#B8952E]" : "border-[#ECECEC] bg-white text-gray-400 hover:border-[#D1AF47]/30"
+                  }`}
+                >
+                  {form[key] ? "★" : "☆"} {label}
+                </button>
+              ))}
+            </div>
+
+            <div className={`mt-6 flex justify-end gap-3 ${flip}`}>
+              <button onClick={() => setModalOpen(false)} className="rounded-xl border border-[#ECECEC] px-5 py-2.5 text-xs font-black text-[#667085]">{t.cancelBtn}</button>
+              <button onClick={() => void saveService()} disabled={saving} className="rounded-xl bg-[#D1AF47] px-5 py-2.5 text-xs font-black text-[#101828] hover:bg-[#E0C46A] disabled:opacity-60">{saving ? t.saving : t.saveBtn}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
