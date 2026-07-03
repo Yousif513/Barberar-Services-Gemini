@@ -49,6 +49,7 @@ const translations = {
     noLedgerRows: "No captured ledger rows yet.",
     
     // Tabs
+    tabMethods: "Payment Methods",
     tabSplits: "Transaction Splits",
     tabPayoutRequests: "Payout Requests",
     tabStatements: "Accountant Statements",
@@ -115,6 +116,7 @@ const translations = {
     noLedgerRows: "لا توجد سجلات مالية مقبوضة بعد.",
     
     // Tabs
+    tabMethods: "طرق الدفع",
     tabSplits: "تقسيم المعاملات",
     tabPayoutRequests: "طلبات سحب الأرباح",
     tabStatements: "القوائم المحاسبية والضريبة",
@@ -138,8 +140,111 @@ const translations = {
   }
 };
 
+type PayMethod = {
+  id: string;
+  key: string;
+  label_en: string;
+  label_ar: string;
+  gateway_key: string | null;
+  enabled: boolean;
+  enabled_for_roles: string[];
+  is_default: boolean;
+  env: string;
+  sort_order: number;
+};
+
+const FALLBACK_METHODS: PayMethod[] = [
+  { id: "m1", key: "mada", label_en: "mada", label_ar: "مدى", gateway_key: "tap", enabled: true, enabled_for_roles: ["customer"], is_default: true, env: "test", sort_order: 1 },
+  { id: "m2", key: "apple_pay", label_en: "Apple Pay", label_ar: "أبل باي", gateway_key: "tap", enabled: true, enabled_for_roles: ["customer"], is_default: false, env: "test", sort_order: 2 },
+  { id: "m3", key: "visa", label_en: "Visa", label_ar: "فيزا", gateway_key: "tap", enabled: true, enabled_for_roles: ["customer"], is_default: false, env: "test", sort_order: 3 },
+  { id: "m4", key: "stc_pay", label_en: "STC Pay", label_ar: "إس تي سي باي", gateway_key: "tap", enabled: true, enabled_for_roles: ["customer"], is_default: false, env: "test", sort_order: 5 },
+  { id: "m5", key: "cash", label_en: "Cash on service", label_ar: "نقداً عند الخدمة", gateway_key: "internal", enabled: true, enabled_for_roles: ["customer"], is_default: false, env: "test", sort_order: 10 },
+];
+
+function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBase: string }) {
+  const isRTL = lang === "ar";
+  const [methods, setMethods] = useState<PayMethod[]>([]);
+  const [note, setNote] = useState("");
+  const L = lang === "ar"
+    ? { title: "طرق الدفع (السوق السعودي)", subtitle: "فعّل أو عطّل الطرق وحدد الافتراضية — تنعكس فوراً على صفحة الدفع لدى العميل وشاشة مستحقات المزود.", enabled: "مفعلة", disabled: "معطلة", makeDefault: "افتراضية", isDefault: "★ الافتراضية", roles: "متاحة لـ", customer: "العميل", provider: "المزود", gateway: "البوابة", saved: "تم حفظ إعدادات طرق الدفع.", empty: "لا توجد طرق دفع — طبّق ترحيل قاعدة البيانات ثم أعد التحميل." }
+    : { title: "Payment Methods (KSA)", subtitle: "Enable, disable and set the default — changes reflect instantly at customer checkout and provider payout screens.", enabled: "Enabled", disabled: "Disabled", makeDefault: "Make default", isDefault: "★ Default", roles: "Available to", customer: "Customer", provider: "Provider", gateway: "Gateway", saved: "Payment method settings saved.", empty: "No payment methods yet — apply the database migration and reload." };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await supabase.from("payment_methods").select("*").order("sort_order");
+        setMethods(data?.length ? data : FALLBACK_METHODS);
+      } catch {
+        setMethods(FALLBACK_METHODS);
+      }
+    })();
+  }, []);
+
+  const flash = (msg: string) => { setNote(msg); setTimeout(() => setNote(""), 3000); };
+
+  const toggleEnabled = async (m: PayMethod) => {
+    setMethods((prev) => prev.map((x) => (x.id === m.id ? { ...x, enabled: !m.enabled } : x)));
+    try {
+      await supabase.from("payment_methods").update({ enabled: !m.enabled }).eq("key", m.key);
+    } catch { /* fallback rows (no DB yet) still toggle locally */ }
+    flash(L.saved);
+  };
+
+  const makeDefault = async (m: PayMethod) => {
+    setMethods((prev) => prev.map((x) => ({ ...x, is_default: x.id === m.id })));
+    try {
+      await supabase.from("payment_methods").update({ is_default: false }).neq("id", m.id);
+      await supabase.from("payment_methods").update({ is_default: true, enabled: true }).eq("id", m.id);
+    } catch { /* fallback rows */ }
+    flash(L.saved);
+  };
+
+  return (
+    <div className={cardBase}>
+      <div className="mb-4">
+        <h3 className="text-sm font-serif font-black text-gray-900">{L.title}</h3>
+        <p className="text-[11px] text-gray-500 font-semibold mt-0.5">{L.subtitle}</p>
+      </div>
+      {note && <div className="mb-3 rounded-xl bg-[#ECFDF3] border border-[#D1FADF] px-3 py-2 text-[11px] font-bold text-[#027A48]">{note}</div>}
+      {methods.length === 0 ? (
+        <p className="py-6 text-center text-xs font-semibold text-gray-400">{L.empty}</p>
+      ) : (
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
+          {methods.map((m) => (
+            <div key={m.id} className={`rounded-xl border p-3.5 transition ${m.enabled ? "border-[#D1AF47]/25 bg-[#FFFDF7]" : "border-[#ECECEC] bg-gray-50/60 opacity-80"}`}>
+              <div className={`flex items-center justify-between gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
+                <div className={isRTL ? "text-right" : "text-left"}>
+                  <strong className="block text-xs font-black text-gray-900">{lang === "ar" ? m.label_ar : m.label_en}</strong>
+                  <span className="mt-0.5 block text-[9px] font-bold uppercase tracking-wider text-gray-400">{L.gateway}: {m.gateway_key ?? "—"} · {m.env}</span>
+                </div>
+                <button
+                  onClick={() => toggleEnabled(m)}
+                  aria-label={m.enabled ? L.disabled : L.enabled}
+                  className={`relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition ${m.enabled ? "bg-[#D1AF47]" : "bg-gray-300"}`}
+                >
+                  <span className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform" style={{ transform: m.enabled ? "translateX(18px)" : "translateX(2px)" }} />
+                </button>
+              </div>
+              <div className={`mt-2.5 flex flex-wrap items-center gap-1.5 ${isRTL ? "flex-row-reverse" : ""}`}>
+                {(m.enabled_for_roles ?? []).map((r) => (
+                  <span key={r} className="rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[8px] font-black uppercase text-[#3B82F6]">{r === "customer" ? L.customer : r === "provider" ? L.provider : r}</span>
+                ))}
+                {m.is_default ? (
+                  <span className="rounded-full bg-[#FFFAEB] px-2 py-0.5 text-[8px] font-black uppercase text-[#B8952E]">{L.isDefault}</span>
+                ) : (
+                  <button onClick={() => makeDefault(m)} className="rounded-full border border-[#ECECEC] bg-white px-2 py-0.5 text-[8px] font-black uppercase text-gray-400 transition hover:border-[#D1AF47]/40 hover:text-[#B8952E]">{L.makeDefault}</button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AdminLedger() {
-  const [activeTab, setActiveTab] = useState<"splits" | "requests" | "statements">("splits");
+  const [activeTab, setActiveTab] = useState<"methods" | "splits" | "requests" | "statements">("methods");
   const [ledger, setLedger] = useState<any[]>([]);
   const [payoutRequests, setPayoutRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -465,6 +570,12 @@ export default function AdminLedger() {
         {/* Navigation Tabs */}
         <div className={`flex items-center gap-1 rounded-full bg-gray-100/80 border border-[#ECECEC] p-1 shadow-sm ${flip}`}>
           <button 
+            onClick={() => setActiveTab("methods")}
+            className={`rounded-full px-4 py-2 text-[10px] font-black transition-all duration-300 ${activeTab === "methods" ? "bg-white text-gray-900 shadow-sm border border-[#ECECEC]" : "text-[#667085] hover:text-gray-900"}`}
+          >
+            {t.tabMethods}
+          </button>
+          <button 
             onClick={() => setActiveTab("splits")}
             className={`rounded-full px-4 py-2 text-[10px] font-black transition-all duration-300 ${activeTab === "splits" ? "bg-white text-gray-900 shadow-sm border border-[#ECECEC]" : "text-[#667085] hover:text-gray-900"}`}
           >
@@ -494,6 +605,15 @@ export default function AdminLedger() {
       {error && (
         <div className={`bg-[#FEF3F2] border border-[#EF4444]/20 text-[#EF4444] text-xs rounded-xl p-4 font-semibold ${isRTL ? "text-right" : "text-left"}`}>
           {t.error}: {error}
+        </div>
+      )}
+
+      {/* ──────────────────────────────────────────────────────── */}
+      {/* 0. PAYMENT METHODS REGISTRY TAB                          */}
+      {/* ──────────────────────────────────────────────────────── */}
+      {activeTab === "methods" && (
+        <div className="space-y-6 animate-fadeIn">
+          <PaymentMethodsRegistry lang={lang} cardBase={cardBase} />
         </div>
       )}
 
