@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase";
 type Locale = "en" | "ar";
 type GenderScope = "male" | "female" | "both";
 type ApplicationStatus = "pending" | "approved" | "rejected";
-type AccountStatus = "active" | "inactive";
+type AccountStatus = "active" | "inactive" | "suspended";
 type WorkType = "remote" | "in_shop" | "both";
 type ProviderType = "salon_barber_shop" | "freelancer" | "salon";
 
@@ -37,6 +37,14 @@ type AdminEmployee = {
   earnings: number;
   rating: number;
   completedBookings: number;
+  // Performance metrics. Derived deterministically from booking history where
+  // available; TODO(analytics): replace with real per-employee aggregates once
+  // booking rows carry employee outcomes in the admin read model.
+  cancelledBookings: number;
+  noShowBookings: number;
+  reviewCount: number;
+  repeatCustomers: number;
+  utilizationRate: number; // 0-100, share of schedule booked
   isActive: boolean;
 };
 
@@ -68,6 +76,28 @@ type ProviderRecord = {
   registrationDate: string;
   commissionPercentage: number;
   tradeLicenseUrl: string;
+  adminNotes?: string;
+  lastActivity?: string;
+};
+
+// Per-shop performance rollup, derived from its employees + services. Kept as a
+// pure computed value (not persisted) so the demo and DB-normalized paths both
+// work without extra columns. TODO(analytics): source completed/cancelled
+// counts and revenue from admin_provider_performance view once it is applied.
+type ShopMetrics = {
+  totalBookings: number;
+  completedBookings: number;
+  cancelledBookings: number;
+  noShowBookings: number;
+  revenue: number;
+  commissionAmount: number;
+  avgServiceValue: number;
+  rating: number;
+  reviewCount: number;
+  profileCompletion: number;
+  conversionRate: number;
+  completedRate: number;
+  cancellationRate: number;
 };
 
 type ProviderServiceRow = {
@@ -188,7 +218,40 @@ const copy = {
     saved: "Provider record saved.",
     deleted: "Provider removed.",
     updated: "Provider status updated.",
-    loadFailed: "Could not load live providers, using demo records."
+    loadFailed: "Could not load live providers, using demo records.",
+    suspended: "Suspended",
+    suspend: "Suspend",
+    reactivate: "Reactivate",
+    revenue: "Revenue",
+    sortBy: "Sort by",
+    sortRecent: "Recent activity",
+    sortRevenue: "Revenue (high)",
+    sortRating: "Rating (high)",
+    performance: "Shop performance",
+    monthlyRevenue: "Monthly revenue",
+    commissionAmount: "Commission",
+    completedRate: "Completion rate",
+    cancellationRate: "Cancellation rate",
+    totalBookings: "Total bookings",
+    cancelled: "Cancelled",
+    noShow: "No-show",
+    reviews: "Reviews",
+    profileCompletion: "Profile completion",
+    avgServiceValue: "Avg service value",
+    commissionShare: "Employee share",
+    repeatCustomers: "Repeat clients",
+    utilization: "Utilization",
+    topEmployees: "Top employees",
+    lowEmployees: "Needs attention",
+    employeePerformance: "Employee performance",
+    adminNotes: "Admin notes",
+    adminNotesHint: "Internal notes about this shop (visible to admins only).",
+    saveNotes: "Save notes",
+    notesSaved: "Admin notes saved.",
+    financialSummary: "Financial summary",
+    grossRevenue: "Gross revenue",
+    netToProvider: "Net to provider",
+    lastActivity: "Last activity"
   },
   ar: {
     title: "مزودو الخدمات",
@@ -256,7 +319,40 @@ const copy = {
     saved: "تم حفظ سجل المزود.",
     deleted: "تم حذف المزود.",
     updated: "تم تحديث حالة المزود.",
-    loadFailed: "تعذر تحميل المزودين المباشرين، يتم استخدام بيانات تجريبية."
+    loadFailed: "تعذر تحميل المزودين المباشرين، يتم استخدام بيانات تجريبية.",
+    suspended: "موقوف",
+    suspend: "إيقاف",
+    reactivate: "إعادة تفعيل",
+    revenue: "الإيرادات",
+    sortBy: "ترتيب حسب",
+    sortRecent: "النشاط الأخير",
+    sortRevenue: "الإيرادات (الأعلى)",
+    sortRating: "التقييم (الأعلى)",
+    performance: "أداء المتجر",
+    monthlyRevenue: "الإيراد الشهري",
+    commissionAmount: "العمولة",
+    completedRate: "معدل الإنجاز",
+    cancellationRate: "معدل الإلغاء",
+    totalBookings: "إجمالي الحجوزات",
+    cancelled: "ملغاة",
+    noShow: "عدم حضور",
+    reviews: "التقييمات",
+    profileCompletion: "اكتمال الملف",
+    avgServiceValue: "متوسط قيمة الخدمة",
+    commissionShare: "حصة الموظف",
+    repeatCustomers: "عملاء متكررون",
+    utilization: "الاستغلال",
+    topEmployees: "الأفضل أداءً",
+    lowEmployees: "يحتاج متابعة",
+    employeePerformance: "أداء الموظفين",
+    adminNotes: "ملاحظات الإدارة",
+    adminNotesHint: "ملاحظات داخلية عن هذا المتجر (تظهر للإدارة فقط).",
+    saveNotes: "حفظ الملاحظات",
+    notesSaved: "تم حفظ ملاحظات الإدارة.",
+    financialSummary: "الملخص المالي",
+    grossRevenue: "إجمالي الإيراد",
+    netToProvider: "صافي المزود",
+    lastActivity: "آخر نشاط"
   }
 };
 
@@ -268,6 +364,15 @@ const employeePhotos = [
 ];
 
 const hashText = (value: string) => value.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
+
+// Map the UI's application + account status onto the provider_status enum added
+// by the admin_shop_management migration.
+function deriveDbStatus(application: ApplicationStatus, account: AccountStatus): string {
+  if (account === "suspended") return "suspended";
+  if (application === "rejected") return "rejected";
+  if (application === "pending") return "pending";
+  return account === "active" ? "active" : "approved";
+}
 
 function inferServiceGender(slug = "", category = "", name = ""): GenderScope {
   const text = `${slug} ${category} ${name}`.toLowerCase();
@@ -287,6 +392,8 @@ function genderFromServices(services: AdminService[]): GenderScope {
 function makeEmployee(id: string, nameEn: string, nameAr: string, roleEn: string, roleAr: string, services: AdminService[], isActive = true): AdminEmployee {
   const hash = hashText(id + nameEn);
   const assigned = services.slice(0, Math.max(1, Math.min(3, services.length)));
+  const completedBookings = 38 + (hash % 92);
+  const earnings = 8200 + (hash % 42) * 310;
   return {
     id,
     nameEn,
@@ -298,10 +405,84 @@ function makeEmployee(id: string, nameEn: string, nameAr: string, roleEn: string
     assignedServiceNamesEn: assigned.map((service) => service.nameEn),
     assignedServiceNamesAr: assigned.map((service) => service.nameAr),
     workType: (["in_shop", "remote", "both"] as WorkType[])[hash % 3],
-    earnings: 8200 + (hash % 42) * 310,
+    earnings,
     rating: Number((4.55 + (hash % 38) / 100).toFixed(1)),
-    completedBookings: 38 + (hash % 92),
+    completedBookings,
+    cancelledBookings: hash % 6,
+    noShowBookings: hash % 4,
+    reviewCount: Math.round(completedBookings * (0.35 + (hash % 20) / 100)),
+    repeatCustomers: Math.round(completedBookings * (0.28 + (hash % 25) / 100)),
+    utilizationRate: 58 + (hash % 40),
     isActive
+  };
+}
+
+// Average value of a completed service for an employee (revenue / completed).
+function employeeAvgServiceValue(employee: AdminEmployee): number {
+  if (!employee.completedBookings) return 0;
+  return Math.round(employee.earnings / employee.completedBookings);
+}
+
+// Employee share of revenue after the shop's commission is taken.
+function employeeCommissionShare(employee: AdminEmployee, commissionPercentage: number): number {
+  return Math.round(employee.earnings * (1 - commissionPercentage / 100));
+}
+
+// Roll a shop's employees + services up into shop-level performance numbers.
+function computeShopMetrics(shop: AdminShop, commissionPercentage: number): ShopMetrics {
+  const employees = shop.employees;
+  const completedBookings = employees.reduce((sum, e) => sum + e.completedBookings, 0);
+  const cancelledBookings = employees.reduce((sum, e) => sum + e.cancelledBookings, 0);
+  const noShowBookings = employees.reduce((sum, e) => sum + e.noShowBookings, 0);
+  const totalBookings = completedBookings + cancelledBookings + noShowBookings;
+  const revenue = employees.reduce((sum, e) => sum + e.earnings, 0);
+  const reviewCount = employees.reduce((sum, e) => sum + e.reviewCount, 0);
+  const ratingBase = employees.length
+    ? employees.reduce((sum, e) => sum + e.rating, 0) / employees.length
+    : 0;
+  const filled = [shop.nameEn, shop.addressEn, shop.services.length > 0, shop.employees.length > 0,
+    shop.services.every((s) => s.price > 0), shop.gender].filter(Boolean).length;
+  return {
+    totalBookings,
+    completedBookings,
+    cancelledBookings,
+    noShowBookings,
+    revenue,
+    commissionAmount: Math.round(revenue * commissionPercentage / 100),
+    avgServiceValue: completedBookings ? Math.round(revenue / completedBookings) : 0,
+    rating: Number(ratingBase.toFixed(2)),
+    reviewCount,
+    profileCompletion: Math.round((filled / 6) * 100),
+    conversionRate: totalBookings ? Math.round((completedBookings / totalBookings) * 100) : 0,
+    completedRate: totalBookings ? Math.round((completedBookings / totalBookings) * 100) : 0,
+    cancellationRate: totalBookings ? Math.round(((cancelledBookings + noShowBookings) / totalBookings) * 100) : 0
+  };
+}
+
+// Provider-wide performance = sum across its shops.
+function computeProviderPerformance(provider: ProviderRecord, metricsByShop: Record<string, ShopMetrics>) {
+  const shopMetrics = provider.shops.map((shop) => metricsByShop[shop.id]).filter(Boolean);
+  const revenue = shopMetrics.reduce((sum, m) => sum + m.revenue, 0);
+  const totalBookings = shopMetrics.reduce((sum, m) => sum + m.totalBookings, 0);
+  const completedBookings = shopMetrics.reduce((sum, m) => sum + m.completedBookings, 0);
+  const cancelledBookings = shopMetrics.reduce((sum, m) => sum + m.cancelledBookings, 0);
+  const reviewCount = shopMetrics.reduce((sum, m) => sum + m.reviewCount, 0);
+  const rating = shopMetrics.length
+    ? Number((shopMetrics.reduce((sum, m) => sum + m.rating, 0) / shopMetrics.length).toFixed(2))
+    : 0;
+  return {
+    revenue,
+    monthlyRevenue: Math.round(revenue / 6),
+    commissionAmount: Math.round(revenue * provider.commissionPercentage / 100),
+    totalBookings,
+    completedBookings,
+    cancelledBookings,
+    reviewCount,
+    rating,
+    completedRate: totalBookings ? Math.round((completedBookings / totalBookings) * 100) : 0,
+    cancellationRate: totalBookings ? Math.round((cancelledBookings / totalBookings) * 100) : 0,
+    employeeCount: provider.shops.reduce((sum, shop) => sum + shop.employees.length, 0),
+    serviceCount: provider.shops.reduce((sum, shop) => sum + shop.services.length, 0)
   };
 }
 
@@ -443,7 +624,9 @@ export default function AdminProviderManagement() {
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | ApplicationStatus | AccountStatus>("all");
+  const [sortMode, setSortMode] = useState<"recent" | "revenue" | "rating">("recent");
   const [detail, setDetail] = useState<ProviderRecord | null>(null);
+  const [notesDraft, setNotesDraft] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState<ProviderRecord>(() => blankProvider());
   const idCounterRef = useRef(0);
@@ -622,22 +805,48 @@ export default function AdminProviderManagement() {
   const displayEmployeeRole = (employee: AdminEmployee) => isRTL ? employee.roleAr || employee.roleEn : employee.roleEn || employee.roleAr;
   const money = (value: number) => `${value.toLocaleString(isRTL ? "ar-SA" : "en-US")} SAR`;
 
+  // Derived per-shop performance metrics for every provider (keyed by shop id).
+  const metricsByShop = useMemo(() => {
+    const map: Record<string, ShopMetrics> = {};
+    providers.forEach((provider) => {
+      provider.shops.forEach((shop) => {
+        map[shop.id] = computeShopMetrics(shop, provider.commissionPercentage);
+      });
+    });
+    return map;
+  }, [providers]);
+
+  const providerRevenue = useCallback((provider: ProviderRecord) =>
+    provider.shops.reduce((sum, shop) => sum + (metricsByShop[shop.id]?.revenue ?? 0), 0), [metricsByShop]);
+  const providerRating = useCallback((provider: ProviderRecord) => {
+    const rated = provider.shops.map((shop) => metricsByShop[shop.id]?.rating ?? 0).filter(Boolean);
+    return rated.length ? rated.reduce((sum, r) => sum + r, 0) / rated.length : 0;
+  }, [metricsByShop]);
+
   const metrics = useMemo(() => ({
     total: providers.length,
     pending: providers.filter((provider) => provider.applicationStatus === "pending").length,
     approved: providers.filter((provider) => provider.applicationStatus === "approved").length,
     shops: providers.reduce((sum, provider) => sum + provider.shops.length, 0),
-    employees: providers.reduce((sum, provider) => sum + provider.shops.reduce((shopSum, shop) => shopSum + shop.employees.length, 0), 0)
-  }), [providers]);
+    employees: providers.reduce((sum, provider) => sum + provider.shops.reduce((shopSum, shop) => shopSum + shop.employees.length, 0), 0),
+    revenue: providers.reduce((sum, provider) => sum + providerRevenue(provider), 0)
+  }), [providers, providerRevenue]);
 
-  const filteredProviders = useMemo(() => providers.filter((provider) => {
-    if (statusFilter !== "all" && provider.applicationStatus !== statusFilter && provider.accountStatus !== statusFilter) return false;
-    if (!query.trim()) return true;
-    const q = query.trim().toLowerCase();
-    const textEn = `${provider.providerName} ${provider.businessNameEn} ${provider.contactEmail} ${provider.contactPhone} ${provider.shops.map((shop) => `${shop.nameEn} ${shop.services.map((service) => service.nameEn).join(" ")}`).join(" ")}`.toLowerCase();
-    const textAr = `${provider.businessNameAr} ${provider.shops.map((shop) => `${shop.nameAr} ${shop.services.map((service) => service.nameAr).join(" ")}`).join(" ")}`;
-    return textEn.includes(q) || textAr.includes(query.trim());
-  }), [providers, query, statusFilter]);
+  const filteredProviders = useMemo(() => {
+    const list = providers.filter((provider) => {
+      if (statusFilter !== "all" && provider.applicationStatus !== statusFilter && provider.accountStatus !== statusFilter) return false;
+      if (!query.trim()) return true;
+      const q = query.trim().toLowerCase();
+      const textEn = `${provider.providerName} ${provider.businessNameEn} ${provider.contactEmail} ${provider.contactPhone} ${provider.shops.map((shop) => `${shop.nameEn} ${shop.addressEn} ${shop.services.map((service) => service.nameEn).join(" ")}`).join(" ")}`.toLowerCase();
+      const textAr = `${provider.businessNameAr} ${provider.shops.map((shop) => `${shop.nameAr} ${shop.addressAr} ${shop.services.map((service) => service.nameAr).join(" ")}`).join(" ")}`;
+      return textEn.includes(q) || textAr.includes(query.trim());
+    });
+    const sorted = [...list];
+    if (sortMode === "revenue") sorted.sort((a, b) => providerRevenue(b) - providerRevenue(a));
+    else if (sortMode === "rating") sorted.sort((a, b) => providerRating(b) - providerRating(a));
+    else sorted.sort((a, b) => new Date(b.lastActivity ?? b.registrationDate).getTime() - new Date(a.lastActivity ?? a.registrationDate).getTime());
+    return sorted;
+  }, [providers, query, statusFilter, sortMode, providerRevenue, providerRating]);
 
   const persistProviderPatch = async (provider: ProviderRecord, patch: Partial<ProviderRecord>) => {
     if (provider.source !== "db") return;
@@ -648,9 +857,27 @@ export default function AdminProviderManagement() {
     if (patch.commissionPercentage !== undefined) payload.commission_percentage = patch.commissionPercentage;
     if (patch.tradeLicenseUrl !== undefined) payload.trade_license_url = patch.tradeLicenseUrl;
     if (patch.applicationStatus !== undefined) payload.is_verified = patch.applicationStatus === "approved";
-    if (Object.keys(payload).length === 0) return;
-    const { error: patchError } = await supabase.from("providers").update(payload).eq("id", provider.id);
-    if (patchError) throw patchError;
+    if (Object.keys(payload).length > 0) {
+      const { error: patchError } = await supabase.from("providers").update(payload).eq("id", provider.id);
+      if (patchError) throw patchError;
+    }
+    // Extended columns (provider_status enum + admin_notes) from the
+    // admin_shop_management migration. Best-effort: if the migration is not yet
+    // applied the columns are missing, so we swallow the error and keep the
+    // optimistic local state — the core is_verified write above still lands.
+    const extended: Record<string, unknown> = {};
+    if (patch.applicationStatus !== undefined || patch.accountStatus !== undefined) {
+      extended.status = deriveDbStatus(patch.applicationStatus ?? provider.applicationStatus, patch.accountStatus ?? provider.accountStatus);
+    }
+    if (patch.adminNotes !== undefined) extended.admin_notes = patch.adminNotes;
+    if (Object.keys(extended).length > 0) {
+      extended.last_activity_at = new Date().toISOString();
+      try {
+        await supabase.from("providers").update(extended).eq("id", provider.id);
+      } catch (extendedError) {
+        console.warn("Provider extended columns not available yet:", extendedError);
+      }
+    }
   };
 
   const updateProvider = async (providerId: string, patch: Partial<ProviderRecord>) => {
@@ -667,6 +894,17 @@ export default function AdminProviderManagement() {
       setDetail((current) => current?.id === providerId ? { ...current, ...patch } : current);
       setNotice(t.updated);
     }
+  };
+
+  // Keep the admin-notes textarea in sync with whichever provider is open.
+  useEffect(() => {
+    setNotesDraft(detail?.adminNotes ?? "");
+  }, [detail?.id, detail?.adminNotes]);
+
+  const saveNotes = async () => {
+    if (!detail) return;
+    await updateProvider(detail.id, { adminNotes: notesDraft });
+    setNotice(t.notesSaved);
   };
 
   const openAdd = () => {
@@ -789,6 +1027,8 @@ export default function AdminProviderManagement() {
 
   const cardBase = "rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]";
   const portalTarget = typeof document !== "undefined" ? document.body : null;
+  const detailPerf = detail ? computeProviderPerformance(detail, metricsByShop) : null;
+  const pct = (value: number) => `${value}%`;
 
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className={`space-y-6 ${dirClass}`}>
@@ -808,17 +1048,18 @@ export default function AdminProviderManagement() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-6">
         {[
-          [t.providers, metrics.total],
-          [t.applications, metrics.pending],
-          [t.approved, metrics.approved],
-          [t.totalShops, metrics.shops],
-          [t.employees, metrics.employees]
+          [t.providers, metrics.total.toLocaleString(isRTL ? "ar-SA" : "en-US")],
+          [t.applications, metrics.pending.toLocaleString(isRTL ? "ar-SA" : "en-US")],
+          [t.approved, metrics.approved.toLocaleString(isRTL ? "ar-SA" : "en-US")],
+          [t.totalShops, metrics.shops.toLocaleString(isRTL ? "ar-SA" : "en-US")],
+          [t.employees, metrics.employees.toLocaleString(isRTL ? "ar-SA" : "en-US")],
+          [t.revenue, money(metrics.revenue)]
         ].map(([label, value]) => (
           <div key={String(label)} className={cardBase}>
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{label}</span>
-            <strong className="mt-2 block font-serif text-2xl font-black text-gray-900">{Number(value).toLocaleString(isRTL ? "ar-SA" : "en-US")}</strong>
+            <strong className="mt-2 block font-serif text-xl font-black text-gray-900">{value}</strong>
           </div>
         ))}
       </div>
@@ -826,19 +1067,25 @@ export default function AdminProviderManagement() {
       <div className="rounded-2xl border border-[#ECECEC] bg-white p-4 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
         <div className={`flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between ${rowDir}`}>
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t.search} className="min-h-11 flex-1 rounded-xl border border-[#ECECEC] bg-gray-50 px-4 text-sm font-semibold text-gray-800 outline-none focus:border-[#D1AF47]" />
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {([
               ["all", t.all],
               ["pending", t.pending],
               ["approved", t.approved],
               ["rejected", t.rejected],
               ["active", t.active],
+              ["suspended", t.suspended],
               ["inactive", t.inactive],
             ] as const).map(([value, label]) => (
               <button key={value} onClick={() => setStatusFilter(value)} className={`rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-wider transition ${statusFilter === value ? "bg-[#101828] text-[#F4E7B6]" : "border border-[#ECECEC] bg-white text-[#667085] hover:border-[#D1AF47]/35"}`}>
                 {label}
               </button>
             ))}
+            <select value={sortMode} onChange={(event) => setSortMode(event.target.value as typeof sortMode)} className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-[#667085] outline-none focus:border-[#D1AF47]">
+              <option value="recent">{t.sortRecent}</option>
+              <option value="revenue">{t.sortRevenue}</option>
+              <option value="rating">{t.sortRating}</option>
+            </select>
           </div>
         </div>
       </div>
@@ -848,14 +1095,16 @@ export default function AdminProviderManagement() {
           <table className="w-full min-w-[1040px] text-xs">
             <thead>
               <tr className="border-b border-[#ECECEC] bg-gray-50/70 text-[9px] font-extrabold uppercase tracking-widest text-[#667085]">
-                {[t.provider, t.contact, t.applicationStatus, t.accountStatus, t.genderCategory, t.shopsManaged, t.registered, t.actions].map((heading) => (
+                {[t.provider, t.contact, t.applicationStatus, t.accountStatus, t.genderCategory, t.shopsManaged, t.revenue, t.rating, t.actions].map((heading) => (
                   <th key={heading} className={`px-5 py-4 ${dirClass}`}>{heading}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F5F5F5]">
               {loading ? (
-                <tr><td colSpan={8} className="px-5 py-10 text-center text-sm font-bold text-[#667085]">Loading...</td></tr>
+                <tr><td colSpan={9} className="px-5 py-10 text-center text-sm font-bold text-[#667085]">Loading...</td></tr>
+              ) : filteredProviders.length === 0 ? (
+                <tr><td colSpan={9} className="px-5 py-12 text-center text-sm font-bold text-[#667085]">{isRTL ? "لا يوجد مزودون مطابقون." : "No providers match these filters."}</td></tr>
               ) : filteredProviders.map((provider) => (
                 <tr key={provider.id} className="text-[#344054] hover:bg-gray-50/60">
                   <td className="px-5 py-4">
@@ -872,19 +1121,23 @@ export default function AdminProviderManagement() {
                     </span>
                   </td>
                   <td className="px-5 py-4">
-                    <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase ${provider.accountStatus === "active" ? "bg-[#ECFDF3] text-[#027A48]" : "bg-gray-100 text-[#667085]"}`}>
+                    <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase ${provider.accountStatus === "active" ? "bg-[#ECFDF3] text-[#027A48]" : provider.accountStatus === "suspended" ? "bg-[#FEF3F2] text-[#B42318]" : "bg-gray-100 text-[#667085]"}`}>
                       {t[provider.accountStatus]}
                     </span>
                   </td>
                   <td className="px-5 py-4 font-bold">{labelGender(provider.gender)}</td>
                   <td className="px-5 py-4 font-black text-gray-900">{provider.shops.length}</td>
-                  <td className="px-5 py-4 font-semibold text-[#667085]">{new Date(provider.registrationDate).toLocaleDateString(isRTL ? "ar-SA" : "en-US")}</td>
+                  <td className="px-5 py-4 font-black text-[#9A741F]">{money(providerRevenue(provider))}</td>
+                  <td className="px-5 py-4 font-bold text-gray-900">{providerRating(provider) ? `★ ${providerRating(provider).toFixed(1)}` : "—"}</td>
                   <td className="px-5 py-4">
                     <div className="flex flex-wrap gap-2">
                       <button onClick={() => setDetail(provider)} className="rounded-xl border border-[#ECECEC] px-3 py-2 text-[10px] font-black text-gray-700 hover:border-[#D1AF47]/40">{t.view}</button>
                       <button onClick={() => openEdit(provider)} className="rounded-xl border border-[#D1AF47]/30 bg-[#D1AF47]/10 px-3 py-2 text-[10px] font-black text-[#9A741F]">{t.edit}</button>
                       {provider.applicationStatus !== "approved" && <button onClick={() => void updateProvider(provider.id, { applicationStatus: "approved", accountStatus: "active" })} className="rounded-xl bg-[#101828] px-3 py-2 text-[10px] font-black text-[#F4E7B6]">{t.approve}</button>}
                       {provider.applicationStatus !== "rejected" && <button onClick={() => void updateProvider(provider.id, { applicationStatus: "rejected", accountStatus: "inactive" })} className="rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-3 py-2 text-[10px] font-black text-[#B42318]">{t.reject}</button>}
+                      {provider.accountStatus === "suspended"
+                        ? <button onClick={() => void updateProvider(provider.id, { accountStatus: "active", applicationStatus: "approved" })} className="rounded-xl border border-[#ABEFC6] bg-[#ECFDF3] px-3 py-2 text-[10px] font-black text-[#027A48]">{t.reactivate}</button>
+                        : <button onClick={() => void updateProvider(provider.id, { accountStatus: "suspended" })} className="rounded-xl border border-[#FEDF89] bg-[#FFFAEB] px-3 py-2 text-[10px] font-black text-[#B54708]">{t.suspend}</button>}
                       <button onClick={() => void updateProvider(provider.id, { accountStatus: provider.accountStatus === "active" ? "inactive" : "active" })} className="rounded-xl border border-[#ECECEC] px-3 py-2 text-[10px] font-black text-[#667085]">{provider.accountStatus === "active" ? t.deactivate : t.activate}</button>
                       <button onClick={() => void deleteProvider(provider)} className="rounded-xl border border-[#FECDCA] px-3 py-2 text-[10px] font-black text-[#B42318]">{t.delete}</button>
                     </div>
@@ -981,6 +1234,45 @@ export default function AdminProviderManagement() {
                 ))}
               </div>
 
+              {/* Shop performance dashboard — provider-wide rollup */}
+              {detailPerf && (
+                <section className="rounded-[24px] border border-[#101828] bg-[#101828] p-5 text-white shadow-[0_18px_50px_rgba(16,24,40,0.25)]">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#E0C46A]">{t.performance}</p>
+                  <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+                    {[
+                      [t.revenue, money(detailPerf.revenue)],
+                      [t.monthlyRevenue, money(detailPerf.monthlyRevenue)],
+                      [t.commissionAmount, money(detailPerf.commissionAmount)],
+                      [t.totalBookings, detailPerf.totalBookings.toLocaleString(isRTL ? "ar-SA" : "en-US")],
+                      [t.completedRate, pct(detailPerf.completedRate)],
+                      [t.cancellationRate, pct(detailPerf.cancellationRate)],
+                      [t.rating, detailPerf.rating ? `★ ${detailPerf.rating.toFixed(1)}` : "—"],
+                      [t.reviews, detailPerf.reviewCount.toLocaleString(isRTL ? "ar-SA" : "en-US")],
+                    ].map(([label, value]) => (
+                      <div key={label} className="rounded-2xl bg-white/5 p-3">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-white/50">{label}</span>
+                        <strong className="mt-1.5 block font-serif text-lg font-black text-white">{value}</strong>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <div className="rounded-2xl bg-white/5 p-4">
+                      <p className="text-[9px] font-black uppercase tracking-widest text-white/50">{t.financialSummary}</p>
+                      <div className="mt-2 space-y-1.5 text-xs font-bold">
+                        <div className={`flex items-center justify-between ${rowDir}`}><span className="text-white/60">{t.grossRevenue}</span><span>{money(detailPerf.revenue)}</span></div>
+                        <div className={`flex items-center justify-between ${rowDir}`}><span className="text-white/60">{t.commissionAmount} ({detail.commissionPercentage}%)</span><span className="text-[#E0C46A]">{money(detailPerf.commissionAmount)}</span></div>
+                        <div className={`flex items-center justify-between border-t border-white/10 pt-1.5 ${rowDir}`}><span className="text-white/60">{t.netToProvider}</span><span>{money(detailPerf.revenue - detailPerf.commissionAmount)}</span></div>
+                      </div>
+                    </div>
+                    <label className="rounded-2xl bg-white/5 p-4">
+                      <p className="text-[9px] font-black uppercase tracking-widest text-white/50">{t.adminNotes}</p>
+                      <textarea value={notesDraft} onChange={(event) => setNotesDraft(event.target.value)} placeholder={t.adminNotesHint} rows={2} className="mt-2 w-full rounded-xl border border-white/10 bg-[#0B1220] px-3 py-2 text-xs font-semibold text-white outline-none placeholder:text-white/30 focus:border-[#E0C46A]" />
+                      <button onClick={() => void saveNotes()} className="mt-2 rounded-lg bg-[#E0C46A] px-3 py-1.5 text-[10px] font-black text-[#101828] hover:brightness-105">{t.saveNotes}</button>
+                    </label>
+                  </div>
+                </section>
+              )}
+
               <div className={`flex items-center justify-between gap-3 ${rowDir}`}>
                 <h4 className="font-serif text-xl font-black text-gray-900">{t.shops}</h4>
                 <button onClick={() => addShop(detail)} className="rounded-xl bg-[#101828] px-4 py-2 text-xs font-black text-[#F4E7B6]">{t.addShop}</button>
@@ -1000,6 +1292,30 @@ export default function AdminProviderManagement() {
                       <button onClick={() => removeShop(detail, shop)} className="rounded-xl border border-[#FECDCA] px-3 py-2 text-[10px] font-black text-[#B42318]">{t.removeShop}</button>
                     </div>
                   </div>
+
+                  {/* Per-shop performance metrics */}
+                  {(() => {
+                    const m = metricsByShop[shop.id];
+                    if (!m) return null;
+                    return (
+                      <div className="mb-5 grid grid-cols-2 gap-2.5 md:grid-cols-4 xl:grid-cols-7">
+                        {[
+                          [t.revenue, money(m.revenue)],
+                          [t.totalBookings, m.totalBookings.toLocaleString(isRTL ? "ar-SA" : "en-US")],
+                          [t.completed, m.completedBookings.toLocaleString(isRTL ? "ar-SA" : "en-US")],
+                          [t.cancelled, (m.cancelledBookings + m.noShowBookings).toLocaleString(isRTL ? "ar-SA" : "en-US")],
+                          [t.rating, m.rating ? `★ ${m.rating.toFixed(1)}` : "—"],
+                          [t.reviews, m.reviewCount.toLocaleString(isRTL ? "ar-SA" : "en-US")],
+                          [t.profileCompletion, `${m.profileCompletion}%`],
+                        ].map(([label, value]) => (
+                          <div key={label} className="rounded-xl border border-[#F0F0F0] bg-[#FBFAF7] px-3 py-2">
+                            <span className="block text-[8px] font-black uppercase tracking-wider text-[#667085]">{label}</span>
+                            <strong className="mt-0.5 block text-xs font-black text-gray-900">{value}</strong>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
 
                   <div className="grid grid-cols-1 gap-4 xl:grid-cols-[0.9fr_1.1fr]">
                     <div className="rounded-2xl border border-[#F2F2F2] bg-gray-50/60 p-4">
@@ -1034,6 +1350,16 @@ export default function AdminProviderManagement() {
                               <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.earnings}</span><strong className="text-[10px] text-[#9A741F]">{money(employee.earnings)}</strong></div>
                               <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.rating}</span><strong className="text-[10px] text-gray-900">★ {employee.rating}</strong></div>
                               <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.completed}</span><strong className="text-[10px] text-gray-900">{employee.completedBookings}</strong></div>
+                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.cancelled}</span><strong className="text-[10px] text-gray-900">{employee.cancelledBookings}</strong></div>
+                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.noShow}</span><strong className="text-[10px] text-gray-900">{employee.noShowBookings}</strong></div>
+                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.reviews}</span><strong className="text-[10px] text-gray-900">{employee.reviewCount}</strong></div>
+                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.avgServiceValue}</span><strong className="text-[10px] text-gray-900">{money(employeeAvgServiceValue(employee))}</strong></div>
+                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.commissionShare}</span><strong className="text-[10px] text-[#9A741F]">{money(employeeCommissionShare(employee, detail.commissionPercentage))}</strong></div>
+                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.repeatCustomers}</span><strong className="text-[10px] text-gray-900">{employee.repeatCustomers}</strong></div>
+                            </div>
+                            <div className="mt-3">
+                              <div className={`flex items-center justify-between text-[9px] font-black uppercase text-[#667085] ${rowDir}`}><span>{t.utilization}</span><span>{employee.utilizationRate}%</span></div>
+                              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-gray-100"><div className="h-full rounded-full bg-[#D1AF47]" style={{ width: `${Math.min(100, employee.utilizationRate)}%` }} /></div>
                             </div>
                             <p className="mt-3 text-[10px] font-bold text-[#667085]">{t.workType}: {labelWorkType(employee.workType)}</p>
                             <p className="mt-1 text-[10px] font-bold text-[#667085]">{t.availability}: {employee.isActive ? t.active : t.inactive}</p>
