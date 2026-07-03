@@ -216,7 +216,7 @@ export default function ProviderLayout({
     { name: t.deliveries, path: "/provider/deliveries" },
     { name: t.wallet, path: "/provider/wallet" },
     { name: t.messages, path: "/provider/messages" },
-    { name: t.employees, path: "/provider/team" },
+    { name: t.employees, path: "/provider/employees" },
     { name: t.customers, path: "/provider/customers" },
     { name: t.reviews, path: "/provider/reviews" },
     { name: t.promotions, path: "/provider/promotions" },

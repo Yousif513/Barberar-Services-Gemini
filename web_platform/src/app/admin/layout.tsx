@@ -10,6 +10,11 @@ import { clearDevRole } from "@/lib/dev-access";
 
 const translations = {
   en: {
+    activity: "Activity Feed",
+    finance: "Financial Control",
+    ledger: "Ledger & Splits",
+    employees: "Staff & Teams",
+    branches: "Venues & Rooms",
     dashboard: "Dashboard",
     analytics: "Analytics",
     bookings: "Bookings",
@@ -27,9 +32,7 @@ const translations = {
     overview: "Overview",
     management: "Management",
     teams: "Teams",
-    employees: "Employees",
     roles: "Roles & Permissions",
-    branches: "Branches",
     rooms: "Rooms & Resources",
     locations: "Locations",
     taxes: "Taxes & Fees",
@@ -50,6 +53,11 @@ const translations = {
     langSwitch: "العربية"
   },
   ar: {
+    activity: "سجل الأنشطة",
+    finance: "الرقابة المالية",
+    ledger: "دفتر الحسابات والعمولات",
+    employees: "الموظفون والصلاحيات",
+    branches: "الفروع والغرف والمواقع",
     dashboard: "لوحة المتابعة",
     analytics: "التحليلات",
     bookings: "الحجوزات",
@@ -67,9 +75,7 @@ const translations = {
     overview: "نظرة عامة",
     management: "الإدارة",
     teams: "فرق العمل",
-    employees: "الموظفون",
     roles: "الأدوار والصلاحيات",
-    branches: "الفروع",
     rooms: "الغرف والموارد",
     locations: "المواقع",
     taxes: "الضرائب والرسوم",
@@ -96,6 +102,10 @@ const getNavIcon = (nameKey: string) => {
   switch (nameKey) {
     case "dashboard":
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" /></svg>;
+    case "activity":
+      return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+    case "ledger":
+      return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 11h.01M12 14h.01M12 17h.01M15 11h.01M15 14h.01M15 17h.01M9 11h.01" /></svg>;
     case "analytics":
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2zm7 0v-9a2 2 0 00-2-2h-2a2 2 0 00-2 2v9a2 2 0 002 2h2a2 2 0 002-2zm7 0V5a2 2 0 00-2-2h-2a2 2 0 00-2 2v14a2 2 0 002 2h2a2 2 0 002-2z" /></svg>;
     case "bookings":
@@ -193,30 +203,27 @@ export default function AdminLayout({
       titleKey: "overview",
       items: [
         { nameKey: "dashboard", path: "/admin" },
-        { nameKey: "analytics", path: "/admin/analytics" },
         { nameKey: "bookings", path: "/admin/bookings" },
         { nameKey: "providers", path: "/admin/providers" },
         { nameKey: "customers", path: "/admin/customers" },
         { nameKey: "services", path: "/admin/services" },
         { nameKey: "packages", path: "/admin/packages" },
-        { nameKey: "orders", path: "/admin/orders" },
-        { nameKey: "payments", path: "/admin/payments" },
-        { nameKey: "payouts", path: "/admin/ledger" },
-        { nameKey: "commissions", path: "/admin/commissions" },
         { nameKey: "reviews", path: "/admin/reviews" },
-        { nameKey: "disputes", path: "/admin/disputes" },
+        { nameKey: "disputes", path: "/admin/disputes" }
+      ]
+    },
+    {
+      titleKey: "finance",
+      items: [
+        { nameKey: "ledger", path: "/admin/ledger" },
         { nameKey: "reports", path: "/admin/reports" }
       ]
     },
     {
       titleKey: "management",
       items: [
-        { nameKey: "teams", path: "/admin/teams" },
         { nameKey: "employees", path: "/admin/employees" },
-        { nameKey: "roles", path: "/admin/roles" },
         { nameKey: "branches", path: "/admin/branches" },
-        { nameKey: "rooms", path: "/admin/rooms" },
-        { nameKey: "locations", path: "/admin/locations" },
         { nameKey: "taxes", path: "/admin/taxes" },
         { nameKey: "coupons", path: "/admin/coupons" }
       ]
@@ -224,14 +231,11 @@ export default function AdminLayout({
     {
       titleKey: "system",
       items: [
+        { nameKey: "activity", path: "/admin/activity" },
         { nameKey: "integrations", path: "/admin/integrations" },
-        { nameKey: "webhooks", path: "/admin/webhooks" },
-        { nameKey: "systemLogs", path: "/admin/system-logs" },
-        { nameKey: "auditLogs", path: "/admin/audit-logs" },
         { nameKey: "settings", path: "/admin/settings" }
       ]
-    }
-  ];
+    }  ];
 
   return (
     <AuthGuard allowedRoles={["admin"]}>

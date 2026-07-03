@@ -174,23 +174,32 @@ export default function AdminServices() {
       if (error) throw error;
 
       if (data && data.length > 0) {
-        setServices(data.map((s, idx) => ({
-          id: s.id,
-          nameEn: s.name_en,
-          nameAr: s.name_ar,
-          categoryId: (s as any).category_id || "",
-          category: (s.categories as any)?.name_en || (s.categories as any)?.name_ar || "Uncategorized",
-          price: Number(s.base_price) || 0,
-          duration: Number(s.base_duration_minutes) || 0,
-          descriptionEn: (s as any).description_en || "",
-          descriptionAr: (s as any).description_ar || "",
-          image: Array.isArray((s as any).images) && (s as any).images.length ? (s as any).images[0] : "",
-          providerId: (s as any).provider_id || "",
-          providersCount: (s as any).provider_id ? 1 : 0,
-          is_active: !!s.is_active,
-          featured_on_landing: !!s.featured_on_landing,
-          featured_in_services: !!s.featured_in_services
-        })));
+        const counts: Record<string, number> = {};
+        data.forEach((item: any) => {
+          const key = String(item.name_en || "").toLowerCase().trim();
+          counts[key] = (counts[key] || 0) + 1;
+        });
+
+        setServices(data.map((s, idx) => {
+          const key = String(s.name_en || "").toLowerCase().trim();
+          return {
+            id: s.id,
+            nameEn: s.name_en,
+            nameAr: s.name_ar,
+            categoryId: (s as any).category_id || "",
+            category: (s.categories as any)?.name_en || (s.categories as any)?.name_ar || "Uncategorized",
+            price: Number(s.base_price) || 0,
+            duration: Number(s.base_duration_minutes) || 0,
+            descriptionEn: (s as any).description_en || "",
+            descriptionAr: (s as any).description_ar || "",
+            image: Array.isArray((s as any).images) && (s as any).images.length ? (s as any).images[0] : "",
+            providerId: (s as any).provider_id || "",
+            providersCount: counts[key] || 1,
+            is_active: !!s.is_active,
+            featured_on_landing: !!s.featured_on_landing,
+            featured_in_services: !!s.featured_in_services
+          };
+        }));
       } else {
         throw new Error("No data");
       }

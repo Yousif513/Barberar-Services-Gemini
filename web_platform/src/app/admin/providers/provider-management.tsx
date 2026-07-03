@@ -78,6 +78,18 @@ type ProviderRecord = {
   tradeLicenseUrl: string;
   adminNotes?: string;
   lastActivity?: string;
+  performance?: {
+    totalBookings: number;
+    completedBookings: number;
+    cancelledBookings: number;
+    noShowBookings: number;
+    revenue: number;
+    commissionAmount: number;
+    rating: number;
+    reviewCount: number;
+    employeeCount: number;
+    serviceCount: number;
+  };
 };
 
 // Per-shop performance rollup, derived from its employees + services. Kept as a
@@ -142,6 +154,8 @@ type ProviderRow = {
   id: string;
   business_name_en?: string | null;
   business_name_ar?: string | null;
+  contact_email?: string | null;
+  contact_phone?: string | null;
   type?: ProviderType | string | null;
   is_verified?: boolean | null;
   commission_percentage?: number | string | null;
@@ -459,8 +473,24 @@ function computeShopMetrics(shop: AdminShop, commissionPercentage: number): Shop
   };
 }
 
-// Provider-wide performance = sum across its shops.
 function computeProviderPerformance(provider: ProviderRecord, metricsByShop: Record<string, ShopMetrics>) {
+  if (provider.performance) {
+    const p = provider.performance;
+    return {
+      revenue: p.revenue,
+      monthlyRevenue: Math.round(p.revenue / 6),
+      commissionAmount: p.commissionAmount,
+      totalBookings: p.totalBookings,
+      completedBookings: p.completedBookings,
+      cancelledBookings: p.cancelledBookings,
+      reviewCount: p.reviewCount,
+      rating: p.rating,
+      completedRate: p.totalBookings ? Math.round((p.completedBookings / p.totalBookings) * 100) : 0,
+      cancellationRate: p.totalBookings ? Math.round((p.cancelledBookings / p.totalBookings) * 100) : 0,
+      employeeCount: p.employeeCount,
+      serviceCount: p.serviceCount
+    };
+  }
   const shopMetrics = provider.shops.map((shop) => metricsByShop[shop.id]).filter(Boolean);
   const revenue = shopMetrics.reduce((sum, m) => sum + m.revenue, 0);
   const totalBookings = shopMetrics.reduce((sum, m) => sum + m.totalBookings, 0);
@@ -661,7 +691,7 @@ export default function AdminProviderManagement() {
     return t.inShop;
   }, [t.inShop, t.remote, t.remoteInShop]);
 
-  const normalizeProvider = useCallback((provider: ProviderRow, index: number): ProviderRecord => {
+  const normalizeProvider = useCallback((provider: ProviderRow, index: number, perfMap: Record<string, any> = {}): ProviderRecord => {
     const providerServices: AdminService[] = (provider.services || []).map((service) => {
       const category = service.categories ?? null;
       const categorySlug = category?.slug ?? "";
@@ -714,14 +744,28 @@ export default function AdminProviderManagement() {
       ? "both"
       : genderFromServices(shops.flatMap((shop) => shop.services));
 
+    const perf = perfMap[provider.id];
+    const performance = perf ? {
+      totalBookings: Number(perf.total_bookings || 0),
+      completedBookings: Number(perf.completed_bookings || 0),
+      cancelledBookings: Number(perf.cancelled_bookings || 0),
+      noShowBookings: Number(perf.no_show_bookings || 0),
+      revenue: Number(perf.gross_revenue || 0),
+      commissionAmount: Number(perf.commission_amount || 0),
+      rating: Number(perf.avg_rating || 0),
+      reviewCount: Number(perf.review_count || 0),
+      employeeCount: Number(perf.employee_count || 0),
+      serviceCount: Number(perf.service_count || 0)
+    } : undefined;
+
     return {
       id: provider.id,
       source: "db",
       providerName: provider.business_name_en || `Provider ${index + 1}`,
       businessNameEn: provider.business_name_en || "Provider",
       businessNameAr: provider.business_name_ar || provider.business_name_en || "مزود",
-      contactEmail: `${String(provider.business_name_en || "provider").toLowerCase().replace(/[^a-z0-9]+/g, ".").replace(/^\.+|\.+$/g, "") || "provider"}@primora.provider`,
-      contactPhone: `+966 5${String(10000000 + (hashText(provider.id || String(index)) % 89999999)).slice(0, 8)}`,
+      contactEmail: provider.contact_email || `${String(provider.business_name_en || "provider").toLowerCase().replace(/[^a-z0-9]+/g, ".").replace(/^\.+|\.+$/g, "") || "provider"}@primora.provider`,
+      contactPhone: provider.contact_phone || `+966 5${String(10000000 + (hashText(provider.id || String(index)) % 89999999)).slice(0, 8)}`,
       type: provider.type === "freelancer" || provider.type === "salon" || provider.type === "salon_barber_shop" ? provider.type : "salon_barber_shop",
       applicationStatus: provider.is_verified ? "approved" : "pending",
       accountStatus: provider.is_verified ? "active" : "inactive",
@@ -729,7 +773,8 @@ export default function AdminProviderManagement() {
       shops,
       registrationDate: provider.created_at || new Date().toISOString(),
       commissionPercentage: Number(provider.commission_percentage || 15),
-      tradeLicenseUrl: provider.trade_license_url || "#"
+      tradeLicenseUrl: provider.trade_license_url || "#",
+      performance
     };
   }, []);
 
@@ -737,12 +782,15 @@ export default function AdminProviderManagement() {
     try {
       setLoading(true);
       setError("");
+      
       const { data, error: dbError } = await supabase
         .from("providers")
         .select(`
           id,
           business_name_en,
           business_name_ar,
+          contact_email,
+          contact_phone,
           type,
           is_verified,
           commission_percentage,
@@ -778,8 +826,23 @@ export default function AdminProviderManagement() {
         .order("created_at", { ascending: false });
 
       if (dbError) throw dbError;
+
+      const perfMap: Record<string, any> = {};
+      try {
+        const { data: perfData, error: perfError } = await supabase
+          .from("admin_provider_performance")
+          .select("*");
+        if (!perfError && perfData) {
+          perfData.forEach((row: any) => {
+            perfMap[row.provider_id] = row;
+          });
+        }
+      } catch (err) {
+        console.warn("Could not query admin_provider_performance, using local rollups:", err);
+      }
+
       if (data?.length) {
-        setProviders((data as ProviderRow[]).map(normalizeProvider));
+        setProviders((data as ProviderRow[]).map((p, idx) => normalizeProvider(p, idx, perfMap)));
       } else {
         setProviders(demoProviders);
       }
@@ -816,9 +879,12 @@ export default function AdminProviderManagement() {
     return map;
   }, [providers]);
 
-  const providerRevenue = useCallback((provider: ProviderRecord) =>
-    provider.shops.reduce((sum, shop) => sum + (metricsByShop[shop.id]?.revenue ?? 0), 0), [metricsByShop]);
+  const providerRevenue = useCallback((provider: ProviderRecord) => {
+    if (provider.performance) return provider.performance.revenue;
+    return provider.shops.reduce((sum, shop) => sum + (metricsByShop[shop.id]?.revenue ?? 0), 0);
+  }, [metricsByShop]);
   const providerRating = useCallback((provider: ProviderRecord) => {
+    if (provider.performance) return provider.performance.rating;
     const rated = provider.shops.map((shop) => metricsByShop[shop.id]?.rating ?? 0).filter(Boolean);
     return rated.length ? rated.reduce((sum, r) => sum + r, 0) / rated.length : 0;
   }, [metricsByShop]);
@@ -853,6 +919,8 @@ export default function AdminProviderManagement() {
     const payload: Record<string, unknown> = {};
     if (patch.businessNameEn !== undefined) payload.business_name_en = patch.businessNameEn;
     if (patch.businessNameAr !== undefined) payload.business_name_ar = patch.businessNameAr;
+    if (patch.contactEmail !== undefined) payload.contact_email = patch.contactEmail;
+    if (patch.contactPhone !== undefined) payload.contact_phone = patch.contactPhone;
     if (patch.type !== undefined) payload.type = patch.type;
     if (patch.commissionPercentage !== undefined) payload.commission_percentage = patch.commissionPercentage;
     if (patch.tradeLicenseUrl !== undefined) payload.trade_license_url = patch.tradeLicenseUrl;
