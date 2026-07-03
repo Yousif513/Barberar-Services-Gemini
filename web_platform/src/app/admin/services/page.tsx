@@ -24,7 +24,11 @@ const translations = {
     saveBtn: "Save",
     cancelBtn: "Cancel",
     successMsg: "Service catalog updated successfully!",
-    errorMsg: "Failed to update service catalog."
+    errorMsg: "Failed to update service catalog.",
+    featured: "Featured",
+    featLanding: "Landing",
+    featServices: "Services",
+    featuredHint: "Featured on the landing page rail / at the top of the Services page."
   },
   ar: {
     title: "سجل الخدمات العام",
@@ -46,7 +50,11 @@ const translations = {
     saveBtn: "حفظ",
     cancelBtn: "إلغاء",
     successMsg: "تم تحديث سجل الخدمات بنجاح!",
-    errorMsg: "فشل تحديث سجل الخدمات."
+    errorMsg: "فشل تحديث سجل الخدمات.",
+    featured: "مميزة",
+    featLanding: "الرئيسية",
+    featServices: "الخدمات",
+    featuredHint: "تظهر في شريط الصفحة الرئيسية / أعلى صفحة الخدمات."
   }
 };
 
@@ -77,7 +85,7 @@ export default function AdminServices() {
       setError("");
       const { data, error } = await supabase
         .from("services")
-        .select("id, name_en, name_ar, base_price, base_duration_minutes, is_active, categories(name_en, name_ar)")
+        .select("id, name_en, name_ar, base_price, base_duration_minutes, is_active, featured_on_landing, featured_in_services, categories(name_en, name_ar)")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -91,7 +99,9 @@ export default function AdminServices() {
           price: Number(s.base_price) || 0,
           duration: Number(s.base_duration_minutes) || 0,
           providersCount: 1,
-          is_active: !!s.is_active
+          is_active: !!s.is_active,
+          featured_on_landing: !!s.featured_on_landing,
+          featured_in_services: !!s.featured_in_services
         })));
       } else {
         throw new Error("No data");
@@ -99,11 +109,11 @@ export default function AdminServices() {
     } catch (err) {
       setError(translations[lang].errorMsg);
       setServices([
-        { id: "s-mock-1", nameEn: "Classic Beard Shave", nameAr: "حلاقة ذقن كلاسيكية", category: "Barber", price: 60, providersCount: 24, is_active: true },
-        { id: "s-mock-2", nameEn: "Royal Moroccan Bath", nameAr: "حمام مغربي ملكي", category: "Spa", price: 250, providersCount: 12, is_active: true },
-        { id: "s-mock-3", nameEn: "Executive Haircut", nameAr: "قص شعر فاخر", category: "Barber", price: 90, providersCount: 38, is_active: true },
-        { id: "s-mock-4", nameEn: "Hydrafacial Therapy", nameAr: "علاج هيدرافيشيل للبشرة", category: "Beauty", price: 450, providersCount: 8, is_active: true },
-        { id: "s-mock-5", nameEn: "Pedicure & Foot Spa", nameAr: "باديكير وسبا للقدمين", category: "Nails", price: 150, providersCount: 15, is_active: true }
+        { id: "s-mock-1", nameEn: "Classic Beard Shave", nameAr: "حلاقة ذقن كلاسيكية", category: "Barber", price: 60, providersCount: 24, is_active: true, featured_on_landing: false, featured_in_services: false },
+        { id: "s-mock-2", nameEn: "Royal Moroccan Bath", nameAr: "حمام مغربي ملكي", category: "Spa", price: 250, providersCount: 12, is_active: true, featured_on_landing: false, featured_in_services: false },
+        { id: "s-mock-3", nameEn: "Executive Haircut", nameAr: "قص شعر فاخر", category: "Barber", price: 90, providersCount: 38, is_active: true, featured_on_landing: false, featured_in_services: false },
+        { id: "s-mock-4", nameEn: "Hydrafacial Therapy", nameAr: "علاج هيدرافيشيل للبشرة", category: "Beauty", price: 450, providersCount: 8, is_active: true, featured_on_landing: false, featured_in_services: false },
+        { id: "s-mock-5", nameEn: "Pedicure & Foot Spa", nameAr: "باديكير وسبا للقدمين", category: "Nails", price: 150, providersCount: 15, is_active: true, featured_on_landing: false, featured_in_services: false }
       ]);
     } finally {
       setLoading(false);
@@ -132,6 +142,31 @@ export default function AdminServices() {
 
     if (updateError) {
       setServices((prev) => prev.map((s) => (s.id === id ? { ...s, is_active: currentStatus } : s)));
+      setError(translations[lang].errorMsg);
+      return;
+    }
+
+    setSuccess(translations[lang].successMsg);
+  };
+
+  const handleToggleFeatured = async (id: string, field: "featured_on_landing" | "featured_in_services", current: boolean) => {
+    setSuccess("");
+    setError("");
+    const next = !current;
+    setServices((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: next } : s)));
+
+    if (id.startsWith("s-mock-")) {
+      setSuccess(translations[lang].successMsg);
+      return;
+    }
+
+    const { error: updateError } = await supabase
+      .from("services")
+      .update({ [field]: next })
+      .eq("id", id);
+
+    if (updateError) {
+      setServices((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: current } : s)));
       setError(translations[lang].errorMsg);
       return;
     }
@@ -266,13 +301,14 @@ export default function AdminServices() {
                 <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>{t.baselinePrice}</th>
                 <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>{t.activeProviders}</th>
                 <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>{t.status}</th>
+                <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`} title={t.featuredHint}>{t.featured}</th>
                 <th className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>{t.actions}</th>
               </tr>
             </thead>
             <tbody className={`divide-y divide-[#F5F5F5] font-semibold text-gray-700 ${isRTL ? "text-right" : "text-left"}`}>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-gray-400 font-bold">{t.loading}</td>
+                  <td colSpan={7} className="py-8 text-center text-gray-400 font-bold">{t.loading}</td>
                 </tr>
               ) : (
                 filtered.map((item) => (
@@ -306,6 +342,32 @@ export default function AdminServices() {
                       }`}>
                         {item.is_active ? t.active : t.inactive}
                       </span>
+                    </td>
+                    <td className="py-4 px-6">
+                      <div className={`flex items-center gap-1.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                        <button
+                          onClick={() => handleToggleFeatured(item.id, "featured_on_landing", item.featured_on_landing)}
+                          title={t.featuredHint}
+                          className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border transition duration-150 ${
+                            item.featured_on_landing
+                              ? "bg-[#FFFAEB] text-[#B8952E] border-[#D1AF47]/40"
+                              : "bg-white text-gray-400 border-[#ECECEC] hover:border-[#D1AF47]/30 hover:text-gray-600"
+                          }`}
+                        >
+                          {item.featured_on_landing ? "★" : "☆"} {t.featLanding}
+                        </button>
+                        <button
+                          onClick={() => handleToggleFeatured(item.id, "featured_in_services", item.featured_in_services)}
+                          title={t.featuredHint}
+                          className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border transition duration-150 ${
+                            item.featured_in_services
+                              ? "bg-[#FFFAEB] text-[#B8952E] border-[#D1AF47]/40"
+                              : "bg-white text-gray-400 border-[#ECECEC] hover:border-[#D1AF47]/30 hover:text-gray-600"
+                          }`}
+                        >
+                          {item.featured_in_services ? "★" : "☆"} {t.featServices}
+                        </button>
+                      </div>
                     </td>
                     <td className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>
                       <button

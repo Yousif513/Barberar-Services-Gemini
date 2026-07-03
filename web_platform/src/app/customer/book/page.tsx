@@ -1,7 +1,19 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+
+// Accepted payment methods come from the admin registry (payment_methods):
+// only rows that are enabled AND available to customers appear here.
+type CheckoutMethod = { key: string; label_en: string; label_ar: string; is_default: boolean };
+
+const FALLBACK_CHECKOUT_METHODS: CheckoutMethod[] = [
+  { key: "mada", label_en: "mada", label_ar: "مدى", is_default: true },
+  { key: "apple_pay", label_en: "Apple Pay", label_ar: "أبل باي", is_default: false },
+  { key: "visa", label_en: "Visa", label_ar: "فيزا", is_default: false },
+  { key: "cash", label_en: "Cash on service", label_ar: "نقداً عند الخدمة", is_default: false },
+];
 
 type ServiceItem = {
   id: string;
@@ -27,6 +39,23 @@ function BookingContent() {
   const [isHomeService, setIsHomeService] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [payMethods, setPayMethods] = useState<CheckoutMethod[]>(FALLBACK_CHECKOUT_METHODS);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("payment_methods")
+          .select("key, label_en, label_ar, is_default, enabled_for_roles")
+          .eq("enabled", true)
+          .order("sort_order");
+        const forCustomers = (data ?? []).filter((m) => (m.enabled_for_roles ?? []).includes("customer"));
+        if (forCustomers.length) setPayMethods(forCustomers);
+      } catch (err) {
+        console.warn("Checkout payment methods using fallback:", err);
+      }
+    })();
+  }, []);
 
   const mockProviderDetails: Record<string, ProviderDetails> = {
     "1": {
@@ -71,7 +100,7 @@ function BookingContent() {
 
     try {
       setMessage("Please select a live provider from the store to reserve a verified slot.");
-      setTimeout(() => router.push("/store"), 1500);
+      setTimeout(() => router.push("/services"), 1500);
     } catch (err: unknown) {
       setMessage(err instanceof Error ? err.message : "Booking could not be completed.");
     } finally {
@@ -200,6 +229,25 @@ function BookingContent() {
                 <span>Due Now</span>
                 <span className="text-[hsl(45,60%,55%)]">{splits.deposit} SAR</span>
               </div>
+            </div>
+          </div>
+
+          {/* Accepted payment methods — admin-controlled registry */}
+          <div className="space-y-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">We accept</span>
+            <div className="flex flex-wrap gap-1.5">
+              {payMethods.map((m) => (
+                <span
+                  key={m.key}
+                  className={`rounded-full border px-2.5 py-1 text-[9px] font-black ${
+                    m.is_default
+                      ? "border-[hsl(45,60%,55%)]/50 bg-[hsl(45,60%,96%)] text-[hsl(42,55%,38%)]"
+                      : "border-gray-200 bg-gray-50 text-gray-500"
+                  }`}
+                >
+                  {m.label_en}
+                </span>
+              ))}
             </div>
           </div>
 
