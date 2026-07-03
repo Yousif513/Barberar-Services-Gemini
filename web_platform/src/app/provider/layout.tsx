@@ -126,7 +126,7 @@ const getNavIcon = (path: string) => {
       </svg>
     );
   }
-  if (path.includes("team")) {
+  if (path.includes("team") || path.includes("employees")) {
     return (
       <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197" />
@@ -216,7 +216,7 @@ export default function ProviderLayout({
     { name: t.deliveries, path: "/provider/deliveries" },
     { name: t.wallet, path: "/provider/wallet" },
     { name: t.messages, path: "/provider/messages" },
-    { name: t.employees, path: "/provider/team" },
+    { name: t.employees, path: "/provider/employees" },
     { name: t.customers, path: "/provider/customers" },
     { name: t.reviews, path: "/provider/reviews" },
     { name: t.promotions, path: "/provider/promotions" },

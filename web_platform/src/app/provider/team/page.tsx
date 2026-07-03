@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
 const translations = {
   en: {
-    teamTitle: "Team & Staff Roster",
-    subtitle: "Manage your beauty specialists, assign services, and edit weekly availability",
-    addStaff: "+ Add Staff",
-    stylist: "Stylist",
+    teamTitle: "Employees",
+    subtitle: "Manage employees, service assignments, work types, availability, and performance",
+    addStaff: "+ Add Employee",
+    stylist: "Employee",
     title: "Title / Role",
     status: "Status",
     assignedServices: "Assigned Services",
@@ -26,13 +26,13 @@ const translations = {
     friday: "Friday",
     saturday: "Saturday",
     sunday: "Sunday",
-    totalStaff: "Total Specialists",
-    activeStaff: "Active Duty",
+    totalStaff: "Total Employees",
+    activeStaff: "Active Employees",
     breakStaff: "Inactive Staff"
   },
   ar: {
-    teamTitle: "فريق العمل والموظفين",
-    subtitle: "إدارة أخصائيي التجميل وتعيين الخدمات وتعديل المناوبات الأسبوعية",
+    teamTitle: "الموظفون",
+    subtitle: "إدارة الموظفين وتعيين الخدمات ونوع العمل والمناوبات والأداء",
     addStaff: "+ إضافة موظف",
     stylist: "الموظف",
     title: "المسمى الوظيفي / الدور",
@@ -59,6 +59,7 @@ const translations = {
 };
 
 type StaffStatus = "active" | "inactive" | "break";
+type WorkType = "remote" | "in_shop" | "both";
 
 type StaffMember = {
   id: string;
@@ -73,6 +74,15 @@ type StaffMember = {
   statusLabel: string;
   servicesCount: number;
   avatar: string;
+  photoUrl: string;
+  phone: string;
+  email: string;
+  workType: WorkType;
+  workTypeLabel: string;
+  totalEarnings: number;
+  rating: number;
+  completedBookings: number;
+  assignedServiceNames: string[];
   availability: string;
   serviceIds: string[];
   availabilityRows: ShiftRow[];
@@ -85,6 +95,10 @@ type StaffForm = {
   titleEn: string;
   titleAr: string;
   branchId: string;
+  phone: string;
+  email: string;
+  photoUrl: string;
+  workType: WorkType;
   isActive: boolean;
 };
 
@@ -118,6 +132,37 @@ const defaultShiftRows = (): ShiftRow[] =>
     start: "09:00",
     end: "21:00"
   }));
+
+const employeePhotoPool = [
+  "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1618077360395-f3068be8e001?q=80&w=400&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=400&auto=format&fit=crop"
+];
+
+const workTypeSequence: WorkType[] = ["in_shop", "remote", "both"];
+
+const hashText = (value: string) =>
+  value.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
+
+const demoProfileFor = (id: string, name: string, index: number, servicesCount: number) => {
+  const hash = hashText(`${id}-${name}-${index}`);
+  const normalizedName = (name || "employee")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ".")
+    .replace(/^\.+|\.+$/g, "") || "employee";
+
+  return {
+    photoUrl: employeePhotoPool[hash % employeePhotoPool.length],
+    phone: `+966 5${String(10000000 + (hash % 89999999)).slice(0, 8)}`,
+    email: `${normalizedName}@primora.team`,
+    workType: workTypeSequence[hash % workTypeSequence.length],
+    totalEarnings: 6200 + (hash % 38) * 420 + servicesCount * 350,
+    rating: Number((4.55 + (hash % 40) / 100).toFixed(1)),
+    completedBookings: 42 + (hash % 76) + servicesCount * 4
+  };
+};
 
 export default function ProviderTeamPage() {
   const [lang, setLang] = useState<"en" | "ar">("ar");
@@ -170,6 +215,27 @@ export default function ProviderTeamPage() {
     noServices: "لا توجد خدمات نشطة لتعيينها لهذا الموظف.",
     confirmDelete: "هل تريد حذف {name}؟ إذا كان لديه حجوزات سابقة سيتم تعطيله بدلا من الحذف.",
     required: "الاسم والفرع مطلوبان.",
+    phone: "الهاتف",
+    email: "البريد الإلكتروني",
+    photoUrl: "رابط الصورة",
+    workType: "نوع العمل",
+    remote: "عن بعد",
+    inShop: "داخل المحل",
+    both: "عن بعد وداخل المحل",
+    totalEarnings: "إجمالي أرباح الموظفين",
+    completedBookings: "الحجوزات المكتملة",
+    averageRating: "متوسط التقييم",
+    bestPerformer: "أفضل موظف أداء",
+    activeEmployees: "الموظفون النشطون",
+    remoteEmployees: "موظفو العمل عن بعد",
+    inShopEmployees: "موظفو المحل",
+    earnings: "الأرباح",
+    rating: "التقييم",
+    bookings: "الحجوزات",
+    view: "عرض",
+    employeeDetails: "تفاصيل الموظف",
+    contact: "التواصل",
+    statusAndMode: "الحالة ونوع العمل",
     closed: "غير متاح"
   } : {
     loading: "Loading team roster...",
@@ -204,6 +270,27 @@ export default function ProviderTeamPage() {
     noServices: "No active services are available to assign to this staff member.",
     confirmDelete: "Delete {name}? If they have previous bookings, the account will be deactivated instead.",
     required: "Name and branch are required.",
+    phone: "Phone",
+    email: "Email",
+    photoUrl: "Photo URL",
+    workType: "Work type",
+    remote: "Remote",
+    inShop: "In-shop",
+    both: "Remote + in-shop",
+    totalEarnings: "Employee earnings",
+    completedBookings: "Completed bookings",
+    averageRating: "Average rating",
+    bestPerformer: "Best performer",
+    activeEmployees: "Active employees",
+    remoteEmployees: "Remote employees",
+    inShopEmployees: "In-shop employees",
+    earnings: "Earnings",
+    rating: "Rating",
+    bookings: "Bookings",
+    view: "View",
+    employeeDetails: "Employee details",
+    contact: "Contact",
+    statusAndMode: "Status & mode",
     closed: "Closed"
   };
 
@@ -214,6 +301,10 @@ export default function ProviderTeamPage() {
     titleEn: "Stylist",
     titleAr: "أخصائي",
     branchId,
+    phone: "",
+    email: "",
+    photoUrl: "",
+    workType: "in_shop",
     isActive: true
   });
 
@@ -228,10 +319,17 @@ export default function ProviderTeamPage() {
   const [staffModalOpen, setStaffModalOpen] = useState(false);
   const [servicesModalOpen, setServicesModalOpen] = useState(false);
   const [shiftsModalOpen, setShiftsModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [activeMember, setActiveMember] = useState<StaffMember | null>(null);
   const [staffForm, setStaffForm] = useState<StaffForm>(() => makeStaffForm(""));
   const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
   const [shiftRows, setShiftRows] = useState<ShiftRow[]>(() => defaultShiftRows());
+
+  const getWorkTypeLabel = useCallback((workType: WorkType) => {
+    if (workType === "remote") return teamCopy.remote;
+    if (workType === "both") return teamCopy.both;
+    return teamCopy.inShop;
+  }, [teamCopy.both, teamCopy.inShop, teamCopy.remote]);
 
   const summarizeAvailability = useCallback((rows: ShiftRow[]) => {
     const activeRows = rows.filter((row) => row.enabled);
@@ -245,7 +343,7 @@ export default function ProviderTeamPage() {
     return `${labels[first.day]} - ${labels[last.day]} (${first.start} - ${last.end})`;
   }, [lang, teamCopy.closed]);
 
-  const normalizeStaffMember = useCallback((employee: any): StaffMember => {
+  const normalizeStaffMember = useCallback((employee: any, index = 0, serviceOptions: ServiceOption[] = []): StaffMember => {
     const serviceIds = (employee.employee_services || [])
       .map((row: any) => row.service_id as string)
       .filter(Boolean);
@@ -261,6 +359,10 @@ export default function ProviderTeamPage() {
     });
     const displayName = lang === "ar" ? employee.name_ar || employee.name_en : employee.name_en || employee.name_ar;
     const title = lang === "ar" ? employee.title_ar || employee.title_en : employee.title_en || employee.title_ar;
+    const profile = demoProfileFor(employee.id || String(index), displayName || employee.name_en || "Staff", index, serviceIds.length);
+    const assignedServiceNames = serviceOptions
+      .filter((service) => serviceIds.includes(service.id))
+      .map((service) => service.name);
 
     return {
       id: employee.id,
@@ -275,11 +377,20 @@ export default function ProviderTeamPage() {
       statusLabel: employee.is_active ? t.active : t.inactive,
       servicesCount: serviceIds.length,
       avatar: String(displayName || "S").trim().charAt(0).toUpperCase(),
+      photoUrl: profile.photoUrl,
+      phone: profile.phone,
+      email: profile.email,
+      workType: profile.workType,
+      workTypeLabel: getWorkTypeLabel(profile.workType),
+      totalEarnings: profile.totalEarnings,
+      rating: profile.rating,
+      completedBookings: profile.completedBookings,
+      assignedServiceNames,
       availability: summarizeAvailability(availabilityRows),
       serviceIds,
       availabilityRows
     };
-  }, [lang, summarizeAvailability, t.active, t.inactive]);
+  }, [getWorkTypeLabel, lang, summarizeAvailability, t.active, t.inactive]);
 
   const loadTeamData = useCallback(async () => {
     try {
@@ -377,7 +488,7 @@ export default function ProviderTeamPage() {
         .order("created_at", { ascending: false });
 
       if (staffError) throw staffError;
-      setLiveStaffMembers((staffData || []).map(normalizeStaffMember));
+      setLiveStaffMembers((staffData || []).map((employee, index) => normalizeStaffMember(employee, index, normalizedServices)));
     } catch (err) {
       console.error("Error loading team roster:", err);
       setError(teamCopy.loadFailed);
@@ -412,9 +523,18 @@ export default function ProviderTeamPage() {
       titleEn: member.titleEn,
       titleAr: member.titleAr,
       branchId: member.branchId,
+      phone: member.phone,
+      email: member.email,
+      photoUrl: member.photoUrl,
+      workType: member.workType,
       isActive: member.status === "active"
     });
     setStaffModalOpen(true);
+  };
+
+  const openProfileModal = (member: StaffMember) => {
+    setActiveMember(member);
+    setProfileModalOpen(true);
   };
 
   const saveStaff = async () => {
@@ -578,45 +698,78 @@ export default function ProviderTeamPage() {
     }
   };
 
-  const staffMembers = liveStaffMembers;
+  const demoServiceOptions = useMemo<ServiceOption[]>(() => services.length > 0 ? services : [
+    { id: "demo-classic", name: lang === "ar" ? "قص شعر كلاسيكي" : "Classic Haircut", price: 45 },
+    { id: "demo-beard", name: lang === "ar" ? "تحديد اللحية" : "Beard Sculpt", price: 30 },
+    { id: "demo-facial", name: lang === "ar" ? "تنظيف البشرة" : "Express Facial", price: 80 },
+    { id: "demo-spa", name: lang === "ar" ? "حمام مغربي" : "Moroccan Bath", price: 90 }
+  ], [lang, services]);
 
-  const fallbackStaffMembers: StaffMember[] = [];
-  void fallbackStaffMembers;
-  /*
-    {
-      id: "1",
-      name: "Ali Al-Harbi",
-      title: lang === "ar" ? "أخصائي حلاقة شعر ورأس" : "Master Barber & Beard Stylist",
-      status: "active",
-      statusLabel: t.active,
-      statusColor: "text-[hsl(150,60%,40%)] bg-[hsla(150,60%,40%,0.08)]",
-      servicesCount: 6,
-      avatar: "A",
-      availability: lang === "ar" ? "السبت - الخميس (09:00 ص - 09:00 م)" : "Sat - Thu (09:00 AM - 09:00 PM)"
-    },
-    {
-      id: "2",
-      name: "Elena Rostova",
-      title: lang === "ar" ? "أخصائية تسريح وصبغ الشعر" : "Senior Hair Stylist & Color Specialist",
-      status: "break",
-      statusLabel: t.onBreak,
-      statusColor: "text-[hsl(45,60%,55%)] bg-[hsla(45,60%,55%,0.08)]",
-      servicesCount: 8,
-      avatar: "E",
-      availability: lang === "ar" ? "السبت - الخميس (10:00 ص - 08:00 م)" : "Sat - Thu (10:00 AM - 08:00 PM)"
-    },
-    {
-      id: "3",
-      name: "Tariq Mahmood",
-      title: lang === "ar" ? "مصفف شعر أطفال" : "Junior Groomer & Kids Barber",
-      status: "active",
-      statusLabel: t.active,
-      statusColor: "text-[hsl(150,60%,40%)] bg-[hsla(150,60%,40%,0.08)]",
-      servicesCount: 4,
-      avatar: "T",
-      availability: lang === "ar" ? "السبت - الخميس (01:00 م - 09:00 م)" : "Sat - Thu (01:00 PM - 09:00 PM)"
-    }
-  */
+  const demoStaffMembers = useMemo(() => {
+    const rows = [
+      {
+        id: "demo-omar",
+        branch_id: "demo-branch",
+        name_en: "Omar Khaled",
+        name_ar: "عمر خالد",
+        title_en: "Master Barber",
+        title_ar: "حلاق خبير",
+        is_active: true,
+        employee_services: demoServiceOptions.slice(0, 3).map((service) => ({ service_id: service.id })),
+        employee_availability: []
+      },
+      {
+        id: "demo-yousef",
+        branch_id: "demo-branch",
+        name_en: "Yousef Adel",
+        name_ar: "يوسف عادل",
+        title_en: "Beard Specialist",
+        title_ar: "أخصائي لحية",
+        is_active: true,
+        employee_services: demoServiceOptions.slice(0, 2).map((service) => ({ service_id: service.id })),
+        employee_availability: []
+      },
+      {
+        id: "demo-karim",
+        branch_id: "demo-branch",
+        name_en: "Karim Saad",
+        name_ar: "كريم سعد",
+        title_en: "Grooming Expert",
+        title_ar: "خبير عناية",
+        is_active: true,
+        employee_services: demoServiceOptions.slice(1, 4).map((service) => ({ service_id: service.id })),
+        employee_availability: []
+      }
+    ];
+
+    return rows.map((employee, index) => normalizeStaffMember(employee, index, demoServiceOptions));
+  }, [demoServiceOptions, normalizeStaffMember]);
+
+  const staffMembers = loading || liveStaffMembers.length > 0 ? liveStaffMembers : demoStaffMembers;
+
+  const employeeMetrics = useMemo(() => {
+    const totalEarnings = staffMembers.reduce((sum, member) => sum + member.totalEarnings, 0);
+    const completedBookings = staffMembers.reduce((sum, member) => sum + member.completedBookings, 0);
+    const averageRating = staffMembers.length
+      ? staffMembers.reduce((sum, member) => sum + member.rating, 0) / staffMembers.length
+      : 0;
+    const bestPerformer = staffMembers.reduce<StaffMember | null>((best, member) => {
+      if (!best) return member;
+      return member.totalEarnings + member.completedBookings * 40 > best.totalEarnings + best.completedBookings * 40 ? member : best;
+    }, null);
+
+    return {
+      totalEarnings,
+      completedBookings,
+      averageRating,
+      bestPerformer,
+      activeEmployees: staffMembers.filter((member) => member.status === "active").length,
+      remoteEmployees: staffMembers.filter((member) => member.workType === "remote" || member.workType === "both").length,
+      inShopEmployees: staffMembers.filter((member) => member.workType === "in_shop" || member.workType === "both").length
+    };
+  }, [staffMembers]);
+
+  const formatMoney = (value: number) => `${value.toLocaleString(lang === "ar" ? "ar-SA" : "en-US")} SAR`;
 
   return (
     <div className="space-y-8 text-start">
@@ -650,57 +803,25 @@ export default function ProviderTeamPage() {
         </div>
       )}
 
-      {/* KPI Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        {/* Total Specialists Card */}
-        <div className="group relative rounded-[24px] bg-gradient-to-b from-[#111827] to-[#0D1422] border border-[rgba(255,255,255,0.06)] hover:border-[#D1AF47]/20 p-6 flex items-center justify-between transition-all duration-300 shadow-xl overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#D1AF47]/[0.02] to-transparent pointer-events-none" />
-          <div className="space-y-1 z-10">
-            <span className="text-[10px] text-[#7B859C] font-bold tracking-wider uppercase">{t.totalStaff}</span>
-            <div className="text-3xl font-black text-white">{staffMembers.length}</div>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#D1AF47]/10 to-[#B8952E]/5 border border-[#D1AF47]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 z-10">
-            <svg className="w-6 h-6 text-[#D1AF47]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Active Duty Card */}
-        <div className="group relative rounded-[24px] bg-gradient-to-b from-[#111827] to-[#0D1422] border border-[rgba(255,255,255,0.06)] hover:border-[#3DDC84]/20 p-6 flex items-center justify-between transition-all duration-300 shadow-xl overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#3DDC84]/[0.01] to-transparent pointer-events-none" />
-          <div className="space-y-1 z-10">
-            <span className="text-[10px] text-[#7B859C] font-bold tracking-wider uppercase">{t.activeStaff}</span>
-            <div className="text-3xl font-black text-[#3DDC84] flex items-center gap-2">
-              {staffMembers.filter(m => m.status === 'active').length}
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3DDC84] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-[#3DDC84]"></span>
-              </span>
+      {/* Employee Performance Dashboard */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-7">
+        {[
+          { label: teamCopy.totalEarnings, value: formatMoney(employeeMetrics.totalEarnings), accent: "text-[#D1AF47]" },
+          { label: teamCopy.completedBookings, value: employeeMetrics.completedBookings.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"), accent: "text-white" },
+          { label: teamCopy.averageRating, value: employeeMetrics.averageRating.toFixed(1), accent: "text-[#3DDC84]" },
+          { label: teamCopy.bestPerformer, value: employeeMetrics.bestPerformer?.name || "—", accent: "text-[#F4E7B6]" },
+          { label: teamCopy.activeEmployees, value: employeeMetrics.activeEmployees.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"), accent: "text-[#3DDC84]" },
+          { label: teamCopy.remoteEmployees, value: employeeMetrics.remoteEmployees.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"), accent: "text-[#B8C0D4]" },
+          { label: teamCopy.inShopEmployees, value: employeeMetrics.inShopEmployees.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"), accent: "text-[#E0C46A]" }
+        ].map((metric) => (
+          <div key={metric.label} className="group relative overflow-hidden rounded-[24px] border border-white/10 bg-gradient-to-b from-[#111827] to-[#0D1422] p-5 shadow-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-[#D1AF47]/35 hover:shadow-[0_0_34px_rgba(209,175,71,0.14)]">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_10%,rgba(209,175,71,0.12),transparent_34%)] opacity-70" />
+            <div className="relative space-y-2">
+              <span className="block text-[9px] font-black uppercase tracking-[0.18em] text-[#7B859C]">{metric.label}</span>
+              <strong className={`block truncate text-2xl font-black ${metric.accent}`}>{metric.value}</strong>
             </div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#3DDC84]/15 to-[#3DDC84]/5 border border-[#3DDC84]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 z-10">
-            <svg className="w-6 h-6 text-[#3DDC84]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-        </div>
-
-        {/* On Break Card */}
-        <div className="group relative rounded-[24px] bg-gradient-to-b from-[#111827] to-[#0D1422] border border-[rgba(255,255,255,0.06)] hover:border-[#F5B041]/20 p-6 flex items-center justify-between transition-all duration-300 shadow-xl overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#F5B041]/[0.01] to-transparent pointer-events-none" />
-          <div className="space-y-1 z-10">
-            <span className="text-[10px] text-[#7B859C] font-bold tracking-wider uppercase">{t.breakStaff}</span>
-            <div className="text-3xl font-black text-[#F5B041]">
-              {staffMembers.filter(m => m.status !== 'active').length}
-            </div>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#F5B041]/15 to-[#F5B041]/5 border border-[#F5B041]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 z-10">
-            <svg className="w-6 h-6 text-[#F5B041]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
-            </svg>
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Roster Layout (Grid of Premium Cards) */}
@@ -745,8 +866,16 @@ export default function ProviderTeamPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div className="relative flex-shrink-0">
-                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#1A2236] to-[#0D1422] border-2 border-[#D1AF47]/30 flex items-center justify-center text-[#D1AF47] font-bold text-lg tracking-wider group-hover:border-[#D1AF47] transition-all duration-300">
-                        {member.avatar}
+                      <div className="relative w-14 h-14 overflow-hidden rounded-full bg-gradient-to-br from-[#1A2236] to-[#0D1422] border-2 border-[#D1AF47]/30 flex items-center justify-center text-[#D1AF47] font-bold text-lg tracking-wider group-hover:border-[#D1AF47] transition-all duration-300">
+                        <span>{member.avatar}</span>
+                        <img
+                          src={member.photoUrl}
+                          alt={member.name}
+                          className="absolute inset-0 h-full w-full object-cover"
+                          onError={(event) => {
+                            event.currentTarget.style.display = "none";
+                          }}
+                        />
                       </div>
                       {/* Avatar Status Dot */}
                       <span className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-[#0D1422] ${dotColorClass} ${isActive ? "animate-pulse" : ""}`} />
@@ -759,6 +888,12 @@ export default function ProviderTeamPage() {
                       <p className="text-xs text-[#7B859C] mt-0.5 font-medium leading-tight">
                         {member.title}
                       </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <span className="rounded-full border border-[#D1AF47]/20 bg-[#D1AF47]/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-[#D1AF47]">
+                          {member.workTypeLabel}
+                        </span>
+                        <span className="text-[10px] font-semibold text-[#7B859C]">{member.phone}</span>
+                      </div>
                     </div>
                   </div>
 
@@ -774,17 +909,51 @@ export default function ProviderTeamPage() {
 
                 {/* Details Section */}
                 <div className="space-y-4">
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="rounded-2xl border border-white/10 bg-[#070B12]/55 p-3">
+                      <span className="block text-[9px] font-black uppercase tracking-widest text-[#7B859C]">{teamCopy.earnings}</span>
+                      <strong className="mt-1 block text-xs font-black text-[#D1AF47]">{formatMoney(member.totalEarnings)}</strong>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-[#070B12]/55 p-3">
+                      <span className="block text-[9px] font-black uppercase tracking-widest text-[#7B859C]">{teamCopy.rating}</span>
+                      <strong className="mt-1 block text-xs font-black text-[#3DDC84]">★ {member.rating.toFixed(1)}</strong>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-[#070B12]/55 p-3">
+                      <span className="block text-[9px] font-black uppercase tracking-widest text-[#7B859C]">{teamCopy.bookings}</span>
+                      <strong className="mt-1 block text-xs font-black text-white">{member.completedBookings}</strong>
+                    </div>
+                  </div>
+
                   {/* Assigned Services */}
-                  <div className="flex items-center justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4 text-[#7B859C]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M14.121 14.121L19 19m-4.879-4.879l-4.121-4.12M14.121 14.121A3 3 0 1017.5 17.5a3 3 0 00-3.379-3.379zm-7 0A3 3 0 103 17.5a3 3 0 005.121-2.121l4.12-4.121m-4.12 4.121a3 3 0 11-3.38-3.38 3 3 0 013.38 3.38zm0-7a3 3 0 105.121-2.121L19 19m-9.879-9.879a3 3 0 00-3.379-3.379A3 3 0 003 9v.121m7 0A3 3 0 1010.5 3a3 3 0 00-3.379 3.379" />
+                        </svg>
+                        <span className="text-xs text-[#B8C0D4] font-medium">{t.assignedServices}</span>
+                      </div>
+                      <span className="text-xs text-white font-extrabold bg-[#172033] px-2.5 py-1 rounded-lg border border-[rgba(255,255,255,0.04)] shadow-inner">
+                        {member.servicesCount}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {(member.assignedServiceNames.length ? member.assignedServiceNames : [teamCopy.noServices]).slice(0, 3).map((serviceName) => (
+                        <span key={serviceName} className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] font-bold text-[#B8C0D4]">
+                          {serviceName}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#070B12]/45 px-3 py-2">
                     <div className="flex items-center gap-2">
                       <svg className="w-4 h-4 text-[#7B859C]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M14.121 14.121L19 19m-4.879-4.879l-4.121-4.12M14.121 14.121A3 3 0 1017.5 17.5a3 3 0 00-3.379-3.379zm-7 0A3 3 0 103 17.5a3 3 0 005.121-2.121l4.12-4.121m-4.12 4.121a3 3 0 11-3.38-3.38 3 3 0 013.38 3.38zm0-7a3 3 0 105.121-2.121L19 19m-9.879-9.879a3 3 0 00-3.379-3.379A3 3 0 003 9v.121m7 0A3 3 0 1010.5 3a3 3 0 00-3.379 3.379" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
-                      <span className="text-xs text-[#B8C0D4] font-medium">{t.assignedServices}</span>
+                      <span className="text-xs text-[#B8C0D4] font-medium">{teamCopy.email}</span>
                     </div>
-                    <span className="text-xs text-white font-extrabold bg-[#172033] px-2.5 py-1 rounded-lg border border-[rgba(255,255,255,0.04)] shadow-inner">
-                      {member.servicesCount}
-                    </span>
+                    <span className="max-w-[170px] truncate text-xs font-bold text-white">{member.email}</span>
                   </div>
 
                   {/* Availability */}
@@ -804,6 +973,13 @@ export default function ProviderTeamPage() {
 
               {/* Actions Footer */}
               <div className="mt-6 pt-5 border-t border-[rgba(255,255,255,0.06)] grid grid-cols-2 gap-3">
+                <button onClick={() => openProfileModal(member)} className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-[#0D1422]/60 hover:bg-[#172033] border border-[rgba(255,255,255,0.06)] hover:border-[#D1AF47]/30 rounded-xl text-xs font-semibold text-[#B8C0D4] hover:text-white transition-all duration-300">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.269 2.943 9.542 7-1.273 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  {teamCopy.view}
+                </button>
                 <button onClick={() => openEditStaff(member)} className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-[#0D1422]/60 hover:bg-[#172033] border border-[rgba(255,255,255,0.06)] hover:border-[#D1AF47]/30 rounded-xl text-xs font-semibold text-[#B8C0D4] hover:text-white transition-all duration-300">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a8.25 8.25 0 0115 0" />
@@ -866,6 +1042,26 @@ export default function ProviderTeamPage() {
                 {teamCopy.titleAr}
                 <input value={staffForm.titleAr} onChange={(event) => setStaffForm((form) => ({ ...form, titleAr: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60" />
               </label>
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C]">
+                {teamCopy.phone}
+                <input value={staffForm.phone} onChange={(event) => setStaffForm((form) => ({ ...form, phone: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60" />
+              </label>
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C]">
+                {teamCopy.email}
+                <input type="email" value={staffForm.email} onChange={(event) => setStaffForm((form) => ({ ...form, email: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60" />
+              </label>
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C]">
+                {teamCopy.photoUrl}
+                <input value={staffForm.photoUrl} onChange={(event) => setStaffForm((form) => ({ ...form, photoUrl: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60" />
+              </label>
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C]">
+                {teamCopy.workType}
+                <select value={staffForm.workType} onChange={(event) => setStaffForm((form) => ({ ...form, workType: event.target.value as WorkType }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60">
+                  <option value="in_shop">{teamCopy.inShop}</option>
+                  <option value="remote">{teamCopy.remote}</option>
+                  <option value="both">{teamCopy.both}</option>
+                </select>
+              </label>
               <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C] sm:col-span-2">
                 {teamCopy.branch}
                 <select value={staffForm.branchId} onChange={(event) => setStaffForm((form) => ({ ...form, branchId: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60">
@@ -887,6 +1083,74 @@ export default function ProviderTeamPage() {
               <button onClick={() => void saveStaff()} disabled={saving} className="rounded-xl bg-[#D1AF47] px-5 py-2.5 text-xs font-black text-[#070B12] transition hover:bg-[#E0C46A] disabled:cursor-not-allowed disabled:opacity-60">
                 {saving ? teamCopy.saving : teamCopy.save}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {profileModalOpen && activeMember && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#070B12]/80 px-4 py-8 backdrop-blur-sm">
+          <div className="w-full max-w-2xl overflow-hidden rounded-[28px] border border-[#D1AF47]/20 bg-gradient-to-b from-[#111827] to-[#0D1422] shadow-[0_0_45px_rgba(209,175,71,0.16)]">
+            <div className="relative h-36 bg-[radial-gradient(circle_at_20%_0%,rgba(209,175,71,0.34),transparent_38%),linear-gradient(135deg,#191D28,#070B12)]">
+              <button onClick={() => setProfileModalOpen(false)} className="absolute right-5 top-5 rounded-full border border-white/10 bg-[#070B12]/45 px-3 py-1 text-xs font-bold text-[#B8C0D4] backdrop-blur-md hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
+                {teamCopy.cancel}
+              </button>
+            </div>
+            <div className="relative px-6 pb-6">
+              <div className="-mt-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div className="flex items-end gap-4">
+                  <div className="relative h-24 w-24 overflow-hidden rounded-[28px] border-2 border-[#D1AF47]/50 bg-[#070B12] shadow-[0_0_28px_rgba(209,175,71,0.22)]">
+                    <img src={activeMember.photoUrl} alt={activeMember.name} className="h-full w-full object-cover" />
+                  </div>
+                  <div className="pb-1">
+                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#D1AF47]">{teamCopy.employeeDetails}</p>
+                    <h3 className="mt-1 text-2xl font-black text-white">{activeMember.name}</h3>
+                    <p className="text-sm font-semibold text-[#B8C0D4]">{activeMember.title}</p>
+                  </div>
+                </div>
+                <span className="rounded-full border border-[#D1AF47]/25 bg-[#D1AF47]/10 px-3 py-1 text-xs font-black text-[#D1AF47]">
+                  {activeMember.workTypeLabel}
+                </span>
+              </div>
+
+              <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl border border-white/10 bg-[#070B12]/55 p-4">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-[#7B859C]">{teamCopy.earnings}</span>
+                  <strong className="mt-2 block text-lg font-black text-[#D1AF47]">{formatMoney(activeMember.totalEarnings)}</strong>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-[#070B12]/55 p-4">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-[#7B859C]">{teamCopy.rating}</span>
+                  <strong className="mt-2 block text-lg font-black text-[#3DDC84]">★ {activeMember.rating.toFixed(1)}</strong>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-[#070B12]/55 p-4">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-[#7B859C]">{teamCopy.bookings}</span>
+                  <strong className="mt-2 block text-lg font-black text-white">{activeMember.completedBookings}</strong>
+                </div>
+              </div>
+
+              <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border border-white/10 bg-[#070B12]/45 p-4">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.18em] text-[#7B859C]">{teamCopy.contact}</h4>
+                  <p className="mt-3 text-sm font-bold text-white">{activeMember.phone}</p>
+                  <p className="mt-1 text-xs font-semibold text-[#B8C0D4]">{activeMember.email}</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-[#070B12]/45 p-4">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.18em] text-[#7B859C]">{teamCopy.statusAndMode}</h4>
+                  <p className="mt-3 text-sm font-bold text-white">{activeMember.statusLabel}</p>
+                  <p className="mt-1 text-xs font-semibold text-[#B8C0D4]">{activeMember.workTypeLabel}</p>
+                </div>
+              </div>
+
+              <div className="mt-5 rounded-2xl border border-white/10 bg-[#070B12]/45 p-4">
+                <h4 className="text-[10px] font-black uppercase tracking-[0.18em] text-[#7B859C]">{t.assignedServices}</h4>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {(activeMember.assignedServiceNames.length ? activeMember.assignedServiceNames : [teamCopy.noServices]).map((serviceName) => (
+                    <span key={serviceName} className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-bold text-[#B8C0D4]">
+                      {serviceName}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -13,6 +13,7 @@ import { supabase } from "@/lib/supabase";
    ──────────────────────────────────────────────────────────────────────── */
 
 type AddOn = { key: string; label_en: string; label_ar: string; priceSAR: number };
+type ServiceGender = "male" | "female" | "unisex";
 type CatalogService = {
   id: string;
   slug: string;
@@ -28,6 +29,8 @@ type CatalogService = {
   category_slug: string;
   add_ons: AddOn[];
   rating: number;
+  images: string[];
+  genderCategory: ServiceGender;
 };
 type CatalogCategory = { id: string; slug: string; name_en: string; name_ar: string; icon: string | null };
 
@@ -44,7 +47,48 @@ const F = (slug: string, cat: string, en: string, ar: string, den: string, dar: 
   id: slug, slug, category_slug: cat, name_en: en, name_ar: ar, description_en: den, description_ar: dar,
   base_price: price, base_duration_minutes: dur, is_home_service_eligible: home,
   featured_in_services: feat, sort_order: ord, add_ons: [], rating: 4.7 + ((slug.length % 3) * 0.1),
+  images: [],
+  genderCategory: inferServiceGender(slug, cat, en),
 });
+
+const SERVICE_IMAGE_BY_CATEGORY: Record<string, string> = {
+  "barber-hair": "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=1200&auto=format&fit=crop",
+  "beard-shave": "https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=1200&auto=format&fit=crop",
+  "skincare-facials": "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1200&auto=format&fit=crop",
+  "spa-wellness": "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=1200&auto=format&fit=crop",
+  "nails-hands": "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=1200&auto=format&fit=crop",
+  "signature-packages": "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1200&auto=format&fit=crop"
+};
+
+const SERVICE_IMAGE_BY_SLUG: Record<string, string> = {
+  "classic-haircut": "https://images.unsplash.com/photo-1622287162716-f311baa1a2b8?q=80&w=1200&auto=format&fit=crop",
+  "skin-fade": "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=1200&auto=format&fit=crop",
+  "beard-sculpt": "https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=1200&auto=format&fit=crop",
+  "hot-towel-shave": "https://images.unsplash.com/photo-1622296089863-eb7fc530daa8?q=80&w=1200&auto=format&fit=crop",
+  "moroccan-bath": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=1200&auto=format&fit=crop",
+  "manicure": "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=1200&auto=format&fit=crop",
+  "pedicure": "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?q=80&w=1200&auto=format&fit=crop"
+};
+
+function inferServiceGender(slug: string, categorySlug: string, name = ""): ServiceGender {
+  const text = `${slug} ${categorySlug} ${name}`.toLowerCase();
+  if (/(beard|shave|barber|groom|fade|kids-cut|scalp)/.test(text)) return "male";
+  if (/(nail|manicure|pedicure|bridal|makeup|lashes|brow|wax|hand-spa)/.test(text)) return "female";
+  return "unisex";
+}
+
+function serviceImageFor(service: CatalogService) {
+  return service.images[0] || SERVICE_IMAGE_BY_SLUG[service.slug] || SERVICE_IMAGE_BY_CATEGORY[service.category_slug] || SERVICE_IMAGE_BY_CATEGORY["barber-hair"];
+}
+
+function normalizeServiceImages(images: unknown, slug: string, categorySlug: string): string[] {
+  const list = Array.isArray(images) ? images.filter((image): image is string => typeof image === "string" && image.trim().length > 0) : [];
+  return list.length > 0 ? list : [SERVICE_IMAGE_BY_SLUG[slug] || SERVICE_IMAGE_BY_CATEGORY[categorySlug] || SERVICE_IMAGE_BY_CATEGORY["barber-hair"]];
+}
+
+function serviceMatchesGender(service: CatalogService, filter: "all" | "male" | "female") {
+  return filter === "all" || service.genderCategory === filter || service.genderCategory === "unisex";
+}
 
 const FALLBACK_SERVICES: CatalogService[] = [
   F("classic-haircut", "barber-hair", "Classic Haircut", "قصة شعر كلاسيكية", "Precision cut with consultation and finish styling.", "قصة دقيقة مع استشارة وتصفيف نهائي.", 45, 40, true, true, 1),
@@ -87,6 +131,10 @@ const translations = {
     p100to200: "100–200 SAR",
     over200: "200+ SAR",
     homeService: "Home service",
+    genderAll: "All genders",
+    male: "Male",
+    female: "Female",
+    unisex: "Unisex",
     sort: "Sort",
     sortRecommended: "Recommended",
     sortPriceLow: "Price: low to high",
@@ -119,6 +167,10 @@ const translations = {
     p100to200: "١٠٠–٢٠٠ ر.س",
     over200: "٢٠٠+ ر.س",
     homeService: "خدمة منزلية",
+    genderAll: "كل الفئات",
+    male: "رجالي",
+    female: "نسائي",
+    unisex: "للجميع",
     sort: "الترتيب",
     sortRecommended: "الموصى به",
     sortPriceLow: "السعر: من الأقل",
@@ -149,6 +201,7 @@ function ServicesCatalog() {
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<string>(searchParams.get("category") ?? "all");
   const [priceBand, setPriceBand] = useState<"any" | "u50" | "50-100" | "100-200" | "200+">("any");
+  const [genderFilter, setGenderFilter] = useState<"all" | "male" | "female">("all");
   const [homeOnly, setHomeOnly] = useState(false);
   const [sort, setSort] = useState<"recommended" | "price-asc" | "price-desc" | "rating">("recommended");
   const [detail, setDetail] = useState<CatalogService | null>(null);
@@ -168,7 +221,7 @@ function ServicesCatalog() {
           supabase.from("categories").select("id, slug, name_en, name_ar, icon, sort_order").eq("is_active", true).order("sort_order"),
           supabase
             .from("services")
-            .select("id, slug, name_en, name_ar, description_en, description_ar, base_price, base_duration_minutes, is_home_service_eligible, featured_in_services, sort_order, add_ons, categories(slug)")
+            .select("id, slug, name_en, name_ar, description_en, description_ar, base_price, base_duration_minutes, is_home_service_eligible, featured_in_services, sort_order, add_ons, images, categories(slug)")
             .eq("is_active", true)
             .order("sort_order"),
         ]);
@@ -187,6 +240,8 @@ function ServicesCatalog() {
               category_slug: cat?.slug ?? "other",
               add_ons: Array.isArray(r.add_ons) ? (r.add_ons as AddOn[]) : [],
               rating: 4.7 + ((String(r.id).charCodeAt(0) % 3) * 0.1),
+              images: normalizeServiceImages((r as { images?: unknown }).images, r.slug ?? r.id, cat?.slug ?? "other"),
+              genderCategory: inferServiceGender(r.slug ?? r.id, cat?.slug ?? "other", r.name_en ?? ""),
             };
           }));
         }
@@ -210,6 +265,7 @@ function ServicesCatalog() {
   const filtered = useMemo(() => {
     let list = services.filter((s) => {
       if (activeCat !== "all" && s.category_slug !== activeCat) return false;
+      if (!serviceMatchesGender(s, genderFilter)) return false;
       if (homeOnly && !s.is_home_service_eligible) return false;
       if (priceBand === "u50" && s.base_price >= 50) return false;
       if (priceBand === "50-100" && (s.base_price < 50 || s.base_price > 100)) return false;
@@ -230,7 +286,7 @@ function ServicesCatalog() {
           Number(b.featured_in_services) - Number(a.featured_in_services) || a.sort_order - b.sort_order);
     }
     return list;
-  }, [services, activeCat, homeOnly, priceBand, query, sort]);
+  }, [services, activeCat, genderFilter, homeOnly, priceBand, query, sort]);
 
   const catName = (c: CatalogCategory) => (isRTL ? c.name_ar : c.name_en);
 
@@ -272,6 +328,25 @@ function ServicesCatalog() {
               <button onClick={() => setHomeOnly((h) => !h)} className={`rounded-xl border px-3.5 py-2.5 text-xs font-bold transition ${homeOnly ? "border-[#C29A4C]/60 bg-[#C29A4C]/10 text-[#A57C32]" : "border-[#211A12]/10 bg-white text-[#5F584D]"}`}>
                 {homeOnly ? "✓ " : ""}{t.homeService}
               </button>
+              <div className="flex rounded-xl border border-[#211A12]/10 bg-white p-1 shadow-sm">
+                {([
+                  ["all", t.genderAll],
+                  ["male", t.male],
+                  ["female", t.female],
+                ] as const).map(([value, label]) => (
+                  <button
+                    key={value}
+                    onClick={() => setGenderFilter(value)}
+                    className={`rounded-lg px-3 py-1.5 text-[11px] font-black transition ${
+                      genderFilter === value
+                        ? "bg-[#15100A] text-[#E6C679]"
+                        : "text-[#5F584D] hover:bg-[#F2EEE6]"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
               <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className="rounded-xl border border-[#211A12]/10 bg-white px-3 py-2.5 text-xs font-bold text-[#5F584D] outline-none">
                 <option value="recommended">{t.sortRecommended}</option>
                 <option value="price-asc">{t.sortPriceLow}</option>
@@ -307,8 +382,22 @@ function ServicesCatalog() {
               <button
                 key={s.id}
                 onClick={() => setDetail(s)}
-                className={`group flex flex-col rounded-[20px] border border-[#211A12]/8 bg-white p-5 shadow-[0_8px_30px_rgba(21,16,10,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#C29A4C]/40 hover:shadow-[0_16px_40px_rgba(194,154,76,0.12)] ${isRTL ? "text-right" : "text-left"}`}
+                className={`group flex flex-col rounded-[20px] border border-[#211A12]/8 bg-white p-4 shadow-[0_8px_30px_rgba(21,16,10,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#C29A4C]/40 hover:shadow-[0_16px_40px_rgba(194,154,76,0.12)] ${isRTL ? "text-right" : "text-left"}`}
               >
+                <div className="relative mb-4 h-40 overflow-hidden rounded-2xl bg-[#15100A]">
+                  <img
+                    src={serviceImageFor(s)}
+                    alt={isRTL ? s.name_ar : s.name_en}
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    onError={(event) => {
+                      event.currentTarget.src = SERVICE_IMAGE_BY_CATEGORY[s.category_slug] || SERVICE_IMAGE_BY_CATEGORY["barber-hair"];
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#15100A]/70 via-transparent to-transparent" />
+                  <span className={`absolute bottom-3 ${isRTL ? "right-3" : "left-3"} rounded-full border border-[#E6C679]/35 bg-[#15100A]/70 px-2.5 py-1 text-[10px] font-black text-[#E6C679] backdrop-blur-md`}>
+                    {t[s.genderCategory]}
+                  </span>
+                </div>
                 <div className={`mb-3 flex items-start justify-between gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
                   <span className="rounded-full bg-[#F2EEE6] px-2.5 py-1 text-[10px] font-black text-[#8A7F6C]">
                     {CATEGORY_ICON[categories.find((c) => c.slug === s.category_slug)?.icon ?? ""] ?? "•"} {catName(categories.find((c) => c.slug === s.category_slug) ?? categories[0])}
@@ -348,11 +437,22 @@ function ServicesCatalog() {
               </button>
             </div>
             <div className="flex-1 space-y-5 overflow-y-auto p-5">
-              <div className="flex h-40 items-center justify-center rounded-2xl bg-gradient-to-br from-[#15100A] to-[#3A2E1D] text-5xl">
-                {CATEGORY_ICON[categories.find((c) => c.slug === detail.category_slug)?.icon ?? ""] ?? "✦"}
+              <div className="relative h-52 overflow-hidden rounded-2xl bg-[#15100A]">
+                <img
+                  src={serviceImageFor(detail)}
+                  alt={isRTL ? detail.name_ar : detail.name_en}
+                  className="h-full w-full object-cover"
+                  onError={(event) => {
+                    event.currentTarget.src = SERVICE_IMAGE_BY_CATEGORY[detail.category_slug] || SERVICE_IMAGE_BY_CATEGORY["barber-hair"];
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#15100A]/75 via-[#15100A]/10 to-transparent" />
+                <span className={`absolute bottom-4 ${isRTL ? "right-4" : "left-4"} rounded-full border border-[#E6C679]/35 bg-[#15100A]/70 px-3 py-1 text-[11px] font-black text-[#E6C679] backdrop-blur-md`}>
+                  {t[detail.genderCategory]}
+                </span>
               </div>
               <p className="text-sm font-medium leading-6 text-[#5F584D]">{isRTL ? detail.description_ar : detail.description_en}</p>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div className="rounded-xl border border-[#211A12]/8 bg-white p-3">
                   <span className="block text-[9px] font-black uppercase tracking-widest text-[#8A7F6C]">{t.from}</span>
                   <strong className="font-serif text-lg font-black text-[#211A12]">{detail.base_price} {t.sar}</strong>
@@ -360,6 +460,10 @@ function ServicesCatalog() {
                 <div className="rounded-xl border border-[#211A12]/8 bg-white p-3">
                   <span className="block text-[9px] font-black uppercase tracking-widest text-[#8A7F6C]">{t.duration}</span>
                   <strong className="font-serif text-lg font-black text-[#211A12]">{detail.base_duration_minutes} {t.min}</strong>
+                </div>
+                <div className="rounded-xl border border-[#211A12]/8 bg-white p-3">
+                  <span className="block text-[9px] font-black uppercase tracking-widest text-[#8A7F6C]">{t.genderAll}</span>
+                  <strong className="font-serif text-lg font-black text-[#211A12]">{t[detail.genderCategory]}</strong>
                 </div>
               </div>
               {detail.add_ons.length > 0 && (
