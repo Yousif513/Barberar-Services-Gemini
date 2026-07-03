@@ -7,7 +7,7 @@ const translations = {
   en: {
     promoText: "Book Premier Home Service & Salon Appointments in Riyadh",
     home: "Home",
-    discover: "Discover",
+    discover: "Services",
     serviceBoard: "Service Board",
     becomeProvider: "Become a Provider",
     aboutUs: "About Us",
@@ -46,7 +46,7 @@ const translations = {
   ar: {
     promoText: "احجز أفضل خدمات التجميل والعناية المنزلية والصالونات بالرياض",
     home: "الرئيسية",
-    discover: "اكتشف",
+    discover: "الخدمات",
     serviceBoard: "لوحة الخدمات",
     becomeProvider: "انضم كمزود خدمة",
     aboutUs: "من نحن",
@@ -234,7 +234,7 @@ export default function ServiceBoardRootPage() {
         </Link>
         <nav className="hidden lg:flex items-center justify-center gap-8 text-xs font-bold uppercase tracking-wider text-stone-500 flex-1 mx-8">
           <Link href="/" className="hover:text-stone-950 transition-colors">{t.home}</Link>
-          <Link href="/store" className="hover:text-stone-950 transition-colors">{t.discover}</Link>
+          <Link href="/services" className="hover:text-stone-950 transition-colors">{t.discover}</Link>
           <Link href="/service-board" className="text-stone-900 hover:text-stone-900 transition-colors">{t.serviceBoard}</Link>
           <Link href="/become-provider" className="hover:text-stone-950 transition-colors">{t.becomeProvider}</Link>
           <Link href="/about" className="hover:text-stone-950 transition-colors">{t.aboutUs}</Link>
@@ -242,7 +242,7 @@ export default function ServiceBoardRootPage() {
         
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-4">
-            <Link href="/store" className="text-stone-700 hover:text-stone-950 transition">
+            <Link href="/services" className="text-stone-700 hover:text-stone-950 transition">
               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
