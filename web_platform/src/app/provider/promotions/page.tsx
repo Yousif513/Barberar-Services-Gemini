@@ -276,7 +276,7 @@ export default function ProviderPromotionsPage() {
         );
       case "new":
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#3DDC84]/10 text-[#3DDC84] border border-[#3DDC84]/20">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#3DDC84]/10 text-[#22C55E] border border-[#3DDC84]/20">
             <span className="w-1 h-1 rounded-full bg-[#3DDC84]"></span>
             {t.targetSegmentNew}
           </span>
@@ -290,7 +290,7 @@ export default function ProviderPromotionsPage() {
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/[0.04] text-[#B8C0D4] border border-white/[0.06]">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F3F4F6] border border-[#ECECEC] text-[#344054] border border-[#ECECEC]">
             <span className="w-1 h-1 rounded-full bg-[#B8C0D4]"></span>
             {t.targetSegmentAll}
           </span>
@@ -312,15 +312,15 @@ export default function ProviderPromotionsPage() {
   const estRevenueLift = totalRedemptions * 180;
 
   return (
-    <div className={`space-y-10 font-sans text-white pb-12 ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
+    <div className={`space-y-10 font-sans text-[#101828] pb-12 ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
       {/* HEADER */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b border-white/[0.06] pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b border-[#ECECEC] pb-6">
         <div className="space-y-1">
-          <h2 className="text-3xl font-bold font-serif tracking-tight text-white flex items-center gap-3">
+          <h2 className="text-3xl font-bold font-serif tracking-tight text-[#101828] flex items-center gap-3">
             <span className="w-3.5 h-7 bg-gradient-to-b from-[#D1AF47] to-[#B8952E] rounded-full inline-block"></span>
             {t.title}
           </h2>
-          <p className="text-sm text-[#B8C0D4]">{t.subtitle}</p>
+          <p className="text-sm text-[#344054]">{t.subtitle}</p>
         </div>
         <button
           onClick={() => setShowForm(prev => !prev)}
@@ -331,7 +331,7 @@ export default function ProviderPromotionsPage() {
       </div>
 
       {error && (
-        <div className="bg-[#FF5D73]/10 border border-[#FF5D73]/20 text-[#FF5D73] text-xs rounded-2xl p-4 flex items-center gap-3">
+        <div className="bg-[#FF5D73]/10 border border-[#FF5D73]/20 text-[#EF4444] text-xs rounded-2xl p-4 flex items-center gap-3">
           <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
@@ -342,9 +342,9 @@ export default function ProviderPromotionsPage() {
       {/* KPI METRICS COUNTERS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Active Campaigns */}
-        <div className="group bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] transition-all duration-300">
+        <div className="group bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] transition-all duration-300">
           <div className="flex justify-between items-center">
-            <span className="text-xs font-semibold text-[#7B859C] uppercase tracking-wider">{t.kpiActive}</span>
+            <span className="text-xs font-semibold text-[#667085] uppercase tracking-wider">{t.kpiActive}</span>
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#D1AF47]/20 to-[#B8952E]/10 flex items-center justify-center text-[#D1AF47]">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -352,24 +352,24 @@ export default function ProviderPromotionsPage() {
             </div>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-3xl font-black text-white">{activeCampaigns}</span>
-            <span className="text-[10px] text-[#7B859C] font-semibold">/ {totalCampaigns} total</span>
+            <span className="text-3xl font-black text-[#101828]">{activeCampaigns}</span>
+            <span className="text-[10px] text-[#667085] font-semibold">/ {totalCampaigns} total</span>
           </div>
         </div>
 
         {/* Total Code Redemptions */}
-        <div className="group bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] transition-all duration-300">
+        <div className="group bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] transition-all duration-300">
           <div className="flex justify-between items-center">
-            <span className="text-xs font-semibold text-[#7B859C] uppercase tracking-wider">{t.kpiTotalRedemptions}</span>
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#3DDC84]/20 to-transparent flex items-center justify-center text-[#3DDC84]">
+            <span className="text-xs font-semibold text-[#667085] uppercase tracking-wider">{t.kpiTotalRedemptions}</span>
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#3DDC84]/20 to-transparent flex items-center justify-center text-[#22C55E]">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-3xl font-black text-white">{totalRedemptions}</span>
-            <span className="text-[10px] text-[#3DDC84] font-semibold flex items-center gap-1">
+            <span className="text-3xl font-black text-[#101828]">{totalRedemptions}</span>
+            <span className="text-[10px] text-[#22C55E] font-semibold flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84] animate-ping"></span>
               Live Redemptions
             </span>
@@ -377,9 +377,9 @@ export default function ProviderPromotionsPage() {
         </div>
 
         {/* Average Discount Rate */}
-        <div className="group bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] transition-all duration-300">
+        <div className="group bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] transition-all duration-300">
           <div className="flex justify-between items-center">
-            <span className="text-xs font-semibold text-[#7B859C] uppercase tracking-wider">{t.kpiAvgDiscount}</span>
+            <span className="text-xs font-semibold text-[#667085] uppercase tracking-wider">{t.kpiAvgDiscount}</span>
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#F5B041]/20 to-transparent flex items-center justify-center text-[#F5B041]">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -387,15 +387,15 @@ export default function ProviderPromotionsPage() {
             </div>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-3xl font-black text-white">{avgDiscount}%</span>
-            <span className="text-[10px] text-[#7B859C] font-semibold">average percentage</span>
+            <span className="text-3xl font-black text-[#101828]">{avgDiscount}%</span>
+            <span className="text-[10px] text-[#667085] font-semibold">average percentage</span>
           </div>
         </div>
 
         {/* Est. Revenue Lift */}
-        <div className="group bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] transition-all duration-300">
+        <div className="group bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] transition-all duration-300">
           <div className="flex justify-between items-center">
-            <span className="text-xs font-semibold text-[#7B859C] uppercase tracking-wider">{t.kpiEstimatedLift}</span>
+            <span className="text-xs font-semibold text-[#667085] uppercase tracking-wider">{t.kpiEstimatedLift}</span>
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#D1AF47]/20 to-transparent flex items-center justify-center text-[#D1AF47]">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -404,7 +404,7 @@ export default function ProviderPromotionsPage() {
           </div>
           <div className="mt-4 flex items-baseline gap-2">
             <span className="text-3xl font-black text-[#D1AF47]">{estRevenueLift.toLocaleString()} SAR</span>
-            <span className="text-[10px] text-[#7B859C] font-semibold">estimated lift</span>
+            <span className="text-[10px] text-[#667085] font-semibold">estimated lift</span>
           </div>
         </div>
       </div>
@@ -412,7 +412,7 @@ export default function ProviderPromotionsPage() {
       {/* ACTIVE SPOTLIGHT BANNERS */}
       {activePromos.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-[#7B859C] flex items-center gap-2">
+          <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-[#667085] flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#D1AF47] animate-pulse"></span>
             {t.activeBannersTitle}
           </h3>
@@ -422,7 +422,7 @@ export default function ProviderPromotionsPage() {
               return (
                 <div
                   key={p.id}
-                  className="group relative bg-gradient-to-br from-[#172033] to-[#0D1422] rounded-[24px] border border-white/[0.06] hover:border-[#D1AF47]/30 p-6 flex flex-col justify-between overflow-hidden shadow-xl hover:shadow-[0_0_30px_rgba(209,175,71,0.08)] transition-all duration-300"
+                  className="group relative bg-gradient-to-br from-[#172033] to-[#0D1422] rounded-[24px] border border-[#ECECEC] hover:border-[#D1AF47]/30 p-6 flex flex-col justify-between overflow-hidden shadow-xl hover:shadow-[0_0_30px_rgba(209,175,71,0.08)] transition-all duration-300"
                 >
                   {/* Premium gold hover glow */}
                   <div className="absolute top-0 right-0 w-24 h-24 bg-[#D1AF47]/5 rounded-full blur-2xl group-hover:bg-[#D1AF47]/10 transition-all duration-500"></div>
@@ -430,7 +430,7 @@ export default function ProviderPromotionsPage() {
                   <div className="space-y-4 relative z-10">
                     <div className="flex justify-between items-start">
                       {getSegmentBadge(segment)}
-                      <span className="text-[10px] font-semibold text-[#7B859C]">
+                      <span className="text-[10px] font-semibold text-[#667085]">
                         {new Date(p.expires_at).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", {
                           day: "numeric",
                           month: "short",
@@ -439,15 +439,15 @@ export default function ProviderPromotionsPage() {
                     </div>
 
                     <div className="space-y-1">
-                      <div className="text-3xl font-black text-white tracking-tight flex items-baseline gap-1">
+                      <div className="text-3xl font-black text-[#101828] tracking-tight flex items-baseline gap-1">
                         <span className="text-[#D1AF47]">
                           {p.type === "percentage" ? `${p.value}%` : `${p.value}`}
                         </span>
-                        <span className="text-xs text-[#B8C0D4] font-medium uppercase">
+                        <span className="text-xs text-[#344054] font-medium uppercase">
                           {p.type === "percentage" ? "OFF" : "SAR OFF"}
                         </span>
                       </div>
-                      <p className="text-xs text-[#B8C0D4] line-clamp-2 min-h-[2rem]">
+                      <p className="text-xs text-[#344054] line-clamp-2 min-h-[2rem]">
                         {cleanDesc || (locale === "ar" ? "عرض حصري لنخبة الرياض" : "Exclusive boutique session discount")}
                       </p>
                     </div>
@@ -455,13 +455,13 @@ export default function ProviderPromotionsPage() {
 
                   {/* Voucher design cutout line */}
                   <div className="relative my-4">
-                    <div className={`absolute -top-1.5 w-3 h-3 bg-[#070B12] rounded-full border-white/[0.06] ${isRTL ? "-right-7.5 border-l" : "-left-7.5 border-r"}`}></div>
-                    <div className={`absolute -top-1.5 w-3 h-3 bg-[#070B12] rounded-full border-white/[0.06] ${isRTL ? "-left-7.5 border-r" : "-right-7.5 border-l"}`}></div>
-                    <div className="border-t border-dashed border-white/[0.08] w-full"></div>
+                    <div className={`absolute -top-1.5 w-3 h-3 bg-transparent rounded-full border-[#ECECEC] ${isRTL ? "-right-7.5 border-l" : "-left-7.5 border-r"}`}></div>
+                    <div className={`absolute -top-1.5 w-3 h-3 bg-transparent rounded-full border-[#ECECEC] ${isRTL ? "-left-7.5 border-r" : "-right-7.5 border-l"}`}></div>
+                    <div className="border-t border-dashed border-[#ECECEC] w-full"></div>
                   </div>
 
                   <div className="flex justify-between items-center relative z-10">
-                    <div className="font-mono text-sm font-bold tracking-wider text-white bg-black/40 px-3 py-1.5 rounded-xl border border-white/[0.04]">
+                    <div className="font-mono text-sm font-bold tracking-wider text-[#101828] bg-black/40 px-3 py-1.5 rounded-xl border border-white/[0.04]">
                       {p.code}
                     </div>
                     <button
@@ -494,10 +494,10 @@ export default function ProviderPromotionsPage() {
 
       {/* CREATE FORM CARD */}
       {showForm && (
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-8 shadow-[0_0_30px_rgba(0,0,0,0.4)] space-y-6 relative overflow-hidden transition-all duration-300">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-8 shadow-[0_0_30px_rgba(0,0,0,0.4)] space-y-6 relative overflow-hidden transition-all duration-300">
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#D1AF47]/10 to-transparent rounded-bl-[100px]"></div>
 
-          <h3 className="font-bold text-base text-white border-b border-white/[0.06] pb-4 tracking-wide flex items-center gap-2">
+          <h3 className="font-bold text-base text-[#101828] border-b border-[#ECECEC] pb-4 tracking-wide flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#D1AF47] shadow-[0_0_10px_rgba(209,175,71,0.5)] animate-pulse"></span>
             {t.createTitle}
           </h3>
@@ -506,30 +506,30 @@ export default function ProviderPromotionsPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Promo Code Input */}
               <div className="space-y-2">
-                <label className="text-[10px] uppercase font-bold text-[#7B859C] tracking-widest block">{t.tableCode}</label>
+                <label className="text-[10px] uppercase font-bold text-[#667085] tracking-widest block">{t.tableCode}</label>
                 <input
                   type="text"
                   required
                   placeholder={t.codePlaceholder}
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  className="w-full bg-[#0D1422] border border-white/[0.06] rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-[#D1AF47] transition placeholder-[#7B859C]/40 font-mono tracking-wider"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs text-[#101828] outline-none focus:border-[#D1AF47] transition placeholder-[#7B859C]/40 font-mono tracking-wider"
                 />
               </div>
 
               {/* Discount Type Select */}
               <div className="space-y-2">
-                <label className="text-[10px] uppercase font-bold text-[#7B859C] tracking-widest block">{t.tableType}</label>
+                <label className="text-[10px] uppercase font-bold text-[#667085] tracking-widest block">{t.tableType}</label>
                 <div className="relative">
                   <select
                     value={type}
                     onChange={(e) => setType(e.target.value as any)}
-                    className="w-full bg-[#0D1422] border border-white/[0.06] rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-[#D1AF47] transition appearance-none cursor-pointer"
+                    className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs text-[#101828] outline-none focus:border-[#D1AF47] transition appearance-none cursor-pointer"
                   >
                     <option value="percentage">{t.discountPct}</option>
                     <option value="fixed">{t.fixedDiscount}</option>
                   </select>
-                  <div className={`absolute inset-y-0 flex items-center pointer-events-none text-[#7B859C] ${isRTL ? "left-4" : "right-4"}`}>
+                  <div className={`absolute inset-y-0 flex items-center pointer-events-none text-[#667085] ${isRTL ? "left-4" : "right-4"}`}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
@@ -539,19 +539,19 @@ export default function ProviderPromotionsPage() {
 
               {/* Target Segment Select */}
               <div className="space-y-2">
-                <label className="text-[10px] uppercase font-bold text-[#7B859C] tracking-widest block">{t.targetSegmentLabel}</label>
+                <label className="text-[10px] uppercase font-bold text-[#667085] tracking-widest block">{t.targetSegmentLabel}</label>
                 <div className="relative">
                   <select
                     value={targetSegment}
                     onChange={(e) => setTargetSegment(e.target.value as any)}
-                    className="w-full bg-[#0D1422] border border-white/[0.06] rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-[#D1AF47] transition appearance-none cursor-pointer"
+                    className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs text-[#101828] outline-none focus:border-[#D1AF47] transition appearance-none cursor-pointer"
                   >
                     <option value="all">{t.targetSegmentAll}</option>
                     <option value="vip">{t.targetSegmentVip}</option>
                     <option value="new">{t.targetSegmentNew}</option>
                     <option value="loyal">{t.targetSegmentLoyal}</option>
                   </select>
-                  <div className={`absolute inset-y-0 flex items-center pointer-events-none text-[#7B859C] ${isRTL ? "left-4" : "right-4"}`}>
+                  <div className={`absolute inset-y-0 flex items-center pointer-events-none text-[#667085] ${isRTL ? "left-4" : "right-4"}`}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
@@ -561,20 +561,20 @@ export default function ProviderPromotionsPage() {
             </div>
 
             {/* Discount Value Slider + Number Input */}
-            <div className="p-5 bg-[#0D1422] border border-white/[0.04] rounded-2xl space-y-4">
+            <div className="p-5 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-white/[0.04] rounded-2xl space-y-4">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="space-y-1">
-                  <span className="text-[10px] uppercase font-bold text-[#7B859C] tracking-widest block">{t.discountRateLabel}</span>
-                  <span className="text-xs text-[#B8C0D4]">{t.discountRateLabel} for the active campaign.</span>
+                  <span className="text-[10px] uppercase font-bold text-[#667085] tracking-widest block">{t.discountRateLabel}</span>
+                  <span className="text-xs text-[#344054]">{t.discountRateLabel} for the active campaign.</span>
                 </div>
-                <div className="relative flex items-center bg-black/40 rounded-xl border border-white/[0.06] overflow-hidden px-3">
+                <div className="relative flex items-center bg-black/40 rounded-xl border border-[#ECECEC] overflow-hidden px-3">
                   <input
                     type="number"
                     required
                     placeholder="15"
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
-                    className="bg-transparent border-none outline-none py-2 text-xs text-white w-20 font-bold text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="bg-transparent border-none outline-none py-2 text-xs text-[#101828] w-20 font-bold text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <span className="text-xs font-bold text-[#D1AF47]">
                     {type === "percentage" ? "%" : "SAR"}
@@ -596,7 +596,7 @@ export default function ProviderPromotionsPage() {
                     background: "linear-gradient(to right, #D1AF47 0%, #D1AF47 100%)",
                   }}
                 />
-                <div className="flex justify-between text-[10px] text-[#7B859C] font-mono">
+                <div className="flex justify-between text-[10px] text-[#667085] font-mono">
                   <span>{type === "percentage" ? "1%" : "5 SAR"}</span>
                   <span>{type === "percentage" ? "50%" : "250 SAR"}</span>
                   <span>{type === "percentage" ? "100%" : "500 SAR"}</span>
@@ -607,25 +607,25 @@ export default function ProviderPromotionsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Expiration Date Input */}
               <div className="space-y-2">
-                <label className="text-[10px] uppercase font-bold text-[#7B859C] tracking-widest block">{t.expiryDate}</label>
+                <label className="text-[10px] uppercase font-bold text-[#667085] tracking-widest block">{t.expiryDate}</label>
                 <input
                   type="date"
                   required
                   value={expiry}
                   onChange={(e) => setExpiry(e.target.value)}
-                  className="w-full bg-[#0D1422] border border-white/[0.06] rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-[#D1AF47] transition placeholder-[#7B859C]/40"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs text-[#101828] outline-none focus:border-[#D1AF47] transition placeholder-[#7B859C]/40"
                 />
               </div>
 
               {/* Campaign Description Input */}
               <div className="space-y-2">
-                <label className="text-[10px] uppercase font-bold text-[#7B859C] tracking-widest block">Campaign Description</label>
+                <label className="text-[10px] uppercase font-bold text-[#667085] tracking-widest block">Campaign Description</label>
                 <input
                   type="text"
                   placeholder={t.descPlaceholder}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full bg-[#0D1422] border border-white/[0.06] rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-[#D1AF47] transition placeholder-[#7B859C]/40"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs text-[#101828] outline-none focus:border-[#D1AF47] transition placeholder-[#7B859C]/40"
                 />
               </div>
             </div>
@@ -635,7 +635,7 @@ export default function ProviderPromotionsPage() {
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="flex-1 py-3 border border-white/[0.08] text-[#B8C0D4] font-bold text-xs rounded-xl hover:text-white hover:bg-white/[0.02] hover:border-white/[0.15] transition-all duration-300"
+                className="flex-1 py-3 border border-[#ECECEC] text-[#344054] font-bold text-xs rounded-xl hover:text-[#101828] hover:bg-transparent hover:border-white/[0.15] transition-all duration-300"
               >
                 {t.cancelBtn}
               </button>
@@ -652,28 +652,28 @@ export default function ProviderPromotionsPage() {
 
       {/* PROMOTIONS LIST TABLE / COUPON MANAGERS LIST */}
       {loading ? (
-        <div className="text-center py-20 text-sm text-[#7B859C] flex flex-col items-center justify-center gap-3">
+        <div className="text-center py-20 text-sm text-[#667085] flex flex-col items-center justify-center gap-3">
           <div className="w-6 h-6 border-2 border-[#D1AF47] border-t-transparent rounded-full animate-spin"></div>
           <span>Loading coupons...</span>
         </div>
       ) : promos.length === 0 ? (
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-16 text-center text-[#7B859C] shadow-sm flex flex-col items-center justify-center space-y-4">
-          <div className="w-16 h-16 rounded-full bg-white/[0.02] border border-white/[0.04] flex items-center justify-center text-[#7B859C]">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-16 text-center text-[#667085] shadow-sm flex flex-col items-center justify-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-transparent border border-white/[0.04] flex items-center justify-center text-[#667085]">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
           <div className="space-y-1">
-            <p className="text-sm font-bold text-white">{t.noPromos}</p>
-            <p className="text-xs text-[#7B859C]">Launch your first exclusive coupon campaign for Riyadh clientele.</p>
+            <p className="text-sm font-bold text-[#101828]">{t.noPromos}</p>
+            <p className="text-xs text-[#667085]">Launch your first exclusive coupon campaign for Riyadh clientele.</p>
           </div>
         </div>
       ) : (
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] overflow-hidden shadow-xl">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] overflow-hidden shadow-xl">
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-start border-collapse" dir={isRTL ? "rtl" : "ltr"}>
               <thead>
-                <tr className="border-b border-white/[0.06] text-[#7B859C] font-bold uppercase text-[10px] tracking-wider bg-white/[0.01]">
+                <tr className="border-b border-[#ECECEC] text-[#667085] font-bold uppercase text-[10px] tracking-wider bg-white/[0.01]">
                   <th className="py-4.5 px-6 text-start">{t.tableCode}</th>
                   <th className="py-4.5 px-6 text-start">{t.tableType}</th>
                   <th className="py-4.5 px-6 text-start">{t.tableValue}</th>
@@ -683,31 +683,31 @@ export default function ProviderPromotionsPage() {
                   <th className="py-4.5 px-6 text-end">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.04]">
+              <tbody className="divide-y divide-[#ECECEC]">
                 {promos.map((p) => {
                   const isExpired = new Date(p.expires_at) < new Date();
                   const { segment, cleanDesc } = parseDescription(p.description);
 
                   return (
-                    <tr key={p.id} className="hover:bg-white/[0.02] transition-colors duration-300">
+                    <tr key={p.id} className="hover:bg-transparent transition-colors duration-300">
                       {/* Code */}
                       <td className="py-5 px-6 text-start">
                         <div className="flex flex-col gap-1.5">
                           <div className="flex items-center gap-3">
-                            <span className="font-mono text-sm font-bold text-white tracking-widest bg-white/[0.04] border border-white/[0.06] px-2.5 py-1 rounded-lg">
+                            <span className="font-mono text-sm font-bold text-[#101828] tracking-widest bg-[#F3F4F6] border border-[#ECECEC] border border-[#ECECEC] px-2.5 py-1 rounded-lg">
                               {p.code}
                             </span>
                             {getSegmentBadge(segment)}
                           </div>
                           {cleanDesc && (
-                            <span className="text-xs text-[#B8C0D4] max-w-xs block mt-0.5">{cleanDesc}</span>
+                            <span className="text-xs text-[#344054] max-w-xs block mt-0.5">{cleanDesc}</span>
                           )}
                         </div>
                       </td>
 
                       {/* Type */}
                       <td className="py-5 px-6 text-start">
-                        <span className="text-[#B8C0D4] font-semibold">
+                        <span className="text-[#344054] font-semibold">
                           {p.type === "percentage" ? t.percentageOff : t.fixedAmount}
                         </span>
                       </td>
@@ -721,7 +721,7 @@ export default function ProviderPromotionsPage() {
 
                       {/* Expiry */}
                       <td className="py-5 px-6 text-start">
-                        <span className="text-[#B8C0D4] font-medium">
+                        <span className="text-[#344054] font-medium">
                           {new Date(p.expires_at).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", {
                             day: 'numeric',
                             month: 'short',
@@ -732,7 +732,7 @@ export default function ProviderPromotionsPage() {
 
                       {/* Usage */}
                       <td className="py-5 px-6 text-center">
-                        <span className="font-bold text-white bg-white/[0.03] border border-white/[0.04] px-3 py-1 rounded-lg text-xs">
+                        <span className="font-bold text-[#101828] bg-[#F9FAFB] border border-[#ECECEC] border border-white/[0.04] px-3 py-1 rounded-lg text-xs">
                           {p.usage_count}
                         </span>
                       </td>
@@ -741,17 +741,17 @@ export default function ProviderPromotionsPage() {
                       <td className="py-5 px-6 text-center">
                         <div className="flex justify-center">
                           {isExpired ? (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#FF5D73]/10 text-[#FF5D73] border border-[#FF5D73]/20">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#FF5D73]/10 text-[#EF4444] border border-[#FF5D73]/20">
                               <span className="w-1.5 h-1.5 rounded-full bg-[#FF5D73]"></span>
                               {t.statusExpired}
                             </span>
                           ) : p.is_active ? (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#3DDC84]/10 text-[#3DDC84] border border-[#3DDC84]/20">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#3DDC84]/10 text-[#22C55E] border border-[#3DDC84]/20">
                               <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84] animate-pulse"></span>
                               {t.statusActive}
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-white/[0.04] text-[#7B859C] border border-white/[0.06]">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#F3F4F6] border border-[#ECECEC] text-[#667085] border border-[#ECECEC]">
                               <span className="w-1.5 h-1.5 rounded-full bg-[#7B859C]"></span>
                               {t.statusDisabled}
                             </span>
@@ -766,8 +766,8 @@ export default function ProviderPromotionsPage() {
                             onClick={() => togglePromoStatus(p.id)}
                             className={`px-3 py-1.5 text-[10px] font-bold rounded-lg transition-all duration-300 border ${
                               p.is_active
-                                ? "bg-[#FF5D73]/10 text-[#FF5D73] border-[#FF5D73]/20 hover:bg-[#FF5D73] hover:text-[#070B12] hover:border-transparent"
-                                : "bg-[#3DDC84]/10 text-[#3DDC84] border-[#3DDC84]/20 hover:bg-[#3DDC84] hover:text-[#070B12] hover:border-transparent"
+                                ? "bg-[#FF5D73]/10 text-[#EF4444] border-[#FF5D73]/20 hover:bg-[#FF5D73] hover:text-[#070B12] hover:border-transparent"
+                                : "bg-[#3DDC84]/10 text-[#22C55E] border-[#3DDC84]/20 hover:bg-[#3DDC84] hover:text-[#070B12] hover:border-transparent"
                             }`}
                           >
                             {p.is_active ? t.disableBtn : t.enableBtn}

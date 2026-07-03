@@ -202,18 +202,18 @@ export default function ProviderReviewsPage() {
   const isRTL = locale === "ar";
 
   return (
-    <div className="space-y-8 font-sans text-white p-1">
+    <div className="space-y-8 font-sans text-[#101828] p-1">
       {/* HEADER */}
       <div className={`flex flex-col gap-2 ${isRTL ? "text-right items-end" : "text-left items-start"}`}>
-        <h2 className="text-3xl font-extrabold tracking-tight text-white font-serif bg-clip-text bg-gradient-to-r from-white via-[#B8C0D4] to-[#7B859C]">
+        <h2 className="text-3xl font-extrabold tracking-tight text-[#101828] font-serif bg-clip-text bg-gradient-to-r from-white via-[#B8C0D4] to-[#7B859C]">
           {t.title}
         </h2>
-        <p className="text-sm text-[#B8C0D4] max-w-2xl font-light leading-relaxed">{t.subtitle}</p>
+        <p className="text-sm text-[#344054] max-w-2xl font-light leading-relaxed">{t.subtitle}</p>
         <div className="w-16 h-1 bg-[#D1AF47] rounded-full mt-1"></div>
       </div>
 
       {error && (
-        <div className={`bg-[#172033]/80 border border-[#D1AF47]/20 text-[#B8C0D4] text-xs rounded-2xl p-4 shadow-[0_0_20px_rgba(209,175,71,0.05)] backdrop-blur-md ${isRTL ? "text-right" : "text-left"}`}>
+        <div className={`bg-white border border-[#ECECEC]/80 border border-[#D1AF47]/20 text-[#344054] text-xs rounded-2xl p-4 shadow-[0_0_20px_rgba(209,175,71,0.05)] backdrop-blur-md ${isRTL ? "text-right" : "text-left"}`}>
           <span className="text-[#D1AF47] font-semibold mr-1.5">{isRTL ? "ملاحظة:" : "Notice:"}</span> {error}
         </div>
       )}
@@ -221,20 +221,20 @@ export default function ProviderReviewsPage() {
       {/* METRIC SUMMARIES */}
       <div dir={isRTL ? "rtl" : "ltr"} className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* AVERAGE RATING */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-xl transition-all duration-300 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] flex flex-col justify-between relative overflow-hidden group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-xl transition-all duration-300 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] flex flex-col justify-between relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47]/5 rounded-full blur-3xl pointer-events-none transition-all duration-300 group-hover:bg-[#D1AF47]/10" />
           <div className={isRTL ? "text-right" : "text-left"}>
-            <span className="text-[10px] uppercase font-bold text-[#7B859C] block tracking-widest">{t.avgRating}</span>
+            <span className="text-[10px] uppercase font-bold text-[#667085] block tracking-widest">{t.avgRating}</span>
             <div className={`flex items-baseline gap-2 mt-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <span className="text-4xl font-extrabold text-white tracking-tight">{averageRating}</span>
-              <span className="text-sm text-[#7B859C] font-semibold">/ 5.0</span>
+              <span className="text-4xl font-extrabold text-[#101828] tracking-tight">{averageRating}</span>
+              <span className="text-sm text-[#667085] font-semibold">/ 5.0</span>
             </div>
             <div className={`flex gap-1 mt-3.5 ${isRTL ? "justify-end" : "justify-start"}`}>
               {Array.from({ length: 5 }).map((_, i) => {
                 const ratingValue = parseFloat(averageRating);
                 const isFilled = i < Math.floor(ratingValue);
                 return (
-                  <span key={i} className={`text-base ${isFilled ? "text-[#D1AF47]" : "text-[#7B859C]/20"}`}>★</span>
+                  <span key={i} className={`text-base ${isFilled ? "text-[#D1AF47]" : "text-[#667085]/20"}`}>★</span>
                 );
               })}
             </div>
@@ -242,14 +242,14 @@ export default function ProviderReviewsPage() {
         </div>
 
         {/* TOTAL REVIEWS */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-xl transition-all duration-300 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] flex flex-col justify-between relative overflow-hidden group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-xl transition-all duration-300 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] flex flex-col justify-between relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47]/5 rounded-full blur-3xl pointer-events-none transition-all duration-300 group-hover:bg-[#D1AF47]/10" />
           <div className={isRTL ? "text-right" : "text-left"}>
-            <span className="text-[10px] uppercase font-bold text-[#7B859C] block tracking-widest">{t.totalReviews}</span>
-            <span className="text-4xl font-extrabold text-white mt-3 block tracking-tight">{reviews.length}</span>
+            <span className="text-[10px] uppercase font-bold text-[#667085] block tracking-widest">{t.totalReviews}</span>
+            <span className="text-4xl font-extrabold text-[#101828] mt-3 block tracking-tight">{reviews.length}</span>
             <div className={`flex items-center gap-1.5 mt-4 ${isRTL ? "justify-end" : "justify-start"}`}>
               <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84] animate-pulse" />
-              <span className="text-[10px] text-[#B8C0D4] font-medium tracking-wide">
+              <span className="text-[10px] text-[#344054] font-medium tracking-wide">
                 {isRTL ? "تقييمات عملاء موثقة 100%" : "100% verified customer ratings"}
               </span>
             </div>
@@ -257,23 +257,23 @@ export default function ProviderReviewsPage() {
         </div>
 
         {/* STAFF FILTER */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-xl flex flex-col justify-between relative overflow-hidden">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-xl flex flex-col justify-between relative overflow-hidden">
           <div className="space-y-3">
-            <span className={`text-[10px] uppercase font-bold text-[#7B859C] block tracking-widest ${isRTL ? "text-right" : "text-left"}`}>{t.filterStaff}</span>
+            <span className={`text-[10px] uppercase font-bold text-[#667085] block tracking-widest ${isRTL ? "text-right" : "text-left"}`}>{t.filterStaff}</span>
             <div className="relative mt-2">
               <select
                 value={selectedStaffId}
                 onChange={(e) => setSelectedStaffId(e.target.value)}
-                className={`w-full bg-[#172033] border border-white/[0.08] text-white rounded-xl px-4 py-2.5 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47]/50 font-medium transition duration-200 appearance-none ${isRTL ? "text-right pr-4 pl-8" : "text-left pl-4 pr-8"}`}
+                className={`w-full bg-white border border-[#ECECEC] border border-[#ECECEC] text-[#101828] rounded-xl px-4 py-2.5 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47]/50 font-medium transition duration-200 appearance-none ${isRTL ? "text-right pr-4 pl-8" : "text-left pl-4 pr-8"}`}
               >
-                <option value="all" className="bg-[#172033] text-white">{t.allStaff}</option>
+                <option value="all" className="bg-white border border-[#ECECEC] text-[#101828]">{t.allStaff}</option>
                 {staffList.map((emp) => (
-                  <option key={emp.id} value={emp.id} className="bg-[#172033] text-white">
+                  <option key={emp.id} value={emp.id} className="bg-white border border-[#ECECEC] text-[#101828]">
                     {locale === "ar" ? emp.name_ar : emp.name_en}
                   </option>
                 ))}
               </select>
-              <div className={`pointer-events-none absolute inset-y-0 flex items-center px-2 text-[#7B859C] ${isRTL ? "left-3" : "right-3"}`}>
+              <div className={`pointer-events-none absolute inset-y-0 flex items-center px-2 text-[#667085] ${isRTL ? "left-3" : "right-3"}`}>
                 <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                   <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
                 </svg>
@@ -287,15 +287,15 @@ export default function ProviderReviewsPage() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 space-y-4">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#D1AF47]"></div>
-          <span className="text-[#B8C0D4] text-xs font-semibold tracking-wider">
+          <span className="text-[#344054] text-xs font-semibold tracking-wider">
             {isRTL ? "جاري تحميل التقييمات..." : "Loading feedback..."}
           </span>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-16 text-center text-[#7B859C] shadow-xl font-medium text-sm max-w-lg mx-auto">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-16 text-center text-[#667085] shadow-xl font-medium text-sm max-w-lg mx-auto">
           <div className="text-4xl mb-4 text-[#D1AF47]">★</div>
-          <p className="text-white font-semibold mb-2">{t.noReviews}</p>
-          <p className="text-xs text-[#7B859C]">{isRTL ? "سيظهر تقييم العملاء هنا فور استلامه." : "Customer reviews will appear here once submitted."}</p>
+          <p className="text-[#101828] font-semibold mb-2">{t.noReviews}</p>
+          <p className="text-xs text-[#667085]">{isRTL ? "سيظهر تقييم العملاء هنا فور استلامه." : "Customer reviews will appear here once submitted."}</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -303,7 +303,7 @@ export default function ProviderReviewsPage() {
             <div
               key={rev.id}
               dir={isRTL ? "rtl" : "ltr"}
-              className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-xl space-y-5 hover:border-[#D1AF47]/20 transition-all duration-300 hover:shadow-[0_4px_30px_rgba(0,0,0,0.4)] relative overflow-hidden"
+              className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-xl space-y-5 hover:border-[#D1AF47]/20 transition-all duration-300 hover:shadow-[0_4px_30px_rgba(0,0,0,0.4)] relative overflow-hidden"
             >
               {/* Header inside review card */}
               <div className="flex justify-between items-start flex-wrap gap-4">
@@ -312,10 +312,10 @@ export default function ProviderReviewsPage() {
                     {rev.bookings?.profiles?.first_name?.[0]?.toUpperCase() || "C"}
                   </div>
                   <div className={isRTL ? "text-right" : "text-left"}>
-                    <h4 className="font-semibold text-sm text-white tracking-wide">
+                    <h4 className="font-semibold text-sm text-[#101828] tracking-wide">
                       {rev.bookings?.profiles?.first_name} {rev.bookings?.profiles?.last_name?.[0]}.
                     </h4>
-                    <span className="text-[10px] text-[#7B859C] block mt-0.5 font-light">
+                    <span className="text-[10px] text-[#667085] block mt-0.5 font-light">
                       {new Date(rev.created_at).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
                     </span>
                   </div>
@@ -326,7 +326,7 @@ export default function ProviderReviewsPage() {
                     {[1, 2, 3, 4, 5].map((star) => (
                       <span
                         key={star}
-                        className={`text-sm ${star <= rev.rating ? "text-[#D1AF47]" : "text-[#7B859C]/20"}`}
+                        className={`text-sm ${star <= rev.rating ? "text-[#D1AF47]" : "text-[#667085]/20"}`}
                       >
                         ★
                       </span>
@@ -337,31 +337,31 @@ export default function ProviderReviewsPage() {
 
               {/* Service & Stylist Tags */}
               <div className="flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-medium bg-[#172033] border border-white/[0.04] text-[#B8C0D4]">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-medium bg-white border border-[#ECECEC] border border-white/[0.04] text-[#344054]">
                   <span className="text-[#D1AF47] text-xs">✂</span>
                   <span>{t.service}: {locale === "ar" ? rev.bookings?.services?.name_ar : rev.bookings?.services?.name_en}</span>
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-medium bg-[#172033] border border-white/[0.04] text-[#B8C0D4]">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-medium bg-white border border-[#ECECEC] border border-white/[0.04] text-[#344054]">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47]" />
                   <span>{locale === "ar" ? rev.bookings?.employees?.name_ar : rev.bookings?.employees?.name_en}</span>
                 </span>
               </div>
 
               {/* Client comment */}
-              <p className="text-xs text-[#B8C0D4] bg-[#0D1422] border border-white/[0.04] rounded-2xl p-4 leading-relaxed font-light">
+              <p className="text-xs text-[#344054] bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-white/[0.04] rounded-2xl p-4 leading-relaxed font-light">
                 "{rev.comment}"
               </p>
 
               {/* Salon Response section */}
               {rev.reply_comment ? (
-                <div className={`bg-[#172033]/60 text-white rounded-2xl p-4 space-y-2 relative border border-[#D1AF47]/10 shadow-[0_0_15px_rgba(209,175,71,0.02)] ${isRTL ? "mr-6 ml-0 border-r-2 border-r-[#D1AF47]" : "ml-6 mr-0 border-l-2 border-l-[#D1AF47]"}`}>
+                <div className={`bg-white border border-[#ECECEC]/60 text-[#101828] rounded-2xl p-4 space-y-2 relative border border-[#D1AF47]/10 shadow-[0_0_15px_rgba(209,175,71,0.02)] ${isRTL ? "mr-6 ml-0 border-r-2 border-r-[#D1AF47]" : "ml-6 mr-0 border-l-2 border-l-[#D1AF47]"}`}>
                   <div className={`flex items-center justify-between ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                     <span className="text-[10px] uppercase font-bold text-[#D1AF47] tracking-widest block font-serif">
                       {isRTL ? "رد المركز" : "Salon Response"}
                     </span>
-                    <span className="text-[10px] text-[#3DDC84] font-semibold">✓</span>
+                    <span className="text-[10px] text-[#22C55E] font-semibold">✓</span>
                   </div>
-                  <p className="text-xs leading-relaxed text-[#B8C0D4] font-medium">{rev.reply_comment}</p>
+                  <p className="text-xs leading-relaxed text-[#344054] font-medium">{rev.reply_comment}</p>
                 </div>
               ) : replyingReviewId !== rev.id ? (
                 <div className={`pt-1 ${isRTL ? "text-left" : "text-right"}`}>
@@ -370,7 +370,7 @@ export default function ProviderReviewsPage() {
                       setReplyingReviewId(rev.id);
                       setReplyText("");
                     }}
-                    className="px-4 py-2 border border-white/[0.08] hover:border-[#D1AF47] text-[10px] font-bold uppercase tracking-wider rounded-xl text-white transition-all duration-300 bg-[#172033] hover:bg-[#1d2942] hover:shadow-[0_0_15px_rgba(209,175,71,0.15)]"
+                    className="px-4 py-2 border border-[#ECECEC] hover:border-[#D1AF47] text-[10px] font-bold uppercase tracking-wider rounded-xl text-[#101828] transition-all duration-300 bg-white border border-[#ECECEC] hover:bg-[#1d2942] hover:shadow-[0_0_15px_rgba(209,175,71,0.15)]"
                   >
                     {t.reply}
                   </button>
@@ -382,18 +382,18 @@ export default function ProviderReviewsPage() {
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                     placeholder={t.replyPlaceholder}
-                    className="w-full bg-[#0D1422] border border-white/[0.08] rounded-xl p-4 text-xs text-white placeholder-[#7B859C] outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] transition duration-200"
+                    className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl p-4 text-xs text-[#101828] placeholder-[#7B859C] outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] transition duration-200"
                   />
                   <div className="flex gap-3 justify-end">
                     <button
                       onClick={() => setReplyingReviewId(null)}
-                      className="px-4 py-2 border border-white/[0.08] text-[10px] font-bold uppercase tracking-wider text-[#B8C0D4] rounded-xl hover:text-white hover:border-white/20 transition-all duration-300"
+                      className="px-4 py-2 border border-[#ECECEC] text-[10px] font-bold uppercase tracking-wider text-[#344054] rounded-xl hover:text-[#101828] hover:border-white/20 transition-all duration-300"
                     >
                       {isRTL ? "إلغاء" : "Cancel"}
                     </button>
                     <button
                       onClick={() => postReply(rev.id)}
-                      className="px-4 py-2 bg-gradient-to-r from-[#D1AF47] to-[#B8952E] text-white font-bold text-[10px] uppercase tracking-wider rounded-xl hover:from-[#E0C46A] hover:to-[#D1AF47] transition-all duration-300 shadow-[0_4px_15px_rgba(209,175,71,0.2)]"
+                      className="px-4 py-2 bg-gradient-to-r from-[#D1AF47] to-[#B8952E] text-[#101828] font-bold text-[10px] uppercase tracking-wider rounded-xl hover:from-[#E0C46A] hover:to-[#D1AF47] transition-all duration-300 shadow-[0_4px_15px_rgba(209,175,71,0.2)]"
                     >
                       {t.postReply}
                     </button>

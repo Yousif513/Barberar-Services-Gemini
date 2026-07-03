@@ -119,13 +119,13 @@ export default function ProviderMessages() {
   );
 
   return (
-    <div className="bg-[#111827] border border-white/5 rounded-[28px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex h-[calc(100vh-12rem)] min-h-[550px] text-white">
+    <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[28px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex h-[calc(100vh-12rem)] min-h-[550px] text-[#101828]">
       
       {/* 1. CHATS SIDEBAR PANEL */}
-      <div className="w-80 border-r border-white/5 flex flex-col justify-between bg-gradient-to-b from-[#1A2236] to-[#0D1422] flex-shrink-0">
+      <div className="w-80 border-r border-[#ECECEC] flex flex-col justify-between bg-gradient-to-b from-[#1A2236] to-[#0D1422] flex-shrink-0">
         
         {/* Sidebar Header */}
-        <div className="p-5 border-b border-white/5 space-y-4">
+        <div className="p-5 border-b border-[#ECECEC] space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-extrabold text-[10px] text-[#D1AF47] uppercase tracking-[0.2em]">Client Inbox</h3>
             <div className="w-2 h-2 rounded-full bg-[#D1AF47] shadow-[0_0_10px_#D1AF47] animate-pulse"></div>
@@ -138,15 +138,15 @@ export default function ProviderMessages() {
               placeholder="Search clients..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#111827]/80 border border-white/5 rounded-xl px-4 py-2.5 pl-9 text-xs text-white placeholder-[#7B859C] outline-none focus:border-[#D1AF47]/40 focus:bg-[#111827] transition-all duration-300"
+              className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]/80 border border-[#ECECEC] rounded-xl px-4 py-2.5 pl-9 text-xs text-[#101828] placeholder-[#7B859C] outline-none focus:border-[#D1AF47]/40 focus:bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] transition-all duration-300"
             />
-            <svg className="absolute left-3.5 top-3 w-3.5 h-3.5 text-[#7B859C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="absolute left-3.5 top-3 w-3.5 h-3.5 text-[#667085]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             {searchQuery && (
               <button 
                 onClick={() => setSearchQuery("")} 
-                className="absolute right-3 top-3 text-[#7B859C] hover:text-white transition-colors"
+                className="absolute right-3 top-3 text-[#667085] hover:text-[#101828] transition-colors"
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
@@ -170,8 +170,8 @@ export default function ProviderMessages() {
                   }}
                   className={`relative p-3.5 rounded-2xl cursor-pointer transition-all duration-300 flex items-center gap-3 border group ${
                     isSelected 
-                      ? "bg-[#172033] border-[#D1AF47]/30 shadow-[0_0_20px_rgba(209,175,71,0.08)]" 
-                      : "border-transparent bg-transparent hover:bg-white/[0.02] hover:border-white/5"
+                      ? "bg-white border border-[#ECECEC] border-[#D1AF47]/30 shadow-[0_0_20px_rgba(209,175,71,0.08)]" 
+                      : "border-transparent bg-transparent hover:bg-transparent hover:border-[#ECECEC]"
                   }`}
                 >
                   {/* Avatar wrapper */}
@@ -179,7 +179,7 @@ export default function ProviderMessages() {
                     <div className={`p-[2px] rounded-full transition-all duration-300 ${
                       isSelected ? "bg-[#D1AF47]" : "bg-transparent group-hover:bg-[#D1AF47]/40"
                     }`}>
-                      <img src={conv.avatar} alt={conv.name} className="w-10 h-10 rounded-full object-cover bg-[#111827] border border-[#0D1422]" />
+                      <img src={conv.avatar} alt={conv.name} className="w-10 h-10 rounded-full object-cover bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#0D1422]" />
                     </div>
                     {conv.online && (
                       <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#3DDC84] border-2 border-[#0D1422] shadow-[0_0_8px_rgba(61,220,132,0.6)]">
@@ -192,9 +192,9 @@ export default function ProviderMessages() {
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-center justify-between gap-1">
                       <h4 className={`font-bold text-xs truncate transition-colors duration-300 ${
-                        isSelected ? "text-white" : "text-[#B8C0D4] group-hover:text-white"
+                        isSelected ? "text-[#101828]" : "text-[#344054] group-hover:text-[#101828]"
                       }`}>{conv.name}</h4>
-                      <span className="text-[9px] font-semibold text-[#7B859C] flex-shrink-0">{conv.time}</span>
+                      <span className="text-[9px] font-semibold text-[#667085] flex-shrink-0">{conv.time}</span>
                     </div>
                     
                     <div className="flex items-center gap-1.5">
@@ -202,14 +202,14 @@ export default function ProviderMessages() {
                         {conv.role}
                       </span>
                       {conv.unread && (
-                        <span className="px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase bg-[#FF5D73]/15 text-[#FF5D73] border border-[#FF5D73]/30 tracking-wider">
+                        <span className="px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase bg-[#FF5D73]/15 text-[#EF4444] border border-[#FF5D73]/30 tracking-wider">
                           New
                         </span>
                       )}
                     </div>
                     
                     <p className={`text-[10.5px] truncate mt-1 ${
-                      conv.unread ? "text-white font-medium" : "text-[#7B859C]"
+                      conv.unread ? "text-[#101828] font-medium" : "text-[#667085]"
                     }`}>
                       {conv.lastMessage}
                     </p>
@@ -223,24 +223,24 @@ export default function ProviderMessages() {
             })
           ) : (
             <div className="flex flex-col items-center justify-center py-8 text-center px-4">
-              <svg className="w-8 h-8 text-[#7B859C] mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-[#667085] mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
-              <p className="text-xs text-[#7B859C] font-medium">No conversations found</p>
+              <p className="text-xs text-[#667085] font-medium">No conversations found</p>
             </div>
           )}
         </div>
       </div>
 
       {/* 2. CHAT CONSOLE PANEL */}
-      <div className="flex-1 flex flex-col justify-between bg-[#111827] min-w-0">
+      <div className="flex-1 flex flex-col justify-between bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] min-w-0">
         
         {/* Header */}
-        <div className="h-20 px-6 border-b border-white/5 flex items-center justify-between bg-[#0D1422]/30 backdrop-blur-md flex-shrink-0">
+        <div className="h-20 px-6 border-b border-[#ECECEC] flex items-center justify-between bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]/30 backdrop-blur-md flex-shrink-0">
           <div className="flex items-center gap-4">
             <div className="relative">
               <div className="p-[2px] rounded-full bg-gradient-to-tr from-[#D1AF47] to-[#B8952E] shadow-[0_0_15px_rgba(209,175,71,0.2)]">
-                <img src={activeConv.avatar} alt={activeConv.name} className="w-10 h-10 rounded-full object-cover bg-[#111827] border border-[#070B12]" />
+                <img src={activeConv.avatar} alt={activeConv.name} className="w-10 h-10 rounded-full object-cover bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#070B12]" />
               </div>
               {activeConv.online && (
                 <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#3DDC84] border-2 border-[#070B12] shadow-[0_0_8px_rgba(61,220,132,0.6)]">
@@ -249,10 +249,10 @@ export default function ProviderMessages() {
               )}
             </div>
             <div>
-              <h4 className="font-bold text-sm text-white tracking-wide">{activeConv.name}</h4>
+              <h4 className="font-bold text-sm text-[#101828] tracking-wide">{activeConv.name}</h4>
               <div className="flex items-center gap-2 mt-0.5">
                 <span className={`w-1.5 h-1.5 rounded-full ${activeConv.online ? "bg-[#3DDC84]" : "bg-[#7B859C]"}`} />
-                <p className="text-[10px] text-[#B8C0D4] font-semibold tracking-wider uppercase">
+                <p className="text-[10px] text-[#344054] font-semibold tracking-wider uppercase">
                   {activeConv.online ? "Online" : "Offline"} | {activeConv.role}
                 </p>
               </div>
@@ -282,7 +282,7 @@ export default function ProviderMessages() {
                     <img
                       src={activeConv.avatar}
                       alt={activeConv.name}
-                      className="w-7 h-7 rounded-full object-cover border border-white/5 flex-shrink-0 shadow-sm"
+                      className="w-7 h-7 rounded-full object-cover border border-[#ECECEC] flex-shrink-0 shadow-sm"
                     />
                   )}
                   
@@ -291,19 +291,19 @@ export default function ProviderMessages() {
                       className={`rounded-[20px] px-5 py-3.5 border transition-all duration-300 ${
                         isProvider
                           ? "bg-gradient-to-r from-[#D1AF47] to-[#B8952E] text-slate-950 border-transparent font-medium shadow-[0_4px_20px_rgba(209,175,71,0.15)] rounded-br-none"
-                          : "bg-[#172033] text-white border-white/5 shadow-md rounded-bl-none"
+                          : "bg-white border border-[#ECECEC] text-[#101828] border-[#ECECEC] shadow-md rounded-bl-none"
                       }`}
                     >
                       <p className="text-xs leading-relaxed tracking-wide font-light">{msg.text}</p>
                     </div>
-                    <span className="text-[9px] mt-1.5 font-medium tracking-wider text-[#7B859C]">
+                    <span className="text-[9px] mt-1.5 font-medium tracking-wider text-[#667085]">
                       {msg.time}
                     </span>
                   </div>
 
                   {/* Avatar for Provider ( Ahmed ) */}
                   {isProvider && (
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#1A2236] to-[#0D1422] border border-white/10 flex items-center justify-center flex-shrink-0 shadow-sm">
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#1A2236] to-[#0D1422] border border-[#ECECEC] flex items-center justify-center flex-shrink-0 shadow-sm">
                       <span className="text-[10px] text-[#D1AF47] font-bold">P</span>
                     </div>
                   )}
@@ -312,11 +312,11 @@ export default function ProviderMessages() {
             })
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-center opacity-50 py-12">
-              <svg className="w-12 h-12 text-[#7B859C] mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-12 h-12 text-[#667085] mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
-              <h5 className="font-bold text-sm text-white tracking-wide">Start the Conversation</h5>
-              <p className="text-xs text-[#7B859C] mt-1">Send a message to begin chatting with {activeConv.name}</p>
+              <h5 className="font-bold text-sm text-[#101828] tracking-wide">Start the Conversation</h5>
+              <p className="text-xs text-[#667085] mt-1">Send a message to begin chatting with {activeConv.name}</p>
             </div>
           )}
 
@@ -326,15 +326,15 @@ export default function ProviderMessages() {
               <img
                 src={activeConv.avatar}
                 alt={activeConv.name}
-                className="w-7 h-7 rounded-full object-cover border border-white/5 flex-shrink-0 shadow-sm"
+                className="w-7 h-7 rounded-full object-cover border border-[#ECECEC] flex-shrink-0 shadow-sm"
               />
               <div className="flex flex-col items-start max-w-[70%]">
-                <div className="bg-[#172033] text-[#B8C0D4] border border-white/5 shadow-md rounded-[20px] rounded-bl-none px-5 py-3.5 flex items-center gap-1.5">
+                <div className="bg-white border border-[#ECECEC] text-[#344054] border border-[#ECECEC] shadow-md rounded-[20px] rounded-bl-none px-5 py-3.5 flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47] animate-bounce" style={{ animationDelay: "0ms" }}></span>
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47] animate-bounce" style={{ animationDelay: "150ms" }}></span>
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47] animate-bounce" style={{ animationDelay: "300ms" }}></span>
                 </div>
-                <span className="text-[9px] mt-1.5 font-medium tracking-wider text-[#7B859C]">
+                <span className="text-[9px] mt-1.5 font-medium tracking-wider text-[#667085]">
                   {activeConv.name} is typing...
                 </span>
               </div>
@@ -345,8 +345,8 @@ export default function ProviderMessages() {
         </div>
 
         {/* Footer Input */}
-        <div className="p-5 border-t border-white/5 bg-[#0D1422]/90 backdrop-blur-md flex items-center gap-3 flex-shrink-0">
-          <button className="p-3 text-[#7B859C] hover:text-[#D1AF47] hover:bg-white/[0.04] rounded-2xl border border-white/5 transition-all duration-300 active:scale-95 cursor-pointer">
+        <div className="p-5 border-t border-[#ECECEC] bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]/90 backdrop-blur-md flex items-center gap-3 flex-shrink-0">
+          <button className="p-3 text-[#667085] hover:text-[#D1AF47] hover:bg-[#F3F4F6] border border-[#ECECEC] rounded-2xl border border-[#ECECEC] transition-all duration-300 active:scale-95 cursor-pointer">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
             </svg>
@@ -359,7 +359,7 @@ export default function ProviderMessages() {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              className="w-full bg-[#111827] border border-white/5 rounded-2xl px-5 py-3.5 pr-12 text-xs outline-none focus:border-[#D1AF47]/40 text-white placeholder-[#7B859C] font-normal transition-all duration-300 focus:shadow-[0_0_20px_rgba(209,175,71,0.06)]"
+              className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl px-5 py-3.5 pr-12 text-xs outline-none focus:border-[#D1AF47]/40 text-[#101828] placeholder-[#7B859C] font-normal transition-all duration-300 focus:shadow-[0_0_20px_rgba(209,175,71,0.06)]"
             />
           </div>
 

@@ -173,8 +173,8 @@ export default function ProviderWalletPage() {
   };
 
   const payoutStatusClass = (status: string) => {
-    if (status === "paid") return "bg-[#3DDC84]/10 text-[#3DDC84] border-[#3DDC84]/20";
-    if (status === "rejected") return "bg-[#FF5D73]/10 text-[#FF5D73] border-[#FF5D73]/20";
+    if (status === "paid") return "bg-[#3DDC84]/10 text-[#22C55E] border-[#3DDC84]/20";
+    if (status === "rejected") return "bg-[#FF5D73]/10 text-[#EF4444] border-[#FF5D73]/20";
     if (status === "processing") return "bg-[#D1AF47]/10 text-[#D1AF47] border-[#D1AF47]/20";
     return "bg-[#F5B041]/10 text-[#F5B041] border-[#F5B041]/20";
   };
@@ -382,7 +382,7 @@ export default function ProviderWalletPage() {
         <h2 className="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-[#D1AF47] to-[#B8952E] font-sans">
           {t.walletTitle}
         </h2>
-        <p className="text-sm text-[#B8C0D4] mt-2 font-medium tracking-wide">
+        <p className="text-sm text-[#344054] mt-2 font-medium tracking-wide">
           {t.subtitle}
         </p>
       </div>
@@ -394,9 +394,9 @@ export default function ProviderWalletPage() {
       )}
 
       {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-white">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-[#101828]">
         {/* Available Balance (Luxury Credit Card Aesthetic) */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-[#172033] via-[#0D1422] to-[#070B12] border border-white/5 rounded-[24px] p-8 shadow-[0_0_30px_rgba(209,175,71,0.08)] flex flex-col justify-between min-h-[240px] group hover:border-[#D1AF47]/25 transition-all duration-300">
+        <div className="relative overflow-hidden bg-gradient-to-br from-[#172033] via-[#0D1422] to-[#070B12] border border-[#ECECEC] rounded-[24px] p-8 shadow-[0_0_30px_rgba(209,175,71,0.08)] flex flex-col justify-between min-h-[240px] group hover:border-[#D1AF47]/25 transition-all duration-300">
           {/* Shimmer/radial gradient reflection effects */}
           <div className="absolute -top-20 -right-20 w-48 h-48 bg-[#D1AF47]/10 rounded-full blur-[80px] pointer-events-none transition-all duration-500 group-hover:bg-[#D1AF47]/15"></div>
           <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-[#B8952E]/5 rounded-full blur-[80px] pointer-events-none"></div>
@@ -412,7 +412,7 @@ export default function ProviderWalletPage() {
                 <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-black/20"></div>
               </div>
               {/* Contactless symbol */}
-              <svg className="w-5 h-5 text-[#B8C0D4]/30 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-[#344054]/30 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
@@ -423,11 +423,11 @@ export default function ProviderWalletPage() {
 
           {/* Card Balance */}
           <div className="mb-6">
-            <p className="text-[10px] font-bold tracking-widest text-[#B8C0D4]/60 uppercase mb-2">
+            <p className="text-[10px] font-bold tracking-widest text-[#344054]/60 uppercase mb-2">
               {t.availableBalance}
             </p>
             <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-extrabold text-[#FFFFFF] tracking-tight">
+              <span className="text-4xl font-extrabold text-[#101828] tracking-tight">
                 {availableBalance.toLocaleString()}.00
               </span>
               <span className="text-sm font-bold text-[#D1AF47] tracking-wider">
@@ -447,17 +447,17 @@ export default function ProviderWalletPage() {
         </div>
 
         {/* Pending Payout */}
-        <div className="bg-[#111827] border border-white/5 rounded-[24px] p-8 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[240px] group hover:border-[#D1AF47]/15 transition-all duration-300">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-8 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[240px] group hover:border-[#D1AF47]/15 transition-all duration-300">
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-white/[0.01] to-transparent rounded-bl-full pointer-events-none"></div>
           
           <div>
             <div className="flex justify-between items-start mb-6">
               <div>
-                <p className="text-[10px] font-bold tracking-widest text-[#B8C0D4]/60 uppercase mb-2">
+                <p className="text-[10px] font-bold tracking-widest text-[#344054]/60 uppercase mb-2">
                   {t.pendingPayout}
                 </p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-extrabold text-[#FFFFFF] tracking-tight">
+                  <span className="text-3xl font-extrabold text-[#101828] tracking-tight">
                     {pendingPayout.toLocaleString()}.00
                   </span>
                   <span className="text-sm font-bold text-[#D1AF47] tracking-wider">
@@ -467,7 +467,7 @@ export default function ProviderWalletPage() {
               </div>
               
               {/* Icon with gradient background */}
-              <div className="p-3.5 rounded-2xl bg-gradient-to-br from-[#1A2236] to-[#0D1422] text-[#D1AF47] border border-white/5 shadow-inner">
+              <div className="p-3.5 rounded-2xl bg-gradient-to-br from-[#1A2236] to-[#0D1422] text-[#D1AF47] border border-[#ECECEC] shadow-inner">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -475,8 +475,8 @@ export default function ProviderWalletPage() {
             </div>
           </div>
           
-          <div className="mt-auto pt-4 border-t border-white/5">
-            <p className="text-[10px] text-[#7B859C] flex items-center gap-2">
+          <div className="mt-auto pt-4 border-t border-[#ECECEC]">
+            <p className="text-[10px] text-[#667085] flex items-center gap-2">
               <svg className="w-4 h-4 text-[#D1AF47] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -486,17 +486,17 @@ export default function ProviderWalletPage() {
         </div>
 
         {/* Escrow Held */}
-        <div className="bg-[#111827] border border-white/5 rounded-[24px] p-8 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[240px] group hover:border-[#D1AF47]/15 transition-all duration-300">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-8 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[240px] group hover:border-[#D1AF47]/15 transition-all duration-300">
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-white/[0.01] to-transparent rounded-bl-full pointer-events-none"></div>
           
           <div>
             <div className="flex justify-between items-start mb-6">
               <div>
-                <p className="text-[10px] font-bold tracking-widest text-[#B8C0D4]/60 uppercase mb-2">
+                <p className="text-[10px] font-bold tracking-widest text-[#344054]/60 uppercase mb-2">
                   {t.escrowHeld}
                 </p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-extrabold text-[#FFFFFF] tracking-tight">
+                  <span className="text-3xl font-extrabold text-[#101828] tracking-tight">
                     530.00
                   </span>
                   <span className="text-sm font-bold text-[#D1AF47] tracking-wider">
@@ -506,7 +506,7 @@ export default function ProviderWalletPage() {
               </div>
               
               {/* Icon with gradient background */}
-              <div className="p-3.5 rounded-2xl bg-gradient-to-br from-[#1A2236] to-[#0D1422] text-[#D1AF47] border border-white/5 shadow-inner">
+              <div className="p-3.5 rounded-2xl bg-gradient-to-br from-[#1A2236] to-[#0D1422] text-[#D1AF47] border border-[#ECECEC] shadow-inner">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
@@ -514,8 +514,8 @@ export default function ProviderWalletPage() {
             </div>
           </div>
           
-          <div className="mt-auto pt-4 border-t border-white/5">
-            <p className="text-[10px] text-[#7B859C] flex items-center gap-2">
+          <div className="mt-auto pt-4 border-t border-[#ECECEC]">
+            <p className="text-[10px] text-[#667085] flex items-center gap-2">
               <svg className="w-4 h-4 text-[#D1AF47] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
@@ -526,31 +526,31 @@ export default function ProviderWalletPage() {
       </div>
 
       {/* Linked Bank details */}
-      <div className="bg-[#111827] border border-white/5 rounded-[24px] p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 text-white shadow-xl hover:border-[#D1AF47]/10 transition-all duration-300">
+      <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 text-[#101828] shadow-xl hover:border-[#D1AF47]/10 transition-all duration-300">
         <div className="flex items-center gap-4">
-          <div className="p-3.5 rounded-2xl bg-gradient-to-br from-[#1A2236] to-[#0D1422] text-[#D1AF47] border border-white/5">
+          <div className="p-3.5 rounded-2xl bg-gradient-to-br from-[#1A2236] to-[#0D1422] text-[#D1AF47] border border-[#ECECEC]">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
             </svg>
           </div>
           <div>
-            <h3 className="font-bold text-[10px] tracking-widest text-[#7B859C] uppercase">{t.payoutBank}</h3>
-            <p className="text-sm font-semibold text-[#FFFFFF] mt-1">{t.bankName}</p>
-            <p className="text-xs text-[#B8C0D4] font-mono tracking-wider mt-0.5">{t.iban}</p>
+            <h3 className="font-bold text-[10px] tracking-widest text-[#667085] uppercase">{t.payoutBank}</h3>
+            <p className="text-sm font-semibold text-[#101828] mt-1">{t.bankName}</p>
+            <p className="text-xs text-[#344054] font-mono tracking-wider mt-0.5">{t.iban}</p>
           </div>
         </div>
-        <span className="px-4 py-2 bg-[#3DDC84]/10 text-[#3DDC84] rounded-full text-xs font-bold flex items-center gap-2 border border-[#3DDC84]/20 shadow-[0_0_15px_rgba(61,220,132,0.1)] transition-all duration-300 hover:scale-105">
+        <span className="px-4 py-2 bg-[#3DDC84]/10 text-[#22C55E] rounded-full text-xs font-bold flex items-center gap-2 border border-[#3DDC84]/20 shadow-[0_0_15px_rgba(61,220,132,0.1)] transition-all duration-300 hover:scale-105">
           <span className="w-2 h-2 rounded-full bg-[#3DDC84] animate-pulse"></span>
           {t.verified}
         </span>
       </div>
 
       {/* Payout Requests */}
-      <div className="bg-[#111827] border border-white/5 rounded-[24px] p-8 shadow-xl text-white">
+      <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-8 shadow-xl text-[#101828]">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
-            <h3 className="text-lg font-bold tracking-tight text-[#FFFFFF]">{t.payoutRequests}</h3>
-            <p className="text-xs text-[#7B859C] mt-1">{t.payoutRequestsSubtitle}</p>
+            <h3 className="text-lg font-bold tracking-tight text-[#101828]">{t.payoutRequests}</h3>
+            <p className="text-xs text-[#667085] mt-1">{t.payoutRequestsSubtitle}</p>
           </div>
           <span className="rounded-full border border-[#D1AF47]/20 bg-[#D1AF47]/10 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-[#D1AF47]">
             {payoutRequests.length} {t.statusPending}
@@ -560,7 +560,7 @@ export default function ProviderWalletPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left border-collapse">
             <thead>
-              <tr className="border-b border-white/5 text-[#7B859C] text-[10px] uppercase tracking-wider bg-[#0D1422]/30">
+              <tr className="border-b border-[#ECECEC] text-[#667085] text-[10px] uppercase tracking-wider bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]/30">
                 <th className="py-4 px-6 text-start font-bold">{t.payoutRequestId}</th>
                 <th className="py-4 px-6 text-start font-bold">{t.payoutRequestedAt}</th>
                 <th className="py-4 px-6 text-start font-bold">{t.payoutAmount}</th>
@@ -572,32 +572,32 @@ export default function ProviderWalletPage() {
             <tbody className="divide-y divide-white/5">
               {loadingLedger ? (
                 <tr>
-                  <td colSpan={6} className="py-10 text-center text-[#7B859C]">
+                  <td colSpan={6} className="py-10 text-center text-[#667085]">
                     {lang === "ar" ? "جاري تحميل طلبات التحويل..." : "Loading payout requests..."}
                   </td>
                 </tr>
               ) : payoutRequests.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-10 text-center text-[#7B859C]">
+                  <td colSpan={6} className="py-10 text-center text-[#667085]">
                     {t.noPayoutRequests}
                   </td>
                 </tr>
               ) : (
                 payoutRequests.map((request) => (
                   <tr key={request.id} className="hover:bg-white/[0.01] transition-all duration-300">
-                    <td className="py-4 px-6 font-mono font-bold text-xs tracking-wider text-white">
+                    <td className="py-4 px-6 font-mono font-bold text-xs tracking-wider text-[#101828]">
                       {request.id.slice(0, 8).toUpperCase()}
                     </td>
-                    <td className="py-4 px-6 text-[#B8C0D4] text-xs font-medium">
+                    <td className="py-4 px-6 text-[#344054] text-xs font-medium">
                       {request.requestedAt}
                     </td>
-                    <td className="py-4 px-6 font-bold text-white">
+                    <td className="py-4 px-6 font-bold text-[#101828]">
                       {request.amount}
                     </td>
-                    <td className="py-4 px-6 text-[#B8C0D4] text-xs font-semibold">
+                    <td className="py-4 px-6 text-[#344054] text-xs font-semibold">
                       {request.bankName}
                     </td>
-                    <td className="py-4 px-6 text-[#B8C0D4] text-xs font-mono">
+                    <td className="py-4 px-6 text-[#344054] text-xs font-mono">
                       {request.iban}
                     </td>
                     <td className="py-4 px-6 text-center">
@@ -614,20 +614,20 @@ export default function ProviderWalletPage() {
       </div>
 
       {/* Transactions Splits Ledger */}
-      <div className="bg-[#111827] border border-white/5 rounded-[24px] p-8 shadow-xl text-white">
+      <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-8 shadow-xl text-[#101828]">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
-            <h3 className="text-lg font-bold tracking-tight text-[#FFFFFF]">{t.transactionLedger}</h3>
-            <p className="text-xs text-[#7B859C] mt-1">{lang === "ar" ? "تتبع توزيع المبالغ بين المنصة وحصتك" : "Track how captured payments are split and transferred"}</p>
+            <h3 className="text-lg font-bold tracking-tight text-[#101828]">{t.transactionLedger}</h3>
+            <p className="text-xs text-[#667085] mt-1">{lang === "ar" ? "تتبع توزيع المبالغ بين المنصة وحصتك" : "Track how captured payments are split and transferred"}</p>
           </div>
           <div className="flex items-center gap-4 text-xs font-medium">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded bg-[#FF5D73]"></span>
-              <span className="text-[#B8C0D4]">{lang === "ar" ? "عمولة المنصة (15%)" : "Platform (15%)"}</span>
+              <span className="text-[#344054]">{lang === "ar" ? "عمولة المنصة (15%)" : "Platform (15%)"}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded bg-[#3DDC84]"></span>
-              <span className="text-[#B8C0D4]">{lang === "ar" ? "صافي الصالون (85%)" : "Net Salon (85%)"}</span>
+              <span className="text-[#344054]">{lang === "ar" ? "صافي الصالون (85%)" : "Net Salon (85%)"}</span>
             </div>
           </div>
         </div>
@@ -635,7 +635,7 @@ export default function ProviderWalletPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left border-collapse">
             <thead>
-              <tr className="border-b border-white/5 text-[#7B859C] text-[10px] uppercase tracking-wider bg-[#0D1422]/30">
+              <tr className="border-b border-[#ECECEC] text-[#667085] text-[10px] uppercase tracking-wider bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]/30">
                 <th className="py-4 px-6 text-start font-bold">{t.bookingId}</th>
                 <th className="py-4 px-6 text-start font-bold">{t.created}</th>
                 <th className="py-4 px-6 text-start font-bold">{t.totalCaptured}</th>
@@ -647,7 +647,7 @@ export default function ProviderWalletPage() {
             <tbody className="divide-y divide-white/5">
               {loadingLedger ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-[#7B859C]">
+                  <td colSpan={6} className="py-12 text-center text-[#667085]">
                     <div className="flex items-center justify-center gap-2">
                       <svg className="animate-spin h-5 w-5 text-[#D1AF47]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -659,28 +659,28 @@ export default function ProviderWalletPage() {
                 </tr>
               ) : ledgerEntries.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-[#7B859C]">
+                  <td colSpan={6} className="py-12 text-center text-[#667085]">
                     {lang === "ar" ? "لا توجد معاملات بعد" : "No transactions found"}
                   </td>
                 </tr>
               ) : (
                 ledgerEntries.map((entry) => (
                   <tr key={entry.id} className="hover:bg-white/[0.01] transition-all duration-300 group">
-                    <td className="py-4 px-6 font-mono font-bold text-xs tracking-wider text-white">
+                    <td className="py-4 px-6 font-mono font-bold text-xs tracking-wider text-[#101828]">
                       {entry.id}
                     </td>
-                    <td className="py-4 px-6 text-[#B8C0D4] text-xs font-medium">
+                    <td className="py-4 px-6 text-[#344054] text-xs font-medium">
                       {entry.date}
                     </td>
-                    <td className="py-4 px-6 font-bold text-white">
+                    <td className="py-4 px-6 font-bold text-[#101828]">
                       {entry.total}
                     </td>
-                    <td className="py-4 px-6 text-[#FF5D73] font-semibold text-xs">
+                    <td className="py-4 px-6 text-[#EF4444] font-semibold text-xs">
                       {entry.platform}
                     </td>
                     <td className="py-4 px-6">
                       <div>
-                        <span className="text-[#3DDC84] font-bold">{entry.salon}</span>
+                        <span className="text-[#22C55E] font-bold">{entry.salon}</span>
                         {/* Splits visual indicator */}
                         <div className="mt-2 w-24 bg-white/5 h-1 rounded-full overflow-hidden flex">
                           <div className="bg-[#FF5D73] h-full" style={{ width: "15%" }}></div>
@@ -691,7 +691,7 @@ export default function ProviderWalletPage() {
                     <td className="py-4 px-6 text-center">
                       <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border transition-all duration-300 ${
                         entry.status === t.statusPaid 
-                          ? "bg-[#3DDC84]/10 text-[#3DDC84] border-[#3DDC84]/20 shadow-[0_0_10px_rgba(61,220,132,0.05)]" 
+                          ? "bg-[#3DDC84]/10 text-[#22C55E] border-[#3DDC84]/20 shadow-[0_0_10px_rgba(61,220,132,0.05)]" 
                           : "bg-[#F5B041]/10 text-[#F5B041] border-[#F5B041]/20 shadow-[0_0_10px_rgba(245,176,65,0.05)]"
                       }`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${
@@ -711,17 +711,17 @@ export default function ProviderWalletPage() {
       {/* REQUEST PAYOUT MODAL */}
       {showPayoutModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-[fadeIn_0.25s_ease-out]">
-          <div className="relative bg-[#111827] border border-white/5 rounded-[28px] w-full max-w-md p-8 shadow-[0_0_50px_rgba(209,175,71,0.15)] space-y-6 overflow-hidden">
+          <div className="relative bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[28px] w-full max-w-md p-8 shadow-[0_0_50px_rgba(209,175,71,0.15)] space-y-6 overflow-hidden">
             {/* Decorative premium card light in the modal corner */}
             <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#D1AF47]/5 rounded-full blur-[60px] pointer-events-none"></div>
 
-            <div className="flex items-center justify-between border-b border-white/5 pb-4">
-              <h3 className="text-lg font-bold tracking-tight text-white">
+            <div className="flex items-center justify-between border-b border-[#ECECEC] pb-4">
+              <h3 className="text-lg font-bold tracking-tight text-[#101828]">
                 {t.payoutModalTitle}
               </h3>
               <button
                 onClick={() => setShowPayoutModal(false)}
-                className="text-[#7B859C] hover:text-white p-1 rounded-lg hover:bg-white/5 transition-colors"
+                className="text-[#667085] hover:text-[#101828] p-1 rounded-lg hover:bg-white/5 transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
@@ -731,7 +731,7 @@ export default function ProviderWalletPage() {
 
             <form onSubmit={handleRequestPayout} className="space-y-5">
               <div>
-                <label className="text-[10px] uppercase font-bold tracking-widest text-[#B8C0D4] block mb-2">
+                <label className="text-[10px] uppercase font-bold tracking-widest text-[#344054] block mb-2">
                   {t.payoutAmountLabel}
                 </label>
                 <div className="relative">
@@ -741,7 +741,7 @@ export default function ProviderWalletPage() {
                     min="1"
                     value={payoutAmount}
                     onChange={(e) => setPayoutAmount(e.target.value)}
-                    className="w-full bg-[#070B12] border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#D1AF47] focus:shadow-[0_0_12px_rgba(209,175,71,0.15)] text-white font-semibold transition-all duration-300"
+                    className="w-full bg-transparent border border-[#ECECEC] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#D1AF47] focus:shadow-[0_0_12px_rgba(209,175,71,0.15)] text-[#101828] font-semibold transition-all duration-300"
                     required
                   />
                   <span className="absolute top-1/2 end-4 -translate-y-1/2 text-xs font-bold text-[#D1AF47]">
@@ -751,13 +751,13 @@ export default function ProviderWalletPage() {
               </div>
 
               <div>
-                <label className="text-[10px] uppercase font-bold tracking-widest text-[#B8C0D4] block mb-2">
+                <label className="text-[10px] uppercase font-bold tracking-widest text-[#344054] block mb-2">
                   {t.bankNameLabel}
                 </label>
                 <select
                   value={payoutBank}
                   onChange={(e) => setPayoutBank(e.target.value)}
-                  className="w-full bg-[#070B12] border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#D1AF47] focus:shadow-[0_0_12px_rgba(209,175,71,0.15)] text-white font-semibold transition-all duration-300 appearance-none"
+                  className="w-full bg-transparent border border-[#ECECEC] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#D1AF47] focus:shadow-[0_0_12px_rgba(209,175,71,0.15)] text-[#101828] font-semibold transition-all duration-300 appearance-none"
                   style={{
                     backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23D1AF47' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>")`,
                     backgroundRepeat: "no-repeat",
@@ -768,16 +768,16 @@ export default function ProviderWalletPage() {
                   }}
                   required
                 >
-                  <option value="" className="bg-[#111827]">-- Select Bank --</option>
-                  <option value="Riyad Bank" className="bg-[#111827]">Riyad Bank (بنك الرياض)</option>
-                  <option value="Al Rajhi Bank" className="bg-[#111827]">Al Rajhi Bank (مصرف الراجحي)</option>
-                  <option value="SNB" className="bg-[#111827]">Al Ahli Bank / SNB (البنك الأهلي)</option>
-                  <option value="Alinma Bank" className="bg-[#111827]">Alinma Bank (مصرف الإنماء)</option>
+                  <option value="" className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]">-- Select Bank --</option>
+                  <option value="Riyad Bank" className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]">Riyad Bank (بنك الرياض)</option>
+                  <option value="Al Rajhi Bank" className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]">Al Rajhi Bank (مصرف الراجحي)</option>
+                  <option value="SNB" className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]">Al Ahli Bank / SNB (البنك الأهلي)</option>
+                  <option value="Alinma Bank" className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]">Alinma Bank (مصرف الإنماء)</option>
                 </select>
               </div>
 
               <div>
-                <label className="text-[10px] uppercase font-bold tracking-widest text-[#B8C0D4] block mb-2">
+                <label className="text-[10px] uppercase font-bold tracking-widest text-[#344054] block mb-2">
                   {t.ibanLabel}
                 </label>
                 <input
@@ -785,7 +785,7 @@ export default function ProviderWalletPage() {
                   placeholder="SA82 2000 0000..."
                   value={payoutIban}
                   onChange={(e) => setPayoutIban(e.target.value)}
-                  className="w-full bg-[#070B12] border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#D1AF47] focus:shadow-[0_0_12px_rgba(209,175,71,0.15)] text-white font-semibold font-mono tracking-wider transition-all duration-300"
+                  className="w-full bg-transparent border border-[#ECECEC] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#D1AF47] focus:shadow-[0_0_12px_rgba(209,175,71,0.15)] text-[#101828] font-semibold font-mono tracking-wider transition-all duration-300"
                   required
                 />
               </div>
@@ -794,7 +794,7 @@ export default function ProviderWalletPage() {
                 <button
                   type="button"
                   onClick={() => setShowPayoutModal(false)}
-                  className="flex-1 py-3 bg-[#1A2236] hover:bg-[#232F4C] border border-white/5 text-[#B8C0D4] rounded-xl font-bold text-xs uppercase tracking-wider transition duration-300"
+                  className="flex-1 py-3 bg-[#1A2236] hover:bg-[#232F4C] border border-[#ECECEC] text-[#344054] rounded-xl font-bold text-xs uppercase tracking-wider transition duration-300"
                 >
                   {t.close}
                 </button>

@@ -387,7 +387,7 @@ export default function CourierDeliveriesPage() {
 
   return (
     <div 
-      className={`space-y-8 font-sans bg-transparent text-[#B8C0D4] p-4 md:p-8 relative overflow-hidden`}
+      className={`space-y-8 font-sans bg-transparent text-[#344054] p-4 md:p-8 relative overflow-hidden`}
       dir={isRTL ? "rtl" : "ltr"}
     >
       {/* Background Glow Accents */}
@@ -395,13 +395,13 @@ export default function CourierDeliveriesPage() {
       <div className="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] bg-blue-500/5 rounded-full blur-[140px] pointer-events-none" />
 
       {/* Top Header Section */}
-      <div className="flex justify-between items-center flex-wrap gap-4 pb-6 border-b border-white/[0.06]">
+      <div className="flex justify-between items-center flex-wrap gap-4 pb-6 border-b border-[#ECECEC]">
         <div className={isRTL ? "text-right" : "text-left"}>
-          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white font-serif flex items-center gap-2">
+          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[#101828] font-serif flex items-center gap-2">
             <span className="w-1.5 h-6 bg-[#D1AF47] rounded-full inline-block" />
             {t.title}
           </h2>
-          <p className="text-xs md:text-sm text-[#7B859C] mt-2 max-w-xl leading-relaxed">{t.subtitle}</p>
+          <p className="text-xs md:text-sm text-[#667085] mt-2 max-w-xl leading-relaxed">{t.subtitle}</p>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-[10px] uppercase font-extrabold text-[#D1AF47] bg-[#D1AF47]/10 px-3.5 py-1.5 border border-[#D1AF47]/20 rounded-full shadow-[0_0_15px_rgba(209,175,71,0.08)]">
@@ -409,7 +409,7 @@ export default function CourierDeliveriesPage() {
           </span>
           <button
             onClick={loadJobs}
-            className="px-4 py-2 bg-[#172033] hover:bg-[#D1AF47] hover:text-[#070B12] text-white font-bold text-xs rounded-xl transition-all duration-300 shadow-sm border border-white/5 hover:border-[#D1AF47]/30 hover:scale-[1.03] active:scale-[0.98]"
+            className="px-4 py-2 bg-white border border-[#ECECEC] hover:bg-[#D1AF47] hover:text-[#070B12] text-[#101828] font-bold text-xs rounded-xl transition-all duration-300 shadow-sm border border-[#ECECEC] hover:border-[#D1AF47]/30 hover:scale-[1.03] active:scale-[0.98]"
           >
             {t.refreshBtn}
           </button>
@@ -418,13 +418,13 @@ export default function CourierDeliveriesPage() {
 
       {/* Alerts */}
       {success && (
-        <div className={`bg-[#3DDC84]/10 border border-[#3DDC84]/20 text-[#3DDC84] text-xs rounded-xl p-4 font-semibold shadow-[0_0_15px_rgba(61,220,132,0.05)] ${isRTL ? "text-right" : "text-left"}`}>
+        <div className={`bg-[#3DDC84]/10 border border-[#3DDC84]/20 text-[#22C55E] text-xs rounded-xl p-4 font-semibold shadow-[0_0_15px_rgba(61,220,132,0.05)] ${isRTL ? "text-right" : "text-left"}`}>
           ✓ {success}
         </div>
       )}
 
       {error && (
-        <div className={`bg-[#FF5D73]/10 border border-[#FF5D73]/20 text-[#FF5D73] text-xs rounded-xl p-4 font-semibold shadow-[0_0_15px_rgba(255,93,115,0.05)] ${isRTL ? "text-right" : "text-left"}`}>
+        <div className={`bg-[#FF5D73]/10 border border-[#FF5D73]/20 text-[#EF4444] text-xs rounded-xl p-4 font-semibold shadow-[0_0_15px_rgba(255,93,115,0.05)] ${isRTL ? "text-right" : "text-left"}`}>
           ⚠ {error}
         </div>
       )}
@@ -432,10 +432,10 @@ export default function CourierDeliveriesPage() {
       {/* KPI Dashboard Indicators */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {/* KPI 1 */}
-        <div className="bg-[#111827] border border-white/5 rounded-[20px] p-5 relative overflow-hidden group hover:border-[#D1AF47]/30 transition duration-300">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[20px] p-5 relative overflow-hidden group hover:border-[#D1AF47]/30 transition duration-300">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#D1AF47]/10 to-transparent rounded-bl-full pointer-events-none transition-all duration-300 group-hover:scale-110" />
-          <p className="text-xs font-semibold text-[#7B859C] uppercase tracking-wider">{t.kpiAvailable}</p>
-          <h3 className="text-2xl md:text-3xl font-extrabold text-white mt-2 font-serif tracking-tight">
+          <p className="text-xs font-semibold text-[#667085] uppercase tracking-wider">{t.kpiAvailable}</p>
+          <h3 className="text-2xl md:text-3xl font-extrabold text-[#101828] mt-2 font-serif tracking-tight">
             {jobs.filter(j => j.status === "pending" && !j.carrier_id).length}
           </h3>
           <div className="mt-2 flex items-center gap-1.5 text-[10px] text-[#D1AF47]">
@@ -445,10 +445,10 @@ export default function CourierDeliveriesPage() {
         </div>
 
         {/* KPI 2 */}
-        <div className="bg-[#111827] border border-white/5 rounded-[20px] p-5 relative overflow-hidden group hover:border-blue-500/30 transition duration-300">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[20px] p-5 relative overflow-hidden group hover:border-blue-500/30 transition duration-300">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-500/10 to-transparent rounded-bl-full pointer-events-none transition-all duration-300 group-hover:scale-110" />
-          <p className="text-xs font-semibold text-[#7B859C] uppercase tracking-wider">{t.kpiActive}</p>
-          <h3 className="text-2xl md:text-3xl font-extrabold text-white mt-2 font-serif tracking-tight">
+          <p className="text-xs font-semibold text-[#667085] uppercase tracking-wider">{t.kpiActive}</p>
+          <h3 className="text-2xl md:text-3xl font-extrabold text-[#101828] mt-2 font-serif tracking-tight">
             {jobs.filter(j => j.carrier_id === carrierId && (j.status === "accepted" || j.status === "in_transit")).length}
           </h3>
           <div className="mt-2 flex items-center gap-1.5 text-[10px] text-blue-400">
@@ -458,24 +458,24 @@ export default function CourierDeliveriesPage() {
         </div>
 
         {/* KPI 3 */}
-        <div className="bg-[#111827] border border-white/5 rounded-[20px] p-5 relative overflow-hidden group hover:border-[#3DDC84]/30 transition duration-300">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[20px] p-5 relative overflow-hidden group hover:border-[#3DDC84]/30 transition duration-300">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#3DDC84]/10 to-transparent rounded-bl-full pointer-events-none transition-all duration-300 group-hover:scale-110" />
-          <p className="text-xs font-semibold text-[#7B859C] uppercase tracking-wider">{t.kpiCompleted}</p>
-          <h3 className="text-2xl md:text-3xl font-extrabold text-white mt-2 font-serif tracking-tight">
+          <p className="text-xs font-semibold text-[#667085] uppercase tracking-wider">{t.kpiCompleted}</p>
+          <h3 className="text-2xl md:text-3xl font-extrabold text-[#101828] mt-2 font-serif tracking-tight">
             {jobs.filter(j => j.carrier_id === carrierId && j.status === "delivered").length}
           </h3>
-          <div className="mt-2 flex items-center gap-1.5 text-[10px] text-[#3DDC84]">
+          <div className="mt-2 flex items-center gap-1.5 text-[10px] text-[#22C55E]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />
             <span>{isRTL ? "مكتملة ومسلمة" : "Delivered"}</span>
           </div>
         </div>
 
         {/* KPI 4 */}
-        <div className="bg-[#111827] border border-white/5 rounded-[20px] p-5 relative overflow-hidden group hover:border-purple-550/30 transition duration-300">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[20px] p-5 relative overflow-hidden group hover:border-purple-550/30 transition duration-300">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-purple-500/10 to-transparent rounded-bl-full pointer-events-none transition-all duration-300 group-hover:scale-110" />
-          <p className="text-xs font-semibold text-[#7B859C] uppercase tracking-wider">{t.activeCouriers}</p>
-          <h3 className="text-2xl md:text-3xl font-extrabold text-white mt-2 font-serif tracking-tight">
-            {couriers.filter(c => c.status !== "offline").length} <span className="text-sm text-[#7B859C] font-sans">/ {couriers.length}</span>
+          <p className="text-xs font-semibold text-[#667085] uppercase tracking-wider">{t.activeCouriers}</p>
+          <h3 className="text-2xl md:text-3xl font-extrabold text-[#101828] mt-2 font-serif tracking-tight">
+            {couriers.filter(c => c.status !== "offline").length} <span className="text-sm text-[#667085] font-sans">/ {couriers.length}</span>
           </h3>
           <div className="mt-2 flex items-center gap-1.5 text-[10px] text-purple-400">
             <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
@@ -491,13 +491,13 @@ export default function CourierDeliveriesPage() {
         <div className="lg:col-span-2 space-y-6">
           
           {/* Active Logistics Dispatch Map */}
-          <div className="bg-[#111827] border border-white/5 rounded-[24px] p-6 relative overflow-hidden shadow-xl">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 relative overflow-hidden shadow-xl">
             <div className={`flex justify-between items-center mb-4 flex-wrap gap-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <div>
-                <h3 className="text-sm md:text-base font-extrabold text-white tracking-wide">{t.mapTitle}</h3>
-                <p className="text-[11px] text-[#7B859C]">{t.mapSubtitle}</p>
+                <h3 className="text-sm md:text-base font-extrabold text-[#101828] tracking-wide">{t.mapTitle}</h3>
+                <p className="text-[11px] text-[#667085]">{t.mapSubtitle}</p>
               </div>
-              <div className={`flex items-center gap-4 text-[10px] text-[#B8C0D4] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <div className={`flex items-center gap-4 text-[10px] text-[#344054] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#D1AF47]" />
                   <span>{t.mapLegendPickup}</span>
@@ -510,7 +510,7 @@ export default function CourierDeliveriesPage() {
             </div>
 
             {/* Radar map panel */}
-            <div className="w-full h-[300px] bg-[#070B12] rounded-2xl relative border border-white/5 overflow-hidden shadow-inner flex items-center justify-center">
+            <div className="w-full h-[300px] bg-transparent rounded-2xl relative border border-[#ECECEC] overflow-hidden shadow-inner flex items-center justify-center">
               {/* Pulse scan sweep circle */}
               <div className="absolute w-[360px] h-[360px] border border-[#D1AF47]/5 rounded-full animate-[spin_18s_linear_infinite] pointer-events-none" />
               <div className="absolute w-[200px] h-[200px] border border-[#D1AF47]/5 rounded-full animate-[spin_10s_linear_infinite] pointer-events-none" />
@@ -640,7 +640,7 @@ export default function CourierDeliveriesPage() {
               </svg>
 
               {/* HUD Hint Tooltip */}
-              <div className={`absolute bottom-3 left-3 right-3 bg-[#111827]/90 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/5 text-[9px] text-[#B8C0D4] flex items-center gap-2 z-20 ${isRTL ? "text-right flex-row-reverse" : "text-left flex-row"}`}>
+              <div className={`absolute bottom-3 left-3 right-3 bg-white/90 backdrop-blur-md px-3.5 py-2 rounded-xl border border-[#ECECEC] text-[9px] text-[#344054] flex items-center gap-2 z-20 ${isRTL ? "text-right flex-row-reverse" : "text-left flex-row"}`}>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47] animate-ping" />
                 <span className="truncate">{t.selectJobTip}</span>
               </div>
@@ -648,7 +648,7 @@ export default function CourierDeliveriesPage() {
           </div>
 
           {/* Tabs Navigation */}
-          <div className={`flex border-b border-white/5 gap-6 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+          <div className={`flex border-b border-[#ECECEC] gap-6 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
             <button
               onClick={() => {
                 setActiveTab("available");
@@ -656,8 +656,8 @@ export default function CourierDeliveriesPage() {
               }}
               className={`pb-4 text-xs font-bold uppercase tracking-wider transition-all duration-300 border-b-2 ${
                 activeTab === "available"
-                  ? "border-[#D1AF47] text-white font-extrabold shadow-[0_4px_12px_-4px_rgba(209,175,71,0.5)]"
-                  : "border-transparent text-[#7B859C] hover:text-white"
+                  ? "border-[#D1AF47] text-[#101828] font-extrabold shadow-[0_4px_12px_-4px_rgba(209,175,71,0.5)]"
+                  : "border-transparent text-[#667085] hover:text-[#101828]"
               }`}
             >
               {t.tabOpen}
@@ -669,8 +669,8 @@ export default function CourierDeliveriesPage() {
               }}
               className={`pb-4 text-xs font-bold uppercase tracking-wider transition-all duration-300 border-b-2 ${
                 activeTab === "active"
-                  ? "border-[#D1AF47] text-white font-extrabold shadow-[0_4px_12px_-4px_rgba(209,175,71,0.5)]"
-                  : "border-transparent text-[#7B859C] hover:text-white"
+                  ? "border-[#D1AF47] text-[#101828] font-extrabold shadow-[0_4px_12px_-4px_rgba(209,175,71,0.5)]"
+                  : "border-transparent text-[#667085] hover:text-[#101828]"
               }`}
             >
               {t.tabActive}
@@ -682,8 +682,8 @@ export default function CourierDeliveriesPage() {
               }}
               className={`pb-4 text-xs font-bold uppercase tracking-wider transition-all duration-300 border-b-2 ${
                 activeTab === "completed"
-                  ? "border-[#D1AF47] text-white font-extrabold shadow-[0_4px_12px_-4px_rgba(209,175,71,0.5)]"
-                  : "border-transparent text-[#7B859C] hover:text-white"
+                  ? "border-[#D1AF47] text-[#101828] font-extrabold shadow-[0_4px_12px_-4px_rgba(209,175,71,0.5)]"
+                  : "border-transparent text-[#667085] hover:text-[#101828]"
               }`}
             >
               {t.tabCompleted}
@@ -692,11 +692,11 @@ export default function CourierDeliveriesPage() {
 
           {/* Delivery Jobs List Grid */}
           {loading ? (
-            <div className="text-center py-16 text-[#7B859C] text-xs font-semibold animate-pulse">
+            <div className="text-center py-16 text-[#667085] text-xs font-semibold animate-pulse">
               {isRTL ? "جاري تحميل اللوحة اللوجستية..." : "Loading logistics board..."}
             </div>
           ) : filteredJobs.length === 0 ? (
-            <div className="bg-[#111827] border border-white/5 rounded-[20px] py-16 text-center text-[#7B859C] text-xs font-medium">
+            <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[20px] py-16 text-center text-[#667085] text-xs font-medium">
               {t.noJobs}
             </div>
           ) : (
@@ -708,10 +708,10 @@ export default function CourierDeliveriesPage() {
                   <div
                     key={job.id}
                     onClick={() => setSelectedJobId(job.id)}
-                    className={`bg-[#111827] border rounded-[20px] p-6 shadow-md transition-all duration-300 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-6 cursor-pointer relative ${
+                    className={`bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border rounded-[20px] p-6 shadow-md transition-all duration-300 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-6 cursor-pointer relative ${
                       isSelected 
-                        ? "border-[#D1AF47] bg-[#172033]/85 shadow-[0_0_20px_rgba(209,175,71,0.08)]" 
-                        : "border-white/5 hover:border-white/10 hover:bg-[#172033]/45"
+                        ? "border-[#D1AF47] bg-white border border-[#ECECEC]/85 shadow-[0_0_20px_rgba(209,175,71,0.08)]" 
+                        : "border-[#ECECEC] hover:border-[#ECECEC] hover:bg-white border border-[#ECECEC]/45"
                     }`}
                   >
                     {/* Glow indicators inside selected cards */}
@@ -722,7 +722,7 @@ export default function CourierDeliveriesPage() {
                     <div className={`space-y-4 flex-1 ${isRTL ? "text-right" : "text-left"}`}>
                       {/* Job Status Header */}
                       <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                        <span className="text-[10px] font-extrabold text-[#7B859C] uppercase tracking-wider">
+                        <span className="text-[10px] font-extrabold text-[#667085] uppercase tracking-wider">
                           ID: {job.id.substring(0, 8)}
                         </span>
                         
@@ -731,7 +731,7 @@ export default function CourierDeliveriesPage() {
                             ? "bg-[#F5B041]/10 text-[#F5B041] border-[#F5B041]/20"
                             : job.status === "in_transit"
                             ? "bg-[#D1AF47]/10 text-[#D1AF47] border-[#D1AF47]/20"
-                            : "bg-[#3DDC84]/10 text-[#3DDC84] border-[#3DDC84]/20"
+                            : "bg-[#3DDC84]/10 text-[#22C55E] border-[#3DDC84]/20"
                         }`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${
                             job.status === "pending"
@@ -753,29 +753,29 @@ export default function CourierDeliveriesPage() {
                       {/* Pickup and Delivery Addresses details */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div className="space-y-1">
-                          <h5 className="text-[9px] uppercase font-bold text-[#7B859C] tracking-wider">{t.pickupAddr}</h5>
-                          <p className="text-xs font-bold text-white leading-relaxed">{job.pickup_address}</p>
+                          <h5 className="text-[9px] uppercase font-bold text-[#667085] tracking-wider">{t.pickupAddr}</h5>
+                          <p className="text-xs font-bold text-[#101828] leading-relaxed">{job.pickup_address}</p>
                         </div>
                         <div className="space-y-1">
-                          <h5 className="text-[9px] uppercase font-bold text-[#7B859C] tracking-wider">{t.deliveryAddr}</h5>
-                          <p className="text-xs font-bold text-white leading-relaxed">{job.delivery_address}</p>
+                          <h5 className="text-[9px] uppercase font-bold text-[#667085] tracking-wider">{t.deliveryAddr}</h5>
+                          <p className="text-xs font-bold text-[#101828] leading-relaxed">{job.delivery_address}</p>
                         </div>
                       </div>
 
                       {/* Trip Metadata info */}
-                      <div className={`flex flex-wrap gap-x-6 gap-y-2 text-[10px] text-[#7B859C] font-semibold border-t border-white/5 pt-3.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                      <div className={`flex flex-wrap gap-x-6 gap-y-2 text-[10px] text-[#667085] font-semibold border-t border-[#ECECEC] pt-3.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                         {job.delivery_metadata?.distance && (
                           <span>
-                            {t.distance}: <strong className="text-white font-extrabold">{job.delivery_metadata.distance}</strong>
+                            {t.distance}: <strong className="text-[#101828] font-extrabold">{job.delivery_metadata.distance}</strong>
                           </span>
                         )}
                         {job.delivery_metadata?.item && (
                           <span>
-                            {t.contentsLabel}: <strong className="text-white font-extrabold">{job.delivery_metadata.item}</strong>
+                            {t.contentsLabel}: <strong className="text-[#101828] font-extrabold">{job.delivery_metadata.item}</strong>
                           </span>
                         )}
                         <span>
-                          {t.estTime}: <strong className="text-white font-extrabold">{new Date(job.estimated_delivery_time).toLocaleTimeString()}</strong>
+                          {t.estTime}: <strong className="text-[#101828] font-extrabold">{new Date(job.estimated_delivery_time).toLocaleTimeString()}</strong>
                         </span>
                       </div>
                     </div>
@@ -783,16 +783,16 @@ export default function CourierDeliveriesPage() {
                     {/* Actions and Dropdown Assigners */}
                     <div 
                       onClick={(e) => e.stopPropagation()} 
-                      className={`flex flex-col items-stretch md:items-end justify-center w-full md:w-auto border-t md:border-0 border-white/5 pt-4 md:pt-0 ${isRTL ? "md:items-start" : "md:items-end"}`}
+                      className={`flex flex-col items-stretch md:items-end justify-center w-full md:w-auto border-t md:border-0 border-[#ECECEC] pt-4 md:pt-0 ${isRTL ? "md:items-start" : "md:items-end"}`}
                     >
                       {job.status === "pending" && (
                         <div className="flex flex-col gap-2 w-full md:w-auto">
-                          <label className="text-[9px] uppercase font-bold text-[#7B859C] tracking-wider">{t.assignCourier}</label>
+                          <label className="text-[9px] uppercase font-bold text-[#667085] tracking-wider">{t.assignCourier}</label>
                           <div className="flex items-center gap-2">
                             <select
                               value={selectedCouriers[job.id] || ""}
                               onChange={(e) => setSelectedCouriers({ ...selectedCouriers, [job.id]: e.target.value })}
-                              className="bg-[#172033] text-white border border-white/10 rounded-xl px-3 py-2 text-xs focus:border-[#D1AF47] focus:outline-none w-full md:w-44 transition duration-200"
+                              className="bg-white border border-[#ECECEC] text-[#101828] border border-[#ECECEC] rounded-xl px-3 py-2 text-xs focus:border-[#D1AF47] focus:outline-none w-full md:w-44 transition duration-200"
                             >
                               <option value="">{t.assignSelectPlaceholder}</option>
                               <option value={carrierId}>{isRTL ? "تعيين لنفسي" : "Assign to self"}</option>
@@ -835,7 +835,7 @@ export default function CourierDeliveriesPage() {
                       )}
                       
                       {job.status === "delivered" && (
-                        <span className="text-[10px] uppercase font-extrabold text-[#3DDC84] bg-[#3DDC84]/10 px-3.5 py-1.5 border border-[#3DDC84]/20 rounded-lg">
+                        <span className="text-[10px] uppercase font-extrabold text-[#22C55E] bg-[#3DDC84]/10 px-3.5 py-1.5 border border-[#3DDC84]/20 rounded-lg">
                           ✓ {isRTL ? "مكتملة ومسلمة للعميل" : "Successfully Handed Over"}
                         </span>
                       )}
@@ -851,8 +851,8 @@ export default function CourierDeliveriesPage() {
         <div className="space-y-6">
           
           {/* Courier Fleet Status List */}
-          <div className="bg-[#111827] border border-white/5 rounded-[24px] p-6 shadow-xl relative overflow-hidden">
-            <h3 className={`text-sm md:text-base font-extrabold text-white tracking-wide mb-4 ${isRTL ? "text-right" : "text-left"}`}>
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-xl relative overflow-hidden">
+            <h3 className={`text-sm md:text-base font-extrabold text-[#101828] tracking-wide mb-4 ${isRTL ? "text-right" : "text-left"}`}>
               {t.courierListTitle}
             </h3>
             
@@ -860,25 +860,25 @@ export default function CourierDeliveriesPage() {
               {couriers.map(courier => (
                 <div 
                   key={courier.id}
-                  className="bg-[#0D1422] border border-white/5 rounded-2xl p-4 flex items-center justify-between hover:bg-[#172033] transition duration-200"
+                  className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl p-4 flex items-center justify-between hover:bg-white border border-[#ECECEC] transition duration-200"
                 >
                   <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                     <div className="w-10 h-10 rounded-full bg-[#1A2236] border border-[#D1AF47]/30 flex items-center justify-center font-bold text-[#D1AF47] text-xs">
                       {courier.avatar}
                     </div>
                     <div className={isRTL ? "text-right" : "text-left"}>
-                      <h4 className="text-xs font-bold text-white">{courier.name}</h4>
-                      <p className="text-[9px] text-[#7B859C] mt-0.5">{courier.vehicle}</p>
+                      <h4 className="text-xs font-bold text-[#101828]">{courier.name}</h4>
+                      <p className="text-[9px] text-[#667085] mt-0.5">{courier.vehicle}</p>
                     </div>
                   </div>
 
                   <div className="text-right">
                     <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-bold border ${
                       courier.status === "online" 
-                        ? "bg-[#3DDC84]/10 text-[#3DDC84] border-[#3DDC84]/25" 
+                        ? "bg-[#3DDC84]/10 text-[#22C55E] border-[#3DDC84]/25" 
                         : courier.status === "busy" 
                         ? "bg-[#F5B041]/10 text-[#F5B041] border-[#F5B041]/25"
-                        : "bg-white/5 text-[#7B859C] border-white/10"
+                        : "bg-white/5 text-[#667085] border-[#ECECEC]"
                     }`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${
                         courier.status === "online" 
@@ -904,8 +904,8 @@ export default function CourierDeliveriesPage() {
           </div>
 
           {/* Dispatch Parameters Form */}
-          <div className="bg-[#111827] border border-white/5 rounded-[24px] p-6 shadow-xl relative overflow-hidden">
-            <h3 className={`text-sm md:text-base font-extrabold text-white tracking-wide mb-4 ${isRTL ? "text-right" : "text-left"}`}>
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-xl relative overflow-hidden">
+            <h3 className={`text-sm md:text-base font-extrabold text-[#101828] tracking-wide mb-4 ${isRTL ? "text-right" : "text-left"}`}>
               {t.dispatchSettings}
             </h3>
 
@@ -914,7 +914,7 @@ export default function CourierDeliveriesPage() {
               {/* Slider 1: Search Radius */}
               <div className="space-y-2">
                 <div className={`flex justify-between text-xs font-bold ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                  <span className="text-[#B8C0D4]">{t.radiusLabel}</span>
+                  <span className="text-[#344054]">{t.radiusLabel}</span>
                   <span className="text-[#D1AF47]">{dispatchRadius} {isRTL ? "كم" : "km"}</span>
                 </div>
                 <input 
@@ -923,14 +923,14 @@ export default function CourierDeliveriesPage() {
                   max="50" 
                   value={dispatchRadius}
                   onChange={(e) => setDispatchRadius(Number(e.target.value))}
-                  className="w-full h-1 bg-[#172033] rounded-lg appearance-none cursor-pointer accent-[#D1AF47]"
+                  className="w-full h-1 bg-white border border-[#ECECEC] rounded-lg appearance-none cursor-pointer accent-[#D1AF47]"
                 />
               </div>
 
               {/* Slider 2: Price Multiplier */}
               <div className="space-y-2">
                 <div className={`flex justify-between text-xs font-bold ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                  <span className="text-[#B8C0D4]">{t.multiplierLabel}</span>
+                  <span className="text-[#344054]">{t.multiplierLabel}</span>
                   <span className="text-[#D1AF47]">{surgeMultiplier.toFixed(1)}x</span>
                 </div>
                 <input 
@@ -940,22 +940,22 @@ export default function CourierDeliveriesPage() {
                   step="0.1"
                   value={surgeMultiplier}
                   onChange={(e) => setSurgeMultiplier(Number(e.target.value))}
-                  className="w-full h-1 bg-[#172033] rounded-lg appearance-none cursor-pointer accent-[#D1AF47]"
+                  className="w-full h-1 bg-white border border-[#ECECEC] rounded-lg appearance-none cursor-pointer accent-[#D1AF47]"
                 />
               </div>
 
               {/* Toggle Switch: Auto-Dispatch Mode */}
-              <div className={`flex items-center justify-between py-2 border-t border-b border-white/5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-xs font-bold text-[#B8C0D4]">{t.autoAssign}</span>
+              <div className={`flex items-center justify-between py-2 border-t border-b border-[#ECECEC] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                <span className="text-xs font-bold text-[#344054]">{t.autoAssign}</span>
                 <button
                   type="button"
                   onClick={() => setAutoDispatch(!autoDispatch)}
                   className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                    autoDispatch ? "bg-[#D1AF47]" : "bg-[#172033]"
+                    autoDispatch ? "bg-[#D1AF47]" : "bg-white border border-[#ECECEC]"
                   }`}
                 >
                   <span
-                    className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-[#070B12] shadow ring-0 transition duration-200 ease-in-out ${
+                    className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-transparent shadow ring-0 transition duration-200 ease-in-out ${
                       autoDispatch ? (isRTL ? "-translate-x-5" : "translate-x-5") : "translate-x-0"
                     }`}
                   />
@@ -965,14 +965,14 @@ export default function CourierDeliveriesPage() {
               {/* Apply settings action button */}
               <button
                 type="submit"
-                className="w-full py-2.5 bg-[#172033] hover:bg-[#D1AF47] hover:text-[#070B12] text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all duration-300 border border-white/5 hover:border-[#D1AF47]/30 active:scale-[0.98]"
+                className="w-full py-2.5 bg-white border border-[#ECECEC] hover:bg-[#D1AF47] hover:text-[#070B12] text-[#101828] font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all duration-300 border border-[#ECECEC] hover:border-[#D1AF47]/30 active:scale-[0.98]"
               >
                 {t.saveSettingsBtn}
               </button>
 
               {/* Saved Success HUD feedback */}
               {showParamsSaved && (
-                <div className="text-[10px] text-[#3DDC84] font-bold text-center mt-2 animate-pulse">
+                <div className="text-[10px] text-[#22C55E] font-bold text-center mt-2 animate-pulse">
                   ✓ {t.settingsSaved}
                 </div>
               )}
@@ -985,7 +985,7 @@ export default function CourierDeliveriesPage() {
       </div>
 
       {/* Offline Simulator Notice Footer */}
-      <div className="bg-[#111827] border border-white/5 rounded-2xl p-4 text-[10px] text-[#7B859C] text-center leading-relaxed font-medium">
+      <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl p-4 text-[10px] text-[#667085] text-center leading-relaxed font-medium">
         🛡 {t.mockNotice}
       </div>
 

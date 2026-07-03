@@ -168,16 +168,16 @@ export default function ProviderReportsPage() {
   return (
     <div className="space-y-8 font-sans">
       {/* HEADER */}
-      <div className={`flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6 border-b border-white/[0.06] pb-6 ${locale === "ar" ? "rtl" : "ltr"}`}>
+      <div className={`flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6 border-b border-[#ECECEC] pb-6 ${locale === "ar" ? "rtl" : "ltr"}`}>
         <div>
-          <h2 className="text-3xl font-serif font-semibold tracking-tight text-white">{t.title}</h2>
-          <p className="text-sm text-[#B8C0D4] mt-1">{t.subtitle}</p>
+          <h2 className="text-3xl font-serif font-semibold tracking-tight text-[#101828]">{t.title}</h2>
+          <p className="text-sm text-[#344054] mt-1">{t.subtitle}</p>
         </div>
         
         {/* DATE FILTERS & EXPORT ROW */}
         <div className={`flex flex-wrap items-center gap-3.5 ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
           {/* Preset Selector Pills */}
-          <div className="flex items-center bg-[#0D1422] p-1.5 rounded-2xl border border-white/[0.06] shadow-inner">
+          <div className="flex items-center bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] p-1.5 rounded-2xl border border-[#ECECEC] shadow-inner">
             {(["7d", "30d", "6m"] as const).map((r) => (
               <button
                 key={r}
@@ -200,7 +200,7 @@ export default function ProviderReportsPage() {
                 className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300 ${
                   dateRange === r
                     ? "bg-[#D1AF47] text-[#070B12] shadow-[0_0_15px_rgba(209,175,71,0.25)] font-bold"
-                    : "text-[#B8C0D4] hover:text-white hover:bg-white/[0.02]"
+                    : "text-[#344054] hover:text-[#101828] hover:bg-transparent"
                 }`}
               >
                 {r === "7d" ? t.last7Days : r === "30d" ? t.last30Days : t.last6Months}
@@ -212,10 +212,10 @@ export default function ProviderReportsPage() {
           <div className="relative">
             <button
               onClick={() => setShowDatePicker(!showDatePicker)}
-              className={`flex items-center gap-2.5 px-4.5 py-3 rounded-2xl border text-xs font-semibold transition-all duration-300 bg-[#0D1422] ${
+              className={`flex items-center gap-2.5 px-4.5 py-3 rounded-2xl border text-xs font-semibold transition-all duration-300 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] ${
                 dateRange === "custom"
                   ? "border-[#D1AF47] text-[#D1AF47] shadow-[0_0_15px_rgba(209,175,71,0.1)]"
-                  : "border-white/[0.06] text-[#B8C0D4] hover:border-[#D1AF47]/40 hover:text-white"
+                  : "border-[#ECECEC] text-[#344054] hover:border-[#D1AF47]/40 hover:text-[#101828]"
               }`}
             >
               <svg className="w-4 h-4 text-[#D1AF47]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -230,25 +230,25 @@ export default function ProviderReportsPage() {
 
             {/* Date Picker Popover */}
             {showDatePicker && (
-              <div className={`absolute top-full mt-2 p-5 rounded-[24px] bg-[#172033] border border-white/[0.08] shadow-2xl z-50 w-72 ${locale === "ar" ? "left-0" : "right-0"}`}>
-                <h4 className="text-xs uppercase tracking-wider text-[#7B859C] mb-3.5 font-bold text-left">{t.customRange}</h4>
+              <div className={`absolute top-full mt-2 p-5 rounded-[24px] bg-white border border-[#ECECEC] border border-[#ECECEC] shadow-2xl z-50 w-72 ${locale === "ar" ? "left-0" : "right-0"}`}>
+                <h4 className="text-xs uppercase tracking-wider text-[#667085] mb-3.5 font-bold text-left">{t.customRange}</h4>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-[10px] text-[#B8C0D4] mb-1 font-semibold text-left">{t.startDate}</label>
+                    <label className="block text-[10px] text-[#344054] mb-1 font-semibold text-left">{t.startDate}</label>
                     <input
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full bg-[#0D1422] border border-white/[0.06] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#D1AF47] transition-all duration-300"
+                      className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-3 py-2 text-xs text-[#101828] focus:outline-none focus:border-[#D1AF47] transition-all duration-300"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] text-[#B8C0D4] mb-1 font-semibold text-left">{t.endDate}</label>
+                    <label className="block text-[10px] text-[#344054] mb-1 font-semibold text-left">{t.endDate}</label>
                     <input
                       type="date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full bg-[#0D1422] border border-white/[0.06] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#D1AF47] transition-all duration-300"
+                      className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-3 py-2 text-xs text-[#101828] focus:outline-none focus:border-[#D1AF47] transition-all duration-300"
                     />
                   </div>
                   <button
@@ -284,7 +284,7 @@ export default function ProviderReportsPage() {
       </div>
 
       {error && (
-        <div className="bg-[#172033]/80 backdrop-blur-md border border-[#D1AF47]/30 text-[#D1AF47] text-xs rounded-2xl p-4 flex items-center gap-3 shadow-[0_0_15px_rgba(209,175,71,0.05)]">
+        <div className="bg-white border border-[#ECECEC]/80 backdrop-blur-md border border-[#D1AF47]/30 text-[#D1AF47] text-xs rounded-2xl p-4 flex items-center gap-3 shadow-[0_0_15px_rgba(209,175,71,0.05)]">
           <svg className="w-5 h-5 text-[#D1AF47] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -295,15 +295,15 @@ export default function ProviderReportsPage() {
       {/* KPI SUMMARIES */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Gross Revenue Card */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-sm hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300 relative overflow-hidden group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-sm hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47] opacity-[0.02] rounded-full blur-3xl group-hover:opacity-[0.06] transition-all duration-500" />
           <div className={`flex items-start justify-between ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
             <div className={locale === "ar" ? "text-right" : "text-left"}>
-              <span className="text-[11px] uppercase font-bold text-[#7B859C] tracking-wider block">{t.grossRevenue}</span>
-              <h3 className="text-3xl font-bold text-white mt-2.5 font-mono">
+              <span className="text-[11px] uppercase font-bold text-[#667085] tracking-wider block">{t.grossRevenue}</span>
+              <h3 className="text-3xl font-bold text-[#101828] mt-2.5 font-mono">
                 {revenue.toLocaleString()} <span className="text-sm font-semibold text-[#D1AF47]">{t.currency}</span>
               </h3>
-              <span className={`text-[11px] text-[#3DDC84] font-bold block mt-3 flex items-center gap-1 ${locale === "ar" ? "flex-row-reverse" : ""}`}>
+              <span className={`text-[11px] text-[#22C55E] font-bold block mt-3 flex items-center gap-1 ${locale === "ar" ? "flex-row-reverse" : ""}`}>
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                 </svg>
@@ -319,13 +319,13 @@ export default function ProviderReportsPage() {
         </div>
 
         {/* Total Bookings Card */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-sm hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300 relative overflow-hidden group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-sm hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47] opacity-[0.02] rounded-full blur-3xl group-hover:opacity-[0.06] transition-all duration-500" />
           <div className={`flex items-start justify-between ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
             <div className={locale === "ar" ? "text-right" : "text-left"}>
-              <span className="text-[11px] uppercase font-bold text-[#7B859C] tracking-wider block">{t.bookingsTotal}</span>
-              <h3 className="text-3xl font-bold text-white mt-2.5 font-mono">{bookingsCount}</h3>
-              <span className={`text-[11px] text-[#3DDC84] font-bold block mt-3 flex items-center gap-1 ${locale === "ar" ? "flex-row-reverse" : ""}`}>
+              <span className="text-[11px] uppercase font-bold text-[#667085] tracking-wider block">{t.bookingsTotal}</span>
+              <h3 className="text-3xl font-bold text-[#101828] mt-2.5 font-mono">{bookingsCount}</h3>
+              <span className={`text-[11px] text-[#22C55E] font-bold block mt-3 flex items-center gap-1 ${locale === "ar" ? "flex-row-reverse" : ""}`}>
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                 </svg>
@@ -341,13 +341,13 @@ export default function ProviderReportsPage() {
         </div>
 
         {/* Completion Rate Card */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-sm hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300 relative overflow-hidden group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-sm hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47] opacity-[0.02] rounded-full blur-3xl group-hover:opacity-[0.06] transition-all duration-500" />
           <div className={`flex items-start justify-between ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
             <div className={locale === "ar" ? "text-right" : "text-left"}>
-              <span className="text-[11px] uppercase font-bold text-[#7B859C] tracking-wider block">{t.completionRate}</span>
-              <h3 className="text-3xl font-bold text-white mt-2.5 font-mono">{completionRate}</h3>
-              <span className="text-[11px] text-[#B8C0D4] font-semibold block mt-3">
+              <span className="text-[11px] uppercase font-bold text-[#667085] tracking-wider block">{t.completionRate}</span>
+              <h3 className="text-3xl font-bold text-[#101828] mt-2.5 font-mono">{completionRate}</h3>
+              <span className="text-[11px] text-[#344054] font-semibold block mt-3">
                 {locale === "ar" ? "المعدل الطبيعي للصناعة: ٩٢٪" : "Standard industry average: 92%"}
               </span>
             </div>
@@ -363,9 +363,9 @@ export default function ProviderReportsPage() {
       {/* SALES TRENDS & SERVICE SHARE CHARTS */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* LINE CHART CARD */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-sm lg:col-span-2 relative overflow-hidden group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-sm lg:col-span-2 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#D1AF47] opacity-[0.01] rounded-full blur-3xl group-hover:opacity-[0.03] transition-all duration-500" />
-          <h3 className="font-serif font-bold text-base text-white mb-6 tracking-wide text-left">
+          <h3 className="font-serif font-bold text-base text-[#101828] mb-6 tracking-wide text-left">
             {locale === "ar" ? "اتجاهات الإيرادات (آخر ٦ أشهر)" : "Revenue Trends (Last 6 Months)"}
           </h3>
           
@@ -430,7 +430,7 @@ export default function ProviderReportsPage() {
             </svg>
           </div>
           
-          <div className={`flex justify-between text-[11px] font-bold text-[#7B859C] mt-4 px-2 tracking-wider uppercase ${locale === "ar" ? "flex-row-reverse" : ""}`}>
+          <div className={`flex justify-between text-[11px] font-bold text-[#667085] mt-4 px-2 tracking-wider uppercase ${locale === "ar" ? "flex-row-reverse" : ""}`}>
             <span>{locale === "ar" ? "يناير" : "Jan"}</span>
             <span>{locale === "ar" ? "فبراير" : "Feb"}</span>
             <span>{locale === "ar" ? "مارس" : "Mar"}</span>
@@ -441,10 +441,10 @@ export default function ProviderReportsPage() {
         </div>
 
         {/* DONUT CHART CARD */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-sm flex flex-col justify-between relative overflow-hidden group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-sm flex flex-col justify-between relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47] opacity-[0.01] rounded-full blur-3xl group-hover:opacity-[0.03] transition-all duration-500" />
           <div>
-            <h3 className="font-serif font-bold text-base text-white mb-6 tracking-wide text-left">{t.servicesDistribution}</h3>
+            <h3 className="font-serif font-bold text-base text-[#101828] mb-6 tracking-wide text-left">{t.servicesDistribution}</h3>
             
             {/* SVG Donut */}
             <div className="flex justify-center mb-8 relative">
@@ -467,23 +467,23 @@ export default function ProviderReportsPage() {
               
               {/* Center Text inside Donut */}
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-xl font-bold text-white font-mono">100%</span>
-                <span className="text-[9px] uppercase tracking-widest text-[#7B859C] font-semibold">{locale === "ar" ? "إجمالي" : "TOTAL"}</span>
+                <span className="text-xl font-bold text-[#101828] font-mono">100%</span>
+                <span className="text-[9px] uppercase tracking-widest text-[#667085] font-semibold">{locale === "ar" ? "إجمالي" : "TOTAL"}</span>
               </div>
             </div>
             
             <div className="space-y-3">
               {categoriesShare.map((cat, idx) => (
-                <div key={idx} className={`flex items-center justify-between text-xs p-2.5 rounded-xl hover:bg-white/[0.02] transition duration-300 ${locale === "ar" ? "flex-row-reverse" : ""}`}>
-                  <div className={`flex items-center gap-2.5 font-bold text-[#B8C0D4] ${locale === "ar" ? "flex-row-reverse" : ""}`}>
+                <div key={idx} className={`flex items-center justify-between text-xs p-2.5 rounded-xl hover:bg-transparent transition duration-300 ${locale === "ar" ? "flex-row-reverse" : ""}`}>
+                  <div className={`flex items-center gap-2.5 font-bold text-[#344054] ${locale === "ar" ? "flex-row-reverse" : ""}`}>
                     <span className={`w-3 h-3 rounded-md ${
                       idx === 0 ? "bg-[#D1AF47]" : idx === 1 ? "bg-[#B8952E]" : "bg-[#4A3F22]"
                     }`} />
                     <span>{locale === "ar" ? cat.name_ar : cat.name_en}</span>
                   </div>
                   <div className={`flex flex-col ${locale === "ar" ? "items-start" : "items-end"}`}>
-                    <span className="font-extrabold text-white font-mono">{cat.pct}%</span>
-                    <span className="text-[10px] text-[#7B859C] font-mono">{cat.amount.toLocaleString()} {t.currency}</span>
+                    <span className="font-extrabold text-[#101828] font-mono">{cat.pct}%</span>
+                    <span className="text-[10px] text-[#667085] font-mono">{cat.amount.toLocaleString()} {t.currency}</span>
                   </div>
                 </div>
               ))}
@@ -495,47 +495,47 @@ export default function ProviderReportsPage() {
       {/* STAFF PERFORMANCE & POPULAR SERVICES GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* STAFF PERFORMANCE */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-sm relative overflow-hidden">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-sm relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#D1AF47]/25 to-transparent" />
-          <h3 className={`font-serif font-bold text-base text-white mb-6 tracking-wide ${locale === "ar" ? "text-right" : "text-left"}`}>{t.staffPerformance}</h3>
+          <h3 className={`font-serif font-bold text-base text-[#101828] mb-6 tracking-wide ${locale === "ar" ? "text-right" : "text-left"}`}>{t.staffPerformance}</h3>
 
           {loading ? (
-            <div className="text-center py-12 text-sm text-[#7B859C]">{t.loadingData}</div>
+            <div className="text-center py-12 text-sm text-[#667085]">{t.loadingData}</div>
           ) : staffPerformance.length === 0 ? (
-            <div className="text-center py-12 text-[#7B859C] text-xs font-semibold">{t.noData}</div>
+            <div className="text-center py-12 text-[#667085] text-xs font-semibold">{t.noData}</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left border-collapse">
                 <thead>
-                  <tr className={`border-b border-white/[0.06] text-[#7B859C] font-bold uppercase text-[10px] tracking-wider bg-white/[0.01] ${locale === "ar" ? "text-right" : "text-left"}`}>
+                  <tr className={`border-b border-[#ECECEC] text-[#667085] font-bold uppercase text-[10px] tracking-wider bg-white/[0.01] ${locale === "ar" ? "text-right" : "text-left"}`}>
                     <th className="py-4 px-6">{t.staffName}</th>
                     <th className="py-4 px-6 text-center">{t.bookingsCompleted}</th>
                     <th className="py-4 px-6 text-center">{t.revenueGenerated}</th>
                     <th className="py-4 px-6 text-center">{t.averageRating}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/[0.04]">
+                <tbody className="divide-y divide-[#ECECEC]">
                   {staffPerformance.map((staff, idx) => (
-                    <tr key={idx} className="hover:bg-white/[0.02] transition duration-300">
-                      <td className={`py-4 px-6 font-bold text-white ${locale === "ar" ? "text-right" : "text-left"}`}>
+                    <tr key={idx} className="hover:bg-transparent transition duration-300">
+                      <td className={`py-4 px-6 font-bold text-[#101828] ${locale === "ar" ? "text-right" : "text-left"}`}>
                         <div className={`flex items-center gap-3 ${locale === "ar" ? "flex-row-reverse" : ""}`}>
                           {/* Initials Avatar */}
-                          <div className="w-8 h-8 rounded-xl bg-[#0D1422] border border-white/[0.06] flex items-center justify-center text-[#D1AF47] text-[10px] font-black uppercase shadow-inner">
+                          <div className="w-8 h-8 rounded-xl bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] flex items-center justify-center text-[#D1AF47] text-[10px] font-black uppercase shadow-inner">
                             {(locale === "ar" ? staff.name_ar : staff.name_en).split(" ").map((n: string) => n[0]).join("")}
                           </div>
                           <span>{locale === "ar" ? staff.name_ar : staff.name_en}</span>
                         </div>
                       </td>
-                      <td className="py-4 px-6 text-center font-mono font-semibold text-[#B8C0D4]">
+                      <td className="py-4 px-6 text-center font-mono font-semibold text-[#344054]">
                         {staff.completed}
                       </td>
                       <td className="py-4 px-6 text-center font-mono font-bold text-[#D1AF47]">
-                        {staff.revenue.toLocaleString()} <span className="text-[10px] text-[#7B859C]">{t.currency}</span>
+                        {staff.revenue.toLocaleString()} <span className="text-[10px] text-[#667085]">{t.currency}</span>
                       </td>
                       <td className="py-4 px-6 text-center">
                         <div className="flex items-center justify-center gap-1.5">
                           <span className="text-[#D1AF47] text-sm leading-none">★</span>
-                          <span className="font-mono font-bold text-white">{staff.rating}</span>
+                          <span className="font-mono font-bold text-[#101828]">{staff.rating}</span>
                         </div>
                       </td>
                     </tr>
@@ -547,11 +547,11 @@ export default function ProviderReportsPage() {
         </div>
 
         {/* POPULARITY BAR CHART */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-sm relative overflow-hidden group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-sm relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#D1AF47]/25 to-transparent" />
           <div className={`flex items-center justify-between mb-6 ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
-            <h3 className="font-serif font-bold text-base text-white tracking-wide">{t.popularServices}</h3>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#7B859C] bg-white/[0.03] px-2.5 py-1 rounded-lg border border-white/[0.04]">
+            <h3 className="font-serif font-bold text-base text-[#101828] tracking-wide">{t.popularServices}</h3>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#667085] bg-[#F9FAFB] border border-[#ECECEC] px-2.5 py-1 rounded-lg border border-white/[0.04]">
               {locale === "ar" ? "حجم الحجز" : "Volume"}
             </span>
           </div>
@@ -565,13 +565,13 @@ export default function ProviderReportsPage() {
               return (
                 <div key={idx} className="group/bar space-y-2">
                   <div className={`flex items-center justify-between text-xs ${locale === "ar" ? "flex-row-reverse" : ""}`}>
-                    <span className="font-bold text-[#B8C0D4] group-hover/bar:text-white transition duration-300">
+                    <span className="font-bold text-[#344054] group-hover/bar:text-[#101828] transition duration-300">
                       {locale === "ar" ? service.name_ar : service.name_en}
                     </span>
                     <div className={`flex items-center gap-2.5 ${locale === "ar" ? "flex-row-reverse" : ""}`}>
-                      <span className="font-mono font-bold text-white">{service.bookings} {locale === "ar" ? "حجوزات" : "bookings"}</span>
+                      <span className="font-mono font-bold text-[#101828]">{service.bookings} {locale === "ar" ? "حجوزات" : "bookings"}</span>
                       <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold font-mono ${
-                        isPositive ? "bg-[#3DDC84]/10 text-[#3DDC84]" : "bg-[#FF5D73]/10 text-[#FF5D73]"
+                        isPositive ? "bg-[#3DDC84]/10 text-[#22C55E]" : "bg-[#FF5D73]/10 text-[#EF4444]"
                       }`}>
                         {service.trend}
                       </span>
@@ -579,13 +579,13 @@ export default function ProviderReportsPage() {
                   </div>
                   
                   {/* Progress track and bar */}
-                  <div className="h-2 w-full bg-[#0D1422] rounded-full border border-white/[0.03] overflow-hidden relative">
+                  <div className="h-2 w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-full border border-white/[0.03] overflow-hidden relative">
                     <div
                       className="h-full bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(209,175,71,0.3)] group-hover/bar:brightness-110"
                       style={{ width: `${pctWidth}%` }}
                     />
                   </div>
-                  <div className={`flex justify-between text-[9px] text-[#7B859C] font-mono ${locale === "ar" ? "flex-row-reverse" : ""}`}>
+                  <div className={`flex justify-between text-[9px] text-[#667085] font-mono ${locale === "ar" ? "flex-row-reverse" : ""}`}>
                     <span>{service.revenue.toLocaleString()} {t.currency}</span>
                     <span>{Math.round(pctWidth)}%</span>
                   </div>

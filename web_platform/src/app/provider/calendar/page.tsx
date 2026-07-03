@@ -2,6 +2,7 @@
 
 import React, { useCallback, useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { usePrayerTimes } from "@/lib/use-prayer-times";
 
 const translations = {
   en: {
@@ -131,6 +132,7 @@ export default function ProviderCalendarPage() {
   const [success, setSuccess] = useState("");
   const [providerId, setProviderId] = useState("");
   const [branches, setBranches] = useState<any[]>([]);
+  const [coords, setCoords] = useState({ lat: 24.7136, lng: 46.6753 });
   const [services, setServices] = useState<any[]>([]);
   const [employees, setEmployees] = useState<any[]>([]);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
@@ -187,6 +189,16 @@ export default function ProviderCalendarPage() {
   const [bookDuration, setBookDuration] = useState("45 mins");
   const [bookNotes, setBookNotes] = useState("");
 
+  const buffersConfig = {
+    fajr: { before: fajrActive ? bufferDuration : 0, after: fajrActive ? bufferDuration : 0 },
+    dhuhr: { before: dhuhrActive ? bufferDuration : 0, after: dhuhrActive ? bufferDuration : 0 },
+    asr: { before: asrActive ? bufferDuration : 0, after: asrActive ? bufferDuration : 0 },
+    maghrib: { before: maghribActive ? bufferDuration : 0, after: maghribActive ? bufferDuration : 0 },
+    isha: { before: ishaActive ? bufferDuration : 0, after: ishaActive ? bufferDuration : 0 }
+  };
+
+  const { todayTimes, tomorrowTimes, resumesIn, lockStartsIn, isLocked: isCurrentlyPrayerLocked } = usePrayerTimes(coords.lat, coords.lng, buffersConfig);
+
   // Time Slots (08:00 AM to 09:00 PM)
   const timeSlots = [
     { label: "08:00 AM", isPrayer: false, prayerKey: "fajr" },
@@ -234,18 +246,51 @@ export default function ProviderCalendarPage() {
     return `${String(hours).padStart(2, "0")}:${minutes} ${ampm}`;
   };
 
+  const getSlotDateTime = (slotLabel: string, date: Date) => {
+    const [time, ampm] = slotLabel.split(" ");
+    const [hoursStr, minutesStr] = time.split(":");
+    let hours = parseInt(hoursStr, 10);
+    const minutes = parseInt(minutesStr, 10);
+    if (ampm === "PM" && hours !== 12) hours += 12;
+    if (ampm === "AM" && hours === 12) hours = 0;
+    
+    const slotDate = new Date(date);
+    slotDate.setHours(hours, minutes, 0, 0);
+    return slotDate;
+  };
+
+  const getSlotPrayerLockInfoRaw = (slot: typeof timeSlots[0]) => {
+    const slotTime = getSlotDateTime(slot.label, selectedDate);
+    const allPrayers = [...todayTimes, ...tomorrowTimes];
+
+    for (const prayer of allPrayers) {
+      const isActive = 
+        (prayer.key === "fajr" && fajrActive) ||
+        (prayer.key === "dhuhr" && dhuhrActive) ||
+        (prayer.key === "asr" && asrActive) ||
+        (prayer.key === "maghrib" && maghribActive) ||
+        (prayer.key === "isha" && ishaActive);
+        
+      if (!isActive) continue;
+
+      const lockStart = new Date(prayer.time.getTime() - bufferDuration * 60 * 1000);
+      const lockEnd = new Date(prayer.time.getTime() + bufferDuration * 60 * 1000);
+
+      if (slotTime >= lockStart && slotTime <= lockEnd) {
+        return prayer;
+      }
+    }
+    return null;
+  };
+
+  const getSlotPrayerLockInfo = (slot: typeof timeSlots[0], index: number) => {
+    if (overriddenSlots.includes(index)) return null;
+    return getSlotPrayerLockInfoRaw(slot);
+  };
+
   // Helper to determine if a slot is locked by a prayer buffer
   const isSlotPrayerLocked = (slot: typeof timeSlots[0], index: number) => {
-    if (!slot.isPrayer) return false;
-    if (overriddenSlots.includes(index)) return false;
-
-    if (slot.prayerKey === "fajr") return fajrActive;
-    if (slot.prayerKey === "dhuhr") return dhuhrActive;
-    if (slot.prayerKey === "asr") return asrActive;
-    if (slot.prayerKey === "maghrib") return maghribActive;
-    if (slot.prayerKey === "isha") return ishaActive;
-
-    return false;
+    return !!getSlotPrayerLockInfo(slot, index);
   };
 
   // Convert time to slot index
@@ -312,10 +357,16 @@ export default function ProviderCalendarPage() {
       // Get branches
       const { data: branchesData, error: branchesError } = await supabase
         .from("branches")
-        .select("id, name_en, name_ar")
+        .select("id, name_en, name_ar, latitude, longitude")
         .eq("provider_id", providerInfo.id);
       if (branchesError) throw branchesError;
       setBranches(branchesData || []);
+      if (branchesData && branchesData.length > 0) {
+        const firstWithCoords = branchesData.find(b => b.latitude && b.longitude);
+        if (firstWithCoords) {
+          setCoords({ lat: Number(firstWithCoords.latitude), lng: Number(firstWithCoords.longitude) });
+        }
+      }
       
       // Get services
       const { data: servicesData, error: servicesError } = await supabase
@@ -636,7 +687,7 @@ export default function ProviderCalendarPage() {
       aria-checked={checked}
       onClick={() => onChange(!checked)}
       className={`relative inline-flex h-5 w-10 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-        checked ? "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A]" : "bg-white/[0.06]"
+        checked ? "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A]" : "bg-[#E5E7EB]"
       }`}
     >
       <span
@@ -648,7 +699,7 @@ export default function ProviderCalendarPage() {
   );
 
   return (
-    <div className="space-y-8 text-[#B8C0D4]">
+    <div className="space-y-8 text-[#344054]">
       {/* ═══════════════ PAGE HEADER ═══════════════ */}
       <div className={`flex flex-col md:flex-row md:items-center md:justify-between gap-6 ${isRTL ? "md:flex-row-reverse text-right" : "text-left"}`}>
         <div>
@@ -665,10 +716,10 @@ export default function ProviderCalendarPage() {
               <select
                 value={selectedEmployeeId}
                 onChange={(e) => setSelectedEmployeeId(e.target.value)}
-                className="pl-4 pr-10 py-2.5 bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] text-xs font-bold rounded-2xl text-[#B8C0D4] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_12px_rgba(209,175,71,0.1)] transition-all duration-300 appearance-none cursor-pointer"
+                className="pl-4 pr-10 py-2.5 bg-[#F9FAFB] border border-[#ECECEC] text-xs font-bold rounded-2xl text-[#101828] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_12px_rgba(209,175,71,0.1)] transition-all duration-300 appearance-none cursor-pointer"
               >
                 {employees.map((emp) => (
-                  <option key={emp.id} value={emp.id} className="bg-[#111827] text-white">
+                  <option key={emp.id} value={emp.id} className="bg-white text-[#101828]">
                     {lang === "ar" ? emp.name_ar || emp.name_en : emp.name_en || emp.name_ar}
                   </option>
                 ))}
@@ -686,12 +737,12 @@ export default function ProviderCalendarPage() {
             type="date"
             value={selectedDate.toISOString().split("T")[0]}
             onChange={(e) => setSelectedDate(new Date(e.target.value))}
-            className="px-4 py-2.5 bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] text-xs font-bold rounded-2xl text-[#B8C0D4] outline-none focus:border-[#D1AF47]/40 transition-all duration-300 cursor-pointer"
+            className="px-4 py-2.5 bg-[#F9FAFB] border border-[#ECECEC] text-xs font-bold rounded-2xl text-[#101828] outline-none focus:border-[#D1AF47]/40 transition-all duration-300 cursor-pointer"
           />
 
           <button 
             onClick={() => setSelectedDate(new Date())}
-            className="px-5 py-2.5 bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] text-xs font-bold uppercase tracking-wider rounded-2xl text-[#B8C0D4] hover:border-[#D1AF47]/30 hover:text-white transition-all duration-300"
+            className="px-5 py-2.5 bg-white border border-[#ECECEC] text-xs font-bold uppercase tracking-wider rounded-2xl text-[#667085] hover:border-[#D1AF47]/30 hover:text-[#101828] transition-all duration-300"
           >
             {t.today}
           </button>
@@ -714,18 +765,18 @@ export default function ProviderCalendarPage() {
 
         {/* ─────── LEFT/MID: SCHEDULE PLANNER ─────── */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-[#111827]/80 backdrop-blur-sm border border-white/[0.06] rounded-3xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+          <div className="bg-white border border-[#ECECEC] rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
             {/* Planner Header */}
-            <div className={`p-6 border-b border-white/[0.04] bg-white/[0.02] rounded-t-3xl flex items-center justify-between ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <h3 className="font-semibold text-sm text-white tracking-wide">
+            <div className={`p-6 border-b border-[#ECECEC] bg-[#F9FAFB] rounded-t-3xl flex items-center justify-between ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <h3 className="font-semibold text-sm text-[#101828] tracking-wide">
                 {lang === "ar" ? "لوحة التخطيط الفوري للمواعيد" : "Real-time Roster Planner"}
               </h3>
               {/* Day/Week Glassmorphic Pill Switcher */}
-              <div className="flex bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] rounded-xl p-1 gap-1">
+              <div className="flex bg-[#F3F4F6] border border-[#ECECEC] rounded-xl p-1 gap-1">
                 <button className="px-4 py-1.5 text-[10px] font-extrabold uppercase rounded-xl bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] shadow-[0_0_12px_rgba(209,175,71,0.2)] transition-all duration-300">
                   {t.dayView}
                 </button>
-                <button className="px-4 py-1.5 text-[10px] font-extrabold uppercase rounded-xl text-[#7B859C] hover:text-white hover:bg-white/[0.04] transition-all duration-300">
+                <button className="px-4 py-1.5 text-[10px] font-extrabold uppercase rounded-xl text-[#667085] hover:text-[#101828] hover:bg-[#E5E7EB] transition-all duration-300">
                   {t.weekView}
                 </button>
               </div>
@@ -733,7 +784,7 @@ export default function ProviderCalendarPage() {
 
             {/* Off-duty banner */}
             {isOffDutyToday && (
-              <div className="m-6 p-6 bg-[#FF5D73]/[0.04] border border-[#FF5D73]/10 rounded-2xl text-center text-[#FF5D73] space-y-3">
+              <div className="m-6 p-6 bg-[#FEF3F2] border border-[#FEE4E2] rounded-2xl text-center text-[#EF4444] space-y-3">
                 <svg className="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -741,7 +792,7 @@ export default function ProviderCalendarPage() {
                   <p className="text-sm font-bold">
                     {lang === "ar" ? "الأخصائي في إجازة اليوم" : "Stylist is Off-Duty Today"}
                   </p>
-                  <p className="text-xs text-[#FF5D73]/60 mt-1">
+                  <p className="text-xs text-[#EF4444]/80 mt-1">
                     {lang === "ar" 
                       ? "تم وضع هذا اليوم كإجازة أسبوعية في مناوبات العمل." 
                       : "This day is configured as off-duty in their weekly working roster."}
@@ -751,10 +802,12 @@ export default function ProviderCalendarPage() {
             )}
 
             {/* Time Slot Rows */}
-            <div className={`divide-y divide-white/[0.04] ${isOffDutyToday ? "opacity-40 pointer-events-none" : ""}`}>
+            <div className={`divide-y divide-[#ECECEC] ${isOffDutyToday ? "opacity-40 pointer-events-none" : ""}`}>
               {timeSlots.map((slot, index) => {
+                const lockingPrayerRaw = getSlotPrayerLockInfoRaw(slot);
                 const isLocked = isSlotPrayerLocked(slot, index);
-                const isOverridden = slot.isPrayer && overriddenSlots.includes(index);
+                const isOverridden = !!lockingPrayerRaw && overriddenSlots.includes(index);
+                const prayerName = lockingPrayerRaw ? (isRTL ? lockingPrayerRaw.nameAr : lockingPrayerRaw.nameEn) : "";
                 const appt = appointments.find(a => a.slotIndex === index);
                 const blocked = blockouts.find(b => b.slotIndex === index);
 
@@ -762,14 +815,14 @@ export default function ProviderCalendarPage() {
                   <div key={index} className={`flex min-h-[80px] items-stretch ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
 
                     {/* Time indicator column */}
-                    <div className={`w-28 px-4 py-4 flex items-center justify-center text-[11px] font-semibold text-[#7B859C] bg-white/[0.02] select-none tracking-wide ${isRTL ? "border-l" : "border-r"} border-white/[0.04]`}>
+                    <div className={`w-28 px-4 py-4 flex items-center justify-center text-[11px] font-semibold text-[#667085] bg-[#F9FAFB] select-none tracking-wide ${isRTL ? "border-l" : "border-r"} border-[#ECECEC]`}>
                       {slot.label}
                     </div>
 
                     {/* Slot content area */}
                     <div
                       className={`flex-grow p-2.5 relative flex items-center transition-all duration-300 ${
-                        draggedOverSlot === index ? "bg-[#D1AF47]/[0.06] border-2 border-dashed border-[#D1AF47]/40 rounded-2xl" : ""
+                        draggedOverSlot === index ? "bg-[#D1AF47]/[0.03] border-2 border-dashed border-[#D1AF47]/40 rounded-2xl" : ""
                       }`}
                       onDragOver={(e) => {
                         e.preventDefault();
@@ -799,64 +852,64 @@ export default function ProviderCalendarPage() {
                     >
                       {isLocked ? (
                         // 1. Prayer Lockout Buffer state
-                        <div className={`w-full h-full bg-[#FF5D73]/[0.04] border border-[#FF5D73]/10 rounded-2xl flex items-center justify-between px-5 gap-3 text-[#FF5D73] shadow-[inset_0_0_20px_rgba(255,93,115,0.03)] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                        <div className={`w-full h-full bg-[#FEF3F2] border border-[#FEE4E2] rounded-2xl flex items-center justify-between px-5 gap-3 text-[#EF4444] shadow-sm ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                           <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse text-right" : "text-left"}`}>
-                            <div className="w-9 h-9 rounded-xl bg-[#FF5D73]/[0.08] flex items-center justify-center flex-shrink-0">
+                            <div className="w-9 h-9 rounded-xl bg-[#FEE4E2] text-[#EF4444] flex items-center justify-center flex-shrink-0">
                               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                               </svg>
                             </div>
                             <div>
-                              <p className="text-xs font-bold">{slot.prayerName} - {t.blockedBuffer}</p>
-                              <p className="text-[10px] text-[#FF5D73]/60">{bufferDuration} mins locked (Geofenced Lockout)</p>
+                              <p className="text-xs font-bold">{prayerName} - {t.blockedBuffer}</p>
+                              <p className="text-[10px] text-[#EF4444]/80">{bufferDuration} mins locked (Geofenced Lockout)</p>
                             </div>
                           </div>
 
                           <button
                             onClick={() => toggleBufferOverride(index)}
-                            className="px-3 py-1.5 bg-[#FF5D73]/[0.08] hover:bg-[#FF5D73]/[0.15] border border-[#FF5D73]/15 rounded-xl text-[9px] font-bold uppercase tracking-wider text-[#FF5D73]/80 hover:text-[#FF5D73] transition-all duration-300"
+                            className="px-3 py-1.5 bg-white border border-[#FEE4E2] hover:bg-[#FEE4E2] rounded-xl text-[9px] font-bold uppercase tracking-wider text-[#EF4444] transition-all duration-300"
                           >
                             {t.unblockSlot}
                           </button>
                         </div>
                       ) : isOverridden ? (
                         // 2. Overridden / Unlocked buffer state
-                        <div className={`w-full h-full bg-[#3DDC84]/[0.04] border border-[#3DDC84]/10 rounded-2xl flex items-center justify-between px-5 gap-3 text-[#3DDC84] shadow-[inset_0_0_20px_rgba(61,220,132,0.03)] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                        <div className={`w-full h-full bg-[#ECFDF3] border border-[#D1FADF] rounded-2xl flex items-center justify-between px-5 gap-3 text-[#22C55E] shadow-sm ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                           <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse text-right" : "text-left"}`}>
-                            <div className="w-9 h-9 rounded-xl bg-[#3DDC84]/[0.08] flex items-center justify-center flex-shrink-0">
+                            <div className="w-9 h-9 rounded-xl bg-[#D1FADF] text-[#22C55E] flex items-center justify-center flex-shrink-0">
                               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
                               </svg>
                             </div>
                             <div>
-                              <p className="text-xs font-bold">{slot.prayerName} - {t.unlockedOverride}</p>
-                              <p className="text-[10px] text-[#3DDC84]/60">Manual buffer bypass allowed</p>
+                              <p className="text-xs font-bold">{prayerName} - {t.unlockedOverride}</p>
+                              <p className="text-[10px] text-[#22C55E]/80">Manual buffer bypass allowed</p>
                             </div>
                           </div>
                           <button
                             onClick={() => toggleBufferOverride(index)}
-                            className="px-3 py-1.5 bg-[#3DDC84]/[0.08] hover:bg-[#3DDC84]/[0.15] border border-[#3DDC84]/15 rounded-xl text-[9px] font-bold uppercase tracking-wider text-[#3DDC84]/80 hover:text-[#3DDC84] transition-all duration-300"
+                            className="px-3 py-1.5 bg-white border border-[#D1FADF] hover:bg-[#D1FADF] rounded-xl text-[9px] font-bold uppercase tracking-wider text-[#027A48] transition-all duration-300"
                           >
                             Lock Buffer
                           </button>
                         </div>
                       ) : blocked ? (
                         // 3. Manual Blockout state
-                        <div className={`w-full h-full bg-white/[0.02] border border-white/[0.06] rounded-2xl flex items-center justify-between px-5 gap-3 text-[#7B859C] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                        <div className={`w-full h-full bg-[#F9FAFB] border border-[#ECECEC] rounded-2xl flex items-center justify-between px-5 gap-3 text-[#667085] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                           <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse text-right" : "text-left"}`}>
-                            <div className="w-9 h-9 rounded-xl bg-white/[0.04] flex items-center justify-center flex-shrink-0">
+                            <div className="w-9 h-9 rounded-xl bg-[#F3F4F6] text-[#667085] flex items-center justify-center flex-shrink-0">
                               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                               </svg>
                             </div>
                             <div>
-                              <p className="text-xs font-bold text-[#B8C0D4]">{blocked.reason}</p>
-                              <p className="text-[10px] text-[#7B859C]">Locked out for appointments</p>
+                              <p className="text-xs font-bold text-[#101828]">{blocked.reason}</p>
+                              <p className="text-[10px] text-[#667085]">Locked out for appointments</p>
                             </div>
                           </div>
                           <button
                             onClick={() => handleBlockSlot(index)}
-                            className="px-3 py-1.5 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] rounded-xl text-[9px] font-bold uppercase tracking-wider text-[#B8C0D4] hover:text-white transition-all duration-300"
+                            className="px-3 py-1.5 bg-white border border-[#ECECEC] hover:bg-[#F9FAFB] rounded-xl text-[9px] font-bold uppercase tracking-wider text-[#667085] transition-all duration-300"
                           >
                             Unblock
                           </button>
@@ -869,32 +922,32 @@ export default function ProviderCalendarPage() {
                           onDragStart={(e) => {
                             e.dataTransfer.setData("text/plain", appt.id);
                           }}
-                          className={`w-full bg-[#D1AF47]/[0.06] rounded-2xl p-4 flex flex-wrap gap-4 items-center justify-between group hover:bg-[#D1AF47]/[0.10] hover:shadow-[0_0_20px_rgba(209,175,71,0.12)] hover:scale-[1.01] transition-all duration-300 cursor-pointer active:scale-[0.98] ${isRTL ? "border-r-4" : "border-l-4"} border-[#D1AF47]`}
+                          className={`w-full bg-[#D1AF47]/[0.04] border border-[#D1AF47]/20 rounded-2xl p-4 flex flex-wrap gap-4 items-center justify-between group hover:bg-[#D1AF47]/[0.08] hover:shadow-[0_4px_20px_rgba(209,175,71,0.08)] hover:scale-[1.01] transition-all duration-300 cursor-pointer active:scale-[0.98] ${isRTL ? "border-r-4" : "border-l-4"} border-[#D1AF47]`}
                         >
                           <div className={isRTL ? "text-right" : "text-left"}>
                             <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                              <h4 className="font-bold text-sm text-white group-hover:text-[#E0C46A] transition-colors duration-300">{appt.customer}</h4>
-                              <span className="text-[10px] bg-white/[0.06] text-[#7B859C] px-2.5 py-0.5 rounded-full font-medium">{appt.duration}</span>
+                              <h4 className="font-bold text-sm text-[#101828] group-hover:text-[#9A741F] transition-colors duration-300">{appt.customer}</h4>
+                              <span className="text-[10px] bg-[#F3F4F6] text-[#667085] px-2.5 py-0.5 rounded-full font-medium">{appt.duration}</span>
                             </div>
-                            <p className="text-xs text-[#7B859C] mt-1.5">
-                              {t.service}: <span className="text-[#B8C0D4] font-semibold">{appt.service}</span>
+                            <p className="text-xs text-[#667085] mt-1.5">
+                              {t.service}: <span className="text-[#101828] font-semibold">{appt.service}</span>
                             </p>
                           </div>
 
                           <div className={`flex items-center gap-6 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                             <div className={isRTL ? "text-left" : "text-right"}>
-                              <p className="text-[10px] text-[#7B859C]">{t.stylist}</p>
+                              <p className="text-[10px] text-[#667085]">{t.stylist}</p>
                               <p className="text-xs font-bold text-[#D1AF47]">{appt.staff}</p>
                             </div>
                             <div className={isRTL ? "text-left" : "text-right"}>
-                              <p className="text-[10px] text-[#7B859C]">{t.price}</p>
-                              <p className="text-xs font-black text-white">{appt.price} SAR</p>
+                              <p className="text-[10px] text-[#667085]">{t.price}</p>
+                              <p className="text-xs font-black text-[#101828]">{appt.price} SAR</p>
                             </div>
                           </div>
                         </div>
                       ) : (
                         // 5. Open empty slot state
-                        <div className={`w-full h-full rounded-2xl border border-dashed border-white/[0.06] hover:border-[#D1AF47]/30 hover:bg-[#D1AF47]/[0.02] transition-all duration-300 cursor-pointer flex items-center justify-between px-6 text-[#7B859C] hover:text-[#D1AF47] group`}>
+                        <div className={`w-full h-full rounded-2xl border border-dashed border-[#ECECEC] hover:border-[#D1AF47]/40 hover:bg-[#D1AF47]/[0.01] transition-all duration-300 cursor-pointer flex items-center justify-between px-6 text-[#667085] hover:text-[#9A741F] group`}>
                           <span className="text-xs font-semibold opacity-0 group-hover:opacity-100 transition-all duration-300">
                             {lang === "ar" ? "جدولة حجز في هذا الوقت" : "Schedule Walk-in / Booking"}
                           </span>
@@ -905,13 +958,13 @@ export default function ProviderCalendarPage() {
                                 setBookStaff(selectedEmployeeId);
                                 setShowBookModal(true);
                               }}
-                              className="px-3 py-1.5 bg-white/[0.04] backdrop-blur-sm border border-white/[0.06] rounded-xl text-[9px] font-bold uppercase tracking-wider text-white hover:bg-[#D1AF47]/10 hover:border-[#D1AF47]/20 hover:text-[#D1AF47] transition-all duration-300"
+                              className="px-3 py-1.5 bg-white border border-[#ECECEC] rounded-xl text-[9px] font-bold uppercase tracking-wider text-[#667085] hover:bg-[#D1AF47]/10 hover:border-[#D1AF47]/20 hover:text-[#D1AF47] transition-all duration-300"
                             >
                               {t.addAppointment}
                             </button>
                             <button
                               onClick={() => handleBlockSlot(index)}
-                              className="px-3 py-1.5 bg-white/[0.02] backdrop-blur-sm border border-white/[0.06] rounded-xl text-[9px] font-bold uppercase tracking-wider text-[#7B859C] hover:bg-white/[0.04] hover:text-[#B8C0D4] transition-all duration-300"
+                              className="px-3 py-1.5 bg-white border border-[#ECECEC] rounded-xl text-[9px] font-bold uppercase tracking-wider text-[#667085] hover:bg-[#F9FAFB] transition-all duration-300"
                             >
                               {t.blockSlot}
                             </button>
@@ -931,14 +984,14 @@ export default function ProviderCalendarPage() {
         <div className="space-y-6">
 
           {/* A. PRAYER LOCK BUFFER CONTROL */}
-          <div className="bg-[#111827]/80 backdrop-blur-sm border border-white/[0.06] rounded-3xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.3)] space-y-5">
-            <div className={`flex items-center gap-2.5 pb-4 border-b border-white/[0.04] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+          <div className="bg-white border border-[#ECECEC] rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] space-y-5">
+            <div className={`flex items-center gap-2.5 pb-4 border-b border-[#ECECEC] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <div className="w-8 h-8 rounded-xl bg-[#D1AF47]/10 flex items-center justify-center">
                 <svg className="w-4 h-4 text-[#D1AF47]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
-              <h3 className="font-bold text-xs uppercase tracking-[0.15em] text-white">{t.prayerControlPanel}</h3>
+              <h3 className="font-bold text-xs uppercase tracking-[0.15em] text-[#101828]">{t.prayerControlPanel}</h3>
             </div>
 
             {/* Buffer time length control */}
@@ -965,7 +1018,7 @@ export default function ProviderCalendarPage() {
             <div className="space-y-3.5 pt-2">
               {/* Fajr */}
               <div className={`flex items-center justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="font-semibold text-[#B8C0D4]">{t.fajr}</span>
+                <span className="font-semibold text-[#344054]">{t.fajr}</span>
                 <ToggleSwitch checked={fajrActive} onChange={setFajrActive} />
               </div>
 
@@ -996,21 +1049,21 @@ export default function ProviderCalendarPage() {
           </div>
 
           {/* B. GEOFENCED LOGISTICS / DISPATCH RADIUS */}
-          <div className="bg-[#111827]/80 backdrop-blur-sm border border-white/[0.06] rounded-3xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.3)] space-y-5">
-            <div className={`flex items-center gap-2.5 pb-4 border-b border-white/[0.04] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+          <div className="bg-white border border-[#ECECEC] rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] space-y-5">
+            <div className={`flex items-center gap-2.5 pb-4 border-b border-[#ECECEC] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <div className="w-8 h-8 rounded-xl bg-[#D1AF47]/10 flex items-center justify-center">
                 <svg className="w-4 h-4 text-[#D1AF47]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
-              <h3 className="font-bold text-xs uppercase tracking-[0.15em] text-white">{t.dispatchControlPanel}</h3>
+              <h3 className="font-bold text-xs uppercase tracking-[0.15em] text-[#101828]">{t.dispatchControlPanel}</h3>
             </div>
 
             {/* Travel boundary radius control */}
             <div className="space-y-3">
               <div className={`flex justify-between items-center text-[10px] font-bold uppercase tracking-wider ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-[#7B859C]">{t.radiusLabel}</span>
+                <span className="text-[#667085]">{t.radiusLabel}</span>
                 <span className="text-[#D1AF47] bg-[#D1AF47]/10 px-3 py-1 rounded-full text-[10px] font-bold">{travelRadius} km</span>
               </div>
               <input
@@ -1019,14 +1072,14 @@ export default function ProviderCalendarPage() {
                 max="50"
                 value={travelRadius}
                 onChange={(e) => setTravelRadius(Number(e.target.value))}
-                className="w-full h-1.5 bg-white/[0.06] rounded-lg appearance-none cursor-pointer accent-[#D1AF47]"
+                className="w-full h-1.5 bg-[#E5E7EB] rounded-lg appearance-none cursor-pointer accent-[#D1AF47]"
               />
             </div>
 
             {/* Traffic delay buffer control */}
             <div className="space-y-3">
               <div className={`flex justify-between items-center text-[10px] font-bold uppercase tracking-wider ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-[#7B859C]">{t.delayBufferLabel}</span>
+                <span className="text-[#667085]">{t.delayBufferLabel}</span>
                 <span className="text-[#D1AF47] bg-[#D1AF47]/10 px-3 py-1 rounded-full text-[10px] font-bold">+{trafficDelay} mins</span>
               </div>
               <input
@@ -1035,39 +1088,39 @@ export default function ProviderCalendarPage() {
                 max="60"
                 value={trafficDelay}
                 onChange={(e) => setTrafficDelay(Number(e.target.value))}
-                className="w-full h-1.5 bg-white/[0.06] rounded-lg appearance-none cursor-pointer accent-[#D1AF47]"
+                className="w-full h-1.5 bg-[#E5E7EB] rounded-lg appearance-none cursor-pointer accent-[#D1AF47]"
               />
             </div>
           </div>
 
           {/* C. ROSTER WORKING HOURS */}
-          <div className="bg-[#111827]/80 backdrop-blur-sm border border-white/[0.06] rounded-3xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.3)] space-y-5">
-            <div className={`flex items-center gap-2.5 pb-4 border-b border-white/[0.04] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+          <div className="bg-white border border-[#ECECEC] rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] space-y-5">
+            <div className={`flex items-center gap-2.5 pb-4 border-b border-[#ECECEC] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <div className="w-8 h-8 rounded-xl bg-[#D1AF47]/10 flex items-center justify-center">
                 <svg className="w-4 h-4 text-[#D1AF47]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="font-bold text-xs uppercase tracking-[0.15em] text-white">{t.workingHoursPanel}</h3>
+              <h3 className="font-bold text-xs uppercase tracking-[0.15em] text-[#101828]">{t.workingHoursPanel}</h3>
             </div>
 
             {/* Day Selector */}
             <div className="space-y-1.5">
-              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>
+              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>
                 {lang === "ar" ? "اليوم المراد تعديله" : "Day to Edit"}
               </label>
               <select
                 value={selectedDayToEdit}
                 onChange={(e) => setSelectedDayToEdit(Number(e.target.value))}
-                className="w-full bg-white/[0.03] border border-white/[0.06] text-xs rounded-2xl px-4 py-2.5 text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300"
+                className="w-full bg-[#F9FAFB] border border-[#ECECEC] text-xs rounded-2xl px-4 py-2.5 text-[#101828] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300"
               >
-                <option value={0} className="bg-[#111827] text-white">{lang === "ar" ? "الأحد" : "Sunday"}</option>
-                <option value={1} className="bg-[#111827] text-white">{lang === "ar" ? "الاثنين" : "Monday"}</option>
-                <option value={2} className="bg-[#111827] text-white">{lang === "ar" ? "الثلاثاء" : "Tuesday"}</option>
-                <option value={3} className="bg-[#111827] text-white">{lang === "ar" ? "الأربعاء" : "Wednesday"}</option>
-                <option value={4} className="bg-[#111827] text-white">{lang === "ar" ? "الخميس" : "Thursday"}</option>
-                <option value={5} className="bg-[#111827] text-white">{lang === "ar" ? "الجمعة" : "Friday"}</option>
-                <option value={6} className="bg-[#111827] text-white">{lang === "ar" ? "السبت" : "Saturday"}</option>
+                <option value={0} className="bg-white text-[#101828]">{lang === "ar" ? "الأحد" : "Sunday"}</option>
+                <option value={1} className="bg-white text-[#101828]">{lang === "ar" ? "الاثنين" : "Monday"}</option>
+                <option value={2} className="bg-white text-[#101828]">{lang === "ar" ? "الثلاثاء" : "Tuesday"}</option>
+                <option value={3} className="bg-white text-[#101828]">{lang === "ar" ? "الأربعاء" : "Wednesday"}</option>
+                <option value={4} className="bg-white text-[#101828]">{lang === "ar" ? "الخميس" : "Thursday"}</option>
+                <option value={5} className="bg-white text-[#101828]">{lang === "ar" ? "الجمعة" : "Friday"}</option>
+                <option value={6} className="bg-white text-[#101828]">{lang === "ar" ? "السبت" : "Saturday"}</option>
               </select>
             </div>
 
@@ -1088,34 +1141,34 @@ export default function ProviderCalendarPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>
+                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>
                   {lang === "ar" ? "بداية المناوبة" : "Shift Start"}
                 </label>
                 <select
                   value={shiftStart}
                   onChange={(e) => setShiftStart(e.target.value)}
-                  className="w-full bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] text-xs rounded-xl px-3 py-2 text-[#B8C0D4] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_12px_rgba(209,175,71,0.1)] transition-all duration-300"
+                  className="w-full bg-[#F9FAFB] border border-[#ECECEC] text-xs rounded-xl px-3 py-2 text-[#101828] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_12px_rgba(209,175,71,0.1)] transition-all duration-300"
                 >
-                  <option value="05:00 AM" className="bg-[#111827] text-white">05:00 AM</option>
-                  <option value="06:00 AM" className="bg-[#111827] text-white">06:00 AM</option>
-                  <option value="07:00 AM" className="bg-[#111827] text-white">07:00 AM</option>
-                  <option value="08:00 AM" className="bg-[#111827] text-white">08:00 AM</option>
-                  <option value="09:00 AM" className="bg-[#111827] text-white">09:00 AM</option>
-                  <option value="10:00 AM" className="bg-[#111827] text-white">10:00 AM</option>
-                  <option value="11:00 AM" className="bg-[#111827] text-white">11:00 AM</option>
-                  <option value="12:00 PM" className="bg-[#111827] text-white">12:00 PM</option>
-                  <option value="01:00 PM" className="bg-[#111827] text-white">01:00 PM</option>
-                  <option value="02:00 PM" className="bg-[#111827] text-white">02:00 PM</option>
+                  <option value="05:00 AM" className="bg-white text-[#101828]">05:00 AM</option>
+                  <option value="06:00 AM" className="bg-white text-[#101828]">06:00 AM</option>
+                  <option value="07:00 AM" className="bg-white text-[#101828]">07:00 AM</option>
+                  <option value="08:00 AM" className="bg-white text-[#101828]">08:00 AM</option>
+                  <option value="09:00 AM" className="bg-white text-[#101828]">09:00 AM</option>
+                  <option value="10:00 AM" className="bg-white text-[#101828]">10:00 AM</option>
+                  <option value="11:00 AM" className="bg-white text-[#101828]">11:00 AM</option>
+                  <option value="12:00 PM" className="bg-white text-[#101828]">12:00 PM</option>
+                  <option value="01:00 PM" className="bg-white text-[#101828]">01:00 PM</option>
+                  <option value="02:00 PM" className="bg-white text-[#101828]">02:00 PM</option>
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>
+                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>
                   {lang === "ar" ? "نهاية المناوبة" : "Shift End"}
                 </label>
                 <select
                   value={shiftEnd}
                   onChange={(e) => setShiftEnd(e.target.value)}
-                  className="w-full bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] text-xs rounded-xl px-3 py-2 text-[#B8C0D4] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_12px_rgba(209,175,71,0.1)] transition-all duration-300"
+                  className="w-full bg-[#F9FAFB] border border-[#ECECEC] text-xs rounded-xl px-3 py-2 text-[#101828] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_12px_rgba(209,175,71,0.1)] transition-all duration-300"
                 >
                   <option value="07:00 PM">07:00 PM</option>
                   <option value="08:00 PM">08:00 PM</option>
@@ -1132,18 +1185,18 @@ export default function ProviderCalendarPage() {
 
       {/* ═══════════════ WALK-IN BOOKING MODAL ═══════════════ */}
       {showBookModal && targetSlotIndex !== null && (
-        <div className="fixed inset-0 bg-[#070B12]/70 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-[#101828]/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <form
             onSubmit={handleBookingSubmit}
-            className="bg-[#111827] border border-white/[0.08] rounded-3xl p-7 max-w-sm w-full space-y-5 shadow-[0_24px_80px_rgba(0,0,0,0.5)] animate-[modalIn_0.25s_ease-out]"
+            className="bg-white border border-[#ECECEC] rounded-3xl p-7 max-w-sm w-full space-y-5 shadow-[0_12px_40px_rgba(0,0,0,0.08)] animate-[modalIn_0.25s_ease-out]"
             style={{ animation: "modalIn 0.25s ease-out" }}
           >
-            <h3 className={`font-bold text-base text-white ${isRTL ? "text-right" : "text-left"}`}>
+            <h3 className={`font-bold text-base text-[#101828] ${isRTL ? "text-right" : "text-left"}`}>
               {t.addAppointment} ({timeSlots[targetSlotIndex].label})
             </h3>
 
             <div className="space-y-1.5">
-              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>{t.clientName}</label>
+              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>{t.clientName}</label>
               {customers.length > 0 ? (
                 <select
                   value={selectedCustomerId}
@@ -1155,10 +1208,10 @@ export default function ProviderCalendarPage() {
                       setBookCustomer(`${selectedCust.first_name || ""} ${selectedCust.last_name || ""}`.trim() || selectedCust.phone_number);
                     }
                   }}
-                  className="w-full bg-white/[0.03] border border-white/[0.06] text-xs rounded-2xl px-4 py-2.5 text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 cursor-pointer"
+                  className="w-full bg-[#F9FAFB] border border-[#ECECEC] text-xs rounded-2xl px-4 py-2.5 text-[#101828] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 cursor-pointer"
                 >
                   {customers.map((c) => (
-                    <option key={c.id} value={c.id} className="bg-[#111827] text-white">
+                    <option key={c.id} value={c.id} className="bg-white text-[#101828]">
                       {`${c.first_name || ""} ${c.last_name || ""}`.trim() || c.phone_number}
                     </option>
                   ))}
@@ -1170,13 +1223,13 @@ export default function ProviderCalendarPage() {
                   value={bookCustomer}
                   onChange={e => setBookCustomer(e.target.value)}
                   placeholder="Fahad Al-Malki"
-                  className={`w-full bg-white/[0.03] border border-white/[0.06] rounded-2xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 placeholder:text-[#7B859C]/50 ${isRTL ? "text-right" : "text-left"}`}
+                  className={`w-full bg-[#F9FAFB] border border-[#ECECEC] rounded-2xl px-4 py-2.5 text-xs text-[#101828] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 placeholder:text-[#667085]/40 ${isRTL ? "text-right" : "text-left"}`}
                 />
               )}
             </div>
 
             <div className="space-y-1.5">
-              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>{t.service}</label>
+              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>{t.service}</label>
               <select
                 value={bookService}
                 onChange={(e) => {
@@ -1188,10 +1241,10 @@ export default function ProviderCalendarPage() {
                     setBookDuration(`${selectedServ.base_duration_minutes || 60} mins`);
                   }
                 }}
-                className="w-full bg-white/[0.03] border border-white/[0.06] text-xs rounded-2xl px-4 py-2.5 text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 cursor-pointer"
+                className="w-full bg-[#F9FAFB] border border-[#ECECEC] text-xs rounded-2xl px-4 py-2.5 text-[#101828] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 cursor-pointer"
               >
                 {services.map((s) => (
-                  <option key={s.id} value={s.id} className="bg-[#111827] text-white">
+                  <option key={s.id} value={s.id} className="bg-white text-[#101828]">
                     {lang === "ar" ? s.name_ar || s.name_en : s.name_en || s.name_ar} ({s.base_price} SAR)
                   </option>
                 ))}
@@ -1200,14 +1253,14 @@ export default function ProviderCalendarPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>{t.assignedStylist}</label>
+                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>{t.assignedStylist}</label>
                 <select
                   value={bookStaff}
                   onChange={e => setBookStaff(e.target.value)}
-                  className="w-full bg-white/[0.03] border border-white/[0.06] text-xs rounded-2xl px-3 py-2.5 text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 cursor-pointer"
+                  className="w-full bg-[#F9FAFB] border border-[#ECECEC] text-xs rounded-2xl px-3 py-2.5 text-[#101828] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 cursor-pointer"
                 >
                   {employees.map((emp) => (
-                    <option key={emp.id} value={emp.id} className="bg-[#111827] text-white">
+                    <option key={emp.id} value={emp.id} className="bg-white text-[#101828]">
                       {lang === "ar" ? emp.name_ar || emp.name_en : emp.name_en || emp.name_ar}
                     </option>
                   ))}
@@ -1215,25 +1268,25 @@ export default function ProviderCalendarPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>{t.priceLabel}</label>
+                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>{t.priceLabel}</label>
                 <input
                   type="text"
                   required
                   value={bookPrice}
                   onChange={e => setBookPrice(e.target.value)}
-                  className={`w-full bg-white/[0.03] border border-white/[0.06] rounded-2xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 ${isRTL ? "text-right" : "text-left"}`}
+                  className={`w-full bg-[#F9FAFB] border border-[#ECECEC] rounded-2xl px-4 py-2.5 text-xs text-[#101828] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 ${isRTL ? "text-right" : "text-left"}`}
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#7B859C] ${isRTL ? "text-right" : "text-left"}`}>{t.notes}</label>
+              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>{t.notes}</label>
               <input
                 type="text"
                 value={bookNotes}
                 onChange={e => setBookNotes(e.target.value)}
                 placeholder={t.notesPlaceholder}
-                className={`w-full bg-white/[0.03] border border-white/[0.06] rounded-2xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 placeholder:text-[#7B859C]/50 ${isRTL ? "text-right" : "text-left"}`}
+                className={`w-full bg-[#F9FAFB] border border-[#ECECEC] rounded-2xl px-4 py-2.5 text-xs text-[#101828] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 placeholder:text-[#667085]/40 ${isRTL ? "text-right" : "text-left"}`}
               />
             </div>
 
@@ -1241,7 +1294,7 @@ export default function ProviderCalendarPage() {
               <button
                 type="button"
                 onClick={() => setShowBookModal(false)}
-                className="px-5 py-2.5 bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] hover:bg-white/[0.06] rounded-2xl text-[10px] font-bold uppercase tracking-wider text-[#B8C0D4] hover:text-white transition-all duration-300"
+                className="px-5 py-2.5 bg-white border border-[#ECECEC] rounded-2xl text-[10px] font-bold uppercase tracking-wider text-[#667085] hover:bg-[#F9FAFB] transition-all duration-300"
               >
                 {t.cancel}
               </button>
@@ -1258,37 +1311,37 @@ export default function ProviderCalendarPage() {
 
       {/* ═══════════════ APPOINTMENT DETAILS MODAL ═══════════════ */}
       {showDetailsModal && (
-        <div className="fixed inset-0 bg-[#070B12]/70 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-[#101828]/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div
-            className="bg-[#111827] border border-white/[0.08] rounded-3xl p-7 max-w-sm w-full space-y-5 shadow-[0_24px_80px_rgba(0,0,0,0.5)]"
+            className="bg-white border border-[#ECECEC] rounded-3xl p-7 max-w-sm w-full space-y-5 shadow-[0_12px_40px_rgba(0,0,0,0.08)]"
             style={{ animation: "modalIn 0.25s ease-out" }}
           >
-            <h3 className={`font-bold text-base text-white ${isRTL ? "text-right" : "text-left"}`}>{t.detailsTitle}</h3>
+            <h3 className={`font-bold text-base text-[#101828] ${isRTL ? "text-right" : "text-left"}`}>{t.detailsTitle}</h3>
 
             <div className="space-y-3.5">
               <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-[#7B859C]">{t.customer}:</span>
-                <span className="font-bold text-white">{showDetailsModal.customer}</span>
+                <span className="text-[#667085]">{t.customer}:</span>
+                <span className="font-bold text-[#101828]">{showDetailsModal.customer}</span>
               </div>
               <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-[#7B859C]">{t.service}:</span>
-                <span className="font-bold text-white">{showDetailsModal.service}</span>
+                <span className="text-[#667085]">{t.service}:</span>
+                <span className="font-bold text-[#101828]">{showDetailsModal.service}</span>
               </div>
               <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-[#7B859C]">{t.stylist}:</span>
+                <span className="text-[#667085]">{t.stylist}:</span>
                 <span className="font-bold text-[#D1AF47]">{showDetailsModal.staff}</span>
               </div>
               <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-[#7B859C]">{t.time}:</span>
-                <span className="font-bold text-white">{showDetailsModal.time}</span>
+                <span className="text-[#667085]">{t.time}:</span>
+                <span className="font-bold text-[#101828]">{showDetailsModal.time}</span>
               </div>
               <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-[#7B859C]">{t.priceLabel}:</span>
-                <span className="font-bold text-white">{showDetailsModal.price} SAR</span>
+                <span className="text-[#667085]">{t.priceLabel}:</span>
+                <span className="font-bold text-[#101828]">{showDetailsModal.price} SAR</span>
               </div>
               {showDetailsModal.notes && (
                 <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                  <span className="text-[#7B859C]">{t.notes}:</span>
+                  <span className="text-[#667085]">{t.notes}:</span>
                   <span className="font-semibold text-[#B8C0D4]">{showDetailsModal.notes}</span>
                 </div>
               )}

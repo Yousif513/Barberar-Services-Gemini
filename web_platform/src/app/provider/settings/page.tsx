@@ -447,12 +447,12 @@ export default function ProviderSettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[500px] space-y-4 bg-[#070B12]">
+      <div className="flex flex-col items-center justify-center min-h-[500px] space-y-4 bg-transparent">
         <div className="relative w-16 h-16">
           <div className="absolute inset-0 rounded-full border-2 border-[#D1AF47]/20 border-t-[#D1AF47] animate-spin" />
-          <div className="absolute inset-2 rounded-full border border-white/5 border-b-white/20 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1s' }} />
+          <div className="absolute inset-2 rounded-full border border-[#ECECEC] border-b-white/20 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1s' }} />
         </div>
-        <p className="text-xs text-[#7B859C] font-mono tracking-widest uppercase animate-pulse">
+        <p className="text-xs text-[#667085] font-mono tracking-widest uppercase animate-pulse">
           {locale === "en" ? "Initializing Configuration..." : "جاري تهيئة الإعدادات..."}
         </p>
       </div>
@@ -463,7 +463,7 @@ export default function ProviderSettingsPage() {
     <div className="space-y-8 font-sans bg-transparent min-h-screen p-1 sm:p-6 md:p-8 transition-colors duration-300">
       
       {/* HEADER SECTION */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.06] pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#ECECEC] pb-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="w-2 h-2 rounded-full bg-[#D1AF47] shadow-[0_0_8px_#D1AF47]" />
@@ -471,16 +471,16 @@ export default function ProviderSettingsPage() {
               {locale === "en" ? "Partner Hub Platform" : "منصة الشركاء الفاخرة"}
             </span>
           </div>
-          <h2 className="text-3xl font-extrabold tracking-tight text-white">{t.title}</h2>
-          <p className="text-sm text-[#7B859C] mt-1.5 leading-relaxed max-w-2xl">{t.subtitle}</p>
+          <h2 className="text-3xl font-extrabold tracking-tight text-[#101828]">{t.title}</h2>
+          <p className="text-sm text-[#667085] mt-1.5 leading-relaxed max-w-2xl">{t.subtitle}</p>
         </div>
         
         {/* Localization Preview Info Badge */}
-        <div className="flex items-center gap-3 bg-[#111827] border border-white/5 rounded-2xl px-4 py-2.5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] self-start md:self-auto">
+        <div className="flex items-center gap-3 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl px-4 py-2.5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] self-start md:self-auto">
           <svg className="w-4 h-4 text-[#D1AF47]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
           </svg>
-          <span className="text-xs font-semibold text-[#B8C0D4]">
+          <span className="text-xs font-semibold text-[#344054]">
             {locale === "en" ? "Language: English (LTR)" : "اللغة: العربية (RTL)"}
           </span>
         </div>
@@ -493,24 +493,24 @@ export default function ProviderSettingsPage() {
         <div className="lg:col-span-7 space-y-8">
           
           {/* BUSINESS PROFILE CARD */}
-          <div className="bg-[#111827] border border-white/5 rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden group">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47]/[0.02] rounded-full blur-3xl pointer-events-none" />
             
-            <div className="flex items-center gap-4 border-b border-white/5 pb-4 mb-6">
+            <div className="flex items-center gap-4 border-b border-[#ECECEC] pb-4 mb-6">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D1AF47]/10 to-transparent flex items-center justify-center border border-[#D1AF47]/20">
                 <svg className="w-5 h-5 text-[#D1AF47]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.426.293-.682.375a48.314 48.314 0 00-6.068.63 48.209 48.209 0 00-6.068-.63 2.035 2.035 0 01-.682-.375m16.5 0V8.706c0-1.08-.768-2.014-1.837-2.175a48.111 48.111 0 00-3.413-.387m0 0V6.25c0-1.094-.787-2.036-1.872-2.18a47.259 47.259 0 00-6.378 0c-1.085.144-1.872 1.086-1.872 2.18v1.069m8.25 0h.008v.008H12v-.008z" />
                 </svg>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">{t.profileSection}</h3>
-                <p className="text-xs text-[#7B859C]">{locale === "en" ? "Update your salon identifiers and branding content." : "تحديث بيانات الصالون ومحتوى العلامة التجارية."}</p>
+                <h3 className="text-lg font-bold text-[#101828]">{t.profileSection}</h3>
+                <p className="text-xs text-[#667085]">{locale === "en" ? "Update your salon identifiers and branding content." : "تحديث بيانات الصالون ومحتوى العلامة التجارية."}</p>
               </div>
             </div>
 
             {/* Profile Success / Error Alerts */}
             {success && (
-              <div className="mb-6 bg-[#3DDC84]/10 border border-[#3DDC84]/20 text-[#3DDC84] text-xs rounded-2xl p-4 font-semibold flex items-center gap-3 animate-fade-in shadow-[0_0_15px_rgba(61,220,132,0.1)]">
+              <div className="mb-6 bg-[#3DDC84]/10 border border-[#3DDC84]/20 text-[#22C55E] text-xs rounded-2xl p-4 font-semibold flex items-center gap-3 animate-fade-in shadow-[0_0_15px_rgba(61,220,132,0.1)]">
                 <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -518,7 +518,7 @@ export default function ProviderSettingsPage() {
               </div>
             )}
             {error && (
-              <div className="mb-6 bg-[#FF5D73]/10 border border-[#FF5D73]/20 text-[#FF5D73] text-xs rounded-2xl p-4 font-semibold flex items-center gap-3 animate-fade-in shadow-[0_0_15px_rgba(255,93,115,0.1)]">
+              <div className="mb-6 bg-[#FF5D73]/10 border border-[#FF5D73]/20 text-[#EF4444] text-xs rounded-2xl p-4 font-semibold flex items-center gap-3 animate-fade-in shadow-[0_0_15px_rgba(255,93,115,0.1)]">
                 <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
@@ -529,62 +529,62 @@ export default function ProviderSettingsPage() {
             <form onSubmit={saveSettings} className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-1.5 group">
-                  <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] group-focus-within:text-[#D1AF47] transition duration-200 block">
+                  <label className="text-[10px] uppercase font-bold tracking-widest text-[#667085] group-focus-within:text-[#D1AF47] transition duration-200 block">
                     {t.businessNameEn}
                   </label>
                   <input
                     type="text"
                     value={businessNameEn}
                     onChange={(e) => setBusinessNameEn(e.target.value)}
-                    className="w-full bg-[#0D1422] border border-white/5 rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-white placeholder-gray-500 font-semibold transition duration-300"
+                    className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300"
                   />
                 </div>
                 <div className="space-y-1.5 group">
-                  <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] group-focus-within:text-[#D1AF47] transition duration-200 block">
+                  <label className="text-[10px] uppercase font-bold tracking-widest text-[#667085] group-focus-within:text-[#D1AF47] transition duration-200 block">
                     {t.businessNameAr}
                   </label>
                   <input
                     type="text"
                     value={businessNameAr}
                     onChange={(e) => setBusinessNameAr(e.target.value)}
-                    className="w-full bg-[#0D1422] border border-white/5 rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-white placeholder-gray-500 font-semibold transition duration-300 text-right"
+                    className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300 text-right"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5 group">
-                <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] group-focus-within:text-[#D1AF47] transition duration-200 block">
+                <label className="text-[10px] uppercase font-bold tracking-widest text-[#667085] group-focus-within:text-[#D1AF47] transition duration-200 block">
                   {t.descriptionEn}
                 </label>
                 <textarea
                   rows={3}
                   value={descriptionEn}
                   onChange={(e) => setDescriptionEn(e.target.value)}
-                  className="w-full bg-[#0D1422] border border-white/5 rounded-xl p-4 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-white placeholder-gray-500 leading-relaxed transition duration-300"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl p-4 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 leading-relaxed transition duration-300"
                 />
               </div>
 
               <div className="space-y-1.5 group">
-                <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] group-focus-within:text-[#D1AF47] transition duration-200 block">
+                <label className="text-[10px] uppercase font-bold tracking-widest text-[#667085] group-focus-within:text-[#D1AF47] transition duration-200 block">
                   {t.descriptionAr}
                 </label>
                 <textarea
                   rows={3}
                   value={descriptionAr}
                   onChange={(e) => setDescriptionAr(e.target.value)}
-                  className="w-full bg-[#0D1422] border border-white/5 rounded-xl p-4 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-white placeholder-gray-500 leading-relaxed transition duration-300 text-right"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl p-4 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 leading-relaxed transition duration-300 text-right"
                 />
               </div>
 
               <div className="space-y-1.5 group">
-                <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] group-focus-within:text-[#D1AF47] transition duration-200 block">
+                <label className="text-[10px] uppercase font-bold tracking-widest text-[#667085] group-focus-within:text-[#D1AF47] transition duration-200 block">
                   {t.phone}
                 </label>
                 <input
                   type="text"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-[#0D1422] border border-white/5 rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-white placeholder-gray-500 font-semibold transition duration-300"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300"
                 />
               </div>
 
@@ -605,22 +605,22 @@ export default function ProviderSettingsPage() {
           </div>
 
           {/* OPENING HOURS SCHEDULE */}
-          <div className="bg-[#111827] border border-white/5 rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
-            <div className="flex items-center gap-4 border-b border-white/5 pb-4 mb-6">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
+            <div className="flex items-center gap-4 border-b border-[#ECECEC] pb-4 mb-6">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D1AF47]/10 to-transparent flex items-center justify-center border border-[#D1AF47]/20">
                 <svg className="w-5 h-5 text-[#D1AF47]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">{t.hoursSection}</h3>
-                <p className="text-xs text-[#7B859C]">{locale === "en" ? "Configure your weekly open and closed time windows." : "تحديد ساعات فتح وإغلاق صالونك الأسبوعية."}</p>
+                <h3 className="text-lg font-bold text-[#101828]">{t.hoursSection}</h3>
+                <p className="text-xs text-[#667085]">{locale === "en" ? "Configure your weekly open and closed time windows." : "تحديد ساعات فتح وإغلاق صالونك الأسبوعية."}</p>
               </div>
             </div>
 
             {/* Hours Success Alert */}
             {hoursSuccess && (
-              <div className="mb-6 bg-[#3DDC84]/10 border border-[#3DDC84]/20 text-[#3DDC84] text-xs rounded-2xl p-4 font-semibold flex items-center gap-3 animate-fade-in shadow-[0_0_15px_rgba(61,220,132,0.1)]">
+              <div className="mb-6 bg-[#3DDC84]/10 border border-[#3DDC84]/20 text-[#22C55E] text-xs rounded-2xl p-4 font-semibold flex items-center gap-3 animate-fade-in shadow-[0_0_15px_rgba(61,220,132,0.1)]">
                 <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -629,7 +629,7 @@ export default function ProviderSettingsPage() {
             )}
 
             <form onSubmit={handleSaveHours}>
-              <div className="divide-y divide-white/[0.04]">
+              <div className="divide-y divide-[#ECECEC]">
                 {daysList.map((day) => {
                   const current = hours[day.key];
                   return (
@@ -639,15 +639,15 @@ export default function ProviderSettingsPage() {
                         current.isClosed ? "opacity-45" : "opacity-100"
                       }`}
                     >
-                      <span className="text-sm font-bold text-white w-28">{day.name}</span>
+                      <span className="text-sm font-bold text-[#101828] w-28">{day.name}</span>
                       
                       <div className="flex items-center gap-6 flex-wrap">
                         {/* Custom Closed Toggle Switch */}
-                        <label className="flex items-center gap-3 text-xs text-[#B8C0D4] font-semibold cursor-pointer">
+                        <label className="flex items-center gap-3 text-xs text-[#344054] font-semibold cursor-pointer">
                           <button
                             type="button"
                             onClick={() => handleHourChange(day.key, "isClosed", !current.isClosed)}
-                            className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border border-white/5 transition-colors duration-300 ease-in-out focus:outline-none ${
+                            className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border border-[#ECECEC] transition-colors duration-300 ease-in-out focus:outline-none ${
                               current.isClosed ? "bg-[#FF5D73]" : "bg-white/10"
                             }`}
                           >
@@ -663,22 +663,22 @@ export default function ProviderSettingsPage() {
                         {!current.isClosed && (
                           <div className="flex items-center gap-4 text-xs">
                             <div className="flex items-center gap-2">
-                              <span className="text-[10px] text-[#7B859C] uppercase font-bold tracking-wider">{t.openTime}</span>
+                              <span className="text-[10px] text-[#667085] uppercase font-bold tracking-wider">{t.openTime}</span>
                               <input
                                 type="time"
                                 value={current.open}
                                 onChange={(e) => handleHourChange(day.key, "open", e.target.value)}
-                                className="bg-[#0D1422] border border-white/5 focus:border-[#D1AF47]/50 rounded-xl px-3 py-1.5 text-xs text-white outline-none focus:ring-1 focus:ring-[#D1AF47]/30 transition duration-300 font-mono"
+                                className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] focus:border-[#D1AF47]/50 rounded-xl px-3 py-1.5 text-xs text-[#101828] outline-none focus:ring-1 focus:ring-[#D1AF47]/30 transition duration-300 font-mono"
                               />
                             </div>
 
                             <div className="flex items-center gap-2">
-                              <span className="text-[10px] text-[#7B859C] uppercase font-bold tracking-wider">{t.closeTime}</span>
+                              <span className="text-[10px] text-[#667085] uppercase font-bold tracking-wider">{t.closeTime}</span>
                               <input
                                 type="time"
                                 value={current.close}
                                 onChange={(e) => handleHourChange(day.key, "close", e.target.value)}
-                                className="bg-[#0D1422] border border-white/5 focus:border-[#D1AF47]/50 rounded-xl px-3 py-1.5 text-xs text-white outline-none focus:ring-1 focus:ring-[#D1AF47]/30 transition duration-300 font-mono"
+                                className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] focus:border-[#D1AF47]/50 rounded-xl px-3 py-1.5 text-xs text-[#101828] outline-none focus:ring-1 focus:ring-[#D1AF47]/30 transition duration-300 font-mono"
                               />
                             </div>
                           </div>
@@ -690,11 +690,11 @@ export default function ProviderSettingsPage() {
               </div>
 
               {/* SAVE SCHEDULE BUTTON */}
-              <div className="flex justify-end pt-6 border-t border-white/5 mt-4">
+              <div className="flex justify-end pt-6 border-t border-[#ECECEC] mt-4">
                 <button
                   type="submit"
                   disabled={isSavingHours}
-                  className="py-2.5 px-6 border border-[#D1AF47]/30 hover:border-[#D1AF47] text-white hover:bg-[#D1AF47]/10 font-bold text-xs rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="py-2.5 px-6 border border-[#D1AF47]/30 hover:border-[#D1AF47] text-[#101828] hover:bg-[#D1AF47]/10 font-bold text-xs rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {isSavingHours && (
                     <div className="w-3.5 h-3.5 rounded-full border border-white/20 border-t-[#D1AF47] animate-spin" />
@@ -711,10 +711,10 @@ export default function ProviderSettingsPage() {
         <div className="lg:col-span-5 space-y-8">
           
           {/* GEOFENCING & SERVICE RADIUS */}
-          <div className="bg-[#111827] border border-white/5 rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
             <div className="absolute top-0 left-0 w-32 h-32 bg-[#D1AF47]/[0.01] rounded-full blur-3xl pointer-events-none" />
             
-            <div className="flex items-center gap-4 border-b border-white/5 pb-4 mb-6">
+            <div className="flex items-center gap-4 border-b border-[#ECECEC] pb-4 mb-6">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D1AF47]/10 to-transparent flex items-center justify-center border border-[#D1AF47]/20">
                 <svg className="w-5 h-5 text-[#D1AF47]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -723,27 +723,27 @@ export default function ProviderSettingsPage() {
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-bold text-white">{t.geofenceSection}</h3>
+                  <h3 className="text-lg font-bold text-[#101828]">{t.geofenceSection}</h3>
                   {geofenceAutosaveText && (
-                    <span className="text-[10px] text-[#3DDC84] bg-[#3DDC84]/10 border border-[#3DDC84]/20 px-2 py-0.5 rounded-full font-bold animate-pulse">
+                    <span className="text-[10px] text-[#22C55E] bg-[#3DDC84]/10 border border-[#3DDC84]/20 px-2 py-0.5 rounded-full font-bold animate-pulse">
                       {geofenceAutosaveText}
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-[#7B859C]">{t.geofenceDesc}</p>
+                <p className="text-xs text-[#667085]">{t.geofenceDesc}</p>
               </div>
             </div>
 
             {/* PREMIUM GEOFENCE VISUALIZER */}
             <div className="mb-6 space-y-4">
-              <div className="relative h-48 w-full bg-[#0D1422] rounded-2xl border border-white/5 overflow-hidden flex items-center justify-center">
+              <div className="relative h-48 w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl border border-[#ECECEC] overflow-hidden flex items-center justify-center">
                 {/* Ambient glow grid */}
                 <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/20 via-transparent to-transparent" />
                 
                 {/* Concentric rings */}
-                <div className="absolute w-40 h-40 rounded-full border border-white/5 flex items-center justify-center">
-                  <div className="w-28 h-28 rounded-full border border-white/5 flex items-center justify-center">
-                    <div className="w-16 h-16 rounded-full border border-white/5 flex items-center justify-center" />
+                <div className="absolute w-40 h-40 rounded-full border border-[#ECECEC] flex items-center justify-center">
+                  <div className="w-28 h-28 rounded-full border border-[#ECECEC] flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full border border-[#ECECEC] flex items-center justify-center" />
                   </div>
                 </div>
 
@@ -764,13 +764,13 @@ export default function ProviderSettingsPage() {
                 {/* Center Hub Marker */}
                 <div className="relative z-10 flex flex-col items-center">
                   <div className="w-3.5 h-3.5 bg-[#D1AF47] rounded-full shadow-[0_0_15px_#D1AF47] animate-pulse" />
-                  <span className="mt-2 text-[9px] text-white font-extrabold bg-[#172033]/90 px-2 py-0.5 rounded-full border border-white/10 tracking-widest uppercase backdrop-blur-sm">
+                  <span className="mt-2 text-[9px] text-[#101828] font-extrabold bg-white border border-[#ECECEC]/90 px-2 py-0.5 rounded-full border border-[#ECECEC] tracking-widest uppercase backdrop-blur-sm">
                     {locale === "en" ? "Riyadh Hub" : "مركز الرياض"}
                   </span>
                 </div>
 
                 {/* Grid coordinates */}
-                <div className="absolute bottom-2 left-3 right-3 flex justify-between text-[8px] text-[#7B859C] font-mono tracking-wider">
+                <div className="absolute bottom-2 left-3 right-3 flex justify-between text-[8px] text-[#667085] font-mono tracking-wider">
                   <span>LAT: 24.7136° N</span>
                   <span>LNG: 46.6753° E</span>
                 </div>
@@ -779,8 +779,8 @@ export default function ProviderSettingsPage() {
 
             {/* Slider Control */}
             <div className="space-y-4 pt-2">
-              <div className="flex justify-between text-xs font-bold text-white">
-                <span className="text-[#B8C0D4]">{t.radiusLabel}</span>
+              <div className="flex justify-between text-xs font-bold text-[#101828]">
+                <span className="text-[#344054]">{t.radiusLabel}</span>
                 <span className="text-[#D1AF47] text-sm font-bold font-mono tracking-tight bg-[#D1AF47]/10 px-2 py-0.5 rounded-md border border-[#D1AF47]/20">
                   {radius} {t.km}
                 </span>
@@ -796,7 +796,7 @@ export default function ProviderSettingsPage() {
                 className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-[#D1AF47] focus:outline-none transition duration-300"
               />
               
-              <div className="flex justify-between text-[9px] text-[#7B859C] font-bold tracking-widest uppercase">
+              <div className="flex justify-between text-[9px] text-[#667085] font-bold tracking-widest uppercase">
                 <span>5 {t.km}</span>
                 <span>25 {t.km}</span>
                 <span>50 {t.km}</span>
@@ -805,22 +805,22 @@ export default function ProviderSettingsPage() {
           </div>
 
           {/* BOOKING DEPOSIT POLICY */}
-          <div className="bg-[#111827] border border-white/5 rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
-            <div className="flex items-center gap-4 border-b border-white/5 pb-4 mb-6">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
+            <div className="flex items-center gap-4 border-b border-[#ECECEC] pb-4 mb-6">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D1AF47]/10 to-transparent flex items-center justify-center border border-[#D1AF47]/20">
                 <svg className="w-5 h-5 text-[#D1AF47]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 8h6m-6 4h6m-7 8h8a2 2 0 002-2V6a2 2 0 00-2-2H8a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">{t.depositSection}</h3>
-                <p className="text-xs text-[#7B859C]">{t.depositDesc}</p>
+                <h3 className="text-lg font-bold text-[#101828]">{t.depositSection}</h3>
+                <p className="text-xs text-[#667085]">{t.depositDesc}</p>
               </div>
             </div>
 
             <div className="space-y-4 pt-2">
-              <div className="flex justify-between text-xs font-bold text-white">
-                <span className="text-[#B8C0D4]">{t.depositLabel}</span>
+              <div className="flex justify-between text-xs font-bold text-[#101828]">
+                <span className="text-[#344054]">{t.depositLabel}</span>
                 <span className="text-[#D1AF47] text-sm font-bold font-mono tracking-tight bg-[#D1AF47]/10 px-2 py-0.5 rounded-md border border-[#D1AF47]/20">
                   {depositPercentage}%
                 </span>
@@ -836,17 +836,17 @@ export default function ProviderSettingsPage() {
                 className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-[#D1AF47] focus:outline-none transition duration-300"
               />
 
-              <div className="flex justify-between text-[9px] text-[#7B859C] font-bold tracking-widest uppercase">
+              <div className="flex justify-between text-[9px] text-[#667085] font-bold tracking-widest uppercase">
                 <span>0%</span><span>50%</span><span>100%</span>
               </div>
 
-              <div className="flex items-center justify-between rounded-2xl bg-[#070B12] border border-white/5 px-4 py-3 mt-2">
-                <span className="text-[11px] text-[#7B859C]">{t.depositExample}</span>
-                <span className="text-sm font-bold text-[#3DDC84] font-mono">{Math.round((200 * depositPercentage) / 100)} SAR</span>
+              <div className="flex items-center justify-between rounded-2xl bg-transparent border border-[#ECECEC] px-4 py-3 mt-2">
+                <span className="text-[11px] text-[#667085]">{t.depositExample}</span>
+                <span className="text-sm font-bold text-[#22C55E] font-mono">{Math.round((200 * depositPercentage) / 100)} SAR</span>
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-2">
-                {depositSuccess && <span className="text-xs font-semibold text-[#3DDC84]">{depositSuccess}</span>}
+                {depositSuccess && <span className="text-xs font-semibold text-[#22C55E]">{depositSuccess}</span>}
                 <button
                   onClick={saveDeposit}
                   disabled={isSavingDeposit}
@@ -859,22 +859,22 @@ export default function ProviderSettingsPage() {
           </div>
 
           {/* NOTIFICATION PREFERENCES */}
-          <div className="bg-[#111827] border border-white/5 rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
-            <div className="flex items-center gap-4 border-b border-white/5 pb-4 mb-6">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
+            <div className="flex items-center gap-4 border-b border-[#ECECEC] pb-4 mb-6">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D1AF47]/10 to-transparent flex items-center justify-center border border-[#D1AF47]/20">
                 <svg className="w-5 h-5 text-[#D1AF47]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
                 </svg>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">{t.notificationsSection}</h3>
-                <p className="text-xs text-[#7B859C]">{t.notificationsDesc}</p>
+                <h3 className="text-lg font-bold text-[#101828]">{t.notificationsSection}</h3>
+                <p className="text-xs text-[#667085]">{t.notificationsDesc}</p>
               </div>
             </div>
 
             {/* Notifications Alerts */}
             {notifySuccess && (
-              <div className="mb-6 bg-[#3DDC84]/10 border border-[#3DDC84]/20 text-[#3DDC84] text-xs rounded-2xl p-4 font-semibold flex items-center gap-3 animate-fade-in shadow-[0_0_15px_rgba(61,220,132,0.1)]">
+              <div className="mb-6 bg-[#3DDC84]/10 border border-[#3DDC84]/20 text-[#22C55E] text-xs rounded-2xl p-4 font-semibold flex items-center gap-3 animate-fade-in shadow-[0_0_15px_rgba(61,220,132,0.1)]">
                 <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -882,7 +882,7 @@ export default function ProviderSettingsPage() {
               </div>
             )}
             {notifyError && (
-              <div className="mb-6 bg-[#FF5D73]/10 border border-[#FF5D73]/20 text-[#FF5D73] text-xs rounded-2xl p-4 font-semibold flex items-center gap-3 animate-fade-in shadow-[0_0_15px_rgba(255,93,115,0.1)]">
+              <div className="mb-6 bg-[#FF5D73]/10 border border-[#FF5D73]/20 text-[#EF4444] text-xs rounded-2xl p-4 font-semibold flex items-center gap-3 animate-fade-in shadow-[0_0_15px_rgba(255,93,115,0.1)]">
                 <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
@@ -893,15 +893,15 @@ export default function ProviderSettingsPage() {
             <form onSubmit={handleSaveNotifications} className="space-y-4">
               
               {/* Email Notifications checkbox card */}
-              <div className="flex items-start justify-between p-4 bg-[#0D1422] border border-white/5 rounded-2xl hover:border-white/10 transition duration-300">
+              <div className="flex items-start justify-between p-4 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl hover:border-[#ECECEC] transition duration-300">
                 <div className="flex flex-col space-y-1 select-none pr-3">
-                  <span className="text-xs font-bold text-white">{t.notifyEmail}</span>
-                  <span className="text-[10px] text-[#7B859C] leading-normal">{t.notifyEmailDesc}</span>
+                  <span className="text-xs font-bold text-[#101828]">{t.notifyEmail}</span>
+                  <span className="text-[10px] text-[#667085] leading-normal">{t.notifyEmailDesc}</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setEmailNotify(!emailNotify)}
-                  className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border border-white/5 transition-colors duration-300 ease-in-out focus:outline-none self-center ${
+                  className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border border-[#ECECEC] transition-colors duration-300 ease-in-out focus:outline-none self-center ${
                     emailNotify ? "bg-[#D1AF47]" : "bg-white/10"
                   }`}
                 >
@@ -914,15 +914,15 @@ export default function ProviderSettingsPage() {
               </div>
 
               {/* SMS Notifications checkbox card */}
-              <div className="flex items-start justify-between p-4 bg-[#0D1422] border border-white/5 rounded-2xl hover:border-white/10 transition duration-300">
+              <div className="flex items-start justify-between p-4 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl hover:border-[#ECECEC] transition duration-300">
                 <div className="flex flex-col space-y-1 select-none pr-3">
-                  <span className="text-xs font-bold text-white">{t.notifySms}</span>
-                  <span className="text-[10px] text-[#7B859C] leading-normal">{t.notifySmsDesc}</span>
+                  <span className="text-xs font-bold text-[#101828]">{t.notifySms}</span>
+                  <span className="text-[10px] text-[#667085] leading-normal">{t.notifySmsDesc}</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setSmsNotify(!smsNotify)}
-                  className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border border-white/5 transition-colors duration-300 ease-in-out focus:outline-none self-center ${
+                  className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border border-[#ECECEC] transition-colors duration-300 ease-in-out focus:outline-none self-center ${
                     smsNotify ? "bg-[#D1AF47]" : "bg-white/10"
                   }`}
                 >
@@ -935,15 +935,15 @@ export default function ProviderSettingsPage() {
               </div>
 
               {/* Push Notifications checkbox card */}
-              <div className="flex items-start justify-between p-4 bg-[#0D1422] border border-white/5 rounded-2xl hover:border-white/10 transition duration-300">
+              <div className="flex items-start justify-between p-4 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl hover:border-[#ECECEC] transition duration-300">
                 <div className="flex flex-col space-y-1 select-none pr-3">
-                  <span className="text-xs font-bold text-white">{t.notifyPush}</span>
-                  <span className="text-[10px] text-[#7B859C] leading-normal">{t.notifyPushDesc}</span>
+                  <span className="text-xs font-bold text-[#101828]">{t.notifyPush}</span>
+                  <span className="text-[10px] text-[#667085] leading-normal">{t.notifyPushDesc}</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setPushNotify(!pushNotify)}
-                  className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border border-white/5 transition-colors duration-300 ease-in-out focus:outline-none self-center ${
+                  className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border border-[#ECECEC] transition-colors duration-300 ease-in-out focus:outline-none self-center ${
                     pushNotify ? "bg-[#D1AF47]" : "bg-white/10"
                   }`}
                 >
@@ -956,15 +956,15 @@ export default function ProviderSettingsPage() {
               </div>
 
               {/* Review Alerts checkbox card */}
-              <div className="flex items-start justify-between p-4 bg-[#0D1422] border border-white/5 rounded-2xl hover:border-white/10 transition duration-300">
+              <div className="flex items-start justify-between p-4 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl hover:border-[#ECECEC] transition duration-300">
                 <div className="flex flex-col space-y-1 select-none pr-3">
-                  <span className="text-xs font-bold text-white">{t.notifyReviews}</span>
-                  <span className="text-[10px] text-[#7B859C] leading-normal">{t.notifyReviewsDesc}</span>
+                  <span className="text-xs font-bold text-[#101828]">{t.notifyReviews}</span>
+                  <span className="text-[10px] text-[#667085] leading-normal">{t.notifyReviewsDesc}</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setAppointmentAlerts(!appointmentAlerts)}
-                  className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border border-white/5 transition-colors duration-300 ease-in-out focus:outline-none self-center ${
+                  className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border border-[#ECECEC] transition-colors duration-300 ease-in-out focus:outline-none self-center ${
                     appointmentAlerts ? "bg-[#D1AF47]" : "bg-white/10"
                   }`}
                 >
@@ -977,15 +977,15 @@ export default function ProviderSettingsPage() {
               </div>
 
               {/* Weekly Digests checkbox card */}
-              <div className="flex items-start justify-between p-4 bg-[#0D1422] border border-white/5 rounded-2xl hover:border-white/10 transition duration-300">
+              <div className="flex items-start justify-between p-4 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl hover:border-[#ECECEC] transition duration-300">
                 <div className="flex flex-col space-y-1 select-none pr-3">
-                  <span className="text-xs font-bold text-white">{t.notifyWeekly}</span>
-                  <span className="text-[10px] text-[#7B859C] leading-normal">{t.notifyWeeklyDesc}</span>
+                  <span className="text-xs font-bold text-[#101828]">{t.notifyWeekly}</span>
+                  <span className="text-[10px] text-[#667085] leading-normal">{t.notifyWeeklyDesc}</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setMarketingAlerts(!marketingAlerts)}
-                  className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border border-white/5 transition-colors duration-300 ease-in-out focus:outline-none self-center ${
+                  className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border border-[#ECECEC] transition-colors duration-300 ease-in-out focus:outline-none self-center ${
                     marketingAlerts ? "bg-[#D1AF47]" : "bg-white/10"
                   }`}
                 >
@@ -1002,7 +1002,7 @@ export default function ProviderSettingsPage() {
                 <button
                   type="submit"
                   disabled={notifyLoading}
-                  className="py-2.5 px-6 border border-[#D1AF47]/30 hover:border-[#D1AF47] text-white hover:bg-[#D1AF47]/10 font-bold text-xs rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="py-2.5 px-6 border border-[#D1AF47]/30 hover:border-[#D1AF47] text-[#101828] hover:bg-[#D1AF47]/10 font-bold text-xs rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {notifyLoading && (
                     <div className="w-3.5 h-3.5 rounded-full border border-white/20 border-t-[#D1AF47] animate-spin" />
@@ -1014,22 +1014,22 @@ export default function ProviderSettingsPage() {
           </div>
 
           {/* SECURITY & CREDENTIALS */}
-          <div className="bg-[#111827] border border-white/5 rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
-            <div className="flex items-center gap-4 border-b border-white/5 pb-4 mb-6">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
+            <div className="flex items-center gap-4 border-b border-[#ECECEC] pb-4 mb-6">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D1AF47]/10 to-transparent flex items-center justify-center border border-[#D1AF47]/20">
                 <svg className="w-5 h-5 text-[#D1AF47]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                 </svg>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">{t.securitySection}</h3>
-                <p className="text-xs text-[#7B859C]">{t.securityDesc}</p>
+                <h3 className="text-lg font-bold text-[#101828]">{t.securitySection}</h3>
+                <p className="text-xs text-[#667085]">{t.securityDesc}</p>
               </div>
             </div>
 
             {/* Security Alerts */}
             {securitySuccess && (
-              <div className="mb-6 bg-[#3DDC84]/10 border border-[#3DDC84]/20 text-[#3DDC84] text-xs rounded-2xl p-4 font-semibold flex items-center gap-3 animate-fade-in shadow-[0_0_15px_rgba(61,220,132,0.1)]">
+              <div className="mb-6 bg-[#3DDC84]/10 border border-[#3DDC84]/20 text-[#22C55E] text-xs rounded-2xl p-4 font-semibold flex items-center gap-3 animate-fade-in shadow-[0_0_15px_rgba(61,220,132,0.1)]">
                 <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -1037,7 +1037,7 @@ export default function ProviderSettingsPage() {
               </div>
             )}
             {securityError && (
-              <div className="mb-6 bg-[#FF5D73]/10 border border-[#FF5D73]/20 text-[#FF5D73] text-xs rounded-2xl p-4 font-semibold flex items-center gap-3 animate-fade-in shadow-[0_0_15px_rgba(255,93,115,0.1)]">
+              <div className="mb-6 bg-[#FF5D73]/10 border border-[#FF5D73]/20 text-[#EF4444] text-xs rounded-2xl p-4 font-semibold flex items-center gap-3 animate-fade-in shadow-[0_0_15px_rgba(255,93,115,0.1)]">
                 <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
@@ -1047,38 +1047,38 @@ export default function ProviderSettingsPage() {
 
             <form onSubmit={handleUpdatePassword} className="space-y-4">
               <div className="space-y-1.5 group">
-                <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] group-focus-within:text-[#D1AF47] block">
+                <label className="text-[10px] uppercase font-bold tracking-widest text-[#667085] group-focus-within:text-[#D1AF47] block">
                   {t.currentPassword}
                 </label>
                 <input
                   type="password"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="w-full bg-[#0D1422] border border-white/5 rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-white placeholder-gray-500 font-semibold transition duration-300"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300"
                 />
               </div>
 
               <div className="space-y-1.5 group">
-                <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] group-focus-within:text-[#D1AF47] block">
+                <label className="text-[10px] uppercase font-bold tracking-widest text-[#667085] group-focus-within:text-[#D1AF47] block">
                   {t.newPassword}
                 </label>
                 <input
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full bg-[#0D1422] border border-white/5 rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-white placeholder-gray-500 font-semibold transition duration-300"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300"
                 />
               </div>
 
               <div className="space-y-1.5 group">
-                <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] group-focus-within:text-[#D1AF47] block">
+                <label className="text-[10px] uppercase font-bold tracking-widest text-[#667085] group-focus-within:text-[#D1AF47] block">
                   {t.confirmPassword}
                 </label>
                 <input
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full bg-[#0D1422] border border-white/5 rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-white placeholder-gray-500 font-semibold transition duration-300"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300"
                 />
               </div>
 
@@ -1087,7 +1087,7 @@ export default function ProviderSettingsPage() {
                 <button
                   type="submit"
                   disabled={securityLoading}
-                  className="py-2.5 px-6 border border-[#D1AF47]/30 hover:border-[#D1AF47] text-white hover:bg-[#D1AF47]/10 font-bold text-xs rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="py-2.5 px-6 border border-[#D1AF47]/30 hover:border-[#D1AF47] text-[#101828] hover:bg-[#D1AF47]/10 font-bold text-xs rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {securityLoading && (
                     <div className="w-3.5 h-3.5 rounded-full border border-white/20 border-t-[#D1AF47] animate-spin" />

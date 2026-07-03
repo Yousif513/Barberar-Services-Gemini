@@ -291,11 +291,11 @@ export default function ResourcesPage() {
     const percentage = Math.min((capacity / maxScale) * 100, 100);
     return (
       <div className="space-y-2 mt-5">
-        <div className={`flex justify-between items-center text-[10px] text-[#7B859C] font-semibold tracking-wide ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+        <div className={`flex justify-between items-center text-[10px] text-[#667085] font-semibold tracking-wide ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
           <span>{isRTL ? "مقياس السعة الاستيعابية" : "Capacity Scale"}</span>
-          <span className="text-white font-bold">{capacity} {capacity === 1 ? t.person : t.people}</span>
+          <span className="text-[#101828] font-bold">{capacity} {capacity === 1 ? t.person : t.people}</span>
         </div>
-        <div className="h-1.5 w-full bg-[#0D1422] rounded-full overflow-hidden p-[1px] border border-white/5 relative">
+        <div className="h-1.5 w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-full overflow-hidden p-[1px] border border-[#ECECEC] relative">
           <div 
             className="h-full rounded-full bg-gradient-to-r from-[#B8952E] via-[#D1AF47] to-[#E0C46A] shadow-[0_0_8px_rgba(209,175,71,0.4)] transition-all duration-500" 
             style={{ width: `${percentage}%` }}
@@ -310,14 +310,14 @@ export default function ResourcesPage() {
       {/* HEADER */}
       <div className={`flex items-center justify-between flex-wrap gap-4 ${isRTL ? "flex-row-reverse text-right" : "flex-row text-left"}`}>
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-white font-serif">{t.title}</h2>
-          <p className="text-sm text-[#7B859C] mt-1">{t.subtitle}</p>
+          <h2 className="text-2xl font-bold tracking-tight text-[#101828] font-serif">{t.title}</h2>
+          <p className="text-sm text-[#667085] mt-1">{t.subtitle}</p>
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
           className={`px-5 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 flex items-center gap-2 hover:scale-[1.02] ${
             showAddForm 
-              ? "bg-white/5 border border-white/10 hover:bg-white/10 text-[#B8C0D4] hover:text-white" 
+              ? "bg-white/5 border border-[#ECECEC] hover:bg-white/10 text-[#344054] hover:text-[#101828]" 
               : "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] shadow-[0_0_20px_rgba(209,175,71,0.15)] hover:shadow-[0_0_25px_rgba(209,175,71,0.25)]"
           }`}
         >
@@ -340,48 +340,48 @@ export default function ResourcesPage() {
       </div>
 
       {error && (
-        <div className={`bg-[#FF5D73]/10 border border-[#FF5D73]/20 text-[#FF5D73] text-xs rounded-2xl p-4 font-semibold ${isRTL ? "text-right" : "text-left"}`}>
+        <div className={`bg-[#FF5D73]/10 border border-[#FF5D73]/20 text-[#EF4444] text-xs rounded-2xl p-4 font-semibold ${isRTL ? "text-right" : "text-left"}`}>
           {error}
         </div>
       )}
 
       {success && (
-        <div className={`bg-[#3DDC84]/10 border border-[#3DDC84]/20 text-[#3DDC84] text-xs rounded-2xl p-4 font-semibold ${isRTL ? "text-right" : "text-left"}`}>
+        <div className={`bg-[#3DDC84]/10 border border-[#3DDC84]/20 text-[#22C55E] text-xs rounded-2xl p-4 font-semibold ${isRTL ? "text-right" : "text-left"}`}>
           {success}
         </div>
       )}
 
       {/* ADD RESOURCE DIALOG */}
       {showAddForm && (
-        <form onSubmit={handleAddResource} className="bg-[#111827] border border-white/5 rounded-[28px] p-6 shadow-2xl max-w-xl space-y-5 animate-slideDown relative overflow-hidden">
+        <form onSubmit={handleAddResource} className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[28px] p-6 shadow-2xl max-w-xl space-y-5 animate-slideDown relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#B8952E] via-[#D1AF47] to-[#E0C46A]" />
           
-          <h3 className={`font-bold text-sm text-[#D1AF47] border-b border-white/5 pb-3 tracking-wide ${isRTL ? "text-right" : "text-left"}`}>
+          <h3 className={`font-bold text-sm text-[#D1AF47] border-b border-[#ECECEC] pb-3 tracking-wide ${isRTL ? "text-right" : "text-left"}`}>
             {isRTL ? "تسجيل مورد مادي جديد" : "Register Physical Resource"}
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className={`text-[10px] uppercase font-bold text-[#7B859C] block mb-2 tracking-wider ${isRTL ? "text-right" : "text-left"}`}>{t.nameLabel}</label>
+              <label className={`text-[10px] uppercase font-bold text-[#667085] block mb-2 tracking-wider ${isRTL ? "text-right" : "text-left"}`}>{t.nameLabel}</label>
               <input
                 type="text"
                 placeholder={isRTL ? "مثال: غرفة حمام مغربي أ" : "e.g. Moroccan Bath Room A"}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className={`w-full bg-[#0D1422] border border-white/5 rounded-xl px-3.5 py-2.5 text-xs outline-none focus:border-[#D1AF47]/40 focus:ring-1 focus:ring-[#D1AF47]/40 text-white font-medium transition-all duration-300 placeholder-white/20 ${isRTL ? "text-right" : "text-left"}`}
+                className={`w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-3.5 py-2.5 text-xs outline-none focus:border-[#D1AF47]/40 focus:ring-1 focus:ring-[#D1AF47]/40 text-[#101828] font-medium transition-all duration-300 placeholder-white/20 ${isRTL ? "text-right" : "text-left"}`}
                 required
               />
             </div>
 
             <div>
-              <label className={`text-[10px] uppercase font-bold text-[#7B859C] block mb-2 tracking-wider ${isRTL ? "text-right" : "text-left"}`}>{t.categoryLabel}</label>
+              <label className={`text-[10px] uppercase font-bold text-[#667085] block mb-2 tracking-wider ${isRTL ? "text-right" : "text-left"}`}>{t.categoryLabel}</label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className={`w-full bg-[#0D1422] border border-white/5 rounded-xl px-3.5 py-2.5 text-xs outline-none focus:border-[#D1AF47]/40 focus:ring-1 focus:ring-[#D1AF47]/40 text-white font-bold transition-all duration-300 appearance-none cursor-pointer ${isRTL ? "text-right" : "text-left"}`}
+                className={`w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-3.5 py-2.5 text-xs outline-none focus:border-[#D1AF47]/40 focus:ring-1 focus:ring-[#D1AF47]/40 text-[#101828] font-bold transition-all duration-300 appearance-none cursor-pointer ${isRTL ? "text-right" : "text-left"}`}
               >
                 {categories.map((cat, idx) => (
-                  <option key={idx} value={cat} className="bg-[#111827] text-white font-medium">
+                  <option key={idx} value={cat} className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] text-[#101828] font-medium">
                     {getTranslatedCategory(cat)}
                   </option>
                 ))}
@@ -389,20 +389,20 @@ export default function ResourcesPage() {
             </div>
 
             <div>
-              <label className={`text-[10px] uppercase font-bold text-[#7B859C] block mb-2 tracking-wider ${isRTL ? "text-right" : "text-left"}`}>{t.capacityLabel}</label>
+              <label className={`text-[10px] uppercase font-bold text-[#667085] block mb-2 tracking-wider ${isRTL ? "text-right" : "text-left"}`}>{t.capacityLabel}</label>
               <input
                 type="number"
                 min="1"
                 max="50"
                 value={capacity}
                 onChange={(e) => setCapacity(parseInt(e.target.value) || 1)}
-                className={`w-full bg-[#0D1422] border border-white/5 rounded-xl px-3.5 py-2.5 text-xs outline-none focus:border-[#D1AF47]/40 focus:ring-1 focus:ring-[#D1AF47]/40 text-white font-medium transition-all duration-300 ${isRTL ? "text-right" : "text-left"}`}
+                className={`w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-3.5 py-2.5 text-xs outline-none focus:border-[#D1AF47]/40 focus:ring-1 focus:ring-[#D1AF47]/40 text-[#101828] font-medium transition-all duration-300 ${isRTL ? "text-right" : "text-left"}`}
                 required
               />
             </div>
           </div>
 
-          <div className={`flex ${isRTL ? "justify-start" : "justify-end"} pt-3 border-t border-white/5`}>
+          <div className={`flex ${isRTL ? "justify-start" : "justify-end"} pt-3 border-t border-[#ECECEC]`}>
             <button
               type="submit"
               className="px-6 py-2.5 bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] hover:bg-gradient-to-r hover:from-[#E0C46A] hover:to-[#D1AF47] text-[#070B12] font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all duration-300 hover:scale-[1.02] shadow-[0_0_20px_rgba(209,175,71,0.15)]"
@@ -416,18 +416,18 @@ export default function ResourcesPage() {
       {/* RESOURCES GRID */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 space-y-4">
-          <div className="w-8 h-8 rounded-full border-2 border-white/5 border-t-[#D1AF47] animate-spin" />
-          <span className="text-xs font-semibold text-[#7B859C]">{t.loading}</span>
+          <div className="w-8 h-8 rounded-full border-2 border-[#ECECEC] border-t-[#D1AF47] animate-spin" />
+          <span className="text-xs font-semibold text-[#667085]">{t.loading}</span>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {resources.map((res) => (
             <div
               key={res.id}
-              className={`bg-[#111827] border rounded-[24px] p-6 shadow-xl flex flex-col justify-between transition-all duration-300 relative group overflow-hidden ${
+              className={`bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border rounded-[24px] p-6 shadow-xl flex flex-col justify-between transition-all duration-300 relative group overflow-hidden ${
                 res.is_active 
-                  ? "border-white/5 hover:border-[#D1AF47]/30 hover:shadow-[0_0_30px_rgba(209,175,71,0.06)] hover:scale-[1.02]" 
-                  : "border-white/5 opacity-50 grayscale"
+                  ? "border-[#ECECEC] hover:border-[#D1AF47]/30 hover:shadow-[0_0_30px_rgba(209,175,71,0.06)] hover:scale-[1.02]" 
+                  : "border-[#ECECEC] opacity-50 grayscale"
               }`}
             >
               <div className={isRTL ? "text-right" : "text-left"}>
@@ -436,28 +436,28 @@ export default function ResourcesPage() {
                     <div className="w-8 h-8 rounded-xl bg-[#D1AF47]/10 flex items-center justify-center border border-[#D1AF47]/10 group-hover:bg-[#D1AF47]/20 transition-all duration-300">
                       {getCategoryIcon(res.category)}
                     </div>
-                    <span className="text-[11px] font-bold text-[#7B859C] tracking-wide">{getTranslatedCategory(res.category)}</span>
+                    <span className="text-[11px] font-bold text-[#667085] tracking-wide">{getTranslatedCategory(res.category)}</span>
                   </div>
                   <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${
                     res.is_active 
-                      ? "bg-[#3DDC84]/10 text-[#3DDC84] border border-[#3DDC84]/20" 
-                      : "bg-[#FF5D73]/10 text-[#FF5D73] border border-[#FF5D73]/20"
+                      ? "bg-[#3DDC84]/10 text-[#22C55E] border border-[#3DDC84]/20" 
+                      : "bg-[#FF5D73]/10 text-[#EF4444] border border-[#FF5D73]/20"
                   }`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${res.is_active ? "bg-[#3DDC84]" : "bg-[#FF5D73]"}`} />
                     {res.is_active ? t.active : t.inactive}
                   </span>
                 </div>
-                <h4 className="font-bold text-base text-white tracking-wide mb-2 group-hover:text-[#D1AF47] transition-colors duration-300">{res.name}</h4>
+                <h4 className="font-bold text-base text-[#101828] tracking-wide mb-2 group-hover:text-[#D1AF47] transition-colors duration-300">{res.name}</h4>
                 {renderCapacityMeter(res.capacity)}
               </div>
 
-              <div className="flex gap-2 border-t border-white/5 pt-4 mt-6">
+              <div className="flex gap-2 border-t border-[#ECECEC] pt-4 mt-6">
                 <button
                   onClick={() => toggleResourceStatus(res.id, res.is_active)}
                   className={`flex-1 py-2.5 rounded-xl text-[11px] font-bold border transition-all duration-300 ${
                     res.is_active 
-                      ? "bg-white/5 hover:bg-[#FF5D73]/10 hover:text-[#FF5D73] hover:border-[#FF5D73]/20 text-[#B8C0D4] border-white/10" 
-                      : "bg-[#3DDC84]/10 text-[#3DDC84] hover:bg-[#3DDC84]/20 border border-[#3DDC84]/20"
+                      ? "bg-white/5 hover:bg-[#FF5D73]/10 hover:text-[#EF4444] hover:border-[#FF5D73]/20 text-[#344054] border-[#ECECEC]" 
+                      : "bg-[#3DDC84]/10 text-[#22C55E] hover:bg-[#3DDC84]/20 border border-[#3DDC84]/20"
                   }`}
                 >
                   {res.is_active ? t.deactivate : t.activate}

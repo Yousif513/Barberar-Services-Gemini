@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import { usePrayerTimes } from "@/lib/use-prayer-times";
 
 const translations = {
   en: {
@@ -34,7 +35,7 @@ const translations = {
 export default function ProviderDashboardPage() {
   const [locale, setLocale] = useState<"en" | "ar">("en");
   const [businessName, setBusinessName] = useState("Elite Barbershop");
-  const [secondsLeft, setSecondsLeft] = useState(4354);
+  const [coords, setCoords] = useState({ lat: 24.7136, lng: 46.6753 });
 
   const isRTL = locale === "ar";
   const t = translations[locale];
@@ -49,27 +50,44 @@ export default function ProviderDashboardPage() {
   }, []);
 
   useEffect(() => {
-    const timer = setInterval(() => setSecondsLeft((s) => (s > 0 ? s - 1 : 4354)), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
     async function load() {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
         const { data: provider } = await supabase
           .from("providers")
-          .select("business_name_en, business_name_ar")
+          .select("id, business_name_en, business_name_ar")
           .eq("owner_id", user.id)
           .maybeSingle();
-        if (provider) setBusinessName(isRTL ? provider.business_name_ar : provider.business_name_en);
+        if (provider) {
+          setBusinessName(isRTL ? provider.business_name_ar : provider.business_name_en);
+          const { data: branch } = await supabase
+            .from("branches")
+            .select("latitude, longitude")
+            .eq("provider_id", provider.id)
+            .limit(1)
+            .maybeSingle();
+          if (branch && branch.latitude && branch.longitude) {
+            setCoords({ lat: Number(branch.latitude), lng: Number(branch.longitude) });
+          }
+        }
       } catch (err) {
         console.warn("Provider dashboard using fallback data:", err);
       }
     }
     load();
   }, [isRTL]);
+
+  const {
+    nextPrayer,
+    prevPrayer,
+    secondsUntilNext,
+    isLocked,
+    resumesIn,
+    lockStartsIn,
+    currentTime
+  } = usePrayerTimes(coords.lat, coords.lng);
+
 
   const toggleLang = () => {
     const target = locale === "en" ? "ar" : "en";
@@ -85,7 +103,23 @@ export default function ProviderDashboardPage() {
     const sec = (s % 60).toString().padStart(2, "0");
     return `${h}:${m}:${sec}`;
   };
-  const lockSeconds = Math.max(0, secondsLeft - 1200);
+
+  const formatTime12h = (date: Date) => {
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const ampm = hours >= 12 ? (isRTL ? "م" : "PM") : (isRTL ? "ص" : "AM");
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    return `${hours}:${minutes} ${ampm}`;
+  };
+
+  const resumeTime = new Date(nextPrayer.time.getTime() + 30 * 60 * 1000);
+  const prevTime = prevPrayer.time.getTime();
+  const nextTime = nextPrayer.time.getTime();
+  const totalGap = nextTime - prevTime || 1;
+  const elapsed = currentTime.getTime() - prevTime;
+  const progressPercent = Math.max(0, Math.min(100, (elapsed / totalGap) * 100));
+
 
   const cardBase = "rounded-2xl border border-[#ECECEC] bg-white shadow-[0_8px_30px_rgb(0,0,0,0.015)] transition-all duration-300 hover:border-[#D1AF47]/20 hover:shadow-[0_12px_40px_rgba(0,0,0,0.035)]";
   const eyebrow = "text-xs font-extrabold uppercase tracking-widest text-[#667085]";
@@ -255,25 +289,25 @@ export default function ProviderDashboardPage() {
         <section className={`${cardBase} flex min-h-0 flex-col p-4 lg:col-span-4`}>
           <div className={`mb-2 flex flex-shrink-0 items-center justify-between ${flip}`}>
             <h3 className={eyebrow}>{t.prayerControl}</h3>
-            <span className="rounded-full border border-[#EF4444]/20 bg-[#EF4444]/10 px-2 py-0.5 text-[8px] font-black uppercase text-[#EF4444]">{t.lockPending}</span>
+            <span className={`rounded-full border px-2 py-0.5 text-[8px] font-black uppercase ${isLocked ? "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20" : "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/20"}`}>{isLocked ? (isRTL ? "مغلق" : "Locked") : (isRTL ? "نشط" : "Active")}</span>
           </div>
           <div className="rounded-xl border border-[#ECECEC] bg-[#F7F6F3] p-3">
             <div className={`flex items-center justify-between ${flip}`}>
               <div>
                 <span className="block text-[8px] font-black uppercase text-[#667085]">{t.nextPrayer}</span>
-                <span className="font-serif text-base font-black">Asr</span>
+                <span className="font-serif text-base font-black">{isRTL ? nextPrayer.nameAr : nextPrayer.nameEn}</span>
               </div>
               <div className={isRTL ? "text-left" : "text-right"}>
                 <span className="block text-[8px] font-black uppercase text-[#667085]">{t.prayerIn}</span>
-                <span className="font-serif text-base font-black text-[#EF4444]">{fmt(secondsLeft)}</span>
+                <span className="font-serif text-base font-black text-[#EF4444]">{fmt(secondsUntilNext)}</span>
               </div>
             </div>
             <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#F5F5F5]">
-              <div className="h-full rounded-full bg-gradient-to-r from-[#D1AF47] to-[#EF4444]" style={{ width: `${((4354 - secondsLeft) / 4354) * 100}%` }} />
+              <div className="h-full rounded-full bg-gradient-to-r from-[#D1AF47] to-[#EF4444]" style={{ width: `${progressPercent}%` }} />
             </div>
             <div className="mt-2 grid grid-cols-2 gap-2 border-t border-[#ECECEC] pt-2">
-              <div><span className="block text-[8px] font-black uppercase text-[#667085]">{t.lockIn}</span><span className="font-serif text-xs font-black text-[#D1AF47]">{fmt(lockSeconds)}</span></div>
-              <div><span className="block text-[8px] font-black uppercase text-[#667085]">{t.autoResume}</span><span className="font-serif text-xs font-black text-[#16A34A]">04:15 PM</span></div>
+              <div><span className="block text-[8px] font-black uppercase text-[#667085]">{isLocked ? (isRTL ? "ينتهي خلال" : "Unlocks in") : t.lockIn}</span><span className="font-serif text-xs font-black text-[#D1AF47]">{fmt(isLocked ? resumesIn : lockStartsIn)}</span></div>
+              <div><span className="block text-[8px] font-black uppercase text-[#667085]">{t.autoResume}</span><span className="font-serif text-xs font-black text-[#16A34A]">{formatTime12h(resumeTime)}</span></div>
             </div>
           </div>
           <div className="mt-2 grid flex-shrink-0 grid-cols-3 gap-2">

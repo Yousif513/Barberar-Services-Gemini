@@ -305,8 +305,8 @@ export default function PackagesPage() {
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-serif font-bold tracking-wide text-white">Wellness Packages & Passes</h2>
-          <p className="text-sm text-[#B8C0D4] mt-1">Configure multi-session memberships, passes, and promotional spa/grooming packages.</p>
+          <h2 className="text-2xl font-serif font-bold tracking-wide text-[#101828]">Wellness Packages & Passes</h2>
+          <p className="text-sm text-[#344054] mt-1">Configure multi-session memberships, passes, and promotional spa/grooming packages.</p>
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
@@ -331,14 +331,14 @@ export default function PackagesPage() {
       </div>
 
       {error && (
-        <div className="bg-red-950/20 border border-[#FF5D73]/30 text-[#FF5D73] text-xs rounded-[20px] p-4 flex items-center gap-3">
+        <div className="bg-red-950/20 border border-[#FF5D73]/30 text-[#EF4444] text-xs rounded-[20px] p-4 flex items-center gap-3">
           <span className="w-2 h-2 rounded-full bg-[#FF5D73] animate-pulse" />
           <span>Error: {error}</span>
         </div>
       )}
 
       {success && (
-        <div className="bg-green-950/20 border border-[#3DDC84]/30 text-[#3DDC84] text-xs rounded-[20px] p-4 flex items-center gap-3">
+        <div className="bg-green-950/20 border border-[#3DDC84]/30 text-[#22C55E] text-xs rounded-[20px] p-4 flex items-center gap-3">
           <span className="w-2 h-2 rounded-full bg-[#3DDC84] animate-pulse" />
           <span>Success: {success}</span>
         </div>
@@ -346,86 +346,86 @@ export default function PackagesPage() {
 
       {/* ADD PACKAGE DIALOG */}
       {showAddForm && (
-        <form onSubmit={handleAddPackage} className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-8 shadow-[0_8px_32px_rgba(0,0,0,0.4)] max-w-2xl space-y-6">
-          <h3 className="font-bold text-sm text-white tracking-wide uppercase">Create Package Template</h3>
+        <form onSubmit={handleAddPackage} className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-8 shadow-[0_8px_32px_rgba(0,0,0,0.4)] max-w-2xl space-y-6">
+          <h3 className="font-bold text-sm text-[#101828] tracking-wide uppercase">Create Package Template</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] block mb-2">Package Name (English)</label>
+              <label className="text-[10px] uppercase font-bold tracking-widest text-[#667085] block mb-2">Package Name (English)</label>
               <input
                 type="text"
                 placeholder="e.g. Deep Tissue 5-Session Pass"
                 value={nameEn}
                 onChange={(e) => setNameEn(e.target.value)}
-                className="w-full bg-[#0D1422] border border-white/[0.06] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-white font-semibold transition-all duration-200"
+                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] font-semibold transition-all duration-200"
                 required
               />
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] block mb-2">Package Name (Arabic)</label>
+              <label className="text-[10px] uppercase font-bold tracking-widest text-[#667085] block mb-2">Package Name (Arabic)</label>
               <input
                 type="text"
                 placeholder="مثال: باقة 5 جلسات مساج عميق"
                 value={nameAr}
                 onChange={(e) => setNameAr(e.target.value)}
-                className="w-full bg-[#0D1422] border border-white/[0.06] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-white font-semibold transition-all duration-200"
+                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] font-semibold transition-all duration-200"
                 required
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] block mb-2">Description (English)</label>
+              <label className="text-[10px] uppercase font-bold tracking-widest text-[#667085] block mb-2">Description (English)</label>
               <textarea
                 placeholder="Specify what services are included and terms..."
                 value={descEn}
                 onChange={(e) => setDescEn(e.target.value)}
-                className="w-full bg-[#0D1422] border border-white/[0.06] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-white min-h-[80px] transition-all duration-200"
+                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] min-h-[80px] transition-all duration-200"
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] block mb-2">Description (Arabic)</label>
+              <label className="text-[10px] uppercase font-bold tracking-widest text-[#667085] block mb-2">Description (Arabic)</label>
               <textarea
                 placeholder="حدد الخدمات المشمولة والشروط باللغة العربية..."
                 value={descAr}
                 onChange={(e) => setDescAr(e.target.value)}
-                className="w-full bg-[#0D1422] border border-white/[0.06] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-white min-h-[80px] transition-all duration-200"
+                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] min-h-[80px] transition-all duration-200"
               />
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] block mb-2">Package Price (SAR)</label>
+              <label className="text-[10px] uppercase font-bold tracking-widest text-[#667085] block mb-2">Package Price (SAR)</label>
               <input
                 type="number"
                 min="1"
                 value={price}
                 onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
-                className="w-full bg-[#0D1422] border border-white/[0.06] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-white font-semibold transition-all duration-200"
+                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] font-semibold transition-all duration-200"
                 required
               />
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] block mb-2">Sessions Count</label>
+              <label className="text-[10px] uppercase font-bold tracking-widest text-[#667085] block mb-2">Sessions Count</label>
               <input
                 type="number"
                 min="1"
                 value={sessionCount}
                 onChange={(e) => setSessionCount(parseInt(e.target.value) || 1)}
-                className="w-full bg-[#0D1422] border border-white/[0.06] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-white font-semibold transition-all duration-200"
+                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] font-semibold transition-all duration-200"
                 required
               />
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold tracking-widest text-[#7B859C] block mb-2">Expires After (Days)</label>
+              <label className="text-[10px] uppercase font-bold tracking-widest text-[#667085] block mb-2">Expires After (Days)</label>
               <input
                 type="number"
                 min="1"
                 value={expiresInDays}
                 onChange={(e) => setExpiresInDays(parseInt(e.target.value) || 365)}
-                className="w-full bg-[#0D1422] border border-white/[0.06] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-white font-semibold transition-all duration-200"
+                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] font-semibold transition-all duration-200"
                 required
               />
             </div>
@@ -446,16 +446,16 @@ export default function PackagesPage() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 space-y-4">
           <div className="w-8 h-8 rounded-full border-2 border-[#D1AF47] border-t-transparent animate-spin" />
-          <div className="text-sm text-[#7B859C] tracking-wide">Loading package templates...</div>
+          <div className="text-sm text-[#667085] tracking-wide">Loading package templates...</div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {packages.map((pkg) => (
             <div
               key={pkg.id}
-              className={`bg-[#111827] border rounded-[24px] p-6 shadow-xl flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] ${
+              className={`bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border rounded-[24px] p-6 shadow-xl flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] ${
                 pkg.is_active 
-                  ? "border-white/[0.06] hover:border-[#D1AF47]/50 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)]" 
+                  ? "border-[#ECECEC] hover:border-[#D1AF47]/50 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)]" 
                   : "border-white/[0.03] opacity-50"
               }`}
             >
@@ -466,31 +466,31 @@ export default function PackagesPage() {
                   </span>
                   <span className={`px-2.5 py-1 rounded-full text-[9px] font-bold flex items-center gap-1.5 ${
                     pkg.is_active 
-                      ? "bg-[#3DDC84]/10 text-[#3DDC84] border border-[#3DDC84]/20" 
-                      : "bg-[#FF5D73]/10 text-[#FF5D73] border border-[#FF5D73]/20"
+                      ? "bg-[#3DDC84]/10 text-[#22C55E] border border-[#3DDC84]/20" 
+                      : "bg-[#FF5D73]/10 text-[#EF4444] border border-[#FF5D73]/20"
                   }`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${pkg.is_active ? "bg-[#3DDC84]" : "bg-[#FF5D73]"}`} />
                     {pkg.is_active ? "Active" : "Inactive"}
                   </span>
                 </div>
-                <h4 className="font-bold text-base text-white tracking-wide">{pkg.name_en}</h4>
-                <h5 className="font-bold text-xs text-[#7B859C] mt-1">{pkg.name_ar}</h5>
+                <h4 className="font-bold text-base text-[#101828] tracking-wide">{pkg.name_en}</h4>
+                <h5 className="font-bold text-xs text-[#667085] mt-1">{pkg.name_ar}</h5>
                 
                 <div className="space-y-2.5 mt-4">
-                  <p className="text-xs text-[#B8C0D4] line-clamp-3 leading-relaxed">{pkg.description_en}</p>
+                  <p className="text-xs text-[#344054] line-clamp-3 leading-relaxed">{pkg.description_en}</p>
                   {pkg.description_ar && (
-                    <p className="text-xs text-[#7B859C] line-clamp-3 leading-relaxed italic">{pkg.description_ar}</p>
+                    <p className="text-xs text-[#667085] line-clamp-3 leading-relaxed italic">{pkg.description_ar}</p>
                   )}
                 </div>
 
-                <div className="mt-6 border-t border-white/[0.06] pt-4 flex justify-between items-end">
+                <div className="mt-6 border-t border-[#ECECEC] pt-4 flex justify-between items-end">
                   <div>
-                    <span className="text-[9px] text-[#7B859C] block font-bold tracking-wider uppercase">Package Price</span>
+                    <span className="text-[9px] text-[#667085] block font-bold tracking-wider uppercase">Package Price</span>
                     <span className="text-lg font-extrabold text-[#D1AF47]">{pkg.price} SAR</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-[9px] text-[#7B859C] block font-bold tracking-wider uppercase">Validity</span>
-                    <span className="text-xs font-bold text-white">{pkg.expires_in_days} Days</span>
+                    <span className="text-[9px] text-[#667085] block font-bold tracking-wider uppercase">Validity</span>
+                    <span className="text-xs font-bold text-[#101828]">{pkg.expires_in_days} Days</span>
                   </div>
                 </div>
               </div>
@@ -499,8 +499,8 @@ export default function PackagesPage() {
                 onClick={() => togglePackageStatus(pkg.id, pkg.is_active)}
                 className={`w-full py-3 rounded-[16px] text-xs font-bold border transition-all duration-300 mt-6 ${
                   pkg.is_active 
-                    ? "bg-[#0D1422] hover:bg-[#FF5D73]/10 hover:text-[#FF5D73] hover:border-[#FF5D73]/30 text-[#B8C0D4] border-white/[0.06]" 
-                    : "bg-[#3DDC84]/10 text-[#3DDC84] hover:bg-[#3DDC84]/20 border-[#3DDC84]/30"
+                    ? "bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:bg-[#FF5D73]/10 hover:text-[#EF4444] hover:border-[#FF5D73]/30 text-[#344054] border-[#ECECEC]" 
+                    : "bg-[#3DDC84]/10 text-[#22C55E] hover:bg-[#3DDC84]/20 border-[#3DDC84]/30"
                 }`}
               >
                 {pkg.is_active ? "Deactivate Package" : "Activate Package"}
@@ -511,22 +511,22 @@ export default function PackagesPage() {
       )}
 
       {/* ACTIVE PURCHASED MEMBERSHIPS */}
-      <div className="bg-[#111827] border border-white/[0.06] rounded-[28px] p-8 shadow-xl mt-8">
+      <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[28px] p-8 shadow-xl mt-8">
         <div className="mb-6">
-          <h3 className="text-base font-bold text-white tracking-wide mb-1">Active Client Memberships</h3>
-          <p className="text-xs text-[#B8C0D4]">Track customer package balances and manually deduct sessions upon client visits.</p>
+          <h3 className="text-base font-bold text-[#101828] tracking-wide mb-1">Active Client Memberships</h3>
+          <p className="text-xs text-[#344054]">Track customer package balances and manually deduct sessions upon client visits.</p>
         </div>
 
         {loadingMemberships ? (
           <div className="flex flex-col items-center justify-center py-10 space-y-3">
             <div className="w-6 h-6 rounded-full border-2 border-[#D1AF47] border-t-transparent animate-spin" />
-            <div className="text-xs text-[#7B859C]">Loading client memberships...</div>
+            <div className="text-xs text-[#667085]">Loading client memberships...</div>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left border-collapse">
               <thead>
-                <tr className="border-b border-white/[0.06] text-[#7B859C] font-bold bg-[#0D1422] uppercase text-[10px] tracking-wider">
+                <tr className="border-b border-[#ECECEC] text-[#667085] font-bold bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] uppercase text-[10px] tracking-wider">
                   <th className="py-4 px-5 text-left first:rounded-l-[14px] last:rounded-r-[14px]">Customer</th>
                   <th className="py-4 px-5 text-left">Package</th>
                   <th className="py-4 px-5 text-left">Sessions Remaining</th>
@@ -534,21 +534,21 @@ export default function PackagesPage() {
                   <th className="py-4 px-5 text-center first:rounded-l-[14px] last:rounded-r-[14px]">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.06]">
+              <tbody className="divide-y divide-[#ECECEC]">
                 {activeMemberships.map((mem) => (
-                  <tr key={mem.id} className="hover:bg-[#172033]/50 transition-all duration-200">
+                  <tr key={mem.id} className="hover:bg-white border border-[#ECECEC]/50 transition-all duration-200">
                     <td className="py-4 px-5">
-                      <div className="font-bold text-white">{mem.customer_name}</div>
-                      <div className="text-[10px] text-[#7B859C] mt-0.5">{mem.customer_phone}</div>
+                      <div className="font-bold text-[#101828]">{mem.customer_name}</div>
+                      <div className="text-[10px] text-[#667085] mt-0.5">{mem.customer_phone}</div>
                     </td>
                     <td className="py-4 px-5">
-                      <div className="font-semibold text-[#B8C0D4]">{mem.package_name_en}</div>
-                      <div className="text-[10px] text-[#7B859C] mt-0.5">{mem.package_name_ar}</div>
+                      <div className="font-semibold text-[#344054]">{mem.package_name_en}</div>
+                      <div className="text-[10px] text-[#667085] mt-0.5">{mem.package_name_ar}</div>
                     </td>
                     <td className="py-4 px-5 font-bold text-[#D1AF47]">
                       {mem.remaining_sessions} sessions
                     </td>
-                    <td className="py-4 px-5 text-[#B8C0D4]">{mem.expires_at}</td>
+                    <td className="py-4 px-5 text-[#344054]">{mem.expires_at}</td>
                     <td className="py-4 px-5 text-center">
                       {mem.remaining_sessions > 0 ? (
                         <button
@@ -558,7 +558,7 @@ export default function PackagesPage() {
                           Deduct Session
                         </button>
                       ) : (
-                        <span className="text-[10px] font-bold text-[#7B859C] bg-white/[0.04] border border-white/[0.06] px-2.5 py-1 rounded-full">
+                        <span className="text-[10px] font-bold text-[#667085] bg-[#F3F4F6] border border-[#ECECEC] border border-[#ECECEC] px-2.5 py-1 rounded-full">
                           Consumed
                         </span>
                       )}
@@ -567,7 +567,7 @@ export default function PackagesPage() {
                 ))}
                 {activeMemberships.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="text-center py-8 text-[#7B859C]">
+                    <td colSpan={5} className="text-center py-8 text-[#667085]">
                       No active client memberships found.
                     </td>
                   </tr>

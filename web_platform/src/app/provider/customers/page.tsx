@@ -283,19 +283,19 @@ export default function ProviderCustomersPage() {
   const avgSpendPerClient = totalClientsCount > 0 ? Math.round(totalSpendSum / totalClientsCount) : 0;
 
   return (
-    <div className="space-y-8 font-sans text-white">
+    <div className="space-y-8 font-sans text-[#101828]">
       {/* HEADER WITH GOLD DETAILS */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 pb-6 border-b border-white/[0.06]">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 pb-6 border-b border-[#ECECEC]">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+          <h2 className="text-3xl font-bold tracking-tight text-[#101828] flex items-center gap-3">
             <span className="bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] bg-clip-text text-transparent">{t.title}</span>
             <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47] animate-pulse"></span>
           </h2>
-          <p className="text-sm text-[#B8C0D4] mt-2 font-medium">{t.subtitle}</p>
+          <p className="text-sm text-[#344054] mt-2 font-medium">{t.subtitle}</p>
         </div>
         
         {/* PREMIUM SEARCH BAR */}
-        <div className="relative w-full md:w-96 flex items-center bg-[#0D1422]/85 backdrop-blur-md border border-white/[0.08] px-5 py-3 rounded-2xl focus-within:border-[#D1AF47]/40 focus-within:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300">
+        <div className="relative w-full md:w-96 flex items-center bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]/85 backdrop-blur-md border border-[#ECECEC] px-5 py-3 rounded-2xl focus-within:border-[#D1AF47]/40 focus-within:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300">
           <svg className="w-4 h-4 text-[#D1AF47] me-3 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -304,13 +304,13 @@ export default function ProviderCustomersPage() {
             placeholder={t.searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-transparent border-none outline-none text-xs placeholder-[#7B859C]/60 text-white font-medium focus:ring-0"
+            className="w-full bg-transparent border-none outline-none text-xs placeholder-[#7B859C]/60 text-[#101828] font-medium focus:ring-0"
           />
         </div>
       </div>
 
       {error && (
-        <div className="bg-[#111827] border border-[#D1AF47]/20 text-[#D1AF47] text-xs rounded-2xl p-4 flex items-center gap-3 shadow-[0_4px_12px_rgba(0,0,0,0.2)]">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#D1AF47]/20 text-[#D1AF47] text-xs rounded-2xl p-4 flex items-center gap-3 shadow-[0_4px_12px_rgba(0,0,0,0.2)]">
           <span className="w-2 h-2 rounded-full bg-[#D1AF47] animate-pulse"></span>
           <span className="font-semibold">{t.localRecordsNotice} ({error})</span>
         </div>
@@ -320,10 +320,10 @@ export default function ProviderCustomersPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
         {/* STAT 1: Total Clients */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
           <div className="space-y-2">
-            <span className="text-[10px] uppercase font-bold text-[#7B859C] tracking-[0.1em] block">{t.statsTotalClients}</span>
-            <span className="text-3xl font-extrabold text-white block tracking-tight">{totalClientsCount}</span>
+            <span className="text-[10px] uppercase font-bold text-[#667085] tracking-[0.1em] block">{t.statsTotalClients}</span>
+            <span className="text-3xl font-extrabold text-[#101828] block tracking-tight">{totalClientsCount}</span>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-[#D1AF47]/10 flex items-center justify-center text-[#D1AF47] group-hover:bg-[#D1AF47] group-hover:text-[#070B12] transition-all duration-300">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -333,10 +333,10 @@ export default function ProviderCustomersPage() {
         </div>
 
         {/* STAT 2: Total Bookings */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
           <div className="space-y-2">
-            <span className="text-[10px] uppercase font-bold text-[#7B859C] tracking-[0.1em] block">{t.statsTotalBookings}</span>
-            <span className="text-3xl font-extrabold text-white block tracking-tight">{totalBookingsCount}</span>
+            <span className="text-[10px] uppercase font-bold text-[#667085] tracking-[0.1em] block">{t.statsTotalBookings}</span>
+            <span className="text-3xl font-extrabold text-[#101828] block tracking-tight">{totalBookingsCount}</span>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-[#D1AF47]/10 flex items-center justify-center text-[#D1AF47] group-hover:bg-[#D1AF47] group-hover:text-[#070B12] transition-all duration-300">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -346,11 +346,11 @@ export default function ProviderCustomersPage() {
         </div>
 
         {/* STAT 3: Total Spend */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
           <div className="space-y-2">
-            <span className="text-[10px] uppercase font-bold text-[#7B859C] tracking-[0.1em] block">{t.statsTotalSpend}</span>
+            <span className="text-[10px] uppercase font-bold text-[#667085] tracking-[0.1em] block">{t.statsTotalSpend}</span>
             <span className="text-3xl font-extrabold text-[#D1AF47] block tracking-tight">
-              {totalSpendSum.toLocaleString()} <span className="text-xs font-semibold text-white/70">{t.currency}</span>
+              {totalSpendSum.toLocaleString()} <span className="text-xs font-semibold text-[#101828]/70">{t.currency}</span>
             </span>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-[#D1AF47]/10 flex items-center justify-center text-[#D1AF47] group-hover:bg-[#D1AF47] group-hover:text-[#070B12] transition-all duration-300">
@@ -361,11 +361,11 @@ export default function ProviderCustomersPage() {
         </div>
 
         {/* STAT 4: Average Spend */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
           <div className="space-y-2">
-            <span className="text-[10px] uppercase font-bold text-[#7B859C] tracking-[0.1em] block">{t.statsAverageSpend}</span>
+            <span className="text-[10px] uppercase font-bold text-[#667085] tracking-[0.1em] block">{t.statsAverageSpend}</span>
             <span className="text-3xl font-extrabold text-[#D1AF47] block tracking-tight">
-              {avgSpendPerClient.toLocaleString()} <span className="text-xs font-semibold text-white/70">{t.currency}</span>
+              {avgSpendPerClient.toLocaleString()} <span className="text-xs font-semibold text-[#101828]/70">{t.currency}</span>
             </span>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-[#D1AF47]/10 flex items-center justify-center text-[#D1AF47] group-hover:bg-[#D1AF47] group-hover:text-[#070B12] transition-all duration-300">
@@ -381,21 +381,21 @@ export default function ProviderCustomersPage() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-24 space-y-4">
           <div className="w-12 h-12 rounded-full border-4 border-[#D1AF47]/20 border-t-[#D1AF47] animate-spin"></div>
-          <p className="text-sm font-semibold text-[#B8C0D4]">{t.loadingClients}</p>
+          <p className="text-sm font-semibold text-[#344054]">{t.loadingClients}</p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-16 text-center text-[#7B859C] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-          <svg className="w-12 h-12 mx-auto text-[#7B859C]/40 mb-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-16 text-center text-[#667085] shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
+          <svg className="w-12 h-12 mx-auto text-[#667085]/40 mb-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.109A2.25 2.25 0 0112.75 21.5h-1.5a2.25 2.25 0 01-2.25-2.263V19.13m4.75-3.07a8.906 8.906 0 00-6-2.225 8.906 8.906 0 00-6 2.225m7.962-3.07a3.95 3.95 0 00-4.924-2.597M16.5 7.75a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 2.25a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
           </svg>
-          <p className="text-base font-bold text-white mb-1">{t.noClients}</p>
+          <p className="text-base font-bold text-[#101828] mb-1">{t.noClients}</p>
         </div>
       ) : (
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-start border-collapse">
               <thead>
-                <tr className="border-b border-white/[0.06] text-[#7B859C] font-semibold uppercase text-[10px] tracking-[0.12em] bg-[#0D1422]/50">
+                <tr className="border-b border-[#ECECEC] text-[#667085] font-semibold uppercase text-[10px] tracking-[0.12em] bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]/50">
                   <th className="py-4 px-6 text-start">{t.clientName}</th>
                   <th className="py-4 px-6 text-center">{t.bookingsCount}</th>
                   <th className="py-4 px-6 text-center">{t.totalSpend}</th>
@@ -404,7 +404,7 @@ export default function ProviderCustomersPage() {
                   <th className="py-4 px-6 text-end">{t.actions}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.04]">
+              <tbody className="divide-y divide-[#ECECEC]">
                 {filtered.map((c) => {
                   // Generate Initials
                   const initials = c.name
@@ -417,7 +417,7 @@ export default function ProviderCustomersPage() {
                     : "CL";
 
                   return (
-                    <tr key={c.id} className="hover:bg-white/[0.02] transition-colors duration-200">
+                    <tr key={c.id} className="hover:bg-transparent transition-colors duration-200">
                       
                       {/* Client Name & Phone */}
                       <td className="py-4 px-6 text-start">
@@ -426,31 +426,31 @@ export default function ProviderCustomersPage() {
                             {initials}
                           </div>
                           <div>
-                            <span className="font-bold text-white block text-sm">{c.name}</span>
-                            <span className="text-[10px] text-[#7B859C] block mt-0.5 tracking-wide">{c.phone}</span>
+                            <span className="font-bold text-[#101828] block text-sm">{c.name}</span>
+                            <span className="text-[10px] text-[#667085] block mt-0.5 tracking-wide">{c.phone}</span>
                           </div>
                         </div>
                       </td>
 
                       {/* Bookings Count */}
                       <td className="py-4 px-6 text-center">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-[#172033] text-[#B8C0D4] border border-white/[0.06]">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-white border border-[#ECECEC] text-[#344054] border border-[#ECECEC]">
                           {c.bookingsCount}
                         </span>
                       </td>
 
                       {/* Total Spend */}
                       <td className="py-4 px-6 text-center font-extrabold text-[#D1AF47] text-sm">
-                        {c.totalSpend.toLocaleString()} <span className="text-[10px] font-medium text-white/60">{t.currency}</span>
+                        {c.totalSpend.toLocaleString()} <span className="text-[10px] font-medium text-[#667085]">{t.currency}</span>
                       </td>
 
                       {/* Last Visit */}
-                      <td className="py-4 px-6 text-start text-[#B8C0D4] font-medium">
+                      <td className="py-4 px-6 text-start text-[#344054] font-medium">
                         {new Date(c.lastVisit).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
                       </td>
 
                       {/* Intake Notes Snippet */}
-                      <td className="py-4 px-6 text-start max-w-xs truncate text-[#7B859C] font-medium">
+                      <td className="py-4 px-6 text-start max-w-xs truncate text-[#667085] font-medium">
                         {c.intakeNotes || "—"}
                       </td>
 
@@ -477,24 +477,24 @@ export default function ProviderCustomersPage() {
 
       {/* INDIVIDUAL CLIENT SUMMARY & NOTES EDIT POPUP (MODAL) */}
       {editingClient && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#070B12]/80 backdrop-blur-md">
-          <div className="bg-[#111827] border border-white/[0.08] rounded-[28px] w-full max-w-3xl p-8 shadow-[0_12px_40px_rgba(0,0,0,0.6),0_0_40px_rgba(209,175,71,0.05)] text-white space-y-6 relative overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-transparent/80 backdrop-blur-md">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[28px] w-full max-w-3xl p-8 shadow-[0_12px_40px_rgba(0,0,0,0.6),0_0_40px_rgba(209,175,71,0.05)] text-[#101828] space-y-6 relative overflow-hidden">
             
             {/* Ambient Background Glow inside Popup */}
             <div className="absolute -top-20 -right-20 w-48 h-48 bg-[#D1AF47]/5 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-[#D1AF47]/5 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="flex justify-between items-start border-b border-white/[0.06] pb-4 relative z-10">
+            <div className="flex justify-between items-start border-b border-[#ECECEC] pb-4 relative z-10">
               <div>
-                <h3 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                <h3 className="text-xl font-bold tracking-tight text-[#101828] flex items-center gap-2">
                   <span className="bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] bg-clip-text text-transparent">{t.clientSummary}</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47] animate-ping"></span>
                 </h3>
-                <p className="text-xs text-[#B8C0D4] mt-1.5 font-medium">{editingClient.name}</p>
+                <p className="text-xs text-[#344054] mt-1.5 font-medium">{editingClient.name}</p>
               </div>
               <button
                 onClick={() => setEditingClient(null)}
-                className="text-[#7B859C] hover:text-white bg-white/[0.04] hover:bg-white/[0.08] p-2 rounded-xl transition duration-200 text-sm font-bold"
+                className="text-[#667085] hover:text-[#101828] bg-[#F3F4F6] border border-[#ECECEC] hover:bg-[#E5E7EB] border border-[#ECECEC] p-2 rounded-xl transition duration-200 text-sm font-bold"
               >
                 ✕
               </button>
@@ -505,45 +505,45 @@ export default function ProviderCustomersPage() {
               
               {/* LEFT PROFILE & METRICS PANEL (5 Cols) */}
               <div className="md:col-span-5 space-y-4">
-                <div className="bg-[#172033] border border-white/[0.06] rounded-2xl p-5 space-y-4">
+                <div className="bg-white border border-[#ECECEC] border border-[#ECECEC] rounded-2xl p-5 space-y-4">
                   
                   {/* Name & Phone */}
                   <div className="space-y-1">
-                    <span className="text-[10px] uppercase font-bold text-[#7B859C] tracking-[0.1em]">{t.clientName}</span>
-                    <p className="text-base font-bold text-white">{editingClient.name}</p>
-                    <p className="text-xs text-[#B8C0D4] mt-0.5">{t.phone}: {editingClient.phone}</p>
+                    <span className="text-[10px] uppercase font-bold text-[#667085] tracking-[0.1em]">{t.clientName}</span>
+                    <p className="text-base font-bold text-[#101828]">{editingClient.name}</p>
+                    <p className="text-xs text-[#344054] mt-0.5">{t.phone}: {editingClient.phone}</p>
                   </div>
                   
-                  <div className="h-px bg-white/[0.06]" />
+                  <div className="h-px bg-[#F9FAFB] border border-[#ECECEC]" />
 
                   {/* Quick stats grid inside modal */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <span className="text-[9px] uppercase font-bold text-[#7B859C] tracking-[0.08em] block">{t.bookingsCount}</span>
-                      <span className="text-base font-bold text-white">{editingClient.bookingsCount}</span>
+                      <span className="text-[9px] uppercase font-bold text-[#667085] tracking-[0.08em] block">{t.bookingsCount}</span>
+                      <span className="text-base font-bold text-[#101828]">{editingClient.bookingsCount}</span>
                     </div>
                     <div className="space-y-1">
-                      <span className="text-[9px] uppercase font-bold text-[#7B859C] tracking-[0.08em] block">{t.totalSpend}</span>
-                      <span className="text-base font-bold text-[#D1AF47]">{editingClient.totalSpend.toLocaleString()} <span className="text-[10px] text-white/70">{t.currency}</span></span>
+                      <span className="text-[9px] uppercase font-bold text-[#667085] tracking-[0.08em] block">{t.totalSpend}</span>
+                      <span className="text-base font-bold text-[#D1AF47]">{editingClient.totalSpend.toLocaleString()} <span className="text-[10px] text-[#101828]/70">{t.currency}</span></span>
                     </div>
                   </div>
 
-                  <div className="h-px bg-white/[0.06]" />
+                  <div className="h-px bg-[#F9FAFB] border border-[#ECECEC]" />
 
                   {/* Last visit info */}
                   <div className="space-y-1">
-                    <span className="text-[9px] uppercase font-bold text-[#7B859C] tracking-[0.08em] block">{t.lastVisit}</span>
-                    <p className="text-xs text-[#B8C0D4] font-medium">
+                    <span className="text-[9px] uppercase font-bold text-[#667085] tracking-[0.08em] block">{t.lastVisit}</span>
+                    <p className="text-xs text-[#344054] font-medium">
                       {new Date(editingClient.lastVisit).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
                     </p>
                   </div>
 
-                  <div className="h-px bg-white/[0.06]" />
+                  <div className="h-px bg-[#F9FAFB] border border-[#ECECEC]" />
 
                   {/* Status Indicator */}
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-[#3DDC84] shadow-[0_0_8px_rgba(61,220,132,0.4)]"></span>
-                    <span className="text-xs font-bold text-[#3DDC84]">{t.activeStatus}</span>
+                    <span className="text-xs font-bold text-[#22C55E]">{t.activeStatus}</span>
                   </div>
 
                 </div>
@@ -551,15 +551,15 @@ export default function ProviderCustomersPage() {
 
               {/* RIGHT BOOKING TIMELINE PANEL (7 Cols) */}
               <div className="md:col-span-7 flex flex-col space-y-3">
-                <span className="text-[10px] uppercase font-bold text-[#7B859C] tracking-[0.1em]">{t.bookingHistory}</span>
+                <span className="text-[10px] uppercase font-bold text-[#667085] tracking-[0.1em]">{t.bookingHistory}</span>
                 
-                <div className="flex-1 bg-[#0D1422]/50 border border-white/[0.06] rounded-2xl p-4 overflow-y-auto max-h-[220px] scrollbar-thin scrollbar-thumb-white/[0.08] space-y-4">
+                <div className="flex-1 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]/50 border border-[#ECECEC] rounded-2xl p-4 overflow-y-auto max-h-[220px] scrollbar-thin scrollbar-thumb-white/[0.08] space-y-4">
                   {(!editingClient.bookings || editingClient.bookings.length === 0) ? (
-                    <div className="h-full flex items-center justify-center text-center py-6 text-xs text-[#7B859C]">
+                    <div className="h-full flex items-center justify-center text-center py-6 text-xs text-[#667085]">
                       {t.noBookingHistory}
                     </div>
                   ) : (
-                    <div className="relative border-s border-white/[0.06] ms-2.5 py-1 space-y-5">
+                    <div className="relative border-s border-[#ECECEC] ms-2.5 py-1 space-y-5">
                       {editingClient.bookings.map((booking: any) => (
                         <div key={booking.id} className="relative ps-6">
                           
@@ -568,10 +568,10 @@ export default function ProviderCustomersPage() {
                           
                           <div className="flex items-center justify-between gap-4">
                             <div className="text-start">
-                              <p className="text-xs font-bold text-white">
+                              <p className="text-xs font-bold text-[#101828]">
                                 {new Date(booking.scheduled_at).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
                               </p>
-                              <p className="text-[10px] text-[#7B859C] mt-0.5">
+                              <p className="text-[10px] text-[#667085] mt-0.5">
                                 {new Date(booking.scheduled_at).toLocaleTimeString(locale === "ar" ? "ar-EG" : "en-US", { hour: '2-digit', minute: '2-digit' })}
                               </p>
                             </div>
@@ -580,7 +580,7 @@ export default function ProviderCustomersPage() {
                               <span className="text-xs font-extrabold text-[#D1AF47] block">
                                 {Number(booking.total_price).toLocaleString()} {t.currency}
                               </span>
-                              <span className="inline-flex items-center gap-1 text-[9px] font-bold text-[#3DDC84] mt-0.5">
+                              <span className="inline-flex items-center gap-1 text-[9px] font-bold text-[#22C55E] mt-0.5">
                                 <span className="w-1 h-1 rounded-full bg-[#3DDC84]"></span>
                                 {t.completedStatus}
                               </span>
@@ -598,21 +598,21 @@ export default function ProviderCustomersPage() {
 
             {/* INTAKE NOTES TEXTAREA */}
             <div className="space-y-2 relative z-10">
-              <label className="text-[10px] uppercase font-bold text-[#7B859C] tracking-[0.1em] block">{t.intakeNotes}</label>
+              <label className="text-[10px] uppercase font-bold text-[#667085] tracking-[0.1em] block">{t.intakeNotes}</label>
               <textarea
                 rows={3}
                 value={noteText}
                 onChange={(e) => setNoteText(e.target.value)}
                 placeholder={t.notesPlaceholder}
-                className="w-full bg-[#0D1422] border border-white/[0.08] focus:border-[#D1AF47]/50 rounded-2xl p-4 text-xs text-white outline-none placeholder-[#7B859C]/40 leading-relaxed transition-all duration-300 focus:shadow-[0_0_15px_rgba(209,175,71,0.05)] resize-none"
+                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] focus:border-[#D1AF47]/50 rounded-2xl p-4 text-xs text-[#101828] outline-none placeholder-[#7B859C]/40 leading-relaxed transition-all duration-300 focus:shadow-[0_0_15px_rgba(209,175,71,0.05)] resize-none"
               />
             </div>
 
             {/* MODAL ACTION BUTTONS */}
-            <div className="flex gap-4 pt-2 border-t border-white/[0.06] relative z-10">
+            <div className="flex gap-4 pt-2 border-t border-[#ECECEC] relative z-10">
               <button
                 onClick={() => setEditingClient(null)}
-                className="flex-1 py-3 border border-white/[0.08] bg-transparent text-[#B8C0D4] hover:text-white font-bold text-xs rounded-xl hover:bg-white/[0.03] transition-all duration-300"
+                className="flex-1 py-3 border border-[#ECECEC] bg-transparent text-[#344054] hover:text-[#101828] font-bold text-xs rounded-xl hover:bg-[#F9FAFB] border border-[#ECECEC] transition-all duration-300"
               >
                 {t.cancel}
               </button>

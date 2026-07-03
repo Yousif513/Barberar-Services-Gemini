@@ -418,11 +418,11 @@ export default function ProviderServicesPage() {
       {/* Title Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border-b border-[rgba(255,255,255,0.06)] pb-6">
         <div className="space-y-1">
-          <h2 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+          <h2 className="text-3xl font-extrabold tracking-tight text-[#101828] flex items-center gap-3">
             <span className="w-1.5 h-8 bg-[#D1AF47] rounded-full shadow-[0_0_15px_rgba(209,175,71,0.6)]"></span>
             {t.servicesTitle}
           </h2>
-          <p className="text-sm text-[#7B859C] max-w-xl leading-relaxed">{t.subtitle}</p>
+          <p className="text-sm text-[#667085] max-w-xl leading-relaxed">{t.subtitle}</p>
         </div>
         
         <button onClick={openAddService} className="relative group overflow-hidden bg-gradient-to-r from-[#D1AF47] to-[#B8952E] hover:from-[#E0C46A] hover:to-[#D1AF47] text-[#070B12] px-6 py-3 rounded-[16px] text-sm font-bold shadow-[0_4px_20px_rgba(209,175,71,0.25)] hover:shadow-[0_0_30px_rgba(209,175,71,0.4)] transition-all duration-300 flex items-center gap-2 cursor-pointer active:scale-95">
@@ -438,7 +438,7 @@ export default function ProviderServicesPage() {
             ? "border-[#FF5D73]/25 bg-[#FF5D73]/10 text-[#FFB3BF]"
             : success
               ? "border-[#3DDC84]/25 bg-[#3DDC84]/10 text-[#9AF0BE]"
-              : "border-[#D1AF47]/20 bg-[#D1AF47]/10 text-[#E0C46A]"
+              : "border-[#D1AF47]/20 bg-[#D1AF47]/10 text-[#D1AF47]"
         }`}>
           {error || success || serviceCopy.loading}
         </div>
@@ -451,10 +451,10 @@ export default function ProviderServicesPage() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent pointer-events-none"></div>
           <div className="flex justify-between items-start">
             <div className="space-y-2">
-              <p className="text-xs uppercase tracking-wider text-[#7B859C] font-semibold">{t.totalServices}</p>
-              <h3 className="text-3xl font-extrabold text-white tracking-tight">{servicesList.length}</h3>
+              <p className="text-xs uppercase tracking-wider text-[#667085] font-semibold">{t.totalServices}</p>
+              <h3 className="text-3xl font-extrabold text-[#101828] tracking-tight">{servicesList.length}</h3>
             </div>
-            <div className="p-3 bg-gradient-to-br from-[#1A2236] to-[#0D1422] rounded-[16px] border border-white/5 shadow-inner group-hover:scale-110 transition-transform duration-300">
+            <div className="p-3 bg-gradient-to-br from-[#1A2236] to-[#0D1422] rounded-[16px] border border-[#ECECEC] shadow-inner group-hover:scale-110 transition-transform duration-300">
               <svg className="w-6 h-6 text-[#D1AF47]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
               </svg>
@@ -467,13 +467,13 @@ export default function ProviderServicesPage() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent pointer-events-none"></div>
           <div className="flex justify-between items-start">
             <div className="space-y-2">
-              <p className="text-xs uppercase tracking-wider text-[#7B859C] font-semibold">{t.activeServices}</p>
-              <h3 className="text-3xl font-extrabold text-white tracking-tight">
+              <p className="text-xs uppercase tracking-wider text-[#667085] font-semibold">{t.activeServices}</p>
+              <h3 className="text-3xl font-extrabold text-[#101828] tracking-tight">
                 {servicesList.filter((s) => s.isActive).length}
               </h3>
             </div>
-            <div className="p-3 bg-gradient-to-br from-[#1A2236] to-[#0D1422] rounded-[16px] border border-white/5 shadow-inner group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-6 h-6 text-[#3DDC84]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <div className="p-3 bg-gradient-to-br from-[#1A2236] to-[#0D1422] rounded-[16px] border border-[#ECECEC] shadow-inner group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-6 h-6 text-[#22C55E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
@@ -485,12 +485,12 @@ export default function ProviderServicesPage() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent pointer-events-none"></div>
           <div className="flex justify-between items-start">
             <div className="space-y-2">
-              <p className="text-xs uppercase tracking-wider text-[#7B859C] font-semibold">{t.homeServicesCount}</p>
-              <h3 className="text-3xl font-extrabold text-white tracking-tight">
+              <p className="text-xs uppercase tracking-wider text-[#667085] font-semibold">{t.homeServicesCount}</p>
+              <h3 className="text-3xl font-extrabold text-[#101828] tracking-tight">
                 {servicesList.filter((s) => s.isHomeService).length}
               </h3>
             </div>
-            <div className="p-3 bg-gradient-to-br from-[#1A2236] to-[#0D1422] rounded-[16px] border border-white/5 shadow-inner group-hover:scale-110 transition-transform duration-300">
+            <div className="p-3 bg-gradient-to-br from-[#1A2236] to-[#0D1422] rounded-[16px] border border-[#ECECEC] shadow-inner group-hover:scale-110 transition-transform duration-300">
               <svg className="w-6 h-6 text-[#F5B041]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
               </svg>
@@ -500,14 +500,14 @@ export default function ProviderServicesPage() {
       </div>
 
       {/* Services Table Card (Desktop) */}
-      <div className="hidden md:block relative bg-[#111827]/80 backdrop-blur-md border border-[rgba(255,255,255,0.06)] rounded-[28px] shadow-2xl p-6 md:p-8 overflow-hidden">
+      <div className="hidden md:block relative bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]/80 backdrop-blur-md border border-[rgba(255,255,255,0.06)] rounded-[28px] shadow-2xl p-6 md:p-8 overflow-hidden">
         {/* Inner top glow */}
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
         
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left border-collapse">
             <thead>
-              <tr className="border-b border-[rgba(255,255,255,0.06)] text-[#7B859C] text-xs uppercase tracking-wider">
+              <tr className="border-b border-[rgba(255,255,255,0.06)] text-[#667085] text-xs uppercase tracking-wider">
                 <th className="py-5 px-6 text-start font-semibold">{t.serviceName}</th>
                 <th className="py-5 px-6 text-start font-semibold">{t.category}</th>
                 <th className="py-5 px-6 text-start font-semibold">{t.price}</th>
@@ -520,7 +520,7 @@ export default function ProviderServicesPage() {
             <tbody className="divide-y divide-[rgba(255,255,255,0.04)]">
               {!loading && servicesList.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-6 py-10 text-center text-sm font-semibold text-[#B8C0D4]">
+                  <td colSpan={7} className="px-6 py-10 text-center text-sm font-semibold text-[#344054]">
                     {serviceCopy.noServices}
                   </td>
                 </tr>
@@ -531,13 +531,13 @@ export default function ProviderServicesPage() {
                   className="group hover:bg-white/[0.01] transition-all duration-300"
                 >
                   {/* Name */}
-                  <td className="py-5 px-6 font-medium text-white transition-colors duration-300 group-hover:text-[#D1AF47]">
+                  <td className="py-5 px-6 font-medium text-[#101828] transition-colors duration-300 group-hover:text-[#D1AF47]">
                     {lang === "ar" ? service.name_ar : service.name_en}
                   </td>
                   
                   {/* Category */}
                   <td className="py-5 px-6">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#172033] text-[#B8C0D4] border border-white/5">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white border border-[#ECECEC] text-[#344054] border border-[#ECECEC]">
                       {lang === "ar" ? service.category_ar : service.category_en}
                     </span>
                   </td>
@@ -548,9 +548,9 @@ export default function ProviderServicesPage() {
                   </td>
                   
                   {/* Duration */}
-                  <td className="py-5 px-6 text-[#B8C0D4]">
+                  <td className="py-5 px-6 text-[#344054]">
                     <div className="flex items-center gap-1.5">
-                      <svg className="w-4 h-4 text-[#7B859C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-[#667085]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                       </svg>
                       <span>{service.duration}</span>
@@ -562,7 +562,7 @@ export default function ProviderServicesPage() {
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all duration-300 ${
                       service.isHomeService 
                         ? "bg-[#D1AF47]/10 text-[#D1AF47] border border-[#D1AF47]/20 shadow-[0_0_10px_rgba(209,175,71,0.05)]" 
-                        : "bg-white/5 text-[#7B859C] border border-white/5"
+                        : "bg-white/5 text-[#667085] border border-[#ECECEC]"
                     }`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${service.isHomeService ? 'bg-[#D1AF47]' : 'bg-[#7B859C]'}`}></span>
                       {service.isHomeService ? t.eligible : t.inStoreOnly}
@@ -573,8 +573,8 @@ export default function ProviderServicesPage() {
                   <td className="py-5 px-6">
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all duration-300 ${
                       service.isActive 
-                        ? "bg-[#3DDC84]/10 text-[#3DDC84] border border-[#3DDC84]/20 shadow-[0_0_12px_rgba(61,220,132,0.1)]" 
-                        : "bg-[#FF5D73]/10 text-[#FF5D73] border border-[#FF5D73]/20"
+                        ? "bg-[#3DDC84]/10 text-[#22C55E] border border-[#3DDC84]/20 shadow-[0_0_12px_rgba(61,220,132,0.1)]" 
+                        : "bg-[#FF5D73]/10 text-[#EF4444] border border-[#FF5D73]/20"
                     }`}>
                       <span className="relative flex h-1.5 w-1.5">
                         {service.isActive && (
@@ -589,14 +589,14 @@ export default function ProviderServicesPage() {
                   {/* Actions Buttons */}
                   <td className="py-5 px-6 text-center">
                     <div className="flex justify-center items-center gap-3">
-                      <button onClick={() => openEditService(service)} className="flex items-center gap-1 text-[#D1AF47] hover:text-[#E0C46A] transition-colors duration-300 text-xs font-semibold bg-[#D1AF47]/5 hover:bg-[#D1AF47]/10 px-3 py-1.5 rounded-lg border border-[#D1AF47]/10 hover:border-[#D1AF47]/30 cursor-pointer">
+                      <button onClick={() => openEditService(service)} className="flex items-center gap-1 text-[#D1AF47] hover:text-[#D1AF47] transition-colors duration-300 text-xs font-semibold bg-[#D1AF47]/5 hover:bg-[#D1AF47]/10 px-3 py-1.5 rounded-lg border border-[#D1AF47]/10 hover:border-[#D1AF47]/30 cursor-pointer">
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                         </svg>
                         {t.edit}
                       </button>
                       
-                      <button onClick={() => void deleteService(service)} className="flex items-center gap-1 text-[#FF5D73] hover:text-[#FF8093] transition-colors duration-300 text-xs font-semibold bg-[#FF5D73]/5 hover:bg-[#FF5D73]/10 px-3 py-1.5 rounded-lg border border-[#FF5D73]/10 hover:border-[#FF5D73]/30 cursor-pointer">
+                      <button onClick={() => void deleteService(service)} className="flex items-center gap-1 text-[#EF4444] hover:text-[#FF8093] transition-colors duration-300 text-xs font-semibold bg-[#FF5D73]/5 hover:bg-[#FF5D73]/10 px-3 py-1.5 rounded-lg border border-[#FEE4E2] hover:border-[#FF5D73]/30 cursor-pointer">
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                         </svg>
@@ -614,30 +614,30 @@ export default function ProviderServicesPage() {
       {/* Services Grid Card (Mobile) */}
       <div className="grid grid-cols-1 gap-4 md:hidden">
         {!loading && servicesList.length === 0 && (
-          <div className="rounded-[24px] border border-[#D1AF47]/15 bg-[#111827]/90 p-6 text-center text-sm text-[#B8C0D4] shadow-[0_0_30px_rgba(209,175,71,0.08)]">
+          <div className="rounded-[24px] border border-[#D1AF47]/15 bg-white/90 p-6 text-center text-sm text-[#344054] shadow-[0_0_30px_rgba(209,175,71,0.08)]">
             {serviceCopy.noServices}
           </div>
         )}
         {servicesList.map((service) => (
           <div 
             key={service.id} 
-            className="relative overflow-hidden bg-[#111827]/90 backdrop-blur-md border border-[rgba(255,255,255,0.06)] rounded-[24px] p-5 shadow-lg flex flex-col gap-4"
+            className="relative overflow-hidden bg-white/90 backdrop-blur-md border border-[rgba(255,255,255,0.06)] rounded-[24px] p-5 shadow-lg flex flex-col gap-4"
           >
             {/* Top Header */}
             <div className="flex justify-between items-start">
               <div className="space-y-1">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-[#172033] text-[#B8C0D4] border border-white/5">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-white border border-[#ECECEC] text-[#344054] border border-[#ECECEC]">
                   {lang === "ar" ? service.category_ar : service.category_en}
                 </span>
-                <h4 className="text-base font-semibold text-white">
+                <h4 className="text-base font-semibold text-[#101828]">
                   {lang === "ar" ? service.name_ar : service.name_en}
                 </h4>
               </div>
               
               <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
                 service.isActive 
-                  ? "bg-[#3DDC84]/10 text-[#3DDC84] border border-[#3DDC84]/20" 
-                  : "bg-[#FF5D73]/10 text-[#FF5D73] border border-[#FF5D73]/20"
+                  ? "bg-[#3DDC84]/10 text-[#22C55E] border border-[#3DDC84]/20" 
+                  : "bg-[#FF5D73]/10 text-[#EF4444] border border-[#FF5D73]/20"
               }`}>
                 <span className={`w-1 h-1 rounded-full ${service.isActive ? 'bg-[#3DDC84]' : 'bg-[#FF5D73]'}`}></span>
                 {service.isActive ? t.active : t.inactive}
@@ -647,17 +647,17 @@ export default function ProviderServicesPage() {
             {/* Details (Price, Duration, Home service) */}
             <div className="grid grid-cols-3 gap-2 py-3 border-y border-[rgba(255,255,255,0.04)] text-xs">
               <div>
-                <p className="text-[#7B859C] mb-1 text-[10px] uppercase tracking-wider">{t.price}</p>
+                <p className="text-[#667085] mb-1 text-[10px] uppercase tracking-wider">{t.price}</p>
                 <p className="font-bold text-[#D1AF47]">{service.price}</p>
               </div>
               <div>
-                <p className="text-[#7B859C] mb-1 text-[10px] uppercase tracking-wider">{t.duration}</p>
-                <p className="text-[#B8C0D4] font-medium">{service.duration}</p>
+                <p className="text-[#667085] mb-1 text-[10px] uppercase tracking-wider">{t.duration}</p>
+                <p className="text-[#344054] font-medium">{service.duration}</p>
               </div>
               <div>
-                <p className="text-[#7B859C] mb-1 text-[10px] uppercase tracking-wider">{t.homeService}</p>
+                <p className="text-[#667085] mb-1 text-[10px] uppercase tracking-wider">{t.homeService}</p>
                 <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                  service.isHomeService ? "text-[#D1AF47]" : "text-[#7B859C]"
+                  service.isHomeService ? "text-[#D1AF47]" : "text-[#667085]"
                 }`}>
                   {service.isHomeService ? t.eligible : t.inStoreOnly}
                 </span>
@@ -666,13 +666,13 @@ export default function ProviderServicesPage() {
 
             {/* Actions */}
             <div className="flex justify-end gap-3 pt-1">
-              <button onClick={() => openEditService(service)} className="flex items-center gap-1 text-[#D1AF47] hover:text-[#E0C46A] transition-colors duration-300 text-xs font-semibold bg-[#D1AF47]/5 px-3 py-1.5 rounded-lg border border-[#D1AF47]/10 cursor-pointer">
+              <button onClick={() => openEditService(service)} className="flex items-center gap-1 text-[#D1AF47] hover:text-[#D1AF47] transition-colors duration-300 text-xs font-semibold bg-[#D1AF47]/5 px-3 py-1.5 rounded-lg border border-[#D1AF47]/10 cursor-pointer">
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                 </svg>
                 {t.edit}
               </button>
-              <button onClick={() => void deleteService(service)} className="flex items-center gap-1 text-[#FF5D73] hover:text-[#FF8093] transition-colors duration-300 text-xs font-semibold bg-[#FF5D73]/5 px-3 py-1.5 rounded-lg border border-[#FF5D73]/10 cursor-pointer">
+              <button onClick={() => void deleteService(service)} className="flex items-center gap-1 text-[#EF4444] hover:text-[#FF8093] transition-colors duration-300 text-xs font-semibold bg-[#FF5D73]/5 px-3 py-1.5 rounded-lg border border-[#FEE4E2] cursor-pointer">
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                 </svg>
@@ -684,40 +684,40 @@ export default function ProviderServicesPage() {
       </div>
 
       {serviceModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#070B12]/80 px-4 py-8 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent/80 px-4 py-8 backdrop-blur-sm">
           <div className="w-full max-w-2xl rounded-[28px] border border-[#D1AF47]/20 bg-gradient-to-b from-[#111827] to-[#0D1422] p-6 shadow-[0_0_45px_rgba(209,175,71,0.16)]">
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-xl font-black text-white">
+                <h3 className="text-xl font-black text-[#101828]">
                   {serviceForm.id ? serviceCopy.editTitle : serviceCopy.addTitle}
                 </h3>
-                <p className="mt-1 text-xs text-[#7B859C]">{t.subtitle}</p>
+                <p className="mt-1 text-xs text-[#667085]">{t.subtitle}</p>
               </div>
-              <button onClick={() => setServiceModalOpen(false)} className="rounded-full border border-white/10 px-3 py-1 text-xs font-bold text-[#B8C0D4] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
+              <button onClick={() => setServiceModalOpen(false)} className="rounded-full border border-[#ECECEC] px-3 py-1 text-xs font-bold text-[#344054] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
                 {serviceCopy.cancel}
               </button>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C]">
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
                 {serviceCopy.nameEn}
-                <input value={serviceForm.nameEn} onChange={(event) => setServiceForm((form) => ({ ...form, nameEn: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60" />
+                <input value={serviceForm.nameEn} onChange={(event) => setServiceForm((form) => ({ ...form, nameEn: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
               </label>
-              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C]">
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
                 {serviceCopy.nameAr}
-                <input value={serviceForm.nameAr} onChange={(event) => setServiceForm((form) => ({ ...form, nameAr: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60" />
+                <input value={serviceForm.nameAr} onChange={(event) => setServiceForm((form) => ({ ...form, nameAr: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
               </label>
-              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C]">
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
                 {serviceCopy.price}
-                <input type="number" min="1" value={serviceForm.basePrice} onChange={(event) => setServiceForm((form) => ({ ...form, basePrice: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60" />
+                <input type="number" min="1" value={serviceForm.basePrice} onChange={(event) => setServiceForm((form) => ({ ...form, basePrice: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
               </label>
-              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C]">
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
                 {serviceCopy.duration}
-                <input type="number" min="5" step="5" value={serviceForm.durationMinutes} onChange={(event) => setServiceForm((form) => ({ ...form, durationMinutes: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60" />
+                <input type="number" min="5" step="5" value={serviceForm.durationMinutes} onChange={(event) => setServiceForm((form) => ({ ...form, durationMinutes: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
               </label>
-              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C] sm:col-span-2">
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085] sm:col-span-2">
                 {serviceCopy.category}
-                <select value={serviceForm.categoryId} onChange={(event) => setServiceForm((form) => ({ ...form, categoryId: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60">
+                <select value={serviceForm.categoryId} onChange={(event) => setServiceForm((form) => ({ ...form, categoryId: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60">
                   {categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {lang === "ar" ? category.name_ar : category.name_en}
@@ -725,18 +725,18 @@ export default function ProviderServicesPage() {
                   ))}
                 </select>
               </label>
-              <label className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#070B12]/50 px-4 py-3 text-sm font-bold text-[#B8C0D4]">
+              <label className="flex items-center justify-between rounded-2xl border border-[#ECECEC] bg-transparent/50 px-4 py-3 text-sm font-bold text-[#344054]">
                 {t.homeService}
                 <input type="checkbox" checked={serviceForm.isHomeService} onChange={(event) => setServiceForm((form) => ({ ...form, isHomeService: event.target.checked }))} className="h-5 w-5 accent-[#D1AF47]" />
               </label>
-              <label className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#070B12]/50 px-4 py-3 text-sm font-bold text-[#B8C0D4]">
+              <label className="flex items-center justify-between rounded-2xl border border-[#ECECEC] bg-transparent/50 px-4 py-3 text-sm font-bold text-[#344054]">
                 {t.status}
                 <input type="checkbox" checked={serviceForm.isActive} onChange={(event) => setServiceForm((form) => ({ ...form, isActive: event.target.checked }))} className="h-5 w-5 accent-[#D1AF47]" />
               </label>
             </div>
 
             <div className="mt-6 flex justify-end gap-3">
-              <button onClick={() => setServiceModalOpen(false)} className="rounded-xl border border-white/10 px-5 py-2.5 text-xs font-bold text-[#B8C0D4] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
+              <button onClick={() => setServiceModalOpen(false)} className="rounded-xl border border-[#ECECEC] px-5 py-2.5 text-xs font-bold text-[#344054] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
                 {serviceCopy.cancel}
               </button>
               <button onClick={() => void saveService()} disabled={saving} className="rounded-xl bg-[#D1AF47] px-5 py-2.5 text-xs font-black text-[#070B12] transition hover:bg-[#E0C46A] disabled:cursor-not-allowed disabled:opacity-60">

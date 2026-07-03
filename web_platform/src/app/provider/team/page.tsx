@@ -779,7 +779,7 @@ export default function ProviderTeamPage() {
           <h2 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-[#D1AF47] via-[#E0C46A] to-[#B8952E] bg-clip-text text-transparent">
             {t.teamTitle}
           </h2>
-          <p className="text-sm text-[#B8C0D4] mt-2 max-w-xl leading-relaxed">
+          <p className="text-sm text-[#344054] mt-2 max-w-xl leading-relaxed">
             {t.subtitle}
           </p>
         </div>
@@ -797,7 +797,7 @@ export default function ProviderTeamPage() {
             ? "border-[#FF5D73]/25 bg-[#FF5D73]/10 text-[#FFB3BF]"
             : success
               ? "border-[#3DDC84]/25 bg-[#3DDC84]/10 text-[#9AF0BE]"
-              : "border-[#D1AF47]/20 bg-[#D1AF47]/10 text-[#E0C46A]"
+              : "border-[#D1AF47]/20 bg-[#D1AF47]/10 text-[#D1AF47]"
         }`}>
           {error || success || teamCopy.loading}
         </div>
@@ -807,17 +807,17 @@ export default function ProviderTeamPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-7">
         {[
           { label: teamCopy.totalEarnings, value: formatMoney(employeeMetrics.totalEarnings), accent: "text-[#D1AF47]" },
-          { label: teamCopy.completedBookings, value: employeeMetrics.completedBookings.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"), accent: "text-white" },
-          { label: teamCopy.averageRating, value: employeeMetrics.averageRating.toFixed(1), accent: "text-[#3DDC84]" },
-          { label: teamCopy.bestPerformer, value: employeeMetrics.bestPerformer?.name || "—", accent: "text-[#F4E7B6]" },
-          { label: teamCopy.activeEmployees, value: employeeMetrics.activeEmployees.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"), accent: "text-[#3DDC84]" },
-          { label: teamCopy.remoteEmployees, value: employeeMetrics.remoteEmployees.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"), accent: "text-[#B8C0D4]" },
-          { label: teamCopy.inShopEmployees, value: employeeMetrics.inShopEmployees.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"), accent: "text-[#E0C46A]" }
+          { label: teamCopy.completedBookings, value: employeeMetrics.completedBookings.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"), accent: "text-[#101828]" },
+          { label: teamCopy.averageRating, value: employeeMetrics.averageRating.toFixed(1), accent: "text-[#22C55E]" },
+          { label: teamCopy.bestPerformer, value: employeeMetrics.bestPerformer?.name || "—", accent: "text-[#9A741F]" },
+          { label: teamCopy.activeEmployees, value: employeeMetrics.activeEmployees.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"), accent: "text-[#22C55E]" },
+          { label: teamCopy.remoteEmployees, value: employeeMetrics.remoteEmployees.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"), accent: "text-[#344054]" },
+          { label: teamCopy.inShopEmployees, value: employeeMetrics.inShopEmployees.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"), accent: "text-[#D1AF47]" }
         ].map((metric) => (
-          <div key={metric.label} className="group relative overflow-hidden rounded-[24px] border border-white/10 bg-gradient-to-b from-[#111827] to-[#0D1422] p-5 shadow-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-[#D1AF47]/35 hover:shadow-[0_0_34px_rgba(209,175,71,0.14)]">
+          <div key={metric.label} className="group relative overflow-hidden rounded-[24px] border border-[#ECECEC] bg-gradient-to-b from-[#111827] to-[#0D1422] p-5 shadow-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-[#D1AF47]/35 hover:shadow-[0_0_34px_rgba(209,175,71,0.14)]">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_10%,rgba(209,175,71,0.12),transparent_34%)] opacity-70" />
             <div className="relative space-y-2">
-              <span className="block text-[9px] font-black uppercase tracking-[0.18em] text-[#7B859C]">{metric.label}</span>
+              <span className="block text-[9px] font-black uppercase tracking-[0.18em] text-[#667085]">{metric.label}</span>
               <strong className={`block truncate text-2xl font-black ${metric.accent}`}>{metric.value}</strong>
             </div>
           </div>
@@ -827,7 +827,7 @@ export default function ProviderTeamPage() {
       {/* Roster Layout (Grid of Premium Cards) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
         {!loading && staffMembers.length === 0 && (
-          <div className="md:col-span-2 lg:col-span-3 rounded-[24px] bg-gradient-to-b from-[#111827] to-[#0D1422] border border-[#D1AF47]/15 p-8 text-center text-sm text-[#B8C0D4] shadow-[0_0_30px_rgba(209,175,71,0.08)]">
+          <div className="md:col-span-2 lg:col-span-3 rounded-[24px] bg-gradient-to-b from-[#111827] to-[#0D1422] border border-[#D1AF47]/15 p-8 text-center text-sm text-[#344054] shadow-[0_0_30px_rgba(209,175,71,0.08)]">
             {teamCopy.noStaff}
           </div>
         )}
@@ -840,7 +840,7 @@ export default function ProviderTeamPage() {
           let hoverBorderClass = "";
           
           if (isActive) {
-            statusBadgeClass = "bg-[#3DDC84]/10 text-[#3DDC84] border border-[#3DDC84]/20";
+            statusBadgeClass = "bg-[#3DDC84]/10 text-[#22C55E] border border-[#3DDC84]/20";
             dotColorClass = "bg-[#3DDC84]";
             hoverBorderClass = "hover:border-[#3DDC84]/30";
           } else if (isBreak) {
@@ -848,7 +848,7 @@ export default function ProviderTeamPage() {
             dotColorClass = "bg-[#F5B041]";
             hoverBorderClass = "hover:border-[#F5B041]/30";
           } else {
-            statusBadgeClass = "bg-[#FF5D73]/10 text-[#FF5D73] border border-[#FF5D73]/20";
+            statusBadgeClass = "bg-[#FF5D73]/10 text-[#EF4444] border border-[#FF5D73]/20";
             dotColorClass = "bg-[#FF5D73]";
             hoverBorderClass = "hover:border-[#FF5D73]/30";
           }
@@ -882,17 +882,17 @@ export default function ProviderTeamPage() {
                     </div>
                     
                     <div>
-                      <h3 className="font-bold text-base text-white tracking-wide group-hover:text-[#D1AF47] transition-colors duration-300">
+                      <h3 className="font-bold text-base text-[#101828] tracking-wide group-hover:text-[#D1AF47] transition-colors duration-300">
                         {member.name}
                       </h3>
-                      <p className="text-xs text-[#7B859C] mt-0.5 font-medium leading-tight">
+                      <p className="text-xs text-[#667085] mt-0.5 font-medium leading-tight">
                         {member.title}
                       </p>
                       <div className="mt-2 flex flex-wrap items-center gap-2">
                         <span className="rounded-full border border-[#D1AF47]/20 bg-[#D1AF47]/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-[#D1AF47]">
                           {member.workTypeLabel}
                         </span>
-                        <span className="text-[10px] font-semibold text-[#7B859C]">{member.phone}</span>
+                        <span className="text-[10px] font-semibold text-[#667085]">{member.phone}</span>
                       </div>
                     </div>
                   </div>
@@ -910,17 +910,17 @@ export default function ProviderTeamPage() {
                 {/* Details Section */}
                 <div className="space-y-4">
                   <div className="grid grid-cols-3 gap-2">
-                    <div className="rounded-2xl border border-white/10 bg-[#070B12]/55 p-3">
-                      <span className="block text-[9px] font-black uppercase tracking-widest text-[#7B859C]">{teamCopy.earnings}</span>
+                    <div className="rounded-2xl border border-[#ECECEC] bg-transparent/55 p-3">
+                      <span className="block text-[9px] font-black uppercase tracking-widest text-[#667085]">{teamCopy.earnings}</span>
                       <strong className="mt-1 block text-xs font-black text-[#D1AF47]">{formatMoney(member.totalEarnings)}</strong>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-[#070B12]/55 p-3">
-                      <span className="block text-[9px] font-black uppercase tracking-widest text-[#7B859C]">{teamCopy.rating}</span>
-                      <strong className="mt-1 block text-xs font-black text-[#3DDC84]">★ {member.rating.toFixed(1)}</strong>
+                    <div className="rounded-2xl border border-[#ECECEC] bg-transparent/55 p-3">
+                      <span className="block text-[9px] font-black uppercase tracking-widest text-[#667085]">{teamCopy.rating}</span>
+                      <strong className="mt-1 block text-xs font-black text-[#22C55E]">★ {member.rating.toFixed(1)}</strong>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-[#070B12]/55 p-3">
-                      <span className="block text-[9px] font-black uppercase tracking-widest text-[#7B859C]">{teamCopy.bookings}</span>
-                      <strong className="mt-1 block text-xs font-black text-white">{member.completedBookings}</strong>
+                    <div className="rounded-2xl border border-[#ECECEC] bg-transparent/55 p-3">
+                      <span className="block text-[9px] font-black uppercase tracking-widest text-[#667085]">{teamCopy.bookings}</span>
+                      <strong className="mt-1 block text-xs font-black text-[#101828]">{member.completedBookings}</strong>
                     </div>
                   </div>
 
@@ -928,43 +928,43 @@ export default function ProviderTeamPage() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2">
-                        <svg className="w-4 h-4 text-[#7B859C]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 text-[#667085]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M14.121 14.121L19 19m-4.879-4.879l-4.121-4.12M14.121 14.121A3 3 0 1017.5 17.5a3 3 0 00-3.379-3.379zm-7 0A3 3 0 103 17.5a3 3 0 005.121-2.121l4.12-4.121m-4.12 4.121a3 3 0 11-3.38-3.38 3 3 0 013.38 3.38zm0-7a3 3 0 105.121-2.121L19 19m-9.879-9.879a3 3 0 00-3.379-3.379A3 3 0 003 9v.121m7 0A3 3 0 1010.5 3a3 3 0 00-3.379 3.379" />
                         </svg>
-                        <span className="text-xs text-[#B8C0D4] font-medium">{t.assignedServices}</span>
+                        <span className="text-xs text-[#344054] font-medium">{t.assignedServices}</span>
                       </div>
-                      <span className="text-xs text-white font-extrabold bg-[#172033] px-2.5 py-1 rounded-lg border border-[rgba(255,255,255,0.04)] shadow-inner">
+                      <span className="text-xs text-[#101828] font-extrabold bg-white border border-[#ECECEC] px-2.5 py-1 rounded-lg border border-[rgba(255,255,255,0.04)] shadow-inner">
                         {member.servicesCount}
                       </span>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {(member.assignedServiceNames.length ? member.assignedServiceNames : [teamCopy.noServices]).slice(0, 3).map((serviceName) => (
-                        <span key={serviceName} className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] font-bold text-[#B8C0D4]">
+                        <span key={serviceName} className="rounded-full border border-[#ECECEC] bg-[#F3F4F6] border border-[#ECECEC] px-2.5 py-1 text-[10px] font-bold text-[#344054]">
                           {serviceName}
                         </span>
                       ))}
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#070B12]/45 px-3 py-2">
+                  <div className="flex items-center justify-between rounded-2xl border border-[#ECECEC] bg-transparent/45 px-3 py-2">
                     <div className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-[#7B859C]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-[#667085]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
-                      <span className="text-xs text-[#B8C0D4] font-medium">{teamCopy.email}</span>
+                      <span className="text-xs text-[#344054] font-medium">{teamCopy.email}</span>
                     </div>
-                    <span className="max-w-[170px] truncate text-xs font-bold text-white">{member.email}</span>
+                    <span className="max-w-[170px] truncate text-xs font-bold text-[#101828]">{member.email}</span>
                   </div>
 
                   {/* Availability */}
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-[#7B859C]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-[#667085]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span className="text-xs text-[#B8C0D4] font-medium">{t.weeklyAvailability}</span>
+                      <span className="text-xs text-[#344054] font-medium">{t.weeklyAvailability}</span>
                     </div>
-                    <div className="text-xs text-[#B8C0D4] bg-[#070B12]/60 rounded-xl p-3 border border-[rgba(255,255,255,0.04)] font-medium leading-relaxed shadow-inner">
+                    <div className="text-xs text-[#344054] bg-transparent/60 rounded-xl p-3 border border-[rgba(255,255,255,0.04)] font-medium leading-relaxed shadow-inner">
                       {member.availability}
                     </div>
                   </div>
@@ -973,26 +973,26 @@ export default function ProviderTeamPage() {
 
               {/* Actions Footer */}
               <div className="mt-6 pt-5 border-t border-[rgba(255,255,255,0.06)] grid grid-cols-2 gap-3">
-                <button onClick={() => openProfileModal(member)} className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-[#0D1422]/60 hover:bg-[#172033] border border-[rgba(255,255,255,0.06)] hover:border-[#D1AF47]/30 rounded-xl text-xs font-semibold text-[#B8C0D4] hover:text-white transition-all duration-300">
+                <button onClick={() => openProfileModal(member)} className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]/60 hover:bg-white border border-[#ECECEC] border border-[rgba(255,255,255,0.06)] hover:border-[#D1AF47]/30 rounded-xl text-xs font-semibold text-[#344054] hover:text-[#101828] transition-all duration-300">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.269 2.943 9.542 7-1.273 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
                   {teamCopy.view}
                 </button>
-                <button onClick={() => openEditStaff(member)} className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-[#0D1422]/60 hover:bg-[#172033] border border-[rgba(255,255,255,0.06)] hover:border-[#D1AF47]/30 rounded-xl text-xs font-semibold text-[#B8C0D4] hover:text-white transition-all duration-300">
+                <button onClick={() => openEditStaff(member)} className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]/60 hover:bg-white border border-[#ECECEC] border border-[rgba(255,255,255,0.06)] hover:border-[#D1AF47]/30 rounded-xl text-xs font-semibold text-[#344054] hover:text-[#101828] transition-all duration-300">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a8.25 8.25 0 0115 0" />
                   </svg>
                   {teamCopy.editStaff}
                 </button>
-                <button onClick={() => openServicesModal(member)} className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-[#0D1422]/60 hover:bg-[#172033] border border-[rgba(255,255,255,0.06)] hover:border-[#D1AF47]/30 rounded-xl text-xs font-semibold text-[#B8C0D4] hover:text-white transition-all duration-300">
+                <button onClick={() => openServicesModal(member)} className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]/60 hover:bg-white border border-[#ECECEC] border border-[rgba(255,255,255,0.06)] hover:border-[#D1AF47]/30 rounded-xl text-xs font-semibold text-[#344054] hover:text-[#101828] transition-all duration-300">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.83 20.013a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
                   </svg>
                   {t.editServices}
                 </button>
-                <button onClick={() => openShiftsModal(member)} className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-gradient-to-r from-[#D1AF47]/10 to-[#B8952E]/10 hover:from-[#D1AF47]/20 hover:to-[#B8952E]/20 border border-[#D1AF47]/20 hover:border-[#D1AF47]/50 rounded-xl text-xs font-semibold text-[#D1AF47] hover:text-[#E0C46A] transition-all duration-300">
+                <button onClick={() => openShiftsModal(member)} className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-gradient-to-r from-[#D1AF47]/10 to-[#B8952E]/10 hover:from-[#D1AF47]/20 hover:to-[#B8952E]/20 border border-[#D1AF47]/20 hover:border-[#D1AF47]/50 rounded-xl text-xs font-semibold text-[#D1AF47] hover:text-[#D1AF47] transition-all duration-300">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                   </svg>
@@ -1011,73 +1011,73 @@ export default function ProviderTeamPage() {
       </div>
 
       {staffModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#070B12]/80 px-4 py-8 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent/80 px-4 py-8 backdrop-blur-sm">
           <div className="w-full max-w-2xl rounded-[28px] border border-[#D1AF47]/20 bg-gradient-to-b from-[#111827] to-[#0D1422] p-6 shadow-[0_0_45px_rgba(209,175,71,0.16)]">
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-xl font-black text-white">
+                <h3 className="text-xl font-black text-[#101828]">
                   {staffForm.id ? teamCopy.editStaffTitle : teamCopy.addStaffTitle}
                 </h3>
-                <p className="mt-1 text-xs text-[#7B859C]">{t.subtitle}</p>
+                <p className="mt-1 text-xs text-[#667085]">{t.subtitle}</p>
               </div>
-              <button onClick={() => setStaffModalOpen(false)} className="rounded-full border border-white/10 px-3 py-1 text-xs font-bold text-[#B8C0D4] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
+              <button onClick={() => setStaffModalOpen(false)} className="rounded-full border border-[#ECECEC] px-3 py-1 text-xs font-bold text-[#344054] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
                 {teamCopy.cancel}
               </button>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C]">
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
                 {teamCopy.nameEn}
-                <input value={staffForm.nameEn} onChange={(event) => setStaffForm((form) => ({ ...form, nameEn: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60" />
+                <input value={staffForm.nameEn} onChange={(event) => setStaffForm((form) => ({ ...form, nameEn: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
               </label>
-              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C]">
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
                 {teamCopy.nameAr}
-                <input value={staffForm.nameAr} onChange={(event) => setStaffForm((form) => ({ ...form, nameAr: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60" />
+                <input value={staffForm.nameAr} onChange={(event) => setStaffForm((form) => ({ ...form, nameAr: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
               </label>
-              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C]">
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
                 {teamCopy.titleEn}
-                <input value={staffForm.titleEn} onChange={(event) => setStaffForm((form) => ({ ...form, titleEn: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60" />
+                <input value={staffForm.titleEn} onChange={(event) => setStaffForm((form) => ({ ...form, titleEn: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
               </label>
-              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C]">
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
                 {teamCopy.titleAr}
-                <input value={staffForm.titleAr} onChange={(event) => setStaffForm((form) => ({ ...form, titleAr: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60" />
+                <input value={staffForm.titleAr} onChange={(event) => setStaffForm((form) => ({ ...form, titleAr: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
               </label>
-              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C]">
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
                 {teamCopy.phone}
-                <input value={staffForm.phone} onChange={(event) => setStaffForm((form) => ({ ...form, phone: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60" />
+                <input value={staffForm.phone} onChange={(event) => setStaffForm((form) => ({ ...form, phone: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
               </label>
-              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C]">
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
                 {teamCopy.email}
-                <input type="email" value={staffForm.email} onChange={(event) => setStaffForm((form) => ({ ...form, email: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60" />
+                <input type="email" value={staffForm.email} onChange={(event) => setStaffForm((form) => ({ ...form, email: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
               </label>
-              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C]">
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
                 {teamCopy.photoUrl}
-                <input value={staffForm.photoUrl} onChange={(event) => setStaffForm((form) => ({ ...form, photoUrl: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60" />
+                <input value={staffForm.photoUrl} onChange={(event) => setStaffForm((form) => ({ ...form, photoUrl: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
               </label>
-              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C]">
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
                 {teamCopy.workType}
-                <select value={staffForm.workType} onChange={(event) => setStaffForm((form) => ({ ...form, workType: event.target.value as WorkType }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60">
+                <select value={staffForm.workType} onChange={(event) => setStaffForm((form) => ({ ...form, workType: event.target.value as WorkType }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60">
                   <option value="in_shop">{teamCopy.inShop}</option>
                   <option value="remote">{teamCopy.remote}</option>
                   <option value="both">{teamCopy.both}</option>
                 </select>
               </label>
-              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#7B859C] sm:col-span-2">
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085] sm:col-span-2">
                 {teamCopy.branch}
-                <select value={staffForm.branchId} onChange={(event) => setStaffForm((form) => ({ ...form, branchId: event.target.value }))} className="w-full rounded-2xl border border-white/10 bg-[#070B12]/70 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none focus:border-[#D1AF47]/60">
+                <select value={staffForm.branchId} onChange={(event) => setStaffForm((form) => ({ ...form, branchId: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60">
                   {branches.map((branch) => (
                     <option key={branch.id} value={branch.id}>{branch.name}</option>
                   ))}
                 </select>
               </label>
-              <label className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#070B12]/50 px-4 py-3 text-sm font-bold text-[#B8C0D4] sm:col-span-2">
+              <label className="flex items-center justify-between rounded-2xl border border-[#ECECEC] bg-transparent/50 px-4 py-3 text-sm font-bold text-[#344054] sm:col-span-2">
                 {teamCopy.activeEmployee}
                 <input type="checkbox" checked={staffForm.isActive} onChange={(event) => setStaffForm((form) => ({ ...form, isActive: event.target.checked }))} className="h-5 w-5 accent-[#D1AF47]" />
               </label>
             </div>
 
             <div className="mt-6 flex justify-end gap-3">
-              <button onClick={() => setStaffModalOpen(false)} className="rounded-xl border border-white/10 px-5 py-2.5 text-xs font-bold text-[#B8C0D4] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
+              <button onClick={() => setStaffModalOpen(false)} className="rounded-xl border border-[#ECECEC] px-5 py-2.5 text-xs font-bold text-[#344054] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
                 {teamCopy.cancel}
               </button>
               <button onClick={() => void saveStaff()} disabled={saving} className="rounded-xl bg-[#D1AF47] px-5 py-2.5 text-xs font-black text-[#070B12] transition hover:bg-[#E0C46A] disabled:cursor-not-allowed disabled:opacity-60">
@@ -1089,23 +1089,23 @@ export default function ProviderTeamPage() {
       )}
 
       {profileModalOpen && activeMember && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#070B12]/80 px-4 py-8 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent/80 px-4 py-8 backdrop-blur-sm">
           <div className="w-full max-w-2xl overflow-hidden rounded-[28px] border border-[#D1AF47]/20 bg-gradient-to-b from-[#111827] to-[#0D1422] shadow-[0_0_45px_rgba(209,175,71,0.16)]">
             <div className="relative h-36 bg-[radial-gradient(circle_at_20%_0%,rgba(209,175,71,0.34),transparent_38%),linear-gradient(135deg,#191D28,#070B12)]">
-              <button onClick={() => setProfileModalOpen(false)} className="absolute right-5 top-5 rounded-full border border-white/10 bg-[#070B12]/45 px-3 py-1 text-xs font-bold text-[#B8C0D4] backdrop-blur-md hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
+              <button onClick={() => setProfileModalOpen(false)} className="absolute right-5 top-5 rounded-full border border-[#ECECEC] bg-transparent/45 px-3 py-1 text-xs font-bold text-[#344054] backdrop-blur-md hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
                 {teamCopy.cancel}
               </button>
             </div>
             <div className="relative px-6 pb-6">
               <div className="-mt-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                 <div className="flex items-end gap-4">
-                  <div className="relative h-24 w-24 overflow-hidden rounded-[28px] border-2 border-[#D1AF47]/50 bg-[#070B12] shadow-[0_0_28px_rgba(209,175,71,0.22)]">
+                  <div className="relative h-24 w-24 overflow-hidden rounded-[28px] border-2 border-[#D1AF47]/50 bg-transparent shadow-[0_0_28px_rgba(209,175,71,0.22)]">
                     <img src={activeMember.photoUrl} alt={activeMember.name} className="h-full w-full object-cover" />
                   </div>
                   <div className="pb-1">
                     <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#D1AF47]">{teamCopy.employeeDetails}</p>
-                    <h3 className="mt-1 text-2xl font-black text-white">{activeMember.name}</h3>
-                    <p className="text-sm font-semibold text-[#B8C0D4]">{activeMember.title}</p>
+                    <h3 className="mt-1 text-2xl font-black text-[#101828]">{activeMember.name}</h3>
+                    <p className="text-sm font-semibold text-[#344054]">{activeMember.title}</p>
                   </div>
                 </div>
                 <span className="rounded-full border border-[#D1AF47]/25 bg-[#D1AF47]/10 px-3 py-1 text-xs font-black text-[#D1AF47]">
@@ -1114,38 +1114,38 @@ export default function ProviderTeamPage() {
               </div>
 
               <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl border border-white/10 bg-[#070B12]/55 p-4">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-[#7B859C]">{teamCopy.earnings}</span>
+                <div className="rounded-2xl border border-[#ECECEC] bg-transparent/55 p-4">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-[#667085]">{teamCopy.earnings}</span>
                   <strong className="mt-2 block text-lg font-black text-[#D1AF47]">{formatMoney(activeMember.totalEarnings)}</strong>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-[#070B12]/55 p-4">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-[#7B859C]">{teamCopy.rating}</span>
-                  <strong className="mt-2 block text-lg font-black text-[#3DDC84]">★ {activeMember.rating.toFixed(1)}</strong>
+                <div className="rounded-2xl border border-[#ECECEC] bg-transparent/55 p-4">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-[#667085]">{teamCopy.rating}</span>
+                  <strong className="mt-2 block text-lg font-black text-[#22C55E]">★ {activeMember.rating.toFixed(1)}</strong>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-[#070B12]/55 p-4">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-[#7B859C]">{teamCopy.bookings}</span>
-                  <strong className="mt-2 block text-lg font-black text-white">{activeMember.completedBookings}</strong>
+                <div className="rounded-2xl border border-[#ECECEC] bg-transparent/55 p-4">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-[#667085]">{teamCopy.bookings}</span>
+                  <strong className="mt-2 block text-lg font-black text-[#101828]">{activeMember.completedBookings}</strong>
                 </div>
               </div>
 
               <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-white/10 bg-[#070B12]/45 p-4">
-                  <h4 className="text-[10px] font-black uppercase tracking-[0.18em] text-[#7B859C]">{teamCopy.contact}</h4>
-                  <p className="mt-3 text-sm font-bold text-white">{activeMember.phone}</p>
-                  <p className="mt-1 text-xs font-semibold text-[#B8C0D4]">{activeMember.email}</p>
+                <div className="rounded-2xl border border-[#ECECEC] bg-transparent/45 p-4">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.18em] text-[#667085]">{teamCopy.contact}</h4>
+                  <p className="mt-3 text-sm font-bold text-[#101828]">{activeMember.phone}</p>
+                  <p className="mt-1 text-xs font-semibold text-[#344054]">{activeMember.email}</p>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-[#070B12]/45 p-4">
-                  <h4 className="text-[10px] font-black uppercase tracking-[0.18em] text-[#7B859C]">{teamCopy.statusAndMode}</h4>
-                  <p className="mt-3 text-sm font-bold text-white">{activeMember.statusLabel}</p>
-                  <p className="mt-1 text-xs font-semibold text-[#B8C0D4]">{activeMember.workTypeLabel}</p>
+                <div className="rounded-2xl border border-[#ECECEC] bg-transparent/45 p-4">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.18em] text-[#667085]">{teamCopy.statusAndMode}</h4>
+                  <p className="mt-3 text-sm font-bold text-[#101828]">{activeMember.statusLabel}</p>
+                  <p className="mt-1 text-xs font-semibold text-[#344054]">{activeMember.workTypeLabel}</p>
                 </div>
               </div>
 
-              <div className="mt-5 rounded-2xl border border-white/10 bg-[#070B12]/45 p-4">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.18em] text-[#7B859C]">{t.assignedServices}</h4>
+              <div className="mt-5 rounded-2xl border border-[#ECECEC] bg-transparent/45 p-4">
+                <h4 className="text-[10px] font-black uppercase tracking-[0.18em] text-[#667085]">{t.assignedServices}</h4>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {(activeMember.assignedServiceNames.length ? activeMember.assignedServiceNames : [teamCopy.noServices]).map((serviceName) => (
-                    <span key={serviceName} className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-bold text-[#B8C0D4]">
+                    <span key={serviceName} className="rounded-full border border-[#ECECEC] bg-[#F3F4F6] border border-[#ECECEC] px-3 py-1 text-xs font-bold text-[#344054]">
                       {serviceName}
                     </span>
                   ))}
@@ -1157,28 +1157,28 @@ export default function ProviderTeamPage() {
       )}
 
       {servicesModalOpen && activeMember && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#070B12]/80 px-4 py-8 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent/80 px-4 py-8 backdrop-blur-sm">
           <div className="w-full max-w-xl rounded-[28px] border border-[#D1AF47]/20 bg-gradient-to-b from-[#111827] to-[#0D1422] p-6 shadow-[0_0_45px_rgba(209,175,71,0.16)]">
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-xl font-black text-white">{teamCopy.servicesTitle}</h3>
-                <p className="mt-1 text-xs text-[#7B859C]">{activeMember.name}</p>
+                <h3 className="text-xl font-black text-[#101828]">{teamCopy.servicesTitle}</h3>
+                <p className="mt-1 text-xs text-[#667085]">{activeMember.name}</p>
               </div>
-              <button onClick={() => setServicesModalOpen(false)} className="rounded-full border border-white/10 px-3 py-1 text-xs font-bold text-[#B8C0D4] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
+              <button onClick={() => setServicesModalOpen(false)} className="rounded-full border border-[#ECECEC] px-3 py-1 text-xs font-bold text-[#344054] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
                 {teamCopy.cancel}
               </button>
             </div>
 
             <div className="max-h-[50vh] space-y-3 overflow-y-auto pe-1">
               {services.length === 0 && (
-                <div className="rounded-2xl border border-white/10 bg-[#070B12]/50 p-4 text-sm text-[#B8C0D4]">
+                <div className="rounded-2xl border border-[#ECECEC] bg-transparent/50 p-4 text-sm text-[#344054]">
                   {teamCopy.noServices}
                 </div>
               )}
               {services.map((service) => (
-                <label key={service.id} className="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-white/10 bg-[#070B12]/50 px-4 py-3 transition hover:border-[#D1AF47]/40">
+                <label key={service.id} className="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-[#ECECEC] bg-transparent/50 px-4 py-3 transition hover:border-[#D1AF47]/40">
                   <span>
-                    <span className="block text-sm font-bold text-white">{service.name}</span>
+                    <span className="block text-sm font-bold text-[#101828]">{service.name}</span>
                     <span className="text-xs font-semibold text-[#D1AF47]">{service.price} SAR</span>
                   </span>
                   <input type="checkbox" checked={selectedServiceIds.includes(service.id)} onChange={() => toggleServiceSelection(service.id)} className="h-5 w-5 accent-[#D1AF47]" />
@@ -1187,7 +1187,7 @@ export default function ProviderTeamPage() {
             </div>
 
             <div className="mt-6 flex justify-end gap-3">
-              <button onClick={() => setServicesModalOpen(false)} className="rounded-xl border border-white/10 px-5 py-2.5 text-xs font-bold text-[#B8C0D4] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
+              <button onClick={() => setServicesModalOpen(false)} className="rounded-xl border border-[#ECECEC] px-5 py-2.5 text-xs font-bold text-[#344054] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
                 {teamCopy.cancel}
               </button>
               <button onClick={() => void saveServiceAssignments()} disabled={saving} className="rounded-xl bg-[#D1AF47] px-5 py-2.5 text-xs font-black text-[#070B12] transition hover:bg-[#E0C46A] disabled:cursor-not-allowed disabled:opacity-60">
@@ -1199,33 +1199,33 @@ export default function ProviderTeamPage() {
       )}
 
       {shiftsModalOpen && activeMember && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#070B12]/80 px-4 py-8 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent/80 px-4 py-8 backdrop-blur-sm">
           <div className="w-full max-w-2xl rounded-[28px] border border-[#D1AF47]/20 bg-gradient-to-b from-[#111827] to-[#0D1422] p-6 shadow-[0_0_45px_rgba(209,175,71,0.16)]">
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-xl font-black text-white">{teamCopy.shiftsTitle}</h3>
-                <p className="mt-1 text-xs text-[#7B859C]">{activeMember.name}</p>
+                <h3 className="text-xl font-black text-[#101828]">{teamCopy.shiftsTitle}</h3>
+                <p className="mt-1 text-xs text-[#667085]">{activeMember.name}</p>
               </div>
-              <button onClick={() => setShiftsModalOpen(false)} className="rounded-full border border-white/10 px-3 py-1 text-xs font-bold text-[#B8C0D4] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
+              <button onClick={() => setShiftsModalOpen(false)} className="rounded-full border border-[#ECECEC] px-3 py-1 text-xs font-bold text-[#344054] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
                 {teamCopy.cancel}
               </button>
             </div>
 
             <div className="max-h-[52vh] space-y-3 overflow-y-auto pe-1">
               {shiftRows.map((row) => (
-                <div key={row.day} className="grid grid-cols-1 gap-3 rounded-2xl border border-white/10 bg-[#070B12]/50 p-4 sm:grid-cols-[1fr_auto_auto] sm:items-center">
-                  <label className="flex items-center gap-3 text-sm font-bold text-white">
+                <div key={row.day} className="grid grid-cols-1 gap-3 rounded-2xl border border-[#ECECEC] bg-transparent/50 p-4 sm:grid-cols-[1fr_auto_auto] sm:items-center">
+                  <label className="flex items-center gap-3 text-sm font-bold text-[#101828]">
                     <input type="checkbox" checked={row.enabled} onChange={(event) => updateShiftEnabled(row.day, event.target.checked)} className="h-5 w-5 accent-[#D1AF47]" />
                     {dayLabels[lang][row.day]}
                   </label>
-                  <input type="time" value={row.start} disabled={!row.enabled} onChange={(event) => updateShiftTime(row.day, "start", event.target.value)} className="rounded-xl border border-white/10 bg-[#0D1422] px-3 py-2 text-sm text-white outline-none focus:border-[#D1AF47]/60 disabled:opacity-40" />
-                  <input type="time" value={row.end} disabled={!row.enabled} onChange={(event) => updateShiftTime(row.day, "end", event.target.value)} className="rounded-xl border border-white/10 bg-[#0D1422] px-3 py-2 text-sm text-white outline-none focus:border-[#D1AF47]/60 disabled:opacity-40" />
+                  <input type="time" value={row.start} disabled={!row.enabled} onChange={(event) => updateShiftTime(row.day, "start", event.target.value)} className="rounded-xl border border-[#ECECEC] bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] px-3 py-2 text-sm text-[#101828] outline-none focus:border-[#D1AF47]/60 disabled:opacity-40" />
+                  <input type="time" value={row.end} disabled={!row.enabled} onChange={(event) => updateShiftTime(row.day, "end", event.target.value)} className="rounded-xl border border-[#ECECEC] bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] px-3 py-2 text-sm text-[#101828] outline-none focus:border-[#D1AF47]/60 disabled:opacity-40" />
                 </div>
               ))}
             </div>
 
             <div className="mt-6 flex justify-end gap-3">
-              <button onClick={() => setShiftsModalOpen(false)} className="rounded-xl border border-white/10 px-5 py-2.5 text-xs font-bold text-[#B8C0D4] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
+              <button onClick={() => setShiftsModalOpen(false)} className="rounded-xl border border-[#ECECEC] px-5 py-2.5 text-xs font-bold text-[#344054] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
                 {teamCopy.cancel}
               </button>
               <button onClick={() => void saveShifts()} disabled={saving} className="rounded-xl bg-[#D1AF47] px-5 py-2.5 text-xs font-black text-[#070B12] transition hover:bg-[#E0C46A] disabled:cursor-not-allowed disabled:opacity-60">

@@ -210,8 +210,8 @@ export default function ProviderBookingsPage() {
       case "confirmed":
       case "completed":
         return {
-          bg: "bg-[#3DDC84]/[0.08]",
-          text: "text-[#3DDC84]",
+          bg: "bg-[#D1FADF] text-[#027A48]",
+          text: "text-[#22C55E]",
           border: "border-[#3DDC84]/20",
           dot: "bg-[#3DDC84] shadow-[0_0_8px_rgba(61,220,132,0.4)]"
         };
@@ -225,16 +225,16 @@ export default function ProviderBookingsPage() {
         };
       case "cancelled":
         return {
-          bg: "bg-[#FF5D73]/[0.08]",
-          text: "text-[#FF5D73]",
+          bg: "bg-[#FEE4E2] text-[#EF4444]",
+          text: "text-[#EF4444]",
           border: "border-[#FF5D73]/20",
           dot: "bg-[#FF5D73] shadow-[0_0_8px_rgba(255,93,115,0.4)]"
         };
       default:
         return {
-          bg: "bg-white/[0.04]",
-          text: "text-[#B8C0D4]",
-          border: "border-white/[0.08]",
+          bg: "bg-[#F3F4F6] border border-[#ECECEC]",
+          text: "text-[#344054]",
+          border: "border-[#ECECEC]",
           dot: "bg-[#B8C0D4]"
         };
     }
@@ -253,18 +253,18 @@ export default function ProviderBookingsPage() {
       {/* HEADER */}
       <div className={`flex flex-col md:flex-row md:items-center md:justify-between gap-4 ${locale === "ar" ? "text-right" : "text-left"}`}>
         <div>
-          <h2 className="text-3xl font-extrabold tracking-wide text-white">{t.title}</h2>
-          <p className="text-sm text-[#7B859C] mt-1.5 max-w-2xl leading-relaxed">{t.subtitle}</p>
+          <h2 className="text-3xl font-extrabold tracking-wide text-[#101828]">{t.title}</h2>
+          <p className="text-sm text-[#667085] mt-1.5 max-w-2xl leading-relaxed">{t.subtitle}</p>
         </div>
       </div>
 
       {error && (
-        <div className={`bg-[#172033]/60 border border-white/[0.06] text-[#B8C0D4] text-xs rounded-2xl p-4 shadow-[0_0_20px_rgba(0,0,0,0.15)] flex items-center gap-3 backdrop-blur-md ${locale === "ar" ? "border-r-4 border-r-[#D1AF47] text-right flex-row-reverse" : "border-l-4 border-l-[#D1AF47] text-left"}`}>
+        <div className={`bg-white border border-[#ECECEC]/60 border border-[#ECECEC] text-[#344054] text-xs rounded-2xl p-4 shadow-[0_0_20px_rgba(0,0,0,0.15)] flex items-center gap-3 backdrop-blur-md ${locale === "ar" ? "border-r-4 border-r-[#D1AF47] text-right flex-row-reverse" : "border-l-4 border-l-[#D1AF47] text-left"}`}>
           <svg className="w-5 h-5 text-[#D1AF47] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div>
-            <span className="font-bold text-white mr-1">{locale === "ar" ? "تنبيه:" : "Notice:"}</span> {error}
+            <span className="font-bold text-[#101828] mr-1">{locale === "ar" ? "تنبيه:" : "Notice:"}</span> {error}
           </div>
         </div>
       )}
@@ -272,10 +272,10 @@ export default function ProviderBookingsPage() {
       {/* KPI STATS ROW */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Card 1: Total */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_30px_rgba(0,0,0,0.2)] hover:border-[#D1AF47]/20 hover:shadow-[0_0_25px_rgba(209,175,71,0.05)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-between">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_30px_rgba(0,0,0,0.2)] hover:border-[#D1AF47]/20 hover:shadow-[0_0_25px_rgba(209,175,71,0.05)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-[10px] text-[#7B859C] font-extrabold tracking-wider uppercase">{t.kpiTotal}</span>
-            <h3 className="text-3xl font-bold text-white tracking-tight">{totalCount}</h3>
+            <span className="text-[10px] text-[#667085] font-extrabold tracking-wider uppercase">{t.kpiTotal}</span>
+            <h3 className="text-3xl font-bold text-[#101828] tracking-tight">{totalCount}</h3>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#D1AF47]/20 to-[#D1AF47]/5 border border-[#D1AF47]/10 flex items-center justify-center text-[#D1AF47] shadow-[0_0_15px_rgba(209,175,71,0.1)]">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -285,10 +285,10 @@ export default function ProviderBookingsPage() {
         </div>
 
         {/* Card 2: Pending */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_30px_rgba(0,0,0,0.2)] hover:border-[#F5B041]/20 hover:shadow-[0_0_25px_rgba(245,176,65,0.05)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-between">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_30px_rgba(0,0,0,0.2)] hover:border-[#F5B041]/20 hover:shadow-[0_0_25px_rgba(245,176,65,0.05)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-[10px] text-[#7B859C] font-extrabold tracking-wider uppercase">{t.kpiPending}</span>
-            <h3 className="text-3xl font-bold text-white tracking-tight">{pendingCount}</h3>
+            <span className="text-[10px] text-[#667085] font-extrabold tracking-wider uppercase">{t.kpiPending}</span>
+            <h3 className="text-3xl font-bold text-[#101828] tracking-tight">{pendingCount}</h3>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#F5B041]/20 to-[#F5B041]/5 border border-[#F5B041]/10 flex items-center justify-center text-[#F5B041] shadow-[0_0_15px_rgba(245,176,65,0.1)]">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -298,12 +298,12 @@ export default function ProviderBookingsPage() {
         </div>
 
         {/* Card 3: Confirmed */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_30px_rgba(0,0,0,0.2)] hover:border-[#3DDC84]/20 hover:shadow-[0_0_25px_rgba(61,220,132,0.05)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-between">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_30px_rgba(0,0,0,0.2)] hover:border-[#3DDC84]/20 hover:shadow-[0_0_25px_rgba(61,220,132,0.05)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-[10px] text-[#7B859C] font-extrabold tracking-wider uppercase">{t.kpiConfirmed}</span>
-            <h3 className="text-3xl font-bold text-white tracking-tight">{confirmedCount}</h3>
+            <span className="text-[10px] text-[#667085] font-extrabold tracking-wider uppercase">{t.kpiConfirmed}</span>
+            <h3 className="text-3xl font-bold text-[#101828] tracking-tight">{confirmedCount}</h3>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#3DDC84]/20 to-[#3DDC84]/5 border border-[#3DDC84]/10 flex items-center justify-center text-[#3DDC84] shadow-[0_0_15px_rgba(61,220,132,0.1)]">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#3DDC84]/20 to-[#3DDC84]/5 border border-[#D1FADF] flex items-center justify-center text-[#22C55E] shadow-[0_0_15px_rgba(61,220,132,0.1)]">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -311,9 +311,9 @@ export default function ProviderBookingsPage() {
         </div>
 
         {/* Card 4: Revenue */}
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-6 shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_30px_rgba(0,0,0,0.2)] hover:border-[#D1AF47]/20 hover:shadow-[0_0_25px_rgba(209,175,71,0.05)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-between">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_30px_rgba(0,0,0,0.2)] hover:border-[#D1AF47]/20 hover:shadow-[0_0_25px_rgba(209,175,71,0.05)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-[10px] text-[#7B859C] font-extrabold tracking-wider uppercase">{t.kpiRevenue}</span>
+            <span className="text-[10px] text-[#667085] font-extrabold tracking-wider uppercase">{t.kpiRevenue}</span>
             <h3 className="text-3xl font-bold text-[#D1AF47] tracking-tight">{totalRevenue} <span className="text-sm font-semibold">{t.currency}</span></h3>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#D1AF47]/20 to-[#D1AF47]/5 border border-[#D1AF47]/10 flex items-center justify-center text-[#D1AF47] shadow-[0_0_15px_rgba(209,175,71,0.15)]">
@@ -327,8 +327,8 @@ export default function ProviderBookingsPage() {
       {/* SEARCH & FILTERS BAR */}
       <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
         {/* Search */}
-        <div className={`w-full lg:w-80 bg-white/[0.03] border border-white/[0.06] px-4 py-2.5 rounded-2xl flex items-center gap-3 shadow-[inset_0_0_12px_rgba(255,255,255,0.01)] focus-within:border-[#D1AF47]/30 focus-within:shadow-[0_0_15px_rgba(209,175,71,0.08)] transition-all duration-300 ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
-          <svg className="w-4 h-4 text-[#7B859C] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className={`w-full lg:w-80 bg-[#F9FAFB] border border-[#ECECEC] border border-[#ECECEC] px-4 py-2.5 rounded-2xl flex items-center gap-3 shadow-[inset_0_0_12px_rgba(255,255,255,0.01)] focus-within:border-[#D1AF47]/30 focus-within:shadow-[0_0_15px_rgba(209,175,71,0.08)] transition-all duration-300 ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
+          <svg className="w-4 h-4 text-[#667085] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -336,12 +336,12 @@ export default function ProviderBookingsPage() {
             placeholder={t.searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className={`w-full bg-transparent border-none outline-none text-xs placeholder-[#7B859C]/60 text-white ${locale === "ar" ? "text-right" : "text-left"}`}
+            className={`w-full bg-transparent border-none outline-none text-xs placeholder-[#7B859C]/60 text-[#101828] ${locale === "ar" ? "text-right" : "text-left"}`}
           />
         </div>
 
         {/* Tabs */}
-        <div className="flex bg-white/[0.02] border border-white/[0.04] rounded-2xl p-1 gap-1 shadow-inner overflow-x-auto w-full lg:w-auto scrollbar-none">
+        <div className="flex bg-transparent border border-white/[0.04] rounded-2xl p-1 gap-1 shadow-inner overflow-x-auto w-full lg:w-auto scrollbar-none">
           {(["all", "pending", "confirmed", "completed", "cancelled"] as const).map((tab) => {
             const isActive = activeTab === tab;
             return (
@@ -351,7 +351,7 @@ export default function ProviderBookingsPage() {
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 whitespace-nowrap ${
                   isActive
                     ? "bg-[#D1AF47]/15 text-[#D1AF47] border border-[#D1AF47]/25 shadow-[0_0_15px_rgba(209,175,71,0.06)]"
-                    : "text-[#7B859C] border border-transparent hover:text-white hover:bg-white/[0.03]"
+                    : "text-[#667085] border border-transparent hover:text-[#101828] hover:bg-[#F9FAFB] border border-[#ECECEC]"
                 }`}
               >
                 {tab === "all" && t.tabAll}
@@ -369,26 +369,26 @@ export default function ProviderBookingsPage() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-24 space-y-4">
           <div className="w-10 h-10 border-2 border-[#D1AF47]/30 border-t-[#D1AF47] rounded-full animate-spin" />
-          <span className="text-sm text-[#7B859C] tracking-wide animate-pulse">Loading appointments...</span>
+          <span className="text-sm text-[#667085] tracking-wide animate-pulse">Loading appointments...</span>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-16 text-center text-[#7B859C] shadow-[0_0_50px_rgba(0,0,0,0.3)]">
-          <div className="w-16 h-16 bg-[#172033] rounded-full flex items-center justify-center mx-auto mb-4 border border-white/[0.04] shadow-[inset_0_0_10px_rgba(255,255,255,0.02)]">
-            <svg className="w-6 h-6 text-[#7B859C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-16 text-center text-[#667085] shadow-[0_0_50px_rgba(0,0,0,0.3)]">
+          <div className="w-16 h-16 bg-white border border-[#ECECEC] rounded-full flex items-center justify-center mx-auto mb-4 border border-white/[0.04] shadow-[inset_0_0_10px_rgba(255,255,255,0.02)]">
+            <svg className="w-6 h-6 text-[#667085]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002-2h-2" />
             </svg>
           </div>
-          <p className="text-sm font-semibold text-white mb-1">{t.noBookings}</p>
-          <p className="text-xs text-[#7B859C]">{locale === "ar" ? "حاول تعديل خيارات البحث أو الفلتر لعرض المزيد." : "Try adjusting your search query or selecting a different status filter."}</p>
+          <p className="text-sm font-semibold text-[#101828] mb-1">{t.noBookings}</p>
+          <p className="text-xs text-[#667085]">{locale === "ar" ? "حاول تعديل خيارات البحث أو الفلتر لعرض المزيد." : "Try adjusting your search query or selecting a different status filter."}</p>
         </div>
       ) : (
         <>
           {/* DESKTOP TABLE VIEW */}
-          <div className="hidden md:block bg-[#111827] border border-white/[0.06] rounded-[24px] overflow-hidden shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_35px_rgba(0,0,0,0.25)]">
+          <div className="hidden md:block bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] overflow-hidden shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_35px_rgba(0,0,0,0.25)]">
             <div className="overflow-x-auto">
               <table className="w-full text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-white/[0.06] text-[#7B859C] font-semibold uppercase tracking-wider text-[10px] bg-white/[0.01]">
+                  <tr className="border-b border-[#ECECEC] text-[#667085] font-semibold uppercase tracking-wider text-[10px] bg-white/[0.01]">
                     <th className={`py-4.5 px-6 ${locale === "ar" ? "text-right" : "text-left"}`}>{t.client}</th>
                     <th className={`py-4.5 px-6 ${locale === "ar" ? "text-right" : "text-left"}`}>{t.service}</th>
                     <th className={`py-4.5 px-6 ${locale === "ar" ? "text-right" : "text-left"}`}>{t.dateTime}</th>
@@ -398,42 +398,42 @@ export default function ProviderBookingsPage() {
                     <th className={`py-4.5 px-6 ${locale === "ar" ? "text-left" : "text-right"}`}>{t.actions}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/[0.04]">
+                <tbody className="divide-y divide-[#ECECEC]">
                   {filtered.map((bk) => {
                     const badge = getStatusBadgeStyles(bk.status);
                     return (
                       <tr key={bk.id} className="hover:bg-white/[0.015] transition-colors duration-200">
                         {/* Client Info */}
                         <td className="py-5 px-6">
-                          <span className="font-bold text-white block text-sm tracking-wide">
+                          <span className="font-bold text-[#101828] block text-sm tracking-wide">
                             {bk.profiles?.first_name} {bk.profiles?.last_name}
                           </span>
-                          <span className="text-[11px] text-[#7B859C] block mt-1 tracking-wider font-mono">{bk.profiles?.phone}</span>
+                          <span className="text-[11px] text-[#667085] block mt-1 tracking-wider font-mono">{bk.profiles?.phone}</span>
                         </td>
 
                         {/* Service Info */}
-                        <td className="py-5 px-6 font-medium text-[#B8C0D4] max-w-[200px] truncate">
+                        <td className="py-5 px-6 font-medium text-[#344054] max-w-[200px] truncate">
                           {locale === "ar" ? bk.services?.name_ar : bk.services?.name_en}
                         </td>
 
                         {/* Date/Time */}
                         <td className="py-5 px-6">
-                          <span className="font-bold text-white block">
+                          <span className="font-bold text-[#101828] block">
                             {new Date(bk.scheduled_at).toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
                           </span>
-                          <span className="text-[11px] text-[#7B859C] block mt-1 tracking-wider">
+                          <span className="text-[11px] text-[#667085] block mt-1 tracking-wider">
                             {new Date(bk.scheduled_at).toLocaleTimeString("en-GB", { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </td>
 
                         {/* Assigned Employee */}
-                        <td className="py-5 px-6 text-[#B8C0D4] font-medium">
+                        <td className="py-5 px-6 text-[#344054] font-medium">
                           {bk.employees ? (locale === "ar" ? bk.employees.name_ar : bk.employees.name_en) : (locale === "ar" ? "غير معين" : "Unassigned")}
                         </td>
 
                         {/* Price */}
                         <td className="py-5 px-6 font-extrabold text-[#D1AF47] text-sm">
-                          {bk.total_price} <span className="text-[10px] font-semibold text-[#7B859C]">{t.currency}</span>
+                          {bk.total_price} <span className="text-[10px] font-semibold text-[#667085]">{t.currency}</span>
                         </td>
 
                         {/* Status Badge */}
@@ -466,7 +466,7 @@ export default function ProviderBookingsPage() {
                             {bk.status !== "completed" && bk.status !== "cancelled" && (
                               <button
                                 onClick={() => updateStatus(bk.id, "cancelled")}
-                                className="px-3.5 py-2 border border-[#FF5D73]/30 bg-[#FF5D73]/[0.08] text-[#FF5D73] hover:bg-[#FF5D73] hover:text-white font-extrabold text-[10px] uppercase tracking-wider rounded-xl active:scale-95 transition-all duration-300"
+                                className="px-3.5 py-2 border border-[#FF5D73]/30 bg-[#FEE4E2] text-[#EF4444] text-[#EF4444] hover:bg-[#FF5D73] hover:text-[#101828] font-extrabold text-[10px] uppercase tracking-wider rounded-xl active:scale-95 transition-all duration-300"
                               >
                                 {t.cancel}
                               </button>
@@ -486,14 +486,14 @@ export default function ProviderBookingsPage() {
             {filtered.map((bk) => {
               const badge = getStatusBadgeStyles(bk.status);
               return (
-                <div key={bk.id} className="bg-[#111827] border border-white/[0.06] rounded-[24px] p-5 shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_30px_rgba(0,0,0,0.2)] hover:border-[#D1AF47]/20 transition-all duration-300 space-y-4">
+                <div key={bk.id} className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-5 shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_30px_rgba(0,0,0,0.2)] hover:border-[#D1AF47]/20 transition-all duration-300 space-y-4">
                   {/* Top: Client & Status */}
                   <div className="flex justify-between items-start">
                     <div>
-                      <h4 className="font-bold text-white text-base tracking-wide">
+                      <h4 className="font-bold text-[#101828] text-base tracking-wide">
                         {bk.profiles?.first_name} {bk.profiles?.last_name}
                       </h4>
-                      <p className="text-xs text-[#7B859C] mt-0.5 tracking-wider font-mono">{bk.profiles?.phone}</p>
+                      <p className="text-xs text-[#667085] mt-0.5 tracking-wider font-mono">{bk.profiles?.phone}</p>
                     </div>
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-bold border uppercase tracking-wider ${badge.bg} ${badge.text} ${badge.border}`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
@@ -504,30 +504,30 @@ export default function ProviderBookingsPage() {
                   {/* Middle Info Block */}
                   <div className="grid grid-cols-2 gap-4 pt-3 border-t border-white/[0.04] text-xs">
                     <div>
-                      <span className="text-[#7B859C] block text-[10px] uppercase font-bold tracking-wider mb-1">{t.service}</span>
-                      <span className="text-[#B8C0D4] font-medium leading-relaxed">
+                      <span className="text-[#667085] block text-[10px] uppercase font-bold tracking-wider mb-1">{t.service}</span>
+                      <span className="text-[#344054] font-medium leading-relaxed">
                         {locale === "ar" ? bk.services?.name_ar : bk.services?.name_en}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[#7B859C] block text-[10px] uppercase font-bold tracking-wider mb-1">{t.dateTime}</span>
-                      <span className="text-white font-bold block">
+                      <span className="text-[#667085] block text-[10px] uppercase font-bold tracking-wider mb-1">{t.dateTime}</span>
+                      <span className="text-[#101828] font-bold block">
                         {new Date(bk.scheduled_at).toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
                       </span>
-                      <span className="text-[#7B859C] text-[11px] block mt-0.5">
+                      <span className="text-[#667085] text-[11px] block mt-0.5">
                         {new Date(bk.scheduled_at).toLocaleTimeString("en-GB", { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[#7B859C] block text-[10px] uppercase font-bold tracking-wider mb-1">{t.staff}</span>
-                      <span className="text-[#B8C0D4] font-medium">
+                      <span className="text-[#667085] block text-[10px] uppercase font-bold tracking-wider mb-1">{t.staff}</span>
+                      <span className="text-[#344054] font-medium">
                         {bk.employees ? (locale === "ar" ? bk.employees.name_ar : bk.employees.name_en) : (locale === "ar" ? "غير معين" : "Unassigned")}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[#7B859C] block text-[10px] uppercase font-bold tracking-wider mb-1">{t.price}</span>
+                      <span className="text-[#667085] block text-[10px] uppercase font-bold tracking-wider mb-1">{t.price}</span>
                       <span className="font-extrabold text-[#D1AF47] text-sm">
-                        {bk.total_price} <span className="text-[10px] font-semibold text-[#7B859C]">{t.currency}</span>
+                        {bk.total_price} <span className="text-[10px] font-semibold text-[#667085]">{t.currency}</span>
                       </span>
                     </div>
                   </div>
@@ -553,7 +553,7 @@ export default function ProviderBookingsPage() {
                     {bk.status !== "completed" && bk.status !== "cancelled" && (
                       <button
                         onClick={() => updateStatus(bk.id, "cancelled")}
-                        className="flex-1 py-2.5 border border-[#FF5D73]/30 bg-[#FF5D73]/[0.08] text-[#FF5D73] hover:bg-[#FF5D73] hover:text-white font-extrabold text-[10px] uppercase tracking-wider rounded-xl text-center active:scale-95 transition-all duration-300"
+                        className="flex-1 py-2.5 border border-[#FF5D73]/30 bg-[#FEE4E2] text-[#EF4444] text-[#EF4444] hover:bg-[#FF5D73] hover:text-[#101828] font-extrabold text-[10px] uppercase tracking-wider rounded-xl text-center active:scale-95 transition-all duration-300"
                       >
                         {t.cancel}
                       </button>
