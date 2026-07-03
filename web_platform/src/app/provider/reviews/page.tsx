@@ -205,7 +205,7 @@ export default function ProviderReviewsPage() {
     <div className="space-y-8 font-sans text-[#101828] p-1">
       {/* HEADER */}
       <div className={`flex flex-col gap-2 ${isRTL ? "text-right items-end" : "text-left items-start"}`}>
-        <h2 className="text-3xl font-extrabold tracking-tight text-[#101828] font-serif bg-clip-text bg-gradient-to-r from-white via-[#B8C0D4] to-[#7B859C]">
+        <h2 className="text-3xl font-extrabold tracking-tight text-[#101828] font-serif">
           {t.title}
         </h2>
         <p className="text-sm text-[#344054] max-w-2xl font-light leading-relaxed">{t.subtitle}</p>
@@ -337,18 +337,18 @@ export default function ProviderReviewsPage() {
 
               {/* Service & Stylist Tags */}
               <div className="flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-medium bg-white border border-[#ECECEC] border border-white/[0.04] text-[#344054]">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-medium bg-white border border-[#ECECEC] text-[#344054]">
                   <span className="text-[#D1AF47] text-xs">✂</span>
                   <span>{t.service}: {locale === "ar" ? rev.bookings?.services?.name_ar : rev.bookings?.services?.name_en}</span>
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-medium bg-white border border-[#ECECEC] border border-white/[0.04] text-[#344054]">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-medium bg-white border border-[#ECECEC] text-[#344054]">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47]" />
                   <span>{locale === "ar" ? rev.bookings?.employees?.name_ar : rev.bookings?.employees?.name_en}</span>
                 </span>
               </div>
 
               {/* Client comment */}
-              <p className="text-xs text-[#344054] bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-white/[0.04] rounded-2xl p-4 leading-relaxed font-light">
+              <p className="text-xs text-[#344054] bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl p-4 leading-relaxed font-light">
                 "{rev.comment}"
               </p>
 

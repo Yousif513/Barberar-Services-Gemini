@@ -584,7 +584,7 @@ export default function ProviderWalletPage() {
                 </tr>
               ) : (
                 payoutRequests.map((request) => (
-                  <tr key={request.id} className="hover:bg-white/[0.01] transition-all duration-300">
+                  <tr key={request.id} className="hover:bg-gray-50/50 transition-all duration-300">
                     <td className="py-4 px-6 font-mono font-bold text-xs tracking-wider text-[#101828]">
                       {request.id.slice(0, 8).toUpperCase()}
                     </td>
@@ -644,7 +644,7 @@ export default function ProviderWalletPage() {
                 <th className="py-4 px-6 text-center font-bold">{t.status}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-[#ECECEC]">
               {loadingLedger ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-[#667085]">
@@ -665,7 +665,7 @@ export default function ProviderWalletPage() {
                 </tr>
               ) : (
                 ledgerEntries.map((entry) => (
-                  <tr key={entry.id} className="hover:bg-white/[0.01] transition-all duration-300 group">
+                  <tr key={entry.id} className="hover:bg-gray-50/50 transition-all duration-300 group">
                     <td className="py-4 px-6 font-mono font-bold text-xs tracking-wider text-[#101828]">
                       {entry.id}
                     </td>

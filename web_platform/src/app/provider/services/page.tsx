@@ -517,7 +517,7 @@ export default function ProviderServicesPage() {
                 <th className="py-5 px-6 text-center font-semibold">{t.actions}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[rgba(255,255,255,0.04)]">
+            <tbody className="divide-y divide-[#ECECEC]">
               {!loading && servicesList.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-6 py-10 text-center text-sm font-semibold text-[#344054]">
@@ -528,7 +528,7 @@ export default function ProviderServicesPage() {
               {servicesList.map((service) => (
                 <tr 
                   key={service.id} 
-                  className="group hover:bg-white/[0.01] transition-all duration-300"
+                  className="group hover:bg-gray-50/50 transition-all duration-300"
                 >
                   {/* Name */}
                   <td className="py-5 px-6 font-medium text-[#101828] transition-colors duration-300 group-hover:text-[#D1AF47]">

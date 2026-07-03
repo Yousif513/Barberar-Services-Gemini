@@ -257,7 +257,7 @@ export default function ProviderLayout({
                     className={`group relative flex items-center gap-3.5 px-4 py-3 rounded-[18px] text-[13px] font-semibold transition-all duration-300 ${
                       isActive
                         ? "border border-[#E0C46A]/50 bg-[#D1AF47]/20 text-[#F4E7B6] shadow-[0_0_34px_rgba(209,175,71,0.34),inset_0_0_18px_rgba(244,231,182,0.08)]"
-                        : "text-[#EFE7D8] hover:bg-white/[0.08] hover:text-white"
+                        : "text-[#EFE7D8] hover:bg-[#ffffff]/[0.08] hover:text-white"
                     } ${isRTL ? "flex-row-reverse text-right" : "flex-row text-left"}`}
                   >
                     <span className={`flex-shrink-0 transition-colors duration-300 ${isActive ? "text-[#E0C46A]" : "text-[#C8BFAE] group-hover:text-[#E0C46A]"}`}>
@@ -307,7 +307,7 @@ export default function ProviderLayout({
             </Link>
 
             {/* User Initials Avatar & Logout */}
-            <div className={`flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <div className={`flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-[#ffffff]/[0.03] px-2 py-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                 <div className="w-9 h-9 rounded-full bg-[#F4E7B6]/15 border border-[#D1AF47]/25 flex items-center justify-center text-[#F4E7B6] font-bold text-sm flex-shrink-0">
                   N
@@ -319,7 +319,7 @@ export default function ProviderLayout({
               </div>
               <Link 
                 href="/" 
-                className="p-2 rounded-xl text-[#EFE7D8] hover:bg-white/[0.08] hover:text-[#F4E7B6] transition-all duration-300"
+                className="p-2 rounded-xl text-[#EFE7D8] hover:bg-[#ffffff]/[0.08] hover:text-[#F4E7B6] transition-all duration-300"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

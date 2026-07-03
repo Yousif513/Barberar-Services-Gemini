@@ -290,8 +290,8 @@ export default function ProviderPromotionsPage() {
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F3F4F6] border border-[#ECECEC] text-[#344054] border border-[#ECECEC]">
-            <span className="w-1 h-1 rounded-full bg-[#B8C0D4]"></span>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F3F4F6] border border-[#ECECEC] text-[#344054]">
+            <span className="w-1 h-1 rounded-full bg-[#667085]"></span>
             {t.targetSegmentAll}
           </span>
         );
@@ -461,7 +461,7 @@ export default function ProviderPromotionsPage() {
                   </div>
 
                   <div className="flex justify-between items-center relative z-10">
-                    <div className="font-mono text-sm font-bold tracking-wider text-[#101828] bg-black/40 px-3 py-1.5 rounded-xl border border-white/[0.04]">
+                    <div className="font-mono text-sm font-bold tracking-wider text-[#101828] bg-[#F9FAFB] px-3 py-1.5 rounded-xl border border-[#ECECEC]">
                       {p.code}
                     </div>
                     <button
@@ -561,13 +561,13 @@ export default function ProviderPromotionsPage() {
             </div>
 
             {/* Discount Value Slider + Number Input */}
-            <div className="p-5 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-white/[0.04] rounded-2xl space-y-4">
+            <div className="p-5 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl space-y-4">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="space-y-1">
                   <span className="text-[10px] uppercase font-bold text-[#667085] tracking-widest block">{t.discountRateLabel}</span>
                   <span className="text-xs text-[#344054]">{t.discountRateLabel} for the active campaign.</span>
                 </div>
-                <div className="relative flex items-center bg-black/40 rounded-xl border border-[#ECECEC] overflow-hidden px-3">
+                <div className="relative flex items-center bg-[#F9FAFB] rounded-xl border border-[#ECECEC] overflow-hidden px-3">
                   <input
                     type="number"
                     required
@@ -631,11 +631,11 @@ export default function ProviderPromotionsPage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4 pt-4 border-t border-white/[0.04]">
+            <div className="flex gap-4 pt-4 border-t border-[#ECECEC]">
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="flex-1 py-3 border border-[#ECECEC] text-[#344054] font-bold text-xs rounded-xl hover:text-[#101828] hover:bg-transparent hover:border-white/[0.15] transition-all duration-300"
+                className="flex-1 py-3 border border-[#ECECEC] text-[#344054] font-bold text-xs rounded-xl hover:text-[#101828] hover:bg-transparent hover:border-[#D1AF47]/40 transition-all duration-300"
               >
                 {t.cancelBtn}
               </button>
@@ -658,7 +658,7 @@ export default function ProviderPromotionsPage() {
         </div>
       ) : promos.length === 0 ? (
         <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-16 text-center text-[#667085] shadow-sm flex flex-col items-center justify-center space-y-4">
-          <div className="w-16 h-16 rounded-full bg-transparent border border-white/[0.04] flex items-center justify-center text-[#667085]">
+          <div className="w-16 h-16 rounded-full bg-transparent border border-[#ECECEC] flex items-center justify-center text-[#667085]">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -673,7 +673,7 @@ export default function ProviderPromotionsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-start border-collapse" dir={isRTL ? "rtl" : "ltr"}>
               <thead>
-                <tr className="border-b border-[#ECECEC] text-[#667085] font-bold uppercase text-[10px] tracking-wider bg-white/[0.01]">
+                <tr className="border-b border-[#ECECEC] text-[#667085] font-bold uppercase text-[10px] tracking-wider bg-[#F9FAFB]/50">
                   <th className="py-4.5 px-6 text-start">{t.tableCode}</th>
                   <th className="py-4.5 px-6 text-start">{t.tableType}</th>
                   <th className="py-4.5 px-6 text-start">{t.tableValue}</th>
@@ -732,7 +732,7 @@ export default function ProviderPromotionsPage() {
 
                       {/* Usage */}
                       <td className="py-5 px-6 text-center">
-                        <span className="font-bold text-[#101828] bg-[#F9FAFB] border border-[#ECECEC] border border-white/[0.04] px-3 py-1 rounded-lg text-xs">
+                        <span className="font-bold text-[#101828] bg-[#F9FAFB] border border-[#ECECEC] px-3 py-1 rounded-lg text-xs">
                           {p.usage_count}
                         </span>
                       </td>

@@ -235,7 +235,7 @@ export default function ProviderBookingsPage() {
           bg: "bg-[#F3F4F6] border border-[#ECECEC]",
           text: "text-[#344054]",
           border: "border-[#ECECEC]",
-          dot: "bg-[#B8C0D4]"
+          dot: "bg-[#667085]"
         };
     }
   };
@@ -341,7 +341,7 @@ export default function ProviderBookingsPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex bg-transparent border border-white/[0.04] rounded-2xl p-1 gap-1 shadow-inner overflow-x-auto w-full lg:w-auto scrollbar-none">
+        <div className="flex bg-transparent border border-[#ECECEC] rounded-2xl p-1 gap-1 shadow-inner overflow-x-auto w-full lg:w-auto scrollbar-none">
           {(["all", "pending", "confirmed", "completed", "cancelled"] as const).map((tab) => {
             const isActive = activeTab === tab;
             return (
@@ -373,7 +373,7 @@ export default function ProviderBookingsPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-16 text-center text-[#667085] shadow-[0_0_50px_rgba(0,0,0,0.3)]">
-          <div className="w-16 h-16 bg-white border border-[#ECECEC] rounded-full flex items-center justify-center mx-auto mb-4 border border-white/[0.04] shadow-[inset_0_0_10px_rgba(255,255,255,0.02)]">
+          <div className="w-16 h-16 bg-white border border-[#ECECEC] rounded-full flex items-center justify-center mx-auto mb-4 shadow-[inset_0_0_10px_rgba(0,0,0,0.01)]">
             <svg className="w-6 h-6 text-[#667085]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002-2h-2" />
             </svg>
@@ -388,7 +388,7 @@ export default function ProviderBookingsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-[#ECECEC] text-[#667085] font-semibold uppercase tracking-wider text-[10px] bg-white/[0.01]">
+                  <tr className="border-b border-[#ECECEC] text-[#667085] font-semibold uppercase tracking-wider text-[10px] bg-[#F9FAFB]/50">
                     <th className={`py-4.5 px-6 ${locale === "ar" ? "text-right" : "text-left"}`}>{t.client}</th>
                     <th className={`py-4.5 px-6 ${locale === "ar" ? "text-right" : "text-left"}`}>{t.service}</th>
                     <th className={`py-4.5 px-6 ${locale === "ar" ? "text-right" : "text-left"}`}>{t.dateTime}</th>
@@ -402,7 +402,7 @@ export default function ProviderBookingsPage() {
                   {filtered.map((bk) => {
                     const badge = getStatusBadgeStyles(bk.status);
                     return (
-                      <tr key={bk.id} className="hover:bg-white/[0.015] transition-colors duration-200">
+                      <tr key={bk.id} className="hover:bg-[#F9FAFB] transition-colors duration-200">
                         {/* Client Info */}
                         <td className="py-5 px-6">
                           <span className="font-bold text-[#101828] block text-sm tracking-wide">
@@ -502,7 +502,7 @@ export default function ProviderBookingsPage() {
                   </div>
 
                   {/* Middle Info Block */}
-                  <div className="grid grid-cols-2 gap-4 pt-3 border-t border-white/[0.04] text-xs">
+                  <div className="grid grid-cols-2 gap-4 pt-3 border-t border-[#ECECEC] text-xs">
                     <div>
                       <span className="text-[#667085] block text-[10px] uppercase font-bold tracking-wider mb-1">{t.service}</span>
                       <span className="text-[#344054] font-medium leading-relaxed">
@@ -533,7 +533,7 @@ export default function ProviderBookingsPage() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-2 pt-3 border-t border-white/[0.04]">
+                  <div className="flex gap-2 pt-3 border-t border-[#ECECEC]">
                     {(bk.status === "pending_payment" || bk.status === "pending") && (
                       <button
                         onClick={() => updateStatus(bk.id, "confirmed")}

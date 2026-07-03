@@ -456,7 +456,7 @@ export default function PackagesPage() {
               className={`bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border rounded-[24px] p-6 shadow-xl flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] ${
                 pkg.is_active 
                   ? "border-[#ECECEC] hover:border-[#D1AF47]/50 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)]" 
-                  : "border-white/[0.03] opacity-50"
+                  : "border-[#ECECEC] opacity-50"
               }`}
             >
               <div>

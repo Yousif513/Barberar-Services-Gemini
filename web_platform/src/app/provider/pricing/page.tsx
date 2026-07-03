@@ -567,7 +567,7 @@ export default function PricingPage() {
               </thead>
               <tbody className="divide-y divide-[rgba(255,255,255,0.03)]">
                 {features.map((feature, idx) => (
-                  <tr key={idx} className="hover:bg-white/[0.01] transition-colors">
+                  <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
                     <td className="py-4 font-medium text-[#101828] text-start">{feature.name}</td>
                     <td className="py-4 text-center">
                       {feature.basic ? (

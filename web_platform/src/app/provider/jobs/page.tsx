@@ -343,7 +343,7 @@ export default function ProviderJobsPage() {
                 </div>
                 <p className="text-sm text-[#344054] leading-relaxed font-normal">{job.description}</p>
                 
-                <div className="flex flex-wrap gap-x-8 gap-y-2 pt-2 border-t border-white/[0.04]">
+                <div className="flex flex-wrap gap-x-8 gap-y-2 pt-2 border-t border-[#ECECEC]">
                   {/* Area */}
                   <div className="flex items-center gap-2 text-xs text-[#667085]">
                     <svg className="w-4 h-4 text-[#D1AF47] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -494,11 +494,11 @@ export default function ProviderJobsPage() {
               </div>
 
               {/* Action buttons */}
-              <div className="flex gap-4 justify-end pt-4 border-t border-white/[0.04] rtl:flex-row-reverse">
+              <div className="flex gap-4 justify-end pt-4 border-t border-[#ECECEC] rtl:flex-row-reverse">
                 <button
                   type="button"
                   onClick={() => setActiveJob(null)}
-                  className="px-6 py-3.5 border border-[#ECECEC] hover:border-white/20 text-[#344054] hover:text-[#101828] font-bold text-xs uppercase tracking-wider rounded-2xl transition-all duration-300 cursor-pointer"
+                  className="px-6 py-3.5 border border-[#ECECEC] hover:border-[#D1AF47]/40 text-[#344054] hover:text-[#101828] font-bold text-xs uppercase tracking-wider rounded-2xl transition-all duration-300 cursor-pointer"
                 >
                   {t.cancel}
                 </button>

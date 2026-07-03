@@ -507,7 +507,7 @@ export default function ProviderReportsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left border-collapse">
                 <thead>
-                  <tr className={`border-b border-[#ECECEC] text-[#667085] font-bold uppercase text-[10px] tracking-wider bg-white/[0.01] ${locale === "ar" ? "text-right" : "text-left"}`}>
+                  <tr className={`border-b border-[#ECECEC] text-[#667085] font-bold uppercase text-[10px] tracking-wider bg-[#F9FAFB]/50 ${locale === "ar" ? "text-right" : "text-left"}`}>
                     <th className="py-4 px-6">{t.staffName}</th>
                     <th className="py-4 px-6 text-center">{t.bookingsCompleted}</th>
                     <th className="py-4 px-6 text-center">{t.revenueGenerated}</th>
@@ -551,7 +551,7 @@ export default function ProviderReportsPage() {
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#D1AF47]/25 to-transparent" />
           <div className={`flex items-center justify-between mb-6 ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
             <h3 className="font-serif font-bold text-base text-[#101828] tracking-wide">{t.popularServices}</h3>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#667085] bg-[#F9FAFB] border border-[#ECECEC] px-2.5 py-1 rounded-lg border border-white/[0.04]">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#667085] bg-[#F9FAFB] border border-[#ECECEC] px-2.5 py-1 rounded-lg">
               {locale === "ar" ? "حجم الحجز" : "Volume"}
             </span>
           </div>
@@ -579,7 +579,7 @@ export default function ProviderReportsPage() {
                   </div>
                   
                   {/* Progress track and bar */}
-                  <div className="h-2 w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-full border border-white/[0.03] overflow-hidden relative">
+                  <div className="h-2 w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-full overflow-hidden relative">
                     <div
                       className="h-full bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(209,175,71,0.3)] group-hover/bar:brightness-110"
                       style={{ width: `${pctWidth}%` }}

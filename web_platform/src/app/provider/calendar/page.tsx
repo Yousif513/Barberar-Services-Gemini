@@ -706,7 +706,7 @@ export default function ProviderCalendarPage() {
           <h2 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-[#D1AF47] via-[#E0C46A] to-[#D1AF47] bg-clip-text text-transparent">
             {t.calendarTitle}
           </h2>
-          <p className="text-xs text-[#7B859C] mt-1.5 tracking-wide">{t.subtitle}</p>
+          <p className="text-xs text-[#667085] mt-1.5 tracking-wide">{t.subtitle}</p>
         </div>
 
         <div className={`flex flex-wrap gap-3 items-center ${isRTL ? "justify-end flex-row-reverse" : "justify-start"}`}>
@@ -724,7 +724,7 @@ export default function ProviderCalendarPage() {
                   </option>
                 ))}
               </select>
-              <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#7B859C]">
+              <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#667085]">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                 </svg>
@@ -996,7 +996,7 @@ export default function ProviderCalendarPage() {
 
             {/* Buffer time length control */}
             <div className="space-y-2.5">
-              <label className="text-[10px] text-[#7B859C] font-bold uppercase tracking-wider block">{t.bufferDurationLabel}</label>
+              <label className="text-[10px] text-[#667085] font-bold uppercase tracking-wider block">{t.bufferDurationLabel}</label>
               <div className="flex gap-2">
                 {[15, 20, 30].map(mins => (
                   <button
@@ -1005,7 +1005,7 @@ export default function ProviderCalendarPage() {
                     className={`flex-1 py-2 rounded-xl text-[10px] font-black tracking-wider transition-all duration-300 ${
                       bufferDuration === mins
                         ? "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] shadow-[0_0_15px_rgba(209,175,71,0.2)]"
-                        : "bg-white/[0.04] hover:bg-white/[0.08] text-[#B8C0D4] backdrop-blur-sm"
+                        : "bg-white border border-[#ECECEC] text-[#667085] hover:border-[#D1AF47]/40"
                     }`}
                   >
                     {mins}m
@@ -1024,25 +1024,25 @@ export default function ProviderCalendarPage() {
 
               {/* Dhuhr */}
               <div className={`flex items-center justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="font-semibold text-[#B8C0D4]">{t.dhuhr}</span>
+                <span className="font-semibold text-[#667085]">{t.dhuhr}</span>
                 <ToggleSwitch checked={dhuhrActive} onChange={setDhuhrActive} />
               </div>
 
               {/* Asr */}
               <div className={`flex items-center justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="font-semibold text-[#B8C0D4]">{t.asr}</span>
+                <span className="font-semibold text-[#667085]">{t.asr}</span>
                 <ToggleSwitch checked={asrActive} onChange={setAsrActive} />
               </div>
 
               {/* Maghrib */}
               <div className={`flex items-center justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="font-semibold text-[#B8C0D4]">{t.maghrib}</span>
+                <span className="font-semibold text-[#667085]">{t.maghrib}</span>
                 <ToggleSwitch checked={maghribActive} onChange={setMaghribActive} />
               </div>
 
               {/* Isha */}
               <div className={`flex items-center justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="font-semibold text-[#B8C0D4]">{t.isha}</span>
+                <span className="font-semibold text-[#667085]">{t.isha}</span>
                 <ToggleSwitch checked={ishaActive} onChange={setIshaActive} />
               </div>
             </div>
@@ -1126,7 +1126,7 @@ export default function ProviderCalendarPage() {
 
             {/* Working Day Toggle */}
             <div className={`flex items-center justify-between text-xs py-1 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <span className="font-semibold text-[#B8C0D4]">
+              <span className="font-semibold text-[#667085]">
                 {lang === "ar" ? "يوم عمل نشط" : "Active Work Day"}
               </span>
               <ToggleSwitch
@@ -1342,12 +1342,12 @@ export default function ProviderCalendarPage() {
               {showDetailsModal.notes && (
                 <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                   <span className="text-[#667085]">{t.notes}:</span>
-                  <span className="font-semibold text-[#B8C0D4]">{showDetailsModal.notes}</span>
+                  <span className="font-semibold text-[#667085]">{showDetailsModal.notes}</span>
                 </div>
               )}
             </div>
 
-            <div className={`flex flex-col gap-2.5 pt-5 border-t border-white/[0.04]`}>
+            <div className="flex flex-col gap-2.5 pt-5 border-t border-[#ECECEC]">
               <button
                 onClick={() => handleCancelBooking(showDetailsModal.id)}
                 className="w-full py-2.5 bg-[#FF5D73]/[0.08] hover:bg-[#FF5D73]/[0.15] border border-[#FF5D73]/15 text-[#FF5D73] text-[10px] font-bold uppercase tracking-wider rounded-2xl hover:shadow-[0_0_15px_rgba(255,93,115,0.1)] transition-all duration-300"
@@ -1356,7 +1356,7 @@ export default function ProviderCalendarPage() {
               </button>
               <button
                 onClick={() => setShowDetailsModal(null)}
-                className="w-full py-2.5 bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] text-[#B8C0D4] text-[10px] font-bold uppercase tracking-wider rounded-2xl hover:bg-white/[0.06] hover:text-white transition-all duration-300"
+                className="w-full py-2.5 bg-white border border-[#ECECEC] text-[#667085] text-[10px] font-bold uppercase tracking-wider rounded-2xl hover:border-[#D1AF47]/40 hover:text-[#101828] transition-all duration-300"
               >
                 {t.cancel}
               </button>
