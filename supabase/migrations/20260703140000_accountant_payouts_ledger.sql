@@ -7,7 +7,8 @@ ADD COLUMN IF NOT EXISTS contact_email TEXT,
 ADD COLUMN IF NOT EXISTS contact_phone TEXT;
 
 -- 2. Create monthly_vat_summary view
-CREATE OR REPLACE VIEW public.monthly_vat_summary AS
+CREATE OR REPLACE VIEW public.monthly_vat_summary
+WITH (security_invoker = true) AS
 SELECT
     date_trunc('month', b.scheduled_at)::date AS month_start,
     br.provider_id,
@@ -21,7 +22,8 @@ WHERE b.status = 'completed'
 GROUP BY 1, 2, 3;
 
 -- 3. Create provider_settlement_summary view
-CREATE OR REPLACE VIEW public.provider_settlement_summary AS
+CREATE OR REPLACE VIEW public.provider_settlement_summary
+WITH (security_invoker = true) AS
 SELECT
     date_trunc('month', tl.created_at)::date AS month_start,
     br.provider_id,
@@ -36,7 +38,8 @@ JOIN public.branches br ON b.branch_id = br.id
 GROUP BY 1, 2;
 
 -- 4. Create employee_earnings_summary view
-CREATE OR REPLACE VIEW public.employee_earnings_summary AS
+CREATE OR REPLACE VIEW public.employee_earnings_summary
+WITH (security_invoker = true) AS
 SELECT
     date_trunc('month', tl.created_at)::date AS month_start,
     b.employee_id,
