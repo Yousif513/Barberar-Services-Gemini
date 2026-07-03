@@ -210,7 +210,7 @@ export default function ProviderCalendarPage() {
   const timeTo24Hour = (time12: string): string => {
     if (!time12) return "08:00:00";
     const [time, modifier] = time12.split(" ");
-    let [hoursStr, minutesStr] = time.split(":");
+    const [hoursStr, minutesStr] = time.split(":");
     let hours = parseInt(hoursStr, 10);
     const minutes = minutesStr ? minutesStr.slice(0, 2) : "00";
     if (hours === 12) {
@@ -267,7 +267,8 @@ export default function ProviderCalendarPage() {
     
     timeSlots.forEach((slot, index) => {
       const [timePart, ampmPart] = slot.label.split(" ");
-      let [h, m] = timePart.split(":").map(Number);
+      const [rawHour, m] = timePart.split(":").map(Number);
+      let h = rawHour;
       if (ampmPart === "PM" && h !== 12) h += 12;
       if (ampmPart === "AM" && h === 12) h = 0;
       const slotMinutes = h * 60 + m;
@@ -483,7 +484,7 @@ export default function ProviderCalendarPage() {
 
       const slotLabel = timeSlots[targetSlotIndex].label;
       const [timePart, ampm] = slotLabel.split(" ");
-      let [hoursStr, minutesStr] = timePart.split(":");
+      const [hoursStr, minutesStr] = timePart.split(":");
       let hours = parseInt(hoursStr, 10);
       const minutes = parseInt(minutesStr, 10) || 0;
       if (ampm === "PM" && hours !== 12) hours += 12;
