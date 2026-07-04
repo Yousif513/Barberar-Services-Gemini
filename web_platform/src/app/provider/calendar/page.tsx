@@ -965,10 +965,10 @@ export default function ProviderCalendarPage() {
                       ) : (
                         // 5. Open empty slot state
                         <div className={`w-full h-full rounded-2xl border border-dashed border-[#ECECEC] hover:border-[#D1AF47]/40 hover:bg-[#D1AF47]/[0.01] transition-all duration-300 cursor-pointer flex items-center justify-between px-6 text-[#344054] group`}>
-                          <span className="text-xs font-semibold opacity-0 group-hover:opacity-100 transition-all duration-300">
+                          <span className="text-xs font-semibold text-[#344054]">
                             {lang === "ar" ? "جدولة حجز في هذا الوقت" : "Schedule Walk-in / Booking"}
                           </span>
-                          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                          <div className="flex gap-2">
                             <button
                               onClick={() => {
                                 setTargetSlotIndex(index);
