@@ -57,6 +57,12 @@ const translations = {
     resumesInLabel: "Resumes in",
     shiftStartLabel: "Shift Start",
     shiftEndLabel: "Shift End",
+    openingLabel: "Opening",
+    closingLabel: "Closing",
+    firstShiftLabel: "First Shift",
+    secondShiftLabel: "Second Shift",
+    addSecondShift: "Add second shift",
+    removeSecondShift: "Remove second shift",
     selectHour: "Select hour"
   },
   ar: {
@@ -111,6 +117,12 @@ const translations = {
     resumesInLabel: "يستأنف خلال",
     shiftStartLabel: "بداية المناوبة",
     shiftEndLabel: "نهاية المناوبة",
+    openingLabel: "الافتتاح",
+    closingLabel: "الإغلاق",
+    firstShiftLabel: "المناوبة الأولى",
+    secondShiftLabel: "المناوبة الثانية",
+    addSecondShift: "إضافة مناوبة ثانية",
+    removeSecondShift: "إزالة المناوبة الثانية",
     selectHour: "اختر الساعة"
   }
 };
@@ -132,11 +144,8 @@ interface Blockout {
   reason: string;
 }
 
-const TIME_WHEEL_OPTIONS = Array.from({ length: 24 }, (_, hour) => {
-  const suffix = hour >= 12 ? "PM" : "AM";
-  const displayHour = hour % 12 === 0 ? 12 : hour % 12;
-  return `${String(displayHour).padStart(2, "0")}:00 ${suffix}`;
-});
+const HOUR_WHEEL_OPTIONS = Array.from({ length: 12 }, (_, index) => `${String(index + 1).padStart(2, "0")}:00`);
+const PERIOD_OPTIONS = ["AM", "PM"] as const;
 
 const SAUDI_CITIES = [
   { key: "riyadh", en: "Riyadh", ar: "الرياض", regionEn: "Riyadh", regionAr: "الرياض", lat: 24.7136, lng: 46.6753 },
@@ -271,6 +280,9 @@ export default function ProviderCalendarPage() {
     start_time: string;
     end_time: string;
     is_working_day: boolean;
+    has_second_shift?: boolean;
+    second_start_time?: string | null;
+    second_end_time?: string | null;
   }>>([]);
   const [selectedDayToEdit, setSelectedDayToEdit] = useState<number>(new Date().getDay());
 
@@ -296,6 +308,9 @@ export default function ProviderCalendarPage() {
   // Roster shift range (shown for editing the selected day)
   const [shiftStart, setShiftStart] = useState("08:00 AM");
   const [shiftEnd, setShiftEnd] = useState("09:00 PM");
+  const [hasSecondShift, setHasSecondShift] = useState(false);
+  const [secondShiftStart, setSecondShiftStart] = useState("02:00 PM");
+  const [secondShiftEnd, setSecondShiftEnd] = useState("10:00 PM");
   const [selectedPrayerCityKey, setSelectedPrayerCityKey] = useState("riyadh");
   const [citySearch, setCitySearch] = useState("");
 
@@ -562,7 +577,7 @@ export default function ProviderCalendarPage() {
       // 1. Fetch weekly availability shifts
       const { data: shiftsData, error: shiftsError } = await supabase
         .from("employee_availability")
-        .select("day_of_week, start_time, end_time, is_working_day")
+        .select("*")
         .eq("employee_id", selectedEmployeeId);
       
       if (shiftsError) throw shiftsError;
@@ -573,7 +588,10 @@ export default function ProviderCalendarPage() {
           day_of_week: index,
           start_time: "08:00:00",
           end_time: "21:00:00",
-          is_working_day: true
+          is_working_day: true,
+          has_second_shift: false,
+          second_start_time: null,
+          second_end_time: null
         };
       });
       setAvailabilityShifts(fullWeekShifts);
@@ -582,6 +600,9 @@ export default function ProviderCalendarPage() {
       if (currentDayShift) {
         setShiftStart(timeTo12Hour(currentDayShift.start_time));
         setShiftEnd(timeTo12Hour(currentDayShift.end_time));
+        setHasSecondShift(Boolean(currentDayShift.has_second_shift));
+        setSecondShiftStart(timeTo12Hour(currentDayShift.second_start_time || "14:00:00"));
+        setSecondShiftEnd(timeTo12Hour(currentDayShift.second_end_time || "22:00:00"));
       }
       
       // 2. Fetch bookings
@@ -776,14 +797,29 @@ export default function ProviderCalendarPage() {
         day_of_week: selectedDayToEdit,
         start_time: timeTo24Hour(shiftStart),
         end_time: timeTo24Hour(shiftEnd),
-        is_working_day: shiftConfig ? shiftConfig.is_working_day : true
+        is_working_day: shiftConfig ? shiftConfig.is_working_day : true,
+        has_second_shift: hasSecondShift,
+        second_start_time: hasSecondShift ? timeTo24Hour(secondShiftStart) : null,
+        second_end_time: hasSecondShift ? timeTo24Hour(secondShiftEnd) : null
       };
 
       const { error: saveError } = await supabase
         .from("employee_availability")
         .upsert(payload, { onConflict: "employee_id,day_of_week" });
 
-      if (saveError) throw saveError;
+      if (saveError) {
+        const legacyPayload = {
+          employee_id: payload.employee_id,
+          day_of_week: payload.day_of_week,
+          start_time: payload.start_time,
+          end_time: payload.end_time,
+          is_working_day: payload.is_working_day
+        };
+        const { error: legacySaveError } = await supabase
+          .from("employee_availability")
+          .upsert(legacyPayload, { onConflict: "employee_id,day_of_week" });
+        if (legacySaveError) throw legacySaveError;
+      }
 
       setSuccess(lang === "ar" ? "تم حفظ ساعات العمل بنجاح" : "Working hours updated successfully.");
       await loadEmployeeSchedule();
@@ -847,46 +883,75 @@ export default function ProviderCalendarPage() {
     label: string;
     value: string;
     onChange: (value: string) => void;
-  }) => (
-    <div className="space-y-2">
-      <div className={`flex items-center justify-between ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-        <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>
-          {label}
-        </label>
-        <span className="rounded-full bg-[#D1AF47]/10 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.12em] text-[#A37B16]">
-          {value}
-        </span>
-      </div>
-      <div
-        role="listbox"
-        aria-label={`${t.selectHour}: ${label}`}
-        className="relative h-40 overflow-y-auto rounded-3xl border border-[#D1AF47]/30 bg-[linear-gradient(180deg,#FFFCF4_0%,#F8F2E5_48%,#FFFCF4_100%)] p-2 shadow-[inset_0_18px_35px_rgba(209,175,71,0.10),0_10px_26px_rgba(17,17,17,0.05)] snap-y snap-mandatory scrollbar-thin scrollbar-thumb-[#D1AF47]/45 scrollbar-track-transparent"
-      >
-        <div className="pointer-events-none sticky top-[calc(50%-18px)] z-10 h-9 rounded-2xl border border-[#D1AF47]/45 bg-[#D1AF47]/10 shadow-[0_0_24px_rgba(209,175,71,0.22)]" />
-        <div className="-mt-9 py-12">
-          {TIME_WHEEL_OPTIONS.map((option) => {
-            const isSelected = option === value;
-            return (
-              <button
-                key={option}
-                type="button"
-                role="option"
-                aria-selected={isSelected}
-                onClick={() => onChange(option)}
-                className={`mb-1 flex h-10 w-full snap-center items-center justify-center rounded-2xl text-xs font-black tracking-[0.08em] transition-all duration-300 ${
-                  isSelected
-                    ? "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] shadow-[0_0_22px_rgba(209,175,71,0.32)] scale-[1.02]"
-                    : "text-[#667085] hover:bg-white/80 hover:text-[#101828]"
-                }`}
-              >
-                {option}
-              </button>
-            );
-          })}
+  }) => {
+    const [hour = "08:00", period = "AM"] = value.split(" ");
+    const normalizedPeriod = period === "PM" ? "PM" : "AM";
+    const updateHour = (nextHour: string) => onChange(`${nextHour} ${normalizedPeriod}`);
+    const updatePeriod = (nextPeriod: "AM" | "PM") => onChange(`${hour} ${nextPeriod}`);
+
+    return (
+      <div className="space-y-2">
+        <div className={`flex items-center justify-between ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+          <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>
+            {label}
+          </label>
+          <span className="rounded-full bg-[#D1AF47]/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[#A37B16]">
+            {value}
+          </span>
+        </div>
+        <div className="grid grid-cols-[1fr_70px] gap-3 rounded-3xl border border-[#D1AF47]/35 bg-[linear-gradient(180deg,#FFFCF4_0%,#F8F2E5_50%,#FFFCF4_100%)] p-3 shadow-[inset_0_18px_35px_rgba(209,175,71,0.10),0_10px_26px_rgba(17,17,17,0.05)]">
+          <div
+            role="listbox"
+            aria-label={`${t.selectHour}: ${label}`}
+            className="relative h-40 overflow-y-auto rounded-2xl border border-[#D1AF47]/20 bg-white/55 p-2 snap-y snap-mandatory scrollbar-thin scrollbar-thumb-[#D1AF47]/45 scrollbar-track-transparent"
+          >
+            <div className="pointer-events-none sticky top-[calc(50%-22px)] z-10 h-11 rounded-2xl border border-[#D1AF47]/45 bg-[#D1AF47]/10 shadow-[0_0_24px_rgba(209,175,71,0.22)]" />
+            <div className="-mt-11 py-12">
+              {HOUR_WHEEL_OPTIONS.map((option) => {
+                const isSelected = option === hour;
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    role="option"
+                    aria-selected={isSelected}
+                    onClick={() => updateHour(option)}
+                    className={`mb-1 flex h-11 w-full snap-center items-center justify-center rounded-2xl text-base font-black tracking-[0.08em] transition-all duration-300 ${
+                      isSelected
+                        ? "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] shadow-[0_0_22px_rgba(209,175,71,0.32)] scale-[1.02]"
+                        : "text-[#B7B1A6] hover:bg-white/80 hover:text-[#101828]"
+                    }`}
+                  >
+                    {option}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="grid content-center gap-2">
+            {PERIOD_OPTIONS.map((option) => {
+              const isSelected = option === normalizedPeriod;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => updatePeriod(option)}
+                  className={`rounded-2xl px-3 py-4 text-sm font-black tracking-[0.12em] transition-all duration-300 ${
+                    isSelected
+                      ? "bg-[#15100A] text-[#E6C679] shadow-[0_0_20px_rgba(21,16,10,0.16)]"
+                      : "border border-[#D1AF47]/20 bg-white/70 text-[#8A7F6C] hover:border-[#D1AF47]/45"
+                  }`}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="space-y-8 text-[#344054]">
@@ -1480,16 +1545,49 @@ export default function ProviderCalendarPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <TimeWheelPicker
-                label={t.shiftStartLabel}
+                label={`${t.firstShiftLabel} · ${t.openingLabel}`}
                 value={shiftStart}
                 onChange={setShiftStart}
               />
               <TimeWheelPicker
-                label={t.shiftEndLabel}
+                label={`${t.firstShiftLabel} · ${t.closingLabel}`}
                 value={shiftEnd}
                 onChange={setShiftEnd}
               />
             </div>
+
+            <div className={`flex items-center justify-between rounded-2xl border border-[#D1AF47]/20 bg-[#FFFCF4] px-4 py-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <div className={isRTL ? "text-right" : "text-left"}>
+                <p className="text-xs font-black uppercase tracking-[0.14em] text-[#101828]">{t.secondShiftLabel}</p>
+                <p className="mt-1 text-[10px] font-semibold text-[#667085]">{hasSecondShift ? `${secondShiftStart} - ${secondShiftEnd}` : t.addSecondShift}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setHasSecondShift((value) => !value)}
+                className={`rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-[0.12em] transition-all duration-300 ${
+                  hasSecondShift
+                    ? "border border-[#FF5D73]/25 bg-[#FF5D73]/10 text-[#EF4444]"
+                    : "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] shadow-[0_0_18px_rgba(209,175,71,0.22)]"
+                }`}
+              >
+                {hasSecondShift ? t.removeSecondShift : t.addSecondShift}
+              </button>
+            </div>
+
+            {hasSecondShift && (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <TimeWheelPicker
+                  label={`${t.secondShiftLabel} · ${t.openingLabel}`}
+                  value={secondShiftStart}
+                  onChange={setSecondShiftStart}
+                />
+                <TimeWheelPicker
+                  label={`${t.secondShiftLabel} · ${t.closingLabel}`}
+                  value={secondShiftEnd}
+                  onChange={setSecondShiftEnd}
+                />
+              </div>
+            )}
 
             <div className="hidden">
               <div className="space-y-1.5">
