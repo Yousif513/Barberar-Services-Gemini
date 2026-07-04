@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { usePrayerTimes } from "@/lib/use-prayer-times";
 
@@ -45,7 +45,19 @@ const translations = {
     notes: "Roster Notes",
     notesPlaceholder: "e.g., in-salon workstation 2",
     blockedTag: "BLOCKED",
-    workingHoursPanel: "Roster Working Hours"
+    workingHoursPanel: "Roster Working Hours",
+    prayerOperationsPanel: "Prayer Operations Control",
+    prayerCityLabel: "Prayer city",
+    prayerCitySearch: "Search Saudi cities...",
+    prayerCityHint: "Choose the city used for prayer calculations and lock windows.",
+    lockState: "Lock state",
+    lockActiveNow: "Locked now",
+    lockClearNow: "Clear now",
+    nextLock: "Next lock",
+    resumesInLabel: "Resumes in",
+    shiftStartLabel: "Shift Start",
+    shiftEndLabel: "Shift End",
+    selectHour: "Select hour"
   },
   ar: {
     calendarTitle: "محرك جدولة ومواعيد الرياض",
@@ -87,7 +99,19 @@ const translations = {
     notes: "ملاحظات الدوام",
     notesPlaceholder: "مثال: كرسي العمل رقم ٢ بالصالون",
     blockedTag: "مغلق مؤقتاً",
-    workingHoursPanel: "ساعات عمل الموظفين أسبوعياً"
+    workingHoursPanel: "ساعات عمل الموظفين أسبوعياً",
+    prayerOperationsPanel: "لوحة تشغيل الصلاة",
+    prayerCityLabel: "مدينة الصلاة",
+    prayerCitySearch: "ابحث في مدن السعودية...",
+    prayerCityHint: "اختر المدينة المستخدمة لحساب أوقات الصلاة وفترات القفل.",
+    lockState: "حالة القفل",
+    lockActiveNow: "مغلق الآن",
+    lockClearNow: "متاح الآن",
+    nextLock: "القفل القادم",
+    resumesInLabel: "يستأنف خلال",
+    shiftStartLabel: "بداية المناوبة",
+    shiftEndLabel: "نهاية المناوبة",
+    selectHour: "اختر الساعة"
   }
 };
 
@@ -107,6 +131,102 @@ interface Blockout {
   slotIndex: number;
   reason: string;
 }
+
+const TIME_WHEEL_OPTIONS = Array.from({ length: 24 }, (_, hour) => {
+  const suffix = hour >= 12 ? "PM" : "AM";
+  const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+  return `${String(displayHour).padStart(2, "0")}:00 ${suffix}`;
+});
+
+const SAUDI_CITIES = [
+  { key: "riyadh", en: "Riyadh", ar: "الرياض", regionEn: "Riyadh", regionAr: "الرياض", lat: 24.7136, lng: 46.6753 },
+  { key: "jeddah", en: "Jeddah", ar: "جدة", regionEn: "Makkah", regionAr: "مكة المكرمة", lat: 21.4858, lng: 39.1925 },
+  { key: "makkah", en: "Makkah", ar: "مكة المكرمة", regionEn: "Makkah", regionAr: "مكة المكرمة", lat: 21.3891, lng: 39.8579 },
+  { key: "madinah", en: "Madinah", ar: "المدينة المنورة", regionEn: "Madinah", regionAr: "المدينة المنورة", lat: 24.5247, lng: 39.5692 },
+  { key: "dammam", en: "Dammam", ar: "الدمام", regionEn: "Eastern Province", regionAr: "المنطقة الشرقية", lat: 26.4207, lng: 50.0888 },
+  { key: "khobar", en: "Khobar", ar: "الخبر", regionEn: "Eastern Province", regionAr: "المنطقة الشرقية", lat: 26.2172, lng: 50.1971 },
+  { key: "dhahran", en: "Dhahran", ar: "الظهران", regionEn: "Eastern Province", regionAr: "المنطقة الشرقية", lat: 26.2361, lng: 50.0393 },
+  { key: "jubail", en: "Jubail", ar: "الجبيل", regionEn: "Eastern Province", regionAr: "المنطقة الشرقية", lat: 27.0174, lng: 49.6225 },
+  { key: "qatif", en: "Qatif", ar: "القطيف", regionEn: "Eastern Province", regionAr: "المنطقة الشرقية", lat: 26.5652, lng: 50.0089 },
+  { key: "hofuf", en: "Hofuf", ar: "الهفوف", regionEn: "Eastern Province", regionAr: "المنطقة الشرقية", lat: 25.3833, lng: 49.5866 },
+  { key: "mubarraz", en: "Al Mubarraz", ar: "المبرز", regionEn: "Eastern Province", regionAr: "المنطقة الشرقية", lat: 25.4077, lng: 49.5903 },
+  { key: "abqaiq", en: "Abqaiq", ar: "بقيق", regionEn: "Eastern Province", regionAr: "المنطقة الشرقية", lat: 25.9340, lng: 49.6688 },
+  { key: "ras_tanura", en: "Ras Tanura", ar: "رأس تنورة", regionEn: "Eastern Province", regionAr: "المنطقة الشرقية", lat: 26.6427, lng: 50.1597 },
+  { key: "safwa", en: "Safwa", ar: "صفوى", regionEn: "Eastern Province", regionAr: "المنطقة الشرقية", lat: 26.6495, lng: 49.9552 },
+  { key: "saihat", en: "Saihat", ar: "سيهات", regionEn: "Eastern Province", regionAr: "المنطقة الشرقية", lat: 26.4852, lng: 50.0405 },
+  { key: "khafji", en: "Khafji", ar: "الخفجي", regionEn: "Eastern Province", regionAr: "المنطقة الشرقية", lat: 28.4391, lng: 48.4913 },
+  { key: "hafar_al_batin", en: "Hafar Al Batin", ar: "حفر الباطن", regionEn: "Eastern Province", regionAr: "المنطقة الشرقية", lat: 28.4328, lng: 45.9708 },
+  { key: "taif", en: "Taif", ar: "الطائف", regionEn: "Makkah", regionAr: "مكة المكرمة", lat: 21.4373, lng: 40.5127 },
+  { key: "rabigh", en: "Rabigh", ar: "رابغ", regionEn: "Makkah", regionAr: "مكة المكرمة", lat: 22.7986, lng: 39.0349 },
+  { key: "al_lith", en: "Al Lith", ar: "الليث", regionEn: "Makkah", regionAr: "مكة المكرمة", lat: 20.1461, lng: 40.2725 },
+  { key: "qunfudhah", en: "Al Qunfudhah", ar: "القنفذة", regionEn: "Makkah", regionAr: "مكة المكرمة", lat: 19.1264, lng: 41.0789 },
+  { key: "bahrah", en: "Bahrah", ar: "بحرة", regionEn: "Makkah", regionAr: "مكة المكرمة", lat: 21.4029, lng: 39.4625 },
+  { key: "khulais", en: "Khulais", ar: "خليص", regionEn: "Makkah", regionAr: "مكة المكرمة", lat: 22.1549, lng: 39.3376 },
+  { key: "jumum", en: "Al Jumum", ar: "الجموم", regionEn: "Makkah", regionAr: "مكة المكرمة", lat: 21.6169, lng: 39.6981 },
+  { key: "yanbu", en: "Yanbu", ar: "ينبع", regionEn: "Madinah", regionAr: "المدينة المنورة", lat: 24.0895, lng: 38.0618 },
+  { key: "alula", en: "AlUla", ar: "العلا", regionEn: "Madinah", regionAr: "المدينة المنورة", lat: 26.6085, lng: 37.9232 },
+  { key: "badr", en: "Badr", ar: "بدر", regionEn: "Madinah", regionAr: "المدينة المنورة", lat: 23.7828, lng: 38.7905 },
+  { key: "khaybar", en: "Khaybar", ar: "خيبر", regionEn: "Madinah", regionAr: "المدينة المنورة", lat: 25.6834, lng: 39.2866 },
+  { key: "tabuk", en: "Tabuk", ar: "تبوك", regionEn: "Tabuk", regionAr: "تبوك", lat: 28.3838, lng: 36.5550 },
+  { key: "al_wajh", en: "Al Wajh", ar: "الوجه", regionEn: "Tabuk", regionAr: "تبوك", lat: 26.2455, lng: 36.4525 },
+  { key: "umluj", en: "Umluj", ar: "أملج", regionEn: "Tabuk", regionAr: "تبوك", lat: 25.0213, lng: 37.2685 },
+  { key: "duba", en: "Duba", ar: "ضباء", regionEn: "Tabuk", regionAr: "تبوك", lat: 27.3513, lng: 35.6901 },
+  { key: "haql", en: "Haql", ar: "حقل", regionEn: "Tabuk", regionAr: "تبوك", lat: 29.2833, lng: 34.9500 },
+  { key: "tayma", en: "Tayma", ar: "تيماء", regionEn: "Tabuk", regionAr: "تبوك", lat: 27.6190, lng: 38.5487 },
+  { key: "abha", en: "Abha", ar: "أبها", regionEn: "Asir", regionAr: "عسير", lat: 18.2465, lng: 42.5117 },
+  { key: "khamis_mushait", en: "Khamis Mushait", ar: "خميس مشيط", regionEn: "Asir", regionAr: "عسير", lat: 18.3064, lng: 42.7292 },
+  { key: "bisha", en: "Bisha", ar: "بيشة", regionEn: "Asir", regionAr: "عسير", lat: 19.9840, lng: 42.6052 },
+  { key: "muhayil", en: "Muhayil", ar: "محايل عسير", regionEn: "Asir", regionAr: "عسير", lat: 18.5478, lng: 42.0499 },
+  { key: "al_namas", en: "Al Namas", ar: "النماص", regionEn: "Asir", regionAr: "عسير", lat: 19.1190, lng: 42.1300 },
+  { key: "tanomah", en: "Tanomah", ar: "تنومة", regionEn: "Asir", regionAr: "عسير", lat: 18.9269, lng: 42.1786 },
+  { key: "rijal_almaa", en: "Rijal Almaa", ar: "رجال ألمع", regionEn: "Asir", regionAr: "عسير", lat: 18.2133, lng: 42.2290 },
+  { key: "najran", en: "Najran", ar: "نجران", regionEn: "Najran", regionAr: "نجران", lat: 17.5656, lng: 44.2289 },
+  { key: "sharurah", en: "Sharurah", ar: "شرورة", regionEn: "Najran", regionAr: "نجران", lat: 17.4750, lng: 47.1000 },
+  { key: "jazan", en: "Jazan", ar: "جازان", regionEn: "Jazan", regionAr: "جازان", lat: 16.8892, lng: 42.5611 },
+  { key: "sabya", en: "Sabya", ar: "صبيا", regionEn: "Jazan", regionAr: "جازان", lat: 17.1495, lng: 42.6256 },
+  { key: "abu_arish", en: "Abu Arish", ar: "أبو عريش", regionEn: "Jazan", regionAr: "جازان", lat: 16.9689, lng: 42.8325 },
+  { key: "samta", en: "Samta", ar: "صامطة", regionEn: "Jazan", regionAr: "جازان", lat: 16.5960, lng: 42.9444 },
+  { key: "farasan", en: "Farasan", ar: "فرسان", regionEn: "Jazan", regionAr: "جازان", lat: 16.7022, lng: 41.9833 },
+  { key: "hail", en: "Hail", ar: "حائل", regionEn: "Hail", regionAr: "حائل", lat: 27.5114, lng: 41.7208 },
+  { key: "baqaa", en: "Baqaa", ar: "بقعاء", regionEn: "Hail", regionAr: "حائل", lat: 27.8877, lng: 42.4101 },
+  { key: "buraidah", en: "Buraidah", ar: "بريدة", regionEn: "Qassim", regionAr: "القصيم", lat: 26.3592, lng: 43.9818 },
+  { key: "unaizah", en: "Unaizah", ar: "عنيزة", regionEn: "Qassim", regionAr: "القصيم", lat: 26.0906, lng: 43.9875 },
+  { key: "al_rass", en: "Al Rass", ar: "الرس", regionEn: "Qassim", regionAr: "القصيم", lat: 25.8694, lng: 43.4973 },
+  { key: "bukayriyah", en: "Al Bukayriyah", ar: "البكيرية", regionEn: "Qassim", regionAr: "القصيم", lat: 26.1440, lng: 43.6570 },
+  { key: "mithnab", en: "Al Mithnab", ar: "المذنب", regionEn: "Qassim", regionAr: "القصيم", lat: 25.8606, lng: 44.2228 },
+  { key: "badayea", en: "Al Badayea", ar: "البدائع", regionEn: "Qassim", regionAr: "القصيم", lat: 25.9867, lng: 43.7319 },
+  { key: "arar", en: "Arar", ar: "عرعر", regionEn: "Northern Borders", regionAr: "الحدود الشمالية", lat: 30.9753, lng: 41.0381 },
+  { key: "rafha", en: "Rafha", ar: "رفحاء", regionEn: "Northern Borders", regionAr: "الحدود الشمالية", lat: 29.6264, lng: 43.4938 },
+  { key: "turaif", en: "Turaif", ar: "طريف", regionEn: "Northern Borders", regionAr: "الحدود الشمالية", lat: 31.6725, lng: 38.6637 },
+  { key: "sakaka", en: "Sakaka", ar: "سكاكا", regionEn: "Al Jouf", regionAr: "الجوف", lat: 29.9697, lng: 40.2064 },
+  { key: "qurayyat", en: "Qurayyat", ar: "القريات", regionEn: "Al Jouf", regionAr: "الجوف", lat: 31.3318, lng: 37.3428 },
+  { key: "dumat_al_jandal", en: "Dumat Al Jandal", ar: "دومة الجندل", regionEn: "Al Jouf", regionAr: "الجوف", lat: 29.8111, lng: 39.8664 },
+  { key: "al_bahah", en: "Al Bahah", ar: "الباحة", regionEn: "Al Bahah", regionAr: "الباحة", lat: 20.0129, lng: 41.4677 },
+  { key: "baljurashi", en: "Baljurashi", ar: "بلجرشي", regionEn: "Al Bahah", regionAr: "الباحة", lat: 19.8611, lng: 41.5572 },
+  { key: "al_makhwah", en: "Al Makhwah", ar: "المخواة", regionEn: "Al Bahah", regionAr: "الباحة", lat: 19.7559, lng: 41.4270 },
+  { key: "qilwah", en: "Qilwah", ar: "قلوة", regionEn: "Al Bahah", regionAr: "الباحة", lat: 19.9399, lng: 41.3511 },
+  { key: "kharj", en: "Al Kharj", ar: "الخرج", regionEn: "Riyadh", regionAr: "الرياض", lat: 24.1554, lng: 47.3346 },
+  { key: "diriyah", en: "Diriyah", ar: "الدرعية", regionEn: "Riyadh", regionAr: "الرياض", lat: 24.7346, lng: 46.5756 },
+  { key: "dawadmi", en: "Dawadmi", ar: "الدوادمي", regionEn: "Riyadh", regionAr: "الرياض", lat: 24.5070, lng: 44.3924 },
+  { key: "majmaah", en: "Al Majmaah", ar: "المجمعة", regionEn: "Riyadh", regionAr: "الرياض", lat: 25.9106, lng: 45.3481 },
+  { key: "zulfi", en: "Zulfi", ar: "الزلفي", regionEn: "Riyadh", regionAr: "الرياض", lat: 26.2995, lng: 44.8154 },
+  { key: "shaqra", en: "Shaqra", ar: "شقراء", regionEn: "Riyadh", regionAr: "الرياض", lat: 25.2524, lng: 45.2528 },
+  { key: "afif", en: "Afif", ar: "عفيف", regionEn: "Riyadh", regionAr: "الرياض", lat: 23.9065, lng: 42.9172 },
+  { key: "wadi_dawasir", en: "Wadi Al Dawasir", ar: "وادي الدواسر", regionEn: "Riyadh", regionAr: "الرياض", lat: 20.4623, lng: 44.7837 },
+  { key: "aflaj", en: "Al Aflaj", ar: "الأفلاج", regionEn: "Riyadh", regionAr: "الرياض", lat: 22.2846, lng: 46.7226 },
+  { key: "quwayiyah", en: "Al Quwayiyah", ar: "القويعية", regionEn: "Riyadh", regionAr: "الرياض", lat: 24.0447, lng: 45.2656 },
+  { key: "muzahimiyah", en: "Al Muzahimiyah", ar: "المزاحمية", regionEn: "Riyadh", regionAr: "الرياض", lat: 24.4688, lng: 46.2728 },
+  { key: "huraymila", en: "Huraymila", ar: "حريملاء", regionEn: "Riyadh", regionAr: "الرياض", lat: 25.1167, lng: 46.1167 },
+  { key: "thadiq", en: "Thadiq", ar: "ثادق", regionEn: "Riyadh", regionAr: "الرياض", lat: 25.2876, lng: 45.8687 },
+  { key: "rumah", en: "Rumah", ar: "رماح", regionEn: "Riyadh", regionAr: "الرياض", lat: 25.5622, lng: 47.1600 }
+] as const;
+
+const getNearestSaudiCityKey = (lat: number, lng: number) =>
+  SAUDI_CITIES.reduce((nearest, city) => {
+    const nearestDistance = Math.hypot(nearest.lat - lat, nearest.lng - lng);
+    const cityDistance = Math.hypot(city.lat - lat, city.lng - lng);
+    return cityDistance < nearestDistance ? city : nearest;
+  }, SAUDI_CITIES[0]).key;
 
 export default function ProviderCalendarPage() {
   const [lang, setLang] = useState<"en" | "ar">("ar");
@@ -176,6 +296,8 @@ export default function ProviderCalendarPage() {
   // Roster shift range (shown for editing the selected day)
   const [shiftStart, setShiftStart] = useState("08:00 AM");
   const [shiftEnd, setShiftEnd] = useState("09:00 PM");
+  const [selectedPrayerCityKey, setSelectedPrayerCityKey] = useState("riyadh");
+  const [citySearch, setCitySearch] = useState("");
 
   // --- 3. MODALS STATES ---
   const [showBookModal, setShowBookModal] = useState(false);
@@ -199,6 +321,20 @@ export default function ProviderCalendarPage() {
   };
 
   const { todayTimes, tomorrowTimes, resumesIn, lockStartsIn, isLocked: isCurrentlyPrayerLocked } = usePrayerTimes(coords.lat, coords.lng, buffersConfig);
+  const selectedPrayerCity = useMemo(
+    () => SAUDI_CITIES.find((city) => city.key === selectedPrayerCityKey) || SAUDI_CITIES[0],
+    [selectedPrayerCityKey]
+  );
+  const filteredSaudiCities = useMemo(() => {
+    const term = citySearch.trim().toLowerCase();
+    if (!term) return SAUDI_CITIES;
+    return SAUDI_CITIES.filter((city) =>
+      city.en.toLowerCase().includes(term) ||
+      city.ar.includes(citySearch.trim()) ||
+      city.regionEn.toLowerCase().includes(term) ||
+      city.regionAr.includes(citySearch.trim())
+    );
+  }, [citySearch]);
 
   // Time Slots (08:00 AM to 09:00 PM)
   const timeSlots = [
@@ -365,7 +501,10 @@ export default function ProviderCalendarPage() {
       if (branchesData && branchesData.length > 0) {
         const firstWithCoords = branchesData.find(b => b.latitude && b.longitude);
         if (firstWithCoords) {
-          setCoords({ lat: Number(firstWithCoords.latitude), lng: Number(firstWithCoords.longitude) });
+          const branchLat = Number(firstWithCoords.latitude);
+          const branchLng = Number(firstWithCoords.longitude);
+          setCoords({ lat: branchLat, lng: branchLng });
+          setSelectedPrayerCityKey(getNearestSaudiCityKey(branchLat, branchLng));
         }
       }
       
@@ -679,6 +818,7 @@ export default function ProviderCalendarPage() {
   const currentDayOfWeekVal = selectedDate.getDay();
   const currentDayShiftInfo = availabilityShifts.find(s => s.day_of_week === currentDayOfWeekVal);
   const isOffDutyToday = currentDayShiftInfo ? !currentDayShiftInfo.is_working_day : false;
+  const activePrayerLockCount = [fajrActive, dhuhrActive, asrActive, maghribActive, ishaActive].filter(Boolean).length;
 
   // Premium Toggle Switch component
   const ToggleSwitch = ({ checked, onChange }: { checked: boolean; onChange: (val: boolean) => void }) => (
@@ -697,6 +837,55 @@ export default function ProviderCalendarPage() {
         }`}
       />
     </button>
+  );
+
+  const TimeWheelPicker = ({
+    label,
+    value,
+    onChange
+  }: {
+    label: string;
+    value: string;
+    onChange: (value: string) => void;
+  }) => (
+    <div className="space-y-2">
+      <div className={`flex items-center justify-between ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+        <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>
+          {label}
+        </label>
+        <span className="rounded-full bg-[#D1AF47]/10 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.12em] text-[#A37B16]">
+          {value}
+        </span>
+      </div>
+      <div
+        role="listbox"
+        aria-label={`${t.selectHour}: ${label}`}
+        className="relative h-40 overflow-y-auto rounded-3xl border border-[#D1AF47]/30 bg-[linear-gradient(180deg,#FFFCF4_0%,#F8F2E5_48%,#FFFCF4_100%)] p-2 shadow-[inset_0_18px_35px_rgba(209,175,71,0.10),0_10px_26px_rgba(17,17,17,0.05)] snap-y snap-mandatory scrollbar-thin scrollbar-thumb-[#D1AF47]/45 scrollbar-track-transparent"
+      >
+        <div className="pointer-events-none sticky top-[calc(50%-18px)] z-10 h-9 rounded-2xl border border-[#D1AF47]/45 bg-[#D1AF47]/10 shadow-[0_0_24px_rgba(209,175,71,0.22)]" />
+        <div className="-mt-9 py-12">
+          {TIME_WHEEL_OPTIONS.map((option) => {
+            const isSelected = option === value;
+            return (
+              <button
+                key={option}
+                type="button"
+                role="option"
+                aria-selected={isSelected}
+                onClick={() => onChange(option)}
+                className={`mb-1 flex h-10 w-full snap-center items-center justify-center rounded-2xl text-xs font-black tracking-[0.08em] transition-all duration-300 ${
+                  isSelected
+                    ? "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] shadow-[0_0_22px_rgba(209,175,71,0.32)] scale-[1.02]"
+                    : "text-[#667085] hover:bg-white/80 hover:text-[#101828]"
+                }`}
+              >
+                {option}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 
   return (
@@ -1087,26 +1276,90 @@ export default function ProviderCalendarPage() {
         {/* ─────── RIGHT COLUMN: CONTROL PANELS ─────── */}
         <div className="space-y-6">
 
-          {/* A. PRAYER LOCK BUFFER CONTROL */}
+          {/* A. PRAYER OPERATIONS CONTROL + LOCK PARAMETERS */}
           <div className="bg-white border border-[#ECECEC] rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] space-y-5">
-            <div className={`flex items-center gap-2.5 pb-4 border-b border-[#ECECEC] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <div className="w-8 h-8 rounded-xl bg-[#D1AF47]/10 flex items-center justify-center">
-                <svg className="w-4 h-4 text-[#D1AF47]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
+            <div className={`flex items-start justify-between gap-4 pb-4 border-b border-[#ECECEC] ${isRTL ? "flex-row-reverse text-right" : "text-left"}`}>
+              <div className={`flex items-start gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                <div className="w-10 h-10 rounded-2xl bg-[#D1AF47]/10 flex items-center justify-center shadow-[0_0_24px_rgba(209,175,71,0.18)]">
+                  <svg className="w-5 h-5 text-[#D1AF47]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-[9px] font-black uppercase tracking-[0.24em] text-[#A37B16]">{t.prayerOperationsPanel}</p>
+                  <h3 className="mt-1 font-bold text-sm uppercase tracking-[0.16em] text-[#101828]">{t.prayerControlPanel}</h3>
+                </div>
               </div>
-              <h3 className="font-bold text-xs uppercase tracking-[0.15em] text-[#101828]">{t.prayerControlPanel}</h3>
+              <span className={`rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-[0.12em] ${
+                isCurrentlyPrayerLocked ? "bg-[#FEF3F2] text-[#EF4444]" : "bg-[#ECFDF3] text-[#027A48]"
+              }`}>
+                {isCurrentlyPrayerLocked ? t.lockActiveNow : t.lockClearNow}
+              </span>
             </div>
 
-            {/* Buffer time length control */}
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { label: t.prayerCityLabel, value: isRTL ? selectedPrayerCity.ar : selectedPrayerCity.en },
+                { label: t.lockState, value: `${activePrayerLockCount}/5` },
+                { label: isCurrentlyPrayerLocked ? t.resumesInLabel : t.nextLock, value: isCurrentlyPrayerLocked ? resumesIn : lockStartsIn }
+              ].map((metric) => (
+                <div key={metric.label} className="rounded-2xl border border-[#D1AF47]/20 bg-[#FFFCF4] px-3 py-3 text-center">
+                  <span className="block text-[8px] font-black uppercase tracking-[0.14em] text-[#667085]">{metric.label}</span>
+                  <strong className="mt-1 block truncate text-[11px] font-black text-[#101828]">{metric.value}</strong>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-2.5">
+              <div className={`flex items-end justify-between gap-3 ${isRTL ? "flex-row-reverse text-right" : "text-left"}`}>
+                <div>
+                  <label className="text-[10px] text-[#667085] font-bold uppercase tracking-wider block">{t.prayerCityLabel}</label>
+                  <p className="mt-1 text-[10px] font-semibold text-[#667085]">{t.prayerCityHint}</p>
+                </div>
+              </div>
+              <input
+                type="search"
+                value={citySearch}
+                onChange={(e) => setCitySearch(e.target.value)}
+                placeholder={t.prayerCitySearch}
+                className={`w-full rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] px-4 py-2.5 text-xs font-semibold text-[#101828] outline-none transition-all duration-300 placeholder:text-[#667085]/45 focus:border-[#D1AF47]/50 focus:shadow-[0_0_18px_rgba(209,175,71,0.14)] ${isRTL ? "text-right" : "text-left"}`}
+              />
+              <div className="max-h-44 space-y-2 overflow-y-auto pr-1">
+                {filteredSaudiCities.map((city) => {
+                  const isSelected = city.key === selectedPrayerCityKey;
+                  return (
+                    <button
+                      key={city.key}
+                      type="button"
+                      onClick={() => {
+                        setSelectedPrayerCityKey(city.key);
+                        setCoords({ lat: city.lat, lng: city.lng });
+                      }}
+                      className={`w-full rounded-2xl border px-3 py-2.5 text-xs transition-all duration-300 ${
+                        isSelected
+                          ? "border-[#D1AF47]/55 bg-[#D1AF47]/[0.12] text-[#101828] shadow-[0_0_18px_rgba(209,175,71,0.18)]"
+                          : "border-[#ECECEC] bg-white/80 text-[#667085] hover:border-[#D1AF47]/35 hover:text-[#101828]"
+                      }`}
+                    >
+                      <span className={`flex items-center justify-between gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                        <strong className="truncate font-black">{isRTL ? city.ar : city.en}</strong>
+                        <span className="truncate text-[10px] font-bold opacity-70">{isRTL ? city.regionAr : city.regionEn}</span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="space-y-2.5">
               <label className="text-[10px] text-[#667085] font-bold uppercase tracking-wider block">{t.bufferDurationLabel}</label>
-              <div className="flex gap-2">
-                {[15, 20, 30].map(mins => (
+              <div className="grid grid-cols-3 gap-2">
+                {[10, 15, 20, 30, 45, 60].map(mins => (
                   <button
                     key={mins}
+                    type="button"
                     onClick={() => setBufferDuration(mins)}
-                    className={`flex-1 py-2 rounded-xl text-[10px] font-black tracking-wider transition-all duration-300 ${
+                    className={`py-2 rounded-xl text-[10px] font-black tracking-wider transition-all duration-300 ${
                       bufferDuration === mins
                         ? "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] shadow-[0_0_15px_rgba(209,175,71,0.2)]"
                         : "bg-white border border-[#ECECEC] text-[#667085] hover:border-[#D1AF47]/40"
@@ -1118,37 +1371,19 @@ export default function ProviderCalendarPage() {
               </div>
             </div>
 
-            {/* Individual prayer lock toggles */}
-            <div className="space-y-3.5 pt-2">
-              {/* Fajr */}
-              <div className={`flex items-center justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="font-semibold text-[#344054]">{t.fajr}</span>
-                <ToggleSwitch checked={fajrActive} onChange={setFajrActive} />
-              </div>
-
-              {/* Dhuhr */}
-              <div className={`flex items-center justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="font-semibold text-[#667085]">{t.dhuhr}</span>
-                <ToggleSwitch checked={dhuhrActive} onChange={setDhuhrActive} />
-              </div>
-
-              {/* Asr */}
-              <div className={`flex items-center justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="font-semibold text-[#667085]">{t.asr}</span>
-                <ToggleSwitch checked={asrActive} onChange={setAsrActive} />
-              </div>
-
-              {/* Maghrib */}
-              <div className={`flex items-center justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="font-semibold text-[#667085]">{t.maghrib}</span>
-                <ToggleSwitch checked={maghribActive} onChange={setMaghribActive} />
-              </div>
-
-              {/* Isha */}
-              <div className={`flex items-center justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="font-semibold text-[#667085]">{t.isha}</span>
-                <ToggleSwitch checked={ishaActive} onChange={setIshaActive} />
-              </div>
+            <div className="grid grid-cols-1 gap-2 pt-1">
+              {[
+                { label: t.fajr, checked: fajrActive, onChange: setFajrActive },
+                { label: t.dhuhr, checked: dhuhrActive, onChange: setDhuhrActive },
+                { label: t.asr, checked: asrActive, onChange: setAsrActive },
+                { label: t.maghrib, checked: maghribActive, onChange: setMaghribActive },
+                { label: t.isha, checked: ishaActive, onChange: setIshaActive }
+              ].map((prayer) => (
+                <div key={prayer.label} className={`flex items-center justify-between rounded-2xl border border-[#ECECEC] bg-white/80 px-3 py-2.5 text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                  <span className="font-bold text-[#344054]">{prayer.label}</span>
+                  <ToggleSwitch checked={prayer.checked} onChange={prayer.onChange} />
+                </div>
+              ))}
             </div>
           </div>
 
@@ -1243,7 +1478,20 @@ export default function ProviderCalendarPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <TimeWheelPicker
+                label={t.shiftStartLabel}
+                value={shiftStart}
+                onChange={setShiftStart}
+              />
+              <TimeWheelPicker
+                label={t.shiftEndLabel}
+                value={shiftEnd}
+                onChange={setShiftEnd}
+              />
+            </div>
+
+            <div className="hidden">
               <div className="space-y-1.5">
                 <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>
                   {lang === "ar" ? "بداية المناوبة" : "Shift Start"}

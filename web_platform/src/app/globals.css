@@ -181,3 +181,48 @@ body {
 .primora-dashboard-content [class*="p-1"] > button {
   border-radius: 9999px;
 }
+
+.primora-dashboard-content,
+.primora-dashboard-content * {
+  caret-color: transparent;
+}
+
+.primora-dashboard-content input,
+.primora-dashboard-content textarea,
+.primora-dashboard-content [contenteditable="true"] {
+  caret-color: auto;
+  cursor: text;
+}
+
+.primora-dashboard-content button,
+.primora-dashboard-content a,
+.primora-dashboard-content select,
+.primora-dashboard-content [role="button"],
+.primora-dashboard-content [role="option"],
+.primora-dashboard-content [role="switch"] {
+  cursor: pointer;
+}
+
+.primora-dashboard-content :is(h1, h2, h3, h4, p, span, strong, label, li, td, th) {
+  user-select: text;
+}
+
+.primora-dashboard-content > div > div:first-child :is(h1, h2) {
+  font-family: var(--font-playfair);
+  font-size: clamp(2rem, 3.8vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  color: #101828 !important;
+  background: none !important;
+  -webkit-text-fill-color: #101828 !important;
+  text-wrap: balance;
+}
+
+.primora-dashboard-content > div > div:first-child p {
+  max-width: 64ch;
+  color: #667085 !important;
+  font-size: 0.925rem;
+  font-weight: 600;
+  line-height: 1.55;
+}
