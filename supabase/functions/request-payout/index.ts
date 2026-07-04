@@ -62,10 +62,16 @@ serve(async (req) => {
       })
     }
 
-    // 2. Fetch pending ledger volume for this provider to verify eligibility
     const { data: ledgerRows, error: ledgerError } = await supabase
       .from("transactional_ledger")
-      .select("provider_share")
+      .select(`
+        provider_share,
+        bookings!inner (
+          branches!inner (
+            provider_id
+          )
+        )
+      `)
       .eq("payout_status", "pending")
       .eq("bookings.branches.provider_id", providerId)
 

@@ -53,7 +53,7 @@ serve(async (req) => {
       })
     }
 
-    const { requestId, status, adminNote } = await req.json()
+    const { requestId, status, adminNote, bankReference } = await req.json()
     if (!requestId || !status) {
       return new Response(JSON.stringify({ error: "Missing requestId or status parameter." }), {
         status: 400,
@@ -123,7 +123,10 @@ serve(async (req) => {
       if (ledgerIdsToRelease.length > 0) {
         const { error: releaseError } = await supabase
           .from("transactional_ledger")
-          .update({ payout_status: "released" })
+          .update({ 
+            payout_status: "released",
+            payout_request_id: request.id
+          })
           .in("id", ledgerIdsToRelease);
 
         if (releaseError) throw releaseError;
@@ -136,6 +139,8 @@ serve(async (req) => {
       .update({
         status,
         processed_at: new Date().toISOString(),
+        processed_by: user.id,
+        bank_reference: bankReference || null,
         admin_note: adminNote || `Status updated to ${status} by admin.`
       })
       .eq("id", requestId)
