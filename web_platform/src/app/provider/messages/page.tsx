@@ -119,10 +119,10 @@ export default function ProviderMessages() {
   );
 
   return (
-    <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[28px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex h-[calc(100vh-12rem)] min-h-[550px] text-[#101828]">
+    <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-[28px] overflow-hidden flex h-[calc(100vh-12rem)] min-h-[550px] text-[#101828]">
       
       {/* 1. CHATS SIDEBAR PANEL */}
-      <div className="w-80 border-r border-[#ECECEC] flex flex-col justify-between bg-gradient-to-b from-[#1A2236] to-[#0D1422] flex-shrink-0">
+      <div className="w-80 border-r border-[#ECECEC] flex flex-col justify-between bg-white flex-shrink-0">
         
         {/* Sidebar Header */}
         <div className="p-5 border-b border-[#ECECEC] space-y-4">
@@ -170,8 +170,8 @@ export default function ProviderMessages() {
                   }}
                   className={`relative p-3.5 rounded-2xl cursor-pointer transition-all duration-300 flex items-center gap-3 border group ${
                     isSelected 
-                      ? "bg-white border border-[#ECECEC] border-[#D1AF47]/30 shadow-[0_0_20px_rgba(209,175,71,0.08)]" 
-                      : "border-transparent bg-transparent hover:bg-transparent hover:border-[#ECECEC]"
+                      ? "bg-[#D1AF47]/5 border-[#D1AF47]/20 shadow-[0_4px_12px_rgba(209,175,71,0.04)]" 
+                      : "border-transparent bg-transparent hover:bg-gray-50/50 hover:border-[#ECECEC]"
                   }`}
                 >
                   {/* Avatar wrapper */}
@@ -179,10 +179,10 @@ export default function ProviderMessages() {
                     <div className={`p-[2px] rounded-full transition-all duration-300 ${
                       isSelected ? "bg-[#D1AF47]" : "bg-transparent group-hover:bg-[#D1AF47]/40"
                     }`}>
-                      <img src={conv.avatar} alt={conv.name} className="w-10 h-10 rounded-full object-cover bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#0D1422]" />
+                      <img src={conv.avatar} alt={conv.name} className="w-10 h-10 rounded-full object-cover bg-white border border-[#ECECEC]" />
                     </div>
                     {conv.online && (
-                      <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#3DDC84] border-2 border-[#0D1422] shadow-[0_0_8px_rgba(61,220,132,0.6)]">
+                      <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#3DDC84] border-2 border-white shadow-[0_0_8px_rgba(61,220,132,0.6)]">
                         <span className="absolute inset-0 rounded-full bg-[#3DDC84] opacity-75 animate-ping"></span>
                       </span>
                     )}
@@ -236,14 +236,14 @@ export default function ProviderMessages() {
       <div className="flex-1 flex flex-col justify-between bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] min-w-0">
         
         {/* Header */}
-        <div className="h-20 px-6 border-b border-[#ECECEC] flex items-center justify-between bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]/30 backdrop-blur-md flex-shrink-0">
+        <div className="h-20 px-6 border-b border-[#ECECEC] flex items-center justify-between bg-white/90 backdrop-blur-md flex-shrink-0">
           <div className="flex items-center gap-4">
             <div className="relative">
               <div className="p-[2px] rounded-full bg-gradient-to-tr from-[#D1AF47] to-[#B8952E] shadow-[0_0_15px_rgba(209,175,71,0.2)]">
-                <img src={activeConv.avatar} alt={activeConv.name} className="w-10 h-10 rounded-full object-cover bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#070B12]" />
+                <img src={activeConv.avatar} alt={activeConv.name} className="w-10 h-10 rounded-full object-cover bg-white border border-[#ECECEC]" />
               </div>
               {activeConv.online && (
-                <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#3DDC84] border-2 border-[#070B12] shadow-[0_0_8px_rgba(61,220,132,0.6)]">
+                <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#3DDC84] border-2 border-white shadow-[0_0_8px_rgba(61,220,132,0.6)]">
                   <span className="absolute inset-0 rounded-full bg-[#3DDC84] opacity-75 animate-ping"></span>
                 </span>
               )}
@@ -268,7 +268,7 @@ export default function ProviderMessages() {
         </div>
 
         {/* Message stream */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gradient-to-b from-[#070B12] to-[#0D1422] scrollbar-thin scrollbar-thumb-white/5 scrollbar-track-transparent">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#FBFAF9] scrollbar-thin scrollbar-thumb-white/5 scrollbar-track-transparent">
           {(messages[activeConv.id] || []).length > 0 ? (
             (messages[activeConv.id] || []).map((msg: Message, i: number) => {
               const isProvider = msg.sender === "provider";
@@ -290,8 +290,8 @@ export default function ProviderMessages() {
                     <div
                       className={`rounded-[20px] px-5 py-3.5 border transition-all duration-300 ${
                         isProvider
-                          ? "bg-gradient-to-r from-[#D1AF47] to-[#B8952E] text-slate-950 border-transparent font-medium shadow-[0_4px_20px_rgba(209,175,71,0.15)] rounded-br-none"
-                          : "bg-white border border-[#ECECEC] text-[#101828] border-[#ECECEC] shadow-md rounded-bl-none"
+                          ? "bg-gradient-to-r from-[#D1AF47] to-[#B8952E] text-slate-950 border-transparent font-medium shadow-[0_4px_20px_rgba(209,175,71,0.1)] rounded-br-none"
+                          : "bg-white border border-[#ECECEC] text-[#101828] shadow-[0_4px_12px_rgba(0,0,0,0.02)] rounded-bl-none"
                       }`}
                     >
                       <p className="text-xs leading-relaxed tracking-wide font-light">{msg.text}</p>
@@ -303,7 +303,7 @@ export default function ProviderMessages() {
 
                   {/* Avatar for Provider ( Ahmed ) */}
                   {isProvider && (
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#1A2236] to-[#0D1422] border border-[#ECECEC] flex items-center justify-center flex-shrink-0 shadow-sm">
+                    <div className="w-7 h-7 rounded-full bg-[#FBFAF7] border border-[#ECECEC] flex items-center justify-center flex-shrink-0 shadow-sm">
                       <span className="text-[10px] text-[#D1AF47] font-bold">P</span>
                     </div>
                   )}
@@ -329,7 +329,7 @@ export default function ProviderMessages() {
                 className="w-7 h-7 rounded-full object-cover border border-[#ECECEC] flex-shrink-0 shadow-sm"
               />
               <div className="flex flex-col items-start max-w-[70%]">
-                <div className="bg-white border border-[#ECECEC] text-[#344054] border border-[#ECECEC] shadow-md rounded-[20px] rounded-bl-none px-5 py-3.5 flex items-center gap-1.5">
+                <div className="bg-white border border-[#ECECEC] text-[#344054] shadow-md rounded-[20px] rounded-bl-none px-5 py-3.5 flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47] animate-bounce" style={{ animationDelay: "0ms" }}></span>
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47] animate-bounce" style={{ animationDelay: "150ms" }}></span>
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47] animate-bounce" style={{ animationDelay: "300ms" }}></span>
@@ -345,8 +345,8 @@ export default function ProviderMessages() {
         </div>
 
         {/* Footer Input */}
-        <div className="p-5 border-t border-[#ECECEC] bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]/90 backdrop-blur-md flex items-center gap-3 flex-shrink-0">
-          <button className="p-3 text-[#667085] hover:text-[#D1AF47] hover:bg-[#F3F4F6] border border-[#ECECEC] rounded-2xl border border-[#ECECEC] transition-all duration-300 active:scale-95 cursor-pointer">
+        <div className="p-5 border-t border-[#ECECEC] bg-white shadow-[0_8px_30px_rgb(0,0,0,0.015)]/90 backdrop-blur-md flex items-center gap-3 flex-shrink-0">
+          <button className="p-3 text-[#667085] hover:text-[#D1AF47] hover:bg-[#F3F4F6] border border-[#ECECEC] rounded-2xl transition-all duration-300 active:scale-95 cursor-pointer">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
             </svg>
@@ -359,7 +359,7 @@ export default function ProviderMessages() {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl px-5 py-3.5 pr-12 text-xs outline-none focus:border-[#D1AF47]/40 text-[#101828] placeholder-[#7B859C] font-normal transition-all duration-300 focus:shadow-[0_0_20px_rgba(209,175,71,0.06)]"
+              className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-2xl px-5 py-3.5 pr-12 text-xs outline-none focus:border-[#D1AF47]/40 text-[#101828] placeholder-[#7B859C] font-normal transition-all duration-300 focus:shadow-[0_0_20px_rgba(209,175,71,0.06)]"
             />
           </div>
 

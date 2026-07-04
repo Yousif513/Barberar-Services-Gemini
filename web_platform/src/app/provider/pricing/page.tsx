@@ -423,7 +423,7 @@ export default function PricingPage() {
               className={`w-full py-2.5 mt-8 rounded-xl text-xs font-bold tracking-wider transition-all duration-300 ${
                 selectedPlan === "basic"
                   ? "bg-[#D1AF47] text-[#070B12]"
-                  : "bg-white/5 hover:bg-white/10 text-[#101828] border border-[rgba(255,255,255,0.08)]"
+                  : "bg-[#FBFAF7] hover:bg-gray-50 text-[#667085] border border-[#ECECEC] hover:border-[#D1AF47]/40"
               }`}
             >
               {selectedPlan === "basic" ? t.currentPlan : t.selectPlan}
@@ -436,7 +436,7 @@ export default function PricingPage() {
             className={`cursor-pointer rounded-[24px] p-6 relative overflow-hidden transition-all duration-300 hover:translate-y-[-4px] flex flex-col justify-between ${
               selectedPlan === "growth" 
                 ? "bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border-2 border-[#D1AF47] shadow-[0_0_25px_rgba(209,175,71,0.2)]" 
-                : "bg-gradient-to-b from-[#111827] to-[#0D1422] border border-[#D1AF47]/30 shadow-[0_0_20px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/60"
+                : "bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:border-[#D1AF47]/60"
             }`}
           >
             {/* Glass shine & Popular tag */}
@@ -462,10 +462,10 @@ export default function PricingPage() {
                   {billingCycle === "annual" ? "Save 720 SAR / year" : "Standard Month Rate"}
                 </div>
               </div>
-              <div className="border-t border-[rgba(255,255,255,0.06)] pt-4 space-y-2">
+              <div className="border-t border-[#ECECEC] pt-4 space-y-2">
                 <div className="flex items-center gap-2 text-xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47] shadow-[0_0_6px_rgba(209,175,71,0.8)]" />
-                  <span>10% {t.platformFee} (Discounted!)</span>
+                  <span className="text-[#344054]">10% {t.platformFee} (Discounted!)</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-[#344054]">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />
@@ -495,7 +495,7 @@ export default function PricingPage() {
             className={`cursor-pointer rounded-[24px] p-6 relative overflow-hidden transition-all duration-300 hover:translate-y-[-4px] flex flex-col justify-between ${
               selectedPlan === "elite" 
                 ? "bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border-2 border-[#D1AF47] shadow-[0_0_20px_rgba(209,175,71,0.1)]" 
-                : "bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.15)]"
+                : "bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:border-[#D1AF47]/40"
             }`}
           >
             <div className="space-y-4">
@@ -853,29 +853,29 @@ export default function PricingPage() {
                 {/* Credit Card Replica Graphic */}
                 <div className="flex justify-center">
                   <div 
-                    className={`w-full max-w-xs h-44 rounded-[20px] p-5 text-[#101828] relative overflow-hidden flex flex-col justify-between shadow-2xl transition-all duration-500 hover:scale-[1.03] ${
+                    className={`w-full max-w-xs h-44 rounded-[20px] p-5 text-[#101828] relative overflow-hidden flex flex-col justify-between shadow-lg transition-all duration-500 hover:scale-[1.03] ${
                       selectedPlan === "basic"
-                        ? "bg-gradient-to-br from-[#1E293B] via-[#0F172A] to-[#020617] border border-[rgba(255,255,255,0.08)] shadow-[0_0_15px_rgba(30,41,59,0.2)]"
+                        ? "bg-[#FBFAF9] border border-[#ECECEC]"
                         : selectedPlan === "growth"
-                        ? "bg-gradient-to-br from-[#1E2235] via-[#111827] to-[#0A0D1A] border border-[#D1AF47]/40 shadow-[0_0_25px_rgba(209,175,71,0.15)]"
-                        : "bg-gradient-to-br from-[#0D1422] via-[#070B12] to-[#030712] border border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.08)]"
+                        ? "bg-[#FBFAF7] border border-[#D1AF47]/40 shadow-[0_4px_15px_rgba(209,175,71,0.05)]"
+                        : "bg-white border-2 border-[#D1AF47] shadow-[0_4px_20px_rgba(209,175,71,0.08)]"
                     }`}
                   >
                     {/* Metallic glow pattern */}
-                    <div className="absolute top-0 left-0 right-0 bottom-0 bg-[linear-gradient(225deg,rgba(255,255,255,0.03)_0%,transparent_50%)] pointer-events-none" />
+                    <div className="absolute top-0 left-0 right-0 bottom-0 bg-[linear-gradient(225deg,rgba(209,175,71,0.02)_0%,transparent_50%)] pointer-events-none" />
                     
                     <div className="flex justify-between items-start z-10">
                       <div>
                         <span className="text-[8px] uppercase tracking-[0.2em] text-[#667085]">Primora Ledger ID</span>
                         <div className="text-xs font-bold text-[#D1AF47]">{pricingDetails.title}</div>
                       </div>
-                      <span className="text-xs font-serif font-black tracking-widest text-[#101828]/50">PRIMORA</span>
+                      <span className="text-xs font-serif font-black tracking-widest text-[#101828]/30">PRIMORA</span>
                     </div>
 
                     {/* Sim Chip Icon */}
-                    <div className="w-8 h-6 bg-[#D1AF47]/30 border border-[#D1AF47]/40 rounded-md flex p-1 items-center gap-0.5 z-10">
-                      <div className="w-1.5 h-full border-r border-[#D1AF47]/40" />
-                      <div className="w-1.5 h-full border-r border-[#D1AF47]/40" />
+                    <div className="w-8 h-6 bg-[#D1AF47]/20 border border-[#D1AF47]/30 rounded-md flex p-1 items-center gap-0.5 z-10">
+                      <div className="w-1.5 h-full border-r border-[#D1AF47]/20" />
+                      <div className="w-1.5 h-full border-r border-[#D1AF47]/20" />
                       <div className="w-1.5 h-full" />
                     </div>
 
@@ -884,7 +884,7 @@ export default function PricingPage() {
                         {cardNumber || "•••• •••• •••• ••••"}
                       </div>
                       <div className="flex justify-between items-center text-[10px]">
-                        <div className="truncate max-w-[150px] font-mono uppercase text-[#344054]">
+                        <div className="truncate max-w-[150px] font-mono uppercase text-[#667085]">
                           {cardholder || (locale === "en" ? "LUXURY SALON OWNER" : "مقدم خدمة فاخر")}
                         </div>
                         <div className="font-mono text-[#101828]">{expiry || "MM/YY"}</div>
@@ -894,8 +894,8 @@ export default function PricingPage() {
                 </div>
 
                 {/* Billing Summary List */}
-                <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-[20px] p-6 border border-[rgba(255,255,255,0.04)] space-y-4">
-                  <h4 className="text-xs font-bold text-[#101828] uppercase tracking-wider border-b border-[rgba(255,255,255,0.04)] pb-3">
+                <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-[20px] p-6 space-y-4">
+                  <h4 className="text-xs font-bold text-[#101828] uppercase tracking-wider border-b border-[#ECECEC] pb-3">
                     {t.summary}
                   </h4>
                   

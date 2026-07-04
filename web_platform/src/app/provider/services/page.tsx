@@ -447,14 +447,13 @@ export default function ProviderServicesPage() {
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Card 1: Total Services */}
-        <div className="relative overflow-hidden bg-gradient-to-b from-[#172033] to-[#0D1422] border border-[rgba(255,255,255,0.06)] rounded-[24px] p-6 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:border-[#D1AF47]/30 hover:shadow-[0_0_30px_rgba(209,175,71,0.05)] group">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent pointer-events-none"></div>
+        <div className="relative overflow-hidden bg-white border border-[#ECECEC] rounded-[24px] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] transition-all duration-300 hover:scale-[1.02] hover:border-[#D1AF47]/30 hover:shadow-[0_0_30px_rgba(209,175,71,0.05)] group">
           <div className="flex justify-between items-start">
             <div className="space-y-2">
               <p className="text-xs uppercase tracking-wider text-[#667085] font-semibold">{t.totalServices}</p>
               <h3 className="text-3xl font-extrabold text-[#101828] tracking-tight">{servicesList.length}</h3>
             </div>
-            <div className="p-3 bg-gradient-to-br from-[#1A2236] to-[#0D1422] rounded-[16px] border border-[#ECECEC] shadow-inner group-hover:scale-110 transition-transform duration-300">
+            <div className="p-3 bg-[#FBFAF7] rounded-[16px] border border-[#ECECEC] text-[#D1AF47] group-hover:scale-110 transition-transform duration-300">
               <svg className="w-6 h-6 text-[#D1AF47]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
               </svg>
@@ -463,8 +462,7 @@ export default function ProviderServicesPage() {
         </div>
 
         {/* Card 2: Active Services */}
-        <div className="relative overflow-hidden bg-gradient-to-b from-[#172033] to-[#0D1422] border border-[rgba(255,255,255,0.06)] rounded-[24px] p-6 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:border-[#3DDC84]/30 hover:shadow-[0_0_30px_rgba(61,220,132,0.05)] group">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent pointer-events-none"></div>
+        <div className="relative overflow-hidden bg-white border border-[#ECECEC] rounded-[24px] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] transition-all duration-300 hover:scale-[1.02] hover:border-[#3DDC84]/30 hover:shadow-[0_0_30px_rgba(61,220,132,0.05)] group">
           <div className="flex justify-between items-start">
             <div className="space-y-2">
               <p className="text-xs uppercase tracking-wider text-[#667085] font-semibold">{t.activeServices}</p>
@@ -472,7 +470,7 @@ export default function ProviderServicesPage() {
                 {servicesList.filter((s) => s.isActive).length}
               </h3>
             </div>
-            <div className="p-3 bg-gradient-to-br from-[#1A2236] to-[#0D1422] rounded-[16px] border border-[#ECECEC] shadow-inner group-hover:scale-110 transition-transform duration-300">
+            <div className="p-3 bg-[#FBFAF7] rounded-[16px] border border-[#ECECEC] text-[#22C55E] group-hover:scale-110 transition-transform duration-300">
               <svg className="w-6 h-6 text-[#22C55E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
@@ -481,8 +479,7 @@ export default function ProviderServicesPage() {
         </div>
 
         {/* Card 3: Home Services */}
-        <div className="relative overflow-hidden bg-gradient-to-b from-[#172033] to-[#0D1422] border border-[rgba(255,255,255,0.06)] rounded-[24px] p-6 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:border-[#F5B041]/30 hover:shadow-[0_0_30px_rgba(245,176,65,0.05)] group">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent pointer-events-none"></div>
+        <div className="relative overflow-hidden bg-white border border-[#ECECEC] rounded-[24px] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] transition-all duration-300 hover:scale-[1.02] hover:border-[#F5B041]/30 hover:shadow-[0_0_30px_rgba(245,176,65,0.05)] group">
           <div className="flex justify-between items-start">
             <div className="space-y-2">
               <p className="text-xs uppercase tracking-wider text-[#667085] font-semibold">{t.homeServicesCount}</p>
@@ -490,7 +487,7 @@ export default function ProviderServicesPage() {
                 {servicesList.filter((s) => s.isHomeService).length}
               </h3>
             </div>
-            <div className="p-3 bg-gradient-to-br from-[#1A2236] to-[#0D1422] rounded-[16px] border border-[#ECECEC] shadow-inner group-hover:scale-110 transition-transform duration-300">
+            <div className="p-3 bg-[#FBFAF7] rounded-[16px] border border-[#ECECEC] text-[#F5B041] group-hover:scale-110 transition-transform duration-300">
               <svg className="w-6 h-6 text-[#F5B041]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
               </svg>
@@ -684,8 +681,8 @@ export default function ProviderServicesPage() {
       </div>
 
       {serviceModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent/80 px-4 py-8 backdrop-blur-sm">
-          <div className="w-full max-w-2xl rounded-[28px] border border-[#D1AF47]/20 bg-gradient-to-b from-[#111827] to-[#0D1422] p-6 shadow-[0_0_45px_rgba(209,175,71,0.16)]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8 backdrop-blur-sm">
+          <div className="w-full max-w-2xl rounded-[28px] border border-[#ECECEC] bg-white p-6 shadow-2xl">
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-xl font-black text-[#101828]">
@@ -701,23 +698,23 @@ export default function ProviderServicesPage() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
                 {serviceCopy.nameEn}
-                <input value={serviceForm.nameEn} onChange={(event) => setServiceForm((form) => ({ ...form, nameEn: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
+                <input value={serviceForm.nameEn} onChange={(event) => setServiceForm((form) => ({ ...form, nameEn: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
               </label>
               <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
                 {serviceCopy.nameAr}
-                <input value={serviceForm.nameAr} onChange={(event) => setServiceForm((form) => ({ ...form, nameAr: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
+                <input value={serviceForm.nameAr} onChange={(event) => setServiceForm((form) => ({ ...form, nameAr: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
               </label>
               <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
                 {serviceCopy.price}
-                <input type="number" min="1" value={serviceForm.basePrice} onChange={(event) => setServiceForm((form) => ({ ...form, basePrice: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
+                <input type="number" min="1" value={serviceForm.basePrice} onChange={(event) => setServiceForm((form) => ({ ...form, basePrice: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
               </label>
               <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
                 {serviceCopy.duration}
-                <input type="number" min="5" step="5" value={serviceForm.durationMinutes} onChange={(event) => setServiceForm((form) => ({ ...form, durationMinutes: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
+                <input type="number" min="5" step="5" value={serviceForm.durationMinutes} onChange={(event) => setServiceForm((form) => ({ ...form, durationMinutes: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60" />
               </label>
               <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085] sm:col-span-2">
                 {serviceCopy.category}
-                <select value={serviceForm.categoryId} onChange={(event) => setServiceForm((form) => ({ ...form, categoryId: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-transparent/70 px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60">
+                <select value={serviceForm.categoryId} onChange={(event) => setServiceForm((form) => ({ ...form, categoryId: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60">
                   {categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {lang === "ar" ? category.name_ar : category.name_en}
@@ -725,11 +722,11 @@ export default function ProviderServicesPage() {
                   ))}
                 </select>
               </label>
-              <label className="flex items-center justify-between rounded-2xl border border-[#ECECEC] bg-transparent/50 px-4 py-3 text-sm font-bold text-[#344054]">
+              <label className="flex items-center justify-between rounded-2xl border border-[#ECECEC] bg-[#FBFAF7] px-4 py-3 text-sm font-bold text-[#344054]">
                 {t.homeService}
                 <input type="checkbox" checked={serviceForm.isHomeService} onChange={(event) => setServiceForm((form) => ({ ...form, isHomeService: event.target.checked }))} className="h-5 w-5 accent-[#D1AF47]" />
               </label>
-              <label className="flex items-center justify-between rounded-2xl border border-[#ECECEC] bg-transparent/50 px-4 py-3 text-sm font-bold text-[#344054]">
+              <label className="flex items-center justify-between rounded-2xl border border-[#ECECEC] bg-[#FBFAF7] px-4 py-3 text-sm font-bold text-[#344054]">
                 {t.status}
                 <input type="checkbox" checked={serviceForm.isActive} onChange={(event) => setServiceForm((form) => ({ ...form, isActive: event.target.checked }))} className="h-5 w-5 accent-[#D1AF47]" />
               </label>

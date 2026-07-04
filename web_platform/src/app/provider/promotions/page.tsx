@@ -422,7 +422,7 @@ export default function ProviderPromotionsPage() {
               return (
                 <div
                   key={p.id}
-                  className="group relative bg-gradient-to-br from-[#172033] to-[#0D1422] rounded-[24px] border border-[#ECECEC] hover:border-[#D1AF47]/30 p-6 flex flex-col justify-between overflow-hidden shadow-xl hover:shadow-[0_0_30px_rgba(209,175,71,0.08)] transition-all duration-300"
+                  className="group relative bg-white rounded-[24px] border border-[#ECECEC] hover:border-[#D1AF47]/30 p-6 flex flex-col justify-between overflow-hidden shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.015)] transition-all duration-300"
                 >
                   {/* Premium gold hover glow */}
                   <div className="absolute top-0 right-0 w-24 h-24 bg-[#D1AF47]/5 rounded-full blur-2xl group-hover:bg-[#D1AF47]/10 transition-all duration-500"></div>

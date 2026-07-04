@@ -439,11 +439,12 @@ export default function ProviderWalletPage() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
       {/* Title Header */}
-      <div>
-        <h2 className="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-[#D1AF47] to-[#B8952E] font-sans">
+      <div className="border-b border-[#ECECEC] pb-6">
+        <h2 className="text-3xl font-extrabold tracking-tight text-[#101828] font-sans flex items-center gap-3">
+          <span className="w-1.5 h-8 bg-[#D1AF47] rounded-full shadow-[0_0_15px_rgba(209,175,71,0.6)]"></span>
           {t.walletTitle}
         </h2>
-        <p className="text-sm text-[#344054] mt-2 font-medium tracking-wide">
+        <p className="text-sm text-[#667085] mt-2 font-medium tracking-wide">
           {t.subtitle}
         </p>
       </div>
@@ -457,11 +458,10 @@ export default function ProviderWalletPage() {
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-[#101828]">
         {/* Available Balance (Luxury Credit Card Aesthetic) */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-[#172033] via-[#0D1422] to-[#070B12] border border-[#ECECEC] rounded-[24px] p-8 shadow-[0_0_30px_rgba(209,175,71,0.08)] flex flex-col justify-between min-h-[240px] group hover:border-[#D1AF47]/25 transition-all duration-300">
+        <div className="relative overflow-hidden bg-white border border-[#ECECEC] rounded-[24px] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.015)] flex flex-col justify-between min-h-[240px] group hover:border-[#D1AF47]/25 transition-all duration-300">
           {/* Shimmer/radial gradient reflection effects */}
-          <div className="absolute -top-20 -right-20 w-48 h-48 bg-[#D1AF47]/10 rounded-full blur-[80px] pointer-events-none transition-all duration-500 group-hover:bg-[#D1AF47]/15"></div>
+          <div className="absolute -top-20 -right-20 w-48 h-48 bg-[#D1AF47]/5 rounded-full blur-[80px] pointer-events-none transition-all duration-500 group-hover:bg-[#D1AF47]/10"></div>
           <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-[#B8952E]/5 rounded-full blur-[80px] pointer-events-none"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent -translate-x-full group-hover:translate-x-full duration-[1500ms] transition-transform ease-out pointer-events-none"></div>
 
           {/* Card Header: Chip and Premium Label */}
           <div className="flex justify-between items-center mb-6">
@@ -473,18 +473,18 @@ export default function ProviderWalletPage() {
                 <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-black/20"></div>
               </div>
               {/* Contactless symbol */}
-              <svg className="w-5 h-5 text-[#344054]/30 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-[#D1AF47]/40 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <span className="text-[8px] font-bold tracking-[0.25em] text-[#D1AF47] uppercase bg-black/40 px-3 py-1 rounded-full border border-[#D1AF47]/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
+            <span className="text-[8px] font-bold tracking-[0.25em] text-[#D1AF47] uppercase bg-[#D1AF47]/10 px-3 py-1 rounded-full border border-[#D1AF47]/20 shadow-sm">
               PREMIUM PARTNER
             </span>
           </div>
 
           {/* Card Balance */}
           <div className="mb-6">
-            <p className="text-[10px] font-bold tracking-widest text-[#344054]/60 uppercase mb-2">
+            <p className="text-[10px] font-bold tracking-widest text-[#667085] uppercase mb-2">
               {t.availableBalance}
             </p>
             <div className="flex items-baseline gap-2">
@@ -508,13 +508,13 @@ export default function ProviderWalletPage() {
         </div>
 
         {/* Pending Payout */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-8 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[240px] group hover:border-[#D1AF47]/15 transition-all duration-300">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-[24px] p-8 relative overflow-hidden flex flex-col justify-between min-h-[240px] group hover:border-[#D1AF47]/15 transition-all duration-300">
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-white/[0.01] to-transparent rounded-bl-full pointer-events-none"></div>
           
           <div>
             <div className="flex justify-between items-start mb-6">
               <div>
-                <p className="text-[10px] font-bold tracking-widest text-[#344054]/60 uppercase mb-2">
+                <p className="text-[10px] font-bold tracking-widest text-[#667085] uppercase mb-2">
                   {t.pendingPayout}
                 </p>
                 <div className="flex items-baseline gap-2">
@@ -528,7 +528,7 @@ export default function ProviderWalletPage() {
               </div>
               
               {/* Icon with gradient background */}
-              <div className="p-3.5 rounded-2xl bg-gradient-to-br from-[#1A2236] to-[#0D1422] text-[#D1AF47] border border-[#ECECEC] shadow-inner">
+              <div className="p-3.5 rounded-2xl bg-[#FBFAF7] text-[#D1AF47] border border-[#ECECEC] shadow-inner">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -547,13 +547,13 @@ export default function ProviderWalletPage() {
         </div>
 
         {/* Escrow Held */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-8 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[240px] group hover:border-[#D1AF47]/15 transition-all duration-300">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-[24px] p-8 relative overflow-hidden flex flex-col justify-between min-h-[240px] group hover:border-[#D1AF47]/15 transition-all duration-300">
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-white/[0.01] to-transparent rounded-bl-full pointer-events-none"></div>
           
           <div>
             <div className="flex justify-between items-start mb-6">
               <div>
-                <p className="text-[10px] font-bold tracking-widest text-[#344054]/60 uppercase mb-2">
+                <p className="text-[10px] font-bold tracking-widest text-[#667085] uppercase mb-2">
                   {t.escrowHeld}
                 </p>
                 <div className="flex items-baseline gap-2">
@@ -567,7 +567,7 @@ export default function ProviderWalletPage() {
               </div>
               
               {/* Icon with gradient background */}
-              <div className="p-3.5 rounded-2xl bg-gradient-to-br from-[#1A2236] to-[#0D1422] text-[#D1AF47] border border-[#ECECEC] shadow-inner">
+              <div className="p-3.5 rounded-2xl bg-[#FBFAF7] text-[#D1AF47] border border-[#ECECEC] shadow-inner">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
@@ -587,9 +587,9 @@ export default function ProviderWalletPage() {
       </div>
 
       {/* Linked Bank details */}
-      <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 text-[#101828] shadow-xl hover:border-[#D1AF47]/10 transition-all duration-300">
+      <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-[24px] p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 text-[#101828] hover:border-[#D1AF47]/10 transition-all duration-300">
         <div className="flex items-center gap-4">
-          <div className="p-3.5 rounded-2xl bg-gradient-to-br from-[#1A2236] to-[#0D1422] text-[#D1AF47] border border-[#ECECEC]">
+          <div className="p-3.5 rounded-2xl bg-[#FBFAF7] text-[#D1AF47] border border-[#ECECEC]">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
             </svg>
