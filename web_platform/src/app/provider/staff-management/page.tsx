@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 export default function ProviderEmployeesRedirect() {
   const router = useRouter();
   useEffect(() => {
-    router.replace("/provider/team");
+    router.replace("/provider/employees");
   }, [router]);
 
   return (
