@@ -313,6 +313,7 @@ export default function ProviderCalendarPage() {
   const [secondShiftEnd, setSecondShiftEnd] = useState("10:00 PM");
   const [selectedPrayerCityKey, setSelectedPrayerCityKey] = useState("riyadh");
   const [citySearch, setCitySearch] = useState("");
+  const [cityListOpen, setCityListOpen] = useState(false);
 
   // --- 3. MODALS STATES ---
   const [showBookModal, setShowBookModal] = useState(false);
@@ -899,37 +900,9 @@ export default function ProviderCalendarPage() {
             {value}
           </span>
         </div>
-        <div className="grid grid-cols-[1fr_70px] gap-3 rounded-3xl border border-[#D1AF47]/35 bg-[linear-gradient(180deg,#FFFCF4_0%,#F8F2E5_50%,#FFFCF4_100%)] p-3 shadow-[inset_0_18px_35px_rgba(209,175,71,0.10),0_10px_26px_rgba(17,17,17,0.05)]">
-          <div
-            role="listbox"
-            aria-label={`${t.selectHour}: ${label}`}
-            className="relative h-40 overflow-y-auto rounded-2xl border border-[#D1AF47]/20 bg-white/55 p-2 snap-y snap-mandatory scrollbar-thin scrollbar-thumb-[#D1AF47]/45 scrollbar-track-transparent"
-          >
-            <div className="pointer-events-none sticky top-[calc(50%-22px)] z-10 h-11 rounded-2xl border border-[#D1AF47]/45 bg-[#D1AF47]/10 shadow-[0_0_24px_rgba(209,175,71,0.22)]" />
-            <div className="-mt-11 py-12">
-              {HOUR_WHEEL_OPTIONS.map((option) => {
-                const isSelected = option === hour;
-                return (
-                  <button
-                    key={option}
-                    type="button"
-                    role="option"
-                    aria-selected={isSelected}
-                    onClick={() => updateHour(option)}
-                    className={`mb-1 flex h-11 w-full snap-center items-center justify-center rounded-2xl text-base font-black tracking-[0.08em] transition-all duration-300 ${
-                      isSelected
-                        ? "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] shadow-[0_0_22px_rgba(209,175,71,0.32)] scale-[1.02]"
-                        : "text-[#B7B1A6] hover:bg-white/80 hover:text-[#101828]"
-                    }`}
-                  >
-                    {option}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="grid content-center gap-2">
+        {/* Hour grid: all 12 hours visible at once (no scrolling), AM/PM pill on top */}
+        <div className="space-y-2.5 rounded-3xl border border-[#D1AF47]/30 bg-[linear-gradient(180deg,#FFFCF4_0%,#F8F2E5_100%)] p-3 shadow-[0_10px_26px_rgba(17,17,17,0.05)]">
+          <div className="flex rounded-xl border border-[#D1AF47]/20 bg-white/70 p-1">
             {PERIOD_OPTIONS.map((option) => {
               const isSelected = option === normalizedPeriod;
               return (
@@ -937,10 +910,31 @@ export default function ProviderCalendarPage() {
                   key={option}
                   type="button"
                   onClick={() => updatePeriod(option)}
-                  className={`rounded-2xl px-3 py-4 text-sm font-black tracking-[0.12em] transition-all duration-300 ${
+                  className={`flex-1 rounded-lg py-1.5 text-xs font-black tracking-[0.14em] transition-all duration-300 ${
                     isSelected
-                      ? "bg-[#15100A] text-[#E6C679] shadow-[0_0_20px_rgba(21,16,10,0.16)]"
-                      : "border border-[#D1AF47]/20 bg-white/70 text-[#8A7F6C] hover:border-[#D1AF47]/45"
+                      ? "bg-[#15100A] text-[#E6C679] shadow-[0_0_16px_rgba(21,16,10,0.15)]"
+                      : "text-[#8A7F6C] hover:text-[#101828]"
+                  }`}
+                >
+                  {option === "AM" ? (isRTL ? "صباحاً AM" : "AM") : (isRTL ? "مساءً PM" : "PM")}
+                </button>
+              );
+            })}
+          </div>
+          <div role="listbox" aria-label={`${t.selectHour}: ${label}`} className="grid grid-cols-3 gap-1.5">
+            {HOUR_WHEEL_OPTIONS.map((option) => {
+              const isSelected = option === hour;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  role="option"
+                  aria-selected={isSelected}
+                  onClick={() => updateHour(option)}
+                  className={`rounded-xl py-2.5 text-sm font-black tracking-[0.06em] transition-all duration-200 ${
+                    isSelected
+                      ? "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] shadow-[0_0_18px_rgba(209,175,71,0.3)] scale-[1.04]"
+                      : "border border-[#D1AF47]/15 bg-white/75 text-[#667085] hover:border-[#D1AF47]/45 hover:text-[#101828]"
                   }`}
                 >
                   {option}
@@ -1382,44 +1376,78 @@ export default function ProviderCalendarPage() {
                   <p className="mt-1 text-[10px] font-semibold text-[#667085]">{t.prayerCityHint}</p>
                 </div>
               </div>
-              <input
-                type="search"
-                value={citySearch}
-                onChange={(e) => setCitySearch(e.target.value)}
-                placeholder={t.prayerCitySearch}
-                className={`w-full rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] px-4 py-2.5 text-xs font-semibold text-[#101828] outline-none transition-all duration-300 placeholder:text-[#667085]/45 focus:border-[#D1AF47]/50 focus:shadow-[0_0_18px_rgba(209,175,71,0.14)] ${isRTL ? "text-right" : "text-left"}`}
-              />
-              <div className="max-h-44 space-y-2 overflow-y-auto pr-1">
-                {filteredSaudiCities.map((city) => {
-                  const isSelected = city.key === selectedPrayerCityKey;
-                  return (
-                    <button
-                      key={city.key}
-                      type="button"
-                      onClick={() => {
-                        setSelectedPrayerCityKey(city.key);
-                        setCoords({ lat: city.lat, lng: city.lng });
-                      }}
-                      className={`w-full rounded-2xl border px-3 py-2.5 text-xs transition-all duration-300 ${
-                        isSelected
-                          ? "border-[#D1AF47]/55 bg-[#D1AF47]/[0.12] text-[#101828] shadow-[0_0_18px_rgba(209,175,71,0.18)]"
-                          : "border-[#ECECEC] bg-white/80 text-[#667085] hover:border-[#D1AF47]/35 hover:text-[#101828]"
-                      }`}
-                    >
-                      <span className={`flex items-center justify-between gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                        <strong className="truncate font-black">{isRTL ? city.ar : city.en}</strong>
-                        <span className="truncate text-[10px] font-bold opacity-70">{isRTL ? city.regionAr : city.regionEn}</span>
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+
+              {/* Selected city on top — tap to expand the picker; search appears only then */}
+              <button
+                type="button"
+                aria-expanded={cityListOpen}
+                onClick={() => {
+                  setCityListOpen((open) => {
+                    if (open) setCitySearch("");
+                    return !open;
+                  });
+                }}
+                className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3 transition-all duration-300 ${
+                  cityListOpen
+                    ? "border-[#D1AF47]/55 bg-[#D1AF47]/[0.10] shadow-[0_0_18px_rgba(209,175,71,0.16)]"
+                    : "border-[#D1AF47]/30 bg-[#FFFCF4] hover:border-[#D1AF47]/50"
+                } ${isRTL ? "flex-row-reverse" : "flex-row"}`}
+              >
+                <span className={`min-w-0 ${isRTL ? "text-right" : "text-left"}`}>
+                  <strong className="block truncate text-sm font-black text-[#101828]">{isRTL ? selectedPrayerCity.ar : selectedPrayerCity.en}</strong>
+                  <span className="block truncate text-[10px] font-bold text-[#8A7F6C]">{isRTL ? selectedPrayerCity.regionAr : selectedPrayerCity.regionEn}</span>
+                </span>
+                <svg className={`h-4 w-4 flex-shrink-0 text-[#A37B16] transition-transform duration-300 ${cityListOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {cityListOpen && (
+                <div className="space-y-2">
+                  <input
+                    type="search"
+                    autoFocus
+                    value={citySearch}
+                    onChange={(e) => setCitySearch(e.target.value)}
+                    placeholder={t.prayerCitySearch}
+                    className={`w-full rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] px-4 py-2.5 text-xs font-semibold text-[#101828] outline-none transition-all duration-300 placeholder:text-[#667085]/45 focus:border-[#D1AF47]/50 focus:shadow-[0_0_18px_rgba(209,175,71,0.14)] ${isRTL ? "text-right" : "text-left"}`}
+                  />
+                  <div className="max-h-44 space-y-1.5 overflow-y-auto pr-1">
+                    {filteredSaudiCities.map((city) => {
+                      const isSelected = city.key === selectedPrayerCityKey;
+                      return (
+                        <button
+                          key={city.key}
+                          type="button"
+                          onClick={() => {
+                            setSelectedPrayerCityKey(city.key);
+                            setCoords({ lat: city.lat, lng: city.lng });
+                            setCitySearch("");
+                            setCityListOpen(false);
+                          }}
+                          className={`w-full rounded-2xl border px-3 py-2.5 text-xs transition-all duration-300 ${
+                            isSelected
+                              ? "border-[#D1AF47]/55 bg-[#D1AF47]/[0.12] text-[#101828] shadow-[0_0_18px_rgba(209,175,71,0.18)]"
+                              : "border-[#ECECEC] bg-white/80 text-[#667085] hover:border-[#D1AF47]/35 hover:text-[#101828]"
+                          }`}
+                        >
+                          <span className={`flex items-center justify-between gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                            <strong className="truncate font-black">{isRTL ? city.ar : city.en}</strong>
+                            <span className="truncate text-[10px] font-bold opacity-70">{isRTL ? city.regionAr : city.regionEn}</span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="space-y-2.5">
               <label className="text-[10px] text-[#667085] font-bold uppercase tracking-wider block">{t.bufferDurationLabel}</label>
-              <div className="grid grid-cols-3 gap-2">
-                {[10, 15, 20, 30, 45, 60].map(mins => (
+              {/* Three presets + a custom-minutes field (highlighted when a non-preset value is active) */}
+              <div className="grid grid-cols-4 gap-2">
+                {[10, 15, 20].map(mins => (
                   <button
                     key={mins}
                     type="button"
@@ -1433,6 +1461,30 @@ export default function ProviderCalendarPage() {
                     {mins}m
                   </button>
                 ))}
+                <div className={`flex items-center gap-0.5 rounded-xl px-2 transition-all duration-300 ${
+                  ![10, 15, 20].includes(bufferDuration)
+                    ? "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] shadow-[0_0_15px_rgba(209,175,71,0.2)]"
+                    : "bg-white border border-[#ECECEC] focus-within:border-[#D1AF47]/50"
+                }`}>
+                  <input
+                    type="number"
+                    min={5}
+                    max={180}
+                    inputMode="numeric"
+                    aria-label={t.bufferDurationLabel}
+                    placeholder={isRTL ? "مخصص" : "Custom"}
+                    value={![10, 15, 20].includes(bufferDuration) ? bufferDuration : ""}
+                    onChange={(e) => {
+                      const next = Math.max(5, Math.min(180, Number(e.target.value) || 0));
+                      if (e.target.value === "") return;
+                      setBufferDuration(next);
+                    }}
+                    className={`w-full bg-transparent py-2 text-center text-[10px] font-black tracking-wider outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
+                      ![10, 15, 20].includes(bufferDuration) ? "text-[#070B12] placeholder:text-[#070B12]/50" : "text-[#667085] placeholder:text-[#667085]/60"
+                    }`}
+                  />
+                  {![10, 15, 20].includes(bufferDuration) && <span className="text-[10px] font-black text-[#070B12]">m</span>}
+                </div>
               </div>
             </div>
 
