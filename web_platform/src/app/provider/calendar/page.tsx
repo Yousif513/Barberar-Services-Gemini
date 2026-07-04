@@ -943,7 +943,7 @@ export default function ProviderCalendarPage() {
                         >
                           <div className={isRTL ? "text-right" : "text-left"}>
                             <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                              <h4 className="font-bold text-sm text-[#101828] group-hover:text-[#9A741F] transition-colors duration-300">{appt.customer}</h4>
+                              <h4 className="font-bold text-sm text-[#101828]">{appt.customer}</h4>
                               <span className="text-[10px] bg-[#F3F4F6] text-[#667085] px-2.5 py-0.5 rounded-full font-medium">{appt.duration}</span>
                             </div>
                             <p className="text-xs text-[#667085] mt-1.5">
@@ -964,7 +964,7 @@ export default function ProviderCalendarPage() {
                         </div>
                       ) : (
                         // 5. Open empty slot state
-                        <div className={`w-full h-full rounded-2xl border border-dashed border-[#ECECEC] hover:border-[#D1AF47]/40 hover:bg-[#D1AF47]/[0.01] transition-all duration-300 cursor-pointer flex items-center justify-between px-6 text-[#667085] hover:text-[#9A741F] group`}>
+                        <div className={`w-full h-full rounded-2xl border border-dashed border-[#ECECEC] hover:border-[#D1AF47]/40 hover:bg-[#D1AF47]/[0.01] transition-all duration-300 cursor-pointer flex items-center justify-between px-6 text-[#344054] group`}>
                           <span className="text-xs font-semibold opacity-0 group-hover:opacity-100 transition-all duration-300">
                             {lang === "ar" ? "جدولة حجز في هذا الوقت" : "Schedule Walk-in / Booking"}
                           </span>
