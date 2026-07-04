@@ -29,23 +29,121 @@ export default function CustomerMessages() {
   });
 
   const [inputMessage, setInputMessage] = useState("");
+  const [liveMode, setLiveMode] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const formatMessageTime = (value: string) =>
+    new Date(value).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+
+  const loadLiveThreads = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setLiveMode(false);
+      return;
+    }
+
+    setCurrentUserId(user.id);
+    const { data: liveConversations, error: conversationError } = await supabase
+      .from("conversations")
+      .select(`
+        id,
+        provider_id,
+        subject,
+        last_message_preview,
+        last_message_at,
+        unread_for_customer,
+        providers!conversations_provider_id_fkey(business_name_en, business_name_ar, logo_url)
+      `)
+      .eq("customer_id", user.id)
+      .order("last_message_at", { ascending: false });
+
+    if (conversationError) throw conversationError;
+    if (!liveConversations?.length) {
+      setLiveMode(true);
+      return;
+    }
+
+    const conversationIds = liveConversations.map((item: any) => item.id);
+    const { data: liveMessages, error: messagesError } = await supabase
+      .from("messages")
+      .select("id, conversation_id, sender_role, body, created_at")
+      .in("conversation_id", conversationIds)
+      .order("created_at", { ascending: true });
+
+    if (messagesError) throw messagesError;
+
+    const nextConversations = liveConversations.map((item: any) => {
+      const provider = item.providers || {};
+      const name = provider.business_name_en || provider.business_name_ar || item.subject || "Provider";
+      return {
+        id: item.id,
+        name,
+        lastMessage: item.last_message_preview || "New conversation",
+        time: item.last_message_at ? formatMessageTime(item.last_message_at) : "",
+        unread: Boolean(item.unread_for_customer),
+        online: true,
+        role: "Provider",
+        avatar: provider.logo_url || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=100&auto=format&fit=crop"
+      };
+    });
+
+    const nextMessages: any = {};
+    (liveMessages || []).forEach((item: any) => {
+      const conversationId = item.conversation_id;
+      nextMessages[conversationId] = [
+        ...(nextMessages[conversationId] || []),
+        {
+          id: item.id,
+          sender: item.sender_role === "customer" ? "customer" : "provider",
+          text: item.body,
+          time: formatMessageTime(item.created_at)
+        }
+      ];
+    });
+
+    setConversations(nextConversations);
+    setMessages(nextMessages);
+    setSelectedConv((current: any) => nextConversations.find((item: any) => item.id === current?.id) || nextConversations[0]);
+    setLiveMode(true);
+  };
+
   useEffect(() => {
     scrollToBottom();
   }, [messages, selectedConv]);
 
-  const handleSend = () => {
+  useEffect(() => {
+    loadLiveThreads().catch((error) => {
+      console.warn("Customer messages using demo fallback:", error);
+      setLiveMode(false);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!liveMode) return;
+    const channel = supabase
+      .channel("customer-messages-live")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, () => {
+        loadLiveThreads().catch((error) => console.warn("Unable to refresh customer messages:", error));
+      })
+      .subscribe();
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [liveMode]);
+
+  const handleSend = async () => {
     if (!inputMessage.trim()) return;
 
     const currentConvId = selectedConv.id;
+    const outgoingText = inputMessage.trim();
     const newMsg = {
       sender: "customer",
-      text: inputMessage,
+      text: outgoingText,
       time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
     };
 
@@ -58,11 +156,27 @@ export default function CustomerMessages() {
     // Update last message in conversation sidebar
     setConversations((prev) =>
       prev.map((c) =>
-        c.id === currentConvId ? { ...c, lastMessage: inputMessage, time: "Just now" } : c
+        c.id === currentConvId ? { ...c, lastMessage: outgoingText, time: "Just now" } : c
       )
     );
 
     setInputMessage("");
+
+    if (liveMode && currentUserId) {
+      const { error: insertError } = await supabase
+        .from("messages")
+        .insert({
+          conversation_id: currentConvId,
+          sender_id: currentUserId,
+          sender_role: "customer",
+          body: outgoingText
+        });
+      if (!insertError) {
+        await loadLiveThreads().catch((error) => console.warn("Unable to refresh customer messages:", error));
+        return;
+      }
+      console.warn("Saving customer message locally:", insertError);
+    }
 
     // Simulate auto-reply response after 1.5 seconds
     setTimeout(() => {

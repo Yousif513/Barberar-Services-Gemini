@@ -85,15 +85,6 @@ export default function ProviderReviewsPage() {
         .maybeSingle();
 
       if (providerInfo) {
-        // Fetch employees
-        const { data: emps } = await supabase
-          .from("employees")
-          .select("id, name_en, name_ar")
-          .eq("provider_id", providerInfo.id);
-        
-        setStaffList(emps || []);
-
-        // Fetch reviews for bookings in this provider's branches
         const { data: branches } = await supabase
           .from("branches")
           .select("id")
@@ -101,14 +92,25 @@ export default function ProviderReviewsPage() {
 
         const branchIds = branches?.map(b => b.id) || [];
         if (branchIds.length > 0) {
+          const { data: emps, error: employeeError } = await supabase
+            .from("employees")
+            .select("id, name_en, name_ar")
+            .in("branch_id", branchIds)
+            .order("name_en", { ascending: true });
+
+          if (employeeError) throw employeeError;
+          setStaffList(emps || []);
+
           const { data: reviewsData, error: fetchError } = await supabase
             .from("reviews")
             .select(`
               id,
+              employee_id,
               rating,
               comment,
               created_at,
               reply_comment,
+              reply_created_at,
               bookings (
                 id,
                 scheduled_at,
@@ -117,6 +119,7 @@ export default function ProviderReviewsPage() {
                 employees ( id, name_en, name_ar )
               )
             `)
+            .eq("provider_id", providerInfo.id)
             .order("created_at", { ascending: false });
 
           if (fetchError) throw fetchError;
@@ -174,7 +177,7 @@ export default function ProviderReviewsPage() {
     try {
       const { error: replyError } = await supabase
         .from("reviews")
-        .update({ reply_comment: replyText })
+        .update({ reply_comment: replyText, reply_created_at: new Date().toISOString() })
         .eq("id", reviewId);
 
       if (replyError) throw replyError;

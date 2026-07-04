@@ -377,11 +377,11 @@ export default function ProviderEmployeesPage() {
       statusLabel: employee.is_active ? t.active : t.inactive,
       servicesCount: serviceIds.length,
       avatar: String(displayName || "S").trim().charAt(0).toUpperCase(),
-      photoUrl: profile.photoUrl,
-      phone: profile.phone,
-      email: profile.email,
-      workType: profile.workType,
-      workTypeLabel: getWorkTypeLabel(profile.workType),
+      photoUrl: employee.photo_url || profile.photoUrl,
+      phone: employee.phone || profile.phone,
+      email: employee.email || profile.email,
+      workType: employee.work_type || profile.workType,
+      workTypeLabel: getWorkTypeLabel(employee.work_type || profile.workType),
       totalEarnings: profile.totalEarnings,
       rating: profile.rating,
       completedBookings: profile.completedBookings,
@@ -481,6 +481,10 @@ export default function ProviderEmployeesPage() {
           title_en,
           title_ar,
           is_active,
+          photo_url,
+          phone,
+          email,
+          work_type,
           employee_services ( service_id ),
           employee_availability ( day_of_week, start_time, end_time, is_working_day )
         `)
@@ -552,7 +556,11 @@ export default function ProviderEmployeesPage() {
         name_ar: staffForm.nameAr.trim(),
         title_en: staffForm.titleEn.trim() || "Stylist",
         title_ar: staffForm.titleAr.trim() || "أخصائي",
-        is_active: staffForm.isActive
+        is_active: staffForm.isActive,
+        photo_url: staffForm.photoUrl.trim() || null,
+        phone: staffForm.phone.trim() || null,
+        email: staffForm.email.trim() || null,
+        work_type: staffForm.workType
       };
 
       const result = staffForm.id

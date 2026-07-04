@@ -408,18 +408,30 @@ export default function ProviderWalletPage() {
         return;
       }
 
-      const { error: insertError } = await supabase
-        .from("payout_requests")
-        .insert({
-          provider_id: providerId,
-          requested_by: user.id,
+      const { error: functionError } = await supabase.functions.invoke("request-payout", {
+        body: {
+          providerId,
           amount: amt,
-          bank_name: payoutBank.trim(),
-          iban: cleanIban,
-          status: "requested"
-        });
+          bankName: payoutBank.trim(),
+          iban: cleanIban
+        }
+      });
 
-      if (insertError) throw insertError;
+      if (functionError) {
+        console.warn("request-payout function unavailable, falling back to direct insert:", functionError);
+        const { error: insertError } = await supabase
+          .from("payout_requests")
+          .insert({
+            provider_id: providerId,
+            requested_by: user.id,
+            amount: amt,
+            bank_name: payoutBank.trim(),
+            iban: cleanIban,
+            status: "requested"
+          });
+
+        if (insertError) throw insertError;
+      }
 
       addToast(t.requestSubmitted, "success");
       setPayoutAmount("");

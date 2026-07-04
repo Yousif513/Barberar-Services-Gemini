@@ -77,7 +77,18 @@ serve(async (req) => {
 
     if (ledgerError) throw ledgerError;
 
-    const availableAmount = (ledgerRows || []).reduce((sum, r) => sum + Number(r.provider_share || 0), 0);
+    const ledgerAvailableAmount = (ledgerRows || []).reduce((sum, r) => sum + Number(r.provider_share || 0), 0);
+
+    const { data: openRequests, error: openRequestsError } = await supabase
+      .from("payout_requests")
+      .select("amount")
+      .eq("provider_id", providerId)
+      .in("status", ["requested", "processing"])
+
+    if (openRequestsError) throw openRequestsError;
+
+    const alreadyRequestedAmount = (openRequests || []).reduce((sum, r) => sum + Number(r.amount || 0), 0);
+    const availableAmount = Math.max(ledgerAvailableAmount - alreadyRequestedAmount, 0);
     const requestedAmount = Number(amount);
 
     if (requestedAmount > availableAmount) {

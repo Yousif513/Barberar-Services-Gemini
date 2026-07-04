@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { supabase } from "@/lib/supabase";
 
 interface Conversation {
@@ -17,9 +16,11 @@ interface Conversation {
 }
 
 interface Message {
+  id?: string;
   sender: string;
   text: string;
   time: string;
+  createdAt?: string;
 }
 
 interface MessagesState {
@@ -52,6 +53,8 @@ export default function ProviderMessages() {
   const [inputMessage, setInputMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [typingConvId, setTypingConvId] = useState<string | null>(null);
+  const [liveMode, setLiveMode] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -59,17 +62,125 @@ export default function ProviderMessages() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const formatMessageTime = (value: string) =>
+    new Date(value).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+
+  const loadLiveThreads = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setLiveMode(false);
+      return;
+    }
+    setCurrentUserId(user.id);
+
+    const { data: provider, error: providerError } = await supabase
+      .from("providers")
+      .select("id")
+      .eq("owner_id", user.id)
+      .maybeSingle();
+
+    if (providerError || !provider) {
+      setLiveMode(false);
+      return;
+    }
+
+    const { data: liveConversations, error: conversationError } = await supabase
+      .from("conversations")
+      .select(`
+        id,
+        subject,
+        customer_id,
+        last_message_preview,
+        last_message_at,
+        unread_for_provider,
+        profiles!conversations_customer_id_fkey(first_name, last_name, email)
+      `)
+      .eq("provider_id", provider.id)
+      .order("last_message_at", { ascending: false });
+
+    if (conversationError) throw conversationError;
+    if (!liveConversations?.length) {
+      setLiveMode(true);
+      return;
+    }
+
+    const conversationIds = liveConversations.map((item: any) => item.id);
+    const { data: liveMessages, error: messagesError } = await supabase
+      .from("messages")
+      .select("id, conversation_id, sender_role, body, created_at")
+      .in("conversation_id", conversationIds)
+      .order("created_at", { ascending: true });
+
+    if (messagesError) throw messagesError;
+
+    const nextConversations: Conversation[] = liveConversations.map((item: any) => {
+      const profile = item.profiles || {};
+      const displayName = [profile.first_name, profile.last_name].filter(Boolean).join(" ") || profile.email || item.subject || "Client";
+      return {
+        id: item.id,
+        name: displayName,
+        lastMessage: item.last_message_preview || "New conversation",
+        time: item.last_message_at ? formatMessageTime(item.last_message_at) : "",
+        unread: Boolean(item.unread_for_provider),
+        online: true,
+        role: "Client",
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop"
+      };
+    });
+
+    const nextMessages: MessagesState = {};
+    (liveMessages || []).forEach((item: any) => {
+      const conversationId = item.conversation_id;
+      nextMessages[conversationId] = [
+        ...(nextMessages[conversationId] || []),
+        {
+          id: item.id,
+          sender: item.sender_role === "provider" ? "provider" : "customer",
+          text: item.body,
+          time: formatMessageTime(item.created_at),
+          createdAt: item.created_at
+        }
+      ];
+    });
+
+    setConversations(nextConversations);
+    setMessages(nextMessages);
+    setSelectedConv((current) => nextConversations.find((item) => item.id === current?.id) || nextConversations[0]);
+    setLiveMode(true);
+  };
+
   useEffect(() => {
     scrollToBottom();
   }, [messages, selectedConv, typingConvId]);
 
-  const handleSend = () => {
+  useEffect(() => {
+    loadLiveThreads().catch((error) => {
+      console.warn("Provider messages using demo fallback:", error);
+      setLiveMode(false);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!liveMode) return;
+    const channel = supabase
+      .channel("provider-messages-live")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, () => {
+        loadLiveThreads().catch((error) => console.warn("Unable to refresh provider messages:", error));
+      })
+      .subscribe();
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [liveMode]);
+
+  const handleSend = async () => {
     if (!inputMessage.trim()) return;
 
     const currentConvId = selectedConv.id;
+    const outgoingText = inputMessage.trim();
     const newMsg: Message = {
       sender: "provider",
-      text: inputMessage,
+      text: outgoingText,
       time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
     };
 
@@ -80,11 +191,27 @@ export default function ProviderMessages() {
 
     setConversations((prev) =>
       prev.map((c) =>
-        c.id === currentConvId ? { ...c, lastMessage: inputMessage, time: "Just now" } : c
+        c.id === currentConvId ? { ...c, lastMessage: outgoingText, time: "Just now" } : c
       )
     );
 
     setInputMessage("");
+
+    if (liveMode && currentUserId) {
+      const { error: insertError } = await supabase
+        .from("messages")
+        .insert({
+          conversation_id: currentConvId,
+          sender_id: currentUserId,
+          sender_role: "provider",
+          body: outgoingText
+        });
+      if (!insertError) {
+        await loadLiveThreads().catch((error) => console.warn("Unable to refresh provider messages:", error));
+        return;
+      }
+      console.warn("Saving provider message locally:", insertError);
+    }
 
     // Simulate typing status starting in 400ms
     setTimeout(() => {

@@ -34,6 +34,8 @@ const translations = {
     serviceIntel: "Service Intelligence", avgLoad: "Avg Load", manageServices: "Manage Services",
     prayerControl: "Prayer Operations Control", lockPending: "Lock Pending", nextPrayer: "Next Prayer", prayerIn: "Prayer in", lockIn: "Lock in", autoResume: "Auto Resume",
     bookingsAffected: "Bookings", staffAffected: "Staff", roomsAffected: "Rooms",
+    demoData: "Demo fallback",
+    highLoad: "High",
   },
   ar: {
     branch: "فرع الرياض الرئيسي", search: "البحث في العمليات، الموظفين، الحجوزات...",
@@ -46,7 +48,35 @@ const translations = {
     serviceIntel: "ذكاء الخدمات", avgLoad: "متوسط الحمل", manageServices: "إدارة الخدمات",
     prayerControl: "التحكم بأوقات الصلاة", lockPending: "إغلاق معلق", nextPrayer: "الصلاة القادمة", prayerIn: "الصلاة خلال", lockIn: "الإغلاق خلال", autoResume: "الاستئناف",
     bookingsAffected: "حجوزات", staffAffected: "موظفون", roomsAffected: "غرف",
+    demoData: "بيانات تجريبية",
+    highLoad: "مرتفع",
   },
+};
+
+type DashboardStats = {
+  revenue: number;
+  bookings: number;
+  customers: number;
+  occupancy: number;
+  activeStaff: number;
+  totalStaff: number;
+  avgRating: number;
+  reviewCount: number;
+  walkins: number;
+  avgTicket: number;
+};
+
+const demoDashboardStats: DashboardStats = {
+  revenue: 128450,
+  bookings: 9178,
+  customers: 1248,
+  occupancy: 78.4,
+  activeStaff: 4,
+  totalStaff: 6,
+  avgRating: 4.8,
+  reviewCount: 246,
+  walkins: 12,
+  avgTicket: 138,
 };
 
 export default function ProviderDashboardPage() {
@@ -56,6 +86,8 @@ export default function ProviderDashboardPage() {
   const [coords, setCoords] = useState({ lat: 24.7136, lng: 46.6753 });
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats>(demoDashboardStats);
+  const [statsMode, setStatsMode] = useState<"live" | "demo">("demo");
 
   const isRTL = locale === "ar";
   const t = translations[locale];
@@ -85,7 +117,10 @@ export default function ProviderDashboardPage() {
     async function load() {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        if (!user) {
+          setStatsMode("demo");
+          return;
+        }
         const { data: provider } = await supabase
           .from("providers")
           .select("id, business_name_en, business_name_ar")
@@ -93,18 +128,72 @@ export default function ProviderDashboardPage() {
           .maybeSingle();
         if (provider) {
           setBusinessName(isRTL ? provider.business_name_ar : provider.business_name_en);
-          const { data: branch } = await supabase
+          const { data: branches } = await supabase
             .from("branches")
-            .select("latitude, longitude")
+            .select("id, latitude, longitude")
             .eq("provider_id", provider.id)
-            .limit(1)
-            .maybeSingle();
+            .order("created_at", { ascending: true });
+          const branch = branches?.[0];
           if (branch && branch.latitude && branch.longitude) {
             setCoords({ lat: Number(branch.latitude), lng: Number(branch.longitude) });
           }
+          const branchIds = (branches || []).map((item) => item.id).filter(Boolean);
+          if (branchIds.length === 0) {
+            setDashboardStats({ ...demoDashboardStats, revenue: 0, bookings: 0, customers: 0, occupancy: 0, activeStaff: 0, totalStaff: 0, walkins: 0, avgTicket: 0 });
+            setStatsMode("live");
+            return;
+          }
+
+          const [bookingsResult, employeesResult, reviewsResult] = await Promise.all([
+            supabase
+              .from("bookings")
+              .select("status, total_price, customer_id, is_home_service")
+              .in("branch_id", branchIds),
+            supabase
+              .from("employees")
+              .select("id, is_active")
+              .in("branch_id", branchIds),
+            supabase
+              .from("reviews")
+              .select("rating")
+              .eq("provider_id", provider.id),
+          ]);
+
+          if (bookingsResult.error) throw bookingsResult.error;
+          if (employeesResult.error) throw employeesResult.error;
+          if (reviewsResult.error) throw reviewsResult.error;
+
+          const bookings = bookingsResult.data || [];
+          const employees = employeesResult.data || [];
+          const reviews = reviewsResult.data || [];
+          const completedBookings = bookings.filter((booking: any) => booking.status === "completed");
+          const revenue = completedBookings.reduce((sum: number, booking: any) => sum + Number(booking.total_price || 0), 0);
+          const activeWorkload = bookings.filter((booking: any) => booking.status === "confirmed" || booking.status === "pending_payment").length;
+          const totalStaff = employees.length;
+          const activeStaff = employees.filter((employee: any) => employee.is_active).length;
+          const reviewCount = reviews.length;
+          const avgRating = reviewCount ? reviews.reduce((sum: number, review: any) => sum + Number(review.rating || 0), 0) / reviewCount : 0;
+          const uniqueCustomers = new Set(bookings.map((booking: any) => booking.customer_id).filter(Boolean)).size;
+          const capacityBase = Math.max(activeStaff * 8, 1);
+
+          setDashboardStats({
+            revenue,
+            bookings: bookings.length,
+            customers: uniqueCustomers,
+            occupancy: Math.min(100, (activeWorkload / capacityBase) * 100),
+            activeStaff,
+            totalStaff,
+            avgRating,
+            reviewCount,
+            walkins: bookings.filter((booking: any) => !booking.is_home_service).length,
+            avgTicket: completedBookings.length ? revenue / completedBookings.length : 0,
+          });
+          setStatsMode("live");
         }
       } catch (err) {
         console.warn("Provider dashboard using fallback data:", err);
+        setDashboardStats(demoDashboardStats);
+        setStatsMode("demo");
       }
     }
     load();
@@ -155,16 +244,19 @@ export default function ProviderDashboardPage() {
 
   const cardBase = "rounded-2xl border border-[#ECECEC] bg-white shadow-[0_8px_30px_rgb(0,0,0,0.015)] transition-all duration-300 hover:border-[#D1AF47]/20 hover:shadow-[0_12px_40px_rgba(0,0,0,0.035)]";
   const eyebrow = "text-xs font-extrabold uppercase tracking-widest text-[#667085]";
+  const compactNumber = (value: number) => value.toLocaleString(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 0 });
+  const money = (value: number) => `${compactNumber(value)} SAR`;
+  const percent = (value: number) => `${value.toLocaleString(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 1 })}%`;
 
   const kpis = [
-    { label: t.revenue, value: "128,450 SAR", change: "+12%", tone: "text-[#22C55E]" },
-    { label: t.bookings, value: "9,178", change: "+8%", tone: "text-[#22C55E]" },
-    { label: t.customers, value: "1,248", change: "+48", tone: "text-[#22C55E]" },
-    { label: t.occupancy, value: "78.4%", change: "-2%", tone: "text-[#EF4444]" },
-    { label: t.staffOnline, value: "4 / 6", change: t.live, tone: "text-[#22C55E]" },
-    { label: t.reviews, value: "4.8 ★", change: "+0.2", tone: "text-[#22C55E]" },
-    { label: t.walkins, value: "12", change: "+4", tone: "text-[#22C55E]" },
-    { label: t.avgTicket, value: "138 SAR", change: locale === "ar" ? "مستقر" : "Stable", tone: "text-[#D1AF47]" },
+    { label: t.revenue, value: money(dashboardStats.revenue), change: statsMode === "live" ? t.live : t.demoData, tone: statsMode === "live" ? "text-[#22C55E]" : "text-[#D1AF47]" },
+    { label: t.bookings, value: compactNumber(dashboardStats.bookings), change: statsMode === "live" ? t.live : "+8%", tone: "text-[#22C55E]" },
+    { label: t.customers, value: compactNumber(dashboardStats.customers), change: statsMode === "live" ? t.live : "+48", tone: "text-[#22C55E]" },
+    { label: t.occupancy, value: percent(dashboardStats.occupancy), change: dashboardStats.occupancy > 85 ? t.highLoad : (locale === "ar" ? "مستقر" : "Stable"), tone: dashboardStats.occupancy > 85 ? "text-[#EF4444]" : "text-[#D1AF47]" },
+    { label: t.staffOnline, value: `${dashboardStats.activeStaff} / ${dashboardStats.totalStaff}`, change: t.live, tone: "text-[#22C55E]" },
+    { label: t.reviews, value: `${dashboardStats.avgRating.toFixed(1)} ★`, change: compactNumber(dashboardStats.reviewCount), tone: "text-[#22C55E]" },
+    { label: t.walkins, value: compactNumber(dashboardStats.walkins), change: statsMode === "live" ? t.live : "+4", tone: "text-[#22C55E]" },
+    { label: t.avgTicket, value: money(dashboardStats.avgTicket), change: locale === "ar" ? "مستقر" : "Stable", tone: "text-[#D1AF47]" },
   ];
 
   return (
