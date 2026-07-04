@@ -832,7 +832,7 @@ export default function ProviderCalendarPage() {
                   <div key={index} className={`flex min-h-[80px] items-stretch ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
 
                     {/* Time indicator column */}
-                    <div className={`w-28 px-4 py-4 flex items-center justify-center text-[11px] font-semibold text-[#667085] bg-[#F9FAFB] select-none tracking-wide ${isRTL ? "border-l" : "border-r"} border-[#ECECEC]`}>
+                    <div className={`w-28 px-4 py-4 flex items-center justify-center text-[11px] font-bold text-[#101828] bg-[#F9FAFB] select-none tracking-wide ${isRTL ? "border-l" : "border-r"} border-[#ECECEC]`}>
                       {slot.label}
                     </div>
 
@@ -1030,7 +1030,7 @@ export default function ProviderCalendarPage() {
                               isSelected ? "bg-[#D1AF47]/10" : "hover:bg-[#F3F4F6]"
                             }`}
                           >
-                            <span className="block text-[10px] font-bold uppercase tracking-wider text-[#667085]">{dayNames[i]}</span>
+                            <span className="block text-[10px] font-extrabold uppercase tracking-wider text-[#101828]">{dayNames[i]}</span>
                             <span className={`mt-1 inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-black ${
                               isToday ? "bg-[#D1AF47] text-[#070B12]" : "text-[#101828]"
                             }`}>{d.getDate()}</span>
@@ -1046,7 +1046,7 @@ export default function ProviderCalendarPage() {
                         const prayerName = lockRaw ? (isRTL ? lockRaw.nameAr : lockRaw.nameEn) : "";
                         return (
                           <div key={index} className={`flex min-h-[52px] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                            <div className={`w-20 flex-shrink-0 px-2 py-2 text-[10px] font-semibold text-[#667085] bg-[#F9FAFB] flex items-center justify-center ${isRTL ? "border-l" : "border-r"} border-[#ECECEC]`}>
+                            <div className={`w-20 flex-shrink-0 px-2 py-2 text-[10px] font-bold text-[#101828] bg-[#F9FAFB] flex items-center justify-center ${isRTL ? "border-l" : "border-r"} border-[#ECECEC]`}>
                               {slot.label}
                             </div>
                             {weekDays.map((d, di) => {

@@ -163,7 +163,7 @@ body {
     linear-gradient(34deg, transparent 0 64%, rgba(209, 175, 71, 0.24) 64.1% 64.35%, transparent 64.6%);
 }
 
-.primora-dashboard-content :is(header, h1, h2, h3, h4, p, span, a, button, input, svg, img, ul, ol, li, table, thead, tbody, tr, td, th, label, div) {
+.primora-dashboard-content :is(header, h1, h2, h3, h4, p, span, a, button, input, svg, img, ul, ol, li, table, thead, tbody, tr, td, th, label, div):not(.absolute):not(.fixed) {
   position: relative;
 }
 

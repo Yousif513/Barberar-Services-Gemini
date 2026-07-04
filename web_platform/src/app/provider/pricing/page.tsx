@@ -307,7 +307,7 @@ export default function PricingPage() {
 
   return (
     <div 
-      className="min-h-screen bg-transparent text-[#344054] font-sans antialiased flex flex-col justify-between relative overflow-x-hidden"
+      className="min-h-full bg-transparent text-[#344054] font-sans antialiased flex flex-col justify-between relative overflow-x-hidden"
       dir={locale === "ar" ? "rtl" : "ltr"}
     >
       {/* Aurora Ambient Gold/Onyx Lights */}

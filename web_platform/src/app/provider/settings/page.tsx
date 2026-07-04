@@ -461,7 +461,7 @@ export default function ProviderSettingsPage() {
   }
 
   return (
-    <div className="space-y-8 font-sans bg-transparent min-h-screen p-1 sm:p-6 md:p-8 transition-colors duration-300">
+    <div className="space-y-8 font-sans bg-transparent p-1 sm:p-6 md:p-8 transition-colors duration-300">
       
       {/* HEADER SECTION */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#ECECEC] pb-6">

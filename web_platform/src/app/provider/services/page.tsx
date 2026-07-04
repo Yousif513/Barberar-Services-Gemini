@@ -409,7 +409,7 @@ export default function ProviderServicesPage() {
 
   return (
     <div 
-      className="relative space-y-8 min-h-screen pb-12 transition-all duration-300"
+      className="relative space-y-8 pb-12 transition-all duration-300"
       dir={lang === "ar" ? "rtl" : "ltr"}
     >
       {/* Decorative top-right gold glow */}
