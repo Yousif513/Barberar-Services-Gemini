@@ -239,7 +239,7 @@ export default function ProviderJobsPage() {
       {/* METRICS / STATS SECTION */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* KPI 1: Active Leads */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 flex items-center justify-between shadow-lg relative overflow-hidden group hover:border-[#D1AF47]/30 transition-all duration-300">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 flex items-center justify-between shadow-lg relative overflow-hidden group hover:border-[#D1AF47]/30 transition-all duration-300">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#3DDC84]/5 to-transparent rounded-bl-full pointer-events-none" />
           <div className="space-y-1">
             <span className="text-[10px] text-[#667085] uppercase font-bold tracking-widest block">{t.activeLeads}</span>
@@ -253,7 +253,7 @@ export default function ProviderJobsPage() {
         </div>
 
         {/* KPI 2: Connection Status */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 flex items-center justify-between shadow-lg relative overflow-hidden group hover:border-[#D1AF47]/30 transition-all duration-300">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 flex items-center justify-between shadow-lg relative overflow-hidden group hover:border-[#D1AF47]/30 transition-all duration-300">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#D1AF47]/5 to-transparent rounded-bl-full pointer-events-none" />
           <div className="space-y-1">
             <span className="text-[10px] text-[#667085] uppercase font-bold tracking-widest block">{t.connectedStatus}</span>
@@ -273,7 +273,7 @@ export default function ProviderJobsPage() {
         </div>
 
         {/* KPI 3: Employee Pool */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 flex items-center justify-between shadow-lg relative overflow-hidden group hover:border-[#D1AF47]/30 transition-all duration-300">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 flex items-center justify-between shadow-lg relative overflow-hidden group hover:border-[#D1AF47]/30 transition-all duration-300">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#F5B041]/5 to-transparent rounded-bl-full pointer-events-none" />
           <div className="space-y-1">
             <span className="text-[10px] text-[#667085] uppercase font-bold tracking-widest block">{t.employeePool}</span>
@@ -322,7 +322,7 @@ export default function ProviderJobsPage() {
           {openJobs.map((job) => (
             <div
               key={job.id}
-              className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-8 shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-8 hover:border-[#D1AF47]/40 hover:shadow-[0_0_30px_rgba(209,175,71,0.08)] transition-all duration-300 hover:-translate-y-0.5 group relative overflow-hidden"
+              className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-8 shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-8 hover:border-[#D1AF47]/40 hover:shadow-[0_0_30px_rgba(209,175,71,0.08)] transition-all duration-300 hover:-translate-y-0.5 group relative overflow-hidden"
             >
               {/* Subtle top inner glow bar */}
               <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#D1AF47]/10 to-transparent" />
@@ -391,7 +391,7 @@ export default function ProviderJobsPage() {
       {/* BID MODAL DIALOG */}
       {activeJob && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[28px] p-8 shadow-[0_0_50px_rgba(0,0,0,0.8)] w-full max-w-xl space-y-6 relative overflow-hidden transition-all duration-300">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[28px] p-8 shadow-[0_12px_40px_rgba(0,0,0,0.04)] w-full max-w-xl space-y-6 relative overflow-hidden transition-all duration-300">
             {/* Ambient gold glow decoration */}
             <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#D1AF47]/10 rounded-full blur-3xl pointer-events-none" />
             
@@ -400,7 +400,7 @@ export default function ProviderJobsPage() {
                 <h3 className="font-black text-xl text-[#101828] tracking-wide">{activeJob.title}</h3>
                 <button
                   onClick={() => setActiveJob(null)}
-                  className="p-2 rounded-xl bg-[#F3F4F6] border border-[#ECECEC] border border-[#ECECEC] text-[#667085] hover:text-[#D1AF47] hover:bg-[#E5E7EB] border border-[#ECECEC] transition-all duration-200 cursor-pointer"
+                  className="p-2 rounded-xl bg-[#F3F4F6] border border-[#ECECEC] text-[#667085] hover:text-[#D1AF47] hover:bg-[#E5E7EB] border border-[#ECECEC] transition-all duration-200 cursor-pointer"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -417,7 +417,7 @@ export default function ProviderJobsPage() {
                   {t.proposedPrice}
                 </label>
                 
-                <div className="flex justify-between items-center bg-white border border-[#ECECEC] border border-[#ECECEC] rounded-2xl p-4 focus-within:border-[#D1AF47]/50 focus-within:shadow-[0_0_15px_rgba(209,175,71,0.06)] transition-all duration-300">
+                <div className="flex justify-between items-center bg-white border border-[#ECECEC] rounded-2xl p-4 focus-within:border-[#D1AF47]/50 focus-within:shadow-[0_0_15px_rgba(209,175,71,0.06)] transition-all duration-300">
                   <div className="flex-1">
                     <span className="text-[10px] text-[#667085] uppercase font-bold tracking-wider block">{t.yourBidOffer}</span>
                     <input
@@ -460,7 +460,7 @@ export default function ProviderJobsPage() {
                     <select
                       value={employeeId}
                       onChange={(e) => setEmployeeId(e.target.value)}
-                      className="w-full bg-white border border-[#ECECEC] border border-[#ECECEC] rounded-2xl px-4 py-3.5 text-xs text-[#101828] font-bold outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] appearance-none cursor-pointer transition-all duration-300"
+                      className="w-full bg-white border border-[#ECECEC] rounded-2xl px-4 py-3.5 text-xs text-[#101828] font-bold outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] appearance-none cursor-pointer transition-all duration-300"
                     >
                       <option value="" className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] text-[#101828]">
                         {t.noEmployee}
@@ -489,7 +489,7 @@ export default function ProviderJobsPage() {
                   placeholder={t.notesPlaceholder}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full bg-white border border-[#ECECEC] border border-[#ECECEC] rounded-2xl px-4 py-3.5 text-xs text-[#101828] font-semibold placeholder-[#7B859C]/50 outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] min-h-[100px] transition-all duration-300"
+                  className="w-full bg-white border border-[#ECECEC] rounded-2xl px-4 py-3.5 text-xs text-[#101828] font-semibold placeholder-[#7B859C]/50 outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] min-h-[100px] transition-all duration-300"
                 />
               </div>
 

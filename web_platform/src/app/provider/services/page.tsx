@@ -497,14 +497,14 @@ export default function ProviderServicesPage() {
       </div>
 
       {/* Services Table Card (Desktop) */}
-      <div className="hidden md:block relative bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]/80 backdrop-blur-md border border-[rgba(255,255,255,0.06)] rounded-[28px] shadow-2xl p-6 md:p-8 overflow-hidden">
+      <div className="hidden md:block relative bg-white border border-[#ECECEC] rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.015)] p-6 md:p-8 overflow-hidden">
         {/* Inner top glow */}
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
         
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left border-collapse">
             <thead>
-              <tr className="border-b border-[rgba(255,255,255,0.06)] text-[#667085] text-xs uppercase tracking-wider">
+              <tr className="border-b border-[#ECECEC] text-[#667085] text-xs uppercase tracking-wider">
                 <th className="py-5 px-6 text-start font-semibold">{t.serviceName}</th>
                 <th className="py-5 px-6 text-start font-semibold">{t.category}</th>
                 <th className="py-5 px-6 text-start font-semibold">{t.price}</th>
@@ -618,7 +618,7 @@ export default function ProviderServicesPage() {
         {servicesList.map((service) => (
           <div 
             key={service.id} 
-            className="relative overflow-hidden bg-white/90 backdrop-blur-md border border-[rgba(255,255,255,0.06)] rounded-[24px] p-5 shadow-lg flex flex-col gap-4"
+            className="relative overflow-hidden bg-white border border-[#ECECEC] rounded-[24px] p-5 shadow-lg flex flex-col gap-4"
           >
             {/* Top Header */}
             <div className="flex justify-between items-start">

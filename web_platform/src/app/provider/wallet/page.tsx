@@ -607,7 +607,7 @@ export default function ProviderWalletPage() {
       </div>
 
       {/* Payout Requests */}
-      <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-8 shadow-xl text-[#101828]">
+      <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-8 shadow-xl text-[#101828]">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h3 className="text-lg font-bold tracking-tight text-[#101828]">{t.payoutRequests}</h3>
@@ -725,7 +725,7 @@ export default function ProviderWalletPage() {
       </div>
 
       {/* Transactions Splits Ledger */}
-      <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-8 shadow-xl text-[#101828]">
+      <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-8 shadow-xl text-[#101828]">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h3 className="text-lg font-bold tracking-tight text-[#101828]">{t.transactionLedger}</h3>
@@ -822,7 +822,7 @@ export default function ProviderWalletPage() {
       {/* REQUEST PAYOUT MODAL */}
       {showPayoutModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-[fadeIn_0.25s_ease-out]">
-          <div className="relative bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[28px] w-full max-w-md p-8 shadow-[0_0_50px_rgba(209,175,71,0.15)] space-y-6 overflow-hidden">
+          <div className="relative bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[28px] w-full max-w-md p-8 shadow-[0_0_50px_rgba(209,175,71,0.15)] space-y-6 overflow-hidden">
             {/* Decorative premium card light in the modal corner */}
             <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#D1AF47]/5 rounded-full blur-[60px] pointer-events-none"></div>
 

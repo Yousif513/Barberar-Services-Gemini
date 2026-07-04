@@ -272,7 +272,7 @@ export default function ProviderBookingsPage() {
       {/* KPI STATS ROW */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Card 1: Total */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_30px_rgba(0,0,0,0.2)] hover:border-[#D1AF47]/20 hover:shadow-[0_0_25px_rgba(209,175,71,0.05)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-between">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.015)] hover:border-[#D1AF47]/20 hover:shadow-[0_0_25px_rgba(209,175,71,0.05)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-[10px] text-[#667085] font-extrabold tracking-wider uppercase">{t.kpiTotal}</span>
             <h3 className="text-3xl font-bold text-[#101828] tracking-tight">{totalCount}</h3>
@@ -285,7 +285,7 @@ export default function ProviderBookingsPage() {
         </div>
 
         {/* Card 2: Pending */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_30px_rgba(0,0,0,0.2)] hover:border-[#F5B041]/20 hover:shadow-[0_0_25px_rgba(245,176,65,0.05)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-between">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.015)] hover:border-[#F5B041]/20 hover:shadow-[0_0_25px_rgba(245,176,65,0.05)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-[10px] text-[#667085] font-extrabold tracking-wider uppercase">{t.kpiPending}</span>
             <h3 className="text-3xl font-bold text-[#101828] tracking-tight">{pendingCount}</h3>
@@ -298,7 +298,7 @@ export default function ProviderBookingsPage() {
         </div>
 
         {/* Card 3: Confirmed */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_30px_rgba(0,0,0,0.2)] hover:border-[#3DDC84]/20 hover:shadow-[0_0_25px_rgba(61,220,132,0.05)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-between">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.015)] hover:border-[#3DDC84]/20 hover:shadow-[0_0_25px_rgba(61,220,132,0.05)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-[10px] text-[#667085] font-extrabold tracking-wider uppercase">{t.kpiConfirmed}</span>
             <h3 className="text-3xl font-bold text-[#101828] tracking-tight">{confirmedCount}</h3>
@@ -311,7 +311,7 @@ export default function ProviderBookingsPage() {
         </div>
 
         {/* Card 4: Revenue */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_30px_rgba(0,0,0,0.2)] hover:border-[#D1AF47]/20 hover:shadow-[0_0_25px_rgba(209,175,71,0.05)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-between">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.015)] hover:border-[#D1AF47]/20 hover:shadow-[0_0_25px_rgba(209,175,71,0.05)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-[10px] text-[#667085] font-extrabold tracking-wider uppercase">{t.kpiRevenue}</span>
             <h3 className="text-3xl font-bold text-[#D1AF47] tracking-tight">{totalRevenue} <span className="text-sm font-semibold">{t.currency}</span></h3>
@@ -327,7 +327,7 @@ export default function ProviderBookingsPage() {
       {/* SEARCH & FILTERS BAR */}
       <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
         {/* Search */}
-        <div className={`w-full lg:w-80 bg-[#F9FAFB] border border-[#ECECEC] border border-[#ECECEC] px-4 py-2.5 rounded-2xl flex items-center gap-3 shadow-[inset_0_0_12px_rgba(255,255,255,0.01)] focus-within:border-[#D1AF47]/30 focus-within:shadow-[0_0_15px_rgba(209,175,71,0.08)] transition-all duration-300 ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
+        <div className={`w-full lg:w-80 bg-[#F9FAFB] border border-[#ECECEC] px-4 py-2.5 rounded-2xl flex items-center gap-3 shadow-[inset_0_0_12px_rgba(255,255,255,0.01)] focus-within:border-[#D1AF47]/30 focus-within:shadow-[0_0_15px_rgba(209,175,71,0.08)] transition-all duration-300 ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
           <svg className="w-4 h-4 text-[#667085] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -372,7 +372,7 @@ export default function ProviderBookingsPage() {
           <span className="text-sm text-[#667085] tracking-wide animate-pulse">Loading appointments...</span>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-16 text-center text-[#667085] shadow-[0_0_50px_rgba(0,0,0,0.3)]">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-16 text-center text-[#667085] shadow-[0_8px_30px_rgba(0,0,0,0.015)]">
           <div className="w-16 h-16 bg-white border border-[#ECECEC] rounded-full flex items-center justify-center mx-auto mb-4 shadow-[inset_0_0_10px_rgba(0,0,0,0.01)]">
             <svg className="w-6 h-6 text-[#667085]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002-2h-2" />
@@ -384,7 +384,7 @@ export default function ProviderBookingsPage() {
       ) : (
         <>
           {/* DESKTOP TABLE VIEW */}
-          <div className="hidden md:block bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] overflow-hidden shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_35px_rgba(0,0,0,0.25)]">
+          <div className="hidden md:block bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.015)]">
             <div className="overflow-x-auto">
               <table className="w-full text-xs border-collapse">
                 <thead>
@@ -486,7 +486,7 @@ export default function ProviderBookingsPage() {
             {filtered.map((bk) => {
               const badge = getStatusBadgeStyles(bk.status);
               return (
-                <div key={bk.id} className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-5 shadow-[inset_0_0_20px_rgba(255,255,255,0.01),0_0_30px_rgba(0,0,0,0.2)] hover:border-[#D1AF47]/20 transition-all duration-300 space-y-4">
+                <div key={bk.id} className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-5 shadow-[0_8px_30px_rgba(0,0,0,0.015)] hover:border-[#D1AF47]/20 transition-all duration-300 space-y-4">
                   {/* Top: Client & Status */}
                   <div className="flex justify-between items-start">
                     <div>

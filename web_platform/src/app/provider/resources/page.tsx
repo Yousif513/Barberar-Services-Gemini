@@ -353,7 +353,7 @@ export default function ResourcesPage() {
 
       {/* ADD RESOURCE DIALOG */}
       {showAddForm && (
-        <form onSubmit={handleAddResource} className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[28px] p-6 shadow-2xl max-w-xl space-y-5 animate-slideDown relative overflow-hidden">
+        <form onSubmit={handleAddResource} className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[28px] p-6 shadow-2xl max-w-xl space-y-5 animate-slideDown relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#B8952E] via-[#D1AF47] to-[#E0C46A]" />
           
           <h3 className={`font-bold text-sm text-[#D1AF47] border-b border-[#ECECEC] pb-3 tracking-wide ${isRTL ? "text-right" : "text-left"}`}>
@@ -368,7 +368,7 @@ export default function ResourcesPage() {
                 placeholder={isRTL ? "مثال: غرفة حمام مغربي أ" : "e.g. Moroccan Bath Room A"}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className={`w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-3.5 py-2.5 text-xs outline-none focus:border-[#D1AF47]/40 focus:ring-1 focus:ring-[#D1AF47]/40 text-[#101828] font-medium transition-all duration-300 placeholder-white/20 ${isRTL ? "text-right" : "text-left"}`}
+                className={`w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-3.5 py-2.5 text-xs outline-none focus:border-[#D1AF47]/40 focus:ring-1 focus:ring-[#D1AF47]/40 text-[#101828] font-medium transition-all duration-300 placeholder-white/20 ${isRTL ? "text-right" : "text-left"}`}
                 required
               />
             </div>
@@ -378,7 +378,7 @@ export default function ResourcesPage() {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className={`w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-3.5 py-2.5 text-xs outline-none focus:border-[#D1AF47]/40 focus:ring-1 focus:ring-[#D1AF47]/40 text-[#101828] font-bold transition-all duration-300 appearance-none cursor-pointer ${isRTL ? "text-right" : "text-left"}`}
+                className={`w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-3.5 py-2.5 text-xs outline-none focus:border-[#D1AF47]/40 focus:ring-1 focus:ring-[#D1AF47]/40 text-[#101828] font-bold transition-all duration-300 appearance-none cursor-pointer ${isRTL ? "text-right" : "text-left"}`}
               >
                 {categories.map((cat, idx) => (
                   <option key={idx} value={cat} className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] text-[#101828] font-medium">
@@ -396,7 +396,7 @@ export default function ResourcesPage() {
                 max="50"
                 value={capacity}
                 onChange={(e) => setCapacity(parseInt(e.target.value) || 1)}
-                className={`w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-3.5 py-2.5 text-xs outline-none focus:border-[#D1AF47]/40 focus:ring-1 focus:ring-[#D1AF47]/40 text-[#101828] font-medium transition-all duration-300 ${isRTL ? "text-right" : "text-left"}`}
+                className={`w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-3.5 py-2.5 text-xs outline-none focus:border-[#D1AF47]/40 focus:ring-1 focus:ring-[#D1AF47]/40 text-[#101828] font-medium transition-all duration-300 ${isRTL ? "text-right" : "text-left"}`}
                 required
               />
             </div>

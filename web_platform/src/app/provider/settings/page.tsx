@@ -477,7 +477,7 @@ export default function ProviderSettingsPage() {
         </div>
         
         {/* Localization Preview Info Badge */}
-        <div className="flex items-center gap-3 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl px-4 py-2.5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] self-start md:self-auto">
+        <div className="flex items-center gap-3 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-2xl px-4 py-2.5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] self-start md:self-auto">
           <svg className="w-4 h-4 text-[#D1AF47]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
           </svg>
@@ -505,7 +505,7 @@ export default function ProviderSettingsPage() {
         <div className="lg:col-span-7 space-y-8">
           
           {/* BUSINESS PROFILE CARD */}
-          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden group">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47]/[0.02] rounded-full blur-3xl pointer-events-none" />
             
             <div className="flex items-center gap-4 border-b border-[#ECECEC] pb-4 mb-6">
@@ -548,7 +548,7 @@ export default function ProviderSettingsPage() {
                     type="text"
                     value={businessNameEn}
                     onChange={(e) => setBusinessNameEn(e.target.value)}
-                    className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300"
+                    className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300"
                   />
                 </div>
                 <div className="space-y-1.5 group">
@@ -559,7 +559,7 @@ export default function ProviderSettingsPage() {
                     type="text"
                     value={businessNameAr}
                     onChange={(e) => setBusinessNameAr(e.target.value)}
-                    className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300 text-right"
+                    className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300 text-right"
                   />
                 </div>
               </div>
@@ -572,7 +572,7 @@ export default function ProviderSettingsPage() {
                   rows={3}
                   value={descriptionEn}
                   onChange={(e) => setDescriptionEn(e.target.value)}
-                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl p-4 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 leading-relaxed transition duration-300"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl p-4 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 leading-relaxed transition duration-300"
                 />
               </div>
 
@@ -584,7 +584,7 @@ export default function ProviderSettingsPage() {
                   rows={3}
                   value={descriptionAr}
                   onChange={(e) => setDescriptionAr(e.target.value)}
-                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl p-4 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 leading-relaxed transition duration-300 text-right"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl p-4 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 leading-relaxed transition duration-300 text-right"
                 />
               </div>
 
@@ -596,7 +596,7 @@ export default function ProviderSettingsPage() {
                   type="text"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300"
                 />
               </div>
 
@@ -617,7 +617,7 @@ export default function ProviderSettingsPage() {
           </div>
 
           {/* OPENING HOURS SCHEDULE */}
-          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
             <div className="flex items-center gap-4 border-b border-[#ECECEC] pb-4 mb-6">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D1AF47]/10 to-transparent flex items-center justify-center border border-[#D1AF47]/20">
                 <svg className="w-5 h-5 text-[#D1AF47]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -680,7 +680,7 @@ export default function ProviderSettingsPage() {
                                 type="time"
                                 value={current.open}
                                 onChange={(e) => handleHourChange(day.key, "open", e.target.value)}
-                                className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] focus:border-[#D1AF47]/50 rounded-xl px-3 py-1.5 text-xs text-[#101828] outline-none focus:ring-1 focus:ring-[#D1AF47]/30 transition duration-300 font-mono"
+                                className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] focus:border-[#D1AF47]/50 rounded-xl px-3 py-1.5 text-xs text-[#101828] outline-none focus:ring-1 focus:ring-[#D1AF47]/30 transition duration-300 font-mono"
                               />
                             </div>
 
@@ -690,7 +690,7 @@ export default function ProviderSettingsPage() {
                                 type="time"
                                 value={current.close}
                                 onChange={(e) => handleHourChange(day.key, "close", e.target.value)}
-                                className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] focus:border-[#D1AF47]/50 rounded-xl px-3 py-1.5 text-xs text-[#101828] outline-none focus:ring-1 focus:ring-[#D1AF47]/30 transition duration-300 font-mono"
+                                className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] focus:border-[#D1AF47]/50 rounded-xl px-3 py-1.5 text-xs text-[#101828] outline-none focus:ring-1 focus:ring-[#D1AF47]/30 transition duration-300 font-mono"
                               />
                             </div>
                           </div>
@@ -723,7 +723,7 @@ export default function ProviderSettingsPage() {
         <div className="lg:col-span-5 space-y-8">
           
           {/* GEOFENCING & SERVICE RADIUS */}
-          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
             <div className="absolute top-0 left-0 w-32 h-32 bg-[#D1AF47]/[0.01] rounded-full blur-3xl pointer-events-none" />
             
             <div className="flex items-center gap-4 border-b border-[#ECECEC] pb-4 mb-6">
@@ -817,7 +817,7 @@ export default function ProviderSettingsPage() {
           </div>
 
           {/* BOOKING DEPOSIT POLICY */}
-          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
             <div className="flex items-center gap-4 border-b border-[#ECECEC] pb-4 mb-6">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D1AF47]/10 to-transparent flex items-center justify-center border border-[#D1AF47]/20">
                 <svg className="w-5 h-5 text-[#D1AF47]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -871,7 +871,7 @@ export default function ProviderSettingsPage() {
           </div>
 
           {/* NOTIFICATION PREFERENCES */}
-          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
             <div className="flex items-center gap-4 border-b border-[#ECECEC] pb-4 mb-6">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D1AF47]/10 to-transparent flex items-center justify-center border border-[#D1AF47]/20">
                 <svg className="w-5 h-5 text-[#D1AF47]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -905,7 +905,7 @@ export default function ProviderSettingsPage() {
             <form onSubmit={handleSaveNotifications} className="space-y-4">
               
               {/* Email Notifications checkbox card */}
-              <div className="flex items-start justify-between p-4 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl hover:border-[#ECECEC] transition duration-300">
+              <div className="flex items-start justify-between p-4 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-2xl hover:border-[#ECECEC] transition duration-300">
                 <div className="flex flex-col space-y-1 select-none pr-3">
                   <span className="text-xs font-bold text-[#101828]">{t.notifyEmail}</span>
                   <span className="text-[10px] text-[#667085] leading-normal">{t.notifyEmailDesc}</span>
@@ -926,7 +926,7 @@ export default function ProviderSettingsPage() {
               </div>
 
               {/* SMS Notifications checkbox card */}
-              <div className="flex items-start justify-between p-4 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl hover:border-[#ECECEC] transition duration-300">
+              <div className="flex items-start justify-between p-4 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-2xl hover:border-[#ECECEC] transition duration-300">
                 <div className="flex flex-col space-y-1 select-none pr-3">
                   <span className="text-xs font-bold text-[#101828]">{t.notifySms}</span>
                   <span className="text-[10px] text-[#667085] leading-normal">{t.notifySmsDesc}</span>
@@ -947,7 +947,7 @@ export default function ProviderSettingsPage() {
               </div>
 
               {/* Push Notifications checkbox card */}
-              <div className="flex items-start justify-between p-4 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl hover:border-[#ECECEC] transition duration-300">
+              <div className="flex items-start justify-between p-4 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-2xl hover:border-[#ECECEC] transition duration-300">
                 <div className="flex flex-col space-y-1 select-none pr-3">
                   <span className="text-xs font-bold text-[#101828]">{t.notifyPush}</span>
                   <span className="text-[10px] text-[#667085] leading-normal">{t.notifyPushDesc}</span>
@@ -968,7 +968,7 @@ export default function ProviderSettingsPage() {
               </div>
 
               {/* Review Alerts checkbox card */}
-              <div className="flex items-start justify-between p-4 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl hover:border-[#ECECEC] transition duration-300">
+              <div className="flex items-start justify-between p-4 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-2xl hover:border-[#ECECEC] transition duration-300">
                 <div className="flex flex-col space-y-1 select-none pr-3">
                   <span className="text-xs font-bold text-[#101828]">{t.notifyReviews}</span>
                   <span className="text-[10px] text-[#667085] leading-normal">{t.notifyReviewsDesc}</span>
@@ -989,7 +989,7 @@ export default function ProviderSettingsPage() {
               </div>
 
               {/* Weekly Digests checkbox card */}
-              <div className="flex items-start justify-between p-4 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl hover:border-[#ECECEC] transition duration-300">
+              <div className="flex items-start justify-between p-4 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-2xl hover:border-[#ECECEC] transition duration-300">
                 <div className="flex flex-col space-y-1 select-none pr-3">
                   <span className="text-xs font-bold text-[#101828]">{t.notifyWeekly}</span>
                   <span className="text-[10px] text-[#667085] leading-normal">{t.notifyWeeklyDesc}</span>
@@ -1026,7 +1026,7 @@ export default function ProviderSettingsPage() {
           </div>
 
           {/* SECURITY & CREDENTIALS */}
-          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
             <div className="flex items-center gap-4 border-b border-[#ECECEC] pb-4 mb-6">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D1AF47]/10 to-transparent flex items-center justify-center border border-[#D1AF47]/20">
                 <svg className="w-5 h-5 text-[#D1AF47]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -1066,7 +1066,7 @@ export default function ProviderSettingsPage() {
                   type="password"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300"
                 />
               </div>
 
@@ -1078,7 +1078,7 @@ export default function ProviderSettingsPage() {
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300"
                 />
               </div>
 
@@ -1090,7 +1090,7 @@ export default function ProviderSettingsPage() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-4 py-3 text-xs outline-none focus:border-[#D1AF47]/50 focus:ring-1 focus:ring-[#D1AF47]/30 text-[#101828] placeholder-gray-500 font-semibold transition duration-300"
                 />
               </div>
 

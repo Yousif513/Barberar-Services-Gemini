@@ -196,7 +196,7 @@ export default function ProviderDashboardPage() {
               />
             </label>
             {searchOpen && searchResults.length > 0 && (
-              <div className={`absolute top-full z-50 mt-2 w-full overflow-hidden rounded-2xl border border-[#ECECEC] bg-white shadow-[0_12px_40px_rgba(0,0,0,0.08)] ${isRTL ? "text-right" : "text-left"}`}>
+              <div className={`absolute top-full z-50 mt-2 w-full overflow-hidden rounded-2xl border border-[#ECECEC] bg-white shadow-[0_12px_40px_rgba(0,0,0,0.02)] ${isRTL ? "text-right" : "text-left"}`}>
                 {searchResults.map((item) => (
                   <button
                     key={item.href}

@@ -1292,7 +1292,7 @@ export default function ProviderCalendarPage() {
         <div className="fixed inset-0 bg-[#101828]/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <form
             onSubmit={handleBookingSubmit}
-            className="bg-white border border-[#ECECEC] rounded-3xl p-7 max-w-sm w-full space-y-5 shadow-[0_12px_40px_rgba(0,0,0,0.08)] animate-[modalIn_0.25s_ease-out]"
+            className="bg-white border border-[#ECECEC] rounded-3xl p-7 max-w-sm w-full space-y-5 shadow-[0_12px_40px_rgba(0,0,0,0.02)] animate-[modalIn_0.25s_ease-out]"
             style={{ animation: "modalIn 0.25s ease-out" }}
           >
             <h3 className={`font-bold text-base text-[#101828] ${isRTL ? "text-right" : "text-left"}`}>
@@ -1417,7 +1417,7 @@ export default function ProviderCalendarPage() {
       {showDetailsModal && (
         <div className="fixed inset-0 bg-[#101828]/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div
-            className="bg-white border border-[#ECECEC] rounded-3xl p-7 max-w-sm w-full space-y-5 shadow-[0_12px_40px_rgba(0,0,0,0.08)]"
+            className="bg-white border border-[#ECECEC] rounded-3xl p-7 max-w-sm w-full space-y-5 shadow-[0_12px_40px_rgba(0,0,0,0.02)]"
             style={{ animation: "modalIn 0.25s ease-out" }}
           >
             <h3 className={`font-bold text-base text-[#101828] ${isRTL ? "text-right" : "text-left"}`}>{t.detailsTitle}</h3>

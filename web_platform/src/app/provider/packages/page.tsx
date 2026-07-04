@@ -346,7 +346,7 @@ export default function PackagesPage() {
 
       {/* ADD PACKAGE DIALOG */}
       {showAddForm && (
-        <form onSubmit={handleAddPackage} className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-8 shadow-[0_8px_32px_rgba(0,0,0,0.4)] max-w-2xl space-y-6">
+        <form onSubmit={handleAddPackage} className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-8 shadow-[0_8px_30px_rgba(0,0,0,0.015)] max-w-2xl space-y-6">
           <h3 className="font-bold text-sm text-[#101828] tracking-wide uppercase">Create Package Template</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -357,7 +357,7 @@ export default function PackagesPage() {
                 placeholder="e.g. Deep Tissue 5-Session Pass"
                 value={nameEn}
                 onChange={(e) => setNameEn(e.target.value)}
-                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] font-semibold transition-all duration-200"
+                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] font-semibold transition-all duration-200"
                 required
               />
             </div>
@@ -369,7 +369,7 @@ export default function PackagesPage() {
                 placeholder="مثال: باقة 5 جلسات مساج عميق"
                 value={nameAr}
                 onChange={(e) => setNameAr(e.target.value)}
-                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] font-semibold transition-all duration-200"
+                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] font-semibold transition-all duration-200"
                 required
               />
             </div>
@@ -380,7 +380,7 @@ export default function PackagesPage() {
                 placeholder="Specify what services are included and terms..."
                 value={descEn}
                 onChange={(e) => setDescEn(e.target.value)}
-                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] min-h-[80px] transition-all duration-200"
+                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] min-h-[80px] transition-all duration-200"
               />
             </div>
 
@@ -390,7 +390,7 @@ export default function PackagesPage() {
                 placeholder="حدد الخدمات المشمولة والشروط باللغة العربية..."
                 value={descAr}
                 onChange={(e) => setDescAr(e.target.value)}
-                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] min-h-[80px] transition-all duration-200"
+                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] min-h-[80px] transition-all duration-200"
               />
             </div>
 
@@ -401,7 +401,7 @@ export default function PackagesPage() {
                 min="1"
                 value={price}
                 onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
-                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] font-semibold transition-all duration-200"
+                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] font-semibold transition-all duration-200"
                 required
               />
             </div>
@@ -413,7 +413,7 @@ export default function PackagesPage() {
                 min="1"
                 value={sessionCount}
                 onChange={(e) => setSessionCount(parseInt(e.target.value) || 1)}
-                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] font-semibold transition-all duration-200"
+                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] font-semibold transition-all duration-200"
                 required
               />
             </div>
@@ -425,7 +425,7 @@ export default function PackagesPage() {
                 min="1"
                 value={expiresInDays}
                 onChange={(e) => setExpiresInDays(parseInt(e.target.value) || 365)}
-                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] font-semibold transition-all duration-200"
+                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[14px] px-4 py-3 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] text-[#101828] font-semibold transition-all duration-200"
                 required
               />
             </div>
@@ -511,7 +511,7 @@ export default function PackagesPage() {
       )}
 
       {/* ACTIVE PURCHASED MEMBERSHIPS */}
-      <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[28px] p-8 shadow-xl mt-8">
+      <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[28px] p-8 shadow-xl mt-8">
         <div className="mb-6">
           <h3 className="text-base font-bold text-[#101828] tracking-wide mb-1">Active Client Memberships</h3>
           <p className="text-xs text-[#344054]">Track customer package balances and manually deduct sessions upon client visits.</p>
@@ -558,7 +558,7 @@ export default function PackagesPage() {
                           Deduct Session
                         </button>
                       ) : (
-                        <span className="text-[10px] font-bold text-[#667085] bg-[#F3F4F6] border border-[#ECECEC] border border-[#ECECEC] px-2.5 py-1 rounded-full">
+                        <span className="text-[10px] font-bold text-[#667085] bg-[#F3F4F6] border border-[#ECECEC] px-2.5 py-1 rounded-full">
                           Consumed
                         </span>
                       )}

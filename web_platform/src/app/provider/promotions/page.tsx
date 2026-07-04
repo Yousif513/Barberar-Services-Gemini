@@ -342,7 +342,7 @@ export default function ProviderPromotionsPage() {
       {/* KPI METRICS COUNTERS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Active Campaigns */}
-        <div className="group bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] transition-all duration-300">
+        <div className="group bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] transition-all duration-300">
           <div className="flex justify-between items-center">
             <span className="text-xs font-semibold text-[#667085] uppercase tracking-wider">{t.kpiActive}</span>
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#D1AF47]/20 to-[#B8952E]/10 flex items-center justify-center text-[#D1AF47]">
@@ -358,7 +358,7 @@ export default function ProviderPromotionsPage() {
         </div>
 
         {/* Total Code Redemptions */}
-        <div className="group bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] transition-all duration-300">
+        <div className="group bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] transition-all duration-300">
           <div className="flex justify-between items-center">
             <span className="text-xs font-semibold text-[#667085] uppercase tracking-wider">{t.kpiTotalRedemptions}</span>
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#3DDC84]/20 to-transparent flex items-center justify-center text-[#22C55E]">
@@ -377,7 +377,7 @@ export default function ProviderPromotionsPage() {
         </div>
 
         {/* Average Discount Rate */}
-        <div className="group bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] transition-all duration-300">
+        <div className="group bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] transition-all duration-300">
           <div className="flex justify-between items-center">
             <span className="text-xs font-semibold text-[#667085] uppercase tracking-wider">{t.kpiAvgDiscount}</span>
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#F5B041]/20 to-transparent flex items-center justify-center text-[#F5B041]">
@@ -393,7 +393,7 @@ export default function ProviderPromotionsPage() {
         </div>
 
         {/* Est. Revenue Lift */}
-        <div className="group bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] transition-all duration-300">
+        <div className="group bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] transition-all duration-300">
           <div className="flex justify-between items-center">
             <span className="text-xs font-semibold text-[#667085] uppercase tracking-wider">{t.kpiEstimatedLift}</span>
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#D1AF47]/20 to-transparent flex items-center justify-center text-[#D1AF47]">
@@ -494,7 +494,7 @@ export default function ProviderPromotionsPage() {
 
       {/* CREATE FORM CARD */}
       {showForm && (
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-8 shadow-[0_0_30px_rgba(0,0,0,0.4)] space-y-6 relative overflow-hidden transition-all duration-300">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-8 shadow-[0_0_30px_rgba(0,0,0,0.4)] space-y-6 relative overflow-hidden transition-all duration-300">
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#D1AF47]/10 to-transparent rounded-bl-[100px]"></div>
 
           <h3 className="font-bold text-base text-[#101828] border-b border-[#ECECEC] pb-4 tracking-wide flex items-center gap-2">
@@ -513,7 +513,7 @@ export default function ProviderPromotionsPage() {
                   placeholder={t.codePlaceholder}
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs text-[#101828] outline-none focus:border-[#D1AF47] transition placeholder-[#7B859C]/40 font-mono tracking-wider"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-4 py-3 text-xs text-[#101828] outline-none focus:border-[#D1AF47] transition placeholder-[#7B859C]/40 font-mono tracking-wider"
                 />
               </div>
 
@@ -524,7 +524,7 @@ export default function ProviderPromotionsPage() {
                   <select
                     value={type}
                     onChange={(e) => setType(e.target.value as any)}
-                    className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs text-[#101828] outline-none focus:border-[#D1AF47] transition appearance-none cursor-pointer"
+                    className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-4 py-3 text-xs text-[#101828] outline-none focus:border-[#D1AF47] transition appearance-none cursor-pointer"
                   >
                     <option value="percentage">{t.discountPct}</option>
                     <option value="fixed">{t.fixedDiscount}</option>
@@ -544,7 +544,7 @@ export default function ProviderPromotionsPage() {
                   <select
                     value={targetSegment}
                     onChange={(e) => setTargetSegment(e.target.value as any)}
-                    className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs text-[#101828] outline-none focus:border-[#D1AF47] transition appearance-none cursor-pointer"
+                    className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-4 py-3 text-xs text-[#101828] outline-none focus:border-[#D1AF47] transition appearance-none cursor-pointer"
                   >
                     <option value="all">{t.targetSegmentAll}</option>
                     <option value="vip">{t.targetSegmentVip}</option>
@@ -613,7 +613,7 @@ export default function ProviderPromotionsPage() {
                   required
                   value={expiry}
                   onChange={(e) => setExpiry(e.target.value)}
-                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs text-[#101828] outline-none focus:border-[#D1AF47] transition placeholder-[#7B859C]/40"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-4 py-3 text-xs text-[#101828] outline-none focus:border-[#D1AF47] transition placeholder-[#7B859C]/40"
                 />
               </div>
 
@@ -625,7 +625,7 @@ export default function ProviderPromotionsPage() {
                   placeholder={t.descPlaceholder}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-4 py-3 text-xs text-[#101828] outline-none focus:border-[#D1AF47] transition placeholder-[#7B859C]/40"
+                  className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-4 py-3 text-xs text-[#101828] outline-none focus:border-[#D1AF47] transition placeholder-[#7B859C]/40"
                 />
               </div>
             </div>
@@ -657,7 +657,7 @@ export default function ProviderPromotionsPage() {
           <span>Loading coupons...</span>
         </div>
       ) : promos.length === 0 ? (
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-16 text-center text-[#667085] shadow-sm flex flex-col items-center justify-center space-y-4">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-16 text-center text-[#667085] shadow-sm flex flex-col items-center justify-center space-y-4">
           <div className="w-16 h-16 rounded-full bg-transparent border border-[#ECECEC] flex items-center justify-center text-[#667085]">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -669,7 +669,7 @@ export default function ProviderPromotionsPage() {
           </div>
         </div>
       ) : (
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] overflow-hidden shadow-xl">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] overflow-hidden shadow-xl">
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-start border-collapse" dir={isRTL ? "rtl" : "ltr"}>
               <thead>
@@ -694,7 +694,7 @@ export default function ProviderPromotionsPage() {
                       <td className="py-5 px-6 text-start">
                         <div className="flex flex-col gap-1.5">
                           <div className="flex items-center gap-3">
-                            <span className="font-mono text-sm font-bold text-[#101828] tracking-widest bg-[#F3F4F6] border border-[#ECECEC] border border-[#ECECEC] px-2.5 py-1 rounded-lg">
+                            <span className="font-mono text-sm font-bold text-[#101828] tracking-widest bg-[#F3F4F6] border border-[#ECECEC] px-2.5 py-1 rounded-lg">
                               {p.code}
                             </span>
                             {getSegmentBadge(segment)}

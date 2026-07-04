@@ -138,7 +138,7 @@ export default function ProviderMessages() {
               placeholder="Search clients..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]/80 border border-[#ECECEC] rounded-xl px-4 py-2.5 pl-9 text-xs text-[#101828] placeholder-[#7B859C] outline-none focus:border-[#D1AF47]/40 focus:bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] transition-all duration-300"
+              className="w-full bg-white border border-[#ECECEC] rounded-xl px-4 py-2.5 pl-9 text-xs text-[#101828] placeholder-[#7B859C] outline-none focus:border-[#D1AF47]/40 focus:bg-white shadow-[0_4px_12px_rgba(0,0,0,0.015)] transition-all duration-300"
             />
             <svg className="absolute left-3.5 top-3 w-3.5 h-3.5 text-[#667085]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

@@ -320,7 +320,7 @@ export default function ProviderCustomersPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
         {/* STAT 1: Total Clients */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
           <div className="space-y-2">
             <span className="text-[10px] uppercase font-bold text-[#667085] tracking-[0.1em] block">{t.statsTotalClients}</span>
             <span className="text-3xl font-extrabold text-[#101828] block tracking-tight">{totalClientsCount}</span>
@@ -333,7 +333,7 @@ export default function ProviderCustomersPage() {
         </div>
 
         {/* STAT 2: Total Bookings */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
           <div className="space-y-2">
             <span className="text-[10px] uppercase font-bold text-[#667085] tracking-[0.1em] block">{t.statsTotalBookings}</span>
             <span className="text-3xl font-extrabold text-[#101828] block tracking-tight">{totalBookingsCount}</span>
@@ -346,7 +346,7 @@ export default function ProviderCustomersPage() {
         </div>
 
         {/* STAT 3: Total Spend */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
           <div className="space-y-2">
             <span className="text-[10px] uppercase font-bold text-[#667085] tracking-[0.1em] block">{t.statsTotalSpend}</span>
             <span className="text-3xl font-extrabold text-[#D1AF47] block tracking-tight">
@@ -361,7 +361,7 @@ export default function ProviderCustomersPage() {
         </div>
 
         {/* STAT 4: Average Spend */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 flex items-center justify-between hover:shadow-[0_0_25px_rgba(209,175,71,0.08)] hover:border-[#D1AF47]/30 transition-all duration-300 group">
           <div className="space-y-2">
             <span className="text-[10px] uppercase font-bold text-[#667085] tracking-[0.1em] block">{t.statsAverageSpend}</span>
             <span className="text-3xl font-extrabold text-[#D1AF47] block tracking-tight">
@@ -384,14 +384,14 @@ export default function ProviderCustomersPage() {
           <p className="text-sm font-semibold text-[#344054]">{t.loadingClients}</p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-16 text-center text-[#667085] shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-16 text-center text-[#667085] shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
           <svg className="w-12 h-12 mx-auto text-[#667085]/40 mb-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.109A2.25 2.25 0 0112.75 21.5h-1.5a2.25 2.25 0 01-2.25-2.263V19.13m4.75-3.07a8.906 8.906 0 00-6-2.225 8.906 8.906 0 00-6 2.225m7.962-3.07a3.95 3.95 0 00-4.924-2.597M16.5 7.75a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 2.25a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
           </svg>
           <p className="text-base font-bold text-[#101828] mb-1">{t.noClients}</p>
         </div>
       ) : (
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.015)]">
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-start border-collapse">
               <thead>
@@ -478,7 +478,7 @@ export default function ProviderCustomersPage() {
       {/* INDIVIDUAL CLIENT SUMMARY & NOTES EDIT POPUP (MODAL) */}
       {editingClient && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-transparent/80 backdrop-blur-md">
-          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[28px] w-full max-w-3xl p-8 shadow-[0_12px_40px_rgba(0,0,0,0.6),0_0_40px_rgba(209,175,71,0.05)] text-[#101828] space-y-6 relative overflow-hidden">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[28px] w-full max-w-3xl p-8 shadow-[0_12px_40px_rgba(0,0,0,0.03)] text-[#101828] space-y-6 relative overflow-hidden">
             
             {/* Ambient Background Glow inside Popup */}
             <div className="absolute -top-20 -right-20 w-48 h-48 bg-[#D1AF47]/5 rounded-full blur-3xl pointer-events-none" />
@@ -505,7 +505,7 @@ export default function ProviderCustomersPage() {
               
               {/* LEFT PROFILE & METRICS PANEL (5 Cols) */}
               <div className="md:col-span-5 space-y-4">
-                <div className="bg-white border border-[#ECECEC] border border-[#ECECEC] rounded-2xl p-5 space-y-4">
+                <div className="bg-white border border-[#ECECEC] rounded-2xl p-5 space-y-4">
                   
                   {/* Name & Phone */}
                   <div className="space-y-1">
@@ -604,7 +604,7 @@ export default function ProviderCustomersPage() {
                 value={noteText}
                 onChange={(e) => setNoteText(e.target.value)}
                 placeholder={t.notesPlaceholder}
-                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] focus:border-[#D1AF47]/50 rounded-2xl p-4 text-xs text-[#101828] outline-none placeholder-[#7B859C]/40 leading-relaxed transition-all duration-300 focus:shadow-[0_0_15px_rgba(209,175,71,0.05)] resize-none"
+                className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] focus:border-[#D1AF47]/50 rounded-2xl p-4 text-xs text-[#101828] outline-none placeholder-[#7B859C]/40 leading-relaxed transition-all duration-300 focus:shadow-[0_0_15px_rgba(209,175,71,0.05)] resize-none"
               />
             </div>
 

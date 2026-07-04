@@ -213,7 +213,7 @@ export default function ProviderReviewsPage() {
       </div>
 
       {error && (
-        <div className={`bg-white border border-[#ECECEC]/80 border border-[#D1AF47]/20 text-[#344054] text-xs rounded-2xl p-4 shadow-[0_0_20px_rgba(209,175,71,0.05)] backdrop-blur-md ${isRTL ? "text-right" : "text-left"}`}>
+        <div className={`bg-white border border-[#ECECEC] text-[#344054] text-xs rounded-2xl p-4 shadow-[0_0_20px_rgba(209,175,71,0.05)] backdrop-blur-md ${isRTL ? "text-right" : "text-left"}`}>
           <span className="text-[#D1AF47] font-semibold mr-1.5">{isRTL ? "ملاحظة:" : "Notice:"}</span> {error}
         </div>
       )}
@@ -221,7 +221,7 @@ export default function ProviderReviewsPage() {
       {/* METRIC SUMMARIES */}
       <div dir={isRTL ? "rtl" : "ltr"} className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* AVERAGE RATING */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-xl transition-all duration-300 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] flex flex-col justify-between relative overflow-hidden group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-xl transition-all duration-300 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] flex flex-col justify-between relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47]/5 rounded-full blur-3xl pointer-events-none transition-all duration-300 group-hover:bg-[#D1AF47]/10" />
           <div className={isRTL ? "text-right" : "text-left"}>
             <span className="text-[10px] uppercase font-bold text-[#667085] block tracking-widest">{t.avgRating}</span>
@@ -242,7 +242,7 @@ export default function ProviderReviewsPage() {
         </div>
 
         {/* TOTAL REVIEWS */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-xl transition-all duration-300 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] flex flex-col justify-between relative overflow-hidden group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-xl transition-all duration-300 hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] flex flex-col justify-between relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47]/5 rounded-full blur-3xl pointer-events-none transition-all duration-300 group-hover:bg-[#D1AF47]/10" />
           <div className={isRTL ? "text-right" : "text-left"}>
             <span className="text-[10px] uppercase font-bold text-[#667085] block tracking-widest">{t.totalReviews}</span>
@@ -257,14 +257,14 @@ export default function ProviderReviewsPage() {
         </div>
 
         {/* STAFF FILTER */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-xl flex flex-col justify-between relative overflow-hidden">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-xl flex flex-col justify-between relative overflow-hidden">
           <div className="space-y-3">
             <span className={`text-[10px] uppercase font-bold text-[#667085] block tracking-widest ${isRTL ? "text-right" : "text-left"}`}>{t.filterStaff}</span>
             <div className="relative mt-2">
               <select
                 value={selectedStaffId}
                 onChange={(e) => setSelectedStaffId(e.target.value)}
-                className={`w-full bg-white border border-[#ECECEC] border border-[#ECECEC] text-[#101828] rounded-xl px-4 py-2.5 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47]/50 font-medium transition duration-200 appearance-none ${isRTL ? "text-right pr-4 pl-8" : "text-left pl-4 pr-8"}`}
+                className={`w-full bg-white border border-[#ECECEC] text-[#101828] rounded-xl px-4 py-2.5 text-xs outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47]/50 font-medium transition duration-200 appearance-none ${isRTL ? "text-right pr-4 pl-8" : "text-left pl-4 pr-8"}`}
               >
                 <option value="all" className="bg-white border border-[#ECECEC] text-[#101828]">{t.allStaff}</option>
                 {staffList.map((emp) => (
@@ -292,7 +292,7 @@ export default function ProviderReviewsPage() {
           </span>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-16 text-center text-[#667085] shadow-xl font-medium text-sm max-w-lg mx-auto">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-16 text-center text-[#667085] shadow-xl font-medium text-sm max-w-lg mx-auto">
           <div className="text-4xl mb-4 text-[#D1AF47]">★</div>
           <p className="text-[#101828] font-semibold mb-2">{t.noReviews}</p>
           <p className="text-xs text-[#667085]">{isRTL ? "سيظهر تقييم العملاء هنا فور استلامه." : "Customer reviews will appear here once submitted."}</p>
@@ -303,7 +303,7 @@ export default function ProviderReviewsPage() {
             <div
               key={rev.id}
               dir={isRTL ? "rtl" : "ltr"}
-              className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-xl space-y-5 hover:border-[#D1AF47]/20 transition-all duration-300 hover:shadow-[0_4px_30px_rgba(0,0,0,0.4)] relative overflow-hidden"
+              className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-xl space-y-5 hover:border-[#D1AF47]/20 transition-all duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.04)] relative overflow-hidden"
             >
               {/* Header inside review card */}
               <div className="flex justify-between items-start flex-wrap gap-4">
@@ -370,7 +370,7 @@ export default function ProviderReviewsPage() {
                       setReplyingReviewId(rev.id);
                       setReplyText("");
                     }}
-                    className="px-4 py-2 border border-[#ECECEC] hover:border-[#D1AF47] text-[10px] font-bold uppercase tracking-wider rounded-xl text-[#101828] transition-all duration-300 bg-white border border-[#ECECEC] hover:bg-[#1d2942] hover:shadow-[0_0_15px_rgba(209,175,71,0.15)]"
+                    className="px-4 py-2 border border-[#ECECEC] text-[10px] font-bold uppercase tracking-wider rounded-xl text-[#101828] transition-all duration-300 bg-white hover:bg-gray-50 hover:border-[#D1AF47]/30 hover:text-[#D1AF47] shadow-sm"
                   >
                     {t.reply}
                   </button>
@@ -382,7 +382,7 @@ export default function ProviderReviewsPage() {
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                     placeholder={t.replyPlaceholder}
-                    className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl p-4 text-xs text-[#101828] placeholder-[#7B859C] outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] transition duration-200"
+                    className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl p-4 text-xs text-[#101828] placeholder-[#7B859C] outline-none focus:border-[#D1AF47] focus:ring-1 focus:ring-[#D1AF47] transition duration-200"
                   />
                   <div className="flex gap-3 justify-end">
                     <button

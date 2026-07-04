@@ -1008,7 +1008,7 @@ export default function ProviderEmployeesPage() {
 
       {staffModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#101828]/40 px-4 py-8 backdrop-blur-sm">
-          <div className="w-full max-w-2xl rounded-[28px] border border-[#ECECEC] bg-white p-6 shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
+          <div className="w-full max-w-2xl rounded-[28px] border border-[#ECECEC] bg-white p-6 shadow-[0_12px_40px_rgba(0,0,0,0.02)]">
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-xl font-black text-[#101828]">
@@ -1086,7 +1086,7 @@ export default function ProviderEmployeesPage() {
 
       {profileModalOpen && activeMember && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#101828]/40 px-4 py-8 backdrop-blur-sm">
-          <div className="w-full max-w-2xl overflow-hidden rounded-[28px] border border-[#ECECEC] bg-white shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
+          <div className="w-full max-w-2xl overflow-hidden rounded-[28px] border border-[#ECECEC] bg-white shadow-[0_12px_40px_rgba(0,0,0,0.02)]">
             <div className="relative h-36 bg-gradient-to-br from-[#F4E7B6]/40 via-[#FDFBF7] to-[#F5EEE0] border-b border-[#ECECEC]">
               <button onClick={() => setProfileModalOpen(false)} className="absolute right-5 top-5 rounded-full border border-[#ECECEC] bg-white px-3 py-1 text-xs font-bold text-[#344054] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
                 {teamCopy.cancel}
@@ -1154,7 +1154,7 @@ export default function ProviderEmployeesPage() {
 
       {servicesModalOpen && activeMember && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#101828]/40 px-4 py-8 backdrop-blur-sm">
-          <div className="w-full max-w-xl rounded-[28px] border border-[#ECECEC] bg-white p-6 shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
+          <div className="w-full max-w-xl rounded-[28px] border border-[#ECECEC] bg-white p-6 shadow-[0_12px_40px_rgba(0,0,0,0.02)]">
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-xl font-black text-[#101828]">{teamCopy.servicesTitle}</h3>
@@ -1196,7 +1196,7 @@ export default function ProviderEmployeesPage() {
 
       {shiftsModalOpen && activeMember && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#101828]/40 px-4 py-8 backdrop-blur-sm">
-          <div className="w-full max-w-2xl rounded-[28px] border border-[#ECECEC] bg-white p-6 shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
+          <div className="w-full max-w-2xl rounded-[28px] border border-[#ECECEC] bg-white p-6 shadow-[0_12px_40px_rgba(0,0,0,0.02)]">
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-xl font-black text-[#101828]">{teamCopy.shiftsTitle}</h3>

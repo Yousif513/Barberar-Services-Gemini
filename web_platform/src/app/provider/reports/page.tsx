@@ -230,7 +230,7 @@ export default function ProviderReportsPage() {
 
             {/* Date Picker Popover */}
             {showDatePicker && (
-              <div className={`absolute top-full mt-2 p-5 rounded-[24px] bg-white border border-[#ECECEC] border border-[#ECECEC] shadow-2xl z-50 w-72 ${locale === "ar" ? "left-0" : "right-0"}`}>
+              <div className={`absolute top-full mt-2 p-5 rounded-[24px] bg-white border border-[#ECECEC] shadow-2xl z-50 w-72 ${locale === "ar" ? "left-0" : "right-0"}`}>
                 <h4 className="text-xs uppercase tracking-wider text-[#667085] mb-3.5 font-bold text-left">{t.customRange}</h4>
                 <div className="space-y-3">
                   <div>
@@ -239,7 +239,7 @@ export default function ProviderReportsPage() {
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-3 py-2 text-xs text-[#101828] focus:outline-none focus:border-[#D1AF47] transition-all duration-300"
+                      className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-3 py-2 text-xs text-[#101828] focus:outline-none focus:border-[#D1AF47] transition-all duration-300"
                     />
                   </div>
                   <div>
@@ -248,7 +248,7 @@ export default function ProviderReportsPage() {
                       type="date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-xl px-3 py-2 text-xs text-[#101828] focus:outline-none focus:border-[#D1AF47] transition-all duration-300"
+                      className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-3 py-2 text-xs text-[#101828] focus:outline-none focus:border-[#D1AF47] transition-all duration-300"
                     />
                   </div>
                   <button
@@ -295,7 +295,7 @@ export default function ProviderReportsPage() {
       {/* KPI SUMMARIES */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Gross Revenue Card */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-sm hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300 relative overflow-hidden group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-sm hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47] opacity-[0.02] rounded-full blur-3xl group-hover:opacity-[0.06] transition-all duration-500" />
           <div className={`flex items-start justify-between ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
             <div className={locale === "ar" ? "text-right" : "text-left"}>
@@ -319,7 +319,7 @@ export default function ProviderReportsPage() {
         </div>
 
         {/* Total Bookings Card */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-sm hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300 relative overflow-hidden group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-sm hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47] opacity-[0.02] rounded-full blur-3xl group-hover:opacity-[0.06] transition-all duration-500" />
           <div className={`flex items-start justify-between ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
             <div className={locale === "ar" ? "text-right" : "text-left"}>
@@ -341,7 +341,7 @@ export default function ProviderReportsPage() {
         </div>
 
         {/* Completion Rate Card */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-sm hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300 relative overflow-hidden group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-sm hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47] opacity-[0.02] rounded-full blur-3xl group-hover:opacity-[0.06] transition-all duration-500" />
           <div className={`flex items-start justify-between ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
             <div className={locale === "ar" ? "text-right" : "text-left"}>
@@ -363,7 +363,7 @@ export default function ProviderReportsPage() {
       {/* SALES TRENDS & SERVICE SHARE CHARTS */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* LINE CHART CARD */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-sm lg:col-span-2 relative overflow-hidden group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-sm lg:col-span-2 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#D1AF47] opacity-[0.01] rounded-full blur-3xl group-hover:opacity-[0.03] transition-all duration-500" />
           <h3 className="font-serif font-bold text-base text-[#101828] mb-6 tracking-wide text-left">
             {locale === "ar" ? "اتجاهات الإيرادات (آخر ٦ أشهر)" : "Revenue Trends (Last 6 Months)"}
@@ -441,7 +441,7 @@ export default function ProviderReportsPage() {
         </div>
 
         {/* DONUT CHART CARD */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-sm flex flex-col justify-between relative overflow-hidden group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-sm flex flex-col justify-between relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47] opacity-[0.01] rounded-full blur-3xl group-hover:opacity-[0.03] transition-all duration-500" />
           <div>
             <h3 className="font-serif font-bold text-base text-[#101828] mb-6 tracking-wide text-left">{t.servicesDistribution}</h3>
@@ -495,7 +495,7 @@ export default function ProviderReportsPage() {
       {/* STAFF PERFORMANCE & POPULAR SERVICES GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* STAFF PERFORMANCE */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-sm relative overflow-hidden">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-sm relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#D1AF47]/25 to-transparent" />
           <h3 className={`font-serif font-bold text-base text-[#101828] mb-6 tracking-wide ${locale === "ar" ? "text-right" : "text-left"}`}>{t.staffPerformance}</h3>
 
@@ -520,7 +520,7 @@ export default function ProviderReportsPage() {
                       <td className={`py-4 px-6 font-bold text-[#101828] ${locale === "ar" ? "text-right" : "text-left"}`}>
                         <div className={`flex items-center gap-3 ${locale === "ar" ? "flex-row-reverse" : ""}`}>
                           {/* Initials Avatar */}
-                          <div className="w-8 h-8 rounded-xl bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] flex items-center justify-center text-[#D1AF47] text-[10px] font-black uppercase shadow-inner">
+                          <div className="w-8 h-8 rounded-xl bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] flex items-center justify-center text-[#D1AF47] text-[10px] font-black uppercase shadow-inner">
                             {(locale === "ar" ? staff.name_ar : staff.name_en).split(" ").map((n: string) => n[0]).join("")}
                           </div>
                           <span>{locale === "ar" ? staff.name_ar : staff.name_en}</span>
@@ -547,7 +547,7 @@ export default function ProviderReportsPage() {
         </div>
 
         {/* POPULARITY BAR CHART */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-sm relative overflow-hidden group">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-sm relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#D1AF47]/25 to-transparent" />
           <div className={`flex items-center justify-between mb-6 ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
             <h3 className="font-serif font-bold text-base text-[#101828] tracking-wide">{t.popularServices}</h3>

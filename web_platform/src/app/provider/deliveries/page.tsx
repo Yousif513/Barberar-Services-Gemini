@@ -432,7 +432,7 @@ export default function CourierDeliveriesPage() {
       {/* KPI Dashboard Indicators */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {/* KPI 1 */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[20px] p-5 relative overflow-hidden group hover:border-[#D1AF47]/30 transition duration-300">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[20px] p-5 relative overflow-hidden group hover:border-[#D1AF47]/30 transition duration-300">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#D1AF47]/10 to-transparent rounded-bl-full pointer-events-none transition-all duration-300 group-hover:scale-110" />
           <p className="text-xs font-semibold text-[#667085] uppercase tracking-wider">{t.kpiAvailable}</p>
           <h3 className="text-2xl md:text-3xl font-extrabold text-[#101828] mt-2 font-serif tracking-tight">
@@ -445,7 +445,7 @@ export default function CourierDeliveriesPage() {
         </div>
 
         {/* KPI 2 */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[20px] p-5 relative overflow-hidden group hover:border-blue-500/30 transition duration-300">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[20px] p-5 relative overflow-hidden group hover:border-blue-500/30 transition duration-300">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-500/10 to-transparent rounded-bl-full pointer-events-none transition-all duration-300 group-hover:scale-110" />
           <p className="text-xs font-semibold text-[#667085] uppercase tracking-wider">{t.kpiActive}</p>
           <h3 className="text-2xl md:text-3xl font-extrabold text-[#101828] mt-2 font-serif tracking-tight">
@@ -458,7 +458,7 @@ export default function CourierDeliveriesPage() {
         </div>
 
         {/* KPI 3 */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[20px] p-5 relative overflow-hidden group hover:border-[#3DDC84]/30 transition duration-300">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[20px] p-5 relative overflow-hidden group hover:border-[#3DDC84]/30 transition duration-300">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#3DDC84]/10 to-transparent rounded-bl-full pointer-events-none transition-all duration-300 group-hover:scale-110" />
           <p className="text-xs font-semibold text-[#667085] uppercase tracking-wider">{t.kpiCompleted}</p>
           <h3 className="text-2xl md:text-3xl font-extrabold text-[#101828] mt-2 font-serif tracking-tight">
@@ -471,7 +471,7 @@ export default function CourierDeliveriesPage() {
         </div>
 
         {/* KPI 4 */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[20px] p-5 relative overflow-hidden group hover:border-purple-550/30 transition duration-300">
+        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[20px] p-5 relative overflow-hidden group hover:border-purple-550/30 transition duration-300">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-purple-500/10 to-transparent rounded-bl-full pointer-events-none transition-all duration-300 group-hover:scale-110" />
           <p className="text-xs font-semibold text-[#667085] uppercase tracking-wider">{t.activeCouriers}</p>
           <h3 className="text-2xl md:text-3xl font-extrabold text-[#101828] mt-2 font-serif tracking-tight">
@@ -491,7 +491,7 @@ export default function CourierDeliveriesPage() {
         <div className="lg:col-span-2 space-y-6">
           
           {/* Active Logistics Dispatch Map */}
-          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 relative overflow-hidden shadow-xl">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 relative overflow-hidden shadow-xl">
             <div className={`flex justify-between items-center mb-4 flex-wrap gap-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <div>
                 <h3 className="text-sm md:text-base font-extrabold text-[#101828] tracking-wide">{t.mapTitle}</h3>
@@ -696,7 +696,7 @@ export default function CourierDeliveriesPage() {
               {isRTL ? "جاري تحميل اللوحة اللوجستية..." : "Loading logistics board..."}
             </div>
           ) : filteredJobs.length === 0 ? (
-            <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[20px] py-16 text-center text-[#667085] text-xs font-medium">
+            <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[20px] py-16 text-center text-[#667085] text-xs font-medium">
               {t.noJobs}
             </div>
           ) : (
@@ -851,7 +851,7 @@ export default function CourierDeliveriesPage() {
         <div className="space-y-6">
           
           {/* Courier Fleet Status List */}
-          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-xl relative overflow-hidden">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-xl relative overflow-hidden">
             <h3 className={`text-sm md:text-base font-extrabold text-[#101828] tracking-wide mb-4 ${isRTL ? "text-right" : "text-left"}`}>
               {t.courierListTitle}
             </h3>
@@ -860,7 +860,7 @@ export default function CourierDeliveriesPage() {
               {couriers.map(courier => (
                 <div 
                   key={courier.id}
-                  className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl p-4 flex items-center justify-between hover:bg-white border border-[#ECECEC] transition duration-200"
+                  className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-2xl p-4 flex items-center justify-between hover:bg-white border border-[#ECECEC] transition duration-200"
                 >
                   <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                     <div className="w-10 h-10 rounded-full bg-[#1A2236] border border-[#D1AF47]/30 flex items-center justify-center font-bold text-[#D1AF47] text-xs">
@@ -904,7 +904,7 @@ export default function CourierDeliveriesPage() {
           </div>
 
           {/* Dispatch Parameters Form */}
-          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-[24px] p-6 shadow-xl relative overflow-hidden">
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-xl relative overflow-hidden">
             <h3 className={`text-sm md:text-base font-extrabold text-[#101828] tracking-wide mb-4 ${isRTL ? "text-right" : "text-left"}`}>
               {t.dispatchSettings}
             </h3>
@@ -985,7 +985,7 @@ export default function CourierDeliveriesPage() {
       </div>
 
       {/* Offline Simulator Notice Footer */}
-      <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[#ECECEC] rounded-2xl p-4 text-[10px] text-[#667085] text-center leading-relaxed font-medium">
+      <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-2xl p-4 text-[10px] text-[#667085] text-center leading-relaxed font-medium">
         🛡 {t.mockNotice}
       </div>
 
