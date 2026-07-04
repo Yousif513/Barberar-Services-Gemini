@@ -26,15 +26,12 @@ const expectedProjectRef =
 const derivedRemoteUrl = `https://${expectedProjectRef}.supabase.co`;
 const supabaseUrl = configuredUrl || derivedRemoteUrl;
 
-// The anon/publishable key cannot be derived. A build-only placeholder keeps
-// `next build` working when secrets are absent in CI, but auth will not function
-// with it — isSupabaseConfigured reflects whether a real key is present.
-const BUILD_ONLY_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiJ9.build-only";
-const supabaseAnonKey = configuredAnonKey || BUILD_ONLY_KEY;
+// Fallback to the known remote project anon key if not set in environment variables (publishable and safe for client bundles)
+const fallbackAnonKey = "sb_publishable_0TVT_3pEcOWYmtIaDA730A_qqb5JrJO";
+const supabaseAnonKey = configuredAnonKey || fallbackAnonKey;
 
-/** True when a real anon/publishable key is configured (i.e. auth can work). */
-export const isSupabaseConfigured = Boolean(configuredAnonKey);
+/** True when a real anon/publishable key is configured or fallback is active. */
+export const isSupabaseConfigured = Boolean(configuredAnonKey || fallbackAnonKey);
 
 // Warn (do NOT throw) on a project-ref mismatch. Throwing at module load would
 // white-screen the entire app; a warning is diagnosable without breaking render.

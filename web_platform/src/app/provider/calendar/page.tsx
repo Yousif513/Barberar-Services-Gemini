@@ -314,6 +314,10 @@ export default function ProviderCalendarPage() {
   const [selectedPrayerCityKey, setSelectedPrayerCityKey] = useState("riyadh");
   const [citySearch, setCitySearch] = useState("");
   const [cityListOpen, setCityListOpen] = useState(false);
+  // Which shift time picker is expanded (only one grid open at a time).
+  // Lifted to the parent because TimeWheelPicker is defined inline and would
+  // lose internal state on every parent re-render.
+  const [openTimePicker, setOpenTimePicker] = useState<string | null>(null);
 
   // --- 3. MODALS STATES ---
   const [showBookModal, setShowBookModal] = useState(false);
@@ -877,10 +881,12 @@ export default function ProviderCalendarPage() {
   );
 
   const TimeWheelPicker = ({
+    pickerId,
     label,
     value,
     onChange
   }: {
+    pickerId: string;
     label: string;
     value: string;
     onChange: (value: string) => void;
@@ -889,18 +895,33 @@ export default function ProviderCalendarPage() {
     const normalizedPeriod = period === "PM" ? "PM" : "AM";
     const updateHour = (nextHour: string) => onChange(`${nextHour} ${normalizedPeriod}`);
     const updatePeriod = (nextPeriod: "AM" | "PM") => onChange(`${hour} ${nextPeriod}`);
+    const isOpen = openTimePicker === pickerId;
 
     return (
       <div className="space-y-2">
-        <div className={`flex items-center justify-between ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+        <div className={`flex items-center justify-between gap-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
           <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>
             {label}
           </label>
-          <span className="rounded-full bg-[#D1AF47]/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[#A37B16]">
+          {/* Tap the time chip to expand/collapse the hour grid */}
+          <button
+            type="button"
+            aria-expanded={isOpen}
+            onClick={() => setOpenTimePicker(isOpen ? null : pickerId)}
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] transition-all duration-300 ${
+              isOpen
+                ? "bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] text-[#070B12] shadow-[0_0_16px_rgba(209,175,71,0.28)]"
+                : "bg-[#D1AF47]/10 text-[#A37B16] hover:bg-[#D1AF47]/20"
+            }`}
+          >
             {value}
-          </span>
+            <svg className={`h-3 w-3 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
         </div>
-        {/* Hour grid: all 12 hours visible at once (no scrolling), AM/PM pill on top */}
+        {/* Hour grid: all 12 hours visible at once, shown only while expanded */}
+        {isOpen && (
         <div className="space-y-2.5 rounded-3xl border border-[#D1AF47]/30 bg-[linear-gradient(180deg,#FFFCF4_0%,#F8F2E5_100%)] p-3 shadow-[0_10px_26px_rgba(17,17,17,0.05)]">
           <div className="flex rounded-xl border border-[#D1AF47]/20 bg-white/70 p-1">
             {PERIOD_OPTIONS.map((option) => {
@@ -943,6 +964,7 @@ export default function ProviderCalendarPage() {
             })}
           </div>
         </div>
+        )}
       </div>
     );
   };
@@ -1597,11 +1619,13 @@ export default function ProviderCalendarPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <TimeWheelPicker
+                pickerId="first-opening"
                 label={`${t.firstShiftLabel} · ${t.openingLabel}`}
                 value={shiftStart}
                 onChange={setShiftStart}
               />
               <TimeWheelPicker
+                pickerId="first-closing"
                 label={`${t.firstShiftLabel} · ${t.closingLabel}`}
                 value={shiftEnd}
                 onChange={setShiftEnd}
@@ -1629,11 +1653,13 @@ export default function ProviderCalendarPage() {
             {hasSecondShift && (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <TimeWheelPicker
+                  pickerId="second-opening"
                   label={`${t.secondShiftLabel} · ${t.openingLabel}`}
                   value={secondShiftStart}
                   onChange={setSecondShiftStart}
                 />
                 <TimeWheelPicker
+                  pickerId="second-closing"
                   label={`${t.secondShiftLabel} · ${t.closingLabel}`}
                   value={secondShiftEnd}
                   onChange={setSecondShiftEnd}
