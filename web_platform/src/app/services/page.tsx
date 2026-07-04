@@ -17,6 +17,7 @@ type ServiceGender = "male" | "female" | "unisex";
 type ShopGender = "male" | "female" | "both";
 type CatalogService = {
   id: string;
+  displayId?: string;
   slug: string;
   name_en: string;
   name_ar: string;
@@ -214,7 +215,7 @@ function normalizeServiceImages(images: unknown, slug: string, categorySlug: str
 }
 
 function serviceMatchesGender(service: CatalogService, filter: "all" | "male" | "female") {
-  return filter === "all" || service.genderCategory === filter || service.genderCategory === "unisex";
+  return filter === "all" || service.genderCategory === filter;
 }
 
 function shopMatchesGender(shop: CatalogShop, filter: "all" | "male" | "female") {
@@ -227,6 +228,66 @@ function genderFromServices(services: Pick<CatalogService, "genderCategory">[]):
   if (hasMale && hasFemale) return "both";
   if (hasFemale) return "female";
   return "male";
+}
+
+function genderedServiceDescription(service: CatalogService, gender: "male" | "female", locale: "en" | "ar") {
+  const category = service.category_slug;
+  if (locale === "ar") {
+    if (gender === "male") {
+      if (category === "skincare-facials") return `عناية رجالية مخصصة: ${service.description_ar}`;
+      if (category === "spa-wellness") return `تجربة استرخاء رجالية بضغط مناسب وتعطير هادئ: ${service.description_ar}`;
+      if (category === "signature-packages") return `باقة رجالية مصممة للظهور الأنيق: ${service.description_ar}`;
+      return `خدمة رجالية بتفاصيل تناسب أسلوب العناية العصري: ${service.description_ar}`;
+    }
+    if (category === "skincare-facials") return `عناية نسائية مخصصة للبشرة والإشراقة: ${service.description_ar}`;
+    if (category === "spa-wellness") return `تجربة استرخاء نسائية هادئة مع لمسات فاخرة: ${service.description_ar}`;
+    if (category === "signature-packages") return `باقة نسائية مصممة للإطلالة المتكاملة: ${service.description_ar}`;
+    return `خدمة نسائية بتفاصيل ناعمة وتجربة عناية فاخرة: ${service.description_ar}`;
+  }
+
+  if (gender === "male") {
+    if (category === "skincare-facials") return `A male-focused treatment calibrated for thicker skin, oil balance, and a clean refreshed finish. ${service.description_en}`;
+    if (category === "spa-wellness") return `A men's wellness ritual with firmer pressure, grounded aromatics, and a composed recovery finish. ${service.description_en}`;
+    if (category === "signature-packages") return `A men's grooming package shaped around sharp presentation, skin refresh, and polished finishing. ${service.description_en}`;
+    return `A male-focused service tuned for modern grooming needs, clean lines, and a confident finish. ${service.description_en}`;
+  }
+  if (category === "skincare-facials") return `A female-focused treatment calibrated for glow, hydration, and a softer luminous finish. ${service.description_en}`;
+  if (category === "spa-wellness") return `A women's wellness ritual with calming pressure, soft aromatics, and a graceful reset. ${service.description_en}`;
+  if (category === "signature-packages") return `A women's beauty package shaped around radiance, relaxation, and polished finishing. ${service.description_en}`;
+  return `A female-focused service tuned for refined beauty care, softness, and a premium finish. ${service.description_en}`;
+}
+
+function genderedServiceVariant(service: CatalogService, gender: "male" | "female"): CatalogService {
+  const suffixEn = gender === "male" ? "for Men" : "for Women";
+  const suffixAr = gender === "male" ? "للرجال" : "للسيدات";
+  return {
+    ...service,
+    displayId: `${service.id}-${gender}`,
+    name_en: `${service.name_en} ${suffixEn}`,
+    name_ar: `${service.name_ar} ${suffixAr}`,
+    description_en: genderedServiceDescription(service, gender, "en"),
+    description_ar: genderedServiceDescription(service, gender, "ar"),
+    images: [
+      SERVICE_IMAGE_BY_GENDER_CATEGORY[service.category_slug]?.[gender] ||
+      SERVICE_IMAGE_BY_CATEGORY[service.category_slug] ||
+      SERVICE_IMAGE_BY_CATEGORY["barber-hair"]
+    ],
+    genderCategory: gender,
+    sort_order: service.sort_order + (gender === "female" ? 0.2 : 0.1)
+  };
+}
+
+function expandGenderedServices(list: CatalogService[]) {
+  return list.flatMap((service) => {
+    if (service.genderCategory !== "unisex") {
+      return [{
+        ...service,
+        displayId: service.displayId || service.id,
+        images: service.images.length > 0 ? service.images : [serviceImageFor(service)]
+      }];
+    }
+    return [genderedServiceVariant(service, "male"), genderedServiceVariant(service, "female")];
+  });
 }
 
 const FALLBACK_SERVICES: CatalogService[] = [
@@ -320,6 +381,11 @@ const translations = {
     subtitle: "Search shops and services by treatment, provider, category, and gender fit.",
     search: "Search shops, services, categories...",
     providerSearch: "Search shop or provider name...",
+    filters: "Filters",
+    filterHint: "Refine the catalog by result type, category, price, availability, and gender.",
+    resultType: "Result type",
+    categoryFilter: "Category",
+    clearFilters: "Clear filters",
     all: "All",
     typeAll: "All",
     shopsTab: "Shops",
@@ -370,6 +436,11 @@ const translations = {
     subtitle: "ابحث عن المتاجر والخدمات حسب العلاج والمزود والفئة وملاءمة الجنس.",
     search: "ابحث عن المتاجر والخدمات والفئات...",
     providerSearch: "ابحث باسم المتجر أو المزود...",
+    filters: "الفلاتر",
+    filterHint: "رتب النتائج حسب النوع والفئة والسعر والتوفر والجنس.",
+    resultType: "نوع النتيجة",
+    categoryFilter: "الفئة",
+    clearFilters: "مسح الفلاتر",
     all: "الكل",
     typeAll: "الكل",
     shopsTab: "المتاجر",
@@ -421,7 +492,7 @@ function ServicesCatalog() {
   const searchParams = useSearchParams();
   const [lang, setLang] = useState<"en" | "ar">("en");
   const [categories, setCategories] = useState<CatalogCategory[]>(FALLBACK_CATEGORIES);
-  const [services, setServices] = useState<CatalogService[]>(FALLBACK_SERVICES);
+  const [services, setServices] = useState<CatalogService[]>(() => expandGenderedServices(FALLBACK_SERVICES));
   const [shops, setShops] = useState<CatalogShop[]>(FALLBACK_SHOPS);
   const [query, setQuery] = useState("");
   const [activeResultTab, setActiveResultTab] = useState<"all" | "shops" | "services">("all");
@@ -486,7 +557,7 @@ function ServicesCatalog() {
         ]);
         if (cats?.length) setCategories(cats);
         if (rows?.length) {
-          setServices((rows as CatalogServiceRow[]).map((r, i) => {
+          const mappedServices = (rows as CatalogServiceRow[]).map((r, i) => {
             const cat = r.categories ?? null;
             const provider = r.providers ?? null;
             return {
@@ -506,7 +577,8 @@ function ServicesCatalog() {
               providerNameAr: provider?.business_name_ar || fallbackProviderFor(cat?.slug ?? "other", "ar"),
               provider_id: r.provider_id || null,
             };
-          }));
+          });
+          setServices(expandGenderedServices(mappedServices));
         }
         if (providerRows?.length) {
           const mappedShops: CatalogShop[] = (providerRows as CatalogProviderRow[]).flatMap((provider, providerIndex) => {
@@ -642,10 +714,33 @@ function ServicesCatalog() {
           <p className="mt-2 max-w-xl text-sm font-medium text-[#5F584D]">{t.subtitle}</p>
         </div>
 
-        {/* Sticky filter bar */}
-        <div className="sticky top-[65px] z-30 -mx-2 mb-6 space-y-3 rounded-2xl border border-[#211A12]/8 bg-white/90 p-4 shadow-[0_8px_30px_rgba(21,16,10,0.05)] backdrop-blur-xl">
-          {/* Row 1: single unified search + type segmented control */}
-          <div className={`flex flex-col gap-3 sm:flex-row sm:items-center ${isRTL ? "sm:flex-row-reverse" : ""}`}>
+        <div className="grid gap-8 lg:grid-cols-[310px_minmax(0,1fr)] lg:items-start">
+        {/* Left filter rail */}
+        <aside className="z-30 space-y-5 rounded-[28px] border border-[#211A12]/8 bg-white/[0.92] p-5 shadow-[0_18px_55px_rgba(21,16,10,0.08)] backdrop-blur-xl lg:sticky lg:top-[88px]">
+          <div className={`flex items-start justify-between gap-3 ${isRTL ? "flex-row-reverse" : ""}`}>
+            <div>
+              <h2 className="font-serif text-xl font-black text-[#211A12]">{t.filters}</h2>
+              <p className="mt-1 text-xs font-semibold leading-5 text-[#8A7F6C]">{t.filterHint}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                setActiveResultTab("all");
+                setActiveCat("all");
+                setPriceBand("any");
+                setGenderFilter("all");
+                setHomeOnly(false);
+                setSort("recommended");
+                setCategoriesCollapsed(false);
+              }}
+              className="rounded-full border border-[#211A12]/10 bg-[#F2EEE6] px-3 py-1.5 text-[10px] font-black text-[#5F584D] transition hover:border-[#C29A4C]/45 hover:text-[#A57C32]"
+            >
+              {t.clearFilters}
+            </button>
+          </div>
+          {/* Search + type segmented control */}
+          <div className="space-y-3">
             <label className={`flex flex-1 items-center gap-2 rounded-xl border border-[#211A12]/10 bg-[#F2EEE6]/60 px-4 py-2.5 ${isRTL ? "flex-row-reverse" : ""}`}>
               <svg className="h-4 w-4 flex-shrink-0 text-[#8A7F6C]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
               <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t.search} className="w-full border-none bg-transparent text-sm outline-none placeholder:text-[#8A7F6C]" />
@@ -656,7 +751,9 @@ function ServicesCatalog() {
               )}
             </label>
             {/* Type: All / Shops / Services */}
-            <div className="flex flex-shrink-0 rounded-xl border border-[#211A12]/10 bg-[#F2EEE6]/65 p-1">
+            <div className="space-y-2">
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#8A7F6C]">{t.resultType}</p>
+            <div className="grid grid-cols-3 rounded-2xl border border-[#211A12]/10 bg-[#F2EEE6]/65 p-1">
               {([
                 ["all", t.typeAll, filteredShops.length + filteredServices.length],
                 ["shops", t.shopsTab, filteredShops.length],
@@ -675,21 +772,27 @@ function ServicesCatalog() {
                 </button>
               ))}
             </div>
+            </div>
           </div>
 
-          {/* Row 2: secondary filters (price / home / gender / sort) */}
-          <div className={`flex flex-wrap items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
-            <select value={priceBand} onChange={(e) => setPriceBand(e.target.value as typeof priceBand)} className="rounded-xl border border-[#211A12]/10 bg-white px-3 py-2 text-xs font-bold text-[#5F584D] outline-none">
+          {/* Secondary filters */}
+          <div className="space-y-3">
+            <label className="block space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.16em] text-[#8A7F6C]">{t.price}</span>
+            <select value={priceBand} onChange={(e) => setPriceBand(e.target.value as typeof priceBand)} className="w-full rounded-2xl border border-[#211A12]/10 bg-white px-3 py-3 text-xs font-bold text-[#5F584D] outline-none transition focus:border-[#C29A4C]/50">
               <option value="any">{t.anyPrice}</option>
               <option value="u50">{t.under50}</option>
               <option value="50-100">{t.p50to100}</option>
               <option value="100-200">{t.p100to200}</option>
               <option value="200+">{t.over200}</option>
             </select>
-            <button onClick={() => setHomeOnly((h) => !h)} className={`rounded-xl border px-3 py-2 text-xs font-bold transition ${homeOnly ? "border-[#C29A4C]/60 bg-[#C29A4C]/10 text-[#A57C32]" : "border-[#211A12]/10 bg-white text-[#5F584D]"}`}>
+            </label>
+            <button onClick={() => setHomeOnly((h) => !h)} className={`w-full rounded-2xl border px-3 py-3 text-xs font-bold transition ${homeOnly ? "border-[#C29A4C]/60 bg-[#C29A4C]/10 text-[#A57C32]" : "border-[#211A12]/10 bg-white text-[#5F584D]"}`}>
               {homeOnly ? "✓ " : ""}{t.homeService}
             </button>
-            <div className="flex rounded-xl border border-[#211A12]/10 bg-white p-1 shadow-sm">
+            <div className="space-y-2">
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#8A7F6C]">{t.genderAll}</p>
+            <div className="grid grid-cols-3 rounded-2xl border border-[#211A12]/10 bg-white p-1 shadow-sm">
               {([
                 ["all", t.genderAll],
                 ["male", t.male],
@@ -706,22 +809,27 @@ function ServicesCatalog() {
                 </button>
               ))}
             </div>
-            <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className="rounded-xl border border-[#211A12]/10 bg-white px-3 py-2 text-xs font-bold text-[#5F584D] outline-none">
+            </div>
+            <label className="block space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.16em] text-[#8A7F6C]">{t.sort}</span>
+            <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className="w-full rounded-2xl border border-[#211A12]/10 bg-white px-3 py-3 text-xs font-bold text-[#5F584D] outline-none transition focus:border-[#C29A4C]/50">
               <option value="recommended">{t.sortRecommended}</option>
               <option value="price-asc">{t.sortPriceLow}</option>
               <option value="price-desc">{t.sortPriceHigh}</option>
               <option value="rating">{t.sortRating}</option>
             </select>
+            </label>
           </div>
 
           {/* Category chips — collapse smoothly on scroll to free vertical space */}
-          <div className={`overflow-hidden transition-all duration-300 ${categoriesCollapsed ? "max-h-0 opacity-0" : "max-h-40 opacity-100 border-t border-[#211A12]/8 pt-3"}`}>
-            <div className={`flex flex-nowrap items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${isRTL ? "flex-row-reverse" : ""}`}>
-              <button onClick={() => setActiveCat("all")} className={`flex-shrink-0 rounded-full px-3.5 py-1.5 text-xs font-black transition ${activeCat === "all" ? "bg-[#15100A] text-[#E6C679]" : "border border-[#211A12]/10 bg-white text-[#5F584D] hover:border-[#C29A4C]/40"}`}>
+          <div className={`overflow-hidden transition-all duration-300 ${categoriesCollapsed ? "max-h-0 opacity-0 lg:max-h-[520px] lg:opacity-100" : "max-h-[520px] opacity-100 border-t border-[#211A12]/8 pt-4"}`}>
+            <p className="mb-2 text-[10px] font-black uppercase tracking-[0.16em] text-[#8A7F6C]">{t.categoryFilter}</p>
+            <div className="grid max-h-64 gap-2 overflow-y-auto pr-1">
+              <button onClick={() => setActiveCat("all")} className={`rounded-2xl px-3.5 py-2.5 text-start text-xs font-black transition ${activeCat === "all" ? "bg-[#15100A] text-[#E6C679]" : "border border-[#211A12]/10 bg-white text-[#5F584D] hover:border-[#C29A4C]/40"}`}>
                 {t.all}
               </button>
               {categories.map((c) => (
-                <button key={c.slug} onClick={() => setActiveCat(c.slug)} className={`flex-shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-black transition ${activeCat === c.slug ? "bg-[#15100A] text-[#E6C679]" : "border border-[#211A12]/10 bg-white text-[#5F584D] hover:border-[#C29A4C]/40"}`}>
+                <button key={c.slug} onClick={() => setActiveCat(c.slug)} className={`rounded-2xl px-3.5 py-2.5 text-start text-xs font-black transition ${activeCat === c.slug ? "bg-[#15100A] text-[#E6C679]" : "border border-[#211A12]/10 bg-white text-[#5F584D] hover:border-[#C29A4C]/40"}`}>
                   <span className="me-1">{CATEGORY_ICON[c.icon ?? ""] ?? "•"}</span>{catName(c)}
                 </button>
               ))}
@@ -734,7 +842,9 @@ function ServicesCatalog() {
               <span className="underline decoration-dotted">{t.changeCategory}</span>
             </button>
           )}
-        </div>
+        </aside>
+
+        <section className="min-w-0">
 
         {/* Combined empty state (only when nothing at all matches) */}
         {activeResultTab === "all" && filteredShops.length === 0 && filteredServices.length === 0 && (
@@ -830,7 +940,7 @@ function ServicesCatalog() {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredServices.map((s) => (
               <button
-                key={s.id}
+                key={s.displayId ?? s.id}
                 onClick={() => setDetail(s)}
                 className={`group flex flex-col rounded-[20px] border border-[#211A12]/8 bg-white p-4 shadow-[0_8px_30px_rgba(21,16,10,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#C29A4C]/40 hover:shadow-[0_16px_40px_rgba(194,154,76,0.12)] ${isRTL ? "text-right" : "text-left"}`}
               >
@@ -840,7 +950,7 @@ function ServicesCatalog() {
                     alt={isRTL ? s.name_ar : s.name_en}
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                     onError={(event) => {
-                      event.currentTarget.src = SERVICE_IMAGE_BY_CATEGORY[s.category_slug] || SERVICE_IMAGE_BY_CATEGORY["barber-hair"];
+                      event.currentTarget.src = SERVICE_IMAGE_BY_GENDER_CATEGORY[s.category_slug]?.[s.genderCategory] || SERVICE_IMAGE_BY_CATEGORY[s.category_slug] || SERVICE_IMAGE_BY_CATEGORY["barber-hair"];
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#15100A]/70 via-transparent to-transparent" />
@@ -876,6 +986,8 @@ function ServicesCatalog() {
         )}
           </>
         )}
+        </section>
+        </div>
       </main>
 
       {/* Detail drawer */}
@@ -896,7 +1008,7 @@ function ServicesCatalog() {
                   alt={isRTL ? detail.name_ar : detail.name_en}
                   className="h-full w-full object-cover"
                   onError={(event) => {
-                    event.currentTarget.src = SERVICE_IMAGE_BY_CATEGORY[detail.category_slug] || SERVICE_IMAGE_BY_CATEGORY["barber-hair"];
+                    event.currentTarget.src = SERVICE_IMAGE_BY_GENDER_CATEGORY[detail.category_slug]?.[detail.genderCategory] || SERVICE_IMAGE_BY_CATEGORY[detail.category_slug] || SERVICE_IMAGE_BY_CATEGORY["barber-hair"];
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#15100A]/75 via-[#15100A]/10 to-transparent" />
