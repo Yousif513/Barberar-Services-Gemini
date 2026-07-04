@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { devRoleHome, isLocalDevAccessEnabled, setDevRole, type DevRole } from "@/lib/dev-access";
 
 type Portal = "customer" | "provider";
@@ -93,10 +93,19 @@ export default function LoginPage() {
       await routeAuthenticatedUser(data.user.id);
     } catch (err: unknown) {
       const authMessage = err instanceof Error ? err.message : "Unable to authenticate. Please try again.";
-      const isConfirmationIssue = authMessage.toLowerCase().includes("confirm");
-      setError(isConfirmationIssue && devAccessEnabled
-        ? `${authMessage} Use the Local development access buttons on this page to keep building without email verification.`
-        : authMessage);
+      const lower = authMessage.toLowerCase();
+      const isConfirmationIssue = lower.includes("confirm");
+      // A network/fetch failure on the deployed site almost always means the
+      // Supabase env vars are missing from the Vercel build.
+      const isConnectivityIssue =
+        !isSupabaseConfigured || lower.includes("failed to fetch") || lower.includes("networkerror") || lower.includes("load failed");
+      if (isConnectivityIssue) {
+        setError("Cannot reach the authentication service. The site is missing its Supabase configuration — see the notice above. (Contact the site owner if this persists.)");
+      } else {
+        setError(isConfirmationIssue && devAccessEnabled
+          ? `${authMessage} Use the Local development access buttons on this page to keep building without email verification.`
+          : authMessage);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -197,6 +206,19 @@ export default function LoginPage() {
                 : "Start as a customer or continue to provider onboarding."}
             </p>
           </div>
+
+          {!isSupabaseConfigured && (
+            <div role="alert" className="mb-6 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4">
+              <span className="block text-[9px] font-black uppercase tracking-[0.18em] text-amber-300">
+                Service not configured
+              </span>
+              <p className="mt-1.5 text-[11px] font-semibold leading-5 text-amber-100/90">
+                This deployment is missing its Supabase keys, so sign in and sign up are disabled.
+                The site owner must add <code className="rounded bg-black/30 px-1">NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
+                <code className="rounded bg-black/30 px-1">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> in Vercel, then redeploy.
+              </p>
+            </div>
+          )}
 
           {devAccessEnabled && (
             <div className="mb-6 rounded-2xl border border-[#D1AF47]/30 bg-[#D1AF47]/10 p-4">
