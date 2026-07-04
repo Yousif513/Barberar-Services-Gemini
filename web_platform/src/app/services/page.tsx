@@ -316,11 +316,13 @@ const translations = {
   en: {
     title: "Services",
     subtitle: "Search shops and services by treatment, provider, category, and gender fit.",
-    search: "Search service name or category...",
+    search: "Search shops, services, categories...",
     providerSearch: "Search shop or provider name...",
     all: "All",
-    shopsTab: "Shops only",
-    servicesTab: "Services only",
+    typeAll: "All",
+    shopsTab: "Shops",
+    servicesTab: "Services",
+    changeCategory: "Change category",
     shops: "shops",
     price: "Price",
     anyPrice: "Any price",
@@ -364,11 +366,13 @@ const translations = {
   ar: {
     title: "الخدمات",
     subtitle: "ابحث عن المتاجر والخدمات حسب العلاج والمزود والفئة وملاءمة الجنس.",
-    search: "ابحث باسم الخدمة أو الفئة...",
+    search: "ابحث عن المتاجر والخدمات والفئات...",
     providerSearch: "ابحث باسم المتجر أو المزود...",
     all: "الكل",
-    shopsTab: "المتاجر فقط",
-    servicesTab: "الخدمات فقط",
+    typeAll: "الكل",
+    shopsTab: "المتاجر",
+    servicesTab: "الخدمات",
+    changeCategory: "تغيير الفئة",
     shops: "متجر",
     price: "السعر",
     anyPrice: "أي سعر",
@@ -418,9 +422,9 @@ function ServicesCatalog() {
   const [services, setServices] = useState<CatalogService[]>(FALLBACK_SERVICES);
   const [shops, setShops] = useState<CatalogShop[]>(FALLBACK_SHOPS);
   const [query, setQuery] = useState("");
-  const [providerQuery, setProviderQuery] = useState("");
-  const [activeResultTab, setActiveResultTab] = useState<"shops" | "services">("shops");
+  const [activeResultTab, setActiveResultTab] = useState<"all" | "shops" | "services">("all");
   const [activeCat, setActiveCat] = useState<string>(searchParams.get("category") ?? "all");
+  const [categoriesCollapsed, setCategoriesCollapsed] = useState(false);
   const [priceBand, setPriceBand] = useState<"any" | "u50" | "50-100" | "100-200" | "200+">("any");
   const [genderFilter, setGenderFilter] = useState<"all" | "male" | "female">("all");
   const [homeOnly, setHomeOnly] = useState(false);
@@ -433,6 +437,22 @@ function ServicesCatalog() {
     const observer = new MutationObserver(sync);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
     return () => observer.disconnect();
+  }, []);
+
+  // Collapse the category chips when scrolling down (frees vertical space on
+  // mobile and stops the sticky bar from covering content); reveal near the top
+  // or when scrolling back up.
+  useEffect(() => {
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (y < 120) setCategoriesCollapsed(false);
+      else if (y > lastY + 6) setCategoriesCollapsed(true);
+      else if (y < lastY - 6) setCategoriesCollapsed(false);
+      lastY = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
@@ -540,20 +560,16 @@ function ServicesCatalog() {
       if (activeCat !== "all" && s.category_slug !== activeCat) return false;
       if (!serviceMatchesGender(s, genderFilter)) return false;
       if (homeOnly && !s.is_home_service_eligible) return false;
-      if (providerQuery.trim()) {
-        const providerQ = providerQuery.trim().toLowerCase();
-        const providerEn = s.providerNameEn.toLowerCase();
-        if (!providerEn.includes(providerQ) && !s.providerNameAr.includes(providerQuery.trim())) return false;
-      }
       if (priceBand === "u50" && s.base_price >= 50) return false;
       if (priceBand === "50-100" && (s.base_price < 50 || s.base_price > 100)) return false;
       if (priceBand === "100-200" && (s.base_price < 100 || s.base_price > 200)) return false;
       if (priceBand === "200+" && s.base_price < 200) return false;
       if (query.trim()) {
+        // Unified search: service name/description/category AND provider name.
         const q = query.trim().toLowerCase();
         const category = categoryNameBySlug.get(s.category_slug);
-        const searchableEn = `${s.name_en} ${s.description_en} ${category?.en ?? ""}`.toLowerCase();
-        const searchableAr = `${s.name_ar} ${s.description_ar} ${category?.ar ?? ""}`;
+        const searchableEn = `${s.name_en} ${s.description_en} ${category?.en ?? ""} ${s.providerNameEn}`.toLowerCase();
+        const searchableAr = `${s.name_ar} ${s.description_ar} ${category?.ar ?? ""} ${s.providerNameAr}`;
         if (!searchableEn.includes(q) && !searchableAr.includes(query.trim())) return false;
       }
       return true;
@@ -567,19 +583,13 @@ function ServicesCatalog() {
           Number(b.featured_in_services) - Number(a.featured_in_services) || a.sort_order - b.sort_order);
     }
     return list;
-  }, [services, activeCat, categoryNameBySlug, genderFilter, homeOnly, priceBand, providerQuery, query, sort]);
+  }, [services, activeCat, categoryNameBySlug, genderFilter, homeOnly, priceBand, query, sort]);
 
   const filteredShops = useMemo(() => {
     return shops.filter((shop) => {
       if (!shopMatchesGender(shop, genderFilter)) return false;
       if (homeOnly && !shop.isHomeServiceEligible) return false;
       if (activeCat !== "all" && !shop.serviceCategorySlugs.includes(activeCat)) return false;
-      if (providerQuery.trim()) {
-        const providerQ = providerQuery.trim().toLowerCase();
-        const providerText = `${shop.nameEn} ${shop.providerNameEn}`.toLowerCase();
-        const providerTextAr = `${shop.nameAr} ${shop.providerNameAr}`;
-        if (!providerText.includes(providerQ) && !providerTextAr.includes(providerQuery.trim())) return false;
-      }
       if (query.trim()) {
         const q = query.trim().toLowerCase();
         const categoriesText = shop.serviceCategorySlugs
@@ -594,7 +604,7 @@ function ServicesCatalog() {
       }
       return true;
     });
-  }, [activeCat, categoryNameBySlug, genderFilter, homeOnly, providerQuery, query, shops]);
+  }, [activeCat, categoryNameBySlug, genderFilter, homeOnly, query, shops]);
 
   const catName = (c: CatalogCategory) => (isRTL ? c.name_ar : c.name_en);
 
@@ -620,103 +630,118 @@ function ServicesCatalog() {
 
         {/* Sticky filter bar */}
         <div className="sticky top-[65px] z-30 -mx-2 mb-6 space-y-3 rounded-2xl border border-[#211A12]/8 bg-white/90 p-4 shadow-[0_8px_30px_rgba(21,16,10,0.05)] backdrop-blur-xl">
-          <div className={`flex flex-col gap-3 lg:flex-row lg:items-center ${isRTL ? "lg:flex-row-reverse" : ""}`}>
+          {/* Row 1: single unified search + type segmented control */}
+          <div className={`flex flex-col gap-3 sm:flex-row sm:items-center ${isRTL ? "sm:flex-row-reverse" : ""}`}>
             <label className={`flex flex-1 items-center gap-2 rounded-xl border border-[#211A12]/10 bg-[#F2EEE6]/60 px-4 py-2.5 ${isRTL ? "flex-row-reverse" : ""}`}>
               <svg className="h-4 w-4 flex-shrink-0 text-[#8A7F6C]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
               <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t.search} className="w-full border-none bg-transparent text-sm outline-none placeholder:text-[#8A7F6C]" />
+              {query && (
+                <button type="button" onClick={() => setQuery("")} aria-label="Clear" className="flex-shrink-0 text-[#8A7F6C] hover:text-[#211A12]">
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              )}
             </label>
-            <label className={`flex flex-1 items-center gap-2 rounded-xl border border-[#211A12]/10 bg-[#F2EEE6]/60 px-4 py-2.5 ${isRTL ? "flex-row-reverse" : ""}`}>
-              <svg className="h-4 w-4 flex-shrink-0 text-[#8A7F6C]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1" /></svg>
-              <input value={providerQuery} onChange={(e) => setProviderQuery(e.target.value)} placeholder={t.providerSearch} className="w-full border-none bg-transparent text-sm outline-none placeholder:text-[#8A7F6C]" />
-            </label>
-            <div className={`flex flex-wrap items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
-              <select value={priceBand} onChange={(e) => setPriceBand(e.target.value as typeof priceBand)} className="rounded-xl border border-[#211A12]/10 bg-white px-3 py-2.5 text-xs font-bold text-[#5F584D] outline-none">
-                <option value="any">{t.anyPrice}</option>
-                <option value="u50">{t.under50}</option>
-                <option value="50-100">{t.p50to100}</option>
-                <option value="100-200">{t.p100to200}</option>
-                <option value="200+">{t.over200}</option>
-              </select>
-              <button onClick={() => setHomeOnly((h) => !h)} className={`rounded-xl border px-3.5 py-2.5 text-xs font-bold transition ${homeOnly ? "border-[#C29A4C]/60 bg-[#C29A4C]/10 text-[#A57C32]" : "border-[#211A12]/10 bg-white text-[#5F584D]"}`}>
-                {homeOnly ? "✓ " : ""}{t.homeService}
-              </button>
-              <div className="flex rounded-xl border border-[#211A12]/10 bg-white p-1 shadow-sm">
-                {([
-                  ["all", t.genderAll],
-                  ["male", t.male],
-                  ["female", t.female],
-                ] as const).map(([value, label]) => (
-                  <button
-                    key={value}
-                    onClick={() => setGenderFilter(value)}
-                    className={`rounded-lg px-3 py-1.5 text-[11px] font-black transition ${
-                      genderFilter === value
-                        ? "bg-[#15100A] text-[#E6C679]"
-                        : "text-[#5F584D] hover:bg-[#F2EEE6]"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-              <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className="rounded-xl border border-[#211A12]/10 bg-white px-3 py-2.5 text-xs font-bold text-[#5F584D] outline-none">
-                <option value="recommended">{t.sortRecommended}</option>
-                <option value="price-asc">{t.sortPriceLow}</option>
-                <option value="price-desc">{t.sortPriceHigh}</option>
-                <option value="rating">{t.sortRating}</option>
-              </select>
-            </div>
-          </div>
-          <div className={`flex flex-wrap items-center justify-between gap-3 border-t border-[#211A12]/8 pt-3 ${isRTL ? "flex-row-reverse" : ""}`}>
-            <div className="flex rounded-2xl border border-[#211A12]/10 bg-[#F2EEE6]/65 p-1">
+            {/* Type: All / Shops / Services */}
+            <div className="flex flex-shrink-0 rounded-xl border border-[#211A12]/10 bg-[#F2EEE6]/65 p-1">
               {([
-                ["shops", `${t.shopsTab} (${filteredShops.length})`],
-                ["services", `${t.servicesTab} (${filteredServices.length})`],
-              ] as const).map(([value, label]) => (
+                ["all", t.typeAll, filteredShops.length + filteredServices.length],
+                ["shops", t.shopsTab, filteredShops.length],
+                ["services", t.servicesTab, filteredServices.length],
+              ] as const).map(([value, label, count]) => (
                 <button
                   key={value}
                   onClick={() => setActiveResultTab(value)}
-                  className={`rounded-xl px-4 py-2 text-xs font-black transition ${
+                  className={`rounded-lg px-3 py-1.5 text-xs font-black transition ${
                     activeResultTab === value
                       ? "bg-[#15100A] text-[#E6C679] shadow-sm"
                       : "text-[#5F584D] hover:bg-white"
+                  }`}
+                >
+                  {label} <span className="opacity-60">{count}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Row 2: secondary filters (price / home / gender / sort) */}
+          <div className={`flex flex-wrap items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
+            <select value={priceBand} onChange={(e) => setPriceBand(e.target.value as typeof priceBand)} className="rounded-xl border border-[#211A12]/10 bg-white px-3 py-2 text-xs font-bold text-[#5F584D] outline-none">
+              <option value="any">{t.anyPrice}</option>
+              <option value="u50">{t.under50}</option>
+              <option value="50-100">{t.p50to100}</option>
+              <option value="100-200">{t.p100to200}</option>
+              <option value="200+">{t.over200}</option>
+            </select>
+            <button onClick={() => setHomeOnly((h) => !h)} className={`rounded-xl border px-3 py-2 text-xs font-bold transition ${homeOnly ? "border-[#C29A4C]/60 bg-[#C29A4C]/10 text-[#A57C32]" : "border-[#211A12]/10 bg-white text-[#5F584D]"}`}>
+              {homeOnly ? "✓ " : ""}{t.homeService}
+            </button>
+            <div className="flex rounded-xl border border-[#211A12]/10 bg-white p-1 shadow-sm">
+              {([
+                ["all", t.genderAll],
+                ["male", t.male],
+                ["female", t.female],
+              ] as const).map(([value, label]) => (
+                <button
+                  key={value}
+                  onClick={() => setGenderFilter(value)}
+                  className={`rounded-lg px-2.5 py-1 text-[11px] font-black transition ${
+                    genderFilter === value ? "bg-[#15100A] text-[#E6C679]" : "text-[#5F584D] hover:bg-[#F2EEE6]"
                   }`}
                 >
                   {label}
                 </button>
               ))}
             </div>
-            <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#8A7F6C]">
-              {filteredShops.length + filteredServices.length} {t.resultSummary}
-            </p>
+            <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className="rounded-xl border border-[#211A12]/10 bg-white px-3 py-2 text-xs font-bold text-[#5F584D] outline-none">
+              <option value="recommended">{t.sortRecommended}</option>
+              <option value="price-asc">{t.sortPriceLow}</option>
+              <option value="price-desc">{t.sortPriceHigh}</option>
+              <option value="rating">{t.sortRating}</option>
+            </select>
           </div>
-          {/* Category chips */}
-          <div className={`flex flex-wrap items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
-            <button onClick={() => setActiveCat("all")} className={`rounded-full px-4 py-1.5 text-xs font-black transition ${activeCat === "all" ? "bg-[#15100A] text-[#E6C679]" : "border border-[#211A12]/10 bg-white text-[#5F584D] hover:border-[#C29A4C]/40"}`}>
-              {t.all}
-            </button>
-            {categories.map((c) => (
-              <button key={c.slug} onClick={() => setActiveCat(c.slug)} className={`rounded-full px-4 py-1.5 text-xs font-black transition ${activeCat === c.slug ? "bg-[#15100A] text-[#E6C679]" : "border border-[#211A12]/10 bg-white text-[#5F584D] hover:border-[#C29A4C]/40"}`}>
-                <span className="me-1">{CATEGORY_ICON[c.icon ?? ""] ?? "•"}</span>{catName(c)}
+
+          {/* Category chips — collapse smoothly on scroll to free vertical space */}
+          <div className={`overflow-hidden transition-all duration-300 ${categoriesCollapsed ? "max-h-0 opacity-0" : "max-h-40 opacity-100 border-t border-[#211A12]/8 pt-3"}`}>
+            <div className={`flex flex-nowrap items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${isRTL ? "flex-row-reverse" : ""}`}>
+              <button onClick={() => setActiveCat("all")} className={`flex-shrink-0 rounded-full px-3.5 py-1.5 text-xs font-black transition ${activeCat === "all" ? "bg-[#15100A] text-[#E6C679]" : "border border-[#211A12]/10 bg-white text-[#5F584D] hover:border-[#C29A4C]/40"}`}>
+                {t.all}
               </button>
-            ))}
+              {categories.map((c) => (
+                <button key={c.slug} onClick={() => setActiveCat(c.slug)} className={`flex-shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-black transition ${activeCat === c.slug ? "bg-[#15100A] text-[#E6C679]" : "border border-[#211A12]/10 bg-white text-[#5F584D] hover:border-[#C29A4C]/40"}`}>
+                  <span className="me-1">{CATEGORY_ICON[c.icon ?? ""] ?? "•"}</span>{catName(c)}
+                </button>
+              ))}
+            </div>
           </div>
+          {/* Compact re-expand affordance shown only while collapsed */}
+          {categoriesCollapsed && activeCat !== "all" && (
+            <button onClick={() => setCategoriesCollapsed(false)} className={`flex items-center gap-1.5 text-[11px] font-black text-[#A57C32] ${isRTL ? "flex-row-reverse" : ""}`}>
+              <span className="rounded-full bg-[#15100A] px-2.5 py-0.5 text-[#E6C679]">{catName(categories.find((c) => c.slug === activeCat) ?? categories[0])}</span>
+              <span className="underline decoration-dotted">{t.changeCategory}</span>
+            </button>
+          )}
         </div>
 
-        {/* Results count */}
-        <p className="mb-4 text-xs font-bold text-[#8A7F6C]">
-          {activeResultTab === "shops"
-            ? `${filteredShops.length} ${t.shops}`
-            : `${filteredServices.length} ${t.results}`}
-        </p>
-
-        {/* Shops Grid */}
-        {activeResultTab === "shops" && (filteredShops.length === 0 ? (
+        {/* Combined empty state (only when nothing at all matches) */}
+        {activeResultTab === "all" && filteredShops.length === 0 && filteredServices.length === 0 && (
           <div className="rounded-2xl border border-[#211A12]/8 bg-white p-12 text-center">
+            <p className="text-sm font-semibold text-[#8A7F6C]">{t.empty}</p>
+          </div>
+        )}
+
+        {/* Shops section */}
+        {(activeResultTab === "shops" || (activeResultTab === "all" && filteredShops.length > 0)) && (
+          <>
+            <div className={`mb-4 flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
+              <h2 className="font-serif text-lg font-black text-[#211A12]">{t.shopsTab}</h2>
+              <span className="text-xs font-bold text-[#8A7F6C]">{filteredShops.length}</span>
+            </div>
+            {filteredShops.length === 0 ? (
+          <div className="mb-8 rounded-2xl border border-[#211A12]/8 bg-white p-12 text-center">
             <p className="text-sm font-semibold text-[#8A7F6C]">{t.shopEmpty}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mb-10 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {filteredShops.map((shop) => (
               <article
                 key={shop.id}
@@ -772,10 +797,18 @@ function ServicesCatalog() {
               </article>
             ))}
           </div>
-        ))}
+        )}
+          </>
+        )}
 
-        {/* Services Grid */}
-        {activeResultTab === "services" && (filteredServices.length === 0 ? (
+        {/* Services section */}
+        {(activeResultTab === "services" || (activeResultTab === "all" && filteredServices.length > 0)) && (
+          <>
+            <div className={`mb-4 flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
+              <h2 className="font-serif text-lg font-black text-[#211A12]">{t.servicesTab}</h2>
+              <span className="text-xs font-bold text-[#8A7F6C]">{filteredServices.length}</span>
+            </div>
+            {filteredServices.length === 0 ? (
           <div className="rounded-2xl border border-[#211A12]/8 bg-white p-12 text-center">
             <p className="text-sm font-semibold text-[#8A7F6C]">{t.servicesEmpty}</p>
           </div>
@@ -826,7 +859,9 @@ function ServicesCatalog() {
               </button>
             ))}
           </div>
-        ))}
+        )}
+          </>
+        )}
       </main>
 
       {/* Detail drawer */}
