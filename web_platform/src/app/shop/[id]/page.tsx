@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { ToastContainer } from "@/components/toast";
+import { usePrayerTimes } from "@/lib/use-prayer-times";
+import { Coordinates, CalculationMethod, PrayerTimes, Madhab } from "adhan";
 
 export const dynamic = "force-dynamic";
 
@@ -235,6 +237,11 @@ export default function ShopDetailsPage() {
   const [selectedSpecialist, setSelectedSpecialist] = useState<SpecialistItem | null>(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlot, setSelectedSlot] = useState("");
+  const searchParams = useSearchParams();
+  const serviceId = searchParams.get("service");
+  const [coordinates, setCoordinates] = useState({ lat: 24.7136, lng: 46.6753 });
+  const [dbSlots, setDbSlots] = useState<string[]>([]);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [isHomeService, setIsHomeService] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -264,6 +271,39 @@ export default function ShopDetailsPage() {
     document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
     document.documentElement.lang = locale;
   }, [locale]);
+
+  useEffect(() => {
+    async function loadShopBranch() {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(shopId)) {
+        // Fallback for mock shops based on city
+        const currentShop = shops.find((sh) => sh.id === shopId) || shops[0];
+        if (currentShop.city === "jeddah") {
+          setCoordinates({ lat: 21.4858, lng: 39.1925 });
+        } else {
+          setCoordinates({ lat: 24.7136, lng: 46.6753 });
+        }
+        return;
+      }
+
+      try {
+        const { data: branch } = await supabase
+          .from("branches")
+          .select("latitude, longitude")
+          .eq("provider_id", shopId)
+          .limit(1)
+          .maybeSingle();
+        if (branch && branch.latitude && branch.longitude) {
+          setCoordinates({ lat: Number(branch.latitude), lng: Number(branch.longitude) });
+        } else {
+          setCoordinates({ lat: 24.7136, lng: 46.6753 });
+        }
+      } catch (err) {
+        console.warn("Failed to load real branch coordinates:", err);
+      }
+    }
+    loadShopBranch();
+  }, [shopId]);
 
   useEffect(() => {
     async function loadClientProfiles() {
@@ -629,26 +669,170 @@ export default function ShopDetailsPage() {
 
   const filteredServices = services.filter((srv) => srv.shopId === shop.id);
 
+  // Hook to preselect service from query parameter (?service=service_id)
+  useEffect(() => {
+    if (serviceId && filteredServices.length > 0) {
+      const match = filteredServices.find(s => s.id === serviceId);
+      if (match) {
+        setSelectedService(match);
+      }
+    }
+  }, [serviceId, filteredServices]);
+
+  const defaultBuffers = {
+    fajr: { before: 10, after: 30 },
+    dhuhr: { before: 10, after: 30 },
+    asr: { before: 10, after: 30 },
+    maghrib: { before: 10, after: 30 },
+    isha: { before: 10, after: 30 }
+  };
+
+  const getPrayerWindowsForDate = (dateString: string) => {
+    if (!dateString) return { starts: [], ends: [], list: [] };
+    const dateObj = new Date(dateString);
+    const coordsObj = new Coordinates(coordinates.lat, coordinates.lng);
+    const params = CalculationMethod.UmmAlQura();
+    params.madhab = Madhab.Shafi;
+    
+    const dayPrayers = new PrayerTimes(coordsObj, dateObj, params);
+    const nextDay = new Date(dateObj);
+    nextDay.setDate(nextDay.getDate() + 1);
+    const nextDayPrayers = new PrayerTimes(coordsObj, nextDay, params);
+
+    const prayerChecks = [
+      { time: dayPrayers.fajr, key: "fajr", nameEn: "Fajr", nameAr: "الفجر" },
+      { time: dayPrayers.dhuhr, key: "dhuhr", nameEn: "Dhuhr", nameAr: "الظهر" },
+      { time: dayPrayers.asr, key: "asr", nameEn: "Asr", nameAr: "العصر" },
+      { time: dayPrayers.maghrib, key: "maghrib", nameEn: "Maghrib", nameAr: "المغرب" },
+      { time: dayPrayers.isha, key: "isha", nameEn: "Isha", nameAr: "العشاء" },
+      { time: nextDayPrayers.fajr, key: "fajr", nameEn: "Fajr", nameAr: "الفجر" }
+    ];
+
+    const starts: string[] = [];
+    const ends: string[] = [];
+    const list = prayerChecks.map((p) => {
+      const buffer = defaultBuffers[p.key as keyof typeof defaultBuffers] || { before: 10, after: 30 };
+      const start = new Date(p.time.getTime() - buffer.before * 60 * 1000);
+      const end = new Date(p.time.getTime() + buffer.after * 60 * 1000);
+      starts.push(start.toISOString());
+      ends.push(end.toISOString());
+      return { key: p.key, nameEn: p.nameEn, nameAr: p.nameAr, start, end };
+    });
+
+    return { starts, ends, list };
+  };
+
+  const slotToDate = (dateValue: string, slotStr: string) => {
+    const [timePart, modifier] = slotStr.split(" ");
+    const [hourPart, minutePart] = timePart.split(":");
+    let hours = Number(hourPart);
+    const minutes = Number(minutePart);
+    if (modifier === "PM" && hours !== 12) hours += 12;
+    if (modifier === "AM" && hours === 12) hours = 0;
+    const candidate = new Date(`${dateValue}T00:00:00`);
+    candidate.setHours(hours, minutes, 0, 0);
+    return candidate;
+  };
+
+  // Fetch available slots from Supabase when specialist, date, and service are selected
+  useEffect(() => {
+    async function fetchSlots() {
+      if (!selectedSpecialist || !selectedDate || !selectedService) {
+        setDbSlots([]);
+        return;
+      }
+
+      setIsLoadingSlots(true);
+      try {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(selectedSpecialist.id)) {
+          throw new Error("Mock employee ID, skipping database slot fetch");
+        }
+
+        const { starts, ends } = getPrayerWindowsForDate(selectedDate);
+        
+        // Call the 5-arg overload RPC
+        const { data, error } = await supabase.rpc("get_available_slots", {
+          target_employee_id: selectedSpecialist.id,
+          target_date: selectedDate,
+          service_duration_minutes: selectedService.duration,
+          prayer_window_starts: starts,
+          prayer_window_ends: ends
+        });
+
+        if (error) {
+          console.warn("5-arg get_available_slots failed, trying 3-arg fallback:", error.message);
+          // Try the 3-arg legacy fallback RPC
+          const { data: fallbackData, error: fallbackError } = await supabase.rpc("get_available_slots", {
+            target_employee_id: selectedSpecialist.id,
+            target_date: selectedDate,
+            service_duration_minutes: selectedService.duration
+          });
+          if (fallbackError) throw fallbackError;
+          
+          setDbSlots((fallbackData || []).map((s: any) => s.slot_start));
+        } else {
+          setDbSlots((data || []).map((s: any) => s.slot_start));
+        }
+      } catch (err) {
+        console.warn("Failed to load live slots from database:", err);
+        setDbSlots([]); // Reset to fallback locally
+      } finally {
+        setIsLoadingSlots(false);
+      }
+    }
+    fetchSlots();
+  }, [selectedSpecialist, selectedDate, selectedService, coordinates]);
+
   // Generate Available Slots excluding prayer buffers
   const getAvailableSlots = () => {
-    return [
-      "09:00 AM",
-      "09:30 AM",
-      "10:00 AM",
-      "10:30 AM",
-      "11:00 AM",
-      "11:30 AM",
-      "01:00 PM",
-      "01:30 PM",
-      "02:00 PM",
-      "02:30 PM",
-      "03:00 PM",
-      "04:00 PM",
-      "04:30 PM",
-      "05:00 PM",
-      "07:30 PM",
-      "08:00 PM"
+    const baseSlots = [
+      "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
+      "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM", "03:00 PM",
+      "04:00 PM", "04:30 PM", "05:00 PM", "07:30 PM", "08:00 PM"
     ];
+    
+    if (!selectedDate) return baseSlots.map(s => ({ slot: s, available: true, prayerLocked: false, prayerName: "" }));
+
+    const { list: prayerWindows } = getPrayerWindowsForDate(selectedDate);
+
+    return baseSlots.map((slot) => {
+      const slotDate = slotToDate(selectedDate, slot);
+      
+      // Check if slot falls in a prayer window
+      const prayerMatch = prayerWindows.find(w => slotDate >= w.start && slotDate <= w.end);
+      
+      if (prayerMatch) {
+        return {
+          slot,
+          available: false,
+          prayerLocked: true,
+          prayerName: locale === "ar" ? prayerMatch.nameAr : prayerMatch.nameEn
+        };
+      }
+
+      // If we have live slots from DB, check if this slot is in the DB slots
+      if (dbSlots.length > 0) {
+        const hasDbMatch = dbSlots.some((dbSlot) => {
+          const dbDate = new Date(dbSlot);
+          return dbDate.getTime() === slotDate.getTime();
+        });
+        return {
+          slot,
+          available: hasDbMatch,
+          prayerLocked: false,
+          prayerName: ""
+        };
+      }
+
+      // If no live slots, default to available
+      return {
+        slot,
+        available: true,
+        prayerLocked: false,
+        prayerName: ""
+      };
+    });
   };
 
   const calculateEscrowSplit = () => {
@@ -727,15 +911,26 @@ export default function ShopDetailsPage() {
         throw bookingError ?? new Error("Unable to reserve the selected time.");
       }
 
-      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
-        body: { bookingId: booking.id },
-      });
+      let redirectUrl = "";
+      try {
+        const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
+          body: { bookingId: booking.id },
+        });
 
-      if (checkoutError || !checkout?.checkoutUrl) {
-        throw checkoutError ?? new Error("Unable to initialize secure payment.");
+        if (checkoutError || !checkout?.checkoutUrl) {
+          redirectUrl = `/customer/bookings/${booking.id}/confirmation?status=pending_payment`;
+        } else {
+          redirectUrl = checkout.checkoutUrl;
+        }
+      } catch (e) {
+        redirectUrl = `/customer/bookings/${booking.id}/confirmation?status=pending_payment`;
       }
 
-      window.location.assign(checkout.checkoutUrl);
+      if (redirectUrl.startsWith("/")) {
+        router.push(redirectUrl);
+      } else {
+        window.location.assign(redirectUrl);
+      }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Booking could not be completed.";
       setIsSuccess(false);
@@ -1142,20 +1337,35 @@ export default function ShopDetailsPage() {
                           {t.prayerBufferWarning}
                         </p>
                       </div>
-                      <div className="grid grid-cols-3 gap-2">
-                        {getAvailableSlots().map((slot) => (
-                          <button
-                            key={slot}
-                            onClick={() => setSelectedSlot(slot)}
-                            className={`py-2 text-[10px] font-extrabold rounded-lg border text-center transition duration-150 ${
-                              selectedSlot === slot
-                                ? "bg-stone-950 border-stone-950 text-white"
-                                : "bg-stone-50 border-stone-200 text-stone-600 hover:border-stone-950"
-                            }`}
-                          >
-                            {slot}
-                          </button>
-                        ))}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {getAvailableSlots().map(({ slot, available, prayerLocked, prayerName }) => {
+                          const isSelected = selectedSlot === slot;
+                          const isDisabled = !available || prayerLocked;
+                          return (
+                            <button
+                              key={slot}
+                              type="button"
+                              disabled={isDisabled}
+                              onClick={() => setSelectedSlot(slot)}
+                              className={`py-2 px-1 text-[10px] font-extrabold rounded-lg border text-center transition duration-150 flex flex-col items-center justify-center min-h-[48px] ${
+                                isSelected
+                                  ? "bg-stone-950 border-stone-950 text-white"
+                                  : prayerLocked
+                                  ? "bg-red-50 border-red-200 text-red-700 cursor-not-allowed"
+                                  : isDisabled
+                                  ? "bg-stone-100 border-stone-200 text-stone-400 cursor-not-allowed"
+                                  : "bg-stone-50 border-stone-200 text-stone-600 hover:border-stone-950"
+                              }`}
+                            >
+                              <span>{slot}</span>
+                              {prayerLocked && (
+                                <span className="text-[7.5px] font-bold text-red-600 uppercase mt-0.5 leading-none">
+                                  {prayerName} • {locale === "ar" ? "مغلق" : "locked"}
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
                   )}

@@ -43,6 +43,40 @@ function BookingContent() {
   const [payMethods, setPayMethods] = useState<CheckoutMethod[]>(FALLBACK_CHECKOUT_METHODS);
   const { isTimeInLockWindow } = usePrayerTimes();
 
+  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    async function checkProvider() {
+      setIsChecking(true);
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(providerId)) {
+        setIsDemoMode(true);
+        setIsChecking(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("providers")
+          .select("id")
+          .eq("id", providerId)
+          .maybeSingle();
+
+        if (data && !error) {
+          router.replace(`/shop/${providerId}`);
+        } else {
+          setIsDemoMode(true);
+          setIsChecking(false);
+        }
+      } catch (err) {
+        setIsDemoMode(true);
+        setIsChecking(false);
+      }
+    }
+    checkProvider();
+  }, [providerId, router]);
+
   useEffect(() => {
     (async () => {
       try {
@@ -134,8 +168,38 @@ function BookingContent() {
 
   const splits = calculateEscrowSplit();
 
+  if (isChecking) {
+    return (
+      <div className="min-h-[400px] flex items-center justify-center bg-[#F2EEE6] rounded-3xl p-12">
+        <div className="text-center space-y-3">
+          <div className="w-8 h-8 border-4 border-[#C29A4C] border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-[10px] font-black tracking-widest text-[#8A7F6C] uppercase">
+            Resolving Live Provider...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
+      {isDemoMode && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-4 flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-2.5 w-2.5 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+            </span>
+            <span className="text-xs font-black text-amber-800 tracking-wide uppercase">
+              Demo Booking Mode / وضع الحجز التجريبي
+            </span>
+          </div>
+          <span className="text-[9px] font-black text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+            Simulation
+          </span>
+        </div>
+      )}
+
       {/* Provider Details Header */}
       <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
         <h2 className="text-xl font-bold text-gray-900">{provider.name}</h2>

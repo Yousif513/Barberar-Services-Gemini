@@ -34,6 +34,7 @@ type CatalogService = {
   genderCategory: ServiceGender;
   providerNameEn: string;
   providerNameAr: string;
+  provider_id?: string | null;
 };
 type CatalogCategory = { id: string; slug: string; name_en: string; name_ar: string; icon: string | null };
 type CatalogShop = {
@@ -59,6 +60,7 @@ type CatalogRelationCategory = { slug?: string | null };
 type CatalogRelationProvider = { business_name_en?: string | null; business_name_ar?: string | null };
 type CatalogServiceRow = {
   id: string;
+  provider_id?: string | null;
   slug?: string | null;
   name_en?: string | null;
   name_ar?: string | null;
@@ -439,6 +441,17 @@ function ServicesCatalog() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam === "shops" || tabParam === "services" || tabParam === "all") {
+      setActiveResultTab(tabParam as any);
+    }
+    const catParam = searchParams.get("category");
+    if (catParam) {
+      setActiveCat(catParam);
+    }
+  }, [searchParams]);
+
   // Collapse the category chips when scrolling down (frees vertical space on
   // mobile and stops the sticky bar from covering content); reveal near the top
   // or when scrolling back up.
@@ -462,7 +475,7 @@ function ServicesCatalog() {
           supabase.from("categories").select("id, slug, name_en, name_ar, icon, sort_order").eq("is_active", true).order("sort_order"),
           supabase
             .from("services")
-            .select("id, slug, name_en, name_ar, description_en, description_ar, base_price, base_duration_minutes, is_home_service_eligible, featured_in_services, sort_order, add_ons, images, categories(slug), providers(business_name_en, business_name_ar)")
+            .select("id, provider_id, slug, name_en, name_ar, description_en, description_ar, base_price, base_duration_minutes, is_home_service_eligible, featured_in_services, sort_order, add_ons, images, categories(slug), providers(business_name_en, business_name_ar)")
             .eq("is_active", true)
             .order("sort_order"),
           supabase
@@ -478,7 +491,7 @@ function ServicesCatalog() {
             const provider = r.providers ?? null;
             return {
               id: r.id, slug: r.slug ?? r.id,
-              name_en: r.name_en || "Service", name_ar: r.name_ar || r.name_en || "Ø®Ø¯Ù…Ø©",
+              name_en: r.name_en || "Service", name_ar: r.name_ar || r.name_en || "خدمة",
               description_en: r.description_en ?? "", description_ar: r.description_ar ?? "",
               base_price: Number(r.base_price || 0), base_duration_minutes: Number(r.base_duration_minutes || 0),
               is_home_service_eligible: !!r.is_home_service_eligible,
@@ -491,6 +504,7 @@ function ServicesCatalog() {
               genderCategory: inferServiceGender(r.slug ?? r.id, cat?.slug ?? "other", r.name_en ?? ""),
               providerNameEn: provider?.business_name_en || fallbackProviderFor(cat?.slug ?? "other", "en"),
               providerNameAr: provider?.business_name_ar || fallbackProviderFor(cat?.slug ?? "other", "ar"),
+              provider_id: r.provider_id || null,
             };
           }));
         }
@@ -920,7 +934,15 @@ function ServicesCatalog() {
               )}
             </div>
             <div className="border-t border-[#211A12]/8 p-5">
-              <Link href="/customer/book" className="block rounded-xl bg-gradient-to-r from-[#C29A4C] to-[#E6C679] py-3 text-center text-sm font-black text-[#15100A] shadow-lg shadow-[#C29A4C]/20 transition hover:brightness-105">
+              <Link
+                href={
+                  detail.provider_id
+                    ? `/shop/${detail.provider_id}?service=${detail.id}`
+                    : `/services?tab=shops&category=${detail.category_slug}`
+                }
+                onClick={() => setDetail(null)}
+                className="block rounded-xl bg-gradient-to-r from-[#C29A4C] to-[#E6C679] py-3 text-center text-sm font-black text-[#15100A] shadow-lg shadow-[#C29A4C]/20 transition hover:brightness-105"
+              >
                 {t.bookNow}
               </Link>
             </div>
