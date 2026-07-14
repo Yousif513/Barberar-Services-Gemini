@@ -167,23 +167,6 @@ type PaymentIntegration = {
   supported_payment_method_keys?: string[] | null;
 };
 
-const FALLBACK_METHODS: PayMethod[] = [
-  { id: "m1", key: "mada", label_en: "mada", label_ar: "مدى", gateway_key: "tap", enabled: true, enabled_for_roles: ["customer"], is_default: true, env: "test", sort_order: 1 },
-  { id: "m2", key: "apple_pay", label_en: "Apple Pay", label_ar: "أبل باي", gateway_key: "tap", enabled: true, enabled_for_roles: ["customer"], is_default: false, env: "test", sort_order: 2 },
-  { id: "m3", key: "visa", label_en: "Visa", label_ar: "فيزا", gateway_key: "tap", enabled: true, enabled_for_roles: ["customer"], is_default: false, env: "test", sort_order: 3 },
-  { id: "m4", key: "stc_pay", label_en: "STC Pay", label_ar: "إس تي سي باي", gateway_key: "tap", enabled: true, enabled_for_roles: ["customer"], is_default: false, env: "test", sort_order: 5 },
-  { id: "m5", key: "cash", label_en: "Cash on service", label_ar: "نقداً عند الخدمة", gateway_key: "internal", enabled: true, enabled_for_roles: ["customer"], is_default: false, env: "test", sort_order: 10 },
-];
-
-const FALLBACK_PAYMENT_INTEGRATIONS: PaymentIntegration[] = [
-  { id: "pi1", key: "tap", name: "Tap Payments", category: "payments", status: "connected", enabled: true, env: "test", supported_payment_method_keys: ["mada", "apple_pay", "visa", "mastercard", "stc_pay"] },
-  { id: "pi2", key: "moyasar", name: "Moyasar", category: "payments", status: "disconnected", enabled: false, env: "test", supported_payment_method_keys: ["mada", "apple_pay", "visa", "mastercard", "stc_pay"] },
-  { id: "pi3", key: "paytabs", name: "PayTabs", category: "payments", status: "disconnected", enabled: false, env: "test", supported_payment_method_keys: ["mada", "apple_pay", "visa", "mastercard", "stc_pay"] },
-  { id: "pi4", key: "myfatoorah", name: "MyFatoorah", category: "payments", status: "disconnected", enabled: false, env: "test", supported_payment_method_keys: ["mada", "apple_pay", "visa", "mastercard", "stc_pay"] },
-  { id: "pi5", key: "tamara", name: "Tamara", category: "payments", status: "disconnected", enabled: false, env: "test", supported_payment_method_keys: ["tamara"] },
-  { id: "pi6", key: "tabby", name: "Tabby", category: "payments", status: "disconnected", enabled: false, env: "test", supported_payment_method_keys: ["tabby"] }
-];
-
 const normalizePayMethod = (method: PayMethod): PayMethod => ({
   ...method,
   requires_gateway: method.requires_gateway ?? !(method.gateway_key === "internal" || method.gateway_key === null),
@@ -198,6 +181,7 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
   const [methods, setMethods] = useState<PayMethod[]>([]);
   const [paymentIntegrations, setPaymentIntegrations] = useState<PaymentIntegration[]>([]);
   const [note, setNote] = useState("");
+  const [methodError, setMethodError] = useState("");
   const L = lang === "ar"
     ? { title: "طرق الدفع (السوق السعودي)", subtitle: "فعّل أو عطّل الطرق وحدد الافتراضية — تنعكس فوراً على صفحة الدفع لدى العميل وشاشة مستحقات المزود.", enabled: "مفعلة", disabled: "معطلة", makeDefault: "افتراضية", isDefault: "★ الافتراضية", roles: "متاحة لـ", customer: "العميل", provider: "المزود", gateway: "البوابة", saved: "تم حفظ إعدادات طرق الدفع.", empty: "لا توجد طرق دفع — طبّق ترحيل قاعدة البيانات ثم أعد التحميل." }
     : { title: "Payment Methods (KSA)", subtitle: "Enable, disable and set the default — changes reflect instantly at customer checkout and provider payout screens.", enabled: "Enabled", disabled: "Disabled", makeDefault: "Make default", isDefault: "★ Default", roles: "Available to", customer: "Customer", provider: "Provider", gateway: "Gateway", saved: "Payment method settings saved.", empty: "No payment methods yet — apply the database migration and reload." };
@@ -209,36 +193,64 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
   useEffect(() => {
     (async () => {
       try {
-        const [{ data: methodRows }, { data: integrationRows }] = await Promise.all([
+        const [{ data: methodRows, error: methodLoadError }, { data: integrationRows, error: integrationLoadError }] = await Promise.all([
           supabase.from("payment_methods").select("*").order("sort_order"),
           supabase.from("integrations").select("id, key, name, category, status, enabled, env, supported_payment_method_keys").eq("category", "payments").order("name")
         ]);
-        setMethods((methodRows?.length ? methodRows : FALLBACK_METHODS).map(normalizePayMethod));
-        setPaymentIntegrations((integrationRows?.length ? integrationRows : FALLBACK_PAYMENT_INTEGRATIONS) as PaymentIntegration[]);
-      } catch {
-        setMethods(FALLBACK_METHODS.map(normalizePayMethod));
-        setPaymentIntegrations(FALLBACK_PAYMENT_INTEGRATIONS);
+        if (methodLoadError) throw methodLoadError;
+        if (integrationLoadError) throw integrationLoadError;
+        setMethods(((methodRows ?? []) as PayMethod[]).map(normalizePayMethod));
+        setPaymentIntegrations((integrationRows ?? []) as PaymentIntegration[]);
+        setMethodError("");
+      } catch (err) {
+        console.error("Payment methods registry load failed:", err);
+        setMethods([]);
+        setPaymentIntegrations([]);
+        setMethodError(lang === "ar"
+          ? "ÙØ´Ù„ ØªØ­Ù…ÙŠÙ„ Ø·Ø±Ù‚ Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ø­Ù‚ÙŠÙ‚ÙŠØ©. Ø·Ø¨Ù‘Ù‚ ØªØ±Ø­ÙŠÙ„Ø§Øª Supabase ÙˆØªØ£ÙƒØ¯ Ù…Ù† ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø´Ø±Ù."
+          : "Failed to load real payment methods. Apply the Supabase migrations and verify admin permissions.");
       }
     })();
-  }, []);
+  }, [lang]);
 
-  const flash = (msg: string) => { setNote(msg); setTimeout(() => setNote(""), 3000); };
+  const flash = (msg: string) => { setMethodError(""); setNote(msg); setTimeout(() => setNote(""), 3000); };
+  const fail = (err: unknown, msg: string, previous: PayMethod[]) => {
+    console.error(msg, err);
+    setMethods(previous);
+    setNote("");
+    setMethodError(lang === "ar"
+      ? "Ù„Ù… ÙŠØªÙ… Ø­ÙØ¸ ØªØºÙŠÙŠØ± Ø·Ø±ÙŠÙ‚Ø© Ø§Ù„Ø¯ÙØ¹. ØªØ£ÙƒØ¯ Ù…Ù† Ø§Ù„ØªØ±Ø­ÙŠÙ„Ø§Øª ÙˆØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø´Ø±Ù."
+      : "Payment method change was not saved. Check the migrations and admin permissions.");
+  };
 
   const toggleEnabled = async (m: PayMethod) => {
+    const previous = methods;
     setMethods((prev) => prev.map((x) => (x.id === m.id ? { ...x, enabled: !m.enabled } : x)));
     try {
-      await supabase.from("payment_methods").update({ enabled: !m.enabled }).eq("key", m.key);
-    } catch { /* fallback rows (no DB yet) still toggle locally */ }
-    flash(L.saved);
+      const { error: updateError } = await supabase.from("payment_methods").update({ enabled: !m.enabled }).eq("key", m.key);
+      if (updateError) throw updateError;
+      flash(L.saved);
+    } catch (err) {
+      fail(err, "Payment method toggle failed:", previous);
+    }
   };
 
   const makeDefault = async (m: PayMethod) => {
+    if (m.requires_gateway && !isOperational(m)) {
+      setMethodError(P.blocked);
+      return;
+    }
+    const previous = methods;
     setMethods((prev) => prev.map((x) => ({ ...x, is_default: x.id === m.id })));
     try {
-      await supabase.from("payment_methods").update({ is_default: false }).neq("id", m.id);
-      await supabase.from("payment_methods").update({ is_default: true, enabled: true }).eq("id", m.id);
-    } catch { /* fallback rows */ }
-    flash(L.saved);
+      const { error: resetError } = await supabase.from("payment_methods").update({ is_default: false }).neq("id", m.id);
+      if (resetError) throw resetError;
+      const { error: updateError } = await supabase.from("payment_methods").update({ is_default: true, enabled: true }).eq("id", m.id);
+      if (updateError) throw updateError;
+      flash(L.saved);
+    } catch (err) {
+      fail(err, "Payment method default update failed:", previous);
+    }
   };
 
   const activeGatewaysFor = (m: PayMethod) =>
@@ -258,14 +270,16 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
   const changeGateway = async (m: PayMethod, gatewayKey: string) => {
     const gateway = paymentIntegrations.find((integration) => integration.key === gatewayKey);
     if (!gateway) return;
+    const previous = methods;
     const nextFields = { gateway_key: gateway.key, env: gateway.env };
     setMethods((prev) => prev.map((x) => (x.id === m.id ? { ...x, ...nextFields } : x)));
     try {
-      await supabase.from("payment_methods").update(nextFields).eq("id", m.id);
-    } catch {
-      /* fallback rows still update locally */
+      const { error: updateError } = await supabase.from("payment_methods").update(nextFields).eq("id", m.id);
+      if (updateError) throw updateError;
+      flash(L.saved);
+    } catch (err) {
+      fail(err, "Payment method gateway update failed:", previous);
     }
-    flash(L.saved);
   };
 
   return (
@@ -275,6 +289,7 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
         <p className="text-[11px] text-gray-500 font-semibold mt-0.5">{L.subtitle}</p>
       </div>
       {note && <div className="mb-3 rounded-xl bg-[#ECFDF3] border border-[#D1FADF] px-3 py-2 text-[11px] font-bold text-[#027A48]">{note}</div>}
+      {methodError && <div className="mb-3 rounded-xl bg-[#FEF3F2] border border-[#FECDCA] px-3 py-2 text-[11px] font-bold text-[#B42318]">{methodError}</div>}
       <div className={`mb-3 flex flex-wrap items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
         <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">{P.activeApis}</span>
         {paymentIntegrations.filter((api) => api.enabled && api.status === "connected").length === 0 ? (

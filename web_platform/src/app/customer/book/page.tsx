@@ -26,13 +26,6 @@ type CheckoutIntegration = {
   supported_payment_method_keys?: string[] | null;
 };
 
-const FALLBACK_CHECKOUT_METHODS: CheckoutMethod[] = [
-  { key: "mada", label_en: "mada", label_ar: "مدى", is_default: true },
-  { key: "apple_pay", label_en: "Apple Pay", label_ar: "أبل باي", is_default: false },
-  { key: "visa", label_en: "Visa", label_ar: "فيزا", is_default: false },
-  { key: "cash", label_en: "Cash on service", label_ar: "نقداً عند الخدمة", is_default: false },
-];
-
 const isCheckoutMethodAcceptable = (method: any, integrations: CheckoutIntegration[]) => {
   const roles = method.enabled_for_roles ?? [];
   const requiresGateway = method.requires_gateway ?? !(method.gateway_key === "internal" || method.gateway_key === null);
@@ -72,7 +65,8 @@ function BookingContent() {
   const [isHomeService, setIsHomeService] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [payMethods, setPayMethods] = useState<CheckoutMethod[]>(FALLBACK_CHECKOUT_METHODS);
+  const [payMethods, setPayMethods] = useState<CheckoutMethod[]>([]);
+  const [paymentConfigMessage, setPaymentConfigMessage] = useState("");
   const { isTimeInLockWindow } = usePrayerTimes();
 
   const [isDemoMode, setIsDemoMode] = useState(false);
@@ -119,6 +113,7 @@ function BookingContent() {
 
         if (!acceptedError && accepted?.length) {
           setPayMethods(accepted as CheckoutMethod[]);
+          setPaymentConfigMessage("");
           return;
         }
 
@@ -145,9 +140,12 @@ function BookingContent() {
             gateway_key: m.gateway_key,
             gateway_name: paymentApis.find((api) => api.key === m.gateway_key)?.name || null
           }));
-        if (forCustomers.length) setPayMethods(forCustomers);
+        setPayMethods(forCustomers);
+        setPaymentConfigMessage(forCustomers.length ? "" : "No active payment methods are currently configured by the admin.");
       } catch (err) {
-        console.warn("Checkout payment methods using fallback:", err);
+        console.error("Checkout payment methods failed to load:", err);
+        setPayMethods([]);
+        setPaymentConfigMessage("Payment methods are not available. Please ask the admin to configure active payment APIs.");
       }
     })();
   }, []);
@@ -375,7 +373,11 @@ function BookingContent() {
           <div className="space-y-2">
             <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">We accept</span>
             <div className="flex flex-wrap gap-1.5">
-              {payMethods.map((m) => (
+              {payMethods.length === 0 ? (
+                <span className="rounded-full border border-red-100 bg-red-50 px-2.5 py-1 text-[9px] font-black text-red-600">
+                  {paymentConfigMessage || "No active payment methods"}
+                </span>
+              ) : payMethods.map((m) => (
                 <span
                   key={m.key}
                   className={`rounded-full border px-2.5 py-1 text-[9px] font-black ${
@@ -399,7 +401,7 @@ function BookingContent() {
 
             <button
               onClick={handleBook}
-              disabled={isLoading || !selectedDate || !selectedSlot}
+              disabled={isLoading || !selectedDate || !selectedSlot || payMethods.length === 0}
               className="w-full py-3 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-lg transition duration-200 disabled:opacity-50"
             >
               {isLoading ? "Redirecting..." : `Pay Escrow Deposit (${splits.deposit} SAR)`}

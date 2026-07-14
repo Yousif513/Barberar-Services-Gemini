@@ -191,20 +191,6 @@ const normalizeIntegration = (item: Integration): Integration => ({
     : defaultPaymentMethodSupport(item.key)
 });
 
-const FALLBACK: Integration[] = [
-  { id: "i1", key: "tap", name: "Tap Payments", category: "payments", status: "connected", enabled: true, env: "test", key_masked: "sk_test_••••••••4Kx2", webhook_url: "/functions/v1/payment-webhook", last_checked_at: null },
-  { id: "i2", key: "moyasar", name: "Moyasar", category: "payments", status: "disconnected", enabled: false, env: "test", key_masked: null, webhook_url: null, last_checked_at: null },
-  { id: "i3", key: "google_maps", name: "Google Maps Platform", category: "maps", status: "disconnected", enabled: false, env: "test", key_masked: null, webhook_url: null, last_checked_at: null },
-  { id: "i4", key: "unifonic", name: "Unifonic SMS/OTP", category: "sms", status: "disconnected", enabled: false, env: "test", key_masked: null, webhook_url: null, last_checked_at: null },
-  { id: "i5", key: "twilio", name: "Twilio WhatsApp/SMS", category: "sms", status: "disconnected", enabled: false, env: "test", key_masked: null, webhook_url: null, last_checked_at: null },
-  { id: "i6", key: "expo_push", name: "Expo Push", category: "push", status: "connected", enabled: true, env: "live", key_masked: "ExpoPush••••••7hQ", webhook_url: "/functions/v1/send-push", last_checked_at: null },
-  { id: "i7", key: "resend", name: "Resend Email", category: "email", status: "disconnected", enabled: false, env: "test", key_masked: null, webhook_url: null, last_checked_at: null },
-  { id: "i8", key: "whatsapp", name: "WhatsApp Business", category: "whatsapp", status: "disconnected", enabled: false, env: "test", key_masked: null, webhook_url: null, last_checked_at: null },
-  { id: "i9", key: "gcal", name: "Google Calendar Sync", category: "calendar", status: "disconnected", enabled: false, env: "test", key_masked: null, webhook_url: null, last_checked_at: null },
-  { id: "i10", key: "analytics", name: "Product Analytics", category: "analytics", status: "disconnected", enabled: false, env: "test", key_masked: null, webhook_url: null, last_checked_at: null },
-  { id: "i11", key: "anthropic", name: "Anthropic Claude (AI Concierge)", category: "ai", status: "disconnected", enabled: false, env: "test", key_masked: null, webhook_url: null, last_checked_at: null }
-];
-
 const CATEGORY_ORDER = [...SECTION_OPTIONS];
 
 const blankForm = (): IntegrationForm => ({
@@ -278,13 +264,18 @@ export default function AdminIntegrations() {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await supabase.from("integrations").select("*").order("category").order("name");
-        setItems((data?.length ? (data as Integration[]) : FALLBACK).map(normalizeIntegration));
-      } catch {
-        setItems(FALLBACK.map(normalizeIntegration));
+        const { data, error: loadError } = await supabase.from("integrations").select("*").order("category").order("name");
+        if (loadError) throw loadError;
+        setItems(((data ?? []) as Integration[]).map(normalizeIntegration));
+      } catch (err) {
+        console.error("Failed to load integrations:", err);
+        setItems([]);
+        setError(lang === "ar"
+          ? "ÙØ´Ù„ ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØªÙƒØ§Ù…Ù„Ø§Øª Ø§Ù„Ø­Ù‚ÙŠÙ‚ÙŠØ©. ØªØ£ÙƒØ¯ Ù…Ù† ØªØ·Ø¨ÙŠÙ‚ ØªØ±Ø­ÙŠÙ„Ø§Øª Supabase ÙˆØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø´Ø±Ù."
+          : "Failed to load real integrations. Apply the Supabase migrations and verify admin table permissions.");
       }
     })();
-  }, []);
+  }, [lang]);
 
   const t = translations[lang];
   const xt = extraTranslations[lang];
@@ -311,15 +302,21 @@ export default function AdminIntegrations() {
   };
 
   const patch = async (item: Integration, fields: Partial<Integration>, change: string) => {
+    const previous = items;
     setItems((prev) => prev.map((x) => (x.id === item.id ? { ...x, ...fields } : x)));
     try {
       const { error: updateError } = await supabase.from("integrations").update(fields).eq("id", item.id);
       if (updateError) throw updateError;
       await audit(item.key, change);
+      flash(t.saved);
     } catch (err) {
-      console.warn("Integration update warning:", err);
+      console.error("Integration update failed:", err);
+      setItems(previous);
+      setNote("");
+      setError(lang === "ar"
+        ? "Ù„Ù… ÙŠØªÙ… Ø­ÙØ¸ ØªØºÙŠÙŠØ± Ø§Ù„ØªÙƒØ§Ù…Ù„. ØªØ£ÙƒØ¯ Ù…Ù† Ø¬Ø¯ÙˆÙ„ integrations ÙˆØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø´Ø±Ù."
+        : "Integration change was not saved. Check the integrations table, migration, and admin permissions.");
     }
-    flash(t.saved);
   };
 
   const openNew = () => { setForm(blankForm()); setError(""); setModalOpen(true); };
@@ -376,25 +373,6 @@ export default function AdminIntegrations() {
 
     if (form.api_key.trim()) payload.api_key = form.api_key.trim();
 
-    const optimistic: Integration = {
-      id: form.id || `local-${key}-${Date.now()}`,
-      key,
-      name: payload.name || form.name,
-      category: payload.category || form.category,
-      status: payload.status || form.status,
-      enabled: payload.enabled ?? form.enabled,
-      env: payload.env || form.env,
-      key_masked: payload.key_masked || null,
-      api_key: payload.api_key || null,
-      base_url: payload.base_url || null,
-      platform_area: payload.platform_area || "all",
-      description: payload.description || null,
-      supported_payment_method_keys: payload.supported_payment_method_keys || [],
-      webhook_url: payload.webhook_url || null,
-      last_checked_at: null,
-      created_at: new Date().toISOString()
-    };
-
     try {
       if (isEdit) {
         const { data, error: updateError } = await supabase
@@ -404,7 +382,7 @@ export default function AdminIntegrations() {
           .select("*")
           .single();
         if (updateError) throw updateError;
-        setItems((prev) => prev.map((item) => (item.id === form.id ? ((data as Integration) || { ...item, ...optimistic }) : item)));
+        setItems((prev) => prev.map((item) => (item.id === form.id ? normalizeIntegration(data as Integration) : item)));
         await audit(key, "updated integration details");
         flash(xt.updated);
       } else {
@@ -414,19 +392,16 @@ export default function AdminIntegrations() {
           .select("*")
           .single();
         if (insertError) throw insertError;
-        setItems((prev) => [((data as Integration) || optimistic), ...prev.filter((item) => item.key !== key)]);
+        setItems((prev) => [normalizeIntegration(data as Integration), ...prev.filter((item) => item.key !== key)]);
         await audit(key, "created integration");
         flash(xt.created);
       }
       setModalOpen(false);
     } catch (err) {
-      console.warn("Integration save fallback:", err);
-      setItems((prev) => isEdit
-        ? prev.map((item) => (item.id === form.id ? { ...item, ...optimistic } : item))
-        : [optimistic, ...prev.filter((item) => item.key !== key)]
-      );
-      setModalOpen(false);
-      flash(isEdit ? xt.updated : xt.created);
+      console.error("Integration save failed:", err);
+      setError(lang === "ar"
+        ? "Ù„Ù… ÙŠØªÙ… Ø­ÙØ¸ API. ØªØ£ÙƒØ¯ Ù…Ù† ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„ØªØ±Ø­ÙŠÙ„Ø§Øª ÙˆØ£Ù† Ø­Ø³Ø§Ø¨Ùƒ Ù…Ø´Ø±Ù."
+        : "API was not saved. Apply the migrations and verify your admin permissions.");
     } finally {
       setSaving(false);
     }
@@ -441,11 +416,15 @@ export default function AdminIntegrations() {
       const { error: deleteError } = await supabase.from("integrations").delete().eq("id", item.id);
       if (deleteError) throw deleteError;
       await audit(item.key, "deleted integration");
+      flash(xt.deleted);
     } catch (err) {
-      console.warn("Integration delete fallback:", err);
-      if (!String(item.id).startsWith("local-")) setItems(previous);
+      console.error("Integration delete failed:", err);
+      setItems(previous);
+      setNote("");
+      setError(lang === "ar"
+        ? "Ù„Ù… ÙŠØªÙ… Ø­Ø°Ù API. ØªØ£ÙƒØ¯ Ù…Ù† ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø´Ø±Ù."
+        : "API was not deleted. Verify admin permissions and try again.");
     }
-    flash(xt.deleted);
   };
 
   const filteredItems = items.filter((item) => {
