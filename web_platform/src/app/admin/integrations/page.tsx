@@ -267,8 +267,7 @@ export default function AdminIntegrations() {
         const { data, error: loadError } = await supabase.from("integrations").select("*").order("category").order("name");
         if (loadError) throw loadError;
         setItems(((data ?? []) as Integration[]).map(normalizeIntegration));
-      } catch (err) {
-        console.error("Failed to load integrations:", err);
+      } catch {
         setItems([]);
         setError(lang === "ar"
           ? "ÙØ´Ù„ ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØªÙƒØ§Ù…Ù„Ø§Øª Ø§Ù„Ø­Ù‚ÙŠÙ‚ÙŠØ©. ØªØ£ÙƒØ¯ Ù…Ù† ØªØ·Ø¨ÙŠÙ‚ ØªØ±Ø­ÙŠÙ„Ø§Øª Supabase ÙˆØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø´Ø±Ù."
@@ -309,8 +308,7 @@ export default function AdminIntegrations() {
       if (updateError) throw updateError;
       await audit(item.key, change);
       flash(t.saved);
-    } catch (err) {
-      console.error("Integration update failed:", err);
+    } catch {
       setItems(previous);
       setNote("");
       setError(lang === "ar"
@@ -397,8 +395,7 @@ export default function AdminIntegrations() {
         flash(xt.created);
       }
       setModalOpen(false);
-    } catch (err) {
-      console.error("Integration save failed:", err);
+    } catch {
       setError(lang === "ar"
         ? "Ù„Ù… ÙŠØªÙ… Ø­ÙØ¸ API. ØªØ£ÙƒØ¯ Ù…Ù† ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„ØªØ±Ø­ÙŠÙ„Ø§Øª ÙˆØ£Ù† Ø­Ø³Ø§Ø¨Ùƒ Ù…Ø´Ø±Ù."
         : "API was not saved. Apply the migrations and verify your admin permissions.");
@@ -417,8 +414,7 @@ export default function AdminIntegrations() {
       if (deleteError) throw deleteError;
       await audit(item.key, "deleted integration");
       flash(xt.deleted);
-    } catch (err) {
-      console.error("Integration delete failed:", err);
+    } catch {
       setItems(previous);
       setNote("");
       setError(lang === "ar"

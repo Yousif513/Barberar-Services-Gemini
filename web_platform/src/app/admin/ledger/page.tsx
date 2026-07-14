@@ -202,8 +202,7 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
         setMethods(((methodRows ?? []) as PayMethod[]).map(normalizePayMethod));
         setPaymentIntegrations((integrationRows ?? []) as PaymentIntegration[]);
         setMethodError("");
-      } catch (err) {
-        console.error("Payment methods registry load failed:", err);
+      } catch {
         setMethods([]);
         setPaymentIntegrations([]);
         setMethodError(lang === "ar"
@@ -214,8 +213,7 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
   }, [lang]);
 
   const flash = (msg: string) => { setMethodError(""); setNote(msg); setTimeout(() => setNote(""), 3000); };
-  const fail = (err: unknown, msg: string, previous: PayMethod[]) => {
-    console.error(msg, err);
+  const fail = (previous: PayMethod[]) => {
     setMethods(previous);
     setNote("");
     setMethodError(lang === "ar"
@@ -230,8 +228,8 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
       const { error: updateError } = await supabase.from("payment_methods").update({ enabled: !m.enabled }).eq("key", m.key);
       if (updateError) throw updateError;
       flash(L.saved);
-    } catch (err) {
-      fail(err, "Payment method toggle failed:", previous);
+    } catch {
+      fail(previous);
     }
   };
 
@@ -248,8 +246,8 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
       const { error: updateError } = await supabase.from("payment_methods").update({ is_default: true, enabled: true }).eq("id", m.id);
       if (updateError) throw updateError;
       flash(L.saved);
-    } catch (err) {
-      fail(err, "Payment method default update failed:", previous);
+    } catch {
+      fail(previous);
     }
   };
 
@@ -277,8 +275,8 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
       const { error: updateError } = await supabase.from("payment_methods").update(nextFields).eq("id", m.id);
       if (updateError) throw updateError;
       flash(L.saved);
-    } catch (err) {
-      fail(err, "Payment method gateway update failed:", previous);
+    } catch {
+      fail(previous);
     }
   };
 

@@ -142,8 +142,7 @@ function BookingContent() {
           }));
         setPayMethods(forCustomers);
         setPaymentConfigMessage(forCustomers.length ? "" : "No active payment methods are currently configured by the admin.");
-      } catch (err) {
-        console.error("Checkout payment methods failed to load:", err);
+      } catch {
         setPayMethods([]);
         setPaymentConfigMessage("Payment methods are not available. Please ask the admin to configure active payment APIs.");
       }
