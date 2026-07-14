@@ -5,9 +5,26 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { usePrayerTimes } from "@/lib/use-prayer-times";
 
-// Accepted payment methods come from the admin registry (payment_methods):
-// only rows that are enabled AND available to customers appear here.
-type CheckoutMethod = { key: string; label_en: string; label_ar: string; is_default: boolean };
+// Accepted payment methods come from the admin registry and linked payment APIs:
+// only enabled, customer-facing methods backed by a connected gateway appear here.
+type CheckoutMethod = {
+  key: string;
+  label_en: string;
+  label_ar: string;
+  is_default: boolean;
+  gateway_key?: string | null;
+  gateway_name?: string | null;
+};
+
+type CheckoutIntegration = {
+  key: string;
+  name: string;
+  category: string;
+  enabled: boolean;
+  status: "connected" | "disconnected";
+  env: string;
+  supported_payment_method_keys?: string[] | null;
+};
 
 const FALLBACK_CHECKOUT_METHODS: CheckoutMethod[] = [
   { key: "mada", label_en: "mada", label_ar: "مدى", is_default: true },
@@ -15,6 +32,21 @@ const FALLBACK_CHECKOUT_METHODS: CheckoutMethod[] = [
   { key: "visa", label_en: "Visa", label_ar: "فيزا", is_default: false },
   { key: "cash", label_en: "Cash on service", label_ar: "نقداً عند الخدمة", is_default: false },
 ];
+
+const isCheckoutMethodAcceptable = (method: any, integrations: CheckoutIntegration[]) => {
+  const roles = method.enabled_for_roles ?? [];
+  const requiresGateway = method.requires_gateway ?? !(method.gateway_key === "internal" || method.gateway_key === null);
+  if (!method.enabled || !roles.includes("customer")) return false;
+  if (!requiresGateway || method.gateway_key === "internal") return true;
+  return integrations.some((integration) =>
+    integration.key === method.gateway_key &&
+    integration.category === "payments" &&
+    integration.enabled &&
+    integration.status === "connected" &&
+    integration.env === method.env &&
+    (integration.supported_payment_method_keys ?? []).includes(method.key)
+  );
+};
 
 type ServiceItem = {
   id: string;
@@ -80,12 +112,39 @@ function BookingContent() {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await supabase
-          .from("payment_methods")
-          .select("key, label_en, label_ar, is_default, enabled_for_roles")
-          .eq("enabled", true)
+        const { data: accepted, error: acceptedError } = await supabase
+          .from("accepted_payment_methods")
+          .select("key, label_en, label_ar, is_default, gateway_key, gateway_name")
           .order("sort_order");
-        const forCustomers = (data ?? []).filter((m) => (m.enabled_for_roles ?? []).includes("customer"));
+
+        if (!acceptedError && accepted?.length) {
+          setPayMethods(accepted as CheckoutMethod[]);
+          return;
+        }
+
+        const [{ data: methods }, { data: integrations }] = await Promise.all([
+          supabase
+            .from("payment_methods")
+            .select("key, label_en, label_ar, is_default, enabled, enabled_for_roles, gateway_key, env, requires_gateway")
+            .eq("enabled", true)
+            .order("sort_order"),
+          supabase
+            .from("integrations")
+            .select("key, name, category, enabled, status, env, supported_payment_method_keys")
+            .eq("category", "payments")
+        ]);
+
+        const paymentApis = (integrations ?? []) as CheckoutIntegration[];
+        const forCustomers = (methods ?? [])
+          .filter((m) => isCheckoutMethodAcceptable(m, paymentApis))
+          .map((m: any) => ({
+            key: m.key,
+            label_en: m.label_en,
+            label_ar: m.label_ar,
+            is_default: m.is_default,
+            gateway_key: m.gateway_key,
+            gateway_name: paymentApis.find((api) => api.key === m.gateway_key)?.name || null
+          }));
         if (forCustomers.length) setPayMethods(forCustomers);
       } catch (err) {
         console.warn("Checkout payment methods using fallback:", err);
@@ -325,7 +384,7 @@ function BookingContent() {
                       : "border-gray-200 bg-gray-50 text-gray-500"
                   }`}
                 >
-                  {m.label_en}
+                  {m.label_en}{m.gateway_name ? ` · ${m.gateway_name}` : ""}
                 </span>
               ))}
             </div>

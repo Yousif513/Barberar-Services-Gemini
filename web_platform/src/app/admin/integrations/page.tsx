@@ -75,6 +75,7 @@ type Integration = {
   base_url?: string | null;
   platform_area?: string | null;
   description?: string | null;
+  supported_payment_method_keys?: string[] | null;
   webhook_url: string | null;
   last_checked_at: string | null;
   created_at?: string | null;
@@ -94,6 +95,7 @@ type IntegrationForm = {
   enabled: boolean;
   env: "test" | "live";
   description: string;
+  supported_payment_method_keys: string[];
 };
 
 const extraTranslations = {
@@ -165,6 +167,30 @@ const SECTION_OPTIONS = [
 
 const PLATFORM_AREAS = ["all", "customer", "provider", "admin", "customer_provider", "notifications", "edge_functions", "mobile"];
 
+const PAYMENT_METHOD_OPTIONS = [
+  { key: "mada", label: "Mada" },
+  { key: "apple_pay", label: "Apple Pay" },
+  { key: "visa", label: "Visa" },
+  { key: "mastercard", label: "Mastercard" },
+  { key: "stc_pay", label: "STC Pay" },
+  { key: "tamara", label: "Tamara" },
+  { key: "tabby", label: "Tabby" }
+];
+
+const defaultPaymentMethodSupport = (key: string) => {
+  if (key === "tamara") return ["tamara"];
+  if (key === "tabby") return ["tabby"];
+  if (["tap", "moyasar", "paytabs", "myfatoorah"].includes(key)) return ["mada", "apple_pay", "visa", "mastercard", "stc_pay"];
+  return [];
+};
+
+const normalizeIntegration = (item: Integration): Integration => ({
+  ...item,
+  supported_payment_method_keys: item.supported_payment_method_keys?.length
+    ? item.supported_payment_method_keys
+    : defaultPaymentMethodSupport(item.key)
+});
+
 const FALLBACK: Integration[] = [
   { id: "i1", key: "tap", name: "Tap Payments", category: "payments", status: "connected", enabled: true, env: "test", key_masked: "sk_test_••••••••4Kx2", webhook_url: "/functions/v1/payment-webhook", last_checked_at: null },
   { id: "i2", key: "moyasar", name: "Moyasar", category: "payments", status: "disconnected", enabled: false, env: "test", key_masked: null, webhook_url: null, last_checked_at: null },
@@ -194,7 +220,8 @@ const blankForm = (): IntegrationForm => ({
   status: "disconnected",
   enabled: true,
   env: "test",
-  description: ""
+  description: "",
+  supported_payment_method_keys: []
 });
 
 const slugifyKey = (value: string) =>
@@ -252,9 +279,9 @@ export default function AdminIntegrations() {
     (async () => {
       try {
         const { data } = await supabase.from("integrations").select("*").order("category").order("name");
-        setItems(data?.length ? (data as Integration[]) : FALLBACK);
+        setItems((data?.length ? (data as Integration[]) : FALLBACK).map(normalizeIntegration));
       } catch {
-        setItems(FALLBACK);
+        setItems(FALLBACK.map(normalizeIntegration));
       }
     })();
   }, []);
@@ -311,7 +338,8 @@ export default function AdminIntegrations() {
       status: item.status || "disconnected",
       enabled: item.enabled !== false,
       env: item.env || "test",
-      description: item.description || ""
+      description: item.description || "",
+      supported_payment_method_keys: item.supported_payment_method_keys?.length ? item.supported_payment_method_keys : defaultPaymentMethodSupport(item.key)
     });
     setError("");
     setModalOpen(true);
@@ -342,7 +370,8 @@ export default function AdminIntegrations() {
       status: form.status,
       enabled: form.enabled,
       env: form.env,
-      description: form.description.trim() || null
+      description: form.description.trim() || null,
+      supported_payment_method_keys: form.category === "payments" ? form.supported_payment_method_keys : []
     };
 
     if (form.api_key.trim()) payload.api_key = form.api_key.trim();
@@ -360,6 +389,7 @@ export default function AdminIntegrations() {
       base_url: payload.base_url || null,
       platform_area: payload.platform_area || "all",
       description: payload.description || null,
+      supported_payment_method_keys: payload.supported_payment_method_keys || [],
       webhook_url: payload.webhook_url || null,
       last_checked_at: null,
       created_at: new Date().toISOString()
@@ -551,6 +581,18 @@ export default function AdminIntegrations() {
                     ))}
                   </div>
                   {item.description && <p className="mt-3 line-clamp-2 text-[11px] font-semibold leading-relaxed text-gray-500">{item.description}</p>}
+                  {item.category === "payments" && (
+                    <div className={`mt-3 flex flex-wrap gap-1.5 ${isRTL ? "justify-end" : "justify-start"}`}>
+                      {(item.supported_payment_method_keys?.length ? item.supported_payment_method_keys : defaultPaymentMethodSupport(item.key)).map((methodKey) => {
+                        const method = PAYMENT_METHOD_OPTIONS.find((option) => option.key === methodKey);
+                        return (
+                          <span key={methodKey} className="rounded-full border border-[#D1AF47]/25 bg-[#FFFAEB] px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-[#9A7211]">
+                            {method?.label || methodKey}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
                   <div className={`mt-4 flex flex-wrap items-center gap-2 ${isRTL ? "justify-end" : "justify-start"}`}>
                     <button
                       onClick={() => patch(item, { status: item.status === "connected" ? "disconnected" : "connected" }, `set status ${item.status === "connected" ? "disconnected" : "connected"}`)}
@@ -617,10 +659,46 @@ export default function AdminIntegrations() {
               </label>
               <label className="space-y-2">
                 <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.section}</span>
-                <select value={form.category} onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-black outline-none focus:border-[#D1AF47]">
+                <select
+                  value={form.category}
+                  onChange={(event) => setForm((prev) => ({
+                    ...prev,
+                    category: event.target.value,
+                    supported_payment_method_keys: event.target.value === "payments" && prev.supported_payment_method_keys.length === 0
+                      ? defaultPaymentMethodSupport(prev.key)
+                      : prev.supported_payment_method_keys
+                  }))}
+                  className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-black outline-none focus:border-[#D1AF47]"
+                >
                   {SECTION_OPTIONS.map((section) => <option key={section} value={section}>{catLabel[section] ?? section}</option>)}
                 </select>
               </label>
+              {form.category === "payments" && (
+                <div className="space-y-2 md:col-span-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{lang === "ar" ? "Ø·Ø±Ù‚ Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ù…Ø¯Ø¹ÙˆÙ…Ø©" : "Supported payment methods"}</span>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {PAYMENT_METHOD_OPTIONS.map((option) => {
+                      const checked = form.supported_payment_method_keys.includes(option.key);
+                      return (
+                        <label key={option.key} className={`flex cursor-pointer items-center gap-2 rounded-2xl border px-3 py-2 text-[10px] font-black uppercase tracking-wider transition ${checked ? "border-[#D1AF47] bg-[#FFFAEB] text-[#8A6A10]" : "border-[#ECECEC] bg-white text-gray-500"}`}>
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={(event) => setForm((prev) => ({
+                              ...prev,
+                              supported_payment_method_keys: event.target.checked
+                                ? Array.from(new Set([...prev.supported_payment_method_keys, option.key]))
+                                : prev.supported_payment_method_keys.filter((key) => key !== option.key)
+                            }))}
+                            className="h-3.5 w-3.5 accent-[#D1AF47]"
+                          />
+                          {option.label}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               <label className="space-y-2">
                 <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.platformArea}</span>
                 <select value={form.platform_area} onChange={(event) => setForm((prev) => ({ ...prev, platform_area: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-black outline-none focus:border-[#D1AF47]">
