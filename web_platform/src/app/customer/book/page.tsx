@@ -5,16 +5,41 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { usePrayerTimes } from "@/lib/use-prayer-times";
 
-// Accepted payment methods come from the admin registry (payment_methods):
-// only rows that are enabled AND available to customers appear here.
-type CheckoutMethod = { key: string; label_en: string; label_ar: string; is_default: boolean };
+// Accepted payment methods come from the admin registry and linked payment APIs:
+// only enabled, customer-facing methods backed by a connected gateway appear here.
+type CheckoutMethod = {
+  key: string;
+  label_en: string;
+  label_ar: string;
+  is_default: boolean;
+  gateway_key?: string | null;
+  gateway_name?: string | null;
+};
 
-const FALLBACK_CHECKOUT_METHODS: CheckoutMethod[] = [
-  { key: "mada", label_en: "mada", label_ar: "مدى", is_default: true },
-  { key: "apple_pay", label_en: "Apple Pay", label_ar: "أبل باي", is_default: false },
-  { key: "visa", label_en: "Visa", label_ar: "فيزا", is_default: false },
-  { key: "cash", label_en: "Cash on service", label_ar: "نقداً عند الخدمة", is_default: false },
-];
+type CheckoutIntegration = {
+  key: string;
+  name: string;
+  category: string;
+  enabled: boolean;
+  status: "connected" | "disconnected";
+  env: string;
+  supported_payment_method_keys?: string[] | null;
+};
+
+const isCheckoutMethodAcceptable = (method: any, integrations: CheckoutIntegration[]) => {
+  const roles = method.enabled_for_roles ?? [];
+  const requiresGateway = method.requires_gateway ?? !(method.gateway_key === "internal" || method.gateway_key === null);
+  if (!method.enabled || !roles.includes("customer")) return false;
+  if (!requiresGateway || method.gateway_key === "internal") return true;
+  return integrations.some((integration) =>
+    integration.key === method.gateway_key &&
+    integration.category === "payments" &&
+    integration.enabled &&
+    integration.status === "connected" &&
+    integration.env === method.env &&
+    (integration.supported_payment_method_keys ?? []).includes(method.key)
+  );
+};
 
 type ServiceItem = {
   id: string;
@@ -40,7 +65,8 @@ function BookingContent() {
   const [isHomeService, setIsHomeService] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [payMethods, setPayMethods] = useState<CheckoutMethod[]>(FALLBACK_CHECKOUT_METHODS);
+  const [payMethods, setPayMethods] = useState<CheckoutMethod[]>([]);
+  const [paymentConfigMessage, setPaymentConfigMessage] = useState("");
   const { isTimeInLockWindow } = usePrayerTimes();
 
   const [isDemoMode, setIsDemoMode] = useState(false);
@@ -80,15 +106,45 @@ function BookingContent() {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await supabase
-          .from("payment_methods")
-          .select("key, label_en, label_ar, is_default, enabled_for_roles")
-          .eq("enabled", true)
+        const { data: accepted, error: acceptedError } = await supabase
+          .from("accepted_payment_methods")
+          .select("key, label_en, label_ar, is_default, gateway_key, gateway_name")
           .order("sort_order");
-        const forCustomers = (data ?? []).filter((m) => (m.enabled_for_roles ?? []).includes("customer"));
-        if (forCustomers.length) setPayMethods(forCustomers);
-      } catch (err) {
-        console.warn("Checkout payment methods using fallback:", err);
+
+        if (!acceptedError && accepted?.length) {
+          setPayMethods(accepted as CheckoutMethod[]);
+          setPaymentConfigMessage("");
+          return;
+        }
+
+        const [{ data: methods }, { data: integrations }] = await Promise.all([
+          supabase
+            .from("payment_methods")
+            .select("key, label_en, label_ar, is_default, enabled, enabled_for_roles, gateway_key, env, requires_gateway")
+            .eq("enabled", true)
+            .order("sort_order"),
+          supabase
+            .from("integrations")
+            .select("key, name, category, enabled, status, env, supported_payment_method_keys")
+            .eq("category", "payments")
+        ]);
+
+        const paymentApis = (integrations ?? []) as CheckoutIntegration[];
+        const forCustomers = (methods ?? [])
+          .filter((m) => isCheckoutMethodAcceptable(m, paymentApis))
+          .map((m: any) => ({
+            key: m.key,
+            label_en: m.label_en,
+            label_ar: m.label_ar,
+            is_default: m.is_default,
+            gateway_key: m.gateway_key,
+            gateway_name: paymentApis.find((api) => api.key === m.gateway_key)?.name || null
+          }));
+        setPayMethods(forCustomers);
+        setPaymentConfigMessage(forCustomers.length ? "" : "No active payment methods are currently configured by the admin.");
+      } catch {
+        setPayMethods([]);
+        setPaymentConfigMessage("Payment methods are not available. Please ask the admin to configure active payment APIs.");
       }
     })();
   }, []);
@@ -316,7 +372,11 @@ function BookingContent() {
           <div className="space-y-2">
             <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">We accept</span>
             <div className="flex flex-wrap gap-1.5">
-              {payMethods.map((m) => (
+              {payMethods.length === 0 ? (
+                <span className="rounded-full border border-red-100 bg-red-50 px-2.5 py-1 text-[9px] font-black text-red-600">
+                  {paymentConfigMessage || "No active payment methods"}
+                </span>
+              ) : payMethods.map((m) => (
                 <span
                   key={m.key}
                   className={`rounded-full border px-2.5 py-1 text-[9px] font-black ${
@@ -325,7 +385,7 @@ function BookingContent() {
                       : "border-gray-200 bg-gray-50 text-gray-500"
                   }`}
                 >
-                  {m.label_en}
+                  {m.label_en}{m.gateway_name ? ` · ${m.gateway_name}` : ""}
                 </span>
               ))}
             </div>
@@ -340,7 +400,7 @@ function BookingContent() {
 
             <button
               onClick={handleBook}
-              disabled={isLoading || !selectedDate || !selectedSlot}
+              disabled={isLoading || !selectedDate || !selectedSlot || payMethods.length === 0}
               className="w-full py-3 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-lg transition duration-200 disabled:opacity-50"
             >
               {isLoading ? "Redirecting..." : `Pay Escrow Deposit (${splits.deposit} SAR)`}

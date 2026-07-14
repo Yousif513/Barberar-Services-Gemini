@@ -151,52 +151,133 @@ type PayMethod = {
   is_default: boolean;
   env: string;
   sort_order: number;
+  requires_gateway?: boolean;
+  gateway_priority?: string[];
+  admin_note?: string | null;
 };
 
-const FALLBACK_METHODS: PayMethod[] = [
-  { id: "m1", key: "mada", label_en: "mada", label_ar: "مدى", gateway_key: "tap", enabled: true, enabled_for_roles: ["customer"], is_default: true, env: "test", sort_order: 1 },
-  { id: "m2", key: "apple_pay", label_en: "Apple Pay", label_ar: "أبل باي", gateway_key: "tap", enabled: true, enabled_for_roles: ["customer"], is_default: false, env: "test", sort_order: 2 },
-  { id: "m3", key: "visa", label_en: "Visa", label_ar: "فيزا", gateway_key: "tap", enabled: true, enabled_for_roles: ["customer"], is_default: false, env: "test", sort_order: 3 },
-  { id: "m4", key: "stc_pay", label_en: "STC Pay", label_ar: "إس تي سي باي", gateway_key: "tap", enabled: true, enabled_for_roles: ["customer"], is_default: false, env: "test", sort_order: 5 },
-  { id: "m5", key: "cash", label_en: "Cash on service", label_ar: "نقداً عند الخدمة", gateway_key: "internal", enabled: true, enabled_for_roles: ["customer"], is_default: false, env: "test", sort_order: 10 },
-];
+type PaymentIntegration = {
+  id: string;
+  key: string;
+  name: string;
+  category: string;
+  status: "connected" | "disconnected";
+  enabled: boolean;
+  env: "test" | "live";
+  supported_payment_method_keys?: string[] | null;
+};
+
+const normalizePayMethod = (method: PayMethod): PayMethod => ({
+  ...method,
+  requires_gateway: method.requires_gateway ?? !(method.gateway_key === "internal" || method.gateway_key === null),
+  gateway_priority: method.gateway_priority ?? []
+});
+
+const supportsMethod = (integration: PaymentIntegration, methodKey: string) =>
+  (integration.supported_payment_method_keys ?? []).includes(methodKey);
 
 function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBase: string }) {
   const isRTL = lang === "ar";
   const [methods, setMethods] = useState<PayMethod[]>([]);
+  const [paymentIntegrations, setPaymentIntegrations] = useState<PaymentIntegration[]>([]);
   const [note, setNote] = useState("");
+  const [methodError, setMethodError] = useState("");
   const L = lang === "ar"
     ? { title: "طرق الدفع (السوق السعودي)", subtitle: "فعّل أو عطّل الطرق وحدد الافتراضية — تنعكس فوراً على صفحة الدفع لدى العميل وشاشة مستحقات المزود.", enabled: "مفعلة", disabled: "معطلة", makeDefault: "افتراضية", isDefault: "★ الافتراضية", roles: "متاحة لـ", customer: "العميل", provider: "المزود", gateway: "البوابة", saved: "تم حفظ إعدادات طرق الدفع.", empty: "لا توجد طرق دفع — طبّق ترحيل قاعدة البيانات ثم أعد التحميل." }
     : { title: "Payment Methods (KSA)", subtitle: "Enable, disable and set the default — changes reflect instantly at customer checkout and provider payout screens.", enabled: "Enabled", disabled: "Disabled", makeDefault: "Make default", isDefault: "★ Default", roles: "Available to", customer: "Customer", provider: "Provider", gateway: "Gateway", saved: "Payment method settings saved.", empty: "No payment methods yet — apply the database migration and reload." };
 
+  const P = lang === "ar"
+    ? { activeApi: "API Ù…ØªØµÙ„", blocked: "Ù…Ø­Ø¬ÙˆØ¨: Ø§Ø®ØªØ± API Ø¯ÙØ¹ Ù…ØªØµÙ„", noGateway: "Ù„Ø§ ÙŠØ­ØªØ§Ø¬ API", selectGateway: "Ø§Ø®ØªÙŠØ§Ø± Ù…Ø²ÙˆØ¯ Ø§Ù„Ø¯ÙØ¹", activeApis: "APIs Ø§Ù„Ù…ÙØ¹Ù„Ø©" }
+    : { activeApi: "Connected API", blocked: "Blocked: choose a connected payment API", noGateway: "No API required", selectGateway: "Select gateway provider", activeApis: "Active payment APIs" };
+
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await supabase.from("payment_methods").select("*").order("sort_order");
-        setMethods(data?.length ? data : FALLBACK_METHODS);
+        const [{ data: methodRows, error: methodLoadError }, { data: integrationRows, error: integrationLoadError }] = await Promise.all([
+          supabase.from("payment_methods").select("*").order("sort_order"),
+          supabase.from("integrations").select("id, key, name, category, status, enabled, env, supported_payment_method_keys").eq("category", "payments").order("name")
+        ]);
+        if (methodLoadError) throw methodLoadError;
+        if (integrationLoadError) throw integrationLoadError;
+        setMethods(((methodRows ?? []) as PayMethod[]).map(normalizePayMethod));
+        setPaymentIntegrations((integrationRows ?? []) as PaymentIntegration[]);
+        setMethodError("");
       } catch {
-        setMethods(FALLBACK_METHODS);
+        setMethods([]);
+        setPaymentIntegrations([]);
+        setMethodError(lang === "ar"
+          ? "ÙØ´Ù„ ØªØ­Ù…ÙŠÙ„ Ø·Ø±Ù‚ Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ø­Ù‚ÙŠÙ‚ÙŠØ©. Ø·Ø¨Ù‘Ù‚ ØªØ±Ø­ÙŠÙ„Ø§Øª Supabase ÙˆØªØ£ÙƒØ¯ Ù…Ù† ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø´Ø±Ù."
+          : "Failed to load real payment methods. Apply the Supabase migrations and verify admin permissions.");
       }
     })();
-  }, []);
+  }, [lang]);
 
-  const flash = (msg: string) => { setNote(msg); setTimeout(() => setNote(""), 3000); };
+  const flash = (msg: string) => { setMethodError(""); setNote(msg); setTimeout(() => setNote(""), 3000); };
+  const fail = (previous: PayMethod[]) => {
+    setMethods(previous);
+    setNote("");
+    setMethodError(lang === "ar"
+      ? "Ù„Ù… ÙŠØªÙ… Ø­ÙØ¸ ØªØºÙŠÙŠØ± Ø·Ø±ÙŠÙ‚Ø© Ø§Ù„Ø¯ÙØ¹. ØªØ£ÙƒØ¯ Ù…Ù† Ø§Ù„ØªØ±Ø­ÙŠÙ„Ø§Øª ÙˆØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø´Ø±Ù."
+      : "Payment method change was not saved. Check the migrations and admin permissions.");
+  };
 
   const toggleEnabled = async (m: PayMethod) => {
+    const previous = methods;
     setMethods((prev) => prev.map((x) => (x.id === m.id ? { ...x, enabled: !m.enabled } : x)));
     try {
-      await supabase.from("payment_methods").update({ enabled: !m.enabled }).eq("key", m.key);
-    } catch { /* fallback rows (no DB yet) still toggle locally */ }
-    flash(L.saved);
+      const { error: updateError } = await supabase.from("payment_methods").update({ enabled: !m.enabled }).eq("key", m.key);
+      if (updateError) throw updateError;
+      flash(L.saved);
+    } catch {
+      fail(previous);
+    }
   };
 
   const makeDefault = async (m: PayMethod) => {
+    if (m.requires_gateway && !isOperational(m)) {
+      setMethodError(P.blocked);
+      return;
+    }
+    const previous = methods;
     setMethods((prev) => prev.map((x) => ({ ...x, is_default: x.id === m.id })));
     try {
-      await supabase.from("payment_methods").update({ is_default: false }).neq("id", m.id);
-      await supabase.from("payment_methods").update({ is_default: true, enabled: true }).eq("id", m.id);
-    } catch { /* fallback rows */ }
-    flash(L.saved);
+      const { error: resetError } = await supabase.from("payment_methods").update({ is_default: false }).neq("id", m.id);
+      if (resetError) throw resetError;
+      const { error: updateError } = await supabase.from("payment_methods").update({ is_default: true, enabled: true }).eq("id", m.id);
+      if (updateError) throw updateError;
+      flash(L.saved);
+    } catch {
+      fail(previous);
+    }
+  };
+
+  const activeGatewaysFor = (m: PayMethod) =>
+    paymentIntegrations.filter((integration) =>
+      integration.category === "payments" &&
+      integration.enabled &&
+      integration.status === "connected" &&
+      supportsMethod(integration, m.key)
+    );
+
+  const selectedGatewayFor = (m: PayMethod) =>
+    paymentIntegrations.find((integration) => integration.key === m.gateway_key && supportsMethod(integration, m.key));
+
+  const isOperational = (m: PayMethod) =>
+    !m.requires_gateway || m.gateway_key === "internal" || activeGatewaysFor(m).some((integration) => integration.key === m.gateway_key && integration.env === m.env);
+
+  const changeGateway = async (m: PayMethod, gatewayKey: string) => {
+    const gateway = paymentIntegrations.find((integration) => integration.key === gatewayKey);
+    if (!gateway) return;
+    const previous = methods;
+    const nextFields = { gateway_key: gateway.key, env: gateway.env };
+    setMethods((prev) => prev.map((x) => (x.id === m.id ? { ...x, ...nextFields } : x)));
+    try {
+      const { error: updateError } = await supabase.from("payment_methods").update(nextFields).eq("id", m.id);
+      if (updateError) throw updateError;
+      flash(L.saved);
+    } catch {
+      fail(previous);
+    }
   };
 
   return (
@@ -206,12 +287,29 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
         <p className="text-[11px] text-gray-500 font-semibold mt-0.5">{L.subtitle}</p>
       </div>
       {note && <div className="mb-3 rounded-xl bg-[#ECFDF3] border border-[#D1FADF] px-3 py-2 text-[11px] font-bold text-[#027A48]">{note}</div>}
+      {methodError && <div className="mb-3 rounded-xl bg-[#FEF3F2] border border-[#FECDCA] px-3 py-2 text-[11px] font-bold text-[#B42318]">{methodError}</div>}
+      <div className={`mb-3 flex flex-wrap items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
+        <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">{P.activeApis}</span>
+        {paymentIntegrations.filter((api) => api.enabled && api.status === "connected").length === 0 ? (
+          <span className="rounded-full border border-[#FECDCA] bg-[#FEF3F2] px-2.5 py-1 text-[9px] font-black uppercase text-[#B42318]">{P.blocked}</span>
+        ) : (
+          paymentIntegrations.filter((api) => api.enabled && api.status === "connected").map((api) => (
+            <span key={api.key} className="rounded-full border border-[#D1FADF] bg-[#ECFDF3] px-2.5 py-1 text-[9px] font-black uppercase text-[#027A48]">
+              {api.name} · {api.env}
+            </span>
+          ))
+        )}
+      </div>
       {methods.length === 0 ? (
         <p className="py-6 text-center text-xs font-semibold text-gray-400">{L.empty}</p>
       ) : (
         <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
-          {methods.map((m) => (
-            <div key={m.id} className={`rounded-xl border p-3.5 transition ${m.enabled ? "border-[#D1AF47]/25 bg-[#FFFDF7]" : "border-[#ECECEC] bg-gray-50/60 opacity-80"}`}>
+          {methods.map((m) => {
+            const candidates = activeGatewaysFor(m);
+            const selectedGateway = selectedGatewayFor(m);
+            const operational = isOperational(m);
+            return (
+            <div key={m.id} className={`rounded-xl border p-3.5 transition ${m.enabled && operational ? "border-[#D1AF47]/25 bg-[#FFFDF7]" : "border-[#ECECEC] bg-gray-50/60 opacity-80"}`}>
               <div className={`flex items-center justify-between gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
                 <div className={isRTL ? "text-right" : "text-left"}>
                   <strong className="block text-xs font-black text-gray-900">{lang === "ar" ? m.label_ar : m.label_en}</strong>
@@ -225,6 +323,26 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
                   <span className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform" style={{ transform: m.enabled ? "translateX(18px)" : "translateX(2px)" }} />
                 </button>
               </div>
+              <div className={`mt-2 rounded-xl border px-2.5 py-2 text-[9px] font-black uppercase tracking-wider ${
+                operational ? "border-[#D1FADF] bg-[#ECFDF3] text-[#027A48]" : "border-[#FECDCA] bg-[#FEF3F2] text-[#B42318]"
+              }`}>
+                {operational ? `${P.activeApi}: ${m.requires_gateway ? selectedGateway?.name || m.gateway_key : P.noGateway}` : P.blocked}
+              </div>
+              {m.requires_gateway && (
+                <label className="mt-2 block space-y-1">
+                  <span className="text-[8px] font-black uppercase tracking-widest text-gray-400">{P.selectGateway}</span>
+                  <select
+                    value={operational ? (m.gateway_key || "") : ""}
+                    onChange={(event) => changeGateway(m, event.target.value)}
+                    className="w-full rounded-xl border border-[#ECECEC] bg-white px-2.5 py-2 text-[10px] font-black text-gray-700 outline-none focus:border-[#D1AF47]"
+                  >
+                    <option value="" disabled>{candidates.length ? P.selectGateway : P.blocked}</option>
+                    {candidates.map((gateway) => (
+                      <option key={gateway.key} value={gateway.key}>{gateway.name} - {gateway.env}</option>
+                    ))}
+                  </select>
+                </label>
+              )}
               <div className={`mt-2.5 flex flex-wrap items-center gap-1.5 ${isRTL ? "flex-row-reverse" : ""}`}>
                 {(m.enabled_for_roles ?? []).map((r) => (
                   <span key={r} className="rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[8px] font-black uppercase text-[#3B82F6]">{r === "customer" ? L.customer : r === "provider" ? L.provider : r}</span>
@@ -236,7 +354,8 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
                 )}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
@@ -874,7 +993,7 @@ export default function AdminLedger() {
                     </tr>
                   ) : (
                     vatSummary.map((v, i) => (
-                      <tr key={v.month_start || i} className="hover:bg-gray-50/40">
+                      <tr key={`vat-${v.month_start || "month"}-${i}`} className="hover:bg-gray-50/40">
                         <td className="py-4 px-6 font-bold text-gray-900">{formatDateMonth(v.month_start)}</td>
                         <td className="py-4 px-6 font-mono">{v.total_bookings}</td>
                         <td className="py-4 px-6 font-serif font-black text-amber-700">{formatMoney(v.total_vat_collected)} SAR</td>
@@ -921,7 +1040,7 @@ export default function AdminLedger() {
                         ? s.providers?.business_name_ar || s.providers?.business_name_en || s.provider_id
                         : s.providers?.business_name_en || s.providers?.business_name_ar || s.provider_id;
                       return (
-                        <tr key={s.month_start || i} className="hover:bg-gray-50/40">
+                        <tr key={`settlement-${s.month_start || "month"}-${s.provider_id || i}`} className="hover:bg-gray-50/40">
                           <td className="py-4 px-6 font-bold text-gray-900">{formatDateMonth(s.month_start)}</td>
                           <td className="py-4 px-6 font-bold text-gray-900">{providerName}</td>
                           <td className="py-4 px-6 font-mono">{s.total_transactions}</td>
@@ -969,7 +1088,7 @@ export default function AdminLedger() {
                         ? e.employees?.name_ar || e.employees?.name_en || e.employee_id
                         : e.employees?.name_en || e.employees?.name_ar || e.employee_id;
                       return (
-                        <tr key={e.month_start || i} className="hover:bg-gray-50/40">
+                        <tr key={`earnings-${e.month_start || "month"}-${e.employee_id || i}`} className="hover:bg-gray-50/40">
                           <td className="py-4 px-6 font-bold text-gray-900">{formatDateMonth(e.month_start)}</td>
                           <td className="py-4 px-6 font-bold text-gray-900">{empName}</td>
                           <td className="py-4 px-6 font-mono">{e.total_completed_bookings}</td>
