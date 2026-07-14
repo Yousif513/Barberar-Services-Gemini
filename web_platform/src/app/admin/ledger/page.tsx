@@ -874,7 +874,7 @@ export default function AdminLedger() {
                     </tr>
                   ) : (
                     vatSummary.map((v, i) => (
-                      <tr key={v.month_start || i} className="hover:bg-gray-50/40">
+                      <tr key={`vat-${v.month_start || "month"}-${i}`} className="hover:bg-gray-50/40">
                         <td className="py-4 px-6 font-bold text-gray-900">{formatDateMonth(v.month_start)}</td>
                         <td className="py-4 px-6 font-mono">{v.total_bookings}</td>
                         <td className="py-4 px-6 font-serif font-black text-amber-700">{formatMoney(v.total_vat_collected)} SAR</td>
@@ -921,7 +921,7 @@ export default function AdminLedger() {
                         ? s.providers?.business_name_ar || s.providers?.business_name_en || s.provider_id
                         : s.providers?.business_name_en || s.providers?.business_name_ar || s.provider_id;
                       return (
-                        <tr key={s.month_start || i} className="hover:bg-gray-50/40">
+                        <tr key={`settlement-${s.month_start || "month"}-${s.provider_id || i}`} className="hover:bg-gray-50/40">
                           <td className="py-4 px-6 font-bold text-gray-900">{formatDateMonth(s.month_start)}</td>
                           <td className="py-4 px-6 font-bold text-gray-900">{providerName}</td>
                           <td className="py-4 px-6 font-mono">{s.total_transactions}</td>
@@ -969,7 +969,7 @@ export default function AdminLedger() {
                         ? e.employees?.name_ar || e.employees?.name_en || e.employee_id
                         : e.employees?.name_en || e.employees?.name_ar || e.employee_id;
                       return (
-                        <tr key={e.month_start || i} className="hover:bg-gray-50/40">
+                        <tr key={`earnings-${e.month_start || "month"}-${e.employee_id || i}`} className="hover:bg-gray-50/40">
                           <td className="py-4 px-6 font-bold text-gray-900">{formatDateMonth(e.month_start)}</td>
                           <td className="py-4 px-6 font-bold text-gray-900">{empName}</td>
                           <td className="py-4 px-6 font-mono">{e.total_completed_bookings}</td>
