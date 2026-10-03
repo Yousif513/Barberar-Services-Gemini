@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 
 const translations = {
   en: {
@@ -170,8 +171,11 @@ export default function PricingPage() {
   const [selectedPlan, setSelectedPlan] = useState<"basic" | "growth" | "elite">("growth");
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
   
-  // Checkout State
+  // Checkout State & Provider Subscription
   const [checkoutStep, setCheckoutStep] = useState<"idle" | "processing" | "success">("idle");
+  const [providerId, setProviderId] = useState<string | null>(null);
+  const [currentSubscription, setCurrentSubscription] = useState<any | null>(null);
+  const [checkoutError, setCheckoutError] = useState("");
 
   const checkoutRef = useRef<HTMLDivElement>(null);
 
@@ -187,20 +191,104 @@ export default function PricingPage() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    async function loadCurrentSubscription() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: prov } = await supabase
+          .from("providers")
+          .select("id")
+          .eq("owner_id", user.id)
+          .maybeSingle();
+
+        if (prov) {
+          setProviderId(prov.id);
+          const { data: sub } = await supabase
+            .from("provider_subscriptions")
+            .select("*")
+            .eq("provider_id", prov.id)
+            .maybeSingle();
+
+          if (sub) {
+            setCurrentSubscription(sub);
+            if (sub.plan_id === "starter") setSelectedPlan("basic");
+            else if (sub.plan_id === "growth") setSelectedPlan("growth");
+            else if (sub.plan_id === "elite") setSelectedPlan("elite");
+          }
+        }
+      } catch (err) {
+        console.warn("Subscription fetch warning:", err);
+      }
+    }
+    loadCurrentSubscription();
+  }, []);
+
   const handleSelectPlan = (plan: "basic" | "growth" | "elite") => {
     setSelectedPlan(plan);
     setCheckoutStep("idle");
+    setCheckoutError("");
     setTimeout(() => {
       checkoutRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 100);
   };
 
-  const handleCheckoutSubmit = (e: React.FormEvent) => {
+  const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setCheckoutStep("processing");
-    setTimeout(() => {
+    setCheckoutError("");
+
+    const planIdMap: Record<string, string> = {
+      basic: "starter",
+      growth: "growth",
+      elite: "elite"
+    };
+    const targetPlanId = planIdMap[selectedPlan] || "growth";
+    const targetInterval = billingCycle === "annual" ? "yearly" : "monthly";
+
+    try {
+      let activeProviderId = providerId;
+      if (!activeProviderId) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setCheckoutError(locale === "ar" ? "يرجى تسجيل الدخول كشريك صالون للاشتراك بالباقة" : "Please log in as a salon partner to subscribe");
+          setCheckoutStep("idle");
+          return;
+        }
+        const { data: prov } = await supabase
+          .from("providers")
+          .select("id")
+          .eq("owner_id", user.id)
+          .maybeSingle();
+        if (!prov) {
+          setCheckoutError(locale === "ar" ? "لم يتم العثور على حساب مزود خدمة مرتبط بهذا الحساب" : "No salon provider account associated with this login");
+          setCheckoutStep("idle");
+          return;
+        }
+        activeProviderId = prov.id;
+        setProviderId(prov.id);
+      }
+
+      const { data, error: rpcErr } = await supabase.rpc("subscribe_provider_plan", {
+        p_provider_id: activeProviderId,
+        p_plan_id: targetPlanId,
+        p_billing_interval: targetInterval
+      });
+
+      if (rpcErr) throw rpcErr;
+
+      setCurrentSubscription({
+        plan_id: targetPlanId,
+        billing_interval: targetInterval,
+        status: "active"
+      });
       setCheckoutStep("success");
-    }, 1800);
+    } catch (err: any) {
+      console.error("Subscription error:", err);
+      setCheckoutError(err?.message || (locale === "ar" ? "فشل معالجة الاشتراك" : "Failed to process subscription"));
+      setCheckoutStep("idle");
+    }
   };
 
   // Pricing calculations based on selections
@@ -675,7 +763,7 @@ export default function PricingPage() {
                 onClick={() => setCheckoutStep("idle")}
                 className="px-6 py-2.5 rounded-full text-xs font-bold bg-[#D1AF47] text-[#070B12] hover:bg-[#E0C46A] transition-all duration-300"
               >
-                {locale === "en" ? "Reset Demo" : "إعادة التجربة"}
+                {locale === "en" ? "Manage Subscription" : "إدارة الاشتراك"}
               </button>
             </div>
           ) : (
@@ -683,6 +771,11 @@ export default function PricingPage() {
               
               {/* Form Input fields */}
               <form onSubmit={handleCheckoutSubmit} className="lg:col-span-7 space-y-6">
+                {checkoutError && (
+                  <div className="bg-[#FEF3F2] border border-[#EF4444]/20 text-[#EF4444] text-xs rounded-xl p-4 font-semibold">
+                    {checkoutError}
+                  </div>
+                )}
                 <div className="space-y-4">
                   <h4 className="text-xs font-bold text-[#101828] uppercase tracking-wider">{t.paymentMethod}</h4>
                   

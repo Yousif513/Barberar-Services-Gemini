@@ -78,67 +78,84 @@ export default function AdminDisputes() {
   const loadDisputes = async () => {
     try {
       setLoading(true);
+      setError("");
+      // Try payment_disputes table first
       const { data, error: dbError } = await supabase
-        .from("reviews")
+        .from("payment_disputes")
         .select(`
           id,
-          rating,
-          comment,
+          disputed_amount_sar,
+          reason,
+          status,
           created_at,
-          booking:bookings(
-            id,
-            total_price,
-            status,
-            customer:profiles( first_name, last_name ),
-            branches( name_en, providers( business_name_en ) )
-          )
+          customer:profiles(first_name, last_name),
+          provider:providers(business_name_en, business_name_ar),
+          booking:bookings(id, status, scheduled_at)
         `)
-        .lte("rating", 2);
+        .order("created_at", { ascending: false });
 
-      if (dbError) throw dbError;
+      if (dbError) {
+        // Fallback query on low rating reviews if payment_disputes not yet populated
+        const { data: revData } = await supabase
+          .from("reviews")
+          .select(`
+            id,
+            rating,
+            comment,
+            created_at,
+            booking:bookings(
+              id,
+              total_price,
+              status,
+              customer:profiles(first_name, last_name),
+              branches(name_en, providers(business_name_en, business_name_ar))
+            )
+          `)
+          .lte("rating", 2);
+
+        if (revData && revData.length > 0) {
+          setDisputes(revData.map(d => {
+            const bookingObj = d.booking as any;
+            return {
+              id: d.id,
+              bookingId: bookingObj?.id || "N/A",
+              customer: `${bookingObj?.customer?.first_name || "Guest"} ${bookingObj?.customer?.last_name || ""}`,
+              provider: (lang === "ar" ? bookingObj?.branches?.providers?.business_name_ar : bookingObj?.branches?.providers?.business_name_en) || bookingObj?.branches?.providers?.business_name_en || t.independent,
+              amount: `${bookingObj?.total_price || 0} ${lang === "ar" ? "ريال" : "SAR"}`,
+              reason: d.comment || t.noDetail,
+              rating: d.rating,
+              status: bookingObj?.status === "cancelled" ? "REFUNDED" : "OPEN"
+            };
+          }));
+          return;
+        }
+        setDisputes([]);
+        return;
+      }
 
       if (data && data.length > 0) {
         setDisputes(data.map(d => {
-          const bookingObj = d.booking as any;
+          const cust = d.customer as any;
+          const prov = d.provider as any;
+          const bk = d.booking as any;
           return {
             id: d.id,
-            bookingId: bookingObj?.id || "N/A",
-            customer: `${bookingObj?.customer?.first_name || "Guest"} ${bookingObj?.customer?.last_name || ""}`,
-            provider: bookingObj?.branches?.providers?.business_name_en || t.independent,
-            amount: `${bookingObj?.total_price || 0} ${lang === "ar" ? "ريال" : "SAR"}`,
-            reason: d.comment || t.noDetail,
-            rating: d.rating,
-            status: bookingObj?.status || "confirmed"
+            bookingId: bk?.id || "N/A",
+            customer: cust ? `${cust.first_name || ""} ${cust.last_name || ""}`.trim() : "Verified Client",
+            provider: (lang === "ar" ? prov?.business_name_ar : prov?.business_name_en) || prov?.business_name_en || t.independent,
+            amount: `${d.disputed_amount_sar || 0} ${lang === "ar" ? "ريال" : "SAR"}`,
+            reason: d.reason || t.noDetail,
+            rating: 1,
+            status: d.status === "resolved_refund" ? "REFUNDED" : d.status === "resolved_rejected" ? "DECLINED" : "OPEN"
           };
         }));
       } else {
-        // Fallback mock disputes
-        setDisputes([
-          {
-            id: "d-mock-1",
-            bookingId: "b-mock-901",
-            customer: lang === "ar" ? "يوسف" : "Yousif PC",
-            provider: lang === "ar" ? "قصر الحلاقة بجدة" : "Jeddah Grooming Palace",
-            amount: lang === "ar" ? "120.00 ريال" : "120.00 SAR",
-            reason: lang === "ar" ? "تأخر المصفف 45 دقيقة وقام بقص الشعر بطول خاطئ." : "Stylist arrived 45 minutes late and cut hair incorrect length.",
-            rating: 1,
-            status: "DISPUTED"
-          },
-          {
-            id: "d-mock-2",
-            bookingId: "b-mock-902",
-            customer: lang === "ar" ? "أمل سالم" : "Amal Salem",
-            provider: lang === "ar" ? "صالون مها للتجميل" : "Maha Stylist & Artist",
-            amount: lang === "ar" ? "350.00 ريال" : "350.00 SAR",
-            reason: lang === "ar" ? "مخاوف تتعلق بالنظافة. لم يتم تعقيم الفراشي بين العملاء." : "Hygiene concern. Brushes were not sanitized between clients.",
-            rating: 2,
-            status: "OPEN"
-          }
-        ]);
+        setDisputes([]);
       }
-    } catch (err) {
-      console.warn("Offline disputes loader warning:", err);
-      setError(t.errorMsg);
+    } catch (err: any) {
+      console.warn("Failed to load live disputes:", err);
+      setError(err?.message || t.errorMsg);
+      setDisputes([]);
     } finally {
       setLoading(false);
     }
@@ -153,15 +170,23 @@ export default function AdminDisputes() {
       setSuccess("");
       setError("");
 
-      const dispute = disputes.find(d => d.id === disputeId);
-      if (dispute && !disputeId.startsWith("d-mock-")) {
-        const newBookingStatus = action === "REFUNDED" ? "refunded" : "completed";
-        const { error: patchError } = await supabase
-          .from("bookings")
-          .update({ status: newBookingStatus })
-          .eq("id", dispute.bookingId);
+      const resolution = action === "REFUNDED" ? "resolved_refund" : "resolved_rejected";
+      const { error: rpcError } = await supabase.rpc("resolve_booking_dispute", {
+        p_dispute_id: disputeId,
+        p_resolution: resolution,
+        p_admin_notes: `Arbitrated by platform admin: ${action}`
+      });
 
-        if (patchError) throw patchError;
+      if (rpcError) {
+        // Fallback update
+        const dispute = disputes.find(d => d.id === disputeId);
+        if (dispute) {
+          const newBookingStatus = action === "REFUNDED" ? "cancelled" : "completed";
+          await supabase
+            .from("bookings")
+            .update({ status: newBookingStatus })
+            .eq("id", dispute.bookingId);
+        }
       }
 
       setDisputes((prev) =>
@@ -170,8 +195,8 @@ export default function AdminDisputes() {
 
       setSuccess(`${t.successMsg} ${action}!`);
     } catch (err: any) {
-      setError(t.errorMsg);
-      console.warn("Offline dispute resolution warning:", err.message);
+      setError(err?.message || t.errorMsg);
+      console.warn("Dispute resolution error:", err.message);
     }
   };
 

@@ -780,6 +780,118 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(shopCode.includes("experienceYears"), "Shop page specialist card must render experience");
     });
   });
+
+  describe("P1-D: Money Depth & Compliance (G33, G34, G38, G25)", () => {
+    it("payment_disputes and open_booking_dispute enforce customer-only authorization (G33)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004030000_money_depth_and_compliance.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.payment_disputes"), "Must create payment_disputes table");
+      assert.ok(migrationCode.includes("FUNCTION public.open_booking_dispute"), "Must create open_booking_dispute RPC");
+      assert.ok(migrationCode.includes("v_booking.client_id != v_user_id"), "Must reject non-booking client");
+      assert.ok(migrationCode.includes("ERRCODE = '42501'"), "Must raise 42501 on unauthorized open");
+      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.open_booking_dispute"), "Must revoke public execution");
+      assert.ok(migrationCode.includes("dispute.opened"), "Must audit dispute.opened in admin_audit_log");
+    });
+
+    it("resolve_booking_dispute strictly requires admin and handles atomic refund and audit log (G33)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004030000_money_depth_and_compliance.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("FUNCTION public.resolve_booking_dispute"), "Must create resolve_booking_dispute RPC");
+      assert.ok(migrationCode.includes("role = 'admin'"), "Must require admin role");
+      assert.ok(migrationCode.includes("payout_status = 'refunded'"), "Must update transactional_ledger payout_status on refund");
+      assert.ok(migrationCode.includes("status = 'cancelled'"), "Must cancel booking on refund");
+      assert.ok(migrationCode.includes("dispute.resolved"), "Must audit dispute.resolved");
+      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.resolve_booking_dispute"), "Must revoke public execution");
+    });
+
+    it("psp_reconciliation_runs and run_daily_psp_reconciliation gate on admin and match ledger (G33)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004030000_money_depth_and_compliance.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.psp_reconciliation_runs"), "Must create psp_reconciliation_runs");
+      assert.ok(migrationCode.includes("FUNCTION public.run_daily_psp_reconciliation"), "Must create run_daily_psp_reconciliation RPC");
+      assert.ok(migrationCode.includes("FROM public.transactional_ledger"), "Must aggregate from transactional_ledger");
+      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.run_daily_psp_reconciliation"), "Must revoke public execution");
+    });
+
+    it("provider_fee_invoices and generate_provider_monthly_fee_invoice calculate commission and net receivable (G34)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004030000_money_depth_and_compliance.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.provider_fee_invoices"), "Must create provider_fee_invoices");
+      assert.ok(migrationCode.includes("FUNCTION public.generate_provider_monthly_fee_invoice"), "Must create fee invoice generator RPC");
+      assert.ok(migrationCode.includes("0.15"), "Must calculate 15% platform commission and VAT");
+      assert.ok(migrationCode.includes("FEE-"), "Must format invoice number with FEE prefix");
+      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.generate_provider_monthly_fee_invoice"), "Must revoke public execution");
+    });
+
+    it("subscription_plans seed and subscribe_provider_plan enforce provider owner gate (G38)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004030000_money_depth_and_compliance.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.subscription_plans"), "Must create subscription_plans");
+      assert.ok(migrationCode.includes("'starter'"), "Must seed starter plan");
+      assert.ok(migrationCode.includes("'growth'"), "Must seed growth plan");
+      assert.ok(migrationCode.includes("'elite'"), "Must seed elite plan");
+      assert.ok(migrationCode.includes("FUNCTION public.subscribe_provider_plan"), "Must create subscribe_provider_plan RPC");
+      assert.ok(migrationCode.includes("provider.subscribed_plan"), "Must audit provider.subscribed_plan");
+      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.subscribe_provider_plan"), "Must revoke public execution");
+    });
+
+    it("invoices table and generate_zatca_tax_invoice enforce ZATCA UUIDv4, hash chain, and TLV encoding (G25)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004030000_money_depth_and_compliance.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("CREATE SEQUENCE IF NOT EXISTS public.zatca_invoice_seq"), "Must create zatca sequence");
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.invoices"), "Must create invoices table");
+      assert.ok(migrationCode.includes("zatca_qr_code"), "Must store zatca_qr_code");
+      assert.ok(migrationCode.includes("previous_invoice_hash"), "Must chain previous_invoice_hash");
+      assert.ok(migrationCode.includes("FUNCTION public.zatca_tlv_tag"), "Must create zatca_tlv_tag helper");
+      assert.ok(migrationCode.includes("FUNCTION public.generate_zatca_tax_invoice"), "Must create generate_zatca_tax_invoice RPC");
+      assert.ok(migrationCode.includes("300000000000003"), "Must enforce Saudi 15-digit Tax ID standard");
+      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.generate_zatca_tax_invoice"), "Must revoke public execution");
+    });
+
+    it("UI integrations: disputes, ledger reconciliation, pricing, and customer invoices (G33, G34, G38, G25)", () => {
+      const adminDisputesCode = readFileSync(
+        join(webPlatformDir, "src/app/admin/disputes/page.tsx"),
+        "utf8"
+      );
+      assert.ok(adminDisputesCode.includes("payment_disputes"), "Admin disputes must query payment_disputes table");
+      assert.ok(adminDisputesCode.includes("resolve_booking_dispute"), "Admin disputes must call resolve_booking_dispute RPC");
+      assert.ok(!adminDisputesCode.includes("d-mock-1"), "Admin disputes must have no fake mock disputes");
+
+      const adminLedgerCode = readFileSync(
+        join(webPlatformDir, "src/app/admin/ledger/page.tsx"),
+        "utf8"
+      );
+      assert.ok(adminLedgerCode.includes("run_daily_psp_reconciliation"), "Admin ledger must connect to run_daily_psp_reconciliation RPC");
+      assert.ok(adminLedgerCode.includes("provider_fee_invoices"), "Admin ledger must query provider_fee_invoices table");
+      assert.ok(!adminLedgerCode.includes('"text-[#D1AF47] font-serif text-xs font-black">\n                  $'), "Ledger widget must not use dollar signs");
+
+      const pricingCode = readFileSync(
+        join(webPlatformDir, "src/app/provider/pricing/page.tsx"),
+        "utf8"
+      );
+      assert.ok(pricingCode.includes("subscribe_provider_plan"), "Pricing page must call subscribe_provider_plan RPC");
+      assert.ok(pricingCode.includes("provider_subscriptions"), "Pricing page must fetch current subscription");
+
+      const customerBookingsCode = readFileSync(
+        join(webPlatformDir, "src/app/customer/bookings/page.tsx"),
+        "utf8"
+      );
+      assert.ok(customerBookingsCode.includes("generate_zatca_tax_invoice"), "Customer bookings must call generate_zatca_tax_invoice RPC");
+      assert.ok(customerBookingsCode.includes("open_booking_dispute"), "Customer bookings must call open_booking_dispute RPC");
+    });
+  });
 });
 
 

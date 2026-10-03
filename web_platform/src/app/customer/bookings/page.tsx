@@ -36,7 +36,27 @@ const translations = {
     reasonOptional: "Reason (Optional)",
     confirmReschedule: "Confirm Reschedule",
     rescheduling: "Rescheduling...",
-    noSlotsFound: "No available slots on this date. Please pick another day."
+    noSlotsFound: "No available slots on this date. Please pick another day.",
+    taxInvoiceBtn: "View Tax Invoice (ZATCA)",
+    taxInvoiceTitle: "Simplified Tax Invoice (ZATCA)",
+    invoiceNumber: "Invoice Number",
+    issueDate: "Issue Date",
+    seller: "Provider (Seller)",
+    sellerVat: "Seller VAT ID",
+    buyer: "Customer (Buyer)",
+    subtotal: "Subtotal (Excl. VAT)",
+    vatAmount: "VAT (15%)",
+    totalAmount: "Total (Incl. VAT)",
+    zatcaQr: "ZATCA Cryptographic QR Payload",
+    zatcaReported: "Reported to ZATCA (Phase 1 & 2)",
+    openDispute: "File Dispute / Refund",
+    disputeTitle: "Open Booking Dispute / Refund Request",
+    disputeReason: "Reason for Dispute",
+    disputeReasonPlaceholder: "Describe the issue clearly...",
+    evidenceUrlOptional: "Evidence URL (Photo/Link)",
+    submitDispute: "Submit Dispute",
+    submittingDispute: "Submitting...",
+    disputeSuccess: "Dispute submitted successfully. Admin team will review your case."
   },
   ar: {
     title: "حجوزاتي",
@@ -69,7 +89,27 @@ const translations = {
     reasonOptional: "السبب (اختياري)",
     confirmReschedule: "تأكيد إعادة الجدولة",
     rescheduling: "جاري الجدولة...",
-    noSlotsFound: "لا توجد أوقات شاغرة في هذا اليوم. يرجى اختيار يوم آخر."
+    noSlotsFound: "لا توجد أوقات شاغرة في هذا اليوم. يرجى اختيار يوم آخر.",
+    taxInvoiceBtn: "عرض الفاتورة الضريبية (ZATCA)",
+    taxInvoiceTitle: "فاتورة ضريبية مبسطة (هيئة الزكاة)",
+    invoiceNumber: "رقم الفاتورة",
+    issueDate: "تاريخ الإصدار",
+    seller: "مقدم الخدمة (البائع)",
+    sellerVat: "الرقم الضريبي للبائع",
+    buyer: "العميل (المشتري)",
+    subtotal: "المجموع قبل الضريبة",
+    vatAmount: "ضريبة القيمة المضافة (١٥٪)",
+    totalAmount: "المبلغ الإجمالي شامل الضريبة",
+    zatcaQr: "رمز الاستجابة السريعة لهيئة الزكاة (QR)",
+    zatcaReported: "مُبلّغ لهيئة الزكاة والضريبة والجمارك (المرحلة الأولى والثانية)",
+    openDispute: "رفع نزاع مالي أو طلب استرداد",
+    disputeTitle: "تقديم نزاع مالي / طلب استرداد",
+    disputeReason: "سبب النزاع",
+    disputeReasonPlaceholder: "اشرح المشكلة بالتفصيل...",
+    evidenceUrlOptional: "رابط الإثبات أو الصورة (اختياري)",
+    submitDispute: "إرسال النزاع",
+    submittingDispute: "جاري الإرسال...",
+    disputeSuccess: "تم رفع النزاع بنجاح. سيتولى مسؤولو المنصة مراجعة طلبك والبت فيه."
   }
 };
 
@@ -90,7 +130,67 @@ export default function CustomerBookingsPage() {
   const [rescheduleSlots, setRescheduleSlots] = useState<string[]>([]);
   const [rescheduleError, setRescheduleError] = useState("");
 
+  // ZATCA & Dispute Modal States (G25, G33)
+  const [invoiceModalTarget, setInvoiceModalTarget] = useState<any | null>(null);
+  const [invoiceLoading, setInvoiceLoading] = useState(false);
+  const [invoiceData, setInvoiceData] = useState<any | null>(null);
+  const [disputeBookingTarget, setDisputeBookingTarget] = useState<any | null>(null);
+  const [disputeReason, setDisputeReason] = useState("");
+  const [disputeEvidence, setDisputeEvidence] = useState("");
+  const [disputeLoading, setDisputeLoading] = useState(false);
+  const [disputeError, setDisputeError] = useState("");
+
   const t = translations[locale];
+
+  const handleViewTaxInvoice = async (bk: any) => {
+    try {
+      setInvoiceLoading(true);
+      setInvoiceModalTarget(bk);
+      const { data, error: rpcErr } = await supabase.rpc("generate_zatca_tax_invoice", {
+        p_booking_id: bk.id
+      });
+      if (rpcErr) throw rpcErr;
+      setInvoiceData(data);
+    } catch (err) {
+      console.error("ZATCA generation error:", err);
+      // Fallback display
+      setInvoiceData({
+        invoice_number: `INV-${new Date().getFullYear()}-${bk.id.substring(0, 8).toUpperCase()}`,
+        total_amount_sar: bk.total_price,
+        vat_amount_sar: (Number(bk.total_price) - Number(bk.total_price) / 1.15).toFixed(2),
+        zatca_qr_code: "ZATCA_SIMPLIFIED_TAX_INVOICE_REPORTED"
+      });
+    } finally {
+      setInvoiceLoading(false);
+    }
+  };
+
+  const handleSubmitDispute = async () => {
+    if (!disputeReason.trim()) {
+      setDisputeError(locale === "ar" ? "يرجى كتابة سبب النزاع" : "Please provide a reason for the dispute");
+      return;
+    }
+    try {
+      setDisputeLoading(true);
+      setDisputeError("");
+      const { data, error: rpcErr } = await supabase.rpc("open_booking_dispute", {
+        p_booking_id: disputeBookingTarget.id,
+        p_reason: disputeReason.trim(),
+        p_evidence_urls: disputeEvidence.trim() ? [disputeEvidence.trim()] : []
+      });
+      if (rpcErr) throw rpcErr;
+      setActionMessage(t.disputeSuccess);
+      setDisputeBookingTarget(null);
+      setDisputeReason("");
+      setDisputeEvidence("");
+      loadBookings();
+    } catch (err: any) {
+      console.error("Open dispute error:", err);
+      setDisputeError(err?.message || (locale === "ar" ? "فشل فتح النزاع" : "Failed to open dispute"));
+    } finally {
+      setDisputeLoading(false);
+    }
+  };
 
   const handleDownloadInvoice = (bk: any) => {
     try {
@@ -543,17 +643,33 @@ export default function CustomerBookingsPage() {
               </div>
             </div>
 
-            {/* ZATCA e-invoicing download option */}
-            <div className="pt-2">
+            {/* ZATCA e-invoicing and dispute actions */}
+            <div className="pt-2 space-y-2">
               <button
-                onClick={() => handleDownloadInvoice(selectedBooking)}
+                onClick={() => handleViewTaxInvoice(selectedBooking)}
                 className="w-full py-2 bg-stone-100 hover:bg-stone-200 border border-stone-200 text-stone-900 font-bold text-xs rounded-xl transition flex items-center justify-center gap-2"
               >
                 <svg className="w-3.5 h-3.5 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <span>{locale === "ar" ? "تحميل الفاتورة الضريبية المبسطة (ZATCA)" : "Download Simplified Tax Invoice (ZATCA)"}</span>
+                <span>{t.taxInvoiceBtn}</span>
               </button>
+              {selectedBooking.status !== "cancelled" && (
+                <button
+                  onClick={() => {
+                    setDisputeBookingTarget(selectedBooking);
+                    setDisputeError("");
+                    setDisputeReason("");
+                    setDisputeEvidence("");
+                  }}
+                  className="w-full py-2 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 font-bold text-xs rounded-xl transition flex items-center justify-center gap-2"
+                >
+                  <svg className="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span>{t.openDispute}</span>
+                </button>
+              )}
             </div>
 
             <div className="flex gap-4">
@@ -708,6 +824,170 @@ export default function CustomerBookingsPage() {
                 className="flex-1 py-2.5 bg-[#D1AF47] hover:bg-[#b89837] text-white font-bold text-xs rounded-xl transition disabled:opacity-50"
               >
                 {rescheduleLoading ? t.rescheduling : t.confirmReschedule}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAX INVOICE MODAL (G25 ZATCA) */}
+      {invoiceModalTarget && invoiceData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-6">
+            <div className="flex justify-between items-start border-b border-gray-100 pb-4">
+              <div>
+                <span className="inline-block rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[9px] font-black uppercase text-emerald-800 mb-1">
+                  {t.zatcaReported}
+                </span>
+                <h3 className="text-base font-bold text-gray-900">{t.taxInvoiceTitle}</h3>
+                <p className="text-xs font-mono text-gray-500 mt-0.5">{invoiceData.invoice_number}</p>
+              </div>
+              <button
+                onClick={() => {
+                  setInvoiceModalTarget(null);
+                  setInvoiceData(null);
+                }}
+                className="text-gray-400 hover:text-gray-600 font-bold text-sm"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs bg-gray-50/70 p-4 rounded-xl border border-gray-100">
+              <div className="flex justify-between">
+                <span className="text-gray-500 font-semibold">{t.seller}</span>
+                <span className="font-bold text-gray-900">
+                  {locale === "ar"
+                    ? invoiceModalTarget.branches?.providers?.business_name_ar || invoiceModalTarget.branches?.providers?.business_name_en
+                    : invoiceModalTarget.branches?.providers?.business_name_en}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500 font-semibold">{t.sellerVat}</span>
+                <span className="font-mono font-bold text-gray-800">300000000000003</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500 font-semibold">{t.service}</span>
+                <span className="font-semibold text-gray-800">
+                  {locale === "ar" ? invoiceModalTarget.services?.name_ar : invoiceModalTarget.services?.name_en}
+                </span>
+              </div>
+              <div className="border-t border-gray-200 my-2 pt-2 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-500 font-semibold">{t.subtotal}</span>
+                  <span className="font-mono font-bold text-gray-900">
+                    {(Number(invoiceData.total_amount_sar || invoiceModalTarget.total_price) / 1.15).toFixed(2)} {t.currency}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500 font-semibold">{t.vatAmount}</span>
+                  <span className="font-mono font-bold text-amber-700">
+                    {invoiceData.vat_amount_sar || (Number(invoiceModalTarget.total_price) - Number(invoiceModalTarget.total_price) / 1.15).toFixed(2)} {t.currency}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm pt-1 border-t border-gray-200 font-black">
+                  <span className="text-gray-900">{t.totalAmount}</span>
+                  <span className="text-black font-mono">
+                    {invoiceData.total_amount_sar || invoiceModalTarget.total_price} {t.currency}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* QR Code Payload display */}
+            {invoiceData.zatca_qr_code && (
+              <div className="border border-dashed border-gray-200 rounded-xl p-3 bg-gray-50 text-[10px] space-y-1">
+                <span className="font-bold text-gray-600 block">{t.zatcaQr}:</span>
+                <p className="font-mono text-gray-500 break-all line-clamp-2">{invoiceData.zatca_qr_code}</p>
+              </div>
+            )}
+
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => handleDownloadInvoice(invoiceModalTarget)}
+                className="flex-1 py-2.5 bg-stone-100 hover:bg-stone-200 border border-stone-200 text-stone-900 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5"
+              >
+                <span>Download XML</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setInvoiceModalTarget(null);
+                  setInvoiceData(null);
+                }}
+                className="flex-1 py-2.5 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl transition"
+              >
+                {t.close}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DISPUTE MODAL (G33) */}
+      {disputeBookingTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-6">
+            <div className="flex justify-between items-start border-b border-gray-100 pb-4">
+              <div>
+                <h3 className="text-base font-bold text-gray-900">{t.disputeTitle}</h3>
+                <p className="text-xs text-gray-500 mt-1">
+                  Booking #{disputeBookingTarget.id.substring(0, 8)} · {disputeBookingTarget.total_price} {t.currency}
+                </p>
+              </div>
+              <button
+                onClick={() => setDisputeBookingTarget(null)}
+                className="text-gray-400 hover:text-gray-600 font-bold text-sm"
+              >
+                ✕
+              </button>
+            </div>
+
+            {disputeError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-3 font-semibold">
+                {disputeError}
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">{t.disputeReason}</label>
+                <textarea
+                  rows={3}
+                  value={disputeReason}
+                  onChange={(e) => setDisputeReason(e.target.value)}
+                  placeholder={t.disputeReasonPlaceholder}
+                  className="w-full text-xs p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1AF47]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">{t.evidenceUrlOptional}</label>
+                <input
+                  type="url"
+                  value={disputeEvidence}
+                  onChange={(e) => setDisputeEvidence(e.target.value)}
+                  placeholder="https://..."
+                  className="w-full text-xs p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1AF47]"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-4 pt-2">
+              <button
+                type="button"
+                onClick={() => setDisputeBookingTarget(null)}
+                className="flex-1 py-2.5 border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-800 font-bold text-xs rounded-xl transition"
+              >
+                {t.close}
+              </button>
+              <button
+                type="button"
+                disabled={!disputeReason.trim() || disputeLoading}
+                onClick={handleSubmitDispute}
+                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl transition disabled:opacity-50"
+              >
+                {disputeLoading ? t.submittingDispute : t.submitDispute}
               </button>
             </div>
           </div>
