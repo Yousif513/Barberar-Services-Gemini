@@ -1,5 +1,7 @@
 # PRIMORA — Work Plan for Gemini (handoff from Claude Code)
 
+> **Superseded 2026-10-03:** current priorities and build order are in [docs/competitive-research/GEMINI_P0_P1_DEVELOPMENT_PROMPT.md](docs/competitive-research/GEMINI_P0_P1_DEVELOPMENT_PROMPT.md). Use this file only for background where the two do not conflict.
+>
 > **Prepared:** 2026-07-03 · **Baseline:** `master @ 20f66c0` (= `claude-code` = origin, clean tree, build green)
 > **Read this whole file before editing anything.** Start from the latest `master`, work ONLY on the `gemini` branch, and follow the Golden Rules in `.cursorrules` / `.coworking_changelog.md` (no branch switching, no force-push/reset, no overwriting other agents' files, append a changelog entry when done).
 

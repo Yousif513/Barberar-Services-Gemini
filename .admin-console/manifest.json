@@ -1,0 +1,3685 @@
+{
+  "$schema": "./admin-console.manifest.schema.json",
+  "manifestVersion": "2.0",
+  "profile": "regulated",
+  "platform": {
+    "name": "PRIMORA",
+    "summary": "PRIMORA is a bilingual (EN/AR, full RTL) luxury barber, beauty, spa and grooming marketplace for Saudi Arabia. Customers book appointments at provider-owned shops/branches or as home/mobile services; money is captured through Tap Payments in SAR, split into platform_share / provider_share / employee_share in transactional_ledger with ZATCA VAT, and settled to providers via payout_requests. The admin console is the only surface that can verify providers, moderate the catalog, arbitrate disputes, release provider money, and configure payment integrations.",
+    "archetypes": [
+      "marketplace",
+      "fintech",
+      "logistics-mobility"
+    ],
+    "tenancy": "multi-tenant",
+    "regulatedData": [
+      "Saudi VAT / ZATCA tax records (bookings.tax_amount, monthly_vat_summary)",
+      "Provider bank details: payout_requests.iban and bank_name, stored unmasked",
+      "Customer PII: profiles.first_name, last_name, email, phone_number",
+      "Payment references: transactional_ledger.payment_intent_id (Tap charge ids)",
+      "Provider trade licence documents: providers.trade_license_url",
+      "Customer-provider private messages: conversations, messages"
+    ],
+    "sourceSystems": [
+      "Supabase Postgres (authoritative for bookings, ledger, payouts, catalog, identity)",
+      "Tap Payments (authoritative for charge capture and refunds; api.tap.company)",
+      "Expo Push (device delivery)",
+      "Google Maps Platform (travel time, calculate-travel function)",
+      "Unifonic / Twilio (OTP and SMS, registered but disconnected)"
+    ],
+    "operationalObjectives": [],
+    "stack": {
+      "frontend": "Next.js 16.2.9 (React 19.2.4, App Router, Tailwind 4, all-client 'use client')",
+      "backend": "none — no Next.js route handlers, no server actions, no middleware; Supabase Edge Functions (Deno) only",
+      "database": "Supabase Postgres 15, SQL migrations in supabase/migrations",
+      "auth": "Supabase Auth (@supabase/supabase-js 2.108.1) browser client only; no @supabase/ssr, no middleware",
+      "jobs": "none — no queue, no scheduler, no pg_cron",
+      "hosting": "Vercel (web) + Supabase (db/functions)",
+      "designSystem": "Tailwind 4 utility classes, bespoke PRIMORA gold/obsidian tokens, no component library",
+      "adminFramework": "none"
+    },
+    "researchSources": [],
+    "volumes": {
+      "entityCounts": "",
+      "peakConcurrentOperators": "",
+      "retentionHorizon": ""
+    }
+  },
+  "roles": [
+    {
+      "id": "admin",
+      "name": "Platform administrator (profiles.role = admin)",
+      "responsibilities": [
+        "Verify and suspend providers",
+        "Moderate the service catalog and pricing",
+        "Arbitrate disputes and authorise refunds",
+        "Review and release provider payouts from the ledger",
+        "Configure payment gateways and integrations",
+        "Configure VAT rate, commission and platform settings",
+        "Manage coupons and promotions"
+      ],
+      "scopes": [
+        "platform-wide, no tenant restriction, no monetary limit"
+      ],
+      "mfaRequired": false,
+      "authenticationStrength": "email+password via Supabase Auth; no MFA, no step-up, no session-timeout policy",
+      "separationOfDuties": "none - a single admin role holds catalog, money and configuration authority"
+    },
+    {
+      "id": "provider-owner",
+      "name": "Provider owner (profiles.role = provider_owner)",
+      "responsibilities": [
+        "Manage own shops, branches, employees and services",
+        "Request payouts of accrued provider_share",
+        "View own bookings and ledger"
+      ],
+      "scopes": [
+        "providers.owner_id = auth.uid()"
+      ],
+      "mfaRequired": false,
+      "authenticationStrength": "email+password via Supabase Auth",
+      "separationOfDuties": "cannot approve own payout request; approval is admin-only"
+    },
+    {
+      "id": "provider-employee",
+      "name": "Provider employee (profiles.role = provider_employee)",
+      "responsibilities": [
+        "View own assigned bookings",
+        "Maintain own availability"
+      ],
+      "scopes": [
+        "employees.profile_id = auth.uid()"
+      ],
+      "mfaRequired": false,
+      "authenticationStrength": "email+password via Supabase Auth",
+      "separationOfDuties": "no financial authority"
+    },
+    {
+      "id": "customer",
+      "name": "Customer (profiles.role = customer)",
+      "responsibilities": [
+        "Book, cancel and review services"
+      ],
+      "scopes": [
+        "profiles.id = auth.uid()"
+      ],
+      "mfaRequired": false,
+      "authenticationStrength": "email+password or phone OTP",
+      "separationOfDuties": "n/a"
+    }
+  ],
+  "entities": [
+    {
+      "id": "provider",
+      "name": "Provider (shop / freelancer)",
+      "sourceOfTruth": "postgres:public.providers",
+      "sensitivity": "confidential",
+      "tenantScoped": true,
+      "lifecycleStates": [
+        "pending",
+        "approved",
+        "rejected",
+        "suspended",
+        "active"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "pending",
+          "to": "approved",
+          "command": "provider.approve",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "pending",
+          "to": "rejected",
+          "command": "provider.reject",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "approved",
+          "to": "suspended",
+          "command": "provider.suspend",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "suspended",
+          "to": "active",
+          "command": "provider.approve",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "unspecified - no retention policy exists in migrations or code",
+      "capabilities": [
+        {
+          "id": "provider.list",
+          "outcome": "Find providers by name, status and verification state so onboarding backlog and suspensions are visible",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "low",
+          "status": "discovered",
+          "rationale": "REAL. web_platform/src/app/admin/providers/provider-management.tsx:810 reads public.providers; falls back to bundled demo records at :896 when the query errors, so an unreachable table is indistinguishable from an empty platform.",
+          "entityStates": {
+            "from": [
+              "pending",
+              "approved",
+              "rejected",
+              "suspended",
+              "active"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/providers"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "provider.approve",
+          "outcome": "Verify a provider so its shops become bookable",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "discovered",
+          "rationale": "PARTIALLY REAL. provider-management.tsx:973 maps applicationStatus to providers.is_verified and :975 writes it; but updateProvider() at :997-1011 has an identical catch branch (:1006-1009) that applies the optimistic state and shows the success notice even when the write is rejected. No audit event, no reason capture, no dual control.",
+          "entityStates": {
+            "from": [
+              "pending"
+            ],
+            "to": [
+              "approved"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/providers"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "provider.reject",
+          "outcome": "Reject a provider application with a recorded reason",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "discovered",
+          "rationale": "PARTIALLY REAL. Same write path and same silent-failure defect as provider.approve. providers.status ('rejected') is written best-effort at provider-management.tsx:987-994 with the error swallowed at :991.",
+          "entityStates": {
+            "from": [
+              "pending"
+            ],
+            "to": [
+              "rejected"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/providers"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "provider.suspend",
+          "outcome": "Suspend a provider so it stops taking bookings, without deleting its history",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "PARTIALLY REAL. Depends entirely on the providers.status enum column added by 20260703080424_admin_shop_management.sql; the write at provider-management.tsx:990 is wrapped in try/catch and swallowed at :991-993, so on an unapplied migration suspension silently does nothing while the UI reports success.",
+          "entityStates": {
+            "from": [
+              "approved",
+              "active"
+            ],
+            "to": [
+              "suspended"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/providers"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "provider.set-commission",
+          "outcome": "Change a provider's commission percentage",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "PARTIALLY REAL. provider-management.tsx:971 writes providers.commission_percentage through the same silent-failure path. This directly changes every future money split and has no audit event, no approval, no confirmation and no before/after record.",
+          "entityStates": {
+            "from": [
+              "approved",
+              "active"
+            ],
+            "to": [
+              "approved",
+              "active"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/providers"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "provider.delete",
+          "outcome": "Remove a provider record",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "REAL BUT UNSAFE. provider-management.tsx:1078 issues a hard DELETE on public.providers. window.confirm at :1075 is the only safeguard; the catch at :1084-1089 removes the row from the UI and reports success even when the DELETE was refused. No soft delete, no archive, no audit.",
+          "entityStates": {
+            "from": [
+              "pending",
+              "approved",
+              "rejected",
+              "suspended",
+              "active"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/providers"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "provider.notes",
+          "outcome": "Attach an internal note to a provider case",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "low",
+          "status": "discovered",
+          "rationale": "PARTIALLY REAL. provider-management.tsx:1018 saveNotes writes providers.admin_notes best-effort; swallowed on failure. No authorship, no timestamp, no note history.",
+          "entityStates": {
+            "from": [
+              "pending",
+              "approved",
+              "suspended"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/providers"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "branch",
+      "name": "Branch / venue",
+      "sourceOfTruth": "postgres:public.branches",
+      "sensitivity": "internal",
+      "tenantScoped": true,
+      "lifecycleStates": [
+        "active",
+        "inactive"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "active",
+          "to": "inactive",
+          "command": "branch.toggle-active",
+          "actorRoles": [
+            "admin",
+            "provider-owner"
+          ]
+        },
+        {
+          "from": "inactive",
+          "to": "active",
+          "command": "branch.toggle-active",
+          "actorRoles": [
+            "admin",
+            "provider-owner"
+          ]
+        }
+      ],
+      "retention": "unspecified",
+      "capabilities": [
+        {
+          "id": "branch.list",
+          "outcome": "See every venue and its activation state",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "low",
+          "status": "discovered",
+          "rationale": "REAL. admin/branches/page.tsx:64 reads public.branches.",
+          "entityStates": {
+            "from": [
+              "active",
+              "inactive"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/branches"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "branch.toggle-active",
+          "outcome": "Take a venue offline",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "discovered",
+          "rationale": "REAL BUT UNSAFE. admin/branches/page.tsx:113-114 writes is_active with no confirmation. Deactivating a venue affects live bookings; nothing warns about them and nothing is audited.",
+          "entityStates": {
+            "from": [
+              "active"
+            ],
+            "to": [
+              "inactive"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/branches"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "service",
+      "name": "Service catalog entry",
+      "sourceOfTruth": "postgres:public.services",
+      "sensitivity": "public",
+      "tenantScoped": true,
+      "lifecycleStates": [
+        "active",
+        "inactive"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "active",
+          "to": "inactive",
+          "command": "service.toggle-active",
+          "actorRoles": [
+            "admin",
+            "provider-owner"
+          ]
+        },
+        {
+          "from": "inactive",
+          "to": "active",
+          "command": "service.toggle-active",
+          "actorRoles": [
+            "admin",
+            "provider-owner"
+          ]
+        }
+      ],
+      "retention": "hard delete only - no soft delete column",
+      "capabilities": [
+        {
+          "id": "service.list",
+          "outcome": "Review the whole marketplace catalog and spot mispriced or duplicated services",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "low",
+          "status": "discovered",
+          "rationale": "REAL. admin/services/page.tsx:169-171 reads public.services with its category join and real duplicate counting at :177-182.",
+          "entityStates": {
+            "from": [
+              "active",
+              "inactive"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/services"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "service.upsert",
+          "outcome": "Create or correct a catalog entry",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "discovered",
+          "rationale": "REAL. admin/services/page.tsx:283 (update) and :286 (insert) with surfaced errors. This page is the reference implementation for the rest of the console.",
+          "entityStates": {
+            "from": [
+              "active",
+              "inactive"
+            ],
+            "to": [
+              "active",
+              "inactive"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/services"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "service.toggle-active",
+          "outcome": "Take a service off sale without deleting it",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "discovered",
+          "rationale": "REAL AND CORRECT. admin/services/page.tsx:314-335 applies the change optimistically, writes it, and rolls the UI back at :329 when the write fails. The only rollback-on-error pattern in the console.",
+          "entityStates": {
+            "from": [
+              "active"
+            ],
+            "to": [
+              "inactive"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/services"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "service.set-price",
+          "outcome": "Change a service base price",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "discovered",
+          "rationale": "REAL WITH ROLLBACK, NO AUDIT. admin/services/page.tsx:364-386 writes base_price with rollback at :380. Nothing records who changed a price or what it was before.",
+          "entityStates": {
+            "from": [
+              "active",
+              "inactive"
+            ],
+            "to": [
+              "active",
+              "inactive"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/services"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "service.delete",
+          "outcome": "Remove a catalog entry",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "discovered",
+          "rationale": "REAL BUT HARD DELETE. admin/services/page.tsx:307 issues a DELETE. window.confirm at :302 is the safeguard and the list is reloaded on failure at :309. No soft delete, no archive, no audit; historical bookings reference the row.",
+          "entityStates": {
+            "from": [
+              "active",
+              "inactive"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/services"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "service.set-featured",
+          "outcome": "Control landing-page and catalog placement",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "discovered",
+          "rationale": "REAL WITH ROLLBACK. admin/services/page.tsx:339-361 writes featured_on_landing / featured_in_services with rollback at :355. Commercially significant placement with no audit.",
+          "entityStates": {
+            "from": [
+              "active"
+            ],
+            "to": [
+              "active"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/services"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "booking",
+      "name": "Booking / appointment",
+      "sourceOfTruth": "postgres:public.bookings",
+      "sensitivity": "confidential",
+      "tenantScoped": true,
+      "lifecycleStates": [
+        "pending_payment",
+        "confirmed",
+        "completed",
+        "cancelled",
+        "no_show"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "pending_payment",
+          "to": "confirmed",
+          "command": "booking.confirm-payment",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "confirmed",
+          "to": "completed",
+          "command": "booking.complete",
+          "actorRoles": [
+            "admin",
+            "provider-owner",
+            "provider-employee"
+          ]
+        },
+        {
+          "from": "confirmed",
+          "to": "no_show",
+          "command": "booking.mark-no-show",
+          "actorRoles": [
+            "admin",
+            "provider-owner",
+            "provider-employee"
+          ]
+        },
+        {
+          "from": "confirmed",
+          "to": "cancelled",
+          "command": "booking.cancel",
+          "actorRoles": [
+            "admin",
+            "provider-owner",
+            "customer"
+          ]
+        }
+      ],
+      "retention": "unspecified - ZATCA requires 6 years for tax-bearing records; not implemented",
+      "capabilities": [
+        {
+          "id": "booking.list",
+          "outcome": "See every booking across the marketplace with money, status and provider attribution",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "low",
+          "status": "discovered",
+          "rationale": "REAL WITH A FABRICATION DEFECT. admin/bookings/page.tsx:129-141 reads public.bookings with joins; but :145-176 substitutes three hardcoded demo bookings (with fake SAR revenue and fake customer names) whenever the query returns zero rows, so an empty or RLS-blocked table renders as a healthy marketplace.",
+          "entityStates": {
+            "from": [
+              "pending_payment",
+              "confirmed",
+              "completed",
+              "cancelled",
+              "no_show"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/bookings"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "booking.transition",
+          "outcome": "Move a booking between lifecycle states from the console (complete, cancel, mark no-show)",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "discovered",
+          "rationale": "MISSING. admin/bookings/page.tsx is read-only - it contains no insert/update/delete. The DB supports admin transitions (validate_booking_status_transition allows is_admin() through at 20260615182811_harden_auth_and_booking_core.sql:513) but no console surface uses it. Operators have no way to fix a stuck booking.",
+          "entityStates": {
+            "from": [
+              "pending_payment",
+              "confirmed"
+            ],
+            "to": [
+              "completed",
+              "cancelled",
+              "no_show"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/bookings"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "booking.detail",
+          "outcome": "Open one booking and see its payment, ledger split, employee and travel context",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "low",
+          "status": "discovered",
+          "rationale": "MISSING. There is no /admin/bookings/[id] route. The list is the only view; there is no drill-down from any dashboard number to a record.",
+          "entityStates": {
+            "from": [
+              "pending_payment",
+              "confirmed",
+              "completed",
+              "cancelled",
+              "no_show"
+            ],
+            "to": []
+          },
+          "uiRoutes": [],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "ledger-entry",
+      "name": "Transactional ledger entry (money split)",
+      "sourceOfTruth": "postgres:public.transactional_ledger",
+      "sensitivity": "restricted",
+      "tenantScoped": true,
+      "lifecycleStates": [
+        "pending",
+        "released",
+        "refunded"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "pending",
+          "to": "released",
+          "command": "ledger.release-payout",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "pending",
+          "to": "refunded",
+          "command": "ledger.mark-refunded",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "unspecified - financial record, no retention or legal-hold policy",
+      "capabilities": [
+        {
+          "id": "ledger.list",
+          "outcome": "Reconcile captured money against platform share, provider share and payout state",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "discovered",
+          "rationale": "REAL. admin/ledger/page.tsx:446-458 reads public.transactional_ledger and surfaces a load error at :463 without substituting fake rows. This is the strongest read path in the console.",
+          "entityStates": {
+            "from": [
+              "pending",
+              "released",
+              "refunded"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/ledger"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "ledger.release-payout",
+          "outcome": "Release one ledger row's provider share for settlement",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "REAL BUT UNSAFE. admin/ledger/page.tsx:556-559 writes payout_status='released' straight from the browser. No confirmation dialog, no idempotency key, no amount check, no audit event, no reversal path. A double click releases twice.",
+          "entityStates": {
+            "from": [
+              "pending"
+            ],
+            "to": [
+              "released"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/ledger"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "ledger.mark-refunded",
+          "outcome": "Record that a captured payment was refunded and back the split out",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "MISSING FROM THE CONSOLE. Only supabase/functions/process-refund/index.ts:101 writes payout_status='refunded', and nothing in the repository invokes that function. The admin console cannot record a refund against the ledger at all.",
+          "entityStates": {
+            "from": [
+              "pending",
+              "released"
+            ],
+            "to": [
+              "refunded"
+            ]
+          },
+          "uiRoutes": [],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "ledger.vat-report",
+          "outcome": "Produce the monthly ZATCA VAT position",
+          "kind": "export",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "REAL READ, FABRICATED FALLBACK. admin/ledger/page.tsx:507 reads public.monthly_vat_summary, but :515-518 substitutes invented VAT totals (862.50 SAR / 2185.00 SAR) whenever the view returns zero rows - not only on error. An operator can read fabricated tax figures believing they are the platform's books. No export or download exists.",
+          "entityStates": {
+            "from": [
+              "pending",
+              "released",
+              "refunded"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/ledger"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "payout-request",
+      "name": "Provider payout request",
+      "sourceOfTruth": "postgres:public.payout_requests",
+      "sensitivity": "restricted",
+      "tenantScoped": true,
+      "lifecycleStates": [
+        "requested",
+        "processing",
+        "paid",
+        "rejected"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "requested",
+          "to": "processing",
+          "command": "payout.approve",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "requested",
+          "to": "rejected",
+          "command": "payout.reject",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "processing",
+          "to": "paid",
+          "command": "payout.mark-paid",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "unspecified - contains IBAN",
+      "capabilities": [
+        {
+          "id": "payout.list",
+          "outcome": "Work the queue of provider payout requests by age and amount",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "discovered",
+          "rationale": "REAL. admin/ledger/page.tsx:473-490 reads public.payout_requests joined to providers. On error it sets an empty list (:495), which reads as 'no requests' rather than 'could not load'. Unmasked IBAN is rendered to every admin.",
+          "entityStates": {
+            "from": [
+              "requested",
+              "processing",
+              "paid",
+              "rejected"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/ledger"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "payout.approve",
+          "outcome": "Approve a payout request for bank processing",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "REAL BUT UNSAFE. admin/ledger/page.tsx:577-584 writes status='processing' directly. It bypasses supabase/functions/process-payout/index.ts, which exists, re-checks the admin role at :49, blocks already-finalised requests at :86 and stamps processed_by - and which nothing calls. No confirmation, no audit, no actor recorded.",
+          "entityStates": {
+            "from": [
+              "requested"
+            ],
+            "to": [
+              "processing"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/ledger"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "payout.reject",
+          "outcome": "Reject a payout request with a reason the provider can see",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "discovered",
+          "rationale": "REAL BUT UNSAFE. Same path as payout.approve; the admin_note is a hardcoded English string at admin/ledger/page.tsx:582, so no operator reason is ever captured.",
+          "entityStates": {
+            "from": [
+              "requested"
+            ],
+            "to": [
+              "rejected"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/ledger"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "payout.mark-paid",
+          "outcome": "Mark a payout paid and release the ledger rows that fund it",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "REAL BUT UNSAFE AND NON-ATOMIC. admin/ledger/page.tsx:598-667 runs a three-step money mutation from the browser: read pending ledger rows (:604), bulk UPDATE them to released (:641), then update the payout request (:648). There is no transaction, so a failure between :644 and :657 leaves ledger rows released against a request that is still processing. No idempotency key, no bank reference captured, no confirmation, no audit. The identical logic exists correctly guarded in supabase/functions/process-payout/index.ts:94-150 and is never invoked.",
+          "entityStates": {
+            "from": [
+              "requested",
+              "processing"
+            ],
+            "to": [
+              "paid"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/ledger"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "refund-request",
+      "name": "Payment refund request",
+      "sourceOfTruth": "postgres:public.payment_refund_requests",
+      "sensitivity": "restricted",
+      "tenantScoped": true,
+      "lifecycleStates": [
+        "requested",
+        "approved",
+        "rejected",
+        "processed"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "requested",
+          "to": "approved",
+          "command": "refund.approve",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "requested",
+          "to": "rejected",
+          "command": "refund.reject",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "approved",
+          "to": "processed",
+          "command": "refund.execute",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "unspecified",
+      "capabilities": [
+        {
+          "id": "refund.list",
+          "outcome": "Work the queue of refund requests raised against captured payments",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "discovered",
+          "rationale": "MISSING. public.payment_refund_requests exists with admin-only RLS and a UNIQUE(ledger_id) idempotency guard (20260621183407_admin_branch_coupon_controls.sql:49-70), but no screen reads it. The only reference in the web app is a fake marker comment at admin/payments/page.tsx:6-9.",
+          "entityStates": {
+            "from": [
+              "requested",
+              "approved",
+              "rejected",
+              "processed"
+            ],
+            "to": []
+          },
+          "uiRoutes": [],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "refund.execute",
+          "outcome": "Issue a real refund through Tap and record it against the booking and ledger",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "BROKEN AND UNAUTHENTICATED. supabase/functions/process-refund/index.ts performs no authentication and no role check at all - it reads only { bookingId, refundReason } and acts with SUPABASE_SERVICE_ROLE_KEY (:17,:31). It calls the live Tap refunds API at :62, then at :92 writes bookings.status='refunded' - a value that does not exist in the booking_status enum (20260613000000_init_schema.sql:8), so the write throws and the function returns 500 after the money has already left. It also treats a Tap error as success (:82) and defaults to a fabricated 'mock-refund-' id (:57). No console screen calls it.",
+          "entityStates": {
+            "from": [
+              "requested",
+              "approved"
+            ],
+            "to": [
+              "processed"
+            ]
+          },
+          "uiRoutes": [],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "customer",
+      "name": "Customer account",
+      "sourceOfTruth": "postgres:public.profiles (role = customer)",
+      "sensitivity": "restricted",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "active"
+      ],
+      "lifecycleTransitions": [],
+      "retention": "unspecified - no deletion, anonymisation or data-subject-request path",
+      "capabilities": [
+        {
+          "id": "customer.list",
+          "outcome": "Find a customer to support them",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "discovered",
+          "rationale": "REAL READ, FABRICATED COLUMNS. admin/customers/page.tsx:75-79 reads public.profiles filtered to role='customer'. The verified / bookings / spend columns at :84-88 use c.id.hashCode, which does not exist on a JavaScript string, so the expression is always undefined and every real customer renders the same invented values (verified, 4 bookings, 650 SAR). On query failure :95-101 substitutes five fake Saudi customers with fake spend.",
+          "entityStates": {
+            "from": [
+              "active"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/customers"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "customer.detail",
+          "outcome": "Open one customer and see their bookings, payments and support history",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "discovered",
+          "rationale": "MISSING. No /admin/customers/[id] route exists. Support has no per-customer view.",
+          "entityStates": {
+            "from": [
+              "active"
+            ],
+            "to": []
+          },
+          "uiRoutes": [],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "customer.suspend",
+          "outcome": "Block an abusive customer from booking",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "discovered",
+          "rationale": "MISSING. No suspension state exists on profiles and no console control writes one. handleToggleVerification at admin/customers/page.tsx:109 mutates local React state only and never touches the database.",
+          "entityStates": {
+            "from": [
+              "active"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/customers"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "customer.data-request",
+          "outcome": "Export or erase a customer's personal data on request",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "MISSING ENTIRELY. No export, anonymisation, deletion or legal-hold path exists in the console, the migrations or the edge functions.",
+          "entityStates": {
+            "from": [
+              "active"
+            ],
+            "to": []
+          },
+          "uiRoutes": [],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "employee",
+      "name": "Provider employee / specialist",
+      "sourceOfTruth": "postgres:public.employees",
+      "sensitivity": "confidential",
+      "tenantScoped": true,
+      "lifecycleStates": [
+        "active",
+        "inactive"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "active",
+          "to": "inactive",
+          "command": "employee.deactivate",
+          "actorRoles": [
+            "provider-owner"
+          ]
+        }
+      ],
+      "retention": "unspecified",
+      "capabilities": [
+        {
+          "id": "employee.list",
+          "outcome": "See provider staff, their assignments and availability",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "low",
+          "status": "discovered",
+          "rationale": "DECORATIVE. admin/employees/page.tsx imports no Supabase client at all. All records are module-level constants and all metrics at :204-222 are computed from them.",
+          "entityStates": {
+            "from": [
+              "active",
+              "inactive"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/employees"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "employee.upsert",
+          "outcome": "Correct a staff record or service assignment",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "discovered",
+          "rationale": "DECORATIVE. saveEmployee at admin/employees/page.tsx:243-256 mutates React state only. Nothing persists; a page refresh discards it. There is also no admin RLS policy on public.employees, so this could not be wired up without a migration.",
+          "entityStates": {
+            "from": [
+              "active",
+              "inactive"
+            ],
+            "to": [
+              "active",
+              "inactive"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/employees"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "employee.delete",
+          "outcome": "Remove a staff record",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "discovered",
+          "rationale": "DECORATIVE. deleteEmployee at admin/employees/page.tsx:259-263 filters local state. The confirmation copy itself admits it: 'This cannot be undone in this local admin view'.",
+          "entityStates": {
+            "from": [
+              "active",
+              "inactive"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/employees"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "review",
+      "name": "Customer review",
+      "sourceOfTruth": "postgres:public.reviews",
+      "sensitivity": "public",
+      "tenantScoped": true,
+      "lifecycleStates": [
+        "published"
+      ],
+      "lifecycleTransitions": [],
+      "retention": "unspecified",
+      "capabilities": [
+        {
+          "id": "review.moderate-queue",
+          "outcome": "Work the queue of flagged or reported reviews",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "discovered",
+          "rationale": "FABRICATED. admin/reviews/page.tsx:55-59 hardcodes three reviews with invented Saudi customer names, and the headline counters at :80-88 are the literal strings 1,248 and 4.8 / 5.0. The page never imports Supabase, although public.reviews exists with an 'Admins manage reviews' policy.",
+          "entityStates": {
+            "from": [
+              "published"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/reviews"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "review.hide",
+          "outcome": "Remove an abusive review from public view",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "discovered",
+          "rationale": "FABRICATED. handleStatus at admin/reviews/page.tsx:62-64 changes a local string. Nothing is written, and public.reviews has no moderation-state column to write to.",
+          "entityStates": {
+            "from": [
+              "published"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/reviews"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "promotional-code",
+      "name": "Coupon / promotional code",
+      "sourceOfTruth": "postgres:public.promotional_codes",
+      "sensitivity": "internal",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "active",
+        "inactive"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "active",
+          "to": "inactive",
+          "command": "coupon.toggle",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "inactive",
+          "to": "active",
+          "command": "coupon.toggle",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "hard delete only",
+      "capabilities": [
+        {
+          "id": "coupon.list",
+          "outcome": "See active and expired promotions and their redemption limits",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "low",
+          "status": "discovered",
+          "rationale": "REAL. admin/coupons/page.tsx:113 reads public.promotional_codes.",
+          "entityStates": {
+            "from": [
+              "active",
+              "inactive"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/coupons"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "coupon.upsert",
+          "outcome": "Create or correct a promotion",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "discovered",
+          "rationale": "REAL. admin/coupons/page.tsx:175-176 update/insert with surfaced errors. Directly controls discount value with no approval and no audit.",
+          "entityStates": {
+            "from": [
+              "active",
+              "inactive"
+            ],
+            "to": [
+              "active",
+              "inactive"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/coupons"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "coupon.toggle",
+          "outcome": "Switch a promotion on or off",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "discovered",
+          "rationale": "REAL. admin/coupons/page.tsx:204-208. No audit event.",
+          "entityStates": {
+            "from": [
+              "active"
+            ],
+            "to": [
+              "inactive"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/coupons"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "coupon.delete",
+          "outcome": "Retire a promotion",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "discovered",
+          "rationale": "REAL BUT UNSAFE. admin/coupons/page.tsx:209-213 issues a hard DELETE wired directly to the onClick at :291 with NO confirmation dialog of any kind. One misclick permanently destroys a promotion and its redemption history.",
+          "entityStates": {
+            "from": [
+              "active",
+              "inactive"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/coupons"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "integration",
+      "name": "External integration / payment gateway",
+      "sourceOfTruth": "postgres:public.integrations",
+      "sensitivity": "restricted",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "connected",
+        "disconnected",
+        "error"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "disconnected",
+          "to": "connected",
+          "command": "integration.toggle",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "connected",
+          "to": "disconnected",
+          "command": "integration.toggle",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "hard delete only",
+      "capabilities": [
+        {
+          "id": "integration.list",
+          "outcome": "See connection health for every payment, SMS, push and maps provider",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "discovered",
+          "rationale": "REAL. admin/integrations/page.tsx reads public.integrations across seven queries. All 44 Arabic strings in this file are double-encoded mojibake (e.g. :151), so the page is unreadable in the platform's primary locale.",
+          "entityStates": {
+            "from": [
+              "connected",
+              "disconnected",
+              "error"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/integrations"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "integration.toggle",
+          "outcome": "Enable or disable a provider connection",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "REAL AND AUDITED. admin/integrations/page.tsx:309 writes then calls audit() at :296-301. This is the only audited command in the console - and the audit insert is best-effort, silently swallowed by the bare catch at :300, so an audit failure is invisible.",
+          "entityStates": {
+            "from": [
+              "disconnected"
+            ],
+            "to": [
+              "connected"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/integrations"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "integration.upsert",
+          "outcome": "Register or reconfigure an external provider",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "REAL AND AUDITED. admin/integrations/page.tsx:384 / :394 with audit calls. Changes which payment gateway takes customer money.",
+          "entityStates": {
+            "from": [
+              "connected",
+              "disconnected"
+            ],
+            "to": [
+              "connected",
+              "disconnected"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/integrations"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "integration.delete",
+          "outcome": "Remove an integration registration",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "REAL, CONFIRMED AND AUDITED. admin/integrations/page.tsx:409 confirmation, :413 hard DELETE, :415 audit. The best-guarded destructive action in the console; still a hard delete with no restore.",
+          "entityStates": {
+            "from": [
+              "connected",
+              "disconnected",
+              "error"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/integrations"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "payment-method",
+      "name": "Accepted payment method (KSA)",
+      "sourceOfTruth": "postgres:public.payment_methods",
+      "sensitivity": "internal",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "enabled",
+        "disabled"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "disabled",
+          "to": "enabled",
+          "command": "payment-method.toggle",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "enabled",
+          "to": "disabled",
+          "command": "payment-method.toggle",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "n/a",
+      "capabilities": [
+        {
+          "id": "payment-method.toggle",
+          "outcome": "Turn a KSA payment method (mada, Apple Pay, tabby, cash) on or off for customers",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "REAL, UNAUDITED. admin/ledger/page.tsx:228 writes payment_methods.enabled. Controls what customers can pay with; no confirmation, no audit, and it is on the Ledger screen rather than a settings surface.",
+          "entityStates": {
+            "from": [
+              "disabled"
+            ],
+            "to": [
+              "enabled"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/ledger"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "payment-method.set-default",
+          "outcome": "Choose the default checkout method",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "discovered",
+          "rationale": "REAL, UNAUDITED, NON-ATOMIC. admin/ledger/page.tsx:244-247 clears is_default on every other row and then sets it on one, in two separate statements with no transaction. A failure between them leaves the platform with no default payment method.",
+          "entityStates": {
+            "from": [
+              "enabled"
+            ],
+            "to": [
+              "enabled"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/ledger"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "platform-settings",
+      "name": "Platform settings (VAT rate, commission, branding)",
+      "sourceOfTruth": "NONE - no settings table exists in any migration",
+      "sensitivity": "restricted",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "active"
+      ],
+      "lifecycleTransitions": [],
+      "retention": "n/a",
+      "capabilities": [
+        {
+          "id": "settings.vat-rate",
+          "outcome": "Set the ZATCA VAT rate the platform charges",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "DECORATIVE. admin/taxes/page.tsx:73 is an uncontrolled input with defaultValue={15}; handleSave at :50 only sets a success string. No settings table exists in any migration, so there is nothing to write to. An operator can change the displayed VAT rate, be told it saved, and change nothing.",
+          "entityStates": {
+            "from": [
+              "active"
+            ],
+            "to": [
+              "active"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/taxes"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "settings.commission",
+          "outcome": "Set the default platform commission",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "DECORATIVE. Same page and same no-op save. The real default (15.00) is hardcoded in the database trigger protect_provider_control_fields at 20260615182811_harden_auth_and_booking_core.sql:143 and can only be changed by a migration.",
+          "entityStates": {
+            "from": [
+              "active"
+            ],
+            "to": [
+              "active"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/taxes"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "settings.platform",
+          "outcome": "Set platform name, support address and operational toggles",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "discovered",
+          "rationale": "DECORATIVE. admin/settings/page.tsx uses uncontrolled defaultValue inputs (:64, :69, :78) and handleSave at :42 sets a success message only. Nothing is read and nothing is written.",
+          "entityStates": {
+            "from": [
+              "active"
+            ],
+            "to": [
+              "active"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/settings"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "audit-event",
+      "name": "Administrative audit event",
+      "sourceOfTruth": "postgres:public.integration_audit_log (integrations only; no general audit table exists)",
+      "sensitivity": "restricted",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "recorded"
+      ],
+      "lifecycleTransitions": [],
+      "retention": "unspecified - append-only by policy but no retention or legal hold",
+      "capabilities": [
+        {
+          "id": "audit.search",
+          "outcome": "Answer who changed this record, when, and from what to what",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "ABSENT AND MISREPRESENTED. /admin/audit-logs and /admin/system-logs both redirect to /admin/activity, which is not an audit log: admin/activity/page.tsx:77-79 derives a feed from the six newest bookings and four newest providers, and falls back to FALLBACK_EVENTS with hardcoded counters (:60-61). public.integration_audit_log is never read by any screen. admin/help/page.tsx:21 tells operators 'Every arbitration action is written to the audit log', which is false.",
+          "entityStates": {
+            "from": [
+              "recorded"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/activity"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "audit.emit",
+          "outcome": "Record every state-changing admin action with actor, target, before and after",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "discovered",
+          "rationale": "ABSENT. Exactly one of roughly 30 state-changing admin commands writes an audit row (integration.toggle/upsert/delete via admin/integrations/page.tsx:296). Provider approval and suspension, commission changes, payout release, ledger release, price changes, coupon deletion and payment-method changes are all silent. There is no general audit table in any migration.",
+          "entityStates": {
+            "from": [
+              "recorded"
+            ],
+            "to": [
+              "recorded"
+            ]
+          },
+          "uiRoutes": [],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": {},
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    }
+  ],
+  "workQueues": [
+    {
+      "id": "provider-onboarding",
+      "purpose": "Providers awaiting verification",
+      "roles": [
+        "admin"
+      ],
+      "source": "public.providers where status='pending' or is_verified=false",
+      "priorityRule": "none defined",
+      "sla": "none defined",
+      "actions": [
+        "approve",
+        "reject",
+        "request documents"
+      ],
+      "status": "in-progress",
+      "rationale": "Filterable on /admin/providers but has no aging, no SLA, no escalation and no owner. 'Request documents' does not exist.",
+      "tests": []
+    },
+    {
+      "id": "payout-approval",
+      "purpose": "Provider payout requests awaiting an admin decision",
+      "roles": [
+        "admin"
+      ],
+      "source": "public.payout_requests where status in (requested, processing)",
+      "priorityRule": "requested_at descending only",
+      "sla": "none defined",
+      "actions": [
+        "approve",
+        "reject",
+        "mark paid"
+      ],
+      "status": "in-progress",
+      "rationale": "Real queue on /admin/ledger. No aging indicator, no SLA, no breach signal, no amount-based ordering, no maker-checker separation - the same admin can approve any amount.",
+      "tests": []
+    },
+    {
+      "id": "refund-arbitration",
+      "purpose": "Refund requests raised against captured payments",
+      "roles": [
+        "admin"
+      ],
+      "source": "public.payment_refund_requests",
+      "priorityRule": "undefined",
+      "sla": "undefined",
+      "actions": [
+        "approve",
+        "reject",
+        "execute"
+      ],
+      "status": "discovered",
+      "rationale": "Table and RLS exist; no screen reads it. /admin/disputes synthesises a substitute queue from low-star reviews instead.",
+      "tests": []
+    },
+    {
+      "id": "failed-payment",
+      "purpose": "Bookings stuck in pending_payment after checkout",
+      "roles": [
+        "admin"
+      ],
+      "source": "public.bookings where status='pending_payment' and created_at older than the payment window",
+      "priorityRule": "undefined",
+      "sla": "undefined",
+      "actions": [
+        "retry capture",
+        "cancel and release the slot"
+      ],
+      "status": "discovered",
+      "rationale": "No queue exists. set_booking_window (20260615182811:417) creates the exclusion window, so a stuck pending_payment booking holds an employee slot indefinitely with no operator control to release it.",
+      "tests": []
+    },
+    {
+      "id": "webhook-failure",
+      "purpose": "Tap webhook deliveries that never confirmed a booking",
+      "roles": [
+        "admin"
+      ],
+      "source": "none - not captured anywhere",
+      "priorityRule": "undefined",
+      "sla": "undefined",
+      "actions": [
+        "replay"
+      ],
+      "status": "discovered",
+      "rationale": "payment-webhook returns 500 on failure (:64) and nothing records the attempt. A dropped webhook leaves a paid customer with an unconfirmed booking and no operator signal. /admin/webhooks redirects to the activity feed.",
+      "tests": []
+    }
+  ],
+  "screens": [
+    {
+      "id": "admin-dashboard",
+      "route": "/admin",
+      "purpose": "Route an operator to what needs attention now",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "none - the screen has no data source; all values are literals in the page file"
+      ],
+      "capabilities": [],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "blocked",
+      "rationale": "FULLY FABRICATED. admin/page.tsx (1090 lines) imports no Supabase client. Every KPI is a string literal (page.tsx:175-179: '$28,560', '3,456', '2,145', '520', '92.4%') as are the insight tiles (:252-255) and the date range 'May 12 - May 18, 2025' (:27). Currency is rendered in US dollars on a SAR-only Saudi platform. No metric has an owner, a threshold, a freshness indicator or a drill-down to records. Quick-action tiles (:237-241) do resolve to real routes.",
+      "tests": []
+    },
+    {
+      "id": "admin-providers",
+      "route": "/admin/providers",
+      "purpose": "Onboarding queue, verification, suspension and commission control",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "public.providers",
+        "public.admin_provider_performance",
+        "public.employee_earnings_summary"
+      ],
+      "capabilities": [
+        "provider.list",
+        "provider.approve",
+        "provider.reject",
+        "provider.suspend",
+        "provider.set-commission",
+        "provider.delete",
+        "provider.notes"
+      ],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "in-progress",
+      "rationale": "Largest real screen (provider-management.tsx, 1567 lines). Undermined by identical try/catch bodies in updateProvider (:997-1011), saveProvider (:1034-1071) and deleteProvider (:1073-1090): every failure path applies the optimistic change and reports success. Shop and employee sub-editors (mutateProviderShops :1092) are local-only.",
+      "tests": []
+    },
+    {
+      "id": "admin-ledger",
+      "route": "/admin/ledger",
+      "purpose": "Reconcile captured money, work the payout queue, configure payment methods, read VAT",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "public.transactional_ledger",
+        "public.payout_requests",
+        "public.payment_methods",
+        "public.integrations",
+        "public.monthly_vat_summary",
+        "public.provider_settlement_summary",
+        "public.employee_earnings_summary"
+      ],
+      "capabilities": [
+        "ledger.list",
+        "ledger.release-payout",
+        "ledger.vat-report",
+        "payout.list",
+        "payout.approve",
+        "payout.reject",
+        "payout.mark-paid",
+        "payment-method.toggle",
+        "payment-method.set-default"
+      ],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "in-progress",
+      "rationale": "The console's money surface, 1108 lines carrying four unrelated jobs. Reads are real. Every write is an unconfirmed, unaudited, non-transactional browser mutation. VAT and settlement tables silently substitute invented figures on an empty result (:515-537). Unmasked IBAN is rendered to every admin.",
+      "tests": []
+    },
+    {
+      "id": "admin-services",
+      "route": "/admin/services",
+      "purpose": "Moderate the marketplace catalog, pricing and placement",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "public.services",
+        "public.categories",
+        "public.providers"
+      ],
+      "capabilities": [
+        "service.list",
+        "service.upsert",
+        "service.toggle-active",
+        "service.set-price",
+        "service.delete",
+        "service.set-featured"
+      ],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "in-progress",
+      "rationale": "The best-implemented screen: real reads, real writes, optimistic updates with rollback on error (:329, :355, :380), confirmation before delete (:302). Missing only audit.",
+      "tests": []
+    },
+    {
+      "id": "admin-integrations",
+      "route": "/admin/integrations",
+      "purpose": "Manage payment, SMS, push, maps and calendar connections",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "public.integrations",
+        "public.integration_audit_log"
+      ],
+      "capabilities": [
+        "integration.list",
+        "integration.toggle",
+        "integration.upsert",
+        "integration.delete"
+      ],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "in-progress",
+      "rationale": "Only screen that writes audit rows (:296-301, best-effort with a swallowing catch). All 44 Arabic strings in the file are double-encoded mojibake, so the page is unreadable in Arabic.",
+      "tests": []
+    },
+    {
+      "id": "admin-coupons",
+      "route": "/admin/coupons",
+      "purpose": "Create and retire promotions",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "public.promotional_codes"
+      ],
+      "capabilities": [
+        "coupon.list",
+        "coupon.upsert",
+        "coupon.toggle",
+        "coupon.delete"
+      ],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "in-progress",
+      "rationale": "Real reads and writes. Hard DELETE wired straight to an onClick with no confirmation (:291 -> :206).",
+      "tests": []
+    },
+    {
+      "id": "admin-bookings",
+      "route": "/admin/bookings",
+      "purpose": "See all marketplace bookings",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "public.bookings",
+        "public.profiles",
+        "public.branches",
+        "public.providers"
+      ],
+      "capabilities": [
+        "booking.list"
+      ],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "in-progress",
+      "rationale": "Read-only. Substitutes three fabricated demo bookings with fake revenue whenever the query returns zero rows (:145-176). No detail view, no state transitions, no way to fix a stuck booking.",
+      "tests": []
+    },
+    {
+      "id": "admin-customers",
+      "route": "/admin/customers",
+      "purpose": "Find and support a customer",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "public.profiles"
+      ],
+      "capabilities": [
+        "customer.list"
+      ],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "in-progress",
+      "rationale": "Real read of profiles; verified / bookings / spend columns are fabricated by a broken c.id.hashCode expression (:84-88) that always yields the same invented values. Falls back to five fake customers on error (:95-101). Verification toggle (:109) never persists.",
+      "tests": []
+    },
+    {
+      "id": "admin-branches",
+      "route": "/admin/branches",
+      "purpose": "Manage venues",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "public.branches"
+      ],
+      "capabilities": [
+        "branch.list",
+        "branch.toggle-active"
+      ],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "in-progress",
+      "rationale": "Real read and toggle; no confirmation on deactivation, no audit, no room or resource management despite /admin/rooms existing as a redirect.",
+      "tests": []
+    },
+    {
+      "id": "admin-disputes",
+      "route": "/admin/disputes",
+      "purpose": "Arbitrate customer complaints and issue refunds",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "public.reviews",
+        "public.bookings"
+      ],
+      "capabilities": [],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "blocked",
+      "rationale": "Disputes are synthesised from low-star rows in public.reviews (:82); there is no dispute entity. Resolving as REFUNDED writes bookings.status='refunded' (:161), a value absent from the booking_status enum, so the write always fails; and it never issues a real refund. Falls back to mock disputes that 'resolve' successfully without touching the database (:157).",
+      "tests": []
+    },
+    {
+      "id": "admin-activity",
+      "route": "/admin/activity",
+      "purpose": "Recent platform activity feed",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "public.bookings",
+        "public.providers"
+      ],
+      "capabilities": [
+        "audit.search"
+      ],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "blocked",
+      "rationale": "Presented as the audit log (/admin/audit-logs, /admin/system-logs and /admin/webhooks all redirect here) but derives a feed from the six newest bookings and four newest providers (:77-79) and seeds hardcoded counters 248 / 64 / 6 (:60-61). It never reads integration_audit_log.",
+      "tests": []
+    },
+    {
+      "id": "admin-employees",
+      "route": "/admin/employees",
+      "purpose": "Manage provider staff",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "none - the screen has no data source; all values are literals in the page file"
+      ],
+      "capabilities": [
+        "employee.list",
+        "employee.upsert",
+        "employee.delete"
+      ],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "blocked",
+      "rationale": "DECORATIVE. No Supabase import. All data is module-level constants; every mutation is local React state. There is also no admin RLS policy on public.employees, so it cannot be wired up without a migration.",
+      "tests": []
+    },
+    {
+      "id": "admin-reviews",
+      "route": "/admin/reviews",
+      "purpose": "Moderate reviews",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "none - the screen has no data source; all values are literals in the page file"
+      ],
+      "capabilities": [
+        "review.moderate-queue",
+        "review.hide"
+      ],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "blocked",
+      "rationale": "DECORATIVE. Three hardcoded reviews (:55-59) and literal counters '1,248' and '4.8 / 5.0' (:80-88). public.reviews exists with an admin policy and is never queried.",
+      "tests": []
+    },
+    {
+      "id": "admin-taxes",
+      "route": "/admin/taxes",
+      "purpose": "Configure ZATCA VAT and commission",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "none - the screen has no data source; all values are literals in the page file"
+      ],
+      "capabilities": [
+        "settings.vat-rate",
+        "settings.commission"
+      ],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "blocked",
+      "rationale": "DECORATIVE. Uncontrolled defaultValue={15} input (:73); handleSave (:50) sets a success string. No settings table exists to write to. The most dangerous decorative screen: it presents tax configuration authority that does not exist.",
+      "tests": []
+    },
+    {
+      "id": "admin-settings",
+      "route": "/admin/settings",
+      "purpose": "Platform configuration",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "none - the screen has no data source; all values are literals in the page file"
+      ],
+      "capabilities": [
+        "settings.platform"
+      ],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "blocked",
+      "rationale": "DECORATIVE. Uncontrolled inputs (:64, :69, :78); handleSave (:42) sets a success string.",
+      "tests": []
+    },
+    {
+      "id": "admin-reports",
+      "route": "/admin/reports",
+      "purpose": "Generate and download VAT, sales, booking and payout reports",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "none - the screen has no data source; all values are literals in the page file"
+      ],
+      "capabilities": [],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "blocked",
+      "rationale": "DECORATIVE. handleExport (:44-46) shows 'export initiated! check downloads folder.' No file is ever generated or downloaded.",
+      "tests": []
+    },
+    {
+      "id": "admin-packages",
+      "route": "/admin/packages",
+      "purpose": "Manage service bundles",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "none - the screen has no data source; all values are literals in the page file"
+      ],
+      "capabilities": [],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "blocked",
+      "rationale": "DECORATIVE. Imports Supabase but never uses it; three hardcoded packages under the comment 'Offline fallback simulator' (:60). public.packages exists in 20260613030000_wellness_expansion.sql and is never queried.",
+      "tests": []
+    },
+    {
+      "id": "admin-notifications",
+      "route": "/admin/notifications",
+      "purpose": "Broadcast notifications to customers and providers",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "public.integrations"
+      ],
+      "capabilities": [],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "blocked",
+      "rationale": "ORPHANED AND SIMULATED. Absent from the sidebar (admin/layout.tsx:201-238); reachable only from a dashboard quick action. Always passes simulate:true (:114) to send-notification, and sends no userId, so the function 400s and every broadcast is recorded 'simulated'. The public.notifications table it would write to does not exist in any migration.",
+      "tests": []
+    },
+    {
+      "id": "admin-help",
+      "route": "/admin/help",
+      "purpose": "Operator help",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "none - the screen has no data source; all values are literals in the page file"
+      ],
+      "capabilities": [],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "blocked",
+      "rationale": "Static FAQ, absent from the sidebar. Line 21 states 'Every arbitration action is written to the audit log', which is false.",
+      "tests": []
+    },
+    {
+      "id": "admin-payments-redirect",
+      "route": "/admin/payments",
+      "purpose": "Redirects to /admin/ledger",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "none - the screen has no data source; all values are literals in the page file"
+      ],
+      "capabilities": [],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "blocked",
+      "rationale": "Redirect stub. Lines 6-9 carry a comment block of fake grep markers - from(\"payment_refund_requests\"), refundDuplicate, ledger_id - explicitly labelled 'Required admin-control markers for verification checks'. This is code written to defeat an automated audit, not to implement anything.",
+      "tests": []
+    },
+    {
+      "id": "admin-redirect-stubs",
+      "route": "/admin/{analytics,audit-logs,commissions,locations,orders,roles,rooms,system-logs,teams,webhooks}",
+      "purpose": "Ten identical client-side redirect stubs",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "none - the screen has no data source; all values are literals in the page file"
+      ],
+      "capabilities": [],
+      "actions": [],
+      "states": [
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "blocked",
+      "rationale": "Each is a 17-line 'use client' page issuing router.replace in useEffect. They flash a spinner, cost a client round trip, and three of them (audit-logs, system-logs, webhooks) redirect an operator looking for audit evidence to a booking activity feed. /admin/roles redirects to a decorative employees page, so the console advertises role administration it does not have.",
+      "tests": []
+    }
+  ],
+  "integrations": [
+    {
+      "id": "tap-payments",
+      "direction": "bidirectional",
+      "sourceOfTruth": "Tap Payments (api.tap.company) is authoritative for charge and refund state",
+      "credentialBoundary": "TAP_SECRET_KEY held only in Supabase Edge Function env; never in the browser bundle",
+      "roles": [
+        "admin"
+      ],
+      "operations": [
+        "charge capture via payment-checkout",
+        "webhook confirmation via payment-webhook -> confirm_booking_payment RPC",
+        "refund via process-refund"
+      ],
+      "failureHandling": "payment-webhook is correct: it ignores the callback body and re-fetches the charge from Tap (:28-35) before acting. process-refund is not: a Tap error is logged and treated as success (:82-83), and with no TAP_SECRET_KEY it fabricates a 'mock-refund-' id and reports SUCCESS (:57-58).",
+      "reconciliation": "transactional_ledger.payment_intent_id has a UNIQUE constraint (20260615182811:563) which prevents duplicate capture. There is no reconciliation screen, no mismatch queue, and no way to compare Tap's charge list against the ledger.",
+      "monitoring": "integrations.last_checked_at is stamped opportunistically by admin/notifications/page.tsx:124. No health check, no alerting, no failure queue.",
+      "status": "in-progress",
+      "rationale": "Capture path is sound. Refund path is unauthenticated, mis-modelled and unreachable from the console.",
+      "tests": []
+    },
+    {
+      "id": "expo-push",
+      "direction": "outbound",
+      "sourceOfTruth": "Expo Push service",
+      "credentialBoundary": "none required for Expo push tokens",
+      "roles": [
+        "admin"
+      ],
+      "operations": [
+        "send-notification",
+        "send-push"
+      ],
+      "failureHandling": "send-notification/index.ts has no authentication and no role check and acts with the service-role key (:17,:30). Any caller holding the public publishable key can push an arbitrary title and body to any userId. Delivery failures are collected but never retried.",
+      "reconciliation": "none",
+      "monitoring": "none - the public.notifications table it inserts into (:46) does not exist in any migration, so every persistence attempt fails and is swallowed at :55-57",
+      "status": "blocked",
+      "rationale": "Unauthenticated broadcast primitive with no backing table and no console surface.",
+      "tests": []
+    },
+    {
+      "id": "sms-otp",
+      "direction": "outbound",
+      "sourceOfTruth": "Unifonic / Twilio",
+      "credentialBoundary": "provider keys in Edge Function env",
+      "roles": [
+        "admin"
+      ],
+      "operations": [
+        "send-otp"
+      ],
+      "failureHandling": "unverified",
+      "reconciliation": "none",
+      "monitoring": "none",
+      "status": "discovered",
+      "rationale": "Registered in public.integrations as disconnected. Out of scope for this audit pass.",
+      "tests": []
+    }
+  ],
+  "crossCutting": {
+    "authentication": {
+      "implemented": false,
+      "mfaForPrivilegedRoles": false,
+      "sessionRevocation": false,
+      "stepUpForSensitiveActions": false,
+      "evidence": []
+    },
+    "authorization": {
+      "serverEnforced": false,
+      "defaultDeny": false,
+      "objectAndScopeChecks": false,
+      "policyTests": [],
+      "evidence": []
+    },
+    "audit": {
+      "privilegedMutations": false,
+      "privilegedReadsWhenRequired": false,
+      "capturesActorTargetReasonResult": false,
+      "capturesSafeBeforeAfter": false,
+      "tamperProtected": false,
+      "evidence": []
+    },
+    "safety": {
+      "riskClassifiedActions": false,
+      "recoveryDefined": false,
+      "bulkPreviewAndPartialFailure": false,
+      "highRiskApprovalOrStepUp": false,
+      "evidence": []
+    },
+    "data": {
+      "releaseUsesRealSources": false,
+      "sensitiveFieldsClassified": false,
+      "retentionDefined": false,
+      "tenantIsolationTested": false,
+      "evidence": []
+    },
+    "experience": {
+      "wcagTarget": "2.2 AA",
+      "keyboardCriticalFlowsTested": false,
+      "responsiveCriticalFlowsTested": false,
+      "localizationRequirementsHandled": false,
+      "evidence": []
+    },
+    "observability": {
+      "adminApiInstrumented": false,
+      "jobsAndIntegrationsMonitored": false,
+      "highRiskActionsDetectable": false,
+      "correlationIdsExposedSafely": false,
+      "evidence": []
+    }
+  },
+  "qualityGates": [
+    {
+      "id": "build",
+      "status": "pending",
+      "threshold": "Project build succeeds",
+      "evidence": [],
+      "rationale": ""
+    },
+    {
+      "id": "typecheck",
+      "status": "pending",
+      "threshold": "Configured type checks succeed",
+      "evidence": [],
+      "rationale": ""
+    },
+    {
+      "id": "lint",
+      "status": "pending",
+      "threshold": "Configured lint checks succeed",
+      "evidence": [],
+      "rationale": ""
+    },
+    {
+      "id": "tests",
+      "status": "pending",
+      "threshold": "Required automated tests succeed",
+      "evidence": [],
+      "rationale": ""
+    },
+    {
+      "id": "browser",
+      "status": "pending",
+      "threshold": "Critical role workflows pass in a real browser",
+      "evidence": [],
+      "rationale": ""
+    },
+    {
+      "id": "accessibility",
+      "status": "pending",
+      "threshold": "WCAG target and keyboard checks pass",
+      "evidence": [],
+      "rationale": ""
+    },
+    {
+      "id": "security",
+      "status": "pending",
+      "threshold": "Authorization, tenant, and high-risk action checks pass",
+      "evidence": [],
+      "rationale": ""
+    },
+    {
+      "id": "performance",
+      "status": "pending",
+      "threshold": "Project-defined production-volume budgets pass",
+      "evidence": [],
+      "rationale": ""
+    }
+  ],
+  "decisions": [
+    {
+      "id": "profile-regulated",
+      "decision": "Model PRIMORA at the 'regulated' profile.",
+      "reason": "The platform holds Saudi VAT/ZATCA tax records, provider IBANs, customer PII and payment references, and moves real money through Tap. ZATCA record-keeping obligations and Saudi PDPL both apply. A lower profile would let assumed decisions and missing audit pass a release gate.",
+      "evidence": [
+        "supabase/migrations/20260703140000_accountant_payouts_ledger.sql",
+        "supabase/migrations/20260620181924_provider_payout_requests.sql",
+        "supabase/functions/payment-checkout/index.ts"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "admin-dashboard"
+      ]
+    },
+    {
+      "id": "archetypes",
+      "decision": "Archetypes are marketplace, fintech and logistics-mobility.",
+      "reason": "Two-sided provider/customer marketplace; captured payments split three ways with VAT and settlement; home/mobile services with travel calculation (calculate-travel, home_services migration).",
+      "evidence": [
+        "supabase/migrations/20260613040000_home_services.sql",
+        "supabase/functions/calculate-travel/index.ts",
+        "supabase/migrations/20260703140000_accountant_payouts_ledger.sql"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "admin-dashboard"
+      ]
+    },
+    {
+      "id": "authz-is-rls-only",
+      "decision": "Treat Postgres RLS as the platform's ONLY authorization boundary for the admin console.",
+      "reason": "Verified by search: no Next.js middleware, no route handlers under src/app, no 'use server' actions anywhere in web_platform. AuthGuard is a client component that only gates rendering. Every admin read and write therefore travels from the browser to PostgREST carrying the user's own JWT, and is allowed or denied solely by RLS and is_admin().",
+      "evidence": [
+        "web_platform/src/components/auth-guard.tsx:28",
+        "web_platform/src/lib/supabase.ts:67",
+        "supabase/migrations/20260615182811_harden_auth_and_booking_core.sql:38"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "provider.approve",
+        "payout.mark-paid"
+      ]
+    },
+    {
+      "id": "rls-is-sound",
+      "decision": "The RLS layer itself is sound and is the strongest part of the system; the defects are above it, in the UI and the edge functions.",
+      "reason": "is_admin() is SECURITY DEFINER with a pinned search_path, revoked from PUBLIC and anon (20260615182811:38-54). RLS is enabled on every table. The dangerous early policy 'Public read on profiles USING (true)' is explicitly dropped (:57). Column-level GRANTs stop a customer editing their own role (:75-83). Triggers protect provider control fields and validate booking transitions. Four of five views set security_invoker. Migrations use DROP POLICY IF EXISTS and are idempotent.",
+      "evidence": [
+        "supabase/migrations/20260615182811_harden_auth_and_booking_core.sql:38",
+        "supabase/migrations/20260615182811_harden_auth_and_booking_core.sql:57",
+        "supabase/migrations/20260615182811_harden_auth_and_booking_core.sql:75",
+        "supabase/migrations/20260615182811_harden_auth_and_booking_core.sql:129",
+        "supabase/migrations/20260703140000_accountant_payouts_ledger.sql:11"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "provider.approve",
+        "payout.mark-paid"
+      ]
+    },
+    {
+      "id": "migration-application-unverified",
+      "decision": "Record which migrations are applied to the live Supabase project as UNVERIFIED, and treat 20260615182811_harden_auth_and_booking_core.sql as the single highest-stakes unknown.",
+      "reason": "The Supabase MCP server is unauthenticated in this session and the live database was never queried, so no applied-migration state could be observed. If 20260615182811 is not applied, the DROP at line 57 has not run and 'Public read on profiles USING (true)' from 20260613010000_triggers_rls.sql:44 is still in force - which would make every customer name, email and phone number readable by any anonymous visitor. Every other RLS finding in this audit is conditional on that file being applied.",
+      "evidence": [
+        "supabase/migrations/20260613010000_triggers_rls.sql:44",
+        "supabase/migrations/20260615182811_harden_auth_and_booking_core.sql:57"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "customer.list",
+        "audit.search"
+      ]
+    },
+    {
+      "id": "real-vs-decorative-criterion",
+      "decision": "A screen counts as REAL only when it both reads live data and surfaces a failure honestly; a screen that reports success on a failed write is classified with the decorative ones.",
+      "reason": "A write path whose catch branch applies the change and reports success is operationally indistinguishable from a mock - the operator cannot tell the difference, which is the property that matters. This is why provider management, despite 1567 lines of real query code, is not treated as a working control surface.",
+      "evidence": [
+        "web_platform/src/app/admin/providers/provider-management.tsx:1005",
+        "web_platform/src/app/admin/services/page.tsx:329"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "admin-providers",
+        "admin-services"
+      ]
+    },
+    {
+      "id": "build-order",
+      "decision": "Remediation order: (1) SPINE, serialized, one implementer - harden process-refund and send-notification with the admin check from process-payout, add 'refunded' to booking_status, create admin_audit_log with append-only RLS, replace the browser payout mutation with the server function, delete the catch-and-succeed branches in provider-management, make the dev bypass opt-in. (2) TRUTH, still serialized - delete every demo fallback and render honest loading/empty/error/forbidden states. (3) FAN OUT in parallel once the spine is green - bookings detail and transitions, refund/dispute queue on payment_refund_requests, reviews moderation, employees, platform_settings for VAT and commission, real reports and exports. (4) LAST - role split and separation of duties, since it changes the RLS predicates every other slice depends on.",
+      "reason": "The money and audit defects are the ones that can cause unrecoverable loss, and several share the same fix. The demo fallbacks must go before anything is verified, because while they remain no one can tell a working screen from a broken one. Role splitting is deferred to last precisely because it rewrites the authorization predicates and would force every earlier slice to be re-verified.",
+      "evidence": [
+        ".admin-console/manifest.json"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "refund.execute",
+        "audit.emit"
+      ]
+    },
+    {
+      "id": "design-architect-not-used",
+      "decision": "The optional DesignArchitect UI-graph closure pass was not run.",
+      "reason": "This is an audit of an existing console, not a new IA design. The affordance graph was closed by hand instead: every sidebar entry and every dashboard quick action was traced to its route, which is how the ten redirect stubs and the two orphaned screens were found.",
+      "evidence": [
+        "web_platform/src/app/admin/layout.tsx:201",
+        "web_platform/src/app/admin/page.tsx:237"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "admin-providers",
+        "admin-services"
+      ]
+    }
+  ],
+  "gaps": [
+    {
+      "id": "refund-function-unauthenticated",
+      "severity": "critical",
+      "description": "The process-refund Edge Function performs no authentication and no authorization, acts with the service-role key, and calls the live Tap refunds API. Any caller holding the publishable key - which is committed to the repository and shipped in every browser bundle - plus a booking UUID can move real money.",
+      "status": "open",
+      "rationale": "REMEDY: read the Authorization header, call auth.getUser, and require profiles.role='admin' exactly as supabase/functions/process-payout/index.ts:22-54 already does; restrict Access-Control-Allow-Origin from '*' to the console origin.",
+      "evidence": [
+        "supabase/functions/process-refund/index.ts:17",
+        "supabase/functions/process-refund/index.ts:23",
+        "supabase/functions/process-refund/index.ts:31",
+        "supabase/functions/process-refund/index.ts:62",
+        "web_platform/src/lib/supabase.ts:30",
+        "supabase/config.toml"
+      ]
+    },
+    {
+      "id": "refund-writes-nonexistent-enum-value",
+      "severity": "critical",
+      "description": "Every refund path writes bookings.status='refunded', but 'refunded' is not a member of the booking_status enum, so the write always fails. In process-refund the failure happens AFTER the Tap refund has been issued, so real money leaves the account and neither the booking nor the ledger records it.",
+      "status": "open",
+      "rationale": "REMEDY: add 'refunded' to booking_status via ALTER TYPE in a new migration, allow the transition in validate_booking_status_transition, and move the money movement and the two status writes into one SECURITY DEFINER RPC so they commit or fail together.",
+      "evidence": [
+        "supabase/migrations/20260613000000_init_schema.sql:8",
+        "supabase/functions/process-refund/index.ts:92",
+        "supabase/functions/process-refund/index.ts:95",
+        "web_platform/src/app/admin/disputes/page.tsx:161"
+      ]
+    },
+    {
+      "id": "send-notification-unauthenticated",
+      "severity": "critical",
+      "description": "The send-notification Edge Function has no authentication and no role check and acts with the service-role key. Any caller holding the public publishable key can push an arbitrary title and body to any userId on the platform - a ready-made phishing channel against customers of a payments product.",
+      "status": "open",
+      "rationale": "REMEDY: require a verified admin JWT before dispatch, exactly as process-payout does; rate-limit per actor.",
+      "evidence": [
+        "supabase/functions/send-notification/index.ts:17",
+        "supabase/functions/send-notification/index.ts:22",
+        "supabase/functions/send-notification/index.ts:30",
+        "supabase/functions/send-notification/index.ts:63"
+      ]
+    },
+    {
+      "id": "payout-money-mutation-in-browser",
+      "severity": "critical",
+      "description": "Marking a payout paid runs a three-step money mutation from the browser with no transaction, no idempotency key and no confirmation: read pending ledger rows, bulk-update them to 'released', then update the payout request. A failure between the two writes leaves ledger rows released against a request that is still 'processing'; a double click releases twice. The correctly guarded server version exists and is never called.",
+      "status": "open",
+      "rationale": "REMEDY: replace the three client writes with supabase.functions.invoke('process-payout'), then move that function's body into a single Postgres transaction (a SECURITY DEFINER RPC) and add an idempotency key on payout_request id plus attempt.",
+      "evidence": [
+        "web_platform/src/app/admin/ledger/page.tsx:598",
+        "web_platform/src/app/admin/ledger/page.tsx:641",
+        "web_platform/src/app/admin/ledger/page.tsx:648",
+        "supabase/functions/process-payout/index.ts:94"
+      ]
+    },
+    {
+      "id": "no-audit-trail",
+      "severity": "critical",
+      "description": "Roughly thirty state-changing admin commands exist and exactly three of them write an audit row. Provider approval, suspension, deletion and commission changes; ledger release; payout approval, rejection and payment; service price changes and deletions; coupon deletion; payment-method changes - all mutate silently. There is no general audit table in any migration, and the only one that exists is written best-effort inside a swallowing catch.",
+      "status": "open",
+      "rationale": "REMEDY: add a general admin_audit_log table (actor_id, action, entity, entity_id, before, after, reason, ip, created_at) with admin-read / no-update / no-delete RLS, write it inside the same transaction as each command, and fail the command when the audit write fails.",
+      "evidence": [
+        "supabase/migrations/20260703014433_phase2_admin_control_plane.sql:129",
+        "web_platform/src/app/admin/integrations/page.tsx:296",
+        "web_platform/src/app/admin/integrations/page.tsx:300",
+        "web_platform/src/app/admin/ledger/page.tsx:556",
+        "web_platform/src/app/admin/providers/provider-management.tsx:975"
+      ]
+    },
+    {
+      "id": "audit-surface-misrepresented",
+      "severity": "critical",
+      "description": "/admin/audit-logs, /admin/system-logs and /admin/webhooks all redirect to /admin/activity, which is not an audit log - it derives a feed from the six newest bookings and four newest providers and seeds hardcoded counters. The in-product help text asserts that every arbitration action is written to the audit log. An operator or an auditor asking 'who released this payout' is shown a booking feed and told it is the audit trail.",
+      "status": "open",
+      "rationale": "REMEDY: build a real audit-log screen over the new audit table, point the three redirects at it, and correct the help copy.",
+      "evidence": [
+        "web_platform/src/app/admin/audit-logs/page.tsx:9",
+        "web_platform/src/app/admin/system-logs/page.tsx:9",
+        "web_platform/src/app/admin/webhooks/page.tsx:9",
+        "web_platform/src/app/admin/activity/page.tsx:60",
+        "web_platform/src/app/admin/activity/page.tsx:77",
+        "web_platform/src/app/admin/help/page.tsx:21"
+      ]
+    },
+    {
+      "id": "fabricated-vat-figures",
+      "severity": "critical",
+      "description": "The VAT summary substitutes invented totals whenever monthly_vat_summary returns zero rows - not only on error - so an operator reading the platform's ZATCA tax position can be shown fabricated numbers with no indication they are not real. The same applies to provider settlement and employee earnings.",
+      "status": "open",
+      "rationale": "REMEDY: delete every demo array; render a real empty state for zero rows and a distinct error state for a failed query. No financial screen may ever substitute invented data.",
+      "evidence": [
+        "web_platform/src/app/admin/ledger/page.tsx:512",
+        "web_platform/src/app/admin/ledger/page.tsx:515",
+        "web_platform/src/app/admin/ledger/page.tsx:524",
+        "web_platform/src/app/admin/ledger/page.tsx:533"
+      ]
+    },
+    {
+      "id": "decorative-tax-and-settings-screens",
+      "severity": "critical",
+      "description": "The VAT rate, commission rate and platform settings screens are uncontrolled inputs whose save handler only sets a success string. There is no settings table in any migration to write to. An operator can change the displayed ZATCA VAT rate, be told it saved, and change nothing - while the real 15.00 default lives in a database trigger only a migration can alter.",
+      "status": "open",
+      "rationale": "REMEDY: either create a platform_settings table with admin-only RLS and wire both screens to it, or remove the screens and replace them with a read-only display of the values with a note that they are changed by migration.",
+      "evidence": [
+        "web_platform/src/app/admin/taxes/page.tsx:50",
+        "web_platform/src/app/admin/taxes/page.tsx:73",
+        "web_platform/src/app/admin/settings/page.tsx:42",
+        "web_platform/src/app/admin/settings/page.tsx:64",
+        "supabase/migrations/20260615182811_harden_auth_and_booking_core.sql:143"
+      ]
+    },
+    {
+      "id": "no-customer-data-rights-path",
+      "severity": "critical",
+      "description": "There is no export, anonymisation, deletion or legal-hold capability for customer personal data anywhere in the console, the migrations or the edge functions, on a platform holding Saudi customer names, emails, phone numbers, booking history and private messages.",
+      "status": "open",
+      "rationale": "REMEDY: add an admin data-subject-request capability with export and anonymise commands, both audited, both requiring a recorded reason.",
+      "evidence": [
+        "web_platform/src/app/admin/customers/page.tsx",
+        "supabase/migrations/"
+      ]
+    },
+    {
+      "id": "silent-write-failure-provider-management",
+      "severity": "high",
+      "description": "updateProvider, saveProvider and deleteProvider each have a catch block identical to the try block: on any failure - RLS denial, network error, missing column - the optimistic state is applied and the same success notice is shown. Provider approval, suspension, commission changes and deletion all report success whether or not anything was persisted. This also makes every authorization denial invisible.",
+      "status": "open",
+      "rationale": "REMEDY: delete the catch-and-succeed branches; roll the optimistic state back and surface the error, following the pattern already used in web_platform/src/app/admin/services/page.tsx:329.",
+      "evidence": [
+        "web_platform/src/app/admin/providers/provider-management.tsx:1005",
+        "web_platform/src/app/admin/providers/provider-management.tsx:1063",
+        "web_platform/src/app/admin/providers/provider-management.tsx:1084",
+        "web_platform/src/app/admin/providers/provider-management.tsx:991"
+      ]
+    },
+    {
+      "id": "dev-role-bypass-auto-grants-admin",
+      "severity": "high",
+      "description": "getDevRole auto-assigns a 'customer' dev role to any visitor when none is set, and AuthGuard treats ANY dev role as authorised for EVERY dashboard including /admin. On localhost an unauthenticated stranger who loads /admin is admitted with no credentials and no click. The env flag is opt-out, not opt-in: only the exact string 'false' disables it, so 'off' or '0' leave it enabled.",
+      "status": "open",
+      "rationale": "REMEDY: make it opt-in (enabled only when NEXT_PUBLIC_ENABLE_DEV_ACCESS === 'true'), remove the auto-initialisation at dev-access.ts:26, require the dev role to match allowedRoles rather than granting all dashboards, and exclude the switcher from production builds. NOTE: this bypasses the UI gate only - RLS still applies - but combined with the silent-write-failure defect above, a bypassed session looks fully functional.",
+      "evidence": [
+        "web_platform/src/lib/dev-access.ts:11",
+        "web_platform/src/lib/dev-access.ts:24",
+        "web_platform/src/lib/dev-access.ts:26",
+        "web_platform/src/components/auth-guard.tsx:32",
+        "web_platform/src/app/layout.tsx:19"
+      ]
+    },
+    {
+      "id": "booking-console-read-only",
+      "severity": "high",
+      "description": "The bookings screen cannot change anything. There is no detail view, no state transition, no cancellation, no no-show marking and no way to release a slot held by a booking stuck in pending_payment - even though the database explicitly permits admin transitions. Support has no lever on the platform's central entity.",
+      "status": "open",
+      "rationale": "REMEDY: add /admin/bookings/[id] with audited confirm, complete, no-show and cancel commands, and a pending_payment aging queue that can release the exclusion window.",
+      "evidence": [
+        "web_platform/src/app/admin/bookings/page.tsx:129",
+        "supabase/migrations/20260615182811_harden_auth_and_booking_core.sql:513",
+        "supabase/migrations/20260615182811_harden_auth_and_booking_core.sql:555"
+      ]
+    },
+    {
+      "id": "dispute-arbitration-not-real",
+      "severity": "high",
+      "description": "Disputes are synthesised from low-star reviews rather than a dispute entity. Resolving one as REFUNDED writes an enum value that cannot exist and never issues a real refund. When the underlying query fails the screen falls back to mock disputes that resolve successfully without touching the database, so an operator can believe a customer was refunded when nothing happened.",
+      "status": "open",
+      "rationale": "REMEDY: build the dispute queue on the existing payment_refund_requests table (which already carries a UNIQUE(ledger_id) idempotency guard), and route the refund action through a hardened process-refund.",
+      "evidence": [
+        "web_platform/src/app/admin/disputes/page.tsx:82",
+        "web_platform/src/app/admin/disputes/page.tsx:157",
+        "web_platform/src/app/admin/disputes/page.tsx:161",
+        "supabase/migrations/20260621183407_admin_branch_coupon_controls.sql:49"
+      ]
+    },
+    {
+      "id": "no-confirmation-on-money-and-delete",
+      "severity": "high",
+      "description": "Releasing a ledger payout, approving, rejecting and marking a payout paid, toggling a payment method, deactivating a branch, and permanently deleting a coupon all execute on a single click with no confirmation, no typed acknowledgement and no summary of what is about to change.",
+      "status": "open",
+      "rationale": "REMEDY: require a confirmation dialog that names the record and the amount for every high and critical command, and a typed confirmation for irreversible money movement.",
+      "evidence": [
+        "web_platform/src/app/admin/ledger/page.tsx:551",
+        "web_platform/src/app/admin/ledger/page.tsx:571",
+        "web_platform/src/app/admin/ledger/page.tsx:598",
+        "web_platform/src/app/admin/coupons/page.tsx:291",
+        "web_platform/src/app/admin/branches/page.tsx:113"
+      ]
+    },
+    {
+      "id": "hard-delete-everywhere",
+      "severity": "high",
+      "description": "Every delete in the console is a hard DELETE with no soft-delete column, no archive and no restore: providers, services, coupons and integrations. Providers and services are referenced by historical bookings and ledger rows, so a delete either destroys reporting lineage or fails on a foreign key with no operator-legible message.",
+      "status": "open",
+      "rationale": "REMEDY: add deleted_at soft-delete columns with RLS-filtered reads, keep hard delete for admin-only purge behind a separate audited capability, and show related-record counts before any destructive action.",
+      "evidence": [
+        "web_platform/src/app/admin/providers/provider-management.tsx:1078",
+        "web_platform/src/app/admin/services/page.tsx:307",
+        "web_platform/src/app/admin/coupons/page.tsx:211",
+        "web_platform/src/app/admin/integrations/page.tsx:413"
+      ]
+    },
+    {
+      "id": "iban-unmasked-to-every-admin",
+      "severity": "high",
+      "description": "Provider bank details are stored and rendered unmasked. payout_requests.iban is selected in full and displayed in the payout queue to every admin, with no masking, no reveal-on-demand, no privileged-read logging and no field-level restriction.",
+      "status": "open",
+      "rationale": "REMEDY: mask to the last four characters by default, gate full reveal behind an audited privileged-read capability, and consider column-level encryption.",
+      "evidence": [
+        "web_platform/src/app/admin/ledger/page.tsx:480",
+        "supabase/migrations/20260620181924_provider_payout_requests.sql"
+      ]
+    },
+    {
+      "id": "no-separation-of-duties",
+      "severity": "high",
+      "description": "A single 'admin' role holds catalog authority, unlimited money authority and integration-configuration authority. There is no finance role, no support role, no read-only analyst, no monetary threshold, no maker-checker on payouts and no MFA or step-up on any command. /admin/roles - which promises role administration - redirects to a decorative employees page.",
+      "status": "open",
+      "rationale": "REMEDY: split admin into at least finance-operator, support-agent and platform-admin with scoped RLS predicates; require a second approver above a monetary threshold on payout.mark-paid.",
+      "evidence": [
+        "supabase/migrations/20260613000000_init_schema.sql:7",
+        "web_platform/src/app/admin/roles/page.tsx:9",
+        "web_platform/src/components/auth-guard.tsx:8"
+      ]
+    },
+    {
+      "id": "demo-fallback-masks-outages",
+      "severity": "medium",
+      "description": "Six screens substitute hardcoded demo records when a query errors or returns zero rows, so a broken connection, an unapplied migration and a genuinely empty platform are indistinguishable. The console reports health it cannot observe.",
+      "status": "open",
+      "rationale": "REMEDY: remove every fallback array; render distinct loading, empty, error and forbidden states, and show the reason a query failed.",
+      "evidence": [
+        "web_platform/src/app/admin/bookings/page.tsx:145",
+        "web_platform/src/app/admin/customers/page.tsx:95",
+        "web_platform/src/app/admin/disputes/page.tsx:140",
+        "web_platform/src/app/admin/activity/page.tsx:60",
+        "web_platform/src/app/admin/ledger/page.tsx:515",
+        "web_platform/src/app/admin/providers/provider-management.tsx:896"
+      ]
+    },
+    {
+      "id": "fabricated-customer-metrics",
+      "severity": "medium",
+      "description": "The customers table computes verified, bookings and spend from c.id.hashCode, which does not exist on a JavaScript string. The expression is always undefined, so every real customer renders the same invented values: verified, 4 bookings, 650 SAR.",
+      "status": "open",
+      "rationale": "REMEDY: delete the three fabricated columns, or compute them from real aggregates over bookings and transactional_ledger.",
+      "evidence": [
+        "web_platform/src/app/admin/customers/page.tsx:84",
+        "web_platform/src/app/admin/customers/page.tsx:85",
+        "web_platform/src/app/admin/customers/page.tsx:86",
+        "web_platform/src/app/admin/customers/page.tsx:87"
+      ]
+    },
+    {
+      "id": "fabricated-dashboard",
+      "severity": "medium",
+      "description": "The landing dashboard has no data source at all. Every KPI, trend, sparkline, top-provider row and insight tile is a string literal, the date range is fixed at 'May 12 - May 18, 2025', and the currency is rendered in US dollars on a SAR-only Saudi platform.",
+      "status": "open",
+      "rationale": "REMEDY: rebuild as an exception router - pending verifications, payouts awaiting decision, bookings stuck in pending_payment, failed webhooks - each with an owner, a threshold, a freshness stamp and a drill-down to the filtered console view.",
+      "evidence": [
+        "web_platform/src/app/admin/page.tsx:175",
+        "web_platform/src/app/admin/page.tsx:252",
+        "web_platform/src/app/admin/page.tsx:27",
+        "web_platform/src/app/admin/page.tsx:280"
+      ]
+    },
+    {
+      "id": "arabic-mojibake-integrations",
+      "severity": "medium",
+      "description": "All 44 Arabic strings in the integrations page are double-encoded UTF-8 and render as unreadable Latin-1 garbage, on a platform whose primary market locale is Arabic with full RTL.",
+      "status": "open",
+      "rationale": "REMEDY: re-save the file as UTF-8 with the Arabic strings restored, and add a CI check that rejects the double-encoding signature in source.",
+      "evidence": [
+        "web_platform/src/app/admin/integrations/page.tsx:151"
+      ]
+    },
+    {
+      "id": "orphaned-and-redundant-routes",
+      "severity": "medium",
+      "description": "Ten of the thirty admin routes are 17-line client-side redirect stubs that flash a spinner before navigating. Two real screens - /admin/notifications and /admin/help - are absent from the sidebar entirely; notifications is reachable only from a dashboard quick action. Three redirects (audit-logs, system-logs, webhooks) send operators looking for audit evidence to a booking feed, and /admin/roles advertises role administration that does not exist.",
+      "status": "open",
+      "rationale": "REMEDY: delete the stubs and let the routes 404, or convert them to Next.js redirects config so no client round trip is spent; add notifications to the sidebar or remove it.",
+      "evidence": [
+        "web_platform/src/app/admin/analytics/page.tsx",
+        "web_platform/src/app/admin/roles/page.tsx",
+        "web_platform/src/app/admin/layout.tsx:201",
+        "web_platform/src/app/admin/notifications/page.tsx"
+      ]
+    },
+    {
+      "id": "verification-marker-comment",
+      "severity": "medium",
+      "description": "The /admin/payments redirect stub carries a comment block of fake grep markers - from(\"payment_refund_requests\"), refundDuplicate, ledger_id - explicitly labelled 'Required admin-control markers for verification checks'. It is code written to satisfy an automated audit rather than to implement anything, and it will make any future text-based coverage check report a refund capability that does not exist.",
+      "status": "open",
+      "rationale": "REMEDY: delete the comment block and build the refund screen it is standing in for.",
+      "evidence": [
+        "web_platform/src/app/admin/payments/page.tsx:6",
+        "web_platform/src/app/admin/payments/page.tsx:7",
+        "web_platform/src/app/admin/payments/page.tsx:8",
+        "web_platform/src/app/admin/payments/page.tsx:9"
+      ]
+    },
+    {
+      "id": "provider-payout-bypasses-balance-check",
+      "severity": "medium",
+      "description": "When the request-payout function is unavailable the provider wallet silently falls back to inserting the payout_requests row directly from the browser, skipping the server-side available-balance calculation that prevents a provider requesting more than they have earned.",
+      "status": "open",
+      "rationale": "REMEDY: remove the fallback and surface the failure; enforce the balance rule with a database CHECK or trigger so it cannot be bypassed by any client.",
+      "evidence": [
+        "web_platform/src/app/provider/wallet/page.tsx:421",
+        "supabase/functions/request-payout/index.ts:80",
+        "supabase/functions/request-payout/index.ts:94"
+      ]
+    },
+    {
+      "id": "no-server-side-rendering-or-middleware",
+      "severity": "medium",
+      "description": "The admin console has no Next.js middleware, no route handlers and no server actions. Every byte of every admin page - all thirty routes, the full navigation, every hardcoded demo dataset - is served to any unauthenticated visitor who requests /admin; only the data behind it is protected, and only by RLS. AuthGuard is a client-side render gate.",
+      "status": "open",
+      "rationale": "REMEDY: adopt @supabase/ssr with a middleware session check so /admin redirects unauthenticated requests server-side, and move privileged reads behind route handlers that verify the role before querying.",
+      "evidence": [
+        "web_platform/src/components/auth-guard.tsx:28",
+        "web_platform/src/app/admin/layout.tsx:241"
+      ]
+    },
+    {
+      "id": "no-pagination-or-server-side-filtering",
+      "severity": "medium",
+      "description": "Every admin list selects all rows with no limit, no pagination and no server-side filtering; sorting and searching happen in the browser over the full result set. Ledger, bookings, customers and services will all degrade and eventually hit Supabase's max_rows ceiling as the marketplace grows.",
+      "status": "open",
+      "rationale": "REMEDY: add range-based pagination and push filters and sorts into the query.",
+      "evidence": [
+        "web_platform/src/app/admin/ledger/page.tsx:458",
+        "web_platform/src/app/admin/bookings/page.tsx:141",
+        "web_platform/src/app/admin/customers/page.tsx:79",
+        "supabase/config.toml"
+      ]
+    },
+    {
+      "id": "committed-anon-key-and-dead-diagnostic",
+      "severity": "low",
+      "description": "The Supabase publishable key is hardcoded as a fallback in the client library. It is a publishable key so exposure is expected, but it makes isSupabaseConfigured unconditionally true, which turns the missing-key diagnostic immediately below it into dead code that can never fire.",
+      "status": "open",
+      "rationale": "REMEDY: drop the fallback, derive isSupabaseConfigured from configuredAnonKey alone, and let the diagnostic work.",
+      "evidence": [
+        "web_platform/src/lib/supabase.ts:30",
+        "web_platform/src/lib/supabase.ts:34",
+        "web_platform/src/lib/supabase.ts:57"
+      ]
+    },
+    {
+      "id": "accepted-payment-methods-view-lacks-security-invoker",
+      "severity": "low",
+      "description": "accepted_payment_methods is the only one of the five views created without WITH (security_invoker = true), and the only one granted to anon. It therefore bypasses RLS on the admin-only integrations table. The exposed columns (gateway name, status, enabled, env) are operational metadata rather than credentials, and the underlying payment_methods rows are publicly readable by policy anyway, so this looks deliberate - but it is an inconsistency worth closing.",
+      "status": "open",
+      "rationale": "REMEDY: add WITH (security_invoker = true) and confirm the anon read still resolves through the existing public-read policy on payment_methods.",
+      "evidence": [
+        "supabase/migrations/20260714170000_link_payment_methods_to_integrations.sql:61",
+        "supabase/migrations/20260714170000_link_payment_methods_to_integrations.sql:93",
+        "supabase/migrations/20260703140000_accountant_payouts_ledger.sql:11"
+      ]
+    },
+    {
+      "id": "no-bulk-operations",
+      "severity": "low",
+      "description": "The console has no multi-select and no bulk actions anywhere. This removes a whole class of authorization risk but means an operator clearing a backlog of pending providers or releasing a month of ledger rows must do so one click at a time.",
+      "status": "open",
+      "rationale": "REMEDY: when bulk actions are added, re-check scope at execution time rather than at selection time, cap the batch size, and audit each affected row individually.",
+      "evidence": [
+        "web_platform/src/app/admin/"
+      ]
+    },
+    {
+      "id": "no-tests",
+      "severity": "low",
+      "description": "There are no tests of any kind for the admin console - no authorization negative tests, no RLS policy tests, no state-machine tests, no component tests.",
+      "status": "open",
+      "rationale": "REMEDY: start with negative authorization tests - a customer JWT attempting every admin write - since those are the checks nothing else in the system can substitute for.",
+      "evidence": [
+        "web_platform/"
+      ]
+    }
+  ],
+  "declaredStatic": [],
+  "feedback": [
+    {
+      "id": "fb-audit-mode-manifest-shape",
+      "observation": "In audit mode the architect must record a verdict per capability (real / decorative / missing / silently-failing) but the capability status enum only expresses build progress, so the verdict has to be smuggled into the rationale prose. The manifest cannot then be queried for 'show me every decorative screen'.",
+      "category": "gap",
+      "proposedChange": "Add an optional capability field such as auditVerdict with an enum of live, partial, decorative, missing, silently-failing, and teach `report` and `coverage` to summarise by it.",
+      "evidence": [
+        ".admin-console/manifest.json"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "fb-silent-catch-antipattern",
+      "observation": "The single most damaging pattern found in this codebase was a catch block whose body is identical to the try block, so every failure reports success. It defeats RLS observability, hides unapplied migrations and makes a decorative screen indistinguishable from a working one. It is not named in capability-catalog.md or verification.md.",
+      "category": "gap",
+      "proposedChange": "Add 'catch-and-succeed' to the anti-pattern list in capability-catalog.md, and add a grep-based check to verification.md: a catch block that calls the same success setter as its try block is a defect.",
+      "evidence": [
+        "web_platform/src/app/admin/providers/provider-management.tsx:1005",
+        "web_platform/src/app/admin/providers/provider-management.tsx:1063",
+        "web_platform/src/app/admin/providers/provider-management.tsx:1084"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "fb-empty-result-fallback",
+      "observation": "Several screens substitute demo data when a query returns ZERO ROWS rather than when it errors. This is more dangerous than an error fallback because it fires in normal operation on a quiet month - a VAT screen showed invented tax totals this way. The discovery reference warns about placeholder data but not about this specific trigger.",
+      "category": "gap",
+      "proposedChange": "In discovery.md and verification.md, state explicitly that a zero-row result must render an empty state and never substitute sample data, and call out financial and compliance screens as absolute.",
+      "evidence": [
+        "web_platform/src/app/admin/ledger/page.tsx:512",
+        "web_platform/src/app/admin/bookings/page.tsx:144"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "fb-edge-function-verify-jwt",
+      "observation": "Supabase Edge Functions default to verify_jwt=true, which developers read as 'authenticated', but the check is satisfied by the project's public publishable/anon key that ships in every browser bundle. Two service-role functions here relied on it and had no role check of their own. stack-adapters.md does not warn about this.",
+      "category": "gap",
+      "proposedChange": "Add to the Supabase section of stack-adapters.md: verify_jwt is not authorization; every service-role Edge Function must independently call auth.getUser on the bearer token and check the role, and Access-Control-Allow-Origin should not be '*' on a privileged function.",
+      "evidence": [
+        "supabase/functions/process-refund/index.ts:31",
+        "supabase/functions/send-notification/index.ts:30",
+        "supabase/config.toml"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "fb-audit-cannot-reach-live-db",
+      "observation": "The most consequential question in this audit - which migrations are applied to the live project - was unanswerable because the Supabase MCP server was unauthenticated in a non-interactive session. Roughly a third of the security findings had to be stated conditionally.",
+      "category": "friction",
+      "proposedChange": "Have the audit agent check for live-database reachability at the START of the pass and, when it is missing, say so in the first paragraph of the report and list precisely which findings are conditional on it, rather than discovering the limitation midway.",
+      "evidence": [
+        ".admin-console/manifest.json"
+      ],
+      "status": "open"
+    }
+  ],
+  "agents": [
+    {
+      "id": "architect-primora-audit",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "handed-off",
+      "notes": ".admin-console/worklog/architect-primora-audit.md",
+      "worklog": ".admin-console/worklog/architect-primora-audit.md"
+    }
+  ]
+}
