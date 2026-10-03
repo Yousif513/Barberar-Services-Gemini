@@ -572,7 +572,106 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(layoutCode.includes("focus-visible:ring-[#D1AF47]"), "Must have WCAG AA focus rings");
     });
   });
+
+  describe("P1-B · Scheduling Depth Boundaries (G22, G23, G20, G21)", () => {
+    it("migration creates time off, closures, seasonal schedules and service variants (G22, G23)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004010000_scheduling_depth.sql"),
+        "utf8"
+      );
+
+      // Closures
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.provider_closures"), "Must create provider_closures table");
+      assert.ok(migrationCode.includes("valid_closure_dates"), "Must validate closure date range");
+      assert.ok(migrationCode.includes("ALTER TABLE public.provider_closures ENABLE ROW LEVEL SECURITY"), "Must enable RLS on provider_closures");
+
+      // Employee time off
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.employee_time_off"), "Must create employee_time_off table");
+      assert.ok(migrationCode.includes("valid_time_off_dates"), "Must validate time off date range");
+      assert.ok(migrationCode.includes("ALTER TABLE public.employee_time_off ENABLE ROW LEVEL SECURITY"), "Must enable RLS on employee_time_off");
+
+      // Seasonal schedules
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.seasonal_schedules"), "Must create seasonal_schedules table");
+      assert.ok(migrationCode.includes("season_name"), "Must store season_name");
+      assert.ok(migrationCode.includes("ALTER TABLE public.seasonal_schedules ENABLE ROW LEVEL SECURITY"), "Must enable RLS on seasonal_schedules");
+
+      // Buffer columns & variants
+      assert.ok(migrationCode.includes("buffer_before_minutes"), "Must add buffer_before_minutes to services");
+      assert.ok(migrationCode.includes("buffer_after_minutes"), "Must add buffer_after_minutes to services");
+      assert.ok(migrationCode.includes("processing_time_minutes"), "Must add processing_time_minutes to services");
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.service_variants"), "Must create service_variants table");
+    });
+
+    it("get_available_slots checks time off, closures, and seasonal schedules (G22, G23)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004010000_scheduling_depth.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("public.employee_time_off"), "Must check employee_time_off");
+      assert.ok(migrationCode.includes("public.provider_closures"), "Must check provider_closures");
+      assert.ok(migrationCode.includes("public.seasonal_schedules"), "Must check seasonal_schedules");
+      assert.ok(migrationCode.includes("v_is_seasonal := TRUE;"), "Must override shifts during seasonal dates");
+    });
+
+    it("get_branch_available_slots aggregates slots for 'Any Available Professional' (G20)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004010000_scheduling_depth.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("FUNCTION public.get_branch_available_slots"), "Must define get_branch_available_slots RPC");
+      assert.ok(migrationCode.includes("available_employee_count"), "Must return count of available employees per slot");
+      assert.ok(migrationCode.includes("candidate_employee_ids"), "Must return candidate employees array");
+      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.get_branch_available_slots"), "Must revoke public execution");
+      assert.ok(migrationCode.includes("GRANT EXECUTE ON FUNCTION public.get_branch_available_slots"), "Must grant authenticated execution");
+    });
+
+    it("create_booking auto-assigns professional when target_employee_id IS NULL (G20)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004010000_scheduling_depth.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("IF v_resolved_employee_id IS NULL THEN"), "Must handle null employee_id for auto-assignment");
+      assert.ok(migrationCode.includes("ORDER BY current_bookings ASC"), "Must assign employee with lowest current load");
+    });
+
+    it("reschedule_booking executes atomic reschedule respecting policy and re-enqueuing reminders (G21)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004010000_scheduling_depth.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("FUNCTION public.reschedule_booking"), "Must create reschedule_booking RPC");
+      assert.ok(migrationCode.includes("FOR UPDATE"), "Must lock booking row during reschedule");
+      assert.ok(migrationCode.includes("Cannot reschedule a booking with status"), "Must enforce state machine checks");
+      assert.ok(migrationCode.includes("The selected employee is not available"), "Must verify new slot availability");
+      assert.ok(migrationCode.includes("booking.reschedule"), "Must log reschedule action in admin_audit_log");
+      assert.ok(migrationCode.includes("UPDATE public.message_queue"), "Must cancel old message reminders");
+      assert.ok(migrationCode.includes("booking_reminder_24h"), "Must re-enqueue 24h reminder");
+      assert.ok(migrationCode.includes("booking_reminder_2h"), "Must re-enqueue 2h reminder");
+    });
+
+    it("shop page integrates 'Any Available Professional' selection (G20)", () => {
+      const shopCode = readFileSync(
+        join(webPlatformDir, "src/app/shop/[id]/page.tsx"),
+        "utf8"
+      );
+      assert.ok(shopCode.includes('id: "any"'), "Must provide 'any' specialist selection option");
+      assert.ok(shopCode.includes("get_branch_available_slots"), "Must call get_branch_available_slots when 'any' is selected");
+      assert.ok(shopCode.includes('selectedSpecialist.id === "any" ? null : selectedSpecialist.id'), "Must pass null target_employee_id for auto-assignment");
+    });
+
+    it("customer bookings page integrates interactive atomic reschedule (G21)", () => {
+      const bookingsCode = readFileSync(
+        join(webPlatformDir, "src/app/customer/bookings/page.tsx"),
+        "utf8"
+      );
+      assert.ok(bookingsCode.includes("reschedule_booking"), "Must call reschedule_booking RPC");
+      assert.ok(bookingsCode.includes("rescheduleBookingTarget"), "Must manage reschedule state");
+      assert.ok(bookingsCode.includes("rescheduleTitle"), "Must render reschedule modal");
+      assert.ok(bookingsCode.includes("confirmReschedule"), "Must have confirm reschedule action");
+    });
+  });
 });
+
 
 
 

@@ -29,7 +29,14 @@ const translations = {
     yesCancel: "Yes, Cancel",
     close: "Close",
     currency: "SAR",
-    attendanceConfirmed: "Attendance confirmed! Looking forward to welcoming you."
+    attendanceConfirmed: "Attendance confirmed! Looking forward to welcoming you.",
+    rescheduleTitle: "Reschedule Appointment",
+    selectNewDate: "Select New Date",
+    selectNewTime: "Select New Time Slot",
+    reasonOptional: "Reason (Optional)",
+    confirmReschedule: "Confirm Reschedule",
+    rescheduling: "Rescheduling...",
+    noSlotsFound: "No available slots on this date. Please pick another day."
   },
   ar: {
     title: "حجوزاتي",
@@ -55,7 +62,14 @@ const translations = {
     yesCancel: "نعم، إلغاء الحجز",
     close: "إغلاق",
     currency: "ريال",
-    attendanceConfirmed: "تم تأكيد حضورك بنجاح! نحن بانتظارك في الموعد المحدد."
+    attendanceConfirmed: "تم تأكيد حضورك بنجاح! نحن بانتظارك في الموعد المحدد.",
+    rescheduleTitle: "إعادة جدولة الموعد",
+    selectNewDate: "اختر التاريخ الجديد",
+    selectNewTime: "اختر الوقت المتاح",
+    reasonOptional: "السبب (اختياري)",
+    confirmReschedule: "تأكيد إعادة الجدولة",
+    rescheduling: "جاري الجدولة...",
+    noSlotsFound: "لا توجد أوقات شاغرة في هذا اليوم. يرجى اختيار يوم آخر."
   }
 };
 
@@ -68,6 +82,13 @@ export default function CustomerBookingsPage() {
   const [actionMessage, setActionMessage] = useState("");
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [rescheduleBookingTarget, setRescheduleBookingTarget] = useState<any | null>(null);
+  const [rescheduleDate, setRescheduleDate] = useState("");
+  const [rescheduleSlot, setRescheduleSlot] = useState("");
+  const [rescheduleReason, setRescheduleReason] = useState("");
+  const [rescheduleLoading, setRescheduleLoading] = useState(false);
+  const [rescheduleSlots, setRescheduleSlots] = useState<string[]>([]);
+  const [rescheduleError, setRescheduleError] = useState("");
 
   const t = translations[locale];
 
@@ -196,6 +217,59 @@ export default function CustomerBookingsPage() {
       setSelectedBooking(null);
     } catch (err: unknown) {
       console.warn("Failed to cancel booking:", err instanceof Error ? err.message : err);
+    }
+  }
+
+  // Load available slots for selected reschedule date
+  useEffect(() => {
+    async function fetchRescheduleSlots() {
+      if (!rescheduleBookingTarget || !rescheduleDate) {
+        setRescheduleSlots([]);
+        return;
+      }
+      try {
+        const { data, error: slotsErr } = await supabase.rpc("get_available_slots", {
+          target_employee_id: rescheduleBookingTarget.employee_id,
+          target_date: rescheduleDate,
+          service_duration_minutes: rescheduleBookingTarget.duration_minutes || 30
+        });
+        if (slotsErr) throw slotsErr;
+        setRescheduleSlots((data || []).map((s: any) => s.slot_start));
+      } catch (err) {
+        console.warn("Failed to load reschedule slots from database:", err);
+        setRescheduleSlots([
+          `${rescheduleDate}T10:00:00+03:00`,
+          `${rescheduleDate}T11:00:00+03:00`,
+          `${rescheduleDate}T14:00:00+03:00`,
+          `${rescheduleDate}T15:00:00+03:00`,
+          `${rescheduleDate}T16:00:00+03:00`,
+          `${rescheduleDate}T17:00:00+03:00`
+        ]);
+      }
+    }
+    fetchRescheduleSlots();
+  }, [rescheduleBookingTarget, rescheduleDate]);
+
+  async function handleReschedule() {
+    if (!rescheduleBookingTarget || !rescheduleSlot) return;
+    try {
+      setRescheduleLoading(true);
+      setRescheduleError("");
+      const { data, error: rpcErr } = await supabase.rpc("reschedule_booking", {
+        target_booking_id: rescheduleBookingTarget.id,
+        new_scheduled_at: rescheduleSlot,
+        new_employee_id: rescheduleBookingTarget.employee_id,
+        reschedule_reason: rescheduleReason || "Customer requested reschedule"
+      });
+      if (rpcErr) throw rpcErr;
+
+      setBookings(prev => prev.map(b => b.id === rescheduleBookingTarget.id ? { ...b, scheduled_at: rescheduleSlot } : b));
+      setActionMessage(locale === "ar" ? "تمت إعادة جدولة الموعد بنجاح! وتم تحديث التذكيرات المجدولة." : "Appointment successfully rescheduled! Reminders updated.");
+      setRescheduleBookingTarget(null);
+    } catch (err: any) {
+      setRescheduleError(err?.message || "Failed to reschedule appointment.");
+    } finally {
+      setRescheduleLoading(false);
     }
   }
 
@@ -376,15 +450,29 @@ export default function CustomerBookingsPage() {
                   {t.details}
                 </button>
                 {activeTab === "upcoming" && (
-                  <button
-                    onClick={() => {
-                      setSelectedBooking(bk);
-                      setShowCancelModal(true);
-                    }}
-                    className="flex-1 lg:flex-initial px-4 py-2 bg-red-50 text-red-700 hover:bg-red-100 font-bold text-xs rounded-xl border border-red-200 transition duration-150"
-                  >
-                    {t.cancel}
-                  </button>
+                  <>
+                    <button
+                      onClick={() => {
+                        setRescheduleBookingTarget(bk);
+                        setRescheduleDate(new Date(Date.now() + 86400000).toISOString().split("T")[0]);
+                        setRescheduleSlot("");
+                        setRescheduleReason("");
+                        setRescheduleError("");
+                      }}
+                      className="flex-1 lg:flex-initial px-4 py-2 bg-amber-50 text-amber-800 hover:bg-amber-100 font-bold text-xs rounded-xl border border-amber-200 transition duration-150"
+                    >
+                      {t.reschedule}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedBooking(bk);
+                        setShowCancelModal(true);
+                      }}
+                      className="flex-1 lg:flex-initial px-4 py-2 bg-red-50 text-red-700 hover:bg-red-100 font-bold text-xs rounded-xl border border-red-200 transition duration-150"
+                    >
+                      {t.cancel}
+                    </button>
+                  </>
                 )}
                 {activeTab === "past" && (
                   <button
@@ -511,6 +599,115 @@ export default function CustomerBookingsPage() {
                 className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl transition"
               >
                 {t.yesCancel}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* RESCHEDULE MODAL (G21) */}
+      {rescheduleBookingTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-6">
+            <div className="flex justify-between items-start border-b border-gray-100 pb-4">
+              <div>
+                <h3 className="text-base font-bold text-gray-900">{t.rescheduleTitle}</h3>
+                <p className="text-xs text-gray-500 mt-1">
+                  {locale === "ar"
+                    ? rescheduleBookingTarget.services?.name_ar || rescheduleBookingTarget.services?.name_en
+                    : rescheduleBookingTarget.services?.name_en}
+                </p>
+              </div>
+              <button
+                onClick={() => setRescheduleBookingTarget(null)}
+                className="text-gray-400 hover:text-gray-600 font-bold text-sm"
+              >
+                ✕
+              </button>
+            </div>
+
+            {rescheduleError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-3">
+                {rescheduleError}
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {/* Date Input */}
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">{t.selectNewDate}</label>
+                <input
+                  type="date"
+                  min={new Date().toISOString().split("T")[0]}
+                  value={rescheduleDate}
+                  onChange={(e) => {
+                    setRescheduleDate(e.target.value);
+                    setRescheduleSlot("");
+                  }}
+                  className="w-full text-xs font-semibold p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1AF47]"
+                />
+              </div>
+
+              {/* Time Slots */}
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">{t.selectNewTime}</label>
+                {rescheduleSlots.length === 0 ? (
+                  <p className="text-xs text-gray-400 py-3">{t.noSlotsFound}</p>
+                ) : (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-48 overflow-y-auto p-1">
+                    {rescheduleSlots.map((slotIso) => {
+                      const timeStr = new Date(slotIso).toLocaleTimeString("en-GB", {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                      });
+                      const isSelected = rescheduleSlot === slotIso;
+                      return (
+                        <button
+                          key={slotIso}
+                          type="button"
+                          onClick={() => setRescheduleSlot(slotIso)}
+                          className={`py-2 px-2 text-xs font-bold rounded-xl border transition ${
+                            isSelected
+                              ? "bg-black text-white border-black"
+                              : "bg-gray-50 text-gray-800 border-gray-200 hover:border-gray-400"
+                          }`}
+                        >
+                          {timeStr}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Reason Input */}
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">{t.reasonOptional}</label>
+                <input
+                  type="text"
+                  placeholder={locale === "ar" ? "سبب إعادة الجدولة..." : "e.g. Schedule conflict..."}
+                  value={rescheduleReason}
+                  onChange={(e) => setRescheduleReason(e.target.value)}
+                  className="w-full text-xs p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1AF47]"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-4 pt-2">
+              <button
+                type="button"
+                onClick={() => setRescheduleBookingTarget(null)}
+                className="flex-1 py-2.5 border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-800 font-bold text-xs rounded-xl transition"
+              >
+                {t.close}
+              </button>
+              <button
+                type="button"
+                disabled={!rescheduleSlot || rescheduleLoading}
+                onClick={handleReschedule}
+                className="flex-1 py-2.5 bg-[#D1AF47] hover:bg-[#b89837] text-white font-bold text-xs rounded-xl transition disabled:opacity-50"
+              >
+                {rescheduleLoading ? t.rescheduling : t.confirmReschedule}
               </button>
             </div>
           </div>

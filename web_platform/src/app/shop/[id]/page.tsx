@@ -758,13 +758,28 @@ export default function ShopDetailsPage() {
 
       setIsLoadingSlots(true);
       try {
+        const { starts, ends } = getPrayerWindowsForDate(selectedDate);
+
+        if (selectedSpecialist.id === "any") {
+          // G20: Aggregated slots across all eligible staff at branch
+          const { data: branchSlots, error: branchErr } = await supabase.rpc("get_branch_available_slots", {
+            target_branch_id: shopId,
+            target_service_id: selectedService.id,
+            target_date: selectedDate,
+            prayer_window_starts: starts,
+            prayer_window_ends: ends
+          });
+          if (!branchErr && branchSlots) {
+            setDbSlots(branchSlots.map((s: any) => s.slot_start));
+            return;
+          }
+        }
+
         const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
         if (!uuidRegex.test(selectedSpecialist.id)) {
           throw new Error("Mock employee ID, skipping database slot fetch");
         }
 
-        const { starts, ends } = getPrayerWindowsForDate(selectedDate);
-        
         // Call the 5-arg overload RPC
         const { data, error } = await supabase.rpc("get_available_slots", {
           target_employee_id: selectedSpecialist.id,
@@ -990,7 +1005,7 @@ export default function ShopDetailsPage() {
       }
 
       const { data: booking, error: bookingError } = await supabase.rpc("create_booking", {
-        target_employee_id: selectedSpecialist.id,
+        target_employee_id: selectedSpecialist.id === "any" ? null : selectedSpecialist.id,
         target_service_id: selectedService.id,
         target_scheduled_at: toRiyadhTimestamp(selectedDate, selectedSlot),
         request_home_service: false,
@@ -1216,6 +1231,42 @@ export default function ShopDetailsPage() {
                       {t.specialistsTitle}
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Any Available Professional (G20) */}
+                      <div
+                        onClick={() => {
+                          setSelectedSpecialist({
+                            id: "any",
+                            name: { en: "Any Available Professional", ar: "أي أخصائي متاح" },
+                            role: { en: "First Available Staff", ar: "الأسرع توفراً من الفريق" },
+                            rating: 4.9,
+                            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"
+                          });
+                          setSelectedSlot("");
+                        }}
+                        className={`bg-white border rounded-2xl p-4 cursor-pointer transition duration-150 flex items-center gap-4 ${
+                          selectedSpecialist?.id === "any"
+                            ? "border-stone-950 shadow-sm ring-2 ring-[#D1AF47]"
+                            : "border-stone-200 hover:border-stone-400"
+                        }`}
+                      >
+                        <div className="w-12 h-12 rounded-full overflow-hidden bg-[#D1AF47]/15 flex items-center justify-center flex-shrink-0 border border-[#D1AF47]/40 text-[#D1AF47]">
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2m-10 0a4 4 0 11-8 0 4 4 0 018 0zm13-3h-6a3 3 0 00-3 3v2h12v-2a3 3 0 00-3-3z" />
+                          </svg>
+                        </div>
+                        <div className={`space-y-0.5 ${isRTL ? "text-right" : "text-left"}`}>
+                          <h4 className="font-bold text-stone-900 text-xs">
+                            {locale === "ar" ? "أي أخصائي متاح" : "Any Available Professional"}
+                          </h4>
+                          <p className="text-[10px] text-stone-400 font-semibold">
+                            {locale === "ar" ? "الأسرع توفراً من الفريق" : "First available specialist"}
+                          </p>
+                          <span className="text-[9px] text-[#D1AF47] font-black uppercase tracking-wider block">
+                            {locale === "ar" ? "موصى به" : "Recommended"}
+                          </span>
+                        </div>
+                      </div>
+
                       {shop.specialists.map((spec) => (
                         <div
                           key={spec.id}
