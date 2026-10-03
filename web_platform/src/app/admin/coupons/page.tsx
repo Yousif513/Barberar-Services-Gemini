@@ -281,7 +281,7 @@ export default function AdminCoupons() {
                   <td className="py-4 px-6 font-serif font-black">{c.count}</td>
                   <td className="py-4 px-6">
                     <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-block ${
-                      c.active ? "bg-[#ECFDF3] text-[#16A34A]" : "bg-[#FEF3F2] text-[#D92D20]"
+                      c.active ? "bg-[#ECFDF3] text-[#15803D]" : "bg-[#FEF3F2] text-[#B91C1C]"
                     }`}>{c.active ? t.active : t.expired}</span>
                   </td>
                   <td className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>

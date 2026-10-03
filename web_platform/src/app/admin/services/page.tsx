@@ -543,8 +543,8 @@ export default function AdminServices() {
                     <td className="py-4 px-6">
                       <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-block ${
                         item.is_active 
-                          ? "bg-[#ECFDF3] text-[#16A34A]" 
-                          : "bg-[#FEF3F2] text-[#D92D20]"
+                          ? "bg-[#ECFDF3] text-[#15803D]" 
+                          : "bg-[#FEF3F2] text-[#B91C1C]"
                       }`}>
                         {item.is_active ? t.active : t.inactive}
                       </span>

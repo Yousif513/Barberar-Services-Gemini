@@ -72,64 +72,54 @@ export default function CustomerNotificationsPage() {
         .order("created_at", { ascending: false });
 
       if (notifyError) throw notifyError;
-      setNotifications(data || []);
+      const mapped = (data || []).map((n: any) => ({
+        id: n.id,
+        type: n.type || "booking",
+        title_en: n.title_en,
+        title_ar: n.title_ar,
+        content_en: n.body_en || n.content_en,
+        content_ar: n.body_ar || n.content_ar,
+        is_read: n.read ?? n.is_read ?? false,
+        created_at: n.created_at
+      }));
+      setNotifications(mapped);
     } catch (err: any) {
-      console.warn("Using premium fallback notifications list:", err.message);
-      setError("Displaying offline cache notifications.");
-
-      setNotifications([
-        {
-          id: "notif-1",
-          type: "booking",
-          title_en: "Appointment Confirmed",
-          title_ar: "تم تأكيد الموعد",
-          content_en: "Your appointment with Marcus Vance at Elite Grooming Lounge is confirmed for tomorrow at 2:00 PM.",
-          content_ar: "تم تأكيد موعدك مع ماركوس فانس في صالون إيليت الرجالي ليوم غد الساعة 2:00 مساءً.",
-          is_read: false,
-          created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() // 2 hours ago
-        },
-        {
-          id: "notif-2",
-          type: "chat",
-          title_en: "Elena Rostova sent you a message",
-          title_ar: "أرسلت لك إيلينا روستوفا رسالة",
-          content_en: "Elena says: 'Please make sure to arrive 10 minutes prior to your facial appointment.'",
-          content_ar: "تقول إيلينا: 'يرجى التأكد من الحضور قبل 10 دقائق من موعد علاج البشرة.'",
-          is_read: false,
-          created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString() // 5 hours ago
-        },
-        {
-          id: "notif-3",
-          type: "promo",
-          title_en: "Special Riyadh Apothecary Weekend Offer",
-          title_ar: "عرض عطلة نهاية الأسبوع الخاص من صيدلية وعطارة الرياض",
-          content_en: "Get a free hydrating face mask add-on on bookings above 200 SAR this weekend.",
-          content_ar: "احصل على قناع ترطيب مجاني للوجه عند الحجز بأكثر من 200 ريال في عطلة نهاية الأسبوع.",
-          is_read: true,
-          created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() // 1 day ago
-        },
-        {
-          id: "notif-4",
-          type: "system",
-          title_en: "Escrow Released Securely",
-          title_ar: "تحرير ضمان الدفع بأمان",
-          content_en: "Escrow payment of 350 SAR for booking #bk-200 has been securely released to Riyadh Premium Spa & Wellness.",
-          content_ar: "تم تحرير دفعة الضمان البالغة 350 ريال للحجز #bk-200 بأمان لصالح سبا الرياض الفاخر للعناية.",
-          is_read: true,
-          created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() // 5 days ago
-        }
-      ]);
+      console.warn("Failed to load notifications:", err.message);
+      setError(err?.message || "Failed to sync notifications from server.");
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
   }
 
-  const markAllAsRead = () => {
+  const markAllAsRead = async () => {
     setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase
+          .from("notifications")
+          .update({ read: true })
+          .eq("user_id", user.id);
+      }
+    } catch (e) {
+      console.warn("Failed to mark all as read:", e);
+    }
   };
 
-  const toggleReadStatus = (id: string) => {
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: !n.is_read } : n));
+  const toggleReadStatus = async (id: string) => {
+    const target = notifications.find(n => n.id === id);
+    if (!target) return;
+    const newStatus = !target.is_read;
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: newStatus } : n));
+    try {
+      await supabase
+        .from("notifications")
+        .update({ read: newStatus })
+        .eq("id", id);
+    } catch (e) {
+      console.warn("Failed to update notification status:", e);
+    }
   };
 
   const removeNotification = (id: string) => {

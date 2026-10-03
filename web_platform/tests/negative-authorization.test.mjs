@@ -490,6 +490,89 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(bookingsCode.includes("confirm_attendance"), "Must check for confirm_attendance URL parameter");
     });
   });
+
+  describe("P1-A · Platform Hygiene, Data Integrity & Security Tests (G31, G32, G40, G39)", () => {
+    it("migration creates missing tables with strict RLS and constraints (G31)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004000000_platform_hygiene_data_integrity.sql"),
+        "utf8"
+      );
+      // notifications table
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.notifications"), "Must create notifications table");
+      assert.ok(migrationCode.includes("ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY"), "Must enable RLS on notifications");
+      assert.ok(migrationCode.includes("user_id = auth.uid()"), "Must restrict notifications to recipient");
+
+      // expo_push_tokens table
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.expo_push_tokens"), "Must create expo_push_tokens table");
+      assert.ok(migrationCode.includes("ALTER TABLE public.expo_push_tokens ENABLE ROW LEVEL SECURITY"), "Must enable RLS on expo_push_tokens");
+      assert.ok(migrationCode.includes("token VARCHAR(255) NOT NULL UNIQUE"), "Must have unique constraint on token");
+
+      // provider_customer_notes table
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.provider_customer_notes"), "Must create provider_customer_notes table");
+      assert.ok(migrationCode.includes("ALTER TABLE public.provider_customer_notes ENABLE ROW LEVEL SECURITY"), "Must enable RLS on provider_customer_notes");
+      assert.ok(migrationCode.includes("UNIQUE (provider_id, customer_id)"), "Must have unique constraint on provider-customer note");
+
+      // provider_promos table
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.provider_promos"), "Must create provider_promos table");
+      assert.ok(migrationCode.includes("ALTER TABLE public.provider_promos ENABLE ROW LEVEL SECURITY"), "Must enable RLS on provider_promos");
+    });
+
+    it("send-push edge function eliminates wildcard CORS and uses allowlist (G40)", () => {
+      const pushCode = readFileSync(
+        join(rootDir, "supabase/functions/send-push/index.ts"),
+        "utf8"
+      );
+      assert.ok(!pushCode.includes('"Access-Control-Allow-Origin": "*"'), "Forbidden: wildcard CORS in send-push");
+      assert.ok(pushCode.includes("getCorsHeaders"), "Must use dynamic CORS allowlist helper");
+      assert.ok(pushCode.includes("Authorization"), "Must verify caller authorization");
+    });
+
+    it("developer console hashes tokens with SHA-256 and removes simulated accounts (G40, G69)", () => {
+      const devCode = readFileSync(
+        join(webPlatformDir, "src/app/developer/page.tsx"),
+        "utf8"
+      );
+      assert.ok(devCode.includes("hashToken"), "Must have SHA-256 hashToken function");
+      assert.ok(devCode.includes("SHA-256"), "Must use SHA-256 algorithm");
+      assert.ok(!devCode.includes("dev-mock-profile"), "Must remove mock developer profile");
+      assert.ok(!devCode.includes("tk-mock-1"), "Must remove mock API tokens");
+      assert.ok(!devCode.includes("wh-mock-1"), "Must remove mock webhooks");
+      assert.ok(devCode.includes("is_approved: false"), "Must require admin audit/approval for tokens");
+    });
+
+    it("admin screens enforce SAR-only currency without dollar signs (G32)", () => {
+      const adminDashboard = readFileSync(join(webPlatformDir, "src/app/admin/page.tsx"), "utf8");
+      assert.ok(!adminDashboard.includes("tooltipItem.raw} $"), "No USD $ symbol in dashboard chart tooltip");
+
+      const adminBookings = readFileSync(join(webPlatformDir, "src/app/admin/bookings/page.tsx"), "utf8");
+      assert.ok(!adminBookings.includes(`text-[#D1AF47] text-[10px] font-black">\n            $`), "No USD $ symbol in KPI badge");
+      assert.ok(adminBookings.includes(`{lang === "ar" ? "ر.س" : "SAR"}`), "Must render SAR currency");
+    });
+
+    it("CRM, promotions and notifications connect to real tables without mock fallbacks (G31, G32)", () => {
+      const promoCode = readFileSync(join(webPlatformDir, "src/app/provider/promotions/page.tsx"), "utf8");
+      assert.ok(!promoCode.includes('"promo-1"'), "Must not use mock promo-1");
+      assert.ok(!promoCode.includes('"promo-2"'), "Must not use mock promo-2");
+      assert.ok(promoCode.includes('from("provider_promos")'), "Must query real provider_promos");
+
+      const custCode = readFileSync(join(webPlatformDir, "src/app/provider/customers/page.tsx"), "utf8");
+      assert.ok(!custCode.includes('"cust-1"'), "Must not use mock cust-1");
+      assert.ok(!custCode.includes('"cust-2"'), "Must not use mock cust-2");
+      assert.ok(custCode.includes('from("provider_customer_notes")'), "Must query real provider_customer_notes");
+
+      const notifCode = readFileSync(join(webPlatformDir, "src/app/customer/notifications/page.tsx"), "utf8");
+      assert.ok(!notifCode.includes("Escrow funds released"), "Must not use fake escrow mock notification");
+      assert.ok(notifCode.includes('from("notifications")'), "Must query real notifications table");
+    });
+
+    it("admin layout includes responsive mobile drawer and WCAG AA focus rings (G39)", () => {
+      const layoutCode = readFileSync(join(webPlatformDir, "src/app/admin/layout.tsx"), "utf8");
+      assert.ok(layoutCode.includes("mobileMenuOpen"), "Must have mobileMenuOpen state");
+      assert.ok(layoutCode.includes("md:hidden"), "Must have mobile-specific responsive containers");
+      assert.ok(layoutCode.includes("focus-visible:ring-[#D1AF47]"), "Must have WCAG AA focus rings");
+    });
+  });
 });
+
 
 

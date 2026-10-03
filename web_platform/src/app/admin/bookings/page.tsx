@@ -249,8 +249,8 @@ export default function AdminBookings() {
         <div className={cardBase}>
           <div className={`flex items-center justify-between ${flip}`}>
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{t.totalVolume}</span>
-            <div className="w-8 h-8 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center text-[#D1AF47] font-serif text-xs font-black">
-              $
+            <div className="w-8 h-8 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center text-[#D1AF47] text-[10px] font-black">
+              {lang === "ar" ? "ر.س" : "SAR"}
             </div>
           </div>
           <strong className="block text-2xl font-serif font-black text-gray-900 mt-2.5">
@@ -351,12 +351,12 @@ export default function AdminBookings() {
                       <td className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>
                         <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-block ${
                           b.status === "confirmed"
-                            ? "bg-[#ECFDF3] text-[#16A34A]"
+                            ? "bg-[#ECFDF3] text-[#15803D]"
                             : b.status === "completed"
-                            ? "bg-gray-100 text-gray-600"
+                            ? "bg-gray-100 text-gray-700"
                             : b.status === "pending_payment"
-                            ? "bg-[#FFFAEB] text-[#F59E0B]"
-                            : "bg-[#FEF3F2] text-[#EF4444]"
+                            ? "bg-[#FFFAEB] text-[#B45309]"
+                            : "bg-[#FEF3F2] text-[#B91C1C]"
                         }`}>
                           {lang === "ar" ? (
                             b.status === "confirmed" ? "مؤكد" : b.status === "completed" ? "مكتمل" : b.status === "pending_payment" ? "انتظار الدفع" : "ملغى / مسترد"

@@ -183,57 +183,12 @@ export default function ProviderCustomersPage() {
           return;
         }
       }
-      throw new Error("No provider active");
+      setClients([]);
     } catch (err: any) {
-      console.warn("Using default CRM clients list due to offline sandbox session:", err.message);
-      setError("Displaying local customer records.");
+      console.warn("Failed to load CRM customers:", err.message);
+      setError(err?.message || "Failed to load CRM customers from server.");
+      setClients([]);
 
-      // Set mock client data with detailed bookings
-      const now = Date.now();
-      setClients([
-        {
-          id: "cust-1",
-          name: "Yousif Al-Saud",
-          phone: "+966 50 123 4567",
-          bookingsCount: 4,
-          totalSpend: 940,
-          lastVisit: new Date(now - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          intakeNotes: "Prefers low skin fade on beard, hot steam towel, and light styling cream. Highly sensitive to alcohol-based products.",
-          bookings: [
-            { id: "b1-1", total_price: 250, scheduled_at: new Date(now - 2 * 24 * 60 * 60 * 1000).toISOString() },
-            { id: "b1-2", total_price: 300, scheduled_at: new Date(now - 10 * 24 * 60 * 60 * 1000).toISOString() },
-            { id: "b1-3", total_price: 190, scheduled_at: new Date(now - 25 * 24 * 60 * 60 * 1000).toISOString() },
-            { id: "b1-4", total_price: 200, scheduled_at: new Date(now - 40 * 24 * 60 * 60 * 1000).toISOString() },
-          ]
-        },
-        {
-          id: "cust-2",
-          name: "Abdulrahman K.",
-          phone: "+966 54 888 1234",
-          bookingsCount: 2,
-          totalSpend: 300,
-          lastVisit: new Date(now - 5 * 24 * 60 * 60 * 1000).toISOString(),
-          intakeNotes: "Classic haircut. Prefers scheduling morning appointments.",
-          bookings: [
-            { id: "b2-1", total_price: 150, scheduled_at: new Date(now - 5 * 24 * 60 * 60 * 1000).toISOString() },
-            { id: "b2-2", total_price: 150, scheduled_at: new Date(now - 18 * 24 * 60 * 60 * 1000).toISOString() },
-          ]
-        },
-        {
-          id: "cust-3",
-          name: "Khalid M.",
-          phone: "+966 53 111 2222",
-          bookingsCount: 3,
-          totalSpend: 1050,
-          lastVisit: new Date(now - 12 * 24 * 60 * 60 * 1000).toISOString(),
-          intakeNotes: "Deep hydration facials, prefers quiet room environments, likes herbal tea service.",
-          bookings: [
-            { id: "b3-1", total_price: 400, scheduled_at: new Date(now - 12 * 24 * 60 * 60 * 1000).toISOString() },
-            { id: "b3-2", total_price: 350, scheduled_at: new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString() },
-            { id: "b3-3", total_price: 300, scheduled_at: new Date(now - 50 * 24 * 60 * 60 * 1000).toISOString() },
-          ]
-        }
-      ]);
     } finally {
       setLoading(false);
     }
@@ -266,9 +221,8 @@ export default function ProviderCustomersPage() {
       setClients(prev => prev.map(c => c.id === editingClient.id ? { ...c, intakeNotes: noteText } : c));
       setEditingClient(null);
     } catch (err: any) {
-      console.warn("Saving notes locally for preview simulation:", err.message);
-      setClients(prev => prev.map(c => c.id === editingClient.id ? { ...c, intakeNotes: noteText } : c));
-      setEditingClient(null);
+      console.error("Failed to save customer notes:", err.message);
+      setError(err?.message || "Failed to persist customer notes to database.");
     }
   }
 

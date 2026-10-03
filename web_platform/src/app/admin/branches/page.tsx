@@ -176,7 +176,7 @@ export default function AdminBranches() {
                   <td className="py-4 px-6">{lang === "ar" ? b.locationAr : b.locationEn}</td>
                   <td className="py-4 px-6">
                     <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-block ${
-                      b.active ? "bg-[#ECFDF3] text-[#16A34A]" : "bg-[#FEF3F2] text-[#D92D20]"
+                      b.active ? "bg-[#ECFDF3] text-[#15803D]" : "bg-[#FEF3F2] text-[#B91C1C]"
                     }`}>{b.active ? t.active : t.inactive}</span>
                   </td>
                   <td className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>

@@ -122,7 +122,7 @@ export default function AdminPackages() {
                   <td className="py-4 px-6 font-serif font-black text-gray-900">{p.price} {lang === "ar" ? "ريال" : "SAR"}</td>
                   <td className="py-4 px-6 font-serif font-black">{p.redemptions}</td>
                   <td className="py-4 px-6">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-block ${p.is_active ? "bg-[#ECFDF3] text-[#16A34A]" : "bg-[#FEF3F2] text-[#D92D20]"}`}>{p.is_active ? t.active : t.inactive}</span>
+                    <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-block ${p.is_active ? "bg-[#ECFDF3] text-[#15803D]" : "bg-[#FEF3F2] text-[#B91C1C]"}`}>{p.is_active ? t.active : t.inactive}</span>
                   </td>
                   <td className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>
                     <button onClick={() => handleToggle(p.id)} className="px-3 py-1.5 bg-gray-900 text-white rounded-lg text-[10px] uppercase font-black tracking-wider hover:bg-gray-800 transition">{t.verifyBtn}</button>

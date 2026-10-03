@@ -174,9 +174,14 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const [locale, setLocale] = useState<"en" | "ar">("en");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const t = translations[locale];
   const isRTL = locale === "ar";
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     const savedLang = localStorage.getItem("primora_lang") as "en" | "ar";
@@ -235,135 +240,219 @@ export default function AdminLayout({
         { nameKey: "integrations", path: "/admin/integrations" },
         { nameKey: "settings", path: "/admin/settings" }
       ]
-    }  ];
+    }
+  ];
+
+  const renderSidebarContent = (isMobile: boolean) => (
+    <div className="primora-dashboard-sidebar flex h-full w-full flex-col rounded-[28px] border border-[#E0C46A]/60 bg-[#10120F] p-5 text-white shadow-[0_24px_70px_rgba(16,18,15,0.28),0_0_46px_rgba(209,175,71,0.24)] md:w-[280px]">
+      {/* Logo & ADMN Badge & optional Close Button on mobile */}
+      <div className={`flex flex-shrink-0 items-center justify-between gap-3 px-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+        <Link 
+          href="/" 
+          onClick={() => isMobile && setMobileMenuOpen(false)}
+          className={`flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1AF47] ${isRTL ? "flex-row-reverse" : "flex-row"}`}
+        >
+          <svg className="w-5.5 h-5.5 text-[#D1AF47]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+          </svg>
+          <span className="text-xl font-serif font-black tracking-[0.2em] text-[#D1AF47] hover:text-[#E0C46A] transition-colors duration-300">
+            PRIMORA
+          </span>
+        </Link>
+        <div className="flex items-center gap-2">
+          <span className="rounded-full border border-[#D1AF47]/40 bg-[#D1AF47]/15 px-2.5 py-1 text-[8px] font-black uppercase tracking-wide text-[#F4E7B6]">
+            ADMN
+          </span>
+          {isMobile && (
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-label={locale === "ar" ? "إغلاق" : "Close"}
+              className="p-1 rounded-lg text-[#9C9688] hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1AF47]"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Grouped Links (Scrollable) */}
+      <nav className="mt-6 min-h-0 flex-1 space-y-3 overflow-y-auto pe-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {navSections.map((sec) => (
+          <div key={sec.titleKey} className="space-y-1">
+            <span className={`block px-4 text-[9px] font-bold text-[#9C9688] uppercase tracking-widest ${isRTL ? "text-right" : "text-left"}`}>
+              {t[sec.titleKey as keyof typeof t] || sec.titleKey.toUpperCase()}
+            </span>
+            <div className="space-y-0.5">
+              {sec.items.map((item) => {
+                const isActive = item.path === "/admin"
+                  ? pathname === "/admin" || pathname === "/admin/"
+                  : pathname.startsWith(item.path);
+
+                return (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    onClick={() => isMobile && setMobileMenuOpen(false)}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`group relative flex items-center gap-3.5 px-4 py-3 rounded-[18px] text-[13px] font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1AF47] ${
+                      isActive
+                        ? "border border-[#E0C46A]/50 bg-[#D1AF47]/20 text-[#F4E7B6] shadow-[0_0_34px_rgba(209,175,71,0.34),inset_0_0_18px_rgba(244,231,182,0.08)]"
+                        : "text-[#D9D4C8] hover:bg-white/[0.06] hover:text-white"
+                    } ${isRTL ? "flex-row-reverse text-right" : "flex-row text-left"}`}
+                  >
+                    <span className={`flex-shrink-0 transition-colors duration-300 ${isActive ? "text-[#E0C46A]" : "text-[#8F8A80] group-hover:text-[#D1AF47]"}`}>
+                      {getNavIcon(item.nameKey)}
+                    </span>
+                    <span className="flex-grow">{t[item.nameKey as keyof typeof t] || item.nameKey}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </nav>
+
+      {/* Sidebar Footer - Support & Admin Profile */}
+      <div className="mt-3 flex-shrink-0 space-y-3 border-t border-white/10 pt-3">
+        <Link
+          href="/admin/settings"
+          onClick={() => isMobile && setMobileMenuOpen(false)}
+          className="flex items-center justify-between p-3 bg-[#14120E]/80 border border-[#E0C46A]/60 rounded-2xl group hover:border-[#E0C46A]/70 transition-all duration-300 shadow-[0_0_38px_rgba(209,175,71,0.24),inset_0_0_18px_rgba(244,231,182,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1AF47]"
+        >
+          <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <div className="w-8 h-8 rounded-xl bg-[#D1AF47]/15 border border-[#D1AF47]/40 flex items-center justify-center text-[#F4E7B6] group-hover:text-[#D1AF47] transition duration-300">
+              <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 0A5 5 0 1110.12 10.12l3.536-3.536m0 0L20 4M9 15l-3 3m0 0l-3-3m3 3V9" />
+              </svg>
+            </div>
+            <div className={`${isRTL ? "text-right" : "text-left"}`}>
+              <h5 className="text-[11px] font-bold text-[#F4E7B6] leading-none">{t.helpTitle}</h5>
+              <p className="text-[9px] text-[#D9D4C8] font-semibold mt-0.5">{t.helpSubtitle}</p>
+            </div>
+          </div>
+          <svg className={`w-3 h-3 text-[#D9D4C8] group-hover:text-[#D1AF47] transition duration-300 ${isRTL ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </Link>
+
+        <div className={`flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+          <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <div className="w-9 h-9 rounded-full overflow-hidden border border-[#D1AF47]/25 bg-[#F4E7B6]/15 flex-shrink-0">
+              <img
+                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"
+                alt="Admin Root"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+              <div className="w-full h-full flex items-center justify-center text-[#F4E7B6] font-black text-xs">
+                AR
+              </div>
+            </div>
+            <div className={`min-w-0 ${isRTL ? "text-right" : "text-left"}`}>
+              <p className="text-[9px] text-[#9C9688] uppercase font-bold tracking-widest leading-none mb-0.5">{t.adminHub}</p>
+              <p className="text-xs font-black text-white leading-tight truncate max-w-[120px]">{t.welcome}</p>
+            </div>
+          </div>
+          <button
+            aria-label={t.logout}
+            title={t.logout}
+            onClick={async () => {
+              try { await supabase.auth.signOut(); } catch {}
+              clearDevRole();
+              window.location.href = "/login";
+            }}
+            className="p-2 rounded-xl text-[#D9D4C8] hover:bg-[#EF4444]/15 hover:text-[#F87171] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1AF47] transition-all duration-300"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <AuthGuard allowedRoles={["admin"]}>
       <div className="primora-dashboard-skin flex flex-col md:flex-row bg-[#F7F6F3] text-black font-sans selection:bg-[#D1AF47] selection:text-white md:h-screen md:overflow-hidden">
         
         {/* ═══════════════════════════════════════════════════════ */}
-        {/* SIDEBAR — Solid dark obsidian sidebar full-height       */}
+        {/* MOBILE TOP BAR (visible on screens < md)                */}
         {/* ═══════════════════════════════════════════════════════ */}
-        <aside className="flex-shrink-0 p-4 md:h-screen">
-          <div className="primora-dashboard-sidebar flex h-full w-full flex-col rounded-[28px] border border-[#E0C46A]/60 bg-[#10120F] p-5 text-white shadow-[0_24px_70px_rgba(16,18,15,0.28),0_0_46px_rgba(209,175,71,0.24)] md:w-[280px]">
-          
-          {/* Logo & ADMN Badge */}
-          <div className={`flex flex-shrink-0 items-center justify-between gap-3 px-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-            <Link href="/" className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <svg className="w-5.5 h-5.5 text-[#D1AF47]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <header className="md:hidden flex items-center justify-between px-4 py-3 bg-[#10120F] text-white border-b border-[#E0C46A]/30 flex-shrink-0 z-30 shadow-md">
+          <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <Link 
+              href="/" 
+              className={`flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1AF47] rounded-lg ${isRTL ? "flex-row-reverse" : "flex-row"}`}
+            >
+              <svg className="w-5 h-5 text-[#D1AF47]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
               </svg>
-              <span className="text-xl font-serif font-black tracking-[0.2em] text-[#D1AF47] hover:text-[#E0C46A] transition-colors duration-300">
+              <span className="text-lg font-serif font-black tracking-[0.18em] text-[#D1AF47]">
                 PRIMORA
               </span>
             </Link>
-            <span className="rounded-full border border-[#D1AF47]/40 bg-[#D1AF47]/15 px-2.5 py-1 text-[8px] font-black uppercase tracking-wide text-[#F4E7B6]">
+            <span className="rounded-full border border-[#D1AF47]/40 bg-[#D1AF47]/15 px-2 py-0.5 text-[8px] font-black uppercase text-[#F4E7B6]">
               ADMN
             </span>
           </div>
 
-          {/* Grouped Links (Scrollable) */}
-          <nav className="mt-6 min-h-0 flex-1 space-y-3 overflow-y-auto pe-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {navSections.map((sec) => (
-              <div key={sec.titleKey} className="space-y-1">
-                <span className={`block px-4 text-[9px] font-bold text-[#9C9688] uppercase tracking-widest ${isRTL ? "text-right" : "text-left"}`}>
-                  {t[sec.titleKey as keyof typeof t] || sec.titleKey.toUpperCase()}
-                </span>
-                <div className="space-y-0.5">
-                  {sec.items.map((item) => {
-                    const isActive = item.path === "/admin"
-                      ? pathname === "/admin" || pathname === "/admin/"
-                      : pathname.startsWith(item.path);
-
-                    return (
-                      <Link
-                        key={item.path}
-                        href={item.path}
-                        aria-current={isActive ? "page" : undefined}
-                        className={`group relative flex items-center gap-3.5 px-4 py-3 rounded-[18px] text-[13px] font-semibold transition-all duration-300 ${
-                          isActive
-                            ? "border border-[#E0C46A]/50 bg-[#D1AF47]/20 text-[#F4E7B6] shadow-[0_0_34px_rgba(209,175,71,0.34),inset_0_0_18px_rgba(244,231,182,0.08)]"
-                            : "text-[#D9D4C8] hover:bg-white/[0.06] hover:text-white"
-                        } ${isRTL ? "flex-row-reverse text-right" : "flex-row text-left"}`}
-                      >
-                        <span className={`flex-shrink-0 transition-colors duration-300 ${isActive ? "text-[#E0C46A]" : "text-[#8F8A80] group-hover:text-[#D1AF47]"}`}>
-                          {getNavIcon(item.nameKey)}
-                        </span>
-                        <span className="flex-grow">{t[item.nameKey as keyof typeof t] || item.nameKey}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </nav>
-
-          {/* Sidebar Footer - Support & Admin Profile */}
-          <div className="mt-3 flex-shrink-0 space-y-3 border-t border-white/10 pt-3">
-            <Link
-              href="/admin/settings"
-              className="flex items-center justify-between p-3 bg-[#14120E]/80 border border-[#E0C46A]/60 rounded-2xl group hover:border-[#E0C46A]/70 transition-all duration-300 shadow-[0_0_38px_rgba(209,175,71,0.24),inset_0_0_18px_rgba(244,231,182,0.08)]"
-            >
-              <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <div className="w-8 h-8 rounded-xl bg-[#D1AF47]/15 border border-[#D1AF47]/40 flex items-center justify-center text-[#F4E7B6] group-hover:text-[#D1AF47] transition duration-300">
-                  <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 0A5 5 0 1110.12 10.12l3.536-3.536m0 0L20 4M9 15l-3 3m0 0l-3-3m3 3V9" />
-                  </svg>
-                </div>
-                <div className={`${isRTL ? "text-right" : "text-left"}`}>
-                  <h5 className="text-[11px] font-bold text-[#F4E7B6] leading-none">{t.helpTitle}</h5>
-                  <p className="text-[9px] text-[#D9D4C8] font-semibold mt-0.5">{t.helpSubtitle}</p>
-                </div>
-              </div>
-              <svg className={`w-3 h-3 text-[#D9D4C8] group-hover:text-[#D1AF47] transition duration-300 ${isRTL ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? (locale === "ar" ? "إغلاق القائمة" : "Close navigation") : (locale === "ar" ? "فتح القائمة" : "Open navigation")}
+            aria-expanded={mobileMenuOpen}
+            className="p-2 rounded-xl text-[#D9D4C8] hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1AF47] transition-colors"
+          >
+            {mobileMenuOpen ? (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </Link>
+            ) : (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
+        </header>
 
-            <div className={`flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <div className="w-9 h-9 rounded-full overflow-hidden border border-[#D1AF47]/25 bg-[#F4E7B6]/15 flex-shrink-0">
-                  <img
-                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"
-                    alt="Admin Root"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                  <div className="w-full h-full flex items-center justify-center text-[#F4E7B6] font-black text-xs">
-                    AR
-                  </div>
-                </div>
-                <div className={`min-w-0 ${isRTL ? "text-right" : "text-left"}`}>
-                  <p className="text-[9px] text-[#9C9688] uppercase font-bold tracking-widest leading-none mb-0.5">{t.adminHub}</p>
-                  <p className="text-xs font-black text-white leading-tight truncate max-w-[120px]">{t.welcome}</p>
-                </div>
-              </div>
-              <button
-                aria-label={t.logout}
-                title={t.logout}
-                onClick={async () => {
-                  try { await supabase.auth.signOut(); } catch {}
-                  clearDevRole();
-                  window.location.href = "/login";
-                }}
-                className="p-2 rounded-xl text-[#D9D4C8] hover:bg-[#EF4444]/15 hover:text-[#F87171] transition-all duration-300"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-              </button>
-            </div>
-          </div>
-          </div>
+        {/* ═══════════════════════════════════════════════════════ */}
+        {/* MOBILE DRAWER (Slide-over overlay on screens < md)      */}
+        {/* ═══════════════════════════════════════════════════════ */}
+        {mobileMenuOpen && (
+          <div
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden transition-opacity duration-300"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+
+        <aside
+          className={`fixed inset-y-0 ${isRTL ? "right-0" : "left-0"} z-50 w-72 max-w-[85vw] transform transition-transform duration-300 ease-in-out md:hidden p-3 flex flex-col ${
+            mobileMenuOpen ? "translate-x-0" : isRTL ? "translate-x-full" : "-translate-x-full"
+          }`}
+          aria-label="Mobile Navigation Drawer"
+        >
+          {renderSidebarContent(true)}
+        </aside>
+
+        {/* ═══════════════════════════════════════════════════════ */}
+        {/* DESKTOP SIDEBAR — Solid dark obsidian sidebar           */}
+        {/* ═══════════════════════════════════════════════════════ */}
+        <aside className="hidden md:flex flex-shrink-0 p-4 md:h-screen">
+          {renderSidebarContent(false)}
         </aside>
 
         {/* ═══════════════════════════════════════════════════════ */}
         {/* MAIN PANEL CONTENT                                      */}
         {/* ═══════════════════════════════════════════════════════ */}
         <div className="flex min-w-0 flex-1 flex-col md:overflow-hidden">
-          <main className="primora-dashboard-content flex-grow p-6 md:overflow-y-auto">
+          <main className="primora-dashboard-content flex-grow p-4 md:p-6 md:overflow-y-auto">
             <div className="max-w-[1500px] mx-auto h-full">
               {children}
             </div>

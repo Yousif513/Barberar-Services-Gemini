@@ -145,36 +145,24 @@ export default function ProviderPromotionsPage() {
           .order("created_at", { ascending: false });
 
         if (fetchError) throw fetchError;
-        setPromos(data || []);
+        const mapped = (data || []).map((p: any) => ({
+          id: p.id,
+          code: p.promo_code || p.code,
+          type: p.discount_type || p.type || "percentage",
+          value: Number(p.discount_value || p.value || 0),
+          expires_at: p.expires_at,
+          description: `[${p.target_segment || "all"}]`,
+          usage_count: p.usage_count || 0,
+          is_active: p.status === "active"
+        }));
+        setPromos(mapped);
         return;
       }
-      throw new Error("No provider active");
+      setPromos([]);
     } catch (err: any) {
-      console.warn("Using offline promotions list due to local sandbox constraints:", err.message);
-      setError("Displaying local campaign records.");
-
-      setPromos([
-        {
-          id: "promo-1",
-          code: "PRIMORA15",
-          type: "percentage",
-          value: 15,
-          expires_at: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString(),
-          description: "[vip] 15% off first booking on the marketplace platform.",
-          usage_count: 48,
-          is_active: true
-        },
-        {
-          id: "promo-2",
-          code: "SUMMERFREE",
-          type: "fixed",
-          value: 50,
-          expires_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-          description: "[all] 50 SAR discount on premium wellness retreats.",
-          usage_count: 120,
-          is_active: false
-        }
-      ]);
+      console.warn("Failed to load provider promotions:", err.message);
+      setError(err?.message || "Failed to sync campaign records from server.");
+      setPromos([]);
     } finally {
       setLoading(false);
     }
@@ -184,11 +172,9 @@ export default function ProviderPromotionsPage() {
     e.preventDefault();
     if (!code || !value || !expiry) return;
 
-    const finalDesc = targetSegment !== "all" ? `[${targetSegment}] ${description}` : description;
-
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user");
+      if (!user) throw new Error("No authenticated provider user.");
 
       const { data: providerInfo } = await supabase
         .from("providers")
@@ -201,19 +187,31 @@ export default function ProviderPromotionsPage() {
           .from("provider_promos")
           .insert({
             provider_id: providerInfo.id,
-            code: code.toUpperCase(),
-            type,
-            value: parseFloat(value),
+            promo_code: code.toUpperCase().trim(),
+            discount_type: type,
+            discount_value: parseFloat(value),
             expires_at: new Date(expiry).toISOString(),
-            description: finalDesc,
-            usage_count: 0,
-            is_active: true
+            status: "active",
+            target_segment: targetSegment,
+            usage_count: 0
           })
           .select()
           .single();
 
         if (insertError) throw insertError;
-        setPromos(prev => [newPromo, ...prev]);
+        if (newPromo) {
+          const mappedItem = {
+            id: newPromo.id,
+            code: newPromo.promo_code,
+            type: newPromo.discount_type,
+            value: Number(newPromo.discount_value),
+            expires_at: newPromo.expires_at,
+            description: `[${newPromo.target_segment || "all"}]`,
+            usage_count: 0,
+            is_active: newPromo.status === "active"
+          };
+          setPromos(prev => [mappedItem, ...prev]);
+        }
       }
 
       setCode("");
@@ -223,24 +221,8 @@ export default function ProviderPromotionsPage() {
       setTargetSegment("all");
       setShowForm(false);
     } catch (err: any) {
-      console.warn("Creating promotion locally for simulation preview:", err.message);
-      const simulatedPromo = {
-        id: `promo-sim-${Date.now()}`,
-        code: code.toUpperCase(),
-        type,
-        value: parseFloat(value),
-        expires_at: new Date(expiry).toISOString(),
-        description: finalDesc,
-        usage_count: 0,
-        is_active: new Date(expiry) > new Date()
-      };
-      setPromos(prev => [simulatedPromo, ...prev]);
-      setCode("");
-      setValue("");
-      setExpiry("");
-      setDescription("");
-      setTargetSegment("all");
-      setShowForm(false);
+      console.error("Failed to create promotion:", err.message);
+      setError(err?.message || "Failed to publish promotional campaign.");
     }
   }
 

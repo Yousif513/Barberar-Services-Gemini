@@ -697,7 +697,7 @@ export default function AdminDashboardPage() {
                   {isRTL ? chartPoints[activeIndex].dateAr : chartPoints[activeIndex].dateEn}
                 </p>
                 <p className="text-white font-black text-xs">
-                  ${chartPoints[activeIndex].valueThis.toLocaleString()}
+                  {chartPoints[activeIndex].valueThis.toLocaleString()} {isRTL ? "ر.س" : "SAR"}
                 </p>
               </div>
             )}

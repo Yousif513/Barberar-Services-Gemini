@@ -97,6 +97,14 @@ interface WebhookItem {
   secret_key: string;
 }
 
+async function hashToken(plainToken: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(plainToken);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 export default function DeveloperConsolePage() {
   const [locale, setLocale] = useState<"en" | "ar">("en");
   const [activeTab, setActiveTab] = useState<"tokens" | "webhooks">("tokens");
@@ -170,22 +178,21 @@ export default function DeveloperConsolePage() {
           .eq("developer_profile_id", profile.id)
           .order("created_at", { ascending: false });
 
+async function hashToken(token: string): Promise<string> {
+  const msgUint8 = new TextEncoder().encode(token);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
         if (webhooks) setWebhooksList(webhooks);
       }
     } catch (err: any) {
-      console.warn("Using offline sandbox developer setup:", err.message);
-      // Sandbox fallback mocks
-      setDevProfile({
-        id: "dev-mock-profile",
-        app_name: "Primora Retail Analytics",
-        is_approved: true
-      });
-      setTokensList([
-        { id: "tk-mock-1", scopes: ["bookings:read"], created_at: new Date().toISOString(), status: "active" }
-      ]);
-      setWebhooksList([
-        { id: "wh-mock-1", target_url: "https://primora-analytics.app/webhooks/bookings", event_types: ["booking.created", "booking.completed"], secret_key: "whsec_RiyadhGroomingSecretKey123" }
-      ]);
+      console.warn("Failed to load developer setup:", err.message);
+      setError(err?.message || "Failed to sync developer account from server.");
+      setDevProfile(null);
+      setTokensList([]);
+      setWebhooksList([]);
     } finally {
       setLoading(false);
     }
@@ -203,30 +210,23 @@ export default function DeveloperConsolePage() {
       setSubmittingDev(true);
       setError("");
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No active user session.");
+      if (!user) throw new Error("Authentication required to register developer profile.");
 
       const { data, error: registerError } = await supabase
         .from("developer_profiles")
         .insert({
           developer_id: user.id,
           app_name: appName,
-          is_approved: true // Auto-approve for sandbox ease
+          is_approved: false // Requires admin audit approval
         })
         .select()
         .single();
 
       if (registerError) throw registerError;
       setDevProfile(data);
-      setSuccess("Developer account successfully activated!");
+      setSuccess("Developer account submitted for security audit!");
     } catch (err: any) {
-      console.warn("Registering mock developer profile locally:", err.message);
-      const simulatedDev = {
-        id: "dev-mock-profile",
-        app_name: appName,
-        is_approved: true
-      };
-      setDevProfile(simulatedDev);
-      setSuccess("Developer account successfully activated!");
+      setError(err?.message || "Failed to register developer profile.");
     } finally {
       setSubmittingDev(false);
       setTimeout(() => setSuccess(""), 4000);
@@ -242,39 +242,31 @@ export default function DeveloperConsolePage() {
       setError("");
       setGeneratedToken(null);
 
-      // Generate a mock secure UUID token
-      const newTokenStr = "pk_live_" + Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
+      // Cryptographically secure random live token
+      const array = new Uint8Array(24);
+      crypto.getRandomValues(array);
+      const randomHex = Array.from(array).map((b) => b.toString(16).padStart(2, "0")).join("");
+      const newTokenStr = `pk_live_${randomHex}`;
+      const hashedToken = await hashToken(newTokenStr);
 
-      if (!devProfile.id.startsWith("dev-mock-")) {
-        const { data, error: tokenError } = await supabase
-          .from("api_tokens")
-          .insert({
-            developer_profile_id: devProfile.id,
-            token_hash: newTokenStr, // store directly for simple sandbox demo
-            scopes: scopes,
-            status: "active",
-            expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
-          })
-          .select()
-          .single();
-
-        if (tokenError) throw tokenError;
-        setTokensList(prev => [data, ...prev]);
-      } else {
-        const simulatedToken: TokenItem = {
-          id: `tk-${Date.now()}`,
+      const { data, error: tokenError } = await supabase
+        .from("api_tokens")
+        .insert({
+          developer_profile_id: devProfile.id,
+          token_hash: hashedToken, // Stored as SHA-256 hash only
           scopes: scopes,
-          created_at: new Date().toISOString(),
-          status: "active"
-        };
-        setTokensList(prev => [simulatedToken, ...prev]);
-      }
+          status: "active",
+          expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+        })
+        .select()
+        .single();
 
+      if (tokenError) throw tokenError;
+      setTokensList((prev) => [data, ...prev]);
       setGeneratedToken(newTokenStr);
-      setSuccess("API token generated successfully!");
+      setSuccess("API token generated and securely hashed (SHA-256)!");
     } catch (err: any) {
-      setError("Failed to generate API token.");
-      console.warn("Offline generate token warning:", err);
+      setError(err?.message || "Failed to generate API token.");
     } finally {
       setGenerating(false);
       setTimeout(() => setSuccess(""), 4000);
@@ -284,18 +276,15 @@ export default function DeveloperConsolePage() {
   const handleRevokeToken = async (id: string) => {
     try {
       setError("");
-      if (!id.startsWith("tk-")) {
-        const { error: patchError } = await supabase
-          .from("api_tokens")
-          .update({ status: "revoked" })
-          .eq("id", id);
-        if (patchError) throw patchError;
-      }
-      setTokensList(prev => prev.filter(t => t.id !== id));
+      const { error: patchError } = await supabase
+        .from("api_tokens")
+        .update({ status: "revoked" })
+        .eq("id", id);
+      if (patchError) throw patchError;
+      setTokensList((prev) => prev.filter((t) => t.id !== id));
       setSuccess("Token revoked successfully!");
     } catch (err: any) {
-      setError("Failed to revoke token.");
-      console.warn(err);
+      setError(err?.message || "Failed to revoke token.");
     } finally {
       setTimeout(() => setSuccess(""), 4000);
     }
@@ -309,38 +298,28 @@ export default function DeveloperConsolePage() {
       setError("");
       setSuccess("");
 
-      const whSecret = "whsec_" + Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
+      const secretArray = new Uint8Array(20);
+      crypto.getRandomValues(secretArray);
+      const whSecret = "whsec_" + Array.from(secretArray).map((b) => b.toString(16).padStart(2, "0")).join("");
 
-      if (!devProfile.id.startsWith("dev-mock-")) {
-        const { data, error: whError } = await supabase
-          .from("webhook_subscriptions")
-          .insert({
-            developer_profile_id: devProfile.id,
-            target_url: webhookUrl,
-            event_types: webhookEvents,
-            secret_key: whSecret,
-            is_active: true
-          })
-          .select()
-          .single();
-
-        if (whError) throw whError;
-        setWebhooksList(prev => [data, ...prev]);
-      } else {
-        const simulatedWh: WebhookItem = {
-          id: `wh-${Date.now()}`,
+      const { data, error: whError } = await supabase
+        .from("webhook_subscriptions")
+        .insert({
+          developer_profile_id: devProfile.id,
           target_url: webhookUrl,
           event_types: webhookEvents,
-          secret_key: whSecret
-        };
-        setWebhooksList(prev => [simulatedWh, ...prev]);
-      }
+          secret_key: whSecret,
+          is_active: true
+        })
+        .select()
+        .single();
 
+      if (whError) throw whError;
+      setWebhooksList((prev) => [data, ...prev]);
       setWebhookUrl("");
       setSuccess("Webhook subscription added successfully!");
     } catch (err: any) {
-      setError("Failed to add webhook subscription.");
-      console.warn(err);
+      setError(err?.message || "Failed to add webhook subscription.");
     } finally {
       setTimeout(() => setSuccess(""), 4000);
     }
