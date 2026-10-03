@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 
 const translations = {
   en: {
@@ -30,6 +31,35 @@ const translations = {
     planProName: "Primora Growth & Pro",
     planProPrice: "299 SAR / month",
     planProDesc: "Advanced staff rosters, physical room resources allocation, geofenced travel limits, and client notes CRM.",
+    appTitle: "Provider Onboarding Application",
+    appSubtitle: "Submit your commercial establishment credentials to begin accepting verified bookings in Riyadh.",
+    loginToApply: "Please sign in or create an account to submit your provider application.",
+    loginButton: "Sign in with Phone OTP",
+    businessNameEnLabel: "Business Name (English)",
+    businessNameArLabel: "Business Name (Arabic)",
+    businessTypeLabel: "Business Type",
+    salon: "Salon",
+    barbershop: "Barbershop",
+    spa: "Spa & Wellness",
+    freelancer: "Specialist / Freelancer",
+    crLabel: "Commercial Registration (CR) Number",
+    taxLabel: "Tax / VAT Registration Number",
+    contactEmailLabel: "Business Email",
+    contactPhoneLabel: "Business Phone (+966)",
+    cityLabel: "City",
+    districtLabel: "District in Riyadh",
+    addressLabel: "Street Address",
+    tradeLicenseLabel: "Trade License Document Reference / URL",
+    agreeTerms: "I confirm I am an authorized representative and agree to the Provider Agreement and Customer Terms.",
+    submitApp: "Submit Provider Application",
+    submitting: "Submitting Application...",
+    underReviewTitle: "Your Application is Under Review",
+    underReviewMsg: "Our onboarding operations team is currently reviewing your registration credentials. We will notify you once approved.",
+    approvedTitle: "Application Approved!",
+    approvedMsg: "Your provider merchant account is active. Complete your guided setup on your salon dashboard.",
+    goToDashboard: "Go to Salon Dashboard",
+    rejectedTitle: "Application Not Approved",
+    reapply: "Submit New Application",
     footerDesc: "Luxury Beauty, Grooming & Wellness Marketplace. Connecting premier Riyadh artists with selective clients.",
     footerDiscover: "Discover",
     footerPartners: "For Partners",
@@ -64,6 +94,35 @@ const translations = {
     planProName: "بريمورا للمحترفين والنمو",
     planProPrice: "299 ريال / شهريًا",
     planProDesc: "جداول نوبات الموظفين المتقدمة، توزيع موارد الغرف الفيزيائية، تحديد نطاقات السفر الجغرافية، ونظام CRM لملاحظات تفضيلات العملاء.",
+    appTitle: "طلب انضمام مزود خدمة جديد",
+    appSubtitle: "قدم بيانات منشأتك وسجلك التجاري لبدء استقبال الحجوزات المعتمدة في الرياض.",
+    loginToApply: "يرجى تسجيل الدخول أو إنشاء حساب لتقديم طلب اعتماد المنشأة.",
+    loginButton: "تسجيل الدخول عبر رمز الجوال (OTP)",
+    businessNameEnLabel: "اسم المنشأة بالإنجليزية",
+    businessNameArLabel: "اسم المنشأة بالعربية",
+    businessTypeLabel: "نوع النشاط",
+    salon: "صالون تجميل",
+    barbershop: "صالون حلاقة رجالي",
+    spa: "سبا وعافية",
+    freelancer: "أخصائي / عمل حر",
+    crLabel: "رقم السجل التجاري",
+    taxLabel: "الرقم الضريبي (15 رقماً)",
+    contactEmailLabel: "البريد الإلكتروني للنشاط",
+    contactPhoneLabel: "رقم جوال التواصل (+966)",
+    cityLabel: "المدينة",
+    districtLabel: "الحي بالرياض",
+    addressLabel: "العنوان والشارع",
+    tradeLicenseLabel: "رابط أو مرجع وثيقة السجل التجاري",
+    agreeTerms: "أقر بأنني مفوض عن المنشأة وأوافق على اتفاقية مزودي الخدمة وشروط المنصة.",
+    submitApp: "إرسال طلب الانضمام",
+    submitting: "جاري تقديم الطلب...",
+    underReviewTitle: "طلبك قيد المراجعة والتدقيق",
+    underReviewMsg: "يعمل فريق العمليات والتحقق على مراجعة وثائق السجل التجاري. سيتم إشعارك فور الاعتماد.",
+    approvedTitle: "تم اعتماد طلبك بنجاح!",
+    approvedMsg: "حسابك التجاري نشط. يمكنك الآن استكمال الإعداد الإرشادي في لوحة تحكم المزود.",
+    goToDashboard: "الانتقال إلى لوحة تحكم المزود",
+    rejectedTitle: "لم تتم الموافقة على الطلب",
+    reapply: "تقديم طلب جديد",
     footerDesc: "منصة الجمال الفاخرة، والعناية والعافية. نصل بين أفضل فناني الرياض والعملاء المميزين.",
     footerDiscover: "استكشف",
     footerPartners: "للشركاء",
@@ -96,6 +155,115 @@ export default function BecomeProviderRootPage() {
   }, [locale]);
 
   const isRTL = locale === "ar";
+
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [existingApp, setExistingApp] = useState<any>(null);
+  const [checkingApp, setCheckingApp] = useState(true);
+  const [appForm, setAppForm] = useState({
+    businessNameEn: "",
+    businessNameAr: "",
+    businessType: "salon" as "salon" | "barbershop" | "spa" | "freelancer",
+    crNumber: "",
+    taxNumber: "",
+    contactEmail: "",
+    contactPhone: "",
+    district: "",
+    addressText: "",
+    tradeLicenseUrl: "",
+    agreed: false
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  useEffect(() => {
+    async function checkUserApp() {
+      try {
+        setCheckingApp(true);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          setCurrentUser(user);
+          setAppForm((prev) => ({
+            ...prev,
+            contactEmail: user.email || prev.contactEmail,
+            contactPhone: user.phone || prev.contactPhone
+          }));
+          const { data: appData, error: appError } = await supabase
+            .from("provider_applications")
+            .select("*")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (!appError && appData) {
+            setExistingApp(appData);
+          }
+        }
+      } catch (err) {
+        console.warn("Could not check provider application status:", err);
+      } finally {
+        setCheckingApp(false);
+      }
+    }
+    void checkUserApp();
+  }, []);
+
+  const handleSubmitApplication = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentUser) return;
+    if (!appForm.businessNameEn.trim() || !appForm.businessNameAr.trim()) {
+      setSubmitError(isRTL ? "يرجى إدخال اسم المنشأة بالعربية والإنجليزية." : "Please enter the business name in both Arabic and English.");
+      return;
+    }
+    if (!appForm.contactPhone.trim() || !appForm.district.trim() || !appForm.addressText.trim()) {
+      setSubmitError(isRTL ? "يرجى تعبئة بيانات الاتصال والحي والعنوان." : "Please complete contact phone, district, and address details.");
+      return;
+    }
+    if (!appForm.agreed) {
+      setSubmitError(isRTL ? "يرجى الموافقة على اتفاقية مزودي الخدمة." : "Please agree to the Provider Agreement and Terms.");
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitError("");
+    try {
+      const { data, error } = await supabase.from("provider_applications").insert({
+        user_id: currentUser.id,
+        business_name_en: appForm.businessNameEn.trim(),
+        business_name_ar: appForm.businessNameAr.trim(),
+        business_type: appForm.businessType,
+        cr_number: appForm.crNumber.trim() || null,
+        tax_number: appForm.taxNumber.trim() || null,
+        contact_email: appForm.contactEmail.trim() || currentUser.email,
+        contact_phone: appForm.contactPhone.trim(),
+        city: "Riyadh",
+        district: appForm.district.trim(),
+        address_text: appForm.addressText.trim(),
+        trade_license_url: appForm.tradeLicenseUrl.trim() || null,
+        status: "pending"
+      }).select().single();
+
+      if (error) throw error;
+
+      try {
+        await supabase.rpc("record_agreement_acceptance", {
+          p_agreement_key: "provider_agreement",
+          p_version: "v1.0",
+          p_method: "become_provider_form"
+        });
+      } catch (accErr) {
+        console.warn("Agreement acceptance record:", accErr);
+      }
+
+      setExistingApp(data);
+      setSubmitSuccess(true);
+    } catch (err: any) {
+      console.error("Failed to submit provider application:", err);
+      setSubmitError(err?.message || (isRTL ? "فشل إرسال الطلب، يرجى المحاولة لاحقاً." : "Failed to submit application. Please try again."));
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div 
@@ -153,9 +321,9 @@ export default function BecomeProviderRootPage() {
             {t.subtitle}
           </p>
           <div className="pt-4">
-            <Link href="/login" className="px-8 py-3.5 bg-stone-900 text-stone-50 font-bold text-xs uppercase tracking-widest rounded-full hover:bg-stone-800 transition shadow-md inline-block">
+            <a href="#application-form" className="px-8 py-3.5 bg-stone-900 text-stone-50 font-bold text-xs uppercase tracking-widest rounded-full hover:bg-stone-800 transition shadow-md inline-block">
               {t.ctaRegister}
-            </Link>
+            </a>
           </div>
         </div>
 
@@ -239,6 +407,251 @@ export default function BecomeProviderRootPage() {
             </div>
           </div>
         </div>
+
+        <hr className="border-stone-200" />
+
+        {/* 5. ONBOARDING APPLICATION SECTION */}
+        <section id="application-form" className="space-y-8 scroll-mt-24">
+          <div className="text-center space-y-3">
+            <span className="text-[10px] tracking-widest uppercase font-extrabold text-[#D1AF47]">
+              {isRTL ? "بوابة الانضمام الرسمية" : "Official Onboarding Gateway"}
+            </span>
+            <h2 className="text-3xl font-serif font-black text-stone-950">{t.appTitle}</h2>
+            <p className="text-sm text-stone-500 max-w-xl mx-auto leading-relaxed">{t.appSubtitle}</p>
+          </div>
+
+          {checkingApp ? (
+            <div className="rounded-2xl border border-stone-200 bg-white p-12 text-center text-sm font-semibold text-stone-500">
+              {isRTL ? "جاري التحقق من بيانات الحساب..." : "Checking account credentials..."}
+            </div>
+          ) : !currentUser ? (
+            <div className="rounded-3xl border border-stone-200 bg-white p-8 sm:p-12 text-center space-y-6 shadow-sm">
+              <div className="w-16 h-16 rounded-full bg-stone-100 border border-stone-200 flex items-center justify-center mx-auto text-2xl font-serif font-black text-stone-900">
+                P
+              </div>
+              <div className="space-y-2 max-w-md mx-auto">
+                <h3 className="font-serif text-xl font-bold text-stone-950">{t.loginToApply}</h3>
+                <p className="text-xs text-stone-500 leading-relaxed">
+                  {isRTL
+                    ? "يتطلب تقديم الطلب تسجيل حساب وتوثيق رقم الجوال لربط المنشأة بحساب المالك بصورة نظامية آمنة."
+                    : "Submitting an application requires an authenticated account to securely link your commercial entity with owner credentials."}
+                </p>
+              </div>
+              <div>
+                <Link
+                  href="/login?returnUrl=/become-provider"
+                  className="px-8 py-3.5 bg-stone-900 text-stone-50 font-bold text-xs uppercase tracking-widest rounded-full hover:bg-stone-850 transition shadow-md inline-block"
+                >
+                  {t.loginButton}
+                </Link>
+              </div>
+            </div>
+          ) : existingApp && existingApp.status === "pending" ? (
+            <div className="rounded-3xl border border-[#FEDF89] bg-[#FFFAEB] p-8 sm:p-12 text-center space-y-4">
+              <span className="rounded-full bg-[#D1AF47] px-3 py-1 text-[10px] font-black uppercase text-[#101828]">
+                {isRTL ? "قيد المراجعة" : "Under Review"}
+              </span>
+              <h3 className="font-serif text-2xl font-black text-stone-900">{t.underReviewTitle}</h3>
+              <p className="text-sm text-stone-600 max-w-lg mx-auto leading-relaxed">{t.underReviewMsg}</p>
+              <div className="pt-4 border-t border-[#FEDF89]/50 max-w-md mx-auto grid grid-cols-2 gap-4 text-xs font-bold text-stone-700">
+                <div>
+                  <span className="block text-[10px] text-stone-400 uppercase font-extrabold">{isRTL ? "المنشأة" : "Business"}</span>
+                  <span>{isRTL ? existingApp.business_name_ar : existingApp.business_name_en}</span>
+                </div>
+                <div>
+                  <span className="block text-[10px] text-stone-400 uppercase font-extrabold">{isRTL ? "تاريخ التقديم" : "Submitted"}</span>
+                  <span>{new Date(existingApp.created_at).toLocaleDateString()}</span>
+                </div>
+              </div>
+            </div>
+          ) : existingApp && existingApp.status === "approved" ? (
+            <div className="rounded-3xl border border-[#ABEFC6] bg-[#ECFDF3] p-8 sm:p-12 text-center space-y-4">
+              <span className="rounded-full bg-[#12B76A] px-3 py-1 text-[10px] font-black uppercase text-white">
+                {isRTL ? "معتمد ومفعل" : "Approved & Active"}
+              </span>
+              <h3 className="font-serif text-2xl font-black text-[#027A48]">{t.approvedTitle}</h3>
+              <p className="text-sm text-stone-700 max-w-lg mx-auto leading-relaxed">{t.approvedMsg}</p>
+              <div className="pt-4">
+                <Link
+                  href="/provider/dashboard"
+                  className="px-8 py-3.5 bg-[#027A48] text-white font-bold text-xs uppercase tracking-widest rounded-full hover:bg-[#05603A] transition shadow-md inline-block"
+                >
+                  {t.goToDashboard}
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmitApplication} className="rounded-3xl border border-stone-200 bg-white p-6 sm:p-10 shadow-sm space-y-6">
+              {existingApp && existingApp.status === "rejected" && (
+                <div className="rounded-2xl border border-[#FECDCA] bg-[#FEF3F2] p-4 text-xs text-[#B42318] space-y-1">
+                  <strong className="block font-bold">{t.rejectedTitle}</strong>
+                  <p>{existingApp.rejection_reason || (isRTL ? "يرجى تعديل المستندات وإعادة التقديم." : "Please correct documents and re-apply.")}</p>
+                </div>
+              )}
+
+              {submitError && (
+                <div className="rounded-2xl border border-[#FECDCA] bg-[#FEF3F2] p-4 text-xs font-bold text-[#B42318]">
+                  {submitError}
+                </div>
+              )}
+
+              {submitSuccess && (
+                <div className="rounded-2xl border border-[#ABEFC6] bg-[#ECFDF3] p-4 text-xs font-bold text-[#027A48]">
+                  {isRTL ? "تم استلام طلبك بنجاح! سيتم التواصل معك عبر رقم الجوال المسجل." : "Application received successfully! Our team will contact you shortly."}
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1.5">{t.businessNameEnLabel} *</label>
+                  <input
+                    type="text"
+                    required
+                    value={appForm.businessNameEn}
+                    onChange={(e) => setAppForm((prev) => ({ ...prev, businessNameEn: e.target.value }))}
+                    placeholder="e.g. Al-Olaya Luxury Salon"
+                    className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs text-stone-900 outline-none focus:border-stone-900 focus:bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1.5">{t.businessNameArLabel} *</label>
+                  <input
+                    type="text"
+                    required
+                    value={appForm.businessNameAr}
+                    onChange={(e) => setAppForm((prev) => ({ ...prev, businessNameAr: e.target.value }))}
+                    placeholder="مثال: صالون العليا الفاخر"
+                    className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs text-stone-900 outline-none focus:border-stone-900 focus:bg-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1.5">{t.businessTypeLabel}</label>
+                  <select
+                    value={appForm.businessType}
+                    onChange={(e) => setAppForm((prev) => ({ ...prev, businessType: e.target.value as any }))}
+                    className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs text-stone-900 outline-none focus:border-stone-900 focus:bg-white"
+                  >
+                    <option value="salon">{t.salon}</option>
+                    <option value="barbershop">{t.barbershop}</option>
+                    <option value="spa">{t.spa}</option>
+                    <option value="freelancer">{t.freelancer}</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1.5">{t.crLabel}</label>
+                  <input
+                    type="text"
+                    value={appForm.crNumber}
+                    onChange={(e) => setAppForm((prev) => ({ ...prev, crNumber: e.target.value }))}
+                    placeholder="1010XXXXXX"
+                    className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs text-stone-900 outline-none focus:border-stone-900 focus:bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1.5">{t.taxLabel}</label>
+                  <input
+                    type="text"
+                    value={appForm.taxNumber}
+                    onChange={(e) => setAppForm((prev) => ({ ...prev, taxNumber: e.target.value }))}
+                    placeholder="3000XXXXXXXXXXX"
+                    className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs text-stone-900 outline-none focus:border-stone-900 focus:bg-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1.5">{t.contactEmailLabel} *</label>
+                  <input
+                    type="email"
+                    required
+                    value={appForm.contactEmail}
+                    onChange={(e) => setAppForm((prev) => ({ ...prev, contactEmail: e.target.value }))}
+                    placeholder="owner@salon.sa"
+                    className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs text-stone-900 outline-none focus:border-stone-900 focus:bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1.5">{t.contactPhoneLabel} *</label>
+                  <input
+                    type="tel"
+                    required
+                    value={appForm.contactPhone}
+                    onChange={(e) => setAppForm((prev) => ({ ...prev, contactPhone: e.target.value }))}
+                    placeholder="+9665XXXXXXXX"
+                    className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs text-stone-900 outline-none focus:border-stone-900 focus:bg-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1.5">{t.districtLabel} *</label>
+                  <input
+                    type="text"
+                    required
+                    value={appForm.district}
+                    onChange={(e) => setAppForm((prev) => ({ ...prev, district: e.target.value }))}
+                    placeholder="e.g. Al-Olaya / حي العليا"
+                    className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs text-stone-900 outline-none focus:border-stone-900 focus:bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 mb-1.5">{t.addressLabel} *</label>
+                  <input
+                    type="text"
+                    required
+                    value={appForm.addressText}
+                    onChange={(e) => setAppForm((prev) => ({ ...prev, addressText: e.target.value }))}
+                    placeholder="Building, street, landmarks"
+                    className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs text-stone-900 outline-none focus:border-stone-900 focus:bg-white"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 mb-1.5">{t.tradeLicenseLabel}</label>
+                <input
+                  type="text"
+                  value={appForm.tradeLicenseUrl}
+                  onChange={(e) => setAppForm((prev) => ({ ...prev, tradeLicenseUrl: e.target.value }))}
+                  placeholder="https://... or CR Reference Number"
+                  className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs text-stone-900 outline-none focus:border-stone-900 focus:bg-white"
+                />
+              </div>
+
+              <div className="pt-2">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={appForm.agreed}
+                    onChange={(e) => setAppForm((prev) => ({ ...prev, agreed: e.target.checked }))}
+                    className="mt-0.5 rounded border-stone-300 text-stone-900 focus:ring-stone-900"
+                  />
+                  <span className="text-xs text-stone-600 leading-relaxed font-medium">
+                    {t.agreeTerms}{" "}
+                    <Link href="/terms" target="_blank" className="underline font-bold text-stone-900">
+                      ({locale === "ar" ? "عرض الاتفاقية" : "View Terms"})
+                    </Link>
+                  </span>
+                </label>
+              </div>
+
+              <div className="pt-4">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full py-3.5 bg-stone-950 text-stone-50 font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-stone-850 transition shadow-md disabled:opacity-50"
+                >
+                  {submitting ? t.submitting : t.submitApp}
+                </button>
+              </div>
+            </form>
+          )}
+        </section>
       </main>
 
       {/* 4. FOOTER */}

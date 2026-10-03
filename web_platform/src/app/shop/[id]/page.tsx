@@ -965,6 +965,10 @@ export default function ShopDetailsPage() {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      const rawSource = searchParams?.get("source") || "marketplace";
+      const validSources = ["marketplace", "link", "qr", "whatsapp", "instagram", "walk_in", "import"];
+      const bookingSource = validSources.includes(rawSource) ? rawSource : "marketplace";
+
       if (!user) {
         // Save booking selection to sessionStorage (G16)
         sessionStorage.setItem("primora_pending_booking", JSON.stringify({
@@ -974,6 +978,7 @@ export default function ShopDetailsPage() {
           date: selectedDate,
           slot: selectedSlot,
           isHomeService,
+          source: bookingSource,
           savedAt: Date.now()
         }));
         setShowAuthModal(true);
@@ -990,6 +995,7 @@ export default function ShopDetailsPage() {
         target_scheduled_at: toRiyadhTimestamp(selectedDate, selectedSlot),
         request_home_service: false,
         request_client_profile_id: selectedClientProfileId || null,
+        request_source: bookingSource,
       });
 
       if (bookingError || !booking?.id) {

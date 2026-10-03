@@ -3357,13 +3357,13 @@
       "id": "silent-write-failure-provider-management",
       "severity": "high",
       "description": "updateProvider, saveProvider and deleteProvider each have a catch block identical to the try block: on any failure - RLS denial, network error, missing column - the optimistic state is applied and the same success notice is shown. Provider approval, suspension, commission changes and deletion all report success whether or not anything was persisted. This also makes every authorization denial invisible.",
-      "status": "open",
-      "rationale": "REMEDY: delete the catch-and-succeed branches; roll the optimistic state back and surface the error, following the pattern already used in web_platform/src/app/admin/services/page.tsx:329.",
+      "status": "fixed",
+      "rationale": "RESOLVED in P0-C: Removed catch-and-succeed branches in updateProvider, saveProvider, and deleteProvider. Failed writes now cleanly roll back state and display honest error banners via setError(). Added server-side atomic approve_provider_application and reject_provider_application RPCs with full admin_audit_logs coverage.",
       "evidence": [
-        "web_platform/src/app/admin/providers/provider-management.tsx:1005",
-        "web_platform/src/app/admin/providers/provider-management.tsx:1063",
-        "web_platform/src/app/admin/providers/provider-management.tsx:1084",
-        "web_platform/src/app/admin/providers/provider-management.tsx:991"
+        "web_platform/src/app/admin/providers/provider-management.tsx:1122",
+        "web_platform/src/app/admin/providers/provider-management.tsx:1180",
+        "web_platform/src/app/admin/providers/provider-management.tsx:1207",
+        "supabase/migrations/20261003210000_supply_and_agreements.sql"
       ]
     },
     {

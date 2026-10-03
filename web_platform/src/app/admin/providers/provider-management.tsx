@@ -92,6 +92,31 @@ type ProviderRecord = {
   };
 };
 
+type ProviderApplicationRecord = {
+  id: string;
+  user_id: string;
+  first_name?: string;
+  last_name?: string;
+  business_name_en: string;
+  business_name_ar: string;
+  business_type: string;
+  cr_number?: string;
+  tax_number?: string;
+  contact_email: string;
+  contact_phone: string;
+  city: string;
+  district: string;
+  address_text: string;
+  trade_license_url?: string;
+  status: "pending" | "under_review" | "approved" | "rejected";
+  rejection_reason?: string;
+  admin_notes?: string;
+  reviewed_by?: string;
+  reviewed_at?: string;
+  created_at: string;
+  updated_at: string;
+};
+
 // Per-shop performance rollup, derived from its employees + services. Kept as a
 // pure computed value (not persisted) so the demo and DB-normalized paths both
 // work without extra columns. TODO(analytics): source completed/cancelled
@@ -246,7 +271,17 @@ const copy = {
     saved: "Provider record saved.",
     deleted: "Provider removed.",
     updated: "Provider status updated.",
-    loadFailed: "Could not load live providers, using demo records.",
+    loadFailed: "Could not load live providers from database.",
+    activeRegistry: "Active Providers Registry",
+    applicationsQueue: "Applications Review Queue",
+    approveApplication: "Approve Application",
+    rejectApplication: "Reject Application",
+    rejectionReason: "Rejection Reason",
+    commissionPct: "Commission %",
+    applicant: "Applicant",
+    crNumber: "CR Number",
+    taxNumber: "Tax Number",
+    noApplications: "No provider applications found.",
     suspended: "Suspended",
     suspend: "Suspend",
     reactivate: "Reactivate",
@@ -351,7 +386,17 @@ const copy = {
     saved: "تم حفظ سجل المزود.",
     deleted: "تم حذف المزود.",
     updated: "تم تحديث حالة المزود.",
-    loadFailed: "تعذر تحميل المزودين المباشرين، يتم استخدام بيانات تجريبية.",
+    loadFailed: "تعذر تحميل بيانات مزودي الخدمة من قاعدة البيانات.",
+    activeRegistry: "سجل مزودي الخدمة المعتمدين",
+    applicationsQueue: "طابور مراجعة طلبات الانضمام",
+    approveApplication: "الموافقة على الطلب",
+    rejectApplication: "رفض الطلب",
+    rejectionReason: "سبب الرفض",
+    commissionPct: "نسبة العمولة",
+    applicant: "مقدم الطلب",
+    crNumber: "رقم السجل التجاري",
+    taxNumber: "الرقم الضريبي",
+    noApplications: "لا توجد طلبات انضمام حالياً.",
     suspended: "موقوف",
     suspend: "إيقاف",
     reactivate: "إعادة تفعيل",
@@ -682,6 +727,15 @@ export default function AdminProviderManagement() {
   const [employeeEarningsById, setEmployeeEarningsById] = useState<Record<string, EmployeeEarningsSummary>>({});
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState<ProviderRecord>(() => blankProvider());
+  const [mainTab, setMainTab] = useState<"providers" | "applications">("providers");
+  const [applications, setApplications] = useState<ProviderApplicationRecord[]>([]);
+  const [appsLoading, setAppsLoading] = useState(false);
+  const [appFilter, setAppFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
+  const [approvalModalApp, setApprovalModalApp] = useState<ProviderApplicationRecord | null>(null);
+  const [approvalCommission, setApprovalCommission] = useState(15);
+  const [rejectionModalApp, setRejectionModalApp] = useState<ProviderApplicationRecord | null>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [submittingAppAction, setSubmittingAppAction] = useState(false);
   const idCounterRef = useRef(0);
 
   const nextLocalId = useCallback((prefix: string) => {
@@ -890,23 +944,94 @@ export default function AdminProviderManagement() {
       if (data?.length) {
         setProviders((data as ProviderRow[]).map((p, idx) => normalizeProvider(p, idx, perfMap)));
       } else {
-        setProviders(demoProviders);
+        setProviders([]);
       }
-    } catch (loadError) {
-      console.warn("Provider management using fallback data:", loadError);
-      setProviders(demoProviders);
-      setError(t.loadFailed);
+    } catch (loadError: any) {
+      console.error("Provider management load error:", loadError);
+      setProviders([]);
+      setError(loadError?.message || t.loadFailed);
     } finally {
       setLoading(false);
     }
   }, [normalizeProvider, t.loadFailed]);
 
+  const loadApplications = useCallback(async () => {
+    try {
+      setAppsLoading(true);
+      const { data, error: appError } = await supabase
+        .from("admin_provider_applications_view")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (appError) {
+        const { data: tableData, error: tableError } = await supabase
+          .from("provider_applications")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (tableError) throw tableError;
+        setApplications((tableData as ProviderApplicationRecord[]) || []);
+      } else {
+        setApplications((data as ProviderApplicationRecord[]) || []);
+      }
+    } catch (err: any) {
+      console.warn("Could not query provider applications:", err);
+      setApplications([]);
+    } finally {
+      setAppsLoading(false);
+    }
+  }, []);
+
+  const handleApproveApplication = async (appId: string, commission: number) => {
+    setSubmittingAppAction(true);
+    setError("");
+    try {
+      const { error: rpcError } = await supabase.rpc("approve_provider_application", {
+        p_application_id: appId,
+        p_commission_percentage: commission
+      });
+      if (rpcError) throw rpcError;
+      setNotice(isRTL ? "تمت الموافقة على الطلب بنجاح وتفعيل مزود الخدمة." : "Application approved successfully and provider activated.");
+      setApprovalModalApp(null);
+      await Promise.all([loadApplications(), loadProviders()]);
+    } catch (err: any) {
+      console.error("Approval failed:", err);
+      setError(err?.message || (isRTL ? "فشلت عملية الموافقة." : "Failed to approve application."));
+    } finally {
+      setSubmittingAppAction(false);
+    }
+  };
+
+  const handleRejectApplication = async (appId: string, reason: string) => {
+    if (!reason.trim()) {
+      setError(isRTL ? "يرجى كتابة سبب الرفض." : "Please specify a rejection reason.");
+      return;
+    }
+    setSubmittingAppAction(true);
+    setError("");
+    try {
+      const { error: rpcError } = await supabase.rpc("reject_provider_application", {
+        p_application_id: appId,
+        p_reason: reason.trim()
+      });
+      if (rpcError) throw rpcError;
+      setNotice(isRTL ? "تم رفض الطلب بنجاح وتسجيل السبب." : "Application rejected and reason recorded.");
+      setRejectionModalApp(null);
+      setRejectionReason("");
+      await loadApplications();
+    } catch (err: any) {
+      console.error("Rejection failed:", err);
+      setError(err?.message || (isRTL ? "فشلت عملية الرفض." : "Failed to reject application."));
+    } finally {
+      setSubmittingAppAction(false);
+    }
+  };
+
   useEffect(() => {
     const timer = window.setTimeout(() => {
       void loadProviders();
+      void loadApplications();
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [loadProviders]);
+  }, [loadProviders, loadApplications]);
 
   const displayProviderName = (provider: ProviderRecord) => isRTL ? provider.businessNameAr || provider.businessNameEn : provider.businessNameEn || provider.businessNameAr;
   const displayShopName = (shop: AdminShop) => isRTL ? shop.nameAr || shop.nameEn : shop.nameEn || shop.nameAr;
@@ -1002,11 +1127,9 @@ export default function AdminProviderManagement() {
       setProviders((current) => current.map((provider) => provider.id === providerId ? { ...provider, ...patch } : provider));
       setDetail((current) => current?.id === providerId ? { ...current, ...patch } : current);
       setNotice(t.updated);
-    } catch (updateError) {
-      console.warn("Provider update fallback:", updateError);
-      setProviders((current) => current.map((provider) => provider.id === providerId ? { ...provider, ...patch } : provider));
-      setDetail((current) => current?.id === providerId ? { ...current, ...patch } : current);
-      setNotice(t.updated);
+    } catch (updateError: any) {
+      console.error("Provider update failed:", updateError);
+      setError(updateError?.message || "Failed to update provider.");
     }
   };
 
@@ -1036,7 +1159,7 @@ export default function AdminProviderManagement() {
     const normalized: ProviderRecord = {
       ...form,
       id: providerId,
-      source: form.source || "local",
+      source: form.source || "db",
       shops: form.shops.length ? form.shops : [
         {
           id: nextLocalId("shop"),
@@ -1054,19 +1177,30 @@ export default function AdminProviderManagement() {
 
     try {
       const existing = providers.find((provider) => provider.id === normalized.id);
-      if (existing) await persistProviderPatch(existing, normalized);
+      if (existing) {
+        await persistProviderPatch(existing, normalized);
+      } else {
+        const { data: inserted, error: insertError } = await supabase.from("providers").insert({
+          business_name_en: normalized.businessNameEn,
+          business_name_ar: normalized.businessNameAr,
+          contact_email: normalized.contactEmail,
+          contact_phone: normalized.contactPhone,
+          type: normalized.type,
+          commission_percentage: normalized.commissionPercentage,
+          trade_license_url: normalized.tradeLicenseUrl,
+          is_verified: normalized.applicationStatus === "approved"
+        }).select().single();
+        if (insertError) throw insertError;
+        if (inserted) normalized.id = inserted.id;
+      }
       setProviders((current) => current.some((provider) => provider.id === normalized.id)
         ? current.map((provider) => provider.id === normalized.id ? normalized : provider)
         : [normalized, ...current]);
       setModalOpen(false);
       setNotice(t.saved);
-    } catch (saveError) {
-      console.warn("Provider save fallback:", saveError);
-      setProviders((current) => current.some((provider) => provider.id === normalized.id)
-        ? current.map((provider) => provider.id === normalized.id ? normalized : provider)
-        : [normalized, ...current]);
-      setModalOpen(false);
-      setNotice(t.saved);
+    } catch (saveError: any) {
+      console.error("Provider save failed:", saveError);
+      setError(saveError?.message || "Failed to save provider.");
     }
   };
 
@@ -1081,11 +1215,9 @@ export default function AdminProviderManagement() {
       setProviders((current) => current.filter((item) => item.id !== provider.id));
       if (detail?.id === provider.id) setDetail(null);
       setNotice(t.deleted);
-    } catch (deleteError) {
-      console.warn("Provider delete fallback:", deleteError);
-      setProviders((current) => current.filter((item) => item.id !== provider.id));
-      if (detail?.id === provider.id) setDetail(null);
-      setNotice(t.deleted);
+    } catch (deleteError: any) {
+      console.error("Provider delete failed:", deleteError);
+      setError(deleteError?.message || "Failed to delete provider.");
     }
   };
 
@@ -1170,106 +1302,283 @@ export default function AdminProviderManagement() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-6">
-        {[
-          [t.providers, metrics.total.toLocaleString(isRTL ? "ar-SA" : "en-US")],
-          [t.applications, metrics.pending.toLocaleString(isRTL ? "ar-SA" : "en-US")],
-          [t.approved, metrics.approved.toLocaleString(isRTL ? "ar-SA" : "en-US")],
-          [t.totalShops, metrics.shops.toLocaleString(isRTL ? "ar-SA" : "en-US")],
-          [t.employees, metrics.employees.toLocaleString(isRTL ? "ar-SA" : "en-US")],
-          [t.revenue, money(metrics.revenue)]
-        ].map(([label, value]) => (
-          <div key={String(label)} className={cardBase}>
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{label}</span>
-            <strong className="mt-2 block font-serif text-xl font-black text-gray-900">{value}</strong>
-          </div>
-        ))}
+      {/* 1. TOP TAB SWITCHER */}
+      <div className={`flex flex-wrap items-center gap-3 border-b border-[#ECECEC] pb-4 ${rowDir}`}>
+        <button
+          onClick={() => setMainTab("providers")}
+          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-black transition ${
+            mainTab === "providers"
+              ? "bg-[#101828] text-[#F4E7B6] shadow-sm"
+              : "border border-[#ECECEC] bg-white text-[#667085] hover:border-[#D1AF47]/40"
+          }`}
+        >
+          <span>{t.activeRegistry}</span>
+          <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px]">{providers.length}</span>
+        </button>
+        <button
+          onClick={() => setMainTab("applications")}
+          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-black transition ${
+            mainTab === "applications"
+              ? "bg-[#101828] text-[#F4E7B6] shadow-sm"
+              : "border border-[#ECECEC] bg-white text-[#667085] hover:border-[#D1AF47]/40"
+          }`}
+        >
+          <span>{t.applicationsQueue}</span>
+          {applications.filter((a) => a.status === "pending").length > 0 && (
+            <span className="rounded-full bg-[#D1AF47] px-2 py-0.5 text-[10px] text-[#101828] font-black">
+              {applications.filter((a) => a.status === "pending").length}
+            </span>
+          )}
+        </button>
       </div>
 
-      <div className="rounded-2xl border border-[#ECECEC] bg-white p-4 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-        <div className={`flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between ${rowDir}`}>
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t.search} className="min-h-11 flex-1 rounded-xl border border-[#ECECEC] bg-gray-50 px-4 text-sm font-semibold text-gray-800 outline-none focus:border-[#D1AF47]" />
-          <div className="flex flex-wrap items-center gap-2">
-            {([
-              ["all", t.all],
-              ["pending", t.pending],
-              ["approved", t.approved],
-              ["rejected", t.rejected],
-              ["active", t.active],
-              ["suspended", t.suspended],
-              ["inactive", t.inactive],
-            ] as const).map(([value, label]) => (
-              <button key={value} onClick={() => setStatusFilter(value)} className={`rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-wider transition ${statusFilter === value ? "bg-[#101828] text-[#F4E7B6]" : "border border-[#ECECEC] bg-white text-[#667085] hover:border-[#D1AF47]/35"}`}>
-                {label}
-              </button>
+      {mainTab === "providers" ? (
+        <>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-6">
+            {[
+              [t.providers, metrics.total.toLocaleString(isRTL ? "ar-SA" : "en-US")],
+              [t.applications, metrics.pending.toLocaleString(isRTL ? "ar-SA" : "en-US")],
+              [t.approved, metrics.approved.toLocaleString(isRTL ? "ar-SA" : "en-US")],
+              [t.totalShops, metrics.shops.toLocaleString(isRTL ? "ar-SA" : "en-US")],
+              [t.employees, metrics.employees.toLocaleString(isRTL ? "ar-SA" : "en-US")],
+              [t.revenue, money(metrics.revenue)]
+            ].map(([label, value]) => (
+              <div key={String(label)} className={cardBase}>
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{label}</span>
+                <strong className="mt-2 block font-serif text-xl font-black text-gray-900">{value}</strong>
+              </div>
             ))}
-            <select value={sortMode} onChange={(event) => setSortMode(event.target.value as typeof sortMode)} className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-[#667085] outline-none focus:border-[#D1AF47]">
-              <option value="recent">{t.sortRecent}</option>
-              <option value="revenue">{t.sortRevenue}</option>
-              <option value="rating">{t.sortRating}</option>
-            </select>
+          </div>
+
+          <div className="rounded-2xl border border-[#ECECEC] bg-white p-4 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
+            <div className={`flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between ${rowDir}`}>
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t.search} className="min-h-11 flex-1 rounded-xl border border-[#ECECEC] bg-gray-50 px-4 text-sm font-semibold text-gray-800 outline-none focus:border-[#D1AF47]" />
+              <div className="flex flex-wrap items-center gap-2">
+                {([
+                  ["all", t.all],
+                  ["pending", t.pending],
+                  ["approved", t.approved],
+                  ["rejected", t.rejected],
+                  ["active", t.active],
+                  ["suspended", t.suspended],
+                  ["inactive", t.inactive],
+                ] as const).map(([value, label]) => (
+                  <button key={value} onClick={() => setStatusFilter(value)} className={`rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-wider transition ${statusFilter === value ? "bg-[#101828] text-[#F4E7B6]" : "border border-[#ECECEC] bg-white text-[#667085] hover:border-[#D1AF47]/35"}`}>
+                    {label}
+                  </button>
+                ))}
+                <select value={sortMode} onChange={(event) => setSortMode(event.target.value as typeof sortMode)} className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-[#667085] outline-none focus:border-[#D1AF47]">
+                  <option value="recent">{t.sortRecent}</option>
+                  <option value="revenue">{t.sortRevenue}</option>
+                  <option value="rating">{t.sortRating}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-[#ECECEC] bg-white shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[1040px] text-xs">
+                <thead>
+                  <tr className="border-b border-[#ECECEC] bg-gray-50/70 text-[9px] font-extrabold uppercase tracking-widest text-[#667085]">
+                    {[t.provider, t.contact, t.applicationStatus, t.accountStatus, t.genderCategory, t.shopsManaged, t.revenue, t.rating, t.actions].map((heading) => (
+                      <th key={heading} className={`px-5 py-4 ${dirClass}`}>{heading}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#F5F5F5]">
+                  {loading ? (
+                    <tr><td colSpan={9} className="px-5 py-10 text-center text-sm font-bold text-[#667085]">Loading...</td></tr>
+                  ) : filteredProviders.length === 0 ? (
+                    <tr><td colSpan={9} className="px-5 py-12 text-center text-sm font-bold text-[#667085]">{isRTL ? "لا يوجد مزودون مطابقون." : "No providers match these filters."}</td></tr>
+                  ) : filteredProviders.map((provider) => (
+                    <tr key={provider.id} className="text-[#344054] hover:bg-gray-50/60">
+                      <td className="px-5 py-4">
+                        <p className="font-black text-gray-900">{displayProviderName(provider)}</p>
+                        <p className="mt-1 text-[10px] font-semibold text-[#667085]">{provider.providerName}</p>
+                      </td>
+                      <td className="px-5 py-4">
+                        <p className="font-bold">{provider.contactEmail}</p>
+                        <p className="mt-1 text-[10px] font-semibold text-[#667085]">{provider.contactPhone}</p>
+                      </td>
+                      <td className="px-5 py-4">
+                        <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase ${provider.applicationStatus === "approved" ? "bg-[#ECFDF3] text-[#027A48]" : provider.applicationStatus === "rejected" ? "bg-[#FEF3F2] text-[#B42318]" : "bg-[#FFFAEB] text-[#B54708]"}`}>
+                          {t[provider.applicationStatus]}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4">
+                        <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase ${provider.accountStatus === "active" ? "bg-[#ECFDF3] text-[#027A48]" : provider.accountStatus === "suspended" ? "bg-[#FEF3F2] text-[#B42318]" : "bg-gray-100 text-[#667085]"}`}>
+                          {t[provider.accountStatus]}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 font-bold">{labelGender(provider.gender)}</td>
+                      <td className="px-5 py-4 font-black text-gray-900">{provider.shops.length}</td>
+                      <td className="px-5 py-4 font-black text-[#9A741F]">{money(providerRevenue(provider))}</td>
+                      <td className="px-5 py-4 font-bold text-gray-900">{providerRating(provider) ? `★ ${providerRating(provider).toFixed(1)}` : "—"}</td>
+                      <td className="px-5 py-4">
+                        <div className="flex flex-wrap gap-2">
+                          <button onClick={() => setDetail(provider)} className="rounded-xl border border-[#ECECEC] px-3 py-2 text-[10px] font-black text-gray-700 hover:border-[#D1AF47]/40">{t.view}</button>
+                          <button onClick={() => openEdit(provider)} className="rounded-xl border border-[#D1AF47]/30 bg-[#D1AF47]/10 px-3 py-2 text-[10px] font-black text-[#9A741F]">{t.edit}</button>
+                          {provider.applicationStatus !== "approved" && <button onClick={() => void updateProvider(provider.id, { applicationStatus: "approved", accountStatus: "active" })} className="rounded-xl bg-[#101828] px-3 py-2 text-[10px] font-black text-[#F4E7B6]">{t.approve}</button>}
+                          {provider.applicationStatus !== "rejected" && <button onClick={() => void updateProvider(provider.id, { applicationStatus: "rejected", accountStatus: "inactive" })} className="rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-3 py-2 text-[10px] font-black text-[#B42318]">{t.reject}</button>}
+                          {provider.accountStatus === "suspended"
+                            ? <button onClick={() => void updateProvider(provider.id, { accountStatus: "active", applicationStatus: "approved" })} className="rounded-xl border border-[#ABEFC6] bg-[#ECFDF3] px-3 py-2 text-[10px] font-black text-[#027A48]">{t.reactivate}</button>
+                            : <button onClick={() => void updateProvider(provider.id, { accountStatus: "suspended" })} className="rounded-xl border border-[#FEDF89] bg-[#FFFAEB] px-3 py-2 text-[10px] font-black text-[#B54708]">{t.suspend}</button>}
+                          <button onClick={() => void updateProvider(provider.id, { accountStatus: provider.accountStatus === "active" ? "inactive" : "active" })} className="rounded-xl border border-[#ECECEC] px-3 py-2 text-[10px] font-black text-[#667085]">{provider.accountStatus === "active" ? t.deactivate : t.activate}</button>
+                          <button onClick={() => void deleteProvider(provider)} className="rounded-xl border border-[#FECDCA] px-3 py-2 text-[10px] font-black text-[#B42318]">{t.delete}</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="space-y-6">
+          {/* Applications Queue Header & Filter */}
+          <div className="rounded-2xl border border-[#ECECEC] bg-white p-4 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
+            <div className={`flex flex-wrap items-center justify-between gap-3 ${rowDir}`}>
+              <div className="flex flex-wrap items-center gap-2">
+                {(["all", "pending", "approved", "rejected"] as const).map((st) => (
+                  <button
+                    key={st}
+                    onClick={() => setAppFilter(st)}
+                    className={`rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-wider transition ${
+                      appFilter === st
+                        ? "bg-[#101828] text-[#F4E7B6]"
+                        : "border border-[#ECECEC] bg-white text-[#667085] hover:border-[#D1AF47]/35"
+                    }`}
+                  >
+                    {t[st] || st}
+                    {st === "pending" && applications.filter((a) => a.status === "pending").length > 0 && ` (${applications.filter((a) => a.status === "pending").length})`}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => void loadApplications()}
+                className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2 text-[10px] font-bold text-[#667085] hover:bg-gray-50"
+              >
+                {isRTL ? "تحديث الطلبات" : "Refresh Applications"}
+              </button>
+            </div>
+          </div>
+
+          {/* Applications Table */}
+          <div className="overflow-hidden rounded-2xl border border-[#ECECEC] bg-white shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[1040px] text-xs">
+                <thead>
+                  <tr className="border-b border-[#ECECEC] bg-gray-50/70 text-[9px] font-extrabold uppercase tracking-widest text-[#667085]">
+                    <th className={`px-5 py-4 ${dirClass}`}>{t.applicant}</th>
+                    <th className={`px-5 py-4 ${dirClass}`}>{t.businessNameEn} / {t.businessNameAr}</th>
+                    <th className={`px-5 py-4 ${dirClass}`}>{t.type}</th>
+                    <th className={`px-5 py-4 ${dirClass}`}>{t.crNumber} / {t.taxNumber}</th>
+                    <th className={`px-5 py-4 ${dirClass}`}>{t.contact}</th>
+                    <th className={`px-5 py-4 ${dirClass}`}>{isRTL ? "الموقع والعنوان" : "Location"}</th>
+                    <th className={`px-5 py-4 ${dirClass}`}>{t.tradeLicense}</th>
+                    <th className={`px-5 py-4 ${dirClass}`}>{t.applicationStatus}</th>
+                    <th className={`px-5 py-4 ${dirClass}`}>{t.actions}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#F5F5F5]">
+                  {appsLoading ? (
+                    <tr><td colSpan={9} className="px-5 py-10 text-center text-sm font-bold text-[#667085]">Loading applications...</td></tr>
+                  ) : applications.filter((a) => appFilter === "all" || a.status === appFilter).length === 0 ? (
+                    <tr><td colSpan={9} className="px-5 py-12 text-center text-sm font-bold text-[#667085]">{t.noApplications}</td></tr>
+                  ) : (
+                    applications.filter((a) => appFilter === "all" || a.status === appFilter).map((app) => (
+                      <tr key={app.id} className="text-[#344054] hover:bg-gray-50/60">
+                        <td className="px-5 py-4">
+                          <p className="font-black text-gray-900">{app.first_name || ""} {app.last_name || ""}</p>
+                          <p className="mt-1 text-[10px] text-[#667085]">{new Date(app.created_at).toLocaleDateString()}</p>
+                        </td>
+                        <td className="px-5 py-4">
+                          <p className="font-black text-gray-900">{isRTL ? app.business_name_ar || app.business_name_en : app.business_name_en || app.business_name_ar}</p>
+                          <p className="mt-1 text-[10px] text-[#667085]">{isRTL ? app.business_name_en : app.business_name_ar}</p>
+                        </td>
+                        <td className="px-5 py-4">
+                          <span className="rounded-md bg-stone-100 px-2 py-0.5 text-[10px] font-bold uppercase">{app.business_type}</span>
+                        </td>
+                        <td className="px-5 py-4">
+                          <p className="font-semibold text-gray-900">CR: {app.cr_number || "—"}</p>
+                          <p className="mt-0.5 text-[10px] text-[#667085]">VAT: {app.tax_number || "—"}</p>
+                        </td>
+                        <td className="px-5 py-4">
+                          <p className="font-bold text-gray-900">{app.contact_email}</p>
+                          <p className="mt-0.5 text-[10px] text-[#667085]">{app.contact_phone}</p>
+                        </td>
+                        <td className="px-5 py-4">
+                          <p className="font-semibold text-gray-900">{app.city} · {app.district}</p>
+                          <p className="mt-0.5 text-[10px] text-[#667085] truncate max-w-[180px]">{app.address_text}</p>
+                        </td>
+                        <td className="px-5 py-4">
+                          {app.trade_license_url && app.trade_license_url !== "#" ? (
+                            <a href={app.trade_license_url} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-[#D1AF47] hover:underline">
+                              {isRTL ? "عرض الوثيقة" : "View Document"}
+                            </a>
+                          ) : (
+                            <span className="text-gray-400">—</span>
+                          )}
+                        </td>
+                        <td className="px-5 py-4">
+                          <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase ${
+                            app.status === "approved"
+                              ? "bg-[#ECFDF3] text-[#027A48]"
+                              : app.status === "rejected"
+                              ? "bg-[#FEF3F2] text-[#B42318]"
+                              : "bg-[#FFFAEB] text-[#B54708]"
+                          }`}>
+                            {app.status === "approved"
+                              ? t.approved
+                              : app.status === "rejected"
+                              ? t.rejected
+                              : t.pending}
+                          </span>
+                          {app.status === "rejected" && app.rejection_reason && (
+                            <p className="mt-1 text-[9px] text-[#B42318] max-w-[140px] truncate" title={app.rejection_reason}>
+                              {app.rejection_reason}
+                            </p>
+                          )}
+                        </td>
+                        <td className="px-5 py-4">
+                          {app.status === "pending" || app.status === "under_review" ? (
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                onClick={() => {
+                                  setApprovalModalApp(app);
+                                  setApprovalCommission(15);
+                                }}
+                                className="rounded-xl bg-[#101828] px-3 py-1.5 text-[10px] font-black text-[#F4E7B6] hover:bg-black transition"
+                              >
+                                {t.approve}
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setRejectionModalApp(app);
+                                  setRejectionReason("");
+                                }}
+                                className="rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-3 py-1.5 text-[10px] font-black text-[#B42318] hover:bg-[#FEE4E2] transition"
+                              >
+                                {t.reject}
+                              </button>
+                            </div>
+                          ) : app.status === "approved" ? (
+                            <span className="text-[10px] font-bold text-[#027A48]">{isRTL ? "مفعل كشريك" : "Active Merchant"}</span>
+                          ) : (
+                            <span className="text-[10px] font-bold text-[#B42318]">{isRTL ? "مرفوض" : "Rejected"}</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className="overflow-hidden rounded-2xl border border-[#ECECEC] bg-white shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[1040px] text-xs">
-            <thead>
-              <tr className="border-b border-[#ECECEC] bg-gray-50/70 text-[9px] font-extrabold uppercase tracking-widest text-[#667085]">
-                {[t.provider, t.contact, t.applicationStatus, t.accountStatus, t.genderCategory, t.shopsManaged, t.revenue, t.rating, t.actions].map((heading) => (
-                  <th key={heading} className={`px-5 py-4 ${dirClass}`}>{heading}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#F5F5F5]">
-              {loading ? (
-                <tr><td colSpan={9} className="px-5 py-10 text-center text-sm font-bold text-[#667085]">Loading...</td></tr>
-              ) : filteredProviders.length === 0 ? (
-                <tr><td colSpan={9} className="px-5 py-12 text-center text-sm font-bold text-[#667085]">{isRTL ? "لا يوجد مزودون مطابقون." : "No providers match these filters."}</td></tr>
-              ) : filteredProviders.map((provider) => (
-                <tr key={provider.id} className="text-[#344054] hover:bg-gray-50/60">
-                  <td className="px-5 py-4">
-                    <p className="font-black text-gray-900">{displayProviderName(provider)}</p>
-                    <p className="mt-1 text-[10px] font-semibold text-[#667085]">{provider.providerName}</p>
-                  </td>
-                  <td className="px-5 py-4">
-                    <p className="font-bold">{provider.contactEmail}</p>
-                    <p className="mt-1 text-[10px] font-semibold text-[#667085]">{provider.contactPhone}</p>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase ${provider.applicationStatus === "approved" ? "bg-[#ECFDF3] text-[#027A48]" : provider.applicationStatus === "rejected" ? "bg-[#FEF3F2] text-[#B42318]" : "bg-[#FFFAEB] text-[#B54708]"}`}>
-                      {t[provider.applicationStatus]}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase ${provider.accountStatus === "active" ? "bg-[#ECFDF3] text-[#027A48]" : provider.accountStatus === "suspended" ? "bg-[#FEF3F2] text-[#B42318]" : "bg-gray-100 text-[#667085]"}`}>
-                      {t[provider.accountStatus]}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 font-bold">{labelGender(provider.gender)}</td>
-                  <td className="px-5 py-4 font-black text-gray-900">{provider.shops.length}</td>
-                  <td className="px-5 py-4 font-black text-[#9A741F]">{money(providerRevenue(provider))}</td>
-                  <td className="px-5 py-4 font-bold text-gray-900">{providerRating(provider) ? `★ ${providerRating(provider).toFixed(1)}` : "—"}</td>
-                  <td className="px-5 py-4">
-                    <div className="flex flex-wrap gap-2">
-                      <button onClick={() => setDetail(provider)} className="rounded-xl border border-[#ECECEC] px-3 py-2 text-[10px] font-black text-gray-700 hover:border-[#D1AF47]/40">{t.view}</button>
-                      <button onClick={() => openEdit(provider)} className="rounded-xl border border-[#D1AF47]/30 bg-[#D1AF47]/10 px-3 py-2 text-[10px] font-black text-[#9A741F]">{t.edit}</button>
-                      {provider.applicationStatus !== "approved" && <button onClick={() => void updateProvider(provider.id, { applicationStatus: "approved", accountStatus: "active" })} className="rounded-xl bg-[#101828] px-3 py-2 text-[10px] font-black text-[#F4E7B6]">{t.approve}</button>}
-                      {provider.applicationStatus !== "rejected" && <button onClick={() => void updateProvider(provider.id, { applicationStatus: "rejected", accountStatus: "inactive" })} className="rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-3 py-2 text-[10px] font-black text-[#B42318]">{t.reject}</button>}
-                      {provider.accountStatus === "suspended"
-                        ? <button onClick={() => void updateProvider(provider.id, { accountStatus: "active", applicationStatus: "approved" })} className="rounded-xl border border-[#ABEFC6] bg-[#ECFDF3] px-3 py-2 text-[10px] font-black text-[#027A48]">{t.reactivate}</button>
-                        : <button onClick={() => void updateProvider(provider.id, { accountStatus: "suspended" })} className="rounded-xl border border-[#FEDF89] bg-[#FFFAEB] px-3 py-2 text-[10px] font-black text-[#B54708]">{t.suspend}</button>}
-                      <button onClick={() => void updateProvider(provider.id, { accountStatus: provider.accountStatus === "active" ? "inactive" : "active" })} className="rounded-xl border border-[#ECECEC] px-3 py-2 text-[10px] font-black text-[#667085]">{provider.accountStatus === "active" ? t.deactivate : t.activate}</button>
-                      <button onClick={() => void deleteProvider(provider)} className="rounded-xl border border-[#FECDCA] px-3 py-2 text-[10px] font-black text-[#B42318]">{t.delete}</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      )}
 
       {portalTarget && modalOpen && createPortal(
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#101828]/55 px-4 py-8 backdrop-blur-sm">
@@ -1323,6 +1632,99 @@ export default function AdminProviderManagement() {
             <div className="mt-6 flex justify-end gap-3">
               <button onClick={() => setModalOpen(false)} className="rounded-xl border border-[#ECECEC] px-5 py-2.5 text-xs font-black text-[#667085]">{t.cancel}</button>
               <button onClick={() => void saveProvider()} className="rounded-xl bg-[#D1AF47] px-5 py-2.5 text-xs font-black text-[#101828] hover:bg-[#E0C46A]">{t.save}</button>
+            </div>
+          </div>
+        </div>,
+        portalTarget
+      )}
+
+      {/* APPROVAL MODAL */}
+      {portalTarget && approvalModalApp && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#101828]/55 px-4 py-8 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-[28px] border border-[#D1AF47]/25 bg-[#F9F7F1] p-6 shadow-2xl">
+            <div className={`mb-4 flex items-center justify-between gap-4 ${rowDir}`}>
+              <div>
+                <h3 className="font-serif text-xl font-black text-gray-900">{t.approveApplication}</h3>
+                <p className="mt-1 text-xs text-[#667085]">{approvalModalApp.business_name_en} ({approvalModalApp.business_name_ar})</p>
+              </div>
+              <button onClick={() => setApprovalModalApp(null)} className="rounded-full border border-[#ECECEC] px-3 py-1 text-xs font-black text-[#667085]">{t.cancel}</button>
+            </div>
+            <div className="space-y-4 py-2">
+              <p className="text-xs text-gray-600 leading-relaxed">
+                {isRTL
+                  ? "سيتم إنشاء سجل المزود والفرع الرئيسي وترقية حساب المستخدم إلى مالك مزود (provider_owner) وتوثيق العملية في سجل التدقيق الإداري."
+                  : "Approving this application will atomically create the provider record, main branch, upgrade user role to provider_owner, and log the action in the admin audit trail."}
+              </p>
+              <label className="block space-y-1 text-xs font-bold text-gray-700">
+                <span>{t.commissionPct}</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.5"
+                  value={approvalCommission}
+                  onChange={(e) => setApprovalCommission(Number(e.target.value))}
+                  className="w-full rounded-xl border border-[#ECECEC] bg-white px-4 py-2.5 text-sm font-bold text-gray-900 outline-none focus:border-[#D1AF47]"
+                />
+              </label>
+            </div>
+            <div className={`mt-6 flex justify-end gap-3 ${rowDir}`}>
+              <button
+                onClick={() => setApprovalModalApp(null)}
+                className="rounded-xl border border-[#ECECEC] px-5 py-2.5 text-xs font-black text-[#667085]"
+              >
+                {t.cancel}
+              </button>
+              <button
+                disabled={submittingAppAction}
+                onClick={() => void handleApproveApplication(approvalModalApp.id, approvalCommission)}
+                className="rounded-xl bg-[#101828] px-5 py-2.5 text-xs font-black text-[#F4E7B6] hover:bg-black transition disabled:opacity-50"
+              >
+                {submittingAppAction ? (isRTL ? "جاري الاعتماد..." : "Approving...") : t.approve}
+              </button>
+            </div>
+          </div>
+        </div>,
+        portalTarget
+      )}
+
+      {/* REJECTION MODAL */}
+      {portalTarget && rejectionModalApp && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#101828]/55 px-4 py-8 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-[28px] border border-[#FECDCA] bg-white p-6 shadow-2xl">
+            <div className={`mb-4 flex items-center justify-between gap-4 ${rowDir}`}>
+              <div>
+                <h3 className="font-serif text-xl font-black text-[#B42318]">{t.rejectApplication}</h3>
+                <p className="mt-1 text-xs text-[#667085]">{rejectionModalApp.business_name_en} ({rejectionModalApp.business_name_ar})</p>
+              </div>
+              <button onClick={() => setRejectionModalApp(null)} className="rounded-full border border-[#ECECEC] px-3 py-1 text-xs font-black text-[#667085]">{t.cancel}</button>
+            </div>
+            <div className="space-y-4 py-2">
+              <label className="block space-y-1 text-xs font-bold text-gray-700">
+                <span>{t.rejectionReason} *</span>
+                <textarea
+                  rows={3}
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  placeholder={isRTL ? "وضح سبب عدم قبول الطلب (بيانات السجل التجاري غير متطابقة، إلخ)..." : "Specify rejection reason (e.g., CR document mismatch)..."}
+                  className="w-full rounded-xl border border-[#ECECEC] bg-white px-4 py-2.5 text-xs text-gray-900 outline-none focus:border-[#B42318]"
+                />
+              </label>
+            </div>
+            <div className={`mt-6 flex justify-end gap-3 ${rowDir}`}>
+              <button
+                onClick={() => setRejectionModalApp(null)}
+                className="rounded-xl border border-[#ECECEC] px-5 py-2.5 text-xs font-black text-[#667085]"
+              >
+                {t.cancel}
+              </button>
+              <button
+                disabled={submittingAppAction || !rejectionReason.trim()}
+                onClick={() => void handleRejectApplication(rejectionModalApp.id, rejectionReason)}
+                className="rounded-xl bg-[#B42318] px-5 py-2.5 text-xs font-black text-white hover:bg-[#912018] transition disabled:opacity-50"
+              >
+                {submittingAppAction ? (isRTL ? "جاري الرفض..." : "Rejecting...") : t.reject}
+              </button>
             </div>
           </div>
         </div>,

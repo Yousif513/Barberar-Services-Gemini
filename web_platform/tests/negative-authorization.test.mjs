@@ -224,5 +224,79 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(loginCode.includes("verifyOtp"), "Must support phone OTP verification");
     });
   });
+
+  describe("Supply & Agreements Boundaries (P0-C: G01, G18, G03)", () => {
+    it("approve_provider_application & reject_provider_application fail closed for non-admins", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261003210000_supply_and_agreements.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("IF NOT public.is_admin() THEN"), "Must check is_admin()");
+      assert.ok(migrationCode.includes("ERRCODE = '42501'"), "Must raise error code 42501 (insufficient privilege)");
+      assert.ok(migrationCode.includes("admin_audit_logs"), "Must log approval/rejection to admin_audit_logs");
+      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.approve_provider_application"), "Must revoke execution from public");
+      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.reject_provider_application"), "Must revoke execution from public");
+    });
+
+    it("provider_applications and legal_agreements enforce strict RLS and security_invoker views", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261003210000_supply_and_agreements.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("ENABLE ROW LEVEL SECURITY"), "Must enable RLS");
+      assert.ok(migrationCode.includes("admin_provider_applications_view"), "Must define admin provider applications view");
+      assert.ok(migrationCode.includes("WITH (security_invoker = true)"), "Admin view must use security_invoker = true");
+      assert.ok(migrationCode.includes("status = 'published'"), "Public users can only read published agreements");
+      assert.ok(migrationCode.includes("provider_agreement"), "Must seed provider agreement");
+      assert.ok(migrationCode.includes("'draft'"), "Provider agreement must be seeded as draft until legal counsel confirms");
+    });
+
+    it("bookings table enforces valid sources and first-visit attribution trigger", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261003210000_supply_and_agreements.sql"),
+        "utf8"
+      );
+      assert.ok(
+        migrationCode.includes("CHECK (source IN ('marketplace', 'link', 'qr', 'whatsapp', 'instagram', 'walk_in', 'import'))"),
+        "Must enforce source check constraint"
+      );
+      assert.ok(migrationCode.includes("handle_booking_first_visit_detection"), "Must detect first visit automatically");
+    });
+
+    it("provider-management.tsx fixes Defect #1 (no catch-and-succeed, honest rollback on error)", () => {
+      const adminCode = readFileSync(
+        join(webPlatformDir, "src/app/admin/providers/provider-management.tsx"),
+        "utf8"
+      );
+      // Ensure no catch-and-succeed pattern exists
+      assert.ok(!adminCode.includes("setProviders(providers.filter("), "Must not do fake local update in catch block");
+      assert.ok(adminCode.includes("setError("), "Failed write must surface error message to operator");
+      assert.ok(adminCode.includes("Applications Review Queue") || adminCode.includes("قائمة طلبات الانضمام"), "Must include application review queue");
+      assert.ok(adminCode.includes("approve_provider_application"), "Must call atomic approve RPC");
+      assert.ok(adminCode.includes("reject_provider_application"), "Must call atomic reject RPC");
+    });
+
+    it("provider dashboard renders guided setup checklist and public share kit with 0% commission", () => {
+      const dashCode = readFileSync(
+        join(webPlatformDir, "src/app/provider/dashboard/page.tsx"),
+        "utf8"
+      );
+      assert.ok(dashCode.includes("setupTitle"), "Must render guided setup checklist");
+      assert.ok(dashCode.includes("shareKitTitle"), "Must render share kit title");
+      assert.ok(dashCode.includes("source=link"), "Must provide direct booking link with source=link");
+      assert.ok(dashCode.includes("source=qr"), "Must provide QR code link with source=qr");
+      assert.ok(dashCode.includes("source=whatsapp"), "Must support WhatsApp sharing");
+      assert.ok(dashCode.includes("source=instagram"), "Must support Instagram bio sharing");
+      assert.ok(dashCode.includes("0% Commission") || dashCode.includes("العمولة 0%"), "Must highlight 0% direct booking commission");
+    });
+
+    it("shop page passes booking source to create_booking RPC", () => {
+      const shopCode = readFileSync(
+        join(webPlatformDir, "src/app/shop/[id]/page.tsx"),
+        "utf8"
+      );
+      assert.ok(shopCode.includes('request_source: bookingSource'), "Must pass request_source to create_booking RPC");
+    });
+  });
 });
 
