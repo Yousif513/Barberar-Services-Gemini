@@ -403,6 +403,93 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(confirmationCode.includes("Cancellation & No-Show Terms") || confirmationCode.includes("سياسة الإلغاء وعدم الحضور"), "Confirmation page must display cancellation policy");
     });
   });
+
+  describe("WhatsApp Messaging Pipeline (P0-E: G11)", () => {
+    it("message_templates seeds bilingual AR/EN utility templates", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261003230000_whatsapp_messaging_pipeline.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.message_templates"), "Must create message_templates table");
+      assert.ok(migrationCode.includes("'booking_confirmation', 'ar'"), "Must seed Arabic booking confirmation");
+      assert.ok(migrationCode.includes("'booking_confirmation', 'en'"), "Must seed English booking confirmation");
+      assert.ok(migrationCode.includes("'reminder_24h', 'ar'"), "Must seed Arabic 24h reminder");
+      assert.ok(migrationCode.includes("'reminder_2h', 'ar'"), "Must seed Arabic 2h reminder");
+      assert.ok(migrationCode.includes("'post_visit_review', 'ar'"), "Must seed Arabic post-visit review");
+      assert.ok(migrationCode.includes("'owner_new_booking', 'ar'"), "Must seed Arabic owner alert");
+    });
+
+    it("message_queue and message_log enforce RLS and cost tracking", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261003230000_whatsapp_messaging_pipeline.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.message_queue"), "Must create message_queue table");
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.message_log"), "Must create message_log table");
+      assert.ok(migrationCode.includes("cost_sar NUMERIC(10, 4) NOT NULL DEFAULT 0.1500"), "Must record SAR utility cost");
+      assert.ok(migrationCode.includes("ALTER TABLE public.message_queue ENABLE ROW LEVEL SECURITY"), "Must enable RLS on queue");
+      assert.ok(migrationCode.includes("ALTER TABLE public.message_log ENABLE ROW LEVEL SECURITY"), "Must enable RLS on log");
+    });
+
+    it("booking lifecycle trigger enqueues confirmations and cancels on cancellation", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261003230000_whatsapp_messaging_pipeline.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("handle_booking_messaging_lifecycle"), "Must create lifecycle messaging function");
+      assert.ok(migrationCode.includes("NEW.status = 'confirmed'"), "Must handle booking confirmation");
+      assert.ok(migrationCode.includes("NEW.status = 'completed'"), "Must handle booking completion for review");
+      assert.ok(migrationCode.includes("NEW.status IN ('cancelled', 'no_show')"), "Must cancel reminders on cancel or no-show");
+      assert.ok(migrationCode.includes("trg_booking_messaging_lifecycle"), "Must bind trigger to bookings table");
+    });
+
+    it("dispatcher stored procedure enforces Saudi quiet hours, phone verification, and consent", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261003230000_whatsapp_messaging_pipeline.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("dispatch_message_queue_batch"), "Must create dispatch_message_queue_batch RPC");
+      assert.ok(migrationCode.includes("Asia/Riyadh"), "Must evaluate Saudi AST timezone (UTC+3)");
+      assert.ok(migrationCode.includes("v_current_hour_ast >= 22 OR v_current_hour_ast < 9"), "Must enforce 22:00-09:00 quiet hours");
+      assert.ok(migrationCode.includes("deferred_quiet_hours"), "Must defer non-urgent messages during quiet hours");
+      assert.ok(migrationCode.includes("phone_verified"), "Must check recipient phone verification status");
+      assert.ok(migrationCode.includes("skipped_unverified"), "Must skip unverified phone numbers");
+      assert.ok(migrationCode.includes("public.consents"), "Must check PDPL consent records");
+      assert.ok(migrationCode.includes("skipped_no_consent"), "Must skip when consent is missing");
+    });
+
+    it("dispatch-messages edge function validates admin/service_role and CORS", () => {
+      const fnCode = readFileSync(
+        join(rootDir, "supabase/functions/dispatch-messages/index.ts"),
+        "utf8"
+      );
+      assert.ok(fnCode.includes("Authorization"), "Must require Authorization header");
+      assert.ok(fnCode.includes("profile.role !== \"admin\""), "Must require admin role when not service_role");
+      assert.ok(fnCode.includes("dispatch_message_queue_batch"), "Must invoke database dispatcher RPC");
+    });
+
+    it("admin/notifications connects to live pipeline and offers queue dispatch", () => {
+      const notifCode = readFileSync(
+        join(webPlatformDir, "src/app/admin/notifications/page.tsx"),
+        "utf8"
+      );
+      assert.ok(!notifCode.includes("INITIAL_HISTORY = ["), "Must not use hardcoded mock history");
+      assert.ok(notifCode.includes('from("message_log")'), "Must query live message_log");
+      assert.ok(notifCode.includes('from("message_queue")'), "Must query live message_queue");
+      assert.ok(notifCode.includes('dispatch_message_queue_batch'), "Must allow manual queue dispatch");
+      assert.ok(notifCode.includes("Quiet Hours") || notifCode.includes("ساعات الهدوء"), "Must display quiet hours metrics");
+    });
+
+    it("customer bookings page eliminates mock fallback and handles interactive attendance action", () => {
+      const bookingsCode = readFileSync(
+        join(webPlatformDir, "src/app/customer/bookings/page.tsx"),
+        "utf8"
+      );
+      assert.ok(!bookingsCode.includes("bk-100"), "Must not fall back to mock bk-100 on error");
+      assert.ok(bookingsCode.includes("customer_confirm_attendance"), "Must support customer_confirm_attendance RPC");
+      assert.ok(bookingsCode.includes("confirm_attendance"), "Must check for confirm_attendance URL parameter");
+    });
+  });
 });
 
 

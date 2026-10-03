@@ -28,7 +28,8 @@ const translations = {
     confirmCancelDesc: "Are you sure you want to cancel this appointment? This action cannot be undone.",
     yesCancel: "Yes, Cancel",
     close: "Close",
-    currency: "SAR"
+    currency: "SAR",
+    attendanceConfirmed: "Attendance confirmed! Looking forward to welcoming you."
   },
   ar: {
     title: "حجوزاتي",
@@ -53,7 +54,8 @@ const translations = {
     confirmCancelDesc: "هل أنت متأكد من إلغاء هذا الموعد؟ لا يمكن التراجع عن هذا الإجراء.",
     yesCancel: "نعم، إلغاء الحجز",
     close: "إغلاق",
-    currency: "ريال"
+    currency: "ريال",
+    attendanceConfirmed: "تم تأكيد حضورك بنجاح! نحن بانتظارك في الموعد المحدد."
   }
 };
 
@@ -63,6 +65,7 @@ export default function CustomerBookingsPage() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [actionMessage, setActionMessage] = useState("");
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
 
@@ -118,6 +121,29 @@ export default function CustomerBookingsPage() {
 
   useEffect(() => {
     loadBookings();
+
+    // Handle interactive action from WhatsApp link (?action=confirm_attendance&booking_id=...)
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const action = params.get("action");
+      const bookingId = params.get("booking_id") || params.get("id");
+
+      if (action === "confirm_attendance" && bookingId) {
+        (async () => {
+          try {
+            const { data, error: rpcErr } = await supabase.rpc("customer_confirm_attendance", {
+              p_booking_id: bookingId
+            });
+            if (!rpcErr && (data as { success?: boolean })?.success) {
+              setActionMessage(t.attendanceConfirmed);
+              loadBookings();
+            }
+          } catch (e) {
+            console.warn("Attendance confirmation error:", e);
+          }
+        })();
+      }
+    }
   }, []);
 
   async function loadBookings() {
@@ -149,72 +175,8 @@ export default function CustomerBookingsPage() {
       setBookings(data || []);
     } catch (err: any) {
       console.error("Error loading bookings:", err.message);
-      setError("Failed to sync live bookings. Displaying verified local appointments.");
-      
-      // Fallback premium mock bookings
-      const mockDate1 = new Date();
-      mockDate1.setDate(mockDate1.getDate() + 2);
-      mockDate1.setHours(14, 0, 0);
-
-      const mockDate2 = new Date();
-      mockDate2.setDate(mockDate2.getDate() - 5);
-      
-      const mockDate3 = new Date();
-      mockDate3.setDate(mockDate3.getDate() - 12);
-
-      setBookings([
-        {
-          id: "bk-100",
-          scheduled_at: mockDate1.toISOString(),
-          status: "confirmed",
-          total_price: 220,
-          services: { name_en: "Luxury Beard Grooming & Hot Towel Shave", name_ar: "حلاقة اللحية الفاخرة بالمنشفة الساخنة" },
-          employees: { name_en: "Marcus Vance", name_ar: "ماركوس فانس" },
-          branches: {
-            name_en: "Olaya Main Branch",
-            name_ar: "فرع العليا الرئيسي",
-            providers: {
-              business_name_en: "Elite Grooming Lounge",
-              business_name_ar: "صالون إيليت الرجالي",
-              logo_url: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=200&auto=format&fit=crop"
-            }
-          }
-        },
-        {
-          id: "bk-200",
-          scheduled_at: mockDate2.toISOString(),
-          status: "completed",
-          total_price: 350,
-          services: { name_en: "Deep Hydrating Facial & Scalp Therapy", name_ar: "علاج ترطيب البشرة العميق وتدليك فروة الرأس" },
-          employees: { name_en: "Elena Rostova", name_ar: "إيلينا روستوفا" },
-          branches: {
-            name_en: "Al-Takhassusi Boulevard",
-            name_ar: "جادة التخصصي",
-            providers: {
-              business_name_en: "Riyadh Premium Spa & Wellness",
-              business_name_ar: "سبا الرياض الفاخر للعناية",
-              logo_url: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=200&auto=format&fit=crop"
-            }
-          }
-        },
-        {
-          id: "bk-300",
-          scheduled_at: mockDate3.toISOString(),
-          status: "cancelled",
-          total_price: 180,
-          services: { name_en: "Classic Haircut & Blow Dry", name_ar: "قص الشعر الكلاسيكي والسيشوار" },
-          employees: { name_en: "Jordan K.", name_ar: "جوردان ك." },
-          branches: {
-            name_en: "Olaya Main Branch",
-            name_ar: "فرع العليا الرئيسي",
-            providers: {
-              business_name_en: "Elite Grooming Lounge",
-              business_name_ar: "صالون إيليت الرجالي",
-              logo_url: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=200&auto=format&fit=crop"
-            }
-          }
-        }
-      ]);
+      setError(err?.message || "Failed to sync bookings from server.");
+      setBookings([]);
     } finally {
       setLoading(false);
     }
@@ -271,6 +233,13 @@ export default function CustomerBookingsPage() {
           <p className="text-sm text-gray-500 mt-1">{t.subtitle}</p>
         </div>
       </div>
+
+      {actionMessage && (
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-xl p-4 flex items-center justify-between">
+          <span>✓ {actionMessage}</span>
+          <button onClick={() => setActionMessage("")} className="text-emerald-700 hover:text-emerald-900 font-bold ml-2">✕</button>
+        </div>
+      )}
 
       {error && (
         <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl p-4">
