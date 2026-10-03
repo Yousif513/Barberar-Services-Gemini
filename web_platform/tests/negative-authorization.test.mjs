@@ -891,6 +891,118 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(customerBookingsCode.includes("generate_zatca_tax_invoice"), "Customer bookings must call generate_zatca_tax_invoice RPC");
       assert.ok(customerBookingsCode.includes("open_booking_dispute"), "Customer bookings must call open_booking_dispute RPC");
     });
+
+    it("search_marketplace_providers and normalize_arabic enforce Arabic normalization and Haversine distance (G29)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004040000_growth_surfaces.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("FUNCTION public.normalize_arabic"), "Must create normalize_arabic helper function");
+      assert.ok(migrationCode.includes("FUNCTION public.search_marketplace_providers"), "Must create search_marketplace_providers RPC");
+      assert.ok(migrationCode.includes("6371 * acos"), "Must calculate Haversine distance in kilometers");
+      assert.ok(migrationCode.includes("public.normalize_arabic(p.business_name_ar)"), "Must normalize Arabic business names for matching");
+      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.search_marketplace_providers"), "Must revoke public execution");
+      assert.ok(migrationCode.includes("GRANT EXECUTE ON FUNCTION public.search_marketplace_providers"), "Must grant execution to authenticated");
+    });
+
+    it("import_provider_clients strictly enforces Saudi PDPL consent validation and provider ownership (G35)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004040000_growth_surfaces.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.provider_client_imports"), "Must create provider_client_imports table");
+      assert.ok(migrationCode.includes("FUNCTION public.import_provider_clients"), "Must create import_provider_clients RPC");
+      assert.ok(migrationCode.includes("IF NOT p_consent_confirmed THEN"), "Must strictly check PDPL consent");
+      assert.ok(migrationCode.includes("PDPL Consent Required"), "Must error on missing PDPL consent");
+      assert.ok(migrationCode.includes("Forbidden: not authorized to import clients"), "Must restrict to provider owner or admin");
+      assert.ok(migrationCode.includes("provider.clients_imported"), "Must emit audit event");
+      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.import_provider_clients"), "Must revoke public execution");
+    });
+
+    it("enqueue_post_visit_rebook trigger enqueues post-visit review and rebook on completed booking (G41)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004040000_growth_surfaces.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("FUNCTION public.enqueue_post_visit_rebook"), "Must create enqueue_post_visit_rebook function");
+      assert.ok(migrationCode.includes("trigger_enqueue_post_visit_rebook"), "Must define trigger on bookings table");
+      assert.ok(migrationCode.includes("WHEN (NEW.status = 'completed')"), "Trigger must only run when booking completes");
+      assert.ok(migrationCode.includes("post_visit_review_rebook"), "Must enqueue post_visit_review_rebook message");
+      assert.ok(migrationCode.includes("message_queue"), "Must enqueue into message_queue");
+    });
+
+    it("get_provider_monthly_value_summary calculates G43 value metrics and commission savings (G43)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004040000_growth_surfaces.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.provider_value_summaries"), "Must create provider_value_summaries table");
+      assert.ok(migrationCode.includes("FUNCTION public.get_provider_monthly_value_summary"), "Must create get_provider_monthly_value_summary RPC");
+      assert.ok(migrationCode.includes("new_clients_acquired"), "Must track new clients acquired");
+      assert.ok(migrationCode.includes("direct_commission_saved_sar"), "Must calculate direct channel commission savings");
+      assert.ok(migrationCode.includes("ROUND(v_direct_gmv * 0.15, 2)"), "Must calculate 15% commission saved on direct GMV");
+      assert.ok(migrationCode.includes("Forbidden: not authorized to view value summary"), "Must restrict access to provider owner or admin");
+      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.get_provider_monthly_value_summary"), "Must revoke public execution");
+    });
+
+    it("get_booking_address_secure masks client home service address until booking is confirmed (G37)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004040000_growth_surfaces.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("FUNCTION public.get_booking_address_secure"), "Must create get_booking_address_secure RPC");
+      assert.ok(migrationCode.includes("is_home_service"), "Must add is_home_service column");
+      assert.ok(migrationCode.includes("home_address_text"), "Must add home_address_text column");
+      assert.ok(migrationCode.includes("Address hidden until booking confirmation"), "Must mask address before confirmation");
+      assert.ok(migrationCode.includes("booking.address_revealed"), "Must audit address reveal event");
+      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.get_booking_address_secure"), "Must revoke public execution");
+    });
+
+    it("sitemap.ts and robots.ts provide discovery and SEO routes (G28)", () => {
+      const sitemapCode = readFileSync(
+        join(webPlatformDir, "src/app/sitemap.ts"),
+        "utf8"
+      );
+      assert.ok(sitemapCode.includes("MetadataRoute.Sitemap"), "Must export Next.js Sitemap type");
+      assert.ok(sitemapCode.includes("districts = ["), "Must include Riyadh districts");
+      assert.ok(sitemapCode.includes("/categories/"), "Must include marketplace categories");
+      assert.ok(sitemapCode.includes("ar-SA"), "Must specify Arabic alternate language");
+      assert.ok(sitemapCode.includes("en-US"), "Must specify English alternate language");
+
+      const robotsCode = readFileSync(
+        join(webPlatformDir, "src/app/robots.ts"),
+        "utf8"
+      );
+      assert.ok(robotsCode.includes("MetadataRoute.Robots"), "Must export Next.js Robots type");
+      assert.ok(robotsCode.includes("sitemap.xml"), "Must point to sitemap");
+      assert.ok(robotsCode.includes('"/admin/*"'), "Must disallow admin area in robots.txt");
+    });
+
+    it("growth surfaces UI integration: customer search, provider client CSV import, and provider dashboard value card (G29, G35, G43)", () => {
+      const customerSearchCode = readFileSync(
+        join(webPlatformDir, "src/app/customer/search/page.tsx"),
+        "utf8"
+      );
+      assert.ok(customerSearchCode.includes("search_marketplace_providers"), "Customer search must call search_marketplace_providers RPC");
+      assert.ok(!customerSearchCode.includes("MOCK_BRANCHES"), "Customer search must not use mock branches");
+      assert.ok(customerSearchCode.includes("fetchProviders"), "Customer search must fetch live providers from DB");
+
+      const providerCustomersCode = readFileSync(
+        join(webPlatformDir, "src/app/provider/customers/page.tsx"),
+        "utf8"
+      );
+      assert.ok(providerCustomersCode.includes("import_provider_clients"), "Provider customers must call import_provider_clients RPC");
+      assert.ok(providerCustomersCode.includes("showImportModal"), "Provider customers must include import modal state");
+      assert.ok(providerCustomersCode.includes("consentCheckbox"), "Provider customers must require PDPL consent confirmation");
+
+      const providerDashboardCode = readFileSync(
+        join(webPlatformDir, "src/app/provider/dashboard/page.tsx"),
+        "utf8"
+      );
+      assert.ok(providerDashboardCode.includes("get_provider_monthly_value_summary"), "Provider dashboard must call get_provider_monthly_value_summary RPC");
+      assert.ok(providerDashboardCode.includes("valueSummaryTitle"), "Provider dashboard must render G43 value summary card");
+      assert.ok(providerDashboardCode.includes("commissionSaved"), "Provider dashboard must display commission saved metric");
+    });
   });
 });
 

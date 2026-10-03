@@ -31,8 +31,17 @@ const translations = {
     phone: "Phone",
     activeStatus: "Active",
     loadingClients: "Loading client directory...",
-    localRecordsNotice: "Displaying demo sandbox client records.",
-    completedStatus: "Completed"
+    localRecordsNotice: "Displaying client records.",
+    completedStatus: "Completed",
+    importClientsBtn: "Import Clients (CSV)",
+    importModalTitle: "Import Existing Salon Clients (CSV)",
+    importModalSubtitle: "Paste your existing client list (Name, Phone, Notes) to migrate contacts to Primora.",
+    pasteCsvPlaceholder: "Sara Al-Harbi, +966501234567, Prefers organic oil treatment\nFahad Al-Otaibi, +966551234567, Low skin fade specialist",
+    consentCheckbox: "I certify that these clients have explicitly consented to receiving appointment communications in compliance with Saudi PDPL regulations.",
+    startImport: "Start Import",
+    importing: "Importing...",
+    importSuccessMsg: "Clients imported successfully into your directory.",
+    importErrorConsent: "You must confirm that clients have consented to receiving messages."
   },
   ar: {
     title: "دليل العملاء",
@@ -61,8 +70,17 @@ const translations = {
     phone: "الجوال",
     activeStatus: "نشط",
     loadingClients: "جاري تحميل دليل العملاء...",
-    localRecordsNotice: "يتم عرض سجلات تجريبية للعملاء.",
-    completedStatus: "مكتمل"
+    localRecordsNotice: "يتم عرض سجلات العملاء.",
+    completedStatus: "مكتمل",
+    importClientsBtn: "استيراد العملاء (CSV)",
+    importModalTitle: "استيراد قائمة عملاء الصالون الحالية",
+    importModalSubtitle: "قم بلصق قائمة عملائك (الاسم، الجوال، الملاحظات) لنقل بياناتهم وحجوزاتهم إلى بريمورا بسهولة.",
+    pasteCsvPlaceholder: "سارة الحربي, +966501234567, تفضل الزيوت العضوية\nفهد العتيبي, +966551234567, تدريج كلاسيكي خفيف",
+    consentCheckbox: "أقر وأتعهد بأن هؤلاء العملاء قد وافقوا صراحة على استلام رسائل وتنبيهات المواعيد من منشأتنا وفقاً لنظام حماية البيانات الشخصية السعودي (PDPL).",
+    startImport: "بدء الاستيراد",
+    importing: "جاري الاستيراد...",
+    importSuccessMsg: "تم استيراد قائمة العملاء بنجاح إلى دليلك.",
+    importErrorConsent: "يجب الموافقة والإقرار بوجود موافقة العملاء المسبقة لمتابعة الاستيراد."
   }
 };
 
@@ -77,7 +95,71 @@ export default function ProviderCustomersPage() {
   const [editingClient, setEditingClient] = useState<any>(null);
   const [noteText, setNoteText] = useState("");
 
+  // Client Import State (G35)
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importText, setImportText] = useState("");
+  const [consentConfirmed, setConsentConfirmed] = useState(false);
+  const [importLoading, setImportLoading] = useState(false);
+  const [importMessage, setImportMessage] = useState("");
+  const [importError, setImportError] = useState("");
+
   const t = translations[locale];
+
+  const handleImportClients = async () => {
+    if (!consentConfirmed) {
+      setImportError(t.importErrorConsent);
+      return;
+    }
+    if (!importText.trim()) {
+      setImportError(locale === "ar" ? "يرجى إدخال بيانات العملاء" : "Please paste client data");
+      return;
+    }
+
+    try {
+      setImportLoading(true);
+      setImportError("");
+      const lines = importText.trim().split("\n");
+      const clientsToImport = lines.map(line => {
+        const parts = line.split(",").map(p => p.trim());
+        return {
+          name: parts[0] || "Client",
+          phone: parts[1] || "",
+          notes: parts[2] || ""
+        };
+      }).filter(c => c.name || c.phone);
+
+      if (clientsToImport.length === 0) {
+        setImportError("No valid rows found to import.");
+        return;
+      }
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: prov } = await supabase.from("providers").select("id").eq("owner_id", user.id).maybeSingle();
+      if (!prov) {
+        setImportError("Provider account not found.");
+        return;
+      }
+
+      const { data, error: rpcErr } = await supabase.rpc("import_provider_clients", {
+        p_provider_id: prov.id,
+        p_clients: clientsToImport,
+        p_consent_confirmed: true
+      });
+
+      if (rpcErr) throw rpcErr;
+
+      setImportMessage(t.importSuccessMsg);
+      setImportText("");
+      setShowImportModal(false);
+      loadClients();
+    } catch (err: any) {
+      console.error("Client import error:", err);
+      setImportError(err?.message || "Failed to import clients.");
+    } finally {
+      setImportLoading(false);
+    }
+  };
 
   // Sync language with document root
   useEffect(() => {
@@ -248,18 +330,35 @@ export default function ProviderCustomersPage() {
           <p className="text-sm text-[#344054] mt-2 font-medium">{t.subtitle}</p>
         </div>
         
-        {/* PREMIUM SEARCH BAR */}
-        <div className="relative w-full md:w-96 flex items-center bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]/85 backdrop-blur-md border border-[#ECECEC] px-5 py-3 rounded-2xl focus-within:border-[#D1AF47]/40 focus-within:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300">
-          <svg className="w-4 h-4 text-[#D1AF47] me-3 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="text"
-            placeholder={t.searchPlaceholder}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-transparent border-none outline-none text-xs placeholder-[#7B859C]/60 text-[#101828] font-medium focus:ring-0"
-          />
+        {/* ACTION BUTTONS & SEARCH BAR */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <button
+            onClick={() => {
+              setShowImportModal(true);
+              setImportError("");
+              setImportMessage("");
+            }}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-[#D1AF47] to-[#B8952E] text-[#070B12] font-bold text-xs shadow-[0_4px_15px_rgba(209,175,71,0.2)] hover:from-[#E0C46A] hover:to-[#D1AF47] transition-all duration-300"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+            </svg>
+            <span>{t.importClientsBtn}</span>
+          </button>
+
+          {/* PREMIUM SEARCH BAR */}
+          <div className="relative w-full md:w-80 flex items-center bg-white shadow-[0_8px_30px_rgb(0,0,0,0.015)]/85 backdrop-blur-md border border-[#ECECEC] px-4 py-2.5 rounded-2xl focus-within:border-[#D1AF47]/40 focus-within:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300">
+            <svg className="w-4 h-4 text-[#D1AF47] me-3 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder={t.searchPlaceholder}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-transparent border-none outline-none text-xs placeholder-[#7B859C]/60 text-[#101828] font-medium focus:ring-0"
+            />
+          </div>
         </div>
       </div>
 
@@ -578,6 +677,83 @@ export default function ProviderCustomersPage() {
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* CSV CLIENT IMPORT MODAL (G35) */}
+      {showImportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white border border-[#ECECEC] shadow-2xl rounded-3xl max-w-xl w-full p-6 space-y-5 text-[#101828]">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-[#101828] flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#D1AF47]"></span>
+                  {t.importModalTitle}
+                </h3>
+                <p className="text-xs text-[#667085] mt-1">{t.importModalSubtitle}</p>
+              </div>
+              <button
+                onClick={() => setShowImportModal(false)}
+                className="text-[#667085] hover:text-[#101828] p-1 font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            {importError && (
+              <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl font-medium">
+                {importError}
+              </div>
+            )}
+            {importMessage && (
+              <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs rounded-xl font-medium">
+                {importMessage}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <label className="text-[11px] font-bold text-[#344054] block uppercase tracking-wider">
+                CSV Data (Name, Phone, Notes)
+              </label>
+              <textarea
+                rows={6}
+                value={importText}
+                onChange={(e) => setImportText(e.target.value)}
+                placeholder={t.pasteCsvPlaceholder}
+                className="w-full bg-[#FAFAFA] border border-[#ECECEC] rounded-xl p-3 text-xs font-mono text-[#101828] outline-none focus:border-[#D1AF47] resize-none"
+              />
+            </div>
+
+            {/* PDPL CONSENT CHECKBOX */}
+            <div className="flex items-start gap-3 p-3.5 bg-[#FFFDF5] border border-[#D1AF47]/30 rounded-xl">
+              <input
+                type="checkbox"
+                id="consentCheck"
+                checked={consentConfirmed}
+                onChange={(e) => setConsentConfirmed(e.target.checked)}
+                className="mt-0.5 w-4 h-4 rounded border-[#D1AF47] text-[#D1AF47] focus:ring-[#D1AF47]"
+              />
+              <label htmlFor="consentCheck" className="text-xs text-[#344054] font-medium leading-relaxed cursor-pointer select-none">
+                {t.consentCheckbox}
+              </label>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                onClick={() => setShowImportModal(false)}
+                className="flex-1 py-2.5 border border-[#ECECEC] rounded-xl text-xs font-bold text-[#344054] hover:bg-gray-50"
+              >
+                {t.cancel}
+              </button>
+              <button
+                onClick={handleImportClients}
+                disabled={importLoading || !importText.trim()}
+                className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#D1AF47] to-[#B8952E] text-[#070B12] font-black text-xs hover:from-[#E0C46A] hover:to-[#D1AF47] transition-all disabled:opacity-50"
+              >
+                {importLoading ? t.importing : t.startImport}
+              </button>
+            </div>
           </div>
         </div>
       )}

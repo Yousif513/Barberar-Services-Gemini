@@ -56,6 +56,13 @@ const translations = {
     shareWhatsApp: "WhatsApp",
     shareInstagram: "Instagram Bio",
     qrTitle: "Scan & Book (QR)",
+    valueSummaryTitle: "PRIMORA Brought You This Month",
+    valueSummarySubtitle: "Real platform impact, client acquisition, and commission savings through direct channels.",
+    newClientsAcquired: "New Clients Acquired",
+    directLinkBookings: "Direct Link Bookings",
+    totalGmv: "Total Gross Volume",
+    commissionSaved: "0% Commission Saved",
+    currency: "SAR",
   },
   ar: {
     branch: "فرع الرياض الرئيسي", search: "البحث في العمليات، الموظفين، الحجوزات...",
@@ -90,6 +97,13 @@ const translations = {
     shareWhatsApp: "واتساب",
     shareInstagram: "بايو انستغرام",
     qrTitle: "رمز QR للحجز المباشر",
+    valueSummaryTitle: "ما حققته لك بريمورا هذا الشهر",
+    valueSummarySubtitle: "أثر المنصة الملموس في استقطاب عملاء جدد وتوفير العمولات عبر قنواتك المباشرة.",
+    newClientsAcquired: "عملاء جدد مكتسبون",
+    directLinkBookings: "حجوزات الروابط المباشرة",
+    totalGmv: "إجمالي حجم المبيعات",
+    commissionSaved: "وفورات العمولة (0%)",
+    currency: "ريال",
   },
 };
 
@@ -129,6 +143,13 @@ export default function ProviderDashboardPage() {
   const [dashboardStats, setDashboardStats] = useState<DashboardStats>(demoDashboardStats);
   const [statsMode, setStatsMode] = useState<"live" | "demo">("demo");
   const [providerId, setProviderId] = useState<string | null>(null);
+  const [valueSummary, setValueSummary] = useState<{
+    new_clients_acquired: number;
+    marketplace_bookings: number;
+    direct_link_bookings: number;
+    total_gmv_sar: number;
+    commission_saved_sar: number;
+  } | null>(null);
   const [origin, setOrigin] = useState("");
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedInstagram, setCopiedInstagram] = useState(false);
@@ -262,6 +283,24 @@ export default function ProviderDashboardPage() {
             linkShared: false,
           });
           setStatsMode("live");
+
+          try {
+            const { data: valData } = await supabase.rpc("get_provider_monthly_value_summary", {
+              p_provider_id: provider.id,
+              p_month_date: new Date().toISOString().split("T")[0],
+            });
+            if (valData && typeof valData === "object") {
+              setValueSummary({
+                new_clients_acquired: Number(valData.new_clients_acquired || 0),
+                marketplace_bookings: Number(valData.marketplace_bookings || 0),
+                direct_link_bookings: Number(valData.direct_link_bookings || 0),
+                total_gmv_sar: Number(valData.total_gmv_sar || 0),
+                commission_saved_sar: Number(valData.commission_saved_sar || 0),
+              });
+            }
+          } catch (valErr) {
+            console.warn("Could not load provider value summary:", valErr);
+          }
         }
       } catch (err) {
         console.warn("Provider dashboard using fallback data:", err);
@@ -618,6 +657,54 @@ export default function ProviderDashboardPage() {
             >
               {isRTL ? "طباعة رمز QR للعرض في الصالون" : "Print Salon QR Display"}
             </button>
+          </div>
+        </div>
+      </section>
+
+      {/* PRIMORA BROUGHT YOU THIS MONTH (P1-E G43) */}
+      <section className={`${cardBase} p-5 border-[#D1AF47]/30 bg-gradient-to-br from-amber-500/[0.03] via-white to-transparent`}>
+        <div className={`flex flex-col gap-2 md:flex-row md:items-center md:justify-between ${flip}`}>
+          <div>
+            <div className={`flex items-center gap-2 ${flip}`}>
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#D1AF47]/20 text-[#8A6F1C] text-xs font-black">⚡</span>
+              <h2 className="font-serif text-base font-black text-[#101828]">{t.valueSummaryTitle}</h2>
+              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-700">G43 Verified</span>
+            </div>
+            <p className="mt-1 text-xs text-[#667085]">{t.valueSummarySubtitle}</p>
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-xl border border-[#ECECEC] bg-white p-4 shadow-sm hover:border-[#D1AF47]/40 transition-colors">
+            <span className="text-[10px] uppercase font-bold text-[#667085] tracking-wider block">{t.newClientsAcquired}</span>
+            <div className="mt-2 flex items-baseline justify-between">
+              <span className="text-2xl font-black text-[#101828]">{valueSummary?.new_clients_acquired ?? 0}</span>
+              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">{isRTL ? "عملاء لأول مرة" : "First-time"}</span>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-[#ECECEC] bg-white p-4 shadow-sm hover:border-[#D1AF47]/40 transition-colors">
+            <span className="text-[10px] uppercase font-bold text-[#667085] tracking-wider block">{t.directLinkBookings}</span>
+            <div className="mt-2 flex items-baseline justify-between">
+              <span className="text-2xl font-black text-[#101828]">{valueSummary?.direct_link_bookings ?? 0}</span>
+              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">0% Fee</span>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-[#ECECEC] bg-white p-4 shadow-sm hover:border-[#D1AF47]/40 transition-colors">
+            <span className="text-[10px] uppercase font-bold text-[#667085] tracking-wider block">{t.totalGmv}</span>
+            <div className="mt-2 flex items-baseline justify-between">
+              <span className="text-2xl font-black text-[#101828]">{(valueSummary?.total_gmv_sar ?? 0).toLocaleString()} <span className="text-xs font-semibold text-gray-500">{t.currency}</span></span>
+              <span className="text-[10px] font-bold text-[#8A6F1C] bg-amber-50 px-2 py-0.5 rounded-full">{isRTL ? "إجمالي الحجوزات" : "Gross Bookings"}</span>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-4 shadow-sm">
+            <span className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider block">{t.commissionSaved}</span>
+            <div className="mt-2 flex items-baseline justify-between">
+              <span className="text-2xl font-black text-emerald-700">{(valueSummary?.commission_saved_sar ?? 0).toLocaleString()} <span className="text-xs font-semibold text-emerald-600">{t.currency}</span></span>
+              <span className="text-[10px] font-bold text-emerald-700 bg-white border border-emerald-200 px-2 py-0.5 rounded-full">15% Saved</span>
+            </div>
           </div>
         </div>
       </section>
