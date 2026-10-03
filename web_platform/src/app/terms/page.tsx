@@ -8,26 +8,26 @@ const translations = {
     backHome: "Back to Home",
     terms: "Terms of Service",
     title: "Marketplace Terms & Rules",
-    subtitle: "Rules governing payments, escrow splits, and cancellation policies",
-    section1Title: "1. The Escrow Booking Model",
-    section1Desc: "When a customer schedules a grooming session on Primora, their payment is authorized and captured into a secure escrow hold. These funds are held safely by our partner payment processor (Tap Connect) and are only released to the service provider after the appointment is marked complete.",
+    subtitle: "Rules governing payments, booking settlements, and cancellation policies",
+    section1Title: "1. Online Booking & Payment Processing",
+    section1Desc: "When a customer schedules an appointment on Primora, their payment is authorized and processed through our licensed partner payment processor (Tap Payments). Payments are settled to the service provider after the appointment is marked complete according to the marketplace settlement terms.",
     section2Title: "2. Client Cancellation & Refunds",
     section2Desc: "Clients can cancel bookings up to 24 hours prior to the scheduled slot without penalty. For cancellations within 24 hours, the platform reserves the right to charge up to 50% of the booking total to compensate the specialist for their lost time slot.",
     section3Title: "3. Split Payout Allocations",
-    section3Desc: "Our platform collects a standard 15% commission fee from every transaction to cover escrow management, WhatsApp OTP notifications, and system servers. The remaining 85% is routed directly to the service provider's bank ledger.",
+    section3Desc: "Our platform collects a standard 15% commission fee from completed transactions to cover payment gateway processing, platform maintenance, customer notifications, and operations. The remaining 85% is routed directly to the service provider's verified local bank account.",
     footerText: "Built for Riyadh, Saudi Arabia. All rights reserved."
   },
   ar: {
     backHome: "العودة للرئيسية",
     terms: "شروط الخدمة",
     title: "شروط وقواعد المنصة",
-    subtitle: "القواعد المنظمة للمدفوعات، تقسيمات الضمان وسياسات الإلغاء",
-    section1Title: "1. نظام حجز الضمان",
-    section1Desc: "عندما يقوم العميل بجدولة جلسة عناية على بريمورا، يتم تفويض الدفع وحجزه في حساب ضمان آمن. يتم الاحتفاظ بهذه الأموال بأمان بواسطة شريك الدفع (Tap Connect) ولا يتم تحريرها لمقدم الخدمة إلا بعد وضع علامة اكتمال على الموعد.",
+    subtitle: "القواعد المنظمة للمدفوعات، تسوية الحجوزات وسياسات الإلغاء",
+    section1Title: "1. الحجز والدفع الإلكتروني",
+    section1Desc: "عندما يقوم العميل بجدولة موعد على بريمورا، تتم معالجة الدفع وتفويضه من خلال بوابة الدفع المرخصة (Tap Payments). وتتم تسوية المستحقات لمقدم الخدمة بعد تأكيد اكتمال الموعد وفقاً لشروط التسوية المعتمدة في المنصة.",
     section2Title: "2. إلغاء الموعد واسترداد الأموال",
     section2Desc: "يمكن للعملاء إلغاء الحجوزات قبل 24 ساعة من الموعد المحدد دون تطبيق أي رسوم. في حال الإلغاء خلال أقل من 24 ساعة، تحتفظ المنصة بالحق في خصم ما يصل إلى 50% من إجمالي قيمة الحجز لتعويض الأخصائي عن وقته الضائع.",
     section3Title: "3. تخصيص دفعات التقسيم",
-    section3Desc: "تقتطع منصتنا رسوم عمولة قياسية بنسبة 15% من كل معاملة لتغطية إدارة حساب الضمان، وتنبيهات الجوال، وصيانة الخوادم. يتم توجيه الـ 85% المتبقية مباشرة إلى الحساب البنكي لمقدم الخدمة.",
+    section3Desc: "تقتطع منصتنا رسوم عمولة قياسية بنسبة 15% من المعاملات المكتملة لتغطية معالجة بوابة الدفع، وتنبيهات العملاء، وصيانة المنصة والعمليات التشغيلية. يتم توجيه الـ 85% المتبقية مباشرة إلى الحساب البنكي المعتمد لمقدم الخدمة.",
     footerText: "صمم خصيصاً للرياض، المملكة العربية السعودية. جميع الحقوق محفوظة."
   }
 };
@@ -49,7 +49,10 @@ export default function TermsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-900 font-sans antialiased flex flex-col justify-between">
+    <div 
+      className="min-h-screen bg-stone-50 text-stone-900 font-sans antialiased flex flex-col justify-between"
+      dir={locale === "ar" ? "rtl" : "ltr"}
+    >
       
       {/* Mini Header */}
       <header className="bg-white border-b border-stone-200/80 py-5 px-6 sm:px-12 flex items-center justify-between sticky top-0 z-50">

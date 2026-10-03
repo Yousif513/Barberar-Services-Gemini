@@ -3236,7 +3236,7 @@
       "id": "refund-function-unauthenticated",
       "severity": "critical",
       "description": "The process-refund Edge Function performs no authentication and no authorization, acts with the service-role key, and calls the live Tap refunds API. Any caller holding the publishable key - which is committed to the repository and shipped in every browser bundle - plus a booking UUID can move real money.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "REMEDY: read the Authorization header, call auth.getUser, and require profiles.role='admin' exactly as supabase/functions/process-payout/index.ts:22-54 already does; restrict Access-Control-Allow-Origin from '*' to the console origin.",
       "evidence": [
         "supabase/functions/process-refund/index.ts:17",
@@ -3264,7 +3264,7 @@
       "id": "send-notification-unauthenticated",
       "severity": "critical",
       "description": "The send-notification Edge Function has no authentication and no role check and acts with the service-role key. Any caller holding the public publishable key can push an arbitrary title and body to any userId on the platform - a ready-made phishing channel against customers of a payments product.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "REMEDY: require a verified admin JWT before dispatch, exactly as process-payout does; rate-limit per actor.",
       "evidence": [
         "supabase/functions/send-notification/index.ts:17",
@@ -3319,7 +3319,7 @@
       "id": "fabricated-vat-figures",
       "severity": "critical",
       "description": "The VAT summary substitutes invented totals whenever monthly_vat_summary returns zero rows - not only on error - so an operator reading the platform's ZATCA tax position can be shown fabricated numbers with no indication they are not real. The same applies to provider settlement and employee earnings.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "REMEDY: delete every demo array; render a real empty state for zero rows and a distinct error state for a failed query. No financial screen may ever substitute invented data.",
       "evidence": [
         "web_platform/src/app/admin/ledger/page.tsx:512",

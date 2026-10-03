@@ -51,14 +51,48 @@ serve(async (req) => {
     }
 
     const supabase = createClient(supabaseUrl, serviceKey)
-    const { error } = await supabase.rpc("confirm_booking_payment", {
+    const { data: confirmResult, error } = await supabase.rpc("confirm_booking_payment", {
       target_booking_id: bookingId,
       target_payment_intent_id: chargeId,
       target_total_captured: capturedAmount,
     })
 
     if (error) throw error
-    return json({ success: true })
+
+    // Handle late webhook conflict auto-refund (E3)
+    if (confirmResult && typeof confirmResult === "object" && (confirmResult as any).conflict) {
+      console.warn(`[Payment Webhook] Slot conflict detected for expired booking ${bookingId}. Initiating auto-refund.`);
+      try {
+        const refundRes = await fetch("https://api.tap.company/v2/refunds", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${tapSecretKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            charge_id: chargeId,
+            amount: capturedAmount,
+            currency: "SAR",
+            reason: "Booking slot expired and conflict occurred",
+          }),
+        });
+
+        if (refundRes.ok) {
+          await supabase
+            .from("transactional_ledger")
+            .update({ payout_status: "refunded" })
+            .eq("payment_intent_id", chargeId);
+        } else {
+          console.error("[Payment Webhook] Failed to auto-refund via Tap:", await refundRes.text());
+        }
+      } catch (refundErr) {
+        console.error("[Payment Webhook] Refund exception:", refundErr);
+      }
+
+      return json({ received: true, status: "refunded_due_to_conflict", booking_id: bookingId });
+    }
+
+    return json({ success: true, result: confirmResult })
   } catch (error) {
     console.error("[Payment Webhook] Failure:", error)
     return json({ error: error instanceof Error ? error.message : "Unexpected webhook error." }, 500)

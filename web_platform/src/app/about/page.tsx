@@ -14,13 +14,13 @@ const translations = {
     storyContent2: "Whether you prefer the tranquil atmosphere of Riyadh's most exclusive wellness spas or the absolute comfort and privacy of a bespoke in-home service, Primora guarantees a vetted, secure, and exceptional experience tailored to you.",
     pillarTitle: "The Primora Pillars",
     pillar1Title: "Top 1% Vetted Talent",
-    pillar1Desc: "Every specialist on our platform passes rigorous licensing, hygiene audits, and style validations.",
-    pillar2Title: "Escrow Deposit Security",
-    pillar2Desc: "Funds are securely deposited in escrow at booking and only released to the artist after successful completion.",
+    pillar1Desc: "Every specialist on our platform passes verified identity checks, portfolio evaluations, and onboarding reviews.",
+    pillar2Title: "Secure Payment Settlement",
+    pillar2Desc: "Payments are authorized through licensed gateways and settled directly to service providers upon appointment completion.",
     pillar3Title: "Geofenced Convenience",
     pillar3Desc: "Seamless logistics management for home-service appointments, ensuring prompt arrivals across Riyadh.",
-    hygieneTitle: "Strict Hygiene Protocol",
-    hygieneDesc: "We enforce a zero-tolerance policy on equipment sanitation. All registered artists are equipped with certified single-use tools or undergo medical-grade disinfection processes before every session.",
+    hygieneTitle: "Professional Service Standards",
+    hygieneDesc: "We promote professional grooming and hygiene practices across our partner network. Independent artists and salons follow industry-standard sanitation guidelines and high-quality product protocols.",
     footerText: "Built for Riyadh, Saudi Arabia. All rights reserved."
   },
   ar: {
@@ -33,13 +33,13 @@ const translations = {
     storyContent2: "سواء كنت تفضل الأجواء الهادئة في المنتجعات الصحية الأكثر تميزاً بالرياض أو الراحة والخصوصية المطلقة للخدمة المنزلية المصممة خصيصاً لك، فإن بريمورا تضمن لك تجربة موثوقة وآمنة واستثنائية.",
     pillarTitle: "ركائز بريمورا",
     pillar1Title: "أفضل 1% من الكفاءات المعتمدة",
-    pillar1Desc: "يمر كل أخصائي على منصتنا بعمليات تدقيق صارمة للتراخيص والنظافة وتقييم الأسلوب.",
-    pillar2Title: "أمان دفع الضمان",
-    pillar2Desc: "يتم إيداع الأموال بشكل آمن في الضمان عند الحجز ولا يتم تحريرها للمزود إلا بعد إتمام الخدمة بنجاح.",
+    pillar1Desc: "يمر كل أخصائي على منصتنا بعمليات تحقق من الهوية وفحص للمحفظة المهنية ومعايير تقديم الخدمة.",
+    pillar2Title: "أمان المدفوعات والتسوية",
+    pillar2Desc: "تتم معالجة المدفوعات بأمان عبر بوابات معتمدة ولا يتم تحرير المستحقات إلا بعد إتمام الخدمة بنجاح.",
     pillar3Title: "سهولة تغطية الرياض الجغرافية",
     pillar3Desc: "إدارة لوجستية سلسة للمواعيد المنزلية لضمان الوصول في الوقت المحدد في جميع أنحاء الرياض.",
-    hygieneTitle: "بروتوكول تعقيم صارم",
-    hygieneDesc: "نحن نطبق سياسة صارمة تجاه تعقيم الأدوات. جميع مقدمي الخدمة مجهزون بأدوات معقمة ذات استخدام واحد أو يخضعون لعمليات تعقيم طبية قبل كل جلسة.",
+    hygieneTitle: "معايير الخدمة المهنية",
+    hygieneDesc: "نحرص على تطبيق أعلى معايير النظافة المهنية في شبكتنا. يلتزم مقدمو الخدمة الشركاء بإرشادات التعقيم القياسية واستخدام منتجات عناية عالية الجودة.",
     footerText: "صمم خصيصاً للرياض، المملكة العربية السعودية. جميع الحقوق محفوظة."
   }
 };
@@ -61,7 +61,10 @@ export default function AboutPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-900 font-sans antialiased flex flex-col justify-between">
+    <div 
+      className="min-h-screen bg-stone-50 text-stone-900 font-sans antialiased flex flex-col justify-between"
+      dir={locale === "ar" ? "rtl" : "ltr"}
+    >
       
       {/* Mini Header */}
       <header className="bg-white border-b border-stone-200/80 py-5 px-6 sm:px-12 flex items-center justify-between sticky top-0 z-50">

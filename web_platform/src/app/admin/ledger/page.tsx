@@ -509,31 +509,25 @@ export default function AdminLedger() {
         supabase.from("employee_earnings_summary").select("*, employees(name_en, name_ar)").order("month_start", { ascending: false })
       ]);
 
-      if (vatResult.data && vatResult.data.length > 0) {
-        setVatSummary(vatResult.data);
+      if (vatResult.error) {
+        console.error("Failed to load monthly_vat_summary:", vatResult.error);
+        setVatSummary([]);
       } else {
-        setVatSummary([
-          { month_start: "2026-07-01", total_bookings: 48, total_vat_collected: 862.50, total_sales: 6612.50 },
-          { month_start: "2026-06-01", total_bookings: 112, total_vat_collected: 2185.00, total_sales: 16750.00 }
-        ]);
+        setVatSummary(vatResult.data || []);
       }
 
-      if (settlementResult.data && settlementResult.data.length > 0) {
-        setSettlementSummary(settlementResult.data);
+      if (settlementResult.error) {
+        console.error("Failed to load provider_settlement_summary:", settlementResult.error);
+        setSettlementSummary([]);
       } else {
-        setSettlementSummary([
-          { month_start: "2026-07-01", provider_id: "demo-p1", providers: { business_name_en: "Elite Barber Lounge", business_name_ar: "صالون إيليت الرجالي" }, total_transactions: 34, gross_captured_volume: 4850.00, platform_share_collected: 727.50, provider_share_expected: 4122.50, provider_share_released: 3500.00 },
-          { month_start: "2026-07-01", provider_id: "demo-p2", providers: { business_name_en: "Sara Beauty Salon", business_name_ar: "صالون وسبا سارة للتجميل" }, total_transactions: 14, gross_captured_volume: 1762.50, platform_share_collected: 264.38, provider_share_expected: 1498.12, provider_share_released: 1498.12 }
-        ]);
+        setSettlementSummary(settlementResult.data || []);
       }
 
-      if (earningsResult.data && earningsResult.data.length > 0) {
-        setEarningsSummary(earningsResult.data);
+      if (earningsResult.error) {
+        console.error("Failed to load employee_earnings_summary:", earningsResult.error);
+        setEarningsSummary([]);
       } else {
-        setEarningsSummary([
-          { month_start: "2026-07-01", employee_id: "demo-e1", employees: { name_en: "Omar Khaled", name_ar: "عمر خالد" }, total_completed_bookings: 18, total_employee_earnings: 1250.00 },
-          { month_start: "2026-07-01", employee_id: "demo-e2", employees: { name_en: "Yousef Adel", name_ar: "يوسف عادل" }, total_completed_bookings: 12, total_employee_earnings: 820.00 }
-        ]);
+        setEarningsSummary(earningsResult.data || []);
       }
     } catch (err) {
       console.warn("Accountant report views loading fallback:", err);

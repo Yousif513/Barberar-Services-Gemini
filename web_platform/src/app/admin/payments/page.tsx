@@ -3,10 +3,6 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-// Required admin-control markers for verification checks:
-// - from("payment_refund_requests")
-// - refundDuplicate
-// - ledger_id
 
 export default function AdminPaymentsRedirectPage() {
   const router = useRouter();

@@ -8,26 +8,26 @@ const translations = {
     backHome: "Back to Home",
     privacy: "Privacy Policy",
     title: "Privacy & Data Protection",
-    subtitle: "Compliance details with Saudi Personal Data Protection Law (PDPL)",
+    subtitle: "Commitment to Saudi Personal Data Protection Law (PDPL) principles",
     section1Title: "1. Data Collection",
-    section1Desc: "To ensure premium geofenced service delivery, we collect customer device geolocations, contact information, in-app chat histories, and vehicle/gate entry notes. Payment card records are never stored directly on our servers; they are vaulted securely inside Tap Connect payment gateways.",
-    section2Title: "2. Personal Data Protection Law (PDPL) Compliance",
-    section2Desc: "Primora adheres strictly to the Saudi PDPL regulations. Your data is processed only upon your explicit consent. You hold the complete right to request data access, correction, limitation of processing, or total account and data deletion at any time.",
+    section1Desc: "To ensure premium service delivery, we collect customer contact information, appointment preferences, in-app communications, and service address details. Payment card records are never stored directly on our servers; they are processed securely through licensed payment gateways.",
+    section2Title: "2. Personal Data Protection Principles",
+    section2Desc: "Primora is committed to data protection principles under the Saudi PDPL. We process personal data transparently based on user consent and legitimate service delivery needs. Users may contact our team to exercise data subject rights including access, correction, or deletion requests.",
     section3Title: "3. Share & Disclosure",
-    section3Desc: "Client location and contact numbers are only shared with the selected service specialist once a booking is confirmed, and are protected through secure tokens. We never sell or distribute your personal logs to third-party marketing companies.",
+    section3Desc: "Client location and contact numbers are only shared with the selected service specialist once a booking is confirmed, and are protected through secure platform access. We never sell or distribute your personal records to third-party marketing companies.",
     footerText: "Built for Riyadh, Saudi Arabia. All rights reserved."
   },
   ar: {
     backHome: "العودة للرئيسية",
     privacy: "سياسة الخصوصية",
     title: "الخصوصية وحماية البيانات",
-    subtitle: "تفاصيل الامتثال لنظام حماية البيانات الشخصية السعودي (PDPL)",
+    subtitle: "الالتزام بمبادئ نظام حماية البيانات الشخصية السعودي (PDPL)",
     section1Title: "1. جمع البيانات",
-    section1Desc: "لضمان تقديم خدمة منزلية وجغرافية ممتازة، نقوم بجمع إحداثيات موقع جهاز العميل، ومعلومات الاتصال، وسجل المحادثات داخل التطبيق، وتفاصيل الدخول للفرع أو البوابة. لا يتم تخزين بيانات بطاقات الدفع نهائياً على خوادمنا، بل تُحفظ بشكل مشفر في خزائن بوابة مدفوعات Tap Connect الآمنة.",
-    section2Title: "2. الامتثال لنظام حماية البيانات الشخصية (PDPL)",
-    section2Desc: "تلتزم بريمورا تماماً بنظام حماية البيانات الشخصية في المملكة العربية السعودية. يتم معالجة بياناتك فقط بناءً على موافقتك الصريحة. لك الحق الكامل في طلب الوصول لبياناتك، أو تصحيحها، أو تقييد معالجتها، أو حذف حسابك وبياناتك بالكامل في أي وقت.",
+    section1Desc: "لضمان تقديم خدمة متميزة، نقوم بجمع معلومات الاتصال، وتفضيلات المواعيد، وسجل المراسلات داخل المنصة، وتفاصيل عنوان تقديم الخدمة. لا يتم تخزين بيانات بطاقات الدفع نهائياً على خوادمنا، بل تتم معالجتها بأمان عبر بوابات الدفع المرخصة.",
+    section2Title: "2. مبادئ حماية البيانات الشخصية",
+    section2Desc: "تلتزم بريمورا بتطبيق مبادئ حماية البيانات الشخصية وفقاً للأنظمة المعمول بها في المملكة. تتم معالجة بياناتك بشفافية لتقديم خدمات المنصة وبناءً على موافقتك. يمكنك التواصل مع فريقنا لممارسة حقوق صاحب البيانات بما في ذلك طلب الوصول أو التصحيح أو الحذف.",
     section3Title: "3. المشاركة والإفصاح",
-    section3Desc: "يتم مشاركة موقع العميل ورقم الاتصال فقط مع الأخصائي المختار بعد تأكيد الحجز وحمايتها برمز وصول آمن. نحن لا نبيع أو نشارك سجلاتك الشخصية لشركات التسويق الخارجية.",
+    section3Desc: "يتم مشاركة موقع العميل وبيانات الاتصال فقط مع الأخصائي المختار بعد تأكيد الحجز وحمايتها عبر قنوات وصول آمنة. نحن لا نبيع أو نشارك سجلاتك الشخصية لشركات التسويق الخارجية.",
     footerText: "صمم خصيصاً للرياض، المملكة العربية السعودية. جميع الحقوق محفوظة."
   }
 };
@@ -49,7 +49,10 @@ export default function PrivacyPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-900 font-sans antialiased flex flex-col justify-between">
+    <div 
+      className="min-h-screen bg-stone-50 text-stone-900 font-sans antialiased flex flex-col justify-between"
+      dir={locale === "ar" ? "rtl" : "ltr"}
+    >
       
       {/* Mini Header */}
       <header className="bg-white border-b border-stone-200/80 py-5 px-6 sm:px-12 flex items-center justify-between sticky top-0 z-50">

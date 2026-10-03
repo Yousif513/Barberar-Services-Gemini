@@ -17,8 +17,8 @@ const translations = {
     title: "Join Riyadh's Finest Beauty & Grooming Collective",
     subtitle: "List your salon, barbershop, or spa, and instantly accept secure bookings.",
     ctaRegister: "Register as Provider Now",
-    value1Title: "Escrow Split Payouts",
-    value1Desc: "Secure Tap Connect integrations process card splits automatically, depositing funds straight into your business ledger.",
+    value1Title: "Automated Split Payouts",
+    value1Desc: "Secure Tap Connect integration processes payment splits automatically, depositing funds straight into your verified bank account.",
     value2Title: "Riyadh Geofencing",
     value2Desc: "Efficient logistics dispatch controls for premium in-home or in-salon booking coordinates.",
     value3Title: "Staff & Availability Engine",
@@ -51,8 +51,8 @@ const translations = {
     title: "انضم إلى نخبة صالونات ومحترفي التجميل بالرياض",
     subtitle: "قم بإدراج صالونك، أو محل الحلاقة، أو السبا الخاص بك وابدأ في استقبال حجوزات آمنة فوراً.",
     ctaRegister: "سجل كمزود خدمة الآن",
-    value1Title: "مدفوعات الضمان المقسمة",
-    value1Desc: "تكامل آمن مع Tap Connect لمعالجة وتقسيم المدفوعات آلياً وإيداعها مباشرة في حسابك التجاري.",
+    value1Title: "تسوية المدفوعات المقسمة آلياً",
+    value1Desc: "تكامل آمن مع بوابة Tap لمعالجة وتقسيم المدفوعات آلياً وإيداعها مباشرة في حسابك البنكي المعتمد.",
     value2Title: "نطاق الخدمة الجغرافي بالرياض",
     value2Desc: "تحكم مرن وبسيط في الخدمات اللوجستية وتعيين إحداثيات الخدمة المنزلية أو الحضور للصالون.",
     value3Title: "محرك جدولة الموظفين والأوقات",
@@ -98,7 +98,10 @@ export default function BecomeProviderRootPage() {
   const isRTL = locale === "ar";
 
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-900 flex flex-col font-sans antialiased">
+    <div 
+      className="min-h-screen bg-stone-50 text-stone-900 flex flex-col font-sans antialiased"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
       {/* 1. TOP PROMO BAR */}
       <div className="w-full bg-stone-100 border-b border-stone-200 py-2.5 px-4 text-center text-[10px] sm:text-xs font-semibold tracking-wider text-stone-600 uppercase flex items-center justify-center gap-4">
         <span>{t.promoText}</span>

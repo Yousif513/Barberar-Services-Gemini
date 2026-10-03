@@ -1,13 +1,26 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.108.1"
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("origin") || ""
+  const allowedOriginEnv = Deno.env.get("APP_ORIGIN")
+  const isAllowed =
+    (allowedOriginEnv && origin === allowedOriginEnv) ||
+    origin === "http://localhost:3000" ||
+    origin === "http://127.0.0.1:3000" ||
+    origin.endsWith(".vercel.app") ||
+    origin.endsWith("primora.sa")
+
+  return {
+    "Access-Control-Allow-Origin": isAllowed ? origin : (allowedOriginEnv || "http://localhost:3000"),
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  }
 }
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req)
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -19,6 +32,14 @@ serve(async (req) => {
       throw new Error("Missing database configuration.")
     }
 
+    const authHeader = req.headers.get("Authorization")
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Missing authorization header." }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
+
     const { userId, title, body, data } = await req.json()
     if (!userId || !title || !body) {
       return new Response(JSON.stringify({ error: "Missing required parameters: userId, title, or body." }), {
@@ -28,6 +49,38 @@ serve(async (req) => {
     }
 
     const supabase = createClient(supabaseUrl, serviceKey)
+    const token = authHeader.replace(/^Bearer\s+/i, "")
+
+    const isServiceRole = token === serviceKey
+
+    if (!isServiceRole) {
+      // Authenticate caller
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+      if (authError || !user) {
+        return new Response(JSON.stringify({ error: "Invalid credentials." }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        })
+      }
+
+      // Check if targeting another user without admin privileges
+      if (user.id !== userId) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single()
+
+        if (profile?.role !== "admin") {
+          return new Response(JSON.stringify({ 
+            error: "Forbidden. Only trusted server-side events or administrators may target other users." 
+          }), {
+            status: 403,
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          })
+        }
+      }
+    }
 
     // 1. Fetch user's registered expo push tokens
     const { data: tokenRows, error: tokenError } = await supabase
@@ -41,22 +94,7 @@ serve(async (req) => {
 
     const tokens = (tokenRows || []).map(r => r.token);
 
-    // 2. Insert notification record into notifications database table
-    const { error: notifInsertError } = await supabase
-      .from("notifications")
-      .insert({
-        user_id: userId,
-        title,
-        body,
-        data: data || {},
-        is_read: false
-      })
-
-    if (notifInsertError) {
-      console.warn("[Send Notification] Database insert failed:", notifInsertError)
-    }
-
-    // 3. Dispatch to Expo Push API for each token
+    // 2. Dispatch to Expo Push API for each token
     const results = []
     for (const token of tokens) {
       try {

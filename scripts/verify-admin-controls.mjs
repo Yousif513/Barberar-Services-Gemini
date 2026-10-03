@@ -18,8 +18,13 @@ const checks = [
   },
   {
     file: "web_platform/src/app/admin/payments/page.tsx",
-    require: ['from("payment_refund_requests")', "refundDuplicate", "ledger_id"],
-    reject: ["Payment successfully refunded!", "setPayments(prev => prev.map"],
+    require: ['router.replace("/admin/ledger")'],
+    reject: ['from("payment_refund_requests")', "refundDuplicate"],
+  },
+  {
+    file: "web_platform/src/app/admin/ledger/page.tsx",
+    require: ['from("transactional_ledger")', 'from("payout_requests")', "handleReleasePayout", "markPayoutRequestPaid"],
+    reject: ["demo-p1", "Omar Khaled"],
   },
   {
     file: "supabase/migrations/20260621183407_admin_branch_coupon_controls.sql",

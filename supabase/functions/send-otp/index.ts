@@ -3,13 +3,26 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("origin") || ""
+  const allowedOriginEnv = Deno.env.get("APP_ORIGIN")
+  const isAllowed =
+    (allowedOriginEnv && origin === allowedOriginEnv) ||
+    origin === "http://localhost:3000" ||
+    origin === "http://127.0.0.1:3000" ||
+    origin.endsWith(".vercel.app") ||
+    origin.endsWith("primora.sa")
+
+  return {
+    "Access-Control-Allow-Origin": isAllowed ? origin : (allowedOriginEnv || "http://localhost:3000"),
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  }
 }
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req)
+
   // Handle CORS preflight request
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -35,7 +48,7 @@ serve(async (req) => {
     }
 
     // 1. WhatsApp OTP gateway selection (Twilio vs. Unifonic)
-    const whatsappProvider = Deno.env.get("WHATSAPP_PROVIDER") || "mock"
+    const whatsappProvider = Deno.env.get("WHATSAPP_PROVIDER")
     const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID")
     const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN")
     const twilioWhatsappSender = Deno.env.get("TWILIO_WHATSAPP_SENDER") || "whatsapp:+14155238886"
@@ -62,10 +75,16 @@ serve(async (req) => {
       if (!response.ok) {
         const errText = await response.text()
         console.error("[OTP Engine] Twilio API Error:", errText)
-        throw new Error("Failed to send OTP via Twilio WhatsApp Gateway.")
+        return new Response(
+          JSON.stringify({ error: "Failed to send OTP via Twilio WhatsApp Gateway.", details: errText }),
+          { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        )
       }
     } else {
-      throw new Error("WhatsApp provider is not configured.")
+      return new Response(
+        JSON.stringify({ error: "WhatsApp provider gateway is not configured on this environment." }),
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
     }
 
     return new Response(

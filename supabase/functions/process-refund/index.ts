@@ -1,13 +1,26 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.108.1"
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("origin") || ""
+  const allowedOriginEnv = Deno.env.get("APP_ORIGIN")
+  const isAllowed =
+    (allowedOriginEnv && origin === allowedOriginEnv) ||
+    origin === "http://localhost:3000" ||
+    origin === "http://127.0.0.1:3000" ||
+    origin.endsWith(".vercel.app") ||
+    origin.endsWith("primora.sa")
+
+  return {
+    "Access-Control-Allow-Origin": isAllowed ? origin : (allowedOriginEnv || "http://localhost:3000"),
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  }
 }
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req)
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -20,6 +33,39 @@ serve(async (req) => {
       throw new Error("Missing database configuration.")
     }
 
+    const authHeader = req.headers.get("Authorization")
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Missing authorization header." }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
+
+    const supabase = createClient(supabaseUrl, serviceKey)
+
+    // Verify caller identity and admin authority
+    const token = authHeader.replace(/^Bearer\s+/i, "")
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Invalid credentials." }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single()
+
+    if (profileError || profile?.role !== "admin") {
+      return new Response(JSON.stringify({ error: "Forbidden. Administrative access required." }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
+
     const { bookingId, refundReason } = await req.json()
     if (!bookingId) {
       return new Response(JSON.stringify({ error: "Missing required bookingId parameter." }), {
@@ -27,8 +73,6 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" }
       })
     }
-
-    const supabase = createClient(supabaseUrl, serviceKey)
 
     // 1. Load the booking details and ledger info
     const { data: booking, error: bookingError } = await supabase
@@ -51,58 +95,75 @@ serve(async (req) => {
       .eq("booking_id", bookingId)
       .single()
 
-    const paymentIntentId = ledgerRow?.payment_intent_id
-
-    // 3. Initiate payment gateway refund if real secret key exists, otherwise mock refund
-    let gatewayRefundId = "mock-refund-" + Math.random().toString(36).substring(2, 10).toUpperCase()
-    let refundStatus = "SUCCESS"
-
-    if (tapSecretKey && paymentIntentId && !paymentIntentId.startsWith("mock-")) {
-      try {
-        const refundResponse = await fetch("https://api.tap.company/v2/refunds", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${tapSecretKey}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            charge_id: paymentIntentId,
-            amount: Number(booking.total_price),
-            currency: "SAR",
-            reason: refundReason || "Customer cancellation and refund requested.",
-            metadata: { booking_id: bookingId }
-          })
-        })
-
-        if (refundResponse.ok) {
-          const refundData = await refundResponse.json()
-          gatewayRefundId = refundData.id
-          refundStatus = refundData.status
-        } else {
-          console.warn("[Refund Gateway] Tap responded with error, degrading to success mock.")
-        }
-      } catch (gatewayErr) {
-        console.error("[Refund Gateway] Communication exception:", gatewayErr)
-      }
+    if (ledgerError || !ledgerRow) {
+      return new Response(JSON.stringify({ error: "No transaction ledger record found for booking." }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
     }
 
-    // 4. Update the booking status to refunded/cancelled
+    const paymentIntentId = ledgerRow.payment_intent_id
+    if (!paymentIntentId) {
+      return new Response(JSON.stringify({ error: "Missing payment intent identifier on ledger." }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
+
+    // 3. Initiate payment gateway refund — fail closed if unconfigured or failed
+    if (!tapSecretKey) {
+      return new Response(JSON.stringify({ error: "Tap Payments refund integration is not configured." }), {
+        status: 503,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
+
+    const refundResponse = await fetch("https://api.tap.company/v2/refunds", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${tapSecretKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        charge_id: paymentIntentId,
+        amount: Number(booking.total_price),
+        currency: "SAR",
+        reason: refundReason || "Administrative refund processed.",
+        metadata: { booking_id: bookingId, processed_by: user.id }
+      })
+    })
+
+    if (!refundResponse.ok) {
+      const errorText = await refundResponse.text()
+      console.error("[Refund Gateway] Tap API error:", errorText)
+      return new Response(JSON.stringify({ 
+        error: "Gateway refund request failed. Money was not debited.",
+        details: errorText
+      }), {
+        status: 502,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
+
+    const refundData = await refundResponse.json()
+    const gatewayRefundId = refundData.id
+    const refundStatus = refundData.status
+
+    // 4. Update the booking status to cancelled
     const { error: updateBookingError } = await supabase
       .from("bookings")
-      .update({ status: "refunded" })
+      .update({ status: "cancelled" })
       .eq("id", bookingId)
 
     if (updateBookingError) throw updateBookingError;
 
-    // 5. Update ledger entry to released/refunded
-    if (ledgerRow) {
-      const { error: updateLedgerError } = await supabase
-        .from("transactional_ledger")
-        .update({ payout_status: "refunded" })
-        .eq("id", ledgerRow.id)
+    // 5. Update ledger entry to refunded
+    const { error: updateLedgerError } = await supabase
+      .from("transactional_ledger")
+      .update({ payout_status: "refunded" })
+      .eq("id", ledgerRow.id)
 
-      if (updateLedgerError) throw updateLedgerError;
-    }
+    if (updateLedgerError) throw updateLedgerError;
 
     return new Response(JSON.stringify({ 
       success: true, 

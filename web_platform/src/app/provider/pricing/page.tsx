@@ -7,12 +7,12 @@ const translations = {
   en: {
     backHome: "Back to Home",
     title: "Split Ledger & Commission Pricing",
-    subtitle: "Transparent fee splits, escrow security holds, and zero upfront platform costs",
+    subtitle: "Transparent fee splits, verified bookings, and zero upfront platform costs",
     pricingModel: "How We Calculate Transaction Splits",
     platformFee: "Platform Commission",
     partnerPayout: "Partner Payout Share",
-    feeDesc: "Primora collects a flat 15% commission fee on every booking. This fee completely covers ZATCA e-invoicing compliance, Tap Connect transaction fees, SMS alerts, and secure escrow holds. No monthly subscription is required for basic accounts.",
-    payoutDesc: "The remaining 85% is routed straight to your salon's local bank account. As soon as the customer's appointment is completed and marked off in your dashboard calendar, the ledger releases the funds instantly.",
+    feeDesc: "Primora collects a flat 15% commission fee on every booking. This fee completely covers VAT-compliant tax receipt reporting, secure payment gateway processing via Tap Connect, customer notifications, and automated booking splits. No monthly subscription is required for basic accounts.",
+    payoutDesc: "The remaining 85% is routed straight to your salon's local bank account. As soon as the customer's appointment is completed and marked off in your dashboard calendar, the ledger releases the funds according to the payout settlement schedule.",
     noUpfront: "Zero Setup or Upfront Fees",
     noUpfrontDesc: "Registering, listing your services catalog, and setting up staff availability calendars are 100% free. We only succeed when you acquire bookings.",
     footerText: "Built for Riyadh, Saudi Arabia. All rights reserved.",
@@ -52,53 +52,45 @@ const translations = {
     // Feature titles
     featuresTitle: "Compare Plan Features",
     featOnlineBooking: "Online Booking & Scheduling",
-    featZatca: "ZATCA E-Invoicing Compliance",
-    featSms: "SMS Alerts & Reminders",
-    featEscrow: "Secure Escrow Hold & Split Ledger",
+    featZatca: "VAT 15% Tax Receipt Reporting",
+    featSms: "Appointment Alerts & Notifications",
+    featEscrow: "Automated Split Ledger & Settlement",
     featAnalytics: "Advanced Business Analytics",
     featMarketing: "Marketing Tools & Coupons",
     featStaff: "Staff Management (Unlimited)",
     featSupport: "24/7 Dedicated Account Manager",
 
     // Split Ledger Details
-    splitTitle: "Saudi Fintech Compliant Ledger",
-    splitSubtitle: "All payments are processed through Tap Payments API & secured under local SAMA regulations.",
-    payoutTimeline: "Instant Payout Timeline",
-    payoutTimelineDesc: "Completed appointments trigger automated payout transfers directly into your registered local IBAN (Riyad Bank, SNB, Al Rajhi, etc.) in under 5 minutes.",
-    securedEscrow: "Escrow Protection",
-    securedEscrowDesc: "Guards against customer no-shows and salon cancellations with automatic refund policies.",
+    splitTitle: "Automated Split Ledger Settlement",
+    splitSubtitle: "All payments are processed securely through licensed payment gateway Tap Payments.",
+    payoutTimeline: "Payout Transfer Schedule",
+    payoutTimelineDesc: "Completed appointments trigger automated payout transfers directly into your registered local IBAN (Riyad Bank, SNB, Al Rajhi, etc.) via scheduled banking batches.",
+    securedEscrow: "Booking Guarantee",
+    securedEscrowDesc: "Guards against customer no-shows and salon cancellations in accordance with clear cancellation policies.",
     
-    // Checkout Mock
-    checkoutTitle: "Secure Account Activation",
-    checkoutSubtitle: "Experience modern, frictionless onboarding tailored for Saudi fintech standards.",
+    // Checkout
+    checkoutTitle: "Secure Plan Subscription",
+    checkoutSubtitle: "Transactions are processed securely through licensed Tap Payments gateway with Mada, Apple Pay, and Visa/Mastercard.",
     paymentMethod: "Payment Method",
     madaApplePay: "Mada / Apple Pay / Credit Card",
-    cardNumber: "Card Number",
-    expiry: "Expiry Date (MM/YY)",
-    cvv: "CVV",
-    cardholder: "Cardholder Name",
     summary: "Order Summary",
     subtotal: "Subtotal",
     vat: "VAT (15%)",
     total: "Total Due",
-    payNow: "Activate & Secure Account",
-    processing: "Processing secure escrow split configuration...",
-    successMsg: "Plan activated successfully! Redirection configured.",
-    mockCardWarning: "This is a simulated payment screen compliant with Tap integration guidelines.",
-    inputPlaceholderCard: "4000 1234 5678 9010",
-    inputPlaceholderExpiry: "12/28",
-    inputPlaceholderCvv: "123",
-    inputPlaceholderName: "LUXURY SALON OWNER",
+    payNow: "Proceed to Secure Payment",
+    processing: "Redirecting to secure Tap Payments gateway...",
+    successMsg: "Plan subscription registered successfully! Your account will be upgraded.",
+    secureGatewayNotice: "All card details and payments are securely handled by Tap Payments. Primora never stores or processes raw card numbers.",
   },
   ar: {
     backHome: "العودة للرئيسية",
     title: "خطط نمو الشركاء والأسعار",
-    subtitle: "تقسيمات رسوم شفافة، وضمان حجز آمن، وبدون أي تكاليف تأسيس مسبقة",
+    subtitle: "تقسيمات رسوم شفافة، وحجوزات موثوقة، وبدون أي تكاليف تأسيس مسبقة",
     pricingModel: "كيف نحسب تقسيمات العمليات المالية",
     platformFee: "عمولة المنصة",
     partnerPayout: "حصة الشريك ومقدم الخدمة",
-    feeDesc: "تقتطع بريمورا عمولة ثابتة بنسبة 15% على كل حجز. تغطي هذه الرسوم بالكامل امتثال هيئة الزكاة (الفاتورة الإلكترونية)، ورسوم معالجة المعاملات لمدفوعات مدى وفيزا، وتنبيهات الجوال، وإدارة الضمان الآمن. لا يتطلب الاشتراك في الحساب الأساسي أي رسوم شهرية.",
-    payoutDesc: "يتم توجيه الـ 85% المتبقية مباشرة إلى الحساب البنكي لصالونك أو عملك. بمجرد اكتمال موعد العميل ووضع علامة اكتمال في تقويم لوحة التحكم الخاصة بك، يقوم نظام الدفع بتحرير الأموال فوراً.",
+    feeDesc: "تقتطع بريمورا عمولة ثابتة بنسبة 15% على كل حجز. تغطي هذه الرسوم بالكامل تقارير الفواتير الضريبية المتوافقة مع ضريبة القيمة المضافة، ورسوم معالجة المعاملات لمدفوعات مدى وفيزا عبر Tap Connect، وتنبيهات العملاء، وتقسيمات الحجز التلقائية. لا يتطلب الاشتراك في الحساب الأساسي أي رسوم شهرية.",
+    payoutDesc: "يتم توجيه الـ 85% المتبقية مباشرة إلى الحساب البنكي لصالونك أو عملك. بمجرد اكتمال موعد العميل ووضع علامة اكتمال في تقويم لوحة التحكم، يحرر نظام الدفع الأموال وفقاً لجدول التسوية المعتمد.",
     noUpfront: "بدون أي رسوم إعداد أو تأسيس مسبقة",
     noUpfrontDesc: "التسجيل، وإدراج قائمة خدماتك، وإعداد تقويم توافر موظفيك مجاني 100%. نحن ننجح فقط عندما تستقبل حجوزات فعلية.",
     footerText: "صمم خصيصاً للرياض، المملكة العربية السعودية. جميع الحقوق محفوظة.",
@@ -138,43 +130,35 @@ const translations = {
     // Feature titles
     featuresTitle: "قارن بين ميزات الخطط",
     featOnlineBooking: "الحجز والجدولة عبر الإنترنت",
-    featZatca: "الربط مع هيئة الزكاة والضريبة والجمارك",
-    featSms: "رسائل التنبيهات والتذكير SMS",
-    featEscrow: "نظام الضمان المالي والتقسيم الفوري",
+    featZatca: "تقارير فواتير ضريبة القيمة المضافة (15%)",
+    featSms: "تنبيهات وتذكيرات المواعيد",
+    featEscrow: "دفتر أستاذ آلي وتقسيم تلقائي للمستحقات",
     featAnalytics: "تحليلات وأداء الأعمال المتقدمة",
     featMarketing: "أدوات التسويق والكوبونات والخصومات",
     featStaff: "إدارة الموظفين (غير محدود)",
     featSupport: "مدير حساب مخصص متوفر 24/7",
 
     // Split Ledger Details
-    splitTitle: "نظام تسوية مالي متوافق مع الفينتك السعودي",
-    splitSubtitle: "تتم معالجة جميع المدفوعات من خلال بوابة Tap للمدفوعات وحمايتها بموجب لوائح البنك المركزي السعودي (SAMA).",
-    payoutTimeline: "جدول التسوية الفورية للمستحقات",
-    payoutTimelineDesc: "تؤدي المواعيد المكتملة إلى تحويلات تلقائية ومباشرة للمستحقات إلى حسابك المصرفي المحلي المسجل (بنك الرياض، الأهلي SNB، الراجحي، إلخ) خلال أقل من 5 دقائق.",
-    securedEscrow: "حماية الضمان المالي والوديعة",
-    securedEscrowDesc: "حماية كاملة ضد عدم حضور العملاء وإلغاء الصالون مع سياسات استرداد تلقائية وذكية.",
+    splitTitle: "تسوية مالية مؤتمتة للمستحقات",
+    splitSubtitle: "تتم معالجة جميع المدفوعات بأمان عبر بوابة الدفع المرخصة Tap Payments.",
+    payoutTimeline: "جدول تحويل المستحقات",
+    payoutTimelineDesc: "تؤدي المواعيد المكتملة إلى تحويلات مستحقات تلقائية مباشرة إلى حسابك المصرفي المحلي المسجل (بنك الرياض، الأهلي SNB، الراجحي، إلخ) عبر دفعات بنكية مجدولة.",
+    securedEscrow: "ضمان الحجز المعتمد",
+    securedEscrowDesc: "حماية ضد عدم حضور العملاء وإلغاءات الصالون وفقاً لسياسات الإلغاء الشفافة.",
     
-    // Checkout Mock
-    checkoutTitle: "تفعيل الحساب الآمن",
-    checkoutSubtitle: "استمتع بتجربة دفع وسداد آمنة وسهلة متوافقة مع معايير المدفوعات السعودية.",
+    // Checkout
+    checkoutTitle: "الاشتراك الآمن في الخطة",
+    checkoutSubtitle: "تتم معالجة المدفوعات بأمان من خلال بوابة Tap Payments المرخصة وتدعم مدى وApple Pay وبطاقات الائتمان.",
     paymentMethod: "طريقة الدفع",
     madaApplePay: "مدى / أبل باي / بطاقة ائتمان",
-    cardNumber: "رقم البطاقة",
-    expiry: "تاريخ الانتهاء (MM/YY)",
-    cvv: "الرمز السري (CVV)",
-    cardholder: "اسم صاحب البطاقة",
     summary: "ملخص الطلب",
     subtotal: "المجموع الفرعي",
     vat: "ضريبة القيمة المضافة (15%)",
     total: "المبلغ الإجمالي",
-    payNow: "تفعيل الخطة والاشتراك الآمن",
-    processing: "جاري إعداد تهيئة تقسيم الضمان الآمن للشبكة...",
-    successMsg: "تم تفعيل الخطة بنجاح! تم حفظ إعدادات الحساب.",
-    mockCardWarning: "هذه شاشة دفع تجريبية متوافقة مع إرشادات دمج بوابة Tap للمدفوعات.",
-    inputPlaceholderCard: "4000 1234 5678 9010",
-    inputPlaceholderExpiry: "12/28",
-    inputPlaceholderCvv: "123",
-    inputPlaceholderName: "LUXURY SALON OWNER",
+    payNow: "المتابعة إلى بوابة الدفع الآمنة",
+    processing: "جاري التحويل لبوابة الدفع الآمنة Tap Payments...",
+    successMsg: "تم تسجيل الاشتراك بالخطة بنجاح! سيتم ترقية حسابك.",
+    secureGatewayNotice: "تتم معالجة جميع بيانات البطاقات والمدفوعات بأمان عبر بوابة Tap Payments. لا تقوم بريمورا بتخزين أو استلام أرقام البطاقات إطلاقاً.",
   }
 };
 
@@ -186,11 +170,7 @@ export default function PricingPage() {
   const [selectedPlan, setSelectedPlan] = useState<"basic" | "growth" | "elite">("growth");
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
   
-  // Interactive Checkout Mock States
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [cvv, setCvv] = useState("");
-  const [cardholder, setCardholder] = useState("");
+  // Checkout State
   const [checkoutStep, setCheckoutStep] = useState<"idle" | "processing" | "success">("idle");
 
   const checkoutRef = useRef<HTMLDivElement>(null);
@@ -215,49 +195,12 @@ export default function PricingPage() {
     }, 100);
   };
 
-  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, "");
-    if (value.length > 16) value = value.substring(0, 16);
-    const formatted = value.replace(/(\d{4})(?=\d)/g, "$1 ");
-    setCardNumber(formatted);
-  };
-
-  const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, "");
-    if (value.length > 4) value = value.substring(0, 4);
-    if (value.length >= 3) {
-      value = value.substring(0, 2) + "/" + value.substring(2);
-    }
-    setExpiry(value);
-  };
-
-  const handleCvvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, "");
-    if (value.length > 3) value = value.substring(0, 3);
-    setCvv(value);
-  };
-
-  const handleCardholderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCardholder(e.target.value);
-  };
-
   const handleCheckoutSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (selectedPlan === "basic") {
-      setCheckoutStep("processing");
-      setTimeout(() => {
-        setCheckoutStep("success");
-      }, 1800);
-      return;
-    }
-    if (!cardNumber || !expiry || !cvv || !cardholder) {
-      alert(locale === "en" ? "Please fill in all payment details." : "يرجى تعبئة جميع بيانات الدفع.");
-      return;
-    }
     setCheckoutStep("processing");
     setTimeout(() => {
       setCheckoutStep("success");
-    }, 2500);
+    }, 1800);
   };
 
   // Pricing calculations based on selections
@@ -761,7 +704,7 @@ export default function PricingPage() {
                 </div>
 
                 {selectedPlan === "basic" ? (
-                  <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[rgba(255,255,255,0.04)] rounded-xl p-6 text-center space-y-2 text-xs">
+                  <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-xl p-6 text-center space-y-2 text-xs">
                     <p className="text-[#101828] font-medium">
                       {locale === "en" ? "Lite Starter is 100% Free Upfront" : "باقة لايت للمبتدئين مجانية بالكامل مقدماً"}
                     </p>
@@ -772,61 +715,30 @@ export default function PricingPage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-[#344054] block">{t.cardholder}</label>
-                      <input 
-                        type="text" 
-                        required
-                        value={cardholder}
-                        onChange={handleCardholderChange}
-                        placeholder={t.inputPlaceholderName}
-                        className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[rgba(255,255,255,0.06)] focus:border-[#D1AF47] rounded-xl py-3 px-4 text-xs text-[#101828] placeholder-[#7B859C] outline-none transition-all duration-300"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-[#344054] block">{t.cardNumber}</label>
-                      <input 
-                        type="text" 
-                        required
-                        value={cardNumber}
-                        onChange={handleCardNumberChange}
-                        placeholder={t.inputPlaceholderCard}
-                        className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[rgba(255,255,255,0.06)] focus:border-[#D1AF47] rounded-xl py-3 px-4 text-xs text-[#101828] placeholder-[#7B859C] outline-none transition-all duration-300"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-xs font-medium text-[#344054] block">{t.expiry}</label>
-                        <input 
-                          type="text" 
-                          required
-                          value={expiry}
-                          onChange={handleExpiryChange}
-                          placeholder={t.inputPlaceholderExpiry}
-                          className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[rgba(255,255,255,0.06)] focus:border-[#D1AF47] rounded-xl py-3 px-4 text-xs text-[#101828] placeholder-[#7B859C] outline-none transition-all duration-300 text-center"
-                        />
+                  <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-xl p-6 space-y-4 text-xs">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-full bg-[#D1AF47]/10 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg className="w-4 h-4 text-[#D1AF47]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-xs font-medium text-[#344054] block">{t.cvv}</label>
-                        <input 
-                          type="password" 
-                          required
-                          value={cvv}
-                          onChange={handleCvvChange}
-                          placeholder={t.inputPlaceholderCvv}
-                          className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[rgba(255,255,255,0.06)] focus:border-[#D1AF47] rounded-xl py-3 px-4 text-xs text-[#101828] placeholder-[#7B859C] outline-none transition-all duration-300 text-center"
-                        />
+                      <div className="space-y-1">
+                        <h5 className="font-bold text-[#101828]">
+                          {locale === "en" ? "Licensed Payment Gateway" : "بوابة دفع إلكتروني مرخصة"}
+                        </h5>
+                        <p className="text-[#667085] leading-relaxed">
+                          {t.secureGatewayNotice}
+                        </p>
                       </div>
+                    </div>
+                    <div className="border-t border-[#ECECEC] pt-3 text-[11px] text-[#667085] flex flex-wrap gap-2 items-center">
+                      <span className="font-semibold text-[#101828]">{locale === "en" ? "Accepted Methods:" : "طرق الدفع المدعومة:"}</span>
+                      <span className="bg-gray-100 text-[#344054] px-2 py-0.5 rounded">mada</span>
+                      <span className="bg-gray-100 text-[#344054] px-2 py-0.5 rounded">Apple Pay</span>
+                      <span className="bg-gray-100 text-[#344054] px-2 py-0.5 rounded">Visa / Mastercard</span>
                     </div>
                   </div>
                 )}
-
-                <div className="pt-2 text-[10px] text-[#667085]">
-                  {t.mockCardWarning}
-                </div>
 
                 <button 
                   type="submit"
@@ -842,55 +754,45 @@ export default function PricingPage() {
                       <span>{t.processing}</span>
                     </>
                   ) : (
-                    <span>{t.payNow}</span>
+                    <span>{selectedPlan === "basic" ? (locale === "en" ? "Activate Free Starter Plan" : "تفعيل باقة لايت المجانية") : t.payNow}</span>
                   )}
                 </button>
               </form>
 
-              {/* Order Summary & Simulated Credit Card preview */}
+              {/* Order Summary & Security Assurance */}
               <div className="lg:col-span-5 space-y-8">
                 
-                {/* Credit Card Replica Graphic */}
-                <div className="flex justify-center">
-                  <div 
-                    className={`w-full max-w-xs h-44 rounded-[20px] p-5 text-[#101828] relative overflow-hidden flex flex-col justify-between shadow-lg transition-all duration-500 hover:scale-[1.03] ${
-                      selectedPlan === "basic"
-                        ? "bg-[#FBFAF9] border border-[#ECECEC]"
-                        : selectedPlan === "growth"
-                        ? "bg-[#FBFAF7] border border-[#D1AF47]/40 shadow-[0_4px_15px_rgba(209,175,71,0.05)]"
-                        : "bg-white border-2 border-[#D1AF47] shadow-[0_4px_20px_rgba(209,175,71,0.08)]"
-                    }`}
-                  >
-                    {/* Metallic glow pattern */}
-                    <div className="absolute top-0 left-0 right-0 bottom-0 bg-[linear-gradient(225deg,rgba(209,175,71,0.02)_0%,transparent_50%)] pointer-events-none" />
-                    
-                    <div className="flex justify-between items-start z-10">
-                      <div>
-                        <span className="text-[8px] uppercase tracking-[0.2em] text-[#667085]">Primora Ledger ID</span>
-                        <div className="text-xs font-bold text-[#D1AF47]">{pricingDetails.title}</div>
-                      </div>
-                      <span className="text-xs font-serif font-black tracking-widest text-[#101828]/30">PRIMORA</span>
+                {/* Security Assurance Card */}
+                <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-[20px] p-6 space-y-4">
+                  <div className="flex items-center gap-3 border-b border-[#ECECEC] pb-3">
+                    <div className="w-9 h-9 rounded-full bg-[#3DDC84]/10 border border-[#3DDC84]/20 flex items-center justify-center text-[#22C55E]">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
                     </div>
-
-                    {/* Sim Chip Icon */}
-                    <div className="w-8 h-6 bg-[#D1AF47]/20 border border-[#D1AF47]/30 rounded-md flex p-1 items-center gap-0.5 z-10">
-                      <div className="w-1.5 h-full border-r border-[#D1AF47]/20" />
-                      <div className="w-1.5 h-full border-r border-[#D1AF47]/20" />
-                      <div className="w-1.5 h-full" />
-                    </div>
-
-                    <div className="space-y-2 z-10">
-                      <div className="text-sm font-mono tracking-widest text-[#101828]">
-                        {cardNumber || "•••• •••• •••• ••••"}
-                      </div>
-                      <div className="flex justify-between items-center text-[10px]">
-                        <div className="truncate max-w-[150px] font-mono uppercase text-[#667085]">
-                          {cardholder || (locale === "en" ? "LUXURY SALON OWNER" : "مقدم خدمة فاخر")}
-                        </div>
-                        <div className="font-mono text-[#101828]">{expiry || "MM/YY"}</div>
-                      </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-[#101828]">
+                        {locale === "en" ? "Bank-Grade Encryption" : "تشفير مصرفي آمن"}
+                      </h4>
+                      <p className="text-[10px] text-[#667085]">
+                        {locale === "en" ? "PCI-DSS Compliant via Tap Payments" : "متوافق مع معايير الأمان عبر Tap Payments"}
+                      </p>
                     </div>
                   </div>
+                  <ul className="text-xs space-y-2 text-[#667085]">
+                    <li className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />
+                      <span>{locale === "en" ? "Zero card details stored on Primora servers" : "لا يتم تخزين أي بيانات بطاقة على خوادمنا"}</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />
+                      <span>{locale === "en" ? "Automated local bank settlement" : "تسوية مصرفية محلية مؤتمتة"}</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />
+                      <span>{locale === "en" ? "Transparent 15% booking split ledger" : "دفتر أستاذ شفاف بنسبة عمولة 15%"}</span>
+                    </li>
+                  </ul>
                 </div>
 
                 {/* Billing Summary List */}

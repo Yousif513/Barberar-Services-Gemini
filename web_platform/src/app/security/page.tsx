@@ -6,28 +6,28 @@ import Link from "next/link";
 const translations = {
   en: {
     backHome: "Back to Home",
-    security: "ZATCA & Payments Compliance",
+    security: "VAT & Payments Compliance",
     title: "Secure Payouts & Invoicing",
-    subtitle: "Under Saudi Arabian tax and electronic payment authority frameworks",
-    section1Title: "1. ZATCA e-Invoicing Compliance",
-    section1Desc: "Every transaction processed on the Primora platform instantly generates a cryptographically signed electronic invoice (XML and PDF format) in compliance with the ZATCA Phase II (Fatoora) guidelines. These invoices feature a secure QR code and are dispatched automatically to client and partner portals.",
+    subtitle: "Aligned with Saudi tax calculations and licensed electronic payment standards",
+    section1Title: "1. VAT (15%) & Tax Breakdown",
+    section1Desc: "Every transaction processed on the Primora platform includes a transparent breakdown reflecting the 15% Value-Added Tax (VAT) in accordance with Saudi tax regulations. Detailed digital receipts and transaction summaries are accessible in customer and provider portals.",
     section2Title: "2. Payment Security & Encryption",
-    section2Desc: "All checkout transactions are routed through Moyasar and Tap Connect secure gateways. Client payment logs, Mada details, and Visa cards are vaulted using PCI-DSS Level 1 certified systems. We utilize TLS 1.3 encryption, ensuring your financial information is secure.",
-    section3Title: "3. Split Payment Ledger routing",
-    section3Desc: "Our automated smart splits routing mechanism splits the captured client funds. The platform's 15% share and the partner's 85% share are automatically calculated and pushed into secure bank ledger holds to avoid delays or manual errors.",
+    section2Desc: "All checkout transactions are securely processed through licensed gateway Tap Payments. Payment details and card credentials are protected using PCI-DSS Level 1 certified systems. We utilize TLS 1.3 encryption, ensuring your financial information is transmitted safely.",
+    section3Title: "3. Automated Split Settlement Routing",
+    section3Desc: "Our automated smart splits routing mechanism calculates the platform's 15% commission and the partner's 85% share, settling completed bookings into local bank accounts to avoid manual calculation errors.",
     footerText: "Built for Riyadh, Saudi Arabia. All rights reserved."
   },
   ar: {
     backHome: "العودة للرئيسية",
-    security: "الامتثال للزكاة والمدفوعات",
+    security: "الامتثال الضريبي والمدفوعات",
     title: "المدفوعات والفواتير الآمنة",
-    subtitle: "تحت أطر هيئة الزكاة والضريبة والجمارك وجهات المدفوعات السعودية",
-    section1Title: "1. الامتثال للفوترة الإلكترونية (الزكاة والجمارك)",
-    section1Desc: "كل معاملة تتم على منصة بريمورا تصدر فوراً فاتورة إلكترونية موقعة رقمياً (بصيغة XML و PDF) متوافقة تماماً مع متطلبات المرحلة الثانية (فاتورة) من هيئة الزكاة والضريبة والجمارك. تحتوي هذه الفواتير على رمز الاستجابة السريعة (QR) وتُرسل تلقائياً إلى العميل ومقدم الخدمة.",
+    subtitle: "متوافق مع حسابات ضريبة القيمة المضافة وبوابات الدفع الإلكتروني المرخصة في المملكة",
+    section1Title: "1. ضريبة القيمة المضافة (15%) وتفاصيل الفواتير",
+    section1Desc: "تتضمن كل معاملة على منصة بريمورا تفصيلاً مالياً دقيقاً يوضح ضريبة القيمة المضافة (15%) طبقاً للأنظمة واللوائح الضريبية السعودية. وتتاح إيصالات الدفع الرقمية وسجلات المعاملات مباشرة عبر لوحات تحكم العملاء ومقدمي الخدمة.",
     section2Title: "2. أمان وتشفير المدفوعات",
-    section2Desc: "يتم تمرير جميع عمليات الدفع عبر بوابات ميسر (Moyasar) و Tap Connect الآمنة. يتم حفظ بيانات بطاقات مدى وفيزا في خزائن مشفرة معتمدة بمعيار PCI-DSS من المستوى الأول. نحن نستخدم تشفير TLS 1.3 لضمان أمان معلوماتك المالية بالكامل.",
-    section3Title: "3. توجيه تقسيم المدفوعات الآلي",
-    section3Desc: "يقوم نظام التقسيم الذكي بتجزئة الأموال المقبوضة تلقائياً. يتم حساب نسبة الـ 15% للمنصة وحصة الشريك البالغة 85% وتوجيهها آلياً إلى الحسابات البنكية المناسبة لتفادي التأخير أو الأخطاء اليدوية.",
+    section2Desc: "تتم معالجة جميع عمليات الدفع عبر بوابة Tap Payments المرخصة. يتم حماية وتشفير بيانات البطاقات في أنظمة معتمدة بمعيار PCI-DSS من المستوى الأول. نحن نستخدم تشفير TLS 1.3 لضمان أمان البيانات المالية أثناء النقل.",
+    section3Title: "3. توجيه تسوية المدفوعات الآلي",
+    section3Desc: "يقوم نظام التقسيم الآلي باحتساب نسبة الـ 15% للمنصة وحصة الشريك البالغة 85% بدقة فور اكتمال الخدمة، وتوجيه المستحقات إلى الحسابات البنكية المعتمدة لتفادي الأخطاء اليدوية.",
     footerText: "صمم خصيصاً للرياض، المملكة العربية السعودية. جميع الحقوق محفوظة."
   }
 };
@@ -49,7 +49,10 @@ export default function SecurityPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-900 font-sans antialiased flex flex-col justify-between">
+    <div 
+      className="min-h-screen bg-stone-50 text-stone-900 font-sans antialiased flex flex-col justify-between"
+      dir={locale === "ar" ? "rtl" : "ltr"}
+    >
       
       {/* Mini Header */}
       <header className="bg-white border-b border-stone-200/80 py-5 px-6 sm:px-12 flex items-center justify-between sticky top-0 z-50">
@@ -97,11 +100,11 @@ export default function SecurityPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-4 text-center">
           <div className="border border-stone-200 p-4 rounded-2xl bg-white space-y-1">
             <span className="text-[10px] uppercase font-bold text-stone-400 block">PCI-DSS</span>
-            <span className="text-xs font-bold text-stone-950 block">LEVEL 1 CERTIFIED</span>
+            <span className="text-xs font-bold text-stone-950 block">GATEWAY COMPLIANT</span>
           </div>
           <div className="border border-stone-200 p-4 rounded-2xl bg-white space-y-1">
-            <span className="text-[10px] uppercase font-bold text-stone-400 block">ZATCA</span>
-            <span className="text-xs font-bold text-stone-950 block">PHASE II COMPLIANT</span>
+            <span className="text-[10px] uppercase font-bold text-stone-400 block">VAT 15%</span>
+            <span className="text-xs font-bold text-stone-950 block">TAX BREAKDOWN</span>
           </div>
           <div className="border border-stone-200 p-4 rounded-2xl bg-white space-y-1 col-span-2 sm:col-span-1">
             <span className="text-[10px] uppercase font-bold text-stone-400 block">Encryption</span>

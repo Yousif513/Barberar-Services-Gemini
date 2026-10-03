@@ -201,21 +201,6 @@ const mockPackages: PackageItem[] = [
   }
 ];
 
-const isValidLuhn = (numStr: string) => {
-  let sum = 0;
-  let shouldDouble = false;
-  for (let i = numStr.length - 1; i >= 0; i--) {
-    let digit = parseInt(numStr.charAt(i), 10);
-    if (shouldDouble) {
-      digit *= 2;
-      if (digit > 9) digit -= 9;
-    }
-    sum += digit;
-    shouldDouble = !shouldDouble;
-  }
-  return sum % 10 === 0;
-};
-
 export default function ShopDetailsPage() {
   const [toasts, setToasts] = useState<Array<{ id: string; message: string; type: "success" | "info" | "error" }>>([]);
   const addToast = (message: string, type: "success" | "info" | "error") => {
@@ -250,10 +235,6 @@ export default function ShopDetailsPage() {
   const [activeTab, setActiveTab] = useState<"services" | "packages">("services");
 
   const [paymentMethod, setPaymentMethod] = useState<"applepay" | "card">("applepay");
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardHolder, setCardHolder] = useState("");
-  const [cardExpiry, setCardExpiry] = useState("");
-  const [cardCvv, setCardCvv] = useState("");
 
   const [clientProfiles, setClientProfiles] = useState<any[]>([]);
   const [selectedClientProfileId, setSelectedClientProfileId] = useState("");
@@ -860,31 +841,6 @@ export default function ShopDetailsPage() {
       return;
     }
 
-    if (paymentMethod === "card") {
-      const cleanNum = cardNumber.replace(/\s/g, "");
-      if (cleanNum.length !== 16 || isNaN(Number(cleanNum)) || !isValidLuhn(cleanNum)) {
-        setMessage(locale === "ar" ? "رقم بطاقة مدى أو الائتمان غير صحيح (يجب أن يتكون من 16 رقماً ويجتاز فحص luhn)." : "Invalid Mada/Credit Card number. Must be 16 digits and pass luhn validation.");
-        return;
-      }
-      if (!cardHolder.trim()) {
-        setMessage(locale === "ar" ? "يرجى كتابة اسم حامل البطاقة كما هو مطبوع." : "Please enter the cardholder name exactly as printed.");
-        return;
-      }
-      if (!cardExpiry.match(/^\d{2}\/\d{2}$/)) {
-        setMessage(locale === "ar" ? "تاريخ انتهاء البطاقة غير صحيح (MM/YY)." : "Invalid expiry date format. Use MM/YY.");
-        return;
-      }
-      const [month, year] = cardExpiry.split("/").map(Number);
-      if (month < 1 || month > 12) {
-        setMessage(locale === "ar" ? "شهر الانتهاء غير صحيح." : "Invalid expiry month.");
-        return;
-      }
-      if (cardCvv.length !== 3 || isNaN(Number(cardCvv))) {
-        setMessage(locale === "ar" ? "رمز الأمان CVV غير صحيح (3 أرقام)." : "Invalid CVV. Must be 3 digits.");
-        return;
-      }
-    }
-
     setIsLoading(true);
     setMessage("");
 
@@ -1442,75 +1398,20 @@ export default function ShopDetailsPage() {
                     </div>
                   </div>
 
-                  {/* Credit Card Details Form */}
+                  {/* Secure Payment Gateway Notice */}
                   {paymentMethod === "card" && (
-                    <div className="space-y-3 pt-2">
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">
-                          {locale === "ar" ? "اسم حامل البطاقة" : "Cardholder Name"}
-                        </label>
-                        <input
-                          type="text"
-                          value={cardHolder}
-                          onChange={(e) => setCardHolder(e.target.value)}
-                          placeholder="FAIZ AL-MUTAIRI"
-                          className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-xs text-stone-700 outline-none focus:border-stone-950"
-                        />
+                    <div className="rounded-xl border border-stone-200 bg-stone-50/70 p-3.5 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
+                        <span className="text-[11px] font-bold text-stone-800">
+                          {locale === "ar" ? "بوابة دفع آمنة ومعتمدة (Tap)" : "Secure Licensed Gateway (Tap)"}
+                        </span>
                       </div>
-                      
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">
-                          {locale === "ar" ? "رقم البطاقة" : "Card Number"}
-                        </label>
-                        <input
-                          type="text"
-                          value={cardNumber}
-                          maxLength={19}
-                          onChange={(e) => {
-                            const raw = e.target.value.replace(/\D/g, "");
-                            const formatted = raw.match(/.{1,4}/g)?.join(" ") || "";
-                            setCardNumber(formatted);
-                          }}
-                          placeholder="4000 1234 5678 9010"
-                          className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-xs text-stone-700 outline-none focus:border-stone-950 tracking-widest text-left"
-                          dir="ltr"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">
-                            {locale === "ar" ? "تاريخ الانتهاء" : "Expiry (MM/YY)"}
-                          </label>
-                          <input
-                            type="text"
-                            value={cardExpiry}
-                            maxLength={5}
-                            onChange={(e) => {
-                              let val = e.target.value.replace(/\D/g, "");
-                              if (val.length > 2) {
-                                val = val.substring(0, 2) + "/" + val.substring(2, 4);
-                              }
-                              setCardExpiry(val);
-                            }}
-                            placeholder="MM/YY"
-                            className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-xs text-stone-700 outline-none focus:border-stone-950 text-center"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">
-                            {locale === "ar" ? "رمز الأمان CVV" : "CVV"}
-                          </label>
-                          <input
-                            type="password"
-                            value={cardCvv}
-                            maxLength={3}
-                            onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, ""))}
-                            placeholder="***"
-                            className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-xs text-stone-700 outline-none focus:border-stone-950 text-center tracking-widest"
-                          />
-                        </div>
-                      </div>
+                      <p className="text-[10px] text-stone-500 leading-relaxed font-medium">
+                        {locale === "ar"
+                          ? "سيتم إدخال بيانات بطاقتك (مدى أو فيزا أو ماستركارد) مباشرة وبأمان تام عبر صفحة الدفع المعتمدة وفق معايير PCI-DSS دون تخزينها على المنصة."
+                          : "Card details (Mada, Visa, Mastercard) are encrypted and processed securely via the licensed Tap checkout interface under PCI-DSS standards."}
+                      </p>
                     </div>
                   )}
 
