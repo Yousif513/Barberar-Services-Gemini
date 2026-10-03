@@ -298,5 +298,111 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(shopCode.includes('request_source: bookingSource'), "Must pass request_source to create_booking RPC");
     });
   });
+
+  describe("Booking Rules & Money (P0-D: G17, G10, G02, G14, G12)", () => {
+    it("get_available_slots supports overnight shifts spanning into next day (21:00 - 02:00)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261003220000_booking_rules_and_money.sql"),
+        "utf8"
+      );
+      assert.ok(
+        migrationCode.includes("IF v_shift_end <= v_shift_start THEN"),
+        "Must check if shift end is less than or equal to start time"
+      );
+      assert.ok(
+        migrationCode.includes("((target_date + 1)::text || ' ' || v_shift_end::text || '+03')::timestamptz"),
+        "Must shift end boundary by 1 day when overnight"
+      );
+      assert.ok(
+        migrationCode.includes("v_prev_day_of_week"),
+        "Must account for previous day overnight spillover into morning"
+      );
+    });
+
+    it("cancel_booking and mark_booking_no_show enforce provider cancellation policies and log audit", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261003220000_booking_rules_and_money.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("free_cancellation_hours"), "Must check free cancellation hours");
+      assert.ok(migrationCode.includes("late_cancellation_fee_percent"), "Must enforce late cancellation fee percent");
+      assert.ok(migrationCode.includes("no_show_fee_percent"), "Must enforce no show fee percent");
+      assert.ok(migrationCode.includes("cancellation_fee"), "Must record cancellation fee");
+      assert.ok(migrationCode.includes("refund_amount"), "Must record refund amount");
+      assert.ok(migrationCode.includes("mark_booking_no_show"), "Must provide mark_booking_no_show RPC");
+      assert.ok(migrationCode.includes("admin_audit_logs"), "Must log cancellation and no-show to admin_audit_logs");
+    });
+
+    it("fee_rules table replaces hardcoded 15% commission with dynamic rules", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261003220000_booking_rules_and_money.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.fee_rules"), "Must create fee_rules table");
+      assert.ok(migrationCode.includes("calculate_booking_platform_commission"), "Must provide commission calculation function");
+      assert.ok(migrationCode.includes("('link', NULL, 0.00, 0.00, 0.00"), "Direct channels must have 0% platform fee");
+      assert.ok(migrationCode.includes("('marketplace', TRUE, 20.00, 10.00, 40.00"), "Marketplace first visit has min and max limits");
+      assert.ok(!migrationCode.includes("NEW.commission_percentage := 15.00;"), "Hardcoded 15.00 override must be removed");
+    });
+
+    it("admin_release_payout executes single server transaction with idempotency and audit logs", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261003220000_booking_rules_and_money.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("CREATE OR REPLACE FUNCTION public.admin_release_payout"), "Must create admin_release_payout RPC");
+      assert.ok(migrationCode.includes("p_idempotency_key TEXT"), "Must require idempotency key");
+      assert.ok(migrationCode.includes("FOR UPDATE"), "Must use row-level locking");
+      assert.ok(migrationCode.includes("admin_audit_logs"), "Must log payout release to audit logs in same transaction");
+      assert.ok(migrationCode.includes("CREATE OR REPLACE FUNCTION public.request_provider_payout"), "Must provide request_provider_payout RPC");
+    });
+
+    it("admin/ledger eliminates 3-step browser mutation (Defect #3)", () => {
+      const ledgerCode = readFileSync(
+        join(webPlatformDir, "src/app/admin/ledger/page.tsx"),
+        "utf8"
+      );
+      assert.ok(!ledgerCode.includes('.update({ payout_status: "released" })'), "Must not update transactional_ledger directly from browser");
+      assert.ok(ledgerCode.includes('supabase.rpc("admin_release_payout"'), "Must call atomic admin_release_payout RPC");
+      assert.ok(ledgerCode.includes("idempotencyKey"), "Must generate idempotency key");
+    });
+
+    it("provider/wallet eliminates direct-insert fallback", () => {
+      const walletCode = readFileSync(
+        join(webPlatformDir, "src/app/provider/wallet/page.tsx"),
+        "utf8"
+      );
+      assert.ok(!walletCode.includes("falling back to direct insert"), "Direct-insert fallback must be eliminated");
+      assert.ok(walletCode.includes('supabase.rpc("request_provider_payout"'), "Must call request_provider_payout RPC");
+    });
+
+    it("payments_marketplace_split feature flag defaults to OFF", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261003220000_booking_rules_and_money.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("('payments_marketplace_split', FALSE"), "Feature flag must default to FALSE");
+      const checkoutCode = readFileSync(
+        join(rootDir, "supabase/functions/payment-checkout/index.ts"),
+        "utf8"
+      );
+      assert.ok(checkoutCode.includes("payments_marketplace_split"), "Checkout must check marketplace split feature flag");
+    });
+
+    it("shop and confirmation pages disclose cancellation & no-show policies", () => {
+      const shopCode = readFileSync(
+        join(webPlatformDir, "src/app/shop/[id]/page.tsx"),
+        "utf8"
+      );
+      assert.ok(shopCode.includes("Cancellation & No-Show Policy") || shopCode.includes("سياسة الإلغاء وعدم الحضور"), "Shop page must display cancellation policy");
+
+      const confirmationCode = readFileSync(
+        join(webPlatformDir, "src/app/customer/bookings/[id]/confirmation/page.tsx"),
+        "utf8"
+      );
+      assert.ok(confirmationCode.includes("Cancellation & No-Show Terms") || confirmationCode.includes("سياسة الإلغاء وعدم الحضور"), "Confirmation page must display cancellation policy");
+    });
+  });
 });
+
 

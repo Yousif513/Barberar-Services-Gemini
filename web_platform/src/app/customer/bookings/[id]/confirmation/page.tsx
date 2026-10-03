@@ -425,6 +425,18 @@ export default function BookingConfirmationPage() {
             <div className="text-[9px] font-medium text-[#8A7F6C] bg-stone-50 border border-stone-150 rounded-lg p-2 text-center">
               {t.vatLine} ({vatIncluded.toFixed(2)} {t.sar})
             </div>
+
+            {/* CANCELLATION & NO-SHOW POLICY (G10) */}
+            <div className="rounded-xl border border-amber-200/80 bg-amber-50/50 p-3 space-y-1.5 text-[10px] text-amber-900">
+              <span className="font-bold block">
+                {locale === "ar" ? "سياسة الإلغاء وعدم الحضور:" : "Cancellation & No-Show Terms:"}
+              </span>
+              <p className="text-amber-800 leading-relaxed font-medium">
+                {locale === "ar"
+                  ? "يمكنك إلغاء الحجز مجاناً مع استرداد كامل العربون حتى 24 ساعة قبل الموعد. في حال الإلغاء المتأخر يُخصم 50% من العربون، وفي حال عدم الحضور يُخصم كامل العربون."
+                  : "Free cancellation with a 100% deposit refund is available up to 24 hours before your scheduled appointment. Late cancellations incur a 50% fee, and no-shows forfeit the full deposit."}
+              </p>
+            </div>
           </div>
 
         </div>

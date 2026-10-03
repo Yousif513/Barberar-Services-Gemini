@@ -547,18 +547,19 @@ export default function AdminLedger() {
       setSuccess("");
       setError("");
 
-      const { error: patchError } = await supabase
-        .from("transactional_ledger")
-        .update({ payout_status: "released" })
-        .eq("id", id);
+      const idempotencyKey = `ledger_release_${id}_${Date.now()}`;
+      const { error: rpcError } = await supabase.rpc("admin_release_ledger_item", {
+        p_ledger_id: id,
+        p_idempotency_key: idempotencyKey,
+      });
 
-      if (patchError) throw patchError;
+      if (rpcError) throw rpcError;
 
       setSuccess(t.successMsg);
       loadLedger();
-    } catch (err) {
-      setError(t.errorMsg);
-      console.warn("Offline split release warning:", err);
+    } catch (err: any) {
+      setError(err?.message || t.errorMsg);
+      console.warn("Offline split release error:", err);
     }
   };
 
@@ -595,66 +596,22 @@ export default function AdminLedger() {
       setError("");
       setProcessingRequestId(request.id);
 
-      const { data: pendingLedger, error: ledgerError } = await supabase
-        .from("transactional_ledger")
-        .select(`
-          id,
-          provider_share,
-          created_at,
-          bookings!inner (
-            branches!inner (
-              provider_id
-            )
-          )
-        `)
-        .eq("payout_status", "pending")
-        .eq("bookings.branches.provider_id", request.provider_id)
-        .order("created_at", { ascending: true });
+      const idempotencyKey = `payout_release_${request.id}_${Date.now()}`;
+      const { error: rpcError } = await supabase.rpc("admin_release_payout", {
+        p_payout_request_id: request.id,
+        p_idempotency_key: idempotencyKey,
+        p_admin_note: `Released payout of ${Number(request.amount || 0).toFixed(2)} SAR.`,
+      });
 
-      if (ledgerError) throw ledgerError;
-      if (!pendingLedger || pendingLedger.length === 0) {
-        setError(t.noLedgerCoverage);
-        return;
+      if (rpcError) {
+        throw rpcError;
       }
-
-      const targetAmount = Number(request.amount || 0);
-      let coveredAmount = 0;
-      const ledgerIdsToRelease: string[] = [];
-
-      for (const entry of pendingLedger) {
-        if (coveredAmount >= targetAmount) break;
-        ledgerIdsToRelease.push(entry.id);
-        coveredAmount += Number(entry.provider_share || 0);
-      }
-
-      if (ledgerIdsToRelease.length === 0) {
-        setError(t.noLedgerCoverage);
-        return;
-      }
-
-      const { error: releaseError } = await supabase
-        .from("transactional_ledger")
-        .update({ payout_status: "released" })
-        .in("id", ledgerIdsToRelease);
-
-      if (releaseError) throw releaseError;
-
-      const { error: requestError } = await supabase
-        .from("payout_requests")
-        .update({
-          status: "paid",
-          processed_at: new Date().toISOString(),
-          admin_note: `Released ${coveredAmount.toFixed(2)} SAR across ${ledgerIdsToRelease.length} ledger rows.`
-        })
-        .eq("id", request.id);
-
-      if (requestError) throw requestError;
 
       setSuccess(t.requestPaidMsg);
       await Promise.all([loadLedger(), loadPayoutRequests()]);
-    } catch (err) {
-      setError(t.requestActionError);
-      console.warn("Payout request paid warning:", err);
+    } catch (err: any) {
+      setError(err?.message || t.requestActionError);
+      console.error("Payout request release error:", err);
     } finally {
       setProcessingRequestId("");
     }

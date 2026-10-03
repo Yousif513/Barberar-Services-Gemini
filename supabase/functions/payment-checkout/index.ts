@@ -62,33 +62,53 @@ serve(async (req) => {
     const customer = Array.isArray(booking.profiles) ? booking.profiles[0] : booking.profiles
     const appUrl = Deno.env.get("APP_URL") || allowedOrigin
     const webhookUrl =
-      Deno.env.get("PAYMENT_WEBHOOK_URL") || `${supabaseUrl}/functions/v1/payment-webhook`
+    // Feature flag: payments_marketplace_split (OFF until owner confirms legal opinion on fund custody)
+    let isSplitEnabled = Deno.env.get("FEATURE_PAYMENTS_MARKETPLACE_SPLIT") === "true"
+    if (!isSplitEnabled) {
+      const { data: flagRow } = await adminClient
+        .from("platform_feature_flags")
+        .select("is_enabled")
+        .eq("flag_key", "payments_marketplace_split")
+        .maybeSingle()
+      if (flagRow?.is_enabled) {
+        isSplitEnabled = true
+      }
+    }
+
+    const chargePayload: Record<string, unknown> = {
+      amount: Number(booking.deposit_required),
+      currency: "SAR",
+      threeDSecure: true,
+      save_card: false,
+      description: `Booking deposit for ${booking.id}`,
+      metadata: { booking_id: booking.id, split_enabled: isSplitEnabled },
+      customer: {
+        first_name: customer?.first_name || "Guest",
+        last_name: customer?.last_name || "User",
+        email: customer?.email || "guest@primora.sa",
+        phone: {
+          country_code: "966",
+          number: customer?.phone_number?.replace("+966", "") || "",
+        },
+      },
+      source: { id: "src_all" },
+      post: { url: webhookUrl },
+      redirect: { url: `${appUrl}/customer/bookings?payment=${booking.id}` },
+    }
+
+    // Only attach Tap Marketplace sub-merchant split when flag is explicitly enabled
+    if (isSplitEnabled) {
+      console.log("[Checkout] payments_marketplace_split flag is ON. Routing with Tap marketplace split.")
+      // Placeholder sub-merchant split configuration when legal approval is confirmed
+    }
+
     const gatewayResponse = await fetch("https://api.tap.company/v2/charges", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        amount: Number(booking.deposit_required),
-        currency: "SAR",
-        threeDSecure: true,
-        save_card: false,
-        description: `Booking deposit for ${booking.id}`,
-        metadata: { booking_id: booking.id },
-        customer: {
-          first_name: customer?.first_name || "Guest",
-          last_name: customer?.last_name || "User",
-          email: customer?.email || "guest@primora.sa",
-          phone: {
-            country_code: "966",
-            number: customer?.phone_number?.replace("+966", "") || "",
-          },
-        },
-        source: { id: "src_all" },
-        post: { url: webhookUrl },
-        redirect: { url: `${appUrl}/customer/bookings?payment=${booking.id}` },
-      }),
+      body: JSON.stringify(chargePayload),
     })
 
     if (!gatewayResponse.ok) {

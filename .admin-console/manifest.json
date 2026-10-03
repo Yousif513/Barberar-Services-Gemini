@@ -3277,7 +3277,7 @@
       "id": "payout-money-mutation-in-browser",
       "severity": "critical",
       "description": "Marking a payout paid runs a three-step money mutation from the browser with no transaction, no idempotency key and no confirmation: read pending ledger rows, bulk-update them to 'released', then update the payout request. A failure between the two writes leaves ledger rows released against a request that is still 'processing'; a double click releases twice. The correctly guarded server version exists and is never called.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "REMEDY: replace the three client writes with supabase.functions.invoke('process-payout'), then move that function's body into a single Postgres transaction (a SECURITY DEFINER RPC) and add an idempotency key on payout_request id plus attempt.",
       "evidence": [
         "web_platform/src/app/admin/ledger/page.tsx:598",
@@ -3536,7 +3536,7 @@
       "id": "provider-payout-bypasses-balance-check",
       "severity": "medium",
       "description": "When the request-payout function is unavailable the provider wallet silently falls back to inserting the payout_requests row directly from the browser, skipping the server-side available-balance calculation that prevents a provider requesting more than they have earned.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "REMEDY: remove the fallback and surface the failure; enforce the balance rule with a database CHECK or trigger so it cannot be bypassed by any client.",
       "evidence": [
         "web_platform/src/app/provider/wallet/page.tsx:421",

@@ -66,12 +66,34 @@ serve(async (req) => {
       })
     }
 
-    const { bookingId, refundReason } = await req.json()
+    const { bookingId, refundReason, idempotencyKey } = await req.json()
     if (!bookingId) {
       return new Response(JSON.stringify({ error: "Missing required bookingId parameter." }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" }
       })
+    }
+
+    // Check for idempotency replay
+    if (idempotencyKey) {
+      const { data: existingAudit } = await supabase
+        .from("admin_audit_logs")
+        .select("payload")
+        .eq("action", "process_refund")
+        .filter("payload->>idempotency_key", "eq", idempotencyKey)
+        .maybeSingle()
+
+      if (existingAudit?.payload) {
+        return new Response(JSON.stringify({
+          success: true,
+          idempotent: true,
+          message: "Refund already processed under this idempotency key.",
+          details: existingAudit.payload
+        }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        })
+      }
     }
 
     // 1. Load the booking details and ledger info
@@ -164,6 +186,22 @@ serve(async (req) => {
       .eq("id", ledgerRow.id)
 
     if (updateLedgerError) throw updateLedgerError;
+
+    // 6. Write to admin audit log
+    await supabase.from("admin_audit_logs").insert({
+      actor_id: user.id,
+      action: "process_refund",
+      entity_name: "bookings",
+      entity_id: bookingId,
+      payload: {
+        idempotency_key: idempotencyKey || null,
+        booking_id: bookingId,
+        refund_id: gatewayRefundId,
+        refund_amount: Number(booking.total_price),
+        status: refundStatus,
+        reason: refundReason || "Administrative refund"
+      }
+    });
 
     return new Response(JSON.stringify({ 
       success: true, 
