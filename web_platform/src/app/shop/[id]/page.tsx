@@ -113,6 +113,10 @@ interface SpecialistItem {
   role: { en: string; ar: string };
   rating: number;
   avatar: string;
+  bio?: { en: string; ar: string };
+  experienceYears?: number;
+  specialties?: string[];
+  instagramHandle?: string;
 }
 
 interface ShopItem {
@@ -1115,6 +1119,13 @@ export default function ShopDetailsPage() {
               <span className="text-[10px] text-stone-300 font-bold uppercase tracking-wider">
                 {shop.city.toUpperCase()} • {shop.neighborhood}
               </span>
+              <span className="h-3 w-px bg-stone-700"></span>
+              <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider bg-amber-400/20 text-[#F4E7B6] border border-[#D1AF47]/40 px-2.5 py-0.5 rounded-full">
+                <svg className="w-3 h-3 text-[#D1AF47]" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                {locale === "ar" ? "موثق بسجل تجاري (واثق)" : "Wathq Verified CR"}
+              </span>
             </div>
             <h1 className="text-3xl sm:text-5xl font-serif font-black tracking-tight leading-tight">
               {shop.name[locale]}
@@ -1274,19 +1285,35 @@ export default function ShopDetailsPage() {
                             setSelectedSpecialist(spec);
                             setSelectedSlot("");
                           }}
-                          className={`bg-white border rounded-2xl p-4 cursor-pointer transition duration-150 flex items-center gap-4 ${
+                          className={`bg-white border rounded-2xl p-4 cursor-pointer transition duration-150 flex items-start gap-4 ${
                             selectedSpecialist?.id === spec.id
-                              ? "border-stone-950 shadow-sm"
+                              ? "border-stone-950 shadow-sm ring-1 ring-stone-950"
                               : "border-stone-200 hover:border-stone-400"
                           }`}
                         >
-                          <div className="w-12 h-12 rounded-full overflow-hidden bg-stone-155 flex-shrink-0 border border-stone-100">
+                          <div className="w-12 h-12 rounded-full overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-200">
                             <img src={spec.avatar} alt={spec.name[locale]} className="w-full h-full object-cover" />
                           </div>
-                          <div className={`space-y-0.5 ${isRTL ? "text-right" : "text-left"}`}>
-                            <h4 className="font-bold text-stone-900 text-xs">{spec.name[locale]}</h4>
-                            <p className="text-[10px] text-stone-400 font-semibold">{spec.role[locale]}</p>
-                            <span className="text-[9px] text-[hsl(45,60%,50%)] font-extrabold">★ {spec.rating}</span>
+                          <div className={`space-y-1 flex-1 ${isRTL ? "text-right" : "text-left"}`}>
+                            <div className="flex items-center justify-between">
+                              <h4 className="font-bold text-stone-900 text-xs">{spec.name[locale]}</h4>
+                              <span className="text-[9px] text-[hsl(45,60%,50%)] font-extrabold">★ {spec.rating}</span>
+                            </div>
+                            <p className="text-[10px] text-stone-500 font-semibold">{spec.role[locale]}</p>
+                            {spec.experienceYears && (
+                              <p className="text-[9px] text-[#9A741F] font-bold">
+                                {locale === "ar" ? `خبرة ${spec.experienceYears} سنوات` : `${spec.experienceYears} yrs exp`}
+                              </p>
+                            )}
+                            {spec.specialties && spec.specialties.length > 0 && (
+                              <div className="flex flex-wrap gap-1 pt-0.5">
+                                {spec.specialties.map((tag, sIdx) => (
+                                  <span key={sIdx} className="text-[8px] bg-stone-100 text-stone-700 font-medium px-1.5 py-0.5 rounded">
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                       ))}

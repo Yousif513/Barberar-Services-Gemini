@@ -670,6 +670,116 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(bookingsCode.includes("confirmReschedule"), "Must have confirm reschedule action");
     });
   });
+
+  describe("P1-C: People & Trust (G24, G26, G30, G42)", () => {
+    it("provider_memberships establishes staff identity and RLS policies (G24)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004020000_people_and_trust.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.provider_memberships"), "Must create provider_memberships");
+      assert.ok(migrationCode.includes("idx_memberships_user"), "Must index user_id");
+      assert.ok(migrationCode.includes("idx_memberships_provider"), "Must index provider_id");
+      assert.ok(migrationCode.includes("idx_memberships_branch"), "Must index branch_id");
+      assert.ok(migrationCode.includes("ENABLE ROW LEVEL SECURITY"), "Must enable RLS on provider_memberships");
+      assert.ok(migrationCode.includes("Members can view own memberships"), "Must define view policy");
+      assert.ok(migrationCode.includes("Provider owners and admins manage memberships"), "Must define manage policy");
+    });
+
+    it("employee_update_booking_status validates statuses, checks auth, and audits (G24)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004020000_people_and_trust.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("FUNCTION public.employee_update_booking_status"), "Must define employee_update_booking_status RPC");
+      assert.ok(migrationCode.includes("in_service"), "Must support in_service status");
+      assert.ok(migrationCode.includes("no_show"), "Must support no_show status");
+      assert.ok(migrationCode.includes("Forbidden: not authorized to update this booking"), "Must verify caller is assigned staff or owner");
+      assert.ok(migrationCode.includes("booking.employee_status_update"), "Must log audit event");
+      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.employee_update_booking_status"), "Must revoke public execution");
+      assert.ok(migrationCode.includes("GRANT EXECUTE ON FUNCTION public.employee_update_booking_status"), "Must grant authenticated execution");
+    });
+
+    it("verify_provider_cr enforces 10-digit Saudi CR regex and records Wathq data (G26)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004020000_people_and_trust.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("FUNCTION public.verify_provider_cr"), "Must define verify_provider_cr RPC");
+      assert.ok(migrationCode.includes("^[0-9]{10}$"), "Must enforce 10-digit CR number regex");
+      assert.ok(migrationCode.includes("Commercial Registration (CR) must be exactly 10 digits"), "Must throw clear error on invalid CR");
+      assert.ok(migrationCode.includes("wathq_saudi_api"), "Must record Wathq validation source");
+      assert.ok(migrationCode.includes("provider.cr_verification"), "Must log verification audit");
+      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.verify_provider_cr"), "Must revoke public execution");
+    });
+
+    it("reply_to_review enforces owner authorization and rejects empty replies (G30)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004020000_people_and_trust.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("FUNCTION public.reply_to_review"), "Must define reply_to_review RPC");
+      assert.ok(migrationCode.includes("Reply text cannot be empty"), "Must validate non-empty reply");
+      assert.ok(migrationCode.includes("Forbidden: only the provider owner can reply"), "Must enforce owner auth");
+      assert.ok(migrationCode.includes("reply_comment"), "Must update reply_comment");
+      assert.ok(migrationCode.includes("reply_created_at"), "Must record reply timestamp");
+    });
+
+    it("moderate_review authorizes admins, validates status, and logs audit events (G30)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004020000_people_and_trust.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("FUNCTION public.moderate_review"), "Must define moderate_review RPC");
+      assert.ok(migrationCode.includes("Forbidden: only administrators can moderate reviews"), "Must restrict to admin role");
+      assert.ok(migrationCode.includes("Invalid moderation status"), "Must validate moderation status enum");
+      assert.ok(migrationCode.includes("review.moderate"), "Must log moderation audit");
+    });
+
+    it("employee_portfolios enforces PDPL client photo consent and employee profile fields (G42)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004020000_people_and_trust.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.employee_portfolios"), "Must create employee_portfolios");
+      assert.ok(migrationCode.includes("customer_consent_confirmed"), "Must require customer consent flag");
+      assert.ok(migrationCode.includes("years_of_experience"), "Must add years_of_experience to employees");
+      assert.ok(migrationCode.includes("specialties"), "Must add specialties to employees");
+      assert.ok(migrationCode.includes("instagram_handle"), "Must add instagram_handle to employees");
+      assert.ok(migrationCode.includes("Public can view consented portfolio photos"), "Must enforce consent RLS on public view");
+    });
+
+    it("UI integrations: admin reviews, provider reviews, bookings, and shop page (G24, G26, G30, G42)", () => {
+      const adminReviewsCode = readFileSync(
+        join(webPlatformDir, "src/app/admin/reviews/page.tsx"),
+        "utf8"
+      );
+      assert.ok(adminReviewsCode.includes("moderate_review"), "Admin reviews must call moderate_review RPC");
+      assert.ok(!adminReviewsCode.includes("Bandar Al-Otaibi"), "Admin reviews must not have mock review fallbacks");
+
+      const providerReviewsCode = readFileSync(
+        join(webPlatformDir, "src/app/provider/reviews/page.tsx"),
+        "utf8"
+      );
+      assert.ok(providerReviewsCode.includes("reply_to_review"), "Provider reviews must use reply_to_review RPC");
+      assert.ok(!providerReviewsCode.includes("Marcus Vance"), "Provider reviews must not contain fake mock reviews");
+
+      const providerBookingsCode = readFileSync(
+        join(webPlatformDir, "src/app/provider/bookings/page.tsx"),
+        "utf8"
+      );
+      assert.ok(providerBookingsCode.includes("employee_update_booking_status"), "Bookings must call employee_update_booking_status RPC");
+      assert.ok(providerBookingsCode.includes("in_service"), "Bookings must support in_service status");
+      assert.ok(providerBookingsCode.includes("no_show"), "Bookings must support no_show status");
+
+      const shopCode = readFileSync(
+        join(webPlatformDir, "src/app/shop/[id]/page.tsx"),
+        "utf8"
+      );
+      assert.ok(shopCode.includes("Wathq Verified CR"), "Shop page must render Wathq verified badge");
+      assert.ok(shopCode.includes("experienceYears"), "Shop page specialist card must render experience");
+    });
+  });
 });
 
 

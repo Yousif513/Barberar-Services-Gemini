@@ -76,6 +76,8 @@ type ProviderRecord = {
   registrationDate: string;
   commissionPercentage: number;
   tradeLicenseUrl: string;
+  crNumber?: string;
+  crVerificationStatus?: string;
   adminNotes?: string;
   lastActivity?: string;
   performance?: {
@@ -197,6 +199,8 @@ type ProviderRow = {
   contact_phone?: string | null;
   type?: ProviderType | string | null;
   is_verified?: boolean | null;
+  cr_number?: string | null;
+  cr_verification_status?: string | null;
   commission_percentage?: number | string | null;
   trade_license_url?: string | null;
   created_at?: string | null;
@@ -851,6 +855,8 @@ export default function AdminProviderManagement() {
       registrationDate: provider.created_at || new Date().toISOString(),
       commissionPercentage: Number(provider.commission_percentage || 15),
       tradeLicenseUrl: provider.trade_license_url || "#",
+      crNumber: provider.cr_number || "",
+      crVerificationStatus: provider.cr_verification_status || (provider.is_verified ? "verified" : "unverified"),
       performance
     };
   }, []);
@@ -870,6 +876,8 @@ export default function AdminProviderManagement() {
           contact_phone,
           type,
           is_verified,
+          cr_number,
+          cr_verification_status,
           commission_percentage,
           trade_license_url,
           created_at,
@@ -1022,6 +1030,29 @@ export default function AdminProviderManagement() {
       setError(err?.message || (isRTL ? "فشلت عملية الرفض." : "Failed to reject application."));
     } finally {
       setSubmittingAppAction(false);
+    }
+  };
+
+  const handleVerifyCr = async (providerId: string, crNumber: string) => {
+    if (!crNumber || !/^[0-9]{10}$/.test(crNumber.trim())) {
+      setError(isRTL ? "يجب أن يتكون السجل التجاري من 10 أرقام بالضبط." : "Commercial Registration (CR) must be exactly 10 digits.");
+      return;
+    }
+    setError("");
+    try {
+      const { error: rpcError } = await supabase.rpc("verify_provider_cr", {
+        p_provider_id: providerId,
+        p_cr_number: crNumber.trim()
+      });
+      if (rpcError) throw rpcError;
+      setNotice(isRTL ? "تم التحقق من السجل التجاري بنجاح عبر واثق وتوثيق الشريك." : "CR verified successfully via Wathq and provider certified.");
+      setProviders((prev) => prev.map((p) => p.id === providerId ? { ...p, crNumber: crNumber.trim(), crVerificationStatus: "verified", applicationStatus: "approved" } : p));
+      if (detail?.id === providerId) {
+        setDetail((prev) => prev ? { ...prev, crNumber: crNumber.trim(), crVerificationStatus: "verified", applicationStatus: "approved" } : null);
+      }
+    } catch (err: any) {
+      console.error("Wathq verification failed:", err);
+      setError(err?.message || (isRTL ? "فشل التحقق من السجل التجاري عبر واثق." : "Failed to verify CR via Wathq."));
     }
   };
 
@@ -1756,6 +1787,38 @@ export default function AdminProviderManagement() {
                     <strong className="mt-2 block text-sm font-black text-gray-900">{value}</strong>
                   </div>
                 ))}
+              </div>
+
+              {/* Wathq CR Verification (G26) */}
+              <div className="rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
+                <div className={`flex flex-wrap items-center justify-between gap-4 ${rowDir}`}>
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#D1AF47] block">
+                      {isRTL ? "توثيق واثق (السجل التجاري السعودي)" : "Wathq Saudi CR Verification"}
+                    </span>
+                    <p className="mt-1 text-sm font-bold text-gray-900">
+                      CR: {detail.crNumber || (isRTL ? "غير مسجل" : "Not Registered")}
+                    </p>
+                    <span className={`inline-block mt-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                      detail.crVerificationStatus === "verified"
+                        ? "bg-[#ECFDF3] text-[#027A48]"
+                        : "bg-[#FFFAEB] text-[#B54708]"
+                    }`}>
+                      {detail.crVerificationStatus === "verified" ? (isRTL ? "موثق ومعتمد" : "Verified & Active") : (isRTL ? "غير موثق" : "Unverified")}
+                    </span>
+                  </div>
+                  {detail.crVerificationStatus !== "verified" && (
+                    <button
+                      onClick={() => {
+                        const cr = prompt(isRTL ? "أدخل رقم السجل التجاري (10 أرقام):" : "Enter 10-digit CR Number:", detail.crNumber || "");
+                        if (cr) void handleVerifyCr(detail.id, cr);
+                      }}
+                      className="px-4 py-2 rounded-xl bg-[#101828] text-[#F4E7B6] text-xs font-black hover:bg-black transition"
+                    >
+                      {isRTL ? "التحقق والتوثيق عبر واثق" : "Verify via Wathq"}
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Shop performance dashboard — provider-wide rollup */}

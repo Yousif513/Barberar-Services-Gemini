@@ -127,69 +127,42 @@ export default function ProviderReviewsPage() {
           return;
         }
       }
-      throw new Error("No provider active");
+      setReviews([]);
+      setStaffList([]);
     } catch (err: any) {
-      console.warn("Using default reviews cache due to local sandbox session:", err.message);
-      setError("Displaying offline reviews cache.");
-
-      setStaffList([
-        { id: "emp-1", name_en: "Marcus Vance", name_ar: "ماركوس فانس" },
-        { id: "emp-2", name_en: "Omar G.", name_ar: "عمر ج." },
-        { id: "emp-3", name_en: "Elena Rostova", name_ar: "إيلينا روستوفا" }
-      ]);
-
-      setReviews([
-        {
-          id: "rev-1",
-          rating: 5,
-          comment: "Absolutely exceptional hot shaving experience. Marcus is detail-oriented and very neat. Will book again.",
-          created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          reply_comment: "Thank you Yousif! Marcus appreciates your recommendation and looks forward to your next visit.",
-          bookings: {
-            id: "bk-100",
-            scheduled_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-            services: { name_en: "Luxury Beard Grooming & Hot Towel Shave", name_ar: "حلاقة اللحية الفاخرة بالمنشفة الساخنة" },
-            profiles: { first_name: "Yousif", last_name: "Al-Saud" },
-            employees: { id: "emp-1", name_en: "Marcus Vance", name_ar: "ماركوس فانس" }
-          }
-        },
-        {
-          id: "rev-2",
-          rating: 4,
-          comment: "The massage room was perfect. Clean sheets and highly professional masseuse. A bit busy on weekends.",
-          created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-          reply_comment: null,
-          bookings: {
-            id: "bk-99",
-            scheduled_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-            services: { name_en: "Deep Hydrating Facial & Scalp Therapy", name_ar: "علاج ترطيب البشرة العميق وتدليك فروة الرأس" },
-            profiles: { first_name: "Khalid", last_name: "M." },
-            employees: { id: "emp-3", name_en: "Elena Rostova", name_ar: "إيلينا روستوفا" }
-          }
-        }
-      ]);
+      console.warn("Failed to load provider reviews:", err.message);
+      setError(err?.message || (locale === "ar" ? "تعذر مزامنة التقييمات من قاعدة البيانات." : "Failed to sync reviews from database."));
+      setStaffList([]);
+      setReviews([]);
     } finally {
       setLoading(false);
     }
   }
 
   async function postReply(reviewId: string) {
+    if (!replyText.trim()) return;
     try {
-      const { error: replyError } = await supabase
-        .from("reviews")
-        .update({ reply_comment: replyText, reply_created_at: new Date().toISOString() })
-        .eq("id", reviewId);
+      setError("");
+      const { error: rpcError } = await supabase.rpc("reply_to_review", {
+        p_review_id: reviewId,
+        p_reply: replyText.trim()
+      });
 
-      if (replyError) throw replyError;
+      if (rpcError) {
+        // Fallback to direct update if RPC is unavailable
+        const { error: updateError } = await supabase
+          .from("reviews")
+          .update({ reply_comment: replyText.trim(), reply_created_at: new Date().toISOString() })
+          .eq("id", reviewId);
+        if (updateError) throw updateError;
+      }
 
-      setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, reply_comment: replyText } : r));
+      setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, reply_comment: replyText.trim() } : r));
       setReplyText("");
       setReplyingReviewId(null);
     } catch (err: any) {
-      console.warn("Saving salon reply locally for simulator preview:", err.message);
-      setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, reply_comment: replyText } : r));
-      setReplyText("");
-      setReplyingReviewId(null);
+      console.error("Failed to post reply:", err);
+      setError(err?.message || (locale === "ar" ? "فشل إرسال الرد على التقييم." : "Failed to post review reply."));
     }
   }
 

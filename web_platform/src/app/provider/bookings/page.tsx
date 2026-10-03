@@ -24,6 +24,8 @@ const translations = {
     cancel: "Cancel",
     assign: "Assign Staff",
     price: "Price",
+    inService: "Seat in Chair",
+    noShow: "Mark No-Show",
     noBookings: "No bookings found matching this filter.",
     currency: "SAR",
     kpiTotal: "Total Bookings",
@@ -51,6 +53,8 @@ const translations = {
     cancel: "إلغاء",
     assign: "تعيين موظف",
     price: "السعر",
+    inService: "بدء الجلسة",
+    noShow: "تسجيل عدم الحضور",
     noBookings: "لا توجد حجوزات تطابق هذا الاختيار.",
     currency: "ريال",
     kpiTotal: "إجمالي الحجوزات",
@@ -129,50 +133,11 @@ export default function ProviderBookingsPage() {
           return;
         }
       }
-      throw new Error("No provider active");
+      setBookings([]);
     } catch (err: any) {
-      console.warn("Using mock provider bookings data:", err.message);
-      setError("Displaying local appointment ledger.");
-
-      // Premium Mock bookings
-      const mockDate1 = new Date();
-      mockDate1.setHours(mockDate1.getHours() + 1);
-
-      const mockDate2 = new Date();
-      mockDate2.setDate(mockDate2.getDate() + 1);
-
-      const mockDate3 = new Date();
-      mockDate3.setDate(mockDate3.getDate() - 2);
-
-      setBookings([
-        {
-          id: "bk-100",
-          scheduled_at: mockDate1.toISOString(),
-          status: "confirmed",
-          total_price: 220,
-          services: { name_en: "Luxury Beard Grooming & Hot Towel Shave", name_ar: "حلاقة اللحية الفاخرة بالمنشفة الساخنة" },
-          profiles: { first_name: "Yousif", last_name: "Al-Saud", phone: "+966 50 123 4567" },
-          employees: { id: "emp-1", name_en: "Marcus Vance", name_ar: "ماركوس فانس" }
-        },
-        {
-          id: "bk-105",
-          scheduled_at: mockDate2.toISOString(),
-          status: "pending_payment",
-          total_price: 150,
-          services: { name_en: "Classic Precision Cut & Wash", name_ar: "قص الشعر الكلاسيكي والغسيل" },
-          profiles: { first_name: "Abdulrahman", last_name: "K.", phone: "+966 54 888 1234" },
-          employees: { id: "emp-2", name_en: "Omar G.", name_ar: "عمر ج." }
-        },
-        {
-          id: "bk-99",
-          scheduled_at: mockDate3.toISOString(),
-          status: "completed",
-          total_price: 350,
-          services: { name_en: "Deep Hydrating Facial & Scalp Therapy", name_ar: "علاج ترطيب البشرة العميق وتدليك فروة الرأس" },
-          profiles: { first_name: "Khalid", last_name: "M.", phone: "+966 53 111 2222" },
-          employees: { id: "emp-3", name_en: "Elena Rostova", name_ar: "إيلينا روستوفا" }
-        }
-      ]);
+      console.warn("Failed to load provider bookings:", err.message);
+      setError(err?.message || (locale === "ar" ? "تعذر تحميل الحجوزات من قاعدة البيانات." : "Failed to load bookings from database."));
+      setBookings([]);
     } finally {
       setLoading(false);
     }
@@ -180,15 +145,25 @@ export default function ProviderBookingsPage() {
 
   async function updateStatus(id: string, newStatus: string) {
     try {
-      const { error: updateError } = await supabase
-        .from("bookings")
-        .update({ status: newStatus })
-        .eq("id", id);
+      setError("");
+      const { error: rpcError } = await supabase.rpc("employee_update_booking_status", {
+        p_booking_id: id,
+        p_new_status: newStatus
+      });
+
+      if (rpcError) {
+        // Fallback to direct update
+        const { error: updateError } = await supabase
+          .from("bookings")
+          .update({ status: newStatus, updated_at: new Date().toISOString() })
+          .eq("id", id);
+        if (updateError) throw updateError;
+      }
       
-      if (updateError) throw updateError;
       setBookings(prev => prev.map(b => b.id === id ? { ...b, status: newStatus } : b));
     } catch (err: unknown) {
-      console.warn("Failed to update booking status:", err instanceof Error ? err.message : err);
+      console.error("Failed to update booking status:", err instanceof Error ? err.message : err);
+      setError(err instanceof Error ? err.message : (locale === "ar" ? "تعذر تحديث حالة الحجز." : "Failed to update booking status."));
     }
   }
 
@@ -222,6 +197,20 @@ export default function ProviderBookingsPage() {
           text: "text-[#F5B041]",
           border: "border-[#F5B041]/20",
           dot: "bg-[#F5B041] shadow-[0_0_8px_rgba(245,176,65,0.4)]"
+        };
+      case "in_service":
+        return {
+          bg: "bg-[#EFF8FF] text-[#175CD3]",
+          text: "text-[#175CD3]",
+          border: "border-[#175CD3]/20",
+          dot: "bg-[#175CD3] shadow-[0_0_8px_rgba(23,92,211,0.4)]"
+        };
+      case "no_show":
+        return {
+          bg: "bg-[#FEF3F2] text-[#B42318]",
+          text: "text-[#B42318]",
+          border: "border-[#B42318]/20",
+          dot: "bg-[#B42318] shadow-[0_0_8px_rgba(180,35,24,0.4)]"
         };
       case "cancelled":
         return {
@@ -456,6 +445,28 @@ export default function ProviderBookingsPage() {
                               </button>
                             )}
                             {bk.status === "confirmed" && (
+                              <>
+                                <button
+                                  onClick={() => updateStatus(bk.id, "in_service")}
+                                  className="px-3 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 font-extrabold text-[10px] uppercase tracking-wider rounded-xl active:scale-95 transition-all duration-300"
+                                >
+                                  {t.inService}
+                                </button>
+                                <button
+                                  onClick={() => updateStatus(bk.id, "completed")}
+                                  className="px-3.5 py-2 bg-[#3DDC84] hover:bg-[#52e291] text-[#070B12] font-extrabold text-[10px] uppercase tracking-wider rounded-xl shadow-[0_0_15px_rgba(61,220,132,0.2)] hover:shadow-[0_0_25px_rgba(61,220,132,0.35)] active:scale-95 transition-all duration-300"
+                                >
+                                  {t.complete}
+                                </button>
+                                <button
+                                  onClick={() => updateStatus(bk.id, "no_show")}
+                                  className="px-3 py-2 border border-stone-200 bg-stone-50 text-stone-700 hover:bg-stone-100 font-extrabold text-[10px] uppercase tracking-wider rounded-xl active:scale-95 transition-all duration-300"
+                                >
+                                  {t.noShow}
+                                </button>
+                              </>
+                            )}
+                            {bk.status === "in_service" && (
                               <button
                                 onClick={() => updateStatus(bk.id, "completed")}
                                 className="px-3.5 py-2 bg-[#3DDC84] hover:bg-[#52e291] text-[#070B12] font-extrabold text-[10px] uppercase tracking-wider rounded-xl shadow-[0_0_15px_rgba(61,220,132,0.2)] hover:shadow-[0_0_25px_rgba(61,220,132,0.35)] active:scale-95 transition-all duration-300"
@@ -463,10 +474,10 @@ export default function ProviderBookingsPage() {
                                 {t.complete}
                               </button>
                             )}
-                            {bk.status !== "completed" && bk.status !== "cancelled" && (
+                            {bk.status !== "completed" && bk.status !== "cancelled" && bk.status !== "no_show" && (
                               <button
                                 onClick={() => updateStatus(bk.id, "cancelled")}
-                                className="px-3.5 py-2 border border-[#FF5D73]/30 bg-[#FEE4E2] text-[#EF4444] text-[#EF4444] hover:bg-[#FF5D73] hover:text-[#101828] font-extrabold text-[10px] uppercase tracking-wider rounded-xl active:scale-95 transition-all duration-300"
+                                className="px-3.5 py-2 border border-[#FF5D73]/30 bg-[#FEE4E2] text-[#EF4444] hover:bg-[#FF5D73] hover:text-[#101828] font-extrabold text-[10px] uppercase tracking-wider rounded-xl active:scale-95 transition-all duration-300"
                               >
                                 {t.cancel}
                               </button>
@@ -532,33 +543,55 @@ export default function ProviderBookingsPage() {
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex gap-2 pt-3 border-t border-[#ECECEC]">
-                    {(bk.status === "pending_payment" || bk.status === "pending") && (
-                      <button
-                        onClick={() => updateStatus(bk.id, "confirmed")}
-                        className="flex-1 py-2.5 bg-[#D1AF47] hover:bg-[#E0C46A] text-[#070B12] font-extrabold text-[10px] uppercase tracking-wider rounded-xl text-center active:scale-95 transition-all duration-300"
-                      >
-                        {t.confirm}
-                      </button>
-                    )}
-                    {bk.status === "confirmed" && (
-                      <button
-                        onClick={() => updateStatus(bk.id, "completed")}
-                        className="flex-1 py-2.5 bg-[#3DDC84] hover:bg-[#52e291] text-[#070B12] font-extrabold text-[10px] uppercase tracking-wider rounded-xl text-center active:scale-95 transition-all duration-300"
-                      >
-                        {t.complete}
-                      </button>
-                    )}
-                    {bk.status !== "completed" && bk.status !== "cancelled" && (
-                      <button
-                        onClick={() => updateStatus(bk.id, "cancelled")}
-                        className="flex-1 py-2.5 border border-[#FF5D73]/30 bg-[#FEE4E2] text-[#EF4444] text-[#EF4444] hover:bg-[#FF5D73] hover:text-[#101828] font-extrabold text-[10px] uppercase tracking-wider rounded-xl text-center active:scale-95 transition-all duration-300"
-                      >
-                        {t.cancel}
-                      </button>
-                    )}
-                  </div>
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap gap-2 pt-3 border-t border-[#ECECEC]">
+                      {(bk.status === "pending_payment" || bk.status === "pending") && (
+                        <button
+                          onClick={() => updateStatus(bk.id, "confirmed")}
+                          className="flex-1 py-2.5 bg-[#D1AF47] hover:bg-[#E0C46A] text-[#070B12] font-extrabold text-[10px] uppercase tracking-wider rounded-xl text-center active:scale-95 transition-all duration-300"
+                        >
+                          {t.confirm}
+                        </button>
+                      )}
+                      {bk.status === "confirmed" && (
+                        <>
+                          <button
+                            onClick={() => updateStatus(bk.id, "in_service")}
+                            className="flex-1 py-2.5 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 font-extrabold text-[10px] uppercase tracking-wider rounded-xl text-center active:scale-95 transition-all duration-300"
+                          >
+                            {t.inService}
+                          </button>
+                          <button
+                            onClick={() => updateStatus(bk.id, "completed")}
+                            className="flex-1 py-2.5 bg-[#3DDC84] hover:bg-[#52e291] text-[#070B12] font-extrabold text-[10px] uppercase tracking-wider rounded-xl text-center shadow-[0_0_15px_rgba(61,220,132,0.2)] active:scale-95 transition-all duration-300"
+                          >
+                            {t.complete}
+                          </button>
+                          <button
+                            onClick={() => updateStatus(bk.id, "no_show")}
+                            className="flex-1 py-2.5 border border-stone-200 bg-stone-50 text-stone-700 hover:bg-stone-100 font-extrabold text-[10px] uppercase tracking-wider rounded-xl text-center active:scale-95 transition-all duration-300"
+                          >
+                            {t.noShow}
+                          </button>
+                        </>
+                      )}
+                      {bk.status === "in_service" && (
+                        <button
+                          onClick={() => updateStatus(bk.id, "completed")}
+                          className="flex-1 py-2.5 bg-[#3DDC84] hover:bg-[#52e291] text-[#070B12] font-extrabold text-[10px] uppercase tracking-wider rounded-xl text-center shadow-[0_0_15px_rgba(61,220,132,0.2)] active:scale-95 transition-all duration-300"
+                        >
+                          {t.complete}
+                        </button>
+                      )}
+                      {bk.status !== "completed" && bk.status !== "cancelled" && bk.status !== "no_show" && (
+                        <button
+                          onClick={() => updateStatus(bk.id, "cancelled")}
+                          className="flex-1 py-2.5 border border-[#FF5D73]/30 bg-[#FEE4E2] text-[#EF4444] hover:bg-[#FF5D73] hover:text-[#101828] font-extrabold text-[10px] uppercase tracking-wider rounded-xl text-center active:scale-95 transition-all duration-300"
+                        >
+                          {t.cancel}
+                        </button>
+                      )}
+                    </div>
                 </div>
               );
             })}
