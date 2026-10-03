@@ -21,6 +21,14 @@ const translations = {
     emailNotif: "Receive email billing invoices",
     smsNotif: "Receive booking SMS reminders",
     pushNotif: "Receive in-app chat reminders",
+    whatsappConsent: "WhatsApp appointment reminders & booking updates",
+    marketingConsent: "Promotional beauty offers and exclusive discounts",
+    photosConsent: "Before & after styling photos in provider portfolio",
+    phoneVerified: "Verified",
+    phoneUnverified: "Unverified",
+    dataRightsTitle: "Saudi PDPL Data Subject Rights",
+    dataRightsDesc: "Submit an official statutory request to access, rectify, erase, or export your personal records within 30 days.",
+    dataRightsBtn: "Exercise Data Rights",
     advancedSection: "Advanced & Family Profiles",
     dependentsCardTitle: "Dependents & Pets Manager",
     dependentsCardDesc: "Add and manage profiles for family members, patients, or pets to book services on their behalf.",
@@ -45,6 +53,14 @@ const translations = {
     emailNotif: "استلام الفواتير عبر البريد الإلكتروني",
     smsNotif: "تلقي رسائل الجوال لتذكير المواعيد",
     pushNotif: "تلقي تنبيهات التطبيق للرسائل والدردشة",
+    whatsappConsent: "تنبيهات وتذكير المواعيد عبر واتساب",
+    marketingConsent: "استلام العروض الخاصة والتخفيضات الترويجية",
+    photosConsent: "الموافقة على عرض صور النتائج في معرض أعمال المزود",
+    phoneVerified: "موثق",
+    phoneUnverified: "غير موثق",
+    dataRightsTitle: "حقوق صاحب البيانات (نظام حماية البيانات الشخصية PDPL)",
+    dataRightsDesc: "تقديم طلب نظامي للوصول إلى بياناتك الشخصية، تصحيحها، إتلافها، أو نقلها خلال مهلة 30 يوماً.",
+    dataRightsBtn: "ممارسة حقوق البيانات",
     advancedSection: "الملفات العائلية والخدمات المتقدمة",
     dependentsCardTitle: "إدارة التابعين والأليفة",
     dependentsCardDesc: "إضافة وإدارة الملفات الشخصية لأفراد عائلتك أو الحيوانات الأليفة للحجز نيابة عنهم.",
@@ -66,8 +82,14 @@ export default function CustomerSettingsPage() {
     firstName: "Yousif",
     lastName: "Al-Saud",
     email: "yousif@primora.com",
-    phone: "+966 50 123 4567"
+    phone: "+966 50 123 4567",
+    phoneVerified: false
   });
+
+  // Consents states (G13)
+  const [whatsappConsent, setWhatsappConsent] = useState(true);
+  const [marketingConsent, setMarketingConsent] = useState(false);
+  const [photosConsent, setPhotosConsent] = useState(true);
 
   // Preference States
   const [emailNotif, setEmailNotif] = useState(true);
@@ -111,7 +133,7 @@ export default function CustomerSettingsPage() {
 
       const { data, error: fetchError } = await supabase
         .from("profiles")
-        .select("first_name, last_name, phone_number")
+        .select("first_name, last_name, phone_number, phone_verified")
         .eq("id", user.id)
         .single();
 
@@ -121,8 +143,25 @@ export default function CustomerSettingsPage() {
           firstName: data.first_name || "",
           lastName: data.last_name || "",
           email: user.email || "",
-          phone: data.phone_number || ""
+          phone: data.phone_number || "",
+          phoneVerified: !!data.phone_verified
         });
+      }
+
+      // Load Consents
+      const { data: consentsData } = await supabase
+        .from("consents")
+        .select("purpose, status")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (consentsData && consentsData.length > 0) {
+        const latestWhatsapp = consentsData.find(c => c.purpose === "whatsapp");
+        const latestMarketing = consentsData.find(c => c.purpose === "marketing");
+        const latestPhotos = consentsData.find(c => c.purpose === "photos_portfolio");
+        if (latestWhatsapp) setWhatsappConsent(latestWhatsapp.status === "granted");
+        if (latestMarketing) setMarketingConsent(latestMarketing.status === "granted");
+        if (latestPhotos) setPhotosConsent(latestPhotos.status === "granted");
       }
 
       // Load Dependents
@@ -145,6 +184,28 @@ export default function CustomerSettingsPage() {
       setLoading(false);
     }
   }
+
+  const handleConsentToggle = async (purpose: "whatsapp" | "marketing" | "photos_portfolio", currentVal: boolean) => {
+    const nextVal = !currentVal;
+    if (purpose === "whatsapp") setWhatsappConsent(nextVal);
+    if (purpose === "marketing") setMarketingConsent(nextVal);
+    if (purpose === "photos_portfolio") setPhotosConsent(nextVal);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      await supabase.from("consents").insert({
+        user_id: user.id,
+        purpose,
+        status: nextVal ? "granted" : "withdrawn",
+        document_version: "v1.0",
+        method: "settings_toggle"
+      });
+      setSuccess(locale === "ar" ? "تم تحديث تفضيلات الموافقة بنجاح" : "Consent preferences updated successfully.");
+    } catch (e) {
+      console.warn("Failed to record consent toggle:", e);
+    }
+  };
 
   async function saveProfile(e: React.FormEvent) {
     e.preventDefault();
@@ -284,7 +345,14 @@ export default function CustomerSettingsPage() {
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.phone}</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-[10px] uppercase font-bold text-gray-400 block">{t.phone}</label>
+                <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
+                  profile.phoneVerified ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
+                }`}>
+                  {profile.phoneVerified ? t.phoneVerified : t.phoneUnverified}
+                </span>
+              </div>
               <input
                 type="text"
                 value={profile.phone}
@@ -356,6 +424,49 @@ export default function CustomerSettingsPage() {
                 />
                 <span>{t.pushNotif}</span>
               </label>
+
+              <div className="pt-3 border-t border-gray-100 space-y-3">
+                <span className="text-[10px] uppercase font-bold text-[#A57C32] block">Saudi PDPL Consents</span>
+                
+                <label className="flex items-start gap-2.5 text-xs text-gray-700 font-medium cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={whatsappConsent}
+                    onChange={() => handleConsentToggle("whatsapp", whatsappConsent)}
+                    className="mt-0.5 rounded border-gray-300 text-[#A57C32] focus:ring-0"
+                  />
+                  <span>{t.whatsappConsent}</span>
+                </label>
+
+                <label className="flex items-start gap-2.5 text-xs text-gray-700 font-medium cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={marketingConsent}
+                    onChange={() => handleConsentToggle("marketing", marketingConsent)}
+                    className="mt-0.5 rounded border-gray-300 text-[#A57C32] focus:ring-0"
+                  />
+                  <span>{t.marketingConsent}</span>
+                </label>
+
+                <label className="flex items-start gap-2.5 text-xs text-gray-700 font-medium cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={photosConsent}
+                    onChange={() => handleConsentToggle("photos_portfolio", photosConsent)}
+                    className="mt-0.5 rounded border-gray-300 text-[#A57C32] focus:ring-0"
+                  />
+                  <span>{t.photosConsent}</span>
+                </label>
+              </div>
+
+              <div className="pt-3 border-t border-gray-100">
+                <Link
+                  href="/privacy"
+                  className="block text-center rounded-xl bg-stone-100 hover:bg-stone-200 p-2.5 text-[11px] font-bold text-stone-800 transition"
+                >
+                  {t.dataRightsBtn} →
+                </Link>
+              </div>
             </div>
           </div>
         </div>

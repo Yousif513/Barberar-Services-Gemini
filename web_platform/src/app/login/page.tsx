@@ -1,20 +1,30 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { devRoleHome, isLocalDevAccessEnabled, setDevRole, type DevRole } from "@/lib/dev-access";
 
 type Portal = "customer" | "provider";
 type AuthMode = "signin" | "signup";
+type AuthMethod = "phone" | "email";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnUrl = searchParams.get("returnUrl");
   const [portal, setPortal] = useState<Portal>("customer");
   const [mode, setMode] = useState<AuthMode>("signin");
+  const [authMethod, setAuthMethod] = useState<AuthMethod>("phone");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [otpCode, setOtpCode] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(true);
+  const [whatsappConsent, setWhatsappConsent] = useState(true);
+  const [marketingConsent, setMarketingConsent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -25,7 +35,51 @@ export default function LoginPage() {
     setDevAccessEnabled(isLocalDevAccessEnabled());
   }, []);
 
+  const recordConsents = async (userId: string) => {
+    if (!termsAccepted) return;
+    try {
+      const records = [
+        {
+          user_id: userId,
+          purpose: "terms_privacy",
+          status: "granted",
+          document_version: "v1.0",
+          method: "web_auth_form",
+        },
+      ];
+      if (whatsappConsent) {
+        records.push({
+          user_id: userId,
+          purpose: "whatsapp",
+          status: "granted",
+          document_version: "v1.0",
+          method: "web_auth_form",
+        });
+      }
+      if (marketingConsent) {
+        records.push({
+          user_id: userId,
+          purpose: "marketing",
+          status: "granted",
+          document_version: "v1.0",
+          method: "web_auth_form",
+        });
+      }
+      await supabase.from("consents").insert(records);
+    } catch (e) {
+      console.warn("Consent registration notice:", e);
+    }
+  };
+
   const routeAuthenticatedUser = async (userId: string) => {
+    await recordConsents(userId);
+
+    if (returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("//")) {
+      router.replace(returnUrl);
+      router.refresh();
+      return;
+    }
+
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("role")
@@ -44,6 +98,69 @@ export default function LoginPage() {
       router.replace("/customer/dashboard");
     }
     router.refresh();
+  };
+
+  const normalizeSaudiPhone = (raw: string): string => {
+    const digits = raw.replace(/[^\d+]/g, "");
+    if (digits.startsWith("+966")) return digits;
+    if (digits.startsWith("00966")) return "+" + digits.slice(2);
+    if (digits.startsWith("966")) return "+" + digits;
+    if (digits.startsWith("05")) return "+966" + digits.slice(1);
+    if (digits.startsWith("5")) return "+966" + digits;
+    return "+966" + digits;
+  };
+
+  const handleSendPhoneOtp = async () => {
+    const formatted = normalizeSaudiPhone(phone);
+    if (!formatted.startsWith("+9665") || formatted.length !== 13) {
+      setError("Please enter a valid Saudi mobile number (e.g. 05XXXXXXXX). / يرجى إدخال رقم جوال سعودي صالح");
+      return;
+    }
+    setIsLoading(true);
+    setError("");
+    setMessage("");
+    try {
+      const { error: otpError } = await supabase.auth.signInWithOtp({
+        phone: formatted,
+        options: {
+          channel: "sms",
+        },
+      });
+      if (otpError) throw otpError;
+      setOtpSent(true);
+      setMessage("Verification code sent to your mobile. Enter the 6-digit code below. / تم إرسال رمز التحقق إلى جوالك");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Unable to send verification code.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyPhoneOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const formatted = normalizeSaudiPhone(phone);
+    if (!otpCode || otpCode.trim().length !== 6) {
+      setError("Please enter the 6-digit verification code. / يرجى إدخال الرمز المكون من 6 أرقام");
+      return;
+    }
+    setIsLoading(true);
+    setError("");
+    setMessage("");
+    try {
+      const { data, error: verifyError } = await supabase.auth.verifyOtp({
+        phone: formatted,
+        token: otpCode.trim(),
+        type: "sms",
+      });
+      if (verifyError || !data.user) {
+        throw verifyError ?? new Error("Invalid verification code.");
+      }
+      await routeAuthenticatedUser(data.user.id);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Verification failed.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -255,7 +372,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <div className="mb-6 grid grid-cols-2 rounded-xl border border-white/10 bg-[#0D111B] p-1">
+          <div className="mb-4 grid grid-cols-2 rounded-xl border border-white/10 bg-[#0D111B] p-1">
             {(["signin", "signup"] as AuthMode[]).map((item) => (
               <button
                 key={item}
@@ -265,9 +382,30 @@ export default function LoginPage() {
                   mode === item ? "bg-[#222A3A] text-[#D1AF47] shadow" : "text-[#98A2B3] hover:text-white"
                 }`}
               >
-                {item === "signin" ? "Sign In" : "Create Account"}
+                {item === "signin" ? "Sign In / تسجيل الدخول" : "Create Account / حساب جديد"}
               </button>
             ))}
+          </div>
+
+          <div className="mb-6 grid grid-cols-2 rounded-xl border border-white/10 bg-[#101828] p-1 text-xs">
+            <button
+              type="button"
+              onClick={() => { setAuthMethod("phone"); setError(""); setMessage(""); }}
+              className={`rounded-lg py-2 font-black transition ${
+                authMethod === "phone" ? "bg-[#D1AF47]/20 text-[#D1AF47] border border-[#D1AF47]/40" : "text-[#98A2B3] hover:text-white"
+              }`}
+            >
+              Phone / الجوال
+            </button>
+            <button
+              type="button"
+              onClick={() => { setAuthMethod("email"); setError(""); setMessage(""); }}
+              className={`rounded-lg py-2 font-black transition ${
+                authMethod === "email" ? "bg-[#D1AF47]/20 text-[#D1AF47] border border-[#D1AF47]/40" : "text-[#98A2B3] hover:text-white"
+              }`}
+            >
+              Email / البريد
+            </button>
           </div>
 
           {error && (
@@ -281,6 +419,124 @@ export default function LoginPage() {
             </div>
           )}
 
+          {authMethod === "phone" ? (
+            <form onSubmit={otpSent ? handleVerifyPhoneOtp : (e) => { e.preventDefault(); handleSendPhoneOtp(); }} className="space-y-5">
+              <fieldset>
+                <legend className="mb-2.5 text-[9px] font-black uppercase tracking-[0.18em] text-[#98A2B3]">
+                  Select portal
+                </legend>
+                <div className="grid grid-cols-2 gap-3">
+                  {(["customer", "provider"] as Portal[]).map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => setPortal(item)}
+                      className={`rounded-xl border px-3 py-3 text-xs font-black transition ${
+                        portal === item
+                          ? "border-[#D1AF47]/50 bg-[#D1AF47]/10 text-[#D1AF47]"
+                          : "border-white/10 bg-[#0D111B] text-[#98A2B3] hover:border-white/20 hover:text-white"
+                      }`}
+                    >
+                      {item === "customer" ? "Customer" : "Provider"}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+
+              <label className="block">
+                <span className="mb-2 block text-[9px] font-black uppercase tracking-[0.18em] text-[#98A2B3]">
+                  Saudi Mobile Number / رقم الجوال
+                </span>
+                <div className="flex rounded-xl border border-white/10 bg-[#0D111B] overflow-hidden focus-within:border-[#D1AF47]/70">
+                  <span className="flex items-center px-3.5 bg-white/5 text-xs font-bold text-[#D1AF47] border-r border-white/10">
+                    +966
+                  </span>
+                  <input
+                    type="tel"
+                    autoComplete="tel"
+                    placeholder="5XXXXXXXX"
+                    value={phone}
+                    onChange={(event) => setPhone(event.target.value)}
+                    disabled={otpSent}
+                    className="w-full bg-transparent px-4 py-3.5 text-sm outline-none transition placeholder:text-[#667085] disabled:opacity-60"
+                    required
+                  />
+                </div>
+              </label>
+
+              {otpSent && (
+                <label className="block">
+                  <span className="mb-2 block text-[9px] font-black uppercase tracking-[0.18em] text-[#98A2B3]">
+                    6-Digit Verification Code / رمز التحقق
+                  </span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    placeholder="123456"
+                    value={otpCode}
+                    onChange={(event) => setOtpCode(event.target.value)}
+                    className="w-full rounded-xl border border-white/10 bg-[#0D111B] px-4 py-3.5 text-sm tracking-widest text-center font-mono outline-none transition placeholder:text-[#667085] focus:border-[#D1AF47]/70"
+                    required
+                  />
+                </label>
+              )}
+
+              {mode === "signup" && (
+                <div className="space-y-3 pt-2 text-xs">
+                  <label className="flex items-start gap-2.5 cursor-pointer text-[#B8C0D4]">
+                    <input
+                      type="checkbox"
+                      checked={termsAccepted}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
+                      className="mt-0.5 rounded border-white/20 bg-[#0D111B] text-[#D1AF47] focus:ring-0"
+                      required
+                    />
+                    <span>
+                      I agree to the <Link href="/terms" className="text-[#D1AF47] underline underline-offset-2">Terms of Service</Link> and <Link href="/privacy" className="text-[#D1AF47] underline underline-offset-2">Privacy Notice</Link> (Saudi PDPL).
+                    </span>
+                  </label>
+                  <label className="flex items-start gap-2.5 cursor-pointer text-[#B8C0D4]">
+                    <input
+                      type="checkbox"
+                      checked={whatsappConsent}
+                      onChange={(e) => setWhatsappConsent(e.target.checked)}
+                      className="mt-0.5 rounded border-white/20 bg-[#0D111B] text-[#D1AF47] focus:ring-0"
+                    />
+                    <span>Receive booking confirmations and appointment reminders via WhatsApp.</span>
+                  </label>
+                  <label className="flex items-start gap-2.5 cursor-pointer text-[#B8C0D4]">
+                    <input
+                      type="checkbox"
+                      checked={marketingConsent}
+                      onChange={(e) => setMarketingConsent(e.target.checked)}
+                      className="mt-0.5 rounded border-white/20 bg-[#0D111B] text-[#D1AF47] focus:ring-0"
+                    />
+                    <span>Receive exclusive beauty offers and promotional discounts (optional).</span>
+                  </label>
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                {otpSent && (
+                  <button
+                    type="button"
+                    onClick={() => { setOtpSent(false); setOtpCode(""); }}
+                    className="rounded-xl border border-white/10 bg-[#0D111B] px-4 py-3.5 text-xs font-bold text-[#B8C0D4] hover:text-white"
+                  >
+                    Change Number
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="flex-1 rounded-xl bg-[#D1AF47] py-3.5 text-xs font-black uppercase tracking-[0.12em] text-[#101828] shadow-lg shadow-[#D1AF47]/10 transition hover:bg-[#E0C46A] disabled:cursor-wait disabled:opacity-60"
+                >
+                  {isLoading ? "Processing..." : otpSent ? "Verify & Continue" : "Send Verification Code"}
+                </button>
+              </div>
+            </form>
+          ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
             <fieldset>
               <legend className="mb-2.5 text-[9px] font-black uppercase tracking-[0.18em] text-[#98A2B3]">
@@ -358,8 +614,10 @@ export default function LoginPage() {
             </button>
           </form>
 
+          )}
+
           <p className="mt-6 text-center text-[10px] font-semibold leading-5 text-[#667085]">
-            Phone verification is unavailable in this environment. Email authentication is active and secure.
+            Secure OTP and email authentication backed by Supabase Auth and Saudi PDPL consent recording.
           </p>
           <button
             type="button"
@@ -372,5 +630,13 @@ export default function LoginPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0D111B] flex items-center justify-center text-stone-400">Loading portal...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

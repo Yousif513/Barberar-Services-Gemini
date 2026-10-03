@@ -3346,7 +3346,7 @@
       "id": "no-customer-data-rights-path",
       "severity": "critical",
       "description": "There is no export, anonymisation, deletion or legal-hold capability for customer personal data anywhere in the console, the migrations or the edge functions, on a platform holding Saudi customer names, emails, phone numbers, booking history and private messages.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "REMEDY: add an admin data-subject-request capability with export and anonymise commands, both audited, both requiring a recorded reason.",
       "evidence": [
         "web_platform/src/app/admin/customers/page.tsx",

@@ -137,4 +137,92 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(!paymentsCode.includes('refundDuplicate'), "Grep-bait comment refundDuplicate must be deleted");
     });
   });
+
+  describe("Phone Identity & Verification Boundaries (G09)", () => {
+    it("handle_new_user does not fabricate random +9665 phone numbers", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261003200000_phone_identity_and_consents.sql"),
+        "utf8"
+      );
+      assert.ok(
+        !migrationCode.includes("'+9665' || floor(random()"),
+        "Fabricated random phone fallback must be removed"
+      );
+      assert.ok(
+        migrationCode.includes("ALTER TABLE public.profiles ALTER COLUMN phone_number DROP NOT NULL"),
+        "profiles.phone_number must be nullable until verified"
+      );
+      assert.ok(
+        migrationCode.includes("phone_verified BOOLEAN NOT NULL DEFAULT FALSE"),
+        "profiles must have phone_verified defaulting to FALSE"
+      );
+    });
+
+    it("manual phone number change un-verifies phone status", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261003200000_phone_identity_and_consents.sql"),
+        "utf8"
+      );
+      assert.ok(
+        migrationCode.includes("handle_profile_phone_update"),
+        "Must have trigger to un-verify phone on manual change"
+      );
+      assert.ok(
+        migrationCode.includes("NEW.phone_verified := FALSE"),
+        "Must set phone_verified to FALSE when phone_number changes without service_role"
+      );
+    });
+  });
+
+  describe("Saudi PDPL Consents & Data Subject Requests Boundaries (G13)", () => {
+    it("consents table enforces strict RLS and immutability", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261003200000_phone_identity_and_consents.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("ENABLE ROW LEVEL SECURITY"), "Consents must have RLS enabled");
+      assert.ok(migrationCode.includes('CREATE POLICY "Users read own consents"'), "Users can only read own consents");
+      assert.ok(migrationCode.includes('CREATE POLICY "Users insert own consents"'), "Users can only insert own consents");
+      assert.ok(migrationCode.includes('CREATE POLICY "Admins read all consents"'), "Admins can read all consents");
+      assert.ok(!migrationCode.includes('CREATE POLICY "Users update own consents"'), "Consents must be immutable (no user update)");
+      assert.ok(!migrationCode.includes('CREATE POLICY "Users delete own consents"'), "Consents must be immutable (no user delete)");
+    });
+
+    it("data_subject_requests enforces 30-day statutory due date and admin queue authorization", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261003200000_phone_identity_and_consents.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("INTERVAL '30 days'"), "Must enforce 30-day statutory due date default");
+      assert.ok(migrationCode.includes('CREATE POLICY "Users submit own DSR requests"'), "Users can submit own DSR");
+      assert.ok(migrationCode.includes('CREATE POLICY "Admins update DSR requests"'), "Only admins can update DSR requests");
+      assert.ok(migrationCode.includes('admin_data_subject_requests_view'), "Must provide admin view");
+      assert.ok(migrationCode.includes('WITH (security_invoker = true)'), "Admin view must use security_invoker = true");
+    });
+  });
+
+  describe("Booking Preservation Through Guest Authentication (G16)", () => {
+    it("shop/[id] caches pending booking and restores selections on load", () => {
+      const shopCode = readFileSync(
+        join(webPlatformDir, "src/app/shop/[id]/page.tsx"),
+        "utf8"
+      );
+      assert.ok(shopCode.includes('sessionStorage.setItem("primora_pending_booking"'), "Must cache pending booking in sessionStorage");
+      assert.ok(shopCode.includes('sessionStorage.getItem("primora_pending_booking"'), "Must check sessionStorage on load");
+      assert.ok(shopCode.includes("setShowAuthModal(true)"), "Must present inline auth modal to guest");
+      assert.ok(!shopCode.includes('if (!user) {\n        router.push("/login");\n        return;'), "No bare redirect to /login that loses state");
+    });
+
+    it("login page respects returnUrl query parameter and supports phone OTP", () => {
+      const loginCode = readFileSync(
+        join(webPlatformDir, "src/app/login/page.tsx"),
+        "utf8"
+      );
+      assert.ok(loginCode.includes('searchParams.get("returnUrl")'), "Must read returnUrl from searchParams");
+      assert.ok(loginCode.includes('returnUrl.startsWith("/")') || loginCode.includes("returnUrl.startsWith('/')"), "Must validate returnUrl is relative path");
+      assert.ok(loginCode.includes("signInWithOtp"), "Must support phone OTP sign-in");
+      assert.ok(loginCode.includes("verifyOtp"), "Must support phone OTP verification");
+    });
+  });
 });
+

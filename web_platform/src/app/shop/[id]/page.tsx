@@ -238,6 +238,14 @@ export default function ShopDetailsPage() {
 
   const [clientProfiles, setClientProfiles] = useState<any[]>([]);
   const [selectedClientProfileId, setSelectedClientProfileId] = useState("");
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authPhone, setAuthPhone] = useState("");
+  const [authOtpCode, setAuthOtpCode] = useState("");
+  const [authOtpSent, setAuthOtpSent] = useState(false);
+  const [authConsentWhatsapp, setAuthConsentWhatsapp] = useState(true);
+  const [authConsentMarketing, setAuthConsentMarketing] = useState(false);
+  const [authModalError, setAuthModalError] = useState("");
+  const [authModalLoading, setAuthModalLoading] = useState(false);
 
   // Synchronize direction with locale
   useEffect(() => {
@@ -660,6 +668,31 @@ export default function ShopDetailsPage() {
     }
   }, [serviceId, filteredServices]);
 
+  // Hook to restore pending booking selection from sessionStorage (G16)
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("primora_pending_booking");
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      if (saved.providerId === shop.id && Date.now() - (saved.savedAt || 0) < 7200000) {
+        if (saved.serviceId && filteredServices.length > 0) {
+          const matchedService = filteredServices.find(s => s.id === saved.serviceId);
+          if (matchedService) setSelectedService(matchedService);
+        }
+        if (saved.specialistId && shop.specialists && shop.specialists.length > 0) {
+          const matchedSpecialist = shop.specialists.find(sp => sp.id === saved.specialistId);
+          if (matchedSpecialist) setSelectedSpecialist(matchedSpecialist);
+        }
+        if (saved.date) setSelectedDate(saved.date);
+        if (saved.slot) setSelectedSlot(saved.slot);
+        if (typeof saved.isHomeService === "boolean") setIsHomeService(saved.isHomeService);
+        addToast(locale === "ar" ? "تم استرجاع تفاصيل حجزك المختار" : "Your selected booking details were restored.", "info");
+      }
+    } catch (e) {
+      console.warn("Failed to restore booking context:", e);
+    }
+  }, [shop.id, shop.specialists, filteredServices, locale]);
+
   const defaultBuffers = {
     fajr: { before: 10, after: 30 },
     dhuhr: { before: 10, after: 30 },
@@ -835,6 +868,92 @@ export default function ShopDetailsPage() {
     return `${date}T${hour.toString().padStart(2, "0")}:${minute}:00+03:00`;
   };
 
+  const handleModalSendOtp = async () => {
+    let digits = authPhone.replace(/[^\d+]/g, "");
+    if (digits.startsWith("05")) digits = "+966" + digits.slice(1);
+    else if (digits.startsWith("5")) digits = "+966" + digits;
+    else if (!digits.startsWith("+966")) digits = "+966" + digits;
+
+    if (!digits.startsWith("+9665") || digits.length !== 13) {
+      setAuthModalError(locale === "ar" ? "يرجى إدخال رقم جوال سعودي صالح (05xxxxxxxx)" : "Please enter a valid Saudi mobile number (05XXXXXXXX)");
+      return;
+    }
+    setAuthModalLoading(true);
+    setAuthModalError("");
+    try {
+      const { error: otpError } = await supabase.auth.signInWithOtp({
+        phone: digits,
+        options: { channel: "sms" },
+      });
+      if (otpError) throw otpError;
+      setAuthOtpSent(true);
+    } catch (err: unknown) {
+      setAuthModalError(err instanceof Error ? err.message : "Failed to transmit OTP.");
+    } finally {
+      setAuthModalLoading(false);
+    }
+  };
+
+  const handleModalVerifyOtp = async () => {
+    let digits = authPhone.replace(/[^\d+]/g, "");
+    if (digits.startsWith("05")) digits = "+966" + digits.slice(1);
+    else if (digits.startsWith("5")) digits = "+966" + digits;
+    else if (!digits.startsWith("+966")) digits = "+966" + digits;
+
+    if (!authOtpCode || authOtpCode.trim().length !== 6) {
+      setAuthModalError(locale === "ar" ? "أدخل رمز التحقق المكون من 6 أرقام" : "Enter the 6-digit code");
+      return;
+    }
+    setAuthModalLoading(true);
+    setAuthModalError("");
+    try {
+      const { data, error: verifyError } = await supabase.auth.verifyOtp({
+        phone: digits,
+        token: authOtpCode.trim(),
+        type: "sms",
+      });
+      if (verifyError || !data.user) {
+        throw verifyError ?? new Error("Invalid verification code.");
+      }
+      try {
+        await supabase.from("consents").insert([
+          {
+            user_id: data.user.id,
+            purpose: "terms_privacy",
+            status: "granted",
+            document_version: "v1.0",
+            method: "inline_booking_modal",
+          },
+          ...(authConsentWhatsapp ? [{
+            user_id: data.user.id,
+            purpose: "whatsapp",
+            status: "granted",
+            document_version: "v1.0",
+            method: "inline_booking_modal",
+          }] : []),
+          ...(authConsentMarketing ? [{
+            user_id: data.user.id,
+            purpose: "marketing",
+            status: "granted",
+            document_version: "v1.0",
+            method: "inline_booking_modal",
+          }] : []),
+        ]);
+      } catch (cErr) {
+        console.warn("Consent registration notice:", cErr);
+      }
+      setShowAuthModal(false);
+      addToast(locale === "ar" ? "تم التحقق بنجاح! جاري إكمال الحجز..." : "Verified successfully! Completing your booking...", "success");
+      setTimeout(() => {
+        handleBook();
+      }, 300);
+    } catch (err: unknown) {
+      setAuthModalError(err instanceof Error ? err.message : "Verification failed.");
+    } finally {
+      setAuthModalLoading(false);
+    }
+  };
+
   const handleBook = async () => {
     if (!selectedService || !selectedSpecialist || !selectedDate || !selectedSlot) {
       setMessage(t.errorSelectDetails);
@@ -847,7 +966,17 @@ export default function ShopDetailsPage() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        router.push("/login");
+        // Save booking selection to sessionStorage (G16)
+        sessionStorage.setItem("primora_pending_booking", JSON.stringify({
+          providerId: shop.id,
+          serviceId: selectedService.id,
+          specialistId: selectedSpecialist.id,
+          date: selectedDate,
+          slot: selectedSlot,
+          isHomeService,
+          savedAt: Date.now()
+        }));
+        setShowAuthModal(true);
         return;
       }
 
@@ -866,6 +995,8 @@ export default function ShopDetailsPage() {
       if (bookingError || !booking?.id) {
         throw bookingError ?? new Error("Unable to reserve the selected time.");
       }
+
+      sessionStorage.removeItem("primora_pending_booking");
 
       let redirectUrl = "";
       try {
