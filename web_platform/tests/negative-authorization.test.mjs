@@ -1133,6 +1133,125 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(providerCustomersCode.includes("blockedCustomerIds"), "Provider customers must manage blocked customer state");
     });
   });
+
+  describe("Commercials & Monetization Boundaries (P2-B: G45, G46, G47, G48, G49, G50)", () => {
+    const p2bMigration = readFileSync(
+      join(rootDir, "supabase/migrations/20261004060000_commercials_and_monetization.sql"),
+      "utf8"
+    );
+
+    it("package_redemptions table and redeem_package_session RPC enforce ownership, validity, and audit trail (G45)", () => {
+      assert.ok(p2bMigration.includes("CREATE TABLE IF NOT EXISTS public.package_redemptions"), "Must create package_redemptions table");
+      assert.ok(p2bMigration.includes("ALTER TABLE public.package_redemptions ENABLE ROW LEVEL SECURITY"), "Must enable RLS on package_redemptions");
+      assert.ok(p2bMigration.includes("FUNCTION public.purchase_service_package"), "Must define purchase_service_package RPC");
+      assert.ok(p2bMigration.includes("FUNCTION public.redeem_package_session"), "Must define redeem_package_session RPC");
+      assert.ok(p2bMigration.includes("Not authorized to redeem sessions from this package"), "Must check authorization (customer, provider owner, admin)");
+      assert.ok(p2bMigration.includes("No remaining sessions in this package"), "Must validate session balance > 0");
+      assert.ok(p2bMigration.includes("This package has expired"), "Must validate package expiry date");
+      assert.ok(p2bMigration.includes("customer.package_session_redeemed"), "Must emit admin audit log on session redemption");
+    });
+
+    it("promotional_codes funding rules and apply_coupon_to_booking RPC enforce authorization and discount cap (G46)", () => {
+      assert.ok(p2bMigration.includes("funding_source TEXT NOT NULL DEFAULT 'platform'"), "Must support funding_source on promotional_codes");
+      assert.ok(p2bMigration.includes("min_order_amount DECIMAL"), "Must support min_order_amount on promotional_codes");
+      assert.ok(p2bMigration.includes("max_discount_cap DECIMAL"), "Must support max_discount_cap on promotional_codes");
+      assert.ok(p2bMigration.includes("CREATE TABLE IF NOT EXISTS public.coupon_redemptions"), "Must create coupon_redemptions table");
+      assert.ok(p2bMigration.includes("FUNCTION public.validate_and_apply_coupon"), "Must define validate_and_apply_coupon RPC");
+      assert.ok(p2bMigration.includes("FUNCTION public.apply_coupon_to_booking"), "Must define apply_coupon_to_booking RPC");
+      assert.ok(p2bMigration.includes("Not authorized to apply coupon to this booking"), "Must enforce caller ownership or admin privilege");
+      assert.ok(p2bMigration.includes("Cannot apply coupon to an already paid booking"), "Must forbid coupon application on paid bookings");
+      assert.ok(p2bMigration.includes("booking.coupon_redeemed"), "Must log coupon redemption to admin_audit_logs");
+    });
+
+    it("booking_tips table and add_booking_tip RPC enforce 100% to professional and 0% platform fee (G47)", () => {
+      assert.ok(p2bMigration.includes("CREATE TABLE IF NOT EXISTS public.booking_tips"), "Must create booking_tips table");
+      assert.ok(p2bMigration.includes("amount DECIMAL(10,2) NOT NULL CHECK (amount >= 5.00)"), "Must enforce minimum 5.00 SAR tip");
+      assert.ok(p2bMigration.includes("ALTER TABLE public.booking_tips ENABLE ROW LEVEL SECURITY"), "Must enable RLS on booking_tips");
+      assert.ok(p2bMigration.includes("FUNCTION public.add_booking_tip"), "Must define add_booking_tip RPC");
+      assert.ok(p2bMigration.includes("Only the booking customer can send a tip"), "Must restrict tipping to the booking customer");
+      assert.ok(p2bMigration.includes("platform_fee,\n        tax_collected,\n        net_provider_payout"), "Must insert tip into transactional_ledger");
+      assert.ok(p2bMigration.includes("0.00, -- 0% platform commission on tips"), "Must enforce 0% platform fee on tips");
+      assert.ok(p2bMigration.includes("customer.tip_submitted"), "Must record customer.tip_submitted audit event");
+    });
+
+    it("gift_cards & gift_card_redemptions enforce minimum 50 SAR, 365-day expiry, and balance tracking (G48)", () => {
+      assert.ok(p2bMigration.includes("CREATE TABLE IF NOT EXISTS public.gift_cards"), "Must create gift_cards table");
+      assert.ok(p2bMigration.includes("CREATE TABLE IF NOT EXISTS public.gift_card_redemptions"), "Must create gift_card_redemptions table");
+      assert.ok(p2bMigration.includes("ALTER TABLE public.gift_cards ENABLE ROW LEVEL SECURITY"), "Must enable RLS on gift_cards");
+      assert.ok(p2bMigration.includes("FUNCTION public.purchase_gift_card"), "Must define purchase_gift_card RPC");
+      assert.ok(p2bMigration.includes("Minimum gift card amount is 50.00 SAR"), "Must enforce 50.00 SAR minimum gift card");
+      assert.ok(p2bMigration.includes("INTERVAL '365 days'"), "Must set 365-day expiration default");
+      assert.ok(p2bMigration.includes("FUNCTION public.redeem_gift_card"), "Must define redeem_gift_card RPC");
+      assert.ok(p2bMigration.includes("Invalid or already fully redeemed gift card"), "Must validate remaining gift card balance");
+      assert.ok(p2bMigration.includes("gift_card.redeemed"), "Must audit gift_card.redeemed event");
+    });
+
+    it("customer_referrals, wallet_credits, and automated trigger reward 25 SAR on first booking completion (G49)", () => {
+      assert.ok(p2bMigration.includes("CREATE TABLE IF NOT EXISTS public.customer_referrals"), "Must create customer_referrals table");
+      assert.ok(p2bMigration.includes("CREATE TABLE IF NOT EXISTS public.wallet_credits"), "Must create wallet_credits table");
+      assert.ok(p2bMigration.includes("ALTER TABLE public.customer_referrals ENABLE ROW LEVEL SECURITY"), "Must enable RLS on customer_referrals");
+      assert.ok(p2bMigration.includes("ALTER TABLE public.wallet_credits ENABLE ROW LEVEL SECURITY"), "Must enable RLS on wallet_credits");
+      assert.ok(p2bMigration.includes("FUNCTION public.get_or_create_referral_code"), "Must define get_or_create_referral_code RPC");
+      assert.ok(p2bMigration.includes("FUNCTION public.apply_referral_code"), "Must define apply_referral_code RPC");
+      assert.ok(p2bMigration.includes("You cannot refer yourself"), "Must forbid self-referrals");
+      assert.ok(p2bMigration.includes("reward_amount DECIMAL(10,2) NOT NULL DEFAULT 25.00"), "Must set 25.00 SAR referral bonus default");
+    });
+
+    it("customer_loyalty, loyalty_points_ledger, and tier multipliers enforce repeat visit point accrual (G50)", () => {
+      assert.ok(p2bMigration.includes("CREATE TABLE IF NOT EXISTS public.customer_loyalty"), "Must create customer_loyalty table");
+      assert.ok(p2bMigration.includes("CREATE TABLE IF NOT EXISTS public.loyalty_points_ledger"), "Must create loyalty_points_ledger table");
+      assert.ok(p2bMigration.includes("tier IN ('bronze', 'silver', 'gold', 'platinum')"), "Must enforce loyalty tier domain");
+      assert.ok(p2bMigration.includes("FUNCTION public.redeem_loyalty_points"), "Must define redeem_loyalty_points RPC");
+      assert.ok(p2bMigration.includes("Minimum points redemption threshold is 100 points"), "Must require at least 100 points to redeem");
+      assert.ok(p2bMigration.includes("loyalty.points_redeemed"), "Must audit loyalty point redemption");
+      assert.ok(p2bMigration.includes("trigger_on_booking_completed_rewards"), "Must define unified booking completion rewards trigger");
+      assert.ok(p2bMigration.includes("IF NEW.status = 'completed'"), "Trigger must evaluate booking status completed");
+    });
+
+    it("Frontend integration: customer packages, provider packages, coupons, tips, shop checkout, and wallet (P2-B)", () => {
+      const customerPkgsCode = readFileSync(
+        join(webPlatformDir, "src/app/customer/packages/page.tsx"),
+        "utf8"
+      );
+      assert.ok(customerPkgsCode.includes("purchase_service_package"), "Customer packages must wire purchase_service_package RPC");
+
+      const providerPkgsCode = readFileSync(
+        join(webPlatformDir, "src/app/provider/packages/page.tsx"),
+        "utf8"
+      );
+      assert.ok(providerPkgsCode.includes("redeem_package_session"), "Provider packages must wire redeem_package_session RPC");
+      assert.ok(!providerPkgsCode.includes("catch (err) {\n        // Offline / mock fallback for demo:\n        const pkg"), "Provider packages must not have catch-and-succeed mock override");
+
+      const adminCouponsCode = readFileSync(
+        join(webPlatformDir, "src/app/admin/coupons/page.tsx"),
+        "utf8"
+      );
+      assert.ok(adminCouponsCode.includes("funding_source"), "Admin coupons must configure funding_source");
+
+      const customerBookingsCode = readFileSync(
+        join(webPlatformDir, "src/app/customer/bookings/page.tsx"),
+        "utf8"
+      );
+      assert.ok(customerBookingsCode.includes("add_booking_tip"), "Customer bookings must wire add_booking_tip RPC");
+      assert.ok(customerBookingsCode.includes("100% of your tip goes directly to your specialist"), "Customer bookings must highlight 100% to specialist notice");
+
+      const shopCode = readFileSync(
+        join(webPlatformDir, "src/app/shop/[id]/page.tsx"),
+        "utf8"
+      );
+      assert.ok(shopCode.includes("apply_coupon_to_booking"), "Shop page must call apply_coupon_to_booking RPC");
+      assert.ok(shopCode.includes("redeem_gift_card"), "Shop page must call redeem_gift_card RPC");
+      assert.ok(shopCode.includes("redeem_loyalty_points"), "Shop page must call redeem_loyalty_points RPC");
+
+      const walletCode = readFileSync(
+        join(webPlatformDir, "src/app/customer/wallet/page.tsx"),
+        "utf8"
+      );
+      assert.ok(walletCode.includes("wallet_credits"), "Wallet page must query wallet_credits table");
+      assert.ok(walletCode.includes("get_or_create_referral_code"), "Wallet page must call get_or_create_referral_code RPC");
+      assert.ok(walletCode.includes("purchase_gift_card"), "Wallet page must call purchase_gift_card RPC");
+    });
+  });
 });
 
 

@@ -60,6 +60,9 @@ const emptyCouponForm = {
   discountType: "percentage",
   discountValue: "",
   maxRedemptions: "",
+  fundingSource: "platform",
+  minOrderAmount: "0",
+  maxDiscountCap: "",
   isActive: true
 };
 
@@ -102,6 +105,9 @@ export default function AdminCoupons() {
     value: coupon.discount_type === "flat" ? `${Number(coupon.discount_value || 0)} SAR` : `${Number(coupon.discount_value || 0)}%`,
     count: Number(coupon.redeemed_count || 0),
     maxRedemptions: coupon.max_redemptions || "",
+    fundingSource: coupon.funding_source || "platform",
+    minOrderAmount: coupon.min_order_amount || 0,
+    maxDiscountCap: coupon.max_discount_cap || "",
     active: Boolean(coupon.is_active)
   });
 
@@ -111,7 +117,7 @@ export default function AdminCoupons() {
       setError("");
       const { data, error: dbError } = await supabase
         .from("promotional_codes")
-        .select("id, code, discount_type, discount_value, max_redemptions, redeemed_count, is_active, created_at")
+        .select("id, code, discount_type, discount_value, max_redemptions, redeemed_count, funding_source, min_order_amount, max_discount_cap, is_active, created_at")
         .order("created_at", { ascending: false });
 
       if (dbError) throw dbError;
@@ -145,6 +151,9 @@ export default function AdminCoupons() {
       discountType: coupon.discountType,
       discountValue: String(coupon.discountValue),
       maxRedemptions: coupon.maxRedemptions ? String(coupon.maxRedemptions) : "",
+      fundingSource: coupon.fundingSource || "platform",
+      minOrderAmount: String(coupon.minOrderAmount || 0),
+      maxDiscountCap: coupon.maxDiscountCap ? String(coupon.maxDiscountCap) : "",
       isActive: coupon.active
     });
     setModalOpen(true);
@@ -156,6 +165,8 @@ export default function AdminCoupons() {
       setError("");
       const discountValue = Number(couponForm.discountValue);
       const maxRedemptions = couponForm.maxRedemptions ? Number(couponForm.maxRedemptions) : null;
+      const minOrderAmount = Number(couponForm.minOrderAmount || 0);
+      const maxDiscountCap = couponForm.maxDiscountCap ? Number(couponForm.maxDiscountCap) : null;
 
       if (!couponForm.code.trim() || !Number.isFinite(discountValue) || discountValue <= 0) {
         setError(t.errorSave);
@@ -167,6 +178,9 @@ export default function AdminCoupons() {
         discount_type: couponForm.discountType,
         discount_value: discountValue,
         max_redemptions: maxRedemptions,
+        funding_source: couponForm.fundingSource,
+        min_order_amount: minOrderAmount,
+        max_discount_cap: maxDiscountCap,
         is_active: couponForm.isActive,
         updated_at: new Date().toISOString()
       };
@@ -330,6 +344,21 @@ export default function AdminCoupons() {
               <label className="space-y-2 text-[10px] font-black uppercase tracking-widest text-gray-500">
                 {t.maxRedemptionsLabel}
                 <input type="number" min="1" value={couponForm.maxRedemptions} onChange={(event) => setCouponForm(form => ({ ...form, maxRedemptions: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-[#D1AF47]" />
+              </label>
+              <label className="space-y-2 text-[10px] font-black uppercase tracking-widest text-gray-500">
+                {isRTL ? "جهة التمويل" : "Funding Source"}
+                <select value={couponForm.fundingSource} onChange={(event) => setCouponForm(form => ({ ...form, fundingSource: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-[#D1AF47]">
+                  <option value="platform">{isRTL ? "منصة بريمورا (Platform)" : "Platform (PRIMORA)"}</option>
+                  <option value="provider">{isRTL ? "مقدم الخدمة / الصالون (Provider)" : "Provider (Salon)"}</option>
+                </select>
+              </label>
+              <label className="space-y-2 text-[10px] font-black uppercase tracking-widest text-gray-500">
+                {isRTL ? "الحد الأدنى للطلب (ريال)" : "Min Order (SAR)"}
+                <input type="number" min="0" value={couponForm.minOrderAmount} onChange={(event) => setCouponForm(form => ({ ...form, minOrderAmount: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-[#D1AF47]" />
+              </label>
+              <label className="space-y-2 text-[10px] font-black uppercase tracking-widest text-gray-500">
+                {isRTL ? "الحد الأقصى للخصم (ريال)" : "Max Discount Cap (SAR)"}
+                <input type="number" min="1" placeholder={isRTL ? "اختياري" : "Optional"} value={couponForm.maxDiscountCap} onChange={(event) => setCouponForm(form => ({ ...form, maxDiscountCap: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-[#D1AF47]" />
               </label>
               <label className="flex items-center justify-between rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-700 sm:col-span-2">
                 {t.activeLabel}

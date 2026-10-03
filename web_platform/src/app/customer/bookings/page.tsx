@@ -56,7 +56,16 @@ const translations = {
     evidenceUrlOptional: "Evidence URL (Photo/Link)",
     submitDispute: "Submit Dispute",
     submittingDispute: "Submitting...",
-    disputeSuccess: "Dispute submitted successfully. Admin team will review your case."
+    disputeSuccess: "Dispute submitted successfully. Admin team will review your case.",
+    tipStaffBtn: "Tip Specialist",
+    tipModalTitle: "Send a Tip to Your Specialist",
+    tipNotice: "100% of your tip goes directly to your specialist with 0% platform commission.",
+    tipSelectAmount: "Select Tip Amount",
+    tipCustom: "Custom Amount (SAR)",
+    sendTipBtn: "Send Tip",
+    sendingTip: "Processing Tip...",
+    tipSuccess: "Tip sent successfully! Thank you for supporting your specialist.",
+    minTipNotice: "Minimum tip amount is 5 SAR."
   },
   ar: {
     title: "حجوزاتي",
@@ -109,7 +118,16 @@ const translations = {
     evidenceUrlOptional: "رابط الإثبات أو الصورة (اختياري)",
     submitDispute: "إرسال النزاع",
     submittingDispute: "جاري الإرسال...",
-    disputeSuccess: "تم رفع النزاع بنجاح. سيتولى مسؤولو المنصة مراجعة طلبك والبت فيه."
+    disputeSuccess: "تم رفع النزاع بنجاح. سيتولى مسؤولو المنصة مراجعة طلبك والبت فيه.",
+    tipStaffBtn: "إكرامية للمختص",
+    tipModalTitle: "إرسال إكرامية للأخصائي",
+    tipNotice: "100% من مبلغ الإكرامية يذهب مباشرة للأخصائي دون أي استقطاع لمنصة بريمورا.",
+    tipSelectAmount: "اختر قيمة الإكرامية",
+    tipCustom: "مبلغ مخصص (ريال)",
+    sendTipBtn: "إرسال الإكرامية الآن",
+    sendingTip: "جاري المعالجة...",
+    tipSuccess: "تم إرسال الإكرامية بنجاح! شكراً لدعمك لمختص العناية.",
+    minTipNotice: "الحد الأدنى للإكرامية 5 ريال."
   }
 };
 
@@ -140,7 +158,46 @@ export default function CustomerBookingsPage() {
   const [disputeLoading, setDisputeLoading] = useState(false);
   const [disputeError, setDisputeError] = useState("");
 
+  // Staff Tipping Modal States (G47)
+  const [tipTarget, setTipTarget] = useState<any | null>(null);
+  const [tipAmount, setTipAmount] = useState<number>(20);
+  const [customTip, setCustomTip] = useState<string>("");
+  const [tipLoading, setTipLoading] = useState(false);
+  const [tipError, setTipError] = useState("");
+  const [tipSuccess, setTipSuccess] = useState("");
+
   const t = translations[locale];
+
+  const handleSendTip = async () => {
+    if (!tipTarget) return;
+    const finalAmount = customTip ? Number(customTip) : tipAmount;
+    if (!finalAmount || finalAmount < 5) {
+      setTipError(t.minTipNotice);
+      return;
+    }
+    try {
+      setTipLoading(true);
+      setTipError("");
+      const { data, error: rpcErr } = await supabase.rpc("add_booking_tip", {
+        p_booking_id: tipTarget.id,
+        p_amount: finalAmount,
+        p_payment_method: "card"
+      });
+      if (rpcErr) throw rpcErr;
+      setTipSuccess(t.tipSuccess);
+      setActionMessage(t.tipSuccess);
+      setTimeout(() => {
+        setTipTarget(null);
+        setTipSuccess("");
+        setCustomTip("");
+      }, 2000);
+    } catch (err: any) {
+      console.error("Tip error:", err);
+      setTipError(err.message || "Failed to submit tip.");
+    } finally {
+      setTipLoading(false);
+    }
+  };
 
   const handleViewTaxInvoice = async (bk: any) => {
     try {
@@ -575,12 +632,29 @@ export default function CustomerBookingsPage() {
                   </>
                 )}
                 {activeTab === "past" && (
-                  <button
-                    onClick={() => (window.location.href = `/customer/book?service_id=${bk.services?.id}`)}
-                    className="flex-1 lg:flex-initial px-4 py-2 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl transition duration-150"
-                  >
-                    {t.rebook}
-                  </button>
+                  <>
+                    {bk.status === "completed" && (
+                      <button
+                        onClick={() => {
+                          setTipTarget(bk);
+                          setTipAmount(20);
+                          setCustomTip("");
+                          setTipError("");
+                          setTipSuccess("");
+                        }}
+                        className="flex-1 lg:flex-initial px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold text-xs rounded-xl transition duration-150 flex items-center justify-center gap-1.5"
+                      >
+                        <span className="text-[#D1AF47]">★</span>
+                        <span>{t.tipStaffBtn}</span>
+                      </button>
+                    )}
+                    <button
+                      onClick={() => (window.location.href = `/customer/book?service_id=${bk.services?.id}`)}
+                      className="flex-1 lg:flex-initial px-4 py-2 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl transition duration-150"
+                    >
+                      {t.rebook}
+                    </button>
+                  </>
                 )}
               </div>
             </div>
@@ -654,6 +728,21 @@ export default function CustomerBookingsPage() {
                 </svg>
                 <span>{t.taxInvoiceBtn}</span>
               </button>
+              {selectedBooking.status === "completed" && (
+                <button
+                  onClick={() => {
+                    setTipTarget(selectedBooking);
+                    setTipAmount(20);
+                    setCustomTip("");
+                    setTipError("");
+                    setTipSuccess("");
+                  }}
+                  className="w-full py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold text-xs rounded-xl transition flex items-center justify-center gap-2"
+                >
+                  <span className="text-[#D1AF47]">★</span>
+                  <span>{t.tipStaffBtn}</span>
+                </button>
+              )}
               {selectedBooking.status !== "cancelled" && (
                 <button
                   onClick={() => {
@@ -988,6 +1077,110 @@ export default function CustomerBookingsPage() {
                 className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl transition disabled:opacity-50"
               >
                 {disputeLoading ? t.submittingDispute : t.submitDispute}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* STAFF TIPPING MODAL (G47) */}
+      {tipTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white border border-gray-200 rounded-3xl w-full max-w-md p-6 shadow-2xl space-y-5">
+            <div className="flex justify-between items-start">
+              <div className="space-y-1">
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#D1AF47] block">
+                  ★ PRIMORA Staff Recognition
+                </span>
+                <h3 className="text-lg font-serif font-black text-gray-900">{t.tipModalTitle}</h3>
+                <p className="text-xs text-gray-500 font-medium">
+                  {locale === "ar"
+                    ? `للأخصائي: ${tipTarget.employees?.name_ar || tipTarget.employees?.name_en || "الأخصائي"}`
+                    : `Specialist: ${tipTarget.employees?.name_en || tipTarget.employees?.name_ar || "Specialist"}`}
+                </p>
+              </div>
+              <button
+                onClick={() => setTipTarget(null)}
+                className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 font-bold text-sm"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Zero Platform Commission Guarantee Badge */}
+            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 text-xs text-emerald-800 font-semibold flex items-center gap-2.5">
+              <span className="text-base text-emerald-600">✓</span>
+              <span>{t.tipNotice}</span>
+            </div>
+
+            {tipSuccess && (
+              <div className="bg-[#ECFDF3] border border-[#D1FADF] text-[#027A48] text-xs rounded-xl p-3 font-bold">
+                {tipSuccess}
+              </div>
+            )}
+
+            {tipError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-3 font-semibold">
+                {tipError}
+              </div>
+            )}
+
+            {/* Tip Amount Chips */}
+            <div className="space-y-3">
+              <label className="block text-xs font-bold text-gray-700">{t.tipSelectAmount}</label>
+              <div className="grid grid-cols-4 gap-2">
+                {[10, 20, 30, 50].map((amt) => (
+                  <button
+                    key={amt}
+                    type="button"
+                    onClick={() => {
+                      setTipAmount(amt);
+                      setCustomTip("");
+                      setTipError("");
+                    }}
+                    className={`py-3 rounded-2xl text-xs font-serif font-black transition border ${
+                      tipAmount === amt && !customTip
+                        ? "bg-black text-white border-black shadow-sm"
+                        : "bg-gray-50 text-gray-800 border-gray-200 hover:border-gray-400"
+                    }`}
+                  >
+                    {amt} ﷼
+                  </button>
+                ))}
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-500 mb-1">{t.tipCustom}</label>
+                <input
+                  type="number"
+                  min="5"
+                  step="5"
+                  placeholder="e.g. 75"
+                  value={customTip}
+                  onChange={(e) => {
+                    setCustomTip(e.target.value);
+                    setTipError("");
+                  }}
+                  className="w-full text-xs p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1AF47] font-bold"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setTipTarget(null)}
+                className="flex-1 py-2.5 border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold text-xs rounded-xl transition"
+              >
+                {t.close}
+              </button>
+              <button
+                type="button"
+                disabled={tipLoading || Boolean(tipSuccess)}
+                onClick={handleSendTip}
+                className="flex-1 py-2.5 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl transition shadow-sm disabled:opacity-50"
+              >
+                {tipLoading ? t.sendingTip : `${t.sendTipBtn} (${customTip ? customTip : tipAmount} ﷼)`}
               </button>
             </div>
           </div>

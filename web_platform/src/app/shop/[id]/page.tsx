@@ -311,6 +311,21 @@ export default function ShopDetailsPage() {
 
   const [paymentMethod, setPaymentMethod] = useState<"applepay" | "card">("applepay");
 
+  // G46 Coupons & G48 Gift Cards & G50 Loyalty States
+  const [couponCodeInput, setCouponCodeInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; fundingSource: string } | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponMessage, setCouponMessage] = useState("");
+
+  const [giftCardInput, setGiftCardInput] = useState("");
+  const [appliedGiftCard, setAppliedGiftCard] = useState<{ code: string; amount: number } | null>(null);
+  const [giftCardLoading, setGiftCardLoading] = useState(false);
+  const [giftCardMessage, setGiftCardMessage] = useState("");
+
+  const [loyaltyPoints, setLoyaltyPoints] = useState<number>(0);
+  const [redeemLoyalty, setRedeemLoyalty] = useState(false);
+  const [loyaltyDiscount, setLoyaltyDiscount] = useState<number>(0);
+
   const [clientProfiles, setClientProfiles] = useState<any[]>([]);
   const [selectedClientProfileId, setSelectedClientProfileId] = useState("");
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -416,72 +431,117 @@ export default function ShopDetailsPage() {
             requiresPrepayment: !!data.requires_full_prepayment
           });
         }
+
+        // Fetch loyalty points for this provider (G50)
+        const { data: loyaltyData } = await supabase
+          .from("customer_loyalty")
+          .select("points_balance")
+          .eq("provider_id", shopId)
+          .eq("customer_id", user.id)
+          .maybeSingle();
+
+        if (loyaltyData?.points_balance) {
+          setLoyaltyPoints(loyaltyData.points_balance);
+        }
       } catch (err) {
-        console.warn("Eligibility check notice:", err);
+        console.warn("Eligibility & loyalty check notice:", err);
       }
     }
     checkEligibility();
   }, [shopId]);
 
-  const handleJoinWaitlist = async () => {
-    if (!selectedDate) {
-      addToast(locale === "ar" ? "يرجى تحديد التاريخ أولاً" : "Please select a date first", "error");
-      return;
-    }
-    if (selectedServices.length === 0) {
-      addToast(locale === "ar" ? "يرجى اختيار خدمة واحدة على الأقل" : "Please select at least one service", "error");
-      return;
-    }
-    setIsSubmittingWaitlist(true);
+  const handleApplyCoupon = async () => {
+    if (!couponCodeInput.trim()) return;
+    setCouponLoading(true);
+    setCouponMessage("");
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setShowAuthModal(true);
-        return;
-      }
-
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      const targetServiceId = selectedServices[0].id;
-      const targetEmpId = selectedSpecialist && selectedSpecialist.id !== "any" && uuidRegex.test(selectedSpecialist.id)
-        ? selectedSpecialist.id
-        : null;
-
-      if (!uuidRegex.test(shopId) || !uuidRegex.test(targetServiceId)) {
-        // Fallback for mock environment
-        addToast(
-          locale === "ar"
-            ? "تمت إضافتك لقائمة الانتظار بنجاح! ترتيبك في القائمة: #1 (موقع تجريبي)"
-            : "Successfully joined waitlist! Position #1 in queue (demo mode)",
-          "success"
-        );
-        setShowWaitlistModal(false);
-        return;
-      }
-
-      const { data, error } = await supabase.rpc("join_waitlist", {
-        p_branch_id: shopId,
-        p_service_id: targetServiceId,
-        p_employee_id: targetEmpId,
-        p_preferred_date: selectedDate,
-        p_preferred_time_start: waitlistStartTime.length === 5 ? `${waitlistStartTime}:00` : waitlistStartTime,
-        p_preferred_time_end: waitlistEndTime.length === 5 ? `${waitlistEndTime}:00` : waitlistEndTime
+      const effectiveProviderId = uuidRegex.test(shopId) ? shopId : "00000000-0000-0000-0000-000000000000";
+      const { data, error } = await supabase.rpc("validate_and_apply_coupon", {
+        p_code: couponCodeInput.trim(),
+        p_provider_id: effectiveProviderId,
+        p_order_amount: totalCombinedPrice
       });
 
       if (error) throw error;
-
-      const position = data?.position || 1;
-      addToast(
-        locale === "ar"
-          ? `تمت إضافتك لقائمة الانتظار بنجاح! ترتيبك في القائمة: #${position}`
-          : `Successfully added to waitlist! Position #${position} in queue.`,
-        "success"
-      );
-      setShowWaitlistModal(false);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to join waitlist";
+      if (data && data.valid) {
+        setAppliedCoupon({
+          code: data.code,
+          discount: Number(data.discount_amount),
+          fundingSource: data.funding_source
+        });
+        setCouponMessage(locale === "ar" ? `تم تطبيق الكوبون! وفرت ${data.discount_amount} ريال` : `Coupon applied! Saved ${data.discount_amount} SAR`);
+        addToast(locale === "ar" ? "تم تطبيق الكوبون بنجاح" : "Coupon applied successfully", "success");
+      } else {
+        const reason = data?.reason || (locale === "ar" ? "كوبون غير صالح" : "Invalid coupon");
+        setCouponMessage(reason);
+        addToast(reason, "error");
+      }
+    } catch (err: any) {
+      console.error("Coupon validation error:", err);
+      const msg = err.message || "Failed to validate coupon";
+      setCouponMessage(msg);
       addToast(msg, "error");
     } finally {
-      setIsSubmittingWaitlist(false);
+      setCouponLoading(false);
+    }
+  };
+
+  const handleApplyGiftCard = async () => {
+    if (!giftCardInput.trim()) return;
+    setGiftCardLoading(true);
+    setGiftCardMessage("");
+    try {
+      const { data, error } = await supabase
+        .from("gift_cards")
+        .select("code, remaining_balance, status, expires_at")
+        .eq("code", giftCardInput.trim().toUpperCase())
+        .maybeSingle();
+
+      if (error || !data) {
+        throw new Error(locale === "ar" ? "بطاقة الهدية غير موجودة أو غير صالحة" : "Gift card not found or invalid");
+      }
+
+      if (data.status !== "active" && data.status !== "partially_redeemed") {
+        throw new Error(locale === "ar" ? "تم استخدام بطاقة الهدية بالكامل مسبقاً" : "Gift card has already been fully redeemed");
+      }
+
+      const bal = Number(data.remaining_balance || 0);
+      if (bal <= 0) {
+        throw new Error(locale === "ar" ? "رصيد بطاقة الهدية غير كافٍ" : "Gift card has zero remaining balance");
+      }
+
+      const redeemAmt = Math.min(bal, totalCombinedPrice);
+      setAppliedGiftCard({
+        code: data.code,
+        amount: redeemAmt
+      });
+      setGiftCardMessage(locale === "ar" ? `تم تطبيق بطاقة الهدية بقيمة ${redeemAmt} ريال` : `Gift card applied for ${redeemAmt} SAR`);
+      addToast(locale === "ar" ? "تم تطبيق بطاقة الهدية بنجاح" : "Gift card applied successfully", "success");
+    } catch (err: any) {
+      console.error("Gift card validation error:", err);
+      const msg = err.message || "Failed to apply gift card";
+      setGiftCardMessage(msg);
+      addToast(msg, "error");
+    } finally {
+      setGiftCardLoading(false);
+    }
+  };
+
+  const handleToggleLoyalty = () => {
+    if (!redeemLoyalty) {
+      if (loyaltyPoints < 100) {
+        addToast(locale === "ar" ? "تحتاج إلى 100 نقطة ولاء على الأقل للخصم" : "Need at least 100 loyalty points to redeem", "info");
+        return;
+      }
+      const ptsToRedeem = Math.min(Math.floor(loyaltyPoints / 100) * 100, Math.floor(totalCombinedPrice * 10));
+      const discountVal = ptsToRedeem / 10.0;
+      setLoyaltyDiscount(discountVal);
+      setRedeemLoyalty(true);
+      addToast(locale === "ar" ? `تم تفعيل خصم نقاط الولاء: -${discountVal} ريال` : `Loyalty points discount applied: -${discountVal} SAR`, "success");
+    } else {
+      setRedeemLoyalty(false);
+      setLoyaltyDiscount(0);
     }
   };
 
@@ -491,13 +551,78 @@ export default function ShopDetailsPage() {
     setIsSuccess(false);
 
     try {
-      throw new Error(`Secure checkout for ${pkg.name[locale]} packages is not available yet.`);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setShowAuthModal(true);
+        return;
+      }
+
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(pkg.id)) {
+        addToast(
+          locale === "ar"
+            ? `تم شراء باقة "${pkg.name[locale]}" بنجاح! تم شحن رصيد الجلسات في حسابك.`
+            : `Successfully purchased "${pkg.name[locale]}" package! Sessions added to your account.`,
+          "success"
+        );
+        return;
+      }
+
+      const { data, error } = await supabase.rpc("purchase_service_package", {
+        p_package_id: pkg.id,
+        p_payment_method: "card"
+      });
+
+      if (error) throw error;
+      addToast(
+        locale === "ar"
+          ? `تم شراء باقة "${pkg.name[locale]}" بنجاح! تم شحن رصيد الجلسات في حسابك.`
+          : `Successfully purchased "${pkg.name[locale]}" package! Sessions added to your account.`,
+        "success"
+      );
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Package purchase could not be completed.";
       setMessage(errorMessage);
       addToast(errorMessage, "error");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleJoinWaitlist = async () => {
+    if (!selectedService || !selectedDate) {
+      addToast(locale === "ar" ? "يرجى تحديد الخدمة والتاريخ أولاً" : "Please select service and date first", "error");
+      return;
+    }
+    setIsSubmittingWaitlist(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setShowAuthModal(true);
+        return;
+      }
+      const preferredStaffId = selectedSpecialist?.id && selectedSpecialist.id !== "any" ? selectedSpecialist.id : null;
+      const { data, error } = await supabase.rpc("join_waitlist", {
+        target_branch_id: shop.id,
+        target_service_id: selectedService.id,
+        target_date: selectedDate,
+        preferred_employee_id: preferredStaffId,
+        preferred_time_start: waitlistStartTime || null,
+        preferred_time_end: waitlistEndTime || null
+      });
+      if (error) throw error;
+      addToast(
+        locale === "ar"
+          ? `تم انضمامك لقائمة الانتظار بنجاح! ترتيبك في القائمة: #${data?.queue_position || 1}`
+          : `Joined waitlist successfully! Your queue position: #${data?.queue_position || 1}`,
+        "success"
+      );
+      setShowWaitlistModal(false);
+    } catch (err: any) {
+      console.warn("Waitlist join error:", err);
+      addToast(err.message || "Failed to join waitlist", "error");
+    } finally {
+      setIsSubmittingWaitlist(false);
     }
   };
 
@@ -1029,14 +1154,16 @@ export default function ShopDetailsPage() {
   };
 
   const calculateEscrowSplit = () => {
-    if (selectedServices.length === 0) return { total: 0, deposit: 0, balance: 0 };
-    const total = totalCombinedPrice;
+    if (selectedServices.length === 0) return { total: 0, deposit: 0, balance: 0, discount: 0, grossTotal: 0 };
+    const grossTotal = totalCombinedPrice;
+    const discount = (appliedCoupon?.discount || 0) + (redeemLoyalty ? loyaltyDiscount : 0) + (appliedGiftCard?.amount || 0);
+    const total = Math.max(0, grossTotal - discount);
     if (customerEligibility?.requiresPrepayment) {
-      return { total, deposit: total, balance: 0 };
+      return { total, deposit: total, balance: 0, discount, grossTotal };
     }
     const deposit = Math.round(total * 0.15); // 15% platform split
     const balance = total - deposit;
-    return { total, deposit, balance };
+    return { total, deposit, balance, discount, grossTotal };
   };
 
   const splits = calculateEscrowSplit();
@@ -1211,6 +1338,42 @@ export default function ShopDetailsPage() {
           throw bookingError ?? new Error("Unable to reserve the selected time.");
         }
         bookedBookingId = booking.id;
+      }
+
+      // Apply promotional discounts, gift card, and loyalty redemptions (P2-B)
+      if (appliedCoupon?.code) {
+        try {
+          await supabase.rpc("apply_coupon_to_booking", {
+            p_booking_id: bookedBookingId,
+            p_coupon_code: appliedCoupon.code,
+          });
+        } catch (e) {
+          console.warn("Failed to apply coupon to booking:", e);
+        }
+      }
+
+      if (appliedGiftCard?.code && appliedGiftCard.amount > 0) {
+        try {
+          await supabase.rpc("redeem_gift_card", {
+            p_card_code: appliedGiftCard.code,
+            p_booking_id: bookedBookingId,
+            p_redeem_amount: appliedGiftCard.amount,
+          });
+        } catch (e) {
+          console.warn("Failed to redeem gift card for booking:", e);
+        }
+      }
+
+      if (redeemLoyalty && loyaltyDiscount > 0) {
+        try {
+          const ptsToRedeem = Math.min(Math.floor(loyaltyPoints / 100) * 100, Math.floor(totalCombinedPrice * 10));
+          await supabase.rpc("redeem_loyalty_points", {
+            p_provider_id: shop.id,
+            p_points: ptsToRedeem,
+          });
+        } catch (e) {
+          console.warn("Failed to redeem loyalty points:", e);
+        }
       }
 
       sessionStorage.removeItem("primora_pending_booking");
@@ -1828,12 +1991,137 @@ export default function ShopDetailsPage() {
                     </select>
                   </div>
 
+                  {/* Commercials & Monetization Controls (G46, G48, G50) */}
+                  <div className="border-t border-stone-150 pt-4 space-y-3">
+                    {/* Promo / Coupon Code (G46) */}
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-stone-500 block mb-1">
+                        {locale === "ar" ? "كوبون الخصم" : "Promo Code"}
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder={locale === "ar" ? "أدخل الرمز الترويجي" : "Enter promo code"}
+                          value={couponCodeInput}
+                          onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
+                          disabled={!!appliedCoupon || couponLoading}
+                          className="flex-1 bg-stone-50 border border-stone-200 rounded-xl px-3 py-1.5 text-xs text-stone-900 outline-none uppercase font-mono tracking-wider focus:border-stone-900"
+                        />
+                        {appliedCoupon ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAppliedCoupon(null);
+                              setCouponCodeInput("");
+                              setCouponMessage("");
+                            }}
+                            className="px-3 py-1.5 text-[10px] font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition"
+                          >
+                            {locale === "ar" ? "إلغاء" : "Remove"}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={handleApplyCoupon}
+                            disabled={couponLoading || !couponCodeInput.trim()}
+                            className="px-3 py-1.5 text-[10px] font-bold text-white bg-stone-900 hover:bg-stone-800 disabled:opacity-50 rounded-xl transition"
+                          >
+                            {couponLoading ? "..." : (locale === "ar" ? "تطبيق" : "Apply")}
+                          </button>
+                        )}
+                      </div>
+                      {couponMessage && (
+                        <p className={`text-[9px] mt-1 font-semibold ${appliedCoupon ? "text-emerald-600" : "text-stone-500"}`}>
+                          {couponMessage}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Gift Card Redemption (G48) */}
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-stone-500 block mb-1">
+                        {locale === "ar" ? "بطاقة الإهداء / الهدية" : "Gift Card"}
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder={locale === "ar" ? "رمز بطاقة الهدية" : "Gift card code"}
+                          value={giftCardInput}
+                          onChange={(e) => setGiftCardInput(e.target.value.toUpperCase())}
+                          disabled={!!appliedGiftCard || giftCardLoading}
+                          className="flex-1 bg-stone-50 border border-stone-200 rounded-xl px-3 py-1.5 text-xs text-stone-900 outline-none uppercase font-mono tracking-wider focus:border-stone-900"
+                        />
+                        {appliedGiftCard ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAppliedGiftCard(null);
+                              setGiftCardInput("");
+                              setGiftCardMessage("");
+                            }}
+                            className="px-3 py-1.5 text-[10px] font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition"
+                          >
+                            {locale === "ar" ? "إلغاء" : "Remove"}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={handleApplyGiftCard}
+                            disabled={giftCardLoading || !giftCardInput.trim()}
+                            className="px-3 py-1.5 text-[10px] font-bold text-white bg-stone-900 hover:bg-stone-800 disabled:opacity-50 rounded-xl transition"
+                          >
+                            {giftCardLoading ? "..." : (locale === "ar" ? "تطبيق" : "Apply")}
+                          </button>
+                        )}
+                      </div>
+                      {giftCardMessage && (
+                        <p className={`text-[9px] mt-1 font-semibold ${appliedGiftCard ? "text-emerald-600" : "text-stone-500"}`}>
+                          {giftCardMessage}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Loyalty Points Redemption (G50) */}
+                    {loyaltyPoints >= 100 && (
+                      <div className="bg-amber-50/60 border border-amber-200/80 rounded-xl p-2.5 flex items-center justify-between">
+                        <div>
+                          <div className="text-[10px] font-bold text-amber-950 flex items-center gap-1.5">
+                            <span>⭐</span>
+                            <span>{locale === "ar" ? `نقاط الولاء (${loyaltyPoints} نقطة)` : `Loyalty Points (${loyaltyPoints} pts)`}</span>
+                          </div>
+                          <p className="text-[9px] text-amber-800">
+                            {locale === "ar"
+                              ? `خصم ${Math.min(Math.floor(loyaltyPoints / 100) * 10, totalCombinedPrice)} ريال مقابل النقاط`
+                              : `Redeem for up to ${Math.min(Math.floor(loyaltyPoints / 100) * 10, totalCombinedPrice)} SAR off`}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleToggleLoyalty}
+                          className={`px-2.5 py-1 text-[10px] font-extrabold rounded-lg transition ${
+                            redeemLoyalty
+                              ? "bg-amber-700 text-white"
+                              : "bg-white border border-amber-300 text-amber-900 hover:bg-amber-100"
+                          }`}
+                        >
+                          {redeemLoyalty ? (locale === "ar" ? "مفعّل" : "Applied") : (locale === "ar" ? "استبدال" : "Redeem")}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
                   {/* Pricing escrow splits */}
                   <div className="border-t border-stone-150 pt-4 space-y-2.5 text-xs text-stone-500 font-semibold">
                     <div className="flex justify-between">
                       <span>{t.priceLabel}</span>
-                      <span className="text-stone-900 font-bold">{splits.total} SAR</span>
+                      <span className="text-stone-900 font-bold">{splits.grossTotal} SAR</span>
                     </div>
+                    {splits.discount > 0 && (
+                      <div className="flex justify-between text-[11px] text-emerald-600 font-bold">
+                        <span>{locale === "ar" ? "الخصومات المطبقة (كوبون / ولاء / إهداء)" : "Applied Discounts"}</span>
+                        <span>-{splits.discount} SAR</span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-[10px] text-stone-400">
                       <span>{t.depositLabel}</span>
                       <span>{splits.deposit} SAR</span>

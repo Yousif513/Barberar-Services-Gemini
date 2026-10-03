@@ -95,49 +95,11 @@ export default function PackagesPage() {
         }));
         setActiveMemberships(formatted);
       } else {
-        setActiveMemberships([
-          {
-            id: "mem-1",
-            customer_name: "Faisal Al-Otaibi",
-            customer_phone: "+966 50 123 4567",
-            package_name_en: "Elite Hair & Beard Grooming Multi-Pass",
-            package_name_ar: "بطاقة قص الشعر واللحية الممتازة",
-            remaining_sessions: 10,
-            expires_at: "2026-12-14"
-          },
-          {
-            id: "mem-2",
-            customer_name: "Sara Al-Mansoori",
-            customer_phone: "+966 50 765 4321",
-            package_name_en: "French Gel Manicure 5-Session Pass",
-            package_name_ar: "بطاقة مانيكير الجل الفرنسي 5 جلسات",
-            remaining_sessions: 4,
-            expires_at: "2026-11-20"
-          }
-        ]);
+        setActiveMemberships([]);
       }
     } catch (err: any) {
       console.error("Error loading active memberships:", err.message);
-      setActiveMemberships([
-        {
-          id: "mem-1",
-          customer_name: "Faisal Al-Otaibi",
-          customer_phone: "+966 50 123 4567",
-          package_name_en: "Elite Hair & Beard Grooming Multi-Pass",
-          package_name_ar: "بطاقة قص الشعر واللحية الممتازة",
-          remaining_sessions: 10,
-          expires_at: "2026-12-14"
-        },
-        {
-          id: "mem-2",
-          customer_name: "Sara Al-Mansoori",
-          customer_phone: "+966 50 765 4321",
-          package_name_en: "French Gel Manicure 5-Session Pass",
-          package_name_ar: "بطاقة مانيكير الجل الفرنسي 5 جلسات",
-          remaining_sessions: 4,
-          expires_at: "2026-11-20"
-        }
-      ]);
+      setActiveMemberships([]);
     } finally {
       setLoadingMemberships(false);
     }
@@ -145,25 +107,24 @@ export default function PackagesPage() {
 
   async function handleDeductSession(membershipId: string, currentSessions: number) {
     if (currentSessions <= 0) return;
-    const newSessions = currentSessions - 1;
 
     try {
-      const { error } = await supabase
-        .from("user_packages")
-        .update({ remaining_sessions: newSessions })
-        .eq("id", membershipId);
+      const { data, error } = await supabase.rpc("redeem_package_session", {
+        p_user_package_id: membershipId
+      });
 
       if (error) throw error;
-      addToast("Session deducted successfully!", "success");
+
+      const remaining = data?.remaining_sessions !== undefined ? data.remaining_sessions : currentSessions - 1;
+      setActiveMemberships(prev =>
+        prev.map(m => (m.id === membershipId ? { ...m, remaining_sessions: remaining } : m))
+      );
+      addToast("Session redeemed successfully!", "success");
       loadPackages();
     } catch (err: any) {
       console.error("Error deducting session:", err.message);
-      addToast("Failed to deduct session from database. Using offline override.", "info");
+      addToast(err.message || "Failed to redeem session from package.", "error");
     }
-
-    setActiveMemberships(prev =>
-      prev.map(m => (m.id === membershipId ? { ...m, remaining_sessions: newSessions } : m))
-    );
   }
 
   async function loadPackages() {
@@ -194,43 +155,8 @@ export default function PackagesPage() {
       }
     } catch (err: any) {
       console.error("Error loading packages:", err.message);
-      setError("Failed to load packages. Showing mock fallbacks.");
-      // Fallback mock items
-      setPackages([
-        { 
-          id: "1", 
-          name_en: "Moroccan Hammam Spa package", 
-          name_ar: "باقة الحمام المغربي الاسترخائي", 
-          description_en: "Buy 5 Moroccan sessions and get 1 free session. Valid for 1 year.", 
-          description_ar: "اشترِ 5 جلسات حمام مغربي واحصل على جلسة إضافية مجانية. صالحة لمدة عام كامل.", 
-          price: 990, 
-          session_count: 6, 
-          expires_in_days: 365, 
-          is_active: true 
-        },
-        { 
-          id: "2", 
-          name_en: "Elite Hair & Beard Grooming Multi-Pass", 
-          name_ar: "بطاقة قص الشعر واللحية الممتازة", 
-          description_en: "10 hair grooming sessions with premium hair styling products.", 
-          description_ar: "باقة 10 جلسات قص شعر ولحية مع مصفف الشعر المميز.", 
-          price: 1000, 
-          session_count: 10, 
-          expires_in_days: 180, 
-          is_active: true 
-        },
-        { 
-          id: "3", 
-          name_en: "Stress Relief Swedish Massage Bundle", 
-          name_ar: "باقة المساج السويدي لتخفيف التوتر", 
-          description_en: "5 Swedish full body massage sessions of 60 minutes each.", 
-          description_ar: "باقة 5 جلسات مساج سويدي للجسم بالكامل لمدة 60 دقيقة لكل جلسة.", 
-          price: 1200, 
-          session_count: 5, 
-          expires_in_days: 365, 
-          is_active: true 
-        }
-      ]);
+      setError("Failed to load packages from database.");
+      setPackages([]);
     } finally {
       setLoading(false);
     }
