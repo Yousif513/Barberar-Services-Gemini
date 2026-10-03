@@ -1,10 +1,12 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { resolve, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { dirname, resolve, join } from "node:path";
 
-const rootDir = resolve(process.cwd(), "..");
-const webPlatformDir = process.cwd();
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const webPlatformDir = resolve(__dirname, "..");
+const rootDir = resolve(webPlatformDir, "..");
 
 describe("Negative Authorization & Security Boundary Tests", () => {
   describe("Edge Functions Authorization Boundaries", () => {
@@ -1002,6 +1004,133 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(providerDashboardCode.includes("get_provider_monthly_value_summary"), "Provider dashboard must call get_provider_monthly_value_summary RPC");
       assert.ok(providerDashboardCode.includes("valueSummaryTitle"), "Provider dashboard must render G43 value summary card");
       assert.ok(providerDashboardCode.includes("commissionSaved"), "Provider dashboard must display commission saved metric");
+    });
+  });
+
+  describe("P2-A: Booking Depth & Capacity (G44, G51, G53, G58, G57)", () => {
+    it("waitlists table enforces statuses, time constraints, and RLS policies (G44)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004050000_booking_depth_and_capacity.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.waitlists"), "Must create waitlists table");
+      assert.ok(migrationCode.includes("CHECK (status IN ('active', 'notified', 'claimed', 'expired', 'cancelled'))"), "Must validate waitlist status check");
+      assert.ok(migrationCode.includes("preferred_time_end > preferred_time_start"), "Must validate time window constraint");
+      assert.ok(migrationCode.includes("idx_waitlists_lookup"), "Must index branch_id, preferred_date, status");
+      assert.ok(migrationCode.includes("idx_waitlists_customer"), "Must index customer_id, status");
+      assert.ok(migrationCode.includes("ALTER TABLE public.waitlists ENABLE ROW LEVEL SECURITY"), "Must enable RLS on waitlists");
+      assert.ok(migrationCode.includes("Customers view own waitlist entries"), "Must define view policy");
+      assert.ok(migrationCode.includes("Customers insert own waitlist requests"), "Must define insert policy");
+    });
+
+    it("join_waitlist RPC validates auth, prevents duplicate entries, and returns queue position (G44)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004050000_booking_depth_and_capacity.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("FUNCTION public.join_waitlist"), "Must create join_waitlist RPC");
+      assert.ok(migrationCode.includes("Authentication required to join waitlist"), "Must enforce authentication");
+      assert.ok(migrationCode.includes("Waitlist date must be today or in the future"), "Must enforce non-past date");
+      assert.ok(migrationCode.includes("End time must be after start time"), "Must enforce valid time range");
+      assert.ok(migrationCode.includes("Already on active waitlist for this service and date"), "Must prevent duplicate active entries");
+      assert.ok(migrationCode.includes("position"), "Must calculate position in waitlist queue");
+      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.join_waitlist"), "Must revoke public execution");
+      assert.ok(migrationCode.includes("GRANT EXECUTE ON FUNCTION public.join_waitlist"), "Must grant authenticated execution");
+    });
+
+    it("claim_waitlist_slot and cancellation backfill trigger enforce 15-minute claim window (G44)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004050000_booking_depth_and_capacity.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("FUNCTION public.claim_waitlist_slot"), "Must create claim_waitlist_slot RPC");
+      assert.ok(migrationCode.includes("Waitlist slot is not in notified state"), "Must check notified state before claiming");
+      assert.ok(migrationCode.includes("Claim window has expired"), "Must check expiration before claiming");
+      assert.ok(migrationCode.includes("FUNCTION public.backfill_waitlist_on_cancellation"), "Must create backfill trigger function");
+      assert.ok(migrationCode.includes("trigger_backfill_waitlist_on_booking_cancellation"), "Must create cancellation trigger on bookings");
+      assert.ok(migrationCode.includes("interval '15 minutes'"), "Must set 15-minute exclusive claim window");
+      assert.ok(migrationCode.includes("waitlist_slot_opened"), "Must queue notification template on cancellation");
+    });
+
+    it("booking_services table and create_multi_service_booking RPC support sequential cart booking (G51)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004050000_booking_depth_and_capacity.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.booking_services"), "Must create booking_services table");
+      assert.ok(migrationCode.includes("idx_booking_services_booking"), "Must index booking_services by booking and sequence");
+      assert.ok(migrationCode.includes("ALTER TABLE public.booking_services ENABLE ROW LEVEL SECURITY"), "Must enable RLS on booking_services");
+      assert.ok(migrationCode.includes("FUNCTION public.create_multi_service_booking"), "Must create create_multi_service_booking RPC");
+      assert.ok(migrationCode.includes("services_payload must be a non-empty array"), "Must validate non-empty services array");
+      assert.ok(migrationCode.includes("v_total_duration"), "Must calculate combined duration across services");
+      assert.ok(migrationCode.includes("v_total_price"), "Must calculate combined price across services");
+      assert.ok(migrationCode.includes("Selected time cannot accommodate the full combined duration"), "Must validate slot capacity for combined duration");
+    });
+
+    it("create_walk_in_booking RPC enforces 0% platform fee and creates walk-in profile (G53)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004050000_booking_depth_and_capacity.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("FUNCTION public.create_walk_in_booking"), "Must create create_walk_in_booking RPC");
+      assert.ok(migrationCode.includes("Forbidden: not authorized to create walk-in"), "Must authorize caller against provider staff/owner");
+      assert.ok(migrationCode.includes("0.00"), "Must enforce 0% platform fee for walk-in booking");
+      assert.ok(migrationCode.includes("in_service"), "Must initialize walk-in status to in_service");
+      assert.ok(migrationCode.includes("provider.walk_in_created"), "Must log walk-in audit event");
+    });
+
+    it("get_branch_schedule_with_prayer_pauses RPC returns prayer buffer windows and slots (G58)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004050000_booking_depth_and_capacity.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("FUNCTION public.get_branch_schedule_with_prayer_pauses"), "Must create get_branch_schedule_with_prayer_pauses RPC");
+      assert.ok(migrationCode.includes("prayer_windows"), "Must return prayer windows array");
+      assert.ok(migrationCode.includes("Asr"), "Must include Asr prayer pause");
+      assert.ok(migrationCode.includes("Maghrib"), "Must include Maghrib prayer pause");
+      assert.ok(migrationCode.includes("Isha"), "Must include Isha prayer pause");
+    });
+
+    it("provider_customer_blocks table, toggle_customer_block, and check_customer_booking_eligibility enforce blocklist and strikes (G57)", () => {
+      const migrationCode = readFileSync(
+        join(rootDir, "supabase/migrations/20261004050000_booking_depth_and_capacity.sql"),
+        "utf8"
+      );
+      assert.ok(migrationCode.includes("CREATE TABLE IF NOT EXISTS public.provider_customer_blocks"), "Must create provider_customer_blocks table");
+      assert.ok(migrationCode.includes("UNIQUE (provider_id, customer_id)"), "Must enforce unique provider/customer block");
+      assert.ok(migrationCode.includes("FUNCTION public.check_customer_booking_eligibility"), "Must create check_customer_booking_eligibility RPC");
+      assert.ok(migrationCode.includes("no_show_at >= (NOW() - interval '60 days')"), "Must evaluate past 60 days no-show strikes");
+      assert.ok(migrationCode.includes("v_no_show_strikes >= 3"), "Must trigger mandatory full prepayment when no-shows >= 3");
+      assert.ok(migrationCode.includes("FUNCTION public.toggle_customer_block"), "Must create toggle_customer_block RPC");
+      assert.ok(migrationCode.includes("provider.customer_blocked"), "Must audit customer blocked event");
+      assert.ok(migrationCode.includes("provider.customer_unblocked"), "Must audit customer unblocked event");
+    });
+
+    it("UI integrations: Shop page multi-service cart, waitlist modal, prayer pause indicators, and provider calendar walk-in (G44, G51, G53, G57, G58)", () => {
+      const shopCode = readFileSync(
+        join(webPlatformDir, "src/app/shop/[id]/page.tsx"),
+        "utf8"
+      );
+      assert.ok(shopCode.includes("selectedServices"), "Shop page must manage selectedServices array");
+      assert.ok(shopCode.includes("handleToggleService"), "Shop page must provide handleToggleService cart toggle");
+      assert.ok(shopCode.includes("create_multi_service_booking"), "Shop page must call create_multi_service_booking when multiple services selected");
+      assert.ok(shopCode.includes("showWaitlistModal"), "Shop page must provide waitlist modal state");
+      assert.ok(shopCode.includes("join_waitlist"), "Shop page must call join_waitlist RPC");
+      assert.ok(shopCode.includes("check_customer_booking_eligibility"), "Shop page must check customer booking eligibility");
+      assert.ok(shopCode.includes("prayerPauseNotice"), "Shop page must display prayer pause notice");
+
+      const providerCalendarCode = readFileSync(
+        join(webPlatformDir, "src/app/provider/calendar/page.tsx"),
+        "utf8"
+      );
+      assert.ok(providerCalendarCode.includes("create_walk_in_booking"), "Provider calendar must call create_walk_in_booking RPC");
+
+      const providerCustomersCode = readFileSync(
+        join(webPlatformDir, "src/app/provider/customers/page.tsx"),
+        "utf8"
+      );
+      assert.ok(providerCustomersCode.includes("toggle_customer_block"), "Provider customers must call toggle_customer_block RPC");
+      assert.ok(providerCustomersCode.includes("blockedCustomerIds"), "Provider customers must manage blocked customer state");
     });
   });
 });

@@ -56,7 +56,22 @@ const translations = {
     purchasePass: "Purchase Pass",
     sessionCountText: "sessions",
     expiresInText: "days validity",
-    successPackageRedirecting: "Package purchased successfully! Redirecting to your memberships..."
+    successPackageRedirecting: "Package purchased successfully! Redirecting to your memberships...",
+    multiServiceCart: "Services in Cart",
+    addService: "Add Service",
+    removeService: "Remove",
+    combinedDuration: "Total Duration",
+    combinedTotal: "Total Amount",
+    joinWaitlistBtn: "Join Waitlist",
+    waitlistModalTitle: "Join Waitlist",
+    waitlistModalDesc: "If a cancellation occurs, you will receive an automated WhatsApp notification with an exclusive 15-minute priority claim window.",
+    preferredTimeStart: "Preferred Start Time",
+    preferredTimeEnd: "Preferred End Time",
+    confirmJoinWaitlist: "Confirm Waitlist Entry",
+    waitlistSuccess: "Successfully added to waitlist! Queue position: #",
+    blockedWarning: "Booking Restricted: Your account has been blocked by this provider.",
+    strikePrepaymentWarning: "Policy Notice: Due to 3 or more previous no-shows, 100% upfront prepayment is required for this appointment.",
+    prayerPauseNotice: "Riyadh Prayer Breaks (25-min congregational prayer pauses)"
   },
   ar: {
     promoText: "احجز أفضل خدمات التجميل والعناية المنزلية والصالونات في الرياض وجدة",
@@ -103,7 +118,22 @@ const translations = {
     purchasePass: "شراء العضوية",
     sessionCountText: "جلسة",
     expiresInText: "يوم صلاحية",
-    successPackageRedirecting: "تم شراء الباقة بنجاح! جاري تحويلك إلى صفحة العضويات..."
+    successPackageRedirecting: "تم شراء الباقة بنجاح! جاري تحويلك إلى صفحة العضويات...",
+    multiServiceCart: "الخدمات المختارة في السلة",
+    addService: "إضافة للحجز",
+    removeService: "إزالة",
+    combinedDuration: "إجمالي المدة",
+    combinedTotal: "إجمالي المبلغ",
+    joinWaitlistBtn: "انضم لقائمة الانتظار",
+    waitlistModalTitle: "الانضمام لقائمة الانتظار التلقائية",
+    waitlistModalDesc: "في حال حدوث أي إلغاء، ستصلك رسالة واتساب فورية مع رابط حجز مخصص بنافذة حصرية مدتها 15 دقيقة.",
+    preferredTimeStart: "بداية الفترة المفضلة",
+    preferredTimeEnd: "نهاية الفترة المفضلة",
+    confirmJoinWaitlist: "تأكيد الانضمام لقائمة الانتظار",
+    waitlistSuccess: "تمت إضافتك لقائمة الانتظار بنجاح! موقعك في الطابور: #",
+    blockedWarning: "الحجز مقيد: حسابك محظور من قبل مزود الخدمة هذا.",
+    strikePrepaymentWarning: "تنبيه السياسة: نظراً لتسجيل 3 حالات عدم حضور سابقة، يلزم دفع كامل المبلغ (100%) مقدماً لتأكيد الحجز.",
+    prayerPauseNotice: "أوقات الصلاة بالرياض (توقف مؤقت 25 دقيقة أثناء أداء صلاة الجماعة)"
   }
 };
 
@@ -222,7 +252,34 @@ export default function ShopDetailsPage() {
   const [locale, setLocale] = useState<"en" | "ar">("en");
   const t = translations[locale];
 
-  const [selectedService, setSelectedService] = useState<ServiceItem | null>(null);
+  const [selectedServices, setSelectedServices] = useState<ServiceItem[]>([]);
+  const selectedService = selectedServices[0] || null;
+  const setSelectedService = (srv: ServiceItem | null) => {
+    if (!srv) {
+      setSelectedServices([]);
+    } else {
+      setSelectedServices([srv]);
+    }
+  };
+
+  const handleToggleService = (srv: ServiceItem) => {
+    setSelectedServices(prev => {
+      const exists = prev.some(s => s.id === srv.id);
+      if (exists) {
+        const next = prev.filter(s => s.id !== srv.id);
+        if (next.length === 0) {
+          setSelectedSlot("");
+        }
+        return next;
+      } else {
+        return [...prev, srv];
+      }
+    });
+  };
+
+  const totalCombinedDuration = selectedServices.reduce((sum, s) => sum + s.duration, 0);
+  const totalCombinedPrice = selectedServices.reduce((sum, s) => sum + s.price, 0);
+
   const [selectedSpecialist, setSelectedSpecialist] = useState<SpecialistItem | null>(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlot, setSelectedSlot] = useState("");
@@ -235,6 +292,20 @@ export default function ShopDetailsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+
+  // G44 Waitlist Modal states
+  const [showWaitlistModal, setShowWaitlistModal] = useState(false);
+  const [waitlistStartTime, setWaitlistStartTime] = useState("10:00");
+  const [waitlistEndTime, setWaitlistEndTime] = useState("18:00");
+  const [isSubmittingWaitlist, setIsSubmittingWaitlist] = useState(false);
+
+  // G57 Customer Eligibility states
+  const [customerEligibility, setCustomerEligibility] = useState<{
+    isBlocked: boolean;
+    blockReason: string;
+    strikes: number;
+    requiresPrepayment: boolean;
+  } | null>(null);
 
   const [activeTab, setActiveTab] = useState<"services" | "packages">("services");
 
@@ -324,6 +395,95 @@ export default function ShopDetailsPage() {
     }
     loadClientProfiles();
   }, [locale]);
+
+  useEffect(() => {
+    async function checkEligibility() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(shopId)) return;
+
+        const { data, error } = await supabase.rpc("check_customer_booking_eligibility", {
+          p_provider_id: shopId,
+          p_customer_id: user.id
+        });
+        if (!error && data) {
+          setCustomerEligibility({
+            isBlocked: !!data.is_blocked,
+            blockReason: data.block_reason || "",
+            strikes: Number(data.no_show_strikes) || 0,
+            requiresPrepayment: !!data.requires_full_prepayment
+          });
+        }
+      } catch (err) {
+        console.warn("Eligibility check notice:", err);
+      }
+    }
+    checkEligibility();
+  }, [shopId]);
+
+  const handleJoinWaitlist = async () => {
+    if (!selectedDate) {
+      addToast(locale === "ar" ? "يرجى تحديد التاريخ أولاً" : "Please select a date first", "error");
+      return;
+    }
+    if (selectedServices.length === 0) {
+      addToast(locale === "ar" ? "يرجى اختيار خدمة واحدة على الأقل" : "Please select at least one service", "error");
+      return;
+    }
+    setIsSubmittingWaitlist(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setShowAuthModal(true);
+        return;
+      }
+
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const targetServiceId = selectedServices[0].id;
+      const targetEmpId = selectedSpecialist && selectedSpecialist.id !== "any" && uuidRegex.test(selectedSpecialist.id)
+        ? selectedSpecialist.id
+        : null;
+
+      if (!uuidRegex.test(shopId) || !uuidRegex.test(targetServiceId)) {
+        // Fallback for mock environment
+        addToast(
+          locale === "ar"
+            ? "تمت إضافتك لقائمة الانتظار بنجاح! ترتيبك في القائمة: #1 (موقع تجريبي)"
+            : "Successfully joined waitlist! Position #1 in queue (demo mode)",
+          "success"
+        );
+        setShowWaitlistModal(false);
+        return;
+      }
+
+      const { data, error } = await supabase.rpc("join_waitlist", {
+        p_branch_id: shopId,
+        p_service_id: targetServiceId,
+        p_employee_id: targetEmpId,
+        p_preferred_date: selectedDate,
+        p_preferred_time_start: waitlistStartTime.length === 5 ? `${waitlistStartTime}:00` : waitlistStartTime,
+        p_preferred_time_end: waitlistEndTime.length === 5 ? `${waitlistEndTime}:00` : waitlistEndTime
+      });
+
+      if (error) throw error;
+
+      const position = data?.position || 1;
+      addToast(
+        locale === "ar"
+          ? `تمت إضافتك لقائمة الانتظار بنجاح! ترتيبك في القائمة: #${position}`
+          : `Successfully added to waitlist! Position #${position} in queue.`,
+        "success"
+      );
+      setShowWaitlistModal(false);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to join waitlist";
+      addToast(msg, "error");
+    } finally {
+      setIsSubmittingWaitlist(false);
+    }
+  };
 
   const handlePurchasePackage = async (pkg: PackageItem) => {
     setIsLoading(true);
@@ -788,7 +948,7 @@ export default function ShopDetailsPage() {
         const { data, error } = await supabase.rpc("get_available_slots", {
           target_employee_id: selectedSpecialist.id,
           target_date: selectedDate,
-          service_duration_minutes: selectedService.duration,
+          service_duration_minutes: totalCombinedDuration || selectedService.duration,
           prayer_window_starts: starts,
           prayer_window_ends: ends
         });
@@ -799,7 +959,7 @@ export default function ShopDetailsPage() {
           const { data: fallbackData, error: fallbackError } = await supabase.rpc("get_available_slots", {
             target_employee_id: selectedSpecialist.id,
             target_date: selectedDate,
-            service_duration_minutes: selectedService.duration
+            service_duration_minutes: totalCombinedDuration || selectedService.duration
           });
           if (fallbackError) throw fallbackError;
           
@@ -815,7 +975,7 @@ export default function ShopDetailsPage() {
       }
     }
     fetchSlots();
-  }, [selectedSpecialist, selectedDate, selectedService, coordinates]);
+  }, [selectedSpecialist, selectedDate, selectedService, coordinates, totalCombinedDuration]);
 
   // Generate Available Slots excluding prayer buffers
   const getAvailableSlots = () => {
@@ -869,8 +1029,11 @@ export default function ShopDetailsPage() {
   };
 
   const calculateEscrowSplit = () => {
-    if (!selectedService) return { total: 0, deposit: 0, balance: 0 };
-    const total = selectedService.price;
+    if (selectedServices.length === 0) return { total: 0, deposit: 0, balance: 0 };
+    const total = totalCombinedPrice;
+    if (customerEligibility?.requiresPrepayment) {
+      return { total, deposit: total, balance: 0 };
+    }
     const deposit = Math.round(total * 0.15); // 15% platform split
     const balance = total - deposit;
     return { total, deposit, balance };
@@ -1008,17 +1171,46 @@ export default function ShopDetailsPage() {
         throw new Error("Home-service address confirmation is required before payment.");
       }
 
-      const { data: booking, error: bookingError } = await supabase.rpc("create_booking", {
-        target_employee_id: selectedSpecialist.id === "any" ? null : selectedSpecialist.id,
-        target_service_id: selectedService.id,
-        target_scheduled_at: toRiyadhTimestamp(selectedDate, selectedSlot),
-        request_home_service: false,
-        request_client_profile_id: selectedClientProfileId || null,
-        request_source: bookingSource,
-      });
+      if (customerEligibility?.isBlocked) {
+        throw new Error(
+          locale === "ar"
+            ? `تم حظر الحجز مع هذا المزود: ${customerEligibility.blockReason || "بناءً على طلب الإدارة"}`
+            : `Booking restricted with this salon: ${customerEligibility.blockReason || "Per provider management"}`
+        );
+      }
 
-      if (bookingError || !booking?.id) {
-        throw bookingError ?? new Error("Unable to reserve the selected time.");
+      let bookedBookingId: string;
+
+      if (selectedServices.length > 1) {
+        // G51 Multi-service sequential cart booking
+        const { data: multiRes, error: multiError } = await supabase.rpc("create_multi_service_booking", {
+          target_branch_id: shop.id,
+          target_employee_id: selectedSpecialist.id === "any" ? null : selectedSpecialist.id,
+          target_scheduled_at: toRiyadhTimestamp(selectedDate, selectedSlot),
+          services_payload: selectedServices.map((s) => ({ service_id: s.id })),
+          request_home_service: false,
+          request_home_address_text: null,
+          request_source: bookingSource,
+        });
+
+        if (multiError || !multiRes?.booking_id) {
+          throw multiError ?? new Error("Unable to reserve the selected multi-service booking.");
+        }
+        bookedBookingId = multiRes.booking_id;
+      } else {
+        const { data: booking, error: bookingError } = await supabase.rpc("create_booking", {
+          target_employee_id: selectedSpecialist.id === "any" ? null : selectedSpecialist.id,
+          target_service_id: selectedServices[0].id,
+          target_scheduled_at: toRiyadhTimestamp(selectedDate, selectedSlot),
+          request_home_service: false,
+          request_client_profile_id: selectedClientProfileId || null,
+          request_source: bookingSource,
+        });
+
+        if (bookingError || !booking?.id) {
+          throw bookingError ?? new Error("Unable to reserve the selected time.");
+        }
+        bookedBookingId = booking.id;
       }
 
       sessionStorage.removeItem("primora_pending_booking");
@@ -1026,16 +1218,16 @@ export default function ShopDetailsPage() {
       let redirectUrl = "";
       try {
         const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
-          body: { bookingId: booking.id },
+          body: { bookingId: bookedBookingId },
         });
 
         if (checkoutError || !checkout?.checkoutUrl) {
-          redirectUrl = `/customer/bookings/${booking.id}/confirmation?status=pending_payment`;
+          redirectUrl = `/customer/bookings/${bookedBookingId}/confirmation?status=pending_payment`;
         } else {
           redirectUrl = checkout.checkoutUrl;
         }
       } catch (e) {
-        redirectUrl = `/customer/bookings/${booking.id}/confirmation?status=pending_payment`;
+        redirectUrl = `/customer/bookings/${bookedBookingId}/confirmation?status=pending_payment`;
       }
 
       if (redirectUrl.startsWith("/")) {
@@ -1189,49 +1381,75 @@ export default function ShopDetailsPage() {
               <>
                 {/* Services List */}
                 <div className="space-y-4">
-                  <h2 className={`text-lg font-serif font-bold tracking-tight text-stone-900 border-b border-stone-200 pb-3 ${isRTL ? "text-right" : "text-left"}`}>
-                    {t.servicesTitle}
-                  </h2>
+                  <div className="flex items-center justify-between border-b border-stone-200 pb-3">
+                    <h2 className={`text-lg font-serif font-bold tracking-tight text-stone-900 ${isRTL ? "text-right" : "text-left"}`}>
+                      {t.servicesTitle}
+                    </h2>
+                    {selectedServices.length > 0 && (
+                      <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-stone-900 text-stone-50 rounded-full">
+                        {selectedServices.length} {t.multiServiceCart} ({totalCombinedDuration} {t.mins} • {totalCombinedPrice} SAR)
+                      </span>
+                    )}
+                  </div>
                   <div className="grid grid-cols-1 gap-4">
-                    {filteredServices.map((srv) => (
-                      <div
-                        key={srv.id}
-                        onClick={() => {
-                          setSelectedService(srv);
-                          // Reset details that depend on service
-                          setSelectedSpecialist(null);
-                          setSelectedSlot("");
-                        }}
-                        className={`bg-white border rounded-2xl p-5 cursor-pointer transition duration-150 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
-                          selectedService?.id === srv.id
-                            ? "border-stone-950 shadow-sm"
-                            : "border-stone-200 hover:border-stone-400"
-                        }`}
-                      >
-                        <div className="flex items-start gap-4">
-                          <div className="w-16 h-16 rounded-xl overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-100">
-                            <img src={srv.image} alt={srv.name[locale]} className="w-full h-full object-cover" />
+                    {filteredServices.map((srv) => {
+                      const isSelected = selectedServices.some((s) => s.id === srv.id);
+                      return (
+                        <div
+                          key={srv.id}
+                          onClick={() => handleToggleService(srv)}
+                          className={`bg-white border rounded-2xl p-5 cursor-pointer transition duration-150 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+                            isSelected
+                              ? "border-stone-950 shadow-sm ring-1 ring-stone-950"
+                              : "border-stone-200 hover:border-stone-400"
+                          }`}
+                        >
+                          <div className="flex items-start gap-4">
+                            <div className="w-16 h-16 rounded-xl overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-100">
+                              <img src={srv.image} alt={srv.name[locale]} className="w-full h-full object-cover" />
+                            </div>
+                            <div className={`space-y-1 ${isRTL ? "text-right" : "text-left"}`}>
+                              <div className="flex items-center gap-2">
+                                <h3 className="font-bold text-stone-900 text-sm">{srv.name[locale]}</h3>
+                                {isSelected && (
+                                  <span className="inline-flex items-center text-[9px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                                    ✓
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[10px] text-stone-400 font-semibold">
+                                {srv.duration} {t.mins} • <span className="uppercase">{srv.category}</span>
+                              </p>
+                              <span className={`inline-block text-[8px] font-extrabold uppercase px-2 py-0.5 rounded ${
+                                srv.serviceType === "mobile" ? "bg-stone-100 text-stone-600" : "bg-stone-900 text-stone-50"
+                              }`}>
+                                {srv.serviceType === "mobile" ? (locale === "ar" ? "خدمة منزلية" : "Home Service") : (locale === "ar" ? "في الصالون" : "At Venue")}
+                              </span>
+                            </div>
                           </div>
-                          <div className={`space-y-1 ${isRTL ? "text-right" : "text-left"}`}>
-                            <h3 className="font-bold text-stone-900 text-sm">{srv.name[locale]}</h3>
-                            <p className="text-[10px] text-stone-400 font-semibold">
-                              {srv.duration} {t.mins} • <span className="uppercase">{srv.category}</span>
-                            </p>
-                            <span className={`inline-block text-[8px] font-extrabold uppercase px-2 py-0.5 rounded ${
-                              srv.serviceType === "mobile" ? "bg-stone-100 text-stone-600" : "bg-stone-900 text-stone-50"
-                            }`}>
-                              {srv.serviceType === "mobile" ? (locale === "ar" ? "خدمة منزلية" : "Home Service") : (locale === "ar" ? "في الصالون" : "At Venue")}
+                          <div className={`flex flex-col items-end flex-shrink-0 ${isRTL ? "sm:items-start" : "sm:items-end"}`}>
+                            <span className="text-base font-black text-stone-950">{srv.price} SAR</span>
+                            <span className="text-[8px] text-[hsl(45,60%,50%)] font-bold uppercase tracking-wider mt-1">
+                              ★ {srv.rating} ({srv.reviewsCount})
                             </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleService(srv);
+                              }}
+                              className={`mt-2 text-[9px] font-bold px-2.5 py-1 rounded-lg border transition ${
+                                isSelected
+                                  ? "bg-stone-950 text-white border-stone-950"
+                                  : "bg-stone-50 text-stone-700 border-stone-200 hover:border-stone-400"
+                              }`}
+                            >
+                              {isSelected ? t.removeService : t.addService}
+                            </button>
                           </div>
                         </div>
-                        <div className={`flex flex-col items-end flex-shrink-0 ${isRTL ? "sm:items-start" : "sm:items-end"}`}>
-                          <span className="text-base font-black text-stone-950">{srv.price} SAR</span>
-                          <span className="text-[8px] text-[hsl(45,60%,50%)] font-bold uppercase tracking-wider mt-1">
-                            ★ {srv.rating} ({srv.reviewsCount})
-                          </span>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -1457,23 +1675,55 @@ export default function ShopDetailsPage() {
               </h2>
 
               {/* Service Selection details */}
-              {selectedService ? (
+              {selectedServices.length > 0 ? (
                 <div className={`space-y-4 ${isRTL ? "text-right" : "text-left"}`}>
-                  <div className="bg-stone-50 border border-stone-150 rounded-xl p-3">
-                    <span className="text-[8px] text-stone-400 font-bold uppercase tracking-wider block">{selectedService.category.toUpperCase()}</span>
-                    <h4 className="font-bold text-xs text-stone-900 mt-0.5">{selectedService.name[locale]}</h4>
-                    <p className="text-[10px] text-stone-500 mt-1 font-semibold">
-                      {selectedService.duration} {t.mins} • {selectedService.price} SAR
-                    </p>
+                  <div className="bg-stone-50 border border-stone-150 rounded-xl p-3 space-y-2">
+                    <div className="flex items-center justify-between text-[8px] text-stone-400 font-bold uppercase tracking-wider">
+                      <span>{t.multiServiceCart} ({selectedServices.length})</span>
+                      <span>{totalCombinedDuration} {t.mins}</span>
+                    </div>
+                    <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                      {selectedServices.map((srv) => (
+                        <div key={srv.id} className="bg-white border border-stone-200/80 rounded-lg p-2 flex items-center justify-between gap-2">
+                          <div>
+                            <h4 className="font-bold text-xs text-stone-900">{srv.name[locale]}</h4>
+                            <p className="text-[10px] text-stone-400">{srv.duration} {t.mins} • {srv.price} SAR</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleService(srv)}
+                            className="text-stone-400 hover:text-red-600 text-xs px-1 font-bold"
+                            title={t.removeService}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                     {selectedSpecialist && (
-                      <p className="text-[10px] text-[hsl(45,60%,45%)] font-extrabold mt-1">
+                      <p className="text-[10px] text-[hsl(45,60%,45%)] font-extrabold mt-1 border-t border-stone-100 pt-1.5">
                         {selectedSpecialist.name[locale]} ({selectedSpecialist.role[locale]})
                       </p>
                     )}
                   </div>
 
+                  {/* Customer Block or Prepayment Warnings (G57) */}
+                  {customerEligibility?.isBlocked && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-[10px] font-bold space-y-1">
+                      <p>{t.blockedWarning}</p>
+                      {customerEligibility.blockReason && (
+                        <p className="font-normal">{customerEligibility.blockReason}</p>
+                      )}
+                    </div>
+                  )}
+                  {customerEligibility?.requiresPrepayment && !customerEligibility?.isBlocked && (
+                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-[10px] font-bold">
+                      {t.strikePrepaymentWarning}
+                    </div>
+                  )}
+
                   {/* Home Service Option (if eligible) */}
-                  {selectedService.serviceType === "mobile" ? (
+                  {selectedServices.some(s => s.serviceType === "mobile") ? (
                     <div className="flex items-center justify-between border-t border-stone-100 pt-3">
                       <span className="text-xs text-stone-600 font-semibold">{t.isHomeServiceLabel}</span>
                       <input
@@ -1499,15 +1749,31 @@ export default function ShopDetailsPage() {
                     />
                   </div>
 
-                  {/* Time Slots selector */}
+                  {/* Time Slots selector & Waitlist (G44, G58) */}
                   {selectedDate && selectedSpecialist && (
                     <div className="space-y-3">
-                      <div className="flex flex-col gap-1">
+                      <div className="flex items-center justify-between">
                         <h3 className="font-bold text-xs text-stone-850">{t.selectTimeTitle}</h3>
-                        <p className="text-[8px] text-red-500 font-bold leading-normal">
+                        <button
+                          type="button"
+                          onClick={() => setShowWaitlistModal(true)}
+                          className="text-[9px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200/80 px-2 py-1 rounded-lg transition"
+                        >
+                          + {t.joinWaitlistBtn}
+                        </button>
+                      </div>
+
+                      {/* Prayer Pause Schedule indicator (G58) */}
+                      <div className="bg-stone-50 border border-stone-200/80 rounded-xl p-2.5 space-y-1 text-[9px]">
+                        <div className="flex items-center gap-1.5 font-bold text-stone-800">
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                          <span>{t.prayerPauseNotice}</span>
+                        </div>
+                        <p className="text-[8px] text-stone-500 leading-normal">
                           {t.prayerBufferWarning}
                         </p>
                       </div>
+
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {getAvailableSlots().map(({ slot, available, prayerLocked, prayerName }) => {
                           const isSelected = selectedSlot === slot;
@@ -1669,7 +1935,7 @@ export default function ShopDetailsPage() {
                   {/* Checkout Confirm Button */}
                   <button
                     onClick={handleBook}
-                    disabled={isLoading || !selectedDate || !selectedSlot || !selectedSpecialist}
+                    disabled={isLoading || !selectedDate || !selectedSlot || !selectedSpecialist || !!customerEligibility?.isBlocked}
                     className="w-full py-3 bg-stone-900 hover:bg-stone-850 text-stone-50 font-bold uppercase tracking-wider text-xs rounded-xl transition shadow-sm disabled:opacity-45"
                   >
                     {isLoading ? "..." : `${t.payButton} (${splits.deposit} SAR)`}
@@ -1731,6 +1997,149 @@ export default function ShopDetailsPage() {
           <p>© {new Date().getFullYear()} PRIMORA. {t.allRightsReserved}</p>
         </div>
       </footer>
+
+      {/* WAITLIST MODAL (G44) */}
+      {showWaitlistModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-stone-200 space-y-6">
+            <div className="flex items-center justify-between border-b border-stone-150 pb-4">
+              <div className="flex items-center gap-2">
+                <span className="p-2 rounded-xl bg-amber-50 text-amber-700 font-bold">
+                  ⏱
+                </span>
+                <h3 className="font-serif font-black text-stone-900 text-lg">
+                  {t.waitlistModalTitle}
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowWaitlistModal(false)}
+                className="text-stone-400 hover:text-stone-700 p-1 rounded-lg"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-xs text-stone-500 leading-relaxed">
+              {t.waitlistModalDesc}
+            </p>
+
+            <div className="space-y-4 text-xs font-semibold text-stone-700">
+              <div className="bg-stone-50 p-3.5 rounded-2xl border border-stone-200/70 space-y-1">
+                <span className="text-[10px] text-stone-400 uppercase font-bold block">{t.selectDateTitle}</span>
+                <p className="font-bold text-stone-900">{selectedDate || (locale === "ar" ? "لم يتم تحديد تاريخ" : "No date selected")}</p>
+                {selectedService && (
+                  <p className="text-[10px] text-stone-500 pt-1">
+                    {selectedService.name[locale]} ({totalCombinedDuration} {t.mins})
+                  </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase font-bold text-stone-500 block">
+                    {t.preferredTimeStart}
+                  </label>
+                  <input
+                    type="time"
+                    value={waitlistStartTime}
+                    onChange={(e) => setWaitlistStartTime(e.target.value)}
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-900 outline-none focus:border-stone-950"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase font-bold text-stone-500 block">
+                    {t.preferredTimeEnd}
+                  </label>
+                  <input
+                    type="time"
+                    value={waitlistEndTime}
+                    onChange={(e) => setWaitlistEndTime(e.target.value)}
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-900 outline-none focus:border-stone-950"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowWaitlistModal(false)}
+                className="flex-1 py-3 border border-stone-200 rounded-xl text-xs font-bold text-stone-600 hover:bg-stone-50 transition"
+              >
+                {locale === "ar" ? "إلغاء" : "Cancel"}
+              </button>
+              <button
+                type="button"
+                onClick={handleJoinWaitlist}
+                disabled={isSubmittingWaitlist}
+                className="flex-1 py-3 bg-stone-950 text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-stone-850 transition disabled:opacity-50"
+              >
+                {isSubmittingWaitlist ? "..." : t.confirmJoinWaitlist}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AUTH OTP MODAL */}
+      {showAuthModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-stone-200 space-y-5">
+            <div className="flex items-center justify-between border-b border-stone-150 pb-3">
+              <h3 className="font-serif font-black text-stone-900 text-base">
+                {locale === "ar" ? "التحقق من رقم الجوال" : "Verify Mobile Number"}
+              </h3>
+              <button onClick={() => setShowAuthModal(false)} className="text-stone-400 hover:text-stone-700">✕</button>
+            </div>
+            {!authOtpSent ? (
+              <div className="space-y-4">
+                <p className="text-xs text-stone-500">
+                  {locale === "ar" ? "أدخل رقم الجوال لتأكيد الحجز وتلقي تنبيهات الموعد عبر الواتساب:" : "Enter your Saudi phone number to complete booking and receive WhatsApp updates:"}
+                </p>
+                <input
+                  type="tel"
+                  placeholder="05XXXXXXXX"
+                  value={authPhone}
+                  onChange={(e) => setAuthPhone(e.target.value)}
+                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-stone-900 outline-none focus:border-stone-950"
+                />
+                {authModalError && <p className="text-xs text-red-600 font-bold">{authModalError}</p>}
+                <button
+                  type="button"
+                  onClick={handleModalSendOtp}
+                  disabled={authModalLoading}
+                  className="w-full py-3 bg-stone-950 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
+                >
+                  {authModalLoading ? "..." : (locale === "ar" ? "إرسال رمز التحقق" : "Send Verification Code")}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-xs text-stone-500">
+                  {locale === "ar" ? "أدخل رمز التحقق (OTP) المرسل إلى جوالك:" : "Enter the 6-digit OTP sent to your phone:"}
+                </p>
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={authOtpCode}
+                  onChange={(e) => setAuthOtpCode(e.target.value)}
+                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-center text-lg font-mono font-bold tracking-widest text-stone-900 outline-none focus:border-stone-950"
+                />
+                {authModalError && <p className="text-xs text-red-600 font-bold">{authModalError}</p>}
+                <button
+                  type="button"
+                  onClick={handleModalVerifyOtp}
+                  disabled={authModalLoading}
+                  className="w-full py-3 bg-stone-950 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
+                >
+                  {authModalLoading ? "..." : (locale === "ar" ? "تأكيد ومتابعة الحجز" : "Confirm & Continue")}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   );

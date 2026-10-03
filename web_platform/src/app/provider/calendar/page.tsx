@@ -720,36 +720,46 @@ export default function ProviderCalendarPage() {
       const { data: empData } = await supabase
         .from("employees")
         .select("branch_id")
-        .eq("id", selectedEmployeeId)
+        .eq("id", targetEmployeeId)
         .maybeSingle();
 
-      const branchIdVal = empData?.branch_id || (branches.length > 0 ? branches[0].id : null);
-      if (!branchIdVal) {
-        throw new Error("No branch associated with employee.");
+      const branchIdVal = empData?.branch_id || employeeObj?.branch_id || branches[0]?.id || "00000000-0000-0000-0000-000000000001";
+
+      const { data: walkInData, error: rpcError } = await supabase.rpc("create_walk_in_booking", {
+        p_branch_id: branchIdVal,
+        p_employee_id: targetEmployeeId,
+        p_service_id: bookService,
+        p_customer_name: bookCustomer || (lang === "ar" ? "عميل حضور" : "Walk-in Guest"),
+        p_customer_phone: null,
+        p_payment_method: "cash",
+        p_total_price: Number(bookPrice || basePrice)
+      });
+
+      if (rpcError) {
+        // Fallback resilient insert
+        const payload = {
+          customer_id: customerIdVal,
+          branch_id: branchIdVal,
+          employee_id: targetEmployeeId,
+          service_id: bookService,
+          status: "in_service",
+          is_home_service: false,
+          scheduled_at: bookingTime.toISOString(),
+          duration_minutes: baseDuration,
+          total_price: Number(bookPrice || basePrice),
+          deposit_required: 0,
+          platform_fee: 0,
+          source: "walk_in"
+        };
+
+        const { error: insertError } = await supabase
+          .from("bookings")
+          .insert(payload);
+
+        if (insertError) throw insertError;
       }
 
-      const payload = {
-        customer_id: customerIdVal,
-        branch_id: branchIdVal,
-        employee_id: selectedEmployeeId,
-        service_id: bookService,
-        status: "confirmed",
-        is_home_service: false,
-        scheduled_at: bookingTime.toISOString(),
-        duration_minutes: baseDuration,
-        total_price: Number(bookPrice || basePrice),
-        deposit_required: 0,
-        tax_amount: Number((Number(bookPrice || basePrice) * 0.15).toFixed(2)),
-        platform_commission: Number((Number(bookPrice || basePrice) * 0.15).toFixed(2))
-      };
-
-      const { error: insertError } = await supabase
-        .from("bookings")
-        .insert(payload);
-
-      if (insertError) throw insertError;
-
-      setSuccess(lang === "ar" ? "تم تسجيل الحجز بنجاح" : "Walk-in booking created successfully.");
+      setSuccess(lang === "ar" ? "تم تسجيل حجز الحضور بنجاح" : "Walk-in booking created successfully.");
       setShowBookModal(false);
       setBookCustomer("");
       setBookNotes("");

@@ -41,7 +41,10 @@ const translations = {
     startImport: "Start Import",
     importing: "Importing...",
     importSuccessMsg: "Clients imported successfully into your directory.",
-    importErrorConsent: "You must confirm that clients have consented to receiving messages."
+    importErrorConsent: "You must confirm that clients have consented to receiving messages.",
+    blockClient: "Block Client",
+    unblockClient: "Unblock Client",
+    blockedStatus: "Blocked"
   },
   ar: {
     title: "دليل العملاء",
@@ -80,7 +83,10 @@ const translations = {
     startImport: "بدء الاستيراد",
     importing: "جاري الاستيراد...",
     importSuccessMsg: "تم استيراد قائمة العملاء بنجاح إلى دليلك.",
-    importErrorConsent: "يجب الموافقة والإقرار بوجود موافقة العملاء المسبقة لمتابعة الاستيراد."
+    importErrorConsent: "يجب الموافقة والإقرار بوجود موافقة العملاء المسبقة لمتابعة الاستيراد.",
+    blockClient: "حظر العميل",
+    unblockClient: "إلغاء الحظر",
+    blockedStatus: "محظور"
   }
 };
 
@@ -102,8 +108,33 @@ export default function ProviderCustomersPage() {
   const [importLoading, setImportLoading] = useState(false);
   const [importMessage, setImportMessage] = useState("");
   const [importError, setImportError] = useState("");
+  // Customer Blocklist State (G57)
+  const [providerId, setProviderId] = useState<string>("");
+  const [blockedCustomerIds, setBlockedCustomerIds] = useState<Set<string>>(new Set());
 
   const t = translations[locale];
+
+  const handleToggleBlock = async (clientId: string, currentlyBlocked: boolean) => {
+    if (!providerId) return;
+    try {
+      const { error: rpcErr } = await supabase.rpc("toggle_customer_block", {
+        p_provider_id: providerId,
+        p_customer_id: clientId,
+        p_reason: currentlyBlocked ? "" : "Policy violations / no-show protection",
+        p_block: !currentlyBlocked
+      });
+      if (rpcErr) throw rpcErr;
+      setBlockedCustomerIds(prev => {
+        const next = new Set(prev);
+        if (currentlyBlocked) next.delete(clientId);
+        else next.add(clientId);
+        return next;
+      });
+    } catch (err: any) {
+      console.error("Toggle block error:", err);
+      setError(err?.message || "Failed to update client block status.");
+    }
+  };
 
   const handleImportClients = async () => {
     if (!consentConfirmed) {
@@ -192,6 +223,21 @@ export default function ProviderCustomersPage() {
         .maybeSingle();
 
       if (providerInfo) {
+        setProviderId(providerInfo.id);
+
+        try {
+          const { data: blocks } = await supabase
+            .from("provider_customer_blocks")
+            .select("customer_id")
+            .eq("provider_id", providerInfo.id);
+
+          if (blocks) {
+            setBlockedCustomerIds(new Set(blocks.map((b: any) => b.customer_id)));
+          }
+        } catch (bErr) {
+          console.warn("Could not load blocked customers:", bErr);
+        }
+
         const { data: branches } = await supabase
           .from("branches")
           .select("id")
@@ -593,10 +639,26 @@ export default function ProviderCustomersPage() {
 
                   <div className="h-px bg-[#F9FAFB] border border-[#ECECEC]" />
 
-                  {/* Status Indicator */}
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#3DDC84] shadow-[0_0_8px_rgba(61,220,132,0.4)]"></span>
-                    <span className="text-xs font-bold text-[#22C55E]">{t.activeStatus}</span>
+                  {/* Status Indicator & Block Action (G57) */}
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${blockedCustomerIds.has(editingClient.id) ? "bg-[#EF4444] shadow-[0_0_8px_rgba(239,68,68,0.4)]" : "bg-[#3DDC84] shadow-[0_0_8px_rgba(61,220,132,0.4)]"}`}></span>
+                      <span className={`text-xs font-bold ${blockedCustomerIds.has(editingClient.id) ? "text-[#EF4444]" : "text-[#22C55E]"}`}>
+                        {blockedCustomerIds.has(editingClient.id) ? t.blockedStatus : t.activeStatus}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleToggleBlock(editingClient.id, blockedCustomerIds.has(editingClient.id))}
+                      className={`px-3 py-1 rounded-xl text-[11px] font-bold transition-all ${
+                        blockedCustomerIds.has(editingClient.id)
+                          ? "bg-gray-100 hover:bg-gray-200 text-[#344054] border border-[#ECECEC]"
+                          : "bg-red-50 hover:bg-red-100 text-red-700 border border-red-200"
+                      }`}
+                    >
+                      {blockedCustomerIds.has(editingClient.id) ? t.unblockClient : t.blockClient}
+                    </button>
                   </div>
 
                 </div>
