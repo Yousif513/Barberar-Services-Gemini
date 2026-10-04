@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { trackEvent } from "@/lib/analytics";
 
 const translations = {
   en: {
@@ -267,6 +268,7 @@ export default function BecomeProviderRootPage() {
 
       setExistingApp(data);
       setSubmitSuccess(true);
+      trackEvent("provider_applied", { channel: "web_form", segment: data?.business_type || "unknown" });
     } catch (err: any) {
       console.error("Failed to submit provider application:", err);
       setSubmitError(err?.message || (isRTL ? "فشل إرسال الطلب، يرجى المحاولة لاحقاً." : "Failed to submit application. Please try again."));

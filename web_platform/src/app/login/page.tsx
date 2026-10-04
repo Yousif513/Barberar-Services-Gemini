@@ -4,6 +4,7 @@ import React, { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { identifyUser, trackEvent } from "@/lib/analytics";
 import { devRoleHome, isLocalDevAccessEnabled, setDevRole, type DevRole } from "@/lib/dev-access";
 
 type Portal = "customer" | "provider";
@@ -73,6 +74,8 @@ function LoginForm() {
 
   const routeAuthenticatedUser = async (userId: string) => {
     await recordConsents(userId);
+    identifyUser(userId);
+    trackEvent("auth_completed", { method: phone && otpSent ? "phone_otp" : "email", user_id: userId });
 
     if (returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("//")) {
       router.replace(returnUrl);
@@ -128,6 +131,7 @@ function LoginForm() {
       });
       if (otpError) throw otpError;
       setOtpSent(true);
+      trackEvent("auth_started", { method: "phone_otp", step: "otp_sent" });
       setMessage("Verification code sent to your mobile. Enter the 6-digit code below. / تم إرسال رمز التحقق إلى جوالك");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Unable to send verification code.");

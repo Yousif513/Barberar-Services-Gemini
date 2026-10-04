@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { trackEvent } from "@/lib/analytics";
 import { ToastContainer } from "@/components/toast";
 import { Coordinates, CalculationMethod, PrayerTimes, Madhab } from "adhan";
 
@@ -466,6 +467,11 @@ export default function ShopDetailsPage() {
             minRedeemPoints: Number(loyalty?.min_redeem_points || 100),
           });
           setShopLoadState("ready");
+          const src = searchParams?.get("source");
+          trackEvent("provider_viewed", {
+            provider_id: provider.id,
+            source: src === "link" || src === "qr" || src === "whatsapp" ? src : src === "instagram" ? "ad" : "search",
+          });
         }
       } catch (err: unknown) {
         if (!cancelled) {
@@ -1114,11 +1120,13 @@ export default function ShopDetailsPage() {
 
       // Nothing to collect online (0% deposit or a gift card covers it): the booking is already confirmed.
       if (bookedStatus === "confirmed") {
+        trackEvent("booking_confirmed", { booking_id: bookedBookingId, provider_id: shop.id, source: bookingSource, total_price: 0 });
         router.push(`/customer/bookings/${bookedBookingId}/confirmation?status=confirmed`);
         return;
       }
 
       let redirectUrl = `/customer/bookings/${bookedBookingId}/confirmation?status=pending_payment`;
+      trackEvent("payment_started", { method: "card", amount: calculateEscrowSplit().deposit, booking_id: bookedBookingId });
       const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
         body: { bookingId: bookedBookingId },
       });
@@ -1738,7 +1746,18 @@ export default function ShopDetailsPage() {
                               key={slot}
                               type="button"
                               disabled={isDisabled}
-                              onClick={() => setSelectedSlot(slot)}
+                              onClick={() => {
+                                setSelectedSlot(slot);
+                                if (selectedService) {
+                                  trackEvent("slot_selected", {
+                                    provider_id: shop.id,
+                                    professional_id: selectedSpecialist?.id || "any",
+                                    service_id: selectedService.id,
+                                    date_offset: Math.round((new Date(slot).getTime() - Date.now()) / 86400000),
+                                    hour: Number(new Date(slot).toLocaleString("en-US", { hour: "numeric", hour12: false, timeZone: "Asia/Riyadh" })),
+                                  });
+                                }
+                              }}
                               className={`py-2 px-1 text-[10px] font-extrabold rounded-lg border text-center transition duration-150 flex flex-col items-center justify-center min-h-[48px] ${
                                 isSelected
                                   ? "bg-stone-950 border-stone-950 text-white"

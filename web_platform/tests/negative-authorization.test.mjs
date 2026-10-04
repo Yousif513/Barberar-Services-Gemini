@@ -970,10 +970,11 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         "utf8"
       );
       assert.ok(sitemapCode.includes("MetadataRoute.Sitemap"), "Must export Next.js Sitemap type");
-      assert.ok(sitemapCode.includes("districts = ["), "Must include Riyadh districts");
       assert.ok(sitemapCode.includes("/categories/"), "Must include marketplace categories");
-      assert.ok(sitemapCode.includes("ar-SA"), "Must specify Arabic alternate language");
-      assert.ok(sitemapCode.includes("en-US"), "Must specify English alternate language");
+      assert.ok(sitemapCode.includes("`${baseUrl}/shop/${provider.id}`"), "Must list every verified shop page");
+      assert.ok(sitemapCode.includes('.eq("is_verified", true)'), "Only verified providers are indexed");
+      assert.ok(!sitemapCode.includes("?lang="), "No language URL variants the app does not serve");
+      assert.ok(!sitemapCode.includes("district="), "No district URLs the discover page does not read");
 
       const robotsCode = readFileSync(
         join(webPlatformDir, "src/app/robots.ts"),

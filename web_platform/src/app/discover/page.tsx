@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { trackEvent } from "@/lib/analytics";
 
 interface DiscoveredBranch {
   branch_id: string;
@@ -18,7 +19,7 @@ interface DiscoveredBranch {
   distance_km: number | null;
   verified_business: boolean;
   cr_verification_status: string;
-  rating: number;
+  rating: number | null;
   reviews: number;
   popular_services: Array<{
     id: string;
@@ -158,17 +159,19 @@ export default function DiscoverPage() {
         p_offset: 0,
       });
 
-      if (error) {
-        console.error("Discovery search error:", error);
-        setBranches([]);
-      } else if (data && data.results) {
-        setBranches(data.results as DiscoveredBranch[]);
-        if (data.results.length > 0 && !selectedBranchId) {
-          setSelectedBranchId(data.results[0].branch_id);
-        }
-      } else {
-        setBranches([]);
+      if (error) throw error;
+      const rows: DiscoveredBranch[] = ((data?.providers || []) as Array<DiscoveredBranch & { sample_services?: DiscoveredBranch["popular_services"] }>)
+        .map((row) => ({ ...row, popular_services: row.sample_services ?? null }));
+      setBranches(rows);
+      if (rows.length > 0 && !selectedBranchId) {
+        setSelectedBranchId(rows[0].branch_id);
       }
+      trackEvent("search_performed", {
+        query: searchQuery.trim() || undefined,
+        district: selectedDistrict === "all" ? undefined : selectedDistrict,
+        category: selectedCategory === "all" ? undefined : selectedCategory,
+        results_count: rows.length,
+      });
     } catch (err) {
       console.error("Failed to load discovery:", err);
       setBranches([]);
@@ -411,7 +414,7 @@ export default function DiscoverPage() {
                             {isRTL ? b.business_name_ar : b.business_name_en}
                           </h4>
                           <span className="text-[10px] font-black text-amber-600 flex items-center gap-0.5">
-                            ★ {b.rating}
+                            {b.rating !== null ? `★ ${b.rating}` : (isRTL ? "جديد" : "New")}
                           </span>
                         </div>
                         <p className="text-[11px] text-stone-500 font-medium mt-1 flex items-center gap-1">
@@ -549,7 +552,7 @@ export default function DiscoverPage() {
                         {selectedBranch.district}
                       </span>
                       <span className="text-xs font-black text-amber-600 flex items-center gap-0.5">
-                        ★ {selectedBranch.rating} ({selectedBranch.reviews})
+                        {selectedBranch.rating !== null ? `★ ${selectedBranch.rating} (${selectedBranch.reviews})` : (isRTL ? "جديد" : "New")}
                       </span>
                     </div>
                     <h3 className="font-bold text-sm text-stone-950 mt-0.5 leading-snug">

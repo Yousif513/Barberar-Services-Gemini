@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { trackEvent } from "@/lib/analytics";
 
 const translations = {
   en: {
@@ -110,7 +111,7 @@ export default function CustomerReviewsPage() {
           scheduled_at,
           services ( name_en, name_ar ),
           branches (
-            providers ( business_name_en, business_name_ar )
+            providers ( id, business_name_en, business_name_ar )
           )
         `)
         .eq("customer_id", user.id)
@@ -148,6 +149,12 @@ export default function CustomerReviewsPage() {
 
       if (insertError) throw insertError;
 
+      trackEvent("review_submitted", {
+        booking_id: bookingId,
+        provider_id: (pendingReviews.find((p) => p.id === bookingId) as any)?.branches?.providers?.id || "",
+        rating,
+        has_text: comment.trim().length > 0,
+      });
       setSuccessMsg(t.thankYou);
       setComment("");
       setRating(5);
