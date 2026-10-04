@@ -3,26 +3,104 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
+interface StaffPerformanceRow {
+  employee_id: string;
+  name_en: string;
+  name_ar: string;
+  role: string;
+  completed_bookings: number;
+  revenue_sar: number;
+}
+
+interface PopularServiceRow {
+  service_id: string;
+  name_en: string;
+  name_ar: string;
+  category: string;
+  bookings_count: number;
+  revenue_sar: number;
+}
+
+interface SourceDistributionRow {
+  source: string;
+  bookings_count: number;
+  revenue_sar: number;
+  share_pct: number;
+}
+
+interface DetailedAnalytics {
+  provider_id: string;
+  start_date: string;
+  end_date: string;
+  gross_revenue_sar: number;
+  platform_fees_sar: number;
+  net_earnings_sar: number;
+  total_bookings: number;
+  completed_bookings: number;
+  cancelled_bookings: number;
+  no_show_bookings: number;
+  completion_rate_pct: number;
+  no_show_rate_pct: number;
+  unique_clients: number;
+  first_time_clients: number;
+  repeat_clients: number;
+  repeat_rate_pct: number;
+  sources_distribution: SourceDistributionRow[];
+  staff_performance: StaffPerformanceRow[];
+  popular_services: PopularServiceRow[];
+}
+
+interface BranchSummaryRow {
+  branch_id: string;
+  name_en: string;
+  name_ar: string;
+  city: string;
+  district: string;
+  revenue_sar: number;
+  total_bookings: number;
+  completed_bookings: number;
+  no_show_bookings: number;
+  no_show_rate_pct: number;
+  active_staff: number;
+}
+
+interface MultiBranchSummary {
+  provider_id: string;
+  start_date: string;
+  end_date: string;
+  chain_total_revenue_sar: number;
+  chain_total_bookings: number;
+  total_branches: number;
+  branches: BranchSummaryRow[];
+}
+
 const translations = {
   en: {
-    title: "Analytics & Reports",
-    subtitle: "Review gross earnings, salon productivity metrics, and export financial summaries.",
+    title: "Analytics & Operations",
+    subtitle: "Real-time revenue, salon performance KPIs, multi-branch rollup, and Saudi WPS payroll export.",
     grossRevenue: "Gross Revenue",
+    platformFees: "Platform Fees (Escrow)",
+    netEarnings: "Net Payout",
     bookingsTotal: "Total Bookings",
     completionRate: "Completion Rate",
-    exportBtn: "Export Report (CSV)",
+    noShowRate: "No-Show Rate",
+    repeatRate: "Repeat Client Retention",
+    uniqueClients: "Unique Clients",
+    exportBtn: "Export Analytics (CSV)",
+    wpsExportBtn: "WPS Payroll Export (Mudad CSV)",
     staffPerformance: "Specialist Performance Overview",
     staffName: "Staff Member",
     bookingsCompleted: "Completed Bookings",
     revenueGenerated: "Revenue Generated",
-    averageRating: "Rating Average",
-    servicesDistribution: "Service Category Share",
-    noData: "No reporting records found in database.",
+    role: "Role",
+    servicesDistribution: "Top Services by Revenue",
+    acquisitionChannels: "Acquisition Source Split",
+    noData: "No booking records found in this timeframe.",
+    emptyStateDesc: "When customers book services at your salon, live performance metrics and financial breakdown will appear here in real time.",
     currency: "SAR",
     popularServices: "Popular Services Analytics",
     serviceName: "Service",
     bookings: "Bookings",
-    trend: "Trend",
     period: "Time Period",
     customRange: "Custom Range",
     apply: "Apply",
@@ -31,29 +109,46 @@ const translations = {
     last7Days: "Last 7 Days",
     last30Days: "Last 30 Days",
     last6Months: "Last 6 Months",
-    allTime: "All Time",
-    noticeLocal: "Displaying local reporting data.",
-    loadingData: "Loading performance data..."
+    loadingData: "Loading live analytics from database...",
+    viewDetailed: "Branch Performance",
+    viewMultiBranch: "Multi-Branch Chain Rollup",
+    chainRevenue: "Total Chain Revenue",
+    chainBookings: "Chain Bookings",
+    branchesCount: "Active Branches",
+    branchName: "Branch Name",
+    location: "Location",
+    activeSpecialists: "Staff Count",
+    firstTimeVsRepeat: "First-Time vs Repeat Clients",
+    firstTime: "New Clients",
+    repeat: "Returning Clients",
+    downloadingWps: "Exporting WPS...",
   },
   ar: {
-    title: "التقارير والتحليلات",
-    subtitle: "مراجعة إجمالي الأرباح، ومقاييس إنتاجية الصالون، وتصدير الملخصات المالية.",
-    grossRevenue: "إجمالي الأرباح",
+    title: "التحليلات والعمليات التشغيلية",
+    subtitle: "الإيرادات اللحظية، مؤشرات الأداء، تقارير الفروع المجمعة، وتصدير مسير الرواتب المعتمد (نظام حماية الأجور / مدد).",
+    grossRevenue: "إجمالي الإيرادات",
+    platformFees: "رسوم المنصة (الضمان)",
+    netEarnings: "صافي الأرباح",
     bookingsTotal: "إجمالي الحجوزات",
-    completionRate: "معدل اكتمال الخدمات",
-    exportBtn: "تصدير التقرير (CSV)",
+    completionRate: "معدل الاكتمال",
+    noShowRate: "نسبة التغيب (No-Show)",
+    repeatRate: "معدل ولاء وعودة العملاء",
+    uniqueClients: "العملاء الفريدين",
+    exportBtn: "تصدير التحليلات (CSV)",
+    wpsExportBtn: "تصدير مسير الرواتب (حماية الأجور WPS)",
     staffPerformance: "أداء الموظفين والأخصائيين",
     staffName: "الموظف",
     bookingsCompleted: "الحجوزات المكتملة",
-    revenueGenerated: "الأرباح المحققة",
-    averageRating: "متوسط التقييم",
-    servicesDistribution: "توزيع مبيعات الخدمات",
-    noData: "لا توجد بيانات تقارير متاحة حالياً.",
+    revenueGenerated: "الإيراد المحقق",
+    role: "المسمى الوظيفي",
+    servicesDistribution: "أعلى الخدمات تحقيقاً للإيرادات",
+    acquisitionChannels: "قنوات استقطاب العملاء",
+    noData: "لا توجد حجوزات مسجلة خلال هذه الفترة الزمنية.",
+    emptyStateDesc: "عند قيام العملاء بحجز الخدمات في صالونك، ستظهر مقاييس الأداء اللحظية والتقارير المالية هنا مباشرة دون أي تأخير.",
     currency: "ريال",
-    popularServices: "تحليلات الخدمات الأكثر شعبية",
+    popularServices: "تحليلات الخدمات الأكثر طلباً",
     serviceName: "الخدمة",
     bookings: "الحجوزات",
-    trend: "الاتجاه",
     period: "الفترة الزمنية",
     customRange: "فترة مخصصة",
     apply: "تطبيق",
@@ -62,30 +157,47 @@ const translations = {
     last7Days: "آخر ٧ أيام",
     last30Days: "آخر ٣٠ يوماً",
     last6Months: "آخر ٦ أشهر",
-    allTime: "كل الأوقات",
-    noticeLocal: "يتم عرض بيانات التقارير المحلية.",
-    loadingData: "جاري تحميل بيانات الأداء..."
+    loadingData: "جاري تحميل البيانات الحقيقية من قاعدة البيانات...",
+    viewDetailed: "أداء الفرع",
+    viewMultiBranch: "تقرير الفروع المجمّع",
+    chainRevenue: "إجمالي إيرادات السلسلة",
+    chainBookings: "إجمالي حجوزات الفروع",
+    branchesCount: "الفروع النشطة",
+    branchName: "اسم الفرع",
+    location: "الموقع",
+    activeSpecialists: "عدد الأخصائيين",
+    firstTimeVsRepeat: "العملاء الجدد مقابل المتكررين",
+    firstTime: "عملاء جدد",
+    repeat: "عملاء متكررين",
+    downloadingWps: "جاري تصدير حماية الأجور...",
   }
 };
+
+function getIsoDateDaysAgo(days: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() - days);
+  return d.toISOString().split("T")[0];
+}
 
 export default function ProviderReportsPage() {
   const [locale, setLocale] = useState<"en" | "ar">("ar");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [providerId, setProviderId] = useState<string | null>(null);
 
-  // Stats States
-  const [revenue, setRevenue] = useState(15450);
-  const [bookingsCount, setBookingsCount] = useState(128);
-  const [completionRate, setCompletionRate] = useState("96.5%");
+  // View mode
+  const [viewMode, setViewMode] = useState<"detailed" | "multi_branch">("detailed");
 
-  // Date picker states
-  const [dateRange, setDateRange] = useState<"7d" | "30d" | "6m" | "custom">("6m");
-  const [startDate, setStartDate] = useState<string>("2026-01-01");
-  const [endDate, setEndDate] = useState<string>("2026-06-14");
+  // Date filters
+  const [dateRange, setDateRange] = useState<"7d" | "30d" | "6m" | "custom">("30d");
+  const [startDate, setStartDate] = useState<string>(getIsoDateDaysAgo(30));
+  const [endDate, setEndDate] = useState<string>(getIsoDateDaysAgo(0));
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // Staff list performance
-  const [staffPerformance, setStaffPerformance] = useState<any[]>([]);
+  // Real Database States
+  const [analytics, setAnalytics] = useState<DetailedAnalytics | null>(null);
+  const [multiBranch, setMultiBranch] = useState<MultiBranchSummary | null>(null);
+  const [exportingWps, setExportingWps] = useState(false);
 
   const t = translations[locale];
 
@@ -103,104 +215,219 @@ export default function ProviderReportsPage() {
   }, []);
 
   useEffect(() => {
-    loadReportData();
+    loadReportData(startDate, endDate);
   }, []);
 
-  async function loadReportData() {
+  async function loadReportData(start: string, end: string) {
     try {
       setLoading(true);
       setError("");
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
 
-      const { data: providerInfo } = await supabase
+      const { data: { user }, error: authErr } = await supabase.auth.getUser();
+      if (authErr || !user) {
+        setError(locale === "ar" ? "يرجى تسجيل الدخول لعرض التقارير" : "Authentication required");
+        return;
+      }
+
+      // Find provider ID
+      const { data: providerInfo, error: provErr } = await supabase
         .from("providers")
         .select("id")
         .eq("owner_id", user.id)
         .maybeSingle();
 
-      if (providerInfo) {
-        // Load report aggregates ...
+      if (provErr || !providerInfo) {
+        setError(locale === "ar" ? "لم يتم العثور على سجل مزود خدمة مرتبط بهذا الحساب" : "No provider record associated with this account");
+        return;
       }
-      throw new Error("No database records");
-    } catch (err: any) {
-      console.warn("Using default reports statistics due to offline sandbox session:", err.message);
-      setError("Displaying local reporting data.");
 
-      // Set mock performance overview
-      setStaffPerformance([
-        { name_en: "Marcus Vance", name_ar: "ماركوس فانس", completed: 58, revenue: 7850, rating: "4.9" },
-        { name_en: "Elena Rostova", name_ar: "إيلينا روستوفا", completed: 42, revenue: 5100, rating: "4.8" },
-        { name_en: "Omar G.", name_ar: "عمر ج.", completed: 28, revenue: 2500, rating: "4.7" }
-      ]);
+      const pId = providerInfo.id;
+      setProviderId(pId);
+
+      // 1. Fetch detailed analytics RPC
+      const { data: detailedData, error: detailedErr } = await supabase.rpc(
+        "get_provider_detailed_analytics",
+        {
+          p_provider_id: pId,
+          p_start_date: start,
+          p_end_date: end,
+        }
+      );
+
+      if (detailedErr) {
+        console.error("Failed to load provider detailed analytics:", detailedErr);
+        setError(detailedErr.message);
+      } else if (detailedData) {
+        setAnalytics(detailedData as DetailedAnalytics);
+      }
+
+      // 2. Fetch multi-branch summary RPC
+      const { data: mbData, error: mbErr } = await supabase.rpc(
+        "get_provider_multi_branch_summary",
+        {
+          p_provider_id: pId,
+          p_start_date: start,
+          p_end_date: end,
+        }
+      );
+
+      if (!mbErr && mbData) {
+        setMultiBranch(mbData as MultiBranchSummary);
+      }
+    } catch (err: any) {
+      console.error("Provider analytics error:", err);
+      setError(err?.message || "Failed to load reporting data");
     } finally {
       setLoading(false);
     }
   }
 
-  const handleExport = () => {
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + "Staff Member,Completed Bookings,Revenue Generated,Rating Average\n"
-      + staffPerformance.map(s => `"${s.name_en}",${s.completed},${s.revenue},${s.rating}`).join("\n");
-    
+  const handleApplyPreset = (preset: "7d" | "30d" | "6m") => {
+    setDateRange(preset);
+    let s = "";
+    const e = getIsoDateDaysAgo(0);
+    if (preset === "7d") s = getIsoDateDaysAgo(7);
+    else if (preset === "30d") s = getIsoDateDaysAgo(30);
+    else if (preset === "6m") s = getIsoDateDaysAgo(180);
+
+    setStartDate(s);
+    setEndDate(e);
+    loadReportData(s, e);
+  };
+
+  const handleApplyCustomDate = () => {
+    setDateRange("custom");
+    setShowDatePicker(false);
+    loadReportData(startDate, endDate);
+  };
+
+  // Export Standard Analytics CSV
+  const handleExportAnalyticsCsv = () => {
+    if (!analytics) return;
+
+    let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+    csvContent += "PRIMORA Provider Analytics Report\n";
+    csvContent += `Period,${analytics.start_date} to ${analytics.end_date}\n`;
+    csvContent += `Gross Revenue (SAR),${analytics.gross_revenue_sar}\n`;
+    csvContent += `Platform Escrow Fees (SAR),${analytics.platform_fees_sar}\n`;
+    csvContent += `Net Earnings (SAR),${analytics.net_earnings_sar}\n`;
+    csvContent += `Total Bookings,${analytics.total_bookings}\n`;
+    csvContent += `Completed Bookings,${analytics.completed_bookings}\n`;
+    csvContent += `Completion Rate (%),${analytics.completion_rate_pct}%\n`;
+    csvContent += `No-Show Rate (%),${analytics.no_show_rate_pct}%\n`;
+    csvContent += `Repeat Retention (%),${analytics.repeat_rate_pct}%\n\n`;
+
+    csvContent += "Staff Performance\n";
+    csvContent += "Staff Name (EN),Staff Name (AR),Role,Completed Bookings,Revenue Generated (SAR)\n";
+    analytics.staff_performance.forEach((s) => {
+      csvContent += `"${s.name_en}","${s.name_ar}","${s.role}",${s.completed_bookings},${s.revenue_sar}\n`;
+    });
+
+    csvContent += "\nPopular Services\n";
+    csvContent += "Service (EN),Service (AR),Category,Bookings Count,Revenue (SAR)\n";
+    analytics.popular_services.forEach((srv) => {
+      csvContent += `"${srv.name_en}","${srv.name_ar}","${srv.category}",${srv.bookings_count},${srv.revenue_sar}\n`;
+    });
+
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `primora_performance_report_${Date.now()}.csv`);
+    link.setAttribute("download", `primora_analytics_${analytics.start_date}_${analytics.end_date}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
-  const categoriesShare = [
-    { name_en: "Barbering & Haircuts", name_ar: "قص الشعر والحلاقة", pct: 55, amount: 8497 },
-    { name_en: "Facials & Spa Services", name_ar: "السبا وعناية البشرة", pct: 30, amount: 4635 },
-    { name_en: "Wellness & Massage Therapy", name_ar: "مساج وعلاجات العافية", pct: 15, amount: 2318 }
-  ];
+  // Export Wages Protection System (WPS / Mudad) Payroll CSV (G55)
+  const handleExportWpsPayrollCsv = async () => {
+    if (!providerId) return;
 
-  const popularServices = [
-    { name_en: "Classic Beard Trim & Shave", name_ar: "حلاقة وتشذيب اللحية الكلاسيكية", bookings: 48, revenue: 2400, trend: "+12%" },
-    { name_en: "Signature Haircut & Style", name_ar: "قص وتصفيف الشعر المميز", bookings: 36, revenue: 3600, trend: "+8%" },
-    { name_en: "Hydrafacial Treatment", name_ar: "علاج الهيدرافيشيل للبشرة", bookings: 22, revenue: 4400, trend: "+15%" },
-    { name_en: "Deep Tissue Massage", name_ar: "مساج الأنسجة العميقة", bookings: 14, revenue: 2100, trend: "-3%" }
-  ];
+    try {
+      setExportingWps(true);
+      const { data, error: wpsErr } = await supabase.rpc("calculate_staff_payroll", {
+        p_provider_id: providerId,
+        p_start_date: startDate,
+        p_end_date: endDate,
+      });
+
+      if (wpsErr) throw wpsErr;
+      if (!data || !data.payroll_entries) {
+        throw new Error("No payroll entries returned");
+      }
+
+      const entries = data.payroll_entries as any[];
+
+      // Mudad / WPS Compliant CSV format
+      let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+      csvContent += "Employee ID,Staff Name,Role,Branch,IBAN,Completed Bookings,Service Revenue (SAR),Commission Rate (%),Commission Earned (SAR),Tips (SAR),Base Salary (SAR),Total Net Payout (SAR)\n";
+
+      entries.forEach((emp) => {
+        csvContent += `"${emp.employee_id}","${emp.name_en} / ${emp.name_ar}","${emp.role}","${emp.branch}","${emp.wps_iban}",${emp.completed_bookings},${emp.service_revenue_sar},${emp.commission_rate_pct}%,${emp.commission_earned_sar},${emp.tips_earned_sar},${emp.base_salary_sar},${emp.total_payout_sar}\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `primora_wps_payroll_${startDate}_${endDate}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err: any) {
+      console.error("WPS export error:", err);
+      alert(locale === "ar" ? `فشل تصدير مسير الرواتب: ${err.message}` : `WPS Export failed: ${err.message}`);
+    } finally {
+      setExportingWps(false);
+    }
+  };
+
+  const isRTL = locale === "ar";
 
   return (
-    <div className="space-y-8 font-sans">
+    <div className={`space-y-8 font-sans ${isRTL ? "text-right" : "text-left"}`} dir={isRTL ? "rtl" : "ltr"}>
       {/* HEADER */}
-      <div className={`flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6 border-b border-[#ECECEC] pb-6 ${locale === "ar" ? "rtl" : "ltr"}`}>
+      <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6 border-b border-[#ECECEC] pb-6">
         <div>
           <h2 className="text-3xl font-serif font-semibold tracking-tight text-[#101828]">{t.title}</h2>
           <p className="text-sm text-[#344054] mt-1">{t.subtitle}</p>
         </div>
-        
-        {/* DATE FILTERS & EXPORT ROW */}
-        <div className={`flex flex-wrap items-center gap-3.5 ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
+
+        {/* DATE FILTERS & EXPORT ACTIONS */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Multi-Branch toggle if multiple branches exist */}
+          {multiBranch && multiBranch.total_branches > 1 && (
+            <div className="flex items-center bg-stone-100 p-1 rounded-2xl border border-stone-200">
+              <button
+                type="button"
+                onClick={() => setViewMode("detailed")}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                  viewMode === "detailed" ? "bg-white text-stone-900 shadow-sm" : "text-stone-500 hover:text-stone-900"
+                }`}
+              >
+                {t.viewDetailed}
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("multi_branch")}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                  viewMode === "multi_branch" ? "bg-[#D1AF47] text-stone-950 shadow-sm" : "text-stone-500 hover:text-stone-900"
+                }`}
+              >
+                {t.viewMultiBranch} ({multiBranch.total_branches})
+              </button>
+            </div>
+          )}
+
           {/* Preset Selector Pills */}
-          <div className="flex items-center bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] p-1.5 rounded-2xl border border-[#ECECEC] shadow-inner">
+          <div className="flex items-center bg-white border border-[#ECECEC] shadow-sm p-1.5 rounded-2xl">
             {(["7d", "30d", "6m"] as const).map((r) => (
               <button
                 key={r}
-                onClick={() => {
-                  setDateRange(r);
-                  if (r === "7d") {
-                    setRevenue(3250);
-                    setBookingsCount(24);
-                    setCompletionRate("98.1%");
-                  } else if (r === "30d") {
-                    setRevenue(12400);
-                    setBookingsCount(98);
-                    setCompletionRate("95.8%");
-                  } else if (r === "6m") {
-                    setRevenue(15450);
-                    setBookingsCount(128);
-                    setCompletionRate("96.5%");
-                  }
-                }}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300 ${
+                type="button"
+                onClick={() => handleApplyPreset(r)}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                   dateRange === r
-                    ? "bg-[#D1AF47] text-[#070B12] shadow-[0_0_15px_rgba(209,175,71,0.25)] font-bold"
-                    : "text-[#344054] hover:text-[#101828] hover:bg-transparent"
+                    ? "bg-[#D1AF47] text-[#070B12] shadow-sm font-bold"
+                    : "text-[#344054] hover:text-[#101828]"
                 }`}
               >
                 {r === "7d" ? t.last7Days : r === "30d" ? t.last30Days : t.last6Months}
@@ -211,57 +438,46 @@ export default function ProviderReportsPage() {
           {/* Custom Date Picker Trigger */}
           <div className="relative">
             <button
+              type="button"
               onClick={() => setShowDatePicker(!showDatePicker)}
-              className={`flex items-center gap-2.5 px-4.5 py-3 rounded-2xl border text-xs font-semibold transition-all duration-300 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl border text-xs font-semibold transition bg-white ${
                 dateRange === "custom"
-                  ? "border-[#D1AF47] text-[#D1AF47] shadow-[0_0_15px_rgba(209,175,71,0.1)]"
-                  : "border-[#ECECEC] text-[#344054] hover:border-[#D1AF47]/40 hover:text-[#101828]"
+                  ? "border-[#D1AF47] text-[#D1AF47]"
+                  : "border-[#ECECEC] text-[#344054] hover:border-[#D1AF47]/40"
               }`}
             >
               <svg className="w-4 h-4 text-[#D1AF47]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <span>
-                {dateRange === "custom"
-                  ? `${startDate} - ${endDate}`
-                  : t.customRange}
-              </span>
+              <span>{dateRange === "custom" ? `${startDate} - ${endDate}` : t.customRange}</span>
             </button>
 
-            {/* Date Picker Popover */}
             {showDatePicker && (
-              <div className={`absolute top-full mt-2 p-5 rounded-[24px] bg-white border border-[#ECECEC] shadow-2xl z-50 w-72 ${locale === "ar" ? "left-0" : "right-0"}`}>
-                <h4 className="text-xs uppercase tracking-wider text-[#667085] mb-3.5 font-bold text-left">{t.customRange}</h4>
+              <div className={`absolute top-full mt-2 p-4 rounded-2xl bg-white border border-[#ECECEC] shadow-2xl z-50 w-72 ${isRTL ? "left-0" : "right-0"}`}>
+                <h4 className="text-xs uppercase tracking-wider text-[#667085] mb-3 font-bold">{t.customRange}</h4>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-[10px] text-[#344054] mb-1 font-semibold text-left">{t.startDate}</label>
+                    <label className="block text-[10px] text-[#344054] mb-1 font-semibold">{t.startDate}</label>
                     <input
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-3 py-2 text-xs text-[#101828] focus:outline-none focus:border-[#D1AF47] transition-all duration-300"
+                      className="w-full border border-[#ECECEC] rounded-xl px-3 py-1.5 text-xs text-[#101828] focus:border-[#D1AF47] outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] text-[#344054] mb-1 font-semibold text-left">{t.endDate}</label>
+                    <label className="block text-[10px] text-[#344054] mb-1 font-semibold">{t.endDate}</label>
                     <input
                       type="date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-xl px-3 py-2 text-xs text-[#101828] focus:outline-none focus:border-[#D1AF47] transition-all duration-300"
+                      className="w-full border border-[#ECECEC] rounded-xl px-3 py-1.5 text-xs text-[#101828] focus:border-[#D1AF47] outline-none"
                     />
                   </div>
                   <button
-                    onClick={() => {
-                      setDateRange("custom");
-                      setShowDatePicker(false);
-                      const diffDays = Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24));
-                      const days = isNaN(diffDays) || diffDays <= 0 ? 30 : diffDays;
-                      setRevenue(days * 350);
-                      setBookingsCount(Math.round(days * 2.8));
-                      setCompletionRate(days > 90 ? "96.5%" : "97.2%");
-                    }}
-                    className="w-full py-2.5 bg-[#D1AF47] hover:bg-[#E0C46A] text-[#070B12] text-xs font-bold rounded-xl transition duration-300 shadow-[0_0_15px_rgba(209,175,71,0.2)]"
+                    type="button"
+                    onClick={handleApplyCustomDate}
+                    className="w-full py-2 bg-[#D1AF47] hover:bg-[#E0C46A] text-[#070B12] text-xs font-bold rounded-xl transition shadow-sm"
                   >
                     {t.apply}
                   </button>
@@ -270,12 +486,28 @@ export default function ProviderReportsPage() {
             )}
           </div>
 
-          {/* Export CSV Button */}
+          {/* WPS Payroll CSV Button (G55) */}
           <button
-            onClick={handleExport}
-            className="flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-[#D1AF47] to-[#B8952E] hover:from-[#E0C46A] hover:to-[#D1AF47] text-[#070B12] font-bold text-xs rounded-2xl transition duration-300 shadow-[0_0_20px_rgba(209,175,71,0.15)] hover:shadow-[0_0_30px_rgba(209,175,71,0.3)]"
+            type="button"
+            onClick={handleExportWpsPayrollCsv}
+            disabled={exportingWps}
+            className="flex items-center gap-2 px-4 py-2 bg-stone-900 hover:bg-stone-800 text-stone-50 font-bold text-xs rounded-2xl transition shadow-sm disabled:opacity-50"
+            title="Saudi Wages Protection System / Mudad CSV export"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-[#D1AF47]" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>{exportingWps ? t.downloadingWps : t.wpsExportBtn}</span>
+          </button>
+
+          {/* Export Analytics CSV Button */}
+          <button
+            type="button"
+            onClick={handleExportAnalyticsCsv}
+            disabled={!analytics || analytics.total_bookings === 0}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#D1AF47] to-[#B8952E] hover:from-[#E0C46A] hover:to-[#D1AF47] text-[#070B12] font-bold text-xs rounded-2xl transition shadow-sm disabled:opacity-50"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
             <span>{t.exportBtn}</span>
@@ -283,318 +515,255 @@ export default function ProviderReportsPage() {
         </div>
       </div>
 
+      {/* ERROR STATE */}
       {error && (
-        <div className="bg-white border border-[#ECECEC]/80 backdrop-blur-md border border-[#D1AF47]/30 text-[#D1AF47] text-xs rounded-2xl p-4 flex items-center gap-3 shadow-[0_0_15px_rgba(209,175,71,0.05)]">
-          <svg className="w-5 h-5 text-[#D1AF47] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-2xl p-4 flex items-center gap-3">
+          <svg className="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
-          <span className="font-semibold">{locale === "ar" ? translations.ar.noticeLocal : translations.en.noticeLocal}</span>
+          <span className="font-semibold">{error}</span>
         </div>
       )}
 
-      {/* KPI SUMMARIES */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Gross Revenue Card */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-sm hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47] opacity-[0.02] rounded-full blur-3xl group-hover:opacity-[0.06] transition-all duration-500" />
-          <div className={`flex items-start justify-between ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
-            <div className={locale === "ar" ? "text-right" : "text-left"}>
-              <span className="text-[11px] uppercase font-bold text-[#667085] tracking-wider block">{t.grossRevenue}</span>
-              <h3 className="text-3xl font-bold text-[#101828] mt-2.5 font-mono">
-                {revenue.toLocaleString()} <span className="text-sm font-semibold text-[#D1AF47]">{t.currency}</span>
+      {/* LOADING STATE */}
+      {loading ? (
+        <div className="bg-white border border-[#ECECEC] rounded-3xl p-16 text-center space-y-3">
+          <div className="w-8 h-8 border-3 border-[#D1AF47] border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-xs font-semibold text-stone-500">{t.loadingData}</p>
+        </div>
+      ) : viewMode === "multi_branch" && multiBranch ? (
+        /* MULTI-BRANCH CONSOLIDATED CHAIN VIEW (G56) */
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white border border-[#ECECEC] rounded-[24px] p-6 shadow-sm">
+              <span className="text-[11px] uppercase font-bold text-[#667085] tracking-wider block">{t.chainRevenue}</span>
+              <h3 className="text-3xl font-bold text-[#101828] mt-2 font-mono">
+                {multiBranch.chain_total_revenue_sar.toLocaleString()}{" "}
+                <span className="text-sm font-semibold text-[#D1AF47]">{t.currency}</span>
               </h3>
-              <span className={`text-[11px] text-[#22C55E] font-bold block mt-3 flex items-center gap-1 ${locale === "ar" ? "flex-row-reverse" : ""}`}>
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-                <span>+18.5% {locale === "ar" ? "منذ الشهر الماضي" : "from last month"}</span>
-              </span>
             </div>
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#D1AF47]/20 to-[#D1AF47]/5 border border-[#D1AF47]/30 flex items-center justify-center text-[#D1AF47] shadow-[0_0_15px_rgba(209,175,71,0.1)] group-hover:scale-110 transition-all duration-300">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+            <div className="bg-white border border-[#ECECEC] rounded-[24px] p-6 shadow-sm">
+              <span className="text-[11px] uppercase font-bold text-[#667085] tracking-wider block">{t.chainBookings}</span>
+              <h3 className="text-3xl font-bold text-[#101828] mt-2 font-mono">
+                {multiBranch.chain_total_bookings.toLocaleString()}
+              </h3>
             </div>
-          </div>
-        </div>
-
-        {/* Total Bookings Card */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-sm hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47] opacity-[0.02] rounded-full blur-3xl group-hover:opacity-[0.06] transition-all duration-500" />
-          <div className={`flex items-start justify-between ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
-            <div className={locale === "ar" ? "text-right" : "text-left"}>
-              <span className="text-[11px] uppercase font-bold text-[#667085] tracking-wider block">{t.bookingsTotal}</span>
-              <h3 className="text-3xl font-bold text-[#101828] mt-2.5 font-mono">{bookingsCount}</h3>
-              <span className={`text-[11px] text-[#22C55E] font-bold block mt-3 flex items-center gap-1 ${locale === "ar" ? "flex-row-reverse" : ""}`}>
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-                <span>+12.3% {locale === "ar" ? "منذ الشهر الماضي" : "from last month"}</span>
-              </span>
-            </div>
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#D1AF47]/20 to-[#D1AF47]/5 border border-[#D1AF47]/30 flex items-center justify-center text-[#D1AF47] shadow-[0_0_15px_rgba(209,175,71,0.1)] group-hover:scale-110 transition-all duration-300">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+            <div className="bg-white border border-[#ECECEC] rounded-[24px] p-6 shadow-sm">
+              <span className="text-[11px] uppercase font-bold text-[#667085] tracking-wider block">{t.branchesCount}</span>
+              <h3 className="text-3xl font-bold text-[#101828] mt-2 font-mono">
+                {multiBranch.total_branches}
+              </h3>
             </div>
           </div>
-        </div>
 
-        {/* Completion Rate Card */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-sm hover:border-[#D1AF47]/30 hover:shadow-[0_0_25px_rgba(209,175,71,0.1)] transition-all duration-300 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47] opacity-[0.02] rounded-full blur-3xl group-hover:opacity-[0.06] transition-all duration-500" />
-          <div className={`flex items-start justify-between ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
-            <div className={locale === "ar" ? "text-right" : "text-left"}>
-              <span className="text-[11px] uppercase font-bold text-[#667085] tracking-wider block">{t.completionRate}</span>
-              <h3 className="text-3xl font-bold text-[#101828] mt-2.5 font-mono">{completionRate}</h3>
-              <span className="text-[11px] text-[#344054] font-semibold block mt-3">
-                {locale === "ar" ? "المعدل الطبيعي للصناعة: ٩٢٪" : "Standard industry average: 92%"}
-              </span>
-            </div>
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#D1AF47]/20 to-[#D1AF47]/5 border border-[#D1AF47]/30 flex items-center justify-center text-[#D1AF47] shadow-[0_0_15px_rgba(209,175,71,0.1)] group-hover:scale-110 transition-all duration-300">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* SALES TRENDS & SERVICE SHARE CHARTS */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* LINE CHART CARD */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-sm lg:col-span-2 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#D1AF47] opacity-[0.01] rounded-full blur-3xl group-hover:opacity-[0.03] transition-all duration-500" />
-          <h3 className="font-serif font-bold text-base text-[#101828] mb-6 tracking-wide text-left">
-            {locale === "ar" ? "اتجاهات الإيرادات (آخر ٦ أشهر)" : "Revenue Trends (Last 6 Months)"}
-          </h3>
-          
-          <div className="relative w-full h-52">
-            <svg viewBox="0 0 500 180" className="w-full h-full overflow-visible">
-              <defs>
-                <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#D1AF47" stopOpacity="0.22" />
-                  <stop offset="100%" stopColor="#D1AF47" stopOpacity="0.00" />
-                </linearGradient>
-                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="4" result="blur" />
-                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                </filter>
-              </defs>
-              
-              {/* Horizontal Grid Lines */}
-              <line x1="20" y1="40" x2="480" y2="40" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="3 3" />
-              <line x1="20" y1="80" x2="480" y2="80" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="3 3" />
-              <line x1="20" y1="120" x2="480" y2="120" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="3 3" />
-              <line x1="20" y1="160" x2="480" y2="160" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="3 3" />
-
-              {/* Vertical Grid Lines at months */}
-              <line x1="20" y1="40" x2="20" y2="160" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-              <line x1="112" y1="40" x2="112" y2="160" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-              <line x1="204" y1="40" x2="204" y2="160" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-              <line x1="296" y1="40" x2="296" y2="160" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-              <line x1="388" y1="40" x2="388" y2="160" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-              <line x1="480" y1="40" x2="480" y2="160" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-              
-              {/* Area path */}
-              <path
-                d="M 20,140 C 60,135 80,105 112,110 C 150,115 170,130 204,125 C 250,120 270,70 296,75 C 340,80 360,95 388,90 C 430,85 450,50 480,45 L 480,160 L 20,160 Z"
-                fill="url(#chartGrad)"
-              />
-              
-              {/* Line path */}
-              <path
-                d="M 20,140 C 60,135 80,105 112,110 C 150,115 170,130 204,125 C 250,120 270,70 296,75 C 340,80 360,95 388,90 C 430,85 450,50 480,45"
-                fill="none"
-                stroke="#D1AF47"
-                strokeWidth="3.5"
-                strokeLinecap="round"
-                filter="url(#glow)"
-              />
-
-              {/* Data points */}
-              <circle cx="20" cy="140" r="5" fill="#070B12" stroke="#D1AF47" strokeWidth="2.5" className="transition-all duration-300 hover:scale-125 cursor-pointer" />
-              <circle cx="112" cy="110" r="5" fill="#070B12" stroke="#D1AF47" strokeWidth="2.5" className="transition-all duration-300 hover:scale-125 cursor-pointer" />
-              <circle cx="204" cy="125" r="5" fill="#070B12" stroke="#D1AF47" strokeWidth="2.5" className="transition-all duration-300 hover:scale-125 cursor-pointer" />
-              <circle cx="296" cy="75" r="5" fill="#070B12" stroke="#D1AF47" strokeWidth="2.5" className="transition-all duration-300 hover:scale-125 cursor-pointer" />
-              <circle cx="388" cy="90" r="5" fill="#070B12" stroke="#D1AF47" strokeWidth="2.5" className="transition-all duration-300 hover:scale-125 cursor-pointer" />
-              <circle cx="480" cy="45" r="5" fill="#070B12" stroke="#D1AF47" strokeWidth="2.5" className="transition-all duration-300 hover:scale-125 cursor-pointer" />
-
-              {/* Value annotations on top of dots */}
-              <text x="20" y="122" textAnchor="middle" fill="#7B859C" fontSize="9" fontWeight="bold" fontFamily="monospace">8.2k</text>
-              <text x="112" y="92" textAnchor="middle" fill="#7B859C" fontSize="9" fontWeight="bold" fontFamily="monospace">11.5k</text>
-              <text x="204" y="108" textAnchor="middle" fill="#7B859C" fontSize="9" fontWeight="bold" fontFamily="monospace">9.0k</text>
-              <text x="296" y="58" textAnchor="middle" fill="#7B859C" fontSize="9" fontWeight="bold" fontFamily="monospace">14.0k</text>
-              <text x="388" y="72" textAnchor="middle" fill="#7B859C" fontSize="9" fontWeight="bold" fontFamily="monospace">12.5k</text>
-              <text x="480" y="26" textAnchor="middle" fill="#D1AF47" fontSize="10" fontWeight="bold" fontFamily="monospace">15.4k</text>
-            </svg>
-          </div>
-          
-          <div className={`flex justify-between text-[11px] font-bold text-[#667085] mt-4 px-2 tracking-wider uppercase ${locale === "ar" ? "flex-row-reverse" : ""}`}>
-            <span>{locale === "ar" ? "يناير" : "Jan"}</span>
-            <span>{locale === "ar" ? "فبراير" : "Feb"}</span>
-            <span>{locale === "ar" ? "مارس" : "Mar"}</span>
-            <span>{locale === "ar" ? "أبريل" : "Apr"}</span>
-            <span>{locale === "ar" ? "مايو" : "May"}</span>
-            <span>{locale === "ar" ? "يونيو" : "Jun"}</span>
-          </div>
-        </div>
-
-        {/* DONUT CHART CARD */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-sm flex flex-col justify-between relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-[#D1AF47] opacity-[0.01] rounded-full blur-3xl group-hover:opacity-[0.03] transition-all duration-500" />
-          <div>
-            <h3 className="font-serif font-bold text-base text-[#101828] mb-6 tracking-wide text-left">{t.servicesDistribution}</h3>
-            
-            {/* SVG Donut */}
-            <div className="flex justify-center mb-8 relative">
-              <svg width="140" height="140" viewBox="0 0 42 42" className="transform -rotate-90">
-                {/* Base circle background track */}
-                <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="rgba(255,255,255,0.03)" strokeWidth="4.5" />
-                
-                {/* 55% Segment: Primary Gold */}
-                <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#D1AF47" strokeWidth="4.5"
-                        strokeDasharray="55 45" strokeDashoffset="0" strokeLinecap="round" className="transition-all duration-500 hover:stroke-[5.5px]" />
-                
-                {/* 30% Segment: Gold Dark */}
-                <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#B8952E" strokeWidth="4.5"
-                        strokeDasharray="30 70" strokeDashoffset="-55" strokeLinecap="round" className="transition-all duration-500 hover:stroke-[5.5px]" />
-                
-                {/* 15% Segment: Muted Gold/Grey Accent */}
-                <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#4A3F22" strokeWidth="4.5"
-                        strokeDasharray="15 85" strokeDashoffset="-85" strokeLinecap="round" className="transition-all duration-500 hover:stroke-[5.5px]" />
-              </svg>
-              
-              {/* Center Text inside Donut */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-xl font-bold text-[#101828] font-mono">100%</span>
-                <span className="text-[9px] uppercase tracking-widest text-[#667085] font-semibold">{locale === "ar" ? "إجمالي" : "TOTAL"}</span>
-              </div>
-            </div>
-            
-            <div className="space-y-3">
-              {categoriesShare.map((cat, idx) => (
-                <div key={idx} className={`flex items-center justify-between text-xs p-2.5 rounded-xl hover:bg-transparent transition duration-300 ${locale === "ar" ? "flex-row-reverse" : ""}`}>
-                  <div className={`flex items-center gap-2.5 font-bold text-[#344054] ${locale === "ar" ? "flex-row-reverse" : ""}`}>
-                    <span className={`w-3 h-3 rounded-md ${
-                      idx === 0 ? "bg-[#D1AF47]" : idx === 1 ? "bg-[#B8952E]" : "bg-[#4A3F22]"
-                    }`} />
-                    <span>{locale === "ar" ? cat.name_ar : cat.name_en}</span>
-                  </div>
-                  <div className={`flex flex-col ${locale === "ar" ? "items-start" : "items-end"}`}>
-                    <span className="font-extrabold text-[#101828] font-mono">{cat.pct}%</span>
-                    <span className="text-[10px] text-[#667085] font-mono">{cat.amount.toLocaleString()} {t.currency}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* STAFF PERFORMANCE & POPULAR SERVICES GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* STAFF PERFORMANCE */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-sm relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#D1AF47]/25 to-transparent" />
-          <h3 className={`font-serif font-bold text-base text-[#101828] mb-6 tracking-wide ${locale === "ar" ? "text-right" : "text-left"}`}>{t.staffPerformance}</h3>
-
-          {loading ? (
-            <div className="text-center py-12 text-sm text-[#667085]">{t.loadingData}</div>
-          ) : staffPerformance.length === 0 ? (
-            <div className="text-center py-12 text-[#667085] text-xs font-semibold">{t.noData}</div>
-          ) : (
+          <div className="bg-white border border-[#ECECEC] rounded-[24px] p-6 shadow-sm overflow-hidden">
+            <h3 className="font-serif font-bold text-base text-[#101828] mb-4">{t.viewMultiBranch}</h3>
             <div className="overflow-x-auto">
-              <table className="w-full text-xs text-left border-collapse">
+              <table className="w-full text-xs border-collapse">
                 <thead>
-                  <tr className={`border-b border-[#ECECEC] text-[#667085] font-bold uppercase text-[10px] tracking-wider bg-[#F9FAFB]/50 ${locale === "ar" ? "text-right" : "text-left"}`}>
-                    <th className="py-4 px-6">{t.staffName}</th>
-                    <th className="py-4 px-6 text-center">{t.bookingsCompleted}</th>
-                    <th className="py-4 px-6 text-center">{t.revenueGenerated}</th>
-                    <th className="py-4 px-6 text-center">{t.averageRating}</th>
+                  <tr className="border-b border-[#ECECEC] text-[#667085] font-bold uppercase text-[10px] tracking-wider bg-stone-50/50">
+                    <th className="py-3 px-4">{t.branchName}</th>
+                    <th className="py-3 px-4">{t.location}</th>
+                    <th className="py-3 px-4 text-center">{t.activeSpecialists}</th>
+                    <th className="py-3 px-4 text-center">{t.bookingsTotal}</th>
+                    <th className="py-3 px-4 text-center">{t.bookingsCompleted}</th>
+                    <th className="py-3 px-4 text-center">{t.noShowRate}</th>
+                    <th className="py-3 px-4 text-center">{t.revenueGenerated}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#ECECEC]">
-                  {staffPerformance.map((staff, idx) => (
-                    <tr key={idx} className="hover:bg-transparent transition duration-300">
-                      <td className={`py-4 px-6 font-bold text-[#101828] ${locale === "ar" ? "text-right" : "text-left"}`}>
-                        <div className={`flex items-center gap-3 ${locale === "ar" ? "flex-row-reverse" : ""}`}>
-                          {/* Initials Avatar */}
-                          <div className="w-8 h-8 rounded-xl bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] flex items-center justify-center text-[#D1AF47] text-[10px] font-black uppercase shadow-inner">
-                            {(locale === "ar" ? staff.name_ar : staff.name_en).split(" ").map((n: string) => n[0]).join("")}
-                          </div>
-                          <span>{locale === "ar" ? staff.name_ar : staff.name_en}</span>
-                        </div>
+                  {multiBranch.branches.map((b) => (
+                    <tr key={b.branch_id} className="hover:bg-stone-50/60 transition">
+                      <td className="py-3 px-4 font-bold text-[#101828]">
+                        {isRTL ? b.name_ar : b.name_en}
                       </td>
-                      <td className="py-4 px-6 text-center font-mono font-semibold text-[#344054]">
-                        {staff.completed}
+                      <td className="py-3 px-4 text-stone-600">
+                        {b.district}, {b.city}
                       </td>
-                      <td className="py-4 px-6 text-center font-mono font-bold text-[#D1AF47]">
-                        {staff.revenue.toLocaleString()} <span className="text-[10px] text-[#667085]">{t.currency}</span>
+                      <td className="py-3 px-4 text-center font-mono font-semibold text-stone-700">
+                        {b.active_staff}
                       </td>
-                      <td className="py-4 px-6 text-center">
-                        <div className="flex items-center justify-center gap-1.5">
-                          <span className="text-[#D1AF47] text-sm leading-none">★</span>
-                          <span className="font-mono font-bold text-[#101828]">{staff.rating}</span>
-                        </div>
+                      <td className="py-3 px-4 text-center font-mono font-semibold text-stone-700">
+                        {b.total_bookings}
+                      </td>
+                      <td className="py-3 px-4 text-center font-mono font-semibold text-emerald-600">
+                        {b.completed_bookings}
+                      </td>
+                      <td className="py-3 px-4 text-center font-mono text-stone-500">
+                        {b.no_show_rate_pct}%
+                      </td>
+                      <td className="py-3 px-4 text-center font-mono font-bold text-[#D1AF47]">
+                        {b.revenue_sar.toLocaleString()} {t.currency}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          )}
+          </div>
         </div>
+      ) : analytics && analytics.total_bookings > 0 ? (
+        /* DETAILED REAL ANALYTICS VIEW (G54) */
+        <div className="space-y-8">
+          {/* TOP KPI CARDS */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Gross Revenue */}
+            <div className="bg-white border border-[#ECECEC] rounded-[24px] p-6 shadow-sm hover:border-[#D1AF47]/40 transition">
+              <span className="text-[11px] uppercase font-bold text-[#667085] tracking-wider block">{t.grossRevenue}</span>
+              <h3 className="text-3xl font-bold text-[#101828] mt-2 font-mono">
+                {analytics.gross_revenue_sar.toLocaleString()}{" "}
+                <span className="text-sm font-semibold text-[#D1AF47]">{t.currency}</span>
+              </h3>
+              <div className="text-[11px] text-stone-400 mt-2">
+                <span>{t.platformFees}: {analytics.platform_fees_sar.toLocaleString()} {t.currency}</span>
+              </div>
+            </div>
 
-        {/* POPULARITY BAR CHART */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 shadow-sm relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#D1AF47]/25 to-transparent" />
-          <div className={`flex items-center justify-between mb-6 ${locale === "ar" ? "flex-row-reverse" : "flex-row"}`}>
-            <h3 className="font-serif font-bold text-base text-[#101828] tracking-wide">{t.popularServices}</h3>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#667085] bg-[#F9FAFB] border border-[#ECECEC] px-2.5 py-1 rounded-lg">
-              {locale === "ar" ? "حجم الحجز" : "Volume"}
-            </span>
+            {/* Net Payout */}
+            <div className="bg-white border border-[#ECECEC] rounded-[24px] p-6 shadow-sm hover:border-emerald-300 transition">
+              <span className="text-[11px] uppercase font-bold text-[#667085] tracking-wider block">{t.netEarnings}</span>
+              <h3 className="text-3xl font-bold text-emerald-600 mt-2 font-mono">
+                {analytics.net_earnings_sar.toLocaleString()}{" "}
+                <span className="text-sm font-semibold text-emerald-700">{t.currency}</span>
+              </h3>
+              <div className="text-[11px] text-stone-400 mt-2">
+                <span>{locale === "ar" ? "صافي مستحق بعد استقطاع المنصة" : "Net payout after platform fee"}</span>
+              </div>
+            </div>
+
+            {/* Total Bookings & Completion */}
+            <div className="bg-white border border-[#ECECEC] rounded-[24px] p-6 shadow-sm hover:border-stone-300 transition">
+              <span className="text-[11px] uppercase font-bold text-[#667085] tracking-wider block">{t.bookingsTotal}</span>
+              <h3 className="text-3xl font-bold text-[#101828] mt-2 font-mono">
+                {analytics.total_bookings}
+              </h3>
+              <div className="text-[11px] text-emerald-600 font-semibold mt-2 flex items-center gap-1">
+                <span>✓ {analytics.completion_rate_pct}% {t.completionRate}</span>
+                <span className="text-stone-300">•</span>
+                <span className="text-red-500">{analytics.no_show_rate_pct}% {t.noShowRate}</span>
+              </div>
+            </div>
+
+            {/* Client Retention */}
+            <div className="bg-white border border-[#ECECEC] rounded-[24px] p-6 shadow-sm hover:border-[#D1AF47]/40 transition">
+              <span className="text-[11px] uppercase font-bold text-[#667085] tracking-wider block">{t.repeatRate}</span>
+              <h3 className="text-3xl font-bold text-[#101828] mt-2 font-mono">
+                {analytics.repeat_rate_pct}%
+              </h3>
+              <div className="text-[11px] text-stone-400 mt-2">
+                <span>{analytics.unique_clients} {t.uniqueClients} ({analytics.first_time_clients} {t.firstTime} / {analytics.repeat_clients} {t.repeat})</span>
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-5">
-            {popularServices.map((service, idx) => {
-              const maxBookings = 48;
-              const pctWidth = (service.bookings / maxBookings) * 100;
-              const isPositive = !service.trend.startsWith("-");
-
-              return (
-                <div key={idx} className="group/bar space-y-2">
-                  <div className={`flex items-center justify-between text-xs ${locale === "ar" ? "flex-row-reverse" : ""}`}>
-                    <span className="font-bold text-[#344054] group-hover/bar:text-[#101828] transition duration-300">
-                      {locale === "ar" ? service.name_ar : service.name_en}
-                    </span>
-                    <div className={`flex items-center gap-2.5 ${locale === "ar" ? "flex-row-reverse" : ""}`}>
-                      <span className="font-mono font-bold text-[#101828]">{service.bookings} {locale === "ar" ? "حجوزات" : "bookings"}</span>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold font-mono ${
-                        isPositive ? "bg-[#3DDC84]/10 text-[#22C55E]" : "bg-[#FF5D73]/10 text-[#EF4444]"
-                      }`}>
-                        {service.trend}
-                      </span>
+          {/* ACQUISITION CHANNELS & POPULAR SERVICES GRID */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Acquisition Source Split */}
+            <div className="bg-white border border-[#ECECEC] rounded-[24px] p-6 shadow-sm">
+              <h3 className="font-serif font-bold text-base text-[#101828] mb-4">{t.acquisitionChannels}</h3>
+              {analytics.sources_distribution.length === 0 ? (
+                <p className="text-xs text-stone-400">{t.noData}</p>
+              ) : (
+                <div className="space-y-4">
+                  {analytics.sources_distribution.map((src, idx) => (
+                    <div key={idx} className="space-y-1.5">
+                      <div className="flex justify-between text-xs font-semibold">
+                        <span className="text-stone-800 capitalize font-medium">{src.source}</span>
+                        <div className="flex items-center gap-3">
+                          <span className="font-mono text-stone-500">{src.bookings_count} {t.bookings}</span>
+                          <span className="font-mono font-bold text-[#D1AF47]">{src.share_pct}%</span>
+                        </div>
+                      </div>
+                      <div className="h-2 w-full bg-stone-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] rounded-full"
+                          style={{ width: `${Math.min(src.share_pct, 100)}%` }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  
-                  {/* Progress track and bar */}
-                  <div className="h-2 w-full bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-full overflow-hidden relative">
-                    <div
-                      className="h-full bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(209,175,71,0.3)] group-hover/bar:brightness-110"
-                      style={{ width: `${pctWidth}%` }}
-                    />
-                  </div>
-                  <div className={`flex justify-between text-[9px] text-[#667085] font-mono ${locale === "ar" ? "flex-row-reverse" : ""}`}>
-                    <span>{service.revenue.toLocaleString()} {t.currency}</span>
-                    <span>{Math.round(pctWidth)}%</span>
-                  </div>
+                  ))}
                 </div>
-              );
-            })}
+              )}
+            </div>
+
+            {/* Popular Services */}
+            <div className="bg-white border border-[#ECECEC] rounded-[24px] p-6 shadow-sm">
+              <h3 className="font-serif font-bold text-base text-[#101828] mb-4">{t.popularServices}</h3>
+              {analytics.popular_services.length === 0 ? (
+                <p className="text-xs text-stone-400">{t.noData}</p>
+              ) : (
+                <div className="space-y-3">
+                  {analytics.popular_services.slice(0, 5).map((srv) => (
+                    <div key={srv.service_id} className="flex items-center justify-between p-2.5 rounded-xl bg-stone-50/70 border border-stone-100">
+                      <div>
+                        <h4 className="text-xs font-bold text-stone-900">{isRTL ? srv.name_ar : srv.name_en}</h4>
+                        <span className="text-[10px] text-stone-400 uppercase font-semibold">{srv.category}</span>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xs font-mono font-bold text-[#D1AF47]">{srv.revenue_sar.toLocaleString()} {t.currency}</div>
+                        <span className="text-[10px] font-mono text-stone-500">{srv.bookings_count} {t.bookings}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* STAFF SPECIALIST PERFORMANCE */}
+          <div className="bg-white border border-[#ECECEC] rounded-[24px] p-6 shadow-sm overflow-hidden">
+            <h3 className="font-serif font-bold text-base text-[#101828] mb-4">{t.staffPerformance}</h3>
+            {analytics.staff_performance.length === 0 ? (
+              <p className="text-xs text-stone-400">{t.noData}</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-[#ECECEC] text-[#667085] font-bold uppercase text-[10px] tracking-wider bg-stone-50/50">
+                      <th className="py-3 px-4">{t.staffName}</th>
+                      <th className="py-3 px-4">{t.role}</th>
+                      <th className="py-3 px-4 text-center">{t.bookingsCompleted}</th>
+                      <th className="py-3 px-4 text-center">{t.revenueGenerated}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#ECECEC]">
+                    {analytics.staff_performance.map((staff) => (
+                      <tr key={staff.employee_id} className="hover:bg-stone-50/60 transition">
+                        <td className="py-3 px-4 font-bold text-[#101828]">
+                          {isRTL ? staff.name_ar : staff.name_en}
+                        </td>
+                        <td className="py-3 px-4 text-stone-500">
+                          {staff.role}
+                        </td>
+                        <td className="py-3 px-4 text-center font-mono font-semibold text-stone-700">
+                          {staff.completed_bookings}
+                        </td>
+                        <td className="py-3 px-4 text-center font-mono font-bold text-[#D1AF47]">
+                          {staff.revenue_sar.toLocaleString()} {t.currency}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      ) : (
+        /* AUTHENTIC EMPTY STATE (Zero mock data rule) */
+        <div className="bg-white border border-[#ECECEC] rounded-[24px] p-16 text-center space-y-4">
+          <div className="w-16 h-16 rounded-2xl bg-stone-100 flex items-center justify-center mx-auto text-stone-400">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+            </svg>
+          </div>
+          <div className="max-w-md mx-auto space-y-1">
+            <h3 className="font-serif font-bold text-lg text-stone-900">{t.noData}</h3>
+            <p className="text-xs text-stone-500 leading-relaxed">{t.emptyStateDesc}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

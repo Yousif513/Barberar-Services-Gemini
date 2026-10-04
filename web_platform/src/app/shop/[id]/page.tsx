@@ -71,7 +71,12 @@ const translations = {
     waitlistSuccess: "Successfully added to waitlist! Queue position: #",
     blockedWarning: "Booking Restricted: Your account has been blocked by this provider.",
     strikePrepaymentWarning: "Policy Notice: Due to 3 or more previous no-shows, 100% upfront prepayment is required for this appointment.",
-    prayerPauseNotice: "Riyadh Prayer Breaks (25-min congregational prayer pauses)"
+    prayerPauseNotice: "Riyadh Prayer Breaks (25-min congregational prayer pauses)",
+    favoriteBtn: "Save to Favorites",
+    favoritedBtn: "Favorited",
+    bnplSplitText: "or 4 interest-free payments of",
+    tabbyOption: "Tabby (4 installments)",
+    tamaraOption: "Tamara (4 installments)",
   },
   ar: {
     promoText: "احجز أفضل خدمات التجميل والعناية المنزلية والصالونات في الرياض وجدة",
@@ -133,7 +138,12 @@ const translations = {
     waitlistSuccess: "تمت إضافتك لقائمة الانتظار بنجاح! موقعك في الطابور: #",
     blockedWarning: "الحجز مقيد: حسابك محظور من قبل مزود الخدمة هذا.",
     strikePrepaymentWarning: "تنبيه السياسة: نظراً لتسجيل 3 حالات عدم حضور سابقة، يلزم دفع كامل المبلغ (100%) مقدماً لتأكيد الحجز.",
-    prayerPauseNotice: "أوقات الصلاة بالرياض (توقف مؤقت 25 دقيقة أثناء أداء صلاة الجماعة)"
+    prayerPauseNotice: "أوقات الصلاة بالرياض (توقف مؤقت 25 دقيقة أثناء أداء صلاة الجماعة)",
+    favoriteBtn: "حفظ في المفضلة",
+    favoritedBtn: "محفوظ في المفضلة",
+    bnplSplitText: "أو قسّمها على 4 دفعات بقيمة",
+    tabbyOption: "تابي (٤ دفعات)",
+    tamaraOption: "تمارا (٤ دفعات)",
   }
 };
 
@@ -309,7 +319,9 @@ export default function ShopDetailsPage() {
 
   const [activeTab, setActiveTab] = useState<"services" | "packages">("services");
 
-  const [paymentMethod, setPaymentMethod] = useState<"applepay" | "card">("applepay");
+  const [paymentMethod, setPaymentMethod] = useState<"applepay" | "card" | "tabby" | "tamara">("applepay");
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
 
   // G46 Coupons & G48 Gift Cards & G50 Loyalty States
   const [couponCodeInput, setCouponCodeInput] = useState("");
@@ -448,7 +460,71 @@ export default function ShopDetailsPage() {
       }
     }
     checkEligibility();
+
+    async function checkFavorite() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(shopId)) return;
+        const { data: fav } = await supabase
+          .from("customer_favorites")
+          .select("id")
+          .eq("customer_id", user.id)
+          .eq("provider_id", shopId)
+          .maybeSingle();
+        if (fav) setIsFavorited(true);
+      } catch (e) {
+        console.warn("Favorite check notice:", e);
+      }
+    }
+    checkFavorite();
   }, [shopId]);
+
+  const handleToggleFavorite = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setShowAuthModal(true);
+        return;
+      }
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(shopId)) {
+        setIsFavorited(!isFavorited);
+        addToast(
+          !isFavorited
+            ? (locale === "ar" ? "تمت إضافة الصالون إلى المفضلة" : "Added to favorites")
+            : (locale === "ar" ? "تمت إزالة الصالون من المفضلة" : "Removed from favorites"),
+          "success"
+        );
+        return;
+      }
+
+      setFavoriteLoading(true);
+      const nextFav = !isFavorited;
+      setIsFavorited(nextFav);
+
+      const { data, error } = await supabase.rpc("toggle_customer_favorite", {
+        p_provider_id: shopId,
+      });
+
+      if (error) {
+        setIsFavorited(!nextFav);
+        addToast(error.message, "error");
+      } else {
+        addToast(
+          nextFav
+            ? (locale === "ar" ? "تمت إضافة الصالون إلى المفضلة" : "Added to favorites")
+            : (locale === "ar" ? "تمت إزالة الصالون من المفضلة" : "Removed from favorites"),
+          "success"
+        );
+      }
+    } catch (err: any) {
+      console.warn("Toggle favorite error:", err);
+    } finally {
+      setFavoriteLoading(false);
+    }
+  };
 
   const handleApplyCoupon = async () => {
     if (!couponCodeInput.trim()) return;
@@ -1481,6 +1557,31 @@ export default function ShopDetailsPage() {
                 </svg>
                 {locale === "ar" ? "موثق بسجل تجاري (واثق)" : "Wathq Verified CR"}
               </span>
+              <span className="h-3 w-px bg-stone-700"></span>
+              <button
+                type="button"
+                onClick={handleToggleFavorite}
+                disabled={favoriteLoading}
+                className={`inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full border transition backdrop-blur-md ${
+                  isFavorited
+                    ? "bg-red-500/20 text-red-300 border-red-500/50"
+                    : "bg-white/10 text-stone-200 border-white/20 hover:bg-white/20"
+                }`}
+              >
+                <svg
+                  className={`w-3.5 h-3.5 ${isFavorited ? "fill-red-500 text-red-500" : "fill-none text-current"}`}
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+                  />
+                </svg>
+                <span>{isFavorited ? t.favoritedBtn : t.favoriteBtn}</span>
+              </button>
             </div>
             <h1 className="text-3xl sm:text-5xl font-serif font-black tracking-tight leading-tight">
               {shop.name[locale]}
@@ -2134,6 +2235,19 @@ export default function ShopDetailsPage() {
                       <span>{t.dueNowLabel}</span>
                       <span className="text-[hsl(45,60%,45%)]">{splits.deposit} SAR</span>
                     </div>
+
+                    {/* BNPL Tabby / Tamara Simulation (G62) */}
+                    <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-xl p-2.5 flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 font-bold">
+                          <span className="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[9px] font-black uppercase">tabby</span>
+                          <span className="px-1.5 py-0.5 rounded bg-amber-500 text-white text-[9px] font-black uppercase">tamara</span>
+                        </div>
+                        <span className="text-[11px] text-stone-700 font-medium">
+                          {t.bnplSplitText} <strong className="font-mono text-stone-950 font-bold">{((splits.deposit || splits.grossTotal) / 4).toFixed(2)} SAR</strong>
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Payment Method Selector */}
@@ -2164,8 +2278,61 @@ export default function ShopDetailsPage() {
                       >
                         {locale === "ar" ? "مدى / بطاقة ائتمان" : "Mada / Card"}
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod("tabby")}
+                        className={`py-2 px-2.5 border rounded-xl flex items-center justify-center gap-1.5 text-[10px] font-bold transition duration-150 ${
+                          paymentMethod === "tabby"
+                            ? "border-emerald-600 bg-emerald-50 text-emerald-950 ring-1 ring-emerald-600"
+                            : "border-stone-200 hover:border-emerald-300 text-stone-700"
+                        }`}
+                      >
+                        <span className="px-1 rounded bg-emerald-600 text-white text-[8px] font-black uppercase">tabby</span>
+                        <span className="truncate">{t.tabbyOption}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod("tamara")}
+                        className={`py-2 px-2.5 border rounded-xl flex items-center justify-center gap-1.5 text-[10px] font-bold transition duration-150 ${
+                          paymentMethod === "tamara"
+                            ? "border-amber-600 bg-amber-50 text-amber-950 ring-1 ring-amber-600"
+                            : "border-stone-200 hover:border-amber-300 text-stone-700"
+                        }`}
+                      >
+                        <span className="px-1 rounded bg-amber-500 text-white text-[8px] font-black uppercase">tamara</span>
+                        <span className="truncate">{t.tamaraOption}</span>
+                      </button>
                     </div>
                   </div>
+
+                  {/* Tabby / Tamara Explanatory Notices */}
+                  {paymentMethod === "tabby" && (
+                    <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 space-y-1.5 text-xs">
+                      <div className="flex items-center justify-between font-bold text-emerald-950">
+                        <span>Tabby • 4 Payments</span>
+                        <span className="font-mono font-bold">{((splits.deposit || splits.grossTotal) / 4).toFixed(2)} SAR / mo</span>
+                      </div>
+                      <p className="text-[10px] text-emerald-800 leading-relaxed font-medium">
+                        {locale === "ar"
+                          ? "ادفع 25% الآن وقسّم الباقي على 3 أشهر بدون أي فوائد أو رسوم خفية. متوافق مع الشريعة الإسلامية ومصرح من البنك المركزي."
+                          : "Pay 25% today and split the rest over 3 months with 0% interest and Sharia compliance."}
+                      </p>
+                    </div>
+                  )}
+
+                  {paymentMethod === "tamara" && (
+                    <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3 space-y-1.5 text-xs">
+                      <div className="flex items-center justify-between font-bold text-amber-950">
+                        <span>Tamara • 4 Payments</span>
+                        <span className="font-mono font-bold">{((splits.deposit || splits.grossTotal) / 4).toFixed(2)} SAR / mo</span>
+                      </div>
+                      <p className="text-[10px] text-amber-800 leading-relaxed font-medium">
+                        {locale === "ar"
+                          ? "قسّم دفعات الحجز على 4 أقساط شهرية ميسرة بدون فوائد إضافية، متوافقة ومصرحة من البنك المركزي السعودي (ساما)."
+                          : "Split your booking into 4 seamless interest-free monthly installments under SAMA regulations."}
+                      </p>
+                    </div>
+                  )}
 
                   {/* Secure Payment Gateway Notice */}
                   {paymentMethod === "card" && (

@@ -1252,7 +1252,94 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(walletCode.includes("purchase_gift_card"), "Wallet page must call purchase_gift_card RPC");
     });
   });
+
+  describe("Milestone P2-C: Multi-Branch, Operations & Analytics (G54, G55, G56, G59, G62, G64)", () => {
+    const p2cMigrationPath = join(rootDir, "supabase/migrations/20261004070000_operations_analytics_and_discovery.sql");
+    const p2cMigration = readFileSync(p2cMigrationPath, "utf8");
+
+    it("customer_favorites and toggle_customer_favorite enforce authentication and owner scope (G64)", () => {
+      assert.ok(p2cMigration.includes("CREATE TABLE IF NOT EXISTS public.customer_favorites"), "Must create customer_favorites table");
+      assert.ok(p2cMigration.includes("UNIQUE (customer_id, provider_id)"), "Must enforce unique customer and provider favorite pair");
+      assert.ok(p2cMigration.includes("ALTER TABLE public.customer_favorites ENABLE ROW LEVEL SECURITY"), "Must enable RLS on customer_favorites");
+      assert.ok(p2cMigration.includes("CREATE POLICY \"Users view own favorites\""), "Must restrict favorites SELECT to owner");
+      assert.ok(p2cMigration.includes("customer_id = auth.uid()"), "Policy must check auth.uid()");
+      assert.ok(p2cMigration.includes("FUNCTION public.toggle_customer_favorite"), "Must define toggle_customer_favorite RPC");
+      assert.ok(p2cMigration.includes("Authentication required to favorite salons"), "RPC must reject unauthenticated requests");
+      assert.ok(p2cMigration.includes("GRANT EXECUTE ON FUNCTION public.toggle_customer_favorite TO authenticated"), "Must grant authenticated execution");
+    });
+
+    it("employee_commission_rules and calculate_staff_payroll enforce WPS/Mudad payroll and provider authorization (G55)", () => {
+      assert.ok(p2cMigration.includes("CREATE TABLE IF NOT EXISTS public.employee_commission_rules"), "Must create employee_commission_rules table");
+      assert.ok(p2cMigration.includes("base_salary_sar DECIMAL(10,2)"), "Must support base salary in SAR");
+      assert.ok(p2cMigration.includes("commission_rate DECIMAL(5,2)"), "Must support commission rate percentage");
+      assert.ok(p2cMigration.includes("wps_iban TEXT"), "Must record WPS IBAN");
+      assert.ok(p2cMigration.includes("ALTER TABLE public.employee_commission_rules ENABLE ROW LEVEL SECURITY"), "Must enable RLS on commission rules");
+      assert.ok(p2cMigration.includes("FUNCTION public.calculate_staff_payroll"), "Must define calculate_staff_payroll RPC");
+      assert.ok(p2cMigration.includes("Forbidden: not authorized to calculate payroll for this provider"), "Must forbid unauthorized payroll access");
+      assert.ok(p2cMigration.includes("tips_earned_sar"), "Must calculate tips separately (100% to staff)");
+      assert.ok(p2cMigration.includes("commission_earned_sar"), "Must calculate commission earned");
+      assert.ok(p2cMigration.includes("total_payout_sar"), "Must calculate total net payout");
+    });
+
+    it("get_provider_multi_branch_summary calculates chain rollups with owner authorization (G56)", () => {
+      assert.ok(p2cMigration.includes("FUNCTION public.get_provider_multi_branch_summary"), "Must define get_provider_multi_branch_summary RPC");
+      assert.ok(p2cMigration.includes("Forbidden: not authorized"), "Must check owner or admin authorization");
+      assert.ok(p2cMigration.includes("chain_total_revenue_sar"), "Must aggregate chain total revenue");
+      assert.ok(p2cMigration.includes("chain_total_bookings"), "Must aggregate chain total bookings");
+      assert.ok(p2cMigration.includes("no_show_rate_pct"), "Must calculate no-show rate percentage per branch");
+      assert.ok(p2cMigration.includes("active_staff"), "Must count active staff per branch");
+    });
+
+    it("get_provider_detailed_analytics returns real live KPIs and eliminates mock fallbacks (G54)", () => {
+      assert.ok(p2cMigration.includes("FUNCTION public.get_provider_detailed_analytics"), "Must define get_provider_detailed_analytics RPC");
+      assert.ok(p2cMigration.includes("Forbidden: not authorized to view reports for this provider"), "Must forbid unauthorized analytics access");
+      assert.ok(p2cMigration.includes("gross_revenue_sar"), "Must return real gross revenue");
+      assert.ok(p2cMigration.includes("platform_fees_sar"), "Must return platform escrow fees");
+      assert.ok(p2cMigration.includes("net_earnings_sar"), "Must return net provider earnings");
+      assert.ok(p2cMigration.includes("completion_rate_pct"), "Must return completion rate");
+      assert.ok(p2cMigration.includes("repeat_rate_pct"), "Must return client repeat retention rate");
+      assert.ok(p2cMigration.includes("sources_distribution"), "Must calculate acquisition source distribution");
+      assert.ok(p2cMigration.includes("staff_performance"), "Must calculate specialist revenue performance");
+      assert.ok(p2cMigration.includes("popular_services"), "Must return top popular services");
+    });
+
+    it("Frontend integration: provider reports, customer favorites, interactive discovery, and BNPL checkout (P2-C)", () => {
+      const reportsCode = readFileSync(
+        join(webPlatformDir, "src/app/provider/reports/page.tsx"),
+        "utf8"
+      );
+      assert.ok(reportsCode.includes("get_provider_detailed_analytics"), "Provider reports must call get_provider_detailed_analytics RPC");
+      assert.ok(reportsCode.includes("get_provider_multi_branch_summary"), "Provider reports must call get_provider_multi_branch_summary RPC");
+      assert.ok(reportsCode.includes("calculate_staff_payroll"), "Provider reports must wire WPS calculate_staff_payroll RPC");
+      assert.ok(!reportsCode.includes("throw new Error(\"No database records\")"), "Provider reports must eliminate mock fallback defect");
+
+      const favoritesCode = readFileSync(
+        join(webPlatformDir, "src/app/customer/favorites/page.tsx"),
+        "utf8"
+      );
+      assert.ok(favoritesCode.includes("customer_favorites"), "Favorites page must query customer_favorites table");
+      assert.ok(favoritesCode.includes("toggle_customer_favorite"), "Favorites page must wire toggle_customer_favorite RPC");
+
+      const discoverCode = readFileSync(
+        join(webPlatformDir, "src/app/discover/page.tsx"),
+        "utf8"
+      );
+      assert.ok(discoverCode.includes("search_marketplace_providers"), "Discover page must call search_marketplace_providers RPC");
+      assert.ok(discoverCode.includes("projectPin"), "Discover page must project map pins");
+      assert.ok(discoverCode.includes("SAUDI_DISTRICTS"), "Discover page must provide Saudi district filters");
+
+      const shopCode = readFileSync(
+        join(webPlatformDir, "src/app/shop/[id]/page.tsx"),
+        "utf8"
+      );
+      assert.ok(shopCode.includes("toggle_customer_favorite"), "Shop page must wire toggle_customer_favorite RPC");
+      assert.ok(shopCode.includes("tabby"), "Shop page must feature Tabby BNPL option");
+      assert.ok(shopCode.includes("tamara"), "Shop page must feature Tamara BNPL option");
+      assert.ok(shopCode.includes("bnplSplitText"), "Shop page must display BNPL 4-installment simulation");
+    });
+  });
 });
+
 
 
 
