@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS public.provider_applications (
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   business_name_en VARCHAR(150) NOT NULL,
   business_name_ar VARCHAR(150) NOT NULL,
-  business_type public.provider_type NOT NULL DEFAULT 'salon',
+  business_type public.provider_type NOT NULL DEFAULT 'salon_barber_shop',
   cr_number VARCHAR(50),
   tax_number VARCHAR(50),
   contact_email VARCHAR(100) NOT NULL,

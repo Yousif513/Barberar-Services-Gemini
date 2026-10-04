@@ -158,7 +158,7 @@ TO authenticated
 USING (
     EXISTS (
         SELECT 1 FROM public.employees e
-        WHERE e.id = employee_commission_rules.employee_id AND e.user_id = auth.uid()
+        WHERE e.id = employee_commission_rules.employee_id AND e.profile_id = auth.uid()
     )
 );
 

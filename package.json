@@ -22,6 +22,7 @@
     "test:quality": "npm run test:security-core && npm run test:admin-controls && npm test && npm run lint && npm run typecheck:mobile && npm run build --workspace=web_platform"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "expo": "~56.0.11",
     "expo-router": "~56.2.10",
     "supabase": "^2.106.0"

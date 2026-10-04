@@ -344,7 +344,7 @@ CREATE POLICY "Users can view own booking services"
             WHERE b.id = booking_services.booking_id
               AND (
                   b.customer_id = auth.uid()
-                  OR b.employee_id IN (SELECT id FROM public.employees WHERE user_id = auth.uid())
+                  OR b.employee_id IN (SELECT id FROM public.employees WHERE profile_id = auth.uid())
                   OR EXISTS (
                       SELECT 1 FROM public.branches br
                       JOIN public.providers p ON p.id = br.provider_id

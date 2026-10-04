@@ -1,6 +1,10 @@
 -- Live demo seed + messaging foundation.
 -- Idempotent and intentionally avoids bookings / transactional_ledger rows.
 
+-- Run as service_role so protect_provider_control_fields keeps the seeded owner_id
+-- (migrations execute without a JWT, which otherwise resets owner_id to auth.uid() = NULL).
+SELECT set_config('request.jwt.claims', '{"role":"service_role"}', true);
+
 ALTER TABLE public.employees
   ADD COLUMN IF NOT EXISTS photo_url TEXT,
   ADD COLUMN IF NOT EXISTS phone TEXT,
