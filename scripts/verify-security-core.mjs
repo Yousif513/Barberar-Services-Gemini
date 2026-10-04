@@ -23,12 +23,27 @@ const checks = [
   {
     file: "supabase/functions/payment-checkout/index.ts",
     require: [
-      '.eq("customer_id", user.id)',
-      "auth.getUser()",
+      '.eq("customer_id", userId)',
+      "resolveCaller(req)",
       "TAP_SECRET_KEY",
       "post: { url: webhookUrl }",
     ],
-    reject: ["chg_mock_", "simulated:"],
+    reject: ["chg_mock_", "simulated:", "Access-Control-Allow-Origin\": \"*\""],
+  },
+  {
+    file: "supabase/functions/_shared/http.ts",
+    require: ["auth.getUser(token)", "profile?.role === \"admin\""],
+    reject: ["Access-Control-Allow-Origin\": \"*\""],
+  },
+  {
+    file: "supabase/functions/process-refund/index.ts",
+    require: ["resolveCaller(req)", 'caller.kind === "user"', "processRefundRequest("],
+    reject: ['.update({ status: "refunded" })', 'from("bookings").update'],
+  },
+  {
+    file: "supabase/functions/dispatch-messages/index.ts",
+    require: ["graph.facebook.com", "complete_message_delivery", "externalId"],
+    reject: ["wamid_", "simulated"],
   },
   {
     file: "supabase/functions/payment-webhook/index.ts",

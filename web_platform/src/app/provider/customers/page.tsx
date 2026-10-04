@@ -153,7 +153,7 @@ export default function ProviderCustomersPage() {
       const clientsToImport = lines.map(line => {
         const parts = line.split(",").map(p => p.trim());
         return {
-          name: parts[0] || "Client",
+          name: parts[0] || "",
           phone: parts[1] || "",
           notes: parts[2] || ""
         };
@@ -180,7 +180,12 @@ export default function ProviderCustomersPage() {
 
       if (rpcErr) throw rpcErr;
 
-      setImportMessage(t.importSuccessMsg);
+      const skipped = Number(data?.skipped_rows || 0);
+      setImportMessage(
+        skipped > 0
+          ? `${t.importSuccessMsg} (${data?.successful_rows ?? 0} ${locale === "ar" ? "تم استيرادها" : "imported"}, ${skipped} ${locale === "ar" ? "تم تخطيها لعدم صحة الاسم أو الرقم" : "skipped: missing name or invalid Saudi mobile number"})`
+          : t.importSuccessMsg
+      );
       setImportText("");
       setShowImportModal(false);
       loadClients();
@@ -252,7 +257,7 @@ export default function ProviderCustomersPage() {
               id,
               total_price,
               scheduled_at,
-              profiles ( id, first_name, last_name, phone )
+              profiles ( id, first_name, last_name, phone_number )
             `)
             .in("branch_id", branchIds);
 
@@ -267,7 +272,7 @@ export default function ProviderCustomersPage() {
               clientMap[profile.id] = {
                 id: profile.id,
                 name: `${profile.first_name || ""} ${profile.last_name || ""}`,
-                phone: profile.phone || "",
+                phone: profile.phone_number || "",
                 bookingsCount: 0,
                 totalSpend: 0,
                 lastVisit: b.scheduled_at,
@@ -307,6 +312,27 @@ export default function ProviderCustomersPage() {
             c.bookings.sort((a: any, b: any) => new Date(b.scheduled_at).getTime() - new Date(a.scheduled_at).getTime());
           });
 
+          // Imported contacts (no PRIMORA account yet, or not yet booked here)
+          const { data: contacts, error: contactsError } = await supabase
+            .from("provider_client_contacts")
+            .select("id, full_name, phone, notes, matched_profile_id, created_at")
+            .eq("provider_id", providerInfo.id);
+          if (contactsError) throw contactsError;
+          contacts?.forEach((c: any) => {
+            if (c.matched_profile_id && clientMap[c.matched_profile_id]) return;
+            clientMap[`contact:${c.id}`] = {
+              id: `contact:${c.id}`,
+              name: c.full_name,
+              phone: c.phone || "",
+              bookingsCount: 0,
+              totalSpend: 0,
+              lastVisit: null,
+              intakeNotes: c.notes || "",
+              bookings: [],
+              imported: true
+            };
+          });
+
           setClients(Object.values(clientMap));
           return;
         }
@@ -334,7 +360,13 @@ export default function ProviderCustomersPage() {
         .eq("owner_id", user.id)
         .single();
 
-      if (providerInfo) {
+      if (providerInfo && String(editingClient.id).startsWith("contact:")) {
+        const { error: contactError } = await supabase
+          .from("provider_client_contacts")
+          .update({ notes: noteText })
+          .eq("id", String(editingClient.id).slice("contact:".length));
+        if (contactError) throw contactError;
+      } else if (providerInfo) {
         const { error: upsertError } = await supabase
           .from("provider_customer_notes")
           .upsert({
@@ -545,7 +577,7 @@ export default function ProviderCustomersPage() {
 
                       {/* Last Visit */}
                       <td className="py-4 px-6 text-start text-[#344054] font-medium">
-                        {new Date(c.lastVisit).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {c.lastVisit ? new Date(c.lastVisit).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", { day: 'numeric', month: 'short', year: 'numeric' }) : "—"}
                       </td>
 
                       {/* Intake Notes Snippet */}
@@ -633,7 +665,7 @@ export default function ProviderCustomersPage() {
                   <div className="space-y-1">
                     <span className="text-[9px] uppercase font-bold text-[#667085] tracking-[0.08em] block">{t.lastVisit}</span>
                     <p className="text-xs text-[#344054] font-medium">
-                      {new Date(editingClient.lastVisit).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {editingClient.lastVisit ? new Date(editingClient.lastVisit).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", { day: 'numeric', month: 'short', year: 'numeric' }) : "—"}
                     </p>
                   </div>
 
@@ -648,6 +680,7 @@ export default function ProviderCustomersPage() {
                       </span>
                     </div>
 
+                    {!editingClient.imported && (
                     <button
                       type="button"
                       onClick={() => handleToggleBlock(editingClient.id, blockedCustomerIds.has(editingClient.id))}
@@ -659,6 +692,7 @@ export default function ProviderCustomersPage() {
                     >
                       {blockedCustomerIds.has(editingClient.id) ? t.unblockClient : t.blockClient}
                     </button>
+                    )}
                   </div>
 
                 </div>

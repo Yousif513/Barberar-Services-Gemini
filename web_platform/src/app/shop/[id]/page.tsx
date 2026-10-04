@@ -5,14 +5,13 @@ import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { ToastContainer } from "@/components/toast";
-import { usePrayerTimes } from "@/lib/use-prayer-times";
 import { Coordinates, CalculationMethod, PrayerTimes, Madhab } from "adhan";
 
 export const dynamic = "force-dynamic";
 
 const translations = {
   en: {
-    promoText: "Book Premier Home Service & Salon Appointments in Riyadh & Jeddah",
+    promoText: "Book salon and barber appointments with verified providers",
     home: "Home",
     discover: "Services",
     serviceBoard: "Service Board",
@@ -30,17 +29,17 @@ const translations = {
     summaryTitle: "Booking Summary",
     isHomeServiceLabel: "Request Home Service",
     priceLabel: "Service Price",
-    depositLabel: "Escrow Deposit (15%)",
-    venueBalanceLabel: "Pay at Venue (85%)",
+    depositLabel: "Deposit paid online",
+    venueBalanceLabel: "Pay at the venue",
     dueNowLabel: "Due Now",
-    payButton: "Confirm & Pay Escrow",
+    payButton: "Confirm & pay deposit",
     successRedirecting: "Payment successful! Redirecting to customer dashboard...",
     errorTitle: "Booking Error",
     errorSelectDetails: "Please select a service, a specialist, a date, and a time slot.",
     reviewsCount: "reviews",
     startingFrom: "Starting from",
     mins: "mins",
-    platformFeeSplit: "15% Escrow splits secured via Tap Connect",
+    platformFeeSplit: "Payments are processed by Tap. Card details never touch PRIMORA.",
     footerDesc: "Luxury Beauty, Grooming & Wellness Marketplace. Connecting premier Riyadh & Jeddah artists with selective clients.",
     footerDiscover: "Discover",
     footerPartners: "For Partners",
@@ -74,9 +73,6 @@ const translations = {
     prayerPauseNotice: "Riyadh Prayer Breaks (25-min congregational prayer pauses)",
     favoriteBtn: "Save to Favorites",
     favoritedBtn: "Favorited",
-    bnplSplitText: "or 4 interest-free payments of",
-    tabbyOption: "Tabby (4 installments)",
-    tamaraOption: "Tamara (4 installments)",
   },
   ar: {
     promoText: "احجز أفضل خدمات التجميل والعناية المنزلية والصالونات في الرياض وجدة",
@@ -97,17 +93,17 @@ const translations = {
     summaryTitle: "ملخص الحجز",
     isHomeServiceLabel: "طلب خدمة منزلية",
     priceLabel: "سعر الخدمة",
-    depositLabel: "مبلغ الضمان (15%)",
-    venueBalanceLabel: "الدفع في المركز (85%)",
+    depositLabel: "العربون المدفوع إلكترونياً",
+    venueBalanceLabel: "المتبقي يُدفع في المركز",
     dueNowLabel: "المستحق الآن",
-    payButton: "تأكيد ودفع الضمان",
+    payButton: "تأكيد ودفع العربون",
     successRedirecting: "تم الدفع بنجاح! جاري تحويلك إلى لوحة التحكم للعميل...",
     errorTitle: "خطأ في الحجز",
     errorSelectDetails: "يرجى اختيار الخدمة، الأخصائي، التاريخ، والوقت المحدد.",
     reviewsCount: "تقييم",
     startingFrom: "تبدأ من",
     mins: "دقيقة",
-    platformFeeSplit: "تقسيمات ضمان بنسبة 15% مؤمنة عبر Tap Connect",
+    platformFeeSplit: "تتم معالجة المدفوعات عبر Tap ولا تمر بيانات البطاقة عبر بريمورا.",
     footerDesc: "منصة الجمال الفاخرة، والعناية والعافية. نصل بين أفضل فناني الرياض وجدة والعملاء المميزين.",
     footerDiscover: "استكشف",
     footerPartners: "للشركاء",
@@ -141,9 +137,6 @@ const translations = {
     prayerPauseNotice: "أوقات الصلاة بالرياض (توقف مؤقت 25 دقيقة أثناء أداء صلاة الجماعة)",
     favoriteBtn: "حفظ في المفضلة",
     favoritedBtn: "محفوظ في المفضلة",
-    bnplSplitText: "أو قسّمها على 4 دفعات بقيمة",
-    tabbyOption: "تابي (٤ دفعات)",
-    tamaraOption: "تمارا (٤ دفعات)",
   }
 };
 
@@ -151,7 +144,7 @@ interface SpecialistItem {
   id: string;
   name: { en: string; ar: string };
   role: { en: string; ar: string };
-  rating: number;
+  rating: number | null;
   avatar: string;
   bio?: { en: string; ar: string };
   experienceYears?: number;
@@ -161,12 +154,18 @@ interface SpecialistItem {
 
 interface ShopItem {
   id: string;
+  branchId: string;
+  crVerified: boolean;
+  depositPercentage: number;
+  freeCancellationHours: number;
+  lateCancellationFeePercent: number;
+  noShowFeePercent: number;
   name: { en: string; ar: string };
-  city: "riyadh" | "jeddah";
+  city: string;
   neighborhood: string;
   neighborhoodKey: string;
   address: { en: string; ar: string };
-  rating: number;
+  rating: number | null;
   reviewsCount: number;
   image: string;
   description: { en: string; ar: string };
@@ -187,6 +186,21 @@ interface ServiceItem {
   image: string;
 }
 
+interface ReviewItem {
+  id: string;
+  name: string;
+  date: string;
+  rating: number;
+  comment: string;
+  reply: string | null;
+}
+
+type LoyaltySettings = { enabled: boolean; sarPerPoint: number; minRedeemPoints: number };
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const formatSlotLabel = (iso: string) =>
+  new Date(iso).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true, timeZone: "Asia/Riyadh" });
+
 interface PackageItem {
   id: string;
   shopId: string;
@@ -197,53 +211,6 @@ interface PackageItem {
   expiresInDays: number;
 }
 
-const mockPackages: PackageItem[] = [
-  {
-    id: "p1",
-    shopId: "3",
-    name: { en: "Moroccan Hammam Spa package", ar: "باقة الحمام المغربي الاسترخائي" },
-    description: { en: "Buy 5 Moroccan sessions and get 1 free session. Valid for 1 year.", ar: "اشترِ 5 جلسات حمام مغربي واحصل على جلسة إضافية مجانية. صالحة لمدة عام كامل." },
-    price: 990,
-    sessionCount: 6,
-    expiresInDays: 365
-  },
-  {
-    id: "p2",
-    shopId: "1",
-    name: { en: "Elite Hair & Beard Grooming Multi-Pass", ar: "بطاقة قص الشعر واللحية الممتازة" },
-    description: { en: "10 hair grooming sessions with premium hair styling products.", ar: "باقة 10 جلسات قص شعر ولحية مع مصفف الشعر المميز." },
-    price: 1000,
-    sessionCount: 10,
-    expiresInDays: 180
-  },
-  {
-    id: "p3",
-    shopId: "3",
-    name: { en: "Stress Relief Swedish Massage Bundle", ar: "باقة المساج السويدي لتخفيف التوتر" },
-    description: { en: "5 Swedish full body massage sessions of 60 minutes each.", ar: "باقة 5 جلسات مساج سويدي للجسم بالكامل لمدة 60 دقيقة لكل جلسة." },
-    price: 1200,
-    sessionCount: 5,
-    expiresInDays: 365
-  },
-  {
-    id: "p4",
-    shopId: "2",
-    name: { en: "French Gel Manicure 5-Session Pass", ar: "بطاقة مانيكير الجل الفرنسي 5 جلسات" },
-    description: { en: "Prepay 5 premium gel manicures with custom nail art designs.", ar: "ادفع مسبقاً مقابل 5 جلسات مانيكير جل مع تصاميم فنية مميزة للأظافر." },
-    price: 800,
-    sessionCount: 5,
-    expiresInDays: 180
-  },
-  {
-    id: "p5",
-    shopId: "5",
-    name: { en: "Coastal Spa Indulgence Membership", ar: "عضوية دلال السبا الساحلي" },
-    description: { en: "6 custom organic deep skin facials with sea mineral clays.", ar: "6 جلسات تنظيف بشرة عضوي مخصص مع طين المعادن البحرية." },
-    price: 2000,
-    sessionCount: 6,
-    expiresInDays: 365
-  }
-];
 
 export default function ShopDetailsPage() {
   const [toasts, setToasts] = useState<Array<{ id: string; message: string; type: "success" | "info" | "error" }>>([]);
@@ -319,7 +286,6 @@ export default function ShopDetailsPage() {
 
   const [activeTab, setActiveTab] = useState<"services" | "packages">("services");
 
-  const [paymentMethod, setPaymentMethod] = useState<"applepay" | "card" | "tabby" | "tamara">("applepay");
   const [isFavorited, setIsFavorited] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
 
@@ -344,10 +310,171 @@ export default function ShopDetailsPage() {
   const [authPhone, setAuthPhone] = useState("");
   const [authOtpCode, setAuthOtpCode] = useState("");
   const [authOtpSent, setAuthOtpSent] = useState(false);
-  const [authConsentWhatsapp, setAuthConsentWhatsapp] = useState(true);
+  const [authConsentWhatsapp, setAuthConsentWhatsapp] = useState(false);
   const [authConsentMarketing, setAuthConsentMarketing] = useState(false);
   const [authModalError, setAuthModalError] = useState("");
   const [authModalLoading, setAuthModalLoading] = useState(false);
+
+  // Provider data loaded from the database (no mock fallbacks)
+  const [loadedShop, setLoadedShop] = useState<ShopItem | null>(null);
+  const [loadedServices, setLoadedServices] = useState<ServiceItem[]>([]);
+  const [providerPackages, setProviderPackages] = useState<PackageItem[]>([]);
+  const [providerReviews, setProviderReviews] = useState<ReviewItem[]>([]);
+  const [shopLoadState, setShopLoadState] = useState<"loading" | "ready" | "not_found" | "error">("loading");
+  const [shopLoadError, setShopLoadError] = useState("");
+  const [loyaltySettings, setLoyaltySettings] = useState<LoyaltySettings>({ enabled: false, sarPerPoint: 0, minRedeemPoints: 100 });
+  const [redeemPoints, setRedeemPoints] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadProvider() {
+      setShopLoadState("loading");
+      if (!UUID_RE.test(shopId)) {
+        setShopLoadState("not_found");
+        return;
+      }
+      try {
+        const { data: provider, error: providerError } = await supabase
+          .from("providers")
+          .select("id, business_name_en, business_name_ar, description_en, description_ar, cover_image_url, logo_url, is_verified, cr_verification_status, deposit_percentage, free_cancellation_hours, late_cancellation_fee_percent, no_show_fee_percent")
+          .eq("id", shopId)
+          .maybeSingle();
+        if (providerError) throw providerError;
+        if (!provider || !provider.is_verified) {
+          if (!cancelled) setShopLoadState("not_found");
+          return;
+        }
+
+        const [branchRes, serviceRes, packageRes, reviewRes, settingRes] = await Promise.all([
+          supabase.from("branches").select("id, city, district, address_text_en, address_text_ar, latitude, longitude, is_active")
+            .eq("provider_id", shopId).order("created_at", { ascending: true }),
+          supabase.from("services").select("id, name_en, name_ar, base_price, base_duration_minutes, is_home_service_eligible, images, tags, categories(name_en, name_ar, slug)")
+            .eq("provider_id", shopId).eq("is_active", true).order("sort_order", { ascending: true }),
+          supabase.from("packages").select("id, name_en, name_ar, description_en, description_ar, price, session_count, expires_in_days")
+            .eq("provider_id", shopId).eq("is_active", true),
+          supabase.from("reviews").select("id, rating, comment, created_at, reply_comment, moderation_status, employee_id, profiles(first_name, last_name)")
+            .eq("provider_id", shopId).order("created_at", { ascending: false }).limit(50),
+          supabase.from("platform_settings").select("value").eq("key", "loyalty_program").maybeSingle(),
+        ]);
+        for (const res of [branchRes, serviceRes, packageRes, reviewRes]) {
+          if (res.error) throw res.error;
+        }
+
+        const branches = (branchRes.data || []).filter((b: any) => b.is_active !== false);
+        const branch = branches[0];
+        if (!branch) {
+          if (!cancelled) setShopLoadState("not_found");
+          return;
+        }
+
+        const { data: employees, error: employeeError } = await supabase
+          .from("employees")
+          .select("id, name_en, name_ar, title_en, title_ar, photo_url, years_of_experience, specialties, instagram_handle, bio_en, bio_ar, is_active")
+          .eq("branch_id", branch.id)
+          .eq("is_active", true);
+        if (employeeError) throw employeeError;
+
+        const published = (reviewRes.data || []).filter((r: any) => (r.moderation_status || "published") === "published");
+        const avg = (rows: any[]) => (rows.length ? Math.round((rows.reduce((sum, r) => sum + Number(r.rating), 0) / rows.length) * 10) / 10 : null);
+
+        const shopData: ShopItem = {
+          id: provider.id,
+          branchId: branch.id,
+          crVerified: provider.cr_verification_status === "verified",
+          depositPercentage: Number(provider.deposit_percentage ?? 20),
+          freeCancellationHours: Number(provider.free_cancellation_hours ?? 24),
+          lateCancellationFeePercent: Number(provider.late_cancellation_fee_percent ?? 0),
+          noShowFeePercent: Number(provider.no_show_fee_percent ?? 0),
+          name: { en: provider.business_name_en || provider.business_name_ar, ar: provider.business_name_ar || provider.business_name_en },
+          city: branch.city || "",
+          neighborhood: branch.district || "",
+          neighborhoodKey: (branch.district || "").toLowerCase(),
+          address: { en: branch.address_text_en || "", ar: branch.address_text_ar || branch.address_text_en || "" },
+          rating: avg(published),
+          reviewsCount: published.length,
+          image: provider.cover_image_url || provider.logo_url || "",
+          description: { en: provider.description_en || "", ar: provider.description_ar || provider.description_en || "" },
+          specialists: (employees || []).map((e: any) => ({
+            id: e.id,
+            name: { en: e.name_en, ar: e.name_ar || e.name_en },
+            role: { en: e.title_en || "", ar: e.title_ar || e.title_en || "" },
+            rating: avg(published.filter((r: any) => r.employee_id === e.id)),
+            avatar: e.photo_url || "",
+            bio: e.bio_en || e.bio_ar ? { en: e.bio_en || "", ar: e.bio_ar || e.bio_en || "" } : undefined,
+            experienceYears: e.years_of_experience || undefined,
+            specialties: Array.isArray(e.specialties) ? e.specialties : undefined,
+            instagramHandle: e.instagram_handle || undefined,
+          })),
+        };
+
+        const servicesData: ServiceItem[] = (serviceRes.data || []).map((srv: any) => {
+          const tags: string[] = Array.isArray(srv.tags) ? srv.tags : [];
+          const gender = tags.includes("women") ? "women" : tags.includes("men") ? "men" : "unisex";
+          return {
+            id: srv.id,
+            shopId: provider.id,
+            name: { en: srv.name_en, ar: srv.name_ar || srv.name_en },
+            category: locale === "ar" ? srv.categories?.name_ar || "" : srv.categories?.name_en || "",
+            gender,
+            price: Number(srv.base_price),
+            duration: Number(srv.base_duration_minutes),
+            rating: 0,
+            reviewsCount: 0,
+            serviceType: srv.is_home_service_eligible ? "mobile" : "salon",
+            image: Array.isArray(srv.images) && srv.images[0] ? srv.images[0] : "",
+          } as ServiceItem;
+        });
+
+        const packagesData: PackageItem[] = (packageRes.data || []).map((pkg: any) => ({
+          id: pkg.id,
+          shopId: provider.id,
+          name: { en: pkg.name_en, ar: pkg.name_ar || pkg.name_en },
+          description: { en: pkg.description_en || "", ar: pkg.description_ar || pkg.description_en || "" },
+          price: Number(pkg.price),
+          sessionCount: Number(pkg.session_count),
+          expiresInDays: Number(pkg.expires_in_days || 0),
+        }));
+
+        const reviewsData: ReviewItem[] = published.map((r: any) => {
+          const profile = Array.isArray(r.profiles) ? r.profiles[0] : r.profiles;
+          const first = profile?.first_name || "";
+          const lastInitial = profile?.last_name ? ` ${String(profile.last_name).charAt(0)}.` : "";
+          return {
+            id: r.id,
+            name: `${first}${lastInitial}`.trim(),
+            date: String(r.created_at).slice(0, 10),
+            rating: Number(r.rating),
+            comment: r.comment || "",
+            reply: r.reply_comment || null,
+          };
+        });
+
+        const loyalty = settingRes.data?.value as any;
+        if (!cancelled) {
+          setLoadedShop(shopData);
+          setLoadedServices(servicesData);
+          setProviderPackages(packagesData);
+          setProviderReviews(reviewsData);
+          if (branch.latitude && branch.longitude) setCoordinates({ lat: Number(branch.latitude), lng: Number(branch.longitude) });
+          setLoyaltySettings({
+            enabled: !!loyalty?.enabled,
+            sarPerPoint: Number(loyalty?.sar_per_point || 0),
+            minRedeemPoints: Number(loyalty?.min_redeem_points || 100),
+          });
+          setShopLoadState("ready");
+        }
+      } catch (err: unknown) {
+        if (!cancelled) {
+          setShopLoadError(err instanceof Error ? err.message : String((err as any)?.message || err));
+          setShopLoadState("error");
+        }
+      }
+    }
+    loadProvider();
+    return () => {
+      cancelled = true;
+    };
+  }, [shopId, locale]);
 
   // Synchronize direction with locale
   useEffect(() => {
@@ -363,38 +490,6 @@ export default function ShopDetailsPage() {
     document.documentElement.lang = locale;
   }, [locale]);
 
-  useEffect(() => {
-    async function loadShopBranch() {
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(shopId)) {
-        // Fallback for mock shops based on city
-        const currentShop = shops.find((sh) => sh.id === shopId) || shops[0];
-        if (currentShop.city === "jeddah") {
-          setCoordinates({ lat: 21.4858, lng: 39.1925 });
-        } else {
-          setCoordinates({ lat: 24.7136, lng: 46.6753 });
-        }
-        return;
-      }
-
-      try {
-        const { data: branch } = await supabase
-          .from("branches")
-          .select("latitude, longitude")
-          .eq("provider_id", shopId)
-          .limit(1)
-          .maybeSingle();
-        if (branch && branch.latitude && branch.longitude) {
-          setCoordinates({ lat: Number(branch.latitude), lng: Number(branch.longitude) });
-        } else {
-          setCoordinates({ lat: 24.7136, lng: 46.6753 });
-        }
-      } catch (err) {
-        console.warn("Failed to load real branch coordinates:", err);
-      }
-    }
-    loadShopBranch();
-  }, [shopId]);
 
   useEffect(() => {
     async function loadClientProfiles() {
@@ -405,19 +500,11 @@ export default function ShopDetailsPage() {
           .from("client_profiles")
           .select("id, name, type")
           .eq("client_id", user.id);
-        if (data && data.length > 0) {
+        if (!error && data) {
           setClientProfiles(data);
-        } else {
-          setClientProfiles([
-            { id: "cp-mock-1", name: locale === "ar" ? "فيصل آل سعود" : "Faisal Al-Saud", type: "dependent" },
-            { id: "cp-mock-2", name: locale === "ar" ? "ركس (كلب أليف)" : "Rex (Golden Retriever)", type: "pet" }
-          ]);
         }
       } catch (err) {
-        setClientProfiles([
-          { id: "cp-mock-1", name: locale === "ar" ? "فيصل آل سعود" : "Faisal Al-Saud", type: "dependent" },
-          { id: "cp-mock-2", name: locale === "ar" ? "ركس (كلب أليف)" : "Rex (Golden Retriever)", type: "pet" }
-        ]);
+        console.warn("Could not load dependents:", err);
       }
     }
     loadClientProfiles();
@@ -428,8 +515,7 @@ export default function ShopDetailsPage() {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
-        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-        if (!uuidRegex.test(shopId)) return;
+        if (!UUID_RE.test(shopId)) return;
 
         const { data, error } = await supabase.rpc("check_customer_booking_eligibility", {
           p_provider_id: shopId,
@@ -465,8 +551,7 @@ export default function ShopDetailsPage() {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
-        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-        if (!uuidRegex.test(shopId)) return;
+        if (!UUID_RE.test(shopId)) return;
         const { data: fav } = await supabase
           .from("customer_favorites")
           .select("id")
@@ -488,23 +573,11 @@ export default function ShopDetailsPage() {
         setShowAuthModal(true);
         return;
       }
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(shopId)) {
-        setIsFavorited(!isFavorited);
-        addToast(
-          !isFavorited
-            ? (locale === "ar" ? "تمت إضافة الصالون إلى المفضلة" : "Added to favorites")
-            : (locale === "ar" ? "تمت إزالة الصالون من المفضلة" : "Removed from favorites"),
-          "success"
-        );
-        return;
-      }
-
       setFavoriteLoading(true);
       const nextFav = !isFavorited;
       setIsFavorited(nextFav);
 
-      const { data, error } = await supabase.rpc("toggle_customer_favorite", {
+      const { error } = await supabase.rpc("toggle_customer_favorite", {
         p_provider_id: shopId,
       });
 
@@ -531,11 +604,14 @@ export default function ShopDetailsPage() {
     setCouponLoading(true);
     setCouponMessage("");
     try {
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      const effectiveProviderId = uuidRegex.test(shopId) ? shopId : "00000000-0000-0000-0000-000000000000";
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setShowAuthModal(true);
+        return;
+      }
       const { data, error } = await supabase.rpc("validate_and_apply_coupon", {
         p_code: couponCodeInput.trim(),
-        p_provider_id: effectiveProviderId,
+        p_provider_id: shopId,
         p_order_amount: totalCombinedPrice
       });
 
@@ -549,7 +625,7 @@ export default function ShopDetailsPage() {
         setCouponMessage(locale === "ar" ? `تم تطبيق الكوبون! وفرت ${data.discount_amount} ريال` : `Coupon applied! Saved ${data.discount_amount} SAR`);
         addToast(locale === "ar" ? "تم تطبيق الكوبون بنجاح" : "Coupon applied successfully", "success");
       } else {
-        const reason = data?.reason || (locale === "ar" ? "كوبون غير صالح" : "Invalid coupon");
+        const reason = locale === "ar" ? "هذا الكوبون غير صالح لهذا الحجز" : "This promo code is not valid for this booking";
         setCouponMessage(reason);
         addToast(reason, "error");
       }
@@ -568,34 +644,20 @@ export default function ShopDetailsPage() {
     setGiftCardLoading(true);
     setGiftCardMessage("");
     try {
-      const { data, error } = await supabase
-        .from("gift_cards")
-        .select("code, remaining_balance, status, expires_at")
-        .eq("code", giftCardInput.trim().toUpperCase())
-        .maybeSingle();
-
-      if (error || !data) {
-        throw new Error(locale === "ar" ? "بطاقة الهدية غير موجودة أو غير صالحة" : "Gift card not found or invalid");
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setShowAuthModal(true);
+        return;
       }
-
-      if (data.status !== "active" && data.status !== "partially_redeemed") {
-        throw new Error(locale === "ar" ? "تم استخدام بطاقة الهدية بالكامل مسبقاً" : "Gift card has already been fully redeemed");
+      const { data, error } = await supabase.rpc("preview_gift_card", { p_code: giftCardInput.trim() });
+      if (error) throw error;
+      if (!data?.valid) {
+        throw new Error(locale === "ar" ? "بطاقة الهدية غير صالحة أو منتهية أو مستخدمة بالكامل" : "Gift card is invalid, expired or fully used");
       }
-
-      const bal = Number(data.remaining_balance || 0);
-      if (bal <= 0) {
-        throw new Error(locale === "ar" ? "رصيد بطاقة الهدية غير كافٍ" : "Gift card has zero remaining balance");
-      }
-
-      const redeemAmt = Math.min(bal, totalCombinedPrice);
-      setAppliedGiftCard({
-        code: data.code,
-        amount: redeemAmt
-      });
-      setGiftCardMessage(locale === "ar" ? `تم تطبيق بطاقة الهدية بقيمة ${redeemAmt} ريال` : `Gift card applied for ${redeemAmt} SAR`);
-      addToast(locale === "ar" ? "تم تطبيق بطاقة الهدية بنجاح" : "Gift card applied successfully", "success");
+      const balance = Number(data.remaining_balance || 0);
+      setAppliedGiftCard({ code: data.code, amount: balance });
+      setGiftCardMessage(locale === "ar" ? `رصيد البطاقة ${balance} ريال، يُخصم عند تأكيد الحجز` : `Card balance ${balance} SAR, applied when the booking is created`);
     } catch (err: any) {
-      console.error("Gift card validation error:", err);
       const msg = err.message || "Failed to apply gift card";
       setGiftCardMessage(msg);
       addToast(msg, "error");
@@ -604,58 +666,47 @@ export default function ShopDetailsPage() {
     }
   };
 
+  const maxRedeemablePoints = loyaltySettings.enabled && loyaltySettings.sarPerPoint > 0
+    ? Math.min(loyaltyPoints, Math.floor(totalCombinedPrice / loyaltySettings.sarPerPoint))
+    : 0;
+
   const handleToggleLoyalty = () => {
-    if (!redeemLoyalty) {
-      if (loyaltyPoints < 100) {
-        addToast(locale === "ar" ? "تحتاج إلى 100 نقطة ولاء على الأقل للخصم" : "Need at least 100 loyalty points to redeem", "info");
-        return;
-      }
-      const ptsToRedeem = Math.min(Math.floor(loyaltyPoints / 100) * 100, Math.floor(totalCombinedPrice * 10));
-      const discountVal = ptsToRedeem / 10.0;
-      setLoyaltyDiscount(discountVal);
-      setRedeemLoyalty(true);
-      addToast(locale === "ar" ? `تم تفعيل خصم نقاط الولاء: -${discountVal} ريال` : `Loyalty points discount applied: -${discountVal} SAR`, "success");
-    } else {
+    if (redeemLoyalty) {
       setRedeemLoyalty(false);
+      setRedeemPoints(0);
       setLoyaltyDiscount(0);
+      return;
     }
+    if (maxRedeemablePoints < loyaltySettings.minRedeemPoints) {
+      addToast(locale === "ar" ? `تحتاج إلى ${loyaltySettings.minRedeemPoints} نقطة على الأقل` : `You need at least ${loyaltySettings.minRedeemPoints} points`, "info");
+      return;
+    }
+    setRedeemPoints(maxRedeemablePoints);
+    setLoyaltyDiscount(Math.round(maxRedeemablePoints * loyaltySettings.sarPerPoint * 100) / 100);
+    setRedeemLoyalty(true);
   };
 
   const handlePurchasePackage = async (pkg: PackageItem) => {
     setIsLoading(true);
     setMessage("");
     setIsSuccess(false);
-
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         setShowAuthModal(true);
         return;
       }
-
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(pkg.id)) {
-        addToast(
-          locale === "ar"
-            ? `تم شراء باقة "${pkg.name[locale]}" بنجاح! تم شحن رصيد الجلسات في حسابك.`
-            : `Successfully purchased "${pkg.name[locale]}" package! Sessions added to your account.`,
-          "success"
-        );
-        return;
-      }
-
-      const { data, error } = await supabase.rpc("purchase_service_package", {
-        p_package_id: pkg.id,
-        p_payment_method: "card"
-      });
-
+      const { data, error } = await supabase.rpc("purchase_service_package", { p_package_id: pkg.id, p_payment_method: "card" });
       if (error) throw error;
-      addToast(
-        locale === "ar"
-          ? `تم شراء باقة "${pkg.name[locale]}" بنجاح! تم شحن رصيد الجلسات في حسابك.`
-          : `Successfully purchased "${pkg.name[locale]}" package! Sessions added to your account.`,
-        "success"
-      );
+      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
+        body: { purchaseType: "package", purchaseId: data.purchase_id },
+      });
+      if (checkoutError || !checkout?.checkoutUrl) {
+        throw new Error(locale === "ar"
+          ? "تعذر فتح صفحة الدفع. لم يتم تفعيل الباقة ولم يُخصم أي مبلغ."
+          : "Could not open the payment page. The package was not activated and nothing was charged.");
+      }
+      window.location.assign(checkout.checkoutUrl);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Package purchase could not be completed.";
       setMessage(errorMessage);
@@ -706,322 +757,13 @@ export default function ShopDetailsPage() {
     setLocale((prev) => (prev === "en" ? "ar" : "en"));
   };
 
-  // Mock Specialists
-  const mockSpecialists: Record<string, SpecialistItem[]> = {
-    "1": [
-      { id: "sp1", name: { en: "Ali Al-Harbi", ar: "علي الحربي" }, role: { en: "Master Barber", ar: "حلاق رئيسي" }, rating: 4.9, avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop" },
-      { id: "sp2", name: { en: "Tariq Mahmood", ar: "طارق محمود" }, role: { en: "Beard Specialist", ar: "أخصائي ذقن" }, rating: 4.8, avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" }
-    ],
-    "2": [
-      { id: "sp3", name: { en: "Elena Rostova", ar: "إيلينا روستوفا" }, role: { en: "Lead Hairstylist", ar: "مصففة شعر رئيسية" }, rating: 4.9, avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop" },
-      { id: "sp4", name: { en: "Sara Al-Mansoori", ar: "سارة المنصوري" }, role: { en: "Makeup Artist", ar: "أخصائية مكياج" }, rating: 4.8, avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop" }
-    ],
-    "3": [
-      { id: "sp5", name: { en: "Elena Rostova", ar: "إيلينا روستوفا" }, role: { en: "Esthetician", ar: "أخصائية بشرة" }, rating: 4.9, avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop" },
-      { id: "sp1", name: { en: "Ali Al-Harbi", ar: "علي الحربي" }, role: { en: "Therapist", ar: "معالج مساج" }, rating: 4.9, avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop" }
-    ],
-    "4": [
-      { id: "sp2", name: { en: "Tariq Mahmood", ar: "طارق محمود" }, role: { en: "Senior Therapist", ar: "معالج أول" }, rating: 4.7, avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" },
-      { id: "sp1", name: { en: "Ali Al-Harbi", ar: "علي الحربي" }, role: { en: "Master Barber", ar: "حلاق رئيسي" }, rating: 4.9, avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop" }
-    ],
-    "5": [
-      { id: "sp4", name: { en: "Sara Al-Mansoori", ar: "سارة المنصوري" }, role: { en: "Hairstylist", ar: "مصففة شعر" }, rating: 4.9, avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop" },
-      { id: "sp3", name: { en: "Elena Rostova", ar: "إيلينا روستوفا" }, role: { en: "Spa Director", ar: "مديرة السبا" }, rating: 4.9, avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop" }
-    ]
+  const shop: ShopItem = loadedShop ?? {
+    id: shopId, branchId: "", crVerified: false, depositPercentage: 20, freeCancellationHours: 24,
+    lateCancellationFeePercent: 0, noShowFeePercent: 0, name: { en: "", ar: "" }, city: "", neighborhood: "",
+    neighborhoodKey: "", address: { en: "", ar: "" }, rating: null, reviewsCount: 0, image: "",
+    description: { en: "", ar: "" }, specialists: [],
   };
-
-  // Mock Shops
-  const shops: ShopItem[] = [
-    {
-      id: "1",
-      name: { en: "Elite Grooming Lounge", ar: "صالون إيليت الرجالي" },
-      city: "riyadh",
-      neighborhood: locale === "ar" ? "الملقا" : "Al-Malqa",
-      neighborhoodKey: "malqa",
-      address: { en: "Anas Bin Malik Road, Al-Malqa, Riyadh", ar: "طريق أنس بن مالك، حي الملقا، الرياض" },
-      rating: 4.9,
-      reviewsCount: 1520,
-      image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=1200&auto=format&fit=crop",
-      description: {
-        en: "Premier luxury grooming salon for modern gentlemen in Riyadh. Master cuts, beard sculpting, and wellness face therapies.",
-        ar: "صالون الحلاقة الفاخر الأول للرجال العصريين بالرياض. قصات شعر إحترافية، تهذيب اللحية، وجلسات العناية بالبشرة."
-      },
-      specialists: mockSpecialists["1"] || []
-    },
-    {
-      id: "2",
-      name: { en: "Sara Beauty Salon & Spa", ar: "صالون وسبا سارة للتجميل" },
-      city: "riyadh",
-      neighborhood: locale === "ar" ? "العليا" : "Olaya",
-      neighborhoodKey: "olaya",
-      address: { en: "Tahlia Street, Olaya, Riyadh", ar: "شارع التحلية، حي العليا، الرياض" },
-      rating: 4.8,
-      reviewsCount: 980,
-      image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1200&auto=format&fit=crop",
-      description: {
-        en: "Exclusive women-only luxury salon offering signature event makeup, hair styling, color treatments, and custom manicures.",
-        ar: "صالون تجميل فاخر وحصري للسيدات يقدم أرقى تسريحات الشعر، المكياج السينمائي، العناية بالأظافر والسبا الاستشفائي."
-      },
-      specialists: mockSpecialists["2"] || []
-    },
-    {
-      id: "3",
-      name: { en: "Riyadh Premium Spa & Wellness", ar: "سبا الرياض الفاخر للعناية" },
-      city: "riyadh",
-      neighborhood: locale === "ar" ? "الياسمين" : "Al-Yasmin",
-      neighborhoodKey: "yasmin",
-      address: { en: "King Abdulaziz Road, Al-Yasmin, Riyadh", ar: "طريق الملك عبدالعزيز، حي الياسمين، الرياض" },
-      rating: 4.9,
-      reviewsCount: 1120,
-      image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=1200&auto=format&fit=crop",
-      description: {
-        en: "A tranquil sanctuary offering deep sports therapies, Moroccan baths, and advanced skincare in Al-Yasmin.",
-        ar: "ملاذ هادئ يقدم جلسات المساج السويدية والرياضية الفاخرة، الحمامات المغربية الملكية، والعناية المتطورة بالبشرة."
-      },
-      specialists: mockSpecialists["3"] || []
-    },
-    {
-      id: "4",
-      name: { en: "Jeddah Royal Wellness Center", ar: "مركز النخبة الملكي بجدة" },
-      city: "jeddah",
-      neighborhood: locale === "ar" ? "الحمراء" : "Al-Hamra",
-      neighborhoodKey: "hamra",
-      address: { en: "Corniche Road, Al-Hamra, Jeddah", ar: "طريق الكورنيش، حي الحمراء، جدة" },
-      rating: 4.7,
-      reviewsCount: 650,
-      image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=1200&auto=format&fit=crop",
-      description: {
-        en: "Luxury wellness and grooming center on the Jeddah Corniche. Specialized therapists and master barbers.",
-        ar: "مركز صحي وحلاقة راقي على كورنيش جدة. معالجون متخصصون وحلاقو نخبة يقدمون أفضل الخدمات المنزلية وفي الفرع."
-      },
-      specialists: mockSpecialists["4"] || []
-    },
-    {
-      id: "5",
-      name: { en: "Ash-Shati Luxury Ladies Spa", ar: "صالون الشاطئ النسائي الفاخر" },
-      city: "jeddah",
-      neighborhood: locale === "ar" ? "الشاطئ" : "Ash-Shati",
-      neighborhoodKey: "shatei",
-      address: { en: "Prince Faisal Bin Fahd Road, Ash-Shati, Jeddah", ar: "طريق الأمير فيصل بن فهد، حي الشاطئ، جدة" },
-      rating: 4.9,
-      reviewsCount: 430,
-      image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=1200&auto=format&fit=crop",
-      description: {
-        en: "Premium coastal spa retreat providing Thalassotherapy, organic facials, nail care, and hair restoration styling.",
-        ar: "منتجع وسبا ساحلي فاخر يقدم جلسات العلاج بالبحر، تنظيف البشرة العضوي، صبغ وتصفيف الشعر، وتجميل العرائس."
-      },
-      specialists: mockSpecialists["5"] || []
-    }
-  ];
-
-  // Get active shop details
-  const shop = shops.find((sh) => sh.id === shopId) || shops[0];
-
-  // Mock Services mapped to Shop IDs
-  const services: ServiceItem[] = [
-    // Shop 1
-    {
-      id: "s1",
-      shopId: "1",
-      name: { en: "Luxury Beard Grooming & Hot Towel Shave", ar: "حلاقة اللحية الفاخرة والمنشفة الساخنة" },
-      category: "haircuts",
-      gender: "men",
-      price: 150,
-      duration: 45,
-      rating: 4.9,
-      reviewsCount: 340,
-      serviceType: "salon",
-      image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=400&auto=format&fit=crop"
-    },
-    {
-      id: "s2",
-      shopId: "1",
-      name: { en: "Master Haircut & Organic Scalp Wash", ar: "قص الشعر الإحترافي وغسيل فروة الرأس العضوي" },
-      category: "haircuts",
-      gender: "men",
-      price: 120,
-      duration: 45,
-      rating: 4.8,
-      reviewsCount: 210,
-      serviceType: "salon",
-      image: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=400&auto=format&fit=crop"
-    },
-    {
-      id: "s1_3",
-      shopId: "1",
-      name: { en: "Royal Charcoal Face Therapy & Scrub", ar: "جلسة الفحم الملكية لتقشير وترطيب الوجه" },
-      category: "skincare",
-      gender: "men",
-      price: 180,
-      duration: 35,
-      rating: 4.9,
-      reviewsCount: 88,
-      serviceType: "salon",
-      image: "https://images.unsplash.com/photo-1590439471364-192aa70c0b53?q=80&w=400&auto=format&fit=crop"
-    },
-    // Shop 2
-    {
-      id: "s4",
-      shopId: "2",
-      name: { en: "Balayage Hand-Painted Color & Silk Blowdry", ar: "تلوين بالياج يدوي واستشوار الحرير الفاخر" },
-      category: "haircolor",
-      gender: "women",
-      price: 650,
-      duration: 150,
-      rating: 4.9,
-      reviewsCount: 412,
-      serviceType: "salon",
-      image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=400&auto=format&fit=crop"
-    },
-    {
-      id: "s5",
-      shopId: "2",
-      name: { en: "Silk Keratin Smoothing Therapy", ar: "علاج بروتين الكيراتين الحريري لتنعيم الشعر" },
-      category: "haircolor",
-      gender: "women",
-      price: 800,
-      duration: 120,
-      rating: 4.8,
-      reviewsCount: 185,
-      serviceType: "salon",
-      image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=400&auto=format&fit=crop"
-    },
-    {
-      id: "s2_3",
-      shopId: "2",
-      name: { en: "French Gel Manicure & Custom Nail Art", ar: "جلسة المانيكير الفرنسي وتجميل الأظافر" },
-      category: "nails",
-      gender: "women",
-      price: 200,
-      duration: 50,
-      rating: 4.7,
-      reviewsCount: 110,
-      serviceType: "salon",
-      image: "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=400&auto=format&fit=crop"
-    },
-    // Shop 3
-    {
-      id: "s3",
-      shopId: "3",
-      name: { en: "Deep Tissue Sports Therapy & Massage", ar: "علاج الأنسجة العميقة وتدليك المفاصل للرياضيين" },
-      category: "massage",
-      gender: "unisex",
-      price: 350,
-      duration: 60,
-      rating: 4.9,
-      reviewsCount: 142,
-      serviceType: "salon",
-      image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=400&auto=format&fit=crop"
-    },
-    {
-      id: "s6",
-      shopId: "3",
-      name: { en: "Charcoal Face Mask Skin Extraction & Hydration", ar: "قناع الفحم لتنقية البشرة وترطيب عميق للوجه" },
-      category: "skincare",
-      gender: "unisex",
-      price: 220,
-      duration: 50,
-      rating: 4.7,
-      reviewsCount: 96,
-      serviceType: "salon",
-      image: "https://images.unsplash.com/photo-1590439471364-192aa70c0b53?q=80&w=400&auto=format&fit=crop"
-    },
-    {
-      id: "s7",
-      shopId: "3",
-      name: { en: "Royal Moroccan Bath Hammam", ar: "الحمام المغربي الملكي الفاخر" },
-      category: "massage",
-      gender: "women",
-      price: 500,
-      duration: 90,
-      rating: 4.9,
-      reviewsCount: 322,
-      serviceType: "salon",
-      image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=400&auto=format&fit=crop"
-    },
-    // Shop 4
-    {
-      id: "s8",
-      shopId: "4",
-      name: { en: "Premium Haircut & Hot Towel Combo", ar: "حزمة قص الشعر وتنعيم الذقن بالمنشفة الساخنة" },
-      category: "haircuts",
-      gender: "men",
-      price: 200,
-      duration: 60,
-      rating: 4.6,
-      reviewsCount: 148,
-      serviceType: "salon",
-      image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=400&auto=format&fit=crop"
-    },
-    {
-      id: "s4_2",
-      shopId: "4",
-      name: { en: "Deep Cleansing Beard Therapy & Steam", ar: "جلسة البخار لتنظيف وتنعيم شعر اللحية" },
-      category: "haircuts",
-      gender: "men",
-      price: 110,
-      duration: 40,
-      rating: 4.8,
-      reviewsCount: 74,
-      serviceType: "salon",
-      image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=400&auto=format&fit=crop"
-    },
-    {
-      id: "s4_3",
-      shopId: "4",
-      name: { en: "Swedish Massage Wellness Session", ar: "جلسة المساج السويدي للاسترخاء وإزالة الإرهاق" },
-      category: "massage",
-      gender: "men",
-      price: 300,
-      duration: 60,
-      rating: 4.7,
-      reviewsCount: 95,
-      serviceType: "salon",
-      image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=400&auto=format&fit=crop"
-    },
-    // Shop 5
-    {
-      id: "s9",
-      shopId: "5",
-      name: { en: "Organic Deep Facial Therapy", ar: "علاج تنظيف البشرة العضوي العميق" },
-      category: "skincare",
-      gender: "women",
-      price: 400,
-      duration: 60,
-      rating: 4.9,
-      reviewsCount: 110,
-      serviceType: "mobile",
-      image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=400&auto=format&fit=crop"
-    },
-    {
-      id: "s5_2",
-      shopId: "5",
-      name: { en: "Classic Pedicure & Soft Paraffin Polish", ar: "جلسة العناية بالقدمين والبارافين المغذي" },
-      category: "nails",
-      gender: "women",
-      price: 180,
-      duration: 45,
-      rating: 4.8,
-      reviewsCount: 62,
-      serviceType: "salon",
-      image: "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=400&auto=format&fit=crop"
-    },
-    {
-      id: "s5_3",
-      shopId: "5",
-      name: { en: "Bridal Hair Styling & Veil Setup", ar: "تصفيف شعر العروس وتركيب الطرحة" },
-      category: "haircolor",
-      gender: "women",
-      price: 900,
-      duration: 180,
-      rating: 5.0,
-      reviewsCount: 43,
-      serviceType: "salon",
-      image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=400&auto=format&fit=crop"
-    }
-  ];
-
-  const filteredServices = services.filter((srv) => srv.shopId === shop.id);
+  const filteredServices = loadedServices;
 
   // Hook to preselect service from query parameter (?service=service_id)
   useEffect(() => {
@@ -1101,157 +843,73 @@ export default function ShopDetailsPage() {
     return { starts, ends, list };
   };
 
-  const slotToDate = (dateValue: string, slotStr: string) => {
-    const [timePart, modifier] = slotStr.split(" ");
-    const [hourPart, minutePart] = timePart.split(":");
-    let hours = Number(hourPart);
-    const minutes = Number(minutePart);
-    if (modifier === "PM" && hours !== 12) hours += 12;
-    if (modifier === "AM" && hours === 12) hours = 0;
-    const candidate = new Date(`${dateValue}T00:00:00`);
-    candidate.setHours(hours, minutes, 0, 0);
-    return candidate;
-  };
 
-  // Fetch available slots from Supabase when specialist, date, and service are selected
+  // Fetch available slots from the database (prayer windows computed with Umm al-Qura are excluded server-side)
+  const [slotError, setSlotError] = useState("");
   useEffect(() => {
     async function fetchSlots() {
-      if (!selectedSpecialist || !selectedDate || !selectedService) {
+      setSlotError("");
+      if (!selectedSpecialist || !selectedDate || !selectedService || !shop.branchId) {
         setDbSlots([]);
         return;
       }
-
       setIsLoadingSlots(true);
       try {
         const { starts, ends } = getPrayerWindowsForDate(selectedDate);
-
+        const duration = totalCombinedDuration || selectedService.duration;
         if (selectedSpecialist.id === "any") {
-          // G20: Aggregated slots across all eligible staff at branch
-          const { data: branchSlots, error: branchErr } = await supabase.rpc("get_branch_available_slots", {
-            target_branch_id: shopId,
+          const { data, error } = await supabase.rpc("get_branch_available_slots", {
+            target_branch_id: shop.branchId,
             target_service_id: selectedService.id,
             target_date: selectedDate,
             prayer_window_starts: starts,
-            prayer_window_ends: ends
+            prayer_window_ends: ends,
           });
-          if (!branchErr && branchSlots) {
-            setDbSlots(branchSlots.map((s: any) => s.slot_start));
-            return;
-          }
-        }
-
-        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-        if (!uuidRegex.test(selectedSpecialist.id)) {
-          throw new Error("Mock employee ID, skipping database slot fetch");
-        }
-
-        // Call the 5-arg overload RPC
-        const { data, error } = await supabase.rpc("get_available_slots", {
-          target_employee_id: selectedSpecialist.id,
-          target_date: selectedDate,
-          service_duration_minutes: totalCombinedDuration || selectedService.duration,
-          prayer_window_starts: starts,
-          prayer_window_ends: ends
-        });
-
-        if (error) {
-          console.warn("5-arg get_available_slots failed, trying 3-arg fallback:", error.message);
-          // Try the 3-arg legacy fallback RPC
-          const { data: fallbackData, error: fallbackError } = await supabase.rpc("get_available_slots", {
+          if (error) throw error;
+          setDbSlots((data || []).map((s: any) => s.slot_start));
+        } else {
+          const { data, error } = await supabase.rpc("get_available_slots", {
             target_employee_id: selectedSpecialist.id,
             target_date: selectedDate,
-            service_duration_minutes: totalCombinedDuration || selectedService.duration
+            service_duration_minutes: duration,
+            prayer_window_starts: starts,
+            prayer_window_ends: ends,
           });
-          if (fallbackError) throw fallbackError;
-          
-          setDbSlots((fallbackData || []).map((s: any) => s.slot_start));
-        } else {
+          if (error) throw error;
           setDbSlots((data || []).map((s: any) => s.slot_start));
         }
-      } catch (err) {
-        console.warn("Failed to load live slots from database:", err);
-        setDbSlots([]); // Reset to fallback locally
+      } catch (err: any) {
+        setDbSlots([]);
+        setSlotError(locale === "ar" ? `تعذر تحميل المواعيد: ${err?.message || ""}` : `Could not load available times: ${err?.message || ""}`);
       } finally {
         setIsLoadingSlots(false);
       }
     }
     fetchSlots();
-  }, [selectedSpecialist, selectedDate, selectedService, coordinates, totalCombinedDuration]);
+  }, [selectedSpecialist, selectedDate, selectedService, coordinates, totalCombinedDuration, shop.branchId]);
 
-  // Generate Available Slots excluding prayer buffers
-  const getAvailableSlots = () => {
-    const baseSlots = [
-      "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
-      "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM", "03:00 PM",
-      "04:00 PM", "04:30 PM", "05:00 PM", "07:30 PM", "08:00 PM"
-    ];
-    
-    if (!selectedDate) return baseSlots.map(s => ({ slot: s, available: true, prayerLocked: false, prayerName: "" }));
+  // Prayer windows for the selected date, shown so customers understand the gaps in the schedule.
+  const prayerWindowsForDay = selectedDate ? getPrayerWindowsForDate(selectedDate).list : [];
 
-    const { list: prayerWindows } = getPrayerWindowsForDate(selectedDate);
+  const getAvailableSlots = () =>
+    dbSlots.map((iso) => ({ slot: iso, label: formatSlotLabel(iso), available: true, prayerLocked: false, prayerName: "" }));
 
-    return baseSlots.map((slot) => {
-      const slotDate = slotToDate(selectedDate, slot);
-      
-      // Check if slot falls in a prayer window
-      const prayerMatch = prayerWindows.find(w => slotDate >= w.start && slotDate <= w.end);
-      
-      if (prayerMatch) {
-        return {
-          slot,
-          available: false,
-          prayerLocked: true,
-          prayerName: locale === "ar" ? prayerMatch.nameAr : prayerMatch.nameEn
-        };
-      }
-
-      // If we have live slots from DB, check if this slot is in the DB slots
-      if (dbSlots.length > 0) {
-        const hasDbMatch = dbSlots.some((dbSlot) => {
-          const dbDate = new Date(dbSlot);
-          return dbDate.getTime() === slotDate.getTime();
-        });
-        return {
-          slot,
-          available: hasDbMatch,
-          prayerLocked: false,
-          prayerName: ""
-        };
-      }
-
-      // If no live slots, default to available
-      return {
-        slot,
-        available: true,
-        prayerLocked: false,
-        prayerName: ""
-      };
-    });
-  };
-
+  // Estimate only; the server prices the booking (fee rules, discounts, VAT, deposit policy).
   const calculateEscrowSplit = () => {
-    if (selectedServices.length === 0) return { total: 0, deposit: 0, balance: 0, discount: 0, grossTotal: 0 };
+    if (selectedServices.length === 0) return { total: 0, deposit: 0, balance: 0, discount: 0, grossTotal: 0, vat: 0, gift: 0 };
     const grossTotal = totalCombinedPrice;
-    const discount = (appliedCoupon?.discount || 0) + (redeemLoyalty ? loyaltyDiscount : 0) + (appliedGiftCard?.amount || 0);
-    const total = Math.max(0, grossTotal - discount);
-    if (customerEligibility?.requiresPrepayment) {
-      return { total, deposit: total, balance: 0, discount, grossTotal };
-    }
-    const deposit = Math.round(total * 0.15); // 15% platform split
-    const balance = total - deposit;
-    return { total, deposit, balance, discount, grossTotal };
+    const discount = Math.min(grossTotal, (appliedCoupon?.discount || 0) + (redeemLoyalty ? loyaltyDiscount : 0));
+    const taxable = Math.max(0, grossTotal - discount);
+    const vat = Math.round(taxable * 15) / 100;
+    const gift = Math.min(appliedGiftCard?.amount || 0, taxable + vat);
+    const total = Math.round((taxable + vat - gift) * 100) / 100;
+    const deposit = customerEligibility?.requiresPrepayment
+      ? total
+      : Math.min(Math.round(taxable * shop.depositPercentage) / 100, total);
+    return { total, deposit, balance: Math.round((total - deposit) * 100) / 100, discount, grossTotal, vat, gift };
   };
 
   const splits = calculateEscrowSplit();
-
-  const toRiyadhTimestamp = (date: string, slot: string) => {
-    const match = slot.match(/^(\d{1,2}):(\d{2})\s(AM|PM)$/);
-    if (!match) throw new Error("Invalid booking time.");
-    const [, rawHour, minute, meridiem] = match;
-    let hour = Number(rawHour) % 12;
-    if (meridiem === "PM") hour += 12;
-    return `${date}T${hour.toString().padStart(2, "0")}:${minute}:00+03:00`;
-  };
 
   const handleModalSendOtp = async () => {
     let digits = authPhone.replace(/[^\d+]/g, "");
@@ -1351,7 +1009,7 @@ export default function ShopDetailsPage() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       const rawSource = searchParams?.get("source") || "marketplace";
-      const validSources = ["marketplace", "link", "qr", "whatsapp", "instagram", "walk_in", "import"];
+      const validSources = ["marketplace", "link", "qr", "whatsapp", "instagram", "import"];
       const bookingSource = validSources.includes(rawSource) ? rawSource : "marketplace";
 
       if (!user) {
@@ -1370,103 +1028,71 @@ export default function ShopDetailsPage() {
         return;
       }
 
-      if (isHomeService) {
-        throw new Error("Home-service address confirmation is required before payment.");
-      }
 
       if (customerEligibility?.isBlocked) {
         throw new Error(
           locale === "ar"
-            ? `تم حظر الحجز مع هذا المزود: ${customerEligibility.blockReason || "بناءً على طلب الإدارة"}`
-            : `Booking restricted with this salon: ${customerEligibility.blockReason || "Per provider management"}`
+            ? "لا يمكن الحجز مع هذا المزود. يرجى التواصل معه مباشرة."
+            : "You cannot book with this provider. Please contact them directly."
         );
       }
 
       let bookedBookingId: string;
+      let bookedStatus = "pending_payment";
 
       if (selectedServices.length > 1) {
         // G51 Multi-service sequential cart booking
         const { data: multiRes, error: multiError } = await supabase.rpc("create_multi_service_booking", {
-          target_branch_id: shop.id,
+          target_branch_id: shop.branchId,
           target_employee_id: selectedSpecialist.id === "any" ? null : selectedSpecialist.id,
-          target_scheduled_at: toRiyadhTimestamp(selectedDate, selectedSlot),
+          target_scheduled_at: selectedSlot,
           services_payload: selectedServices.map((s) => ({ service_id: s.id })),
-          request_home_service: false,
-          request_home_address_text: null,
           request_source: bookingSource,
+          request_coupon_code: appliedCoupon?.code || null,
+          request_gift_card_code: appliedGiftCard?.code || null,
+          request_loyalty_points: redeemLoyalty ? redeemPoints : 0,
+          request_client_profile_id: selectedClientProfileId || null,
         });
 
         if (multiError || !multiRes?.booking_id) {
           throw multiError ?? new Error("Unable to reserve the selected multi-service booking.");
         }
         bookedBookingId = multiRes.booking_id;
+        bookedStatus = multiRes.status;
       } else {
         const { data: booking, error: bookingError } = await supabase.rpc("create_booking", {
           target_employee_id: selectedSpecialist.id === "any" ? null : selectedSpecialist.id,
           target_service_id: selectedServices[0].id,
-          target_scheduled_at: toRiyadhTimestamp(selectedDate, selectedSlot),
-          request_home_service: false,
+          target_scheduled_at: selectedSlot,
+          request_branch_id: shop.branchId,
           request_client_profile_id: selectedClientProfileId || null,
           request_source: bookingSource,
+          request_coupon_code: appliedCoupon?.code || null,
+          request_gift_card_code: appliedGiftCard?.code || null,
+          request_loyalty_points: redeemLoyalty ? redeemPoints : 0,
         });
 
         if (bookingError || !booking?.id) {
           throw bookingError ?? new Error("Unable to reserve the selected time.");
         }
         bookedBookingId = booking.id;
-      }
-
-      // Apply promotional discounts, gift card, and loyalty redemptions (P2-B)
-      if (appliedCoupon?.code) {
-        try {
-          await supabase.rpc("apply_coupon_to_booking", {
-            p_booking_id: bookedBookingId,
-            p_coupon_code: appliedCoupon.code,
-          });
-        } catch (e) {
-          console.warn("Failed to apply coupon to booking:", e);
-        }
-      }
-
-      if (appliedGiftCard?.code && appliedGiftCard.amount > 0) {
-        try {
-          await supabase.rpc("redeem_gift_card", {
-            p_card_code: appliedGiftCard.code,
-            p_booking_id: bookedBookingId,
-            p_redeem_amount: appliedGiftCard.amount,
-          });
-        } catch (e) {
-          console.warn("Failed to redeem gift card for booking:", e);
-        }
-      }
-
-      if (redeemLoyalty && loyaltyDiscount > 0) {
-        try {
-          const ptsToRedeem = Math.min(Math.floor(loyaltyPoints / 100) * 100, Math.floor(totalCombinedPrice * 10));
-          await supabase.rpc("redeem_loyalty_points", {
-            p_provider_id: shop.id,
-            p_points: ptsToRedeem,
-          });
-        } catch (e) {
-          console.warn("Failed to redeem loyalty points:", e);
-        }
+        bookedStatus = booking.status;
       }
 
       sessionStorage.removeItem("primora_pending_booking");
 
-      let redirectUrl = "";
-      try {
-        const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
-          body: { bookingId: bookedBookingId },
-        });
+      // Nothing to collect online (0% deposit or a gift card covers it): the booking is already confirmed.
+      if (bookedStatus === "confirmed") {
+        router.push(`/customer/bookings/${bookedBookingId}/confirmation?status=confirmed`);
+        return;
+      }
 
-        if (checkoutError || !checkout?.checkoutUrl) {
-          redirectUrl = `/customer/bookings/${bookedBookingId}/confirmation?status=pending_payment`;
-        } else {
-          redirectUrl = checkout.checkoutUrl;
-        }
-      } catch (e) {
-        redirectUrl = `/customer/bookings/${bookedBookingId}/confirmation?status=pending_payment`;
+      let redirectUrl = `/customer/bookings/${bookedBookingId}/confirmation?status=pending_payment`;
+      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
+        body: { bookingId: bookedBookingId },
+      });
+      if (!checkoutError && checkout?.checkoutUrl) {
+        redirectUrl = checkout.checkoutUrl;
       }
 
       if (redirectUrl.startsWith("/")) {
@@ -1529,34 +1155,70 @@ export default function ShopDetailsPage() {
         </div>
       </header>
 
+      {shopLoadState !== "ready" && (
+        <main className="max-w-3xl mx-auto py-24 px-6 text-center flex-grow w-full">
+          {shopLoadState === "loading" && (
+            <p className="text-sm text-stone-500">{locale === "ar" ? "جاري تحميل بيانات المزود..." : "Loading provider..."}</p>
+          )}
+          {shopLoadState === "not_found" && (
+            <div className="space-y-4">
+              <h1 className="text-2xl font-serif font-black text-stone-900">{locale === "ar" ? "المزود غير متاح" : "Provider not available"}</h1>
+              <p className="text-sm text-stone-500">{locale === "ar" ? "هذا المزود غير موجود أو لا يستقبل حجوزات حالياً." : "This provider does not exist or is not accepting bookings."}</p>
+              <Link href="/services" className="inline-block text-xs font-bold uppercase tracking-wider underline">{t.backToStore}</Link>
+            </div>
+          )}
+          {shopLoadState === "error" && (
+            <div className="space-y-4">
+              <h1 className="text-2xl font-serif font-black text-stone-900">{locale === "ar" ? "تعذر تحميل المزود" : "Could not load this provider"}</h1>
+              <p className="text-sm text-red-600">{shopLoadError}</p>
+              <button onClick={() => window.location.reload()} className="text-xs font-bold uppercase tracking-wider underline">
+                {locale === "ar" ? "إعادة المحاولة" : "Try again"}
+              </button>
+            </div>
+          )}
+        </main>
+      )}
+
+      {shopLoadState === "ready" && (<>
       {/* 3. HERO / SHOP PROFILE BANNER */}
       <section className="relative h-[280px] sm:h-[380px] w-full overflow-hidden bg-stone-900">
-        <img
-          src={shop.image}
-          alt={shop.name[locale]}
-          className="w-full h-full object-cover opacity-65"
-        />
+        {shop.image ? (
+          <img
+            src={shop.image}
+            alt={shop.name[locale]}
+            className="w-full h-full object-cover opacity-65"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-stone-800 to-stone-950" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/40 to-transparent"></div>
         <div className="absolute bottom-0 left-0 right-0 max-w-7xl mx-auto px-6 sm:px-8 py-8 flex flex-col justify-end text-white">
           <div className={`space-y-3 ${isRTL ? "text-right" : "text-left"}`}>
             <div className="flex items-center gap-2.5">
-              <span className="text-[9px] font-extrabold uppercase tracking-widest bg-[hsl(45,60%,50%)] text-stone-950 px-2.5 py-0.5 rounded-full">
-                ★ {shop.rating}
-              </span>
-              <span className="text-[10px] text-stone-300 font-medium tracking-wide">
-                ({shop.reviewsCount} {t.reviewsCount})
-              </span>
+              {shop.rating !== null ? (
+                <>
+                  <span className="text-[9px] font-extrabold uppercase tracking-widest bg-[hsl(45,60%,50%)] text-stone-950 px-2.5 py-0.5 rounded-full">
+                    ★ {shop.rating}
+                  </span>
+                  <span className="text-[10px] text-stone-300 font-medium tracking-wide">
+                    ({shop.reviewsCount} {t.reviewsCount})
+                  </span>
+                </>
+              ) : (
+                <span className="text-[10px] text-stone-300 font-medium tracking-wide">
+                  {locale === "ar" ? "جديد على بريمورا" : "New on PRIMORA"}
+                </span>
+              )}
               <span className="h-3 w-px bg-stone-700"></span>
               <span className="text-[10px] text-stone-300 font-bold uppercase tracking-wider">
-                {shop.city.toUpperCase()} • {shop.neighborhood}
+                {[shop.city, shop.neighborhood].filter(Boolean).join(" • ")}
               </span>
               <span className="h-3 w-px bg-stone-700"></span>
+              {shop.crVerified && (
               <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider bg-amber-400/20 text-[#F4E7B6] border border-[#D1AF47]/40 px-2.5 py-0.5 rounded-full">
-                <svg className="w-3 h-3 text-[#D1AF47]" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                {locale === "ar" ? "موثق بسجل تجاري (واثق)" : "Wathq Verified CR"}
+                {locale === "ar" ? "سجل تجاري موثق عبر واثق" : "CR verified via Wathq"}
               </span>
+              )}
               <span className="h-3 w-px bg-stone-700"></span>
               <button
                 type="button"
@@ -1656,6 +1318,11 @@ export default function ShopDetailsPage() {
                     )}
                   </div>
                   <div className="grid grid-cols-1 gap-4">
+                    {filteredServices.length === 0 && (
+                      <p className="text-xs text-stone-400 font-medium py-6 text-center">
+                        {locale === "ar" ? "لا توجد خدمات منشورة لهذا المزود بعد." : "This provider has not published any services yet."}
+                      </p>
+                    )}
                     {filteredServices.map((srv) => {
                       const isSelected = selectedServices.some((s) => s.id === srv.id);
                       return (
@@ -1670,7 +1337,13 @@ export default function ShopDetailsPage() {
                         >
                           <div className="flex items-start gap-4">
                             <div className="w-16 h-16 rounded-xl overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-100">
-                              <img src={srv.image} alt={srv.name[locale]} className="w-full h-full object-cover" />
+                              {srv.image ? (
+                                <img src={srv.image} alt={srv.name[locale]} className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-lg font-serif font-black text-stone-400">
+                                  {srv.name[locale].charAt(0)}
+                                </div>
+                              )}
                             </div>
                             <div className={`space-y-1 ${isRTL ? "text-right" : "text-left"}`}>
                               <div className="flex items-center gap-2">
@@ -1693,9 +1366,6 @@ export default function ShopDetailsPage() {
                           </div>
                           <div className={`flex flex-col items-end flex-shrink-0 ${isRTL ? "sm:items-start" : "sm:items-end"}`}>
                             <span className="text-base font-black text-stone-950">{srv.price} SAR</span>
-                            <span className="text-[8px] text-[hsl(45,60%,50%)] font-bold uppercase tracking-wider mt-1">
-                              ★ {srv.rating} ({srv.reviewsCount})
-                            </span>
                             <button
                               type="button"
                               onClick={(e) => {
@@ -1731,8 +1401,8 @@ export default function ShopDetailsPage() {
                             id: "any",
                             name: { en: "Any Available Professional", ar: "أي أخصائي متاح" },
                             role: { en: "First Available Staff", ar: "الأسرع توفراً من الفريق" },
-                            rating: 4.9,
-                            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"
+                            rating: null,
+                            avatar: ""
                           });
                           setSelectedSlot("");
                         }}
@@ -1774,12 +1444,20 @@ export default function ShopDetailsPage() {
                           }`}
                         >
                           <div className="w-12 h-12 rounded-full overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-200">
-                            <img src={spec.avatar} alt={spec.name[locale]} className="w-full h-full object-cover" />
+                            {spec.avatar ? (
+                              <img src={spec.avatar} alt={spec.name[locale]} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-sm font-black text-stone-500">
+                                {spec.name[locale].charAt(0)}
+                              </div>
+                            )}
                           </div>
                           <div className={`space-y-1 flex-1 ${isRTL ? "text-right" : "text-left"}`}>
                             <div className="flex items-center justify-between">
                               <h4 className="font-bold text-stone-900 text-xs">{spec.name[locale]}</h4>
-                              <span className="text-[9px] text-[hsl(45,60%,50%)] font-extrabold">★ {spec.rating}</span>
+                              {spec.rating !== null && (
+                                <span className="text-[9px] text-[hsl(45,60%,50%)] font-extrabold">★ {spec.rating}</span>
+                              )}
                             </div>
                             <p className="text-[10px] text-stone-500 font-semibold">{spec.role[locale]}</p>
                             {spec.experienceYears && (
@@ -1821,7 +1499,7 @@ export default function ShopDetailsPage() {
                 )}
 
                 <div className="grid grid-cols-1 gap-6">
-                  {mockPackages.filter(p => p.shopId === shop.id).map((pkg) => (
+                  {providerPackages.map((pkg) => (
                     <div
                       key={pkg.id}
                       className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 hover:border-stone-400 transition"
@@ -1834,7 +1512,7 @@ export default function ShopDetailsPage() {
                             {pkg.sessionCount} {t.sessionCountText}
                           </span>
                           <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-stone-900 text-stone-50">
-                            {pkg.expiresInDays} {t.expiresInText}
+                            {pkg.expiresInDays > 0 ? `${pkg.expiresInDays} ${t.expiresInText}` : (locale === "ar" ? "بدون انتهاء" : "No expiry")}
                           </span>
                         </div>
                       </div>
@@ -1850,7 +1528,7 @@ export default function ShopDetailsPage() {
                       </div>
                     </div>
                   ))}
-                  {mockPackages.filter(p => p.shopId === shop.id).length === 0 && (
+                  {providerPackages.length === 0 && (
                     <p className="text-xs text-stone-400 font-medium py-6 text-center">
                       {locale === "ar" ? "لا توجد باقات متاحة حالياً لهذا المركز" : "No packages currently available for this shop."}
                     </p>
@@ -1865,68 +1543,35 @@ export default function ShopDetailsPage() {
                 {locale === "ar" ? "تقييمات وآراء العملاء" : "Customer Reviews & Highlights"}
               </h2>
 
-              {/* Gold highlights tags */}
-              <div className={`flex flex-wrap gap-2.5 ${isRTL ? "justify-start" : "justify-start"}`}>
-                {[
-                  { tag: locale === "ar" ? "معقم وآمن" : "Clean & Sanitized", pct: "98%" },
-                  { tag: locale === "ar" ? "طاقم عمل محترف" : "Professional Staff", pct: "95%" },
-                  { tag: locale === "ar" ? "دقة في المواعيد" : "Punctual Slots", pct: "92%" },
-                  { tag: locale === "ar" ? "أجواء فاخرة" : "Premium Ambience", pct: "96%" }
-                ].map((hl, idx) => (
-                  <span key={idx} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold bg-stone-100 border border-stone-200/50 text-stone-850">
-                    <span className="text-[hsl(45,60%,45%)] font-bold">★</span>
-                    {hl.tag} <span className="text-stone-400 font-normal">({hl.pct})</span>
-                  </span>
-                ))}
-              </div>
-
-              {/* Reviews Feed */}
-              <div className="space-y-4 mt-6">
-                {[
-                  {
-                    name: locale === "ar" ? "فهد العتيبي" : "Fahad Al-Otaibi",
-                    date: "2026-06-12",
-                    rating: 5,
-                    text: {
-                      en: "Outstanding unisex luxury service. The specialist was highly professional, and the prayer buffer block works seamlessly.",
-                      ar: "خدمة ممتازة وفاخرة للغاية. الأخصائي كان محترفاً جداً والالتزام التام بوقف الحجوزات وقت الصلاة مريح للغاية."
-                    }
-                  },
-                  {
-                    name: locale === "ar" ? "سارة خالد" : "Sarah Khalid",
-                    date: "2026-06-10",
-                    rating: 5,
-                    text: {
-                      en: "The salon is very clean and adheres to premium guidelines. The face skin cleansing session was relaxing.",
-                      ar: "المركز نظيف جداً ويتبع أعلى معايير النظافة والتعقيم الفاخرة. جلسة تنظيف البشرة كانت مريحة وممتازة."
-                    }
-                  },
-                  {
-                    name: locale === "ar" ? "ليلى محمد" : "Layla Mohammad",
-                    date: "2026-06-08",
-                    rating: 4,
-                    text: {
-                      en: "Highly recommend for anyone looking for premium service. Friendly receptionist and great manicure work.",
-                      ar: "أوصي به بشدة لكل من يبحث عن خدمة راقية. الاستقبال ودود للغاية وشغل الأظافر رائع."
-                    }
-                  }
-                ].map((rev, rIdx) => (
-                  <div key={rIdx} className="bg-stone-50 border border-stone-200/40 rounded-2xl p-5 space-y-2">
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="font-extrabold text-stone-900">{rev.name}</span>
-                      <span className="text-stone-400 font-semibold">{rev.date}</span>
+              {providerReviews.length === 0 ? (
+                <p className="text-xs text-stone-400 font-medium py-4">
+                  {locale === "ar" ? "لا توجد تقييمات بعد. التقييمات تُكتب فقط بعد زيارة مكتملة." : "No reviews yet. Reviews can only be written after a completed visit."}
+                </p>
+              ) : (
+                <div className="space-y-4 mt-6">
+                  {providerReviews.map((rev) => (
+                    <div key={rev.id} className="bg-stone-50 border border-stone-200/40 rounded-2xl p-5 space-y-2">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-extrabold text-stone-900">{rev.name || (locale === "ar" ? "عميل موثّق" : "Verified customer")}</span>
+                        <span className="text-stone-400 font-semibold">{rev.date}</span>
+                      </div>
+                      <div className="flex gap-0.5 text-xs text-[hsl(45,60%,50%)]">
+                        {Array.from({ length: rev.rating }).map((_, i) => (
+                          <span key={i}>★</span>
+                        ))}
+                      </div>
+                      {rev.comment && (
+                        <p className={`text-xs text-stone-600 leading-relaxed font-light ${isRTL ? "text-right" : "text-left"}`}>{rev.comment}</p>
+                      )}
+                      {rev.reply && (
+                        <p className={`text-[11px] text-stone-500 border-s-2 border-stone-300 ps-3 ${isRTL ? "text-right" : "text-left"}`}>
+                          <span className="font-bold">{locale === "ar" ? "رد المزود: " : "Provider reply: "}</span>{rev.reply}
+                        </p>
+                      )}
                     </div>
-                    <div className="flex gap-0.5 text-xs text-[hsl(45,60%,50%)]">
-                      {Array.from({ length: rev.rating }).map((_, i) => (
-                        <span key={i}>★</span>
-                      ))}
-                    </div>
-                    <p className={`text-xs text-stone-600 leading-relaxed font-light ${isRTL ? "text-right" : "text-left"}`}>
-                      {rev.text[locale]}
-                    </p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -1986,18 +1631,13 @@ export default function ShopDetailsPage() {
                     </div>
                   )}
 
-                  {/* Home Service Option (if eligible) */}
-                  {selectedServices.some(s => s.serviceType === "mobile") ? (
-                    <div className="flex items-center justify-between border-t border-stone-100 pt-3">
-                      <span className="text-xs text-stone-600 font-semibold">{t.isHomeServiceLabel}</span>
-                      <input
-                        type="checkbox"
-                        checked={isHomeService}
-                        onChange={(e) => setIsHomeService(e.target.checked)}
-                        className="w-4 h-4 accent-stone-900 rounded cursor-pointer"
-                      />
-                    </div>
-                  ) : null}
+                  {selectedServices.some(s => s.serviceType === "mobile") && (
+                    <p className="text-[10px] text-stone-500 border-t border-stone-100 pt-3">
+                      {locale === "ar"
+                        ? "الحجز المنزلي عبر الموقع غير متاح بعد؛ هذا الحجز في مقر المزود."
+                        : "Online home-visit booking is not available yet; this booking is at the provider's venue."}
+                    </p>
+                  )}
 
                   {/* Date selection input */}
                   <div className="space-y-2">
@@ -2027,19 +1667,32 @@ export default function ShopDetailsPage() {
                         </button>
                       </div>
 
-                      {/* Prayer Pause Schedule indicator (G58) */}
-                      <div className="bg-stone-50 border border-stone-200/80 rounded-xl p-2.5 space-y-1 text-[9px]">
-                        <div className="flex items-center gap-1.5 font-bold text-stone-800">
-                          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                          <span>{t.prayerPauseNotice}</span>
+                      {/* Prayer pauses for this date (Umm al-Qura, computed for the branch location) */}
+                      {prayerWindowsForDay.length > 0 && (
+                        <div className="bg-stone-50 border border-stone-200/80 rounded-xl p-2.5 space-y-1 text-[9px]">
+                          <div className="flex items-center gap-1.5 font-bold text-stone-800">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                            <span>{locale === "ar" ? "توقف أوقات الصلاة لهذا اليوم" : "Prayer pauses on this day"}</span>
+                          </div>
+                          <p className="text-[9px] text-stone-600 leading-normal">
+                            {prayerWindowsForDay
+                              .map((w: any) => `${locale === "ar" ? w.nameAr : w.nameEn} ${formatSlotLabel(w.start.toISOString())}–${formatSlotLabel(w.end.toISOString())}`)
+                              .join(" · ")}
+                          </p>
                         </div>
-                        <p className="text-[8px] text-stone-500 leading-normal">
-                          {t.prayerBufferWarning}
+                      )}
+                      {isLoadingSlots && (
+                        <p className="text-[10px] text-stone-400">{locale === "ar" ? "جاري تحميل المواعيد..." : "Loading available times..."}</p>
+                      )}
+                      {slotError && <p className="text-[10px] text-red-600 font-bold">{slotError}</p>}
+                      {!isLoadingSlots && !slotError && dbSlots.length === 0 && (
+                        <p className="text-[10px] text-stone-500">
+                          {locale === "ar" ? "لا توجد مواعيد متاحة في هذا اليوم. جرّب يوماً آخر أو انضم لقائمة الانتظار." : "No times are available on this day. Try another day or join the waitlist."}
                         </p>
-                      </div>
+                      )}
 
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {getAvailableSlots().map(({ slot, available, prayerLocked, prayerName }) => {
+                        {getAvailableSlots().map(({ slot, label, available, prayerLocked, prayerName }) => {
                           const isSelected = selectedSlot === slot;
                           const isDisabled = !available || prayerLocked;
                           return (
@@ -2058,7 +1711,7 @@ export default function ShopDetailsPage() {
                                   : "bg-stone-50 border-stone-200 text-stone-600 hover:border-stone-950"
                               }`}
                             >
-                              <span>{slot}</span>
+                              <span>{label}</span>
                               {prayerLocked && (
                                 <span className="text-[7.5px] font-bold text-red-600 uppercase mt-0.5 leading-none">
                                   {prayerName} • {locale === "ar" ? "مغلق" : "locked"}
@@ -2183,7 +1836,7 @@ export default function ShopDetailsPage() {
                     </div>
 
                     {/* Loyalty Points Redemption (G50) */}
-                    {loyaltyPoints >= 100 && (
+                    {loyaltySettings.enabled && maxRedeemablePoints >= loyaltySettings.minRedeemPoints && (
                       <div className="bg-amber-50/60 border border-amber-200/80 rounded-xl p-2.5 flex items-center justify-between">
                         <div>
                           <div className="text-[10px] font-bold text-amber-950 flex items-center gap-1.5">
@@ -2192,8 +1845,8 @@ export default function ShopDetailsPage() {
                           </div>
                           <p className="text-[9px] text-amber-800">
                             {locale === "ar"
-                              ? `خصم ${Math.min(Math.floor(loyaltyPoints / 100) * 10, totalCombinedPrice)} ريال مقابل النقاط`
-                              : `Redeem for up to ${Math.min(Math.floor(loyaltyPoints / 100) * 10, totalCombinedPrice)} SAR off`}
+                              ? `خصم حتى ${Math.round(maxRedeemablePoints * loyaltySettings.sarPerPoint * 100) / 100} ريال`
+                              : `Redeem for up to ${Math.round(maxRedeemablePoints * loyaltySettings.sarPerPoint * 100) / 100} SAR off`}
                           </p>
                         </div>
                         <button
@@ -2219,12 +1872,22 @@ export default function ShopDetailsPage() {
                     </div>
                     {splits.discount > 0 && (
                       <div className="flex justify-between text-[11px] text-emerald-600 font-bold">
-                        <span>{locale === "ar" ? "الخصومات المطبقة (كوبون / ولاء / إهداء)" : "Applied Discounts"}</span>
+                        <span>{locale === "ar" ? "الخصم (كوبون / نقاط)" : "Discount (promo / points)"}</span>
                         <span>-{splits.discount} SAR</span>
                       </div>
                     )}
                     <div className="flex justify-between text-[10px] text-stone-400">
-                      <span>{t.depositLabel}</span>
+                      <span>{locale === "ar" ? "ضريبة القيمة المضافة 15%" : "VAT 15%"}</span>
+                      <span>{splits.vat} SAR</span>
+                    </div>
+                    {splits.gift > 0 && (
+                      <div className="flex justify-between text-[11px] text-emerald-600 font-bold">
+                        <span>{locale === "ar" ? "بطاقة الهدية" : "Gift card"}</span>
+                        <span>-{splits.gift} SAR</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-[10px] text-stone-400">
+                      <span>{t.depositLabel}{customerEligibility?.requiresPrepayment ? "" : ` (${shop.depositPercentage}%)`}</span>
                       <span>{splits.deposit} SAR</span>
                     </div>
                     <div className="flex justify-between text-[10px] text-stone-400">
@@ -2235,123 +1898,26 @@ export default function ShopDetailsPage() {
                       <span>{t.dueNowLabel}</span>
                       <span className="text-[hsl(45,60%,45%)]">{splits.deposit} SAR</span>
                     </div>
-
-                    {/* BNPL Tabby / Tamara Simulation (G62) */}
-                    <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-xl p-2.5 flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1 font-bold">
-                          <span className="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[9px] font-black uppercase">tabby</span>
-                          <span className="px-1.5 py-0.5 rounded bg-amber-500 text-white text-[9px] font-black uppercase">tamara</span>
-                        </div>
-                        <span className="text-[11px] text-stone-700 font-medium">
-                          {t.bnplSplitText} <strong className="font-mono text-stone-950 font-bold">{((splits.deposit || splits.grossTotal) / 4).toFixed(2)} SAR</strong>
-                        </span>
-                      </div>
-                    </div>
+                    <p className="text-[9px] text-stone-400 font-normal">
+                      {locale === "ar" ? "تقدير؛ السعر النهائي يُحسب عند إنشاء الحجز." : "Estimate; the final price is calculated when the booking is created."}
+                    </p>
                   </div>
 
-                  {/* Payment Method Selector */}
-                  <div className="space-y-2 border-t border-stone-150 pt-4">
-                    <h3 className="font-bold text-xs text-stone-850">
-                      {locale === "ar" ? "طريقة الدفع" : "Payment Method"}
-                    </h3>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod("applepay")}
-                        className={`py-2 px-3 border rounded-xl flex items-center justify-center gap-2 text-xs font-bold transition duration-150 ${
-                          paymentMethod === "applepay"
-                            ? "border-stone-950 bg-stone-50 text-stone-950"
-                            : "border-stone-200 hover:border-stone-400 text-stone-500"
-                        }`}
-                      >
-                        <span className="text-sm"></span> Pay
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod("card")}
-                        className={`py-2 px-3 border rounded-xl flex items-center justify-center gap-2 text-[10px] font-bold uppercase transition duration-150 ${
-                          paymentMethod === "card"
-                            ? "border-stone-950 bg-stone-50 text-stone-950"
-                            : "border-stone-200 hover:border-stone-400 text-stone-500"
-                        }`}
-                      >
-                        {locale === "ar" ? "مدى / بطاقة ائتمان" : "Mada / Card"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod("tabby")}
-                        className={`py-2 px-2.5 border rounded-xl flex items-center justify-center gap-1.5 text-[10px] font-bold transition duration-150 ${
-                          paymentMethod === "tabby"
-                            ? "border-emerald-600 bg-emerald-50 text-emerald-950 ring-1 ring-emerald-600"
-                            : "border-stone-200 hover:border-emerald-300 text-stone-700"
-                        }`}
-                      >
-                        <span className="px-1 rounded bg-emerald-600 text-white text-[8px] font-black uppercase">tabby</span>
-                        <span className="truncate">{t.tabbyOption}</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod("tamara")}
-                        className={`py-2 px-2.5 border rounded-xl flex items-center justify-center gap-1.5 text-[10px] font-bold transition duration-150 ${
-                          paymentMethod === "tamara"
-                            ? "border-amber-600 bg-amber-50 text-amber-950 ring-1 ring-amber-600"
-                            : "border-stone-200 hover:border-amber-300 text-stone-700"
-                        }`}
-                      >
-                        <span className="px-1 rounded bg-amber-500 text-white text-[8px] font-black uppercase">tamara</span>
-                        <span className="truncate">{t.tamaraOption}</span>
-                      </button>
+                  <div className="rounded-xl border border-stone-200 bg-stone-50/70 p-3.5 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
+                      <span className="text-[11px] font-bold text-stone-800">
+                        {locale === "ar" ? "الدفع عبر Tap" : "Payment via Tap"}
+                      </span>
                     </div>
+                    <p className="text-[10px] text-stone-500 leading-relaxed font-medium">
+                      {locale === "ar"
+                        ? "ستنتقل إلى صفحة الدفع الآمنة لدى Tap لاختيار طريقة الدفع المتاحة (مدى، Apple Pay، بطاقة). لا تُحفظ بيانات البطاقة لدى بريمورا."
+                        : "You will continue to Tap's secure payment page to choose an available method (mada, Apple Pay, card). Card details are never stored by PRIMORA."}
+                    </p>
                   </div>
 
-                  {/* Tabby / Tamara Explanatory Notices */}
-                  {paymentMethod === "tabby" && (
-                    <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 space-y-1.5 text-xs">
-                      <div className="flex items-center justify-between font-bold text-emerald-950">
-                        <span>Tabby • 4 Payments</span>
-                        <span className="font-mono font-bold">{((splits.deposit || splits.grossTotal) / 4).toFixed(2)} SAR / mo</span>
-                      </div>
-                      <p className="text-[10px] text-emerald-800 leading-relaxed font-medium">
-                        {locale === "ar"
-                          ? "ادفع 25% الآن وقسّم الباقي على 3 أشهر بدون أي فوائد أو رسوم خفية. متوافق مع الشريعة الإسلامية ومصرح من البنك المركزي."
-                          : "Pay 25% today and split the rest over 3 months with 0% interest and Sharia compliance."}
-                      </p>
-                    </div>
-                  )}
-
-                  {paymentMethod === "tamara" && (
-                    <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3 space-y-1.5 text-xs">
-                      <div className="flex items-center justify-between font-bold text-amber-950">
-                        <span>Tamara • 4 Payments</span>
-                        <span className="font-mono font-bold">{((splits.deposit || splits.grossTotal) / 4).toFixed(2)} SAR / mo</span>
-                      </div>
-                      <p className="text-[10px] text-amber-800 leading-relaxed font-medium">
-                        {locale === "ar"
-                          ? "قسّم دفعات الحجز على 4 أقساط شهرية ميسرة بدون فوائد إضافية، متوافقة ومصرحة من البنك المركزي السعودي (ساما)."
-                          : "Split your booking into 4 seamless interest-free monthly installments under SAMA regulations."}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Secure Payment Gateway Notice */}
-                  {paymentMethod === "card" && (
-                    <div className="rounded-xl border border-stone-200 bg-stone-50/70 p-3.5 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                        <span className="text-[11px] font-bold text-stone-800">
-                          {locale === "ar" ? "بوابة دفع آمنة ومعتمدة (Tap)" : "Secure Licensed Gateway (Tap)"}
-                        </span>
-                      </div>
-                      <p className="text-[10px] text-stone-500 leading-relaxed font-medium">
-                        {locale === "ar"
-                          ? "سيتم إدخال بيانات بطاقتك (مدى أو فيزا أو ماستركارد) مباشرة وبأمان تام عبر صفحة الدفع المعتمدة وفق معايير PCI-DSS دون تخزينها على المنصة."
-                          : "Card details (Mada, Visa, Mastercard) are encrypted and processed securely via the licensed Tap checkout interface under PCI-DSS standards."}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Errors / Success notifications */}
+                  {/* Secure Payment Gateway Notice */}                  {/* Errors / Success notifications */}
                   {message && (
                     <p className={`text-[10px] font-bold text-center leading-relaxed p-3 rounded-xl border ${
                       isSuccess
@@ -2371,18 +1937,23 @@ export default function ShopDetailsPage() {
                     <ul className="text-amber-800/90 space-y-1 ps-4 list-disc font-medium">
                       <li>
                         {locale === "ar"
-                          ? "إلغاء مجاني حتى 24 ساعة قبل الموعد مع استرداد كامل العربون."
-                          : "Free cancellation up to 24 hours before appointment for a 100% deposit refund."}
+                          ? `إلغاء مجاني حتى ${shop.freeCancellationHours} ساعة قبل الموعد مع استرداد كامل العربون.`
+                          : `Free cancellation up to ${shop.freeCancellationHours} hours before the appointment, with a full deposit refund.`}
                       </li>
                       <li>
                         {locale === "ar"
-                          ? "في حال الإلغاء خلال أقل من 24 ساعة، يُخصم 50% من العربون كرسوم إلغاء متأخر."
-                          : "Late cancellations within 24 hours incur a 50% fee deducted from deposit."}
+                          ? `الإلغاء بعد ذلك: يُخصم ${shop.lateCancellationFeePercent}% من العربون.`
+                          : `Later cancellations: ${shop.lateCancellationFeePercent}% of the deposit is kept.`}
                       </li>
                       <li>
                         {locale === "ar"
-                          ? "عدم الحضور يحتسب 100% من العربون لتغطية حجز الوقت والأخصائي."
-                          : "No-shows forfeit 100% of deposit to cover reserved specialist time."}
+                          ? `عدم الحضور: يُخصم ${shop.noShowFeePercent}% من العربون.`
+                          : `No-show: ${shop.noShowFeePercent}% of the deposit is kept.`}
+                      </li>
+                      <li>
+                        {locale === "ar"
+                          ? "إذا ألغى المزود الموعد يُسترد العربون كاملاً."
+                          : "If the provider cancels, the deposit is refunded in full."}
                       </li>
                     </ul>
                   </div>
@@ -2412,6 +1983,8 @@ export default function ShopDetailsPage() {
           </aside>
         </div>
       </main>
+
+      </>)}
 
       {/* 5. FOOTER */}
       <footer className="bg-stone-950 text-stone-400 py-12 px-6 sm:px-12 border-t border-stone-900 mt-auto">
@@ -2558,6 +2131,14 @@ export default function ShopDetailsPage() {
                   onChange={(e) => setAuthPhone(e.target.value)}
                   className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-stone-900 outline-none focus:border-stone-950"
                 />
+                <label className="flex items-start gap-2 text-[11px] text-stone-600">
+                  <input type="checkbox" checked={authConsentWhatsapp} onChange={(e) => setAuthConsentWhatsapp(e.target.checked)} className="mt-0.5 accent-stone-900" />
+                  <span>{locale === "ar" ? "أوافق على استلام تأكيد الحجز والتذكيرات عبر واتساب." : "Send my booking confirmation and reminders on WhatsApp."}</span>
+                </label>
+                <label className="flex items-start gap-2 text-[11px] text-stone-600">
+                  <input type="checkbox" checked={authConsentMarketing} onChange={(e) => setAuthConsentMarketing(e.target.checked)} className="mt-0.5 accent-stone-900" />
+                  <span>{locale === "ar" ? "أوافق على استلام العروض التسويقية (اختياري)." : "Send me offers and promotions (optional)."}</span>
+                </label>
                 {authModalError && <p className="text-xs text-red-600 font-bold">{authModalError}</p>}
                 <button
                   type="button"

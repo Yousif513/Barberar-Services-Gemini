@@ -87,9 +87,9 @@ export default function CustomerSettingsPage() {
   });
 
   // Consents states (G13)
-  const [whatsappConsent, setWhatsappConsent] = useState(true);
+  const [whatsappConsent, setWhatsappConsent] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
-  const [photosConsent, setPhotosConsent] = useState(true);
+  const [photosConsent, setPhotosConsent] = useState(false);
 
   // Preference States
   const [emailNotif, setEmailNotif] = useState(true);

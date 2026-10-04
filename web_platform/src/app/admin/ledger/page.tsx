@@ -642,11 +642,26 @@ export default function AdminLedger() {
       setRunningRecon(true);
       setError("");
       setSuccess("");
-      const { data, error: rpcErr } = await supabase.rpc("run_daily_psp_reconciliation", {
-        p_date: reconDateInput
+      // Pulls the day's captured charges and refunds from Tap (reconcile-psp) and compares them with the ledger.
+      const { data, error: fnErr } = await supabase.functions.invoke("reconcile-psp", {
+        body: { date: reconDateInput }
       });
-      if (rpcErr) throw rpcErr;
-      setSuccess(t.reconSuccess);
+      if (fnErr) {
+        let detail = fnErr.message;
+        try {
+          const body = await (fnErr as { context?: Response }).context?.json();
+          if (body?.error) detail = body.error;
+        } catch {
+          // keep the generic message
+        }
+        // Without Tap access, record ledger totals only; the run is marked "awaiting PSP data", never "matched".
+        const { error: rpcErr } = await supabase.rpc("run_daily_psp_reconciliation", { p_date: reconDateInput });
+        if (rpcErr) throw rpcErr;
+        setError(`${detail}. ${lang === "ar" ? "تم تسجيل أرصدة السجل فقط بانتظار بيانات Tap." : "Ledger totals were recorded; the run is awaiting Tap data."}`);
+        await loadReconciliationRuns();
+        return;
+      }
+      setSuccess(data?.status === "matched" ? t.reconSuccess : (lang === "ar" ? "توجد فروقات بين Tap والسجل" : "Tap totals differ from the ledger"));
       await loadReconciliationRuns();
     } catch (err: any) {
       console.error("Reconciliation execution error:", err);
@@ -1247,17 +1262,19 @@ export default function AdminLedger() {
                       <tr key={run.id} className="hover:bg-gray-50/40">
                         <td className="py-4 px-6 font-bold text-gray-900 font-mono">{run.run_date}</td>
                         <td className="py-4 px-6 font-bold uppercase tracking-wider text-xs">{run.gateway}</td>
-                        <td className="py-4 px-6 font-mono text-emerald-700 font-bold">{formatMoney(run.total_captured_sar)} SAR</td>
-                        <td className="py-4 px-6 font-mono text-rose-700 font-bold">{formatMoney(run.total_refunded_sar)} SAR</td>
+                        <td className="py-4 px-6 font-mono text-emerald-700 font-bold">{run.total_captured_sar === null ? "—" : `${formatMoney(run.total_captured_sar)} SAR`}</td>
+                        <td className="py-4 px-6 font-mono text-rose-700 font-bold">{run.total_refunded_sar === null ? "—" : `${formatMoney(run.total_refunded_sar)} SAR`}</td>
                         <td className="py-4 px-6 font-mono font-bold">{formatMoney(run.total_ledger_gross_sar)} SAR</td>
                         <td className="py-4 px-6 font-mono font-bold">{formatMoney(run.discrepancy_amount_sar)} SAR</td>
                         <td className="py-4 px-6">
                           <span className={`inline-block rounded-full px-2.5 py-1 text-[9px] font-black uppercase tracking-wider ${
-                            run.status === "matched" 
+                            run.status === "matched"
                               ? "bg-[#ECFDF3] text-[#027A48] border border-[#D1FADF]"
+                              : run.status === "awaiting_psp_data"
+                              ? "bg-[#F2F4F7] text-[#344054] border border-[#EAECF0]"
                               : "bg-[#FEF3F2] text-[#B42318] border border-[#FECDCA]"
                           }`}>
-                            {run.status === "matched" ? t.reconStatusMatched : t.reconStatusDiscrepant}
+                            {run.status === "matched" ? t.reconStatusMatched : run.status === "awaiting_psp_data" ? (lang === "ar" ? "بانتظار بيانات Tap" : "Awaiting Tap data") : t.reconStatusDiscrepant}
                           </span>
                         </td>
                         <td className="py-4 px-6 text-gray-500 text-[11px] max-w-xs truncate">{run.notes || "—"}</td>

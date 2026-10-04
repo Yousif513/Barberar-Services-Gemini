@@ -245,21 +245,30 @@ export default function AdminNotificationsPage() {
     setIsDispatching(true);
     setDispatchResult(null);
     try {
-      const { data, error } = await supabase.rpc("dispatch_message_queue_batch", {
-        p_batch_size: 25
+      // Sends through the WhatsApp Cloud API via the dispatch-messages Edge Function; a message is
+      // counted as sent only when WhatsApp returns a message id.
+      const { data, error } = await supabase.functions.invoke("dispatch-messages", {
+        body: { batchSize: 25 }
       });
 
       if (error) {
-        setDispatchResult(`Error: ${error.message}`);
+        let detail = error.message;
+        try {
+          const body = await (error as { context?: Response }).context?.json();
+          if (body?.error) detail = body.error;
+        } catch {
+          // keep the generic message
+        }
+        setDispatchResult(`Error: ${detail}`);
       } else {
-        const res = data as { sent?: number; deferred_quiet_hours?: number; skipped_no_consent?: number };
+        const res = data as { sent?: number; failed?: number; deferred_quiet_hours?: number; skipped?: number };
         setDispatchResult(
           isRTL
-            ? `تم الإرسال: ${res?.sent ?? 0} | مؤجل للهدوء: ${res?.deferred_quiet_hours ?? 0} | مستبعد لعدم الموافقة: ${res?.skipped_no_consent ?? 0}`
-            : `Sent: ${res?.sent ?? 0} | Deferred: ${res?.deferred_quiet_hours ?? 0} | Skipped: ${res?.skipped_no_consent ?? 0}`
+            ? `أُرسلت: ${res?.sent ?? 0} | فشلت: ${res?.failed ?? 0} | مؤجلة لساعات الهدوء: ${res?.deferred_quiet_hours ?? 0} | مستبعدة: ${res?.skipped ?? 0}`
+            : `Sent: ${res?.sent ?? 0} | Failed: ${res?.failed ?? 0} | Deferred: ${res?.deferred_quiet_hours ?? 0} | Skipped: ${res?.skipped ?? 0}`
         );
-        loadData();
       }
+      loadData();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Dispatch failed";
       setDispatchResult(`Error: ${msg}`);
@@ -341,7 +350,7 @@ export default function AdminNotificationsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-[#ECECEC]">
             <div>
               <h3 className="text-sm font-bold text-gray-900">{t.recentTitle}</h3>
-              <p className="text-xs text-gray-400">Saudi Quiet Hours: 22:00 - 09:00 AST (UTC+3) · Utility Message Fee: 0.15 SAR</p>
+              <p className="text-xs text-gray-400">Saudi Quiet Hours: 22:00 - 09:00 AST (UTC+3) · Costs come from your WhatsApp Business account billing</p>
             </div>
             <div className={`flex items-center gap-3 ${flip}`}>
               {dispatchResult && (

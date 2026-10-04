@@ -37,8 +37,8 @@ const translations = {
     confirmReschedule: "Confirm Reschedule",
     rescheduling: "Rescheduling...",
     noSlotsFound: "No available slots on this date. Please pick another day.",
-    taxInvoiceBtn: "View Tax Invoice (ZATCA)",
-    taxInvoiceTitle: "Simplified Tax Invoice (ZATCA)",
+    taxInvoiceBtn: "View tax invoice",
+    taxInvoiceTitle: "Simplified tax invoice",
     invoiceNumber: "Invoice Number",
     issueDate: "Issue Date",
     seller: "Provider (Seller)",
@@ -47,8 +47,8 @@ const translations = {
     subtotal: "Subtotal (Excl. VAT)",
     vatAmount: "VAT (15%)",
     totalAmount: "Total (Incl. VAT)",
-    zatcaQr: "ZATCA Cryptographic QR Payload",
-    zatcaReported: "Reported to ZATCA (Phase 1 & 2)",
+    zatcaQr: "Invoice QR (ZATCA Phase 1 format)",
+    zatcaReported: "Not yet submitted to ZATCA (FATOORA Phase 2 integration pending)",
     openDispute: "File Dispute / Refund",
     disputeTitle: "Open Booking Dispute / Refund Request",
     disputeReason: "Reason for Dispute",
@@ -64,7 +64,7 @@ const translations = {
     tipCustom: "Custom Amount (SAR)",
     sendTipBtn: "Send Tip",
     sendingTip: "Processing Tip...",
-    tipSuccess: "Tip sent successfully! Thank you for supporting your specialist.",
+    tipSuccess: "Redirecting to payment for your tip...",
     minTipNotice: "Minimum tip amount is 5 SAR."
   },
   ar: {
@@ -99,7 +99,7 @@ const translations = {
     confirmReschedule: "تأكيد إعادة الجدولة",
     rescheduling: "جاري الجدولة...",
     noSlotsFound: "لا توجد أوقات شاغرة في هذا اليوم. يرجى اختيار يوم آخر.",
-    taxInvoiceBtn: "عرض الفاتورة الضريبية (ZATCA)",
+    taxInvoiceBtn: "عرض الفاتورة الضريبية",
     taxInvoiceTitle: "فاتورة ضريبية مبسطة (هيئة الزكاة)",
     invoiceNumber: "رقم الفاتورة",
     issueDate: "تاريخ الإصدار",
@@ -110,7 +110,7 @@ const translations = {
     vatAmount: "ضريبة القيمة المضافة (١٥٪)",
     totalAmount: "المبلغ الإجمالي شامل الضريبة",
     zatcaQr: "رمز الاستجابة السريعة لهيئة الزكاة (QR)",
-    zatcaReported: "مُبلّغ لهيئة الزكاة والضريبة والجمارك (المرحلة الأولى والثانية)",
+    zatcaReported: "لم تُرسل بعد إلى هيئة الزكاة (الربط مع فاتورة - المرحلة الثانية قيد التنفيذ)",
     openDispute: "رفع نزاع مالي أو طلب استرداد",
     disputeTitle: "تقديم نزاع مالي / طلب استرداد",
     disputeReason: "سبب النزاع",
@@ -126,7 +126,7 @@ const translations = {
     tipCustom: "مبلغ مخصص (ريال)",
     sendTipBtn: "إرسال الإكرامية الآن",
     sendingTip: "جاري المعالجة...",
-    tipSuccess: "تم إرسال الإكرامية بنجاح! شكراً لدعمك لمختص العناية.",
+    tipSuccess: "جاري تحويلك لصفحة دفع الإكرامية...",
     minTipNotice: "الحد الأدنى للإكرامية 5 ريال."
   }
 };
@@ -184,13 +184,15 @@ export default function CustomerBookingsPage() {
         p_payment_method: "card"
       });
       if (rpcErr) throw rpcErr;
+      // The tip is credited to the professional only after Tap confirms the payment.
+      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
+        body: { purchaseType: "tip", purchaseId: data.purchase_id }
+      });
+      if (checkoutError || !checkout?.checkoutUrl) {
+        throw new Error(locale === "ar" ? "تعذر فتح صفحة الدفع، لم يُخصم أي مبلغ." : "Could not open the payment page; nothing was charged.");
+      }
       setTipSuccess(t.tipSuccess);
-      setActionMessage(t.tipSuccess);
-      setTimeout(() => {
-        setTipTarget(null);
-        setTipSuccess("");
-        setCustomTip("");
-      }, 2000);
+      window.location.assign(checkout.checkoutUrl);
     } catch (err: any) {
       console.error("Tip error:", err);
       setTipError(err.message || "Failed to submit tip.");
@@ -208,15 +210,10 @@ export default function CustomerBookingsPage() {
       });
       if (rpcErr) throw rpcErr;
       setInvoiceData(data);
-    } catch (err) {
-      console.error("ZATCA generation error:", err);
-      // Fallback display
-      setInvoiceData({
-        invoice_number: `INV-${new Date().getFullYear()}-${bk.id.substring(0, 8).toUpperCase()}`,
-        total_amount_sar: bk.total_price,
-        vat_amount_sar: (Number(bk.total_price) - Number(bk.total_price) / 1.15).toFixed(2),
-        zatca_qr_code: "ZATCA_SIMPLIFIED_TAX_INVOICE_REPORTED"
-      });
+    } catch (err: any) {
+      setInvoiceModalTarget(null);
+      setInvoiceData(null);
+      setActionMessage(err?.message || (locale === "ar" ? "تعذر إصدار الفاتورة" : "Could not issue the invoice"));
     } finally {
       setInvoiceLoading(false);
     }
@@ -249,22 +246,23 @@ export default function CustomerBookingsPage() {
     }
   };
 
+  // Builds the XML only from the invoice issued by the server (seller VAT number from the provider).
   const handleDownloadInvoice = (bk: any) => {
+    if (!invoiceData?.invoice_number || !invoiceData?.seller_vat_number) return;
     try {
+      const issued = new Date(invoiceData.issue_date || invoiceData.created_at);
       const xmlString = generateZatcaXml({
-        invoiceId: `INV-${bk.id.substring(0, 8).toUpperCase()}`,
-        uuid: bk.id.includes("bk-") ? "f5f0b5d0-9bb4-4cfd-8e43-1e58ea9c1a55" : bk.id, // Ensure UUID format
-        issueDate: new Date(bk.scheduled_at).toISOString().split('T')[0],
-        issueTime: new Date(bk.scheduled_at).toTimeString().split(' ')[0],
-        sellerName: locale === "ar" 
-          ? bk.branches?.providers?.business_name_ar || bk.branches?.providers?.business_name_en
-          : bk.branches?.providers?.business_name_en,
-        sellerVatNumber: "310122345600003", // Saudi mock VAT number
+        invoiceId: invoiceData.invoice_number,
+        uuid: invoiceData.id,
+        issueDate: issued.toISOString().split('T')[0],
+        issueTime: issued.toISOString().split('T')[1].slice(0, 8),
+        sellerName: invoiceData.seller_name,
+        sellerVatNumber: invoiceData.seller_vat_number,
         sellerAddress: locale === "ar" ? bk.branches?.name_ar : bk.branches?.name_en,
         items: [
           {
             name: locale === "ar" ? bk.services?.name_ar : bk.services?.name_en,
-            price: Number(bk.total_price),
+            price: Number(invoiceData.subtotal_sar),
             vatRate: 0.15
           }
         ]
@@ -965,19 +963,19 @@ export default function CustomerBookingsPage() {
                 <div className="flex justify-between">
                   <span className="text-gray-500 font-semibold">{t.subtotal}</span>
                   <span className="font-mono font-bold text-gray-900">
-                    {(Number(invoiceData.total_amount_sar || invoiceModalTarget.total_price) / 1.15).toFixed(2)} {t.currency}
+                    {Number(invoiceData.subtotal_sar).toFixed(2)} {t.currency}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500 font-semibold">{t.vatAmount}</span>
                   <span className="font-mono font-bold text-amber-700">
-                    {invoiceData.vat_amount_sar || (Number(invoiceModalTarget.total_price) - Number(invoiceModalTarget.total_price) / 1.15).toFixed(2)} {t.currency}
+                    {Number(invoiceData.vat_amount_sar).toFixed(2)} {t.currency}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm pt-1 border-t border-gray-200 font-black">
                   <span className="text-gray-900">{t.totalAmount}</span>
                   <span className="text-black font-mono">
-                    {invoiceData.total_amount_sar || invoiceModalTarget.total_price} {t.currency}
+                    {Number(invoiceData.total_amount_sar).toFixed(2)} {t.currency}
                   </span>
                 </div>
               </div>

@@ -1033,27 +1033,60 @@ export default function AdminProviderManagement() {
     }
   };
 
+  const applyCrStatus = (providerId: string, crNumber: string, status: string) => {
+    setProviders((prev) => prev.map((p) => p.id === providerId ? { ...p, crNumber, crVerificationStatus: status } : p));
+    if (detail?.id === providerId) {
+      setDetail((prev) => prev ? { ...prev, crNumber, crVerificationStatus: status } : null);
+    }
+  };
+
+  // Calls the Ministry of Commerce Wathq API through the wathq-verify Edge Function.
   const handleVerifyCr = async (providerId: string, crNumber: string) => {
-    if (!crNumber || !/^[0-9]{10}$/.test(crNumber.trim())) {
+    const cr = crNumber.trim();
+    if (!/^[0-9]{10}$/.test(cr)) {
       setError(isRTL ? "يجب أن يتكون السجل التجاري من 10 أرقام بالضبط." : "Commercial Registration (CR) must be exactly 10 digits.");
       return;
     }
     setError("");
-    try {
-      const { error: rpcError } = await supabase.rpc("verify_provider_cr", {
-        p_provider_id: providerId,
-        p_cr_number: crNumber.trim()
-      });
-      if (rpcError) throw rpcError;
-      setNotice(isRTL ? "تم التحقق من السجل التجاري بنجاح عبر واثق وتوثيق الشريك." : "CR verified successfully via Wathq and provider certified.");
-      setProviders((prev) => prev.map((p) => p.id === providerId ? { ...p, crNumber: crNumber.trim(), crVerificationStatus: "verified", applicationStatus: "approved" } : p));
-      if (detail?.id === providerId) {
-        setDetail((prev) => prev ? { ...prev, crNumber: crNumber.trim(), crVerificationStatus: "verified", applicationStatus: "approved" } : null);
+    setNotice("");
+    const { data, error: fnError } = await supabase.functions.invoke("wathq-verify", { body: { providerId, crNumber: cr } });
+    if (fnError) {
+      let detailMessage = fnError.message;
+      try {
+        const body = await (fnError as { context?: Response }).context?.json();
+        if (body?.error) detailMessage = body.error;
+      } catch {
+        // keep the generic message
       }
-    } catch (err: any) {
-      console.error("Wathq verification failed:", err);
-      setError(err?.message || (isRTL ? "فشل التحقق من السجل التجاري عبر واثق." : "Failed to verify CR via Wathq."));
+      setError(detailMessage);
+      return;
     }
+    if (data?.status === "verified") {
+      setNotice(isRTL ? "أكد واثق أن السجل التجاري قائم." : "Wathq confirmed the Commercial Registration is active.");
+      applyCrStatus(providerId, cr, "verified");
+    } else {
+      setError(isRTL ? "واثق لم يؤكد هذا السجل التجاري (غير موجود أو غير قائم)." : "Wathq did not confirm this CR (not found or not active).");
+      applyCrStatus(providerId, cr, "rejected");
+    }
+  };
+
+  // Manual review of the CR certificate by an admin. Recorded as "manually reviewed", never as Wathq-verified.
+  const handleManualCrReview = async (providerId: string, crNumber: string) => {
+    const cr = crNumber.trim();
+    const notes = prompt(isRTL ? "ما الذي تم التحقق منه؟ (المستند، تاريخ الانتهاء)" : "What did you check? (document reviewed, expiry date)", "");
+    if (!notes || !notes.trim()) return;
+    setError("");
+    const { error: rpcError } = await supabase.rpc("admin_record_cr_review", {
+      p_provider_id: providerId,
+      p_cr_number: cr,
+      p_notes: notes.trim(),
+    });
+    if (rpcError) {
+      setError(rpcError.message);
+      return;
+    }
+    setNotice(isRTL ? "تم تسجيل المراجعة اليدوية للسجل التجاري." : "Manual CR review recorded.");
+    applyCrStatus(providerId, cr, "manually_reviewed");
   };
 
   useEffect(() => {
@@ -1804,19 +1837,36 @@ export default function AdminProviderManagement() {
                         ? "bg-[#ECFDF3] text-[#027A48]"
                         : "bg-[#FFFAEB] text-[#B54708]"
                     }`}>
-                      {detail.crVerificationStatus === "verified" ? (isRTL ? "موثق ومعتمد" : "Verified & Active") : (isRTL ? "غير موثق" : "Unverified")}
+                      {detail.crVerificationStatus === "verified"
+                        ? (isRTL ? "مؤكد عبر واثق" : "Confirmed by Wathq")
+                        : detail.crVerificationStatus === "manually_reviewed"
+                        ? (isRTL ? "مراجعة يدوية" : "Manually reviewed")
+                        : detail.crVerificationStatus === "rejected"
+                        ? (isRTL ? "غير قائم في واثق" : "Not active in Wathq")
+                        : (isRTL ? "غير موثق" : "Unverified")}
                     </span>
                   </div>
                   {detail.crVerificationStatus !== "verified" && (
-                    <button
-                      onClick={() => {
-                        const cr = prompt(isRTL ? "أدخل رقم السجل التجاري (10 أرقام):" : "Enter 10-digit CR Number:", detail.crNumber || "");
-                        if (cr) void handleVerifyCr(detail.id, cr);
-                      }}
-                      className="px-4 py-2 rounded-xl bg-[#101828] text-[#F4E7B6] text-xs font-black hover:bg-black transition"
-                    >
-                      {isRTL ? "التحقق والتوثيق عبر واثق" : "Verify via Wathq"}
-                    </button>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => {
+                          const cr = prompt(isRTL ? "أدخل رقم السجل التجاري (10 أرقام):" : "Enter 10-digit CR Number:", detail.crNumber || "");
+                          if (cr) void handleVerifyCr(detail.id, cr);
+                        }}
+                        className="px-4 py-2 rounded-xl bg-[#101828] text-[#F4E7B6] text-xs font-black hover:bg-black transition"
+                      >
+                        {isRTL ? "التحقق عبر واثق" : "Check with Wathq"}
+                      </button>
+                      <button
+                        onClick={() => {
+                          const cr = prompt(isRTL ? "أدخل رقم السجل التجاري (10 أرقام):" : "Enter 10-digit CR Number:", detail.crNumber || "");
+                          if (cr) void handleManualCrReview(detail.id, cr);
+                        }}
+                        className="px-4 py-2 rounded-xl border border-gray-300 text-gray-800 text-xs font-bold hover:border-gray-500 transition"
+                      >
+                        {isRTL ? "تسجيل مراجعة يدوية" : "Record manual review"}
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>

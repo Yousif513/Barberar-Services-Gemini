@@ -245,14 +245,20 @@ export default function BecomeProviderRootPage() {
 
       if (error) throw error;
 
-      try {
-        await supabase.rpc("record_agreement_acceptance", {
+      // Acceptance is recorded only against a published (legally reviewed) agreement version.
+      const { data: publishedAgreement } = await supabase
+        .from("legal_agreements")
+        .select("version")
+        .eq("agreement_key", "provider_agreement")
+        .eq("status", "published")
+        .maybeSingle();
+      if (publishedAgreement?.version) {
+        const { error: acceptanceError } = await supabase.rpc("record_agreement_acceptance", {
           p_agreement_key: "provider_agreement",
-          p_version: "v1.0",
+          p_version: publishedAgreement.version,
           p_method: "become_provider_form"
         });
-      } catch (accErr) {
-        console.warn("Agreement acceptance record:", accErr);
+        if (acceptanceError) throw acceptanceError;
       }
 
       setExistingApp(data);

@@ -278,12 +278,19 @@ export default function PricingPage() {
 
       if (rpcErr) throw rpcErr;
 
-      setCurrentSubscription({
-        plan_id: targetPlanId,
-        billing_interval: targetInterval,
-        status: "active"
+      // Free plans activate immediately; paid plans activate only after Tap confirms the payment.
+      if (data?.status === "paid") {
+        setCurrentSubscription({ plan_id: targetPlanId, billing_interval: targetInterval, status: "active" });
+        setCheckoutStep("success");
+        return;
+      }
+      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
+        body: { purchaseType: "subscription", purchaseId: data.purchase_id }
       });
-      setCheckoutStep("success");
+      if (checkoutError || !checkout?.checkoutUrl) {
+        throw new Error(locale === "ar" ? "تعذر فتح صفحة الدفع، لم يتم تغيير الباقة." : "Could not open the payment page; your plan was not changed.");
+      }
+      window.location.assign(checkout.checkoutUrl);
     } catch (err: any) {
       console.error("Subscription error:", err);
       setCheckoutError(err?.message || (locale === "ar" ? "فشل معالجة الاشتراك" : "Failed to process subscription"));

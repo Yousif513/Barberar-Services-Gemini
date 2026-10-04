@@ -22,8 +22,8 @@ function LoginForm() {
   const [phone, setPhone] = useState("");
   const [otpCode, setOtpCode] = useState("");
   const [otpSent, setOtpSent] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(true);
-  const [whatsappConsent, setWhatsappConsent] = useState(true);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [whatsappConsent, setWhatsappConsent] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");

@@ -696,8 +696,12 @@ export default function ProviderCalendarPage() {
       setSuccess("");
 
       const selectedService = services.find(s => s.id === bookService);
-      const basePrice = selectedService ? selectedService.base_price : 100;
-      const baseDuration = selectedService ? selectedService.base_duration_minutes : 60;
+      if (!selectedService) {
+        throw new Error(lang === "ar" ? "اختر الخدمة أولاً" : "Select a service first");
+      }
+      if (!bookCustomer.trim()) {
+        throw new Error(lang === "ar" ? "أدخل اسم العميل" : "Enter the customer's name");
+      }
 
       const slotLabel = timeSlots[targetSlotIndex].label;
       const [timePart, ampm] = slotLabel.split(" ");
@@ -706,58 +710,30 @@ export default function ProviderCalendarPage() {
       const minutes = parseInt(minutesStr, 10) || 0;
       if (ampm === "PM" && hours !== 12) hours += 12;
       if (ampm === "AM" && hours === 12) hours = 0;
+      const dateKey = new Date(selectedDate).toLocaleDateString("en-CA", { timeZone: "Asia/Riyadh" });
+      const scheduledAt = `${dateKey}T${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00+03:00`;
 
-      const bookingTime = new Date(selectedDate);
-      bookingTime.setHours(hours, minutes, 0, 0);
-
-      let customerIdVal = selectedCustomerId;
-      if (!customerIdVal) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) customerIdVal = user.id;
-      }
-
-      const employeeObj = employees.find(e => e.id === targetEmployeeId);
-      const { data: empData } = await supabase
+      const { data: empData, error: empError } = await supabase
         .from("employees")
         .select("branch_id")
         .eq("id", targetEmployeeId)
         .maybeSingle();
+      if (empError || !empData?.branch_id) {
+        throw new Error(lang === "ar" ? "تعذر تحديد فرع الموظف" : "Could not determine the staff member's branch");
+      }
 
-      const branchIdVal = empData?.branch_id || employeeObj?.branch_id || branches[0]?.id || "00000000-0000-0000-0000-000000000001";
-
-      const { data: walkInData, error: rpcError } = await supabase.rpc("create_walk_in_booking", {
-        p_branch_id: branchIdVal,
+      // Server-side counter booking: provider fee rules (0% for walk-ins), VAT and audit apply; no browser fallback.
+      const { error: rpcError } = await supabase.rpc("create_walk_in_booking", {
+        p_branch_id: empData.branch_id,
         p_employee_id: targetEmployeeId,
         p_service_id: bookService,
-        p_customer_name: bookCustomer || (lang === "ar" ? "عميل حضور" : "Walk-in Guest"),
+        p_customer_name: bookCustomer.trim(),
         p_customer_phone: null,
         p_payment_method: "cash",
-        p_total_price: Number(bookPrice || basePrice)
+        p_total_price: bookPrice ? Number(bookPrice) : null,
+        p_scheduled_at: scheduledAt
       });
-
-      if (rpcError) {
-        // Fallback resilient insert
-        const payload = {
-          customer_id: customerIdVal,
-          branch_id: branchIdVal,
-          employee_id: targetEmployeeId,
-          service_id: bookService,
-          status: "in_service",
-          is_home_service: false,
-          scheduled_at: bookingTime.toISOString(),
-          duration_minutes: baseDuration,
-          total_price: Number(bookPrice || basePrice),
-          deposit_required: 0,
-          platform_fee: 0,
-          source: "walk_in"
-        };
-
-        const { error: insertError } = await supabase
-          .from("bookings")
-          .insert(payload);
-
-        if (insertError) throw insertError;
-      }
+      if (rpcError) throw rpcError;
 
       setSuccess(lang === "ar" ? "تم تسجيل حجز الحضور بنجاح" : "Walk-in booking created successfully.");
       setShowBookModal(false);

@@ -285,9 +285,14 @@ export default function CustomerWalletPage() {
 
       if (purchaseErr) throw purchaseErr;
 
-      setGiftSuccessMsg(locale === "ar" 
-        ? `تم إصدار بطاقة الهدية بنجاح! كود الهدية: ${data?.code || "PRM-GIFT"}` 
-        : `Gift card issued successfully! Gift code: ${data?.code || "PRM-GIFT"}`);
+      // The card becomes usable (and its code is shown) only after Tap confirms the payment.
+      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
+        body: { purchaseType: "gift_card", purchaseId: data.purchase_id }
+      });
+      if (checkoutError || !checkout?.checkoutUrl) {
+        throw new Error(locale === "ar" ? "تعذر فتح صفحة الدفع، لم يتم إصدار البطاقة." : "Could not open the payment page; the gift card was not issued.");
+      }
+      window.location.assign(checkout.checkoutUrl);
 
       setGiftForm({
         recipientName: "",
@@ -508,7 +513,7 @@ export default function CustomerWalletPage() {
               <div key={card.id} className="bg-stone-50 border border-stone-200 rounded-xl p-4 flex flex-col justify-between space-y-3">
                 <div className="flex justify-between items-start">
                   <div>
-                    <span className="font-mono text-xs font-bold text-stone-900 block tracking-wider">{card.code}</span>
+                    <span className="font-mono text-xs font-bold text-stone-900 block tracking-wider">{card.status === "pending_payment" ? (locale === "ar" ? "بانتظار الدفع" : "Awaiting payment") : card.code}</span>
                     <span className="text-[10px] text-stone-500 block mt-0.5">
                       {locale === "ar" ? `مُهدى إلى: ${card.recipient_name}` : `For: ${card.recipient_name}`}
                     </span>

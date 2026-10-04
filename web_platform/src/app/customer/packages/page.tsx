@@ -52,7 +52,7 @@ const translations = {
     bookSession: "Book Session",
     purchaseBtn: "Purchase Package",
     purchasing: "Purchasing...",
-    purchaseSuccess: "Package purchased successfully! Your session balance is now updated.",
+    purchaseSuccess: "Payment received. Your package is active.",
     priceSar: "SAR",
     sessionsCount: "sessions",
     validFor: "Valid for",
@@ -72,7 +72,7 @@ const translations = {
     bookSession: "حجز موعد",
     purchaseBtn: "شراء الباقة الآن",
     purchasing: "جاري الشراء...",
-    purchaseSuccess: "تم شراء الباقة بنجاح! تم تحديث رصيد جلساتك الآن.",
+    purchaseSuccess: "تم استلام الدفع وتفعيل الباقة.",
     priceSar: "ريال",
     sessionsCount: "جلسات",
     validFor: "صالحة لمدة",
@@ -123,6 +123,7 @@ export default function CustomerPackagesPage() {
           .from("user_packages")
           .select(`
             id,
+            status,
             remaining_sessions,
             expires_at,
             packages (
@@ -139,6 +140,7 @@ export default function CustomerPackagesPage() {
               )
             )
           `)
+          .eq("status", "active")
           .eq("customer_id", user.id)
           .order("created_at", { ascending: false });
 
@@ -195,9 +197,14 @@ export default function CustomerPackagesPage() {
 
       if (purchaseErr) throw purchaseErr;
 
-      setSuccessMsg(t.purchaseSuccess);
-      await loadAllPackages();
-      setActiveTab("my_passes");
+      // The package activates only after Tap confirms the payment (payment webhook).
+      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
+        body: { purchaseType: "package", purchaseId: data.purchase_id }
+      });
+      if (checkoutError || !checkout?.checkoutUrl) {
+        throw new Error(isRTL ? "تعذر فتح صفحة الدفع، لم يتم تفعيل الباقة." : "Could not open the payment page; the package was not activated.");
+      }
+      window.location.assign(checkout.checkoutUrl);
     } catch (err: any) {
       console.error("Purchase failed:", err.message);
       setError(err.message || "Failed to purchase package.");

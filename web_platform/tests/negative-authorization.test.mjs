@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync as readRaw } from "node:fs";
+const readFileSync = (path, enc) => readRaw(path, enc).replace(/\r\n/g, "\n");
 import { fileURLToPath } from "node:url";
 import { dirname, resolve, join } from "node:path";
 
@@ -15,10 +16,11 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         join(rootDir, "supabase/functions/process-refund/index.ts"),
         "utf8"
       );
-      assert.ok(code.includes('req.headers.get("Authorization")'), "Must check Authorization header");
+      assert.ok(code.includes("resolveCaller(req)"), "Must resolve the caller from the Authorization header");
       assert.ok(code.includes('401'), "Must return 401 when unauthenticated");
-      assert.ok(code.includes('profile?.role !== "admin"'), "Must require profiles.role === 'admin'");
+      assert.ok(code.includes('caller.kind === "user"'), "Must reject non-admin users");
       assert.ok(code.includes('403'), "Must return 403 when caller is not admin");
+      assert.ok(code.includes("processRefundRequest("), "Must refund only recorded refund requests");
       assert.ok(!code.includes('"Access-Control-Allow-Origin": "*"'), "Forbidden: Access-Control-Allow-Origin: *");
     });
 
@@ -465,9 +467,11 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         join(rootDir, "supabase/functions/dispatch-messages/index.ts"),
         "utf8"
       );
-      assert.ok(fnCode.includes("Authorization"), "Must require Authorization header");
-      assert.ok(fnCode.includes("profile.role !== \"admin\""), "Must require admin role when not service_role");
-      assert.ok(fnCode.includes("dispatch_message_queue_batch"), "Must invoke database dispatcher RPC");
+      assert.ok(fnCode.includes("resolveCaller(req)"), "Must resolve the caller from the Authorization header");
+      assert.ok(fnCode.includes('caller.kind === "user"'), "Must reject non-admin users");
+      assert.ok(fnCode.includes("claim_message_batch"), "Must claim messages through the database");
+      assert.ok(fnCode.includes("graph.facebook.com"), "Must send through the WhatsApp Cloud API");
+      assert.ok(!fnCode.includes("wamid_"), "Must never fabricate WhatsApp message ids");
     });
 
     it("admin/notifications connects to live pipeline and offers queue dispatch", () => {
@@ -478,7 +482,7 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(!notifCode.includes("INITIAL_HISTORY = ["), "Must not use hardcoded mock history");
       assert.ok(notifCode.includes('from("message_log")'), "Must query live message_log");
       assert.ok(notifCode.includes('from("message_queue")'), "Must query live message_queue");
-      assert.ok(notifCode.includes('dispatch_message_queue_batch'), "Must allow manual queue dispatch");
+      assert.ok(notifCode.includes('functions.invoke("dispatch-messages"'), "Must allow manual queue dispatch through the Edge Function");
       assert.ok(notifCode.includes("Quiet Hours") || notifCode.includes("ساعات الهدوء"), "Must display quiet hours metrics");
     });
 
@@ -778,7 +782,7 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         join(webPlatformDir, "src/app/shop/[id]/page.tsx"),
         "utf8"
       );
-      assert.ok(shopCode.includes("Wathq Verified CR"), "Shop page must render Wathq verified badge");
+      assert.ok(shopCode.includes("shop.crVerified &&"), "Shop page shows the Wathq badge only for verified CRs");
       assert.ok(shopCode.includes("experienceYears"), "Shop page specialist card must render experience");
     });
   });
@@ -1169,9 +1173,9 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(p2bMigration.includes("ALTER TABLE public.booking_tips ENABLE ROW LEVEL SECURITY"), "Must enable RLS on booking_tips");
       assert.ok(p2bMigration.includes("FUNCTION public.add_booking_tip"), "Must define add_booking_tip RPC");
       assert.ok(p2bMigration.includes("Only the booking customer can send a tip"), "Must restrict tipping to the booking customer");
-      assert.ok(p2bMigration.includes("platform_fee,\n        tax_collected,\n        net_provider_payout"), "Must insert tip into transactional_ledger");
-      assert.ok(p2bMigration.includes("0.00, -- 0% platform commission on tips"), "Must enforce 0% platform fee on tips");
-      assert.ok(p2bMigration.includes("customer.tip_submitted"), "Must record customer.tip_submitted audit event");
+      const moneyFix = readFileSync(join(rootDir, "supabase/migrations/20261005010000_review_fix_money.sql"), "utf8");
+      assert.ok(moneyFix.includes("'tip', p_payment_intent_id, p_amount, 0, p_amount, p_amount, 'pending'"), "Tip reaches the ledger only after a confirmed payment, 0% platform share");
+      assert.ok(moneyFix.includes("A tip was already sent for this visit"), "One tip per visit");
     });
 
     it("gift_cards & gift_card_redemptions enforce minimum 50 SAR, 365-day expiry, and balance tracking (G48)", () => {
@@ -1233,15 +1237,17 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         "utf8"
       );
       assert.ok(customerBookingsCode.includes("add_booking_tip"), "Customer bookings must wire add_booking_tip RPC");
+      assert.ok(customerBookingsCode.includes('purchaseType: "tip"'), "Tips are paid through checkout before they count");
       assert.ok(customerBookingsCode.includes("100% of your tip goes directly to your specialist"), "Customer bookings must highlight 100% to specialist notice");
 
       const shopCode = readFileSync(
         join(webPlatformDir, "src/app/shop/[id]/page.tsx"),
         "utf8"
       );
-      assert.ok(shopCode.includes("apply_coupon_to_booking"), "Shop page must call apply_coupon_to_booking RPC");
-      assert.ok(shopCode.includes("redeem_gift_card"), "Shop page must call redeem_gift_card RPC");
-      assert.ok(shopCode.includes("redeem_loyalty_points"), "Shop page must call redeem_loyalty_points RPC");
+      assert.ok(shopCode.includes("request_coupon_code: appliedCoupon?.code"), "Shop page passes the promo code to create_booking");
+      assert.ok(shopCode.includes("request_gift_card_code: appliedGiftCard?.code"), "Shop page passes the gift card to create_booking");
+      assert.ok(shopCode.includes("request_loyalty_points: redeemLoyalty"), "Shop page passes loyalty points to create_booking");
+      assert.ok(!shopCode.includes("apply_coupon_to_booking"), "No discount is applied after the booking is priced");
 
       const walletCode = readFileSync(
         join(webPlatformDir, "src/app/customer/wallet/page.tsx"),
@@ -1333,9 +1339,7 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         "utf8"
       );
       assert.ok(shopCode.includes("toggle_customer_favorite"), "Shop page must wire toggle_customer_favorite RPC");
-      assert.ok(shopCode.includes("tabby"), "Shop page must feature Tabby BNPL option");
-      assert.ok(shopCode.includes("tamara"), "Shop page must feature Tamara BNPL option");
-      assert.ok(shopCode.includes("bnplSplitText"), "Shop page must display BNPL 4-installment simulation");
+      assert.ok(!/tabby|tamara|bnpl/i.test(shopCode), "No instalment option is shown until a BNPL provider is integrated");
     });
   });
 });

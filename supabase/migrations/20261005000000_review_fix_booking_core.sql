@@ -917,7 +917,8 @@ CREATE OR REPLACE FUNCTION public.create_walk_in_booking(
   p_customer_name TEXT,
   p_customer_phone TEXT DEFAULT NULL,
   p_payment_method TEXT DEFAULT 'cash',
-  p_total_price NUMERIC DEFAULT NULL
+  p_total_price NUMERIC DEFAULT NULL,
+  p_scheduled_at TIMESTAMPTZ DEFAULT NULL
 )
 RETURNS JSONB
 LANGUAGE plpgsql
@@ -932,7 +933,13 @@ DECLARE
   v_phone TEXT := NULLIF(regexp_replace(COALESCE(p_customer_phone, ''), '\s', '', 'g'), '');
   v_price NUMERIC(10,2);
   v_booking public.bookings;
+  -- Counter bookings: a walk-in now, or a time the staff member picked in the calendar.
+  v_start TIMESTAMPTZ := date_trunc('minute', COALESCE(p_scheduled_at, now()));
+  v_is_now BOOLEAN := p_scheduled_at IS NULL OR p_scheduled_at <= now() + interval '10 minutes';
 BEGIN
+  IF v_start < now() - interval '15 minutes' THEN
+    RAISE EXCEPTION 'A counter booking cannot start in the past' USING ERRCODE = '22023';
+  END IF;
   SELECT provider_id INTO v_provider_id FROM public.branches WHERE id = p_branch_id;
   IF v_provider_id IS NULL THEN
     RAISE EXCEPTION 'Branch not found' USING ERRCODE = 'P0002';
@@ -975,15 +982,15 @@ BEGIN
       source, is_first_visit, checked_in_at, walk_in_name, walk_in_phone
     ) VALUES (
       v_customer_id, p_branch_id, p_employee_id, p_service_id, 'confirmed',
-      date_trunc('minute', now()), v_service.duration,
+      v_start, v_service.duration,
       v_price, v_price, ROUND(v_price * 0.15, 2), 0,
       public.calculate_booking_platform_commission('walk_in', FALSE, v_price, v_provider_id),
-      'walk_in', FALSE, now(), TRIM(p_customer_name), v_phone
+      'walk_in', FALSE, CASE WHEN v_is_now THEN now() ELSE NULL END, TRIM(p_customer_name), v_phone
     )
     RETURNING * INTO v_booking;
   EXCEPTION
     WHEN exclusion_violation THEN
-      RAISE EXCEPTION 'This professional already has a booking right now' USING ERRCODE = '23P01';
+      RAISE EXCEPTION 'This professional already has a booking at that time' USING ERRCODE = '23P01';
   END;
 
   INSERT INTO public.booking_services (booking_id, service_id, employee_id, sequence_order, duration_minutes, price)
@@ -1999,7 +2006,7 @@ BEGIN
     'public.toggle_customer_block(uuid, uuid, text, boolean)',
     'public.create_booking(uuid, uuid, timestamptz, boolean, numeric, numeric, uuid, text, text, text, integer, uuid, text)',
     'public.create_multi_service_booking(uuid, uuid, timestamptz, jsonb, boolean, text, text, text, text, integer, numeric, numeric, uuid)',
-    'public.create_walk_in_booking(uuid, uuid, uuid, text, text, text, numeric)',
+    'public.create_walk_in_booking(uuid, uuid, uuid, text, text, text, numeric, timestamptz)',
     'public.cancel_booking(uuid, text)',
     'public.mark_booking_no_show(uuid, text)',
     'public.employee_update_booking_status(uuid, character varying, text)',
