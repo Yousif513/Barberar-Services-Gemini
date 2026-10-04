@@ -1,24 +1,29 @@
-import React, { useState } from "react";
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  ScrollView, 
-  Image, 
-  Dimensions 
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ShopDetailsModal } from "@/components/shop-details-modal";
-import { mockShops, mockServices } from "@/constants/mockData";
+import { Category, MarketplaceProvider, formatSar, loadCategories, searchProviders } from "@/lib/marketplace";
 
-const { width } = Dimensions.get("window");
+type LoadState = "loading" | "ready" | "error";
 
 export default function HomeScreen() {
   const [lang, setLang] = useState<"en" | "ar">("ar");
-  const [isHomeService, setIsHomeService] = useState(false);
-  const [selectedProvider, setSelectedProvider] = useState<any>(null);
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("all");
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [providers, setProviders] = useState<MarketplaceProvider[]>([]);
+  const [loadState, setLoadState] = useState<LoadState>("loading");
+  const [loadError, setLoadError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
+  const [selectedProvider, setSelectedProvider] = useState<MarketplaceProvider | null>(null);
 
   const toggleLanguage = () => setLang((prev) => (prev === "en" ? "ar" : "en"));
 
@@ -26,125 +31,146 @@ export default function HomeScreen() {
   const t = {
     en: {
       brand: "Beauty & Grooming",
-      city: "Riyadh, KSA",
-      searchPlaceholder: "Search salons, stylists, or makeup artists...",
-      inStore: "In-Salon",
-      homeService: "Home Service",
-      menCategory: "Men's Grooming",
-      womenCategory: "Women's Beauty",
+      city: "Saudi Arabia",
+      searchPlaceholder: "Search salons, services or districts...",
+      allCategories: "All",
       topSalons: "Recommended Near You",
       reviews: "reviews",
+      newShop: "New - no reviews yet",
       startingFrom: "Starting from",
-      bookNow: "Book Slot"
+      bookNow: "Book Slot",
+      empty: "No shops match your search yet.",
+      emptyAll: "No shops are listed yet.",
+      loadFailed: "Could not load shops",
+      retry: "Try again",
+      verifiedCr: "Verified CR"
     },
     ar: {
       brand: "الجمال والعناية",
-      city: "الرياض، المملكة العربية السعودية",
-      searchPlaceholder: "البحث عن الصالونات والمصففين والمكياج...",
-      inStore: "في الصالون",
-      homeService: "خدمة منزلية",
-      menCategory: "عناية الرجال",
-      womenCategory: "جمال النساء",
+      city: "المملكة العربية السعودية",
+      searchPlaceholder: "ابحث عن صالون أو خدمة أو حي...",
+      allCategories: "الكل",
       topSalons: "الموصى بها بالقرب منك",
       reviews: "تقييمات",
+      newShop: "جديد - لا توجد تقييمات بعد",
       startingFrom: "يبدأ من",
-      bookNow: "احجز الموعد"
+      bookNow: "احجز الموعد",
+      empty: "لا توجد صالونات مطابقة لبحثك حالياً.",
+      emptyAll: "لا توجد صالونات مدرجة بعد.",
+      loadFailed: "تعذر تحميل الصالونات",
+      retry: "إعادة المحاولة",
+      verifiedCr: "سجل تجاري موثق"
     }
   }[lang];
 
-  // Mock categories
-  const categories = {
-    men: [
-      { id: "m1", name: lang === "ar" ? "قص شعر" : "Haircut" },
-      { id: "m2", name: lang === "ar" ? "لحية" : "Beard" },
-      { id: "m3", name: lang === "ar" ? "عناية ممتازة" : "Facial" },
-    ],
-    women: [
-      { id: "w1", name: lang === "ar" ? "تصفيف شعر" : "Styling" },
-      { id: "w2", name: lang === "ar" ? "أظافر" : "Nails" },
-      { id: "w3", name: lang === "ar" ? "مكياج" : "Makeup" },
-      { id: "w4", name: lang === "ar" ? "حناء" : "Henna" },
-    ]
-  };
+  useEffect(() => {
+    loadCategories().then(setCategories).catch(() => setCategories([]));
+  }, []);
 
-  // Use unified mockShops
-  const providers = mockShops;
+  const runSearch = useCallback(async (signal: { cancelled: boolean }) => {
+    setLoadState("loading");
+    try {
+      const result = await searchProviders({ query, category });
+      if (signal.cancelled) return;
+      setProviders(result.providers);
+      setLoadState("ready");
+    } catch (err) {
+      if (signal.cancelled) return;
+      setLoadError(err instanceof Error ? err.message : String(err));
+      setLoadState("error");
+    }
+  }, [query, category]);
+
+  useEffect(() => {
+    const signal = { cancelled: false };
+    const timer = setTimeout(() => runSearch(signal), 300);
+    return () => {
+      signal.cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [runSearch, reloadKey]);
+
+  const isAr = lang === "ar";
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        
+
         {/* HEADER */}
-        <View style={[styles.header, lang === "ar" && styles.rtlRow]}>
+        <View style={[styles.header, isAr && styles.rtlRow]}>
           <View>
             <Text style={styles.brandText}>{t.brand}</Text>
             <Text style={styles.subBrandText}>{t.city}</Text>
           </View>
           <TouchableOpacity onPress={toggleLanguage} style={styles.langBtn}>
-            <Text style={styles.langBtnText}>{lang === "ar" ? "English" : "العربية"}</Text>
+            <Text style={styles.langBtnText}>{isAr ? "English" : "العربية"}</Text>
           </TouchableOpacity>
         </View>
 
         {/* SEARCH BAR */}
-        <View style={[styles.searchContainer, lang === "ar" && styles.rtlRow]}>
-          <TextInput 
-            placeholder={t.searchPlaceholder} 
-            placeholderTextColor="hsl(210,8%,65%)" 
-            style={[styles.searchInput, lang === "ar" && styles.rtlText, { paddingHorizontal: 12 }]}
+        <View style={[styles.searchContainer, isAr && styles.rtlRow]}>
+          <TextInput
+            placeholder={t.searchPlaceholder}
+            placeholderTextColor="hsl(210,8%,65%)"
+            value={query}
+            onChangeText={setQuery}
+            returnKeyType="search"
+            style={[styles.searchInput, isAr && styles.rtlText, { paddingHorizontal: 12 }]}
           />
         </View>
 
-        {/* IN-STORE VS HOME SERVICE TOGGLE */}
-        <View style={styles.toggleWrapper}>
-          <TouchableOpacity 
-            onPress={() => setIsHomeService(false)} 
-            style={[styles.toggleBtn, !isHomeService && styles.toggleActive]}
-          >
-            <Text style={[styles.toggleText, !isHomeService && styles.toggleTextActive]}>{t.inStore}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            onPress={() => setIsHomeService(true)} 
-            style={[styles.toggleBtn, isHomeService && styles.toggleActive]}
-          >
-            <Text style={[styles.toggleText, isHomeService && styles.toggleTextActive]}>{t.homeService}</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* CATEGORIES SECTION */}
-        <Text style={[styles.sectionTitle, lang === "ar" && styles.rtlText]}>{t.womenCategory}</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={[styles.catScroll, lang === "ar" && styles.rtlRow]}>
-          {categories.women.map((cat) => (
-            <TouchableOpacity key={cat.id} style={styles.catCard}>
-              <Text style={styles.catName}>{cat.name}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        <Text style={[styles.sectionTitle, lang === "ar" && styles.rtlText]}>{t.menCategory}</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={[styles.catScroll, lang === "ar" && styles.rtlRow]}>
-          {categories.men.map((cat) => (
-            <TouchableOpacity key={cat.id} style={styles.catCard}>
-              <Text style={styles.catName}>{cat.name}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+        {/* CATEGORIES (from the categories table) */}
+        {categories.length > 0 && (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.catScroll} contentContainerStyle={isAr && styles.rtlRow}>
+            {[{ id: "all", slug: "all", name: { en: t.allCategories, ar: t.allCategories } }, ...categories].map((cat) => (
+              <TouchableOpacity
+                key={cat.id}
+                onPress={() => setCategory(cat.slug)}
+                style={[styles.catCard, category === cat.slug && styles.catCardActive]}
+              >
+                <Text style={[styles.catName, category === cat.slug && styles.catNameActive]}>{cat.name[lang]}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        )}
 
         {/* RECOMMENDED FEED */}
-        <Text style={[styles.sectionTitle, lang === "ar" && styles.rtlText]}>{t.topSalons}</Text>
-        <View style={styles.providerGrid}>
-          {providers
-            .filter(p => !isHomeService || mockServices.some(s => s.shopId === p.id && s.serviceType === "mobile"))
-            .map((provider) => (
-              <View key={provider.id} style={styles.providerCard}>
-                <Image source={{ uri: provider.image }} style={styles.cardImg as any} />
+        <Text style={[styles.sectionTitle, isAr && styles.rtlText]}>{t.topSalons}</Text>
+        {loadState === "loading" && <ActivityIndicator color="hsl(45,60%,55%)" style={styles.stateBox} />}
+        {loadState === "error" && (
+          <View style={styles.stateBox}>
+            <Text style={styles.stateTitle}>{t.loadFailed}</Text>
+            <Text style={styles.stateText}>{loadError}</Text>
+            <TouchableOpacity onPress={() => setReloadKey((k) => k + 1)} style={styles.bookBtn}>
+              <Text style={styles.bookBtnText}>{t.retry}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        {loadState === "ready" && providers.length === 0 && (
+          <View style={styles.stateBox}>
+            <Text style={styles.stateText}>{query.trim() || category !== "all" ? t.empty : t.emptyAll}</Text>
+          </View>
+        )}
+        {loadState === "ready" && providers.length > 0 && (
+          <View style={styles.providerGrid}>
+            {providers.map((provider) => (
+              <View key={provider.branchId} style={styles.providerCard}>
                 <View style={styles.cardDetails}>
-                  <Text style={styles.cardName}>{provider.name[lang]}</Text>
-                  <Text style={styles.cardLoc}>{provider.address[lang]}</Text>
-                  <Text style={styles.cardRating}>★ {provider.rating} ({provider.reviewsCount} {t.reviews})</Text>
-                  
-                  <View style={[styles.cardFooter, lang === "ar" && styles.rtlRow]}>
-                    <Text style={styles.cardPrice}>{t.startingFrom}: <Text style={styles.priceHighlight}>{mockServices.filter(s => s.shopId === provider.id)[0]?.price || 100} SAR</Text></Text>
-                    <TouchableOpacity 
+                  <Text style={[styles.cardName, isAr && styles.rtlText]}>{provider.name[lang]}</Text>
+                  <Text style={[styles.cardLoc, isAr && styles.rtlText]}>
+                    {[provider.district, provider.city].filter(Boolean).join(isAr ? "، " : ", ")}
+                    {provider.distanceKm !== null ? ` • ${provider.distanceKm} km` : ""}
+                  </Text>
+                  <Text style={[styles.cardRating, isAr && styles.rtlText]}>
+                    {provider.rating !== null ? `★ ${provider.rating} (${provider.reviews} ${t.reviews})` : t.newShop}
+                    {provider.crVerified ? ` • ${t.verifiedCr}` : ""}
+                  </Text>
+
+                  <View style={[styles.cardFooter, isAr && styles.rtlRow]}>
+                    {provider.startingPrice !== null ? (
+                      <Text style={styles.cardPrice}>{t.startingFrom}: <Text style={styles.priceHighlight}>{formatSar(provider.startingPrice, lang)}</Text></Text>
+                    ) : <View />}
+                    <TouchableOpacity
                       onPress={() => setSelectedProvider(provider)}
                       style={styles.bookBtn}
                     >
@@ -153,17 +179,18 @@ export default function HomeScreen() {
                   </View>
                 </View>
               </View>
-          ))}
-        </View>
+            ))}
+          </View>
+        )}
 
       </ScrollView>
 
       {/* SHOP DETAILS & BOOKING MODAL */}
       {selectedProvider && (
-        <ShopDetailsModal 
-          shop={selectedProvider} 
-          locale={lang} 
-          onClose={() => setSelectedProvider(null)} 
+        <ShopDetailsModal
+          shop={selectedProvider}
+          locale={lang}
+          onClose={() => setSelectedProvider(null)}
         />
       )}
 
@@ -172,6 +199,28 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  catCardActive: {
+    backgroundColor: "hsl(45,60%,55%)"
+  },
+  catNameActive: {
+    color: "hsl(220,15%,8%)",
+    fontWeight: "700"
+  },
+  stateBox: {
+    paddingVertical: 32,
+    alignItems: "center",
+    gap: 12
+  },
+  stateTitle: {
+    color: "hsl(0,0%,98%)",
+    fontSize: 14,
+    fontWeight: "700"
+  },
+  stateText: {
+    color: "hsl(210,8%,65%)",
+    fontSize: 12,
+    textAlign: "center"
+  },
   container: {
     flex: 1,
     backgroundColor: "hsl(220,15%,8%)",

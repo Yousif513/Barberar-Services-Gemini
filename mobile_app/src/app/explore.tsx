@@ -1,314 +1,273 @@
-import React, { useState } from "react";
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  ScrollView, 
-  Image, 
-  FlatList, 
-  Dimensions 
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  FlatList,
+  ActivityIndicator
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ShopDetailsModal } from "@/components/shop-details-modal";
-import { mockShops, mockServices } from "@/constants/mockData";
+import { supabase } from "@/lib/supabase";
+import { Category, MarketplaceProvider, formatSar, loadCategories, searchProviders } from "@/lib/marketplace";
 
-const { width } = Dimensions.get("window");
+type LoadState = "loading" | "ready" | "error";
+type Area = { city: string; districts: string[] };
+
+// Places pins inside the bounding box of the shops being shown. Positions are relative to each
+// other, not to a street map.
+function projectPins(providers: MarketplaceProvider[]) {
+  const located = providers.filter((p) => p.latitude !== null && p.longitude !== null);
+  if (located.length === 0) return [];
+  const lats = located.map((p) => p.latitude as number);
+  const lngs = located.map((p) => p.longitude as number);
+  const [minLat, maxLat, minLng, maxLng] = [Math.min(...lats), Math.max(...lats), Math.min(...lngs), Math.max(...lngs)];
+  const spanLat = maxLat - minLat || 1;
+  const spanLng = maxLng - minLng || 1;
+  return located.map((p) => ({
+    provider: p,
+    left: `${10 + (((p.longitude as number) - minLng) / spanLng) * 80}%`,
+    top: `${10 + ((maxLat - (p.latitude as number)) / spanLat) * 70}%`,
+  }));
+}
 
 export default function ExploreScreen() {
   const [lang, setLang] = useState<"en" | "ar">("ar");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [selectedCity, setSelectedCity] = useState("all");
   const [selectedLocation, setSelectedLocation] = useState("all");
-  const [selectedProvider, setSelectedProvider] = useState<any>(null);
+  const [selectedProvider, setSelectedProvider] = useState<MarketplaceProvider | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
-  const [selectedCity, setSelectedCity] = useState<"riyadh" | "jeddah">("riyadh");
-  const [selectedMapShop, setSelectedMapShop] = useState<any>(null);
+  const [selectedMapShop, setSelectedMapShop] = useState<MarketplaceProvider | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [areas, setAreas] = useState<Area[]>([]);
+  const [providers, setProviders] = useState<MarketplaceProvider[]>([]);
+  const [loadState, setLoadState] = useState<LoadState>("loading");
+  const [loadError, setLoadError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
 
   const toggleLanguage = () => setLang((prev) => (prev === "en" ? "ar" : "en"));
-
-  const categories = [
-    { id: "all", name_ar: "الكل", name_en: "All" },
-    { id: "haircut", name_ar: "قص شعر", name_en: "Haircut" },
-    { id: "makeup", name_ar: "مكياج", name_en: "Makeup" },
-    { id: "nails", name_ar: "أظافر", name_en: "Nails" },
-    { id: "home", name_ar: "خدمة منزلية", name_en: "Home Service" },
-    { id: "salon", name_ar: "صالونات", name_en: "Salons" }
-  ];
-
-  const locations = [
-    { id: "all", name_ar: "كل الأحياء", name_en: "All Neighborhoods" },
-    { id: "malqa", name_ar: "الملقا", name_en: "Al-Malqa" },
-    { id: "olaya", name_ar: "العليا", name_en: "Olaya" },
-    { id: "yasmin", name_ar: "الياسمين", name_en: "Al-Yasmin" },
-    { id: "hamra", name_ar: "الحمراء", name_en: "Al-Hamra" },
-    { id: "shatei", name_ar: "الشاطئ", name_en: "Ash-Shati" }
-  ];
-
-  const handleNeighborhoodSelect = (id: string) => {
-    setSelectedLocation(id);
-    if (id === "malqa" || id === "olaya" || id === "yasmin") {
-      setSelectedCity("riyadh");
-    } else if (id === "hamra" || id === "shatei") {
-      setSelectedCity("jeddah");
-    }
-  };
-
-  const filteredLocations = locations.filter(loc => {
-    if (loc.id === "all") return true;
-    if (selectedCity === "riyadh") {
-      return loc.id === "malqa" || loc.id === "olaya" || loc.id === "yasmin";
-    } else {
-      return loc.id === "hamra" || loc.id === "shatei";
-    }
-  });
+  const isAr = lang === "ar";
 
   const t = {
     en: {
       title: "Discover & Explore",
-      subtitle: "Find the best beauty & grooming venues in Riyadh & Jeddah",
-      searchPlaceholder: "Search salons, specialists, or styling...",
-      startingFrom: "Starting from",
+      subtitle: "Find verified beauty & grooming venues near you",
+      searchPlaceholder: "Search salons, services or districts...",
       reviews: "reviews",
+      newShop: "New",
       empty: "No results match your filters",
       langBtn: "العربية",
       listView: "List",
       mapView: "Map",
-      riyadh: "Riyadh",
-      jeddah: "Jeddah",
-      interactiveMap: "Interactive Map",
-      mapInstructions: "Tap gold pins to view details and book.",
+      allCategories: "All",
+      allCities: "All cities",
+      allDistricts: "All districts",
+      mapTitle: "Shops on the map",
+      mapInstructions: "Pins show where shops are relative to each other. Tap a pin to book.",
+      noCoordinates: "None of these shops has a map location yet.",
       close: "Close",
-      bookNow: "Book Now"
+      bookNow: "Book Now",
+      loadFailed: "Could not load shops",
+      retry: "Try again"
     },
     ar: {
       title: "البحث والاستكشاف",
-      subtitle: "ابحث عن أفضل خدمات التجميل والعناية في الرياض وجدة",
-      searchPlaceholder: "البحث عن الصالونات والمصففين والمكياج...",
-      startingFrom: "يبدأ من",
+      subtitle: "ابحث عن صالونات تجميل وعناية موثقة بالقرب منك",
+      searchPlaceholder: "ابحث عن صالون أو خدمة أو حي...",
       reviews: "تقييم",
+      newShop: "جديد",
       empty: "لم يتم العثور على أي نتائج مطابقة",
       langBtn: "English",
       listView: "قائمة",
       mapView: "خريطة",
-      riyadh: "الرياض",
-      jeddah: "جدة",
-      interactiveMap: "خريطة تفاعلية",
-      mapInstructions: "انقر على المؤشرات الذهبية لعرض التفاصيل وحجز موعد.",
+      allCategories: "الكل",
+      allCities: "كل المدن",
+      allDistricts: "كل الأحياء",
+      mapTitle: "الصالونات على الخريطة",
+      mapInstructions: "تُظهر المؤشرات مواقع الصالونات بالنسبة لبعضها. انقر على مؤشر للحجز.",
+      noCoordinates: "لا يوجد موقع على الخريطة لهذه الصالونات بعد.",
       close: "إغلاق",
-      bookNow: "حجز الموعد"
+      bookNow: "حجز الموعد",
+      loadFailed: "تعذر تحميل الصالونات",
+      retry: "إعادة المحاولة"
     }
   }[lang];
 
-  // Use unified mockShops
-  const mockProviders = mockShops;
+  // Filter options come from the database: active categories and the cities/districts of active branches.
+  useEffect(() => {
+    loadCategories().then(setCategories).catch(() => setCategories([]));
+    supabase.from("branches").select("city, district").eq("is_active", true).then(({ data }) => {
+      const byCity = new Map<string, Set<string>>();
+      for (const row of (data || []) as { city: string | null; district: string | null }[]) {
+        if (!row.city) continue;
+        if (!byCity.has(row.city)) byCity.set(row.city, new Set());
+        if (row.district) byCity.get(row.city)!.add(row.district);
+      }
+      setAreas([...byCity.entries()].map(([city, districts]) => ({ city, districts: [...districts].sort() })));
+    });
+  }, []);
 
-  // Filter logic
-  const filteredProviders = mockProviders.filter(p => {
-    const matchesSearch = p.name.en.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          p.name.ar.includes(searchQuery) ||
-                          p.address.en.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          p.address.ar.includes(searchQuery);
-    
-    const matchesCategory = selectedFilter === "all" || 
-                            (selectedFilter === "home" && mockServices.some(s => s.shopId === p.id && s.serviceType === "mobile")) ||
-                            (selectedFilter === "salon" && mockServices.some(s => s.shopId === p.id && s.serviceType === "salon")) ||
-                            mockServices.some(s => s.shopId === p.id && s.category === selectedFilter);
+  const runSearch = useCallback(async (signal: { cancelled: boolean }) => {
+    setLoadState("loading");
+    try {
+      const result = await searchProviders({
+        query: searchQuery,
+        category: selectedFilter,
+        city: selectedCity,
+        district: selectedLocation,
+        limit: 50,
+      });
+      if (signal.cancelled) return;
+      const mapped = result.providers;
+      setProviders(mapped);
+      setLoadState("ready");
+    } catch (err) {
+      if (signal.cancelled) return;
+      setLoadError(err instanceof Error ? err.message : String(err));
+      setLoadState("error");
+    }
+  }, [searchQuery, selectedFilter, selectedCity, selectedLocation]);
 
-    const matchesLocation = selectedLocation === "all" || 
-                            p.neighborhoodKey === selectedLocation;
+  useEffect(() => {
+    const signal = { cancelled: false };
+    const timer = setTimeout(() => runSearch(signal), 300);
+    return () => {
+      signal.cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [runSearch, reloadKey]);
 
-    const matchesCity = p.city === selectedCity;
+  const districtOptions = useMemo(
+    () => (selectedCity === "all" ? [] : areas.find((a) => a.city === selectedCity)?.districts || []),
+    [areas, selectedCity]
+  );
+  const pins = useMemo(() => projectPins(providers), [providers]);
 
-    return matchesSearch && matchesCategory && matchesLocation && matchesCity;
-  });
+  const chipRow = (
+    items: { id: string; label: string }[],
+    active: string,
+    onSelect: (id: string) => void,
+    variant: "filter" | "loc"
+  ) => (
+    <FlatList
+      data={items}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <TouchableOpacity
+          onPress={() => onSelect(item.id)}
+          style={[variant === "filter" ? styles.filterChip : styles.locChip, active === item.id && (variant === "filter" ? styles.activeChip : styles.activeLocChip)]}
+        >
+          <Text style={[variant === "filter" ? styles.chipText : styles.locChipText, active === item.id && (variant === "filter" ? styles.activeChipText : styles.activeLocChipText)]}>
+            {item.label}
+          </Text>
+        </TouchableOpacity>
+      )}
+      contentContainerStyle={[variant === "filter" ? styles.chipList : styles.locChipList, isAr && styles.rtlRow]}
+    />
+  );
 
-  const activePins = [
-    { id: "1", name: { en: "Elite Grooming Lounge", ar: "صالون إيليت الرجالي" }, city: "riyadh", district: "malqa", left: "25%", top: "30%", rating: 4.9, address: { en: "Al-Malqa, Riyadh", ar: "حي الملقا، الرياض" }, image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=300&auto=format&fit=crop" },
-    { id: "3", name: { en: "Riyadh Premium Spa & Wellness", ar: "سبا الرياض الفاخر للعناية" }, city: "riyadh", district: "yasmin", left: "70%", top: "32%", rating: 4.9, address: { en: "Al-Yasmin, Riyadh", ar: "حي الياسمين، الرياض" }, image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=300&auto=format&fit=crop" },
-    { id: "2", name: { en: "Sara Beauty Salon & Spa", ar: "صالون وسبا سارة للتجميل" }, city: "riyadh", district: "olaya", left: "50%", top: "68%", rating: 4.8, address: { en: "Olaya, Riyadh", ar: "حي العليا، الرياض" }, image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=300&auto=format&fit=crop" },
-    { id: "4", name: { en: "Jeddah Royal Wellness Center", ar: "مركز النخبة الملكي بجدة" }, city: "jeddah", district: "hamra", left: "68%", top: "70%", rating: 4.7, address: { en: "Al-Hamra, Jeddah", ar: "حي الحمراء، جدة" }, image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=300&auto=format&fit=crop" },
-    { id: "5", name: { en: "Ash-Shati Luxury Ladies Spa", ar: "صالون الشاطئ النسائي الفاخر" }, city: "jeddah", district: "shatei", left: "55%", top: "35%", rating: 4.9, address: { en: "Ash-Shati, Jeddah", ar: "حي الشاطئ، جدة" }, image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=300&auto=format&fit=crop" }
-  ].filter(pin => {
-    if (pin.city !== selectedCity) return false;
-    
-    if (selectedLocation !== "all" && pin.district !== selectedLocation) return false;
-
-    const shopObj = mockShops.find(s => s.id === pin.id);
-    if (!shopObj) return false;
-
-    const matchesCategory = selectedFilter === "all" || 
-                            (selectedFilter === "home" && mockServices.some(s => s.shopId === pin.id && s.serviceType === "mobile")) ||
-                            (selectedFilter === "salon" && mockServices.some(s => s.shopId === pin.id && s.serviceType === "salon")) ||
-                            mockServices.some(s => s.shopId === pin.id && s.category === selectedFilter);
-
-    const matchesSearch = searchQuery === "" ||
-                          pin.name.en.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          pin.name.ar.includes(searchQuery) ||
-                          pin.address.en.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          pin.address.ar.includes(searchQuery);
-
-    return matchesCategory && matchesSearch;
-  });
+  const ratingText = (p: MarketplaceProvider) =>
+    p.rating !== null ? `★ ${p.rating} (${p.reviews} ${t.reviews})` : t.newShop;
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Search Header */}
       <View style={styles.searchHeader}>
-        <View style={{ flexDirection: lang === "ar" ? "row-reverse" : "row", justifyContent: "space-between", alignItems: "center" }}>
+        <View style={{ flexDirection: isAr ? "row-reverse" : "row", justifyContent: "space-between", alignItems: "center" }}>
           <View>
-            <Text style={[styles.title, lang === "ar" && styles.rtlText]}>{t.title}</Text>
-            <Text style={[styles.subtitle, lang === "ar" && styles.rtlText]}>{t.subtitle}</Text>
+            <Text style={[styles.title, isAr && styles.rtlText]}>{t.title}</Text>
+            <Text style={[styles.subtitle, isAr && styles.rtlText]}>{t.subtitle}</Text>
           </View>
           <TouchableOpacity onPress={toggleLanguage} style={styles.langBtn}>
             <Text style={styles.langBtnText}>{t.langBtn}</Text>
           </TouchableOpacity>
         </View>
-        
-        <View style={[styles.searchContainer, lang === "ar" && styles.rtlRow]}>
+
+        <View style={[styles.searchContainer, isAr && styles.rtlRow]}>
           <TextInput
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholder={t.searchPlaceholder}
             placeholderTextColor="hsl(210,8%,65%)"
-            style={[styles.searchInput, lang === "ar" && styles.rtlText, { paddingHorizontal: 10 }]}
+            style={[styles.searchInput, isAr && styles.rtlText, { paddingHorizontal: 10 }]}
           />
         </View>
 
-        {/* ViewMode (List/Map) & City Selection Toggles */}
-        <View style={{ flexDirection: lang === "ar" ? "row-reverse" : "row", justifyContent: "space-between", alignItems: "center", marginTop: 12 }}>
-          {/* List/Map Selector */}
-          <View style={{ flexDirection: lang === "ar" ? "row-reverse" : "row", backgroundColor: "hsl(220,12%,14%)", borderRadius: 8, padding: 2 }}>
-            <TouchableOpacity 
-              onPress={() => setViewMode("list")}
-              style={[{ paddingVertical: 6, paddingHorizontal: 16, borderRadius: 6 }, viewMode === "list" && { backgroundColor: "hsl(45,60%,55%)" }]}
-            >
-              <Text style={{ fontSize: 11, fontWeight: "bold", color: viewMode === "list" ? "hsl(220,15%,8%)" : "hsl(0,0%,80%)" }}>
-                {t.listView}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              onPress={() => {
-                setViewMode("map");
-                setSelectedMapShop(null);
-              }}
-              style={[{ paddingVertical: 6, paddingHorizontal: 16, borderRadius: 6 }, viewMode === "map" && { backgroundColor: "hsl(45,60%,55%)" }]}
-            >
-              <Text style={{ fontSize: 11, fontWeight: "bold", color: viewMode === "map" ? "hsl(220,15%,8%)" : "hsl(0,0%,80%)" }}>
-                {t.mapView}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* City Selector */}
-          <View style={{ flexDirection: lang === "ar" ? "row-reverse" : "row", backgroundColor: "hsl(220,12%,14%)", borderRadius: 8, padding: 2 }}>
-            <TouchableOpacity 
-              onPress={() => {
-                setSelectedCity("riyadh");
-                if (selectedLocation === "hamra" || selectedLocation === "shatei") {
-                  setSelectedLocation("all");
-                }
-              }}
-              style={[{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6 }, selectedCity === "riyadh" && { backgroundColor: "hsla(45,60%,55%,0.15)" }]}
-            >
-              <Text style={{ fontSize: 11, fontWeight: "600", color: selectedCity === "riyadh" ? "hsl(45,60%,55%)" : "hsl(210,8%,65%)" }}>
-                {t.riyadh}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              onPress={() => {
-                setSelectedCity("jeddah");
-                if (selectedLocation === "malqa" || selectedLocation === "olaya" || selectedLocation === "yasmin") {
-                  setSelectedLocation("all");
-                }
-              }}
-              style={[{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6 }, selectedCity === "jeddah" && { backgroundColor: "hsla(45,60%,55%,0.15)" }]}
-            >
-              <Text style={{ fontSize: 11, fontWeight: "600", color: selectedCity === "jeddah" ? "hsl(45,60%,55%)" : "hsl(210,8%,65%)" }}>
-                {t.jeddah}
-              </Text>
-            </TouchableOpacity>
+        {/* List/Map Selector */}
+        <View style={{ flexDirection: isAr ? "row-reverse" : "row", marginTop: 12 }}>
+          <View style={{ flexDirection: isAr ? "row-reverse" : "row", backgroundColor: "hsl(220,12%,14%)", borderRadius: 8, padding: 2 }}>
+            {(["list", "map"] as const).map((mode) => (
+              <TouchableOpacity
+                key={mode}
+                onPress={() => {
+                  setViewMode(mode);
+                  setSelectedMapShop(null);
+                }}
+                style={[{ paddingVertical: 6, paddingHorizontal: 16, borderRadius: 6 }, viewMode === mode && { backgroundColor: "hsl(45,60%,55%)" }]}
+              >
+                <Text style={{ fontSize: 11, fontWeight: "bold", color: viewMode === mode ? "hsl(220,15%,8%)" : "hsl(0,0%,80%)" }}>
+                  {mode === "list" ? t.listView : t.mapView}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
       </View>
 
-      {/* Quick Filters */}
+      {/* Filters */}
       <View style={styles.filterSection}>
-        <FlatList
-          data={categories}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => setSelectedFilter(item.id)}
-              style={[
-                styles.filterChip,
-                selectedFilter === item.id && styles.activeChip
-              ]}
-            >
-              <Text 
-                style={[
-                  styles.chipText,
-                  selectedFilter === item.id && styles.activeChipText
-                ]}
-              >
-                {lang === "ar" ? item.name_ar : item.name_en}
-              </Text>
-            </TouchableOpacity>
-          )}
-          contentContainerStyle={[styles.chipList, lang === "ar" && styles.rtlRow]}
-        />
-
-        {/* Location Selectors */}
-        <FlatList
-          data={filteredLocations}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => handleNeighborhoodSelect(item.id)}
-              style={[
-                styles.locChip,
-                selectedLocation === item.id && styles.activeLocChip
-              ]}
-            >
-              <Text 
-                style={[
-                  styles.locChipText,
-                  selectedLocation === item.id && styles.activeLocChipText
-                ]}
-              >
-                {lang === "ar" ? item.name_ar : item.name_en}
-              </Text>
-            </TouchableOpacity>
-          )}
-          contentContainerStyle={[styles.locChipList, lang === "ar" && styles.rtlRow]}
-        />
+        {chipRow(
+          [{ id: "all", label: t.allCategories }, ...categories.map((c) => ({ id: c.slug, label: c.name[lang] }))],
+          selectedFilter,
+          setSelectedFilter,
+          "filter"
+        )}
+        {areas.length > 0 && chipRow(
+          [{ id: "all", label: t.allCities }, ...areas.map((a) => ({ id: a.city, label: a.city }))],
+          selectedCity,
+          (id) => {
+            setSelectedCity(id);
+            setSelectedLocation("all");
+          },
+          "loc"
+        )}
+        {districtOptions.length > 0 && chipRow(
+          [{ id: "all", label: t.allDistricts }, ...districtOptions.map((d) => ({ id: d, label: d }))],
+          selectedLocation,
+          setSelectedLocation,
+          "loc"
+        )}
       </View>
 
-      {/* Results List or Interactive Map */}
-      {viewMode === "map" ? (
+      {loadState === "loading" && <ActivityIndicator color="hsl(45,60%,55%)" style={styles.emptyContainer} />}
+      {loadState === "error" && (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>{t.loadFailed}: {loadError}</Text>
+          <TouchableOpacity onPress={() => setReloadKey((k) => k + 1)} style={[styles.mapOverlayBookBtn, { marginTop: 12 }]}>
+            <Text style={styles.mapOverlayBookText}>{t.retry}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Results List or Map */}
+      {loadState === "ready" && (viewMode === "map" ? (
         <ScrollView style={styles.mapScroll} contentContainerStyle={styles.mapContainer}>
           <View style={styles.mapCard}>
-            <View style={[styles.mapHeaderRow, lang === "ar" && styles.rtlRow]}>
+            <View style={[styles.mapHeaderRow, isAr && styles.rtlRow]}>
               <View>
-                <Text style={[styles.mapTitle, lang === "ar" && styles.rtlText]}>
-                  {selectedCity === "jeddah" 
-                    ? (lang === "ar" ? "خريطة جدة التفاعلية" : "Jeddah Interactive Map")
-                    : (lang === "ar" ? "خريطة الرياض التفاعلية" : "Riyadh Interactive Map")}
-                </Text>
-                <Text style={[styles.mapSubtitle, lang === "ar" && styles.rtlText]}>
-                  {t.mapInstructions}
-                </Text>
+                <Text style={[styles.mapTitle, isAr && styles.rtlText]}>{t.mapTitle}</Text>
+                <Text style={[styles.mapSubtitle, isAr && styles.rtlText]}>{t.mapInstructions}</Text>
               </View>
             </View>
 
-            {/* Simulated Digital Grid Map Box */}
             <View style={styles.mapCanvas}>
-              {/* Subtle Grid Lines */}
               <View style={styles.gridLineH1} />
               <View style={styles.gridLineH2} />
               <View style={styles.gridLineH3} />
@@ -316,84 +275,43 @@ export default function ExploreScreen() {
               <View style={styles.gridLineV2} />
               <View style={styles.gridLineV3} />
 
-              {selectedCity === "riyadh" ? (
-                <>
-                  {/* Routing boundary ring (dashed style) */}
-                  <View style={styles.routingBoundaryRing} />
-                  <Text style={styles.routingBoundaryText}>10KM ROUTING BOUNDARY / حد التوصيل ١٠ كم</Text>
-
-                  {/* Neighborhood Area Text labels */}
-                  <Text style={[styles.districtLabel, { left: "15%", top: "22%" }]}>AL-MALQA{"\n"}الملقا</Text>
-                  <Text style={[styles.districtLabel, { left: "65%", top: "20%" }]}>AL-YASMIN{"\n"}الياسمين</Text>
-                  <Text style={[styles.districtLabel, { left: "45%", top: "75%" }]}>OLAYA{"\n"}العليا</Text>
-                </>
-              ) : (
-                <>
-                  {/* Red Sea block on the left */}
-                  <View style={styles.redSeaBlock}>
-                    <Text style={styles.redSeaText}>
-                      RED SEA{"\n"}البحر الأحمر
-                    </Text>
-                  </View>
-
-                  {/* Neighborhood Area Text labels */}
-                  <Text style={[styles.districtLabel, { left: "45%", top: "25%" }]}>ASH-SHATI{"\n"}الشاطئ</Text>
-                  <Text style={[styles.districtLabel, { left: "60%", top: "65%" }]}>AL-HAMRA{"\n"}الحمراء</Text>
-                </>
+              {pins.length === 0 && (
+                <View style={styles.emptyContainer}>
+                  <Text style={styles.emptyText}>{providers.length === 0 ? t.empty : t.noCoordinates}</Text>
+                </View>
               )}
 
-              {/* Render Map Pins */}
-              {activePins.map((pin) => (
+              {pins.map((pin) => (
                 <TouchableOpacity
-                  key={pin.id}
-                  onPress={() => setSelectedMapShop(pin)}
+                  key={pin.provider.branchId}
+                  onPress={() => setSelectedMapShop(pin.provider)}
                   style={[styles.mapPinContainer, { left: pin.left as any, top: pin.top as any }]}
                 >
-                  {/* Pin label bubble */}
                   <View style={styles.pinBubble}>
-                    <Text style={styles.pinBubbleText} numberOfLines={1}>
-                      {pin.name[lang]}
-                    </Text>
+                    <Text style={styles.pinBubbleText} numberOfLines={1}>{pin.provider.name[lang]}</Text>
                   </View>
-
-                  {/* Pin Marker */}
                   <View style={styles.pinPulseRing} />
                   <View style={styles.pinGlowInner} />
                   <View style={styles.pinDot} />
                 </TouchableOpacity>
               ))}
 
-              {/* Selected Shop Overlay Card at the bottom of the map */}
               {selectedMapShop && (
-                <View style={[styles.mapOverlayCard, lang === "ar" && styles.rtlRow]}>
-                  <Image source={{ uri: selectedMapShop.image }} style={styles.mapOverlayImage} />
+                <View style={[styles.mapOverlayCard, isAr && styles.rtlRow]}>
                   <View style={{ flex: 1, paddingHorizontal: 10, justifyContent: "center" }}>
-                    <Text style={[styles.mapOverlayName, lang === "ar" && styles.rtlText]} numberOfLines={1}>
+                    <Text style={[styles.mapOverlayName, isAr && styles.rtlText]} numberOfLines={1}>
                       {selectedMapShop.name[lang]}
                     </Text>
-                    <Text style={[styles.mapOverlayAddress, lang === "ar" && styles.rtlText]} numberOfLines={1}>
-                      {selectedMapShop.address[lang]}
+                    <Text style={[styles.mapOverlayAddress, isAr && styles.rtlText]} numberOfLines={1}>
+                      {[selectedMapShop.district, selectedMapShop.city].filter(Boolean).join(isAr ? "، " : ", ")}
                     </Text>
-                    <Text style={[styles.mapOverlayRating, lang === "ar" && styles.rtlText]}>
-                      ★ {selectedMapShop.rating}
-                    </Text>
+                    <Text style={[styles.mapOverlayRating, isAr && styles.rtlText]}>{ratingText(selectedMapShop)}</Text>
                   </View>
                   <View style={{ gap: 6, justifyContent: "center" }}>
-                    <TouchableOpacity
-                      onPress={() => {
-                        const shopObj = mockShops.find((s) => s.id === selectedMapShop.id);
-                        if (shopObj) {
-                          setSelectedProvider(shopObj);
-                        }
-                      }}
-                      style={styles.mapOverlayBookBtn}
-                    >
+                    <TouchableOpacity onPress={() => setSelectedProvider(selectedMapShop)} style={styles.mapOverlayBookBtn}>
                       <Text style={styles.mapOverlayBookText}>{t.bookNow}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => setSelectedMapShop(null)}
-                      style={styles.mapOverlayCloseBtn}
-                    >
+                    <TouchableOpacity onPress={() => setSelectedMapShop(null)} style={styles.mapOverlayCloseBtn}>
                       <Text style={styles.mapOverlayCloseText}>{t.close}</Text>
                     </TouchableOpacity>
                   </View>
@@ -403,24 +321,22 @@ export default function ExploreScreen() {
           </View>
         </ScrollView>
       ) : (
-        /* Results List */
         <FlatList
-          data={filteredProviders}
-          keyExtractor={(item) => item.id}
+          data={providers}
+          keyExtractor={(item) => item.branchId}
           renderItem={({ item }) => (
             <TouchableOpacity style={styles.card} onPress={() => setSelectedProvider(item)}>
-              <Image source={{ uri: item.image }} style={styles.cardImage as any} />
               <View style={styles.cardContent}>
-                <View style={[styles.cardHeader, lang === "ar" && styles.rtlRow]}>
+                <View style={[styles.cardHeader, isAr && styles.rtlRow]}>
                   <Text style={styles.cardName}>{item.name[lang]}</Text>
-                  <Text style={styles.cardPrice}>
-                    {mockServices.filter(s => s.shopId === item.id)[0]?.price || 100} SAR
-                  </Text>
+                  {item.startingPrice !== null && (
+                    <Text style={styles.cardPrice}>{formatSar(item.startingPrice, lang)}</Text>
+                  )}
                 </View>
-                
-                <View style={[styles.cardFooter, lang === "ar" && styles.rtlRow]}>
-                  <Text style={styles.cardLoc}>{item.neighborhood}</Text>
-                  <Text style={styles.cardRating}>★ {item.rating} ({item.reviewsCount} {t.reviews})</Text>
+
+                <View style={[styles.cardFooter, isAr && styles.rtlRow]}>
+                  <Text style={styles.cardLoc}>{[item.district, item.city].filter(Boolean).join(isAr ? "، " : ", ")}</Text>
+                  <Text style={styles.cardRating}>{ratingText(item)}</Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -432,14 +348,14 @@ export default function ExploreScreen() {
           }
           contentContainerStyle={styles.resultsList}
         />
-      )}
+      ))}
 
       {/* SHOP DETAILS & BOOKING MODAL */}
       {selectedProvider && (
-        <ShopDetailsModal 
-          shop={selectedProvider} 
-          locale={lang} 
-          onClose={() => setSelectedProvider(null)} 
+        <ShopDetailsModal
+          shop={selectedProvider}
+          locale={lang}
+          onClose={() => setSelectedProvider(null)}
         />
       )}
     </SafeAreaView>

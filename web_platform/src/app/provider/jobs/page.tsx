@@ -3,6 +3,12 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
+interface MyBid {
+  job_post_id: string;
+  bid_price: number;
+  status: string;
+}
+
 interface JobPost {
   id: string;
   title: string;
@@ -16,10 +22,17 @@ interface JobPost {
 const contentTranslations = {
   en: {
     title: "On-Demand Dispatch Board",
-    subtitle: "Submit bidding proposals for open customer requests near Riyadh.",
+    subtitle: "Send price offers on open customer requests.",
     activeLeads: "Active Opportunities",
-    connectedStatus: "Live Riyadh Dispatch",
-    connectedText: "Connected & Listening",
+    myPendingBids: "My Pending Offers",
+    bidSent: "Offer sent",
+    yourOffer: "Your offer",
+    noProvider: "This page is for provider owners. No business is linked to your account.",
+    loadFailed: "Could not load open requests",
+    retry: "Try again",
+    empty: "There are no open requests right now.",
+    priceRequired: "Enter a price greater than zero.",
+    sent: "Your offer was sent to the customer.",
     employeePool: "Available Dispatch Pool",
     searching: "Searching active leads...",
     openLead: "Open Lead",
@@ -46,10 +59,17 @@ const contentTranslations = {
   },
   ar: {
     title: "لوحة التوزيع الفوري",
-    subtitle: "تقديم عروض الأسعار لطلبات العملاء النشطة في الرياض.",
+    subtitle: "أرسل عروض أسعار على طلبات العملاء المفتوحة.",
     activeLeads: "الفرص النشطة",
-    connectedStatus: "توزيع حي في الرياض",
-    connectedText: "متصل ويستمع الآن",
+    myPendingBids: "عروضي قيد الانتظار",
+    bidSent: "تم إرسال العرض",
+    yourOffer: "عرضك",
+    noProvider: "هذه الصفحة لأصحاب المنشآت. لا توجد منشأة مرتبطة بحسابك.",
+    loadFailed: "تعذر تحميل الطلبات المفتوحة",
+    retry: "إعادة المحاولة",
+    empty: "لا توجد طلبات مفتوحة حالياً.",
+    priceRequired: "أدخل سعراً أكبر من صفر.",
+    sent: "تم إرسال عرضك إلى العميل.",
     employeePool: "طاقم العمل المتاح للتوجيه",
     searching: "جاري البحث عن فرص نشطة...",
     openLead: "فرصة نشطة",
@@ -80,7 +100,10 @@ export default function ProviderJobsPage() {
   const [openJobs, setOpenJobs] = useState<JobPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [providerId, setProviderId] = useState("");
-  const [employees, setEmployees] = useState<{ id: string; name_en: string }[]>([]);
+  const [employees, setEmployees] = useState<{ id: string; name_en: string; name_ar: string }[]>([]);
+  const [myBids, setMyBids] = useState<MyBid[]>([]);
+  const [loadError, setLoadError] = useState("");
+  const [noProvider, setNoProvider] = useState(false);
 
   // Bidding Modal states
   const [activeJob, setActiveJob] = useState<JobPost | null>(null);
@@ -111,71 +134,50 @@ export default function ProviderJobsPage() {
   async function loadJobsData() {
     try {
       setLoading(true);
-      setError("");
+      setLoadError("");
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       // Find provider owned by current user
-      const { data: providerInfo } = await supabase
+      const { data: providerInfo, error: providerError } = await supabase
         .from("providers")
         .select("id")
         .eq("owner_id", user.id)
         .maybeSingle();
-
-      if (providerInfo) {
-        setProviderId(providerInfo.id);
-
-        // Fetch employees of this provider
-        const { data: employeesData } = await supabase
-          .from("employees")
-          .select("id, name_en")
-          .eq("is_active", true); // Simple query fallback
-
-        setEmployees(employeesData || []);
-
-        // Fetch open job posts
-        const { data: openJobsData, error: fetchError } = await supabase
-          .from("job_posts")
-          .select("*")
-          .eq("status", "open")
-          .order("created_at", { ascending: false });
-
-        if (fetchError) throw fetchError;
-        setOpenJobs(openJobsData || []);
+      if (providerError) throw providerError;
+      if (!providerInfo) {
+        setNoProvider(true);
+        return;
       }
-    } catch (err: any) {
-      console.error("Error loading open job posts:", err.message);
-      setError("Failed to load active job leads. Showing mock leads.");
-      // Fallback mock items
-      setOpenJobs([
-        {
-          id: "1",
-          title: "Urgent Split AC Maintenance & Leak Fix",
-          description: "Water is leaking from the indoor AC unit. Need filter cleaning and leak sealing.",
-          address_text: "Al-Malqa, Riyadh",
-          target_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-          budget_max: 300,
-          status: "open"
-        },
-        {
-          id: "2",
-          title: "Deep Cleaning for 3-Bedroom Apartment",
-          description: "Full deep cleaning of windows, kitchen, bathrooms, and vacuuming carpet rooms.",
-          address_text: "Al-Olaya, Riyadh",
-          target_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-          budget_max: 500,
-          status: "open"
-        },
-        {
-          id: "3",
-          title: "Full Body Massage & Aromatherapy (Home Service)",
-          description: "Requesting professional Swedish massage therapist for home session. Spa table required.",
-          address_text: "Al-Naseem, Riyadh",
-          target_date: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
-          budget_max: 400,
-          status: "open"
-        }
+      setProviderId(providerInfo.id);
+
+      const [employeesRes, jobsRes, bidsRes] = await Promise.all([
+        // Only this provider's professionals (through its branches).
+        supabase
+          .from("employees")
+          .select("id, name_en, name_ar, branches!inner(provider_id)")
+          .eq("branches.provider_id", providerInfo.id)
+          .eq("is_active", true),
+        supabase
+          .from("job_posts")
+          .select("id, title, description, address_text, target_date, budget_max, status")
+          .eq("status", "open")
+          .order("created_at", { ascending: false })
+          .limit(100),
+        supabase
+          .from("job_bids")
+          .select("job_post_id, bid_price, status")
+          .eq("provider_id", providerInfo.id),
       ]);
+      for (const res of [employeesRes, jobsRes, bidsRes]) {
+        if (res.error) throw res.error;
+      }
+      setEmployees((employeesRes.data || []).map((e: { id: string; name_en: string; name_ar: string }) => ({ id: e.id, name_en: e.name_en, name_ar: e.name_ar })));
+      setOpenJobs(jobsRes.data || []);
+      setMyBids(bidsRes.data || []);
+    } catch (err: unknown) {
+      setOpenJobs([]);
+      setLoadError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
@@ -195,6 +197,10 @@ export default function ProviderJobsPage() {
 
     setError("");
     setSuccess("");
+    if (!(bidPrice > 0)) {
+      setError(t.priceRequired);
+      return;
+    }
     setSubmitting(true);
 
     try {
@@ -205,18 +211,16 @@ export default function ProviderJobsPage() {
           provider_id: providerId,
           employee_id: employeeId || null,
           bid_price: bidPrice,
-          proposal_notes: notes,
-          status: "pending"
+          proposal_notes: notes.trim() || null,
         });
 
       if (insertError) throw insertError;
 
-      setSuccess("Your price proposal bid has been sent successfully!");
+      setSuccess(t.sent);
       setActiveJob(null);
       loadJobsData();
-    } catch (err: any) {
-      console.error("Error submitting bid:", err.message);
-      setError(err.message || "Failed to submit proposal bid.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setSubmitting(false);
     }
@@ -256,14 +260,8 @@ export default function ProviderJobsPage() {
         <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-[24px] p-6 flex items-center justify-between shadow-lg relative overflow-hidden group hover:border-[#D1AF47]/30 transition-all duration-300">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#D1AF47]/5 to-transparent rounded-bl-full pointer-events-none" />
           <div className="space-y-1">
-            <span className="text-[10px] text-[#667085] uppercase font-bold tracking-widest block">{t.connectedStatus}</span>
-            <span className="text-sm font-bold text-[#22C55E] flex items-center gap-1.5 mt-2">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3DDC84] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#3DDC84]"></span>
-              </span>
-              {t.connectedText}
-            </span>
+            <span className="text-[10px] text-[#667085] uppercase font-bold tracking-widest block">{t.myPendingBids}</span>
+            <span className="text-3xl font-black text-[#101828]">{myBids.filter((b) => b.status === "pending").length}</span>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-[#D1AF47]/10 border border-[#D1AF47]/20 flex items-center justify-center text-[#D1AF47] group-hover:scale-110 transition-transform duration-300">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -311,8 +309,20 @@ export default function ProviderJobsPage() {
         </div>
       )}
 
+      {noProvider && (
+        <div className="bg-white border border-[#ECECEC] rounded-[20px] p-5 text-sm text-[#344054]">{t.noProvider}</div>
+      )}
+
       {/* JOBS LEADS LIST */}
-      {loading ? (
+      {loadError ? (
+        <div className="bg-[#FF5D73]/10 border border-[#FF5D73]/20 text-[#EF4444] text-sm rounded-[20px] p-5 space-y-2">
+          <p className="font-bold">{t.loadFailed}</p>
+          <p className="text-xs">{loadError}</p>
+          <button onClick={loadJobsData} className="px-3 py-1.5 bg-white border border-[#FF5D73]/30 rounded-lg text-xs font-bold">{t.retry}</button>
+        </div>
+      ) : !loading && !noProvider && openJobs.length === 0 ? (
+        <div className="bg-white border border-[#ECECEC] rounded-[20px] p-8 text-center text-sm text-[#667085]">{t.empty}</div>
+      ) : loading ? (
         <div className="flex flex-col items-center justify-center py-20 space-y-4">
           <div className="w-10 h-10 border-2 border-[#D1AF47]/20 border-t-[#D1AF47] rounded-full animate-spin" />
           <div className="text-sm text-[#667085] font-semibold tracking-wide">{t.searching}</div>
@@ -361,7 +371,7 @@ export default function ProviderJobsPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <span>
-                      {t.date}: <strong className="text-[#101828] font-semibold">{new Date(job.target_date).toLocaleString()}</strong>
+                      {t.date}: <strong className="text-[#101828] font-semibold">{new Date(job.target_date).toLocaleString(isRTL ? "ar-SA" : "en-US", { timeZone: "Asia/Riyadh" })}</strong>
                     </span>
                   </div>
                 </div>
@@ -375,12 +385,18 @@ export default function ProviderJobsPage() {
                     {job.budget_max} <span className="text-xs font-semibold text-[#344054]">{t.sar}</span>
                   </span>
                 </div>
+                {myBids.some((b) => b.job_post_id === job.id) ? (
+                  <span className="px-4 py-2 rounded-2xl bg-[#3DDC84]/10 text-[#22C55E] text-[11px] font-black border border-[#3DDC84]/20">
+                    {t.bidSent}: {myBids.find((b) => b.job_post_id === job.id)?.bid_price} {t.sar}
+                  </span>
+                ) : (
                 <button
                   onClick={() => handleOpenBidModal(job)}
                   className="px-6 py-3.5 bg-gradient-to-r from-[#D1AF47] to-[#B8952E] hover:from-[#E0C46A] hover:to-[#D1AF47] text-[#070B12] font-black text-[11px] uppercase tracking-wider rounded-2xl shadow-[0_4px_20px_rgba(209,175,71,0.15)] hover:shadow-[0_4px_25px_rgba(209,175,71,0.35)] transition-all duration-300 transform hover:scale-[1.03] active:scale-95 cursor-pointer"
                 >
                   {t.placeOffer}
                 </button>
+                )}
               </div>
 
             </div>
@@ -423,8 +439,9 @@ export default function ProviderJobsPage() {
                     <input
                       type="number"
                       min="1"
+                      step="0.01"
                       value={bidPrice}
-                      onChange={(e) => setBidPrice(parseInt(e.target.value) || 0)}
+                      onChange={(e) => setBidPrice(Number(e.target.value) || 0)}
                       className="w-full bg-transparent border-none text-2xl font-black text-[#D1AF47] tracking-wider focus:outline-none focus:ring-0 mt-1"
                       required
                     />
@@ -467,7 +484,7 @@ export default function ProviderJobsPage() {
                       </option>
                       {employees.map((emp) => (
                         <option key={emp.id} value={emp.id} className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] text-[#101828] font-semibold">
-                          {emp.name_en}
+                          {isRTL ? emp.name_ar || emp.name_en : emp.name_en}
                         </option>
                       ))}
                     </select>

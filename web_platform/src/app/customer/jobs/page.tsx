@@ -27,44 +27,147 @@ interface JobPost {
   job_bids?: JobBid[];
 }
 
+const contentTranslations = {
+  en: {
+    title: "Service Requests Board",
+    subtitle: "Post a request and compare price offers from verified providers.",
+    openForm: "Post Service Request",
+    closeForm: "Close Form",
+    formTitle: "What service do you need?",
+    jobTitle: "Job Title",
+    titlePlaceholder: "e.g. Bridal hair styling for two people",
+    description: "Detailed Description",
+    descriptionPlaceholder: "Describe what you need so providers can price it accurately...",
+    address: "Location Address",
+    addressPlaceholder: "District, city",
+    targetDate: "Target Date & Time",
+    budget: "Maximum Budget (SAR)",
+    category: "Service Category",
+    chooseCategory: "Choose a category",
+    submit: "Post Request",
+    submitting: "Posting...",
+    noCategories: "Requests are unavailable because no service categories are configured yet.",
+    fillRequired: "Please fill in the title, description, address, date and category.",
+    futureDate: "Please choose a date and time in the future.",
+    posted: "Request posted. Verified providers can now send you price offers.",
+    accepted: "Offer accepted. The provider can now see the request is assigned to them.",
+    cancelled: "Request cancelled.",
+    loadFailed: "Could not load your requests",
+    retry: "Try again",
+    loading: "Loading requests...",
+    empty: "You have not posted any requests yet.",
+    addressLabel: "Address",
+    dateLabel: "Date",
+    budgetLimit: "BUDGET LIMIT",
+    bidsReceived: "Bids Received",
+    waiting: "Waiting for offers from verified providers...",
+    proposedBid: "PROPOSED BID",
+    acceptBid: "Accept Bid",
+    cancelRequest: "Cancel Request",
+    confirmAccept: "Accept this offer? All other offers on this request will be declined.",
+    confirmCancel: "Cancel this request? Providers will no longer be able to send offers.",
+    status: { open: "OPEN", assigned: "ASSIGNED", completed: "COMPLETED", cancelled: "CANCELLED" } as Record<string, string>,
+    bidStatus: { accepted: "ACCEPTED", rejected: "DECLINED", withdrawn: "WITHDRAWN" } as Record<string, string>,
+    sar: "SAR",
+    errorPrefix: "Error",
+    successPrefix: "Success",
+  },
+  ar: {
+    title: "لوحة طلبات الخدمة",
+    subtitle: "انشر طلبك وقارن عروض الأسعار من مقدمي خدمة موثقين.",
+    openForm: "نشر طلب خدمة",
+    closeForm: "إغلاق النموذج",
+    formTitle: "ما الخدمة التي تحتاجها؟",
+    jobTitle: "عنوان الطلب",
+    titlePlaceholder: "مثال: تصفيف شعر عروس لشخصين",
+    description: "الوصف التفصيلي",
+    descriptionPlaceholder: "صف ما تحتاجه ليتمكن مقدمو الخدمة من تسعيره بدقة...",
+    address: "العنوان",
+    addressPlaceholder: "الحي، المدينة",
+    targetDate: "التاريخ والوقت المطلوب",
+    budget: "الميزانية القصوى (ريال)",
+    category: "فئة الخدمة",
+    chooseCategory: "اختر الفئة",
+    submit: "نشر الطلب",
+    submitting: "جارٍ النشر...",
+    noCategories: "الطلبات غير متاحة لعدم إعداد فئات الخدمات بعد.",
+    fillRequired: "يرجى تعبئة العنوان والوصف والموقع والتاريخ والفئة.",
+    futureDate: "يرجى اختيار تاريخ ووقت في المستقبل.",
+    posted: "تم نشر الطلب. يمكن لمقدمي الخدمة الموثقين إرسال عروضهم الآن.",
+    accepted: "تم قبول العرض. يرى مقدم الخدمة الآن أن الطلب أُسند إليه.",
+    cancelled: "تم إلغاء الطلب.",
+    loadFailed: "تعذر تحميل طلباتك",
+    retry: "إعادة المحاولة",
+    loading: "جارٍ تحميل الطلبات...",
+    empty: "لم تنشر أي طلبات بعد.",
+    addressLabel: "العنوان",
+    dateLabel: "التاريخ",
+    budgetLimit: "الحد الأقصى للميزانية",
+    bidsReceived: "العروض المستلمة",
+    waiting: "بانتظار عروض من مقدمي خدمة موثقين...",
+    proposedBid: "العرض المقترح",
+    acceptBid: "قبول العرض",
+    cancelRequest: "إلغاء الطلب",
+    confirmAccept: "قبول هذا العرض؟ سيتم رفض جميع العروض الأخرى على هذا الطلب.",
+    confirmCancel: "إلغاء هذا الطلب؟ لن يتمكن مقدمو الخدمة من إرسال عروض.",
+    status: { open: "مفتوح", assigned: "مُسند", completed: "مكتمل", cancelled: "ملغى" } as Record<string, string>,
+    bidStatus: { accepted: "مقبول", rejected: "مرفوض", withdrawn: "مسحوب" } as Record<string, string>,
+    sar: "ريال",
+    errorPrefix: "خطأ",
+    successPrefix: "تم",
+  },
+};
+
 export default function CustomerJobsPage() {
   const [jobPosts, setJobPosts] = useState<JobPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
+  const [isRTL, setIsRTL] = useState(false);
 
   // Form states
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [addressText, setAddressText] = useState("Al-Malqa, Riyadh");
+  const [addressText, setAddressText] = useState("");
   const [targetDate, setTargetDate] = useState("");
   const [budgetMax, setBudgetMax] = useState(250);
   const [categoryId, setCategoryId] = useState("");
-  const [categoriesList, setCategoriesList] = useState<{ id: string; name_en: string }[]>([]);
+  const [categoriesList, setCategoriesList] = useState<{ id: string; name_en: string; name_ar: string }[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [busyId, setBusyId] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const t = contentTranslations[isRTL ? "ar" : "en"];
 
   useEffect(() => {
     loadJobPosts();
     loadCategories();
+    if (typeof document !== "undefined") {
+      setIsRTL(document.documentElement.dir === "rtl");
+      const observer = new MutationObserver(() => setIsRTL(document.documentElement.dir === "rtl"));
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ["dir"] });
+      return () => observer.disconnect();
+    }
   }, []);
 
   async function loadCategories() {
-    try {
-      const { data } = await supabase
-        .from("categories")
-        .select("id, name_en")
-        .eq("is_active", true);
-      setCategoriesList(data || []);
-      if (data && data.length > 0) setCategoryId(data[0].id);
-    } catch (err) {
-      console.error("Error loading categories:", err);
+    const { data, error: catError } = await supabase
+      .from("categories")
+      .select("id, name_en, name_ar")
+      .eq("is_active", true)
+      .order("name_en", { ascending: true });
+    if (catError) {
+      setError(catError.message);
+      return;
     }
+    setCategoriesList(data || []);
   }
 
   async function loadJobPosts() {
     try {
       setLoading(true);
-      setError("");
+      setLoadError("");
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
@@ -92,61 +195,14 @@ export default function CustomerJobsPage() {
           )
         `)
         .eq("customer_id", user.id)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(100);
 
       if (fetchError) throw fetchError;
-      setJobPosts((data as any) || []);
-    } catch (err: any) {
-      console.error("Error loading job posts:", err.message);
-      setError("Failed to load your requests. Showing mock fallbacks.");
-      // Fallback mock items
-      setJobPosts([
-        {
-          id: "1",
-          title: "Urgent Split AC Maintenance & Leak Fix",
-          description: "Water is leaking from the indoor AC unit. Need filter cleaning and leak sealing.",
-          address_text: "Al-Malqa, Riyadh",
-          target_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-          budget_max: 300,
-          status: "open",
-          category_id: "cat_ac",
-          job_bids: [
-            {
-              id: "b1",
-              bid_price: 280,
-              proposal_notes: "We have certified AC technicians available. Can complete in 45 mins. 30-day warranty.",
-              status: "pending",
-              providers: {
-                business_name_en: "Riyadh Home Maintenance Experts",
-                business_name_ar: "خبراء الصيانة المنزلية بالرياض",
-                logo_url: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=100&auto=format&fit=crop"
-              }
-            },
-            {
-              id: "b2",
-              bid_price: 250,
-              proposal_notes: "Local technician nearby. Can visit today evening.",
-              status: "pending",
-              providers: {
-                business_name_en: "Quick Fix Technical Services",
-                business_name_ar: "خدمات التصليح السريع",
-                logo_url: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=100&auto=format&fit=crop"
-              }
-            }
-          ]
-        },
-        {
-          id: "2",
-          title: "Deep Cleaning for 3-Bedroom Apartment",
-          description: "Full deep cleaning of windows, kitchen, bathrooms, and vacuuming carpet rooms.",
-          address_text: "Al-Olaya, Riyadh",
-          target_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-          budget_max: 500,
-          status: "open",
-          category_id: "cat_clean",
-          job_bids: []
-        }
-      ]);
+      setJobPosts((data as unknown as JobPost[]) || []);
+    } catch (err: unknown) {
+      setJobPosts([]);
+      setLoadError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
@@ -157,73 +213,86 @@ export default function CustomerJobsPage() {
     setError("");
     setSuccess("");
 
-    if (!title.trim() || !description.trim()) {
-      setError("Please fill in the job title and description.");
+    if (!title.trim() || !description.trim() || !addressText.trim() || !targetDate || !categoryId) {
+      setError(t.fillRequired);
+      return;
+    }
+    const when = new Date(targetDate);
+    if (Number.isNaN(when.getTime()) || when.getTime() <= Date.now()) {
+      setError(t.futureDate);
       return;
     }
 
+    setSubmitting(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Authentication session expired.");
-
-      // If category list is empty, use a dummy category uuid
-      const finalCategory = categoryId || "00000000-0000-0000-0000-000000000000";
 
       const { error: insertError } = await supabase
         .from("job_posts")
         .insert({
           customer_id: user.id,
-          category_id: finalCategory,
-          title,
-          description,
-          address_text: addressText,
-          latitude: 24.7136, // Riyadh center coordinates
-          longitude: 46.6753,
-          target_date: targetDate ? new Date(targetDate).toISOString() : new Date().toISOString(),
+          category_id: categoryId,
+          title: title.trim(),
+          description: description.trim(),
+          address_text: addressText.trim(),
+          target_date: when.toISOString(),
           budget_max: budgetMax,
-          status: "open"
         });
 
       if (insertError) throw insertError;
 
-      setSuccess("Job request posted successfully! Local providers are being notified.");
+      setSuccess(t.posted);
       setTitle("");
       setDescription("");
+      setAddressText("");
       setTargetDate("");
       setShowAddForm(false);
       loadJobPosts();
-    } catch (err: any) {
-      console.error("Error inserting job post:", err.message);
-      setError(err.message || "Failed to submit request.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setSubmitting(false);
     }
   }
 
-  async function acceptBid(bidId: string, jobId: string) {
+  async function acceptBid(bidId: string) {
+    if (!window.confirm(t.confirmAccept)) return;
+    setError("");
+    setSuccess("");
+    setBusyId(bidId);
     try {
-      setError("");
-      setSuccess("");
-
-      // Update the bid status to accepted
-      const { error: bidUpdateError } = await supabase
-        .from("job_bids")
-        .update({ status: "accepted" })
-        .eq("id", bidId);
-
-      if (bidUpdateError) throw bidUpdateError;
-
-      // Update the job status to assigned
-      const { error: jobUpdateError } = await supabase
-        .from("job_posts")
-        .update({ status: "assigned" })
-        .eq("id", jobId);
-
-      if (jobUpdateError) throw jobUpdateError;
-
-      setSuccess("Bid accepted successfully! Provider will contact you shortly.");
+      const { error: acceptError } = await supabase.rpc("accept_job_bid", { p_bid_id: bidId });
+      if (acceptError) throw acceptError;
+      setSuccess(t.accepted);
       loadJobPosts();
-    } catch (err: any) {
-      console.error("Error accepting bid:", err.message);
-      setError(err.message || "Failed to accept bid.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusyId("");
+    }
+  }
+
+  async function cancelRequest(jobId: string) {
+    if (!window.confirm(t.confirmCancel)) return;
+    setError("");
+    setSuccess("");
+    setBusyId(jobId);
+    try {
+      const { data, error: cancelError } = await supabase
+        .from("job_posts")
+        .update({ status: "cancelled" })
+        .eq("id", jobId)
+        .eq("status", "open")
+        .select("id");
+      if (cancelError) throw cancelError;
+      if (!data || data.length === 0) throw new Error(t.loadFailed);
+      setSuccess(t.cancelled);
+      loadJobPosts();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusyId("");
     }
   }
 
@@ -232,40 +301,46 @@ export default function CustomerJobsPage() {
       {/* HEADER */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-gray-900">Service Requests Board</h2>
-          <p className="text-sm text-gray-500 mt-1">Post on-demand requests for home maintenance, cleaning, wellness, and events, and accept bids.</p>
+          <h2 className="text-2xl font-bold tracking-tight text-gray-900">{t.title}</h2>
+          <p className="text-sm text-gray-500 mt-1">{t.subtitle}</p>
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
+          disabled={categoriesList.length === 0}
           className="px-4 py-2 bg-black text-white hover:bg-gray-800 rounded-xl text-xs font-bold transition duration-150 flex items-center gap-2"
         >
-          {showAddForm ? "Close Form" : "Post Service Request"}
+          {showAddForm ? t.closeForm : t.openForm}
         </button>
       </div>
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-4">
-          Error: {error}
+          {t.errorPrefix}: {error}
         </div>
       )}
 
       {success && (
         <div className="bg-green-50 border border-green-200 text-green-700 text-xs rounded-xl p-4">
-          Success: {success}
+          {t.successPrefix}: {success}
         </div>
+      )}
+
+      {!loading && categoriesList.length === 0 && (
+        <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl p-4">{t.noCategories}</div>
       )}
 
       {/* ADD SERVICE REQUEST */}
       {showAddForm && (
         <form onSubmit={handleAddJob} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm max-w-2xl space-y-4">
-          <h3 className="font-bold text-sm text-gray-800">What service do you need?</h3>
+          <h3 className="font-bold text-sm text-gray-800">{t.formTitle}</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Job Title</label>
+              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.jobTitle}</label>
               <input
                 type="text"
-                placeholder="e.g. Clean & service 4 Split AC units before summer"
+                maxLength={200}
+                placeholder={t.titlePlaceholder}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 font-semibold"
@@ -274,9 +349,9 @@ export default function CustomerJobsPage() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Detailed Description</label>
+              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.description}</label>
               <textarea
-                placeholder="Describe the issues, symptoms, or requirements clearly to get accurate price bids..."
+                placeholder={t.descriptionPlaceholder}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 min-h-[80px]"
@@ -285,9 +360,10 @@ export default function CustomerJobsPage() {
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Location Address</label>
+              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.address}</label>
               <input
                 type="text"
+                placeholder={t.addressPlaceholder}
                 value={addressText}
                 onChange={(e) => setAddressText(e.target.value)}
                 className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 font-semibold"
@@ -296,9 +372,10 @@ export default function CustomerJobsPage() {
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Target Date & Time</label>
+              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.targetDate}</label>
               <input
                 type="datetime-local"
+                required
                 value={targetDate}
                 onChange={(e) => setTargetDate(e.target.value)}
                 className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-500 font-semibold"
@@ -306,7 +383,7 @@ export default function CustomerJobsPage() {
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Maximum Budget (SAR)</label>
+              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.budget}</label>
               <input
                 type="number"
                 min="50"
@@ -319,14 +396,16 @@ export default function CustomerJobsPage() {
 
             {categoriesList.length > 0 && (
               <div>
-                <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Service Category</label>
+                <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.category}</label>
                 <select
+                  required
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
                   className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 font-bold"
                 >
+                  <option value="">{t.chooseCategory}</option>
                   {categoriesList.map((cat) => (
-                    <option key={cat.id} value={cat.id}>{cat.name_en}</option>
+                    <option key={cat.id} value={cat.id}>{isRTL ? cat.name_ar : cat.name_en}</option>
                   ))}
                 </select>
               </div>
@@ -335,16 +414,25 @@ export default function CustomerJobsPage() {
 
           <button
             type="submit"
-            className="px-4 py-2 bg-[hsl(45,60%,55%)] hover:bg-[hsl(45,60%,45%)] text-black font-bold text-xs rounded-xl transition duration-150"
+            disabled={submitting}
+            className="px-4 py-2 bg-[hsl(45,60%,55%)] hover:bg-[hsl(45,60%,45%)] text-black font-bold text-xs rounded-xl transition duration-150 disabled:opacity-50"
           >
-            Post Request
+            {submitting ? t.submitting : t.submit}
           </button>
         </form>
       )}
 
       {/* JOB POSTS LIST */}
       {loading ? (
-        <div className="text-center py-12 text-sm text-gray-400">Loading requests...</div>
+        <div className="text-center py-12 text-sm text-gray-400">{t.loading}</div>
+      ) : loadError ? (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-4 space-y-2">
+          <p className="font-bold">{t.loadFailed}</p>
+          <p>{loadError}</p>
+          <button onClick={loadJobPosts} className="px-3 py-1.5 bg-white border border-red-200 rounded-lg font-bold">{t.retry}</button>
+        </div>
+      ) : jobPosts.length === 0 ? (
+        <div className="text-center py-12 text-sm text-gray-400">{t.empty}</div>
       ) : (
         <div className="space-y-6">
           {jobPosts.map((post) => (
@@ -360,31 +448,40 @@ export default function CustomerJobsPage() {
                         ? "bg-green-50 text-green-700 border-green-200" 
                         : "bg-blue-50 text-blue-700 border-blue-200"
                     }`}>
-                      {post.status.toUpperCase()}
+                      {t.status[post.status] || post.status}
                     </span>
                   </div>
                   <p className="text-xs text-gray-500 mt-2 leading-relaxed">{post.description}</p>
                   
                   <div className="flex flex-wrap gap-x-6 gap-y-2 mt-4 text-[10px] text-gray-400 font-bold uppercase">
-                    <span>Address: <strong className="text-gray-600 font-bold">{post.address_text}</strong></span>
-                    <span>Date: <strong className="text-gray-600 font-bold">{new Date(post.target_date).toLocaleString()}</strong></span>
+                    <span>{t.addressLabel}: <strong className="text-gray-600 font-bold">{post.address_text}</strong></span>
+                    <span>{t.dateLabel}: <strong className="text-gray-600 font-bold">{new Date(post.target_date).toLocaleString(isRTL ? "ar-SA" : "en-US", { timeZone: "Asia/Riyadh" })}</strong></span>
                   </div>
                 </div>
 
                 <div className="text-left sm:text-right">
-                  <span className="text-[10px] text-gray-400 block font-bold">BUDGET LIMIT</span>
-                  <span className="text-xl font-black text-gray-900">{post.budget_max} SAR</span>
+                  <span className="text-[10px] text-gray-400 block font-bold">{t.budgetLimit}</span>
+                  <span className="text-xl font-black text-gray-900">{post.budget_max} {t.sar}</span>
+                  {post.status === "open" && (
+                    <button
+                      onClick={() => cancelRequest(post.id)}
+                      disabled={busyId === post.id}
+                      className="block mt-2 text-[10px] font-bold text-red-600 hover:underline disabled:opacity-50"
+                    >
+                      {t.cancelRequest}
+                    </button>
+                  )}
                 </div>
               </div>
 
               {/* Bids Section */}
               <div className="border-t border-gray-100 pt-6">
                 <h4 className="font-bold text-xs text-gray-800 mb-4">
-                  Bids Received ({post.job_bids?.length || 0})
+                  {t.bidsReceived} ({post.job_bids?.length || 0})
                 </h4>
 
                 {!post.job_bids || post.job_bids.length === 0 ? (
-                  <p className="text-[11px] text-gray-400 italic">Waiting for bids from local providers...</p>
+                  <p className="text-[11px] text-gray-400 italic">{post.status === "open" ? t.waiting : ""}</p>
                 ) : (
                   <div className="space-y-4">
                     {post.job_bids.map((bid) => (
@@ -394,28 +491,29 @@ export default function CustomerJobsPage() {
                             {bid.providers?.logo_url && <img src={bid.providers.logo_url} alt={bid.providers.business_name_en} className="w-full h-full object-cover" />}
                           </div>
                           <div>
-                            <h5 className="font-bold text-xs text-gray-800">{bid.providers?.business_name_en}</h5>
+                            <h5 className="font-bold text-xs text-gray-800">{isRTL ? bid.providers?.business_name_ar || bid.providers?.business_name_en : bid.providers?.business_name_en}</h5>
                             <p className="text-[10px] text-gray-500 mt-0.5">{bid.proposal_notes}</p>
                           </div>
                         </div>
 
                         <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
                           <div className="text-left sm:text-right">
-                            <span className="text-[9px] text-gray-400 block font-bold">PROPOSED BID</span>
-                            <span className="text-sm font-extrabold text-gray-900">{bid.bid_price} SAR</span>
+                            <span className="text-[9px] text-gray-400 block font-bold">{t.proposedBid}</span>
+                            <span className="text-sm font-extrabold text-gray-900">{bid.bid_price} {t.sar}</span>
                           </div>
 
                           {post.status === "open" && bid.status === "pending" && (
                             <button
-                              onClick={() => acceptBid(bid.id, post.id)}
-                              className="px-4 py-2 bg-black hover:bg-gray-800 text-white text-[10px] font-bold rounded-lg transition duration-150"
+                              onClick={() => acceptBid(bid.id)}
+                              disabled={busyId === bid.id}
+                              className="px-4 py-2 bg-black hover:bg-gray-800 text-white text-[10px] font-bold rounded-lg transition duration-150 disabled:opacity-50"
                             >
-                              Accept Bid
+                              {t.acceptBid}
                             </button>
                           )}
-                          {bid.status === "accepted" && (
-                            <span className="px-2.5 py-1 bg-green-50 text-green-700 rounded-lg text-[9px] font-bold border border-green-200">
-                              ACCEPTED
+                          {bid.status !== "pending" && t.bidStatus[bid.status] && (
+                            <span className={`px-2.5 py-1 rounded-lg text-[9px] font-bold border ${bid.status === "accepted" ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-100 text-gray-500 border-gray-200"}`}>
+                              {t.bidStatus[bid.status]}
                             </span>
                           )}
                         </div>

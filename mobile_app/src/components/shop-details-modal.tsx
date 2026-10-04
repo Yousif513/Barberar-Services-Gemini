@@ -1,348 +1,303 @@
-import React, { useState } from "react";
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  Modal, 
-  ScrollView, 
-  Image, 
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  ScrollView,
+  Image,
   Alert,
   Dimensions,
-  TextInput,
-  Linking
+  Linking,
+  ActivityIndicator
 } from "react-native";
-import { ShopItem, mockServices, ServiceItem, SpecialistItem, mockPackages, PackageItem, mockReviews } from "../constants/mockData";
 import { supabase } from "../lib/supabase";
+import {
+  MarketplaceProvider,
+  ShopDetails,
+  ShopPackage,
+  ShopService,
+  VAT_RATE,
+  formatSar,
+  formatSlotLabel,
+  loadAvailableSlots,
+  loadShopDetails,
+  riyadhDate
+} from "../lib/marketplace";
 
-const { height, width } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
-const isValidLuhn = (numStr: string) => {
-  let sum = 0;
-  let shouldDouble = false;
-  for (let i = numStr.length - 1; i >= 0; i--) {
-    let digit = parseInt(numStr.charAt(i), 10);
-    if (shouldDouble) {
-      digit *= 2;
-      if (digit > 9) digit -= 9;
-    }
-    sum += digit;
-    shouldDouble = !shouldDouble;
-  }
-  return sum % 10 === 0;
-};
+const ANY_SPECIALIST = "any";
+const BOOKING_DAYS = 7;
 
-export function ShopDetailsModal({ 
-  shop, 
-  locale, 
-  onClose 
-}: { 
-  shop: ShopItem, 
-  locale: "en" | "ar", 
-  onClose: () => void 
+type ClientProfile = { id: string | null; name: string };
+
+export function ShopDetailsModal({
+  shop,
+  locale,
+  onClose
+}: {
+  shop: MarketplaceProvider,
+  locale: "en" | "ar",
+  onClose: () => void
 }) {
-  const [selectedService, setSelectedService] = useState<ServiceItem | null>(null);
-  const [selectedSpecialist, setSelectedSpecialist] = useState<SpecialistItem | null>(null);
+  const isAr = locale === "ar";
+  const [details, setDetails] = useState<ShopDetails | null>(null);
+  const [detailsError, setDetailsError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
+
+  const [selectedService, setSelectedService] = useState<ShopService | null>(null);
+  const [selectedSpecialist, setSelectedSpecialist] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"services" | "packages">("services");
 
-  const [paymentMethod, setPaymentMethod] = useState<"applepay" | "card">("applepay");
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardHolder, setCardHolder] = useState("");
-  const [cardExpiry, setCardExpiry] = useState("");
-  const [cardCvv, setCardCvv] = useState("");
+  const [slots, setSlots] = useState<string[]>([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
+  const [slotsError, setSlotsError] = useState("");
 
-  const [clientProfiles, setClientProfiles] = useState<any[]>([]);
-  const [selectedProfileId, setSelectedProfileId] = useState<string | null>("cp-mock-myself");
-
-  const isAr = locale === "ar";
-
-  React.useEffect(() => {
-    const fetchProfiles = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          setDefaultProfiles();
-          return;
-        }
-        const { data, error } = await supabase
-          .from("client_profiles")
-          .select("id, name, type")
-          .eq("client_id", user.id);
-        if (data && data.length > 0) {
-          setClientProfiles([
-            { id: "cp-mock-myself", name: isAr ? "نفسي" : "Myself", type: "self" },
-            ...data
-          ]);
-        } else {
-          setDefaultProfiles();
-        }
-      } catch (err) {
-        setDefaultProfiles();
-      }
-    };
-
-    const setDefaultProfiles = () => {
-      setClientProfiles([
-        { id: "cp-mock-myself", name: isAr ? "نفسي" : "Myself", type: "self" },
-        { id: "cp-mock-1", name: isAr ? "فيصل آل سعود (ابن)" : "Faisal Al-Saud (Son)", type: "dependent" },
-        { id: "cp-mock-2", name: isAr ? "ركس (حيوان أليف)" : "Rex (Pet)", type: "pet" }
-      ]);
-    };
-
-    fetchProfiles();
-  }, [locale]);
+  const [clientProfiles, setClientProfiles] = useState<ClientProfile[]>([]);
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const t = {
     en: {
       servicesHeading: "Our Services",
       specialistsHeading: "Choose Specialist",
+      anySpecialist: "Any professional",
       dateHeading: "Select Date",
       slotsHeading: "Available Time Slots",
-      prayerBufferMsg: "Prayer times are automatically blocked.",
+      prayerBufferMsg: "Prayer times are excluded from the schedule.",
+      noSlots: "No free times on this day. Try another date.",
+      slotsFailed: "Could not load available times",
       pricingHeading: "Booking Summary",
-      servicePrice: "Service Price",
-      deposit: "Escrow Deposit (15%)",
-      venueBalance: "Due at Venue (85%)",
-      totalNow: "Total Due Now",
-      payBtn: " Confirm & Pay Deposit",
+      servicePrice: "Service price",
+      vat: "VAT (15%)",
+      total: "Estimated total",
+      depositNow: "Deposit due now",
+      venueBalance: "Due at the venue",
+      estimateNote: "Final amount is confirmed by the server at checkout.",
+      policyHeading: "Cancellation policy",
+      policy: (h: number, late: number, noShow: number) =>
+        `Free cancellation up to ${h} hours before the appointment. Later cancellations: ${late}% of the price. No-show: ${noShow}% of the price.`,
+      payBtn: "Confirm & continue to payment",
+      confirmBtn: "Confirm booking",
       close: "Close",
       reviews: "reviews",
-      startingFrom: "Starting from",
+      newShop: "New - no reviews yet",
       mins: "mins",
       today: "Today",
       tomorrow: "Tomorrow",
-      dayAfter: "Day After",
-      errorSelectDetails: "Please select a service, specialist, date, and time slot first."
+      forWhom: "Who is this booking for?",
+      myself: "Myself",
+      signIn: "Please sign in from the Profile tab before booking.",
+      bookingFailed: "Booking failed",
+      bookingConfirmed: "Booking confirmed",
+      bookingConfirmedText: "Nothing is due online. Details are in your bookings.",
+      paymentFailed: "Your time is held, but the payment page could not be opened. Open it again from your bookings before the hold expires.",
+      loadFailed: "Could not load this shop",
+      retry: "Try again",
+      noServices: "This shop has not listed any services yet.",
+      noSpecialists: "No professionals are listed for this branch yet.",
+      packagesHeading: "Packages & Passes",
+      sessions: "sessions",
+      validity: "valid for",
+      days: "days",
+      buy: "Buy",
+      noPackages: "No packages currently available for this shop.",
+      packageFailed: "Could not open the payment page. The package was not activated and nothing was charged.",
+      reviewsHeading: "Customer Reviews",
+      noReviews: "No written reviews for this shop yet.",
+      ownerReply: "Reply from the shop"
     },
     ar: {
       servicesHeading: "خدماتنا",
       specialistsHeading: "اختر الأخصائي",
+      anySpecialist: "أي أخصائي متاح",
       dateHeading: "اختر التاريخ",
       slotsHeading: "الأوقات المتاحة",
-      prayerBufferMsg: "يتم حجب أوقات الصلاة تلقائياً.",
+      prayerBufferMsg: "أوقات الصلاة مستثناة من الجدول.",
+      noSlots: "لا توجد أوقات متاحة في هذا اليوم. جرّب تاريخاً آخر.",
+      slotsFailed: "تعذر تحميل الأوقات المتاحة",
       pricingHeading: "ملخص الحجز",
       servicePrice: "سعر الخدمة",
-      deposit: "مبلغ الضمان (15%)",
-      venueBalance: "المستحق في المركز (85%)",
-      totalNow: "المستحق الآن",
-      payBtn: " تأكيد ودفع الضمان",
+      vat: "ضريبة القيمة المضافة (15%)",
+      total: "الإجمالي التقديري",
+      depositNow: "العربون المستحق الآن",
+      venueBalance: "المتبقي في المركز",
+      estimateNote: "يؤكد الخادم المبلغ النهائي عند الدفع.",
+      policyHeading: "سياسة الإلغاء",
+      policy: (h: number, late: number, noShow: number) =>
+        `الإلغاء مجاني حتى ${h} ساعة قبل الموعد. الإلغاء المتأخر: ${late}% من السعر. عدم الحضور: ${noShow}% من السعر.`,
+      payBtn: "تأكيد والمتابعة للدفع",
+      confirmBtn: "تأكيد الحجز",
       close: "إغلاق",
       reviews: "تقييم",
-      startingFrom: "تبدأ من",
+      newShop: "جديد - لا توجد تقييمات بعد",
       mins: "دقيقة",
       today: "اليوم",
       tomorrow: "غداً",
-      dayAfter: "بعد غد",
-      errorSelectDetails: "يرجى اختيار الخدمة والأخصائي والتاريخ والوقت أولاً."
+      forWhom: "لمن هذا الحجز؟",
+      myself: "نفسي",
+      signIn: "يرجى تسجيل الدخول من تبويب الملف الشخصي قبل الحجز.",
+      bookingFailed: "تعذر إتمام الحجز",
+      bookingConfirmed: "تم تأكيد الحجز",
+      bookingConfirmedText: "لا يوجد مبلغ مستحق عبر الإنترنت. التفاصيل في حجوزاتك.",
+      paymentFailed: "تم حجز الموعد مؤقتاً، لكن تعذر فتح صفحة الدفع. افتحها من حجوزاتك قبل انتهاء مهلة الحجز.",
+      loadFailed: "تعذر تحميل بيانات المركز",
+      retry: "إعادة المحاولة",
+      noServices: "لم يضف هذا المركز أي خدمات بعد.",
+      noSpecialists: "لا يوجد أخصائيون مدرجون لهذا الفرع بعد.",
+      packagesHeading: "الباقات والعضويات",
+      sessions: "جلسات",
+      validity: "صلاحية",
+      days: "يوم",
+      buy: "شراء",
+      noPackages: "لا توجد باقات متاحة حالياً لهذا المركز",
+      packageFailed: "تعذر فتح صفحة الدفع. لم يتم تفعيل الباقة ولم يُخصم أي مبلغ.",
+      reviewsHeading: "تقييمات وآراء العملاء",
+      noReviews: "لا توجد تقييمات مكتوبة لهذا المركز بعد.",
+      ownerReply: "رد المركز"
     }
   }[locale];
 
-  // Filter services for the current shop
-  const shopServices = mockServices.filter(s => s.shopId === shop.id);
+  useEffect(() => {
+    let cancelled = false;
+    setDetails(null);
+    setDetailsError("");
+    loadShopDetails(shop.providerId, shop.branchId)
+      .then((d) => { if (!cancelled) setDetails(d); })
+      .catch((err) => { if (!cancelled) setDetailsError(err instanceof Error ? err.message : String(err)); });
+    return () => { cancelled = true; };
+  }, [shop.providerId, shop.branchId, reloadKey]);
 
-  // Filter packages for the current shop
-  const shopPackages = mockPackages.filter(p => p.shopId === shop.id);
-
-  // Quick Date Presets
-  const getPresetDates = () => {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-    const dayAfter = new Date(today);
-    dayAfter.setDate(today.getDate() + 2);
-
-    const formatLabel = (date: Date, labelKey: "today" | "tomorrow" | "dayAfter") => {
-      const dayName = date.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", { day: 'numeric', month: 'short' });
-      return {
-        id: date.toISOString().split('T')[0],
-        label: t[labelKey],
-        dateStr: dayName
-      };
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      const myself = { id: null, name: t.myself };
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setClientProfiles([myself]);
+        return;
+      }
+      const { data } = await supabase.from("client_profiles").select("id, name").eq("client_id", user.id);
+      setClientProfiles([myself, ...((data || []) as ClientProfile[])]);
     };
+    fetchProfiles().catch(() => setClientProfiles([{ id: null, name: t.myself }]));
+  }, [locale]);
 
-    return [
-      formatLabel(today, "today"),
-      formatLabel(tomorrow, "tomorrow"),
-      formatLabel(dayAfter, "dayAfter")
-    ];
-  };
+  // Real availability from the database for the chosen service, professional and day.
+  useEffect(() => {
+    if (!details || !selectedService || !selectedSpecialist || !selectedDate) {
+      setSlots([]);
+      return;
+    }
+    let cancelled = false;
+    setSlotsLoading(true);
+    setSlotsError("");
+    loadAvailableSlots({
+      branchId: shop.branchId,
+      serviceId: selectedService.id,
+      employeeId: selectedSpecialist === ANY_SPECIALIST ? null : selectedSpecialist,
+      durationMinutes: selectedService.duration,
+      date: selectedDate,
+      lat: details.latitude,
+      lng: details.longitude,
+    })
+      .then((rows) => { if (!cancelled) setSlots(rows.filter((iso) => new Date(iso).getTime() > Date.now())); })
+      .catch((err) => {
+        if (cancelled) return;
+        setSlots([]);
+        setSlotsError(err instanceof Error ? err.message : String(err));
+      })
+      .finally(() => { if (!cancelled) setSlotsLoading(false); });
+    return () => { cancelled = true; };
+  }, [details, selectedService, selectedSpecialist, selectedDate, shop.branchId]);
 
-  const datesList = getPresetDates();
+  const datesList = useMemo(() => Array.from({ length: BOOKING_DAYS }, (_, offset) => {
+    const id = riyadhDate(offset);
+    const dateStr = new Date(`${id}T12:00:00+03:00`).toLocaleDateString(isAr ? "ar-SA" : "en-US", {
+      weekday: "short", day: "numeric", month: "short", timeZone: "Asia/Riyadh"
+    });
+    return { id, label: offset === 0 ? t.today : offset === 1 ? t.tomorrow : dateStr, dateStr };
+  }), [locale]);
 
-  // Mock slot list
-  const slots = [
-    "09:00 AM",
-    "10:00 AM",
-    "11:30 AM",
-    "01:00 PM",
-    "02:30 PM",
-    "04:00 PM",
-    "05:30 PM",
-    "07:30 PM"
-  ];
+  // Estimate only; create_booking prices the visit (fees, VAT, deposit) on the server.
+  const estimate = useMemo(() => {
+    if (!selectedService || !details) return null;
+    const price = selectedService.price;
+    const vat = Math.round(price * VAT_RATE * 100) / 100;
+    const total = Math.round((price + vat) * 100) / 100;
+    const deposit = Math.round(total * details.depositPercentage) / 100;
+    return { price, vat, total, deposit, balance: Math.round((total - deposit) * 100) / 100 };
+  }, [selectedService, details]);
 
-  const basePriceVal = selectedService ? selectedService.price : 0;
-  const depositVal = Math.round(basePriceVal * 0.15);
-  const balanceVal = basePriceVal - depositVal;
-
-  const toRiyadhTimestamp = (date: string, slot: string) => {
-    const match = slot.match(/^(\d{1,2}):(\d{2})\s(AM|PM)$/);
-    if (!match) throw new Error("Invalid booking time.");
-    const [, rawHour, minute, meridiem] = match;
-    let hour = Number(rawHour) % 12;
-    if (meridiem === "PM") hour += 12;
-    return `${date}T${hour.toString().padStart(2, "0")}:${minute}:00+03:00`;
+  const requireUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      Alert.alert(t.bookingFailed, t.signIn);
+      return null;
+    }
+    return user;
   };
 
   const handleBookingConfirm = async () => {
-    if (!selectedService || !selectedSpecialist || !selectedDate || !selectedSlot) {
-      Alert.alert(
-        isAr ? "تنبيه" : "Alert",
-        t.errorSelectDetails
-      );
-      return;
-    }
-
-    if (paymentMethod === "card") {
-      const cleanNum = cardNumber.replace(/\s/g, "");
-      if (cleanNum.length !== 16 || isNaN(Number(cleanNum)) || !isValidLuhn(cleanNum)) {
-        Alert.alert(
-          isAr ? "خطأ في الدفع" : "Payment Error",
-          isAr ? "رقم بطاقة مدى أو الائتمان غير صحيح (يجب أن يتكون من 16 رقماً ويجتاز فحص luhn)." : "Invalid Mada/Credit Card number. Must be 16 digits and pass luhn validation."
-        );
-        return;
-      }
-      if (!cardHolder.trim()) {
-        Alert.alert(
-          isAr ? "خطأ في الدفع" : "Payment Error",
-          isAr ? "يرجى كتابة اسم حامل البطاقة كما هو مطبوع." : "Please enter the cardholder name exactly as printed."
-        );
-        return;
-      }
-      if (!cardExpiry.match(/^\d{2}\/\d{2}$/)) {
-        Alert.alert(
-          isAr ? "خطأ في الدفع" : "Payment Error",
-          isAr ? "تاريخ انتهاء البطاقة غير صحيح (MM/YY)." : "Invalid expiry date format. Use MM/YY."
-        );
-        return;
-      }
-      const [month, year] = cardExpiry.split("/").map(Number);
-      if (month < 1 || month > 12) {
-        Alert.alert(
-          isAr ? "خطأ في الدفع" : "Payment Error",
-          isAr ? "شهر الانتهاء غير صحيح." : "Invalid expiry month."
-        );
-        return;
-      }
-      if (cardCvv.length !== 3 || isNaN(Number(cardCvv))) {
-        Alert.alert(
-          isAr ? "خطأ في الدفع" : "Payment Error",
-          isAr ? "رمز الأمان CVV غير صحيح (3 أرقام)." : "Invalid CVV. Must be 3 digits."
-        );
-        return;
-      }
-    }
-
+    if (!selectedService || !selectedSpecialist || !selectedSlot || submitting) return;
+    setSubmitting(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error("Please sign in before booking.");
-      }
+      if (!(await requireUser())) return;
 
       const { data: booking, error: bookingError } = await supabase.rpc("create_booking", {
-        target_employee_id: selectedSpecialist.id,
+        target_employee_id: selectedSpecialist === ANY_SPECIALIST ? null : selectedSpecialist,
         target_service_id: selectedService.id,
-        target_scheduled_at: toRiyadhTimestamp(selectedDate, selectedSlot),
-        request_home_service: false,
-        request_client_profile_id:
-          selectedProfileId && selectedProfileId !== "cp-mock-myself" ? selectedProfileId : null,
+        target_scheduled_at: selectedSlot,
+        request_branch_id: shop.branchId,
+        request_client_profile_id: selectedProfileId,
+        request_source: "marketplace",
       });
-
       if (bookingError || !booking?.id) {
         throw bookingError ?? new Error("Unable to reserve the selected time.");
+      }
+
+      if (booking.status === "confirmed") {
+        Alert.alert(t.bookingConfirmed, t.bookingConfirmedText, [{ text: "OK", onPress: onClose }]);
+        return;
       }
 
       const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
         body: { bookingId: booking.id },
       });
-
       if (checkoutError || !checkout?.checkoutUrl) {
-        throw checkoutError ?? new Error("Unable to initialize secure payment.");
+        Alert.alert(t.bookingFailed, t.paymentFailed);
+        return;
       }
-
       await Linking.openURL(checkout.checkoutUrl);
       onClose();
-      return;
     } catch (err) {
-      Alert.alert("Booking Failed", err instanceof Error ? err.message : "Booking could not be completed.");
-      return;
-    }
-
-    if (selectedService && selectedSpecialist) {
-
-    /*
-    Alert.alert(
-      isAr ? "تم إرسال طلب الحجز" : "Booking Request Received",
-      isAr 
-        ? `تم تأكيد حجز الخدمة: ${selectedService.name.ar} مع ${selectedSpecialist.name.ar} بنجاح. العربون المدفوع: ${depositVal} ريال. ستصلك تفاصيل الموعد عبر الواتساب.` 
-        : `Your appointment for ${selectedService.name.en} with ${selectedSpecialist.name.en} has been requested. Deposit of ${depositVal} SAR processed. Detail updates sent via WhatsApp.`,
-      [{ text: "OK", onPress: onClose }]
-    );
-    */
+      Alert.alert(t.bookingFailed, err instanceof Error ? err.message : String(err));
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const handlePackagePurchase = (pkg: PackageItem) => {
-    Alert.alert(
-      "Secure Checkout Required",
-      `Secure package checkout for ${pkg.name.en} is not available yet.`
-    );
-    return;
-
-    /*
-    Alert.alert(
-      isAr ? " الدفع باستخدام Apple Pay" : " Pay with Apple Pay",
-      isAr 
-        ? `هل ترغب في شراء باقة "${pkg.name.ar}" مقابل ${pkg.price} ريال؟`
-        : `Confirm purchasing package "${pkg.name.en}" for ${pkg.price} SAR?`,
-      [
-        {
-          text: isAr ? "إلغاء" : "Cancel",
-          style: "cancel"
-        },
-        {
-          text: isAr ? "دفع وتأكيد" : "Pay & Confirm",
-          onPress: async () => {
-            try {
-              const { data: { user } } = await supabase.auth.getUser();
-              if (user) {
-                const { error } = await supabase.from("packages").select({
-                  customer_id: user.id,
-                  package_id: pkg.id,
-                  remaining_sessions: pkg.sessionCount,
-                  expires_at: new Date(Date.now() + pkg.expiresInDays * 24 * 60 * 60 * 1000).toISOString()
-                });
-                if (error) throw error;
-              }
-            } catch (err) {
-              Alert.alert("Package Purchase Failed", err instanceof Error ? err.message : "Purchase could not be completed.");
-              return;
-            }
-
-            Alert.alert(
-              isAr ? "تمت عملية الشراء بنجاح" : "Purchase Complete",
-              isAr
-                ? `لقد قمت بشراء باقة "${pkg.name.ar}" بنجاح. تم معالجة الدفع عبر Apple Pay وإضافة الباقة إلى لوحة التحكم الخاصة بك.`
-                : `You have successfully purchased the package "${pkg.name.en}". Payment processed and the pass has been added to your dashboard.`,
-              [{ text: "OK", onPress: onClose }]
-            );
-          }
-        }
-      ]
-    );
-    */
+  const handlePackagePurchase = async (pkg: ShopPackage) => {
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      if (!(await requireUser())) return;
+      const { data, error } = await supabase.rpc("purchase_service_package", { p_package_id: pkg.id, p_payment_method: "card" });
+      if (error) throw error;
+      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
+        body: { purchaseType: "package", purchaseId: data.purchase_id },
+      });
+      if (checkoutError || !checkout?.checkoutUrl) throw new Error(t.packageFailed);
+      await Linking.openURL(checkout.checkoutUrl);
+      onClose();
+    } catch (err) {
+      Alert.alert(t.bookingFailed, err instanceof Error ? err.message : String(err));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleTabChange = (tab: "services" | "packages") => {
@@ -353,48 +308,69 @@ export function ShopDetailsModal({
     setSelectedSlot(null);
   };
 
+  const specialistOptions = details
+    ? [{ id: ANY_SPECIALIST, name: { en: t.anySpecialist, ar: t.anySpecialist }, role: { en: "", ar: "" }, avatar: "" }, ...details.specialists]
+    : [];
+
   return (
-    <Modal animationType="slide" transparent={true} visible={true}>
+    <Modal animationType="slide" transparent={true} visible={true} onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <View style={styles.sheetContainer}>
-          
+
           {/* Header */}
           <View style={[styles.sheetHeader, isAr && styles.rtlRow]}>
             <View style={styles.titleContainer}>
-              <Text style={styles.sheetTitle}>{shop.name[locale]}</Text>
-              <Text style={styles.sheetSub}>★ {shop.rating} ({shop.reviewsCount} {t.reviews})</Text>
+              <Text style={[styles.sheetTitle, isAr && styles.rtlText]}>{shop.name[locale]}</Text>
+              <Text style={[styles.sheetSub, isAr && styles.rtlText]}>
+                {shop.rating !== null ? `★ ${shop.rating} (${shop.reviews} ${t.reviews})` : t.newShop}
+              </Text>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
               <Text style={styles.closeBtnText}>{t.close}</Text>
             </TouchableOpacity>
           </View>
 
+          {!details && !detailsError && <ActivityIndicator color="hsl(45,60%,55%)" style={{ marginTop: 40 }} />}
+          {detailsError !== "" && (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>{t.loadFailed}: {detailsError}</Text>
+              <TouchableOpacity onPress={() => setReloadKey((k) => k + 1)} style={[styles.payBtn, { marginTop: 12 }]}>
+                <Text style={styles.payBtnText}>{t.retry}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {details && (
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
             {/* Cover Image & Description */}
             <View style={styles.coverContainer}>
-              <Image source={{ uri: shop.image }} style={styles.coverImage as any} />
+              {details.coverImage !== "" && <Image source={{ uri: details.coverImage }} style={styles.coverImage as any} />}
               <View style={styles.descCard}>
-                <Text style={[styles.descText, isAr && styles.rtlText]}>{shop.description[locale]}</Text>
-                <Text style={[styles.addressText, isAr && styles.rtlText]}>{shop.address[locale]}</Text>
+                {details.description[locale] !== "" && (
+                  <Text style={[styles.descText, isAr && styles.rtlText]}>{details.description[locale]}</Text>
+                )}
+                <Text style={[styles.addressText, isAr && styles.rtlText]}>
+                  {details.address[locale] || [shop.district, shop.city].filter(Boolean).join(isAr ? "، " : ", ")}
+                </Text>
               </View>
             </View>
 
             {/* Tab Switcher */}
             <View style={[styles.tabContainer, isAr && styles.rtlRow]}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => handleTabChange("services")}
                 style={[styles.tabButton, activeTab === "services" && styles.activeTabButton]}
               >
                 <Text style={[styles.tabButtonText, activeTab === "services" && styles.activeTabButtonText]}>
-                  {isAr ? "الخدمات" : "Services"}
+                  {t.servicesHeading}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => handleTabChange("packages")}
                 style={[styles.tabButton, activeTab === "packages" && styles.activeTabButton]}
               >
                 <Text style={[styles.tabButtonText, activeTab === "packages" && styles.activeTabButtonText]}>
-                  {isAr ? "الباقات والعضويات" : "Packages & Passes"}
+                  {t.packagesHeading}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -404,49 +380,60 @@ export function ShopDetailsModal({
                 {/* 1. SELECT SERVICE */}
                 <Text style={[styles.sectionHeading, isAr && styles.rtlText]}>{t.servicesHeading}</Text>
                 <View style={styles.servicesGrid}>
-                  {shopServices.map((srv) => (
-                    <TouchableOpacity 
-                      key={srv.id} 
+                  {details.services.map((srv) => (
+                    <TouchableOpacity
+                      key={srv.id}
                       onPress={() => {
                         setSelectedService(srv);
                         setSelectedSpecialist(null);
                         setSelectedSlot(null);
                       }}
                       style={[
-                        styles.serviceCard, 
+                        styles.serviceCard,
                         selectedService?.id === srv.id && styles.selectedBorder,
                         isAr && styles.rtlRow
                       ]}
                     >
                       <View style={[styles.srvInfo, isAr && styles.rtlText]}>
                         <Text style={styles.srvName}>{srv.name[locale]}</Text>
-                        <Text style={styles.srvSub}>{srv.duration} {t.mins} • {srv.gender === "men" ? (isAr ? "رجال" : "Men") : srv.gender === "women" ? (isAr ? "نساء" : "Women") : (isAr ? "مشترك" : "Unisex")}</Text>
+                        <Text style={styles.srvSub}>
+                          {srv.duration} {t.mins}{srv.category[locale] ? ` • ${srv.category[locale]}` : ""}
+                        </Text>
                       </View>
-                      <Text style={styles.srvPrice}>{srv.price} SAR</Text>
+                      <Text style={styles.srvPrice}>{formatSar(srv.price, locale)}</Text>
                     </TouchableOpacity>
                   ))}
+                  {details.services.length === 0 && (
+                    <View style={styles.emptyContainer}>
+                      <Text style={styles.emptyText}>{t.noServices}</Text>
+                    </View>
+                  )}
                 </View>
 
                 {/* 2. SELECT SPECIALIST */}
                 {selectedService && (
                   <>
                     <Text style={[styles.sectionHeading, isAr && styles.rtlText]}>{t.specialistsHeading}</Text>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, isAr && styles.rtlRow]}>
-                      {shop.specialists.map((spec) => (
-                        <TouchableOpacity 
-                          key={spec.id} 
-                          onPress={() => {
-                            setSelectedSpecialist(spec);
-                            setSelectedSlot(null);
-                          }}
-                          style={[styles.specCard, selectedSpecialist?.id === spec.id && styles.selectedSpecCard]}
-                        >
-                          <Image source={{ uri: spec.avatar }} style={styles.specAvatar as any} />
-                          <Text style={styles.specName}>{spec.name[locale]}</Text>
-                          <Text style={styles.specRole}>{spec.role[locale]}</Text>
-                        </TouchableOpacity>
-                      ))}
-                    </ScrollView>
+                    {details.specialists.length === 0 ? (
+                      <Text style={[styles.emptyText, { paddingVertical: 8 }]}>{t.noSpecialists}</Text>
+                    ) : (
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, isAr && styles.rtlRow]}>
+                        {specialistOptions.map((spec) => (
+                          <TouchableOpacity
+                            key={spec.id}
+                            onPress={() => {
+                              setSelectedSpecialist(spec.id);
+                              setSelectedSlot(null);
+                            }}
+                            style={[styles.specCard, selectedSpecialist === spec.id && styles.selectedSpecCard]}
+                          >
+                            {spec.avatar !== "" && <Image source={{ uri: spec.avatar }} style={styles.specAvatar as any} />}
+                            <Text style={styles.specName}>{spec.name[locale]}</Text>
+                            {spec.role[locale] !== "" && <Text style={styles.specRole}>{spec.role[locale]}</Text>}
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    )}
                   </>
                 )}
 
@@ -454,10 +441,10 @@ export function ShopDetailsModal({
                 {selectedService && selectedSpecialist && (
                   <>
                     <Text style={[styles.sectionHeading, isAr && styles.rtlText]}>{t.dateHeading}</Text>
-                    <View style={[styles.dateGrid, isAr && styles.rtlRow]}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.dateGrid, isAr && styles.rtlRow]}>
                       {datesList.map((dt) => (
-                        <TouchableOpacity 
-                          key={dt.id} 
+                        <TouchableOpacity
+                          key={dt.id}
                           onPress={() => {
                             setSelectedDate(dt.id);
                             setSelectedSlot(null);
@@ -468,7 +455,7 @@ export function ShopDetailsModal({
                           <Text style={[styles.dateSub, selectedDate === dt.id && styles.activeDateSub]}>{dt.dateStr}</Text>
                         </TouchableOpacity>
                       ))}
-                    </View>
+                    </ScrollView>
                   </>
                 )}
 
@@ -479,165 +466,77 @@ export function ShopDetailsModal({
                       <Text style={styles.sectionHeadingCompact}>{t.slotsHeading}</Text>
                       <Text style={styles.prayerMsg}>{t.prayerBufferMsg}</Text>
                     </View>
-                    <View style={styles.slotGrid}>
-                      {slots.map((slot) => (
-                        <TouchableOpacity 
-                          key={slot} 
-                          onPress={() => setSelectedSlot(slot)}
-                          style={[styles.slotChip, selectedSlot === slot && styles.slotSelected]}
-                        >
-                          <Text style={[styles.slotText, selectedSlot === slot && styles.slotTextSelected]}>{slot}</Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
+                    {slotsLoading && <ActivityIndicator color="hsl(45,60%,55%)" />}
+                    {!slotsLoading && slotsError !== "" && (
+                      <Text style={[styles.emptyText, { paddingVertical: 8 }]}>{t.slotsFailed}: {slotsError}</Text>
+                    )}
+                    {!slotsLoading && slotsError === "" && slots.length === 0 && (
+                      <Text style={[styles.emptyText, { paddingVertical: 8 }]}>{t.noSlots}</Text>
+                    )}
+                    {!slotsLoading && slots.length > 0 && (
+                      <View style={styles.slotGrid}>
+                        {slots.map((slot) => (
+                          <TouchableOpacity
+                            key={slot}
+                            onPress={() => setSelectedSlot(slot)}
+                            style={[styles.slotChip, selectedSlot === slot && styles.slotSelected]}
+                          >
+                            <Text style={[styles.slotText, selectedSlot === slot && styles.slotTextSelected]}>{formatSlotLabel(slot, locale)}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    )}
                   </>
                 )}
 
-                {/* 5. PRICE BREAKDOWN */}
-                {selectedService && selectedSpecialist && selectedDate && selectedSlot && (
+                {/* 5. SUMMARY & CONFIRM */}
+                {selectedService && selectedSpecialist && selectedDate && selectedSlot && estimate && (
                   <>
-                     {/* Client profiles dependents picker */}
-                     <Text style={[styles.sectionHeadingCompact, { marginTop: 12 }, isAr && styles.rtlText]}>
-                       {isAr ? "لمن هذا الحجز؟" : "Who is this booking for?"}
-                     </Text>
-                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, isAr && styles.rtlRow, { marginTop: 8, marginBottom: 12 }]}>
-                       {clientProfiles.map((p: any) => (
-                         <TouchableOpacity
-                           key={p.id}
-                           onPress={() => setSelectedProfileId(p.id)}
-                           style={[
-                             styles.profileChip,
-                             selectedProfileId === p.id && styles.profileChipSelected
-                           ]}
-                         >
-                           <Text style={[
-                             styles.profileChipText,
-                             selectedProfileId === p.id && styles.profileChipTextSelected
-                           ]}>
-                             {p.name}
-                           </Text>
-                         </TouchableOpacity>
-                       ))}
-                     </ScrollView>
-
-                     <Text style={[styles.sectionHeading, isAr && styles.rtlText]}>{t.pricingHeading}</Text>
-                    <View style={styles.breakdownCard}>
-                      <View style={[styles.row, isAr && styles.rtlRow]}>
-                        <Text style={styles.rowLabel}>{t.servicePrice}</Text>
-                        <Text style={styles.rowVal}>{basePriceVal} SAR</Text>
-                      </View>
-                      <View style={[styles.row, isAr && styles.rtlRow]}>
-                        <Text style={styles.rowLabel}>{t.deposit}</Text>
-                        <Text style={styles.rowVal}>{depositVal} SAR</Text>
-                      </View>
-                      <View style={[styles.row, isAr && styles.rtlRow]}>
-                        <Text style={styles.rowLabel}>{t.venueBalance}</Text>
-                        <Text style={styles.rowVal}>{balanceVal} SAR</Text>
-                      </View>
-                    </View>
-
-                    {/* Payment Method Selector */}
-                    <Text style={[styles.sectionHeadingCompact, { marginTop: 12 }, isAr && styles.rtlText]}>
-                      {isAr ? "طريقة الدفع" : "Payment Method"}
-                    </Text>
-                    <View style={[styles.payMethodContainer, isAr && styles.rtlRow]}>
-                      <TouchableOpacity
-                        onPress={() => setPaymentMethod("applepay")}
-                        style={[styles.payMethodBtn, paymentMethod === "applepay" && styles.payMethodBtnActive]}
-                      >
-                        <Text style={[styles.payMethodText, paymentMethod === "applepay" && styles.payMethodTextActive]}>
-                           Pay
-                        </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => setPaymentMethod("card")}
-                        style={[styles.payMethodBtn, paymentMethod === "card" && styles.payMethodBtnActive]}
-                      >
-                        <Text style={[styles.payMethodText, paymentMethod === "card" && styles.payMethodTextActive]}>
-                          {isAr ? "مدى / بطاقة ائتمان" : "Mada / Card"}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    {/* Card inputs */}
-                    {paymentMethod === "card" && (
-                      <View style={styles.cardForm}>
-                        <View style={styles.inputGroup}>
-                          <Text style={[styles.inputLabel, isAr && styles.rtlText]}>
-                            {isAr ? "اسم حامل البطاقة" : "Cardholder Name"}
-                          </Text>
-                          <TextInput
-                            style={[styles.textInput, isAr && styles.rtlText]}
-                            placeholder="FAIZ AL-MUTAIRI"
-                            placeholderTextColor="#a8a29e"
-                            value={cardHolder}
-                            onChangeText={setCardHolder}
-                            autoCapitalize="characters"
-                          />
-                        </View>
-                        <View style={styles.inputGroup}>
-                          <Text style={[styles.inputLabel, isAr && styles.rtlText]}>
-                            {isAr ? "رقم البطاقة" : "Card Number"}
-                          </Text>
-                          <TextInput
-                            style={[styles.textInput, { textAlign: "left", letterSpacing: 2 }]}
-                            placeholder="4000 1234 5678 9010"
-                            placeholderTextColor="#a8a29e"
-                            keyboardType="numeric"
-                            maxLength={19}
-                            value={cardNumber}
-                            onChangeText={(text) => {
-                              const raw = text.replace(/\D/g, "");
-                              const formatted = raw.match(/.{1,4}/g)?.join(" ") || "";
-                              setCardNumber(formatted);
-                            }}
-                          />
-                        </View>
-                        <View style={[styles.row, isAr && styles.rtlRow, { gap: 12 }]}>
-                          <View style={[styles.inputGroup, { flex: 1 }]}>
-                            <Text style={[styles.inputLabel, isAr && styles.rtlText]}>
-                              {isAr ? "تاريخ الانتهاء" : "Expiry (MM/YY)"}
-                            </Text>
-                            <TextInput
-                              style={[styles.textInput, { textAlign: "center" }]}
-                              placeholder="MM/YY"
-                              placeholderTextColor="#a8a29e"
-                              keyboardType="numeric"
-                              maxLength={5}
-                              value={cardExpiry}
-                              onChangeText={(text) => {
-                                let val = text.replace(/\D/g, "");
-                                if (val.length > 2) {
-                                  val = val.substring(0, 2) + "/" + val.substring(2, 4);
-                                }
-                                setCardExpiry(val);
-                              }}
-                            />
-                          </View>
-                          <View style={[styles.inputGroup, { flex: 1 }]}>
-                            <Text style={[styles.inputLabel, isAr && styles.rtlText]}>
-                              {isAr ? "رمز الأمان CVV" : "CVV"}
-                            </Text>
-                            <TextInput
-                              style={[styles.textInput, { textAlign: "center" }]}
-                              placeholder="***"
-                              placeholderTextColor="#a8a29e"
-                              keyboardType="numeric"
-                              maxLength={3}
-                              secureTextEntry
-                              value={cardCvv}
-                              onChangeText={(text) => setCardCvv(text.replace(/\D/g, ""))}
-                            />
-                          </View>
-                        </View>
-                      </View>
+                    {clientProfiles.length > 1 && (
+                      <>
+                        <Text style={[styles.sectionHeadingCompact, { marginTop: 12 }, isAr && styles.rtlText]}>{t.forWhom}</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, isAr && styles.rtlRow, { marginTop: 8, marginBottom: 12 }]}>
+                          {clientProfiles.map((p) => (
+                            <TouchableOpacity
+                              key={p.id ?? "self"}
+                              onPress={() => setSelectedProfileId(p.id)}
+                              style={[styles.profileChip, selectedProfileId === p.id && styles.profileChipSelected]}
+                            >
+                              <Text style={[styles.profileChipText, selectedProfileId === p.id && styles.profileChipTextSelected]}>
+                                {p.name}
+                              </Text>
+                            </TouchableOpacity>
+                          ))}
+                        </ScrollView>
+                      </>
                     )}
 
-                    {/* PAY BUTTON */}
-                    <TouchableOpacity onPress={handleBookingConfirm} style={styles.payBtn}>
-                      <Text style={styles.payBtnText}>
-                        {paymentMethod === "applepay" ? t.payBtn : (isAr ? `تأكيد ودفع ${depositVal} ريال` : `Confirm & Pay ${depositVal} SAR`)}
-                      </Text>
+                    <Text style={[styles.sectionHeading, isAr && styles.rtlText]}>{t.pricingHeading}</Text>
+                    <View style={styles.breakdownCard}>
+                      {[
+                        [t.servicePrice, estimate.price],
+                        [t.vat, estimate.vat],
+                        [t.total, estimate.total],
+                        [t.depositNow, estimate.deposit],
+                        [t.venueBalance, estimate.balance],
+                      ].map(([label, value]) => (
+                        <View key={label as string} style={[styles.row, isAr && styles.rtlRow]}>
+                          <Text style={styles.rowLabel}>{label}</Text>
+                          <Text style={styles.rowVal}>{formatSar(value as number, locale)}</Text>
+                        </View>
+                      ))}
+                      <Text style={[styles.addressText, isAr && styles.rtlText]}>{t.estimateNote}</Text>
+                    </View>
+
+                    <Text style={[styles.sectionHeadingCompact, { marginTop: 12 }, isAr && styles.rtlText]}>{t.policyHeading}</Text>
+                    <Text style={[styles.descText, isAr && styles.rtlText]}>
+                      {t.policy(details.freeCancellationHours, details.lateCancellationFeePercent, details.noShowFeePercent)}
+                    </Text>
+
+                    <TouchableOpacity onPress={handleBookingConfirm} disabled={submitting} style={[styles.payBtn, submitting && { opacity: 0.6 }]}>
+                      {submitting
+                        ? <ActivityIndicator color="hsl(220,15%,8%)" />
+                        : <Text style={styles.payBtnText}>{estimate.deposit > 0 ? t.payBtn : t.confirmBtn}</Text>}
                     </TouchableOpacity>
                   </>
                 )}
@@ -645,106 +544,75 @@ export function ShopDetailsModal({
             ) : (
               <>
                 {/* PACKAGES VIEW */}
-                <Text style={[styles.sectionHeading, isAr && styles.rtlText]}>
-                  {isAr ? "باقات وعضويات السبا المتاحة" : "Spa Packages & Multi-Session Passes"}
-                </Text>
-                
+                <Text style={[styles.sectionHeading, isAr && styles.rtlText]}>{t.packagesHeading}</Text>
+
                 <View style={styles.packagesGrid}>
-                  {shopPackages.map((pkg) => (
-                    <View 
-                      key={pkg.id} 
-                      style={[styles.packageCard, isAr && styles.rtlRow]}
-                    >
+                  {details.packages.map((pkg) => (
+                    <View key={pkg.id} style={[styles.packageCard, isAr && styles.rtlRow]}>
                       <View style={styles.packageInfo}>
                         <Text style={[styles.packageName, isAr && styles.rtlText]}>{pkg.name[locale]}</Text>
-                        <Text style={[styles.packageDesc, isAr && styles.rtlText]}>{pkg.description[locale]}</Text>
-                        
+                        {pkg.description[locale] !== "" && (
+                          <Text style={[styles.packageDesc, isAr && styles.rtlText]}>{pkg.description[locale]}</Text>
+                        )}
                         <View style={[styles.packageBadges, isAr && styles.rtlRow]}>
                           <View style={styles.packageBadgeSessions}>
-                            <Text style={styles.packageBadgeSessionsText}>
-                              {pkg.sessionCount} {isAr ? "جلسات" : "sessions"}
-                            </Text>
+                            <Text style={styles.packageBadgeSessionsText}>{pkg.sessionCount} {t.sessions}</Text>
                           </View>
                           <View style={styles.packageBadgeExpiry}>
-                            <Text style={styles.packageBadgeExpiryText}>
-                              {isAr ? "صلاحية" : "validity"} {pkg.expiresInDays} {isAr ? "يوم" : "days"}
-                            </Text>
+                            <Text style={styles.packageBadgeExpiryText}>{t.validity} {pkg.expiresInDays} {t.days}</Text>
                           </View>
                         </View>
                       </View>
-                      
+
                       <View style={styles.packageAction}>
-                        <Text style={styles.packagePrice}>{pkg.price} SAR</Text>
-                        <TouchableOpacity 
-                          onPress={() => handlePackagePurchase(pkg)}
-                          style={styles.packageBuyBtn}
-                        >
-                          <Text style={styles.packageBuyBtnText}>
-                            {isAr ? " شراء" : " Buy"}
-                          </Text>
+                        <Text style={styles.packagePrice}>{formatSar(pkg.price, locale)}</Text>
+                        <TouchableOpacity onPress={() => handlePackagePurchase(pkg)} disabled={submitting} style={styles.packageBuyBtn}>
+                          <Text style={styles.packageBuyBtnText}>{t.buy}</Text>
                         </TouchableOpacity>
                       </View>
                     </View>
                   ))}
-                  {shopPackages.length === 0 && (
+                  {details.packages.length === 0 && (
                     <View style={styles.emptyContainer}>
-                      <Text style={styles.emptyText}>
-                        {isAr ? "لا توجد باقات متاحة حالياً لهذا المركز" : "No packages currently available for this shop."}
-                      </Text>
+                      <Text style={styles.emptyText}>{t.noPackages}</Text>
                     </View>
                   )}
                 </View>
               </>
             )}
 
-            {/* Customer Reviews & Highlights */}
+            {/* Customer Reviews (published only) */}
             <View style={styles.reviewsSection}>
-              <Text style={[styles.sectionHeading, isAr && styles.rtlText, { marginBottom: 10 }]}>
-                {isAr ? "تقييمات وآراء العملاء" : "Customer Reviews & Highlights"}
-              </Text>
-              
-              {/* Highlight Badges */}
-              <View style={[styles.highlightsRow, isAr && styles.rtlRow]}>
-                {[
-                  { tag: isAr ? "معقم وآمن" : "Clean & Sanitized", pct: "98%" },
-                  { tag: isAr ? "طاقم عمل محترف" : "Professional Staff", pct: "95%" },
-                  { tag: isAr ? "دقة في المواعيد" : "Punctual Slots", pct: "92%" },
-                  { tag: isAr ? "أجواء فاخرة" : "Premium Ambience", pct: "96%" }
-                ].map((hl, idx) => (
-                  <View key={idx} style={[styles.highlightBadge, isAr && styles.rtlRow]}>
-                    <Text style={styles.highlightBadgeText}>★ {hl.tag} ({hl.pct})</Text>
-                  </View>
-                ))}
-              </View>
-
-              {/* Reviews list */}
+              <Text style={[styles.sectionHeading, isAr && styles.rtlText, { marginBottom: 10 }]}>{t.reviewsHeading}</Text>
               <View style={styles.reviewsList}>
-                {mockReviews.filter(r => r.shopId === shop.id).map((rev, idx) => (
-                  <View key={idx} style={styles.reviewCard}>
+                {details.reviews.map((rev) => (
+                  <View key={rev.id} style={styles.reviewCard}>
                     <View style={[styles.reviewCardTop, isAr && styles.rtlRow]}>
-                      <Text style={styles.reviewCardName}>{rev.name}</Text>
-                      <Text style={styles.reviewCardDate}>{rev.date}</Text>
+                      <Text style={styles.reviewCardName}>{rev.authorName}</Text>
+                      <Text style={styles.reviewCardDate}>
+                        {new Date(rev.createdAt).toLocaleDateString(isAr ? "ar-SA" : "en-US", { timeZone: "Asia/Riyadh" })}
+                      </Text>
                     </View>
                     <View style={[styles.reviewStars, isAr && styles.rtlRow]}>
-                      {Array.from({ length: rev.rating }).map((_, sIdx) => (
+                      {Array.from({ length: Math.round(rev.rating) }).map((_, sIdx) => (
                         <Text key={sIdx} style={styles.starText}>★</Text>
                       ))}
                     </View>
-                    <Text style={[styles.reviewCardText, isAr && styles.rtlText]}>
-                      {isAr ? rev.text.ar : rev.text.en}
-                    </Text>
+                    {rev.comment !== "" && <Text style={[styles.reviewCardText, isAr && styles.rtlText]}>{rev.comment}</Text>}
+                    {rev.reply !== "" && (
+                      <Text style={[styles.reviewCardText, isAr && styles.rtlText, { opacity: 0.8 }]}>{t.ownerReply}: {rev.reply}</Text>
+                    )}
                   </View>
                 ))}
-                {mockReviews.filter(r => r.shopId === shop.id).length === 0 && (
-                  <Text style={[styles.emptyText, { paddingVertical: 12 }]}>
-                    {isAr ? "لا توجد تقييمات مكتوبة لهذا المركز بعد." : "No written reviews for this shop yet."}
-                  </Text>
+                {details.reviews.length === 0 && (
+                  <Text style={[styles.emptyText, { paddingVertical: 12 }]}>{t.noReviews}</Text>
                 )}
               </View>
             </View>
 
             <View style={styles.bottomSpacer} />
           </ScrollView>
+          )}
         </View>
       </View>
     </Modal>

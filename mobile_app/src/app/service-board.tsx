@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
@@ -23,56 +21,32 @@ interface Bid {
   providerName: string;
   price: number;
   notes: string;
-  status: "pending" | "accepted" | "rejected";
+  status: "pending" | "accepted" | "rejected" | "withdrawn";
 }
 
 interface Post {
   id: string;
+  customerId: string;
   title: string;
   description: string;
   location: string;
   date: string;
-  budgetMax: number;
-  status: "open" | "assigned";
+  budgetMax: number | null;
+  status: "open" | "assigned" | "completed" | "cancelled";
   bids: Bid[];
 }
 
-// Initial mock data if DB read fails
-const initialMockPosts: Post[] = [
-  {
-    id: "post-1",
-    title: "Bridal Hair Styling & Event Glam",
-    description: "Looking for an expert makeup artist and hairstylist for a wedding party in Al-Yasmin. Need home service for 3 ladies. High quality premium products required.",
-    location: "Al-Yasmin, Riyadh",
-    date: "2026-06-18",
-    budgetMax: 1500,
-    status: "open",
-    bids: [
-      {
-        id: "bid-11",
-        providerName: "Sara Beauty Salon & Spa",
-        price: 1350,
-        notes: "We have 2 senior stylists available with premium French products. Fully equipped for home service.",
-        status: "pending"
-      }
-    ]
-  },
-  {
-    id: "post-2",
-    title: "Royal Moroccan Bath & Massage Package",
-    description: "Home service deep tissue Swedish therapy and organic bath scrub setup. Must bring portable steaming tent and natural argan scrubs.",
-    location: "Al-Malqa, Riyadh",
-    date: "2026-06-20",
-    budgetMax: 800,
-    status: "open",
-    bids: []
-  }
-];
+type Category = { id: string; name_en: string; name_ar: string };
 
 export default function ServiceBoardScreen() {
   const [lang, setLang] = useState<"en" | "ar">("ar");
-  const [posts, setPosts] = useState<Post[]>(initialMockPosts);
-  const [loading, setLoading] = useState(false);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
+  const [providerId, setProviderId] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [submitting, setSubmitting] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
   const [showBidModal, setShowBidModal] = useState(false);
   const [activePost, setActivePost] = useState<Post | null>(null);
@@ -83,11 +57,11 @@ export default function ServiceBoardScreen() {
   const [newBudget, setNewBudget] = useState("");
   const [newLocation, setNewLocation] = useState("");
   const [newDate, setNewDate] = useState("");
+  const [newCategoryId, setNewCategoryId] = useState("");
 
   // New Bid Form state
   const [bidPrice, setBidPrice] = useState("");
   const [bidNotes, setBidNotes] = useState("");
-  const [bidProviderName, setBidProviderName] = useState("");
 
   const isRTL = lang === "ar";
 
@@ -112,15 +86,24 @@ export default function ServiceBoardScreen() {
       reqTitleLabel: "What service do you need?",
       reqDescLabel: "Describe your requirements",
       reqBudgetLabel: "Maximum Budget (SAR)",
-      reqLocationLabel: "District in Riyadh",
+      reqLocationLabel: "Address (district, city)",
+      reqCategoryLabel: "Service category",
+      signIn: "Sign in from the Profile tab to post requests or send offers.",
+      empty: "No requests to show yet.",
+      loadFailed: "Could not load requests",
+      retry: "Try again",
+      futureDate: "Use a future date in the format YYYY-MM-DD.",
+      providerOnly: "Only provider accounts can send offers.",
+      cancelRequest: "Cancel request",
+      statusCancelled: "CANCELLED",
+      yourOffer: "Your offer was sent",
       reqDateLabel: "Scheduled Date (YYYY-MM-DD)",
       bidPriceLabel: "Proposal Price (SAR)",
       bidNotesLabel: "Offer Details",
-      providerNameLabel: "Business / Artist Name",
       placeBidTitle: "Submit Proposal",
-      successPost: "Request published successfully.",
+      successPost: "Request published. Verified providers can now send offers.",
       successBid: "Proposal submitted successfully.",
-      acceptedSuccess: "Offer accepted! Request locked.",
+      acceptedSuccess: "Offer accepted. The other offers were declined.",
       errorFill: "Please fill in all fields."
     },
     ar: {
@@ -143,11 +126,20 @@ export default function ServiceBoardScreen() {
       reqTitleLabel: "ما هي الخدمة التي تحتاجها؟",
       reqDescLabel: "وصف المتطلبات والتفاصيل",
       reqBudgetLabel: "الميزانية القصوى (ريال)",
-      reqLocationLabel: "الحي بالرياض",
+      reqLocationLabel: "العنوان (الحي، المدينة)",
+      reqCategoryLabel: "فئة الخدمة",
+      signIn: "سجّل الدخول من تبويب الملف الشخصي لنشر الطلبات أو إرسال العروض.",
+      empty: "لا توجد طلبات لعرضها بعد.",
+      loadFailed: "تعذر تحميل الطلبات",
+      retry: "إعادة المحاولة",
+      futureDate: "استخدم تاريخاً مستقبلياً بصيغة YYYY-MM-DD.",
+      providerOnly: "يمكن لحسابات مقدمي الخدمة فقط إرسال العروض.",
+      cancelRequest: "إلغاء الطلب",
+      statusCancelled: "ملغى",
+      yourOffer: "تم إرسال عرضك",
       reqDateLabel: "تاريخ الموعد (YYYY-MM-DD)",
       bidPriceLabel: "قيمة العرض المقترح (ريال)",
       bidNotesLabel: "تفاصيل العرض والمؤهلات",
-      providerNameLabel: "اسم المركز أو مقدم الخدمة",
       placeBidTitle: "تقديم عرض سعر",
       successPost: "تم نشر طلب الخدمة بنجاح.",
       successBid: "تم تقديم عرض السعر بنجاح.",
@@ -156,72 +148,55 @@ export default function ServiceBoardScreen() {
     }
   }[lang];
 
-  // Fetch job posts
+  // Requests visible to this account: a customer's own posts, or open posts for providers (RLS).
   const loadServiceRequests = async () => {
     setLoading(true);
+    setLoadError("");
     try {
-      // Fetch job posts from database
-      const { data: jobPostsData, error: postsError } = await supabase
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id ?? null);
+      if (!user) {
+        setPosts([]);
+        return;
+      }
+
+      const [{ data: provider }, { data: cats }] = await Promise.all([
+        supabase.from("providers").select("id").eq("owner_id", user.id).maybeSingle(),
+        supabase.from("categories").select("id, name_en, name_ar").eq("is_active", true).order("name_en"),
+      ]);
+      setProviderId(provider?.id ?? null);
+      setCategories((cats || []) as Category[]);
+
+      const { data, error } = await supabase
         .from("job_posts")
         .select(`
-          id,
-          title,
-          description,
-          address_text,
-          target_date,
-          budget_max,
-          status
+          id, customer_id, title, description, address_text, target_date, budget_max, status,
+          job_bids ( id, bid_price, proposal_notes, status, providers ( business_name_en, business_name_ar ) )
         `)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
 
-      if (postsError) throw postsError;
-
-      if (jobPostsData && jobPostsData.length > 0) {
-        // Fetch corresponding bids
-        const formattedPosts: Post[] = await Promise.all(
-          jobPostsData.map(async (jp: any) => {
-            const { data: bidsData, error: bidsError } = await supabase
-              .from("job_bids")
-              .select(`
-                id,
-                bid_price,
-                proposal_notes,
-                status,
-                provider_id,
-                providers (
-                  business_name_en,
-                  business_name_ar
-                )
-              `)
-              .eq("job_post_id", jp.id);
-
-            const formattedBids: Bid[] = (bidsData || []).map((b: any) => ({
-              id: b.id,
-              providerName: lang === "ar" ? b.providers?.business_name_ar : b.providers?.business_name_en,
-              price: Number(b.bid_price),
-              notes: b.proposal_notes || "",
-              status: b.status
-            }));
-
-            return {
-              id: jp.id,
-              title: jp.title,
-              description: jp.description,
-              location: jp.address_text,
-              date: jp.target_date.split("T")[0],
-              budgetMax: Number(jp.budget_max),
-              status: jp.status === "open" ? "open" : "assigned",
-              bids: formattedBids
-            };
-          })
-        );
-        setPosts(formattedPosts);
-      } else {
-        setPosts(initialMockPosts);
-      }
+      setPosts((data || []).map((jp: any) => ({
+        id: jp.id,
+        customerId: jp.customer_id,
+        title: jp.title,
+        description: jp.description,
+        location: jp.address_text,
+        date: String(jp.target_date).split("T")[0],
+        budgetMax: jp.budget_max === null ? null : Number(jp.budget_max),
+        status: jp.status,
+        bids: (jp.job_bids || []).map((b: any) => ({
+          id: b.id,
+          providerName: (lang === "ar" ? b.providers?.business_name_ar : b.providers?.business_name_en) || b.providers?.business_name_en || "",
+          price: Number(b.bid_price),
+          notes: b.proposal_notes || "",
+          status: b.status,
+        })),
+      })));
     } catch (err) {
-      console.log("Supabase fetch failed, falling back to mock data:", err);
-      // Keep mock posts
+      setPosts([]);
+      setLoadError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
@@ -231,143 +206,122 @@ export default function ServiceBoardScreen() {
     loadServiceRequests();
   }, [lang]);
 
+  const fail = (err: unknown) =>
+    Alert.alert(isRTL ? "خطأ" : "Error", err instanceof Error ? err.message : String(err));
+
   // Handle Post Care Request
   const handlePostRequest = async () => {
-    if (!newTitle.trim() || !newDesc.trim() || !newBudget.trim() || !newLocation.trim() || !newDate.trim()) {
+    if (!userId) {
+      Alert.alert(isRTL ? "خطأ" : "Error", t.signIn);
+      return;
+    }
+    if (!newTitle.trim() || !newDesc.trim() || !newLocation.trim() || !newDate.trim() || !newCategoryId) {
+      Alert.alert(isRTL ? "خطأ" : "Error", t.errorFill);
+      return;
+    }
+    const target = new Date(`${newDate.trim()}T12:00:00+03:00`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(newDate.trim()) || Number.isNaN(target.getTime()) || target.getTime() <= Date.now()) {
+      Alert.alert(isRTL ? "خطأ" : "Error", t.futureDate);
+      return;
+    }
+    const budgetVal = newBudget.trim() ? Number(newBudget) : null;
+    if (budgetVal !== null && !(budgetVal > 0)) {
       Alert.alert(isRTL ? "خطأ" : "Error", t.errorFill);
       return;
     }
 
-    const budgetVal = parseFloat(newBudget);
-    const newRequest: Post = {
-      id: `post-${Date.now()}`,
-      title: newTitle,
-      description: newDesc,
-      location: newLocation,
-      date: newDate,
-      budgetMax: budgetVal,
-      status: "open",
-      bids: []
-    };
-
+    setSubmitting(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        // Fetch a category ID to bypass NOT NULL constraint if available
-        const { data: catData } = await supabase.from("categories").select("id").limit(1);
-        const catId = catData && catData.length > 0 ? catData[0].id : null;
+      const { error } = await supabase.from("job_posts").insert({
+        customer_id: userId,
+        category_id: newCategoryId,
+        title: newTitle.trim(),
+        description: newDesc.trim(),
+        address_text: newLocation.trim(),
+        target_date: target.toISOString(),
+        budget_max: budgetVal,
+      });
+      if (error) throw error;
 
-        if (catId) {
-          const { error } = await supabase.from("job_posts").insert({
-            customer_id: user.id,
-            category_id: catId,
-            title: newTitle,
-            description: newDesc,
-            address_text: newLocation,
-            latitude: 24.7136, // Riyadh center fallback coords
-            longitude: 46.6753,
-            target_date: `${newDate}T12:00:00Z`,
-            budget_max: budgetVal,
-            status: "open"
-          });
-          if (error) throw error;
-        }
-      }
+      setShowPostModal(false);
+      setNewTitle("");
+      setNewDesc("");
+      setNewBudget("");
+      setNewLocation("");
+      setNewDate("");
+      setNewCategoryId("");
+      Alert.alert(isRTL ? "تأكيد" : "Success", t.successPost);
+      loadServiceRequests();
     } catch (err) {
-      console.log("Supabase insert request failed, running offline update:", err);
+      fail(err);
+    } finally {
+      setSubmitting(false);
     }
-
-    setPosts(prev => [newRequest, ...prev]);
-    setShowPostModal(false);
-    // Reset form
-    setNewTitle("");
-    setNewDesc("");
-    setNewBudget("");
-    setNewLocation("");
-    setNewDate("");
-    Alert.alert(isRTL ? "تأكيد" : "Success", t.successPost);
   };
 
-  // Handle Submit Bid
+  // Handle Submit Bid (provider owners only; the bid carries the business name from the database)
   const handleSubmitBid = async () => {
-    if (!activePost || !bidPrice.trim() || !bidNotes.trim() || !bidProviderName.trim()) {
+    if (!activePost) return;
+    if (!providerId) {
+      Alert.alert(isRTL ? "خطأ" : "Error", t.providerOnly);
+      return;
+    }
+    const priceVal = Number(bidPrice);
+    if (!bidPrice.trim() || !(priceVal > 0)) {
       Alert.alert(isRTL ? "خطأ" : "Error", t.errorFill);
       return;
     }
 
-    const priceVal = parseFloat(bidPrice);
-    const newBid: Bid = {
-      id: `bid-${Date.now()}`,
-      providerName: bidProviderName,
-      price: priceVal,
-      notes: bidNotes,
-      status: "pending"
-    };
-
+    setSubmitting(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        // Fetch provider linked to active owner profile
-        const { data: provData } = await supabase.from("providers").select("id").eq("owner_id", user.id).limit(1);
-        const provId = provData && provData.length > 0 ? provData[0].id : null;
+      const { error } = await supabase.from("job_bids").insert({
+        job_post_id: activePost.id,
+        provider_id: providerId,
+        bid_price: priceVal,
+        proposal_notes: bidNotes.trim() || null,
+      });
+      if (error) throw error;
 
-        if (provId) {
-          const { error } = await supabase.from("job_bids").insert({
-            job_post_id: activePost.id,
-            provider_id: provId,
-            bid_price: priceVal,
-            proposal_notes: bidNotes,
-            status: "pending"
-          });
-          if (error) throw error;
-        }
-      }
+      setShowBidModal(false);
+      setBidPrice("");
+      setBidNotes("");
+      Alert.alert(isRTL ? "تأكيد" : "Success", t.successBid);
+      loadServiceRequests();
     } catch (err) {
-      console.log("Supabase bid insert failed, running offline update:", err);
+      fail(err);
+    } finally {
+      setSubmitting(false);
     }
-
-    // Update locally
-    setPosts(prev => prev.map(p => {
-      if (p.id === activePost.id) {
-        const updatedBids = [...p.bids, newBid];
-        setActivePost({ ...p, bids: updatedBids });
-        return { ...p, bids: updatedBids };
-      }
-      return p;
-    }));
-
-    setShowBidModal(false);
-    setBidPrice("");
-    setBidNotes("");
-    setBidProviderName("");
-    Alert.alert(isRTL ? "تأكيد" : "Success", t.successBid);
   };
 
-  // Handle Accept Bid
+  // Accepting is one server command: the chosen bid is accepted, the rest declined, the post assigned.
   const handleAcceptBid = async (bidId: string) => {
-    if (!activePost) return;
-
+    setSubmitting(true);
     try {
-      // Update bid status and post status in Supabase
-      const { error: bidErr } = await supabase.from("job_bids").update({ status: "accepted" }).eq("id", bidId);
-      const { error: postErr } = await supabase.from("job_posts").update({ status: "assigned" }).eq("id", activePost.id);
-      
-      if (bidErr || postErr) throw bidErr || postErr;
+      const { error } = await supabase.rpc("accept_job_bid", { p_bid_id: bidId });
+      if (error) throw error;
+      Alert.alert(isRTL ? "تم القبول" : "Accepted", t.acceptedSuccess);
+      loadServiceRequests();
     } catch (err) {
-      console.log("Supabase accept update failed, running offline update:", err);
+      fail(err);
+    } finally {
+      setSubmitting(false);
     }
+  };
 
-    setPosts(prev => prev.map(p => {
-      if (p.id === activePost.id) {
-        const updatedBids = p.bids.map(b => b.id === bidId ? { ...b, status: "accepted" as const } : b);
-        const updatedPost = { ...p, status: "assigned" as const, bids: updatedBids };
-        setActivePost(updatedPost);
-        return updatedPost;
-      }
-      return p;
-    }));
-
-    Alert.alert(isRTL ? "تم القبول" : "Accepted", t.acceptedSuccess);
+  const handleCancelPost = async (postId: string) => {
+    setSubmitting(true);
+    try {
+      const { data, error } = await supabase
+        .from("job_posts").update({ status: "cancelled" }).eq("id", postId).eq("status", "open").select("id");
+      if (error) throw error;
+      if (!data || data.length === 0) throw new Error(t.loadFailed);
+      loadServiceRequests();
+    } catch (err) {
+      fail(err);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -385,12 +339,25 @@ export default function ServiceBoardScreen() {
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* POST CARE BUTTON */}
-        <TouchableOpacity style={styles.postBtn} onPress={() => setShowPostModal(true)}>
-          <Text style={styles.postBtnText}>{t.postBtn}</Text>
-        </TouchableOpacity>
+        {userId && !providerId && (
+          <TouchableOpacity style={styles.postBtn} onPress={() => setShowPostModal(true)} disabled={categories.length === 0}>
+            <Text style={styles.postBtnText}>{t.postBtn}</Text>
+          </TouchableOpacity>
+        )}
 
         {loading ? (
           <ActivityIndicator color="hsl(45,60%,55%)" size="large" style={styles.loader} />
+        ) : !userId ? (
+          <Text style={[styles.noBidsText, { textAlign: "center", paddingVertical: 32 }]}>{t.signIn}</Text>
+        ) : loadError ? (
+          <View style={{ paddingVertical: 32, alignItems: "center", gap: 12 }}>
+            <Text style={[styles.noBidsText, { textAlign: "center" }]}>{t.loadFailed}: {loadError}</Text>
+            <TouchableOpacity style={styles.submitBidBtn} onPress={loadServiceRequests}>
+              <Text style={styles.submitBidBtnText}>{t.retry}</Text>
+            </TouchableOpacity>
+          </View>
+        ) : posts.length === 0 ? (
+          <Text style={[styles.noBidsText, { textAlign: "center", paddingVertical: 32 }]}>{t.empty}</Text>
         ) : (
           <View style={styles.listContainer}>
             {posts.map(post => (
@@ -399,13 +366,13 @@ export default function ServiceBoardScreen() {
                   <Text style={styles.cardTitle}>{post.title}</Text>
                   <View style={[
                     styles.statusBadge,
-                    post.status === "assigned" && styles.statusBadgeClosed
+                    post.status !== "open" && styles.statusBadgeClosed
                   ]}>
                     <Text style={[
                       styles.statusBadgeText,
-                      post.status === "assigned" && styles.statusBadgeTextClosed
+                      post.status !== "open" && styles.statusBadgeTextClosed
                     ]}>
-                      {post.status === "open" ? t.statusOpen : t.statusClosed}
+                      {post.status === "open" ? t.statusOpen : post.status === "cancelled" ? t.statusCancelled : t.statusClosed}
                     </Text>
                   </View>
                 </View>
@@ -415,7 +382,7 @@ export default function ServiceBoardScreen() {
                 <View style={[styles.cardMetrics, isRTL && styles.rtlRow]}>
                   <View style={styles.metricItem}>
                     <Text style={styles.metricLabel}>{t.budget}</Text>
-                    <Text style={styles.metricVal}>{post.budgetMax} SAR</Text>
+                    <Text style={styles.metricVal}>{post.budgetMax !== null ? `${post.budgetMax} ${isRTL ? "ريال" : "SAR"}` : "-"}</Text>
                   </View>
                   <View style={styles.metricItem}>
                     <Text style={styles.metricLabel}>{t.location}</Text>
@@ -438,13 +405,14 @@ export default function ServiceBoardScreen() {
                   <View key={bid.id} style={styles.bidRow}>
                     <View style={[styles.bidHeader, isRTL && styles.rtlRow]}>
                       <Text style={styles.bidProviderName}>{bid.providerName}</Text>
-                      <Text style={styles.bidPrice}>{bid.price} SAR</Text>
+                      <Text style={styles.bidPrice}>{bid.price} {isRTL ? "ريال" : "SAR"}</Text>
                     </View>
                     <Text style={[styles.bidNotes, isRTL && styles.textRight]}>{bid.notes}</Text>
                     
-                    {post.status === "open" && (
-                      <TouchableOpacity 
+                    {post.status === "open" && bid.status === "pending" && post.customerId === userId && (
+                      <TouchableOpacity
                         style={styles.acceptBidBtn}
+                        disabled={submitting}
                         onPress={() => handleAcceptBid(bid.id)}
                       >
                         <Text style={styles.acceptBidBtnText}>{t.acceptBidBtn}</Text>
@@ -463,8 +431,8 @@ export default function ServiceBoardScreen() {
                   <Text style={[styles.noBidsText, isRTL && styles.textRight]}>{t.noBids}</Text>
                 )}
 
-                {post.status === "open" && (
-                  <TouchableOpacity 
+                {post.status === "open" && providerId && post.customerId !== userId && post.bids.length === 0 && (
+                  <TouchableOpacity
                     style={styles.submitBidBtn}
                     onPress={() => {
                       setActivePost(post);
@@ -472,6 +440,16 @@ export default function ServiceBoardScreen() {
                     }}
                   >
                     <Text style={styles.submitBidBtnText}>{t.submitBidBtn}</Text>
+                  </TouchableOpacity>
+                )}
+
+                {post.status === "open" && providerId && post.bids.length > 0 && (
+                  <Text style={[styles.noBidsText, isRTL && styles.textRight]}>{t.yourOffer}</Text>
+                )}
+
+                {post.status === "open" && post.customerId === userId && (
+                  <TouchableOpacity style={styles.submitBidBtn} disabled={submitting} onPress={() => handleCancelPost(post.id)}>
+                    <Text style={styles.submitBidBtnText}>{t.cancelRequest}</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -513,16 +491,31 @@ export default function ServiceBoardScreen() {
                 value={newBudget}
                 onChangeText={setNewBudget}
                 keyboardType="numeric"
-                placeholder="e.g. 500"
+                placeholder="500"
                 placeholderTextColor="#a8a29e"
               />
+
+              <Text style={[styles.inputLabel, isRTL && styles.textRight]}>{t.reqCategoryLabel}</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[{ gap: 8, paddingVertical: 4 }, isRTL && styles.rtlRow]}>
+                {categories.map((cat) => (
+                  <TouchableOpacity
+                    key={cat.id}
+                    onPress={() => setNewCategoryId(cat.id)}
+                    style={[styles.modalBtnCancel, newCategoryId === cat.id && styles.modalBtnConfirm, { flex: 0, paddingHorizontal: 12 }]}
+                  >
+                    <Text style={newCategoryId === cat.id ? styles.modalBtnConfirmLabel : styles.modalBtnCancelLabel}>
+                      {isRTL ? cat.name_ar : cat.name_en}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
 
               <Text style={[styles.inputLabel, isRTL && styles.textRight]}>{t.reqLocationLabel}</Text>
               <TextInput
                 style={[styles.modalInput, isRTL && styles.textRight]}
                 value={newLocation}
                 onChangeText={setNewLocation}
-                placeholder="e.g. Al-Malqa, Riyadh"
+                placeholder={isRTL ? "الحي، المدينة" : "District, city"}
                 placeholderTextColor="#a8a29e"
               />
 
@@ -531,7 +524,7 @@ export default function ServiceBoardScreen() {
                 style={[styles.modalInput, isRTL && styles.textRight]}
                 value={newDate}
                 onChangeText={setNewDate}
-                placeholder="2026-06-18"
+                placeholder="YYYY-MM-DD"
                 placeholderTextColor="#a8a29e"
               />
 
@@ -539,7 +532,7 @@ export default function ServiceBoardScreen() {
                 <TouchableOpacity style={styles.modalBtnCancel} onPress={() => setShowPostModal(false)}>
                   <Text style={styles.modalBtnCancelLabel}>{t.cancel}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.modalBtnConfirm} onPress={handlePostRequest}>
+                <TouchableOpacity style={styles.modalBtnConfirm} disabled={submitting} onPress={handlePostRequest}>
                   <Text style={styles.modalBtnConfirmLabel}>{t.submit}</Text>
                 </TouchableOpacity>
               </View>
@@ -555,15 +548,6 @@ export default function ServiceBoardScreen() {
             <Text style={[styles.modalTitle, isRTL && styles.textRight]}>{t.placeBidTitle}</Text>
             
             <ScrollView showsVerticalScrollIndicator={false}>
-              <Text style={[styles.inputLabel, isRTL && styles.textRight]}>{t.providerNameLabel}</Text>
-              <TextInput
-                style={[styles.modalInput, isRTL && styles.textRight]}
-                value={bidProviderName}
-                onChangeText={setBidProviderName}
-                placeholder="e.g. Elite Grooming Lounge"
-                placeholderTextColor="#a8a29e"
-              />
-
               <Text style={[styles.inputLabel, isRTL && styles.textRight]}>{t.bidPriceLabel}</Text>
               <TextInput
                 style={[styles.modalInput, isRTL && styles.textRight]}
@@ -589,7 +573,7 @@ export default function ServiceBoardScreen() {
                 <TouchableOpacity style={styles.modalBtnCancel} onPress={() => setShowBidModal(false)}>
                   <Text style={styles.modalBtnCancelLabel}>{t.cancel}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.modalBtnConfirm} onPress={handleSubmitBid}>
+                <TouchableOpacity style={styles.modalBtnConfirm} disabled={submitting} onPress={handleSubmitBid}>
                   <Text style={styles.modalBtnConfirmLabel}>{t.submit}</Text>
                 </TouchableOpacity>
               </View>
