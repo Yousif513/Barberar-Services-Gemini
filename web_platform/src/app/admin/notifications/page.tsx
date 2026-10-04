@@ -13,14 +13,14 @@ const translations = {
     audProviders: "Providers",
     audAll: "Everyone",
     channel: "Channels",
-    chPush: "App Push",
+    chPush: "In-app",
     chWhatsapp: "WhatsApp",
     titleEnL: "Title (English)",
     titleArL: "Title (Arabic)",
     bodyEnL: "Message (English)",
     bodyArL: "Message (Arabic)",
     queueBtn: "Queue Broadcast",
-    queuedMsg: "Broadcast queued in message pipeline.",
+    queuedMsg: "Broadcast sent.",
     recentTitle: "Recent Live Transmissions",
     statusQueued: "Queued",
     statusSent: "Sent",
@@ -29,7 +29,7 @@ const translations = {
     statusDeferred: "Deferred (Quiet Hours)",
     statusSkippedConsent: "No Consent",
     statusSkippedUnverified: "Unverified Phone",
-    validation: "Add a title and message in at least one language.",
+    validation: "Add the title and message in Arabic and English, and choose a channel.",
     dispatchBtn: "Dispatch Pending Queue Now",
     dispatching: "Dispatching...",
     dispatchedOk: "Queue processed successfully.",
@@ -57,14 +57,14 @@ const translations = {
     audProviders: "المزودون",
     audAll: "الجميع",
     channel: "القنوات",
-    chPush: "إشعار التطبيق",
+    chPush: "داخل التطبيق",
     chWhatsapp: "واتساب",
     titleEnL: "العنوان (إنجليزي)",
     titleArL: "العنوان (عربي)",
     bodyEnL: "الرسالة (إنجليزي)",
     bodyArL: "الرسالة (عربي)",
     queueBtn: "إرسال البث إلى الطابور",
-    queuedMsg: "تم إدراج البث في طابور الإرسال بنجاح.",
+    queuedMsg: "تم إرسال البث.",
     recentTitle: "أحدث الرسائل والإرسالات الحية",
     statusQueued: "بالانتظار",
     statusSent: "أُرسل",
@@ -73,7 +73,7 @@ const translations = {
     statusDeferred: "مؤجل (ساعات الهدوء)",
     statusSkippedConsent: "بدون موافقة",
     statusSkippedUnverified: "هاتف غير موثق",
-    validation: "أضف عنواناً ورسالة بلغة واحدة على الأقل.",
+    validation: "أضف العنوان والرسالة بالعربية والإنجليزية واختر قناة.",
     dispatchBtn: "تشغيل ومعالجة الطابور الآن",
     dispatching: "جارٍ الإرسال...",
     dispatchedOk: "تمت معالجة طابور الرسائل بنجاح.",
@@ -118,12 +118,13 @@ export default function AdminNotificationsPage() {
   const [lang, setLang] = useState<"en" | "ar">("ar");
   const [activeTab, setActiveTab] = useState<"broadcast" | "pipeline">("pipeline");
   const [audience, setAudience] = useState<"customers" | "providers" | "all">("customers");
-  const [channels, setChannels] = useState({ push: true, whatsapp: true });
+  const [channels, setChannels] = useState({ push: true, whatsapp: false });
   const [titleEn, setTitleEn] = useState("");
   const [titleAr, setTitleAr] = useState("");
   const [bodyEn, setBodyEn] = useState("");
   const [bodyAr, setBodyAr] = useState("");
   const [feedback, setFeedback] = useState<"" | "ok" | "invalid">("");
+  const [broadcastResult, setBroadcastResult] = useState("");
   const [isDispatching, setIsDispatching] = useState(false);
   const [dispatchResult, setDispatchResult] = useState<string | null>(null);
 
@@ -200,45 +201,38 @@ export default function AdminNotificationsPage() {
   const cardBase = "rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]";
   const inputBase = "w-full rounded-xl border border-[#ECECEC] bg-[#FDFDFC] px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-[#D1AF47]/50";
 
+  // One server command: in-app notifications for the audience, WhatsApp only for recipients with
+  // WhatsApp and marketing consent (admin_broadcast_notification). Counts come back from the server.
   const queueBroadcast = async () => {
-    const hasEn = titleEn.trim() && bodyEn.trim();
-    const hasAr = titleAr.trim() && bodyAr.trim();
-    if (!hasEn && !hasAr) {
+    setBroadcastResult("");
+    if (!titleEn.trim() || !bodyEn.trim() || !titleAr.trim() || !bodyAr.trim() || (!channels.push && !channels.whatsapp)) {
       setFeedback("invalid");
       setTimeout(() => setFeedback(""), 3500);
       return;
     }
-
-    try {
-      // Direct enqueue via supabase RPC if available
-      const textToQueue = (isRTL ? bodyAr : bodyEn) || bodyEn || bodyAr;
-      const { error } = await supabase.rpc("enqueue_direct_message", {
-        p_recipient_phone: "+966500000000",
-        p_recipient_id: null,
-        p_template_name: "broadcast_notice",
-        p_locale: isRTL ? "ar" : "en",
-        p_variables: { message: textToQueue },
-        p_channel: channels.whatsapp ? "whatsapp" : "sms"
-      });
-
-      if (error) {
-        // Fallback to edge function invocation
-        await supabase.functions.invoke("send-notification", {
-          body: { broadcast: true, simulate: true, audience, channels, titleEn, titleAr, bodyEn, bodyAr }
-        });
-      }
-
-      setTitleEn("");
-      setTitleAr("");
-      setBodyEn("");
-      setBodyAr("");
-      setFeedback("ok");
-      setTimeout(() => setFeedback(""), 4000);
-      loadData();
-    } catch {
-      setFeedback("invalid");
-      setTimeout(() => setFeedback(""), 3500);
+    const { data, error } = await supabase.rpc("admin_broadcast_notification", {
+      p_audience: audience,
+      p_title_en: titleEn,
+      p_title_ar: titleAr,
+      p_body_en: bodyEn,
+      p_body_ar: bodyAr,
+      p_in_app: channels.push,
+      p_whatsapp: channels.whatsapp,
+    });
+    if (error) {
+      setBroadcastResult(error.message);
+      return;
     }
+    setTitleEn("");
+    setTitleAr("");
+    setBodyEn("");
+    setBodyAr("");
+    setFeedback("ok");
+    setBroadcastResult(isRTL
+      ? `إشعارات داخل التطبيق: ${data.in_app_created} · رسائل واتساب في الطابور: ${data.whatsapp_queued}`
+      : `In-app notifications: ${data.in_app_created} · WhatsApp messages queued: ${data.whatsapp_queued}`);
+    setTimeout(() => setFeedback(""), 4000);
+    loadData();
   };
 
   const handleManualDispatch = async () => {
@@ -463,6 +457,7 @@ export default function AdminNotificationsPage() {
           <div className={`flex items-center justify-end gap-3 ${flip}`}>
             {feedback === "ok" && <span className="text-xs font-bold text-[#16A34A]">{t.queuedMsg}</span>}
             {feedback === "invalid" && <span className="text-xs font-bold text-[#EF4444]">{t.validation}</span>}
+            {broadcastResult && <span className="text-xs font-semibold text-[#344054]">{broadcastResult}</span>}
             <button
               onClick={queueBroadcast}
               className="rounded-xl bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] px-6 py-2.5 text-sm font-black text-[#101828] shadow-md shadow-[#D1AF47]/15 transition hover:brightness-105"

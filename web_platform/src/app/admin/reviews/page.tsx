@@ -102,19 +102,17 @@ export default function AdminReviews() {
 
   const handleModerate = async (reviewId: string, status: "published" | "flagged" | "hidden") => {
     try {
+      // Hiding or flagging customer content needs a recorded reason (moderate_review audits it).
+      const reason = status === "published"
+        ? "Restored by admin"
+        : window.prompt(lang === "ar" ? "سبب الإجراء:" : "Reason for this action:");
+      if (!reason || !reason.trim()) return;
       const { error } = await supabase.rpc("moderate_review", {
         p_review_id: reviewId,
         p_status: status,
-        p_reason: `Moderated by admin to ${status}`
+        p_reason: reason.trim()
       });
-
-      if (error) {
-        // Direct fallback update if RPC fails
-        await supabase
-          .from("reviews")
-          .update({ moderation_status: status })
-          .eq("id", reviewId);
-      }
+      if (error) throw error;
 
       setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, moderation_status: status } : r));
     } catch (err: any) {

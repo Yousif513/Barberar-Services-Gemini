@@ -28,7 +28,7 @@ const translations = {
     openTime: "Opens At",
     closeTime: "Closes At",
     geofenceSection: "Geofencing & Service Radius",
-    geofenceDesc: "Define the home-service radius around your main Riyadh branch location.",
+    geofenceDesc: "Define the home-service radius around your branch location.",
     radiusLabel: "Home-Service Radius Limit",
     depositSection: "Booking Deposit Policy",
     depositDesc: "The upfront deposit customers pay to confirm a booking. Applied at checkout.",
@@ -69,7 +69,7 @@ const translations = {
     centerPoint: "Center Point",
     coordinatesVal: "24.7136° N, 46.6753° E",
     saveHours: "Save Schedule",
-    hoursSavedMsg: "Opening hours updated successfully."
+    hoursSavedMsg: "Hours applied to every professional's schedule."
   },
   ar: {
     title: "إعدادات الصالون",
@@ -135,7 +135,7 @@ const translations = {
     centerPoint: "نقطة المركز",
     coordinatesVal: "٢٤.٧١٣٦° شمالاً، ٤٦.٦٧٥٣° شرقاً",
     saveHours: "حفظ الجدول",
-    hoursSavedMsg: "تم تحديث أوقات العمل بنجاح."
+    hoursSavedMsg: "تم تطبيق الأوقات على جداول جميع الأخصائيين."
   }
 };
 
@@ -153,7 +153,9 @@ export default function ProviderSettingsPage() {
   const [phone, setPhone] = useState("+966 11 456 7890");
 
   // Geofence Radius
-  const [radius, setRadius] = useState(15); // 15 km
+  const [radius, setRadius] = useState(0);
+  const [branchIds, setBranchIds] = useState<string[]>([]);
+  const radiusTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [geofenceAutosaving, setGeofenceAutosaving] = useState(false);
   const [geofenceAutosaveText, setGeofenceAutosaveText] = useState("");
 
@@ -252,6 +254,40 @@ export default function ProviderSettingsPage() {
         setPhone(providerInfo.phone);
       }
 
+      // Branches carry the home-service radius; staff schedules (employee_availability) drive bookable hours.
+      const { data: ownerProvider } = await supabase.from("providers").select("id").eq("owner_id", user.id).maybeSingle();
+      if (ownerProvider) {
+        const { data: branchRows, error: branchError } = await supabase
+          .from("branches").select("id, geofence_radius_km").eq("provider_id", ownerProvider.id).order("created_at", { ascending: true });
+        if (branchError) throw branchError;
+        const ids = (branchRows || []).map((b: any) => b.id);
+        setBranchIds(ids);
+        if (branchRows?.[0]) setRadius(Number(branchRows[0].geofence_radius_km || 0));
+        if (ids.length) {
+          const { data: staffHours, error: hoursError } = await supabase
+            .from("employee_availability")
+            .select("day_of_week, start_time, end_time, is_working_day, employees!inner(branch_id, is_active)")
+            .in("employees.branch_id", ids)
+            .eq("employees.is_active", true);
+          if (hoursError) throw hoursError;
+          if (staffHours?.length) {
+            const keys = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+            const next: any = {};
+            keys.forEach((key, dow) => {
+              const working = staffHours.filter((h: any) => h.day_of_week === dow && h.is_working_day !== false);
+              next[key] = working.length
+                ? {
+                    open: working.map((h: any) => String(h.start_time).slice(0, 5)).sort()[0],
+                    close: working.map((h: any) => String(h.end_time).slice(0, 5)).sort().reverse()[0],
+                    isClosed: false,
+                  }
+                : { open: "09:00", close: "22:00", isClosed: true };
+            });
+            setHours(next);
+          }
+        }
+      }
+
       // Load user preferences metadata if available
       const prefs = user.user_metadata?.preferences;
       if (prefs) {
@@ -262,7 +298,7 @@ export default function ProviderSettingsPage() {
         if (typeof prefs.marketingAlerts === "boolean") setMarketingAlerts(prefs.marketingAlerts);
       }
     } catch (err: any) {
-      console.warn("Using offline salon configurations settings:", err.message);
+      setError(err?.message || String(err));
     } finally {
       setLoading(false);
     }
@@ -310,11 +346,17 @@ export default function ProviderSettingsPage() {
     setRadius(val);
     setGeofenceAutosaving(true);
     setGeofenceAutosaveText(locale === "en" ? "Saving..." : "جاري الحفظ...");
-    setTimeout(() => {
+    if (radiusTimer.current) clearTimeout(radiusTimer.current);
+    radiusTimer.current = setTimeout(async () => {
+      const { error: radiusError } = branchIds.length
+        ? await supabase.from("branches").update({ geofence_radius_km: val }).in("id", branchIds)
+        : { error: new Error(locale === "en" ? "Add a branch first." : "أضف فرعاً أولاً.") };
       setGeofenceAutosaving(false);
-      setGeofenceAutosaveText(locale === "en" ? "Saved" : "تم الحفظ");
-      setTimeout(() => setGeofenceAutosaveText(""), 2000);
-    }, 800);
+      setGeofenceAutosaveText(radiusError
+        ? `${locale === "en" ? "Not saved" : "لم يتم الحفظ"}: ${radiusError.message}`
+        : (locale === "en" ? "Saved" : "تم الحفظ"));
+      if (!radiusError) setTimeout(() => setGeofenceAutosaveText(""), 2000);
+    }, 600);
   };
 
   async function saveDeposit() {
@@ -332,9 +374,7 @@ export default function ProviderSettingsPage() {
       setDepositSuccess(t.depositSavedMsg);
       setTimeout(() => setDepositSuccess(""), 4000);
     } catch (err: unknown) {
-      console.warn("Saving deposit policy in offline preview:", err instanceof Error ? err.message : err);
-      setDepositSuccess(t.depositSavedMsg);
-      setTimeout(() => setDepositSuccess(""), 4000);
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setIsSavingDeposit(false);
     }
@@ -350,17 +390,45 @@ export default function ProviderSettingsPage() {
     }));
   };
 
+  // Applies the weekly hours to every active professional at this provider's branches; individual
+  // schedules can still be adjusted per person afterwards.
   async function handleSaveHours(e: React.FormEvent) {
     e.preventDefault();
     setHoursSuccess("");
+    setError("");
     try {
       setIsSavingHours(true);
-      // Simulate database write duration
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (!branchIds.length) throw new Error(locale === "en" ? "Add a branch first." : "أضف فرعاً أولاً.");
+      const { data: staff, error: staffError } = await supabase
+        .from("employees").select("id").in("branch_id", branchIds).eq("is_active", true);
+      if (staffError) throw staffError;
+      if (!staff?.length) {
+        throw new Error(locale === "en"
+          ? "Add a team member first; bookable hours belong to professionals."
+          : "أضف أحد أعضاء الفريق أولاً؛ أوقات الحجز مرتبطة بالأخصائيين.");
+      }
+      const keys = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+      for (const key of keys) {
+        const day = hours[key];
+        if (!day.isClosed && day.open >= day.close) {
+          throw new Error(locale === "en" ? "Closing time must be after opening time." : "يجب أن يكون وقت الإغلاق بعد وقت الفتح.");
+        }
+      }
+      const rows = staff.flatMap((member: any) => keys.map((key, dow) => ({
+        employee_id: member.id,
+        day_of_week: dow,
+        start_time: hours[key].open,
+        end_time: hours[key].close,
+        is_working_day: !hours[key].isClosed,
+      })));
+      const { error: upsertError } = await supabase
+        .from("employee_availability")
+        .upsert(rows, { onConflict: "employee_id,day_of_week" });
+      if (upsertError) throw upsertError;
       setHoursSuccess(t.hoursSavedMsg);
       setTimeout(() => setHoursSuccess(""), 4000);
     } catch (err: any) {
-      console.warn("Error saving opening hours:", err.message);
+      setError(err?.message || String(err));
     } finally {
       setIsSavingHours(false);
     }
@@ -428,9 +496,7 @@ export default function ProviderSettingsPage() {
       setNotifySuccess(t.notificationsSavedMsg);
       setTimeout(() => setNotifySuccess(""), 4000);
     } catch (err: any) {
-      console.warn("Saving notifications locally in offline preview:", err.message);
-      setNotifySuccess(t.notificationsSavedMsg);
-      setTimeout(() => setNotifySuccess(""), 4000);
+      setNotifyError(err?.message || String(err));
     } finally {
       setNotifyLoading(false);
     }

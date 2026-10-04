@@ -201,17 +201,12 @@ export default function AdminServices() {
           };
         }));
       } else {
-        throw new Error("No data");
+        setServices([]);
       }
     } catch (err) {
-      setError(translations[lang].errorMsg);
-      setServices([
-        { id: "s-mock-1", nameEn: "Classic Beard Shave", nameAr: "حلاقة ذقن كلاسيكية", category: "Barber", price: 60, providersCount: 24, is_active: true, featured_on_landing: false, featured_in_services: false },
-        { id: "s-mock-2", nameEn: "Royal Moroccan Bath", nameAr: "حمام مغربي ملكي", category: "Spa", price: 250, providersCount: 12, is_active: true, featured_on_landing: false, featured_in_services: false },
-        { id: "s-mock-3", nameEn: "Executive Haircut", nameAr: "قص شعر فاخر", category: "Barber", price: 90, providersCount: 38, is_active: true, featured_on_landing: false, featured_in_services: false },
-        { id: "s-mock-4", nameEn: "Hydrafacial Therapy", nameAr: "علاج هيدرافيشيل للبشرة", category: "Beauty", price: 450, providersCount: 8, is_active: true, featured_on_landing: false, featured_in_services: false },
-        { id: "s-mock-5", nameEn: "Pedicure & Foot Spa", nameAr: "باديكير وسبا للقدمين", category: "Nails", price: 150, providersCount: 15, is_active: true, featured_on_landing: false, featured_in_services: false }
-      ]);
+      // An empty catalogue is an empty table, not an error; a failed query shows its reason.
+      setServices([]);
+      setError(`${translations[lang].errorMsg} ${err instanceof Error ? err.message : ""}`.trim());
     } finally {
       setLoading(false);
     }
@@ -303,7 +298,6 @@ export default function AdminServices() {
     setSuccess(""); setError("");
     // Optimistic removal from the list.
     setServices((prev) => prev.filter((s) => s.id !== item.id));
-    if (String(item.id).startsWith("s-mock-")) { setSuccess(translations[lang].deletedMsg); return; }
     const { error: delErr } = await supabase.from("services").delete().eq("id", item.id);
     if (delErr) { setError(translations[lang].errorMsg); await loadServices(); return; }
     setSuccess(translations[lang].deletedMsg);
@@ -314,11 +308,6 @@ export default function AdminServices() {
     setError("");
     const nextStatus = !currentStatus;
     setServices((prev) => prev.map((s) => (s.id === id ? { ...s, is_active: nextStatus } : s)));
-
-    if (id.startsWith("s-mock-")) {
-      setSuccess(translations[lang].successMsg);
-      return;
-    }
 
     const { error: updateError } = await supabase
       .from("services")
@@ -340,11 +329,6 @@ export default function AdminServices() {
     const next = !current;
     setServices((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: next } : s)));
 
-    if (id.startsWith("s-mock-")) {
-      setSuccess(translations[lang].successMsg);
-      return;
-    }
-
     const { error: updateError } = await supabase
       .from("services")
       .update({ [field]: next })
@@ -364,11 +348,6 @@ export default function AdminServices() {
     setError("");
     const previous = services.find((s) => s.id === id)?.price ?? 0;
     setServices((prev) => prev.map((s) => (s.id === id ? { ...s, price: newPrice } : s)));
-
-    if (id.startsWith("s-mock-")) {
-      setSuccess(translations[lang].successMsg);
-      return;
-    }
 
     const { error: updateError } = await supabase
       .from("services")

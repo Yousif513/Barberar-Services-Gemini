@@ -10,11 +10,11 @@ const translations = {
     title: "Marketplace Terms & Rules",
     subtitle: "Rules governing payments, booking settlements, and cancellation policies",
     section1Title: "1. Online Booking & Payment Processing",
-    section1Desc: "When a customer schedules an appointment on Primora, their payment is authorized and processed through our licensed partner payment processor (Tap Payments). Payments are settled to the service provider after the appointment is marked complete according to the marketplace settlement terms.",
+    section1Desc: "When a customer books on Primora, the deposit is paid by card through Tap Payments. The service provider is paid out after the appointment is marked complete, according to the marketplace settlement terms.",
     section2Title: "2. Client Cancellation & Refunds",
-    section2Desc: "Clients can cancel bookings up to 24 hours prior to the scheduled slot without penalty. For cancellations within 24 hours, the platform reserves the right to charge up to 50% of the booking total to compensate the specialist for their lost time slot.",
-    section3Title: "3. Split Payout Allocations",
-    section3Desc: "Our platform collects a standard 15% commission fee from completed transactions to cover payment gateway processing, platform maintenance, customer notifications, and operations. The remaining 85% is routed directly to the service provider's verified local bank account.",
+    section2Desc: "Each shop sets its free-cancellation window and its late-cancellation and no-show fees. They are shown on the shop page before you book and apply automatically when you cancel. If the shop cancels, you receive a full refund.",
+    section3Title: "3. Fees and Payouts",
+    section3Desc: "Bookings a provider brings from its own clients carry no commission. A new client found through the Primora marketplace carries a 20% commission on the first visit (minimum SAR 10, maximum SAR 40); repeat visits from that client carry none. Each booking is recorded in the ledger and the provider's share is paid out to its verified bank account after the visit is completed.",
     footerText: "Built for Riyadh, Saudi Arabia. All rights reserved."
   },
   ar: {
@@ -23,11 +23,11 @@ const translations = {
     title: "شروط وقواعد المنصة",
     subtitle: "القواعد المنظمة للمدفوعات، تسوية الحجوزات وسياسات الإلغاء",
     section1Title: "1. الحجز والدفع الإلكتروني",
-    section1Desc: "عندما يقوم العميل بجدولة موعد على بريمورا، تتم معالجة الدفع وتفويضه من خلال بوابة الدفع المرخصة (Tap Payments). وتتم تسوية المستحقات لمقدم الخدمة بعد تأكيد اكتمال الموعد وفقاً لشروط التسوية المعتمدة في المنصة.",
+    section1Desc: "عند الحجز على بريمورا يدفع العميل العربون بالبطاقة عبر Tap Payments. وتُصرف مستحقات مقدم الخدمة بعد تأكيد اكتمال الموعد وفقاً لشروط التسوية في المنصة.",
     section2Title: "2. إلغاء الموعد واسترداد الأموال",
-    section2Desc: "يمكن للعملاء إلغاء الحجوزات قبل 24 ساعة من الموعد المحدد دون تطبيق أي رسوم. في حال الإلغاء خلال أقل من 24 ساعة، تحتفظ المنصة بالحق في خصم ما يصل إلى 50% من إجمالي قيمة الحجز لتعويض الأخصائي عن وقته الضائع.",
-    section3Title: "3. تخصيص دفعات التقسيم",
-    section3Desc: "تقتطع منصتنا رسوم عمولة قياسية بنسبة 15% من المعاملات المكتملة لتغطية معالجة بوابة الدفع، وتنبيهات العملاء، وصيانة المنصة والعمليات التشغيلية. يتم توجيه الـ 85% المتبقية مباشرة إلى الحساب البنكي المعتمد لمقدم الخدمة.",
+    section2Desc: "يحدد كل مركز مدة الإلغاء المجاني ورسوم الإلغاء المتأخر وعدم الحضور، وتظهر في صفحة المركز قبل الحجز وتُطبق تلقائياً عند الإلغاء. وإذا ألغى المركز الموعد تسترد المبلغ كاملاً.",
+    section3Title: "3. الرسوم وصرف المستحقات",
+    section3Desc: "لا عمولة على الحجوزات التي يجلبها مقدم الخدمة من عملائه. العميل الجديد القادم من سوق بريمورا عليه عمولة 20% في الزيارة الأولى (بحد أدنى 10 ر.س وأقصى 40 ر.س) ولا عمولة على زياراته المتكررة. تُسجل كل عملية حجز في دفتر الأستاذ وتُصرف حصة مقدم الخدمة إلى حسابه البنكي الموثق بعد اكتمال الزيارة.",
     footerText: "صمم خصيصاً للرياض، المملكة العربية السعودية. جميع الحقوق محفوظة."
   }
 };

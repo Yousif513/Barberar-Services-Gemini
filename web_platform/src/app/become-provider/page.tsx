@@ -19,7 +19,7 @@ const translations = {
     subtitle: "List your salon, barbershop, or spa, and instantly accept secure bookings.",
     ctaRegister: "Register as Provider Now",
     value1Title: "Automated Split Payouts",
-    value1Desc: "Secure Tap Connect integration processes payment splits automatically, depositing funds straight into your verified bank account.",
+    value1Desc: "Customers pay deposits by card through Tap, and your earnings are paid out to your verified bank account after each visit.",
     value2Title: "Riyadh Geofencing",
     value2Desc: "Efficient logistics dispatch controls for premium in-home or in-salon booking coordinates.",
     value3Title: "Staff & Availability Engine",
@@ -691,7 +691,7 @@ export default function BecomeProviderRootPage() {
             <ul className="space-y-2 text-xs">
               <li><Link href="/privacy" className="hover:text-white transition">{locale === "ar" ? "سياسة الخصوصية" : "Privacy Policy"}</Link></li>
               <li><Link href="/terms" className="hover:text-white transition">{locale === "ar" ? "شروط الخدمة" : "Terms of Service"}</Link></li>
-              <li><Link href="/security" className="hover:text-white transition">{locale === "ar" ? "هيئة الزكاة والمدفوعات" : "ZATCA & Payments"}</Link></li>
+              <li><Link href="/security" className="hover:text-white transition">{locale === "ar" ? "المدفوعات والأمان" : "Payments & Security"}</Link></li>
             </ul>
           </div>
         </div>

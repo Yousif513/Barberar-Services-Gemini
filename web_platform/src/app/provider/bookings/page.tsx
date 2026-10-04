@@ -151,14 +151,8 @@ export default function ProviderBookingsPage() {
         p_new_status: newStatus
       });
 
-      if (rpcError) {
-        // Fallback to direct update
-        const { error: updateError } = await supabase
-          .from("bookings")
-          .update({ status: newStatus, updated_at: new Date().toISOString() })
-          .eq("id", id);
-        if (updateError) throw updateError;
-      }
+      // Status changes run only through the server command (transition rules, refunds, audit).
+      if (rpcError) throw rpcError;
       
       setBookings(prev => prev.map(b => b.id === id ? { ...b, status: newStatus } : b));
     } catch (err: unknown) {

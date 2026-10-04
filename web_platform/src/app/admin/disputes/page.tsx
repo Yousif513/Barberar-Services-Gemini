@@ -14,7 +14,7 @@ const translations = {
     bookingId: "Booking ID",
     flaggedRating: "Flagged Review Rating",
     disputeDetail: "Dispute Detail / Reason",
-    selectAction: "Select Action to Release Escrow or Dismiss Flag",
+    selectAction: "Refund the customer or reject the dispute",
     declineRefund: "Decline Refund",
     approveRefund: "Approve Full Refund",
     statusRefunded: "REFUNDED",
@@ -94,44 +94,7 @@ export default function AdminDisputes() {
         `)
         .order("created_at", { ascending: false });
 
-      if (dbError) {
-        // Fallback query on low rating reviews if payment_disputes not yet populated
-        const { data: revData } = await supabase
-          .from("reviews")
-          .select(`
-            id,
-            rating,
-            comment,
-            created_at,
-            booking:bookings(
-              id,
-              total_price,
-              status,
-              customer:profiles(first_name, last_name),
-              branches(name_en, providers(business_name_en, business_name_ar))
-            )
-          `)
-          .lte("rating", 2);
-
-        if (revData && revData.length > 0) {
-          setDisputes(revData.map(d => {
-            const bookingObj = d.booking as any;
-            return {
-              id: d.id,
-              bookingId: bookingObj?.id || "N/A",
-              customer: `${bookingObj?.customer?.first_name || "Guest"} ${bookingObj?.customer?.last_name || ""}`,
-              provider: (lang === "ar" ? bookingObj?.branches?.providers?.business_name_ar : bookingObj?.branches?.providers?.business_name_en) || bookingObj?.branches?.providers?.business_name_en || t.independent,
-              amount: `${bookingObj?.total_price || 0} ${lang === "ar" ? "ريال" : "SAR"}`,
-              reason: d.comment || t.noDetail,
-              rating: d.rating,
-              status: bookingObj?.status === "cancelled" ? "REFUNDED" : "OPEN"
-            };
-          }));
-          return;
-        }
-        setDisputes([]);
-        return;
-      }
+      if (dbError) throw dbError;
 
       if (data && data.length > 0) {
         setDisputes(data.map(d => {
@@ -170,24 +133,16 @@ export default function AdminDisputes() {
       setSuccess("");
       setError("");
 
+      // A decision moves money, so it needs a recorded reason; the server issues any refund request.
+      const reason = window.prompt(lang === "ar" ? "سبب القرار (يُحفظ في سجل التدقيق):" : "Reason for this decision (kept in the audit log):");
+      if (!reason || !reason.trim()) return;
       const resolution = action === "REFUNDED" ? "resolved_refund" : "resolved_rejected";
       const { error: rpcError } = await supabase.rpc("resolve_booking_dispute", {
         p_dispute_id: disputeId,
         p_resolution: resolution,
-        p_admin_notes: `Arbitrated by platform admin: ${action}`
+        p_admin_notes: reason.trim()
       });
-
-      if (rpcError) {
-        // Fallback update
-        const dispute = disputes.find(d => d.id === disputeId);
-        if (dispute) {
-          const newBookingStatus = action === "REFUNDED" ? "cancelled" : "completed";
-          await supabase
-            .from("bookings")
-            .update({ status: newBookingStatus })
-            .eq("id", dispute.bookingId);
-        }
-      }
+      if (rpcError) throw rpcError;
 
       setDisputes((prev) =>
         prev.map((d) => (d.id === disputeId ? { ...d, status: action } : d))
@@ -196,7 +151,6 @@ export default function AdminDisputes() {
       setSuccess(`${t.successMsg} ${action}!`);
     } catch (err: any) {
       setError(err?.message || t.errorMsg);
-      console.warn("Dispute resolution error:", err.message);
     }
   };
 

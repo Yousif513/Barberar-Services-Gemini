@@ -148,14 +148,7 @@ export default function ProviderReviewsPage() {
         p_reply: replyText.trim()
       });
 
-      if (rpcError) {
-        // Fallback to direct update if RPC is unavailable
-        const { error: updateError } = await supabase
-          .from("reviews")
-          .update({ reply_comment: replyText.trim(), reply_created_at: new Date().toISOString() })
-          .eq("id", reviewId);
-        if (updateError) throw updateError;
-      }
+      if (rpcError) throw rpcError;
 
       setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, reply_comment: replyText.trim() } : r));
       setReplyText("");

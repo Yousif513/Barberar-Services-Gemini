@@ -47,8 +47,8 @@ const translations = {
     exploreCollective: "Explore Collective",
     verifiedArtists: "Verified Artists",
     vettedSub: "Top 1% Vetted",
-    escrowSecurity: "Escrow Security",
-    escrowSub: "Pay Post-Checkout",
+    escrowSecurity: "Clear Deposits",
+    escrowSub: "Deposit now, balance at the venue",
     riyadhGeofenced: "Riyadh Geofenced",
     geofencedSub: "Flexible In-Home",
     flexibleBookings: "Flexible Bookings",
@@ -58,8 +58,8 @@ const translations = {
     featuredSpacePrice: "Starting from 150 SAR per session",
     verifiedArtistsProp: "Verified Artists",
     vettedSubProp: "Top 1% vetted professionals",
-    escrowSecurityProp: "Secure Escrow",
-    escrowSubProp: "Released only after service",
+    escrowSecurityProp: "Transparent Pricing",
+    escrowSubProp: "VAT and policies shown before you pay",
     hygieneCertifiedProp: "Hygiene Certified",
     hygieneSubProp: "Strict hygiene protocols",
     supportProp: "24/7 Dedicated Help",
@@ -71,7 +71,7 @@ const translations = {
     how1Title: "Select Service",
     how1Desc: "Find the perfect grooming, massage, or salon treatment based on reviews, locations, and transparent pricing.",
     how2Title: "Secure Booking",
-    how2Desc: "Choose your preferred date, time slot, and staff. Secure the booking using our trusted escrow payout system.",
+    how2Desc: "Choose your preferred date, time slot, and staff, then pay the deposit by card through Tap.",
     how3Title: "Exceptional Care",
     how3Desc: "Enjoy the premium care you deserve, either at the provider's physical location or in the comfort of your home.",
     providerAcqBadge: "Join Riyadh's Finest Collective",
@@ -100,8 +100,8 @@ const translations = {
     exploreCollective: "اكتشف المجموعة",
     verifiedArtists: "فنانون موثوقون",
     vettedSub: "نخبة مصفاة 1%",
-    escrowSecurity: "أمان الضمان",
-    escrowSub: "الدفع بعد الخدمة",
+    escrowSecurity: "عربون واضح",
+    escrowSub: "العربون الآن والباقي في المركز",
     riyadhGeofenced: "تغطية كاملة بالرياض",
     geofencedSub: "خدمة منزلية مرنة",
     flexibleBookings: "حجوزات مرنة",
@@ -111,8 +111,8 @@ const translations = {
     featuredSpacePrice: "تبدأ من 150 ريال لكل جلسة",
     verifiedArtistsProp: "فنانون معتمدون",
     vettedSubProp: "أفضل 1% من المحترفين المعتمدين",
-    escrowSecurityProp: "ضمان آمن",
-    escrowSubProp: "يتم تحرير الأموال بعد انتهاء الخدمة",
+    escrowSecurityProp: "أسعار شفافة",
+    escrowSubProp: "الضريبة والسياسات واضحة قبل الدفع",
     hygieneCertifiedProp: "شهادة النظافة",
     hygieneSubProp: "بروتوكولات تعقيم صارمة 100%",
     supportProp: "دعم مخصص 24/7",
@@ -639,7 +639,7 @@ export default function Home() {
             <ul className="space-y-2 text-xs">
               <li><Link href="/privacy" className="hover:text-[#D1AF47] transition">{locale === "ar" ? "سياسة الخصوصية" : "Privacy Policy"}</Link></li>
               <li><Link href="/terms" className="hover:text-[#D1AF47] transition">{locale === "ar" ? "شروط الخدمة" : "Terms of Service"}</Link></li>
-              <li><Link href="/security" className="hover:text-[#D1AF47] transition">{locale === "ar" ? "هيئة الزكاة والمدفوعات" : "ZATCA & Payments"}</Link></li>
+              <li><Link href="/security" className="hover:text-[#D1AF47] transition">{locale === "ar" ? "المدفوعات والأمان" : "Payments & Security"}</Link></li>
             </ul>
           </div>
         </div>

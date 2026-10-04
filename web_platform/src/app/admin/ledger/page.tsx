@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 const translations = {
   en: {
     title: "Financial Ledger & Statements",
-    subtitle: "Audit Tap Connect escrow splits, manage provider payout requests, and view accountant summaries.",
+    subtitle: "Audit ledger entries, manage provider payout requests, and view accountant summaries.",
     loading: "Loading ledger details...",
     success: "Success",
     error: "Error",
@@ -21,7 +21,7 @@ const translations = {
     bookingUuid: "Booking UUID",
     payoutStatusReleased: "released",
     payoutStatusPending: "pending",
-    successMsg: "Escrow split payout released successfully!",
+    successMsg: "Payout released.",
     errorMsg: "Failed to release transaction payout split.",
     errorLoad: "Failed to load financial records.",
     payoutRequestsTitle: "Provider Payout Requests",

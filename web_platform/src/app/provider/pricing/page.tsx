@@ -12,7 +12,7 @@ const translations = {
     pricingModel: "How We Calculate Transaction Splits",
     platformFee: "Platform Commission",
     partnerPayout: "Partner Payout Share",
-    feeDesc: "Primora collects a flat 15% commission fee on every booking. This fee completely covers VAT-compliant tax receipt reporting, secure payment gateway processing via Tap Connect, customer notifications, and automated booking splits. No monthly subscription is required for basic accounts.",
+    feeDesc: "Bookings from your own clients (your link, QR code or imported contacts) carry no commission. A new client who finds you on the Primora marketplace carries a 20% commission on the first visit (minimum SAR 10, maximum SAR 40); repeat visits from that client carry no commission. No monthly subscription is required for basic accounts.",
     payoutDesc: "The remaining 85% is routed straight to your salon's local bank account. As soon as the customer's appointment is completed and marked off in your dashboard calendar, the ledger releases the funds according to the payout settlement schedule.",
     noUpfront: "Zero Setup or Upfront Fees",
     noUpfrontDesc: "Registering, listing your services catalog, and setting up staff availability calendars are 100% free. We only succeed when you acquire bookings.",
@@ -55,7 +55,7 @@ const translations = {
     featOnlineBooking: "Online Booking & Scheduling",
     featZatca: "VAT 15% Tax Receipt Reporting",
     featSms: "Appointment Alerts & Notifications",
-    featEscrow: "Automated Split Ledger & Settlement",
+    featEscrow: "Automated Ledger & Payouts",
     featAnalytics: "Advanced Business Analytics",
     featMarketing: "Marketing Tools & Coupons",
     featStaff: "Staff Management (Unlimited)",
@@ -63,7 +63,7 @@ const translations = {
 
     // Split Ledger Details
     splitTitle: "Automated Split Ledger Settlement",
-    splitSubtitle: "All payments are processed securely through licensed payment gateway Tap Payments.",
+    splitSubtitle: "Card payments are processed by Tap Payments.",
     payoutTimeline: "Payout Transfer Schedule",
     payoutTimelineDesc: "Completed appointments trigger automated payout transfers directly into your registered local IBAN (Riyad Bank, SNB, Al Rajhi, etc.) via scheduled banking batches.",
     securedEscrow: "Booking Guarantee",
@@ -71,7 +71,7 @@ const translations = {
     
     // Checkout
     checkoutTitle: "Secure Plan Subscription",
-    checkoutSubtitle: "Transactions are processed securely through licensed Tap Payments gateway with Mada, Apple Pay, and Visa/Mastercard.",
+    checkoutSubtitle: "Payment is taken on Tap's secure page (Mada, Apple Pay, Visa/Mastercard).",
     paymentMethod: "Payment Method",
     madaApplePay: "Mada / Apple Pay / Credit Card",
     summary: "Order Summary",
@@ -90,7 +90,7 @@ const translations = {
     pricingModel: "كيف نحسب تقسيمات العمليات المالية",
     platformFee: "عمولة المنصة",
     partnerPayout: "حصة الشريك ومقدم الخدمة",
-    feeDesc: "تقتطع بريمورا عمولة ثابتة بنسبة 15% على كل حجز. تغطي هذه الرسوم بالكامل تقارير الفواتير الضريبية المتوافقة مع ضريبة القيمة المضافة، ورسوم معالجة المعاملات لمدفوعات مدى وفيزا عبر Tap Connect، وتنبيهات العملاء، وتقسيمات الحجز التلقائية. لا يتطلب الاشتراك في الحساب الأساسي أي رسوم شهرية.",
+    feeDesc: "لا عمولة على حجوزات عملائك (رابطك أو رمز QR أو جهات الاتصال المستوردة). العميل الجديد القادم من سوق بريمورا عليه عمولة 20% في الزيارة الأولى (بحد أدنى 10 ر.س وأقصى 40 ر.س)، ولا عمولة على زياراته المتكررة. لا يلزم اشتراك شهري للحسابات الأساسية.",
     payoutDesc: "يتم توجيه الـ 85% المتبقية مباشرة إلى الحساب البنكي لصالونك أو عملك. بمجرد اكتمال موعد العميل ووضع علامة اكتمال في تقويم لوحة التحكم، يحرر نظام الدفع الأموال وفقاً لجدول التسوية المعتمد.",
     noUpfront: "بدون أي رسوم إعداد أو تأسيس مسبقة",
     noUpfrontDesc: "التسجيل، وإدراج قائمة خدماتك، وإعداد تقويم توافر موظفيك مجاني 100%. نحن ننجح فقط عندما تستقبل حجوزات فعلية.",
@@ -133,7 +133,7 @@ const translations = {
     featOnlineBooking: "الحجز والجدولة عبر الإنترنت",
     featZatca: "تقارير فواتير ضريبة القيمة المضافة (15%)",
     featSms: "تنبيهات وتذكيرات المواعيد",
-    featEscrow: "دفتر أستاذ آلي وتقسيم تلقائي للمستحقات",
+    featEscrow: "دفتر أستاذ آلي وصرف المستحقات",
     featAnalytics: "تحليلات وأداء الأعمال المتقدمة",
     featMarketing: "أدوات التسويق والكوبونات والخصومات",
     featStaff: "إدارة الموظفين (غير محدود)",
@@ -141,7 +141,7 @@ const translations = {
 
     // Split Ledger Details
     splitTitle: "تسوية مالية مؤتمتة للمستحقات",
-    splitSubtitle: "تتم معالجة جميع المدفوعات بأمان عبر بوابة الدفع المرخصة Tap Payments.",
+    splitSubtitle: "تتم معالجة مدفوعات البطاقات عبر Tap Payments.",
     payoutTimeline: "جدول تحويل المستحقات",
     payoutTimelineDesc: "تؤدي المواعيد المكتملة إلى تحويلات مستحقات تلقائية مباشرة إلى حسابك المصرفي المحلي المسجل (بنك الرياض، الأهلي SNB، الراجحي، إلخ) عبر دفعات بنكية مجدولة.",
     securedEscrow: "ضمان الحجز المعتمد",
@@ -149,7 +149,7 @@ const translations = {
     
     // Checkout
     checkoutTitle: "الاشتراك الآمن في الخطة",
-    checkoutSubtitle: "تتم معالجة المدفوعات بأمان من خلال بوابة Tap Payments المرخصة وتدعم مدى وApple Pay وبطاقات الائتمان.",
+    checkoutSubtitle: "يتم الدفع عبر صفحة Tap الآمنة (مدى وApple Pay وبطاقات الائتمان).",
     paymentMethod: "طريقة الدفع",
     madaApplePay: "مدى / أبل باي / بطاقة ائتمان",
     summary: "ملخص الطلب",
@@ -645,8 +645,8 @@ export default function PricingPage() {
             </h2>
             <p className="text-xs text-[#667085] max-w-xl mx-auto">
               {locale === "en" 
-                ? "Every booking transaction is automatically split into secure escrows on completion." 
-                : "يتم تقسيم مستحقات كل عملية حجز تلقائياً وحمايتها في حساب ضمان بنكي حتى انتهاء الموعد."}
+                ? "Every booking is recorded in the ledger, and your share is paid out after the visit is completed." 
+                : "تُسجل كل عملية حجز في دفتر الأستاذ، وتُصرف حصتك بعد اكتمال الزيارة."}
             </p>
           </div>
           
@@ -824,7 +824,7 @@ export default function PricingPage() {
                       </div>
                       <div className="space-y-1">
                         <h5 className="font-bold text-[#101828]">
-                          {locale === "en" ? "Licensed Payment Gateway" : "بوابة دفع إلكتروني مرخصة"}
+                          {locale === "en" ? "Payments by Tap" : "المدفوعات عبر Tap"}
                         </h5>
                         <p className="text-[#667085] leading-relaxed">
                           {t.secureGatewayNotice}

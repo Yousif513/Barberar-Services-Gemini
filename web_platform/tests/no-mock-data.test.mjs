@@ -29,6 +29,11 @@ const FORBIDDEN = [
   { pattern: /running offline update/i, why: "catch-and-succeed writes" },
   { pattern: /constants\/mockData/, why: "mock catalogue imports" },
   { pattern: /00000000-0000-0000-0000-000000000000/, why: "placeholder ids written to the database" },
+  // Copy must match how money actually moves: no escrow, no "licensed" claims, no flat 15% commission.
+  { pattern: /"[^"\n]*\b[Ee]scrow\b[^"\n]*\s[^"\n]*"/, why: "escrow claims in user-facing copy" },
+  { pattern: /licensed (payment )?gateway|المرخصة/i, why: "unverified licensing claims" },
+  { pattern: /flat 15% commission|standard 15% commission|عمولة ثابتة/i, why: "a commission rate the fee rules do not apply" },
+  { pattern: /ZATCA & Payments|PRIMORA15/, why: "implied endorsements or non-existent offers" },
 ];
 
 describe("release path contains no mock data", () => {

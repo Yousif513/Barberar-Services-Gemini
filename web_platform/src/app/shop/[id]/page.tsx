@@ -2051,7 +2051,7 @@ export default function ShopDetailsPage() {
             <ul className="space-y-2 text-xs">
               <li><Link href="/privacy" className="hover:text-white transition">{locale === "ar" ? "سياسة الخصوصية" : "Privacy Policy"}</Link></li>
               <li><Link href="/terms" className="hover:text-white transition">{locale === "ar" ? "شروط الخدمة" : "Terms of Service"}</Link></li>
-              <li><Link href="/security" className="hover:text-white transition">{locale === "ar" ? "هيئة الزكاة والمدفوعات" : "ZATCA & Payments"}</Link></li>
+              <li><Link href="/security" className="hover:text-white transition">{locale === "ar" ? "المدفوعات والأمان" : "Payments & Security"}</Link></li>
             </ul>
           </div>
         </div>

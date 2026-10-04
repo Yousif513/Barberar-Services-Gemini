@@ -79,7 +79,7 @@ const translations = {
     title: "Analytics & Operations",
     subtitle: "Real-time revenue, salon performance KPIs, multi-branch rollup, and Saudi WPS payroll export.",
     grossRevenue: "Gross Revenue",
-    platformFees: "Platform Fees (Escrow)",
+    platformFees: "Platform Fees",
     netEarnings: "Net Payout",
     bookingsTotal: "Total Bookings",
     completionRate: "Completion Rate",
@@ -309,7 +309,7 @@ export default function ProviderReportsPage() {
     csvContent += "PRIMORA Provider Analytics Report\n";
     csvContent += `Period,${analytics.start_date} to ${analytics.end_date}\n`;
     csvContent += `Gross Revenue (SAR),${analytics.gross_revenue_sar}\n`;
-    csvContent += `Platform Escrow Fees (SAR),${analytics.platform_fees_sar}\n`;
+    csvContent += `Platform Fees (SAR),${analytics.platform_fees_sar}\n`;
     csvContent += `Net Earnings (SAR),${analytics.net_earnings_sar}\n`;
     csvContent += `Total Bookings,${analytics.total_bookings}\n`;
     csvContent += `Completed Bookings,${analytics.completed_bookings}\n`;

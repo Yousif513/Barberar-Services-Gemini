@@ -109,77 +109,17 @@ export default function CustomerSearchPage() {
       // Attempt server search RPC with Arabic normalization (G29)
       const { data: rpcData, error: rpcError } = await supabase.rpc("search_marketplace_providers", {
         p_query: searchQuery.trim() || null,
-        p_category: selectedCategory === "all" ? null : selectedCategory,
-        p_city: "Riyadh",
-        p_district: selectedLocation === "all" ? null : selectedLocation,
+        p_category: selectedCategory,
+        p_city: "all",
+        p_district: selectedLocation,
         p_limit: 24,
         p_offset: 0
       });
 
-      if (!rpcError && rpcData?.providers) {
-        setProviders(rpcData.providers);
-        return;
-      }
-
-      // Live Supabase fallback query if RPC unapplied
-      let query = supabase
-        .from("providers")
-        .select(`
-          id,
-          business_name_en,
-          business_name_ar,
-          rating,
-          review_count,
-          verified_business,
-          cr_verification_status,
-          branches (
-            id,
-            name_en,
-            name_ar,
-            city,
-            district,
-            latitude,
-            longitude
-          ),
-          services (
-            id,
-            name_en,
-            name_ar,
-            price,
-            category
-          )
-        `)
-        .eq("status", "approved");
-
-      if (searchQuery.trim()) {
-        query = query.or(`business_name_en.ilike.%${searchQuery}%,business_name_ar.ilike.%${searchQuery}%`);
-      }
-
-      const { data: dbData, error: dbError } = await query.limit(24);
-      if (dbError) throw dbError;
-
-      const formatted = (dbData || []).map((p: any) => {
-        const branch = Array.isArray(p.branches) ? p.branches[0] : p.branches;
-        const services = Array.isArray(p.services) ? p.services : [];
-        return {
-          id: p.id,
-          provider_id: p.id,
-          business_name_en: p.business_name_en,
-          business_name_ar: p.business_name_ar,
-          district: branch?.district || "Riyadh",
-          city: branch?.city || "Riyadh",
-          rating: p.rating || 5.0,
-          reviews: p.review_count || 0,
-          verified_business: p.verified_business,
-          cr_verification_status: p.cr_verification_status,
-          sample_services: services.slice(0, 3)
-        };
-      });
-
-      setProviders(formatted);
+      if (rpcError) throw rpcError;
+      setProviders(rpcData?.providers || []);
     } catch (err: any) {
-      console.warn("Search providers fetch warning:", err);
-      setError(t.errorMsg);
+      setError(`${t.errorMsg} ${err?.message || ""}`.trim());
       setProviders([]);
     } finally {
       setLoading(false);
@@ -280,7 +220,7 @@ export default function CustomerSearchPage() {
                       </h4>
                       <div className="flex items-center gap-1 text-[11px] font-black text-amber-700 shrink-0">
                         <span>★</span>
-                        <span>{Number(p.rating || 5.0).toFixed(1)}</span>
+                        <span>{p.rating != null ? Number(p.rating).toFixed(1) : (isRTL ? "جديد" : "New")}</span>
                       </div>
                     </div>
 
