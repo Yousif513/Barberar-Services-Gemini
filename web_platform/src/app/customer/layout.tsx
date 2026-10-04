@@ -127,6 +127,8 @@ export default function CustomerLayout({
   children: React.ReactNode;
 }) {
   const [locale, setLocale] = useState<"en" | "ar">("en");
+  // Persist the language only after the saved choice has been read (avoids overwriting it on mount).
+  const [langReady, setLangReady] = useState(false);
   const pathname = usePathname();
   const t = translations[locale];
   const isRTL = locale === "ar";
@@ -140,6 +142,7 @@ export default function CustomerLayout({
     if (savedLang === "en" || savedLang === "ar") {
       setLocale(savedLang);
     }
+    setLangReady(true);
     // Keep the sidebar in sync when language is toggled elsewhere (e.g. dashboard header)
     const syncFromDoc = () => {
       const docLang = document.documentElement.lang;
@@ -151,10 +154,11 @@ export default function CustomerLayout({
   }, []);
 
   useEffect(() => {
+    if (!langReady) return;
     localStorage.setItem("primora_lang", locale);
     document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
     document.documentElement.lang = locale;
-  }, [locale]);
+  }, [locale, langReady]);
 
   const navItems = [
     { name: t.dashboard, path: "/customer/dashboard" },

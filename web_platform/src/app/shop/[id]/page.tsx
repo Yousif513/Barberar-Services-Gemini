@@ -229,6 +229,8 @@ export default function ShopDetailsPage() {
   const shopId = (params?.id as string) || "1";
 
   const [locale, setLocale] = useState<"en" | "ar">("en");
+  // Persist the language only after the saved choice has been read (avoids overwriting it on mount).
+  const [langReady, setLangReady] = useState(false);
   const t = translations[locale];
 
   const [selectedServices, setSelectedServices] = useState<ServiceItem[]>([]);
@@ -484,13 +486,15 @@ export default function ShopDetailsPage() {
     if (savedLang === "en" || savedLang === "ar") {
       setLocale(savedLang);
     }
+    setLangReady(true);
   }, []);
 
   useEffect(() => {
+    if (!langReady) return;
     localStorage.setItem("primora_lang", locale);
     document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
     document.documentElement.lang = locale;
-  }, [locale]);
+  }, [locale, langReady]);
 
 
   useEffect(() => {

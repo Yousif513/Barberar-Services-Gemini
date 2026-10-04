@@ -140,6 +140,8 @@ const translations = {
 
 export default function Home() {
   const [locale, setLocale] = useState<"en" | "ar">("en");
+  // Persist the language only after the saved choice has been read (avoids overwriting it on mount).
+  const [langReady, setLangReady] = useState(false);
   const t = translations[locale];
 
   const toggleLanguage = () => {
@@ -151,13 +153,15 @@ export default function Home() {
     if (savedLang === "en" || savedLang === "ar") {
       setLocale(savedLang);
     }
+    setLangReady(true);
   }, []);
 
   useEffect(() => {
+    if (!langReady) return;
     localStorage.setItem("primora_lang", locale);
     document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
     document.documentElement.lang = locale;
-  }, [locale]);
+  }, [locale, langReady]);
 
   const categories = [
     { 

@@ -20,6 +20,12 @@ body {
   font-family: var(--font-outfit);
 }
 
+/* Arabic pages use IBM Plex Sans Arabic for body and display text (loaded via next/font). */
+html[lang="ar"] {
+  --font-outfit: var(--font-arabic), Inter, Arial, sans-serif;
+  --font-playfair: var(--font-arabic), Georgia, serif;
+}
+
 /* PRIMORA dashboard-wide luxury skin: shared by admin and provider workspaces. */
 .primora-dashboard-skin {
   --primora-gold: #D1AF47;
@@ -121,7 +127,7 @@ body {
   z-index: 1;
 }
 
-.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea) {
+.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea):not(span):not([class*="rounded-full"]) {
   position: relative;
   overflow: hidden;
   border-color: rgba(209, 175, 71, 0.46) !important;
@@ -132,7 +138,7 @@ body {
     0 0 34px rgba(209, 175, 71, 0.18) !important;
 }
 
-.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea)::before {
+.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea):not(span):not([class*="rounded-full"])::before {
   content: "";
   pointer-events: none;
   position: absolute;
@@ -149,7 +155,7 @@ body {
     radial-gradient(circle at 12px calc(100% - 12px), rgba(224, 196, 106, 0.92) 0 2px, transparent 6px);
 }
 
-.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea)::after {
+.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea):not(span):not([class*="rounded-full"])::after {
   content: "";
   pointer-events: none;
   position: absolute;
@@ -163,8 +169,11 @@ body {
     linear-gradient(34deg, transparent 0 64%, rgba(209, 175, 71, 0.24) 64.1% 64.35%, transparent 64.6%);
 }
 
-.primora-dashboard-content :is(header, h1, h2, h3, h4, p, span, a, button, input, svg, img, ul, ol, li, table, thead, tbody, tr, td, th, label, div):not(.absolute):not(.fixed) {
+/* Lift card content above the decorative ::before/::after overlays. Only direct children of
+   decorated cards are positioned, so sticky, absolute and fixed elements keep their own behaviour. */
+.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea):not(span):not([class*="rounded-full"]) > :not(.absolute):not(.fixed):not(.sticky) {
   position: relative;
+  z-index: 2;
 }
 
 .primora-dashboard-content button[class*="rounded"],

@@ -174,6 +174,8 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const [locale, setLocale] = useState<"en" | "ar">("en");
+  // Persist the language only after the saved choice has been read (avoids overwriting it on mount).
+  const [langReady, setLangReady] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const t = translations[locale];
@@ -188,6 +190,7 @@ export default function AdminLayout({
     if (savedLang === "en" || savedLang === "ar") {
       setLocale(savedLang);
     }
+    setLangReady(true);
     const syncFromDoc = () => {
       const docLang = document.documentElement.lang;
       if (docLang === "en" || docLang === "ar") setLocale(docLang);
@@ -198,10 +201,11 @@ export default function AdminLayout({
   }, []);
 
   useEffect(() => {
+    if (!langReady) return;
     localStorage.setItem("primora_lang", locale);
     document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
     document.documentElement.lang = locale;
-  }, [locale]);
+  }, [locale, langReady]);
 
   const navSections: Section[] = [
     {

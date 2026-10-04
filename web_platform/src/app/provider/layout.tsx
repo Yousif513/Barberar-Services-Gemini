@@ -174,6 +174,8 @@ export default function ProviderLayout({
   children: React.ReactNode;
 }) {
   const [locale, setLocale] = useState<"en" | "ar">("en");
+  // Persist the language only after the saved choice has been read (avoids overwriting it on mount).
+  const [langReady, setLangReady] = useState(false);
   const pathname = usePathname();
   const t = translations[locale];
   const isRTL = locale === "ar";
@@ -187,13 +189,15 @@ export default function ProviderLayout({
     if (savedLang === "en" || savedLang === "ar") {
       setLocale(savedLang);
     }
+    setLangReady(true);
   }, []);
 
   useEffect(() => {
+    if (!langReady) return;
     localStorage.setItem("primora_lang", locale);
     document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
     document.documentElement.lang = locale;
-  }, [locale]);
+  }, [locale, langReady]);
 
   const navItems = [
     { name: t.dashboard, path: "/provider/dashboard" },
