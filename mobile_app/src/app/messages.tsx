@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useState, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -11,27 +9,26 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
-  Dimensions,
-  Modal
+  Modal,
+  ActivityIndicator,
+  Alert
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const { width, height } = Dimensions.get("window");
+import { supabase } from "../lib/supabase";
 
 interface Message {
   id: string;
-  sender: "customer" | "provider";
+  sender: "customer" | "provider" | "system";
   text: string;
-  timestamp: string;
+  createdAt: string;
 }
 
 interface Thread {
   id: string;
   name: { en: string; ar: string };
-  lastMessage: { en: string; ar: string };
-  time: { en: string; ar: string };
+  lastMessage: string;
+  lastAt: string;
   unread: boolean;
-  status: { en: string; ar: string };
 }
 
 export default function MessagesScreen() {
@@ -39,261 +36,166 @@ export default function MessagesScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
   const [inputText, setInputText] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const [threads, setThreads] = useState<Thread[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [sending, setSending] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+
+  const isRTL = lang === "ar";
 
   // Translations
   const t = {
     en: {
       title: "Messages",
-      subtitle: "Chat with your luxury service providers",
+      subtitle: "Chat with the shops you book with",
       searchPlaceholder: "Search conversations...",
-      online: "Online",
       typePlaceholder: "Type a message...",
       send: "Send",
-      noThreads: "No conversations found.",
-      typing: "Salon is typing...",
+      noThreads: "No conversations yet. Start one from a shop's page.",
+      noMatches: "No conversations match your search.",
+      signIn: "Sign in from the Profile tab to see your messages.",
+      loadFailed: "Could not load your messages",
+      retry: "Try again",
+      sendFailed: "Message not sent",
       back: "Back",
-      details: "Details"
+      newConversation: "New conversation"
     },
     ar: {
       title: "الرسائل",
-      subtitle: "تواصل مع مقدمي الخدمات الفاخرة",
+      subtitle: "تواصل مع المراكز التي تحجز لديها",
       searchPlaceholder: "البحث في المحادثات...",
-      online: "متصل",
       typePlaceholder: "اكتب رسالة...",
       send: "إرسال",
-      noThreads: "لم يتم العثور على محادثات.",
-      typing: "الصالون يكتب الآن...",
+      noThreads: "لا توجد محادثات بعد. ابدأ محادثة من صفحة المركز.",
+      noMatches: "لا توجد محادثات مطابقة لبحثك.",
+      signIn: "سجّل الدخول من تبويب الملف الشخصي لعرض رسائلك.",
+      loadFailed: "تعذر تحميل رسائلك",
+      retry: "إعادة المحاولة",
+      sendFailed: "لم يتم إرسال الرسالة",
       back: "رجوع",
-      details: "التفاصيل"
+      newConversation: "محادثة جديدة"
     }
   }[lang];
 
-  // Mock Threads
-  const [threads, setThreads] = useState<Thread[]>([
-    {
-      id: "t-1",
-      name: {
-        en: "Elite Grooming Lounge",
-        ar: "صالون إيليت الرجالي"
-      },
-      lastMessage: {
-        en: "Your appointment is confirmed for Tuesday.",
-        ar: "تم تأكيد موعدك يوم الثلاثاء."
-      },
-      time: {
-        en: "2m ago",
-        ar: "قبل دقيقتين"
-      },
-      unread: true,
-      status: {
-        en: "Online",
-        ar: "متصل"
+  const formatTime = (iso: string) => {
+    const d = new Date(iso);
+    const sameDay = d.toDateString() === new Date().toDateString();
+    return sameDay
+      ? d.toLocaleTimeString(isRTL ? "ar-SA" : "en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Riyadh" })
+      : d.toLocaleDateString(isRTL ? "ar-SA" : "en-GB", { day: "numeric", month: "short", timeZone: "Asia/Riyadh" });
+  };
+
+  const loadThreads = useCallback(async () => {
+    setLoadError("");
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id ?? null);
+      if (!user) {
+        setThreads([]);
+        return;
       }
-    },
-    {
-      id: "t-2",
-      name: {
-        en: "Riyadh Premium Spa & Wellness",
-        ar: "سبا الرياض الفاخر للعناية"
-      },
-      lastMessage: {
-        en: "We offer custom organic oils for the therapy session.",
-        ar: "نحن نوفر زيوتًا عضوية مخصصة لجلسة العلاج."
-      },
-      time: {
-        en: "1h ago",
-        ar: "قبل ساعة"
-      },
-      unread: false,
-      status: {
-        en: "Away",
-        ar: "بالخارج"
-      }
-    },
-    {
-      id: "t-3",
-      name: {
-        en: "Sara Beauty Salon & Spa",
-        ar: "صالون سارة للتجميل والسبا"
-      },
-      lastMessage: {
-        en: "Looking forward to your visit. Let us know if you need to reschedule.",
-        ar: "نتطلع لزيارتك. أخبرنا إذا كنت ترغب في إعادة الجدولة."
-      },
-      time: {
-        en: "Yesterday",
-        ar: "بالأمس"
-      },
-      unread: false,
-      status: {
-        en: "Online",
-        ar: "متصل"
-      }
+      const { data, error } = await supabase
+        .from("conversations")
+        .select("id, subject, last_message_preview, last_message_at, unread_for_customer, providers!conversations_provider_id_fkey(business_name_en, business_name_ar)")
+        .eq("customer_id", user.id)
+        .order("last_message_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      setThreads((data || []).map((c: any) => ({
+        id: c.id,
+        name: {
+          en: c.providers?.business_name_en || c.providers?.business_name_ar || c.subject || "",
+          ar: c.providers?.business_name_ar || c.providers?.business_name_en || c.subject || ""
+        },
+        lastMessage: c.last_message_preview || "",
+        lastAt: c.last_message_at,
+        unread: Boolean(c.unread_for_customer),
+      })));
+    } catch (err) {
+      setThreads([]);
+      setLoadError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
     }
-  ]);
+  }, []);
 
-  // Mock Messages Store grouped by Thread ID
-  const [messagesStore, setMessagesStore] = useState<Record<string, Message[]>>({
-    "t-1": [
-      {
-        id: "m1",
-        sender: "provider",
-        text: lang === "ar" ? "مرحباً بك في صالون إيليت. كيف يمكننا مساعدتك اليوم؟" : "Welcome to Elite Lounge. How can we assist you today?",
-        timestamp: "10:15 AM"
-      },
-      {
-        id: "m2",
-        sender: "customer",
-        text: lang === "ar" ? "أهلاً بك، أردت التأكيد على موعدي لحلاقة اللحية الفاخرة." : "Hello, I wanted to confirm my appointment for the luxury beard grooming.",
-        timestamp: "10:20 AM"
-      },
-      {
-        id: "m3",
-        sender: "provider",
-        text: lang === "ar" ? "تم تأكيد موعدك يوم الثلاثاء. الأخصائي ماركوس بانتظارك." : "Your appointment is confirmed for Tuesday. Stylist Marcus is looking forward to seeing you.",
-        timestamp: "10:22 AM"
-      }
-    ],
-    "t-2": [
-      {
-        id: "m4",
-        sender: "customer",
-        text: lang === "ar" ? "هل تشمل الجلسة السويدية المساج بالزيوت العطرية؟" : "Does the Swedish session include aromatherapy oils?",
-        timestamp: "Yesterday"
-      },
-      {
-        id: "m5",
-        sender: "provider",
-        text: lang === "ar" ? "نعم بالتأكيد، نحن نوفر زيوتًا عضوية مخصصة لجلسة العلاج." : "Yes absolutely, we offer custom organic oils for the therapy session.",
-        timestamp: "Yesterday"
-      }
-    ],
-    "t-3": [
-      {
-        id: "m6",
-        sender: "provider",
-        text: lang === "ar" ? "مرحباً سيدي، تم تأكيد حجز الماكياج والمكياج السينمائي الخاص بك." : "Hello, your booking for the event makeup has been verified.",
-        timestamp: "3 days ago"
-      },
-      {
-        id: "m7",
-        sender: "customer",
-        text: lang === "ar" ? "رائع جداً، شكراً لكم!" : "Wonderful, thank you!",
-        timestamp: "3 days ago"
-      },
-      {
-        id: "m8",
-        sender: "provider",
-        text: lang === "ar" ? "نتطلع لزيارتك. أخبرنا إذا كنت ترغب في إعادة الجدولة." : "Looking forward to your visit. Let us know if you need to reschedule.",
-        timestamp: "Yesterday"
-      }
-    ]
-  });
+  const loadMessages = useCallback(async (threadId: string) => {
+    const { data, error } = await supabase
+      .from("messages")
+      .select("id, sender_role, body, created_at")
+      .eq("conversation_id", threadId)
+      .order("created_at", { ascending: true })
+      .limit(500);
+    if (error) {
+      Alert.alert(t.loadFailed, error.message);
+      return;
+    }
+    setMessages((data || []).map((m: any) => ({ id: m.id, sender: m.sender_role, text: m.body, createdAt: m.created_at })));
+  }, [t.loadFailed]);
 
-  const handleSendMessage = () => {
-    if (!inputText.trim() || !selectedThread) return;
+  useEffect(() => {
+    loadThreads();
+    const { data: sub } = supabase.auth.onAuthStateChange(() => loadThreads());
+    return () => sub.subscription.unsubscribe();
+  }, [loadThreads]);
 
-    const threadId = selectedThread.id;
-    const newMsg: Message = {
-      id: `m-${Date.now()}`,
-      sender: "customer",
-      text: inputText,
-      timestamp: new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+  // Live updates: RLS limits the change feed to this customer's conversations.
+  useEffect(() => {
+    if (!userId) return;
+    const channel = supabase
+      .channel("mobile-customer-messages")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, (payload: any) => {
+        loadThreads();
+        if (selectedThread && payload.new?.conversation_id === selectedThread.id) {
+          loadMessages(selectedThread.id);
+        }
+      })
+      .subscribe();
+    return () => {
+      void supabase.removeChannel(channel);
     };
+  }, [userId, selectedThread, loadThreads, loadMessages]);
 
-    // Update message log
-    setMessagesStore(prev => ({
-      ...prev,
-      [threadId]: [...(prev[threadId] || []), newMsg]
-    }));
-
-    // Update thread last message
-    setThreads(prev =>
-      prev.map(t =>
-        t.id === threadId
-          ? {
-              ...t,
-              lastMessage: { en: inputText, ar: inputText },
-              time: { en: "Just now", ar: "الآن" }
-            }
-          : t
-      )
-    );
-
-    const userQuery = inputText;
-    setInputText("");
-
-    // Simulate Salon Auto Response
-    setTimeout(() => {
-      setIsTyping(true);
-    }, 800);
-
-    setTimeout(() => {
-      setIsTyping(false);
-      
-      const responseTextAr = getSimulatedReplyAr(userQuery);
-      const responseTextEn = getSimulatedReplyEn(userQuery);
-
-      const replyMsg: Message = {
-        id: `m-${Date.now() + 1}`,
-        sender: "provider",
-        text: lang === "ar" ? responseTextAr : responseTextEn,
-        timestamp: new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
-      };
-
-      setMessagesStore(prev => ({
-        ...prev,
-        [threadId]: [...(prev[threadId] || []), replyMsg]
-      }));
-
-      setThreads(prev =>
-        prev.map(t =>
-          t.id === threadId
-            ? {
-                ...t,
-                lastMessage: { en: responseTextEn, ar: responseTextAr },
-                time: { en: "Just now", ar: "الآن" }
-              }
-            : t
-        )
-      );
-    }, 2200);
-  };
-
-  const getSimulatedReplyAr = (query: string): string => {
-    const q = query.toLowerCase();
-    if (q.includes("سعر") || q.includes("بكم") || q.includes("تكلفة")) {
-      return "الأسعار موضحة بالتفصيل في لوحة الخدمات على التطبيق، وتخضع لنظام الحساب المشترك والضريبة.";
-    }
-    if (q.includes("وقت") || q.includes("موعد") || q.includes("ساعة")) {
-      return "نحن نلتزم بفترات الصلاة في الرياض. سيتم حجار حجزك مع توفير منظم الحجز التلقائي.";
-    }
-    return "بكل سرور! نحن نثمن تواصلكم. هل تود الاستفسار عن تفاصيل إضافية بشأن الخدمة أو الأخصائي؟";
-  };
-
-  const getSimulatedReplyEn = (query: string): string => {
-    const q = query.toLowerCase();
-    if (q.includes("price") || q.includes("cost") || q.includes("how much")) {
-      return "Pricing is strictly split-routed as detailed in the service card details, complying with local VAT.";
-    }
-    if (q.includes("time") || q.includes("when") || q.includes("hour")) {
-      return "Our schedules are locked dynamically with Riyadh prayer buffers. You can view open times on the Booking Sheet.";
-    }
-    return "Understood. Our team will verify this request and match it to your designated stylist.";
-  };
-
-  const filteredThreads = threads.filter(t =>
-    t.name[lang].toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.lastMessage[lang].toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const openThread = (thread: Thread) => {
-    // Clear unread
-    setThreads(prev => prev.map(t => (t.id === thread.id ? { ...t, unread: false } : t)));
+  const openThread = async (thread: Thread) => {
     setSelectedThread(thread);
+    setMessages([]);
+    await loadMessages(thread.id);
+    if (thread.unread) {
+      await supabase.from("conversations").update({ unread_for_customer: false }).eq("id", thread.id);
+      setThreads(prev => prev.map(x => (x.id === thread.id ? { ...x, unread: false } : x)));
+    }
   };
+
+  const handleSendMessage = async () => {
+    const body = inputText.trim();
+    if (!body || !selectedThread || !userId || sending) return;
+    setSending(true);
+    try {
+      const { error } = await supabase.from("messages").insert({
+        conversation_id: selectedThread.id,
+        sender_id: userId,
+        sender_role: "customer",
+        body,
+      });
+      if (error) throw error;
+      setInputText("");
+      await loadMessages(selectedThread.id);
+      loadThreads();
+    } catch (err) {
+      // The text stays in the input so nothing the customer typed is lost.
+      Alert.alert(t.sendFailed, err instanceof Error ? err.message : String(err));
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const filteredThreads = threads.filter(x =>
+    x.name[lang].toLowerCase().includes(searchQuery.toLowerCase()) ||
+    x.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // Scroll chat list to end on new message
   useEffect(() => {
@@ -302,9 +204,7 @@ export default function MessagesScreen() {
         flatListRef.current?.scrollToEnd({ animated: true });
       }, 100);
     }
-  }, [messagesStore, selectedThread, isTyping]);
-
-  const isRTL = lang === "ar";
+  }, [messages, selectedThread]);
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
@@ -320,21 +220,36 @@ export default function MessagesScreen() {
       </View>
 
       {/* SEARCH */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={[styles.searchInput, isRTL && styles.textRight]}
-          placeholder={t.searchPlaceholder}
-          placeholderTextColor="#a8a29e"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
+      {userId && threads.length > 0 && (
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={[styles.searchInput, isRTL && styles.textRight]}
+            placeholder={t.searchPlaceholder}
+            placeholderTextColor="#a8a29e"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+      )}
 
       {/* THREADS LIST */}
       <ScrollView contentContainerStyle={styles.listContainer} showsVerticalScrollIndicator={false}>
-        {filteredThreads.length === 0 ? (
+        {loading ? (
+          <ActivityIndicator style={{ marginTop: 40 }} />
+        ) : !userId ? (
           <View style={styles.emptyView}>
-            <Text style={styles.emptyText}>{t.noThreads}</Text>
+            <Text style={styles.emptyText}>{t.signIn}</Text>
+          </View>
+        ) : loadError ? (
+          <View style={styles.emptyView}>
+            <Text style={styles.emptyText}>{t.loadFailed}: {loadError}</Text>
+            <TouchableOpacity style={styles.chatSendBtn} onPress={() => { setLoading(true); loadThreads(); }}>
+              <Text style={styles.chatSendBtnText}>{t.retry}</Text>
+            </TouchableOpacity>
+          </View>
+        ) : filteredThreads.length === 0 ? (
+          <View style={styles.emptyView}>
+            <Text style={styles.emptyText}>{threads.length === 0 ? t.noThreads : t.noMatches}</Text>
           </View>
         ) : (
           filteredThreads.map(item => (
@@ -354,12 +269,12 @@ export default function MessagesScreen() {
                     ]}
                     numberOfLines={1}
                   >
-                    {item.lastMessage[lang]}
+                    {item.lastMessage || t.newConversation}
                   </Text>
                 </View>
 
                 <View style={styles.metaCol}>
-                  <Text style={styles.threadTime}>{item.time[lang]}</Text>
+                  <Text style={styles.threadTime}>{item.lastAt ? formatTime(item.lastAt) : ""}</Text>
                   {item.unread && <View style={styles.unreadDot} />}
                 </View>
               </View>
@@ -370,7 +285,7 @@ export default function MessagesScreen() {
 
       {/* CHAT DETAIL MODAL */}
       {selectedThread && (
-        <Modal transparent={false} animationType="slide" visible={!!selectedThread}>
+        <Modal transparent={false} animationType="slide" visible={!!selectedThread} onRequestClose={() => setSelectedThread(null)}>
           <SafeAreaView style={styles.chatContainer}>
             {/* CHAT HEADER */}
             <View style={[styles.chatHeader, isRTL && styles.rtlRow]}>
@@ -378,12 +293,11 @@ export default function MessagesScreen() {
                 style={[styles.chatHeaderBtn, isRTL && styles.rtlRow]}
                 onPress={() => setSelectedThread(null)}
               >
-                <Text style={styles.chatHeaderBtnLabel}>← {t.back}</Text>
+                <Text style={styles.chatHeaderBtnLabel}>{isRTL ? "→" : "←"} {t.back}</Text>
               </TouchableOpacity>
 
               <View style={styles.chatHeaderTitleContainer}>
                 <Text style={styles.chatHeaderName}>{selectedThread.name[lang]}</Text>
-                <Text style={styles.chatHeaderStatus}>{t.online}</Text>
               </View>
 
               <View style={styles.chatHeaderPlaceholder} />
@@ -392,7 +306,7 @@ export default function MessagesScreen() {
             {/* MESSAGE STREAM */}
             <FlatList
               ref={flatListRef}
-              data={messagesStore[selectedThread.id] || []}
+              data={messages}
               keyExtractor={item => item.id}
               contentContainerStyle={styles.chatMessageStream}
               showsVerticalScrollIndicator={false}
@@ -425,19 +339,12 @@ export default function MessagesScreen() {
                           isCustomer ? styles.msgTimeCustomer : styles.msgTimeProvider
                         ]}
                       >
-                        {item.timestamp}
+                        {formatTime(item.createdAt)}
                       </Text>
                     </View>
                   </View>
                 );
               }}
-              ListFooterComponent={
-                isTyping ? (
-                  <View style={styles.typingIndicatorContainer}>
-                    <Text style={styles.typingIndicatorText}>{t.typing}</Text>
-                  </View>
-                ) : null
-              }
             />
 
             {/* INPUT PANEL */}
@@ -452,10 +359,11 @@ export default function MessagesScreen() {
                   placeholderTextColor="#a8a29e"
                   value={inputText}
                   onChangeText={setInputText}
+                  maxLength={2000}
                   multiline
                 />
-                <TouchableOpacity style={styles.chatSendBtn} onPress={handleSendMessage}>
-                  <Text style={styles.chatSendBtnText}>{t.send}</Text>
+                <TouchableOpacity style={styles.chatSendBtn} disabled={sending} onPress={handleSendMessage}>
+                  {sending ? <ActivityIndicator color="#fff" /> : <Text style={styles.chatSendBtnText}>{t.send}</Text>}
                 </TouchableOpacity>
               </View>
             </KeyboardAvoidingView>

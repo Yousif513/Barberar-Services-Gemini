@@ -34,7 +34,7 @@ const translations = {
     serviceIntel: "Service Intelligence", avgLoad: "Avg Load", manageServices: "Manage Services",
     prayerControl: "Prayer Operations Control", lockPending: "Lock Pending", nextPrayer: "Next Prayer", prayerIn: "Prayer in", lockIn: "Lock in", autoResume: "Auto Resume",
     bookingsAffected: "Bookings", staffAffected: "Staff", roomsAffected: "Rooms",
-    demoData: "Demo fallback",
+    demoData: "Unavailable",
     highLoad: "High",
     setupTitle: "Guided Setup Checklist",
     setupSubtitle: "Complete your salon onboarding setup to start receiving customer bookings.",
@@ -75,7 +75,7 @@ const translations = {
     serviceIntel: "ذكاء الخدمات", avgLoad: "متوسط الحمل", manageServices: "إدارة الخدمات",
     prayerControl: "التحكم بأوقات الصلاة", lockPending: "إغلاق معلق", nextPrayer: "الصلاة القادمة", prayerIn: "الصلاة خلال", lockIn: "الإغلاق خلال", autoResume: "الاستئناف",
     bookingsAffected: "حجوزات", staffAffected: "موظفون", roomsAffected: "غرف",
-    demoData: "بيانات تجريبية",
+    demoData: "غير متاح",
     highLoad: "مرتفع",
     setupTitle: "دليل إعداد الصالون",
     setupSubtitle: "أكمل خطوات تأسيس الصالون للبدء في استقبال حجوزات العملاء.",
@@ -120,17 +120,17 @@ type DashboardStats = {
   avgTicket: number;
 };
 
-const demoDashboardStats: DashboardStats = {
-  revenue: 128450,
-  bookings: 9178,
-  customers: 1248,
-  occupancy: 78.4,
-  activeStaff: 4,
-  totalStaff: 6,
-  avgRating: 4.8,
-  reviewCount: 246,
-  walkins: 12,
-  avgTicket: 138,
+const emptyDashboardStats: DashboardStats = {
+  revenue: 0,
+  bookings: 0,
+  customers: 0,
+  occupancy: 0,
+  activeStaff: 0,
+  totalStaff: 0,
+  avgRating: 0,
+  reviewCount: 0,
+  walkins: 0,
+  avgTicket: 0,
 };
 
 export default function ProviderDashboardPage() {
@@ -140,8 +140,9 @@ export default function ProviderDashboardPage() {
   const [coords, setCoords] = useState({ lat: 24.7136, lng: 46.6753 });
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
-  const [dashboardStats, setDashboardStats] = useState<DashboardStats>(demoDashboardStats);
-  const [statsMode, setStatsMode] = useState<"live" | "demo">("demo");
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats>(emptyDashboardStats);
+  const [statsMode, setStatsMode] = useState<"loading" | "live" | "error">("loading");
+  const [statsError, setStatsError] = useState("");
   const [providerId, setProviderId] = useState<string | null>(null);
   const [valueSummary, setValueSummary] = useState<{
     new_clients_acquired: number;
@@ -193,7 +194,8 @@ export default function ProviderDashboardPage() {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
-          setStatsMode("demo");
+          setStatsMode("error");
+          setStatsError(isRTL ? "يرجى تسجيل الدخول." : "Please sign in.");
           return;
         }
         const { data: provider } = await supabase
@@ -215,7 +217,7 @@ export default function ProviderDashboardPage() {
           }
           const branchIds = (branches || []).map((item) => item.id).filter(Boolean);
           if (branchIds.length === 0) {
-            setDashboardStats({ ...demoDashboardStats, revenue: 0, bookings: 0, customers: 0, occupancy: 0, activeStaff: 0, totalStaff: 0, walkins: 0, avgTicket: 0 });
+            setDashboardStats(emptyDashboardStats);
             setSetupState({
               hasHours: false,
               servicesCount: 0,
@@ -303,9 +305,9 @@ export default function ProviderDashboardPage() {
           }
         }
       } catch (err) {
-        console.warn("Provider dashboard using fallback data:", err);
-        setDashboardStats(demoDashboardStats);
-        setStatsMode("demo");
+        setDashboardStats(emptyDashboardStats);
+        setStatsError(err instanceof Error ? err.message : String(err));
+        setStatsMode("error");
       }
     }
     load();
@@ -362,12 +364,12 @@ export default function ProviderDashboardPage() {
 
   const kpis = [
     { label: t.revenue, value: money(dashboardStats.revenue), change: statsMode === "live" ? t.live : t.demoData, tone: statsMode === "live" ? "text-[#22C55E]" : "text-[#D1AF47]" },
-    { label: t.bookings, value: compactNumber(dashboardStats.bookings), change: statsMode === "live" ? t.live : "+8%", tone: "text-[#22C55E]" },
-    { label: t.customers, value: compactNumber(dashboardStats.customers), change: statsMode === "live" ? t.live : "+48", tone: "text-[#22C55E]" },
+    { label: t.bookings, value: compactNumber(dashboardStats.bookings), change: statsMode === "live" ? t.live : t.demoData, tone: "text-[#22C55E]" },
+    { label: t.customers, value: compactNumber(dashboardStats.customers), change: statsMode === "live" ? t.live : t.demoData, tone: "text-[#22C55E]" },
     { label: t.occupancy, value: percent(dashboardStats.occupancy), change: dashboardStats.occupancy > 85 ? t.highLoad : (locale === "ar" ? "مستقر" : "Stable"), tone: dashboardStats.occupancy > 85 ? "text-[#EF4444]" : "text-[#D1AF47]" },
     { label: t.staffOnline, value: `${dashboardStats.activeStaff} / ${dashboardStats.totalStaff}`, change: t.live, tone: "text-[#22C55E]" },
     { label: t.reviews, value: `${dashboardStats.avgRating.toFixed(1)} ★`, change: compactNumber(dashboardStats.reviewCount), tone: "text-[#22C55E]" },
-    { label: t.walkins, value: compactNumber(dashboardStats.walkins), change: statsMode === "live" ? t.live : "+4", tone: "text-[#22C55E]" },
+    { label: t.walkins, value: compactNumber(dashboardStats.walkins), change: statsMode === "live" ? t.live : t.demoData, tone: "text-[#22C55E]" },
     { label: t.avgTicket, value: money(dashboardStats.avgTicket), change: locale === "ar" ? "مستقر" : "Stable", tone: "text-[#D1AF47]" },
   ];
 
@@ -708,6 +710,12 @@ export default function ProviderDashboardPage() {
           </div>
         </div>
       </section>
+
+      {statsMode === "error" && (
+        <div className="rounded-[20px] border border-[#FF5D73]/20 bg-[#FF5D73]/10 p-4 text-xs text-[#EF4444]">
+          {isRTL ? "تعذر تحميل مؤشرات الأداء: " : "Could not load your performance figures: "}{statsError}
+        </div>
+      )}
 
       {/* KPI STRIP */}
       <div className={`${cardBase} flex-shrink-0 overflow-x-auto p-3`}>

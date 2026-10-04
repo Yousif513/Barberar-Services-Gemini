@@ -1,24 +1,44 @@
-"use client";
-
-import React, { useState } from "react";
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  ScrollView, 
-  TouchableOpacity, 
-  Modal, 
-  Dimensions 
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
+  Linking,
+  ActivityIndicator,
+  Alert
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { supabase } from "../lib/supabase";
 
-const { width } = Dimensions.get("window");
+type BookingStatus = "pending_payment" | "confirmed" | "completed" | "cancelled" | "no_show";
+
+interface BookingRow {
+  id: string;
+  scheduledAt: string;
+  status: BookingStatus;
+  totalPrice: number;
+  service: { en: string; ar: string };
+  stylist: { en: string; ar: string };
+  provider: { en: string; ar: string };
+}
+
+const UPCOMING: BookingStatus[] = ["pending_payment", "confirmed"];
 
 export default function BookingsScreen() {
   const [lang, setLang] = useState<"en" | "ar">("ar");
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
-  const [selectedBooking, setSelectedBooking] = useState<any>(null);
+  const [selectedBooking, setSelectedBooking] = useState<BookingRow | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [bookings, setBookings] = useState<BookingRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [signedIn, setSignedIn] = useState(true);
+  const [busy, setBusy] = useState(false);
+
+  const isRTL = lang === "ar";
 
   const t = {
     en: {
@@ -27,20 +47,32 @@ export default function BookingsScreen() {
       upcoming: "Upcoming",
       past: "History",
       noBookings: "No appointments scheduled under this tab.",
+      signIn: "Sign in from the Profile tab to see your appointments.",
+      loadFailed: "Could not load your appointments",
+      retry: "Try again",
       details: "View Info",
       cancel: "Cancel Booking",
-      rebook: "Book Again",
+      payNow: "Complete Payment",
       close: "Close",
       confirmCancelTitle: "Cancel Booking?",
-      confirmCancelDesc: "Are you sure you want to cancel this booking? This action cannot be undone.",
+      confirmCancelDesc: "The shop's cancellation policy applies. Any refund due is sent back to your card.",
       yesCancel: "Yes, Cancel",
+      cancelled: "Booking cancelled.",
+      paymentFailed: "Could not open the payment page. Please try again.",
       provider: "Provider",
       service: "Service",
       stylist: "Stylist",
       dateTime: "Date & Time",
       price: "Total Price",
       status: "Status",
-      currency: "SAR"
+      currency: "SAR",
+      statuses: {
+        pending_payment: "AWAITING PAYMENT",
+        confirmed: "CONFIRMED",
+        completed: "COMPLETED",
+        cancelled: "CANCELLED",
+        no_show: "NO-SHOW"
+      } as Record<BookingStatus, string>
     },
     ar: {
       title: "مواعيدي وحجوزاتي",
@@ -48,62 +80,125 @@ export default function BookingsScreen() {
       upcoming: "القادمة",
       past: "السابق",
       noBookings: "لا توجد حجوزات مجدولة في هذا التبويب.",
+      signIn: "سجّل الدخول من تبويب الملف الشخصي لعرض مواعيدك.",
+      loadFailed: "تعذر تحميل مواعيدك",
+      retry: "إعادة المحاولة",
       details: "التفاصيل",
       cancel: "إلغاء الحجز",
-      rebook: "احجز مجدداً",
+      payNow: "إكمال الدفع",
       close: "إغلاق",
       confirmCancelTitle: "إلغاء الحجز؟",
-      confirmCancelDesc: "هل أنت متأكد من رغبتك في إلغاء هذا الموعد؟ لا يمكن التراجع عن هذا الإجراء.",
+      confirmCancelDesc: "تُطبق سياسة الإلغاء الخاصة بالمركز. أي مبلغ مستحق للاسترداد يُعاد إلى بطاقتك.",
       yesCancel: "نعم، إلغاء الموعد",
+      cancelled: "تم إلغاء الحجز.",
+      paymentFailed: "تعذر فتح صفحة الدفع. يرجى المحاولة مرة أخرى.",
       provider: "مزود الخدمة",
       service: "الخدمة",
       stylist: "الأخصائي",
       dateTime: "التاريخ والوقت",
       price: "السعر الإجمالي",
       status: "الحالة",
-      currency: "ريال"
+      currency: "ريال",
+      statuses: {
+        pending_payment: "بانتظار الدفع",
+        confirmed: "مؤكد",
+        completed: "مكتمل",
+        cancelled: "ملغى",
+        no_show: "لم يحضر"
+      } as Record<BookingStatus, string>
     }
   }[lang];
 
-  // Mock Bookings
-  const [bookings, setBookings] = useState<any[]>([
-    {
-      id: "bk-100",
-      scheduled_at: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days later
-      status: "CONFIRMED",
-      total_price: 220,
-      service: lang === "ar" ? "حلاقة اللحية الفاخرة بالمنشفة الساخنة" : "Luxury Beard Grooming & Hot Towel Shave",
-      stylist: lang === "ar" ? "ماركوس فانس" : "Marcus Vance",
-      provider: lang === "ar" ? "صالون إيليت الرجالي" : "Elite Grooming Lounge"
-    },
-    {
-      id: "bk-200",
-      scheduled_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
-      status: "COMPLETED",
-      total_price: 350,
-      service: lang === "ar" ? "علاج ترطيب البشرة وتدليك الرأس" : "Deep Hydrating Facial & Scalp Therapy",
-      stylist: lang === "ar" ? "إيلينا روستوفا" : "Elena Rostova",
-      provider: lang === "ar" ? "سبا الرياض الفاخر للعناية" : "Riyadh Premium Spa & Wellness"
-    }
-  ]);
+  const both = (en?: string | null, ar?: string | null) => ({ en: en || ar || "", ar: ar || en || "" });
 
-  const handleCancelBooking = (id: string) => {
-    setBookings(prev => prev.map(b => b.id === id ? { ...b, status: "CANCELLED" } : b));
-    setShowCancelModal(false);
-    setSelectedBooking(null);
+  const loadBookings = useCallback(async () => {
+    setLoading(true);
+    setLoadError("");
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      setSignedIn(Boolean(user));
+      if (!user) {
+        setBookings([]);
+        return;
+      }
+      const { data, error } = await supabase
+        .from("bookings")
+        .select(`
+          id, scheduled_at, status, total_price,
+          services ( name_en, name_ar ),
+          employees ( name_en, name_ar ),
+          branches ( providers ( business_name_en, business_name_ar ) )
+        `)
+        .eq("customer_id", user.id)
+        .order("scheduled_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      setBookings((data || []).map((b: any) => ({
+        id: b.id,
+        scheduledAt: b.scheduled_at,
+        status: b.status,
+        totalPrice: Number(b.total_price),
+        service: both(b.services?.name_en, b.services?.name_ar),
+        stylist: both(b.employees?.name_en, b.employees?.name_ar),
+        provider: both(b.branches?.providers?.business_name_en, b.branches?.providers?.business_name_ar),
+      })));
+    } catch (err) {
+      setBookings([]);
+      setLoadError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadBookings();
+    const { data: sub } = supabase.auth.onAuthStateChange(() => loadBookings());
+    return () => sub.subscription.unsubscribe();
+  }, [loadBookings]);
+
+  const handleCancelBooking = async (id: string) => {
+    setBusy(true);
+    try {
+      const { error } = await supabase.rpc("cancel_booking", { target_booking_id: id, p_reason: "customer_mobile" });
+      if (error) throw error;
+      setShowCancelModal(false);
+      setSelectedBooking(null);
+      Alert.alert(t.confirmCancelTitle, t.cancelled);
+      loadBookings();
+    } catch (err) {
+      Alert.alert(t.confirmCancelTitle, err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
+    }
   };
 
-  const filtered = bookings.filter(b => {
-    if (activeTab === "upcoming") {
-      return b.status === "CONFIRMED" || b.status === "PENDING";
+  const handlePayNow = async (id: string) => {
+    setBusy(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("payment-checkout", { body: { bookingId: id } });
+      if (error || !data?.checkoutUrl) throw new Error(t.paymentFailed);
+      await Linking.openURL(data.checkoutUrl);
+    } catch (err) {
+      Alert.alert(t.payNow, err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
     }
-    return b.status === "COMPLETED" || b.status === "CANCELLED";
-  });
+  };
+
+  const filtered = bookings.filter(b =>
+    activeTab === "upcoming"
+      ? UPCOMING.includes(b.status) && new Date(b.scheduledAt).getTime() > Date.now() - 2 * 3600000
+      : !UPCOMING.includes(b.status) || new Date(b.scheduledAt).getTime() <= Date.now() - 2 * 3600000
+  );
+
+  const locale = isRTL ? "ar-SA" : "en-GB";
+  const formatWhen = (iso: string) =>
+    `${new Date(iso).toLocaleDateString(locale, { day: "numeric", month: "short", timeZone: "Asia/Riyadh" })} • ${new Date(iso).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Riyadh" })}`;
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       {/* HEADER */}
-      <View style={styles.header}>
+      <View style={[styles.header, isRTL && styles.rtlRow]}>
         <View>
           <Text style={styles.titleText}>{t.title}</Text>
           <Text style={styles.subtitleText}>{t.subtitle}</Text>
@@ -114,14 +209,14 @@ export default function BookingsScreen() {
       </View>
 
       {/* TABS */}
-      <View style={styles.tabContainer}>
-        <TouchableOpacity 
+      <View style={[styles.tabContainer, isRTL && styles.rtlRow]}>
+        <TouchableOpacity
           style={[styles.tabButton, activeTab === "upcoming" && styles.tabActive]}
           onPress={() => setActiveTab("upcoming")}
         >
           <Text style={[styles.tabLabel, activeTab === "upcoming" && styles.tabLabelActive]}>{t.upcoming}</Text>
         </TouchableOpacity>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.tabButton, activeTab === "past" && styles.tabActive]}
           onPress={() => setActiveTab("past")}
         >
@@ -131,72 +226,77 @@ export default function BookingsScreen() {
 
       {/* LIST */}
       <ScrollView contentContainerStyle={styles.listContainer} showsVerticalScrollIndicator={false}>
-        {filtered.length === 0 ? (
+        {loading ? (
+          <ActivityIndicator style={{ marginTop: 40 }} />
+        ) : !signedIn ? (
+          <View style={styles.emptyView}>
+            <Text style={styles.emptyText}>{t.signIn}</Text>
+          </View>
+        ) : loadError ? (
+          <View style={styles.emptyView}>
+            <Text style={styles.emptyText}>{t.loadFailed}: {loadError}</Text>
+            <TouchableOpacity style={styles.btnSecondary} onPress={loadBookings}>
+              <Text style={styles.btnSecondaryLabel}>{t.retry}</Text>
+            </TouchableOpacity>
+          </View>
+        ) : filtered.length === 0 ? (
           <View style={styles.emptyView}>
             <Text style={styles.emptyText}>{t.noBookings}</Text>
           </View>
         ) : (
           filtered.map((item) => (
             <View key={item.id} style={styles.card}>
-              <View style={styles.cardHeader}>
+              <View style={[styles.cardHeader, isRTL && styles.rtlRow]}>
                 <View>
-                  <Text style={styles.cardProvider}>{item.provider}</Text>
-                  <Text style={styles.cardService}>{item.service}</Text>
+                  <Text style={styles.cardProvider}>{item.provider[lang]}</Text>
+                  <Text style={styles.cardService}>{item.service[lang]}</Text>
                 </View>
                 <View style={[
                   styles.statusBadge,
-                  item.status === "COMPLETED" && styles.statusCompleted,
-                  item.status === "CANCELLED" && styles.statusCancelled
+                  item.status === "completed" && styles.statusCompleted,
+                  (item.status === "cancelled" || item.status === "no_show") && styles.statusCancelled
                 ]}>
                   <Text style={[
                     styles.statusLabel,
-                    item.status === "COMPLETED" && styles.statusLabelCompleted,
-                    item.status === "CANCELLED" && styles.statusLabelCancelled
-                  ]}>{item.status}</Text>
+                    item.status === "completed" && styles.statusLabelCompleted,
+                    (item.status === "cancelled" || item.status === "no_show") && styles.statusLabelCancelled
+                  ]}>{t.statuses[item.status] || item.status}</Text>
                 </View>
               </View>
 
               <View style={styles.cardDivider} />
 
-              <View style={styles.cardDetailsRow}>
+              <View style={[styles.cardDetailsRow, isRTL && styles.rtlRow]}>
                 <View>
                   <Text style={styles.detailTitle}>{t.dateTime}</Text>
-                  <Text style={styles.detailVal}>
-                    {new Date(item.scheduled_at).toLocaleDateString("en-GB", { day: 'numeric', month: 'short' })} • {new Date(item.scheduled_at).toLocaleTimeString("en-GB", { hour: '2-digit', minute: '2-digit' })}
-                  </Text>
+                  <Text style={styles.detailVal}>{formatWhen(item.scheduledAt)}</Text>
                 </View>
                 <View style={styles.alignEnd}>
                   <Text style={styles.detailTitle}>{t.price}</Text>
-                  <Text style={styles.detailVal}>{item.total_price} {t.currency}</Text>
+                  <Text style={styles.detailVal}>{item.totalPrice} {t.currency}</Text>
                 </View>
               </View>
 
-              <View style={styles.cardActions}>
-                <TouchableOpacity 
-                  style={styles.btnSecondary} 
-                  onPress={() => setSelectedBooking(item)}
-                >
+              <View style={[styles.cardActions, isRTL && styles.rtlRow]}>
+                <TouchableOpacity style={styles.btnSecondary} onPress={() => setSelectedBooking(item)}>
                   <Text style={styles.btnSecondaryLabel}>{t.details}</Text>
                 </TouchableOpacity>
 
-                {item.status === "CONFIRMED" && (
-                  <TouchableOpacity 
-                    style={styles.btnPrimary} 
+                {item.status === "pending_payment" && (
+                  <TouchableOpacity style={styles.btnDark} disabled={busy} onPress={() => handlePayNow(item.id)}>
+                    <Text style={styles.btnDarkLabel}>{t.payNow}</Text>
+                  </TouchableOpacity>
+                )}
+
+                {UPCOMING.includes(item.status) && new Date(item.scheduledAt).getTime() > Date.now() && (
+                  <TouchableOpacity
+                    style={styles.btnPrimary}
                     onPress={() => {
                       setSelectedBooking(item);
                       setShowCancelModal(true);
                     }}
                   >
                     <Text style={styles.btnPrimaryLabel}>{t.cancel}</Text>
-                  </TouchableOpacity>
-                )}
-
-                {(item.status === "COMPLETED" || item.status === "CANCELLED") && (
-                  <TouchableOpacity 
-                    style={styles.btnDark} 
-                    onPress={() => {}}
-                  >
-                    <Text style={styles.btnDarkLabel}>{t.rebook}</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -207,27 +307,31 @@ export default function BookingsScreen() {
 
       {/* DETAIL MODAL */}
       {selectedBooking && !showCancelModal && (
-        <Modal transparent animationType="fade" visible>
+        <Modal transparent animationType="fade" visible onRequestClose={() => setSelectedBooking(null)}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{selectedBooking.provider}</Text>
-              
+              <Text style={styles.modalTitle}>{selectedBooking.provider[lang]}</Text>
+
               <View style={styles.modalMeta}>
                 <View style={styles.metaRow}>
                   <Text style={styles.metaLabel}>{t.service}</Text>
-                  <Text style={styles.metaValue}>{selectedBooking.service}</Text>
+                  <Text style={styles.metaValue}>{selectedBooking.service[lang]}</Text>
                 </View>
                 <View style={styles.metaRow}>
                   <Text style={styles.metaLabel}>{t.stylist}</Text>
-                  <Text style={styles.metaValue}>{selectedBooking.stylist}</Text>
+                  <Text style={styles.metaValue}>{selectedBooking.stylist[lang]}</Text>
                 </View>
                 <View style={styles.metaRow}>
                   <Text style={styles.metaLabel}>{t.dateTime}</Text>
-                  <Text style={styles.metaValue}>{new Date(selectedBooking.scheduled_at).toLocaleString()}</Text>
+                  <Text style={styles.metaValue}>{formatWhen(selectedBooking.scheduledAt)}</Text>
+                </View>
+                <View style={styles.metaRow}>
+                  <Text style={styles.metaLabel}>{t.status}</Text>
+                  <Text style={styles.metaValue}>{t.statuses[selectedBooking.status] || selectedBooking.status}</Text>
                 </View>
                 <View style={styles.metaRow}>
                   <Text style={styles.metaLabel}>{t.price}</Text>
-                  <Text style={[styles.metaValue, styles.metaValuePrice]}>{selectedBooking.total_price} {t.currency}</Text>
+                  <Text style={[styles.metaValue, styles.metaValuePrice]}>{selectedBooking.totalPrice} {t.currency}</Text>
                 </View>
               </View>
 
@@ -241,21 +345,22 @@ export default function BookingsScreen() {
 
       {/* CONFIRM CANCEL MODAL */}
       {showCancelModal && selectedBooking && (
-        <Modal transparent animationType="fade" visible>
+        <Modal transparent animationType="fade" visible onRequestClose={() => setShowCancelModal(false)}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>{t.confirmCancelTitle}</Text>
               <Text style={styles.modalDesc}>{t.confirmCancelDesc}</Text>
 
-              <View style={styles.modalActionRow}>
-                <TouchableOpacity style={styles.modalBtnCancel} onPress={() => setShowCancelModal(false)}>
+              <View style={[styles.modalActionRow, isRTL && styles.rtlRow]}>
+                <TouchableOpacity style={styles.modalBtnCancel} disabled={busy} onPress={() => setShowCancelModal(false)}>
                   <Text style={styles.modalBtnCancelLabel}>{t.close}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.modalBtnConfirm} 
+                <TouchableOpacity
+                  style={styles.modalBtnConfirm}
+                  disabled={busy}
                   onPress={() => handleCancelBooking(selectedBooking.id)}
                 >
-                  <Text style={styles.modalBtnConfirmLabel}>{t.yesCancel}</Text>
+                  {busy ? <ActivityIndicator color="#fff" /> : <Text style={styles.modalBtnConfirmLabel}>{t.yesCancel}</Text>}
                 </TouchableOpacity>
               </View>
             </View>

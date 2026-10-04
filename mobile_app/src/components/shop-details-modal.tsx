@@ -109,7 +109,9 @@ export function ShopDetailsModal({
       packageFailed: "Could not open the payment page. The package was not activated and nothing was charged.",
       reviewsHeading: "Customer Reviews",
       noReviews: "No written reviews for this shop yet.",
-      ownerReply: "Reply from the shop"
+      ownerReply: "Reply from the shop",
+      messageShop: "Message this shop",
+      conversationReady: "Your conversation with this shop is in the Messages tab."
     },
     ar: {
       servicesHeading: "خدماتنا",
@@ -158,7 +160,9 @@ export function ShopDetailsModal({
       packageFailed: "تعذر فتح صفحة الدفع. لم يتم تفعيل الباقة ولم يُخصم أي مبلغ.",
       reviewsHeading: "تقييمات وآراء العملاء",
       noReviews: "لا توجد تقييمات مكتوبة لهذا المركز بعد.",
-      ownerReply: "رد المركز"
+      ownerReply: "رد المركز",
+      messageShop: "راسل هذا المركز",
+      conversationReady: "محادثتك مع هذا المركز موجودة في تبويب الرسائل."
     }
   }[locale];
 
@@ -300,6 +304,32 @@ export function ShopDetailsModal({
     }
   };
 
+  // Opens (or reuses) the single conversation between this customer and the provider.
+  const handleMessageShop = async () => {
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      const user = await requireUser();
+      if (!user) return;
+      const { data: existing, error: findError } = await supabase
+        .from("conversations").select("id").eq("customer_id", user.id).eq("provider_id", shop.providerId).maybeSingle();
+      if (findError) throw findError;
+      if (!existing) {
+        const { error } = await supabase.from("conversations").insert({
+          customer_id: user.id,
+          provider_id: shop.providerId,
+          subject: shop.name[locale],
+        });
+        if (error) throw error;
+      }
+      Alert.alert(t.messageShop, t.conversationReady);
+    } catch (err) {
+      Alert.alert(t.bookingFailed, err instanceof Error ? err.message : String(err));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handleTabChange = (tab: "services" | "packages") => {
     setActiveTab(tab);
     setSelectedService(null);
@@ -352,6 +382,9 @@ export function ShopDetailsModal({
                 <Text style={[styles.addressText, isAr && styles.rtlText]}>
                   {details.address[locale] || [shop.district, shop.city].filter(Boolean).join(isAr ? "، " : ", ")}
                 </Text>
+                <TouchableOpacity onPress={handleMessageShop} disabled={submitting} style={[styles.closeBtn, { alignSelf: isAr ? "flex-end" : "flex-start" }]}>
+                  <Text style={styles.closeBtnText}>{t.messageShop}</Text>
+                </TouchableOpacity>
               </View>
             </View>
 

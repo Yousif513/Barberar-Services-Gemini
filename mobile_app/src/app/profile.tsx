@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -8,33 +6,41 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
-  Modal,
-  Dimensions,
-  Alert
+  Switch,
+  ActivityIndicator,
+  Dimensions
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import type { User } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
 import { Toast } from "../components/toast";
 
 const { width } = Dimensions.get("window");
 
-interface SavedCard {
+interface UserPackageItem {
   id: string;
-  brand: "mada" | "visa" | "mastercard";
-  last4: string;
-  holder: string;
-  expiry: string;
+  packageName: { en: string; ar: string };
+  shopName: { en: string; ar: string };
+  remainingSessions: number;
+  expiresAt: string;
 }
 
-interface EscrowHolding {
-  id: string;
-  provider: { en: string; ar: string };
-  amount: number;
-  platformFee: number;
-  providerPayout: number;
-  status: "held" | "released" | "refunded";
-  date: string;
+interface ProfileRow {
+  first_name: string | null;
+  last_name: string | null;
+  phone_number: string | null;
 }
+
+// Same normalisation as the web login: Saudi mobiles in E.164 (+9665XXXXXXXX).
+const normalizeSaudiPhone = (raw: string): string => {
+  const digits = raw.replace(/[^\d+]/g, "");
+  if (digits.startsWith("+966")) return digits;
+  if (digits.startsWith("00966")) return "+" + digits.slice(2);
+  if (digits.startsWith("966")) return "+" + digits;
+  if (digits.startsWith("05")) return "+966" + digits.slice(1);
+  if (digits.startsWith("5")) return "+966" + digits;
+  return "+966" + digits;
+};
 
 export default function ProfileScreen() {
   const [lang, setLang] = useState<"en" | "ar">("ar");
@@ -42,267 +48,213 @@ export default function ProfileScreen() {
   const [toastType, setToastType] = useState<"success" | "info" | "error">("success");
   const [toastVisible, setToastVisible] = useState(false);
 
-  const [showAddCard, setShowAddCard] = useState(false);
-  const [newCardNumber, setNewCardNumber] = useState("");
-  const [newCardHolder, setNewCardHolder] = useState("");
-  const [newCardExpiry, setNewCardExpiry] = useState("");
+  const [user, setUser] = useState<User | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [profile, setProfile] = useState<ProfileRow | null>(null);
+  const [userPackages, setUserPackages] = useState<UserPackageItem[]>([]);
+  const [packagesError, setPackagesError] = useState("");
 
-  const [savedCards, setSavedCards] = useState<SavedCard[]>([
-    {
-      id: "c1",
-      brand: "mada",
-      last4: "4021",
-      holder: "Faisal Al-Otaibi",
-      expiry: "09/28"
-    },
-    {
-      id: "c2",
-      brand: "visa",
-      last4: "9812",
-      holder: "Faisal Al-Otaibi",
-      expiry: "12/29"
-    }
-  ]);
+  const [phone, setPhone] = useState("");
+  const [otpCode, setOtpCode] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [whatsappConsent, setWhatsappConsent] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  interface UserPackageItem {
-    id: string;
-    packageName: { en: string; ar: string };
-    shopName: { en: string; ar: string };
-    remainingSessions: number;
-    expiresAt: string;
-  }
-
-  const [userPackages, setUserPackages] = useState<UserPackageItem[]>([
-    {
-      id: "up-1",
-      packageName: { en: "Elite Hair & Beard Grooming Multi-Pass", ar: "بطاقة قص الشعر واللحية الممتازة" },
-      shopName: { en: "Elite Grooming Lounge", ar: "صالون إيليت الرجالي" },
-      remainingSessions: 10,
-      expiresAt: "2026-12-14"
-    },
-    {
-      id: "up-2",
-      packageName: { en: "Moroccan Hammam Spa package", ar: "باقة الحمام المغربي الاسترخائي" },
-      shopName: { en: "Riyadh Premium Spa & Wellness", ar: "سبا الرياض الفاخر للعناية" },
-      remainingSessions: 5,
-      expiresAt: "2027-06-14"
-    }
-  ]);
-
-  const loadUserPackages = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data, error } = await supabase
-          .from("user_packages")
-          .select(`
-            id,
-            remaining_sessions,
-            expires_at,
-            packages (
-              name_en,
-              name_ar,
-              providers (
-                business_name_en,
-                business_name_ar
-              )
-            )
-          `)
-          .eq("customer_id", user.id);
-        
-        if (error) throw error;
-        
-        if (data && data.length > 0) {
-          const formatted: UserPackageItem[] = data.map((item: any) => ({
-            id: item.id,
-            packageName: {
-              en: item.packages?.name_en || "",
-              ar: item.packages?.name_ar || ""
-            },
-            shopName: {
-              en: item.packages?.providers?.business_name_en || "",
-              ar: item.packages?.providers?.business_name_ar || ""
-            },
-            remainingSessions: item.remaining_sessions,
-            expiresAt: item.expires_at ? item.expires_at.split("T")[0] : ""
-          }));
-          setUserPackages(formatted);
-        }
-      }
-    } catch (err) {
-      console.log("Supabase packages fetch failed, falling back to mock:", err);
-    }
-  };
-
-  const registerExpoPushToken = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const simulatedToken = `ExponentPushToken[mock-user-device-${user.id.substring(0, 8)}]`;
-
-      const { error } = await supabase
-        .from("profiles")
-        .update({ expo_push_token: simulatedToken })
-        .eq("id", user.id);
-
-      if (error) throw error;
-      console.log("[Push Registration] Successfully registered token:", simulatedToken);
-    } catch (err: any) {
-      console.log("[Push Registration] Token registry skipped or offline:", err.message);
-    }
-  };
-
-  useEffect(() => {
-    loadUserPackages();
-    registerExpoPushToken();
-  }, [lang]);
-
-  const handleRedeemSession = async (pkgId: string) => {
-    const pkg = userPackages.find(p => p.id === pkgId);
-    if (!pkg || pkg.remainingSessions <= 0) return;
-
-    const newSessions = pkg.remainingSessions - 1;
-
-    try {
-      const { error } = await supabase
-        .from("user_packages")
-        .update({ remaining_sessions: newSessions })
-        .eq("id", pkgId);
-
-      if (error) throw error;
-    } catch (err) {
-      console.log("Supabase update failed, running offline update:", err);
-    }
-
-    setUserPackages(prev =>
-      prev.map(p => (p.id === pkgId ? { ...p, remainingSessions: newSessions } : p))
-    );
-
-    setToastMessage(`${t.redeemSuccessMsg} (${pkg.packageName[lang]})`);
-    setToastType("success");
-    setToastVisible(true);
-  };
-
-  const [escrowHoldings, setEscrowHoldings] = useState<EscrowHolding[]>([
-    {
-      id: "esc-100",
-      provider: {
-        en: "Elite Grooming Lounge",
-        ar: "صالون إيليت الرجالي"
-      },
-      amount: 220,
-      platformFee: 33, // 15%
-      providerPayout: 187, // 85%
-      status: "held",
-      date: "2026-06-15"
-    },
-    {
-      id: "esc-98",
-      provider: {
-        en: "Riyadh Premium Spa & Wellness",
-        ar: "سبا الرياض الفاخر للعناية"
-      },
-      amount: 350,
-      platformFee: 52.5,
-      providerPayout: 297.5,
-      status: "released",
-      date: "2026-06-08"
-    }
-  ]);
+  const isRTL = lang === "ar";
 
   // Translations
   const t = {
     en: {
       profileTitle: "Client Profile",
-      walletTitle: "Split Ledger Wallet",
-      walletDesc: "Funds are securely routed via Tap Connect smart escrow.",
-      balance: "Escrow Holdings",
-      currency: "SAR",
+      signInTitle: "Sign in",
+      signInDesc: "Sign in with your Saudi mobile number to book, buy packages and post requests.",
+      phoneLabel: "Mobile number",
+      phonePlaceholder: "05XXXXXXXX",
+      sendCode: "Send code",
+      codeLabel: "6-digit code",
+      verify: "Verify and sign in",
+      changeNumber: "Use another number",
+      terms: "I accept the Terms of Service and the Privacy Notice.",
+      whatsapp: "Send booking updates on WhatsApp (optional).",
+      termsRequired: "Please accept the Terms of Service and Privacy Notice to continue.",
+      invalidPhone: "Please enter a valid Saudi mobile number (05XXXXXXXX).",
+      invalidCode: "Please enter the 6-digit code.",
+      codeSent: "Verification code sent by SMS.",
+      signedIn: "Signed in.",
+      signOut: "Sign out",
       customerDetails: "Customer Information",
       nameLabel: "Full Name",
-      phoneLabel: "Phone Number",
       emailLabel: "Email Address",
-      savedCardsTitle: "Payment Cards",
-      addCard: "Add Mada Card",
-      close: "Close",
-      save: "Save Card",
-      cardPlaceholder: "Card Number (16 digits)",
-      holderPlaceholder: "Holder Name",
-      expiryPlaceholder: "MM/YY",
-      escrowListTitle: "Escrow Split Status",
-      totalCaptured: "Captured",
-      providerShare: "Provider (85%)",
-      platformShare: "Platform (15%)",
-      statusHeld: "HELD IN ESCROW",
-      statusReleased: "RELEASED TO MERCHANT",
-      statusRefunded: "REFUNDED TO CLIENT",
+      notSet: "Not set",
+      paymentsTitle: "Payments",
+      paymentsDesc: "Payments are taken on Tap's secure payment page. Card details are never stored in this app.",
       packagesTitle: "My Active Packages & Passes",
       sessionsLeft: "sessions left",
       expires: "Expires:",
-      redeemBtn: "Redeem Session",
+      redeemNote: "Show this package at your visit; the shop's staff record each session.",
       fullyConsumed: "Fully Consumed",
       emptyPackages: "No active packages found.",
-      redeemSuccessTitle: "Session Redeemed",
-      redeemSuccessMsg: "You have successfully redeemed one session from your package."
+      packagesFailed: "Could not load your packages"
     },
     ar: {
       profileTitle: "الملف الشخصي",
-      walletTitle: "محفظة الحساب المشترك",
-      walletDesc: "يتم توجيه الأموال بشكل آمن عبر نظام الضمان الذكي من Tap Connect.",
-      balance: "حيازات الضمان المعلقة",
-      currency: "ريال",
+      signInTitle: "تسجيل الدخول",
+      signInDesc: "سجّل الدخول برقم جوالك السعودي للحجز وشراء الباقات ونشر الطلبات.",
+      phoneLabel: "رقم الجوال",
+      phonePlaceholder: "05XXXXXXXX",
+      sendCode: "إرسال الرمز",
+      codeLabel: "رمز من 6 أرقام",
+      verify: "تحقق وسجّل الدخول",
+      changeNumber: "استخدام رقم آخر",
+      terms: "أوافق على شروط الخدمة وإشعار الخصوصية.",
+      whatsapp: "إرسال تحديثات الحجز عبر واتساب (اختياري).",
+      termsRequired: "يرجى الموافقة على شروط الخدمة وإشعار الخصوصية للمتابعة.",
+      invalidPhone: "يرجى إدخال رقم جوال سعودي صالح (05XXXXXXXX).",
+      invalidCode: "يرجى إدخال الرمز المكون من 6 أرقام.",
+      codeSent: "تم إرسال رمز التحقق برسالة نصية.",
+      signedIn: "تم تسجيل الدخول.",
+      signOut: "تسجيل الخروج",
       customerDetails: "بيانات العميل",
       nameLabel: "الاسم الكامل",
-      phoneLabel: "رقم الجوال",
       emailLabel: "البريد الإلكتروني",
-      savedCardsTitle: "البطاقات المخزنة",
-      addCard: "إضافة بطاقة مدى",
-      close: "إغلاق",
-      save: "حفظ البطاقة",
-      cardPlaceholder: "رقم البطاقة (16 رقم)",
-      holderPlaceholder: "اسم حامل البطاقة",
-      expiryPlaceholder: "شهر / سنة",
-      escrowListTitle: "حالة تقسيمات الضمان",
-      totalCaptured: "المبلغ المقبوض",
-      providerShare: "حصة المزود (85%)",
-      platformShare: "حصة المنصة (15%)",
-      statusHeld: "معلق في الضمان",
-      statusReleased: "تم الإفراج للمزود",
-      statusRefunded: "تمت الاستعادة للعميل",
+      notSet: "غير محدد",
+      paymentsTitle: "المدفوعات",
+      paymentsDesc: "تتم المدفوعات عبر صفحة الدفع الآمنة من Tap. لا تُحفظ بيانات البطاقة في هذا التطبيق.",
       packagesTitle: "الباقات والعضويات الفعالة",
       sessionsLeft: "جلسات متبقية",
       expires: "ينتهي في:",
-      redeemBtn: "استخدام جلسة",
+      redeemNote: "اعرض هذه الباقة عند زيارتك؛ يسجّل فريق المركز كل جلسة.",
       fullyConsumed: "مستهلكة بالكامل",
       emptyPackages: "لا توجد عضويات نشطة حالياً.",
-      redeemSuccessTitle: "تم استخدام الجلسة بنجاح",
-      redeemSuccessMsg: "لقد قمت باستخدام جلسة واحدة من باقتك الفعالة."
+      packagesFailed: "تعذر تحميل باقاتك"
     }
   }[lang];
 
-  const handleAddCard = () => {
-    if (!newCardNumber.trim() || !newCardHolder.trim() || !newCardExpiry.trim()) return;
-
-    const cleanNum = newCardNumber.replace(/\s?/g, "");
-    const last4 = cleanNum.slice(-4) || "0000";
-
-    const newCard: SavedCard = {
-      id: `c-${Date.now()}`,
-      brand: cleanNum.startsWith("4") ? "visa" : "mada",
-      last4,
-      holder: newCardHolder,
-      expiry: newCardExpiry
-    };
-
-    setSavedCards(prev => [...prev, newCard]);
-    setShowAddCard(false);
-    setNewCardNumber("");
-    setNewCardHolder("");
-    setNewCardExpiry("");
+  const showToast = (message: string, type: "success" | "info" | "error") => {
+    setToastMessage(message);
+    setToastType(type);
+    setToastVisible(true);
   };
 
-  const isRTL = lang === "ar";
+  const loadAccount = useCallback(async (current: User | null) => {
+    setUser(current);
+    setAuthChecked(true);
+    if (!current) {
+      setProfile(null);
+      setUserPackages([]);
+      return;
+    }
+    const [{ data: profileRow }, packagesRes] = await Promise.all([
+      supabase.from("profiles").select("first_name, last_name, phone_number").eq("id", current.id).maybeSingle(),
+      supabase
+        .from("user_packages")
+        .select(`
+          id,
+          remaining_sessions,
+          expires_at,
+          packages (
+            name_en,
+            name_ar,
+            providers (
+              business_name_en,
+              business_name_ar
+            )
+          )
+        `)
+        .eq("customer_id", current.id)
+        .eq("status", "active")
+        .order("expires_at", { ascending: true }),
+    ]);
+    setProfile((profileRow as ProfileRow) ?? null);
+    if (packagesRes.error) {
+      setPackagesError(packagesRes.error.message);
+      setUserPackages([]);
+      return;
+    }
+    setPackagesError("");
+    setUserPackages((packagesRes.data || []).map((item: any) => ({
+      id: item.id,
+      packageName: { en: item.packages?.name_en || "", ar: item.packages?.name_ar || item.packages?.name_en || "" },
+      shopName: {
+        en: item.packages?.providers?.business_name_en || "",
+        ar: item.packages?.providers?.business_name_ar || item.packages?.providers?.business_name_en || ""
+      },
+      remainingSessions: Number(item.remaining_sessions),
+      expiresAt: item.expires_at ? String(item.expires_at).split("T")[0] : ""
+    })));
+  }, []);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => loadAccount(data.user ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      loadAccount(session?.user ?? null);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [loadAccount]);
+
+  const handleSendCode = async () => {
+    const formatted = normalizeSaudiPhone(phone);
+    if (!formatted.startsWith("+9665") || formatted.length !== 13) {
+      showToast(t.invalidPhone, "error");
+      return;
+    }
+    if (!termsAccepted) {
+      showToast(t.termsRequired, "error");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({ phone: formatted, options: { channel: "sms" } });
+      if (error) throw error;
+      setOtpSent(true);
+      showToast(t.codeSent, "info");
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : String(err), "error");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleVerify = async () => {
+    if (otpCode.trim().length !== 6) {
+      showToast(t.invalidCode, "error");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        phone: normalizeSaudiPhone(phone),
+        token: otpCode.trim(),
+        type: "sms",
+      });
+      if (error || !data.user) throw error ?? new Error(t.invalidCode);
+
+      const consents = [
+        { user_id: data.user.id, purpose: "terms_privacy", status: "granted", document_version: "v1.0", method: "mobile_auth_form" },
+      ];
+      if (whatsappConsent) {
+        consents.push({ user_id: data.user.id, purpose: "whatsapp", status: "granted", document_version: "v1.0", method: "mobile_auth_form" });
+      }
+      const { error: consentError } = await supabase.from("consents").insert(consents);
+      if (consentError) throw consentError;
+
+      setOtpCode("");
+      setOtpSent(false);
+      showToast(t.signedIn, "success");
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : String(err), "error");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) showToast(error.message, "error");
+  };
+
+  const fullName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ");
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
@@ -317,204 +269,146 @@ export default function ProfileScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* CLIENT INFO CARD */}
-        <View style={styles.card}>
-          <Text style={[styles.sectionTitle, isRTL && styles.textRight]}>{t.customerDetails}</Text>
-          <View style={styles.cardDivider} />
-          
-          <View style={[styles.infoRow, isRTL && styles.rtlRow]}>
-            <Text style={styles.infoLabel}>{t.nameLabel}</Text>
-            <Text style={styles.infoValue}>فيصل العتيبي / Faisal Al-Otaibi</Text>
-          </View>
-          <View style={[styles.infoRow, isRTL && styles.rtlRow]}>
-            <Text style={styles.infoLabel}>{t.phoneLabel}</Text>
-            <Text style={styles.infoValue}>+966 50 123 4567</Text>
-          </View>
-          <View style={[styles.infoRow, isRTL && styles.rtlRow]}>
-            <Text style={styles.infoLabel}>{t.emailLabel}</Text>
-            <Text style={styles.infoValue}>faisal.otaibi@primora.sa</Text>
-          </View>
-        </View>
+        {!authChecked && <ActivityIndicator style={{ marginTop: 40 }} />}
 
-        {/* LEDGER SPLIT WALLET SECTION */}
-        <View style={[styles.card, styles.walletCard]}>
-          <Text style={[styles.sectionTitle, styles.textWhite, isRTL && styles.textRight]}>{t.walletTitle}</Text>
-          <Text style={[styles.walletDesc, isRTL && styles.textRight]}>{t.walletDesc}</Text>
-          
-          <View style={styles.cardDividerLight} />
-          
-          <View style={[styles.balanceRow, isRTL && styles.rtlRow]}>
-            <Text style={styles.balanceLabel}>{t.balance}</Text>
-            <Text style={styles.balanceValue}>220.00 {t.currency}</Text>
-          </View>
-        </View>
+        {authChecked && !user && (
+          <View style={styles.card}>
+            <Text style={[styles.sectionTitle, isRTL && styles.textRight]}>{t.signInTitle}</Text>
+            <Text style={[styles.walletDesc, { color: "#78716c" }, isRTL && styles.textRight]}>{t.signInDesc}</Text>
+            <View style={styles.cardDivider} />
 
-        {/* ESCROW HOLDINGS LIST */}
-        <View style={styles.card}>
-          <Text style={[styles.sectionTitle, isRTL && styles.textRight]}>{t.escrowListTitle}</Text>
-          <View style={styles.cardDivider} />
+            <Text style={[styles.infoLabel, isRTL && styles.textRight]}>{t.phoneLabel}</Text>
+            <TextInput
+              style={[styles.modalInput, { textAlign: "left" }]}
+              placeholder={t.phonePlaceholder}
+              placeholderTextColor="#a8a29e"
+              keyboardType="phone-pad"
+              autoComplete="tel"
+              editable={!otpSent}
+              value={phone}
+              onChangeText={setPhone}
+            />
 
-          {escrowHoldings.map((hold) => (
-            <View key={hold.id} style={styles.holdRow}>
-              <View style={[styles.holdHeader, isRTL && styles.rtlRow]}>
-                <Text style={styles.holdProvider}>{hold.provider[lang]}</Text>
-                <Text style={styles.holdDate}>{hold.date}</Text>
-              </View>
-
-              <View style={[styles.holdSplits, isRTL && styles.rtlRow]}>
-                <View style={styles.splitCol}>
-                  <Text style={styles.splitLabel}>{t.totalCaptured}</Text>
-                  <Text style={styles.splitValue}>{hold.amount} {t.currency}</Text>
+            {!otpSent && (
+              <>
+                <View style={[styles.infoRow, isRTL && styles.rtlRow]}>
+                  <Text style={[styles.infoLabel, { flex: 1 }, isRTL && styles.textRight]}>{t.terms}</Text>
+                  <Switch value={termsAccepted} onValueChange={setTermsAccepted} />
                 </View>
-                <View style={styles.splitCol}>
-                  <Text style={styles.splitLabel}>{t.providerShare}</Text>
-                  <Text style={styles.splitValue}>{hold.providerPayout} {t.currency}</Text>
+                <View style={[styles.infoRow, isRTL && styles.rtlRow]}>
+                  <Text style={[styles.infoLabel, { flex: 1 }, isRTL && styles.textRight]}>{t.whatsapp}</Text>
+                  <Switch value={whatsappConsent} onValueChange={setWhatsappConsent} />
                 </View>
-                <View style={styles.splitCol}>
-                  <Text style={styles.splitLabel}>{t.platformShare}</Text>
-                  <Text style={styles.splitValue}>{hold.platformFee} {t.currency}</Text>
-                </View>
-              </View>
+                <TouchableOpacity style={styles.modalBtnConfirm} disabled={busy} onPress={handleSendCode}>
+                  {busy ? <ActivityIndicator color="#fff" /> : <Text style={styles.modalBtnConfirmLabel}>{t.sendCode}</Text>}
+                </TouchableOpacity>
+              </>
+            )}
 
-              <View style={[
-                styles.holdStatusContainer,
-                isRTL && styles.rtlRow
-              ]}>
-                <View style={[
-                  styles.statusDot,
-                  hold.status === "released" && styles.statusDotReleased
-                ]} />
-                <Text style={[
-                  styles.holdStatusText,
-                  hold.status === "released" && styles.holdStatusTextReleased
-                ]}>
-                  {hold.status === "held" ? t.statusHeld : t.statusReleased}
-                </Text>
-              </View>
-
-              <View style={styles.holdDivider} />
-            </View>
-          ))}
-        </View>
-
-        {/* WELLNESS PACKAGES & PASSES SECTION */}
-        <View style={styles.card}>
-          <Text style={[styles.sectionTitle, isRTL && styles.textRight]}>{t.packagesTitle}</Text>
-          <View style={styles.cardDivider} />
-          
-          <View style={styles.packagesList}>
-            {userPackages.map((pkg) => (
-              <View key={pkg.id} style={styles.packageItem}>
-                <View style={[styles.packageHeader, isRTL && styles.rtlRow]}>
-                  <View style={styles.pkgInfoCol}>
-                    <Text style={[styles.pkgName, isRTL && styles.textRight]}>{pkg.packageName[lang]}</Text>
-                    <Text style={[styles.pkgShop, isRTL && styles.textRight]}>{pkg.shopName[lang]}</Text>
-                  </View>
-                  <Text style={styles.pkgSessionsCount}>
-                    {pkg.remainingSessions} {t.sessionsLeft}
-                  </Text>
+            {otpSent && (
+              <>
+                <Text style={[styles.infoLabel, isRTL && styles.textRight]}>{t.codeLabel}</Text>
+                <TextInput
+                  style={[styles.modalInput, { textAlign: "center", letterSpacing: 6 }]}
+                  keyboardType="number-pad"
+                  autoComplete="one-time-code"
+                  maxLength={6}
+                  value={otpCode}
+                  onChangeText={(v) => setOtpCode(v.replace(/\D/g, ""))}
+                />
+                <View style={[styles.modalActionRow, isRTL && styles.rtlRow]}>
+                  <TouchableOpacity style={styles.modalBtnCancel} disabled={busy} onPress={() => { setOtpSent(false); setOtpCode(""); }}>
+                    <Text style={styles.modalBtnCancelLabel}>{t.changeNumber}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.modalBtnConfirm} disabled={busy} onPress={handleVerify}>
+                    {busy ? <ActivityIndicator color="#fff" /> : <Text style={styles.modalBtnConfirmLabel}>{t.verify}</Text>}
+                  </TouchableOpacity>
                 </View>
-                
-                <View style={[styles.packageFooter, isRTL && styles.rtlRow]}>
-                  <Text style={styles.pkgExpiry}>
-                    {t.expires} {pkg.expiresAt}
-                  </Text>
-                  
-                  {pkg.remainingSessions > 0 ? (
-                    <TouchableOpacity 
-                      style={styles.btnRedeem} 
-                      onPress={() => handleRedeemSession(pkg.id)}
-                    >
-                      <Text style={styles.btnRedeemText}>{t.redeemBtn}</Text>
-                    </TouchableOpacity>
-                  ) : (
-                    <View style={styles.consumedBadge}>
-                      <Text style={styles.consumedText}>{t.fullyConsumed}</Text>
-                    </View>
-                  )}
-                </View>
-                <View style={styles.pkgDivider} />
-              </View>
-            ))}
-            {userPackages.length === 0 && (
-              <Text style={[styles.emptyPkgText, isRTL && styles.textRight]}>
-                {t.emptyPackages}
-              </Text>
+              </>
             )}
           </View>
-        </View>
+        )}
 
-        {/* SAVED CARDS SECTION */}
-        <View style={styles.card}>
-          <View style={[styles.sectionHeaderRow, isRTL && styles.rtlRow]}>
-            <Text style={styles.sectionTitle}>{t.savedCardsTitle}</Text>
-            <TouchableOpacity style={styles.btnAddCard} onPress={() => setShowAddCard(true)}>
-              <Text style={styles.btnAddCardText}>+ {t.addCard}</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.cardDivider} />
-
-          <View style={styles.cardsList}>
-            {savedCards.map((card) => (
-              <View key={card.id} style={styles.cardItem}>
-                <View style={[styles.cardItemTop, isRTL && styles.rtlRow]}>
-                  <Text style={styles.cardBrand}>{card.brand.toUpperCase()}</Text>
-                  <Text style={styles.cardExpiry}>{card.expiry}</Text>
-                </View>
-                <Text style={[styles.cardNumber, isRTL && styles.textRight]}>•••• •••• •••• {card.last4}</Text>
-                <Text style={[styles.cardHolder, isRTL && styles.textRight]}>{card.holder}</Text>
+        {user && (
+          <>
+            {/* CLIENT INFO CARD */}
+            <View style={styles.card}>
+              <View style={[styles.sectionHeaderRow, isRTL && styles.rtlRow]}>
+                <Text style={styles.sectionTitle}>{t.customerDetails}</Text>
+                <TouchableOpacity style={styles.btnAddCard} onPress={handleSignOut}>
+                  <Text style={styles.btnAddCardText}>{t.signOut}</Text>
+                </TouchableOpacity>
               </View>
-            ))}
-          </View>
-        </View>
-      </ScrollView>
+              <View style={styles.cardDivider} />
 
-      {/* ADD CARD MODAL */}
-      {showAddCard && (
-        <Modal transparent animationType="fade" visible={showAddCard}>
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{t.addCard}</Text>
-
-              <TextInput
-                style={[styles.modalInput, isRTL && styles.textRight]}
-                placeholder={t.cardPlaceholder}
-                placeholderTextColor="#a8a29e"
-                keyboardType="numeric"
-                maxLength={16}
-                value={newCardNumber}
-                onChangeText={setNewCardNumber}
-              />
-
-              <TextInput
-                style={[styles.modalInput, isRTL && styles.textRight]}
-                placeholder={t.holderPlaceholder}
-                placeholderTextColor="#a8a29e"
-                value={newCardHolder}
-                onChangeText={setNewCardHolder}
-              />
-
-              <TextInput
-                style={[styles.modalInput, isRTL && styles.textRight]}
-                placeholder={t.expiryPlaceholder}
-                placeholderTextColor="#a8a29e"
-                maxLength={5}
-                value={newCardExpiry}
-                onChangeText={setNewCardExpiry}
-              />
-
-              <View style={styles.modalActionRow}>
-                <TouchableOpacity style={styles.modalBtnCancel} onPress={() => setShowAddCard(false)}>
-                  <Text style={styles.modalBtnCancelLabel}>{t.close}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.modalBtnConfirm} onPress={handleAddCard}>
-                  <Text style={styles.modalBtnConfirmLabel}>{t.save}</Text>
-                </TouchableOpacity>
+              <View style={[styles.infoRow, isRTL && styles.rtlRow]}>
+                <Text style={styles.infoLabel}>{t.nameLabel}</Text>
+                <Text style={styles.infoValue}>{fullName || t.notSet}</Text>
+              </View>
+              <View style={[styles.infoRow, isRTL && styles.rtlRow]}>
+                <Text style={styles.infoLabel}>{t.phoneLabel}</Text>
+                <Text style={styles.infoValue}>{profile?.phone_number || user.phone || t.notSet}</Text>
+              </View>
+              <View style={[styles.infoRow, isRTL && styles.rtlRow]}>
+                <Text style={styles.infoLabel}>{t.emailLabel}</Text>
+                <Text style={styles.infoValue}>{user.email || t.notSet}</Text>
               </View>
             </View>
-          </View>
-        </Modal>
-      )}
+
+            {/* PAYMENTS */}
+            <View style={[styles.card, styles.walletCard]}>
+              <Text style={[styles.sectionTitle, styles.textWhite, isRTL && styles.textRight]}>{t.paymentsTitle}</Text>
+              <Text style={[styles.walletDesc, isRTL && styles.textRight]}>{t.paymentsDesc}</Text>
+            </View>
+
+            {/* PACKAGES & PASSES (read-only; staff redeem sessions at the visit) */}
+            <View style={styles.card}>
+              <Text style={[styles.sectionTitle, isRTL && styles.textRight]}>{t.packagesTitle}</Text>
+              <View style={styles.cardDivider} />
+
+              <View style={styles.packagesList}>
+                {packagesError !== "" && (
+                  <Text style={[styles.emptyPkgText, isRTL && styles.textRight]}>{t.packagesFailed}: {packagesError}</Text>
+                )}
+                {userPackages.map((pkg) => (
+                  <View key={pkg.id} style={styles.packageItem}>
+                    <View style={[styles.packageHeader, isRTL && styles.rtlRow]}>
+                      <View style={styles.pkgInfoCol}>
+                        <Text style={[styles.pkgName, isRTL && styles.textRight]}>{pkg.packageName[lang]}</Text>
+                        <Text style={[styles.pkgShop, isRTL && styles.textRight]}>{pkg.shopName[lang]}</Text>
+                      </View>
+                      <Text style={styles.pkgSessionsCount}>
+                        {pkg.remainingSessions} {t.sessionsLeft}
+                      </Text>
+                    </View>
+
+                    <View style={[styles.packageFooter, isRTL && styles.rtlRow]}>
+                      <Text style={styles.pkgExpiry}>
+                        {t.expires} {pkg.expiresAt}
+                      </Text>
+                      {pkg.remainingSessions <= 0 && (
+                        <View style={styles.consumedBadge}>
+                          <Text style={styles.consumedText}>{t.fullyConsumed}</Text>
+                        </View>
+                      )}
+                    </View>
+                    {pkg.remainingSessions > 0 && (
+                      <Text style={[styles.pkgShop, isRTL && styles.textRight]}>{t.redeemNote}</Text>
+                    )}
+                    <View style={styles.pkgDivider} />
+                  </View>
+                ))}
+                {packagesError === "" && userPackages.length === 0 && (
+                  <Text style={[styles.emptyPkgText, isRTL && styles.textRight]}>
+                    {t.emptyPackages}
+                  </Text>
+                )}
+              </View>
+            </View>
+          </>
+        )}
+      </ScrollView>
+
       {/* Toast Overlay */}
       <Toast
         message={toastMessage}

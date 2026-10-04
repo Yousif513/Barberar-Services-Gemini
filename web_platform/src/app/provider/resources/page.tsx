@@ -21,7 +21,7 @@ const translations = {
     successAdd: "Resource registered successfully!",
     errorName: "Please specify a resource name.",
     errorBranch: "No branch found. Please verify your provider account settings.",
-    errorLoad: "Failed to load resources. Showing mock fallbacks.",
+    errorLoad: "Failed to load resources.",
     people: "people",
     person: "person",
     capacityText: "Max Capacity:"
@@ -43,7 +43,7 @@ const translations = {
     successAdd: "تم تسجيل المورد بنجاح!",
     errorName: "يرجى تحديد اسم المورد.",
     errorBranch: "لم يتم العثور على فرع. يرجى مراجعة إعدادات مزود الخدمة.",
-    errorLoad: "فشل تحميل الموارد. يتم عرض بيانات محاكاة.",
+    errorLoad: "فشل تحميل الموارد.",
     people: "أشخاص",
     person: "شخص واحد",
     capacityText: "الحد الأقصى للسعة:"
@@ -131,38 +131,8 @@ export default function ResourcesPage() {
       }
     } catch (err: any) {
       console.error("Error loading resources:", err.message);
-      setError(t.errorLoad);
-      // Fallback mock items
-      setResources([
-        {
-          id: "1",
-          name: locale === "ar" ? "سرير مساج زن أ" : "Zen Massage Bed A",
-          category: "Massage Room",
-          capacity: 1,
-          is_active: true
-        },
-        {
-          id: "2",
-          name: locale === "ar" ? "غرفة الساونا الملكية" : "Royal Spa Room",
-          category: "Sauna",
-          capacity: 4,
-          is_active: true
-        },
-        {
-          id: "3",
-          name: locale === "ar" ? "طاولة حمام مغربي" : "Hammam Scrub Table",
-          category: "Massage Room",
-          capacity: 1,
-          is_active: true
-        },
-        {
-          id: "4",
-          name: locale === "ar" ? "محطة العناية بالبشرة 1" : "Facial Care Station 1",
-          category: "Facial Room",
-          capacity: 2,
-          is_active: true
-        }
-      ]);
+      setResources([]);
+      setError(`${t.errorLoad} ${err?.message || ""}`.trim());
     } finally {
       setLoading(false);
     }

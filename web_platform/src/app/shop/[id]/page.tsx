@@ -72,6 +72,7 @@ const translations = {
     strikePrepaymentWarning: "Policy Notice: Due to 3 or more previous no-shows, 100% upfront prepayment is required for this appointment.",
     prayerPauseNotice: "Riyadh Prayer Breaks (25-min congregational prayer pauses)",
     favoriteBtn: "Save to Favorites",
+    messageBtn: "Message",
     favoritedBtn: "Favorited",
   },
   ar: {
@@ -136,6 +137,7 @@ const translations = {
     strikePrepaymentWarning: "تنبيه السياسة: نظراً لتسجيل 3 حالات عدم حضور سابقة، يلزم دفع كامل المبلغ (100%) مقدماً لتأكيد الحجز.",
     prayerPauseNotice: "أوقات الصلاة بالرياض (توقف مؤقت 25 دقيقة أثناء أداء صلاة الجماعة)",
     favoriteBtn: "حفظ في المفضلة",
+    messageBtn: "مراسلة",
     favoritedBtn: "محفوظ في المفضلة",
   }
 };
@@ -596,6 +598,31 @@ export default function ShopDetailsPage() {
       console.warn("Toggle favorite error:", err);
     } finally {
       setFavoriteLoading(false);
+    }
+  };
+
+  // Opens (or reuses) this customer's single conversation with the provider, then goes to the inbox.
+  const handleMessageShop = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setShowAuthModal(true);
+        return;
+      }
+      const { data: existing, error: findError } = await supabase
+        .from("conversations").select("id").eq("customer_id", user.id).eq("provider_id", shopId).maybeSingle();
+      if (findError) throw findError;
+      if (!existing) {
+        const { error } = await supabase.from("conversations").insert({
+          customer_id: user.id,
+          provider_id: shopId,
+          subject: shop?.name[locale] || null,
+        });
+        if (error) throw error;
+      }
+      router.push("/customer/messages");
+    } catch (err: unknown) {
+      addToast(err instanceof Error ? err.message : String(err), "error");
     }
   };
 
@@ -1243,6 +1270,13 @@ export default function ShopDetailsPage() {
                   />
                 </svg>
                 <span>{isFavorited ? t.favoritedBtn : t.favoriteBtn}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleMessageShop}
+                className="inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full border transition backdrop-blur-md bg-white/10 text-stone-200 border-white/20 hover:bg-white/20"
+              >
+                {t.messageBtn}
               </button>
             </div>
             <h1 className="text-3xl sm:text-5xl font-serif font-black tracking-tight leading-tight">
