@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 type BookingDetail = {
@@ -45,7 +45,9 @@ const translations = {
     subtitle: "Thank you for choosing Primora. Your appointment details are saved below.",
     loading: "Fetching booking details...",
     notFound: "Booking not found",
-    fallbackWarning: "Displaying simulated booking confirmation.",
+    loadFailed: "We could not load this booking right now. Your booking is not affected; check My Bookings or try again.",
+    titlePending: "Awaiting Payment",
+    subtitlePending: "Your time is held. Complete the payment to confirm the appointment.",
     serviceLabel: "Service",
     venueLabel: "Venue & Shop",
     specialistLabel: "Specialist",
@@ -78,7 +80,9 @@ const translations = {
     subtitle: "شكراً لاختيارك بريمورا. تفاصيل موعدك محفوظة أدناه.",
     loading: "جاري تحميل تفاصيل الحجز...",
     notFound: "لم يتم العثور على الحجز",
-    fallbackWarning: "عرض تأكيد حجز تجريبي/محاكى.",
+    loadFailed: "تعذر تحميل هذا الحجز الآن. حجزك لم يتأثر؛ راجع حجوزاتي أو حاول مرة أخرى.",
+    titlePending: "بانتظار الدفع",
+    subtitlePending: "تم حجز الموعد مؤقتاً. أكمل الدفع لتأكيد الموعد.",
     serviceLabel: "الخدمة",
     venueLabel: "الموقع والمتجر",
     specialistLabel: "الأخصائي",
@@ -110,17 +114,15 @@ const translations = {
 
 export default function BookingConfirmationPage() {
   const params = useParams();
-  const searchParams = useSearchParams();
   const router = useRouter();
   const bookingId = params?.id as string;
-  const statusParam = searchParams.get("status");
 
   const [locale, setLocale] = useState<"en" | "ar">("en");
   const t = translations[locale];
 
   const [booking, setBooking] = useState<BookingDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isFallback, setIsFallback] = useState(false);
+  const [loadError, setLoadError] = useState("");
 
   // Synchronize language with HTML element attribute
   useEffect(() => {
@@ -173,51 +175,16 @@ export default function BookingConfirmationPage() {
         }
 
         setBooking(data as any);
-        setIsFallback(false);
+        setLoadError("");
       } catch (err) {
-        console.warn("Could not load live booking from DB. Displaying premium mock fallback.", err);
-        // Premium fallback mock data
-        const mockBooking: BookingDetail = {
-          id: bookingId || "bk-mock-789",
-          status: statusParam === "pending_payment" ? "pending_payment" : "confirmed",
-          scheduled_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
-          duration_minutes: 45,
-          total_price: 150.00,
-          deposit_required: 22.50,
-          is_home_service: false,
-          services: {
-            id: "s-mock-1",
-            name_en: "Classic Luxury Haircut & Style",
-            name_ar: "قصة شعر كلاسيكية فاخرة وتصفيف",
-            base_price: 150.00,
-            base_duration_minutes: 45
-          },
-          employees: {
-            id: "e-mock-1",
-            name_en: "Mustafa Al-Alami",
-            name_ar: "مصطفى العلمي"
-          },
-          branches: {
-            id: "b-mock-1",
-            name_en: "Elite Grooming Lounge - Branch 1",
-            name_ar: "صالون النخبة للعناية - الفرع الأول",
-            address_text_en: "Al-Malqa District, Riyadh",
-            address_text_ar: "حي الملقا، الرياض",
-            providers: {
-              id: "p-mock-1",
-              business_name_en: "Elite Grooming Co.",
-              business_name_ar: "شركة النخبة للحلاقة"
-            }
-          }
-        };
-        setBooking(mockBooking);
-        setIsFallback(true);
+        setBooking(null);
+        setLoadError(err instanceof Error ? err.message : String(err));
       } finally {
         setIsLoading(false);
       }
     }
     loadBooking();
-  }, [bookingId, statusParam]);
+  }, [bookingId]);
 
   const downloadICS = () => {
     if (!booking) return;
@@ -296,6 +263,7 @@ export default function BookingConfirmationPage() {
       <div className="min-h-screen bg-[#FBFAF9] flex items-center justify-center p-6">
         <div className="text-center space-y-4 max-w-md">
           <h2 className="font-serif text-2xl font-black text-[#211A12]">{t.notFound}</h2>
+          {loadError && <p className="text-xs text-[#8A7F6C]">{t.loadFailed} ({loadError})</p>}
           <Link href="/" className="inline-block bg-[#211A12] text-white text-xs font-bold px-6 py-3 rounded-xl transition hover:bg-black">
             {t.backHome}
           </Link>
@@ -310,7 +278,8 @@ export default function BookingConfirmationPage() {
   const balance = total - deposit;
   const vatIncluded = total * 15 / 115; // 15% VAT KSA rollup
 
-  const isPaid = booking.status !== "pending_payment" && statusParam !== "pending_payment";
+  // The database is the source of truth; the ?status= hint can be stale once the payment webhook lands.
+  const isPaid = booking.status !== "pending_payment";
 
   return (
     <div className="min-h-screen bg-[#FBFAF9] text-[#211A12] py-10 px-4 flex justify-center font-sans antialiased" dir={isRTL ? "rtl" : "ltr"}>
@@ -323,17 +292,9 @@ export default function BookingConfirmationPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
             </svg>
           </div>
-          <h1 className="font-serif text-3xl font-black tracking-tight text-[#15100A]">{t.title}</h1>
-          <p className="text-xs text-[#8A7F6C] font-semibold leading-relaxed px-4">{t.subtitle}</p>
+          <h1 className="font-serif text-3xl font-black tracking-tight text-[#15100A]">{isPaid ? t.title : t.titlePending}</h1>
+          <p className="text-xs text-[#8A7F6C] font-semibold leading-relaxed px-4">{isPaid ? t.subtitle : t.subtitlePending}</p>
         </div>
-
-        {/* FALLBACK BADGE */}
-        {isFallback && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50/50 px-3.5 py-2.5 text-center flex items-center justify-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
-            <span className="text-[10px] font-bold text-amber-800 leading-none">{t.fallbackWarning}</span>
-          </div>
-        )}
 
         {/* RECEIPT SUMMARY CARD */}
         <div className="bg-white border border-[#211A12]/8 rounded-2xl p-5 shadow-sm space-y-5">

@@ -16,7 +16,6 @@ const translations = {
     resources: "Rooms & Resources",
     packages: "Wellness Packages",
     jobs: "Find Job Leads",
-    deliveries: "Logistics Board",
     customers: "Customers",
     reviews: "Reviews",
     promotions: "Promotions",
@@ -38,7 +37,6 @@ const translations = {
     resources: "الغرف والموارد",
     packages: "باقات العافية",
     jobs: "فرص العمل المتاحة",
-    deliveries: "لوحة اللوجستيات والشحن",
     messages: "الرسائل",
     customers: "العملاء",
     reviews: "التقييمات",
@@ -101,14 +99,6 @@ const getNavIcon = (path: string) => {
     return (
       <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-      </svg>
-    );
-  }
-  if (path.includes("deliveries")) {
-    return (
-      <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414" />
       </svg>
     );
   }
@@ -175,8 +165,8 @@ const getNavIcon = (path: string) => {
   );
 };
 
-// Separator indices: after "deliveries" (index 7) and after "customers" (index 11)
-const separatorAfterIndices = [7, 11];
+// Separator indices: after "jobs" (index 6) and after "customers" (index 10)
+const separatorAfterIndices = [6, 10];
 
 export default function ProviderLayout({
   children,
@@ -213,7 +203,6 @@ export default function ProviderLayout({
     { name: t.resources, path: "/provider/resources" },
     { name: t.packages, path: "/provider/packages" },
     { name: t.jobs, path: "/provider/jobs" },
-    { name: t.deliveries, path: "/provider/deliveries" },
     { name: t.wallet, path: "/provider/wallet" },
     { name: t.messages, path: "/provider/messages" },
     { name: t.employees, path: "/provider/employees" },

@@ -8,6 +8,9 @@ import { supabase } from "@/lib/supabase";
 // imagery per category when a service has no photos of its own.
 type FeaturedRow = {
   id: string;
+  provider_id: string;
+  rating: number | null;
+  reviews: number;
   name_en: string;
   name_ar: string;
   base_price: number;
@@ -28,8 +31,7 @@ const CATEGORY_FALLBACK_IMAGE: Record<string, string> = {
 
 const translations = {
   en: {
-    promoText: "Book Premier Home Service & Salon Appointments in Riyadh",
-    promoSub: "Get 15% off your first booking - Use code:",
+    promoText: "Book verified beauty & grooming salons across Saudi Arabia",
     home: "Home",
     discover: "Services",
     serviceBoard: "Service Board",
@@ -82,8 +84,7 @@ const translations = {
     allRightsReserved: "All rights reserved. Built for Riyadh, Saudi Arabia."
   },
   ar: {
-    promoText: "احجز أفضل خدمات التجميل والعناية المنزلية والصالونات بالرياض",
-    promoSub: "احصل على خصم 15% على حجزك الأول - استخدم الرمز:",
+    promoText: "احجز لدى صالونات تجميل وعناية موثقة في أنحاء المملكة",
     home: "الرئيسية",
     discover: "الخدمات",
     serviceBoard: "لوحة الخدمات",
@@ -186,102 +187,56 @@ export default function Home() {
     }
   ];
 
-  // Featured services — pulled live from the admin catalog. The hardcoded
-  // list below is only the graceful fallback when nothing is featured yet
-  // or the database is unreachable.
+  // Featured services, pulled live from the admin catalog. When nothing is featured
+  // (or the catalog cannot be read) the rail is hidden rather than filled with samples.
   const [featuredRows, setFeaturedRows] = useState<FeaturedRow[]>([]);
 
   useEffect(() => {
     (async () => {
-      try {
-        const { data } = await supabase
-          .from("services")
-          .select("id, name_en, name_ar, base_price, images, sort_order, categories(slug, name_en, name_ar)")
-          .eq("featured_on_landing", true)
-          .eq("is_active", true)
-          .order("sort_order")
-          .limit(5);
-        if (data?.length) {
-          setFeaturedRows(data.map((r) => {
-            const cat = r.categories as unknown as { slug?: string; name_en?: string; name_ar?: string } | null;
-            return {
-              id: r.id,
-              name_en: r.name_en,
-              name_ar: r.name_ar,
-              base_price: Number(r.base_price),
-              images: Array.isArray(r.images) ? r.images : [],
-              category_slug: cat?.slug ?? "",
-              category_en: cat?.name_en ?? "PRIMORA",
-              category_ar: cat?.name_ar ?? "بريمورا",
-            };
-          }));
-        }
-      } catch (err) {
-        console.warn("Landing featured rail using fallback data:", err);
-      }
+      const { data, error } = await supabase
+        .from("services")
+        .select("id, provider_id, name_en, name_ar, base_price, images, sort_order, categories(slug, name_en, name_ar)")
+        .eq("featured_on_landing", true)
+        .eq("is_active", true)
+        .order("sort_order")
+        .limit(5);
+      if (error || !data?.length) return;
+      const providerIds = [...new Set(data.map((r) => r.provider_id))];
+      const { data: reviewRows } = await supabase
+        .from("reviews")
+        .select("provider_id, rating, moderation_status")
+        .in("provider_id", providerIds);
+      const published = (reviewRows || []).filter((r) => (r.moderation_status || "published") === "published");
+      setFeaturedRows(data.map((r) => {
+        const cat = r.categories as unknown as { slug?: string; name_en?: string; name_ar?: string } | null;
+        const own = published.filter((rev) => rev.provider_id === r.provider_id);
+        return {
+          id: r.id,
+          provider_id: r.provider_id,
+          rating: own.length ? Math.round((own.reduce((sum, rev) => sum + Number(rev.rating), 0) / own.length) * 10) / 10 : null,
+          reviews: own.length,
+          name_en: r.name_en,
+          name_ar: r.name_ar,
+          base_price: Number(r.base_price),
+          images: Array.isArray(r.images) ? r.images : [],
+          category_slug: cat?.slug ?? "",
+          category_en: cat?.name_en ?? "",
+          category_ar: cat?.name_ar ?? "",
+        };
+      }));
     })();
   }, []);
 
-  const bestSellers = useMemo(() => {
-    if (featuredRows.length) {
-      return featuredRows.map((r, i) => ({
-        id: r.id,
-        name: locale === "ar" ? r.name_ar : r.name_en,
-        category: locale === "ar" ? r.category_ar : r.category_en,
-        rating: (4.7 + ((i % 3) * 0.1)).toFixed(1),
-        reviews: String(58 + i * 17),
-        price: `${r.base_price} SAR`,
-        image: r.images[0] ?? CATEGORY_FALLBACK_IMAGE[r.category_slug] ?? CATEGORY_FALLBACK_IMAGE["signature-packages"],
-      }));
-    }
-    return [
-      {
-        id: "1",
-        name: locale === "ar" ? "صالون إيليت الرجالي" : "Elite Grooming Lounge",
-        category: locale === "ar" ? "صالون حلاقة" : "Barbershop",
-        rating: "4.9",
-        reviews: "128",
-        price: "120 SAR",
-        image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=400&auto=format&fit=crop"
-      },
-      {
-        id: "2",
-        name: locale === "ar" ? "صالون وسبا سارة للتجميل" : "Sara Beauty Salon & Spa",
-        category: locale === "ar" ? "صالون وسبا نسائي" : "Luxury Spa",
-        rating: "4.8",
-        reviews: "96",
-        price: "250 SAR",
-        image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=400&auto=format&fit=crop"
-      },
-      {
-        id: "3",
-        name: locale === "ar" ? "منتجع الرياض الصحي" : "Riyadh Wellness Retreat",
-        category: locale === "ar" ? "مساج وعلاج" : "Therapies & Massage",
-        rating: "4.9",
-        reviews: "74",
-        price: "300 SAR",
-        image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=400&auto=format&fit=crop"
-      },
-      {
-        id: "4",
-        name: locale === "ar" ? "صالون الحلاقة والسبا الفاخر" : "The Barberia & Spa",
-        category: locale === "ar" ? "خدمات مدمجة" : "Grooming Combo",
-        rating: "4.7",
-        reviews: "58",
-        price: "180 SAR",
-        image: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=400&auto=format&fit=crop"
-      },
-      {
-        id: "5",
-        name: locale === "ar" ? "استوديو لوميير للتوهج" : "Lumière Glow Studio",
-        category: locale === "ar" ? "عناية بالبشرة" : "Facials & Skincare",
-        rating: "4.9",
-        reviews: "110",
-        price: "150 SAR",
-        image: "https://images.unsplash.com/photo-1590439471364-192aa70c0b53?q=80&w=400&auto=format&fit=crop"
-      }
-    ];
-  }, [featuredRows, locale]);
+  const bestSellers = useMemo(() => featuredRows.map((r) => ({
+    id: r.id,
+    href: `/shop/${r.provider_id}`,
+    name: locale === "ar" ? r.name_ar : r.name_en,
+    category: locale === "ar" ? r.category_ar : r.category_en,
+    rating: r.rating,
+    reviews: r.reviews,
+    price: `${r.base_price} ${locale === "ar" ? "ر.س" : "SAR"}`,
+    image: r.images[0] ?? CATEGORY_FALLBACK_IMAGE[r.category_slug] ?? CATEGORY_FALLBACK_IMAGE["signature-packages"],
+  })), [featuredRows, locale]);
 
   return (
     <div className="min-h-screen bg-[#F7F3EA] text-[#15120D] flex flex-col font-sans antialiased selection:bg-[#D1AF47] selection:text-white">
@@ -289,8 +244,6 @@ export default function Home() {
       {/* 1. TOP PROMO BAR */}
       <div className="w-full bg-[#10120F] border-b border-[#D1AF47]/30 py-2.5 px-4 text-center text-[10px] sm:text-xs font-semibold tracking-wider text-[#F4E7B6] uppercase flex items-center justify-center gap-4">
         <span>{t.promoText}</span>
-        <span className="hidden md:inline text-[#D1AF47]/40">|</span>
-        <span className="hidden md:inline">{t.promoSub} <strong className="text-white font-bold">PRIMORA15</strong></span>
       </div>
 
       {/* 2. HEADER */}
@@ -535,6 +488,11 @@ export default function Home() {
           </div>
 
           {/* Cards Grid */}
+          {bestSellers.length === 0 && (
+            <p className="text-sm text-[#746B5D]">
+              {locale === "ar" ? "ستظهر هنا الخدمات المميزة عند إضافتها." : "Featured services will appear here once they are added."}
+            </p>
+          )}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
             {bestSellers.map((item) => (
               <div key={item.id} className="flex flex-col justify-between bg-white/90 border border-[#D8C99F]/55 rounded-[24px] overflow-hidden shadow-[0_16px_36px_rgba(21,18,13,0.07)] hover:shadow-[0_20px_46px_rgba(21,18,13,0.11)] transition-shadow duration-300 group p-3 relative">
@@ -560,7 +518,7 @@ export default function Home() {
                       <svg className="w-3.5 h-3.5 text-[#D1AF47] fill-current" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
-                      <span className="text-[10px] font-bold text-[#5F584D]">{item.rating} <span className="text-[#9C8C69] font-normal">({item.reviews})</span></span>
+                      <span className="text-[10px] font-bold text-[#5F584D]">{item.rating !== null ? <>{item.rating} <span className="text-[#9C8C69] font-normal">({item.reviews})</span></> : (locale === "ar" ? "جديد" : "New")}</span>
                     </div>
 
                     <h4 className="font-bold text-[#10120F] text-xs sm:text-sm mt-1 group-hover:text-[#B8952E] transition-colors line-clamp-1">{item.name}</h4>
@@ -571,7 +529,7 @@ export default function Home() {
                   <div className="flex items-center justify-between pt-3 border-t border-[#EFE6D1] mt-2">
                     <span className="text-xs font-extrabold text-[#10120F]">{item.price}</span>
                     <Link 
-                      href={`/customer/book?id=${item.id}`} 
+                      href={item.href}
                       className="w-8 h-8 rounded-full bg-[#10120F] hover:bg-[#B8952E] text-[#F7F3EA] flex items-center justify-center transition shadow-sm"
                     >
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

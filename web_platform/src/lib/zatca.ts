@@ -44,7 +44,7 @@ export function generateZatcaTlvQr(
     return buf;
   };
 
-  try {
+  {
     const tlv1 = encodeTlv(1, sellerName);
     const tlv2 = encodeTlv(2, vatNumber);
     const tlv3 = encodeTlv(3, timestamp);
@@ -67,10 +67,8 @@ export function generateZatcaTlvQr(
     for (let i = 0; i < len; i++) {
       binary += String.fromCharCode(combined[i]);
     }
+    // An encoding failure propagates: a tax invoice must never carry a placeholder QR.
     return btoa(binary);
-  } catch (e) {
-    console.error("TLV Encoding failed, returning mock string:", e);
-    return "MOCK_ZATCA_QR_BASE64_TLV_STRING_=";
   }
 }
 

@@ -56,51 +56,14 @@ const translations = {
   }
 };
 
-const generateZatcaQrBase64 = (seller: string, vatNo: string, timeStr: string, totalStr: string, vatStr: string) => {
-  try {
-    const encodeTlv = (tag: number, val: string) => {
-      const encoder = new TextEncoder();
-      const valBytes = encoder.encode(val);
-      const tagByte = tag;
-      const lenByte = valBytes.length;
-      
-      const bytes = new Uint8Array(2 + valBytes.length);
-      bytes[0] = tagByte;
-      bytes[1] = lenByte;
-      bytes.set(valBytes, 2);
-      return bytes;
-    };
-    
-    const t1 = encodeTlv(1, seller);
-    const t2 = encodeTlv(2, vatNo);
-    const t3 = encodeTlv(3, timeStr);
-    const t4 = encodeTlv(4, totalStr);
-    const t5 = encodeTlv(5, vatStr);
-    
-    const totalLength = t1.length + t2.length + t3.length + t4.length + t5.length;
-    const merged = new Uint8Array(totalLength);
-    let offset = 0;
-    [t1, t2, t3, t4, t5].forEach(t => {
-      merged.set(t, offset);
-      offset += t.length;
-    });
-    
-    let binary = "";
-    for (let i = 0; i < merged.length; i++) {
-      binary += String.fromCharCode(merged[i]);
-    }
-    return btoa(binary);
-  } catch (err) {
-    console.error("ZATCA QR Generation error:", err);
-    return "";
-  }
-};
-
 export default function AdminBookings() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [lang, setLang] = useState<"en" | "ar">("ar");
   const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
+  const [storedInvoice, setStoredInvoice] = useState<any | null>(null);
+  const [invoiceLoading, setInvoiceLoading] = useState(false);
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
     const checkLang = () => {
@@ -138,46 +101,14 @@ export default function AdminBookings() {
             customer:profiles( first_name, last_name ),
             branches( name_en, name_ar, providers( business_name_en, business_name_ar ) )
           `)
-          .order("scheduled_at", { ascending: false });
+          .order("scheduled_at", { ascending: false })
+          .limit(500);
 
-        if (data && data.length > 0) {
-          setBookings(data);
-        } else {
-          setBookings([
-            {
-              id: "b-mock-1",
-              scheduled_at: new Date(Date.now() + 86400000).toISOString(),
-              status: "confirmed",
-              total_price: 120.00,
-              platform_commission: 18.00,
-              tax_amount: 15.65,
-              customer: { first_name: "يوسف", last_name: "الكمبيوتر" },
-              branches: { name_en: "Al-Malqa Branch", name_ar: "فرع الملقا", providers: { business_name_en: "Elite Barber Lounge", business_name_ar: "صالون إيليت الرجالي" } }
-            },
-            {
-              id: "b-mock-2",
-              scheduled_at: new Date(Date.now() - 86400000).toISOString(),
-              status: "completed",
-              total_price: 250.00,
-              platform_commission: 37.50,
-              tax_amount: 32.60,
-              customer: { first_name: "سارة", last_name: "آل سعود" },
-              branches: { name_en: "Olaya Spa", name_ar: "سبا العليا", providers: { business_name_en: "Sara Beauty Salon", business_name_ar: "صالون وسبا سارة للتجميل" } }
-            },
-            {
-              id: "b-mock-3",
-              scheduled_at: new Date(Date.now() - 172800000).toISOString(),
-              status: "pending_payment",
-              total_price: 300.00,
-              platform_commission: 45.00,
-              tax_amount: 39.13,
-              customer: { first_name: "محمد", last_name: "العتيبي" },
-              branches: { name_en: "Al-Yasmin Resort", name_ar: "منتجع الياسمين الصحي", providers: { business_name_en: "Riyadh Premium Spa", business_name_ar: "سبا الرياض الفاخر للعناية" } }
-            }
-          ]);
-        }
+        if (error) throw error;
+        setBookings(data || []);
       } catch (err) {
-        console.warn("Offline global bookings warning:", err);
+        setBookings([]);
+        setLoadError(err instanceof Error ? err.message : String(err));
       } finally {
         setLoading(false);
       }
@@ -190,43 +121,37 @@ export default function AdminBookings() {
 
   // Calculate summary metrics
   const totalVolume = bookings.reduce((sum, b) => sum + (parseFloat(b.total_price) || 0), 0);
-  const platformRevenue = bookings.reduce((sum, b) => sum + (parseFloat(b.platform_commission) || (b.total_price * 0.15)), 0);
+  const platformRevenue = bookings.reduce((sum, b) => sum + (parseFloat(b.platform_commission) || 0), 0);
   const activeCount = bookings.filter(b => b.status === "confirmed" || b.status === "pending_payment").length;
 
   const cardBase = "rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] transition-all duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.035)] hover:border-[#D1AF47]/20";
 
-  // ZATCA invoice metrics for the selected item
-  const invoiceData = useMemo(() => {
-    if (!selectedBooking) return null;
-    const b = selectedBooking;
-    const providerName = isRTL 
-      ? b.branches?.providers?.business_name_ar || b.branches?.providers?.business_name_en || t.independent
-      : b.branches?.providers?.business_name_en || b.branches?.providers?.business_name_ar || t.independent;
-    
-    const vatNo = "310123456700003"; // Standard mock KSA VAT ID
-    const timeStr = b.scheduled_at;
-    const price = Number(b.total_price || 0);
-    const tax = Number(b.tax_amount || (price * 0.15 / 1.15));
-    const subtotal = price - tax;
-    
-    const qrBase64 = generateZatcaQrBase64(
-      providerName,
-      vatNo,
-      timeStr,
-      price.toFixed(2),
-      tax.toFixed(2)
-    );
+  // Tax invoices are issued and signed server-side (generate_zatca_tax_invoice); this view only
+  // displays the stored invoice and never builds one in the browser.
+  useEffect(() => {
+    if (!selectedBooking) {
+      setStoredInvoice(null);
+      return;
+    }
+    setInvoiceLoading(true);
+    supabase.from("invoices").select("*").eq("booking_id", selectedBooking.id).maybeSingle()
+      .then(({ data }) => setStoredInvoice(data ?? null))
+      .then(() => setInvoiceLoading(false), () => setInvoiceLoading(false));
+  }, [selectedBooking]);
 
+  const invoiceData = useMemo(() => {
+    if (!storedInvoice) return null;
     return {
-      providerName,
-      vatNo,
-      timeStr,
-      subtotal,
-      tax,
-      total: price,
-      qrBase64
+      number: storedInvoice.invoice_number as string,
+      providerName: storedInvoice.seller_name as string,
+      vatNo: storedInvoice.seller_vat_number as string,
+      timeStr: storedInvoice.issue_date as string,
+      subtotal: Number(storedInvoice.subtotal_sar),
+      tax: Number(storedInvoice.vat_amount_sar),
+      total: Number(storedInvoice.total_amount_sar),
+      qrBase64: (storedInvoice.zatca_qr_code as string) || "",
     };
-  }, [selectedBooking, isRTL, t.independent]);
+  }, [storedInvoice]);
 
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className={`space-y-6 ${isRTL ? "text-right" : "text-left"}`}>
@@ -346,7 +271,7 @@ export default function AdminBookings() {
                         {b.total_price} {lang === "ar" ? "ريال" : "SAR"}
                       </td>
                       <td className="py-4 px-6 font-serif font-black text-amber-700">
-                        {(parseFloat(b.platform_commission) || (b.total_price * 0.15)).toFixed(2)} {lang === "ar" ? "ريال" : "SAR"}
+                        {(parseFloat(b.platform_commission) || 0).toFixed(2)} {lang === "ar" ? "ريال" : "SAR"}
                       </td>
                       <td className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>
                         <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-block ${
@@ -374,6 +299,19 @@ export default function AdminBookings() {
         </div>
       </div>
 
+      {loadError && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-700">{loadError}</div>
+      )}
+
+      {selectedBooking && !invoiceData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#101828]/40 px-4 py-6 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-3xl border border-[#ECECEC] bg-white p-6 space-y-4 text-sm text-gray-700">
+            <p>{invoiceLoading ? "…" : (lang === "ar" ? "لم تُصدر فاتورة ضريبية لهذا الحجز بعد." : "No tax invoice has been issued for this booking yet.")}</p>
+            <button onClick={() => setSelectedBooking(null)} className="rounded-full border border-[#ECECEC] px-3 py-1 text-xs font-bold text-gray-500">{t.close}</button>
+          </div>
+        </div>
+      )}
+
       {/* Invoice slide-over drawer / modal */}
       {selectedBooking && invoiceData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#101828]/40 px-4 py-6 backdrop-blur-sm">
@@ -397,7 +335,7 @@ export default function AdminBookings() {
               <div className="my-5 space-y-4 text-xs font-semibold text-gray-700">
                 <div className={`flex justify-between ${flip}`}>
                   <span className="text-gray-400">{t.invoiceNo}</span>
-                  <span className="font-mono font-bold text-gray-900">INV-2026-{selectedBooking.id.substring(0, 6).toUpperCase()}</span>
+                  <span className="font-mono font-bold text-gray-900">{invoiceData.number}</span>
                 </div>
                 <div className={`flex justify-between ${flip}`}>
                   <span className="text-gray-400">{t.issueDate}</span>

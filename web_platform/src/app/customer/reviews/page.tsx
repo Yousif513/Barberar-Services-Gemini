@@ -84,6 +84,7 @@ export default function CustomerReviewsPage() {
         .from("reviews")
         .select(`
           id,
+          booking_id,
           rating,
           comment,
           created_at,
@@ -118,63 +119,14 @@ export default function CustomerReviewsPage() {
       if (bookingsError) throw bookingsError;
 
       // Filter out bookings that already have reviews
-      const reviewedBookingIds = new Set((reviewsData || []).map(r => (r.bookings as any)?.id).filter(Boolean));
+      const reviewedBookingIds = new Set((reviewsData || []).map(r => r.booking_id).filter(Boolean));
       const unreviewed = (completedBookings || []).filter(b => !reviewedBookingIds.has(b.id));
       setPendingReviews(unreviewed);
 
     } catch (err: any) {
-      console.warn("Using mock data as Supabase connection is offline or empty:", err.message);
-      setError("Displaying offline review records.");
-
-      // Setup high quality mock data
-      setMyReviews([
-        {
-          id: "rev-1",
-          rating: 5,
-          comment: "Absolutely exceptional hot shaving experience. Marcus is detail-oriented and very neat. Will book again.",
-          created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-          bookings: {
-            scheduled_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-            services: { name_en: "Luxury Beard Grooming & Hot Towel Shave", name_ar: "حلاقة اللحية الفاخرة بالمنشفة الساخنة" },
-            branches: {
-              providers: {
-                business_name_en: "Elite Grooming Lounge",
-                business_name_ar: "صالون إيليت الرجالي"
-              }
-            }
-          }
-        },
-        {
-          id: "rev-2",
-          rating: 4,
-          comment: "The massage room was perfect. Clean sheets and highly professional masseuse. A bit busy on weekends.",
-          created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-          bookings: {
-            scheduled_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-            services: { name_en: "Deep Hydrating Facial & Scalp Therapy", name_ar: "علاج ترطيب البشرة العميق وتدليك فروة الرأس" },
-            branches: {
-              providers: {
-                business_name_en: "Riyadh Premium Spa & Wellness",
-                business_name_ar: "سبا الرياض الفاخر للعناية"
-              }
-            }
-          }
-        }
-      ]);
-
-      setPendingReviews([
-        {
-          id: "bk-completed-1",
-          scheduled_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          services: { name_en: "Moroccan Hammam Classic", name_ar: "الحمام المغربي الكلاسيكي" },
-          branches: {
-            providers: {
-              business_name_en: "Riyadh Premium Spa & Wellness",
-              business_name_ar: "سبا الرياض الفاخر للعناية"
-            }
-          }
-        }
-      ]);
+      setMyReviews([]);
+      setPendingReviews([]);
+      setError(err?.message || String(err));
     } finally {
       setLoading(false);
     }
@@ -204,32 +156,8 @@ export default function CustomerReviewsPage() {
       // Reload lists
       loadData();
     } catch (err: any) {
-      console.warn("Failed to save to database, simulating locally:", err.message);
-      
-      // Simulate locally
-      const mockPending = pendingReviews.find(b => b.id === bookingId);
-      if (mockPending) {
-        const newReview = {
-          id: `rev-sim-${Date.now()}`,
-          rating,
-          comment,
-          created_at: new Date().toISOString(),
-          bookings: {
-            scheduled_at: mockPending.scheduled_at,
-            services: mockPending.services,
-            branches: mockPending.branches
-          }
-        };
-        setMyReviews(prev => [newReview, ...prev]);
-        setPendingReviews(prev => prev.filter(b => b.id !== bookingId));
-      }
-
-      setSuccessMsg(t.thankYou);
-      setComment("");
-      setRating(5);
-      setActivePendingId(null);
-
-      setTimeout(() => setSuccessMsg(""), 5000);
+      // Keep the rating and comment so the customer can retry.
+      setError(err?.message || String(err));
     }
   }
 

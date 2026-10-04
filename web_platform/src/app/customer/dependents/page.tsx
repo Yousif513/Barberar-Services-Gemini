@@ -19,6 +19,7 @@ const translations = {
     noProfiles: "No dependents or pets registered yet.",
     successSave: "Profile saved successfully!",
     successDelete: "Profile deleted successfully!",
+    confirmDelete: "Delete this profile? Past bookings keep their records.",
     errorLoad: "Failed to load profiles.",
     errorSave: "Failed to save profile.",
     genderMale: "Male",
@@ -46,6 +47,7 @@ const translations = {
     noProfiles: "لم يتم تسجيل تابعين أو حيوانات أليفة بعد.",
     successSave: "تم حفظ الملف الشخصي بنجاح!",
     successDelete: "تم حذف الملف الشخصي بنجاح!",
+    confirmDelete: "حذف هذا الملف الشخصي؟ تبقى سجلات الحجوزات السابقة.",
     errorLoad: "فشل تحميل الملفات الشخصية.",
     errorSave: "فشل حفظ الملف الشخصي.",
     genderMale: "ذكر",
@@ -119,26 +121,8 @@ export default function CustomerDependentsPage() {
         setProfiles(data);
       }
     } catch (err: any) {
-      console.warn("Offline client_profiles notice:", err.message);
-      // Fallback mock profiles
-      setProfiles([
-        {
-          id: "cp-mock-1",
-          name: locale === "ar" ? "فيصل آل سعود" : "Faisal Al-Saud",
-          type: "dependent",
-          dob: "2014-05-12",
-          medical_info: locale === "ar" ? "حساسية من المكسرات" : "Nut allergy",
-          gender: "male"
-        },
-        {
-          id: "cp-mock-2",
-          name: locale === "ar" ? "ركس (كلب أليف)" : "Rex (Golden Retriever)",
-          type: "pet",
-          dob: "2022-09-01",
-          medical_info: locale === "ar" ? "تطعيمات كاملة" : "Fully vaccinated",
-          gender: "male"
-        }
-      ]);
+      setProfiles([]);
+      setError(`${t.errorLoad} ${err?.message || String(err)}`);
     } finally {
       setLoading(false);
     }
@@ -182,20 +166,8 @@ export default function CustomerDependentsPage() {
       setShowForm(false);
       resetForm();
     } catch (err: any) {
-      console.warn("Simulating client profile save locally:", err.message);
-      // Mock insert
-      const newProfile: ClientProfile = {
-        id: `cp-${Date.now()}`,
-        name,
-        type,
-        dob,
-        gender,
-        medical_info: medicalInfo
-      };
-      setProfiles(prev => [newProfile, ...prev]);
-      setSuccess(t.successSave);
-      setShowForm(false);
-      resetForm();
+      // The form stays open with what was typed so the customer can retry.
+      setError(err?.message || t.errorSave);
     } finally {
       setSaving(false);
       setTimeout(() => setSuccess(""), 4000);
@@ -207,20 +179,18 @@ export default function CustomerDependentsPage() {
       setError("");
       setSuccess("");
 
-      if (!id.startsWith("cp-mock-")) {
-        const { error: deleteError } = await supabase
-          .from("client_profiles")
-          .delete()
-          .eq("id", id);
+      if (!window.confirm(t.confirmDelete)) return;
+      const { error: deleteError } = await supabase
+        .from("client_profiles")
+        .delete()
+        .eq("id", id);
 
-        if (deleteError) throw deleteError;
-      }
+      if (deleteError) throw deleteError;
 
       setProfiles(prev => prev.filter(p => p.id !== id));
       setSuccess(t.successDelete);
     } catch (err: any) {
-      setError(t.errorSave);
-      console.warn("Offline delete error:", err);
+      setError(err?.message || t.errorSave);
     } finally {
       setTimeout(() => setSuccess(""), 4000);
     }

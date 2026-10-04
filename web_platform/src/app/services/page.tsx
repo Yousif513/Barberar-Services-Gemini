@@ -30,7 +30,7 @@ type CatalogService = {
   sort_order: number;
   category_slug: string;
   add_ons: AddOn[];
-  rating: number;
+  rating: number | null;
   images: string[];
   genderCategory: ServiceGender;
   providerNameEn: string;
@@ -51,7 +51,7 @@ type CatalogShop = {
   serviceCategorySlugs: string[];
   serviceNamesEn: string[];
   serviceNamesAr: string[];
-  rating: number;
+  rating: number | null;
   reviews: number;
   image: string;
   isHomeServiceEligible: boolean;
@@ -106,25 +106,6 @@ type ProviderServiceSummary = {
   genderCategory: ServiceGender;
   isHomeServiceEligible: boolean;
 };
-
-const FALLBACK_CATEGORIES: CatalogCategory[] = [
-  { id: "c1", slug: "barber-hair", name_en: "Barber & Hair", name_ar: "الحلاقة والشعر", icon: "scissors" },
-  { id: "c2", slug: "beard-shave", name_en: "Beard & Shave", name_ar: "اللحية والحلاقة", icon: "razor" },
-  { id: "c3", slug: "skincare-facials", name_en: "Skincare & Facials", name_ar: "العناية بالبشرة", icon: "sparkles" },
-  { id: "c4", slug: "spa-wellness", name_en: "Spa & Wellness", name_ar: "السبا والعافية", icon: "lotus" },
-  { id: "c5", slug: "nails-hands", name_en: "Nails & Hands", name_ar: "الأظافر واليدين", icon: "hand" },
-  { id: "c6", slug: "signature-packages", name_en: "Signature Packages", name_ar: "الباقات المميزة", icon: "crown" },
-];
-
-const F = (slug: string, cat: string, en: string, ar: string, den: string, dar: string, price: number, dur: number, home: boolean, feat: boolean, ord: number): CatalogService => ({
-  id: slug, slug, category_slug: cat, name_en: en, name_ar: ar, description_en: den, description_ar: dar,
-  base_price: price, base_duration_minutes: dur, is_home_service_eligible: home,
-  featured_in_services: feat, sort_order: ord, add_ons: [], rating: 4.7 + ((slug.length % 3) * 0.1),
-  images: [],
-  genderCategory: inferServiceGender(slug, cat, en),
-  providerNameEn: fallbackProviderFor(cat, "en"),
-  providerNameAr: fallbackProviderFor(cat, "ar"),
-});
 
 const SERVICE_IMAGE_BY_CATEGORY: Record<string, string> = {
   "barber-hair": "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=1200&auto=format&fit=crop",
@@ -183,19 +164,6 @@ const SHOP_IMAGE_BY_GENDER: Record<ShopGender, string> = {
   female: "https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1200&auto=format&fit=crop",
   both: "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=1200&auto=format&fit=crop"
 };
-
-function fallbackProviderFor(categorySlug: string, locale: "en" | "ar") {
-  const providers = {
-    "barber-hair": ["Elite Barbershop", "إليت باربرشوب"],
-    "beard-shave": ["Royal Cuts Riyadh", "رويال كتس الرياض"],
-    "skincare-facials": ["Lumi Skin Studio", "لومي للعناية بالبشرة"],
-    "spa-wellness": ["Primora Wellness Spa", "بريمورا سبا"],
-    "nails-hands": ["Sara Beauty Lounge", "سارة بيوتي لاونج"],
-    "signature-packages": ["PRIMORA Signature", "بريمورا سيغنتشر"]
-  } as const;
-  const item = providers[categorySlug as keyof typeof providers] ?? providers["signature-packages"];
-  return locale === "ar" ? item[1] : item[0];
-}
 
 function inferServiceGender(slug: string, categorySlug: string, name = ""): ServiceGender {
   const text = `${slug} ${categorySlug} ${name}`.toLowerCase();
@@ -290,87 +258,6 @@ function expandGenderedServices(list: CatalogService[]) {
   });
 }
 
-const FALLBACK_SERVICES: CatalogService[] = [
-  F("classic-haircut", "barber-hair", "Classic Haircut", "قصة شعر كلاسيكية", "Precision cut with consultation and finish styling.", "قصة دقيقة مع استشارة وتصفيف نهائي.", 45, 40, true, true, 1),
-  F("skin-fade", "barber-hair", "Skin Fade", "قصة فيد", "Sharp zero fade blended to your length on top.", "تدريج حاد يبدأ من الصفر مع دمج احترافي.", 55, 45, true, true, 2),
-  F("kids-cut", "barber-hair", "Kids Cut", "قصة أطفال", "Gentle, patient cuts for the young gentlemen.", "قصات لطيفة وصبورة لصغار السادة.", 35, 30, true, false, 3),
-  F("hair-coloring", "barber-hair", "Hair Coloring", "صبغ الشعر", "Full color or camouflage greys with premium dyes.", "صبغة كاملة أو تمويه الشيب بأصباغ فاخرة.", 90, 60, false, true, 4),
-  F("scalp-therapy", "barber-hair", "Scalp Therapy", "علاج فروة الرأس", "Detox scalp treatment with massage and steam.", "علاج منقٍ لفروة الرأس مع مساج وبخار.", 55, 35, false, false, 5),
-  F("beard-sculpt", "beard-shave", "Beard Sculpt", "نحت اللحية", "Shape and line-up with hot towel finish.", "تشكيل وتحديد مع لمسة المنشفة الساخنة.", 30, 25, true, true, 1),
-  F("hot-towel-shave", "beard-shave", "Hot Towel Shave", "حلاقة بالمنشفة الساخنة", "Classic straight-razor shave, hot towels and balm.", "حلاقة كلاسيكية بالموس مع مناشف ساخنة وبلسم.", 40, 30, true, false, 2),
-  F("beard-color", "beard-shave", "Beard Color", "صبغ اللحية", "Natural-look beard coloring, ammonia-free.", "صبغ لحية بمظهر طبيعي خالٍ من الأمونيا.", 45, 30, false, false, 3),
-  F("royal-shave-ritual", "beard-shave", "Royal Shave Ritual", "طقس الحلاقة الملكي", "Our signature 5-step shave with facial massage.", "طقسنا المميز من خمس خطوات مع مساج للوجه.", 70, 50, false, true, 4),
-  F("express-facial", "skincare-facials", "Express Facial", "فيشل سريع", "30-minute glow-up cleanse and hydration.", "تنظيف وترطيب لإشراقة سريعة خلال ٣٠ دقيقة.", 80, 30, true, false, 1),
-  F("deep-cleanse", "skincare-facials", "Deep Cleanse", "تنظيف عميق", "Deep-pore cleansing facial with extraction.", "تنظيف عميق للمسام مع إزالة الشوائب.", 120, 60, false, true, 2),
-  F("anti-fatigue", "skincare-facials", "Anti-fatigue Treatment", "علاج مضاد للإجهاد", "Revitalizing treatment for tired skin.", "علاج منشّط للبشرة المجهدة.", 140, 60, false, false, 3),
-  F("moroccan-bath", "spa-wellness", "Moroccan Bath", "حمام مغربي", "Traditional hammam with black soap and kessa.", "حمام تقليدي بالصابون المغربي والكيس.", 90, 60, false, true, 1),
-  F("aromatherapy-massage", "spa-wellness", "Aromatherapy Massage", "مساج بالزيوت العطرية", "Full-body relaxation with essential oil blends.", "استرخاء كامل للجسم بخلطات الزيوت العطرية.", 160, 60, true, false, 2),
-  F("recovery-massage", "spa-wellness", "Recovery Massage", "مساج استشفائي", "Deep-tissue recovery for active lifestyles.", "مساج عميق للاستشفاء العضلي.", 180, 75, true, false, 3),
-  F("manicure", "nails-hands", "Manicure", "مانيكير", "Clean, shape and finish for hands and nails.", "تنظيف وتشكيل وعناية كاملة لليدين والأظافر.", 60, 40, true, false, 1),
-  F("pedicure", "nails-hands", "Pedicure", "باديكير", "Full pedicure with exfoliation and massage.", "باديكير كامل مع تقشير ومساج.", 70, 50, true, false, 2),
-  F("hand-spa", "nails-hands", "Hand Spa", "سبا اليدين", "Paraffin hand spa with cuticle care.", "سبا بارافين لليدين مع عناية بالجليدة.", 50, 30, true, false, 3),
-  F("grooms-prep", "signature-packages", "Groom's Prep", "تجهيز العريس", "Complete pre-wedding grooming: cut, shave, facial, hands.", "تجهيز متكامل قبل الزفاف: قصة، حلاقة، فيشل، وعناية باليدين.", 350, 180, false, true, 1),
-  F("executive-refresh", "signature-packages", "Executive Refresh", "انتعاشة المدير", "Cut, beard sculpt and express facial in one sitting.", "قصة ونحت لحية وفيشل سريع في جلسة واحدة.", 220, 100, false, true, 2),
-  F("full-reset", "signature-packages", "Full Reset", "استعادة كاملة", "The complete PRIMORA experience, head to toe.", "تجربة بريمورا الكاملة من الرأس إلى القدمين.", 480, 240, false, true, 3),
-];
-
-const FALLBACK_SHOPS: CatalogShop[] = [
-  {
-    id: "shop-elite",
-    providerId: "provider-elite",
-    nameEn: "Elite Barbershop",
-    nameAr: "إليت باربرشوب",
-    districtEn: "Riyadh Central",
-    districtAr: "وسط الرياض",
-    providerNameEn: "Elite Barbershop Group",
-    providerNameAr: "مجموعة إليت للحلاقة",
-    genderCategory: "male",
-    serviceCategorySlugs: ["barber-hair", "beard-shave", "signature-packages"],
-    serviceNamesEn: ["Classic Haircut", "Skin Fade", "Beard Sculpt", "Groom's Prep"],
-    serviceNamesAr: ["قصة شعر كلاسيكية", "قصة فيد", "نحت اللحية", "تجهيز العريس"],
-    rating: 4.9,
-    reviews: 1240,
-    image: SHOP_IMAGE_BY_GENDER.male,
-    isHomeServiceEligible: true
-  },
-  {
-    id: "shop-sara",
-    providerId: "provider-sara",
-    nameEn: "Sara Beauty Lounge",
-    nameAr: "سارة بيوتي لاونج",
-    districtEn: "Olaya",
-    districtAr: "العليا",
-    providerNameEn: "Sara Beauty Group",
-    providerNameAr: "مجموعة سارة للتجميل",
-    genderCategory: "female",
-    serviceCategorySlugs: ["skincare-facials", "spa-wellness", "nails-hands"],
-    serviceNamesEn: ["Deep Cleanse", "Aromatherapy Massage", "Manicure", "Pedicure"],
-    serviceNamesAr: ["تنظيف عميق", "مساج بالزيوت العطرية", "مانيكير", "باديكير"],
-    rating: 4.8,
-    reviews: 980,
-    image: SHOP_IMAGE_BY_GENDER.female,
-    isHomeServiceEligible: true
-  },
-  {
-    id: "shop-primora",
-    providerId: "provider-primora",
-    nameEn: "PRIMORA Wellness Spa",
-    nameAr: "بريمورا سبا",
-    districtEn: "Al-Malqa",
-    districtAr: "الملقا",
-    providerNameEn: "PRIMORA Signature",
-    providerNameAr: "بريمورا سيغنتشر",
-    genderCategory: "both",
-    serviceCategorySlugs: ["spa-wellness", "skincare-facials", "signature-packages"],
-    serviceNamesEn: ["Moroccan Bath", "Express Facial", "Full Reset"],
-    serviceNamesAr: ["حمام مغربي", "فيشل سريع", "استعادة كاملة"],
-    rating: 4.9,
-    reviews: 1540,
-    image: SHOP_IMAGE_BY_GENDER.both,
-    isHomeServiceEligible: false
-  }
-];
-
 const CATEGORY_ICON: Record<string, string> = {
   scissors: "✂️", razor: "🪒", sparkles: "✨", lotus: "🪷", hand: "🤲", crown: "👑",
 };
@@ -423,6 +310,9 @@ const translations = {
     servicesOffered: "Services offered",
     viewShop: "View shop",
     reviewsLabel: "reviews",
+    newShop: "New",
+    loadingCatalog: "Loading the catalogue...",
+    catalogFailed: "Could not load the catalogue",
     empty: "No services match these filters — try widening your search.",
     addOns: "Add-ons",
     duration: "Duration",
@@ -478,6 +368,9 @@ const translations = {
     servicesOffered: "الخدمات المقدمة",
     viewShop: "عرض المتجر",
     reviewsLabel: "تقييم",
+    newShop: "جديد",
+    loadingCatalog: "جارٍ تحميل الدليل...",
+    catalogFailed: "تعذر تحميل الدليل",
     empty: "لا توجد خدمات مطابقة — جرّب توسيع البحث.",
     addOns: "الإضافات",
     duration: "المدة",
@@ -491,9 +384,11 @@ const translations = {
 function ServicesCatalog() {
   const searchParams = useSearchParams();
   const [lang, setLang] = useState<"en" | "ar">("en");
-  const [categories, setCategories] = useState<CatalogCategory[]>(FALLBACK_CATEGORIES);
-  const [services, setServices] = useState<CatalogService[]>(() => expandGenderedServices(FALLBACK_SERVICES));
-  const [shops, setShops] = useState<CatalogShop[]>(FALLBACK_SHOPS);
+  const [categories, setCategories] = useState<CatalogCategory[]>([]);
+  const [services, setServices] = useState<CatalogService[]>([]);
+  const [shops, setShops] = useState<CatalogShop[]>([]);
+  const [catalogState, setCatalogState] = useState<"loading" | "ready" | "error">("loading");
+  const [catalogError, setCatalogError] = useState("");
   const [query, setQuery] = useState("");
   const [activeResultTab, setActiveResultTab] = useState<"all" | "shops" | "services">("all");
   const [activeCat, setActiveCat] = useState<string>(searchParams.get("category") ?? "all");
@@ -542,19 +437,40 @@ function ServicesCatalog() {
   useEffect(() => {
     (async () => {
       try {
-        const [{ data: cats }, { data: rows }, { data: providerRows }] = await Promise.all([
+        const [catRes, serviceRes, providerRes, reviewRes] = await Promise.all([
           supabase.from("categories").select("id, slug, name_en, name_ar, icon, sort_order").eq("is_active", true).order("sort_order"),
           supabase
             .from("services")
-            .select("id, provider_id, slug, name_en, name_ar, description_en, description_ar, base_price, base_duration_minutes, is_home_service_eligible, featured_in_services, sort_order, add_ons, images, categories(slug), providers(business_name_en, business_name_ar)")
+            .select("id, provider_id, slug, name_en, name_ar, description_en, description_ar, base_price, base_duration_minutes, is_home_service_eligible, featured_in_services, sort_order, add_ons, images, categories(slug), providers!inner(business_name_en, business_name_ar, is_verified)")
             .eq("is_active", true)
+            .eq("providers.is_verified", true)
             .order("sort_order"),
           supabase
             .from("providers")
             .select("id, business_name_en, business_name_ar, type, is_verified, branches(id, name_en, name_ar, address_text_en, address_text_ar), services(id, slug, name_en, name_ar, is_home_service_eligible, categories(slug))")
             .eq("is_verified", true)
             .order("created_at", { ascending: false }),
+          supabase.from("reviews").select("provider_id, rating, moderation_status"),
         ]);
+        for (const res of [catRes, serviceRes, providerRes, reviewRes]) {
+          if (res.error) throw res.error;
+        }
+        const cats = catRes.data;
+        const rows = serviceRes.data;
+        const providerRows = providerRes.data;
+        // Ratings come only from published reviews; a provider without reviews has no rating.
+        const ratingByProvider = new Map<string, { sum: number; count: number }>();
+        for (const review of reviewRes.data || []) {
+          if ((review.moderation_status || "published") !== "published") continue;
+          const entry = ratingByProvider.get(review.provider_id) || { sum: 0, count: 0 };
+          entry.sum += Number(review.rating);
+          entry.count += 1;
+          ratingByProvider.set(review.provider_id, entry);
+        }
+        const ratingFor = (providerId?: string | null) => {
+          const entry = providerId ? ratingByProvider.get(providerId) : undefined;
+          return entry ? Math.round((entry.sum / entry.count) * 10) / 10 : null;
+        };
         if (cats?.length) setCategories(cats);
         if (rows?.length) {
           const mappedServices = (rows as CatalogServiceRow[]).map((r, i) => {
@@ -570,11 +486,11 @@ function ServicesCatalog() {
               sort_order: r.sort_order ?? i,
               category_slug: cat?.slug ?? "other",
               add_ons: Array.isArray(r.add_ons) ? (r.add_ons as AddOn[]) : [],
-              rating: 4.7 + ((String(r.id).charCodeAt(0) % 3) * 0.1),
+              rating: ratingFor(r.provider_id),
               images: normalizeServiceImages(r.images, r.slug ?? r.id, cat?.slug ?? "other"),
               genderCategory: inferServiceGender(r.slug ?? r.id, cat?.slug ?? "other", r.name_en ?? ""),
-              providerNameEn: provider?.business_name_en || fallbackProviderFor(cat?.slug ?? "other", "en"),
-              providerNameAr: provider?.business_name_ar || fallbackProviderFor(cat?.slug ?? "other", "ar"),
+              providerNameEn: provider?.business_name_en || provider?.business_name_ar || "",
+              providerNameAr: provider?.business_name_ar || provider?.business_name_en || "",
               provider_id: r.provider_id || null,
             };
           });
@@ -593,33 +509,34 @@ function ServicesCatalog() {
               };
             });
             const shopGender = genderFromServices(providerServices);
-            const branchRows: CatalogProviderBranchRow[] = provider.branches?.length
-              ? provider.branches
-              : [{ id: `${provider.id}-virtual`, name_en: provider.business_name_en, name_ar: provider.business_name_ar, address_text_en: "Riyadh", address_text_ar: "الرياض" }];
+            // A provider without a branch has nowhere to book yet, so it is not listed.
+            const branchRows: CatalogProviderBranchRow[] = provider.branches || [];
 
             return branchRows.map((branch, branchIndex) => ({
               id: branch.id,
               providerId: provider.id,
               nameEn: branch.name_en || provider.business_name_en || "Provider Shop",
               nameAr: branch.name_ar || provider.business_name_ar || provider.business_name_en || "متجر المزود",
-              districtEn: String(branch.address_text_en || "Riyadh").split(",")[0],
-              districtAr: String(branch.address_text_ar || "الرياض").split(",")[0],
+              districtEn: String(branch.address_text_en || branch.address_text_ar || "").split(",")[0],
+              districtAr: String(branch.address_text_ar || branch.address_text_en || "").split(",")[0],
               providerNameEn: provider.business_name_en || "Provider",
               providerNameAr: provider.business_name_ar || provider.business_name_en || "مزود",
               genderCategory: shopGender,
               serviceCategorySlugs: [...new Set(providerServices.map((service) => service.categorySlug))],
               serviceNamesEn: providerServices.map((service) => service.nameEn).filter(Boolean),
               serviceNamesAr: providerServices.map((service) => service.nameAr).filter(Boolean),
-              rating: 4.6 + (((providerIndex + branchIndex) % 4) * 0.1),
-              reviews: 220 + providerIndex * 140 + branchIndex * 35,
+              rating: ratingFor(provider.id),
+              reviews: ratingByProvider.get(provider.id)?.count ?? 0,
               image: SHOP_IMAGE_BY_GENDER[shopGender],
               isHomeServiceEligible: providerServices.some((service) => service.isHomeServiceEligible)
             }));
           });
-          if (mappedShops.length) setShops(mappedShops);
+          setShops(mappedShops);
         }
+        setCatalogState("ready");
       } catch (err) {
-        console.warn("Services catalog using fallback data:", err);
+        setCatalogError(err instanceof Error ? err.message : String(err));
+        setCatalogState("error");
       }
     })();
   }, []);
@@ -663,7 +580,7 @@ function ServicesCatalog() {
     switch (sort) {
       case "price-asc": list = [...list].sort((a, b) => a.base_price - b.base_price); break;
       case "price-desc": list = [...list].sort((a, b) => b.base_price - a.base_price); break;
-      case "rating": list = [...list].sort((a, b) => b.rating - a.rating); break;
+      case "rating": list = [...list].sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1)); break;
       default:
         list = [...list].sort((a, b) =>
           Number(b.featured_in_services) - Number(a.featured_in_services) || a.sort_order - b.sort_order);
@@ -692,7 +609,7 @@ function ServicesCatalog() {
     });
   }, [activeCat, categoryNameBySlug, genderFilter, homeOnly, query, shops]);
 
-  const catName = (c: CatalogCategory) => (isRTL ? c.name_ar : c.name_en);
+  const catName = (c?: CatalogCategory) => (c ? (isRTL ? c.name_ar : c.name_en) : "");
 
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className={`min-h-screen bg-[#F2EEE6] text-[#211A12] font-sans ${isRTL ? "text-right" : "text-left"}`}>
@@ -702,12 +619,20 @@ function ServicesCatalog() {
           <Link href="/" className="font-serif text-lg font-black tracking-[0.22em] text-[#A57C32]">{t.backHome}</Link>
           <div className="flex items-center gap-2.5">
             <button onClick={toggleLang} className="rounded-full border border-[#211A12]/10 bg-white px-3.5 py-2 text-xs font-bold text-[#5F584D] shadow-sm transition hover:border-[#C29A4C]/50 hover:text-[#A57C32]">{t.lang}</button>
-            <Link href="/customer/book" className="rounded-full bg-gradient-to-r from-[#C29A4C] to-[#E6C679] px-4 py-2 text-xs font-black text-[#15100A] shadow-md shadow-[#C29A4C]/20 transition hover:brightness-105">{t.book}</Link>
+            <Link href="/discover" className="rounded-full bg-gradient-to-r from-[#C29A4C] to-[#E6C679] px-4 py-2 text-xs font-black text-[#15100A] shadow-md shadow-[#C29A4C]/20 transition hover:brightness-105">{t.book}</Link>
           </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-[1440px] px-[clamp(16px,4vw,40px)] py-8">
+        {catalogState === "loading" && (
+          <p className="mb-6 text-sm font-semibold text-[#8A7F6C]">{t.loadingCatalog}</p>
+        )}
+        {catalogState === "error" && (
+          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {t.catalogFailed}: {catalogError}
+          </div>
+        )}
         {/* Title */}
         <div className="mb-6">
           <h1 className="font-serif text-3xl font-black leading-tight text-[#211A12] sm:text-4xl">{t.title}</h1>
@@ -899,7 +824,7 @@ function ServicesCatalog() {
                       <p className="mt-1 text-xs font-bold text-[#8A7F6C]">{t.provider}: {isRTL ? shop.providerNameAr : shop.providerNameEn}</p>
                       <p className="mt-1 text-xs font-semibold text-[#8A7F6C]">{isRTL ? shop.districtAr : shop.districtEn}</p>
                     </div>
-                    <span className="flex items-center gap-1 rounded-full bg-[#F2EEE6] px-2.5 py-1 text-[11px] font-black text-[#A57C32]">★ {shop.rating.toFixed(1)}</span>
+                    <span className="flex items-center gap-1 rounded-full bg-[#F2EEE6] px-2.5 py-1 text-[11px] font-black text-[#A57C32]">{shop.rating !== null ? `★ ${shop.rating.toFixed(1)}` : t.newShop}</span>
                   </div>
                   <div>
                     <p className="mb-2 text-[9px] font-black uppercase tracking-[0.18em] text-[#8A7F6C]">{t.servicesOffered}</p>
@@ -962,7 +887,7 @@ function ServicesCatalog() {
                   <span className="rounded-full bg-[#F2EEE6] px-2.5 py-1 text-[10px] font-black text-[#8A7F6C]">
                     {CATEGORY_ICON[categories.find((c) => c.slug === s.category_slug)?.icon ?? ""] ?? "•"} {catName(categories.find((c) => c.slug === s.category_slug) ?? categories[0])}
                   </span>
-                  <span className="flex items-center gap-1 text-[11px] font-black text-[#A57C32]">★ {s.rating.toFixed(1)}</span>
+                  <span className="flex items-center gap-1 text-[11px] font-black text-[#A57C32]">{s.rating !== null ? `★ ${s.rating.toFixed(1)}` : t.newShop}</span>
                 </div>
                 <h3 className="font-serif text-lg font-black leading-snug text-[#211A12] group-hover:text-[#A57C32] transition-colors">{isRTL ? s.name_ar : s.name_en}</h3>
                 <p className="mt-1 text-[10px] font-black uppercase tracking-[0.14em] text-[#A57C32]">{isRTL ? s.providerNameAr : s.providerNameEn}</p>
