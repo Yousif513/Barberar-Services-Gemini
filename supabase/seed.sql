@@ -136,12 +136,8 @@ INSERT INTO public.delivery_jobs (id, booking_id, pickup_address, delivery_addre
 ('d0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000001', 'صالون إيليت - حي الملقا، طريق أنس بن مالك، الرياض', 'حي العليا، شارع التحلية، فيلا 14، الرياض', 24.796300, 46.611100, 24.711200, 46.674400, NULL, 'pending', NOW() + INTERVAL '1 hour', '{"distance": "8.4 km", "item": "Beard Sculpting Balm & Premium Aftershave"}');
 
 
--- 14. DEVELOPER API CONSOLE DATA
-INSERT INTO public.developer_profiles (id, developer_id, app_name, is_approved) VALUES
-('d0000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000001', 'Primora App Integrator', true);
-
-INSERT INTO public.api_tokens (id, developer_profile_id, token_hash, scopes, status, expires_at) VALUES
-('t0000000-0000-0000-0000-000000000101', 'd0000000-0000-0000-0000-000000000101', 'pk_live_8a38a7c29e1f4c76b92a34419cb7d100', '{"bookings:read", "bookings:write"}', 'active', NOW() + INTERVAL '1 year');
-
-INSERT INTO public.webhook_subscriptions (id, developer_profile_id, target_url, subscribed_events, signing_secret, status) VALUES
-('w0000000-0000-0000-0000-000000000101', 'd0000000-0000-0000-0000-000000000101', 'https://api.myclientapp.com/webhooks/primora', '{"booking.created", "booking.completed"}', 'whsec_7d2f9a1c8e0b4d6f9a0b2c3d4e5f6a7b', 'active');
+-- 14. DEVELOPER API: no seed data on purpose.
+-- API keys (api_keys) and webhook endpoints are created by a provider owner through the console, and their
+-- credentials exist in plaintext only in the create response. A seeded key or signing secret would be a
+-- plaintext credential in the repository, and the old rows here could not apply anyway (invalid UUID
+-- literals, columns that do not exist).
