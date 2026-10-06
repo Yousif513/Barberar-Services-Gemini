@@ -1,7 +1,10 @@
 // Database test harness: a Supabase-shaped Postgres (PGlite) with every migration applied.
 // Mirrors the Supabase details that matter for authorization: extensions live in the
-// "extensions" schema, anon/authenticated/service_role exist, public objects are granted to
-// them by default privileges, and auth.uid()/auth.jwt() read request.jwt.claims.
+// "extensions" schema, anon/authenticated/service_role exist, functions are executable by default
+// (as on Supabase), and auth.uid()/auth.jwt() read request.jwt.claims.
+// Tables, views and sequences are NOT granted to the client roles by default: current Supabase
+// projects start with no Data API privileges, so every table must carry explicit grants
+// (see 20261006220000_explicit_data_api_grants.sql). Granting them here would hide a missing grant.
 import { PGlite } from "@electric-sql/pglite";
 import { btree_gist } from "@electric-sql/pglite/contrib/btree_gist";
 import { pgcrypto } from "@electric-sql/pglite/contrib/pgcrypto";
@@ -26,9 +29,7 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 GRANT anon, authenticated, service_role TO postgres;
 GRANT USAGE ON SCHEMA public, extensions TO anon, authenticated, service_role;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA extensions TO anon, authenticated, service_role;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon, authenticated, service_role;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
 CREATE SCHEMA IF NOT EXISTS auth;
 CREATE TABLE IF NOT EXISTS auth.users (
   instance_id uuid, id uuid PRIMARY KEY DEFAULT gen_random_uuid(), aud text, role text,
