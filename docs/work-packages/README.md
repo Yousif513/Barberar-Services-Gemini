@@ -49,6 +49,27 @@ package. Build it completely and prove it, or say precisely what is not done and
 - Do not touch `.admin-console/manifest.json` (the owner's integrator updates it from your report), other packages' files
   beyond a one-line navigation entry, or anything under another worktree.
 
+## Invariants the existing test suite already enforces on anything you add
+
+Break one of these and `npm run test:db` fails, so design for them from the start:
+
+- **Every table** in `public` has RLS switched on, and every base table has the administrator audit trigger. End your migration with
+  `SELECT public.attach_admin_audit_trigger('public.<new_table>');` for each new table (helper in `20261006000000_attach_admin_audit_trigger_helper.sql`).
+- **Every `SECURITY DEFINER` function** sets `SET search_path = public` (or `public, pg_temp`), and starts with
+  `REVOKE ALL ON FUNCTION ... FROM PUBLIC, anon, authenticated;` then `GRANT EXECUTE ... TO authenticated` (or `service_role`) only where intended.
+  Supabase's default privileges hand `EXECUTE` to `anon` and `authenticated` on every new function; revoke first, then grant.
+- **Admin commands** are named `admin_*` or begin with `IF NOT public.is_admin() THEN RAISE ...`. A catalog-driven matrix
+  (`supabase/tests/db/admin_security_matrix.test.mjs`) calls each one as every other role with probe values and expects a refusal. Keep admin command
+  arguments to `uuid`, `text`/`varchar`, `numeric`/integer types, `boolean`, `date`, `timestamptz`, `jsonb`, arrays and enums, or extend `callFor` in that file.
+- **Views** are `WITH (security_invoker = true)` and not readable by `anon` unless the view is deliberately public.
+- **Status changes of a booking** go only through `cancel_booking`, `mark_booking_no_show`, `employee_update_booking_status` (providers cannot UPDATE `bookings`).
+  To react to booking changes, add an additive `AFTER` trigger; never loosen those policies.
+- **Invoices** are append-only; **payout requests** exist only through `request_provider_payout`; **money** moves only through the existing ledger functions.
+- Error codes: `28000` unauthenticated, `42501` forbidden, `P0002` not found (answer "not found" for another person's object, never "forbidden"),
+  `22023` invalid input, `23505` conflict.
+- Static source-text guards under `web_platform/tests/` forbid native `prompt/confirm/alert`, mock data, and invented placeholders in `src/app/admin`;
+  follow the same standard everywhere you build.
+
 ## Tests you must write (and keep green)
 
 - `supabase/tests/db/<your-feature>.test.mjs`: executing tests on the migrated PGlite schema. For every command: the happy path,
