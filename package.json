@@ -18,8 +18,10 @@
     "typecheck:mobile": "tsc --noEmit --incremental false --project mobile_app/tsconfig.json",
     "test:security-core": "node scripts/verify-security-core.mjs",
     "test:admin-controls": "node scripts/verify-admin-controls.mjs",
-    "test": "npm run test:db && npm run test --workspace=web_platform",
+    "test": "npm run test:db && npm run test:inventory && npm run test --workspace=web_platform",
     "test:db": "node --test \"supabase/tests/db/**/*.test.mjs\"",
+    "test:inventory": "node --test supabase/tests/inventory.test.mjs",
+    "test:p3-compat": "node scripts/verify-p3-migration-compatibility.mjs",
     "test:quality": "npm run test:security-core && npm run test:admin-controls && npm test && npm run lint && npm run typecheck:mobile && npm run build --workspace=web_platform"
   },
   "devDependencies": {

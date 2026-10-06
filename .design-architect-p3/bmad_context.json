@@ -1,0 +1,28 @@
+{
+  "bmad_present": false,
+  "project_root": "C:\\Users\\Yousif's PC\\Desktop\\Ai Projects\\Barberar Services-Gemini",
+  "config_path": null,
+  "docs_dir": "docs",
+  "project_name": null,
+  "project_description": null,
+  "prd_path": null,
+  "architecture_path": null,
+  "front_end_spec_path": null,
+  "epic_paths": [],
+  "story_paths": [],
+  "qa_paths": [],
+  "spec_paths": [],
+  "actors": [],
+  "entities": [],
+  "epics": [],
+  "explicit_screens": [],
+  "story_triggers": [],
+  "spec_snippets": [],
+  "design_md_path": null,
+  "stitch_metadata_path": null,
+  "site_md_path": null,
+  "brand_hints": {},
+  "warnings": [
+    "No BMAD artifacts detected. Falling back to template + inference only."
+  ]
+}
