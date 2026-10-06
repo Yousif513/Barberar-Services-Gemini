@@ -61,6 +61,9 @@ export async function createMigratedDb() {
   const db = new PGlite({ extensions: { btree_gist, pgcrypto, uuid_ossp } });
   await db.exec(BOOTSTRAP);
   await db.exec(`ALTER DATABASE postgres SET search_path TO "$user", public, extensions; SET search_path TO "$user", public, extensions;`);
+  // A hosted Supabase session runs in UTC. The tests must too, so a time of day compared in the session time zone instead of
+  // Asia/Riyadh fails here the way it fails in production (it used to pass on a developer machine set to UTC+3).
+  await db.exec(`ALTER DATABASE postgres SET timezone TO 'UTC'; SET TIME ZONE 'UTC';`);
   for (const m of migrationFiles()) {
     try {
       await db.exec("BEGIN;");
