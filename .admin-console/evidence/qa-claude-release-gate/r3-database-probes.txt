@@ -1,0 +1,49 @@
+agent: qa-claude-release-gate (round 3)
+date: 2026-10-06
+target: all 56 migration files (through 20261005180000_admin_booking_directory.sql) applied to PGlite, roles anon, authenticated, service_role, seeded administrator, two provider owners, a provider employee, customers. Nothing was applied to the hosted project.
+what each probe returned. Passing behaviour is in supabase/tests/db/qa_round3_verification.test.mjs; defects are in supabase/tests/db/qa_open_defects.repro.mjs.
+
+REMOVED OWNER AND DELEGATE POLICIES ON BOOKINGS
+policies left on bookings that are not SELECT: one, "Admins manage bookings" (ALL)
+owner, assigned employee, customer and other owner: update status, update checked_in_at, delete -> 0 rows each; booking stays confirmed; no refund request created
+owner cancel_booking with a null reason: cancelled, cancelled_by provider, one refund request for the deposit
+client code: every from("bookings") query in web_platform/src, mobile_app/src and supabase/functions is a read; the writes are rpc calls to cancel_booking, reschedule_booking, create_walk_in_booking, employee_update_booking_status, mark_booking_no_show; no client path writes a booking directly, so none now changes zero rows silently
+employee_time_off, payout inserts: no client code reads employee_time_off; the only payout insert is the rpc request_provider_payout from the provider wallet screen
+
+AUDIT TRIGGER ON EVERY BASE TABLE
+one administrator cancel of a paid booking writes 10 audit rows (booking.cancelled, refund.requested, two bookings.update, four message_queue.update, transactional_ledger.update, refund_requests.insert); no personal value in them
+one administrator completion of a booking writes message_queue.insert whose details include variables with the customer's first and last name, the branch address and booking links -> personal values in the audit log (gap audit-redaction-is-a-short-deny-list re-opened)
+administrator direct edit of provider_customer_notes.notes: before and after text in the log, including an allergy and a phone number
+administrator direct edit of employee_time_off.reason: before and after text in the log
+columns the redaction pattern does not cover and that can hold private text: message_queue.variables, messages.body, message_log.message_body, notifications.body_en and body_ar, provider_customer_notes.notes, provider_client_contacts.notes, employee_time_off.reason, refund_requests.reason, bookings.cancellation_reason, payment_disputes.reason, client_profiles.dob and metadata, job_posts.description
+bulk: an administrator-session insert of 4,000 rows into notifications took 452 ms and wrote 4,000 audit rows (3.7 MB); the same insert by the service role took 64 ms and wrote none; a customer-session write is not recorded (gap bulk-administrator-writes-write-one-audit-row-per-affected-row)
+administrator direct write to psp_reconciliation_runs: 1 audit row; to message_templates: 2 audit rows (two locales)
+
+ISSUED INVOICES
+foreign keys on invoices: booking_id and customer_id ON DELETE SET NULL, provider_id ON DELETE CASCADE
+delete the booking: invoice keeps its figures, booking_id becomes null; delete the customer's auth user: customer_id becomes null; delete the provider: refused 22023 (the cascade hits the delete guard), so a provider with issued invoices cannot be removed
+service role: update total_amount_sar refused 22023, delete refused 22023, update zatca_status accepted
+administrator: forged insert refused 42501, update and delete change 0 rows
+
+SLOTS AND DAYS OFF
+get_available_slots is SECURITY DEFINER with search_path public, returns only slot_start, executable by anonymous visitors; a non-existent employee returns no rows
+pending time off: slots unchanged; approved time off: 0 slots for customer, visitor and other owner; create_booking on that slot refused 23P01 "Selected time is no longer available"; "any available" refused with no professional available
+employee_time_off readable by: owner (1 row), staff member (1), administrator (1); customer, visitor, other owner, other customer: 0; delegated manager with the staff permission: 0 and cannot approve (the web and mobile code never read the table)
+a staff member can insert a leave row already approved (gap staff-can-approve-their-own-leave)
+
+SIGNATURES AND GRANTS
+one function per name for set_user_role(uuid, user_role, text), approve_provider_application(uuid, text, numeric), admin_release_payout(uuid, text, text, text), admin_release_ledger_item(uuid, text, text), admin_create_refund_request(uuid, numeric, text, text), admin_booking_directory(...); search_path public on all; anonymous cannot execute any; owner, employee, customer, anonymous and service role are refused 42501 on every one
+anonymous-executable functions now: get_available_slots, get_branch_available_slots, get_branch_schedule_with_prayer_pauses, normalize_arabic, search_marketplace_providers
+
+ROLE CHANGES, PAYOUT REQUESTS, REFUNDS
+set_user_role: reason "ab" refused; own role refused; unknown profile P0002; audit rows profile.role_changed (role_before, role_after, reason) and profiles.update with the reason; direct profile role write refused 42501
+request_provider_payout: balance 450; owner request 400 accepted; the same request again refused (available 50); 50 accepted; administrator, delegated manager with every operations permission and other owner refused 42501; direct insert refused for owner and administrator; owner cannot edit or delete (0 rows)
+admin_create_refund_request: identical call twice returns the same request; a different case of the reason is the same request; an edited reason makes a second pending refund of the same amount
+
+BOOKING COMMANDS
+administrator with reason null, empty, blank, "x", "ab": cancel_booking, mark_booking_no_show and employee_update_booking_status all refused 22023; "abc" accepted; provider owner with a null reason accepted
+foreign booking against missing booking, as another customer: cancel_booking, mark_booking_no_show, employee_update_booking_status, get_booking_address_secure answer the same; reschedule_booking, customer_confirm_attendance and generate_zatca_tax_invoice answer differently (42501 against P0002) (gap refused-booking-commands-reveal-whether-a-booking-id-exists re-opened)
+get_booking_address_secure: customer, owner, assigned employee and administrator receive the address of a confirmed home visit, a masked notice for a pending one and the branch address for a salon visit; another customer and another owner receive P0002; a visitor 42501
+
+BOOKING DIRECTORY
+administrator only; page size 100000 returns at most 100; offset and size clamps; a booking at 20:59 UTC the day before is excluded and one at 21:00 UTC (00:00 Riyadh) is included for a Riyadh day, and 20:59:59 UTC is the last included; percent, underscores, backslash, quote-injection, semicolons, 13 digit numbers, 5,000 characters, partial ids: 0 matches and no error; a capitalised exact id: 1 match; unknown status and a start after the end: 22023; audit rows for bookings.listed carry the page and filters but not the search text

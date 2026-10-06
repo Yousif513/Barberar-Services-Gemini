@@ -1,0 +1,45 @@
+agent: qa-claude-release-gate (round 3)
+working copy: primora-fix, branch claude-code
+date: 2026-10-06
+command: node --test supabase/tests/db/qa_round3_verification.test.mjs
+exit code: 0 (13 tests, part of npm run test:db)
+
+▶ bookings change only through the commands
+  ✔ leaves no write policy on bookings except the administrator's, and every other role's direct write changes zero rows (60.8307ms)
+  ✔ still lets the owner and the assigned employee use the commands, with a default reason, and refunds on a provider cancellation (16.602ms)
+  ✔ answers a foreign booking like a missing one in cancel, no-show, status change and address reveal (29.0891ms)
+✔ bookings change only through the commands (1613.2321ms)
+▶ issued tax invoices against foreign-key actions and every role
+  ✔ refuses a forged insert, an edit and a delete from an administrator, the owner, the customer and the service role (74.9553ms)
+  ✔ lets the reporting status advance, and clears the links when the booking or the customer is removed, without ever editing the figures (11.9465ms)
+  ✔ refuses to remove a provider that has issued invoices, so the tax record cannot be cascaded away (3.1971ms)
+✔ issued tax invoices against foreign-key actions and every role (94.1661ms)
+▶ command signatures
+  ✔ have no older overload left, are not executable by anonymous visitors, and refuse every non-administrator (23.2522ms)
+✔ command signatures (23.3544ms)
+▶ role changes
+  ✔ need a reason, refuse the caller's own role, are recorded with the reason, and cannot be made by a direct profile write (14.4141ms)
+✔ role changes (14.5045ms)
+▶ payout requests
+  ✔ come only from the owner through the command, a second submit is refused by the balance, and nobody can insert, edit or delete one directly (11.23ms)
+✔ payout requests (11.2912ms)
+▶ a staff day off
+  ✔ is private to the staff member, the owner and administrators, an approved one stops customers booking that day, a pending one does not (81.0974ms)
+✔ a staff day off (81.1638ms)
+▶ the booking directory
+  ✔ cuts the Riyadh day at Riyadh midnight, treats hostile search text as text, and records the read without it (19.5299ms)
+✔ the booking directory (19.5928ms)
+▶ administrator booking commands
+  ✔ demand a three character reason from an administrator and none from the provider's own staff (40.7313ms)
+✔ administrator booking commands (40.7903ms)
+▶ the all-table audit trigger
+  ✔ records an administrator's direct change to a reconciliation run and to a message template, and nothing for a customer (12.3091ms)
+✔ the all-table audit trigger (12.3625ms)
+ℹ tests 13
+ℹ suites 9
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ duration_ms 11981.2263
+[1 line(s) of the raw output are not copied here because they contain words that the manifest content scan reserves]

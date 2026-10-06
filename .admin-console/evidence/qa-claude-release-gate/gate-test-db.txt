@@ -1,0 +1,273 @@
+agent: qa-claude-release-gate
+working copy: primora-fix, branch claude-code
+date: 2026-10-06
+command: npm run test:db
+exit code: 0
+
+▶ admin broadcast
+  ✔ is admin-only (10.9273ms)
+  ✔ writes in-app notifications and queues WhatsApp only with WhatsApp and marketing consent (24.4289ms)
+  ✔ rejects an empty message or unknown audience (4.0861ms)
+✔ admin broadcast (4215.8081ms)
+▶ admin dashboard overview
+  ✔ is readable by administrators only (21.3269ms)
+  ✔ counts work waiting for an operator from live rows (27.6511ms)
+  ✔ reports platform figures in SAR from the ledger and bookings (31.077ms)
+  ✔ stops counting a suspended provider as live (20.6243ms)
+✔ admin dashboard overview (4232.7636ms)
+▶ operator refund retry
+  ✔ is admin-only and needs a reason (10.9589ms)
+  ✔ re-opens a refund that ran out of attempts for exactly one more, and audits who asked (9.7972ms)
+  ✔ leaves attempts alone while automatic retries remain, and refuses finished refunds (17.3566ms)
+✔ operator refund retry (38.4072ms)
+▶ administrator commands refuse every other role before doing anything else
+  ✔ finds the commands from the catalog (7.4931ms)
+  ✔ rejects provider owner, provider employee, customer and anonymous callers with insufficient_privilege (199.2873ms)
+  ✔ lets an administrator through the same check (90.4478ms)
+✔ administrator commands refuse every other role before doing anything else (4499.4989ms)
+▶ tables the console and the money flows write
+  ✔ have rows for the checks below to protect (13.4182ms)
+  ✔ a customer cannot update or delete them directly (56.1535ms)
+  ✔ an anonymous visitor cannot update or delete them directly (27.694ms)
+  ✔ another provider's owner cannot update or delete them directly (48.0249ms)
+  ✔ a provider employee cannot update or delete them directly (39.9724ms)
+  ✔ a customer cannot insert into the audit trail, the ledger or the settings (10.3381ms)
+  ✔ nobody can promote themselves to administrator (30.7305ms)
+✔ tables the console and the money flows write (238.7213ms)
+▶ another provider's data
+  ✔ is not writable by an owner or an employee of a different provider (12.469ms)
+  ✔ an employee cannot change the provider, its branches, prices or payouts (6.1038ms)
+✔ another provider's data (18.7109ms)
+▶ the audit trail
+  ✔ cannot be forged, edited or deleted through any client role (13.1484ms)
+  ✔ is readable by administrators only (3.2873ms)
+  ✔ has no writer that a client role can execute (0.9242ms)
+✔ the audit trail (17.4838ms)
+▶ what the landing page summary reveals
+  ✔ contains counts and money totals, never a customer's name, email or phone (5.1051ms)
+✔ what the landing page summary reveals (5.1609ms)
+▶ database invariants the authorization model relies on
+  ✔ every elevated-rights function pins its search path (1.4315ms)
+  ✔ every table in public has row-level security switched on (1.033ms)
+  ✔ the views added for the console run with the caller's rights and are closed to anonymous visitors (1.0538ms)
+✔ database invariants the authorization model relies on (3.6284ms)
+▶ booking engine
+  ✔ has exactly one version of each booking entry point (3.5182ms)
+  ✔ prices a marketplace first visit with fee rules, VAT and the provider deposit (121.8254ms)
+  ✔ charges no platform fee on provider-sourced bookings (71.3139ms)
+  ✔ assigns a professional when 'any available' is requested (74.2457ms)
+  ✔ refuses bookings with unverified providers (115.3988ms)
+  ✔ confirms on verified payment, records the ledger and queues messages (61.739ms)
+  ✔ customer cancellation inside the free window refunds the full deposit through a refund request (56.709ms)
+  ✔ customer late cancellation keeps the provider's fee; provider cancellation refunds everything (93.2669ms)
+  ✔ enforces the reschedule notice rule for customers and lets the provider move the booking (52.5941ms)
+  ✔ staff check-in, completion and no-show follow the visit time (54.739ms)
+  ✔ expires unpaid holds only for the scheduler or an admin (40.8795ms)
+  ✔ confirms a late payment when the released slot is still free, otherwise requests a refund (83.3712ms)
+  ✔ applies coupons and gift cards server-side and returns them when the booking is cancelled (41.6654ms)
+  ✔ rejects loyalty redemption while the programme is disabled and invalid promo codes (34.3273ms)
+  ✔ books several services in one visit (36.8355ms)
+  ✔ lets staff record walk-ins with no platform fee and no fabricated customer (6.045ms)
+  ✔ keeps block reasons and other customers' eligibility private (37.7635ms)
+  ✔ stops owners from approving or verifying their own business (3.3476ms)
+  ✔ does not let audit rows be written from a client (2.19ms)
+✔ booking engine (5200.8127ms)
+▶ customer overview
+  ✔ is for administrators only (9.3734ms)
+  ✔ counts visits and completed spend from bookings, leaving out unpaid and system-released holds (38.8165ms)
+  ✔ returns totals over every customer and one page of the matching ones, newest first (10.8184ms)
+  ✔ searches names, email and phone, treating % and _ as ordinary characters (10.3113ms)
+  ✔ finds a customer by ID, so a data request can open the record it concerns (3.8303ms)
+  ✔ records each look at customer data without the search text (6.5113ms)
+✔ customer overview (4207.7221ms)
+▶ data-subject requests
+  ✔ are for administrators only and need the operator's own note (14.071ms)
+  ✔ move through start, complete and reject once, recording who reviewed them and why (15.0966ms)
+✔ data-subject requests (32.7971ms)
+▶ manual phone verification
+  ✔ is for administrators only and needs a reason (9.0971ms)
+  ✔ cannot verify a number that does not exist (2.2307ms)
+  ✔ verifies and revokes with the reason in the audit log, and treats a repeat as a safe retry (13.2785ms)
+✔ manual phone verification (24.8425ms)
+▶ owner workflows
+  ✔ adds stock, retries safely and rejects a reused request id with a different payload (17.4967ms)
+  ✔ refuses waste beyond stock, then succeeds with the same request id once stock exists (15.8058ms)
+  ✔ transfers conserve stock and reject insufficient or foreign transfers (17.551ms)
+  ✔ deactivates a product reversibly and audits catalog changes (13.6382ms)
+  ✔ runs a purchase order from draft to received exactly once (22.1878ms)
+✔ owner workflows (4271.9818ms)
+▶ delegated staff
+  ✔ can be granted branch-scoped inventory access only for registered staff (13.7589ms)
+  ✔ cannot approve orders, grant itself access, or replay another user's request id (13.4693ms)
+  ✔ loses access immediately when permissions are revoked or the membership is disabled (94.1432ms)
+✔ delegated staff (121.615ms)
+▶ unauthorized callers
+  ✔ cannot read or mutate another provider's stock or catalog (7.1306ms)
+  ✔ cannot open the admin supply overview (4.0474ms)
+✔ unauthorized callers (11.3598ms)
+▶ admin oversight
+  ✔ returns real orders and stock health and audits each read (16.2009ms)
+✔ admin oversight (16.3142ms)
+▶ booking safeguards survive P3
+  ✔ anonymous visitors still can execute only discovery functions (4.8523ms)
+  ✔ a customer still cannot move a booking into completed (2.2646ms)
+✔ booking safeguards survive P3 (7.2661ms)
+▶ request board
+  ✔ creates posts as open without invented coordinates (17.6193ms)
+  ✔ forces new bids to pending and blocks self-acceptance (71.9161ms)
+  ✔ lets only the posting customer accept, rejecting the other bids (84.8084ms)
+  ✔ lets the customer cancel an open request but not reopen it (34.0262ms)
+  ✔ rejects bids from unverified providers and foreign professionals (27.844ms)
+  ✔ does not expose the accept command to anonymous visitors (1.443ms)
+✔ request board (4353.4573ms)
+▶ purchases need a captured payment
+  ✔ keeps a gift card unusable until the webhook confirms payment (21.8073ms)
+  ✔ activates a package only after payment and lets only provider staff record sessions (23.3659ms)
+  ✔ only credits a tip to the provider after it is paid (39.0288ms)
+  ✔ activates a paid plan only after payment and only for the owner (9.5123ms)
+✔ purchases need a captured payment (4506.9446ms)
+▶ refunds, payouts and reports
+  ✔ processes refunds only through the service role and updates the ledger (24.9453ms)
+  ✔ never lets the same balance be requested or released twice (21.7779ms)
+  ✔ invoices the fee still owed after what the deposit already covered (12.5734ms)
+  ✔ does not report a reconciliation as matched without Tap figures (6.8156ms)
+  ✔ turns an upheld dispute into a refund request (16.7888ms)
+  ✔ issues a tax invoice only with the provider's real VAT number and never claims FATOORA submission (21.2596ms)
+  ✔ charges no platform fee on a returning marketplace client (1.866ms)
+  ✔ books with a paid gift card end to end (85.0629ms)
+✔ refunds, payouts and reports (191.5696ms)
+▶ admin visibility of employees
+  ✔ lets administrators read inactive employees that nobody else outside the provider can see (16.7547ms)
+✔ admin visibility of employees (4469.4158ms)
+▶ branch and employee figures
+  ✔ count outcomes, revenue, commission and earnings from bookings and the ledger (82.0554ms)
+  ✔ report revenue for the last 30 days separately from older revenue (12.3419ms)
+  ✔ show a provider's own figures to its owner only, and nothing to the public (16.8005ms)
+✔ branch and employee figures (111.4027ms)
+▶ provider status command
+  ✔ is for administrators only and needs a reason (6.8186ms)
+  ✔ suspends and reactivates with the reason in the audit log, and reports bookings still ahead (19.3892ms)
+  ✔ only offers the moves that change what customers can book (12.2356ms)
+✔ provider status command (38.7196ms)
+▶ client-executable functions are accounted for
+  ✔ only the public catalogue functions are callable by an anonymous visitor (6.4624ms)
+  ✔ every elevated-rights function a signed-in user can run carries an identity, role or service-role check (6.2307ms)
+  ✔ confirm_booking_payment and the other service-role commands refuse an administrator, an owner, a customer and a visitor (15.0624ms)
+  ✔ internal money helpers cannot be executed by any client role (1.7019ms)
+✔ client-executable functions are accounted for (4221.6043ms)
+▶ reasoned administrator commands
+  ✔ admin_clear_customer_profile refuses a missing, blank or too short reason and changes nothing (22.8743ms)
+  ✔ admin_release_expired_holds refuses a missing, blank or too short reason and changes nothing (25.4305ms)
+  ✔ admin_reopen_stuck_refund refuses a missing, blank or too short reason and changes nothing (22.8003ms)
+  ✔ admin_retry_refund_request refuses a missing, blank or too short reason and changes nothing (25.0713ms)
+  ✔ admin_review_payout_request refuses a missing, blank or too short reason and changes nothing (18.8272ms)
+  ✔ admin_set_phone_verified refuses a missing, blank or too short reason and changes nothing (20.1717ms)
+  ✔ admin_set_provider_status refuses a missing, blank or too short reason and changes nothing (23.5506ms)
+  ✔ admin_update_data_request refuses a missing, blank or too short reason and changes nothing (17.4375ms)
+  ✔ admin_update_platform_setting refuses a missing, blank or too short reason and changes nothing (18.9683ms)
+  ✔ a reason is recorded, with the acting administrator, when the command succeeds (8.6872ms)
+✔ reasoned administrator commands (219.9682ms)
+▶ replayed commands have one effect
+  ✔ releasing the same payout twice with the same key pays once (12.5237ms)
+  ✔ releasing a paid payout again under a different key is refused, not paid twice (11.539ms)
+  ✔ a payout that the ledger cannot cover is refused whole and allocates nothing (7.2921ms)
+  ✔ settling a ledger row twice records one settlement (6.0937ms)
+  ✔ repeating a payout review, a provider status change or a profile clear does not repeat the effect (21.4246ms)
+  ✔ a refund that already succeeded cannot be retried or reopened (5.6986ms)
+  ✔ retrying a refund that ran out of attempts grants exactly one more attempt, however often it is clicked (10.258ms)
+✔ replayed commands have one effect (75.195ms)
+▶ customer directory and export record
+  ✔ returns at most 100 rows however large a page is asked for, and never a negative offset (8.143ms)
+  ✔ pages are stable and do not overlap (4.7353ms)
+  ✔ searches wildcard characters literally and never finds a partial customer ID (9.7813ms)
+  ✔ records every listing as a privileged read, with the administrator and the page, and no personal values (6.5734ms)
+  ✔ refuses an export record for an unknown report, an unbounded period or an empty file, and writes nothing (9.3786ms)
+✔ customer directory and export record (54.2679ms)
+▶ booking commands refuse other people's bookings
+  ✔ another customer, another provider's owner and staff and a visitor cannot cancel, reschedule, dispute, tip or change its status (31.132ms)
+  ✔ the owner of another provider cannot read or update the booking, its ledger row or its refunds (17.8097ms)
+  ✔ a provider's owner cannot change what the customer paid, who booked, or the commission (17.7485ms)
+✔ booking commands refuse other people's bookings (165.4646ms)
+▶ identity
+  ✔ a role named in signup metadata does not become the account's role (3.0471ms)
+  ✔ a demoted administrator is refused at once, by command, by table and by audit log (11.5173ms)
+  ✔ a provider owner cannot give themselves or anyone else a provider's control fields (3.2754ms)
+  ✔ customers cannot change their own role, phone verification or verification time (21.4897ms)
+✔ identity (39.4695ms)
+▶ cross-tenant reads, swept over every table and view
+  ✔ has rows to protect in every money, tax and personal-data table it lists (18.7908ms)
+  ✔ shows no row at all of a money, tax or personal-data table to another provider, its staff, another customer or a visitor (429.2696ms)
+  ✔ shows a stranger nothing of another provider's or another customer's rows outside the public catalogue (658.1513ms)
+  ✔ shows an anonymous visitor only the public catalogue, whatever the table holds (66.3841ms)
+  ✔ keeps a customer's own wallet, loyalty, requests and consent invisible to other customers and to providers (14.1775ms)
+✔ cross-tenant reads, swept over every table and view (1333.6742ms)
+▶ admin write audit
+  ✔ records admin changes to services with before/after values in the same transaction (12.2168ms)
+  ✔ redacts sensitive values and ignores provider-owner writes (12.0161ms)
+✔ admin write audit (4372.8045ms)
+▶ payout review
+  ✔ approves and rejects only through valid transitions with a reason (16.5084ms)
+✔ payout review (16.6233ms)
+▶ platform settings
+  ✔ change only through the validated command, with reason and audit (11.2864ms)
+  ✔ validates loyalty values and keeps tier tables (4.4864ms)
+✔ platform settings (15.9594ms)
+▶ operator hold release
+  ✔ is admin-only, needs a reason and records how many holds were released (7.158ms)
+✔ operator hold release (7.4637ms)
+▶ customer profile clearing
+  ✔ is admin-only, needs a reason and only applies to customer profiles (10.3087ms)
+  ✔ clears profile details without inventing values, so repeated clears never collide (24.0506ms)
+✔ customer profile clearing (34.5612ms)
+▶ report exports
+  ✔ are recorded by administrators only, for a known report, a sensible period and at least one row (8.9177ms)
+  ✔ leave an audit entry naming the report, the period and how many rows left the system (2.9378ms)
+✔ report exports (11.9966ms)
+▶ monthly VAT summary
+  ✔ puts a booking after midnight Riyadh time on the 1st in the new month (12.7562ms)
+✔ monthly VAT summary (4348.6021ms)
+▶ administrator writes to money and configuration tables
+  ✔ leave an audit entry, the way the console commands do (36.0863ms)
+  ✔ cover every table an administrator policy can write (10.6496ms)
+  ✔ do not copy personal values into the log, even when the command that clears them runs (11.1414ms)
+  ✔ keep only the last four digits of a bank account, and no codes or free text (23.9267ms)
+✔ administrator writes to money and configuration tables (4451.19ms)
+▶ payout requests
+  ✔ keep the amount and bank details the provider asked for, even against an administrator (10.7024ms)
+  ✔ can still be reviewed, which only changes the status (4.673ms)
+✔ payout requests (18.6242ms)
+▶ what anonymous visitors can read
+  ✔ keeps the public marketplace columns and drops provider and staff internals (29.049ms)
+  ✔ does not change what the provider owner and the administrator can read (4.7583ms)
+✔ what anonymous visitors can read (34.1064ms)
+▶ refunds stuck in progress
+  ✔ are reopened only by an administrator, with a reason, and only after 15 minutes (16.2172ms)
+  ✔ go back to failed so the operator can retry them, with the reason in the audit log (8.0839ms)
+  ✔ are counted as stuck on the dashboard (9.998ms)
+✔ refunds stuck in progress (34.4662ms)
+▶ anonymous access
+  ✔ exposes only read-only discovery functions to anonymous visitors (6.1592ms)
+  ✔ lets guests see availability before signing in (24.5599ms)
+  ✔ does not let anyone else confirm attendance on a booking (2.2758ms)
+✔ anonymous access (4356.7529ms)
+▶ verification and onboarding
+  ✔ records CR verification only from the Wathq integration or an admin review (17.6153ms)
+  ✔ activates an approved provider and refuses incomplete applications (23.843ms)
+  ✔ accepts only published agreements (9.2716ms)
+✔ verification and onboarding (50.9934ms)
+▶ search, import and messaging
+  ✔ searches with Arabic normalization and reports no rating when there are no reviews (4.4999ms)
+  ✔ imports clients as provider contacts without inventing accounts (11.777ms)
+  ✔ dispatches only to verified, consenting recipients and never marks a message sent without a provider id (32.6519ms)
+✔ search, import and messaging (49.2018ms)
+▶ provider analytics (P2-C)
+  ✔ runs the analytics functions for the owner and refuses customers (24.4222ms)
+✔ provider analytics (P2-C) (24.5305ms)
+ℹ tests 167
+ℹ suites 46
+ℹ pass 167
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ duration_ms 16346.6201
+[1 line(s) of the raw output are not copied here because they contain words that the manifest content scan reserves]

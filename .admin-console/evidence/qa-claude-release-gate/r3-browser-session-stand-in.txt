@@ -1,0 +1,27 @@
+agent: qa-claude-release-gate (round 3)
+date: 2026-10-06
+environment: primora-fix dev server on http://localhost:3030 (NEXT_PUBLIC_ENABLE_DEV_ACCESS=true) pointed at the verification-only REST stand-in on http://127.0.0.1:54397, which now also serves payout requests and admin_booking_directory. Role: admin through the local dev role only. The hosted project was never contacted. Both servers were stopped afterwards and ports 3030 and 54397 were confirmed free.
+LIMITS: proves screen behaviour only, not row-level security or real sessions. The stand-in does not serve the ledger table, disputes or reviews, so the ledger "release provider share" dialog, the dispute dialog and the review moderation dialog could not be opened; they were read in source (components and rpc parameter names checked against the database signatures).
+
+LEDGER, PAYOUT REQUESTS TAB (/admin/ledger)
+6 payout requests listed; row actions carry the request in their accessible name ("Mark payout request PR-000-9 as paid", "Reject payout request PR-001-D")
+Enter on "Mark payout request PR-000-9 as paid": role=dialog aria-modal=true; shows the request id, provider, amount 450.00 SAR, bank with the IBAN masked (SA03 **** **** 7510), status; a reason field "Bank transfer reference or note (recorded in the audit log)"; a typed confirmation of the amount
+Enter with an empty reason and nothing typed: reason and amount fields marked invalid, message "Enter a reason of at least 3 characters.", no request sent
+reason typed and amount "450" typed: the amount field marked invalid, no request sent
+reason and "450.00" typed with the stand-in forced to answer 500 on admin_release_payout: dialog stays open, both values kept, message "internal error while reading rpc:admin_release_payout" shown; the stand-in log shows one call with p_reason "Bank transfer ref TR-88231" and p_idempotency_key payout_release_<request id>; active element afterwards BODY
+failure cleared, Enter on Mark as paid: dialog closed, "Success: Payout request marked paid and ledger rows released." in a status region, active element MAIN
+"Reject payout request PR-001-D": names the request, provider, amount, masked bank, status; a required reason; Escape closed it
+
+BOOKINGS DIRECTORY (/admin/bookings)
+fields: search, From (Riyadh date), To (Riyadh date), Status; 25 rows per page; text "Totals cover every booking that matches the filters, not only the page below."; totals SAR 561,818.00 value and SAR 78,022.75 commission across all matching bookings
+search "Al-Dosari" by Enter: address ?q=Al-Dosari, request p_search "Al-Dosari" offset 0, 25 rows, "Showing 1-25 of 111"
+Next by Enter: request offset 25, "Showing 26-50 of 111", focus stays on the Next button
+From 2026-10-20 with To 2026-10-01: message "The From date must not be after the To date.", both date fields marked invalid, no request carried both dates
+the screen no longer limits the list to the newest 500
+
+PHONE DRAWER AT 375 x 812 (/admin/refunds)
+Enter on the menu button: focus moves to the drawer's Close button; the header, the sidebar and the content area are inert while it is open
+40 Tab presses and 3 Shift+Tab presses: focus stayed inside the drawer every time (26 focusable controls, wraps)
+Escape: drawer inert again, focus back on "Open navigation", aria-expanded false
+
+NOT EXERCISED: dispute and review dialogs, ledger release-item dialog (stand-in does not serve them); provider and customer roles; Arabic at phone width this round; any hosted session

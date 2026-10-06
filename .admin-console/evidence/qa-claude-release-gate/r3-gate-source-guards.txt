@@ -1,0 +1,16 @@
+agent: qa-claude-release-gate (round 3)
+working copy: primora-fix, branch claude-code
+date: 2026-10-06
+commands: npm run test:security-core ; npm run test:admin-controls ; npm run test:p3-compat
+exit codes: 0, 0, 0
+
+> beauty-grooming-marketplace@1.0.0 test:security-core
+> node scripts/verify-security-core.mjs
+Security core verification passed.
+> beauty-grooming-marketplace@1.0.0 test:admin-controls
+> node scripts/verify-admin-controls.mjs
+Admin controls verification passed.
+> beauty-grooming-marketplace@1.0.0 test:p3-compat
+> node scripts/verify-p3-migration-compatibility.mjs
+Applied 43 migrations from origin/claude-code and 2 P3 migrations in isolated Postgres.
+Full-chain owner writes, scoped delegation, duplicate retry and revoked-permission denial passed.

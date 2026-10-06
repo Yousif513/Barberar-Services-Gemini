@@ -1,0 +1,61 @@
+agent: qa-claude-release-gate
+working copy: primora-fix, branch claude-code
+date: 2026-10-06
+commands: admin_console_manifest.py validate --phase release (exit 1) ; admin_console_manifest.py coverage (exit 1)
+
+VALIDATE (rule: count)
+release-status-unresolved: 94
+screen-accessibility: 26
+screen-state-missing: 21
+gap-unresolved: 20
+crosscutting-flag: 17
+screen-responsive: 17
+required-field-empty: 15
+gate-not-passed: 8
+screen-no-capability: 7
+decision-assumed: 4
+crosscutting-evidence: 3
+entity-query-missing: 2
+nonfunctional-gate-required: 2
+role-unused: 2
+privileged-read-audit: 1
+
+ERROR: [gap-unresolved] gaps[admin-can-still-rewrite-money-tables-directly].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[admin-create-refund-request-replay-creates-a-second-refund].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[admin-direct-writes-to-money-tables-leave-no-audit].status: unresolved critical gap blocks release
+ERROR: [gap-unresolved] gaps[admin-reads-of-personal-and-bank-data-bypass-the-audited-commands].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[admin-sessions-have-no-mfa-or-step-up].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[administrator-role-grants-have-no-screen-reason-or-last-admin-guard].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[iban-unmasked-to-every-admin].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[issued-tax-invoices-can-be-edited-and-deleted-by-an-administrator].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[ledger-and-payout-commands-use-native-dialogs-and-take-no-reason].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[no-customer-data-rights-path].status: unresolved critical gap blocks release
+ERROR: [gap-unresolved] gaps[no-separation-of-duties].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[operators-cannot-find-a-booking-outside-the-newest-500].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[payout-iban-can-be-rewritten-by-an-admin-before-release].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[pdpl-erasure-scope-undecided].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[process-payout-edge-function-releases-money-without-allocation-or-audit].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[provider-direct-booking-writes-bypass-cancel-refund-and-time-guards].status: unresolved critical gap blocks release
+ERROR: [gap-unresolved] gaps[public-read-policies-expose-internal-provider-and-staff-columns].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[referral-and-loyalty-values-self-approved-and-unbounded].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[refund-outcomes-that-cannot-be-known-have-no-recovery].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[staff-leave-reasons-readable-by-every-signed-in-account].status: unresolved high gap blocks release
+Validation complete: 239 error(s), 1 warning(s)
+
+COVERAGE
+# Structural coverage audit
+Profile: regulated (manifest)
+| Severity | Rule | Path | Finding |
+|---|---|---|---|
+| error | entity-query-missing | entities[payment-method].capabilities | entity has no query capability, so operators cannot observe it |
+| error | entity-query-missing | entities[platform-settings].capabilities | entity has no query capability, so operators cannot observe it |
+| error | role-unused | roles[customer] | role is not granted access to any screen |
+| error | role-unused | roles[customer] | role is not the actor on any capability |
+| error | screen-no-capability | screens[admin-dashboard].capabilities | screen exposes no capability; either link one or delete the screen |
+| error | screen-no-capability | screens[admin-disputes].capabilities | screen exposes no capability; either link one or delete the screen |
+| error | screen-no-capability | screens[admin-help].capabilities | screen exposes no capability; either link one or delete the screen |
+| error | screen-no-capability | screens[admin-notifications].capabilities | screen exposes no capability; either link one or delete the screen |
+| error | screen-no-capability | screens[admin-packages].capabilities | screen exposes no capability; either link one or delete the screen |
+| error | screen-no-capability | screens[admin-payments-redirect].capabilities | screen exposes no capability; either link one or delete the screen |
+11 error(s), 0 warning(s)
+[1 line(s) of the raw output are not copied here because they contain words that the manifest content scan reserves]

@@ -1,0 +1,19 @@
+agent: qa-claude-release-gate
+date: 2026-10-06
+method: supabase/migrations and supabase/tests were copied to a scratch folder outside the repository, one guard was weakened per run (either an edit to a migration or an extra migration appended), and supabase/tests/db/qa_adversarial.test.mjs was run against it. The repository files were not changed.
+
+baseline (no change): exit code 0, 38 of 38 tests pass
+
+weakened guard -> result
+admin_retry_refund_request stops checking the reason -> exit 1, test "admin_retry_refund_request refuses a missing, blank or too short reason and changes nothing" fails
+extra policy lets everyone read public.invoices -> exit 1, 3 tests fail (no row of a money table to a stranger; cross-tenant sweep; anonymous visitor sees only the catalogue)
+extra policy lets every signed-in user read public.provider_fee_invoices -> exit 1, 2 tests fail (money-table stranger read; cross-tenant sweep)
+admin_customer_overview page size cap raised from 100 to 100000 -> exit 1, test "returns at most 100 rows however large a page is asked for" fails
+protect_booking_immutable_fields replaced with a function that allows every change -> exit 1, test "a provider's owner cannot change what the customer paid, who booked, or the commission" fails
+new SECURITY DEFINER function with no identity check granted to authenticated -> exit 1, 2 tests fail (anonymous-callable list; elevated-rights functions carry a check)
+is_admin() replaced by a check that trusts the role claim -> exit 1, 7 tests fail (other people's booking commands, cross-provider booking reads, demoted administrator, provider control fields, money-table stranger read, cross-tenant sweep, customer wallet and requests)
+write_audit_log granted to authenticated -> exit 1, test "internal money helpers cannot be executed by any client role" fails
+admin_dashboard_overview granted to anon -> exit 1, test "only the public catalogue functions are callable by an anonymous visitor" fails
+confirm_booking_payment rewritten to accept an administrator -> exit 1, test "confirm_booking_payment and the other service-role commands refuse an administrator ..." fails
+
+summary: 10 of 10 weakenings were caught, 0 missed.

@@ -1,0 +1,40 @@
+agent: qa-claude-release-gate
+date: 2026-10-06
+environment: the primora-fix dev server on http://localhost:3030 (next dev, NEXT_PUBLIC_ENABLE_DEV_ACCESS=true) pointed at a verification-only REST stand-in on http://127.0.0.1:54397 that serves production-shaped data (1,150 customers, 1,420 bookings in every status, 27 refunds in every state, 38 providers with long English and Arabic names, ties in sort keys) and can force 403, 500, a dropped connection, a slow reply or an empty table per resource. Role: admin through the local dev role only. The hosted project was never contacted. Both servers were stopped afterwards and ports 3030 and 54397 were confirmed free.
+LIMITS: this proves screen behaviour, not row-level security, hosted data or real sessions. Provider and customer roles were not walked. Screens whose tables the stand-in does not serve (ledger, disputes, integrations, coupons, packages, reviews, services, branches, supply) answer 404 and could only be seen in their error state; their populated and command paths were not exercised in a browser.
+
+ROUTES OPENED (22): /admin, activity, audit-logs, bookings, branches, coupons, customers, disputes, employees, help, integrations, ledger, notifications, packages, providers, refunds, reports, reviews, services, settings, supply, taxes
+console messages across all 22 visits: no uncaught error, no hydration warning, no React warning. The only error lines were (a) failed requests for tables the stand-in does not serve, (b) the dev server's hot-reload websocket refusing in this pane (dev only), (c) requests the test itself forced to fail.
+screens served by the stand-in with zero failed requests: dashboard, activity, audit-logs, bookings, customers, employees, help, notifications, providers, refunds, reports, settings, taxes
+
+KEYBOARD, REFUND RETRY DIALOG (/admin/refunds)
+Enter on "Retry refund rf-023-7, SAR 60.00": role=dialog, aria-modal=true, labelled "Retry this refund"; focus lands in the reason field; 10 background regions inert; the dialog names the refund reference, amount, booking, status
+Tab and Shift+Tab wrap inside the dialog in both directions (checked from the last control to the first and back)
+Enter with an empty reason: aria-invalid on the field, message "Enter a reason of at least 3 characters.", no request sent
+two characters "ab": same refusal, no request sent
+reason "abc" with the server forced to 403: dialog stays open, reason kept, message shown in an alert region; request body had p_reason "abc"
+with the server forced to 500: after the previous failure the active element was BODY, so the next Enter did nothing; Tab then re-entered the dialog at the reason field (gap focus-lost-after-commands-and-paging)
+Escape: dialog closed, focus back on the "Retry refund rf-023-7" button, no element left inert except the closed phone drawer
+valid reason "Gateway is back, retrying": request body p_reason "Gateway is back, retrying", then process-refund called; the gateway refusal shown in a status region; dialog closed; active element BODY afterwards
+
+OTHER DIALOGS
+/admin/customers clear profile (Mohammed Al-Otaibi): shows name, email, phone, id, what is removed and kept, reason and a typed confirmation of the first eight characters of the id; empty fields: both marked invalid, nothing sent; correct reason with the wrong confirmation: confirmation marked invalid, nothing sent (stand-in log has no clear-profile command)
+/admin/bookings?status=confirmed cancel "Cancel booking dddfe2ad": names customer, provider and branch, time, amount; reason required; Escape returns focus to the button
+/admin/bookings invoice dialog (Tax Invoice): role=dialog, focus on Close; hosts requested while open: localhost:3030 and 127.0.0.1:54397 only; QR payload shown as text with a Copy action
+/admin/settings hold minutes 10 with no reason: reason field marked invalid and focused; with reason and the server forced to 403: values 10 and the reason kept, message "permission denied" in an alert region; active element BODY afterwards
+
+DEEP LINKS
+/admin/providers?tab=applications&appStatus=pending: opens the Applications Review Queue with Pending (4) selected (the address bar shows ?tab=applications because pending is the default)
+/admin/customers?tab=requests: opens the PDPL data requests section; rows are linked to the customer record and carry start, complete and refuse actions named with the request
+/admin/bookings?status=pending_payment and ?status=confirmed: the status filter is selected and the request carries status=eq.<value>; the list is the newest 500 (the page says so)
+
+STATES REACHED
+dashboard: populated; 403 -> "You do not have access to this screen" with the role explanation; 500 -> error with Try again; slow (4 s) -> "Loading the overview..." in a status region
+refunds, customers, bookings, settings, audit-logs, reports, employees, providers, taxes: populated
+bookings with 1,420 rows in the data: 500 rendered, no pagination or search beyond the status filter
+
+PHONE (375 x 812) AND ARABIC
+no horizontal page scroll on /admin/refunds at 375 px in English or Arabic; dir=rtl and lang=ar after the switch; title and heading in Arabic
+phone drawer: Enter on the menu button opens it, focus moves to its Close button, Escape closes it and returns focus to the button; BUT after opening it 28 Tab presses moved focus out to a refund button behind it and no element was inert although the drawer declares aria-modal=true (gap admin-phone-drawer-not-keyboard-operable re-opened)
+language switch at phone width without reload: closed drawer left 87 px inside the viewport (gap phone-drawer-leaves-a-sliver-on-screen-after-a-language-switch)
+packages and services screens show an Arabic load error under the English interface (gap packages-and-services-load-errors-ignore-the-interface-language)

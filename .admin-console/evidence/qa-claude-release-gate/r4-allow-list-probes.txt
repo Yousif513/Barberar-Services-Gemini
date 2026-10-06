@@ -1,0 +1,28 @@
+agent: qa-claude-release-gate (round 4)
+date: 2026-10-06
+target: all migrations through 20261005190000_audit_values_by_allow_list.sql applied to PGlite. Nothing applied to the hosted project.
+gates re-run: test:db 217/217, test:inventory 10/10, web 156/156, security-core, admin-controls, p3-compat, typecheck:mobile, lint (0 errors, 390 and 14 warnings), build, all exit 0
+
+AUDIT ALLOW-LIST
+administrator completes a booking: message_queue.insert is recorded, customer first and last name not present
+administrator edits a customer note: one provider_customer_notes.update row, note text not present; leave reason edits are recorded as changed without the text
+500-row administrator insert: 6 audit rows (5 itemised and one notifications.bulk_write summary); 500-row delete: 6 rows
+within one transaction the counter spans tables: after 5 itemised rows a later important write (a reconciliation run flipped to matched) is not itemised; reachable only inside one command, which writes its own audit entry, since each request is its own transaction
+audit reason set by one command stays attached to a later unrelated write in the same transaction (reason carry-over); not reachable from separate requests
+FAILS: administrator runs generate_zatca_tax_invoice: invoices.insert row holds buyer_name (the customer's name) because invoices is on the full-value list
+FAILS: administrator updates integrations.webhook_url and base_url: both values, including a token in the URL, are in the log because integrations is on the full-value list
+text and json columns on the full-value list include integrations.base_url, integrations.webhook_url, invoices.buyer_name, invoices.buyer_vat_number, refund_requests.error_message, psp_reconciliation_runs.notes, loyalty_points_ledger.description
+
+FOREIGN AGAINST MISSING BOOKING
+reschedule_booking, customer_confirm_attendance and generate_zatca_tax_invoice answer another customer and another owner exactly as they answer a missing id; the owner can still reschedule
+
+REASON LENGTH
+moderate_review (hidden and flagged), reject_provider_application and resolve_booking_dispute refuse a one character reason with 22023; publishing a review needs none
+
+LEAVE APPROVAL TRIGGER
+staff insert approved: refused 42501; staff insert pending: accepted; staff update own pending to approved: refused
+owner approves: accepted; administrator approves: accepted; service role inserts approved: accepted; other provider's owner: 0 rows; a delegate with the staff permission: 0 rows (the table policy does not include delegates, the trigger would allow them)
+FAILS: a staff member edits end_date of a row the owner already approved (status unchanged) and the row now blocks 30 days: the trigger acts only on a change of status
+
+PROVIDER REGISTRATION REVIEW
+no bare prompt( remains in provider-management.tsx; the CR number and note use CommandDialog with a field; the guard regex is now (?<![\w.])(?:window\.)?(prompt|confirm|alert)\( (source read, not opened in a browser)

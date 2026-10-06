@@ -1,0 +1,88 @@
+agent: qa-claude-release-gate
+working copy: primora-fix, branch claude-code
+date: 2026-10-06
+command: node --test supabase/tests/db/qa_open_defects.repro.mjs
+exit code: 1 (every case fails today by design; each asserts the behaviour the console needs)
+file: supabase/tests/db/qa_open_defects.repro.mjs (18 cases, not part of npm run test:db)
+
+▶ QA-1 a provider's direct write to bookings bypasses the money commands
+  ✖ cancelling a paid booking directly must not leave the customer's deposit with the provider and no refund (85.6884ms)
+  ✖ completing a booking before its start time must be refused on the direct path as it is on the command path (53.3701ms)
+  ✖ marking a future booking as a no-show must be refused on the direct path (48.1786ms)
+✖ QA-1 a provider's direct write to bookings bypasses the money commands (1689.3944ms)
+▶ QA-2 administrator writes to tax, reconciliation and message tables leave no audit entry
+  ✖ an administrator's direct change to invoices is recorded in the audit log (30.6621ms)
+  ✖ an administrator's direct change to provider_fee_invoices is recorded in the audit log (29.9685ms)
+  ✖ an administrator's direct change to psp_reconciliation_runs is recorded in the audit log (9.6517ms)
+  ✖ an administrator's direct change to message_templates is recorded in the audit log (9.7909ms)
+  ✖ a ZATCA tax invoice cannot be edited or deleted by an administrator after issue (26.4076ms)
+✖ QA-2 administrator writes to tax, reconciliation and message tables leave no audit entry (106.7376ms)
+▶ QA-3 replayed administrator refund creates a second refund
+  ✖ two identical admin_create_refund_request calls produce one refund request (80.1115ms)
+✖ QA-3 replayed administrator refund creates a second refund (80.2246ms)
+▶ QA-4 internal provider and staff details are readable by every signed-in account
+  ✖ a customer and a competing provider's owner cannot read operator notes, commission, registration or staff contact details (9.0926ms)
+  ✖ staff leave reasons are not readable by customers (28.0011ms)
+✖ QA-4 internal provider and staff details are readable by every signed-in account (37.1782ms)
+▶ QA-5 get_booking_address_secure works for the people it is meant for
+  ✖ returns the address to the booking's own customer (4.882ms)
+✖ QA-5 get_booking_address_secure works for the people it is meant for (4.933ms)
+▶ QA-6 role administration
+  ✖ granting or removing the administrator role takes a reason (1.0466ms)
+  ✖ the last administrator cannot demote themself (3.3768ms)
+✖ QA-6 role administration (4.4884ms)
+▶ QA-7 money and access commands that take no reason
+  ✖ every administrator command that moves money or grants access has a reason or note argument that is required (2.5212ms)
+✖ QA-7 money and access commands that take no reason (2.5615ms)
+▶ QA-8 a refused booking command must not reveal whether the booking exists
+  ✖ cancel_booking answers a foreign booking and a missing booking the same way (29.5187ms)
+✖ QA-8 a refused booking command must not reveal whether the booking exists (29.5729ms)
+▶ QA-9 an administrator can create a payout to a bank account the provider never supplied
+  ✖ an administrator cannot insert a payout request for a provider, and so cannot choose the destination of a release (4.0695ms)
+✖ QA-9 an administrator can create a payout to a bank account the provider never supplied (4.1235ms)
+▶ QA-10 booking commands take their reason from the screen, not from the database
+  ✖ cancel_booking, mark_booking_no_show and employee_update_booking_status refuse a blank reason (15.4003ms)
+✖ QA-10 booking commands take their reason from the screen, not from the database (15.4538ms)
+ℹ tests 18
+ℹ suites 10
+ℹ pass 0
+ℹ fail 18
+ℹ cancelled 0
+ℹ skipped 0
+ℹ duration_ms 12050.9475
+✖ failing tests:
+✖ cancelling a paid booking directly must not leave the customer's deposit with the provider and no refund (85.6884ms)
+  AssertionError [ERR_ASSERTION]: direct cancel succeeded, refund requests created: 0; cancel_booking() would have created one for 17.00
+✖ completing a booking before its start time must be refused on the direct path as it is on the command path (53.3701ms)
+  AssertionError [ERR_ASSERTION]: the direct write must refuse too
+✖ marking a future booking as a no-show must be refused on the direct path (48.1786ms)
+  AssertionError [ERR_ASSERTION]: Expected "actual" to be strictly unequal to: 'ok'
+✖ an administrator's direct change to invoices is recorded in the audit log (30.6621ms)
+  AssertionError [ERR_ASSERTION]: no audit entry for a direct change to invoices
+✖ an administrator's direct change to provider_fee_invoices is recorded in the audit log (29.9685ms)
+  AssertionError [ERR_ASSERTION]: no audit entry for a direct change to provider_fee_invoices
+✖ an administrator's direct change to psp_reconciliation_runs is recorded in the audit log (9.6517ms)
+  AssertionError [ERR_ASSERTION]: no audit entry for a direct change to psp_reconciliation_runs
+✖ an administrator's direct change to message_templates is recorded in the audit log (9.7909ms)
+  AssertionError [ERR_ASSERTION]: no audit entry for a direct change to message_templates
+✖ a ZATCA tax invoice cannot be edited or deleted by an administrator after issue (26.4076ms)
+  AssertionError [ERR_ASSERTION]: Expected "actual" to be strictly unequal to: 'ok'
+✖ two identical admin_create_refund_request calls produce one refund request (80.1115ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+✖ a customer and a competing provider's owner cannot read operator notes, commission, registration or staff contact details (9.0926ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+✖ staff leave reasons are not readable by customers (28.0011ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+✖ returns the address to the booking's own customer (4.882ms)
+✖ granting or removing the administrator role takes a reason (1.0466ms)
+  AssertionError [ERR_ASSERTION]: set_user_role(target_user_id, target_role) has no reason argument
+✖ the last administrator cannot demote themself (3.3768ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+✖ every administrator command that moves money or grants access has a reason or note argument that is required (2.5212ms)
+  AssertionError [ERR_ASSERTION]: these commands accept no reason; admin_release_payout takes an optional note that the screen fills with a fixed sentence
+✖ cancel_booking answers a foreign booking and a missing booking the same way (29.5187ms)
+✖ an administrator cannot insert a payout request for a provider, and so cannot choose the destination of a release (4.0695ms)
+  AssertionError [ERR_ASSERTION]: the INSERT policy still has an is_admin() branch: one administrator can request, release and so redirect a provider's earnings
+✖ cancel_booking, mark_booking_no_show and employee_update_booking_status refuse a blank reason (15.4003ms)
+  AssertionError [ERR_ASSERTION]: these commands accepted a blank reason from an administrator
+[1 line(s) of the raw output are not copied here because they contain words that the manifest content scan reserves]
