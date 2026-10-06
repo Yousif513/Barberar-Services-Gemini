@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../lib/supabase";
+import { errorMessage } from "@/lib/error-message";
 
 interface Message {
   id: string;
@@ -116,7 +117,7 @@ export default function MessagesScreen() {
       })));
     } catch (err) {
       setThreads([]);
-      setLoadError(err instanceof Error ? err.message : String(err));
+      setLoadError(errorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -186,7 +187,7 @@ export default function MessagesScreen() {
       loadThreads();
     } catch (err) {
       // The text stays in the input so nothing the customer typed is lost.
-      Alert.alert(t.sendFailed, err instanceof Error ? err.message : String(err));
+      Alert.alert(t.sendFailed, errorMessage(err));
     } finally {
       setSending(false);
     }

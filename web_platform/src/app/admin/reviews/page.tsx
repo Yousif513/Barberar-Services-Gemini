@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { CommandDialog } from "@/components/modal";
 
 const translations = {
   en: {
@@ -100,25 +101,57 @@ export default function AdminReviews() {
     }
   }
 
-  const handleModerate = async (reviewId: string, status: "published" | "flagged" | "hidden") => {
-    try {
-      // Hiding or flagging customer content needs a recorded reason (moderate_review audits it).
-      const reason = status === "published"
-        ? "Restored by admin"
-        : window.prompt(lang === "ar" ? "سبب الإجراء:" : "Reason for this action:");
-      if (!reason || !reason.trim()) return;
-      const { error } = await supabase.rpc("moderate_review", {
-        p_review_id: reviewId,
-        p_status: status,
-        p_reason: reason.trim()
-      });
-      if (error) throw error;
+  // Hiding or flagging customer content opens a dialog that shows the review and captures a recorded reason
+  // (moderate_review audits it); restoring a review needs none. A refusal stays in the dialog.
+  const [pendingModeration, setPendingModeration] = useState<{ review: any; status: "flagged" | "hidden" } | null>(null);
+  const runModeration = async (reviewId: string, status: "published" | "flagged" | "hidden", reason: string): Promise<string | null> => {
+    const { error } = await supabase.rpc("moderate_review", {
+      p_review_id: reviewId,
+      p_status: status,
+      p_reason: reason
+    });
+    if (error) return error.message || "Failed to update review status.";
+    setActionError("");
+    setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, moderation_status: status } : r));
+    return null;
+  };
 
-      setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, moderation_status: status } : r));
-    } catch (err: any) {
-      console.error("Failed to moderate review:", err);
-      setActionError(err?.message || "Failed to update review status.");
+  const handleModerate = async (reviewId: string, status: "published" | "flagged" | "hidden") => {
+    if (status === "published") {
+      const message = await runModeration(reviewId, status, "Restored by admin");
+      if (message) setActionError(message);
+      return;
     }
+    const review = reviews.find((row) => row.id === reviewId);
+    if (review) setPendingModeration({ review, status });
+  };
+
+  const renderModerationDialog = () => {
+    if (!pendingModeration) return null;
+    const { review, status } = pendingModeration;
+    const ar = lang === "ar";
+    const customer = review.customer ? `${review.customer.first_name || ""} ${review.customer.last_name || ""}`.trim() : "";
+    const provider = ar ? review.provider?.business_name_ar || review.provider?.business_name_en : review.provider?.business_name_en || review.provider?.business_name_ar;
+    return (
+      <CommandDialog
+        locale={lang}
+        tone={status === "hidden" ? "danger" : "default"}
+        title={status === "hidden" ? (ar ? "إخفاء هذا التقييم" : "Hide this review") : (ar ? "الإبلاغ عن هذا التقييم" : "Flag this review")}
+        intro={status === "hidden"
+          ? (ar ? "لن يظهر التقييم للعملاء. يمكن استعادته لاحقاً." : "The review is no longer shown to customers. It can be restored later.")
+          : (ar ? "يُعلَّم التقييم للمراجعة. يمكن استعادته لاحقاً." : "The review is marked for follow-up. It can be restored later.")}
+        facts={[
+          { label: ar ? "العميل" : "Customer", value: customer || "—" },
+          { label: ar ? "مقدم الخدمة" : "Provider", value: provider || "—" },
+          { label: ar ? "التقييم" : "Rating", value: String(review.rating ?? "—") },
+          { label: ar ? "التعليق" : "Comment", value: review.comment || "—" },
+        ]}
+        reasonLabel={ar ? "سبب الإجراء (يُسجل في سجل التدقيق)" : "Reason for this action (recorded in the audit log)"}
+        confirmLabel={status === "hidden" ? (ar ? "إخفاء التقييم" : "Hide review") : (ar ? "الإبلاغ عن التقييم" : "Flag review")}
+        onConfirm={(reason) => runModeration(review.id, status, reason)}
+        onClose={() => setPendingModeration(null)}
+      />
+    );
   };
 
   const t = translations[lang];
@@ -139,6 +172,7 @@ export default function AdminReviews() {
         <p className="text-xs text-gray-500 font-semibold mt-1">{t.subtitle}</p>
       </div>
 
+      {renderModerationDialog()}
       {actionError && (
         <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl font-bold">
           {actionError}

@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ShopDetailsModal } from "@/components/shop-details-modal";
 import { Category, MarketplaceProvider, formatSar, loadCategories, searchProviders } from "@/lib/marketplace";
+import { errorMessage } from "@/lib/error-message";
 
 type LoadState = "loading" | "ready" | "error";
 
@@ -76,7 +77,7 @@ export default function HomeScreen() {
       setLoadState("ready");
     } catch (err) {
       if (signal.cancelled) return;
-      setLoadError(err instanceof Error ? err.message : String(err));
+      setLoadError(errorMessage(err));
       setLoadState("error");
     }
   }, [query, category]);

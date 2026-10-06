@@ -1,18 +1,21 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/auth-guard";
 import { supabase } from "@/lib/supabase";
 import { clearDevRole } from "@/lib/dev-access";
+import { useOperationsLocale } from "@/components/operations-ui";
 
 
 const translations = {
   en: {
     activity: "Activity Feed",
+    notifications: "Notifications",
     finance: "Financial Control",
     ledger: "Ledger & Splits",
+    refunds: "Refunds",
     employees: "Staff & Teams",
     branches: "Venues & Rooms",
     dashboard: "Dashboard",
@@ -23,6 +26,7 @@ const translations = {
     services: "Services",
     packages: "Packages",
     orders: "Orders",
+    supply: "Supply Oversight",
     payments: "Payments",
     payouts: "Payouts",
     commissions: "Commissions",
@@ -44,19 +48,29 @@ const translations = {
     auditLogs: "Audit Logs",
     settings: "Settings",
     logout: "Log Out",
-    welcome: "Admin Root",
+    adminAccount: "Administrator",
     roleLabel: "Super Administrator",
     searchPlaceholder: "Search for anything...",
     adminHub: "Admin Hub",
     helpTitle: "Need Help?",
-    helpSubtitle: "System Support",
-    langSwitch: "العربية"
+    helpSubtitle: "Help Center",
+    langSwitch: "العربية",
+    skipToContent: "Skip to content",
+    mainNavigation: "Console navigation",
+    mobileDrawer: "Console navigation menu",
+    openMenu: "Open navigation",
+    closeMenu: "Close navigation",
+    close: "Close",
+    signOutFailed: "Signing out failed, so you are still signed in on this device. Check your connection and try again.",
+    pageSuffix: "PRIMORA Admin"
   },
   ar: {
     activity: "سجل الأنشطة",
+    notifications: "الإشعارات",
     finance: "الرقابة المالية",
     ledger: "دفتر الحسابات والعمولات",
-    employees: "الموظفون والصلاحيات",
+    refunds: "المبالغ المستردة",
+    employees: "الموظفون",
     branches: "الفروع والغرف والمواقع",
     dashboard: "لوحة المتابعة",
     analytics: "التحليلات",
@@ -66,6 +80,7 @@ const translations = {
     services: "الخدمات",
     packages: "الباقات",
     orders: "الطلبات",
+    supply: "الإشراف على التوريد",
     payments: "المدفوعات",
     payouts: "المدفوعات الخارجية",
     commissions: "العمولات",
@@ -87,13 +102,21 @@ const translations = {
     auditLogs: "سجلات التدقيق",
     settings: "الإعدادات العامة",
     logout: "تسجيل الخروج",
-    welcome: "مدير النظام",
+    adminAccount: "حساب المشرف",
     roleLabel: "مدير عام النظام",
     searchPlaceholder: "البحث عن أي شيء...",
     adminHub: "مركز الإدارة",
     helpTitle: "تحتاج مساعدة؟",
-    helpSubtitle: "دعم النظام",
-    langSwitch: "English"
+    helpSubtitle: "مركز المساعدة",
+    langSwitch: "English",
+    skipToContent: "تخطي إلى المحتوى",
+    mainNavigation: "قائمة لوحة الإدارة",
+    mobileDrawer: "قائمة تنقل لوحة الإدارة",
+    openMenu: "فتح القائمة",
+    closeMenu: "إغلاق القائمة",
+    close: "إغلاق",
+    signOutFailed: "تعذّر تسجيل الخروج، لذا ما زلت مسجلاً على هذا الجهاز. تحقق من الاتصال وحاول مجدداً.",
+    pageSuffix: "إدارة PRIMORA"
   }
 };
 
@@ -102,10 +125,14 @@ const getNavIcon = (nameKey: string) => {
   switch (nameKey) {
     case "dashboard":
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" /></svg>;
+    case "notifications":
+      return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>;
     case "activity":
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
     case "ledger":
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 11h.01M12 14h.01M12 17h.01M15 11h.01M15 14h.01M15 17h.01M9 11h.01" /></svg>;
+    case "refunds":
+      return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" /></svg>;
     case "analytics":
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2zm7 0v-9a2 2 0 00-2-2h-2a2 2 0 00-2 2v9a2 2 0 002 2h2a2 2 0 002-2zm7 0V5a2 2 0 00-2-2h-2a2 2 0 00-2 2v14a2 2 0 002 2h2a2 2 0 002-2z" /></svg>;
     case "bookings":
@@ -134,7 +161,7 @@ const getNavIcon = (nameKey: string) => {
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>;
     case "teams":
     case "employees":
-      return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197" /></svg>;
+      return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>;
     case "roles":
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 7a2 2 0 012 2m-2-2a2 2 0 00-2 2m2-2V5a2 2 0 10-4 0v2m4 0h2m-6 0h-2m-2 0a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V9a2 2 0 00-2-2h-2" /></svg>;
     case "branches":
@@ -173,39 +200,94 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [locale, setLocale] = useState<"en" | "ar">("en");
-  // Persist the language only after the saved choice has been read (avoids overwriting it on mount).
-  const [langReady, setLangReady] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const locale = useOperationsLocale();
+  const [mobileMenuPath, setMobileMenuPath] = useState<string | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
+  const mobileMenuOpen = mobileMenuPath === pathname;
+  const setMobileMenuOpen = (open: boolean) => setMobileMenuPath(open ? pathname : null);
   const t = translations[locale];
   const isRTL = locale === "ar";
+  const menuToggleRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
+  const [signOutError, setSignOutError] = useState(false);
 
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
-    const savedLang = localStorage.getItem("primora_lang") as "en" | "ar";
-    if (savedLang === "en" || savedLang === "ar") {
-      setLocale(savedLang);
+  const toggleLanguage = () => {
+    const next = locale === "en" ? "ar" : "en";
+    try {
+      localStorage.setItem("primora_lang", next);
+    } catch {
+      // The choice still applies to this page when storage is unavailable.
     }
-    setLangReady(true);
-    const syncFromDoc = () => {
-      const docLang = document.documentElement.lang;
-      if (docLang === "en" || docLang === "ar") setLocale(docLang);
+    document.documentElement.dir = next === "ar" ? "rtl" : "ltr";
+    document.documentElement.lang = next;
+  };
+
+  // Local scope: leaving this device must not end the operator's sessions everywhere else. A failure is shown and the
+  // operator stays where they are, because the session is still on this device.
+  const signOut = async () => {
+    setSignOutError(false);
+    try {
+      const { error } = await supabase.auth.signOut({ scope: "local" });
+      if (error) {
+        setSignOutError(true);
+        return;
+      }
+    } catch {
+      setSignOutError(true);
+      return;
+    }
+    clearDevRole();
+    router.replace("/login");
+  };
+  // The signed-in operator's own name; a neutral account label when there is no session (local dev roles).
+  const [accountName, setAccountName] = useState("");
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const { data } = await supabase.auth.getUser();
+      const userId = data.user?.id;
+      if (!userId) return;
+      const { data: profile } = await supabase.from("profiles").select("first_name, last_name").eq("id", userId).maybeSingle();
+      if (!cancelled && profile) setAccountName([profile.first_name, profile.last_name].filter(Boolean).join(" "));
+    })();
+    return () => {
+      cancelled = true;
     };
-    const observer = new MutationObserver(syncFromDoc);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
-    return () => observer.disconnect();
+  }, []);
+  const displayName = accountName || t.adminAccount;
+
+  // The phone drawer does not exist on a wide screen: widening the window closes it, so the page behind it is never
+  // left inert with no drawer to leave.
+  useEffect(() => {
+    const wide = window.matchMedia("(min-width: 768px)");
+    const closeWhenWide = () => {
+      if (wide.matches) setMobileMenuPath(null);
+    };
+    wide.addEventListener("change", closeWhenWide);
+    return () => wide.removeEventListener("change", closeWhenWide);
   }, []);
 
+  // Phone drawer: focus moves into it when it opens, Escape closes it, and focus returns to the toggle.
+  const previouslyOpen = useRef(false);
   useEffect(() => {
-    if (!langReady) return;
-    localStorage.setItem("primora_lang", locale);
-    document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
-    document.documentElement.lang = locale;
-  }, [locale, langReady]);
+    if (mobileMenuOpen) {
+      previouslyOpen.current = true;
+      drawerRef.current?.querySelector<HTMLElement>("nav a, button")?.focus();
+      const onKeyDown = (event: KeyboardEvent) => {
+        if (event.key === "Escape") setMobileMenuPath(null);
+      };
+      document.addEventListener("keydown", onKeyDown);
+      return () => document.removeEventListener("keydown", onKeyDown);
+    }
+    if (previouslyOpen.current) {
+      previouslyOpen.current = false;
+      menuToggleRef.current?.focus();
+    }
+  }, [mobileMenuOpen]);
+  const initials = accountName
+    ? accountName.split(/\s+/).map((word) => word.charAt(0)).join("").slice(0, 2).toUpperCase()
+    : t.adminAccount.charAt(0);
 
   const navSections: Section[] = [
     {
@@ -225,6 +307,7 @@ export default function AdminLayout({
       titleKey: "finance",
       items: [
         { nameKey: "ledger", path: "/admin/ledger" },
+        { nameKey: "refunds", path: "/admin/refunds" },
         { nameKey: "reports", path: "/admin/reports" }
       ]
     },
@@ -233,6 +316,7 @@ export default function AdminLayout({
       items: [
         { nameKey: "employees", path: "/admin/employees" },
         { nameKey: "branches", path: "/admin/branches" },
+        { nameKey: "supply", path: "/admin/supply" },
         { nameKey: "taxes", path: "/admin/taxes" },
         { nameKey: "coupons", path: "/admin/coupons" }
       ]
@@ -241,11 +325,31 @@ export default function AdminLayout({
       titleKey: "system",
       items: [
         { nameKey: "activity", path: "/admin/activity" },
+        { nameKey: "notifications", path: "/admin/notifications" },
+        { nameKey: "auditLogs", path: "/admin/audit-logs" },
         { nameKey: "integrations", path: "/admin/integrations" },
         { nameKey: "settings", path: "/admin/settings" }
       ]
     }
   ];
+
+  const currentItem = navSections
+    .flatMap((section) => section.items)
+    .filter((item) => (item.path === "/admin" ? pathname === "/admin" || pathname === "/admin/" : pathname.startsWith(item.path)))
+    .sort((a, b) => b.path.length - a.path.length)[0];
+  const currentName = currentItem ? t[currentItem.nameKey as keyof typeof t] : pathname.startsWith("/admin/help") ? t.helpSubtitle : "";
+  // The page title follows the screen and the language. The framework applies its own title again once the page's
+  // metadata has streamed in, so the title is re-asserted whenever the head changes while this shell is on screen.
+  useEffect(() => {
+    const title = currentName ? `${currentName} · ${t.pageSuffix}` : t.pageSuffix;
+    const apply = () => {
+      if (document.title !== title) document.title = title;
+    };
+    apply();
+    const observer = new MutationObserver(apply);
+    observer.observe(document.head, { childList: true, subtree: true, characterData: true });
+    return () => observer.disconnect();
+  }, [currentName, t.pageSuffix]);
 
   const renderSidebarContent = (isMobile: boolean) => (
     <div className="primora-dashboard-sidebar flex h-full w-full flex-col rounded-[28px] border border-[#E0C46A]/60 bg-[#10120F] p-5 text-white shadow-[0_24px_70px_rgba(16,18,15,0.28),0_0_46px_rgba(209,175,71,0.24)] md:w-[280px]">
@@ -264,14 +368,14 @@ export default function AdminLayout({
           </span>
         </Link>
         <div className="flex items-center gap-2">
-          <span className="rounded-full border border-[#D1AF47]/40 bg-[#D1AF47]/15 px-2.5 py-1 text-[8px] font-black uppercase tracking-wide text-[#F4E7B6]">
+          <span className="rounded-full border border-[#D1AF47]/40 bg-[#D1AF47]/15 px-2.5 py-1 text-[11px] font-black uppercase tracking-wide text-[#F4E7B6]">
             ADMN
           </span>
           {isMobile && (
             <button
               type="button"
               onClick={() => setMobileMenuOpen(false)}
-              aria-label={locale === "ar" ? "إغلاق" : "Close"}
+              aria-label={t.close}
               className="p-1 rounded-lg text-[#9C9688] hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1AF47]"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -283,10 +387,10 @@ export default function AdminLayout({
       </div>
 
       {/* Grouped Links (Scrollable) */}
-      <nav className="mt-6 min-h-0 flex-1 space-y-3 overflow-y-auto pe-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <nav aria-label={t.mainNavigation} className="mt-6 min-h-0 flex-1 space-y-3 overflow-y-auto pe-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {navSections.map((sec) => (
           <div key={sec.titleKey} className="space-y-1">
-            <span className={`block px-4 text-[9px] font-bold text-[#9C9688] uppercase tracking-widest ${isRTL ? "text-right" : "text-left"}`}>
+            <span className={`block px-4 text-[11px] font-bold text-[#B8B2A4] uppercase tracking-widest ${isRTL ? "text-right" : "text-left"}`}>
               {t[sec.titleKey as keyof typeof t] || sec.titleKey.toUpperCase()}
             </span>
             <div className="space-y-0.5">
@@ -322,7 +426,7 @@ export default function AdminLayout({
       {/* Sidebar Footer - Support & Admin Profile */}
       <div className="mt-3 flex-shrink-0 space-y-3 border-t border-white/10 pt-3">
         <Link
-          href="/admin/settings"
+          href="/admin/help"
           onClick={() => isMobile && setMobileMenuOpen(false)}
           className="flex items-center justify-between p-3 bg-[#14120E]/80 border border-[#E0C46A]/60 rounded-2xl group hover:border-[#E0C46A]/70 transition-all duration-300 shadow-[0_0_38px_rgba(209,175,71,0.24),inset_0_0_18px_rgba(244,231,182,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1AF47]"
         >
@@ -333,8 +437,8 @@ export default function AdminLayout({
               </svg>
             </div>
             <div className={`${isRTL ? "text-right" : "text-left"}`}>
-              <h5 className="text-[11px] font-bold text-[#F4E7B6] leading-none">{t.helpTitle}</h5>
-              <p className="text-[9px] text-[#D9D4C8] font-semibold mt-0.5">{t.helpSubtitle}</p>
+              <span className="block text-[12px] font-bold text-[#F4E7B6] leading-none">{t.helpTitle}</span>
+              <span className="mt-0.5 block text-[11px] text-[#D9D4C8] font-semibold">{t.helpSubtitle}</span>
             </div>
           </div>
           <svg className={`w-3 h-3 text-[#D9D4C8] group-hover:text-[#D1AF47] transition duration-300 ${isRTL ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -345,31 +449,20 @@ export default function AdminLayout({
         <div className={`flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
           <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
             <div className="w-9 h-9 rounded-full overflow-hidden border border-[#D1AF47]/25 bg-[#F4E7B6]/15 flex-shrink-0">
-              <img
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"
-                alt="Admin Root"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
               <div className="w-full h-full flex items-center justify-center text-[#F4E7B6] font-black text-xs">
-                AR
+                {initials}
               </div>
             </div>
             <div className={`min-w-0 ${isRTL ? "text-right" : "text-left"}`}>
-              <p className="text-[9px] text-[#9C9688] uppercase font-bold tracking-widest leading-none mb-0.5">{t.adminHub}</p>
-              <p className="text-xs font-black text-white leading-tight truncate max-w-[120px]">{t.welcome}</p>
+              <p className="text-[11px] text-[#B8B2A4] uppercase font-bold tracking-widest leading-none mb-0.5">{t.adminHub}</p>
+              <p className="text-xs font-black text-white leading-tight truncate max-w-[120px]">{displayName}</p>
             </div>
           </div>
           <button
+            type="button"
             aria-label={t.logout}
             title={t.logout}
-            onClick={async () => {
-              try { await supabase.auth.signOut(); } catch {}
-              clearDevRole();
-              window.location.href = "/login";
-            }}
+            onClick={() => void signOut()}
             className="p-2 rounded-xl text-[#D9D4C8] hover:bg-[#EF4444]/15 hover:text-[#F87171] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1AF47] transition-all duration-300"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
@@ -377,6 +470,14 @@ export default function AdminLayout({
             </svg>
           </button>
         </div>
+        {signOutError && <p role="alert" className="rounded-xl border border-red-400/40 bg-red-500/10 px-3 py-2 text-[12px] font-semibold text-red-200">{t.signOutFailed}</p>}
+        <button
+          type="button"
+          onClick={toggleLanguage}
+          className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-[12px] font-bold text-[#F4E7B6] hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1AF47]"
+        >
+          {t.langSwitch}
+        </button>
       </div>
     </div>
   );
@@ -385,10 +486,17 @@ export default function AdminLayout({
     <AuthGuard allowedRoles={["admin"]}>
       <div className="primora-dashboard-skin flex flex-col md:flex-row bg-[#F7F6F3] text-black font-sans selection:bg-[#D1AF47] selection:text-white md:h-screen md:overflow-hidden">
         
+        <a
+          href="#admin-main"
+          className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[10000] focus:rounded-xl focus:bg-[#10120F] focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-[#F4E7B6] focus:outline-none focus:ring-2 focus:ring-[#D1AF47]"
+        >
+          {t.skipToContent}
+        </a>
+
         {/* ═══════════════════════════════════════════════════════ */}
         {/* MOBILE TOP BAR (visible on screens < md)                */}
         {/* ═══════════════════════════════════════════════════════ */}
-        <header className="md:hidden flex items-center justify-between px-4 py-3 bg-[#10120F] text-white border-b border-[#E0C46A]/30 flex-shrink-0 z-30 shadow-md">
+        <header inert={mobileMenuOpen} className="md:hidden flex items-center justify-between px-4 py-3 bg-[#10120F] text-white border-b border-[#E0C46A]/30 flex-shrink-0 z-30 shadow-md">
           <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
             <Link 
               href="/" 
@@ -401,16 +509,26 @@ export default function AdminLayout({
                 PRIMORA
               </span>
             </Link>
-            <span className="rounded-full border border-[#D1AF47]/40 bg-[#D1AF47]/15 px-2 py-0.5 text-[8px] font-black uppercase text-[#F4E7B6]">
+            <span className="rounded-full border border-[#D1AF47]/40 bg-[#D1AF47]/15 px-2 py-0.5 text-[11px] font-black uppercase text-[#F4E7B6]">
               ADMN
             </span>
           </div>
 
+          <div className="flex items-center gap-1">
           <button
             type="button"
+            onClick={toggleLanguage}
+            className="rounded-xl px-3 py-2 text-xs font-bold text-[#F4E7B6] hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1AF47]"
+          >
+            {t.langSwitch}
+          </button>
+          <button
+            ref={menuToggleRef}
+            type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label={mobileMenuOpen ? (locale === "ar" ? "إغلاق القائمة" : "Close navigation") : (locale === "ar" ? "فتح القائمة" : "Open navigation")}
+            aria-label={mobileMenuOpen ? t.closeMenu : t.openMenu}
             aria-expanded={mobileMenuOpen}
+            aria-controls="admin-mobile-drawer"
             className="p-2 rounded-xl text-[#D9D4C8] hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1AF47] transition-colors"
           >
             {mobileMenuOpen ? (
@@ -423,6 +541,7 @@ export default function AdminLayout({
               </svg>
             )}
           </button>
+          </div>
         </header>
 
         {/* ═══════════════════════════════════════════════════════ */}
@@ -437,10 +556,15 @@ export default function AdminLayout({
         )}
 
         <aside
+          id="admin-mobile-drawer"
+          ref={drawerRef}
+          inert={!mobileMenuOpen}
+          role={mobileMenuOpen ? "dialog" : undefined}
+          aria-modal={mobileMenuOpen ? true : undefined}
+          aria-label={t.mobileDrawer}
           className={`fixed inset-y-0 ${isRTL ? "right-0" : "left-0"} z-50 w-72 max-w-[85vw] transform transition-transform duration-300 ease-in-out md:hidden p-3 flex flex-col ${
             mobileMenuOpen ? "translate-x-0" : isRTL ? "translate-x-full" : "-translate-x-full"
           }`}
-          aria-label="Mobile Navigation Drawer"
         >
           {renderSidebarContent(true)}
         </aside>
@@ -448,15 +572,15 @@ export default function AdminLayout({
         {/* ═══════════════════════════════════════════════════════ */}
         {/* DESKTOP SIDEBAR — Solid dark obsidian sidebar           */}
         {/* ═══════════════════════════════════════════════════════ */}
-        <aside className="hidden md:flex flex-shrink-0 p-4 md:h-screen">
+        <aside inert={mobileMenuOpen} className="hidden md:flex flex-shrink-0 p-4 md:h-screen">
           {renderSidebarContent(false)}
         </aside>
 
         {/* ═══════════════════════════════════════════════════════ */}
         {/* MAIN PANEL CONTENT                                      */}
         {/* ═══════════════════════════════════════════════════════ */}
-        <div className="flex min-w-0 flex-1 flex-col md:overflow-hidden">
-          <main className="primora-dashboard-content flex-grow p-4 md:p-6 md:overflow-y-auto">
+        <div inert={mobileMenuOpen} className="flex min-w-0 flex-1 flex-col md:overflow-hidden">
+          <main id="admin-main" tabIndex={-1} className="primora-dashboard-content flex-grow p-4 focus:outline-none md:p-6 md:overflow-y-auto">
             <div className="max-w-[1500px] mx-auto h-full">
               {children}
             </div>

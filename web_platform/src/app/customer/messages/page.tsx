@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
 
 interface Conversation {
   id: string;
@@ -116,7 +117,7 @@ export default function CustomerMessages() {
       setSelectedId((current) => current && next.some((c) => c.id === current) ? current : next[0]?.id ?? null);
     } catch (err: unknown) {
       setConversations([]);
-      setLoadError(err instanceof Error ? err.message : String(err));
+      setLoadError(errorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -194,7 +195,7 @@ export default function CustomerMessages() {
       loadThreads();
     } catch (err: unknown) {
       // The typed text stays in the box so nothing is lost.
-      setSendError(err instanceof Error ? err.message : String(err));
+      setSendError(errorMessage(err));
     } finally {
       setSending(false);
     }

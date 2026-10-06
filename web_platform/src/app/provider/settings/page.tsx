@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
 
 const translations = {
   en: {
@@ -374,7 +375,7 @@ export default function ProviderSettingsPage() {
       setDepositSuccess(t.depositSavedMsg);
       setTimeout(() => setDepositSuccess(""), 4000);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setIsSavingDeposit(false);
     }

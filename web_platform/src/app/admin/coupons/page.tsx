@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { useConfirm } from "@/components/modal";
 
 const translations = {
   en: {
@@ -19,7 +20,7 @@ const translations = {
     expired: "EXPIRED",
     addCoupon: "Add Coupon",
     edit: "Edit",
-    delete: "Delete",
+    delete: "Deactivate",
     toggle: "Toggle",
     save: "Save",
     cancel: "Cancel",
@@ -27,7 +28,7 @@ const translations = {
     noCoupons: "No promotional codes yet.",
     errorLoad: "Failed to load promotional codes.",
     errorSave: "Failed to save promotional code.",
-    errorDelete: "Failed to delete promotional code.",
+    errorDelete: "Failed to deactivate promotional code.",
     errorToggle: "Failed to update promotional code.",
     codeLabel: "Code",
     typeLabel: "Type",
@@ -50,7 +51,26 @@ const translations = {
     status: "الحالة",
     actions: "الإجراءات",
     active: "نشط",
-    expired: "منتهي"
+    expired: "منتهي",
+    addCoupon: "إضافة كوبون",
+    edit: "تعديل",
+    delete: "إيقاف",
+    toggle: "تبديل",
+    save: "حفظ",
+    cancel: "إلغاء",
+    loading: "جارٍ تحميل رموز الخصم...",
+    noCoupons: "لا توجد رموز خصم بعد.",
+    errorLoad: "تعذر تحميل رموز الخصم.",
+    errorSave: "تعذر حفظ رمز الخصم.",
+    errorDelete: "تعذر إيقاف رمز الخصم.",
+    errorToggle: "تعذر تحديث رمز الخصم.",
+    codeLabel: "الرمز",
+    typeLabel: "النوع",
+    valueLabel: "القيمة",
+    maxRedemptionsLabel: "الحد الأقصى للاستخدام",
+    percentage: "نسبة مئوية",
+    flat: "مبلغ ثابت (ر.س)",
+    activeLabel: "نشط"
   }
 };
 
@@ -217,16 +237,28 @@ export default function AdminCoupons() {
     }
   };
 
+  const [confirmNode, ask] = useConfirm(lang);
+
   const deleteCoupon = async (coupon: any) => {
+    const question = lang === "ar"
+      ? `إيقاف رمز الخصم ${coupon.code}؟ لن يقبل استخدامات جديدة، ويبقى سجل الاستخدام.`
+      : `Deactivate code ${coupon.code}? It stops accepting new redemptions; its redemption history is kept.`;
+    if (!(await ask({
+      title: lang === "ar" ? "إيقاف رمز الخصم" : "Deactivate this promotion code",
+      intro: question,
+      facts: [{ label: lang === "ar" ? "الرمز" : "Code", value: String(coupon.code) }],
+      confirmLabel: lang === "ar" ? "إيقاف الرمز" : "Deactivate code",
+      tone: "danger",
+    }))) return;
     try {
       setError("");
       const { error: dbError } = await supabase
         .from("promotional_codes")
-        .delete()
+        .update({ is_active: false })
         .eq("id", coupon.id);
 
       if (dbError) throw dbError;
-      setCoupons(prev => prev.filter(item => item.id !== coupon.id));
+      setCoupons(prev => prev.map(item => item.id === coupon.id ? { ...item, is_active: false } : item));
     } catch (err) {
       setError(t.errorDelete);
       console.warn("Admin coupon delete warning:", err);
@@ -237,6 +269,7 @@ export default function AdminCoupons() {
 
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className={`space-y-6 ${isRTL ? "text-right" : "text-left"}`}>
+      {confirmNode}
       <div className={`flex items-start justify-between gap-4 ${flip}`}>
         <div>
           <h2 className="text-2xl font-serif font-black text-gray-900 leading-tight">{t.title}</h2>
@@ -328,37 +361,37 @@ export default function AdminCoupons() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <label className="space-y-2 text-[10px] font-black uppercase tracking-widest text-gray-500">
                 {t.codeLabel}
-                <input value={couponForm.code} onChange={(event) => setCouponForm(form => ({ ...form, code: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold uppercase text-gray-900 outline-none focus:border-[#D1AF47]" />
+                <input value={couponForm.code} onChange={(event) => setCouponForm(form => ({ ...form, code: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold uppercase text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
               <label className="space-y-2 text-[10px] font-black uppercase tracking-widest text-gray-500">
                 {t.typeLabel}
-                <select value={couponForm.discountType} onChange={(event) => setCouponForm(form => ({ ...form, discountType: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-[#D1AF47]">
+                <select value={couponForm.discountType} onChange={(event) => setCouponForm(form => ({ ...form, discountType: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
                   <option value="percentage">{t.percentage}</option>
                   <option value="flat">{t.flat}</option>
                 </select>
               </label>
               <label className="space-y-2 text-[10px] font-black uppercase tracking-widest text-gray-500">
                 {t.valueLabel}
-                <input type="number" min="1" value={couponForm.discountValue} onChange={(event) => setCouponForm(form => ({ ...form, discountValue: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-[#D1AF47]" />
+                <input type="number" min="1" value={couponForm.discountValue} onChange={(event) => setCouponForm(form => ({ ...form, discountValue: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
               <label className="space-y-2 text-[10px] font-black uppercase tracking-widest text-gray-500">
                 {t.maxRedemptionsLabel}
-                <input type="number" min="1" value={couponForm.maxRedemptions} onChange={(event) => setCouponForm(form => ({ ...form, maxRedemptions: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-[#D1AF47]" />
+                <input type="number" min="1" value={couponForm.maxRedemptions} onChange={(event) => setCouponForm(form => ({ ...form, maxRedemptions: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
               <label className="space-y-2 text-[10px] font-black uppercase tracking-widest text-gray-500">
                 {isRTL ? "جهة التمويل" : "Funding Source"}
-                <select value={couponForm.fundingSource} onChange={(event) => setCouponForm(form => ({ ...form, fundingSource: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-[#D1AF47]">
+                <select value={couponForm.fundingSource} onChange={(event) => setCouponForm(form => ({ ...form, fundingSource: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
                   <option value="platform">{isRTL ? "منصة بريمورا (Platform)" : "Platform (PRIMORA)"}</option>
                   <option value="provider">{isRTL ? "مقدم الخدمة / الصالون (Provider)" : "Provider (Salon)"}</option>
                 </select>
               </label>
               <label className="space-y-2 text-[10px] font-black uppercase tracking-widest text-gray-500">
                 {isRTL ? "الحد الأدنى للطلب (ريال)" : "Min Order (SAR)"}
-                <input type="number" min="0" value={couponForm.minOrderAmount} onChange={(event) => setCouponForm(form => ({ ...form, minOrderAmount: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-[#D1AF47]" />
+                <input type="number" min="0" value={couponForm.minOrderAmount} onChange={(event) => setCouponForm(form => ({ ...form, minOrderAmount: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
               <label className="space-y-2 text-[10px] font-black uppercase tracking-widest text-gray-500">
                 {isRTL ? "الحد الأقصى للخصم (ريال)" : "Max Discount Cap (SAR)"}
-                <input type="number" min="1" placeholder={isRTL ? "اختياري" : "Optional"} value={couponForm.maxDiscountCap} onChange={(event) => setCouponForm(form => ({ ...form, maxDiscountCap: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-[#D1AF47]" />
+                <input type="number" min="1" placeholder={isRTL ? "اختياري" : "Optional"} value={couponForm.maxDiscountCap} onChange={(event) => setCouponForm(form => ({ ...form, maxDiscountCap: event.target.value }))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
               <label className="flex items-center justify-between rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-700 sm:col-span-2">
                 {t.activeLabel}

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
 
 type BookingDetail = {
   id: string;
@@ -178,7 +179,7 @@ export default function BookingConfirmationPage() {
         setLoadError("");
       } catch (err) {
         setBooking(null);
-        setLoadError(err instanceof Error ? err.message : String(err));
+        setLoadError(errorMessage(err));
       } finally {
         setIsLoading(false);
       }

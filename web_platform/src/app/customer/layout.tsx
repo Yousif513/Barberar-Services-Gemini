@@ -2,8 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/auth-guard";
+import { supabase } from "@/lib/supabase";
+import { clearDevRole } from "@/lib/dev-access";
+import { CommandResult, signOutFailedText } from "@/components/operations-ui";
 
 
 // Localized Navigation Strings
@@ -20,9 +23,12 @@ const translations = {
     notifications: "Notifications",
     settings: "Settings",
     logout: "Log Out",
+    customerAccount: "Customer account",
     welcome: "Welcome back,",
     searchPlaceholder: "Search services...",
-    langSwitch: "العربية"
+    langSwitch: "العربية",
+    openMenu: "Open menu",
+    closeMenu: "Close menu"
   },
   ar: {
     dashboard: "لوحة التحكم",
@@ -36,9 +42,12 @@ const translations = {
     notifications: "التنبيهات",
     settings: "الإعدادات",
     logout: "تسجيل الخروج",
+    customerAccount: "حساب العميل",
     welcome: "مرحباً بك،",
     searchPlaceholder: "البحث عن الخدمات...",
-    langSwitch: "English"
+    langSwitch: "English",
+    openMenu: "فتح القائمة",
+    closeMenu: "إغلاق القائمة"
   }
 };
 
@@ -82,14 +91,14 @@ const getNavIcon = (path: string) => {
   if (path.includes("messages")) {
     return (
       <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
       </svg>
     );
   }
   if (path.includes("reviews")) {
     return (
       <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
       </svg>
     );
   }
@@ -110,7 +119,8 @@ const getNavIcon = (path: string) => {
   if (path.includes("settings")) {
     return (
       <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.066z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
       </svg>
     );
   }
@@ -130,7 +140,54 @@ export default function CustomerLayout({
   // Persist the language only after the saved choice has been read (avoids overwriting it on mount).
   const [langReady, setLangReady] = useState(false);
   const pathname = usePathname();
+  // Conversations with a message the customer has not opened; read from the same table the Messages screen uses.
+  // Nothing is shown when it cannot be read, rather than a number that was not counted.
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const { count, error } = await supabase.from("conversations").select("id", { count: "exact", head: true }).eq("unread_for_customer", true);
+      if (!cancelled) setUnreadMessages(error ? 0 : (count ?? 0));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname]);
+  const router = useRouter();
+  const [firstName, setFirstName] = useState("");
+  // The phone menu closes on navigation because it is keyed to the path it was opened on.
+  const [navOpenPath, setNavOpenPath] = useState<string | null>(null);
+  const navOpen = navOpenPath === pathname;
   const t = translations[locale];
+
+  useEffect(() => {
+    let cancelled = false;
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user || cancelled) return;
+      const { data: profile } = await supabase.from("profiles").select("first_name").eq("id", data.user.id).maybeSingle();
+      if (!cancelled) setFirstName(profile?.first_name || "");
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Local scope: leaving this device must not end the person's sessions on their other devices. A failure is shown,
+  // and they stay signed in, because the session is still on this device.
+  const [signOutFailed, setSignOutFailed] = useState(false);
+  const signOut = async () => {
+    setSignOutFailed(false);
+    try {
+      const { error } = await supabase.auth.signOut({ scope: "local" });
+      if (error) {
+        setSignOutFailed(true);
+        return;
+      }
+    } catch {
+      setSignOutFailed(true);
+      return;
+    }
+    clearDevRole();
+    router.replace("/login");
+  };
   const isRTL = locale === "ar";
 
   const toggleLanguage = () => {
@@ -166,7 +223,7 @@ export default function CustomerLayout({
     { name: t.packages, path: "/customer/packages" },
     { name: t.jobs, path: "/customer/jobs" },
     { name: t.favorites, path: "/customer/favorites" },
-    { name: t.messages, path: "/customer/messages", badge: 3 },
+    { name: t.messages, path: "/customer/messages", badge: unreadMessages > 0 ? unreadMessages : undefined },
     { name: t.reviews, path: "/customer/reviews" },
     { name: t.wallet, path: "/customer/wallet" },
     { name: t.notifications, path: "/customer/notifications" },
@@ -175,6 +232,7 @@ export default function CustomerLayout({
 
   return (
     <AuthGuard allowedRoles={["customer"]}>
+      <CommandResult error={signOutFailed ? signOutFailedText[locale] : undefined} locale={locale} onDismiss={() => setSignOutFailed(false)} />
     <div className="flex flex-col bg-[#F7F3EA] text-black selection:bg-[#D1AF47] selection:text-white md:h-screen md:flex-row md:overflow-hidden">
 
       {/* ═══════════════════════════════════════════════════════ */}
@@ -207,7 +265,8 @@ export default function CustomerLayout({
               ))}
             </svg>
           </div>
-          {/* Logo */}
+          {/* Logo and phone menu toggle */}
+          <div className="relative z-10 flex flex-shrink-0 flex-row items-center justify-between gap-3">
           <Link href="/" className={`relative z-10 flex flex-shrink-0 items-center gap-2.5 px-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
             <svg className="w-5.5 h-5.5 text-[#D1AF47]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
@@ -216,9 +275,22 @@ export default function CustomerLayout({
               PRIMORA
             </span>
           </Link>
+          <button
+            type="button"
+            onClick={() => setNavOpenPath(navOpen ? null : pathname)}
+            aria-expanded={navOpen}
+            aria-controls="customer-navigation"
+            aria-label={navOpen ? t.closeMenu : t.openMenu}
+            className="rounded-xl border border-white/15 p-2 text-[#F4E7B6] transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-[#E0C46A] md:hidden"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d={navOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+            </svg>
+          </button>
+          </div>
 
           {/* Navigation Links (scrolls independently) */}
-          <nav className="relative z-10 mt-6 min-h-0 flex-1 space-y-0.5 overflow-y-auto pe-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <nav id="customer-navigation" className={`relative z-10 mt-6 min-h-0 flex-1 space-y-0.5 overflow-y-auto pe-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${navOpen ? "block" : "hidden"} md:block`}>
             {navItems.map((item) => {
               const isActive = pathname.startsWith(item.path);
               return (
@@ -248,41 +320,22 @@ export default function CustomerLayout({
           </nav>
 
           {/* Sidebar Footer — Help & Logged-in User */}
-          <div className="relative z-10 mt-3 flex-shrink-0 space-y-3 border-t border-white/10 pt-3">
-          <Link
-            href="/customer/search"
-            className="group relative block overflow-hidden rounded-2xl border border-[#E0C46A]/60 bg-[#14120E]/80 p-3 shadow-[0_0_38px_rgba(209,175,71,0.34),inset_0_0_18px_rgba(244,231,182,0.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#E0C46A]/70"
-          >
-            <div className="pointer-events-none absolute -right-8 -top-8 h-20 w-20 rounded-full bg-[#E0C46A]/15 blur-2xl" />
-            <div className={`relative flex items-start gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <div className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-xl border border-[#D1AF47]/30 bg-[#D1AF47]/15 text-[#F4E7B6] shadow-[0_0_18px_rgba(209,175,71,0.25)]">
-                <svg className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l1.35 4.16L17.5 8.5l-4.15 1.34L12 14l-1.35-4.16L6.5 8.5l4.15-1.34L12 3zM5 14l.8 2.2L8 17l-2.2.8L5 20l-.8-2.2L2 17l2.2-.8L5 14zm14 0l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z" />
-                </svg>
-              </div>
-              <div className={`min-w-0 ${isRTL ? "text-right" : "text-left"}`}>
-                <h5 className="text-[11px] font-black leading-none text-[#F4E7B6]">Primora AI Assistant</h5>
-                <p className="mt-1 text-[9.5px] font-semibold leading-relaxed text-[#D9D4C8]">I found 2 slots this week that match your routine.</p>
-                <span className="mt-2 inline-flex rounded-full border border-[#D1AF47]/40 bg-[#D1AF47]/15 px-3 py-1 text-[9px] font-black text-[#F4E7B6]">View Suggestions</span>
-              </div>
-            </div>
-          </Link>
-
+          <div className={`relative z-10 mt-3 flex-shrink-0 space-y-3 border-t border-white/10 pt-3 ${navOpen ? "block" : "hidden"} md:block`}>
           <div className={`flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-2 py-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
             <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-[#D1AF47]/25 bg-[#F4E7B6]/15 text-sm font-bold text-[#F4E7B6]">
-                Y
+                {firstName.trim().charAt(0).toUpperCase() || "•"}
               </div>
               <div className={`hidden md:block ${isRTL ? "text-left" : "text-right"}`}>
-                <p className="mb-0.5 text-[9px] font-bold uppercase leading-none tracking-widest text-[#9C9688]">Gold Member</p>
-                <p className="max-w-[110px] truncate text-xs font-black leading-tight text-white">Yousif</p>
+                <p className="mb-0.5 text-[9px] font-bold uppercase leading-none tracking-widest text-[#9C9688]">{t.customerAccount}</p>
+                <p className="max-w-[110px] truncate text-xs font-black leading-tight text-white">{firstName}</p>
               </div>
             </div>
-            <Link href="/" className="rounded-xl p-2 text-[#D9D4C8] transition-all duration-300 hover:bg-white/[0.06] hover:text-[#F4E7B6]">
+            <button type="button" onClick={() => void signOut()} aria-label={t.logout} title={t.logout} className="rounded-xl p-2 text-[#D9D4C8] transition-all duration-300 hover:bg-white/[0.06] hover:text-[#F4E7B6]">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-            </Link>
+            </button>
           </div>
           </div>
         </div>
@@ -295,16 +348,15 @@ export default function CustomerLayout({
         {/* HEADER */}
         {!(pathname === "/customer/dashboard" || pathname === "/customer/dashboard/") && (
           <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-[#E8E8E8] px-8 flex items-center justify-between sticky top-0 z-40">
-            <div className={`flex items-center gap-3 bg-[#F7F7F5] border border-[#E8E8E8] px-5 py-3 rounded-2xl w-80 focus-within:border-[#D1AF47]/30 transition-all duration-300 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <svg className="w-4 h-4 text-[#667085]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <Link
+              href="/customer/search"
+              className={`flex items-center gap-3 bg-[#F7F7F5] border border-[#E8E8E8] px-5 py-3 rounded-2xl w-80 max-w-[60vw] text-sm text-[#475467] hover:border-[#D1AF47]/30 focus-visible:outline-2 focus-visible:outline-[#9B7928] transition-all duration-300 ${isRTL ? "flex-row-reverse" : "flex-row"}`}
+            >
+              <svg aria-hidden="true" className="w-4 h-4 flex-shrink-0 text-[#667085]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              <input
-                type="text"
-                placeholder={t.searchPlaceholder}
-                className={`bg-transparent border-none outline-none text-sm w-full placeholder-[#667085]/60 text-[#101828] ${isRTL ? "text-right" : "text-left"}`}
-              />
-            </div>
+              <span className="truncate">{t.searchPlaceholder}</span>
+            </Link>
 
             <div className={`flex items-center gap-6 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <button
@@ -317,10 +369,10 @@ export default function CustomerLayout({
               <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                 <div className={`text-right hidden sm:block ${isRTL ? "text-left" : "text-right"}`}>
                   <p className="text-[10px] text-gray-400 font-bold leading-none mb-1">{t.welcome}</p>
-                  <p className="text-xs font-bold text-gray-900 leading-tight">Yousif</p>
+                  <p className="text-xs font-bold text-gray-900 leading-tight">{firstName}</p>
                 </div>
-                <div className="w-10 h-10 rounded-xl overflow-hidden border border-[#E8E8E8] shadow-[0_0_15px_rgba(209,175,71,0.1)]">
-                  <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=200&auto=format&fit=crop" alt="Yousif" className="w-full h-full object-cover" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E8E8E8] bg-[#F4E7B6] text-sm font-black text-[#9A7B1E] shadow-[0_0_15px_rgba(209,175,71,0.1)]">
+                  {firstName.trim().charAt(0).toUpperCase() || "•"}
                 </div>
               </div>
             </div>

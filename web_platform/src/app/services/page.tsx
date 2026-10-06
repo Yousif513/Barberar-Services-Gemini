@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
 
 /* ─────────────────────────────────────────────────────────────────────────
    PRIMORA · Services — the public, admin-driven catalog.
@@ -535,7 +536,7 @@ function ServicesCatalog() {
         }
         setCatalogState("ready");
       } catch (err) {
-        setCatalogError(err instanceof Error ? err.message : String(err));
+        setCatalogError(errorMessage(err));
         setCatalogState("error");
       }
     })();

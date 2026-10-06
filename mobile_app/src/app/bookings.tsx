@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../lib/supabase";
+import { errorMessage } from "@/lib/error-message";
 
 type BookingStatus = "pending_payment" | "confirmed" | "completed" | "cancelled" | "no_show";
 
@@ -144,7 +145,7 @@ export default function BookingsScreen() {
       })));
     } catch (err) {
       setBookings([]);
-      setLoadError(err instanceof Error ? err.message : String(err));
+      setLoadError(errorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -166,7 +167,7 @@ export default function BookingsScreen() {
       Alert.alert(t.confirmCancelTitle, t.cancelled);
       loadBookings();
     } catch (err) {
-      Alert.alert(t.confirmCancelTitle, err instanceof Error ? err.message : String(err));
+      Alert.alert(t.confirmCancelTitle, errorMessage(err));
     } finally {
       setBusy(false);
     }
@@ -179,7 +180,7 @@ export default function BookingsScreen() {
       if (error || !data?.checkoutUrl) throw new Error(t.paymentFailed);
       await Linking.openURL(data.checkoutUrl);
     } catch (err) {
-      Alert.alert(t.payNow, err instanceof Error ? err.message : String(err));
+      Alert.alert(t.payNow, errorMessage(err));
     } finally {
       setBusy(false);
     }

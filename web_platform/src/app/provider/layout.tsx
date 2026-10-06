@@ -1,9 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/auth-guard";
+import { CommandResult, signOutFailedText, useOperationsLocale } from "@/components/operations-ui";
+import { supabase } from "@/lib/supabase";
+import { clearDevRole } from "@/lib/dev-access";
 
 // Localized Navigation Strings
 const translations = {
@@ -14,6 +17,8 @@ const translations = {
     services: "Services",
     employees: "Employees",
     resources: "Rooms & Resources",
+    inventory: "Inventory & Suppliers",
+    chain: "Chain Operations",
     packages: "Wellness Packages",
     jobs: "Find Job Leads",
     customers: "Customers",
@@ -26,7 +31,12 @@ const translations = {
     welcome: "Welcome back,",
     searchPlaceholder: "Search...",
     langSwitch: "العربية",
-    wallet: "Wallet & Payouts"
+    wallet: "Wallet & Payouts",
+    needHelp: "Need help?",
+    contactSupport: "Settings & support",
+    partnerHub: "Partner Hub",
+    openMenu: "Open menu",
+    closeMenu: "Close menu"
   },
   ar: {
     dashboard: "لوحة التحكم",
@@ -35,6 +45,8 @@ const translations = {
     services: "الخدمات",
     employees: "الموظفين",
     resources: "الغرف والموارد",
+    inventory: "المخزون والموردون",
+    chain: "عمليات الفروع",
     packages: "باقات العافية",
     jobs: "فرص العمل المتاحة",
     messages: "الرسائل",
@@ -47,7 +59,12 @@ const translations = {
     welcome: "مرحباً بك،",
     searchPlaceholder: "البحث...",
     langSwitch: "English",
-    wallet: "المحفظة والمدفوعات"
+    wallet: "المحفظة والمدفوعات",
+    needHelp: "تحتاج مساعدة؟",
+    contactSupport: "الإعدادات والدعم",
+    partnerHub: "بوابة الشركاء",
+    openMenu: "فتح القائمة",
+    closeMenu: "إغلاق القائمة"
   }
 };
 
@@ -88,6 +105,13 @@ const getNavIcon = (path: string) => {
       </svg>
     );
   }
+  if (path.includes("inventory")) {
+    return (
+      <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M20 7.5l-8-4-8 4m16 0l-8 4m8-4v9l-8 4m0-9L4 7.5m8 4v9M4 7.5v9l8 4" />
+      </svg>
+    );
+  }
   if (path.includes("packages")) {
     return (
       <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -112,49 +136,50 @@ const getNavIcon = (path: string) => {
   if (path.includes("messages")) {
     return (
       <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
       </svg>
     );
   }
   if (path.includes("team") || path.includes("employees")) {
     return (
       <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
       </svg>
     );
   }
   if (path.includes("customers")) {
     return (
       <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
       </svg>
     );
   }
   if (path.includes("reviews")) {
     return (
       <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
       </svg>
     );
   }
   if (path.includes("promotions")) {
     return (
       <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
       </svg>
     );
   }
   if (path.includes("reports")) {
     return (
       <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
       </svg>
     );
   }
   if (path.includes("settings")) {
     return (
       <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.066z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
       </svg>
     );
   }
@@ -165,39 +190,74 @@ const getNavIcon = (path: string) => {
   );
 };
 
-// Separator indices: after "jobs" (index 6) and after "customers" (index 10)
-const separatorAfterIndices = [6, 10];
+// Keep navigation groups anchored to their destination as tabs are added.
+const separatorAfterPaths = ["/provider/jobs", "/provider/customers"];
 
 export default function ProviderLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [locale, setLocale] = useState<"en" | "ar">("en");
-  // Persist the language only after the saved choice has been read (avoids overwriting it on mount).
-  const [langReady, setLangReady] = useState(false);
+  const locale = useOperationsLocale();
   const pathname = usePathname();
+  // Conversations with a message the shop has not opened; nothing is shown when it cannot be read.
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const { count, error } = await supabase.from("conversations").select("id", { count: "exact", head: true }).eq("unread_for_provider", true);
+      if (!cancelled) setUnreadMessages(error ? 0 : (count ?? 0));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname]);
+  const router = useRouter();
+  // The phone menu closes on navigation because it is keyed to the path it was opened on.
+  const [navOpenPath, setNavOpenPath] = useState<string | null>(null);
+  const navOpen = navOpenPath === pathname;
+  const [business, setBusiness] = useState<{ en: string; ar: string } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user || cancelled) return;
+      const { data: provider } = await supabase
+        .from("providers").select("business_name_en, business_name_ar").eq("owner_id", data.user.id).maybeSingle();
+      if (!cancelled && provider) {
+        setBusiness({ en: provider.business_name_en || provider.business_name_ar || "", ar: provider.business_name_ar || provider.business_name_en || "" });
+      }
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Local scope: leaving this device must not end the person's sessions on their other devices. A failure is shown,
+  // and they stay signed in, because the session is still on this device.
+  const [signOutFailed, setSignOutFailed] = useState(false);
+  const signOut = async () => {
+    setSignOutFailed(false);
+    try {
+      const { error } = await supabase.auth.signOut({ scope: "local" });
+      if (error) {
+        setSignOutFailed(true);
+        return;
+      }
+    } catch {
+      setSignOutFailed(true);
+      return;
+    }
+    clearDevRole();
+    router.replace("/login");
+  };
   const t = translations[locale];
   const isRTL = locale === "ar";
 
   const toggleLanguage = () => {
-    setLocale((prev) => (prev === "en" ? "ar" : "en"));
+    const next = locale === "en" ? "ar" : "en";
+    localStorage.setItem("primora_lang", next);
+    document.documentElement.dir = next === "ar" ? "rtl" : "ltr";
+    document.documentElement.lang = next;
   };
-
-  useEffect(() => {
-    const savedLang = localStorage.getItem("primora_lang") as "en" | "ar";
-    if (savedLang === "en" || savedLang === "ar") {
-      setLocale(savedLang);
-    }
-    setLangReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (!langReady) return;
-    localStorage.setItem("primora_lang", locale);
-    document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
-    document.documentElement.lang = locale;
-  }, [locale, langReady]);
 
   const navItems = [
     { name: t.dashboard, path: "/provider/dashboard" },
@@ -205,6 +265,8 @@ export default function ProviderLayout({
     { name: t.bookings, path: "/provider/bookings" },
     { name: t.services, path: "/provider/services" },
     { name: t.resources, path: "/provider/resources" },
+    { name: t.inventory, path: "/provider/inventory" },
+    { name: t.chain, path: "/provider/chain" },
     { name: t.packages, path: "/provider/packages" },
     { name: t.jobs, path: "/provider/jobs" },
     { name: t.wallet, path: "/provider/wallet" },
@@ -219,6 +281,7 @@ export default function ProviderLayout({
 
   return (
     <AuthGuard allowedRoles={["provider_owner", "provider_employee"]}>
+      <CommandResult error={signOutFailed ? signOutFailedText[locale] : undefined} locale={locale} onDismiss={() => setSignOutFailed(false)} />
     <div className="primora-dashboard-skin flex flex-col md:flex-row bg-[radial-gradient(circle_at_20%_10%,rgba(209,175,71,0.13),transparent_32%),linear-gradient(135deg,#F8F6EF_0%,#F2EEE4_46%,#E9E2D2_100%)] text-black font-sans selection:bg-[#D1AF47] selection:text-white md:h-screen md:overflow-hidden">
       
       {/* ═══════════════════════════════════════════════════════ */}
@@ -226,7 +289,8 @@ export default function ProviderLayout({
       {/* ═══════════════════════════════════════════════════════ */}
       <aside className="flex-shrink-0 p-4 md:h-screen">
         <div className="primora-dashboard-sidebar relative flex h-full w-full flex-col overflow-hidden rounded-[28px] border border-[#E0C46A]/60 bg-[radial-gradient(circle_at_22%_0%,rgba(224,196,106,0.22),transparent_36%),linear-gradient(160deg,#221C12_0%,#171814_46%,#2B2417_100%)] p-5 text-[#F8F5EA] shadow-[0_24px_70px_rgba(16,18,15,0.22),0_0_46px_rgba(209,175,71,0.24)] md:w-[280px]">
-          {/* Logo */}
+          {/* Logo and phone menu toggle */}
+          <div className="flex flex-shrink-0 flex-row items-center justify-between gap-3">
           <Link href="/" className={`flex flex-shrink-0 items-center gap-2.5 px-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
             <svg className="w-5.5 h-5.5 text-[#D1AF47]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
@@ -235,10 +299,23 @@ export default function ProviderLayout({
               PRIMORA
             </span>
           </Link>
+          <button
+            type="button"
+            onClick={() => setNavOpenPath(navOpen ? null : pathname)}
+            aria-expanded={navOpen}
+            aria-controls="provider-navigation"
+            aria-label={navOpen ? t.closeMenu : t.openMenu}
+            className="rounded-xl border border-white/15 p-2 text-[#F4E7B6] transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-[#E0C46A] md:hidden"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d={navOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+            </svg>
+          </button>
+          </div>
 
           {/* Navigation Links (scrolls independently) */}
-          <nav className="mt-6 min-h-0 flex-1 space-y-0.5 overflow-y-auto pe-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {navItems.map((item, index) => {
+          <nav id="provider-navigation" className={`mt-6 min-h-0 flex-1 space-y-0.5 overflow-y-auto pe-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${navOpen ? "block" : "hidden"} md:block`}>
+            {navItems.map((item) => {
               const isActive = pathname.startsWith(item.path);
               const isMessages = item.path.includes("messages");
 
@@ -260,13 +337,13 @@ export default function ProviderLayout({
                     <span className="flex-grow">{item.name}</span>
 
                     {/* Notification dot */}
-                    {isMessages && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#FF5D73] flex-shrink-0" />
+                    {isMessages && unreadMessages > 0 && (
+                      <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF5D73] px-1 text-[11px] font-bold text-white">{unreadMessages}</span>
                     )}
                   </Link>
 
                   {/* Separator lines between nav groups */}
-                  {separatorAfterIndices.includes(index) && (
+                  {separatorAfterPaths.includes(item.path) && (
                     <div className="my-2 mx-4">
                       <div className="h-px bg-white/10" />
                     </div>
@@ -277,7 +354,7 @@ export default function ProviderLayout({
           </nav>
 
           {/* Sidebar Footer — Support & Logout */}
-          <div className="mt-3 flex-shrink-0 space-y-3 border-t border-white/10 pt-3">
+          <div className={`mt-3 flex-shrink-0 space-y-3 border-t border-white/10 pt-3 ${navOpen ? "block" : "hidden"} md:block`}>
             {/* Help Support Card */}
             <Link
               href="/provider/settings"
@@ -290,8 +367,8 @@ export default function ProviderLayout({
                   </svg>
                 </div>
                 <div className={`text-left ${isRTL ? "text-right" : "text-left"}`}>
-                  <h5 className="text-[11px] font-bold text-[#F4E7B6] leading-none">Need Help?</h5>
-                  <p className="text-[9px] text-[#EFE7D8] font-semibold mt-0.5">Contact Support</p>
+                  <h5 className="text-[11px] font-bold text-[#F4E7B6] leading-none">{t.needHelp}</h5>
+                  <p className="text-[9px] text-[#EFE7D8] font-semibold mt-0.5">{t.contactSupport}</p>
                 </div>
               </div>
               <svg className={`w-3 h-3 text-[#EFE7D8] group-hover:text-[#E0C46A] transition duration-300 ${isRTL ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -303,21 +380,24 @@ export default function ProviderLayout({
             <div className={`flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-[#ffffff]/[0.03] px-2 py-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                 <div className="w-9 h-9 rounded-full bg-[#F4E7B6]/15 border border-[#D1AF47]/25 flex items-center justify-center text-[#F4E7B6] font-bold text-sm flex-shrink-0">
-                  N
+                  {(business?.[locale] || "").trim().charAt(0).toUpperCase() || "•"}
                 </div>
                 <div className={`hidden md:block ${isRTL ? "text-left" : "text-right"}`}>
-                  <p className="text-[9px] text-[#D0C5AF] uppercase font-bold tracking-widest leading-none mb-0.5">Partner Hub</p>
-                  <p className="text-xs font-black text-white leading-tight truncate max-w-[110px]">Elite Barbershop</p>
+                  <p className="text-[9px] text-[#D0C5AF] uppercase font-bold tracking-widest leading-none mb-0.5">{t.partnerHub}</p>
+                  <p className="text-xs font-black text-white leading-tight truncate max-w-[110px]">{business?.[locale] || ""}</p>
                 </div>
               </div>
-              <Link 
-                href="/" 
+              <button
+                type="button"
+                onClick={() => void signOut()}
+                aria-label={t.logout}
+                title={t.logout}
                 className="p-2 rounded-xl text-[#EFE7D8] hover:bg-[#ffffff]/[0.08] hover:text-[#F4E7B6] transition-all duration-300"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -333,17 +413,8 @@ export default function ProviderLayout({
           <header className="mx-5 mt-5 h-[72px] rounded-[26px] border border-[#ECECEC] bg-white px-6 flex items-center justify-between sticky top-5 z-40 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
 
           
-          {/* Light Search Input */}
-          <div className={`flex items-center gap-3 bg-white border border-[#ECECEC] px-5 py-3 rounded-2xl w-80 focus-within:border-[#D1AF47]/40 transition-all duration-300 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-            <svg className="w-4 h-4 text-[#667085] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="text"
-              placeholder={t.searchPlaceholder}
-              className={`bg-transparent border-none outline-none text-sm w-full placeholder:text-[#667085]/60 text-[#101828] ${isRTL ? "text-right" : "text-left"}`}
-            />
-          </div>
+          {/* Spacer keeps the controls on the end side; there is no global search to offer here. */}
+          <div aria-hidden="true" />
 
           <div className={`flex items-center gap-6 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
             {/* Language Switcher Button */}
@@ -358,12 +429,12 @@ export default function ProviderLayout({
             <div className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <div className={`hidden sm:block ${isRTL ? "text-left" : "text-right"}`}>
                 <p className="text-[10px] text-[#667085] font-semibold uppercase tracking-[0.15em] leading-none mb-1">{t.welcome}</p>
-                <p className="text-sm font-bold text-[#101828] tracking-wide">Elite Barbershop</p>
+                <p className="text-sm font-bold text-[#101828] tracking-wide">{business?.[locale] || ""}</p>
               </div>
               <div
                 className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#D1AF47] to-[#E0C46A] text-[#101828] font-black text-sm flex items-center justify-center shadow-[0_0_20px_rgba(209,175,71,0.15)]"
               >
-                EB
+                {(business?.[locale] || "").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w.charAt(0).toUpperCase()).join("") || "•"}
               </div>
             </div>
           </div>

@@ -756,10 +756,11 @@ export default function ProviderCalendarPage() {
       setError("");
       setSuccess("");
 
-      const { error: cancelError } = await supabase
-        .from("bookings")
-        .update({ status: "cancelled" })
-        .eq("id", id);
+      // The command applies the cancellation rules and creates the customer's refund; a direct status write cannot.
+      const { error: cancelError } = await supabase.rpc("cancel_booking", {
+        target_booking_id: id,
+        p_reason: lang === "ar" ? "ألغاه مقدم الخدمة من التقويم" : "Cancelled by the provider from the calendar",
+      });
 
       if (cancelError) throw cancelError;
 

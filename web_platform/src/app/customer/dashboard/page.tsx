@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
 
 type Locale = "en" | "ar";
 type Bilingual = { en: string; ar: string };
@@ -237,7 +238,7 @@ export default function CustomerDashboard() {
           rating: p.rating === null ? null : Number(p.rating),
         })));
     }
-    load().catch((err) => setLoadError(err instanceof Error ? err.message : String(err)));
+    load().catch((err) => setLoadError(errorMessage(err)));
   }, []);
 
   const upcomingList = bookings

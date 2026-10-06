@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { trackEvent } from "@/lib/analytics";
 import { ToastContainer } from "@/components/toast";
 import { Coordinates, CalculationMethod, PrayerTimes, Madhab } from "adhan";
+import { errorMessage } from "@/lib/error-message";
 
 export const dynamic = "force-dynamic";
 
@@ -475,7 +476,7 @@ export default function ShopDetailsPage() {
         }
       } catch (err: unknown) {
         if (!cancelled) {
-          setShopLoadError(err instanceof Error ? err.message : String((err as any)?.message || err));
+          setShopLoadError(errorMessage(err));
           setShopLoadState("error");
         }
       }
@@ -632,7 +633,7 @@ export default function ShopDetailsPage() {
       }
       router.push("/customer/messages");
     } catch (err: unknown) {
-      addToast(err instanceof Error ? err.message : String(err), "error");
+      addToast(errorMessage(err), "error");
     }
   };
 

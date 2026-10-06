@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { useConfirm } from "@/components/modal";
 
 const translations = {
   en: {
@@ -31,8 +32,8 @@ const translations = {
     featuredHint: "Featured on the landing page rail / at the top of the Services page.",
     addBtn: "+ Add service",
     editBtn: "Edit",
-    deleteBtn: "Delete",
-    confirmDelete: "Delete service \"{name}\"? This cannot be undone.",
+    deleteBtn: "Archive",
+    confirmDelete: "Archive service \"{name}\"? It stops being bookable; bookings and history are kept and you can reactivate it.",
     newService: "New service",
     editService: "Edit service",
     nameEnLabel: "Name (EN)",
@@ -51,7 +52,7 @@ const translations = {
     allCategories: "All categories",
     allStatuses: "All statuses",
     createdMsg: "Service created.",
-    deletedMsg: "Service deleted.",
+    deletedMsg: "Service archived.",
     saving: "Saving...",
     required: "Name and category are required.",
     filterBy: "Filter"
@@ -83,8 +84,8 @@ const translations = {
     featuredHint: "تظهر في شريط الصفحة الرئيسية / أعلى صفحة الخدمات.",
     addBtn: "+ إضافة خدمة",
     editBtn: "تعديل",
-    deleteBtn: "حذف",
-    confirmDelete: "حذف الخدمة \"{name}\"؟ لا يمكن التراجع.",
+    deleteBtn: "أرشفة",
+    confirmDelete: "أرشفة الخدمة \"{name}\"؟ تتوقف عن قبول الحجوزات مع الاحتفاظ بالحجوزات والسجل ويمكن إعادة تفعيلها.",
     newService: "خدمة جديدة",
     editService: "تعديل الخدمة",
     nameEnLabel: "الاسم (إنجليزي)",
@@ -103,7 +104,7 @@ const translations = {
     allCategories: "كل الفئات",
     allStatuses: "كل الحالات",
     createdMsg: "تم إنشاء الخدمة.",
-    deletedMsg: "تم حذف الخدمة.",
+    deletedMsg: "تمت أرشفة الخدمة.",
     saving: "جارٍ الحفظ...",
     required: "الاسم والفئة مطلوبان.",
     filterBy: "تصفية"
@@ -292,14 +293,21 @@ export default function AdminServices() {
     }
   };
 
+  const [confirmNode, ask] = useConfirm(lang);
+
   const deleteService = async (item: any) => {
     const name = lang === "ar" ? item.nameAr : item.nameEn;
-    if (!window.confirm(translations[lang].confirmDelete.replace("{name}", name))) return;
+    if (!(await ask({
+      title: lang === "ar" ? "أرشفة هذه الخدمة" : "Archive this service",
+      intro: translations[lang].confirmDelete.replace("{name}", name),
+      facts: [{ label: lang === "ar" ? "الخدمة" : "Service", value: name }],
+      confirmLabel: lang === "ar" ? "أرشفة" : "Archive",
+      tone: "danger",
+    }))) return;
     setSuccess(""); setError("");
-    // Optimistic removal from the list.
-    setServices((prev) => prev.filter((s) => s.id !== item.id));
-    const { error: delErr } = await supabase.from("services").delete().eq("id", item.id);
-    if (delErr) { setError(translations[lang].errorMsg); await loadServices(); return; }
+    const { error: archiveErr } = await supabase.from("services").update({ is_active: false }).eq("id", item.id);
+    if (archiveErr) { setError(`${translations[lang].errorMsg} ${archiveErr.message}`); return; }
+    setServices((prev) => prev.map((s) => (s.id === item.id ? { ...s, is_active: false } : s)));
     setSuccess(translations[lang].deletedMsg);
   };
 
@@ -387,6 +395,7 @@ export default function AdminServices() {
 
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className={`space-y-6 ${isRTL ? "text-right" : "text-left"}`}>
+      {confirmNode}
       {/* Header */}
       <div className={`flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between ${flip}`}>
         <div>
@@ -455,14 +464,14 @@ export default function AdminServices() {
             placeholder={t.searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className={`w-full bg-white border border-[#ECECEC] rounded-xl px-4 py-2.5 text-xs text-gray-900 outline-none focus:border-[#D1AF47] transition duration-150 ${isRTL ? "text-right" : "text-left"}`}
+            className={`w-full bg-white border border-[#ECECEC] rounded-xl px-4 py-2.5 text-xs text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47] transition duration-150 ${isRTL ? "text-right" : "text-left"}`}
           />
         </div>
-        <select value={catFilter} onChange={(e) => setCatFilter(e.target.value)} className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-xs font-bold text-gray-700 outline-none focus:border-[#D1AF47]">
+        <select value={catFilter} onChange={(e) => setCatFilter(e.target.value)} className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-xs font-bold text-gray-700 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
           <option value="all">{t.allCategories}</option>
           {categories.map((c) => <option key={c.id} value={c.id}>{lang === "ar" ? c.name_ar : c.name_en}</option>)}
         </select>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)} className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-xs font-bold text-gray-700 outline-none focus:border-[#D1AF47]">
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)} className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-xs font-bold text-gray-700 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
           <option value="all">{t.allStatuses}</option>
           <option value="active">{t.active}</option>
           <option value="inactive">{t.inactive}</option>
@@ -511,7 +520,7 @@ export default function AdminServices() {
                           type="number"
                           value={item.price}
                           onChange={(e) => handlePriceChange(item.id, parseFloat(e.target.value) || 0)}
-                          className="w-16 bg-gray-50 border border-[#ECECEC] rounded-lg px-2 py-1 text-center font-bold text-gray-900 outline-none focus:border-[#D1AF47]"
+                          className="w-16 bg-gray-50 border border-[#ECECEC] rounded-lg px-2 py-1 text-center font-bold text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]"
                         />
                         <span className="font-bold text-gray-400">{lang === "ar" ? "ريال" : "SAR"}</span>
                       </div>
@@ -601,37 +610,37 @@ export default function AdminServices() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.nameEnLabel}
-                <input value={form.nameEn} onChange={(e) => setForm((f) => ({ ...f, nameEn: e.target.value }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]" />
+                <input value={form.nameEn} onChange={(e) => setForm((f) => ({ ...f, nameEn: e.target.value }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
               <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.nameArLabel}
-                <input value={form.nameAr} onChange={(e) => setForm((f) => ({ ...f, nameAr: e.target.value }))} dir="rtl" className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]" />
+                <input value={form.nameAr} onChange={(e) => setForm((f) => ({ ...f, nameAr: e.target.value }))} dir="rtl" className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
               <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.categorySel}
-                <select value={form.categoryId} onChange={(e) => setForm((f) => ({ ...f, categoryId: e.target.value }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]">
+                <select value={form.categoryId} onChange={(e) => setForm((f) => ({ ...f, categoryId: e.target.value }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
                   <option value="">{t.categorySel}…</option>
                   {categories.map((c) => <option key={c.id} value={c.id}>{lang === "ar" ? c.name_ar : c.name_en}</option>)}
                 </select>
               </label>
               <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.assignProvider}
-                <select value={form.providerId} onChange={(e) => setForm((f) => ({ ...f, providerId: e.target.value }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]">
+                <select value={form.providerId} onChange={(e) => setForm((f) => ({ ...f, providerId: e.target.value }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
                   <option value="">{t.unassigned}</option>
                   {providersList.map((p) => <option key={p.id} value={p.id}>{lang === "ar" ? p.name_ar : p.name_en}</option>)}
                 </select>
               </label>
               <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.priceLabel}
-                <input type="number" min={0} value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: Number(e.target.value) || 0 }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]" />
+                <input type="number" min={0} value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: Number(e.target.value) || 0 }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
               <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.durationLabel}
-                <input type="number" min={0} value={form.duration} onChange={(e) => setForm((f) => ({ ...f, duration: Number(e.target.value) || 0 }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]" />
+                <input type="number" min={0} value={form.duration} onChange={(e) => setForm((f) => ({ ...f, duration: Number(e.target.value) || 0 }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
               <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085] sm:col-span-2">{t.imageLabel}
-                <input value={form.image} onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))} placeholder="https://…" dir="ltr" className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]" />
+                <input value={form.image} onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))} placeholder="https://…" dir="ltr" className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
               <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085] sm:col-span-2">{t.descEnLabel}
-                <textarea rows={2} value={form.descriptionEn} onChange={(e) => setForm((f) => ({ ...f, descriptionEn: e.target.value }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]" />
+                <textarea rows={2} value={form.descriptionEn} onChange={(e) => setForm((f) => ({ ...f, descriptionEn: e.target.value }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
               <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085] sm:col-span-2">{t.descArLabel}
-                <textarea rows={2} value={form.descriptionAr} onChange={(e) => setForm((f) => ({ ...f, descriptionAr: e.target.value }))} dir="rtl" className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]" />
+                <textarea rows={2} value={form.descriptionAr} onChange={(e) => setForm((f) => ({ ...f, descriptionAr: e.target.value }))} dir="rtl" className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
             </div>
 

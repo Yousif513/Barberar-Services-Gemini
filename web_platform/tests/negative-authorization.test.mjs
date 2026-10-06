@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync as readRaw } from "node:fs";
+import { existsSync, readFileSync as readRaw } from "node:fs";
 const readFileSync = (path, enc) => readRaw(path, enc).replace(/\r\n/g, "\n");
 import { fileURLToPath } from "node:url";
 import { dirname, resolve, join } from "node:path";
@@ -32,6 +32,14 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(code.includes('req.headers.get("Authorization")'), "Must read Authorization header");
       assert.ok(code.includes('profile?.role !== "admin"'), "Must require admin role");
       assert.ok(code.includes('403'), "Must return 403 for non-admin");
+      assert.ok(!code.includes('"Access-Control-Allow-Origin": "*"'), "Must not use wildcard CORS");
+    });
+
+    it("calculate-travel needs a signed-in session before it spends the maps quota", async () => {
+      const code = readFileSync(join(rootDir, "supabase/functions/calculate-travel/index.ts"), "utf8");
+      assert.ok(code.includes('req.headers.get("Authorization")'), "Must read Authorization header");
+      assert.ok(code.includes("auth.getUser(") && code.includes("401"), "Must reject a request with no real session");
+      assert.ok(code.indexOf("auth.getUser(") < code.indexOf("GOOGLE_MAPS_API_KEY"), "Must check the caller before using the key");
       assert.ok(!code.includes('"Access-Control-Allow-Origin": "*"'), "Must not use wildcard CORS");
     });
 
@@ -132,13 +140,10 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(!ledgerCode.includes("Omar Khaled"), "Forbidden mock name Omar Khaled found");
     });
 
-    it("admin/payments has no grep-bait comments", () => {
-      const paymentsCode = readFileSync(
-        join(webPlatformDir, "src/app/admin/payments/page.tsx"),
-        "utf8"
-      );
-      assert.ok(!paymentsCode.includes('Required admin-control markers'), "Grep-bait comments must be deleted");
-      assert.ok(!paymentsCode.includes('refundDuplicate'), "Grep-bait comment refundDuplicate must be deleted");
+    it("admin/payments is a server redirect to the ledger, not a stub page carrying marker comments", () => {
+      assert.ok(!existsSync(join(webPlatformDir, "src/app/admin/payments/page.tsx")), "the stub page must not come back");
+      const config = readFileSync(join(webPlatformDir, "next.config.ts"), "utf8");
+      assert.ok(config.includes('source: "/admin/payments", destination: "/admin/ledger"'), "the old address must redirect to the ledger");
     });
   });
 

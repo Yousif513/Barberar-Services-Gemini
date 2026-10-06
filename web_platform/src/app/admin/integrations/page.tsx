@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { useConfirm } from "@/components/modal";
 
 /* Integrations registry — the admin control plane for every external API.
    Secrets never live client-side: `key_masked` is a display-only hint and the
@@ -102,7 +103,7 @@ const extraTranslations = {
   en: {
     addApi: "Add API",
     edit: "Edit",
-    delete: "Delete",
+    delete: "Disable",
     save: "Save API",
     update: "Update API",
     cancel: "Cancel",
@@ -116,9 +117,9 @@ const extraTranslations = {
     envLabel: "Environment",
     created: "API integration added.",
     updated: "API integration updated.",
-    deleted: "API integration deleted.",
+    deleted: "API integration disabled.",
     required: "Add an API name, base URL, API key, and integration section.",
-    confirmDelete: "Delete {name}? This removes the registered API from the admin registry.",
+    confirmDelete: "Disable {name}? It stops being used; its configuration stays in the registry and can be re-enabled.",
     activeCount: "Active APIs",
     configuredCount: "Configured keys",
     liveCount: "Live mode",
@@ -130,34 +131,34 @@ const extraTranslations = {
     notSet: "Not set"
   },
   ar: {
-    addApi: "Ø¥Ø¶Ø§ÙØ© API",
-    edit: "ØªØ¹Ø¯ÙŠÙ„",
-    delete: "Ø­Ø°Ù",
-    save: "Ø­ÙØ¸ API",
-    update: "ØªØ­Ø¯ÙŠØ« API",
-    cancel: "Ø¥Ù„ØºØ§Ø¡",
-    apiName: "Ø§Ø³Ù… API",
-    baseUrl: "Ø±Ø§Ø¨Ø· API Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ",
-    apiKey: "Ù…ÙØªØ§Ø­ API",
-    section: "Ù‚Ø³Ù… Ø§Ù„ØªÙƒØ§Ù…Ù„",
-    platformArea: "Ø¬Ø§Ù†Ø¨ Ø§Ù„Ù…Ù†ØµØ©",
-    description: "Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø§Ù„Ø±Ø¨Ø·",
-    status: "Ø­Ø§Ù„Ø© Ø§Ù„Ø§ØªØµØ§Ù„",
-    envLabel: "Ø§Ù„Ø¨ÙŠØ¦Ø©",
-    created: "ØªÙ…Øª Ø¥Ø¶Ø§ÙØ© Ø§Ù„ØªÙƒØ§Ù…Ù„.",
-    updated: "ØªÙ… ØªØ­Ø¯ÙŠØ« Ø§Ù„ØªÙƒØ§Ù…Ù„.",
-    deleted: "ØªÙ… Ø­Ø°Ù Ø§Ù„ØªÙƒØ§Ù…Ù„.",
-    required: "Ø£Ø¶Ù Ø§Ø³Ù… API ÙˆØ§Ù„Ø±Ø§Ø¨Ø· ÙˆØ§Ù„Ù…ÙØªØ§Ø­ ÙˆÙ‚Ø³Ù… Ø§Ù„ØªÙƒØ§Ù…Ù„.",
-    confirmDelete: "Ø­Ø°Ù {name}ØŸ Ø³ØªØªÙ… Ø¥Ø²Ø§Ù„Ø© API Ù…Ù† Ø³Ø¬Ù„ Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©.",
-    activeCount: "API Ù…ÙØ¹Ù„Ø©",
-    configuredCount: "Ù…ÙØ§ØªÙŠØ­ Ù…Ù‡ÙŠØ£Ø©",
-    liveCount: "ÙˆØ¶Ø¹ Ù…Ø¨Ø§Ø´Ø±",
-    sectionCount: "Ø£Ù‚Ø³Ø§Ù… Ù…Ø±Ø¨ÙˆØ·Ø©",
-    keyHint: "ÙŠØ¸Ù‡Ø± Ø§Ù„Ù…ÙØªØ§Ø­ Ù…Ù‚Ù†Ø¹Ø§Ù‹ Ø¨Ø¹Ø¯ Ø§Ù„Ø­ÙØ¸. Ø£Ø¯Ø®Ù„ Ù…ÙØªØ§Ø­Ø§Ù‹ Ø¬Ø¯ÙŠØ¯Ø§Ù‹ ÙÙ‚Ø· Ø¹Ù†Ø¯ ØªØ¯ÙˆÙŠØ± Ø§Ù„Ø§Ø¹ØªÙ…Ø§Ø¯Ø§Øª.",
-    search: "Ø§Ø¨Ø­Ø« Ø¹Ù† API Ø£Ùˆ Ù‚Ø³Ù… Ø£Ùˆ Ø±Ø§Ø¨Ø·...",
-    allSections: "ÙƒÙ„ Ø§Ù„Ø£Ù‚Ø³Ø§Ù…",
-    allPlatform: "ÙƒÙ„ Ø§Ù„Ù…Ù†ØµØ©",
-    notSet: "ØºÙŠØ± Ù…Ø­Ø¯Ø¯"
+    addApi: "إضافة API",
+    edit: "تعديل",
+    delete: "تعطيل",
+    save: "حفظ API",
+    update: "تحديث API",
+    cancel: "إلغاء",
+    apiName: "اسم API",
+    baseUrl: "رابط API الأساسي",
+    apiKey: "مفتاح API",
+    section: "قسم التكامل",
+    platformArea: "جانب المنصة",
+    description: "ملاحظات الربط",
+    status: "حالة الاتصال",
+    envLabel: "البيئة",
+    created: "تمت إضافة التكامل.",
+    updated: "تم تحديث التكامل.",
+    deleted: "تم تعطيل التكامل.",
+    required: "أضف اسم API والرابط والمفتاح وقسم التكامل.",
+    confirmDelete: "تعطيل {name}؟ يتوقف استخدامه ويبقى إعداده في السجل ويمكن إعادة تفعيله.",
+    activeCount: "API مفعلة",
+    configuredCount: "مفاتيح مهيأة",
+    liveCount: "وضع مباشر",
+    sectionCount: "أقسام مربوطة",
+    keyHint: "يظهر المفتاح مقنعاً بعد الحفظ. أدخل مفتاحاً جديداً فقط عند تدوير الاعتمادات.",
+    search: "ابحث عن API أو قسم أو رابط...",
+    allSections: "كل الأقسام",
+    allPlatform: "كل المنصة",
+    notSet: "غير محدد"
   }
 };
 
@@ -227,14 +228,14 @@ const maskApiKey = (value: string) => {
 
 const platformLabel = (value: string | null | undefined, lang: "en" | "ar") => {
   const labels: Record<string, { en: string; ar: string }> = {
-    all: { en: "All platform", ar: "ÙƒÙ„ Ø§Ù„Ù…Ù†ØµØ©" },
-    customer: { en: "Customer app", ar: "ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡" },
-    provider: { en: "Provider dashboard", ar: "Ù„ÙˆØ­Ø© Ø§Ù„Ù…Ø²ÙˆØ¯" },
-    admin: { en: "Admin dashboard", ar: "Ù„ÙˆØ­Ø© Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©" },
-    customer_provider: { en: "Customer + Provider", ar: "Ø§Ù„Ø¹Ù…ÙŠÙ„ + Ø§Ù„Ù…Ø²ÙˆØ¯" },
-    notifications: { en: "Notifications", ar: "Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª" },
-    edge_functions: { en: "Edge functions", ar: "Ø¯ÙˆØ§Ù„ Ø§Ù„Ø®Ø§Ø¯Ù…" },
-    mobile: { en: "Mobile app", ar: "ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„Ø¬ÙˆØ§Ù„" }
+    all: { en: "All platform", ar: "كل المنصة" },
+    customer: { en: "Customer app", ar: "تطبيق العملاء" },
+    provider: { en: "Provider dashboard", ar: "لوحة المزود" },
+    admin: { en: "Admin dashboard", ar: "لوحة الإدارة" },
+    customer_provider: { en: "Customer + Provider", ar: "العميل + المزود" },
+    notifications: { en: "Notifications", ar: "الإشعارات" },
+    edge_functions: { en: "Edge functions", ar: "دوال الخادم" },
+    mobile: { en: "Mobile app", ar: "تطبيق الجوال" }
   };
   return labels[value || "all"]?.[lang] || value || labels.all[lang];
 };
@@ -270,7 +271,7 @@ export default function AdminIntegrations() {
       } catch {
         setItems([]);
         setError(lang === "ar"
-          ? "ÙØ´Ù„ ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØªÙƒØ§Ù…Ù„Ø§Øª Ø§Ù„Ø­Ù‚ÙŠÙ‚ÙŠØ©. ØªØ£ÙƒØ¯ Ù…Ù† ØªØ·Ø¨ÙŠÙ‚ ØªØ±Ø­ÙŠÙ„Ø§Øª Supabase ÙˆØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø´Ø±Ù."
+          ? "فشل تحميل التكاملات الحقيقية. تأكد من تطبيق ترحيلات Supabase وصلاحيات المشرف."
           : "Failed to load real integrations. Apply the Supabase migrations and verify admin table permissions.");
       }
     })();
@@ -286,9 +287,9 @@ export default function AdminIntegrations() {
     payments: t.catPayments, maps: t.catMaps, sms: t.catSms, push: t.catPush,
     email: t.catEmail, whatsapp: t.catWhatsapp, calendar: t.catCalendar,
     analytics: t.catAnalytics, ai: t.catAi,
-    auth: lang === "ar" ? "Ø§Ù„ØªØ­Ù‚Ù‚ ÙˆØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„" : "Authentication",
-    storage: lang === "ar" ? "Ø§Ù„ØªØ®Ø²ÙŠÙ†" : "Storage",
-    logistics: lang === "ar" ? "Ø§Ù„ØªÙˆØµÙŠÙ„ ÙˆØ§Ù„ØªØ´ØºÙŠÙ„" : "Logistics"
+    auth: lang === "ar" ? "التحقق وتسجيل الدخول" : "Authentication",
+    storage: lang === "ar" ? "التخزين" : "Storage",
+    logistics: lang === "ar" ? "التوصيل والتشغيل" : "Logistics"
   };
 
   const flash = (msg: string) => { setError(""); setNote(msg); setTimeout(() => setNote(""), 3000); };
@@ -312,7 +313,7 @@ export default function AdminIntegrations() {
       setItems(previous);
       setNote("");
       setError(lang === "ar"
-        ? "Ù„Ù… ÙŠØªÙ… Ø­ÙØ¸ ØªØºÙŠÙŠØ± Ø§Ù„ØªÙƒØ§Ù…Ù„. ØªØ£ÙƒØ¯ Ù…Ù† Ø¬Ø¯ÙˆÙ„ integrations ÙˆØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø´Ø±Ù."
+        ? "لم يتم حفظ تغيير التكامل. تأكد من جدول integrations وصلاحيات المشرف."
         : "Integration change was not saved. Check the integrations table, migration, and admin permissions.");
     }
   };
@@ -397,29 +398,37 @@ export default function AdminIntegrations() {
       setModalOpen(false);
     } catch {
       setError(lang === "ar"
-        ? "Ù„Ù… ÙŠØªÙ… Ø­ÙØ¸ API. ØªØ£ÙƒØ¯ Ù…Ù† ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„ØªØ±Ø­ÙŠÙ„Ø§Øª ÙˆØ£Ù† Ø­Ø³Ø§Ø¨Ùƒ Ù…Ø´Ø±Ù."
+        ? "لم يتم حفظ API. تأكد من تطبيق الترحيلات وأن حسابك مشرف."
         : "API was not saved. Apply the migrations and verify your admin permissions.");
     } finally {
       setSaving(false);
     }
   };
 
+  const [confirmNode, ask] = useConfirm(lang);
+
   const deleteIntegration = async (item: Integration) => {
     const message = xt.confirmDelete.replace("{name}", item.name);
-    if (typeof window !== "undefined" && !window.confirm(message)) return;
+    if (!(await ask({
+      title: lang === "ar" ? "تعطيل هذا الربط" : "Disable this integration",
+      intro: message,
+      facts: [{ label: lang === "ar" ? "الربط" : "Integration", value: item.name }],
+      confirmLabel: lang === "ar" ? "تعطيل" : "Disable",
+      tone: "danger",
+    }))) return;
     const previous = items;
-    setItems((prev) => prev.filter((x) => x.id !== item.id));
+    setItems((prev) => prev.map((x) => (x.id === item.id ? { ...x, enabled: false } : x)));
     try {
-      const { error: deleteError } = await supabase.from("integrations").delete().eq("id", item.id);
-      if (deleteError) throw deleteError;
-      await audit(item.key, "deleted integration");
+      const { error: disableError } = await supabase.from("integrations").update({ enabled: false }).eq("id", item.id);
+      if (disableError) throw disableError;
+      await audit(item.key, "disabled integration");
       flash(xt.deleted);
     } catch {
       setItems(previous);
       setNote("");
       setError(lang === "ar"
-        ? "Ù„Ù… ÙŠØªÙ… Ø­Ø°Ù API. ØªØ£ÙƒØ¯ Ù…Ù† ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø´Ø±Ù."
-        : "API was not deleted. Verify admin permissions and try again.");
+        ? "لم يتم تعطيل API. تأكد من صلاحيات المشرف."
+        : "API was not disabled. Verify admin permissions and try again.");
     }
   };
 
@@ -446,6 +455,7 @@ export default function AdminIntegrations() {
 
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className={`space-y-6 ${isRTL ? "text-right" : "text-left"}`}>
+      {confirmNode}
       <div className={`flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between ${isRTL ? "lg:flex-row-reverse" : ""}`}>
         <div>
           <h2 className="text-2xl font-serif font-black text-gray-900 leading-tight">{t.title}</h2>
@@ -476,12 +486,12 @@ export default function AdminIntegrations() {
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder={xt.search}
-          className="min-h-11 flex-1 rounded-2xl border border-[#ECECEC] bg-[#F8F8F7] px-4 text-sm font-semibold text-gray-800 outline-none transition focus:border-[#D1AF47] focus:bg-white"
+          className="min-h-11 flex-1 rounded-2xl border border-[#ECECEC] bg-[#F8F8F7] px-4 text-sm font-semibold text-gray-800 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] transition focus:border-[#D1AF47] focus:bg-white"
         />
         <select
           value={sectionFilter}
           onChange={(event) => setSectionFilter(event.target.value)}
-          className="min-h-11 rounded-2xl border border-[#ECECEC] bg-[#F8F8F7] px-4 text-xs font-black uppercase tracking-wider text-gray-700 outline-none transition focus:border-[#D1AF47] focus:bg-white"
+          className="min-h-11 rounded-2xl border border-[#ECECEC] bg-[#F8F8F7] px-4 text-xs font-black uppercase tracking-wider text-gray-700 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] transition focus:border-[#D1AF47] focus:bg-white"
         >
           <option value="all">{xt.allSections}</option>
           {SECTION_OPTIONS.map((section) => (
@@ -614,23 +624,23 @@ export default function AdminIntegrations() {
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               <label className="space-y-2">
                 <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.apiName}</span>
-                <input value={form.name} onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value, key: prev.id ? prev.key : slugifyKey(event.target.value) }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-bold outline-none focus:border-[#D1AF47]" />
+                <input value={form.name} onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value, key: prev.id ? prev.key : slugifyKey(event.target.value) }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-bold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
               <label className="space-y-2">
                 <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">API key ID</span>
-                <input value={form.key} onChange={(event) => setForm((prev) => ({ ...prev, key: slugifyKey(event.target.value) }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-none focus:border-[#D1AF47]" dir="ltr" />
+                <input value={form.key} onChange={(event) => setForm((prev) => ({ ...prev, key: slugifyKey(event.target.value) }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" dir="ltr" />
               </label>
               <label className="space-y-2 md:col-span-2">
                 <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.baseUrl}</span>
-                <input value={form.base_url} onChange={(event) => setForm((prev) => ({ ...prev, base_url: event.target.value }))} placeholder="https://api.example.com" className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-none focus:border-[#D1AF47]" dir="ltr" />
+                <input value={form.base_url} onChange={(event) => setForm((prev) => ({ ...prev, base_url: event.target.value }))} placeholder="https://api.example.com" className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" dir="ltr" />
               </label>
               <label className="space-y-2">
                 <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.apiKey}</span>
-                <input value={form.api_key} onChange={(event) => setForm((prev) => ({ ...prev, api_key: event.target.value, key_masked: event.target.value ? maskApiKey(event.target.value) : prev.key_masked }))} placeholder={form.key_masked || "sk_live_..."} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-none focus:border-[#D1AF47]" dir="ltr" />
+                <input value={form.api_key} onChange={(event) => setForm((prev) => ({ ...prev, api_key: event.target.value, key_masked: event.target.value ? maskApiKey(event.target.value) : prev.key_masked }))} placeholder={form.key_masked || "sk_live_..."} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" dir="ltr" />
               </label>
               <label className="space-y-2">
                 <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{t.keys}</span>
-                <input value={form.key_masked} onChange={(event) => setForm((prev) => ({ ...prev, key_masked: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-none focus:border-[#D1AF47]" dir="ltr" />
+                <input value={form.key_masked} onChange={(event) => setForm((prev) => ({ ...prev, key_masked: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" dir="ltr" />
               </label>
               <label className="space-y-2">
                 <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.section}</span>
@@ -643,14 +653,14 @@ export default function AdminIntegrations() {
                       ? defaultPaymentMethodSupport(prev.key)
                       : prev.supported_payment_method_keys
                   }))}
-                  className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-black outline-none focus:border-[#D1AF47]"
+                  className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-black outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]"
                 >
                   {SECTION_OPTIONS.map((section) => <option key={section} value={section}>{catLabel[section] ?? section}</option>)}
                 </select>
               </label>
               {form.category === "payments" && (
                 <div className="space-y-2 md:col-span-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{lang === "ar" ? "Ø·Ø±Ù‚ Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ù…Ø¯Ø¹ÙˆÙ…Ø©" : "Supported payment methods"}</span>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{lang === "ar" ? "طرق الدفع المدعومة" : "Supported payment methods"}</span>
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                     {PAYMENT_METHOD_OPTIONS.map((option) => {
                       const checked = form.supported_payment_method_keys.includes(option.key);
@@ -676,31 +686,31 @@ export default function AdminIntegrations() {
               )}
               <label className="space-y-2">
                 <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.platformArea}</span>
-                <select value={form.platform_area} onChange={(event) => setForm((prev) => ({ ...prev, platform_area: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-black outline-none focus:border-[#D1AF47]">
+                <select value={form.platform_area} onChange={(event) => setForm((prev) => ({ ...prev, platform_area: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-black outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
                   {PLATFORM_AREAS.map((area) => <option key={area} value={area}>{platformLabel(area, lang)}</option>)}
                 </select>
               </label>
               <label className="space-y-2">
                 <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.status}</span>
-                <select value={form.status} onChange={(event) => setForm((prev) => ({ ...prev, status: event.target.value as Integration["status"] }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-black outline-none focus:border-[#D1AF47]">
+                <select value={form.status} onChange={(event) => setForm((prev) => ({ ...prev, status: event.target.value as Integration["status"] }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-black outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
                   <option value="connected">{t.connected}</option>
                   <option value="disconnected">{t.disconnected}</option>
                 </select>
               </label>
               <label className="space-y-2">
                 <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.envLabel}</span>
-                <select value={form.env} onChange={(event) => setForm((prev) => ({ ...prev, env: event.target.value as Integration["env"] }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-black outline-none focus:border-[#D1AF47]">
+                <select value={form.env} onChange={(event) => setForm((prev) => ({ ...prev, env: event.target.value as Integration["env"] }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-black outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
                   <option value="test">{t.test}</option>
                   <option value="live">{t.live}</option>
                 </select>
               </label>
               <label className="space-y-2 md:col-span-2">
                 <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{t.webhook}</span>
-                <input value={form.webhook_url} onChange={(event) => setForm((prev) => ({ ...prev, webhook_url: event.target.value }))} placeholder="/functions/v1/example-webhook" className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-none focus:border-[#D1AF47]" dir="ltr" />
+                <input value={form.webhook_url} onChange={(event) => setForm((prev) => ({ ...prev, webhook_url: event.target.value }))} placeholder="/functions/v1/example-webhook" className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" dir="ltr" />
               </label>
               <label className="space-y-2 md:col-span-2">
                 <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.description}</span>
-                <textarea value={form.description} onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))} rows={3} className="w-full resize-none rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-semibold outline-none focus:border-[#D1AF47]" />
+                <textarea value={form.description} onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))} rows={3} className="w-full resize-none rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-semibold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
             </div>
 

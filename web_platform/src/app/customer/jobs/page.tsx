@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
 
 interface JobBid {
   id: string;
@@ -202,7 +203,7 @@ export default function CustomerJobsPage() {
       setJobPosts((data as unknown as JobPost[]) || []);
     } catch (err: unknown) {
       setJobPosts([]);
-      setLoadError(err instanceof Error ? err.message : String(err));
+      setLoadError(errorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -250,7 +251,7 @@ export default function CustomerJobsPage() {
       setShowAddForm(false);
       loadJobPosts();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -267,7 +268,7 @@ export default function CustomerJobsPage() {
       setSuccess(t.accepted);
       loadJobPosts();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setBusyId("");
     }
@@ -290,7 +291,7 @@ export default function CustomerJobsPage() {
       setSuccess(t.cancelled);
       loadJobPosts();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setBusyId("");
     }

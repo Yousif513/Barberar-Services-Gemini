@@ -2,6 +2,7 @@
 // Deno Edge Function to calculate travel time and traffic buffers for home services
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.108.1"
 
 function getCorsHeaders(req: Request) {
   const origin = req.headers.get("origin") || ""
@@ -28,9 +29,32 @@ serve(async (req) => {
   }
 
   try {
-    const { providerLat, providerLng, customerLat, customerLng } = await req.json()
+    // Every call spends a paid Maps quota, so only a signed-in account may make one. The publishable key that ships in
+    // every browser bundle is not an identity; getUser needs a real session token.
+    const authHeader = req.headers.get("Authorization")
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Missing authorization header." }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
+    const supabase = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_ANON_KEY") ?? "")
+    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""))
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Invalid credentials." }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
 
-    if (!providerLat || !providerLng || !customerLat || !customerLng) {
+    const body = await req.json()
+    const providerLat = Number(body.providerLat)
+    const providerLng = Number(body.providerLng)
+    const customerLat = Number(body.customerLat)
+    const customerLng = Number(body.customerLng)
+
+    const inRange = (lat: number, lng: number) => Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180
+    if (!inRange(providerLat, providerLng) || !inRange(customerLat, customerLng)) {
       return new Response(
         JSON.stringify({ error: "Missing required coordinates (lat/lng) for calculation." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }

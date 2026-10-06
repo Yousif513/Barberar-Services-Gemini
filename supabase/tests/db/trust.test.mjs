@@ -70,11 +70,11 @@ describe("verification and onboarding", () => {
        values ($1, 'Malqa Cuts', 'قصات الملقا', 'a@b.sa', '+966500001234', 'Al Malqa', 'King Fahd Rd', $2, $3, '1010202020', '300012345600003') returning id`,
       [applicant, lat, lat === null ? null : 46.6]).then((r) => r[0].id);
     const noLocation = await insert(null);
-    await expectError(as(db, admin, `select approve_provider_application($1)`, [noLocation]), /location/);
+    await expectError(as(db, admin, `select approve_provider_application($1, 'Documents checked')`, [noLocation]), /location/);
     await as(db, admin, `select reject_provider_application($1, 'Missing location')`, [noLocation]);
     const app = await insert(24.8);
-    await expectError(as(db, owner1, `select approve_provider_application($1)`, [app]), /Administrator/);
-    const r = (await as(db, admin, `select approve_provider_application($1) r`, [app]))[0].r;
+    await expectError(as(db, owner1, `select approve_provider_application($1, 'Documents checked')`, [app]), /Administrator/);
+    const r = (await as(db, admin, `select approve_provider_application($1, 'Documents checked') r`, [app]))[0].r;
     const p = (await sys(db, `select status, is_verified, description_en, vat_number, cr_number from providers where id = $1`, [r.provider_id]))[0];
     assert.equal(p.status, "active");
     assert.equal(p.is_verified, true);

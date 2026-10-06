@@ -14,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
 import { Toast } from "../components/toast";
+import { errorMessage } from "@/lib/error-message";
 
 const { width } = Dimensions.get("window");
 
@@ -210,7 +211,7 @@ export default function ProfileScreen() {
       setOtpSent(true);
       showToast(t.codeSent, "info");
     } catch (err) {
-      showToast(err instanceof Error ? err.message : String(err), "error");
+      showToast(errorMessage(err), "error");
     } finally {
       setBusy(false);
     }
@@ -243,7 +244,7 @@ export default function ProfileScreen() {
       setOtpSent(false);
       showToast(t.signedIn, "success");
     } catch (err) {
-      showToast(err instanceof Error ? err.message : String(err), "error");
+      showToast(errorMessage(err), "error");
     } finally {
       setBusy(false);
     }

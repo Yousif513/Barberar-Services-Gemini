@@ -117,9 +117,9 @@ describe("refunds, payouts and reports", () => {
     const owner = ROLES.user(other);
     const first = (await as(db, owner, `select * from request_provider_payout($1, 70, 'SNB', 'SA0380000000608010167519')`, [prov]))[0];
     await expectError(as(db, owner, `select request_provider_payout($1, 40, 'SNB', 'SA0380000000608010167519')`, [prov]), /exceeds the available balance/);
-    const released = (await as(db, admin, `select admin_release_payout($1, 'release-1') r`, [first.id]))[0].r;
+    const released = (await as(db, admin, `select admin_release_payout($1, 'release-1', 'Bank transfer made') r`, [first.id]))[0].r;
     assert.equal(released.status, "success");
-    assert.equal((await as(db, admin, `select admin_release_payout($1, 'release-1') r`, [first.id]))[0].r.status, "already_processed");
+    assert.equal((await as(db, admin, `select admin_release_payout($1, 'release-1', 'Bank transfer made') r`, [first.id]))[0].r.status, "already_processed");
     const rows = await sys(db, `select provider_share, payout_status from transactional_ledger where provider_id = $1 order by provider_share`, [prov]);
     assert.deepEqual(rows.map((r) => r.payout_status).sort(), ["pending", "released"]);
     assert.equal(Number((await sys(db, `select provider_available_balance($1) v`, [prov]))[0].v), 30);

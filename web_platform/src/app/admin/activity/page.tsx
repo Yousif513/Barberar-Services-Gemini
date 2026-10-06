@@ -1,20 +1,21 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
 
 const translations = {
   en: {
     title: "Platform Activity",
-    subtitle: "Live feed of marketplace events — bookings, providers, payments, and reviews across the platform.",
-    events24h: "Events (24h)",
-    newBookings: "New Bookings",
-    newProviders: "New Providers",
+    subtitle: "The most recent bookings and provider sign-ups. For who changed what and why, open the Audit Log.",
+    events24h: "Events shown",
+    newBookings: "Recent bookings shown",
+    newProviders: "Recent providers shown",
     filterAll: "All",
     filterBookings: "Bookings",
     filterProviders: "Providers",
     filterPayments: "Payments",
     feedTitle: "Recent Events",
-    live: "Live",
+    live: "Latest",
     empty: "No activity recorded for this filter yet.",
     typeBooking: "Booking",
     typeProvider: "Provider",
@@ -23,16 +24,16 @@ const translations = {
   },
   ar: {
     title: "نشاط المنصة",
-    subtitle: "بث مباشر لأحداث السوق — الحجوزات، المزودون، المدفوعات، والتقييمات عبر المنصة.",
-    events24h: "الأحداث (٢٤ ساعة)",
-    newBookings: "حجوزات جديدة",
-    newProviders: "مزودون جدد",
+    subtitle: "أحدث الحجوزات وتسجيلات المزودين. لمعرفة من غيّر ماذا ولماذا، افتح سجل التدقيق.",
+    events24h: "الأحداث المعروضة",
+    newBookings: "أحدث الحجوزات المعروضة",
+    newProviders: "أحدث المزودين المعروضين",
     filterAll: "الكل",
     filterBookings: "الحجوزات",
     filterProviders: "المزودون",
     filterPayments: "المدفوعات",
     feedTitle: "أحدث الأحداث",
-    live: "مباشر",
+    live: "الأحدث",
     empty: "لا يوجد نشاط مسجل لهذا الفلتر بعد.",
     typeBooking: "حجز",
     typeProvider: "مزود",
@@ -98,7 +99,7 @@ export default function AdminActivityPage() {
         setStats({ events: mapped.length, bookings: (bookings ?? []).length, providers: (providers ?? []).length });
       } catch (err) {
         setEvents([]);
-        setLoadError(err instanceof Error ? err.message : String(err));
+        setLoadError(errorMessage(err));
       }
     })();
   }, []);
@@ -134,6 +135,7 @@ export default function AdminActivityPage() {
         <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-700">{loadError}</div>
       )}
 
+      {!loadError && (
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[[t.events24h, String(stats.events)], [t.newBookings, String(stats.bookings)], [t.newProviders, String(stats.providers)]].map(([label, value]) => (
           <div key={label} className={cardBase}>
@@ -142,6 +144,7 @@ export default function AdminActivityPage() {
           </div>
         ))}
       </div>
+      )}
 
       <div className={cardBase}>
         <div className={`flex flex-col gap-3 sm:items-center sm:justify-between mb-4 ${isRTL ? "sm:flex-row-reverse" : "sm:flex-row"}`}>

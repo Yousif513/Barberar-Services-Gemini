@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../lib/supabase";
+import { errorMessage } from "@/lib/error-message";
 
 const { width, height } = Dimensions.get("window");
 
@@ -196,7 +197,7 @@ export default function ServiceBoardScreen() {
       })));
     } catch (err) {
       setPosts([]);
-      setLoadError(err instanceof Error ? err.message : String(err));
+      setLoadError(errorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -207,7 +208,7 @@ export default function ServiceBoardScreen() {
   }, [lang]);
 
   const fail = (err: unknown) =>
-    Alert.alert(isRTL ? "خطأ" : "Error", err instanceof Error ? err.message : String(err));
+    Alert.alert(isRTL ? "خطأ" : "Error", errorMessage(err));
 
   // Handle Post Care Request
   const handlePostRequest = async () => {

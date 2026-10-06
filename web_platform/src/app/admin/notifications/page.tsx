@@ -199,7 +199,7 @@ export default function AdminNotificationsPage() {
   const isRTL = lang === "ar";
   const flip = isRTL ? "flex-row-reverse" : "flex-row";
   const cardBase = "rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]";
-  const inputBase = "w-full rounded-xl border border-[#ECECEC] bg-[#FDFDFC] px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-[#D1AF47]/50";
+  const inputBase = "w-full rounded-xl border border-[#ECECEC] bg-[#FDFDFC] px-4 py-2.5 text-sm text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] transition focus:border-[#D1AF47]/50";
 
   // One server command: in-app notifications for the audience, WhatsApp only for recipients with
   // WhatsApp and marketing consent (admin_broadcast_notification). Counts come back from the server.

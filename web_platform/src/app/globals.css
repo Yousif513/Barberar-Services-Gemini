@@ -71,8 +71,10 @@ html[lang="ar"] {
     radial-gradient(circle at 96% 4%, rgba(209, 175, 71, 0.14), transparent 20%);
 }
 
-.primora-dashboard-skin > aside,
-.primora-dashboard-skin > div {
+/* Unlayered, so it would beat Tailwind's layered `fixed`/`z-*` utilities: the admin phone drawer and its
+   backdrop are direct children that must stay fixed overlays rather than take up page height. */
+.primora-dashboard-skin > aside:not(.fixed),
+.primora-dashboard-skin > div:not(.fixed) {
   position: relative;
   z-index: 1;
 }
@@ -122,12 +124,18 @@ html[lang="ar"] {
   box-shadow: 0 0 34px rgba(209, 175, 71, 0.30), inset 0 0 18px rgba(244, 231, 182, 0.08);
 }
 
+/* The link for the current page carries its own glow; the keyboard ring must still show on top of it. */
+.primora-dashboard-sidebar nav a:focus-visible {
+  outline: 2px solid #F4E7B6;
+  outline-offset: 2px;
+}
+
 .primora-dashboard-content {
   position: relative;
   z-index: 1;
 }
 
-.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea):not(span):not([class*="rounded-full"]) {
+.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea):not(span):not([class*="rounded-full"]):not([role="dialog"]):not([data-plain-panel]) {
   position: relative;
   overflow: hidden;
   border-color: rgba(209, 175, 71, 0.46) !important;
@@ -138,7 +146,7 @@ html[lang="ar"] {
     0 0 34px rgba(209, 175, 71, 0.18) !important;
 }
 
-.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea):not(span):not([class*="rounded-full"])::before {
+.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea):not(span):not([class*="rounded-full"]):not([role="dialog"]):not([data-plain-panel])::before {
   content: "";
   pointer-events: none;
   position: absolute;
@@ -155,7 +163,7 @@ html[lang="ar"] {
     radial-gradient(circle at 12px calc(100% - 12px), rgba(224, 196, 106, 0.92) 0 2px, transparent 6px);
 }
 
-.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea):not(span):not([class*="rounded-full"])::after {
+.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea):not(span):not([class*="rounded-full"]):not([role="dialog"]):not([data-plain-panel])::after {
   content: "";
   pointer-events: none;
   position: absolute;
@@ -171,7 +179,7 @@ html[lang="ar"] {
 
 /* Lift card content above the decorative ::before/::after overlays. Only direct children of
    decorated cards are positioned, so sticky, absolute and fixed elements keep their own behaviour. */
-.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea):not(span):not([class*="rounded-full"]) > :not(.absolute):not(.fixed):not(.sticky) {
+.primora-dashboard-content :is(section, article, form, [class*="rounded"][class*="border"]):not(button):not(input):not(select):not(textarea):not(span):not([class*="rounded-full"]):not([role="dialog"]):not([data-plain-panel]) > :not(.absolute):not(.fixed):not(.sticky) {
   position: relative;
   z-index: 2;
 }

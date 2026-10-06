@@ -25,6 +25,7 @@ import {
   loadShopDetails,
   riyadhDate
 } from "../lib/marketplace";
+import { errorMessage } from "@/lib/error-message";
 
 const { height } = Dimensions.get("window");
 
@@ -172,7 +173,7 @@ export function ShopDetailsModal({
     setDetailsError("");
     loadShopDetails(shop.providerId, shop.branchId)
       .then((d) => { if (!cancelled) setDetails(d); })
-      .catch((err) => { if (!cancelled) setDetailsError(err instanceof Error ? err.message : String(err)); });
+      .catch((err) => { if (!cancelled) setDetailsError(errorMessage(err)); });
     return () => { cancelled = true; };
   }, [shop.providerId, shop.branchId, reloadKey]);
 
@@ -212,7 +213,7 @@ export function ShopDetailsModal({
       .catch((err) => {
         if (cancelled) return;
         setSlots([]);
-        setSlotsError(err instanceof Error ? err.message : String(err));
+        setSlotsError(errorMessage(err));
       })
       .finally(() => { if (!cancelled) setSlotsLoading(false); });
     return () => { cancelled = true; };
@@ -278,7 +279,7 @@ export function ShopDetailsModal({
       await Linking.openURL(checkout.checkoutUrl);
       onClose();
     } catch (err) {
-      Alert.alert(t.bookingFailed, err instanceof Error ? err.message : String(err));
+      Alert.alert(t.bookingFailed, errorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -298,7 +299,7 @@ export function ShopDetailsModal({
       await Linking.openURL(checkout.checkoutUrl);
       onClose();
     } catch (err) {
-      Alert.alert(t.bookingFailed, err instanceof Error ? err.message : String(err));
+      Alert.alert(t.bookingFailed, errorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -324,7 +325,7 @@ export function ShopDetailsModal({
       }
       Alert.alert(t.messageShop, t.conversationReady);
     } catch (err) {
-      Alert.alert(t.bookingFailed, err instanceof Error ? err.message : String(err));
+      Alert.alert(t.bookingFailed, errorMessage(err));
     } finally {
       setSubmitting(false);
     }

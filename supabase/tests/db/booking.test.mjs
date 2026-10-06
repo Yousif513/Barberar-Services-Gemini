@@ -25,12 +25,15 @@ const confirmPayment = async (booking) => {
 };
 
 // Inserts a confirmed booking that already started (for completion / no-show tests).
+// Each one starts a different number of days back, so two of them never overlap.
+let pastDays = 0;
 const pastBooking = async (customerId = SEED.customer) => {
+  pastDays += 7;
   const r = await sys(db,
     `insert into bookings (customer_id, branch_id, employee_id, service_id, status, scheduled_at, duration_minutes,
                            subtotal_price, total_price, tax_amount, deposit_required, platform_commission, source)
-     values ($1, $2, $3, $4, 'confirmed', now() - interval '3 hours' - (random() * interval '100 days'), $5, $6, $6, round($6 * 0.15, 2), 0, 0, 'link')
-     returning *`, [customerId, SEED.branch1, SEED.employee1, svc.id, svc.duration, svc.price]);
+     values ($1, $2, $3, $4, 'confirmed', now() - interval '3 hours' - make_interval(days => $7::int), $5, $6, $6, round($6 * 0.15, 2), 0, 0, 'link')
+     returning *`, [customerId, SEED.branch1, SEED.employee1, svc.id, svc.duration, svc.price, pastDays]);
   return r[0];
 };
 
@@ -166,7 +169,7 @@ describe("booking engine", () => {
     const checkedIn = (await as(db, owner1, `select employee_update_booking_status($1, 'in_service') r`, [future.id]))[0].r;
     assert.equal(checkedIn.status, "confirmed");
     assert.ok(checkedIn.checked_in_at);
-    await expectError(as(db, customer, `select employee_update_booking_status($1, 'in_service')`, [future.id]), /Not authorized/);
+    await expectError(as(db, customer, `select employee_update_booking_status($1, 'in_service')`, [future.id]), /Booking not found/);
 
     const past = await pastBooking();
     const done = (await as(db, owner1, `select employee_update_booking_status($1, 'completed') r`, [past.id]))[0].r;

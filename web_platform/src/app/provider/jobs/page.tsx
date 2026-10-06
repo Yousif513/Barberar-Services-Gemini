@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
 
 interface MyBid {
   job_post_id: string;
@@ -177,7 +178,7 @@ export default function ProviderJobsPage() {
       setMyBids(bidsRes.data || []);
     } catch (err: unknown) {
       setOpenJobs([]);
-      setLoadError(err instanceof Error ? err.message : String(err));
+      setLoadError(errorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -220,7 +221,7 @@ export default function ProviderJobsPage() {
       setActiveJob(null);
       loadJobsData();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -279,7 +280,7 @@ export default function ProviderJobsPage() {
           </div>
           <div className="w-12 h-12 rounded-2xl bg-[#F5B041]/10 border border-[#F5B041]/20 flex items-center justify-center text-[#F5B041] group-hover:scale-110 transition-transform duration-300">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
           </div>
         </div>

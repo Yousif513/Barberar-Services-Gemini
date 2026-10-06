@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePrayerTimes } from "@/lib/use-prayer-times";
+import { errorMessage } from "@/lib/error-message";
 
 // Destinations the provider header search can jump to.
 const SEARCH_TARGETS: { en: string; ar: string; href: string }[] = [
@@ -306,7 +307,7 @@ export default function ProviderDashboardPage() {
         }
       } catch (err) {
         setDashboardStats(emptyDashboardStats);
-        setStatsError(err instanceof Error ? err.message : String(err));
+        setStatsError(errorMessage(err));
         setStatsMode("error");
       }
     }

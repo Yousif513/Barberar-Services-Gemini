@@ -17,8 +17,8 @@ const checks = [
     reject: ["RAMADAN20", "WELCOME50", "PRIMORA10", "24,320", "2,432"],
   },
   {
-    file: "web_platform/src/app/admin/payments/page.tsx",
-    require: ['router.replace("/admin/ledger")'],
+    file: "web_platform/next.config.ts",
+    require: ['source: "/admin/payments", destination: "/admin/ledger"', 'source: "/admin/system-logs", destination: "/admin/audit-logs"'],
     reject: ['from("payment_refund_requests")', "refundDuplicate"],
   },
   {

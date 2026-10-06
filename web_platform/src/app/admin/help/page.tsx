@@ -16,11 +16,11 @@ const translations = {
     open: "Open",
     faqTitle: "Frequently Asked Questions",
     faqs: [
-      { q: "How do I verify a new provider?", a: "Open Providers from the sidebar, review the trade license link on the provider row, then press the Verify action. Verified providers become visible in customer search immediately." },
-      { q: "How are payment splits calculated?", a: "Each captured deposit is split automatically: the platform commission (per-provider percentage set on the provider record) goes to the platform ledger and the remainder to the provider. Review and release payouts from the Splits Ledger page." },
-      { q: "How do I resolve a customer dispute?", a: "Open Disputes from the sidebar, review the case evidence and booking details, then apply a partial or full refund. Every arbitration action is written to the audit log." },
-      { q: "How do I change platform commission for one provider?", a: "Open Commissions (or the provider's row in Providers) and set the override percentage. New bookings use the new rate; existing bookings keep the rate captured at booking time." },
-      { q: "Why is a provider not appearing in search?", a: "Only verified providers with at least one active service and one active employee appear. Check verification status, then the provider's services and staff." }
+      { q: "How do I verify a new provider?", a: "Open Providers, then Applications. Check the Commercial Registration with Wathq (or record a manual review with a note) and approve the application. A provider appears in customer search once verified and with at least one active branch." },
+      { q: "How are payment splits calculated?", a: "At booking time the server computes the platform commission from the fee rules shown on Taxes & Fees (by booking source and first visit) and stores it on the booking. When the deposit is captured, the ledger records the platform share and the provider share. Review and release payouts from the Splits Ledger page." },
+      { q: "How do I resolve a customer dispute?", a: "Open Disputes, review the case and booking, then refund or reject it with a reason. A refund creates a refund request that is processed through Tap, and every decision is written to the audit log." },
+      { q: "How do I change platform commission?", a: "Commission comes from the platform fee rules on Taxes & Fees, the same for every provider. The commission field on a provider record is not used in pricing. Changing a rate is a reviewed database change approved by the platform owner." },
+      { q: "Why is a provider not appearing in search?", a: "Only verified providers with at least one active branch appear. A provider without active services shows no prices. Check the provider's status, then its branches and services." }
     ]
   },
   ar: {
@@ -36,11 +36,11 @@ const translations = {
     open: "فتح",
     faqTitle: "الأسئلة الشائعة",
     faqs: [
-      { q: "كيف أوثق مزوداً جديداً؟", a: "افتح «المزودون» من القائمة الجانبية، راجع رابط السجل التجاري في صف المزود، ثم اضغط زر التوثيق. يظهر المزود الموثق في بحث العملاء فوراً." },
-      { q: "كيف تُحسب تقسيمات المدفوعات؟", a: "يُقسم كل عربون محصّل تلقائياً: عمولة المنصة (نسبة محددة لكل مزود) تذهب لدفتر المنصة والباقي للمزود. راجع واصرف المستحقات من صفحة دفتر التقسيمات." },
-      { q: "كيف أحل نزاع عميل؟", a: "افتح «النزاعات» من القائمة، راجع أدلة الحالة وتفاصيل الحجز، ثم طبّق استرداداً جزئياً أو كاملاً. يُسجل كل إجراء تحكيم في سجل التدقيق." },
-      { q: "كيف أغيّر عمولة المنصة لمزود واحد؟", a: "افتح «العمولات» (أو صف المزود في «المزودون») وحدد نسبة الاستثناء. تستخدم الحجوزات الجديدة النسبة الجديدة بينما تحتفظ الحجوزات القائمة بنسبتها وقت الحجز." },
-      { q: "لماذا لا يظهر مزود في البحث؟", a: "يظهر فقط المزودون الموثقون الذين لديهم خدمة نشطة وموظف نشط على الأقل. تحقق من حالة التوثيق ثم من خدمات وموظفي المزود." }
+      { q: "كيف أوثق مزوداً جديداً؟", a: "افتح «المزودون» ثم «الطلبات». تحقق من السجل التجاري عبر واثق (أو سجّل مراجعة يدوية مع ملاحظة) ثم اعتمد الطلب. يظهر المزود في بحث العملاء بعد توثيقه وعند وجود فرع نشط واحد على الأقل." },
+      { q: "كيف تُحسب تقسيمات المدفوعات؟", a: "عند الحجز يحسب الخادم عمولة المنصة من قواعد الرسوم المعروضة في «الضرائب والرسوم» (حسب مصدر الحجز والزيارة الأولى) ويحفظها في الحجز. وعند تحصيل العربون يسجل الدفتر حصة المنصة وحصة المزود. راجع واصرف المستحقات من صفحة دفتر التقسيمات." },
+      { q: "كيف أحل نزاع عميل؟", a: "افتح «النزاعات»، راجع الحالة والحجز، ثم استرد المبلغ أو ارفض النزاع مع ذكر السبب. ينشئ الاسترداد طلب استرداد يُعالج عبر Tap، ويُسجل كل قرار في سجل التدقيق." },
+      { q: "كيف أغيّر عمولة المنصة؟", a: "تأتي العمولة من قواعد رسوم المنصة في «الضرائب والرسوم» وهي نفسها لكل المزودين. حقل العمولة في سجل المزود لا يُستخدم في التسعير. تغيير النسبة تعديل في قاعدة البيانات تتم مراجعته ويعتمده مالك المنصة." },
+      { q: "لماذا لا يظهر مزود في البحث؟", a: "يظهر فقط المزودون الموثقون الذين لديهم فرع نشط واحد على الأقل. المزود الذي لا يملك خدمات نشطة لا تظهر له أسعار. تحقق من حالة المزود ثم من فروعه وخدماته." }
     ]
   }
 };
