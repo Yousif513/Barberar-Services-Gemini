@@ -102,7 +102,7 @@ describe("coupon per-customer limit (D5 / C-D5)", () => {
   it("customers cannot change coupon rows, visitors cannot read them", async () => {
     await coupon("ADM", { per_customer_limit: 3 });
     await expectError(as(db, ROLES.anon, `select 1 from promotional_codes`), /permission denied/);
-    await as(db, customer, `update promotional_codes set per_customer_limit = null`);
+    await expectError(as(db, customer, `update promotional_codes set per_customer_limit = null`), /permission denied/);  // ADM1: no client holds a write privilege on the table any more
     assert.equal((await sys(db, `select count(*)::int n from promotional_codes where per_customer_limit is null and code = 'ADM'`))[0].n, 0);
   });
 });

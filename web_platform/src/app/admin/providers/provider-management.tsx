@@ -132,6 +132,8 @@ type ProviderApplicationRecord = {
   admin_notes?: string;
   reviewed_by?: string;
   reviewed_at?: string;
+  cr_verification_status?: string | null;
+  cr_check_data?: { registered_name?: string | null; name_match?: boolean | null; notes?: string | null } | null;
   created_at: string;
   updated_at: string;
 };
@@ -555,13 +557,17 @@ const providerRating = (provider: ProviderRecord) => (provider.figures ? describ
 
 const blankDraft: EditDraft = { businessNameEn: "", businessNameAr: "", contactEmail: "", contactPhone: "", tradeLicenseUrl: "" };
 
+function crIsCleared(app: { cr_verification_status?: string | null }) {
+  return app.cr_verification_status === "verified" || app.cr_verification_status === "manually_reviewed";
+}
+
 export default function AdminProviderManagement() {
   const [lang, setLang] = useState<Locale>("en");
   const [providers, setProviders] = useState<ProviderRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
-  const [crDialog, setCrDialog] = useState<{ kind: "wathq" | "manual"; providerId: string; cr: string; name: string } | null>(null);
+  const [crDialog, setCrDialog] = useState<{ kind: "wathq" | "manual"; providerId: string; applicationId?: string; cr: string; name: string } | null>(null);
   const [statusPending, setStatusPending] = useState<{ provider: ProviderRecord; next: DbProviderStatus; actionLabel: string } | null>(null);
   const [metricsError, setMetricsError] = useState("");
   const params = useSearchParams();
@@ -826,8 +832,19 @@ export default function AdminProviderManagement() {
     setProviders((prev) => prev.map((p) => p.id === providerId ? { ...p, crNumber, crVerificationStatus: status } : p));
   };
 
-  // Calls the Ministry of Commerce Wathq API through the wathq-verify Edge Function.
-  const handleVerifyCr = async (providerId: string, crNumber: string) => {
+  const crStatusLabel = (status: string | null | undefined) => {
+    switch (status) {
+      case "verified": return isRTL ? "مؤكد عبر واثق" : "Confirmed by Wathq";
+      case "manually_reviewed": return isRTL ? "مراجعة يدوية" : "Manually reviewed";
+      case "name_mismatch": return isRTL ? "الاسم لا يطابق واثق" : "Name differs from Wathq";
+      case "rejected": return isRTL ? "غير قائم في واثق" : "Not active in Wathq";
+      default: return isRTL ? "لم يُفحص بعد" : "Not checked yet";
+    }
+  };
+
+  // Calls the Ministry of Commerce Wathq API through the wathq-verify Edge Function. The target is an approved provider or,
+  // before approval, an application: approve_provider_application refuses an application whose CR is not cleared.
+  const handleVerifyCr = async (target: { providerId: string; applicationId?: string }, crNumber: string) => {
     const cr = crNumber.trim();
     if (!/^[0-9]{10}$/.test(cr)) {
       setError(isRTL ? "يجب أن يتكون السجل التجاري من 10 أرقام بالضبط." : "Commercial Registration (CR) must be exactly 10 digits.");
@@ -835,7 +852,9 @@ export default function AdminProviderManagement() {
     }
     setError("");
     setNotice("");
-    const { data, error: fnError } = await supabase.functions.invoke("wathq-verify", { body: { providerId, crNumber: cr } });
+    const { data, error: fnError } = await supabase.functions.invoke("wathq-verify", {
+      body: target.applicationId ? { applicationId: target.applicationId, crNumber: cr } : { providerId: target.providerId, crNumber: cr },
+    });
     if (fnError) {
       let detailMessage = fnError.message;
       try {
@@ -847,27 +866,32 @@ export default function AdminProviderManagement() {
       setError(detailMessage);
       return;
     }
-    if (data?.status === "verified") {
-      setNotice(isRTL ? "أكد واثق أن السجل التجاري قائم." : "Wathq confirmed the Commercial Registration is active.");
-      applyCrStatus(providerId, cr, "verified");
+    const outcome: string = data?.status === "verified" || data?.status === "name_mismatch" ? data.status : "rejected";
+    if (outcome === "verified") {
+      setNotice(isRTL ? "أكد واثق أن السجل التجاري قائم ويطابق اسم النشاط." : "Wathq confirmed the Commercial Registration is active and matches the business name.");
+    } else if (outcome === "name_mismatch") {
+      const registered = data?.crName ? ` (${data.crName})` : "";
+      setError(isRTL
+        ? `السجل قائم لكن الاسم المسجل في واثق${registered} لا يطابق اسم النشاط. راجع الشهادة وسجّل مراجعة يدوية إن كانت صحيحة.`
+        : `The registration is active but the name registered with Wathq${registered} does not match the business name. Review the certificate and record a manual review if it is correct.`);
     } else {
       setError(isRTL ? "واثق لم يؤكد هذا السجل التجاري (غير موجود أو غير قائم)." : "Wathq did not confirm this CR (not found or not active).");
-      applyCrStatus(providerId, cr, "rejected");
     }
+    if (target.applicationId) await loadApplications();
+    else applyCrStatus(target.providerId, cr, outcome);
   };
 
   // Manual review of the CR certificate by an admin. Recorded as "manually reviewed", never as Wathq-verified.
-  const handleManualCrReview = async (providerId: string, crNumber: string, notes: string): Promise<string | null> => {
+  const handleManualCrReview = async (target: { providerId: string; applicationId?: string }, crNumber: string, notes: string): Promise<string | null> => {
     const cr = crNumber.trim();
     setError("");
-    const { error: rpcError } = await supabase.rpc("admin_record_cr_review", {
-      p_provider_id: providerId,
-      p_cr_number: cr,
-      p_notes: notes.trim(),
-    });
+    const { error: rpcError } = target.applicationId
+      ? await supabase.rpc("admin_confirm_application_cr", { p_application_id: target.applicationId, p_notes: notes.trim() })
+      : await supabase.rpc("admin_record_cr_review", { p_provider_id: target.providerId, p_cr_number: cr, p_notes: notes.trim() });
     if (rpcError) return errorMessage(rpcError);
     setNotice(isRTL ? "تم تسجيل المراجعة اليدوية للسجل التجاري." : "Manual CR review recorded.");
-    applyCrStatus(providerId, cr, "manually_reviewed");
+    if (target.applicationId) await loadApplications();
+    else applyCrStatus(target.providerId, cr, "manually_reviewed");
     return null;
   };
 
@@ -1276,6 +1300,34 @@ export default function AdminProviderManagement() {
                         <td className="px-5 py-4">
                           <p className="font-semibold text-gray-900">CR: {app.cr_number || "—"}</p>
                           <p className="mt-0.5 text-[11px] text-[#667085]">VAT: {app.tax_number || "—"}</p>
+                          {app.cr_number ? (
+                            <div className="mt-2 space-y-1">
+                              <span className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-black ${crIsCleared(app) ? "bg-[#ECFDF3] text-[#027A48]" : "bg-[#FFFAEB] text-[#B54708]"}`}>
+                                {crStatusLabel(app.cr_verification_status)}
+                              </span>
+                              {app.cr_check_data?.registered_name ? (
+                                <p className="text-[11px] text-[#667085]">{isRTL ? "الاسم في واثق:" : "Wathq name:"} {app.cr_check_data.registered_name}</p>
+                              ) : null}
+                              {!crIsCleared(app) && (app.status === "pending" || app.status === "under_review") ? (
+                                <div className="flex flex-wrap gap-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => setCrDialog({ kind: "wathq", providerId: "", applicationId: app.id, cr: app.cr_number || "", name: app.business_name_en || app.business_name_ar })}
+                                    className="rounded-lg bg-[#101828] px-2 py-1 text-[11px] font-black text-[#F4E7B6] hover:bg-black"
+                                  >
+                                    {isRTL ? "تحقق عبر واثق" : "Check with Wathq"}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setCrDialog({ kind: "manual", providerId: "", applicationId: app.id, cr: app.cr_number || "", name: app.business_name_en || app.business_name_ar })}
+                                    className="rounded-lg border border-gray-300 px-2 py-1 text-[11px] font-bold text-gray-800 hover:border-gray-500"
+                                  >
+                                    {isRTL ? "مراجعة يدوية" : "Manual review"}
+                                  </button>
+                                </div>
+                              ) : null}
+                            </div>
+                          ) : null}
                         </td>
                         <td className="px-5 py-4">
                           <p className="font-bold text-gray-900">{app.contact_email}</p>
@@ -1410,8 +1462,9 @@ export default function AdminProviderManagement() {
           reasonRequired={crDialog.kind === "manual"}
           confirmLabel={crDialog.kind === "wathq" ? (isRTL ? "التحقق عبر واثق" : "Check with Wathq") : (isRTL ? "تسجيل المراجعة" : "Record review")}
           onConfirm={async (reason, cr) => {
-            if (crDialog.kind === "manual") return handleManualCrReview(crDialog.providerId, cr, reason);
-            await handleVerifyCr(crDialog.providerId, cr);
+            const target = { providerId: crDialog.providerId, applicationId: crDialog.applicationId };
+            if (crDialog.kind === "manual") return handleManualCrReview(target, cr, reason);
+            await handleVerifyCr(target, cr);
             return null;
           }}
           onClose={() => setCrDialog(null)}
@@ -1450,8 +1503,16 @@ export default function AdminProviderManagement() {
             { label: t.businessNameAr, value: approvalModalApp.business_name_ar },
             { label: t.contact, value: approvalModalApp.contact_email || approvalModalApp.contact_phone || "—" },
             { label: "CR", value: approvalModalApp.cr_number || "—" },
+            ...(approvalModalApp.cr_number ? [{ label: isRTL ? "حالة السجل التجاري" : "CR check", value: crStatusLabel(approvalModalApp.cr_verification_status) }] : []),
           ]}
-          effects={[t.approvalFeeNote]}
+          effects={[
+            t.approvalFeeNote,
+            ...(approvalModalApp.cr_number && !crIsCleared(approvalModalApp)
+              ? [isRTL
+                ? "السجل التجاري لم يُعتمد بعد: سترفض قاعدة البيانات الموافقة حتى يتم التحقق عبر واثق أو تسجيل مراجعة يدوية."
+                : "The commercial registration is not cleared yet: the database refuses approval until it is verified with Wathq or manually reviewed."]
+              : []),
+          ]}
           reasonLabel={t.statusReasonLabel}
           confirmLabel={t.approve}
           onConfirm={(reason) => handleApproveApplication(approvalModalApp.id, reason)}
@@ -1562,6 +1623,8 @@ export default function AdminProviderManagement() {
                         ? (isRTL ? "مراجعة يدوية" : "Manually reviewed")
                         : detail.crVerificationStatus === "rejected"
                         ? (isRTL ? "غير قائم في واثق" : "Not active in Wathq")
+                        : detail.crVerificationStatus === "name_mismatch"
+                        ? (isRTL ? "الاسم لا يطابق واثق" : "Name differs from Wathq")
                         : (isRTL ? "غير موثق" : "Unverified")}
                     </span>
                   </div>
