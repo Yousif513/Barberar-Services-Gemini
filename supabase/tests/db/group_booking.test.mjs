@@ -399,6 +399,8 @@ describe("creating a group", () => {
     await bad(plan, /longer than 1000/, { notes: "n".repeat(1001) });
     await bad(plan.map((g) => ({ ...g, scheduled_at: undefined })), /needs a start time/);
     await bad([plan[0], { ...plan[1], scheduled_at: `${freshDate()}T07:00:00Z` }, plan[2]], /must be booked on the event date/);
+    // 21:30 UTC is half past midnight in Riyadh: the next day, so not the event date even though the UTC date matches.
+    await bad([plan[0], { ...plan[1], scheduled_at: `${date}T21:30:00Z` }, plan[2]], /must be booked on the event date/);
     await bad([plan[0], { ...plan[1], label: undefined }, plan[2]], /needs a name or a saved profile/);
     await expectError(create(host, "2020-01-01", plan), /cannot be in the past/);
     assert.equal(await count("group_bookings", `host_id = $1`, [host.sub]), 0, "every refused request left nothing behind");

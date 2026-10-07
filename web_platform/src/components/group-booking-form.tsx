@@ -250,7 +250,7 @@ export default function GroupBookingForm({ onCreated }: { onCreated: () => void 
             {providerId && branches.status === "ready" && branches.data.length > 1 && (
               <Field label={t.branch}>
                 <select className={input} value={branchId} disabled={locked} onChange={(e) => selectBranch(e.target.value)}>
-                  <option value="">{t.providerChoose}</option>
+                  <option value="">{t.branchChoose}</option>
                   {branches.data.map((b) => <option key={b.id} value={b.id}>{pick(b.name_en, b.name_ar) || [b.city, b.district].filter(Boolean).join(" - ")}</option>)}
                 </select>
               </Field>

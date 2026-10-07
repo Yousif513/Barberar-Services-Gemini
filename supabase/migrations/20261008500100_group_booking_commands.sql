@@ -561,9 +561,16 @@ BEGIN
   EXECUTE replace(v_def, p_from, p_to);
 END $patch$;
 
-SELECT pg_temp.patch_function('public.expire_stale_booking_holds(integer)'::regprocedure,
-  $q$AND created_at < now() - make_interval(mins => v_minutes)$q$,
-  $q$AND created_at < now() - make_interval(mins => v_minutes)
+DO $do$
+BEGIN
+  -- Applied once: a second run finds the clause already in place and leaves the function alone.
+  IF position('group_booking_members' IN pg_get_functiondef('public.expire_stale_booking_holds(integer)'::regprocedure)) = 0 THEN
+    PERFORM pg_temp.patch_function('public.expire_stale_booking_holds(integer)'::regprocedure,
+      $q$AND created_at < now() - make_interval(mins => v_minutes)$q$,
+      $q$AND created_at < now() - make_interval(mins => v_minutes)
       AND NOT EXISTS (SELECT 1 FROM public.group_booking_members gm JOIN public.group_bookings gb ON gb.id = gm.group_id
                       WHERE gm.booking_id = bookings.id AND gb.payment_due_at > now())$q$);
+  END IF;
+END
+$do$;
 DROP FUNCTION IF EXISTS pg_temp.patch_function(regprocedure, text, text);
