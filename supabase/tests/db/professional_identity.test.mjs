@@ -119,6 +119,15 @@ describe("handles", () => {
     assert.equal(await count("professional_profiles"), 0);
   });
 
+  it("tells a person who is not staff that there is nothing to create, and a member of staff what to prefill", async () => {
+    assert.deepEqual(await identity(customer), { can_create: false, suggested_names: null, profile: null, portfolio: [], invitations: [], workplaces: [], follower_count: 0 });
+    const staff = await identity(noProfile);
+    assert.equal(staff.can_create, true);
+    assert.deepEqual(staff.suggested_names, { en: "No Profile", ar: "موظف" });
+    assert.equal(staff.profile, null);
+    assert.equal(await sqlstate(identity(ROLES.anon)), "42501");
+  });
+
   it("validates the profile fields in both languages", async () => {
     assert.equal(await sqlstate(save(pro, { en: "  " })), "22023");
     assert.equal(await sqlstate(save(pro, { ar: "" })), "22023");
@@ -282,6 +291,23 @@ describe("the handshake", () => {
     assert.equal(r.status, "invited");
     const row = await workplace(r.workplace_id);
     assert.equal(row.invited_by, delegateStaff.sub);
+  });
+
+  it("limits a delegate who holds the staff permission for one branch to that branch's employees", async () => {
+    const [branchB] = await sys(db, `insert into branches (provider_id, name_en, name_ar, address_text_en, address_text_ar, latitude, longitude)
+      values ($1, 'Second branch', 'الفرع الثاني', 'Test street', 'شارع الاختبار', 24.7, 46.7) returning id`, [SEED.provider1]);
+    const branchLead = ROLES.user(await createUser(db, { role: "provider_employee" }));
+    await newEmployee(SEED.branch1, branchLead.sub, { name: "Branch Lead" });
+    await sys(db, `insert into provider_memberships (provider_id, user_id, branch_id, role, permissions, is_active)
+      values ($1, $2, $3, 'branch_manager', '{"staff":true}', true)`, [SEED.provider1, branchLead.sub, branchB.id]);
+    const other = ROLES.user(await createUser(db, { role: "provider_employee" }));
+    const otherEmployee = await newEmployee(branchB.id, other.sub, { name: "Branch B Pro" });
+    await save(other, { handle: "branch-b-pro", en: "Branch B Pro", ar: "محترف الفرع" });
+
+    assert.equal(await sqlstate(invite(branchLead, proTwoEmployeeId)), "P0002", "an employee of another branch is out of scope");
+    assert.equal((await invite(branchLead, otherEmployee)).status, "invited");
+    const rows = await call(branchLead, `select provider_professional_links($1) r`, [SEED.provider1]);
+    assert.deepEqual(rows.map((row) => row.employee_id), [otherEmployee], "the list holds only this branch's employees");
   });
 
   it("shows the salon the state of each employee without exposing the profile", async () => {

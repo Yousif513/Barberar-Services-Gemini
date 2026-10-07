@@ -178,7 +178,7 @@ const common = {
   ar: {
     loading: "جارٍ التحميل…",
     retry: "حاول مجدداً",
-    loadFailed: "تعذّر التحميل: ",
+    loadFailed: "حدثت مشكلة أثناء التحميل. ",
     save: "حفظ",
     saving: "جارٍ الحفظ…",
     cancel: "إلغاء",
