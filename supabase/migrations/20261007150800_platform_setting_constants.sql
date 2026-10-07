@@ -33,9 +33,10 @@ INSERT INTO public.platform_settings (key, value, description, requires_owner_ap
    'Public base URL of the customer app (https://host, no trailing slash) used in message links. Unset until the owner enters it: messages then carry no link.', TRUE)
 ON CONFLICT (key) DO NOTHING;
 
--- A number inside a setting, or NULL when the setting, the field or its type is missing.
+-- A number inside a setting, or NULL when the setting, the field or its type is missing (platform_settings is readable by everyone, so no
+-- elevated rights are needed).
 CREATE OR REPLACE FUNCTION public.setting_number(p_key TEXT, p_field TEXT)
-RETURNS NUMERIC LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+RETURNS NUMERIC LANGUAGE sql STABLE SET search_path = public AS $$
   SELECT CASE WHEN jsonb_typeof(value -> p_field) = 'number' THEN (value ->> p_field)::numeric END
   FROM public.platform_settings WHERE key = p_key;
 $$;

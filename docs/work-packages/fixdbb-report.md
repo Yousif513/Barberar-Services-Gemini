@@ -25,3 +25,49 @@ something these migrations depend on.
 | D-03 | fixed (SQL part) | same commit | `booking_message_variables` reads `public_app_url` (seeded `null` = unset: every link is null, no hard-coded domain); `action_url` -> `/customer/bookings?booking=<id>`, new `confirm_url` -> `...&action=confirm_attendance`, `review_url`, `rebook_url`, `dashboard_url` on the same base. Web part (the page opening the matching modal from `?booking=`/`action=`) belongs to the screen package; templates must use `confirm_url` for the confirm action. |
 | D-26 | fixed (SQL part) | next commit "D-26" | `fixdbb_analytics_events.test.mjs`. `analytics_events` table (admin read only, no direct writes), `track_analytics_event` (insert-only RPC for anon/authenticated; names validated, server-owned funnel names refused, no personal keys, 4 KB cap, 120/min), additive triggers on `bookings` (confirmed/completed/cancelled/no_show) and `transactional_ledger` (payment_succeeded) that warn instead of failing the write, `admin_get_event_counts` for the funnel by Riyadh day. Not done here (web files): loading PostHog/Sentry only after consent and calling `captureError` from an error boundary; the consents table has no analytics purpose and none was invented. |
 | R32 | fixed (SQL part) | next commit "R32" | `fixdbb_wathq_name_check.test.mjs`. `cr_names_match` (normalised Arabic/English, legal-form words, containment of at least 4 characters); `record_wathq_cr_verification` stores `name_match`/`registered_name` and answers `verified` / `name_mismatch` / `rejected`; applications get `cr_verification_status` (applicant cannot write it; reset when the CR or the names change), `record_wathq_application_check` (service role), `admin_confirm_application_cr` (administrator, notes); `approve_provider_application` refuses an application that states a CR number until it is verified or manually reviewed and copies the result to the provider. Freelancers without a CR number are not gated. NOT done (Deno/web, outside this package): `supabase/functions/wathq-verify/index.ts` must send the application id (or provider id) and pass the response's registered name as `crName` in the payload, and the admin approval screen must run the check or the manual confirmation before approving. Existing tests changed: `trust.test.mjs` (confirm the CR before approving; Wathq payload carries `crName`; `track_analytics_event` added to the anonymous allow-list, D-26). |
+| R33 | fixed (SQL part); Expo integration set back to disconnected | next commit "R33" | `fixdbb_push_notifications.test.mjs`. `register_push_token` / `unregister_push_token`, bilingual in-app notifications from booking events (customer, and the salon owner for a new booking; a failure never fails the booking), `push_notification_queue` filled only when the `expo_push` integration is enabled and the user has an active token, `claim_push_batch` / `complete_push_delivery` (service role) for the sender. The `expo_push` integration row is now `disconnected`, disabled, without the invented key mask. NOT done (outside this package): `mobile_app` registering tokens on sign-in (needs `expo-notifications`), `supabase/functions/send-push` calling `claim_push_batch` / `complete_push_delivery`, and the owner switching the integration on. |
+
+## Verification (exact commands, run from an LF copy of the repository, see the environment note)
+
+| command | result |
+|---|---|
+| `node --test supabase/tests/db/fixdbb_inventory.test.mjs` | 22 tests pass (C-D29 x2, C-D21b x5, C-D22 x3, C-D27 x7) |
+| `node --test supabase/tests/db/fixdbb_fee_invoices.test.mjs` | 6 pass |
+| `node --test supabase/tests/db/fixdbb_subscriptions.test.mjs` | 7 pass |
+| `node --test supabase/tests/db/fixdbb_no_show_appeal.test.mjs` | 4 pass |
+| `node --test supabase/tests/db/fixdbb_report_definitions.test.mjs` | 6 pass |
+| `node --test supabase/tests/db/fixdbb_platform_constants.test.mjs` | 7 pass |
+| `node --test supabase/tests/db/fixdbb_analytics_events.test.mjs` | 7 pass |
+| `node --test supabase/tests/db/fixdbb_wathq_name_check.test.mjs` | 7 pass |
+| `node --test supabase/tests/db/fixdbb_push_notifications.test.mjs` | 7 pass |
+| `node --test "supabase/tests/db/**/*.test.mjs"` | 539 tests, 539 pass, 0 fail (includes `migration_hygiene`, `data_api_grants`, `admin_security_matrix`) |
+| `node --test supabase/tests/inventory.test.mjs` | 10 pass |
+| `node scripts/verify-ui-schema.mjs` | checked 77 rpc calls and 174 select strings; 0 mismatches, 0 in the baseline |
+
+## Existing tests changed because behaviour changed on purpose
+
+- `supabase/tests/db/inventory_workflows.test.mjs`: a positive adjustment on an inactive product now answers "Product is inactive" (C-D22); `track_analytics_event` added to the anonymous allow-list (D-26).
+- `supabase/tests/db/qa_adversarial.test.mjs`: `track_analytics_event` added to the anonymous allow-list (D-26).
+- `supabase/tests/db/trust.test.mjs`: approval confirms the CR first (R32); the Wathq payload carries `crName` (R32); `track_analytics_event` in the anonymous allow-list.
+- `supabase/tests/inventory.test.mjs`: the stale booking-update assertion deleted (C-D31).
+- `.coworking_changelog.md`: join_waitlist signature, BNPL claim and the "91/91" claim corrected (C-D31).
+
+## Migrations added (all in 20261007150000 .. 20261007151100)
+
+150000 inventory audit allow-list, 150100 moving-average cost + cost audit command, 150200 inactive products, 150300 purchase-order idempotency + reservations,
+150400 fee invoices (closed months), 150500 subscription entitlements, 150600 no-show appeal, 150700 report definitions, 150800 platform-setting constants + public URL,
+150900 analytics events, 151000 Wathq name check, 151100 push tokens and notification queue.
+
+## Open questions for the owner / counsel (nothing was decided for them)
+
+- VAT on fee invoices is still 15 percent of the receivable only (R19); whether it applies to the whole commission is a tax question.
+- Seeded plan prices (299 / 799 SAR) and limits (1/3, 3/10, 10/50) were invented by an earlier agent and are now enforced as plan limits; confirm or edit them (R20). `commission_discount_pct` and `included_monthly_sms` are still unused.
+- The seeded strike policy (3 in 60 days), gift card limits (50-5,000 SAR, 365 days) and tip limits (5-1,000 SAR) keep today's behaviour and are flagged `requires_owner_approval` until the owner edits them in the console (C-D30).
+- `public_app_url` is unset: until the owner enters it, WhatsApp/message links are empty (D-03).
+- Not changed because off limits or outside the package: VAT rate in `booking_create_internal`, wallet `points / 10` in `customer/wallet/page.tsx`, `claim_url` (waitlist) and `share_url` (referral) still contain `https://primora.sa`.
+- Not done: netting a fee-invoice receivable in `admin_release_payout` (R19); refund of a no-show fee after a cleared strike (C-D11).
+
+## Files touched outside the package's own new files
+
+`supabase/tests/db/inventory_workflows.test.mjs`, `supabase/tests/db/qa_adversarial.test.mjs`, `supabase/tests/db/trust.test.mjs`, `supabase/tests/inventory.test.mjs`, `.coworking_changelog.md`.
+No web, mobile or Edge Function file was changed.

@@ -173,7 +173,8 @@ describe("admin oversight", () => {
 describe("booking safeguards survive P3", () => {
   it("anonymous visitors still can execute only discovery functions", async () => {
     const allowed = new Set(["get_available_slots", "get_branch_available_slots", "get_branch_schedule_with_prayer_pauses",
-      "search_marketplace_providers", "normalize_arabic", "provider_rating_summaries"]);
+      "search_marketplace_providers", "normalize_arabic", "provider_rating_summaries",
+      "track_analytics_event"]); // D-26: insert-only client event recorder
     const rows = await sys(db, `
       select distinct p.proname from pg_proc p
       cross join lateral aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
