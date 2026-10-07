@@ -17,6 +17,7 @@ run the whole DB suite.
 | R42 / G37 | fixed (radius); travel buffer deferred | `20261007091000_home_service_radius.sql` | `booking_engine_home_radius.test.mjs` |
 | C-D10 / D10 | fixed (DB part; claim screen deferred) | `20261007092000_waitlist_exclusive_claim.sql` | `booking_engine_waitlist.test.mjs` |
 | D19 / C-D19 | fixed (DB part; shop/customer screens deferred) | `20261007093000_packages_linked_to_bookings.sql` | `booking_engine_packages.test.mjs` |
+| D5 / C-D5 | fixed (DB part; admin coupon screen deferred) | `20261007094000_coupon_per_customer_limit.sql` | `booking_engine_coupons.test.mjs` |
 | R24 / C-D16 | fixed (DB part; shop page and mobile pass the list) | `20261007090000_branch_slots_any_professional.sql` | `booking_engine_branch_slots.test.mjs`, `qa_adversarial.test.mjs` (allow-list updated) |
 
 ## Callers cheat-sheet (current signatures; every new argument is optional and last, named arguments keep old callers working)
@@ -204,3 +205,13 @@ accepted a booking that did not contain the package's service.
 - Not changed: the platform commission is still calculated on the pre-discount subtotal, as for coupons; the owner should decide whether a package-covered service carries a commission at redemption
   (the package sale may already have carried one). A fully covered booking is `confirmed` without a ledger capture, like a gift-card-covered one.
 - Screens: customer "my packages" -> "book with this package" (pass `request_user_package_id`), provider package form (the covered service), show "covered by package" from `package_covered_amount`.
+
+## 7c. D5 / C-D5 coupon per-customer limit (fixed in the database)
+
+Reproduced by the reviewer's probe (one customer, one unlimited 50 percent code, two bookings, 42.50 off each); the new test asserts the second use is now refused.
+- `promotional_codes.per_customer_limit INTEGER DEFAULT 1` (NULL = unlimited, must be > 0) and `first_booking_only BOOLEAN DEFAULT false`. The customer's non-reversed `coupon_redemptions`
+  are counted inside the coupon's existing `FOR UPDATE` lock; a cancelled or expired booking frees the use. `first_booking_only` refuses customers with a confirmed or completed booking (with that
+  provider for a provider-scoped code, anywhere for a platform code). Errors `22023`: "You have already used this promo code" / "This promo code is for a first booking only".
+- DECISION FOR THE OWNER: the default of 1 now applies to every existing code; reusable codes must be set to NULL or a higher number.
+- Screens: `web_platform/src/app/admin/coupons/page.tsx` must expose both fields; the checkout should map the two new messages.
+- Observation for the policy owner (not changed): any signed-in customer can SELECT the active rows of `promotional_codes` (the new test found 9 visible rows), i.e. all code strings are enumerable.
