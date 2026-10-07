@@ -57,3 +57,16 @@ describe("ADM1 item 3: failed financial lists are errors with a retry, not empty
     assert.match(notifications, /logsFailed: "تعذّر/);
   });
 });
+
+describe("ADM1 item 4: coupons change only through the reasoned commands", () => {
+  const coupons = read("web_platform/src/app/admin/coupons/page.tsx");
+  it("saves and switches codes through admin_save_promo_code and admin_set_promo_code_active, never by table write", () => {
+    assert.match(coupons, /rpc\("admin_save_promo_code"/);
+    assert.match(coupons, /rpc\("admin_set_promo_code_active"/);
+    assert.doesNotMatch(coupons, /from\("promotional_codes"\)\s*\.(insert|update|delete|upsert)/);
+    assert.match(coupons, /p_per_customer_limit/);
+    assert.match(coupons, /p_first_booking_only/);
+    assert.match(coupons, /<CommandDialog/);
+    assert.match(coupons, /perCustomerLabel: "مرات الاستخدام لكل عميل"/, "Arabic copy for the new fields");
+  });
+});
