@@ -14,6 +14,7 @@ run the whole DB suite.
 | D-16 / R21 | fixed | `20261007060000_scheduling_overnight_and_seasons.sql` | `booking_engine_overnight_schedules.test.mjs` |
 | D-02 / C-D8 | fixed | `20261007070000_booking_source_attribution_tokens.sql` | `booking_engine_attribution.test.mjs`, `booking.test.mjs` (updated) |
 | R15 / G23 | fixed (DB part; provider screens deferred to the screen packages) | `20261007080000_booking_buffers_processing_variants.sql` | `booking_engine_buffers_variants.test.mjs` |
+| R42 / G37 | fixed (radius); travel buffer deferred | `20261007091000_home_service_radius.sql` | `booking_engine_home_radius.test.mjs` |
 | R24 / C-D16 | fixed (DB part; shop page and mobile pass the list) | `20261007090000_branch_slots_any_professional.sql` | `booking_engine_branch_slots.test.mjs`, `qa_adversarial.test.mjs` (allow-list updated) |
 
 ## 1. D-21 / R3 prayer windows and the Riyadh clock (fixed)
@@ -124,3 +125,16 @@ prayer_window_ends, p_service_ids uuid[] DEFAULT NULL, p_variant_ids uuid[] DEFA
 
 Screens: `web_platform/src/app/shop/[id]/page.tsx:899-905` and `mobile_app/src/lib/marketplace.ts:248` must pass `p_service_ids` (all selected services, in order) and
 `p_variant_ids` (aligned, NULL for none), and format slots with `ar-SA` and `timeZone: 'Asia/Riyadh'` (shop page line ~205 formats with `en-US`; the page has 15 hard-coded "SAR").
+
+## 6. R42 / G37 home-service radius (fixed; travel buffer deferred)
+
+Reproduced on the base commit: a home visit 300 km (and 800 km) from a branch with `geofence_radius_km = 5` was accepted, and the any-professional pick ignored the
+branch's service area (the new tests fail on the base and pass now).
+- `haversine_km` (great-circle, 6371.0088 km) and `branch_serves_location(branch, lat, lng)` are internal helpers. `booking_create_internal` refuses a home-service booking
+  whose address is farther than the radius of the branch of the professional who would serve it (`22023`, "This address is outside the branch home-visit area of N km"),
+  refuses coordinates outside -90..90 / -180..180, and "any professional" only considers professionals of branches that serve the address.
+- DECISION FOR THE OWNER: `geofence_radius_km` 0 or NULL (the column default) means "no service area configured" and is NOT enforced; the migration invents no radius. If home
+  visits must not be offered without a radius, that is a product rule (require a radius when `is_home_service_eligible` is switched on); not changed here.
+- DEFERRED: the travel buffer. `calculate-travel` is an Edge Function that needs a routing provider over the network; the booking transaction must not call out, and a
+  travel speed is an owner decision. A provider can already add a fixed travel allowance through `services.buffer_before_minutes` (item 4).
+- Screens: show the radius to the customer (public `branches.geofence_radius_km`, latitude, longitude) and refuse client-side before submit; the server message above is the backstop.
