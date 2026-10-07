@@ -186,3 +186,19 @@ describe("promo codes (R9)", () => {
     assert.ok(!/setPromos\(prev => prev\.map/.test(promotions()));
   });
 });
+
+describe("client import and blocking (R36, C-D26)", () => {
+  const customers = () => byPath("customers/page.tsx").code;
+  it("reads the file with the shared parser and sends only rows with a normalized phone", () => {
+    assert.ok(customers().includes("parseClientCsv"));
+    assert.match(customers(), /type="file"/);
+    assert.ok(!/split\("\n"\)/.test(customers()), "no line-and-comma splitting on the page");
+    assert.ok(!customers().includes("CSV Data (Name, Phone, Notes)"), "the label is translated");
+    assert.ok(!/Please paste client data|No valid rows found|Provider account not found/.test(customers()), "the error strings are translated");
+  });
+  it("asks for a reason before blocking and records it, with no constant reason", () => {
+    assert.match(customers(), /<CommandDialog/);
+    assert.ok(!customers().includes("Policy violations / no-show protection"));
+    assert.match(customers(), /p_reason: blockTarget\.blocked \? "" : reason/);
+  });
+});

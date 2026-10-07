@@ -112,3 +112,17 @@ Branch `wp/fixprov`, worktree `primora-wp-fixprov`. Status per defect is updated
   (the defect); it now asserts the owner command.
 * The migration hygiene test from the integrator (`migration_hygiene.test.mjs`) is copied into this worktree and passes: my migrations use dollar quoting and `chr(13) || chr(10)`
   (no E-string with a backslash-escaped quote).
+
+## Group 7: client import and the block dialog (R36, C-D26)
+
+| Defect | Status | Test |
+|---|---|---|
+| R36 CSV import robustness | fixed | `web_platform/tests/client-import.test.mjs` (12 tests: quotes, doubled quotes, line breaks in quotes, CRLF, BOM, English and Arabic header, comma/semicolon/tab, Arabic-Indic digits, 966/00966/5xx forms, rows without phone rejected with line and reason, duplicates, length limits, 2000-row cap), `supabase/tests/db/fixprov_client_import.test.mjs` (6 tests) |
+| C-D26 provider block with one click and a constant reason | fixed | guard tests "client import and blocking"; the server already required a reason (`toggle_customer_block`) |
+
+* `src/lib/client-import.mjs` is a pure parser (RFC 4180 quoting, delimiter detection, header skip, `normalizeSaudiMobile` from `src/lib/phone.mjs`). The screen accepts a file or a paste, shows a live
+  summary ("N ready", a list of rejected lines with the reason in Arabic or English) and sends only valid, normalized rows. The English-only label "CSV Data (Name, Phone, Notes)" and the three hard-coded
+  error strings are translated.
+* `import_provider_clients` is patched in place (`20261007104000_import_clients_phone_forms.sql`): Arabic-Indic digits are translated, 00966/966/5xxxxxxxx/05xxxxxxxx become `+9665xxxxxxxx`, and a row with no
+  or an invalid phone is skipped. Before, an Arabic-digit number became empty and was stored with no phone, so the (provider, phone) key could not de-duplicate it.
+* Blocking opens `CommandDialog` (danger tone, reason required, the server records it with the actor); unblocking confirms in the same dialog. The block list changes on screen only after the command succeeds.
