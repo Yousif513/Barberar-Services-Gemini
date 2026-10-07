@@ -9,10 +9,10 @@ import {
   Image,
   Alert,
   Dimensions,
-  Linking,
   ActivityIndicator
 } from "react-native";
 import { supabase } from "../lib/supabase";
+import { openCheckout, PAYMENT_RETURN_URL, notifyBookingsChanged } from "@/lib/payment-return";
 import {
   MarketplaceProvider,
   ShopDetails,
@@ -266,18 +266,19 @@ export function ShopDetailsModal({
       }
 
       if (booking.status === "confirmed") {
+        notifyBookingsChanged();
         Alert.alert(t.bookingConfirmed, t.bookingConfirmedText, [{ text: "OK", onPress: onClose }]);
         return;
       }
 
       const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
-        body: { bookingId: booking.id },
+        body: { bookingId: booking.id, returnUrl: PAYMENT_RETURN_URL },
       });
       if (checkoutError || !checkout?.checkoutUrl) {
         Alert.alert(t.bookingFailed, t.paymentFailed);
         return;
       }
-      await Linking.openURL(checkout.checkoutUrl);
+      await openCheckout(checkout.checkoutUrl);
       onClose();
     } catch (err) {
       Alert.alert(t.bookingFailed, errorMessage(err));
@@ -294,10 +295,10 @@ export function ShopDetailsModal({
       const { data, error } = await supabase.rpc("purchase_service_package", { p_package_id: pkg.id, p_payment_method: "card" });
       if (error) throw error;
       const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
-        body: { purchaseType: "package", purchaseId: data.purchase_id },
+        body: { purchaseType: "package", purchaseId: data.purchase_id, returnUrl: PAYMENT_RETURN_URL },
       });
       if (checkoutError || !checkout?.checkoutUrl) throw new Error(t.packageFailed);
-      await Linking.openURL(checkout.checkoutUrl);
+      await openCheckout(checkout.checkoutUrl);
       onClose();
     } catch (err) {
       Alert.alert(t.bookingFailed, errorMessage(err));

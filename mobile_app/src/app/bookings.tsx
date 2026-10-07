@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../lib/supabase";
 import { errorMessage } from "@/lib/error-message";
+import { subscribeBookingsChanged } from "@/lib/payment-return";
 
 type BookingStatus = "pending_payment" | "confirmed" | "completed" | "cancelled" | "no_show";
 
@@ -116,7 +117,8 @@ export default function BookingsScreen() {
     setLoading(true);
     setLoadError("");
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user ?? null;
       setSignedIn(Boolean(user));
       if (!user) {
         setBookings([]);
@@ -154,7 +156,11 @@ export default function BookingsScreen() {
   useEffect(() => {
     loadBookings();
     const { data: sub } = supabase.auth.onAuthStateChange(() => loadBookings());
-    return () => sub.subscription.unsubscribe();
+    const stopWatching = subscribeBookingsChanged(() => loadBookings());
+    return () => {
+      sub.subscription.unsubscribe();
+      stopWatching();
+    };
   }, [loadBookings]);
 
   const handleCancelBooking = async (id: string) => {
