@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
 import { sar, useOperationsLocale } from "@/components/operations-ui";
 import { CommandDialog, ModalOverlay, ModalPortal } from "@/components/modal";
+import MakeRegularButton from "@/components/make-regular";
 import {
   receiptAmounts, bookingStatusLabel, policyFromProvider, policySentences, cancellationPreview,
   formatBookingDate, formatBookingTime, formatBookingDateTime, riyadhDateKey, bookAgainHref,
@@ -726,6 +727,7 @@ export default function CustomerBookingsPage() {
                     >
                       {t.cancel}
                     </button>
+                    <MakeRegularButton booking={bk} className="flex-1 lg:flex-initial px-4 py-2 bg-[#F8F3E4] text-[#725517] hover:bg-[#F4E7B6] font-bold text-xs rounded-xl border border-[#D1AF47]/50 transition duration-150" />
                   </>
                 )}
                 {activeTab === "past" && (

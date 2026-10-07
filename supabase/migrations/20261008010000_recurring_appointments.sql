@@ -272,6 +272,9 @@ DECLARE
   v_all BOOLEAN := TRUE;
   n INTEGER;
 BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Authentication required' USING ERRCODE = '28000';
+  END IF;
   SELECT * INTO v_chk FROM public.booking_series_check_anchor(p_booking_id, p_interval_weeks, p_occurrences);
   v_a := v_chk.o_booking;
 
