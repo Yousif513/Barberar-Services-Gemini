@@ -3,6 +3,12 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { usePrayerTimes } from "@/lib/use-prayer-times";
+import { errorMessage } from "@/lib/error-message";
+import { CommandDialog } from "@/components/modal";
+import { riyadhDateKey } from "@/lib/booking-display.mjs";
+import { slotIso } from "@/lib/calendar-slots.mjs";
+import { normalizeSaudiMobile } from "@/lib/phone.mjs";
+import { ProviderDialog, providerFieldClass } from "../_components/dialog";
 
 const translations = {
   en: {
@@ -127,6 +133,67 @@ const translations = {
   }
 };
 
+const calExtra = {
+  en: {
+    moveTo: "Move to another time",
+    chooseSlot: "Choose a free time",
+    noFreeSlot: "No free time today",
+    move: "Move",
+    moving: "Moving…",
+    moved: "The appointment was moved and the customer was notified.",
+    moveFailed: "The appointment was not moved: ",
+    rescheduleReason: "Rescheduled by the provider from the calendar",
+    cancelTitle: "Cancel this appointment?",
+    cancelIntro: "The customer is told and the cancellation rules of your booking policy decide any refund. This cannot be undone.",
+    cancelReason: "Reason for cancelling",
+    cancelDone: "The appointment was cancelled.",
+    phone: "Phone (optional)",
+    phoneInvalid: "Enter a Saudi mobile number, for example 05XXXXXXXX or +9665XXXXXXXX.",
+    phoneHelp: "A verified customer with this number is linked to the booking.",
+    payment: "Payment method",
+    noPayment: "Choose how the customer paid.",
+    paymentLoadFailed: "Payment methods could not be loaded: ",
+    contextFailed: "Past customers could not be loaded: ",
+    existingClient: "Choose a customer who has booked here before",
+    newClient: "New customer (type the name)",
+    walkInFallback: "Walk-in customer",
+    serviceFallback: "Service",
+    bookFailed: "The booking was not created: ",
+    priceInvalid: "Enter a price of zero or more.",
+    paidBy: "Payment",
+    phoneLabel: "Phone",
+  },
+  ar: {
+    moveTo: "نقل إلى وقت آخر",
+    chooseSlot: "اختر وقتاً شاغراً",
+    noFreeSlot: "لا يوجد وقت شاغر اليوم",
+    move: "نقل",
+    moving: "جارٍ النقل…",
+    moved: "تم نقل الموعد وإبلاغ العميل.",
+    moveFailed: "لم يُنقل الموعد: ",
+    rescheduleReason: "أعاد مقدم الخدمة جدولة الموعد من التقويم",
+    cancelTitle: "إلغاء هذا الموعد؟",
+    cancelIntro: "يُبلَّغ العميل وتحدد قواعد سياسة الحجز لديك أي استرداد. لا يمكن التراجع عن ذلك.",
+    cancelReason: "سبب الإلغاء",
+    cancelDone: "تم إلغاء الموعد.",
+    phone: "الهاتف (اختياري)",
+    phoneInvalid: "أدخل رقم جوال سعودي، مثل 05XXXXXXXX أو +9665XXXXXXXX.",
+    phoneHelp: "يُربط الحجز بعميل موثّق يحمل هذا الرقم.",
+    payment: "طريقة الدفع",
+    noPayment: "اختر طريقة دفع العميل.",
+    paymentLoadFailed: "تعذر تحميل طرق الدفع: ",
+    contextFailed: "تعذر تحميل العملاء السابقين: ",
+    existingClient: "اختر عميلاً حجز لديكم من قبل",
+    newClient: "عميل جديد (اكتب الاسم)",
+    walkInFallback: "عميل حضوري",
+    serviceFallback: "خدمة",
+    bookFailed: "لم يُنشأ الحجز: ",
+    priceInvalid: "أدخل سعراً لا يقل عن صفر.",
+    paidBy: "الدفع",
+    phoneLabel: "الهاتف",
+  },
+};
+
 interface Appointment {
   id: string;
   customer: string;
@@ -137,6 +204,8 @@ interface Appointment {
   price: string;
   duration: string;
   notes?: string;
+  phone?: string;
+  payment?: string;
 }
 
 interface Blockout {
@@ -270,9 +339,7 @@ export default function ProviderCalendarPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [blockouts, setBlockouts] = useState<Blockout[]>([
-    { slotIndex: 1, reason: "Stylist Break & Sanitation" }
-  ]);
+  const [blockouts, setBlockouts] = useState<Blockout[]>([]);
 
   // Weekly availability shifts (0 to 6)
   const [availabilityShifts, setAvailabilityShifts] = useState<Array<{
@@ -328,9 +395,18 @@ export default function ProviderCalendarPage() {
   const [bookCustomer, setBookCustomer] = useState("");
   const [bookService, setBookService] = useState("");
   const [bookStaff, setBookStaff] = useState("");
-  const [bookPrice, setBookPrice] = useState("150");
-  const [bookDuration, setBookDuration] = useState("45 mins");
+  const [bookPrice, setBookPrice] = useState("");
+  const [bookDuration, setBookDuration] = useState("");
   const [bookNotes, setBookNotes] = useState("");
+  const [bookPhone, setBookPhone] = useState("");
+  const [bookPayment, setBookPayment] = useState("");
+  const [bookError, setBookError] = useState("");
+  const [paymentMethods, setPaymentMethods] = useState<Array<{ key: string; label_en: string; label_ar: string }>>([]);
+  const [moveSlot, setMoveSlot] = useState("");
+  const [moveBusy, setMoveBusy] = useState(false);
+  const [moveError, setMoveError] = useState("");
+  const [cancelTarget, setCancelTarget] = useState<Appointment | null>(null);
+  const cx = calExtra[lang];
 
   const buffersConfig = {
     fajr: { before: fajrActive ? bufferDuration : 0, after: fajrActive ? bufferDuration : 0 },
@@ -537,21 +613,35 @@ export default function ProviderCalendarPage() {
       if (servicesError) throw servicesError;
       setServices(servicesData || []);
       
-      // Get customers
-      const { data: customersData } = await supabase
-        .from("profiles")
-        .select("id, first_name, last_name, phone_number")
-        .eq("role", "customer")
-        .limit(100);
-      setCustomers(customersData || []);
-      if (customersData && customersData.length > 0) {
-        setSelectedCustomerId(customersData[0].id);
-        setBookCustomer(`${customersData[0].first_name || ""} ${customersData[0].last_name || ""}`.trim() || customersData[0].phone_number);
-      }
-      
       const branchIds = (branchesData || []).map(b => b.id);
       if (branchIds.length === 0) return;
-      
+
+      // Only people who have booked this business before are offered (never the platform's whole customer list).
+      const { data: pastBookings, error: pastError } = await supabase
+        .from("bookings")
+        .select("customer_id, profiles ( first_name, last_name, phone_number )")
+        .in("branch_id", branchIds)
+        .not("customer_id", "is", null)
+        .order("scheduled_at", { ascending: false })
+        .limit(300);
+      if (pastError) throw new Error(calExtra[lang].contextFailed + errorMessage(pastError));
+      const seen = new Map<string, { id: string; first_name: string | null; last_name: string | null; phone_number: string | null }>();
+      for (const row of (pastBookings || []) as unknown as Array<{ customer_id: string | null; profiles: { first_name: string | null; last_name: string | null; phone_number: string | null } | null }>) {
+        if (row.customer_id && row.profiles && !seen.has(row.customer_id)) seen.set(row.customer_id, { id: row.customer_id, ...row.profiles });
+      }
+      setCustomers(Array.from(seen.values()));
+
+      // Counter payments use the methods the platform offers customers and has switched on (never the wallet balance).
+      const { data: methods, error: methodsError } = await supabase
+        .from("payment_methods")
+        .select("key, label_en, label_ar, enabled_for_roles")
+        .eq("enabled", true)
+        .order("sort_order", { ascending: true });
+      if (methodsError) throw new Error(calExtra[lang].paymentLoadFailed + errorMessage(methodsError));
+      const counterMethods = (methods || []).filter((m) => (m.enabled_for_roles || []).includes("customer") && m.key !== "wallet");
+      setPaymentMethods(counterMethods);
+      setBookPayment((current) => current || counterMethods[0]?.key || "");
+
       // Get employees
       const { data: staffData, error: staffError } = await supabase
         .from("employees")
@@ -565,9 +655,9 @@ export default function ProviderCalendarPage() {
         setSelectedEmployeeId(prev => prev || staffData[0].id);
         setBookStaff(staffData[0].id);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error loading calendar context:", err);
-      setError(lang === "ar" ? "فشل تحميل بيانات الجدولة" : "Failed to load calendar scheduling context.");
+      setError((lang === "ar" ? "فشل تحميل بيانات الجدولة: " : "Failed to load calendar scheduling context: ") + errorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -624,6 +714,9 @@ export default function ProviderCalendarPage() {
           duration_minutes,
           total_price,
           status,
+          walk_in_name,
+          walk_in_phone,
+          walk_in_booking_details ( notes, payment_method ),
           services ( name_en, name_ar ),
           profiles ( first_name, last_name, phone_number )
         `)
@@ -638,10 +731,10 @@ export default function ProviderCalendarPage() {
       const mapped: Appointment[] = (bookingsData || []).map((bk: any) => {
         const scheduledTime = new Date(bk.scheduled_at);
         const serviceName = lang === "ar" ? bk.services?.name_ar || bk.services?.name_en : bk.services?.name_en || bk.services?.name_ar;
-        const customerName = bk.profiles 
-          ? `${bk.profiles.first_name || ""} ${bk.profiles.last_name || ""}`.trim() || bk.profiles.phone_number
-          : "Walk-in Customer";
-        
+        const customerName = bk.profiles
+          ? `${bk.profiles.first_name || ""} ${bk.profiles.last_name || ""}`.trim() || bk.profiles.phone_number || calExtra[lang].walkInFallback
+          : bk.walk_in_name || calExtra[lang].walkInFallback;
+
         const startStr = scheduledTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const endTimeVal = new Date(scheduledTime.getTime() + (bk.duration_minutes || 60) * 60 * 1000);
         const endStr = endTimeVal.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -649,13 +742,15 @@ export default function ProviderCalendarPage() {
         return {
           id: bk.id,
           customer: customerName,
-          service: serviceName || "Styling Service",
+          service: serviceName || calExtra[lang].serviceFallback,
           time: `${startStr} - ${endStr}`,
           slotIndex: getSlotIndexForTime(scheduledTime),
           staff: employees.find(e => e.id === selectedEmployeeId)?.name_en || "Stylist",
           price: String(bk.total_price || 0),
           duration: `${bk.duration_minutes || 60} mins`,
-          notes: ""
+          notes: bk.walk_in_booking_details?.notes || "",
+          phone: bk.walk_in_phone || bk.profiles?.phone_number || undefined,
+          payment: bk.walk_in_booking_details?.payment_method || undefined
         };
       });
       
@@ -688,30 +783,23 @@ export default function ProviderCalendarPage() {
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const targetEmployeeId = bookStaff || selectedEmployeeId;
-    if (targetSlotIndex === null || !targetEmployeeId) return;
+    if (targetSlotIndex === null || !targetEmployeeId || loading) return;
+    setBookError("");
+    const phoneText = bookPhone.trim();
+    const phone = phoneText ? normalizeSaudiMobile(phoneText) : null;
+    if (phoneText && !phone) { setBookError(cx.phoneInvalid); return; }
+    if (!bookService) { setBookError(lang === "ar" ? "اختر الخدمة أولاً" : "Select a service first"); return; }
+    if (!bookCustomer.trim()) { setBookError(lang === "ar" ? "أدخل اسم العميل" : "Enter the customer's name"); return; }
+    if (!bookPayment) { setBookError(cx.noPayment); return; }
+    const price = bookPrice.trim() === "" ? null : Number(bookPrice);
+    if (price !== null && !(price >= 0)) { setBookError(cx.priceInvalid); return; }
+    const scheduledAt = slotIso(riyadhDateKey(selectedDate), timeSlots[targetSlotIndex].label);
+    if (!scheduledAt) { setBookError(cx.bookFailed); return; }
 
     try {
       setLoading(true);
       setError("");
       setSuccess("");
-
-      const selectedService = services.find(s => s.id === bookService);
-      if (!selectedService) {
-        throw new Error(lang === "ar" ? "اختر الخدمة أولاً" : "Select a service first");
-      }
-      if (!bookCustomer.trim()) {
-        throw new Error(lang === "ar" ? "أدخل اسم العميل" : "Enter the customer's name");
-      }
-
-      const slotLabel = timeSlots[targetSlotIndex].label;
-      const [timePart, ampm] = slotLabel.split(" ");
-      const [hoursStr, minutesStr] = timePart.split(":");
-      let hours = parseInt(hoursStr, 10);
-      const minutes = parseInt(minutesStr, 10) || 0;
-      if (ampm === "PM" && hours !== 12) hours += 12;
-      if (ampm === "AM" && hours === 12) hours = 0;
-      const dateKey = new Date(selectedDate).toLocaleDateString("en-CA", { timeZone: "Asia/Riyadh" });
-      const scheduledAt = `${dateKey}T${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00+03:00`;
 
       const { data: empData, error: empError } = await supabase
         .from("employees")
@@ -728,52 +816,78 @@ export default function ProviderCalendarPage() {
         p_employee_id: targetEmployeeId,
         p_service_id: bookService,
         p_customer_name: bookCustomer.trim(),
-        p_customer_phone: null,
-        p_payment_method: "cash",
-        p_total_price: bookPrice ? Number(bookPrice) : null,
-        p_scheduled_at: scheduledAt
+        p_customer_phone: phone,
+        p_payment_method: bookPayment,
+        p_total_price: price,
+        p_scheduled_at: scheduledAt,
+        p_notes: bookNotes.trim() || null
       });
       if (rpcError) throw rpcError;
 
       setSuccess(lang === "ar" ? "تم تسجيل حجز الحضور بنجاح" : "Walk-in booking created successfully.");
       setShowBookModal(false);
       setBookCustomer("");
+      setBookPhone("");
       setBookNotes("");
+      setSelectedCustomerId("");
       setTargetSlotIndex(null);
       await loadEmployeeSchedule();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error creating walk-in booking:", err);
-      setError(lang === "ar" ? "فشل إنشاء الحجز" : `Failed to create walk-in: ${err.message}`);
+      setBookError(cx.bookFailed + errorMessage(err));
     } finally {
       setLoading(false);
     }
   };
 
-  // Cancel Appointment
-  const handleCancelBooking = async (id: string) => {
-    try {
-      setLoading(true);
-      setError("");
-      setSuccess("");
-
-      // The command applies the cancellation rules and creates the customer's refund; a direct status write cannot.
-      const { error: cancelError } = await supabase.rpc("cancel_booking", {
-        target_booking_id: id,
-        p_reason: lang === "ar" ? "ألغاه مقدم الخدمة من التقويم" : "Cancelled by the provider from the calendar",
-      });
-
-      if (cancelError) throw cancelError;
-
-      setSuccess(lang === "ar" ? "تم إلغاء الموعد" : "Appointment cancelled successfully.");
-      setShowDetailsModal(null);
-      await loadEmployeeSchedule();
-    } catch (err: any) {
-      console.error("Error cancelling booking:", err);
-      setError(lang === "ar" ? "فشل إلغاء الموعد" : "Failed to cancel appointment.");
-    } finally {
-      setLoading(false);
-    }
+  // Cancel an appointment: asked for in a dialog that records why. The command applies the cancellation rules
+  // and creates the customer's refund; a direct status write cannot.
+  const cancelAppointment = async (id: string, reason: string): Promise<string | null> => {
+    const { error: cancelError } = await supabase.rpc("cancel_booking", {
+      target_booking_id: id,
+      p_reason: reason,
+    });
+    if (cancelError) return errorMessage(cancelError);
+    setSuccess(cx.cancelDone);
+    setShowDetailsModal(null);
+    await loadEmployeeSchedule();
+    return null;
   };
+
+  // Move an appointment to another slot of the day (drag and drop, or "Move to" for keyboard users). The calendar changes
+  // only after reschedule_booking has accepted the move; a refusal leaves everything where it was and says why.
+  const moveAppointment = async (appointmentId: string, slotIndex: number): Promise<boolean> => {
+    const label = timeSlots[slotIndex]?.label;
+    const newTime = label ? slotIso(riyadhDateKey(selectedDate), label) : null;
+    if (!newTime || moveBusy) return false;
+    setMoveBusy(true);
+    setMoveError("");
+    setError("");
+    setSuccess("");
+    const { error: moveRpcError } = await supabase.rpc("reschedule_booking", {
+      target_booking_id: appointmentId,
+      new_scheduled_at: newTime,
+      reschedule_reason: cx.rescheduleReason,
+    });
+    setMoveBusy(false);
+    if (moveRpcError) {
+      const message = cx.moveFailed + errorMessage(moveRpcError);
+      setMoveError(message);
+      setError(message);
+      return false;
+    }
+    setSuccess(cx.moved);
+    setShowDetailsModal(null);
+    setMoveSlot("");
+    await loadEmployeeSchedule();
+    return true;
+  };
+
+  // Free slots the open appointment can move to: not taken, not blocked, not inside a prayer lock.
+  const freeSlotIndexes = () =>
+    timeSlots.map((slot, index) => ({ slot, index }))
+      .filter(({ slot, index }) => !appointments.some((a) => a.slotIndex === index) && !blockouts.some((b) => b.slotIndex === index) && !isSlotPrayerLocked(slot, index))
+      .map(({ index }) => index);
 
   // Save employee working shifts Roster
   const handleSaveShift = async () => {
@@ -886,8 +1000,8 @@ export default function ProviderCalendarPage() {
 
     return (
       <div className="space-y-2">
-        <div className={`flex items-center justify-between gap-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-          <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>
+        <div className={`flex items-center justify-between gap-2 flex-row`}>
+          <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] text-start`}>
             {label}
           </label>
           {/* Tap the time chip to expand/collapse the hour grid */}
@@ -959,7 +1073,7 @@ export default function ProviderCalendarPage() {
   return (
     <div className="space-y-8 text-[#344054]">
       {/* ═══════════════ PAGE HEADER ═══════════════ */}
-      <div className={`flex flex-col md:flex-row md:items-center md:justify-between gap-6 ${isRTL ? "md:flex-row-reverse text-right" : "text-left"}`}>
+      <div className={`flex flex-col md:flex-row md:items-center md:justify-between gap-6 text-start`}>
         <div>
           <h2 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-[#D1AF47] via-[#E0C46A] to-[#D1AF47] bg-clip-text text-transparent">
             {t.calendarTitle}
@@ -967,7 +1081,7 @@ export default function ProviderCalendarPage() {
           <p className="text-xs text-[#667085] mt-1.5 tracking-wide">{t.subtitle}</p>
         </div>
 
-        <div className={`flex flex-wrap gap-3 items-center ${isRTL ? "justify-end flex-row-reverse" : "justify-start"}`}>
+        <div className={`flex flex-wrap gap-3 items-center justify-start`}>
           {/* Employee/Stylist Dropdown */}
           {employees.length > 0 && (
             <div className="relative">
@@ -1025,7 +1139,7 @@ export default function ProviderCalendarPage() {
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white border border-[#ECECEC] rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
             {/* Planner Header */}
-            <div className={`p-6 border-b border-[#ECECEC] bg-[#F9FAFB] rounded-t-3xl flex items-center justify-between ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <div className={`p-6 border-b border-[#ECECEC] bg-[#F9FAFB] rounded-t-3xl flex items-center justify-between flex-row`}>
               <h3 className="font-semibold text-sm text-[#101828] tracking-wide">
                 {lang === "ar" ? "لوحة التخطيط الفوري للمواعيد" : "Real-time Roster Planner"}
               </h3>
@@ -1086,10 +1200,10 @@ export default function ProviderCalendarPage() {
                 const blocked = blockouts.find(b => b.slotIndex === index);
 
                 return (
-                  <div key={index} className={`flex min-h-[80px] items-stretch ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                  <div key={index} className={`flex min-h-[80px] items-stretch flex-row`}>
 
                     {/* Time indicator column */}
-                    <div className={`w-28 px-4 py-4 flex items-center justify-center text-[11px] font-bold text-[#101828] bg-[#F9FAFB] select-none tracking-wide ${isRTL ? "border-l" : "border-r"} border-[#ECECEC]`}>
+                    <div className={`w-28 px-4 py-4 flex items-center justify-center text-[11px] font-bold text-[#101828] bg-[#F9FAFB] select-none tracking-wide border-e border-[#ECECEC]`}>
                       {slot.label}
                     </div>
 
@@ -1110,24 +1224,14 @@ export default function ProviderCalendarPage() {
                         setDraggedOverSlot(null);
                         const apptId = e.dataTransfer.getData("text/plain");
                         if (apptId && !isLocked && !blocked && !appt) {
-                          setAppointments(prev => prev.map(a => {
-                            if (a.id === apptId) {
-                              const newLabel = timeSlots[index].label;
-                              return {
-                                ...a,
-                                slotIndex: index,
-                                time: `${newLabel} - ${lang === "ar" ? "تعديل موعد" : "Rescheduled"}`
-                              };
-                            }
-                            return a;
-                          }));
+                          void moveAppointment(apptId, index);
                         }
                       }}
                     >
                       {isLocked ? (
                         // 1. Prayer Lockout Buffer state
-                        <div className={`w-full h-full bg-[#FEF3F2] border border-[#FEE4E2] rounded-2xl flex items-center justify-between px-5 gap-3 text-[#EF4444] shadow-sm ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                          <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse text-right" : "text-left"}`}>
+                        <div className={`w-full h-full bg-[#FEF3F2] border border-[#FEE4E2] rounded-2xl flex items-center justify-between px-5 gap-3 text-[#EF4444] shadow-sm flex-row`}>
+                          <div className={`flex items-center gap-3 text-start`}>
                             <div className="w-9 h-9 rounded-xl bg-[#FEE4E2] text-[#EF4444] flex items-center justify-center flex-shrink-0">
                               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -1148,8 +1252,8 @@ export default function ProviderCalendarPage() {
                         </div>
                       ) : isOverridden ? (
                         // 2. Overridden / Unlocked buffer state
-                        <div className={`w-full h-full bg-[#ECFDF3] border border-[#D1FADF] rounded-2xl flex items-center justify-between px-5 gap-3 text-[#22C55E] shadow-sm ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                          <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse text-right" : "text-left"}`}>
+                        <div className={`w-full h-full bg-[#ECFDF3] border border-[#D1FADF] rounded-2xl flex items-center justify-between px-5 gap-3 text-[#22C55E] shadow-sm flex-row`}>
+                          <div className={`flex items-center gap-3 text-start`}>
                             <div className="w-9 h-9 rounded-xl bg-[#D1FADF] text-[#22C55E] flex items-center justify-center flex-shrink-0">
                               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
@@ -1169,8 +1273,8 @@ export default function ProviderCalendarPage() {
                         </div>
                       ) : blocked ? (
                         // 3. Manual Blockout state
-                        <div className={`w-full h-full bg-[#F9FAFB] border border-[#ECECEC] rounded-2xl flex items-center justify-between px-5 gap-3 text-[#667085] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                          <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse text-right" : "text-left"}`}>
+                        <div className={`w-full h-full bg-[#F9FAFB] border border-[#ECECEC] rounded-2xl flex items-center justify-between px-5 gap-3 text-[#667085] flex-row`}>
+                          <div className={`flex items-center gap-3 text-start`}>
                             <div className="w-9 h-9 rounded-xl bg-[#F3F4F6] text-[#667085] flex items-center justify-center flex-shrink-0">
                               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -1196,10 +1300,10 @@ export default function ProviderCalendarPage() {
                           onDragStart={(e) => {
                             e.dataTransfer.setData("text/plain", appt.id);
                           }}
-                          className={`w-full bg-[#D1AF47]/[0.04] border border-[#D1AF47]/20 rounded-2xl p-4 flex flex-wrap gap-4 items-center justify-between group hover:bg-[#D1AF47]/[0.08] hover:shadow-[0_4px_20px_rgba(209,175,71,0.08)] hover:scale-[1.01] transition-all duration-300 cursor-pointer active:scale-[0.98] ${isRTL ? "border-r-4" : "border-l-4"} border-[#D1AF47]`}
+                          className={`w-full bg-[#D1AF47]/[0.04] border border-[#D1AF47]/20 rounded-2xl p-4 flex flex-wrap gap-4 items-center justify-between group hover:bg-[#D1AF47]/[0.08] hover:shadow-[0_4px_20px_rgba(209,175,71,0.08)] hover:scale-[1.01] transition-all duration-300 cursor-pointer active:scale-[0.98] border-s-4 border-[#D1AF47]`}
                         >
                           <div className={isRTL ? "text-right" : "text-left"}>
-                            <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                            <div className={`flex items-center gap-2.5 flex-row`}>
                               <h4 className="font-bold text-sm text-[#101828]">{appt.customer}</h4>
                               <span className="text-[10px] bg-[#F3F4F6] text-[#667085] px-2.5 py-0.5 rounded-full font-medium">{appt.duration}</span>
                             </div>
@@ -1208,7 +1312,7 @@ export default function ProviderCalendarPage() {
                             </p>
                           </div>
 
-                          <div className={`flex items-center gap-6 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                          <div className={`flex items-center gap-6 flex-row`}>
                             <div className={isRTL ? "text-left" : "text-right"}>
                               <p className="text-[10px] text-[#667085]">{t.stylist}</p>
                               <p className="text-xs font-bold text-[#D1AF47]">{appt.staff}</p>
@@ -1274,8 +1378,8 @@ export default function ProviderCalendarPage() {
                 <div className="overflow-x-auto">
                   <div className="min-w-[720px]">
                     {/* Day header row */}
-                    <div className={`flex border-b border-[#ECECEC] bg-[#F9FAFB] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                      <div className={`w-20 flex-shrink-0 ${isRTL ? "border-l" : "border-r"} border-[#ECECEC]`} />
+                    <div className={`flex border-b border-[#ECECEC] bg-[#F9FAFB] flex-row`}>
+                      <div className={`w-20 flex-shrink-0 border-e border-[#ECECEC]`} />
                       {weekDays.map((d, i) => {
                         const isToday = sameDay(d, now);
                         const isSelected = sameDay(d, selectedDate);
@@ -1283,7 +1387,7 @@ export default function ProviderCalendarPage() {
                           <button
                             key={i}
                             onClick={() => setSelectedDate(new Date(d))}
-                            className={`flex-1 px-2 py-3 text-center transition-all duration-200 ${isRTL ? "border-l" : "border-r"} border-[#ECECEC] last:border-0 ${
+                            className={`flex-1 px-2 py-3 text-center transition-all duration-200 border-e border-[#ECECEC] last:border-0 ${
                               isSelected ? "bg-[#D1AF47]/10" : "hover:bg-[#F3F4F6]"
                             }`}
                           >
@@ -1302,8 +1406,8 @@ export default function ProviderCalendarPage() {
                         const lockRaw = getSlotPrayerLockInfoRaw(slot);
                         const prayerName = lockRaw ? (isRTL ? lockRaw.nameAr : lockRaw.nameEn) : "";
                         return (
-                          <div key={index} className={`flex min-h-[52px] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                            <div className={`w-20 flex-shrink-0 px-2 py-2 text-[10px] font-bold text-[#101828] bg-[#F9FAFB] flex items-center justify-center ${isRTL ? "border-l" : "border-r"} border-[#ECECEC]`}>
+                          <div key={index} className={`flex min-h-[52px] flex-row`}>
+                            <div className={`w-20 flex-shrink-0 px-2 py-2 text-[10px] font-bold text-[#101828] bg-[#F9FAFB] flex items-center justify-center border-e border-[#ECECEC]`}>
                               {slot.label}
                             </div>
                             {weekDays.map((d, di) => {
@@ -1312,7 +1416,7 @@ export default function ProviderCalendarPage() {
                               return (
                                 <div
                                   key={di}
-                                  className={`flex-1 p-1 ${isRTL ? "border-l" : "border-r"} border-[#ECECEC] last:border-0 ${
+                                  className={`flex-1 p-1 border-e border-[#ECECEC] last:border-0 ${
                                     isLocked ? "bg-[#FEF3F2]" : sameDay(d, now) ? "bg-[#D1AF47]/[0.02]" : ""
                                   }`}
                                 >
@@ -1346,8 +1450,8 @@ export default function ProviderCalendarPage() {
 
           {/* A. PRAYER OPERATIONS CONTROL + LOCK PARAMETERS */}
           <div className="bg-white border border-[#ECECEC] rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] space-y-5">
-            <div className={`flex items-start justify-between gap-4 pb-4 border-b border-[#ECECEC] ${isRTL ? "flex-row-reverse text-right" : "text-left"}`}>
-              <div className={`flex items-start gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <div className={`flex items-start justify-between gap-4 pb-4 border-b border-[#ECECEC] text-start`}>
+              <div className={`flex items-start gap-3 flex-row`}>
                 <div className="w-10 h-10 rounded-2xl bg-[#D1AF47]/10 flex items-center justify-center shadow-[0_0_24px_rgba(209,175,71,0.18)]">
                   <svg className="w-5 h-5 text-[#D1AF47]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -1379,7 +1483,7 @@ export default function ProviderCalendarPage() {
             </div>
 
             <div className="space-y-2.5">
-              <div className={`flex items-end justify-between gap-3 ${isRTL ? "flex-row-reverse text-right" : "text-left"}`}>
+              <div className={`flex items-end justify-between gap-3 text-start`}>
                 <div>
                   <label className="text-[10px] text-[#667085] font-bold uppercase tracking-wider block">{t.prayerCityLabel}</label>
                   <p className="mt-1 text-[10px] font-semibold text-[#667085]">{t.prayerCityHint}</p>
@@ -1400,9 +1504,9 @@ export default function ProviderCalendarPage() {
                   cityListOpen
                     ? "border-[#D1AF47]/55 bg-[#D1AF47]/[0.10] shadow-[0_0_18px_rgba(209,175,71,0.16)]"
                     : "border-[#D1AF47]/30 bg-[#FFFCF4] hover:border-[#D1AF47]/50"
-                } ${isRTL ? "flex-row-reverse" : "flex-row"}`}
+                } flex-row`}
               >
-                <span className={`min-w-0 ${isRTL ? "text-right" : "text-left"}`}>
+                <span className={`min-w-0 text-start`}>
                   <strong className="block truncate text-sm font-black text-[#101828]">{isRTL ? selectedPrayerCity.ar : selectedPrayerCity.en}</strong>
                   <span className="block truncate text-[10px] font-bold text-[#8A7F6C]">{isRTL ? selectedPrayerCity.regionAr : selectedPrayerCity.regionEn}</span>
                 </span>
@@ -1419,7 +1523,7 @@ export default function ProviderCalendarPage() {
                     value={citySearch}
                     onChange={(e) => setCitySearch(e.target.value)}
                     placeholder={t.prayerCitySearch}
-                    className={`w-full rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] px-4 py-2.5 text-xs font-semibold text-[#101828] outline-none transition-all duration-300 placeholder:text-[#667085]/45 focus:border-[#D1AF47]/50 focus:shadow-[0_0_18px_rgba(209,175,71,0.14)] ${isRTL ? "text-right" : "text-left"}`}
+                    className={`w-full rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] px-4 py-2.5 text-xs font-semibold text-[#101828] outline-none transition-all duration-300 placeholder:text-[#667085]/45 focus:border-[#D1AF47]/50 focus:shadow-[0_0_18px_rgba(209,175,71,0.14)] text-start`}
                   />
                   <div className="max-h-44 space-y-1.5 overflow-y-auto pr-1">
                     {filteredSaudiCities.map((city) => {
@@ -1440,7 +1544,7 @@ export default function ProviderCalendarPage() {
                               : "border-[#ECECEC] bg-white/80 text-[#667085] hover:border-[#D1AF47]/35 hover:text-[#101828]"
                           }`}
                         >
-                          <span className={`flex items-center justify-between gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                          <span className={`flex items-center justify-between gap-3 flex-row`}>
                             <strong className="truncate font-black">{isRTL ? city.ar : city.en}</strong>
                             <span className="truncate text-[10px] font-bold opacity-70">{isRTL ? city.regionAr : city.regionEn}</span>
                           </span>
@@ -1505,7 +1609,7 @@ export default function ProviderCalendarPage() {
                 { label: t.maghrib, checked: maghribActive, onChange: setMaghribActive },
                 { label: t.isha, checked: ishaActive, onChange: setIshaActive }
               ].map((prayer) => (
-                <div key={prayer.label} className={`flex items-center justify-between rounded-2xl border border-[#ECECEC] bg-white/80 px-3 py-2.5 text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                <div key={prayer.label} className={`flex items-center justify-between rounded-2xl border border-[#ECECEC] bg-white/80 px-3 py-2.5 text-xs flex-row`}>
                   <span className="font-bold text-[#344054]">{prayer.label}</span>
                   <ToggleSwitch checked={prayer.checked} onChange={prayer.onChange} />
                 </div>
@@ -1515,7 +1619,7 @@ export default function ProviderCalendarPage() {
 
           {/* B. GEOFENCED LOGISTICS / DISPATCH RADIUS */}
           <div className="bg-white border border-[#ECECEC] rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] space-y-5">
-            <div className={`flex items-center gap-2.5 pb-4 border-b border-[#ECECEC] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <div className={`flex items-center gap-2.5 pb-4 border-b border-[#ECECEC] flex-row`}>
               <div className="w-8 h-8 rounded-xl bg-[#D1AF47]/10 flex items-center justify-center">
                 <svg className="w-4 h-4 text-[#D1AF47]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -1527,7 +1631,7 @@ export default function ProviderCalendarPage() {
 
             {/* Travel boundary radius control */}
             <div className="space-y-3">
-              <div className={`flex justify-between items-center text-[10px] font-bold uppercase tracking-wider ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <div className={`flex justify-between items-center text-[10px] font-bold uppercase tracking-wider flex-row`}>
                 <span className="text-[#667085]">{t.radiusLabel}</span>
                 <span className="text-[#D1AF47] bg-[#D1AF47]/10 px-3 py-1 rounded-full text-[10px] font-bold">{travelRadius} km</span>
               </div>
@@ -1543,7 +1647,7 @@ export default function ProviderCalendarPage() {
 
             {/* Traffic delay buffer control */}
             <div className="space-y-3">
-              <div className={`flex justify-between items-center text-[10px] font-bold uppercase tracking-wider ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <div className={`flex justify-between items-center text-[10px] font-bold uppercase tracking-wider flex-row`}>
                 <span className="text-[#667085]">{t.delayBufferLabel}</span>
                 <span className="text-[#D1AF47] bg-[#D1AF47]/10 px-3 py-1 rounded-full text-[10px] font-bold">+{trafficDelay} mins</span>
               </div>
@@ -1560,7 +1664,7 @@ export default function ProviderCalendarPage() {
 
           {/* C. ROSTER WORKING HOURS */}
           <div className="bg-white border border-[#ECECEC] rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] space-y-5">
-            <div className={`flex items-center gap-2.5 pb-4 border-b border-[#ECECEC] ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <div className={`flex items-center gap-2.5 pb-4 border-b border-[#ECECEC] flex-row`}>
               <div className="w-8 h-8 rounded-xl bg-[#D1AF47]/10 flex items-center justify-center">
                 <svg className="w-4 h-4 text-[#D1AF47]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1571,7 +1675,7 @@ export default function ProviderCalendarPage() {
 
             {/* Day Selector */}
             <div className="space-y-1.5">
-              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>
+              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] text-start`}>
                 {lang === "ar" ? "اليوم المراد تعديله" : "Day to Edit"}
               </label>
               <select
@@ -1590,7 +1694,7 @@ export default function ProviderCalendarPage() {
             </div>
 
             {/* Working Day Toggle */}
-            <div className={`flex items-center justify-between text-xs py-1 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <div className={`flex items-center justify-between text-xs py-1 flex-row`}>
               <span className="font-semibold text-[#667085]">
                 {lang === "ar" ? "يوم عمل نشط" : "Active Work Day"}
               </span>
@@ -1619,7 +1723,7 @@ export default function ProviderCalendarPage() {
               />
             </div>
 
-            <div className={`flex items-center justify-between rounded-2xl border border-[#D1AF47]/20 bg-[#FFFCF4] px-4 py-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <div className={`flex items-center justify-between rounded-2xl border border-[#D1AF47]/20 bg-[#FFFCF4] px-4 py-3 flex-row`}>
               <div className={isRTL ? "text-right" : "text-left"}>
                 <p className="text-xs font-black uppercase tracking-[0.14em] text-[#101828]">{t.secondShiftLabel}</p>
                 <p className="mt-1 text-[10px] font-semibold text-[#667085]">{hasSecondShift ? `${secondShiftStart} - ${secondShiftEnd}` : t.addSecondShift}</p>
@@ -1656,7 +1760,7 @@ export default function ProviderCalendarPage() {
 
             <div className="hidden">
               <div className="space-y-1.5">
-                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>
+                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] text-start`}>
                   {lang === "ar" ? "بداية المناوبة" : "Shift Start"}
                 </label>
                 <select
@@ -1677,7 +1781,7 @@ export default function ProviderCalendarPage() {
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>
+                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] text-start`}>
                   {lang === "ar" ? "نهاية المناوبة" : "Shift End"}
                 </label>
                 <select
@@ -1700,51 +1804,64 @@ export default function ProviderCalendarPage() {
 
       {/* ═══════════════ WALK-IN BOOKING MODAL ═══════════════ */}
       {showBookModal && targetSlotIndex !== null && (
-        <div className="fixed inset-0 bg-[#101828]/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <form
-            onSubmit={handleBookingSubmit}
-            className="bg-white border border-[#ECECEC] rounded-3xl p-7 max-w-sm w-full space-y-5 shadow-[0_12px_40px_rgba(0,0,0,0.02)] animate-[modalIn_0.25s_ease-out]"
-            style={{ animation: "modalIn 0.25s ease-out" }}
-          >
-            <h3 className={`font-bold text-base text-[#101828] ${isRTL ? "text-right" : "text-left"}`}>
+        <ProviderDialog label={t.addAppointment} onClose={() => setShowBookModal(false)} canClose={!loading}>
+          <form onSubmit={handleBookingSubmit} noValidate className="space-y-5">
+            <h3 className={`font-bold text-base text-[#101828] text-start`}>
               {t.addAppointment} ({timeSlots[targetSlotIndex].label})
             </h3>
 
             <div className="space-y-1.5">
-              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>{t.clientName}</label>
-              {customers.length > 0 ? (
+              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] text-start`}>{t.clientName}</label>
+              <input
+                id="walkin-name"
+                type="text"
+                required
+                value={bookCustomer}
+                onChange={(e) => { setBookCustomer(e.target.value); setSelectedCustomerId(""); }}
+                className={providerFieldClass}
+              />
+              {customers.length > 0 && (
                 <select
+                  aria-label={cx.existingClient}
                   value={selectedCustomerId}
                   onChange={(e) => {
                     const custId = e.target.value;
                     setSelectedCustomerId(custId);
                     const selectedCust = customers.find(c => c.id === custId);
                     if (selectedCust) {
-                      setBookCustomer(`${selectedCust.first_name || ""} ${selectedCust.last_name || ""}`.trim() || selectedCust.phone_number);
+                      setBookCustomer(`${selectedCust.first_name || ""} ${selectedCust.last_name || ""}`.trim() || selectedCust.phone_number || "");
+                      setBookPhone(selectedCust.phone_number || "");
                     }
                   }}
-                  className="w-full bg-[#F9FAFB] border border-[#ECECEC] text-xs rounded-2xl px-4 py-2.5 text-[#101828] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 cursor-pointer"
+                  className={`${providerFieldClass} mt-2`}
                 >
+                  <option value="">{cx.newClient}</option>
                   {customers.map((c) => (
-                    <option key={c.id} value={c.id} className="bg-white text-[#101828]">
+                    <option key={c.id} value={c.id}>
                       {`${c.first_name || ""} ${c.last_name || ""}`.trim() || c.phone_number}
                     </option>
                   ))}
                 </select>
-              ) : (
-                <input
-                  type="text"
-                  required
-                  value={bookCustomer}
-                  onChange={e => setBookCustomer(e.target.value)}
-                  placeholder="Fahad Al-Malki"
-                  className={`w-full bg-[#F9FAFB] border border-[#ECECEC] rounded-2xl px-4 py-2.5 text-xs text-[#101828] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 placeholder:text-[#667085]/40 ${isRTL ? "text-right" : "text-left"}`}
-                />
               )}
             </div>
 
             <div className="space-y-1.5">
-              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>{t.service}</label>
+              <label htmlFor="walkin-phone" className="block text-[9px] font-bold uppercase tracking-wider text-[#667085] text-start">{cx.phone}</label>
+              <input id="walkin-phone" type="tel" dir="ltr" inputMode="tel" value={bookPhone} onChange={(e) => setBookPhone(e.target.value)} aria-describedby="walkin-phone-help" className={providerFieldClass} />
+              <p id="walkin-phone-help" className="text-[10px] text-[#667085]">{cx.phoneHelp}</p>
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="walkin-payment" className="block text-[9px] font-bold uppercase tracking-wider text-[#667085] text-start">{cx.payment}</label>
+              <select id="walkin-payment" value={bookPayment} onChange={(e) => setBookPayment(e.target.value)} className={providerFieldClass}>
+                {paymentMethods.map((m) => (
+                  <option key={m.key} value={m.key}>{lang === "ar" ? m.label_ar || m.label_en : m.label_en || m.label_ar}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] text-start`}>{t.service}</label>
               <select
                 value={bookService}
                 onChange={(e) => {
@@ -1768,7 +1885,7 @@ export default function ProviderCalendarPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>{t.assignedStylist}</label>
+                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] text-start`}>{t.assignedStylist}</label>
                 <select
                   value={bookStaff}
                   onChange={e => setBookStaff(e.target.value)}
@@ -1783,29 +1900,31 @@ export default function ProviderCalendarPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>{t.priceLabel}</label>
+                <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] text-start`}>{t.priceLabel}</label>
                 <input
                   type="text"
                   required
                   value={bookPrice}
                   onChange={e => setBookPrice(e.target.value)}
-                  className={`w-full bg-[#F9FAFB] border border-[#ECECEC] rounded-2xl px-4 py-2.5 text-xs text-[#101828] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 ${isRTL ? "text-right" : "text-left"}`}
+                  className={`w-full bg-[#F9FAFB] border border-[#ECECEC] rounded-2xl px-4 py-2.5 text-xs text-[#101828] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 text-start`}
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] ${isRTL ? "text-right" : "text-left"}`}>{t.notes}</label>
+              <label className={`block text-[9px] font-bold uppercase tracking-wider text-[#667085] text-start`}>{t.notes}</label>
               <input
                 type="text"
                 value={bookNotes}
                 onChange={e => setBookNotes(e.target.value)}
                 placeholder={t.notesPlaceholder}
-                className={`w-full bg-[#F9FAFB] border border-[#ECECEC] rounded-2xl px-4 py-2.5 text-xs text-[#101828] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 placeholder:text-[#667085]/40 ${isRTL ? "text-right" : "text-left"}`}
+                className={`w-full bg-[#F9FAFB] border border-[#ECECEC] rounded-2xl px-4 py-2.5 text-xs text-[#101828] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_15px_rgba(209,175,71,0.1)] transition-all duration-300 placeholder:text-[#667085]/40 text-start`}
               />
             </div>
 
-            <div className={`flex justify-end gap-3 pt-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            {bookError && <div role="alert" className="rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-3 py-2.5 text-sm font-semibold text-[#B42318]">{bookError}</div>}
+
+            <div className="flex justify-end gap-3 pt-3">
               <button
                 type="button"
                 onClick={() => setShowBookModal(false)}
@@ -1821,63 +1940,82 @@ export default function ProviderCalendarPage() {
               </button>
             </div>
           </form>
-        </div>
+        </ProviderDialog>
       )}
 
       {/* ═══════════════ APPOINTMENT DETAILS MODAL ═══════════════ */}
       {showDetailsModal && (
-        <div className="fixed inset-0 bg-[#101828]/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div
-            className="bg-white border border-[#ECECEC] rounded-3xl p-7 max-w-sm w-full space-y-5 shadow-[0_12px_40px_rgba(0,0,0,0.02)]"
-            style={{ animation: "modalIn 0.25s ease-out" }}
-          >
-            <h3 className={`font-bold text-base text-[#101828] ${isRTL ? "text-right" : "text-left"}`}>{t.detailsTitle}</h3>
+        <ProviderDialog label={t.detailsTitle} onClose={() => { setShowDetailsModal(null); setMoveError(""); setMoveSlot(""); }} canClose={!moveBusy}>
+          <h3 className="text-start text-base font-bold text-[#101828]">{t.detailsTitle}</h3>
 
-            <div className="space-y-3.5">
-              <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-[#667085]">{t.customer}:</span>
-                <span className="font-bold text-[#101828]">{showDetailsModal.customer}</span>
+          <dl className="mt-4 space-y-3.5">
+            {[
+              [t.customer, showDetailsModal.customer, "text-[#101828]"],
+              [t.service, showDetailsModal.service, "text-[#101828]"],
+              [t.stylist, showDetailsModal.staff, "text-[#D1AF47]"],
+              [t.time, showDetailsModal.time, "text-[#101828]"],
+              [t.priceLabel, `${showDetailsModal.price} SAR`, "text-[#101828]"],
+              ...(showDetailsModal.phone ? [[cx.phoneLabel, showDetailsModal.phone, "text-[#101828]"]] : []),
+              ...(showDetailsModal.payment ? [[cx.paidBy, (paymentMethods.find((m) => m.key === showDetailsModal.payment)?.[lang === "ar" ? "label_ar" : "label_en"]) || showDetailsModal.payment, "text-[#101828]"]] : []),
+              ...(showDetailsModal.notes ? [[t.notes, showDetailsModal.notes, "text-[#667085]"]] : []),
+            ].map(([label, value, tone]) => (
+              <div key={label} className="flex justify-between gap-4 text-xs">
+                <dt className="text-[#667085]">{label}:</dt>
+                <dd dir={label === cx.phoneLabel ? "ltr" : undefined} className={`font-bold ${tone}`}>{value}</dd>
               </div>
-              <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-[#667085]">{t.service}:</span>
-                <span className="font-bold text-[#101828]">{showDetailsModal.service}</span>
-              </div>
-              <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-[#667085]">{t.stylist}:</span>
-                <span className="font-bold text-[#D1AF47]">{showDetailsModal.staff}</span>
-              </div>
-              <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-[#667085]">{t.time}:</span>
-                <span className="font-bold text-[#101828]">{showDetailsModal.time}</span>
-              </div>
-              <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <span className="text-[#667085]">{t.priceLabel}:</span>
-                <span className="font-bold text-[#101828]">{showDetailsModal.price} SAR</span>
-              </div>
-              {showDetailsModal.notes && (
-                <div className={`flex justify-between text-xs ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                  <span className="text-[#667085]">{t.notes}:</span>
-                  <span className="font-semibold text-[#667085]">{showDetailsModal.notes}</span>
-                </div>
-              )}
-            </div>
+            ))}
+          </dl>
 
-            <div className="flex flex-col gap-2.5 pt-5 border-t border-[#ECECEC]">
+          <div className="mt-5 space-y-2 border-t border-[#ECECEC] pt-5">
+            <label htmlFor="move-slot" className="block text-[9px] font-bold uppercase tracking-wider text-[#667085] text-start">{cx.moveTo}</label>
+            <div className="flex gap-2">
+              <select id="move-slot" value={moveSlot} disabled={moveBusy || freeSlotIndexes().length === 0} onChange={(e) => setMoveSlot(e.target.value)} className={providerFieldClass}>
+                <option value="">{freeSlotIndexes().length ? cx.chooseSlot : cx.noFreeSlot}</option>
+                {freeSlotIndexes().map((i) => <option key={i} value={String(i)}>{timeSlots[i].label}</option>)}
+              </select>
               <button
-                onClick={() => handleCancelBooking(showDetailsModal.id)}
-                className="w-full py-2.5 bg-[#FF5D73]/[0.08] hover:bg-[#FF5D73]/[0.15] border border-[#FF5D73]/15 text-[#FF5D73] text-[10px] font-bold uppercase tracking-wider rounded-2xl hover:shadow-[0_0_15px_rgba(255,93,115,0.1)] transition-all duration-300"
+                type="button"
+                disabled={moveBusy || moveSlot === ""}
+                onClick={() => void moveAppointment(showDetailsModal.id, Number(moveSlot))}
+                className="shrink-0 rounded-xl bg-[#D1AF47] px-4 py-2.5 text-xs font-black text-[#070B12] outline-2 outline-offset-2 outline-transparent hover:bg-[#E0C46A] focus-visible:outline-[#9B7928] disabled:opacity-50"
               >
-                {t.cancelBooking}
-              </button>
-              <button
-                onClick={() => setShowDetailsModal(null)}
-                className="w-full py-2.5 bg-white border border-[#ECECEC] text-[#667085] text-[10px] font-bold uppercase tracking-wider rounded-2xl hover:border-[#D1AF47]/40 hover:text-[#101828] transition-all duration-300"
-              >
-                {t.cancel}
+                {moveBusy ? cx.moving : cx.move}
               </button>
             </div>
+            {moveError && <p role="alert" className="text-xs font-semibold text-[#B42318]">{moveError}</p>}
           </div>
-        </div>
+
+          <div className="mt-5 flex flex-col gap-2.5 border-t border-[#ECECEC] pt-5">
+            <button
+              type="button"
+              onClick={() => setCancelTarget(showDetailsModal)}
+              className="w-full py-2.5 bg-[#FF5D73]/[0.08] hover:bg-[#FF5D73]/[0.15] border border-[#FF5D73]/15 text-[#FF5D73] text-[10px] font-bold uppercase tracking-wider rounded-2xl transition-all duration-300"
+            >
+              {t.cancelBooking}
+            </button>
+            <button
+              type="button"
+              onClick={() => { setShowDetailsModal(null); setMoveError(""); setMoveSlot(""); }}
+              className="w-full py-2.5 bg-white border border-[#ECECEC] text-[#667085] text-[10px] font-bold uppercase tracking-wider rounded-2xl hover:border-[#D1AF47]/40 hover:text-[#101828] transition-all duration-300"
+            >
+              {t.cancel}
+            </button>
+          </div>
+        </ProviderDialog>
+      )}
+
+      {cancelTarget && (
+        <CommandDialog
+          locale={lang}
+          tone="danger"
+          title={cx.cancelTitle}
+          intro={cx.cancelIntro}
+          facts={[{ label: t.customer, value: cancelTarget.customer }, { label: t.time, value: cancelTarget.time }]}
+          reasonLabel={cx.cancelReason}
+          confirmLabel={t.cancelBooking}
+          onConfirm={(reason) => cancelAppointment(cancelTarget.id, reason)}
+          onClose={() => setCancelTarget(null)}
+        />
       )}
 
       {/* Modal entrance animation keyframes */}

@@ -109,8 +109,9 @@ describe("issued tax invoices are append-only", () => {
 
   it("cannot be edited or deleted by an administrator", async () => {
     const id = await issue("INV-FIX-1");
-    assert.equal((await as(db, admin, `update invoices set total_amount_sar = 1, vat_amount_sar = 0 where id = $1 returning id`, [id])).length, 0);
-    assert.equal((await as(db, admin, `delete from invoices where id = $1 returning id`, [id])).length, 0);
+    // An administrator holds SELECT on invoices and nothing else: the write is refused outright, not silently ignored.
+    assert.equal(await outcome(as(db, admin, `update invoices set total_amount_sar = 1, vat_amount_sar = 0 where id = $1 returning id`, [id])), "42501");
+    assert.equal(await outcome(as(db, admin, `delete from invoices where id = $1 returning id`, [id])), "42501");
     const stored = (await sys(db, `select total_amount_sar, vat_amount_sar from invoices where id = $1`, [id]))[0];
     assert.deepEqual([Number(stored.total_amount_sar), Number(stored.vat_amount_sar)], [115, 15]);
   });

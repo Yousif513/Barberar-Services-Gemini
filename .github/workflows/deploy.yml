@@ -38,6 +38,18 @@ jobs:
       - name: Database tests (migrations, RLS, server commands on PGlite)
         run: npm run test:db
 
+      - name: Inventory and supply tests
+        run: npm run test:inventory
+
+      - name: Screens only ask the database for what exists (rpc arguments, columns, embeds)
+        run: npm run test:ui-schema
+
+      - name: Mobile unit tests (session storage)
+        run: npm run test:mobile
+
+      - name: Migration compatibility with the P3 branch
+        run: npm run test:p3-compat
+
       - name: Web tests (authorization boundaries, no mock data)
         run: npm run test --workspace=web_platform
 
@@ -95,8 +107,11 @@ jobs:
       - name: Start local Supabase
         run: supabase start
 
-      - name: Apply migrations
-        run: supabase db reset --no-seed
+      - name: Apply migrations and seed on the real Postgres
+        run: supabase db reset
+
+      - name: Smoke test the real stack (sign-in, row-level security, privileges, booking)
+        run: node scripts/smoke-local-supabase.mjs
 
       - name: Verify DB Migration Integrity
         run: supabase db lint

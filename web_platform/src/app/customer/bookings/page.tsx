@@ -1,8 +1,34 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { generateZatcaXml } from "@/lib/zatca";
+import { errorMessage } from "@/lib/error-message";
+import { sar, useOperationsLocale } from "@/components/operations-ui";
+import { CommandDialog, ModalOverlay, ModalPortal } from "@/components/modal";
+import {
+  receiptAmounts, bookingStatusLabel, policyFromProvider, policySentences, cancellationPreview,
+  formatBookingDate, formatBookingTime, formatBookingDateTime, riyadhDateKey, bookAgainHref,
+} from "@/lib/booking-display.mjs";
+import { prayerWindowsForDate } from "@/lib/prayer-windows.mjs";
+
+// Replaces the hand-made `fixed inset-0` layers: a modal dialog with focus moved in, Tab kept inside, Escape to close
+// and the page behind it inert (ModalOverlay), named for screen readers.
+function Dialog({ label, onClose, canClose = true, panelClass = "rounded-2xl max-w-lg space-y-6", children }: {
+  label: string; onClose: () => void; canClose?: boolean; panelClass?: string; children: React.ReactNode;
+}) {
+  return (
+    <ModalPortal>
+      <ModalOverlay onClose={onClose} canClose={canClose} className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div role="dialog" aria-modal="true" aria-label={label} tabIndex={-1} className={`bg-white border border-gray-200 w-full max-h-full overflow-y-auto p-6 shadow-2xl ${panelClass}`}>
+          {children}
+        </div>
+      </ModalOverlay>
+    </ModalPortal>
+  );
+}
+
+const fill = (template: string, values: Record<string, string>) => template.replace(/\{(\w+)\}/g, (_, key) => values[key] ?? "");
 
 const translations = {
   en: {
@@ -16,7 +42,7 @@ const translations = {
     provider: "Provider",
     service: "Service",
     staff: "Stylist / Specialist",
-    price: "Total Price",
+    price: "Total (incl. VAT)",
     status: "Status",
     actions: "Actions",
     details: "View Details",
@@ -26,6 +52,18 @@ const translations = {
     rebook: "Book Again",
     confirmCancelTitle: "Cancel Appointment",
     confirmCancelDesc: "Are you sure you want to cancel this appointment? This action cannot be undone.",
+    cancelUnpaid: "No payment has been taken for this booking, so cancelling costs nothing.",
+    cancelFree: "You are inside the free-cancellation window: nothing is kept and your full deposit is refunded.",
+    cancelLate: "This is a late cancellation: {fee} of your {deposit} deposit is kept ({pct}%) and {refund} is refunded.",
+    cancelPolicyUnknown: "The provider's cancellation terms could not be loaded, so the fee cannot be shown in advance. Any fee kept is shown right after you cancel.",
+    cancelEstimate: "This is worked out from the provider's terms; the final amounts are confirmed when you cancel.",
+    cancelTermsTitle: "Provider's cancellation terms",
+    factDeposit: "Deposit paid",
+    factFee: "You will lose",
+    factRefund: "Refund to you",
+    cancelDone: "Booking cancelled. No fee was kept.",
+    cancelDoneFee: "Booking cancelled. Fee kept: {fee}. Refund requested: {refund}.",
+    cancelDoneRefund: "Booking cancelled. Refund requested: {refund}.",
     yesCancel: "Yes, Cancel",
     close: "Close",
     currency: "SAR",
@@ -59,13 +97,27 @@ const translations = {
     disputeSuccess: "Dispute submitted successfully. Admin team will review your case.",
     tipStaffBtn: "Tip Specialist",
     tipModalTitle: "Send a Tip to Your Specialist",
-    tipNotice: "100% of your tip goes directly to your specialist with 0% platform commission.",
+    tipNotice: "The full tip is paid to the provider for the specialist who served you. The platform takes no commission on tips; how the provider shares it with the specialist is up to them.",
     tipSelectAmount: "Select Tip Amount",
     tipCustom: "Custom Amount (SAR)",
     sendTipBtn: "Send Tip",
     sendingTip: "Processing Tip...",
     tipSuccess: "Redirecting to payment for your tip...",
-    minTipNotice: "Minimum tip amount is 5 SAR."
+    minTipNotice: "Minimum tip amount is 5 SAR.",
+    tipBadge: "Staff recognition",
+    loading: "Loading bookings...",
+    loadFailed: "Your bookings could not be loaded:",
+    retry: "Try again",
+    bookingId: "Booking ID",
+    bookingRef: "Booking",
+    feeKept: "Fee kept",
+    refundLabel: "Refund",
+    slotsLoading: "Loading available times...",
+    slotsFailed: "Could not load available times:",
+    noSpecialist: "This booking has no assigned specialist, so times cannot be loaded. Contact the provider.",
+    rescheduleNotice: "Rescheduling closes {hours} hours before the appointment.",
+    rescheduleDone: "Appointment rescheduled to {when}.",
+    closeDialog: "Close dialog"
   },
   ar: {
     title: "حجوزاتي",
@@ -78,7 +130,7 @@ const translations = {
     provider: "مزود الخدمة",
     service: "الخدمة",
     staff: "الأخصائي / المصفف",
-    price: "السعر الإجمالي",
+    price: "الإجمالي شامل الضريبة",
     status: "الحالة",
     actions: "الإجراءات",
     details: "عرض التفاصيل",
@@ -88,6 +140,18 @@ const translations = {
     rebook: "احجز مرة أخرى",
     confirmCancelTitle: "إلغاء الحجز",
     confirmCancelDesc: "هل أنت متأكد من إلغاء هذا الموعد؟ لا يمكن التراجع عن هذا الإجراء.",
+    cancelUnpaid: "لم يتم سحب أي مبلغ لهذا الحجز، لذلك لا يترتب على إلغائه أي تكلفة.",
+    cancelFree: "أنت ضمن فترة الإلغاء المجاني: لن يُستقطع شيء وسيُسترد العربون كاملاً.",
+    cancelLate: "هذا إلغاء متأخر: سيُستقطع {fee} من عربونك البالغ {deposit} ({pct}%) ويُسترد {refund}.",
+    cancelPolicyUnknown: "تعذر تحميل سياسة الإلغاء الخاصة بمقدم الخدمة، لذلك لا يمكن عرض الرسم مسبقاً. سيظهر أي رسم مستقطع مباشرة بعد الإلغاء.",
+    cancelEstimate: "هذه الأرقام محسوبة من سياسة مقدم الخدمة، وتتأكد المبالغ النهائية عند الإلغاء.",
+    cancelTermsTitle: "سياسة الإلغاء لدى مقدم الخدمة",
+    factDeposit: "العربون المدفوع",
+    factFee: "ستخسر",
+    factRefund: "المبلغ المسترد إليك",
+    cancelDone: "تم إلغاء الحجز. لم يُستقطع أي رسم.",
+    cancelDoneFee: "تم إلغاء الحجز. الرسم المستقطع: {fee}. المبلغ المطلوب استرداده: {refund}.",
+    cancelDoneRefund: "تم إلغاء الحجز. المبلغ المطلوب استرداده: {refund}.",
     yesCancel: "نعم، إلغاء الحجز",
     close: "إغلاق",
     currency: "ريال",
@@ -121,18 +185,32 @@ const translations = {
     disputeSuccess: "تم رفع النزاع بنجاح. سيتولى مسؤولو المنصة مراجعة طلبك والبت فيه.",
     tipStaffBtn: "إكرامية للمختص",
     tipModalTitle: "إرسال إكرامية للأخصائي",
-    tipNotice: "100% من مبلغ الإكرامية يذهب مباشرة للأخصائي دون أي استقطاع لمنصة بريمورا.",
+    tipNotice: "يُدفع مبلغ الإكرامية كاملاً إلى مقدم الخدمة عن الأخصائي الذي خدمك. لا تقتطع المنصة أي عمولة من الإكرامية، وتوزيعها على الأخصائي يعود إلى مقدم الخدمة.",
     tipSelectAmount: "اختر قيمة الإكرامية",
     tipCustom: "مبلغ مخصص (ريال)",
     sendTipBtn: "إرسال الإكرامية الآن",
     sendingTip: "جاري المعالجة...",
     tipSuccess: "جاري تحويلك لصفحة دفع الإكرامية...",
-    minTipNotice: "الحد الأدنى للإكرامية 5 ريال."
+    minTipNotice: "الحد الأدنى للإكرامية 5 ريال.",
+    tipBadge: "تقدير الفريق",
+    loading: "جارٍ تحميل الحجوزات...",
+    loadFailed: "تعذر تحميل حجوزاتك:",
+    retry: "حاول مرة أخرى",
+    bookingId: "رقم الحجز",
+    bookingRef: "الحجز",
+    feeKept: "الرسم المستقطع",
+    refundLabel: "المسترد",
+    slotsLoading: "جارٍ تحميل الأوقات المتاحة...",
+    slotsFailed: "تعذر تحميل الأوقات المتاحة:",
+    noSpecialist: "لا يوجد أخصائي معيّن لهذا الحجز، لذلك لا يمكن تحميل الأوقات. تواصل مع مقدم الخدمة.",
+    rescheduleNotice: "تُغلق إعادة الجدولة قبل الموعد بـ {hours} ساعة.",
+    rescheduleDone: "تمت إعادة جدولة الموعد إلى {when}.",
+    closeDialog: "إغلاق النافذة"
   }
 };
 
 export default function CustomerBookingsPage() {
-  const [locale, setLocale] = useState<"en" | "ar">("ar");
+  const locale = useOperationsLocale();
   const [activeTab, setActiveTab] = useState<"upcoming" | "past" | "cancelled">("upcoming");
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -147,6 +225,11 @@ export default function CustomerBookingsPage() {
   const [rescheduleLoading, setRescheduleLoading] = useState(false);
   const [rescheduleSlots, setRescheduleSlots] = useState<string[]>([]);
   const [rescheduleError, setRescheduleError] = useState("");
+  const [rescheduleMin, setRescheduleMin] = useState("");
+  const [slotsLoading, setSlotsLoading] = useState(false);
+  const [slotsError, setSlotsError] = useState("");
+  const [slotsRetry, setSlotsRetry] = useState(0);
+  const [cancelInfo, setCancelInfo] = useState<{ policy: ReturnType<typeof policyFromProvider>; preview: ReturnType<typeof cancellationPreview> | null } | null>(null);
 
   // ZATCA & Dispute Modal States (G25, G33)
   const [invoiceModalTarget, setInvoiceModalTarget] = useState<any | null>(null);
@@ -195,7 +278,7 @@ export default function CustomerBookingsPage() {
       window.location.assign(checkout.checkoutUrl);
     } catch (err: any) {
       console.error("Tip error:", err);
-      setTipError(err.message || "Failed to submit tip.");
+      setTipError(errorMessage(err));
     } finally {
       setTipLoading(false);
     }
@@ -246,55 +329,6 @@ export default function CustomerBookingsPage() {
     }
   };
 
-  // Builds the XML only from the invoice issued by the server (seller VAT number from the provider).
-  const handleDownloadInvoice = (bk: any) => {
-    if (!invoiceData?.invoice_number || !invoiceData?.seller_vat_number) return;
-    try {
-      const issued = new Date(invoiceData.issue_date || invoiceData.created_at);
-      const xmlString = generateZatcaXml({
-        invoiceId: invoiceData.invoice_number,
-        uuid: invoiceData.id,
-        issueDate: issued.toISOString().split('T')[0],
-        issueTime: issued.toISOString().split('T')[1].slice(0, 8),
-        sellerName: invoiceData.seller_name,
-        sellerVatNumber: invoiceData.seller_vat_number,
-        sellerAddress: locale === "ar" ? bk.branches?.name_ar : bk.branches?.name_en,
-        items: [
-          {
-            name: locale === "ar" ? bk.services?.name_ar : bk.services?.name_en,
-            price: Number(invoiceData.subtotal_sar),
-            vatRate: 0.15
-          }
-        ]
-      });
-
-      const blob = new Blob([xmlString], { type: "text/xml" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `ZATCA-invoice-${bk.id.substring(0, 8)}.xml`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (e) {
-      console.error("Failed to generate ZATCA XML:", e);
-    }
-  };
-
-  // Sync language with document root
-  useEffect(() => {
-    const handleLangSync = () => {
-      const currentLang = document.documentElement.lang as "en" | "ar";
-      if (currentLang === "en" || currentLang === "ar") {
-        setLocale(currentLang);
-      }
-    };
-    handleLangSync();
-    const interval = setInterval(handleLangSync, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   useEffect(() => {
     loadBookings();
 
@@ -335,13 +369,21 @@ export default function CustomerBookingsPage() {
           id,
           scheduled_at,
           status,
+          employee_id,
+          duration_minutes,
           total_price,
-          services ( name_en, name_ar ),
+          tax_amount,
+          deposit_required,
+          cancellation_fee,
+          refund_amount,
+          services ( id, name_en, name_ar ),
           employees ( name_en, name_ar ),
           branches (
             name_en,
             name_ar,
-            providers ( business_name_en, business_name_ar, logo_url )
+            latitude,
+            longitude,
+            providers ( id, business_name_en, business_name_ar, logo_url, free_cancellation_hours, late_cancellation_fee_percent, no_show_fee_percent, deposit_percentage )
           )
         `)
         .eq("customer_id", user.id)
@@ -350,60 +392,112 @@ export default function CustomerBookingsPage() {
       if (fetchError) throw fetchError;
       setBookings(data || []);
     } catch (err: any) {
-      console.error("Error loading bookings:", err.message);
-      setError(err?.message || "Failed to sync bookings from server.");
+      setError(errorMessage(err));
       setBookings([]);
     } finally {
       setLoading(false);
     }
   }
 
-  async function cancelBooking(id: string) {
+  // The fee and refund shown before confirming come from the provider's policy; the figures after it come from the row
+  // cancel_booking returns. Resolves to a message when the server refused (the dialog stays open and shows it).
+  async function cancelBooking(id: string): Promise<string | null> {
     try {
-      const { error: cancelError } = await supabase.rpc("cancel_booking", {
-        target_booking_id: id,
-      });
-      
+      const { data, error: cancelError } = await supabase.rpc("cancel_booking", { target_booking_id: id });
       if (cancelError) throw cancelError;
-      
-      // Update local state
-      setBookings(prev => prev.map(b => b.id === id ? { ...b, status: "cancelled" } : b));
-      setShowCancelModal(false);
+      const row = data as { cancellation_fee?: number | string | null; refund_amount?: number | string | null } | null;
+      const fee = Number(row?.cancellation_fee ?? 0);
+      const refund = Number(row?.refund_amount ?? 0);
+      setBookings(prev => prev.map(b => b.id === id ? { ...b, status: "cancelled", cancellation_fee: fee, refund_amount: refund } : b));
+      setActionMessage(
+        fee > 0 ? fill(t.cancelDoneFee, { fee: sar(fee, locale), refund: sar(refund, locale) })
+          : refund > 0 ? fill(t.cancelDoneRefund, { refund: sar(refund, locale) })
+          : t.cancelDone
+      );
       setSelectedBooking(null);
-    } catch (err: unknown) {
-      console.warn("Failed to cancel booking:", err instanceof Error ? err.message : err);
+      return null;
+    } catch (err) {
+      return errorMessage(err);
     }
   }
 
+  function openCancel(bk: any) {
+    const policy = policyFromProvider(bk.branches?.providers);
+    setCancelInfo({
+      policy,
+      preview: policy
+        ? cancellationPreview({ status: bk.status, scheduledAt: bk.scheduled_at, now: new Date(), depositRequired: bk.deposit_required, policy })
+        : null,
+    });
+    setSelectedBooking(bk);
+    setShowCancelModal(true);
+  }
+
+  function describeCancel(bk: any) {
+    const preview = cancelInfo?.preview;
+    const policy = cancelInfo?.policy;
+    const facts: { label: string; value: string }[] = [];
+    let intro = t.confirmCancelDesc;
+    if (bk.status === "pending_payment") {
+      intro = `${t.cancelUnpaid} ${t.confirmCancelDesc}`;
+    } else if (preview && policy) {
+      facts.push(
+        { label: t.factDeposit, value: sar(preview.captured, locale) },
+        { label: t.factFee, value: sar(preview.fee, locale) },
+        { label: t.factRefund, value: sar(preview.refund, locale) },
+      );
+      const verdict = preview.fee > 0
+        ? fill(t.cancelLate, { fee: sar(preview.fee, locale), deposit: sar(preview.captured, locale), pct: String(policy.lateFeePercent), refund: sar(preview.refund, locale) })
+        : t.cancelFree;
+      intro = `${verdict} ${t.cancelEstimate}`;
+    } else {
+      intro = `${t.cancelPolicyUnknown} ${t.confirmCancelDesc}`;
+    }
+    return { intro, facts, effects: policy ? policySentences(policy, locale) : [] };
+  }
+
   // Load available slots for selected reschedule date
+  // Only slots the database returns are ever offered: a failed query shows its error and a retry, never made-up times.
   useEffect(() => {
+    let active = true;
     async function fetchRescheduleSlots() {
+      setSlotsError("");
       if (!rescheduleBookingTarget || !rescheduleDate) {
         setRescheduleSlots([]);
         return;
       }
+      if (!rescheduleBookingTarget.employee_id) {
+        setRescheduleSlots([]);
+        setSlotsError(translations[locale].noSpecialist);
+        return;
+      }
+      setSlotsLoading(true);
       try {
+        const branch = rescheduleBookingTarget.branches;
+        const { starts, ends } = prayerWindowsForDate(rescheduleDate, branch?.latitude, branch?.longitude);
         const { data, error: slotsErr } = await supabase.rpc("get_available_slots", {
           target_employee_id: rescheduleBookingTarget.employee_id,
           target_date: rescheduleDate,
-          service_duration_minutes: rescheduleBookingTarget.duration_minutes || 30
+          service_duration_minutes: rescheduleBookingTarget.duration_minutes,
+          prayer_window_starts: starts,
+          prayer_window_ends: ends,
         });
         if (slotsErr) throw slotsErr;
-        setRescheduleSlots((data || []).map((s: any) => s.slot_start));
+        if (!active) return;
+        setRescheduleSlots((data || []).map((s: { slot_start: string }) => s.slot_start));
       } catch (err) {
-        console.warn("Failed to load reschedule slots from database:", err);
-        setRescheduleSlots([
-          `${rescheduleDate}T10:00:00+03:00`,
-          `${rescheduleDate}T11:00:00+03:00`,
-          `${rescheduleDate}T14:00:00+03:00`,
-          `${rescheduleDate}T15:00:00+03:00`,
-          `${rescheduleDate}T16:00:00+03:00`,
-          `${rescheduleDate}T17:00:00+03:00`
-        ]);
+        if (!active) return;
+        setRescheduleSlots([]);
+        setSlotsError(errorMessage(err));
+      } finally {
+        if (active) setSlotsLoading(false);
       }
     }
     fetchRescheduleSlots();
-  }, [rescheduleBookingTarget, rescheduleDate]);
+    return () => {
+      active = false;
+    };
+  }, [rescheduleBookingTarget, rescheduleDate, slotsRetry, locale]);
 
   async function handleReschedule() {
     if (!rescheduleBookingTarget || !rescheduleSlot) return;
@@ -414,15 +508,15 @@ export default function CustomerBookingsPage() {
         target_booking_id: rescheduleBookingTarget.id,
         new_scheduled_at: rescheduleSlot,
         new_employee_id: rescheduleBookingTarget.employee_id,
-        reschedule_reason: rescheduleReason || "Customer requested reschedule"
+        reschedule_reason: rescheduleReason.trim() || undefined
       });
       if (rpcErr) throw rpcErr;
 
       setBookings(prev => prev.map(b => b.id === rescheduleBookingTarget.id ? { ...b, scheduled_at: rescheduleSlot } : b));
-      setActionMessage(locale === "ar" ? "تمت إعادة جدولة الموعد بنجاح! وتم تحديث التذكيرات المجدولة." : "Appointment successfully rescheduled! Reminders updated.");
+      setActionMessage(fill(t.rescheduleDone, { when: formatBookingDateTime(rescheduleSlot, locale) }));
       setRescheduleBookingTarget(null);
-    } catch (err: any) {
-      setRescheduleError(err?.message || "Failed to reschedule appointment.");
+    } catch (err) {
+      setRescheduleError(errorMessage(err));
     } finally {
       setRescheduleLoading(false);
     }
@@ -464,15 +558,16 @@ export default function CustomerBookingsPage() {
       </div>
 
       {actionMessage && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-xl p-4 flex items-center justify-between">
+        <div role="status" className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-xl p-4 flex items-center justify-between">
           <span>✓ {actionMessage}</span>
-          <button onClick={() => setActionMessage("")} className="text-emerald-700 hover:text-emerald-900 font-bold ml-2">✕</button>
+          <button type="button" aria-label={t.closeDialog} onClick={() => setActionMessage("")} className="text-emerald-700 hover:text-emerald-900 font-bold ms-2">✕</button>
         </div>
       )}
 
       {error && (
-        <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl p-4">
-          Notice: {error}
+        <div role="alert" className="bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl p-4 flex items-center justify-between gap-3">
+          <span>{t.loadFailed} {error}</span>
+          <button type="button" onClick={() => void loadBookings()} className="shrink-0 rounded-lg border border-red-200 bg-white px-3 py-1.5 font-bold">{t.retry}</button>
         </div>
       )}
 
@@ -512,7 +607,7 @@ export default function CustomerBookingsPage() {
 
       {/* LIST SECTION */}
       {loading ? (
-        <div className="text-center py-12 text-sm text-gray-400">Loading bookings...</div>
+        <div role="status" className="text-center py-12 text-sm text-gray-400">{t.loading}</div>
       ) : filteredBookings.length === 0 ? (
         <div className="bg-white border border-gray-200 rounded-2xl p-12 text-center text-gray-500 shadow-sm">
           <p className="text-sm font-semibold">{t.noBookings}</p>
@@ -527,14 +622,18 @@ export default function CustomerBookingsPage() {
               {/* Left Info: Provider & Service */}
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-xl overflow-hidden border border-gray-100 bg-stone-100 flex-shrink-0">
-                  <img
-                    src={
-                      (bk as any).branches?.providers?.logo_url ||
-                      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=200&auto=format&fit=crop"
-                    }
-                    alt="Provider Logo"
-                    className="w-full h-full object-cover"
-                  />
+                  {bk.branches?.providers?.logo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={bk.branches.providers.logo_url}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span aria-hidden="true" className="flex h-full w-full items-center justify-center text-lg font-black text-stone-400">
+                      {(bk.branches?.providers?.business_name_en || bk.branches?.providers?.business_name_ar || "").charAt(0)}
+                    </span>
+                  )}
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
@@ -556,17 +655,10 @@ export default function CustomerBookingsPage() {
                 <div>
                   <span className="text-[9px] uppercase font-bold text-gray-400 block">{t.date}</span>
                   <span className="text-xs font-bold text-gray-700 block mt-1">
-                    {new Date(bk.scheduled_at).toLocaleDateString("en-GB", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })}
+                    {formatBookingDate(bk.scheduled_at, locale)}
                   </span>
                   <span className="text-[10px] font-semibold text-gray-500 block">
-                    {new Date(bk.scheduled_at).toLocaleTimeString("en-GB", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {formatBookingTime(bk.scheduled_at, locale)}
                   </span>
                 </div>
 
@@ -580,8 +672,14 @@ export default function CustomerBookingsPage() {
                 <div>
                   <span className="text-[9px] uppercase font-bold text-gray-400 block">{t.price}</span>
                   <span className="text-xs font-bold text-gray-800 block mt-1">
-                    {bk.total_price} {t.currency}
+                    {sar(receiptAmounts(bk).totalDue, locale)}
                   </span>
+                  {(bk.status === "cancelled" || bk.status === "no_show") && Number(bk.cancellation_fee) > 0 && (
+                    <span className="text-[10px] font-semibold text-red-700 block">{t.feeKept}: {sar(Number(bk.cancellation_fee), locale)}</span>
+                  )}
+                  {(bk.status === "cancelled" || bk.status === "no_show") && Number(bk.refund_amount) > 0 && (
+                    <span className="text-[10px] font-semibold text-emerald-700 block">{t.refundLabel}: {sar(Number(bk.refund_amount), locale)}</span>
+                  )}
                 </div>
 
                 <div>
@@ -591,7 +689,7 @@ export default function CustomerBookingsPage() {
                       bk.status
                     )}`}
                   >
-                    {bk.status.replace("_", " ")}
+                    {bookingStatusLabel(bk.status, locale)}
                   </span>
                 </div>
               </div>
@@ -599,6 +697,7 @@ export default function CustomerBookingsPage() {
               {/* Actions Section */}
               <div className="flex items-center gap-3 w-full lg:w-auto border-t lg:border-t-0 pt-4 lg:pt-0 border-gray-50">
                 <button
+                  type="button"
                   onClick={() => setSelectedBooking(bk)}
                   className="flex-1 lg:flex-initial px-4 py-2 border border-gray-200 bg-gray-50 text-xs font-bold rounded-xl hover:border-black transition duration-150"
                 >
@@ -607,9 +706,11 @@ export default function CustomerBookingsPage() {
                 {activeTab === "upcoming" && (
                   <>
                     <button
+                      type="button"
                       onClick={() => {
                         setRescheduleBookingTarget(bk);
-                        setRescheduleDate(new Date(Date.now() + 86400000).toISOString().split("T")[0]);
+                        setRescheduleMin(riyadhDateKey(new Date()));
+                        setRescheduleDate(riyadhDateKey(new Date(Date.now() + 86400000)));
                         setRescheduleSlot("");
                         setRescheduleReason("");
                         setRescheduleError("");
@@ -619,10 +720,8 @@ export default function CustomerBookingsPage() {
                       {t.reschedule}
                     </button>
                     <button
-                      onClick={() => {
-                        setSelectedBooking(bk);
-                        setShowCancelModal(true);
-                      }}
+                      type="button"
+                      onClick={() => openCancel(bk)}
                       className="flex-1 lg:flex-initial px-4 py-2 bg-red-50 text-red-700 hover:bg-red-100 font-bold text-xs rounded-xl border border-red-200 transition duration-150"
                     >
                       {t.cancel}
@@ -646,12 +745,14 @@ export default function CustomerBookingsPage() {
                         <span>{t.tipStaffBtn}</span>
                       </button>
                     )}
-                    <button
-                      onClick={() => (window.location.href = `/customer/book?service_id=${bk.services?.id}`)}
-                      className="flex-1 lg:flex-initial px-4 py-2 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl transition duration-150"
-                    >
-                      {t.rebook}
-                    </button>
+                    {bookAgainHref(bk.branches?.providers?.id, bk.services?.id) && (
+                      <Link
+                        href={bookAgainHref(bk.branches?.providers?.id, bk.services?.id) as string}
+                        className="flex-1 lg:flex-initial px-4 py-2 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl transition duration-150 text-center"
+                      >
+                        {t.rebook}
+                      </Link>
+                    )}
                   </>
                 )}
               </div>
@@ -662,8 +763,7 @@ export default function CustomerBookingsPage() {
 
       {/* DETAIL MODAL */}
       {selectedBooking && !showCancelModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-6">
+        <Dialog label={t.details} onClose={() => setSelectedBooking(null)}>
             <div className="flex justify-between items-start">
               <div>
                 <h3 className="text-base font-bold text-gray-900">
@@ -671,9 +771,11 @@ export default function CustomerBookingsPage() {
                     ? selectedBooking.branches?.providers?.business_name_ar || selectedBooking.branches?.providers?.business_name_en
                     : selectedBooking.branches?.providers?.business_name_en}
                 </h3>
-                <p className="text-xs text-gray-500 mt-1">Booking ID: {selectedBooking.id}</p>
+                <p className="text-xs text-gray-500 mt-1">{t.bookingId}: {selectedBooking.id}</p>
               </div>
               <button
+                type="button"
+                aria-label={t.closeDialog}
                 onClick={() => setSelectedBooking(null)}
                 className="text-gray-400 hover:text-gray-600 text-lg font-bold"
               >
@@ -691,14 +793,7 @@ export default function CustomerBookingsPage() {
               <div className="flex justify-between text-xs pt-4">
                 <span className="font-bold text-gray-400">{t.date}</span>
                 <span className="font-semibold text-gray-800">
-                  {new Date(selectedBooking.scheduled_at).toLocaleString("en-GB", {
-                    weekday: "long",
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {formatBookingDateTime(selectedBooking.scheduled_at, locale)}
                 </span>
               </div>
               <div className="flex justify-between text-xs pt-4">
@@ -710,7 +805,7 @@ export default function CustomerBookingsPage() {
               <div className="flex justify-between text-xs pt-4">
                 <span className="font-bold text-gray-400">{t.price}</span>
                 <span className="font-bold text-black">
-                  {selectedBooking.total_price} {t.currency}
+                  {sar(receiptAmounts(selectedBooking).totalDue, locale)}
                 </span>
               </div>
             </div>
@@ -718,6 +813,7 @@ export default function CustomerBookingsPage() {
             {/* ZATCA e-invoicing and dispute actions */}
             <div className="pt-2 space-y-2">
               <button
+                type="button"
                 onClick={() => handleViewTaxInvoice(selectedBooking)}
                 className="w-full py-2 bg-stone-100 hover:bg-stone-200 border border-stone-200 text-stone-900 font-bold text-xs rounded-xl transition flex items-center justify-center gap-2"
               >
@@ -766,52 +862,43 @@ export default function CustomerBookingsPage() {
               >
                 {t.close}
               </button>
-              {selectedBooking.status === "confirmed" && (
+              {(selectedBooking.status === "confirmed" || selectedBooking.status === "pending_payment") && (
                 <button
-                  onClick={() => setShowCancelModal(true)}
+                  type="button"
+                  onClick={() => openCancel(selectedBooking)}
                   className="flex-1 py-2.5 bg-red-50 border border-red-200 text-red-700 hover:bg-red-100 font-bold text-xs rounded-xl transition"
                 >
                   {t.cancel}
                 </button>
               )}
             </div>
-          </div>
-        </div>
+        </Dialog>
       )}
 
-      {/* CONFIRM CANCEL MODAL */}
-      {showCancelModal && selectedBooking && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-6">
-            <div>
-              <h3 className="text-base font-bold text-gray-900">{t.confirmCancelTitle}</h3>
-              <p className="text-xs text-gray-500 mt-2 leading-relaxed">{t.confirmCancelDesc}</p>
-            </div>
-
-            <div className="flex gap-4">
-              <button
-                onClick={() => {
-                  setShowCancelModal(false);
-                }}
-                className="flex-1 py-2.5 border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-800 font-bold text-xs rounded-xl transition"
-              >
-                {t.close}
-              </button>
-              <button
-                onClick={() => cancelBooking(selectedBooking.id)}
-                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl transition"
-              >
-                {t.yesCancel}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* CONFIRM CANCEL: shows what the provider's policy would keep before the command is sent */}
+      {showCancelModal && selectedBooking && (() => {
+        const described = describeCancel(selectedBooking);
+        return (
+          <CommandDialog
+            locale={locale}
+            tone="danger"
+            title={t.confirmCancelTitle}
+            intro={described.intro}
+            facts={described.facts}
+            effects={described.effects}
+            effectsTitle={t.cancelTermsTitle}
+            reasonLabel=""
+            reasonRequired={false}
+            confirmLabel={t.yesCancel}
+            onConfirm={() => cancelBooking(selectedBooking.id)}
+            onClose={() => setShowCancelModal(false)}
+          />
+        );
+      })()}
 
       {/* RESCHEDULE MODAL (G21) */}
       {rescheduleBookingTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-6">
+        <Dialog label={t.rescheduleTitle} onClose={() => setRescheduleBookingTarget(null)} canClose={!rescheduleLoading}>
             <div className="flex justify-between items-start border-b border-gray-100 pb-4">
               <div>
                 <h3 className="text-base font-bold text-gray-900">{t.rescheduleTitle}</h3>
@@ -822,6 +909,8 @@ export default function CustomerBookingsPage() {
                 </p>
               </div>
               <button
+                type="button"
+                aria-label={t.closeDialog}
                 onClick={() => setRescheduleBookingTarget(null)}
                 className="text-gray-400 hover:text-gray-600 font-bold text-sm"
               >
@@ -829,8 +918,15 @@ export default function CustomerBookingsPage() {
               </button>
             </div>
 
+            {(() => {
+              const policy = policyFromProvider(rescheduleBookingTarget.branches?.providers);
+              return policy && policy.freeHours > 0
+                ? <p className="text-[11px] font-medium text-gray-500">{fill(t.rescheduleNotice, { hours: String(policy.freeHours) })}</p>
+                : null;
+            })()}
+
             {rescheduleError && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-3">
+              <div role="alert" className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-3">
                 {rescheduleError}
               </div>
             )}
@@ -838,10 +934,11 @@ export default function CustomerBookingsPage() {
             <div className="space-y-4">
               {/* Date Input */}
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">{t.selectNewDate}</label>
+                <label htmlFor="reschedule-date" className="block text-xs font-bold text-gray-700 mb-1">{t.selectNewDate}</label>
                 <input
+                  id="reschedule-date"
                   type="date"
-                  min={new Date().toISOString().split("T")[0]}
+                  min={rescheduleMin}
                   value={rescheduleDate}
                   onChange={(e) => {
                     setRescheduleDate(e.target.value);
@@ -853,21 +950,28 @@ export default function CustomerBookingsPage() {
 
               {/* Time Slots */}
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">{t.selectNewTime}</label>
-                {rescheduleSlots.length === 0 ? (
+                <span id="reschedule-times" className="block text-xs font-bold text-gray-700 mb-1">{t.selectNewTime}</span>
+                {slotsLoading ? (
+                  <p role="status" className="text-xs text-gray-400 py-3">{t.slotsLoading}</p>
+                ) : slotsError ? (
+                  <div role="alert" className="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+                    <span>{rescheduleBookingTarget.employee_id ? `${t.slotsFailed} ${slotsError}` : slotsError}</span>
+                    {rescheduleBookingTarget.employee_id && (
+                      <button type="button" onClick={() => setSlotsRetry((n) => n + 1)} className="shrink-0 rounded-lg border border-red-200 bg-white px-3 py-1.5 font-bold">{t.retry}</button>
+                    )}
+                  </div>
+                ) : rescheduleSlots.length === 0 ? (
                   <p className="text-xs text-gray-400 py-3">{t.noSlotsFound}</p>
                 ) : (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-48 overflow-y-auto p-1">
+                  <div role="group" aria-labelledby="reschedule-times" className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-48 overflow-y-auto p-1">
                     {rescheduleSlots.map((slotIso) => {
-                      const timeStr = new Date(slotIso).toLocaleTimeString("en-GB", {
-                        hour: "2-digit",
-                        minute: "2-digit"
-                      });
+                      const timeStr = formatBookingTime(slotIso, locale);
                       const isSelected = rescheduleSlot === slotIso;
                       return (
                         <button
                           key={slotIso}
                           type="button"
+                          aria-pressed={isSelected}
                           onClick={() => setRescheduleSlot(slotIso)}
                           className={`py-2 px-2 text-xs font-bold rounded-xl border transition ${
                             isSelected
@@ -885,8 +989,9 @@ export default function CustomerBookingsPage() {
 
               {/* Reason Input */}
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">{t.reasonOptional}</label>
+                <label htmlFor="reschedule-reason" className="block text-xs font-bold text-gray-700 mb-1">{t.reasonOptional}</label>
                 <input
+                  id="reschedule-reason"
                   type="text"
                   placeholder={locale === "ar" ? "سبب إعادة الجدولة..." : "e.g. Schedule conflict..."}
                   value={rescheduleReason}
@@ -913,14 +1018,12 @@ export default function CustomerBookingsPage() {
                 {rescheduleLoading ? t.rescheduling : t.confirmReschedule}
               </button>
             </div>
-          </div>
-        </div>
+        </Dialog>
       )}
 
       {/* TAX INVOICE MODAL (G25 ZATCA) */}
       {invoiceModalTarget && invoiceData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-6">
+        <Dialog label={t.taxInvoiceTitle} onClose={() => { setInvoiceModalTarget(null); setInvoiceData(null); }}>
             <div className="flex justify-between items-start border-b border-gray-100 pb-4">
               <div>
                 <span className="inline-block rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[9px] font-black uppercase text-emerald-800 mb-1">
@@ -930,6 +1033,8 @@ export default function CustomerBookingsPage() {
                 <p className="text-xs font-mono text-gray-500 mt-0.5">{invoiceData.invoice_number}</p>
               </div>
               <button
+                type="button"
+                aria-label={t.closeDialog}
                 onClick={() => {
                   setInvoiceModalTarget(null);
                   setInvoiceData(null);
@@ -951,7 +1056,7 @@ export default function CustomerBookingsPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500 font-semibold">{t.sellerVat}</span>
-                <span className="font-mono font-bold text-gray-800">300000000000003</span>
+                <span className="font-mono font-bold text-gray-800" dir="ltr">{invoiceData.seller_vat_number}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500 font-semibold">{t.service}</span>
@@ -992,13 +1097,6 @@ export default function CustomerBookingsPage() {
             <div className="flex gap-4">
               <button
                 type="button"
-                onClick={() => handleDownloadInvoice(invoiceModalTarget)}
-                className="flex-1 py-2.5 bg-stone-100 hover:bg-stone-200 border border-stone-200 text-stone-900 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5"
-              >
-                <span>Download XML</span>
-              </button>
-              <button
-                type="button"
                 onClick={() => {
                   setInvoiceModalTarget(null);
                   setInvoiceData(null);
@@ -1008,22 +1106,22 @@ export default function CustomerBookingsPage() {
                 {t.close}
               </button>
             </div>
-          </div>
-        </div>
+        </Dialog>
       )}
 
       {/* DISPUTE MODAL (G33) */}
       {disputeBookingTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-6">
+        <Dialog label={t.disputeTitle} onClose={() => setDisputeBookingTarget(null)} canClose={!disputeLoading}>
             <div className="flex justify-between items-start border-b border-gray-100 pb-4">
               <div>
                 <h3 className="text-base font-bold text-gray-900">{t.disputeTitle}</h3>
                 <p className="text-xs text-gray-500 mt-1">
-                  Booking #{disputeBookingTarget.id.substring(0, 8)} · {disputeBookingTarget.total_price} {t.currency}
+                  {t.bookingRef} #{disputeBookingTarget.id.substring(0, 8)} · {sar(receiptAmounts(disputeBookingTarget).totalDue, locale)}
                 </p>
               </div>
               <button
+                type="button"
+                aria-label={t.closeDialog}
                 onClick={() => setDisputeBookingTarget(null)}
                 className="text-gray-400 hover:text-gray-600 font-bold text-sm"
               >
@@ -1032,15 +1130,16 @@ export default function CustomerBookingsPage() {
             </div>
 
             {disputeError && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-3 font-semibold">
+              <div role="alert" className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-3 font-semibold">
                 {disputeError}
               </div>
             )}
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">{t.disputeReason}</label>
+                <label htmlFor="dispute-reason" className="block text-xs font-bold text-gray-700 mb-1">{t.disputeReason}</label>
                 <textarea
+                  id="dispute-reason"
                   rows={3}
                   value={disputeReason}
                   onChange={(e) => setDisputeReason(e.target.value)}
@@ -1049,8 +1148,9 @@ export default function CustomerBookingsPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">{t.evidenceUrlOptional}</label>
+                <label htmlFor="dispute-evidence" className="block text-xs font-bold text-gray-700 mb-1">{t.evidenceUrlOptional}</label>
                 <input
+                  id="dispute-evidence"
                   type="url"
                   value={disputeEvidence}
                   onChange={(e) => setDisputeEvidence(e.target.value)}
@@ -1077,18 +1177,16 @@ export default function CustomerBookingsPage() {
                 {disputeLoading ? t.submittingDispute : t.submitDispute}
               </button>
             </div>
-          </div>
-        </div>
+        </Dialog>
       )}
 
       {/* STAFF TIPPING MODAL (G47) */}
       {tipTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white border border-gray-200 rounded-3xl w-full max-w-md p-6 shadow-2xl space-y-5">
+        <Dialog label={t.tipModalTitle} onClose={() => setTipTarget(null)} canClose={!tipLoading} panelClass="rounded-3xl max-w-md space-y-5">
             <div className="flex justify-between items-start">
               <div className="space-y-1">
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#D1AF47] block">
-                  ★ PRIMORA Staff Recognition
+                  ★ {t.tipBadge}
                 </span>
                 <h3 className="text-lg font-serif font-black text-gray-900">{t.tipModalTitle}</h3>
                 <p className="text-xs text-gray-500 font-medium">
@@ -1098,6 +1196,8 @@ export default function CustomerBookingsPage() {
                 </p>
               </div>
               <button
+                type="button"
+                aria-label={t.closeDialog}
                 onClick={() => setTipTarget(null)}
                 className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 font-bold text-sm"
               >
@@ -1118,19 +1218,20 @@ export default function CustomerBookingsPage() {
             )}
 
             {tipError && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-3 font-semibold">
+              <div role="alert" className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-3 font-semibold">
                 {tipError}
               </div>
             )}
 
             {/* Tip Amount Chips */}
             <div className="space-y-3">
-              <label className="block text-xs font-bold text-gray-700">{t.tipSelectAmount}</label>
-              <div className="grid grid-cols-4 gap-2">
+              <span id="tip-amounts" className="block text-xs font-bold text-gray-700">{t.tipSelectAmount}</span>
+              <div role="group" aria-labelledby="tip-amounts" className="grid grid-cols-4 gap-2">
                 {[10, 20, 30, 50].map((amt) => (
                   <button
                     key={amt}
                     type="button"
+                    aria-pressed={tipAmount === amt && !customTip}
                     onClick={() => {
                       setTipAmount(amt);
                       setCustomTip("");
@@ -1148,12 +1249,13 @@ export default function CustomerBookingsPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-gray-500 mb-1">{t.tipCustom}</label>
+                <label htmlFor="tip-custom" className="block text-[11px] font-bold text-gray-500 mb-1">{t.tipCustom}</label>
                 <input
+                  id="tip-custom"
                   type="number"
                   min="5"
-                  step="5"
-                  placeholder="e.g. 75"
+                  max="1000"
+                  step="1"
                   value={customTip}
                   onChange={(e) => {
                     setCustomTip(e.target.value);
@@ -1178,11 +1280,10 @@ export default function CustomerBookingsPage() {
                 onClick={handleSendTip}
                 className="flex-1 py-2.5 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl transition shadow-sm disabled:opacity-50"
               >
-                {tipLoading ? t.sendingTip : `${t.sendTipBtn} (${customTip ? customTip : tipAmount} ﷼)`}
+                {tipLoading ? t.sendingTip : `${t.sendTipBtn} (${sar(Number(customTip || tipAmount), locale)})`}
               </button>
             </div>
-          </div>
-        </div>
+        </Dialog>
       )}
     </div>
   );

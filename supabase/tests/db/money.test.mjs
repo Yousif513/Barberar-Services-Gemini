@@ -172,6 +172,23 @@ describe("refunds, payouts and reports", () => {
     assert.equal(again.invoice_number, inv.invoice_number);
   });
 
+  it("chains every invoice of a provider to the one before it, even when they are issued in the same transaction", async () => {
+    const first = await paidCompletedBooking();
+    const second = await paidCompletedBooking();
+    await sys(db, `update providers set vat_number = '310123456700003' where id = $1`, [SEED.provider1]);
+    const issued = await db.transaction(async (tx) => {
+      await tx.exec(`SET LOCAL ROLE authenticated`);
+      await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify({ role: "authenticated", sub: SEED.customer })]);
+      const a = (await tx.query(`select generate_zatca_tax_invoice($1) r`, [first.id])).rows[0].r;
+      const b = (await tx.query(`select generate_zatca_tax_invoice($1) r`, [second.id])).rows[0].r;
+      return { a, b };
+    });
+    assert.equal(issued.b.previous_invoice_hash, issued.a.invoice_hash, "the second invoice follows the first");
+    const third = await paidCompletedBooking();
+    const c = (await as(db, customer, `select generate_zatca_tax_invoice($1) r`, [third.id]))[0].r;
+    assert.equal(c.previous_invoice_hash, issued.b.invoice_hash, "a later invoice follows the newest one, not the oldest transaction start");
+  });
+
   it("charges no platform fee on a returning marketplace client", async () => {
     const fee = (await sys(db, `select calculate_booking_platform_commission('marketplace', false, 200, null) f`))[0].f;
     assert.equal(Number(fee), 0);

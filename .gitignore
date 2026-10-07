@@ -42,6 +42,7 @@ Thumbs.db
 # Supabase local environment files
 .supabase/
 supabase/.temp/
+supabase/.branches/
 supabase/functions/.env
 supabase/functions/*/deno.lock
 

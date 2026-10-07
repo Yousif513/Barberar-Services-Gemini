@@ -1,67 +1,71 @@
 -- Supabase Database Seed File
 -- Description: Seed data for categories, profiles, providers, branches, staff, services, resources, bookings, ledgers, and developer API registers in Riyadh and Jeddah.
 
+SELECT set_config('request.jwt.claims', '{"role":"service_role"}', false);
+
 -- 1. INSERT SYSTEM CATEGORIES
-INSERT INTO public.categories (id, parent_id, name_en, name_ar, slug, is_active) VALUES
-('c0000000-0000-0000-0000-000000000001', NULL, 'Grooming & Barbering', 'العناية والحلاقة', 'grooming-barbering', true),
-('c0000000-0000-0000-0000-000000000002', NULL, 'Hair Styling & Color', 'صبغ وتصفيف الشعر', 'hair-styling', true),
-('c0000000-0000-0000-0000-000000000003', NULL, 'Spa & Wellness', 'السبا والعناية الاستشفائية', 'spa-wellness', true),
-('c0000000-0000-0000-0000-000000000004', NULL, 'Nails & Manicures', 'العناية بالأظافر', 'nails-manicures', true),
-('c0000000-0000-0000-0000-000000000005', NULL, 'Makeup & Glam', 'المكياج والتجميل', 'makeup-glam', true),
-('c0000000-0000-0000-0000-000000000006', NULL, 'Apothecary & Skincare', 'العناية بالبشرة والوجه', 'apothecary-skincare', true);
+-- Missing top-level categories first, then the sub-categories under them. Existing slugs are left untouched.
+INSERT INTO public.categories (name_en, name_ar, slug, is_active) VALUES
+('Grooming & Barbering', 'العناية والحلاقة', 'grooming-barbering', true),
+('Hair Styling & Color', 'صبغ وتصفيف الشعر', 'hair-styling', true),
+('Spa & Wellness', 'السبا والعناية الاستشفائية', 'spa-wellness', true),
+('Nails & Manicures', 'العناية بالأظافر', 'nails-manicures', true),
+('Makeup & Glam', 'المكياج والتجميل', 'makeup-glam', true),
+('Apothecary & Skincare', 'العناية بالبشرة والوجه', 'apothecary-skincare', true)
+ON CONFLICT (slug) DO NOTHING;
 
-INSERT INTO public.categories (id, parent_id, name_en, name_ar, slug, is_active) VALUES
-('c0000000-0000-0000-0000-000000000101', 'c0000000-0000-0000-0000-000000000001', 'Men''s Haircut', 'قص شعر رجالي', 'mens-haircut', true),
-('c0000000-0000-0000-0000-000000000102', 'c0000000-0000-0000-0000-000000000001', 'Beard Grooming', 'تهذيب اللحية وتنعيمها', 'beard-grooming', true),
-('c0000000-0000-0000-0000-000000000201', 'c0000000-0000-0000-0000-000000000002', 'Balayage & Highlights', 'صبغة بالياج وتلوين الشعر', 'balayage-highlights', true),
-('c0000000-0000-0000-0000-000000000301', 'c0000000-0000-0000-0000-000000000003', 'Moroccan Bath', 'حمام مغربي ملكي', 'moroccan-bath', true),
-('c0000000-0000-0000-0000-000000000302', 'c0000000-0000-0000-0000-000000000003', 'Swedish Massage', 'جلسة مساج سويدي', 'swedish-massage', true),
-('c0000000-0000-0000-0000-000000000401', 'c0000000-0000-0000-0000-000000000004', 'Gel Manicure', 'جلسة جل مانيكير للأظافر', 'gel-manicure', true);
+INSERT INTO public.categories (parent_id, name_en, name_ar, slug, is_active)
+SELECT parent.id, v.name_en, v.name_ar, v.slug, true
+FROM (VALUES
+  ('grooming-barbering', 'Men''s Haircut', 'قص شعر رجالي', 'mens-haircut'),
+  ('grooming-barbering', 'Beard Grooming', 'تهذيب اللحية وتنعيمها', 'beard-grooming'),
+  ('hair-styling', 'Balayage & Highlights', 'صبغة بالياج وتلوين الشعر', 'balayage-highlights'),
+  ('spa-wellness', 'Moroccan Bath', 'حمام مغربي ملكي', 'moroccan-bath'),
+  ('spa-wellness', 'Swedish Massage', 'جلسة مساج سويدي', 'swedish-massage'),
+  ('nails-manicures', 'Gel Manicure', 'جلسة جل مانيكير للأظافر', 'gel-manicure')
+) AS v(parent_slug, name_en, name_ar, slug)
+JOIN public.categories parent ON parent.slug = v.parent_slug
+ON CONFLICT (slug) DO NOTHING;
 
 
--- 2. INSERT PROFILES (Mock authenticated user IDs mapping to profiles)
--- In live Supabase, these correspond to auth.users records.
--- Generating UUIDs for sandbox testing:
--- Customers:
---   - Yousif Al-Saud (u0000000-0000-0000-0000-000000000001)
---   - Khalid M. (u0000000-0000-0000-0000-000000000002)
--- Provider Owners:
---   - Elite Owner (u0000000-0000-0000-0000-000000000101)
---   - Sara Owner (u0000000-0000-0000-0000-000000000102)
--- Employees:
---   - Ali Al-Harbi (u0000000-0000-0000-0000-000000000201)
---   - Elena Rostova (u0000000-0000-0000-0000-000000000202)
+-- 2. INSERT PROFILES
+-- Local development accounts. Each one is an auth.users row (the sign-up trigger creates the profile) and then the
+-- profile is completed below. No password is set: sign in with the phone test code from supabase/config.toml, or create
+-- a password for a local account through the Studio.
+INSERT INTO auth.users (instance_id, id, aud, role, email, phone, email_confirmed_at, phone_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at, confirmation_token, recovery_token, email_change_token_new, email_change)
+SELECT '00000000-0000-0000-0000-000000000000', u.id, 'authenticated', 'authenticated', u.email, u.phone, NOW(), NOW(),
+       '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, NOW(), NOW(), '', '', '', ''
+FROM (VALUES
+  ('00000000-0000-0000-0000-000000000001'::uuid, 'yousif@primora.com', '966501234567'),
+  ('00000000-0000-0000-0000-000000000002'::uuid, 'khalid@primora.com', '966502345678'),
+  ('00000000-0000-0000-0000-000000000101'::uuid, 'faisal@elitebarber.sa', '966503456789'),
+  ('00000000-0000-0000-0000-000000000102'::uuid, 'sara@sarabeauty.sa', '966504567890'),
+  ('00000000-0000-0000-0000-000000000201'::uuid, 'ali@elitebarber.sa', '966505678901'),
+  ('00000000-0000-0000-0000-000000000202'::uuid, 'elena@sarabeauty.sa', '966506789012')
+) AS u(id, email, phone)
+ON CONFLICT (id) DO NOTHING;
 
--- Normally triggers handle this, but seeding directly for standalone DB resets.
--- First, disable any conflicting triggers or insert with safety:
--- (We'll assume database RLS or triggers are configured, writing standard inserts)
-
--- Seeding profiles directly (since profiles references auth.users(id), we should seed this safely.
--- Note: In local supabase testing, users might run this without auth.users existing.
--- To bypass foreign keys checking during seeding in postgres:
--- SET session_replication_role = 'replica';
--- We will write standard inserts that work in staging.
-
--- We assume profiles table matches. Let's write them:
 INSERT INTO public.profiles (id, role, first_name, last_name, email, phone_number, language_preference) VALUES
 ('00000000-0000-0000-0000-000000000001', 'customer', 'Yousif', 'Al-Saud', 'yousif@primora.com', '+966501234567', 'ar'),
 ('00000000-0000-0000-0000-000000000002', 'customer', 'Khalid', 'M.', 'khalid@primora.com', '+966502345678', 'ar'),
 ('00000000-0000-0000-0000-000000000101', 'provider_owner', 'Faisal', 'Owner', 'faisal@elitebarber.sa', '+966503456789', 'ar'),
 ('00000000-0000-0000-0000-000000000102', 'provider_owner', 'Sara', 'Owner', 'sara@sarabeauty.sa', '+966504567890', 'ar'),
 ('00000000-0000-0000-0000-000000000201', 'provider_employee', 'Ali', 'Al-Harbi', 'ali@elitebarber.sa', '+966505678901', 'ar'),
-('00000000-0000-0000-0000-000000000202', 'provider_employee', 'Elena', 'Rostova', 'elena@sarabeauty.sa', '+966506789012', 'ar');
+('00000000-0000-0000-0000-000000000202', 'provider_employee', 'Elena', 'Rostova', 'elena@sarabeauty.sa', '+966506789012', 'ar')
+ON CONFLICT (id) DO UPDATE SET role = EXCLUDED.role, first_name = EXCLUDED.first_name, last_name = EXCLUDED.last_name,
+  email = EXCLUDED.email, phone_number = EXCLUDED.phone_number, language_preference = EXCLUDED.language_preference;
 
 
 -- 3. INSERT PROVIDER PROFILES
-INSERT INTO public.providers (id, owner_id, type, business_name_en, business_name_ar, description_en, description_ar, logo_url, cover_image_url, is_verified, commission_percentage) VALUES
-('p0000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000101', 'salon_barber_shop', 'Elite Grooming Lounge', 'صالون إيليت الرجالي', 'Premier luxury grooming salon for gentlemen in Riyadh.', 'صالون الحلاقة الفاخر الأول للرجال بالرياض.', 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=150', 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=600', true, 15.00),
-('p0000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000102', 'salon_barber_shop', 'Sara Beauty Salon & Spa', 'صالون وسبا سارة للتجميل', 'Exclusive women-only luxury salon offering event makeup and hair styling.', 'صالون تجميل فاخر وحصري للسيدات بالرياض.', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=150', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=600', true, 15.00);
+INSERT INTO public.providers (id, owner_id, type, business_name_en, business_name_ar, description_en, description_ar, logo_url, cover_image_url, is_verified, commission_percentage, status) VALUES
+('a0000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000101', 'salon_barber_shop', 'Elite Grooming Lounge', 'صالون إيليت الرجالي', 'Premier luxury grooming salon for gentlemen in Riyadh.', 'صالون الحلاقة الفاخر الأول للرجال بالرياض.', 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=150', 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=600', true, 15.00, 'active'),
+('a0000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000102', 'salon_barber_shop', 'Sara Beauty Salon & Spa', 'صالون وسبا سارة للتجميل', 'Exclusive women-only luxury salon offering event makeup and hair styling.', 'صالون تجميل فاخر وحصري للسيدات بالرياض.', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=150', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=600', true, 15.00, 'active');
 
 
 -- 4. INSERT BRANCHES (Riyadh districts)
 INSERT INTO public.branches (id, provider_id, name_en, name_ar, address_text_en, address_text_ar, latitude, longitude, geofence_radius_km) VALUES
-('b0000000-0000-0000-0000-000000000001', 'p0000000-0000-0000-0000-000000000001', 'Al-Malqa Branch', 'فرع الملقا', 'Anas Bin Malik Road, Al-Malqa, Riyadh', 'طريق أنس بن مالك، حي الملقا، الرياض', 24.796300, 46.611100, 5.00),
-('b0000000-0000-0000-0000-000000000002', 'p0000000-0000-0000-0000-000000000002', 'Olaya Branch', 'فرع العليا', 'Tahlia Street, Olaya, Riyadh', 'شارع التحلية، حي العليا، الرياض', 24.711200, 46.674400, 5.00);
+('b0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', 'Al-Malqa Branch', 'فرع الملقا', 'Anas Bin Malik Road, Al-Malqa, Riyadh', 'طريق أنس بن مالك، حي الملقا، الرياض', 24.796300, 46.611100, 5.00),
+('b0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000002', 'Olaya Branch', 'فرع العليا', 'Tahlia Street, Olaya, Riyadh', 'شارع التحلية، حي العليا، الرياض', 24.711200, 46.674400, 5.00);
 
 
 -- 5. INSERT STAFF EMPLOYEES
@@ -72,18 +76,18 @@ INSERT INTO public.employees (id, branch_id, profile_id, name_en, name_ar, title
 
 -- 6. INSERT SERVICES
 INSERT INTO public.services (id, provider_id, category_id, name_en, name_ar, description_en, description_ar, base_price, base_duration_minutes, is_home_service_eligible, is_active) VALUES
-('s0000000-0000-0000-0000-000000000001', 'p0000000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000102', 'Luxury Beard Grooming', 'حلاقة اللحية الفاخرة بالمنشفة الساخنة', 'Sculpting, shaping, and steam towels.', 'تهذيب وتحديد اللحية واستخدام بخار المناشف.', 150.00, 45, true, true),
-('s0000000-0000-0000-0000-000000000002', 'p0000000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000101', 'Master Haircut', 'قص الشعر الاحترافي', 'Elite master hair wash and styling.', 'غسيل شعر احترافي وتصفيف عصري.', 120.00, 45, false, true),
-('s0000000-0000-0000-0000-000000000003', 'p0000000-0000-0000-0000-000000000002', 'c0000000-0000-0000-0000-000000000201', 'Balayage Color', 'صبغة بالياج وتصفيف شعر حرير', 'Couture hand-painted color highlights.', 'تلوين خصلات شعر يدوي وتجفيف الحرير.', 650.00, 150, false, true),
-('s0000000-0000-0000-0000-000000000004', 'p0000000-0000-0000-0000-000000000002', 'c0000000-0000-0000-0000-000000000401', 'French Gel Manicure', 'جلسة جل مانيكير فرنسي', 'Nail files and organic gel polish.', 'جلسة العناية بالأظافر وطلاء جل فرنسي.', 180.00, 45, true, true);
+('50000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', (SELECT id FROM public.categories WHERE slug = 'beard-grooming'), 'Luxury Beard Grooming', 'حلاقة اللحية الفاخرة بالمنشفة الساخنة', 'Sculpting, shaping, and steam towels.', 'تهذيب وتحديد اللحية واستخدام بخار المناشف.', 150.00, 45, true, true),
+('50000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000001', (SELECT id FROM public.categories WHERE slug = 'mens-haircut'), 'Master Haircut', 'قص الشعر الاحترافي', 'Elite master hair wash and styling.', 'غسيل شعر احترافي وتصفيف عصري.', 120.00, 45, false, true),
+('50000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000002', (SELECT id FROM public.categories WHERE slug = 'balayage-highlights'), 'Balayage Color', 'صبغة بالياج وتصفيف شعر حرير', 'Couture hand-painted color highlights.', 'تلوين خصلات شعر يدوي وتجفيف الحرير.', 650.00, 150, false, true),
+('50000000-0000-0000-0000-000000000004', 'a0000000-0000-0000-0000-000000000002', (SELECT id FROM public.categories WHERE slug = 'gel-manicure'), 'French Gel Manicure', 'جلسة جل مانيكير فرنسي', 'Nail files and organic gel polish.', 'جلسة العناية بالأظافر وطلاء جل فرنسي.', 180.00, 45, true, true);
 
 
 -- 7. MAP EMPLOYEE SERVICES
 INSERT INTO public.employee_services (employee_id, service_id, custom_price, custom_duration_minutes) VALUES
-('e0000000-0000-0000-0000-000000000001', 's0000000-0000-0000-0000-000000000001', NULL, NULL),
-('e0000000-0000-0000-0000-000000000001', 's0000000-0000-0000-0000-000000000002', NULL, NULL),
-('e0000000-0000-0000-0000-000000000002', 's0000000-0000-0000-0000-000000000003', NULL, NULL),
-('e0000000-0000-0000-0000-000000000002', 's0000000-0000-0000-0000-000000000004', NULL, NULL);
+('e0000000-0000-0000-0000-000000000001', '50000000-0000-0000-0000-000000000001', NULL, NULL),
+('e0000000-0000-0000-0000-000000000001', '50000000-0000-0000-0000-000000000002', NULL, NULL),
+('e0000000-0000-0000-0000-000000000002', '50000000-0000-0000-0000-000000000003', NULL, NULL),
+('e0000000-0000-0000-0000-000000000002', '50000000-0000-0000-0000-000000000004', NULL, NULL);
 
 
 -- 8. SET WEEKLY SHIFTS (Day 0 to 6)
@@ -116,19 +120,19 @@ INSERT INTO public.client_profiles (id, client_id, name, type, dob, gender, medi
 
 -- 10. SPA ROOMS & RESOURCES
 INSERT INTO public.resources (id, branch_id, name, category, capacity, is_active) VALUES
-('r0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000002', 'Zen Spa Room A', 'Massage Room', 1, true),
-('r0000000-0000-0000-0000-000000000002', 'b0000000-0000-0000-0000-000000000002', 'Lumiere Sauna Room', 'Sauna', 4, true);
+('f0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000002', 'Zen Spa Room A', 'Massage Room', 1, true),
+('f0000000-0000-0000-0000-000000000002', 'b0000000-0000-0000-0000-000000000002', 'Lumiere Sauna Room', 'Sauna', 4, true);
 
 
 -- 11. MOCK BOOKINGS (Scheduled in future dates)
 INSERT INTO public.bookings (id, customer_id, branch_id, employee_id, service_id, status, is_home_service, scheduled_at, duration_minutes, total_price, deposit_required, platform_commission, client_profile_id) VALUES
-('b0000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000001', 's0000000-0000-0000-0000-000000000001', 'confirmed', false, CURRENT_DATE + INTERVAL '2 days' + TIME '14:00:00', 45, 150.00, 22.50, 22.50, 'd0000000-0000-0000-0000-000000000001'),
-('b0000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000002', 'e0000000-0000-0000-0000-000000000002', 's0000000-0000-0000-0000-000000000003', 'pending_payment', false, CURRENT_DATE + INTERVAL '3 days' + TIME '16:00:00', 150, 650.00, 97.50, 97.50, NULL);
+('b0000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000001', '50000000-0000-0000-0000-000000000001', 'confirmed', false, CURRENT_DATE + INTERVAL '2 days' + TIME '14:00:00', 45, 150.00, 22.50, 22.50, 'd0000000-0000-0000-0000-000000000001'),
+('b0000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000002', 'e0000000-0000-0000-0000-000000000002', '50000000-0000-0000-0000-000000000003', 'pending_payment', false, CURRENT_DATE + INTERVAL '3 days' + TIME '16:00:00', 150, 650.00, 97.50, 97.50, NULL);
 
 
 -- 12. TRANSACTIONAL LEDGER
 INSERT INTO public.transactional_ledger (id, booking_id, payment_intent_id, total_captured, platform_share, provider_share, payout_status) VALUES
-('l0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000001', 'ch_mada_mock_99182', 150.00, 22.50, 127.50, 'pending');
+('10000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000001', 'ch_mada_mock_99182', 150.00, 22.50, 127.50, 'pending');
 
 
 -- 13. COURIER DELIVERY JOBS
@@ -141,3 +145,5 @@ INSERT INTO public.delivery_jobs (id, booking_id, pickup_address, delivery_addre
 -- credentials exist in plaintext only in the create response. A seeded key or signing secret would be a
 -- plaintext credential in the repository, and the old rows here could not apply anyway (invalid UUID
 -- literals, columns that do not exist).
+
+SELECT set_config('request.jwt.claims', '', false);

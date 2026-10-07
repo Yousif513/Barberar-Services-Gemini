@@ -304,6 +304,7 @@ export default function CustomerMessages() {
                 <input
                   type="text"
                   maxLength={2000}
+                  aria-label={t.placeholder(selectedConv.name)}
                   placeholder={t.placeholder(selectedConv.name)}
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}

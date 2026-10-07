@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -8,6 +8,11 @@ import { trackEvent } from "@/lib/analytics";
 import { ToastContainer } from "@/components/toast";
 import { Coordinates, CalculationMethod, PrayerTimes, Madhab } from "adhan";
 import { errorMessage } from "@/lib/error-message";
+import { sar } from "@/components/operations-ui";
+import { PublicDialog } from "@/components/public-dialog";
+import { formatBookingDate, formatBookingTime, riyadhDateKey } from "@/lib/booking-display.mjs";
+import { lookupPublishedAgreement, type AgreementLookup } from "@/lib/published-agreement";
+import { usePageLocale } from "@/lib/use-page-locale";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +47,7 @@ const translations = {
     startingFrom: "Starting from",
     mins: "mins",
     platformFeeSplit: "Payments are processed by Tap. Card details never touch PRIMORA.",
-    footerDesc: "Luxury Beauty, Grooming & Wellness Marketplace. Connecting premier Riyadh & Jeddah artists with selective clients.",
+    footerDesc: "A marketplace for beauty, grooming and wellness bookings in Saudi Arabia.",
     footerDiscover: "Discover",
     footerPartners: "For Partners",
     footerLegal: "Legal",
@@ -64,6 +69,19 @@ const translations = {
     combinedDuration: "Total Duration",
     combinedTotal: "Total Amount",
     joinWaitlistBtn: "Join Waitlist",
+    closeDialog: "Close",
+    authTermsBefore: "I agree to the",
+    authTermsLink: "Terms of Service",
+    authTermsMid: "and the",
+    authPrivacyLink: "Privacy Notice",
+    authTermsVersion: "version",
+    authTermsRequired: "Please accept the Terms of Service and the Privacy Notice to continue.",
+    authTermsLoading: "Checking the published terms...",
+    authTermsUnpublished: "The customer terms have not been published yet, so a new account cannot be verified here. Please try again later.",
+    authTermsError: "The published terms could not be loaded:",
+    authConsentFailed: "Your number is verified, but your consent choices could not be saved:",
+    authRetryConsent: "Retry saving consent",
+    bookAgainMissing: "The service from your previous booking is no longer offered. Pick a service below.",
     waitlistModalTitle: "Join Waitlist",
     waitlistModalDesc: "If a cancellation occurs, you will receive an automated WhatsApp notification with an exclusive 15-minute priority claim window.",
     preferredTimeStart: "Preferred Start Time",
@@ -107,7 +125,7 @@ const translations = {
     startingFrom: "تبدأ من",
     mins: "دقيقة",
     platformFeeSplit: "تتم معالجة المدفوعات عبر Tap ولا تمر بيانات البطاقة عبر بريمورا.",
-    footerDesc: "منصة الجمال الفاخرة، والعناية والعافية. نصل بين أفضل فناني الرياض وجدة والعملاء المميزين.",
+    footerDesc: "منصة لحجوزات الجمال والعناية والعافية في المملكة العربية السعودية.",
     footerDiscover: "استكشف",
     footerPartners: "للشركاء",
     footerLegal: "قانوني",
@@ -129,6 +147,19 @@ const translations = {
     combinedDuration: "إجمالي المدة",
     combinedTotal: "إجمالي المبلغ",
     joinWaitlistBtn: "انضم لقائمة الانتظار",
+    closeDialog: "إغلاق",
+    authTermsBefore: "أوافق على",
+    authTermsLink: "شروط الخدمة",
+    authTermsMid: "و",
+    authPrivacyLink: "إشعار الخصوصية",
+    authTermsVersion: "الإصدار",
+    authTermsRequired: "يرجى الموافقة على شروط الخدمة وإشعار الخصوصية للمتابعة.",
+    authTermsLoading: "جارٍ التحقق من الشروط المنشورة...",
+    authTermsUnpublished: "لم تُنشر شروط العملاء بعد، لذلك لا يمكن توثيق حساب جديد هنا. يرجى المحاولة لاحقاً.",
+    authTermsError: "تعذر تحميل الشروط المنشورة:",
+    authConsentFailed: "تم التحقق من رقمك، لكن تعذر حفظ خيارات الموافقة:",
+    authRetryConsent: "إعادة محاولة حفظ الموافقة",
+    bookAgainMissing: "الخدمة من حجزك السابق لم تعد متاحة. اختر خدمة من القائمة.",
     waitlistModalTitle: "الانضمام لقائمة الانتظار التلقائية",
     waitlistModalDesc: "في حال حدوث أي إلغاء، ستصلك رسالة واتساب فورية مع رابط حجز مخصص بنافذة حصرية مدتها 15 دقيقة.",
     preferredTimeStart: "بداية الفترة المفضلة",
@@ -202,8 +233,7 @@ interface ReviewItem {
 type LoyaltySettings = { enabled: boolean; sarPerPoint: number; minRedeemPoints: number };
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const formatSlotLabel = (iso: string) =>
-  new Date(iso).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true, timeZone: "Asia/Riyadh" });
+const formatSlotLabel = (iso: string, locale: "en" | "ar") => formatBookingTime(iso, locale);
 
 interface PackageItem {
   id: string;
@@ -230,10 +260,11 @@ export default function ShopDetailsPage() {
   const router = useRouter();
   const shopId = (params?.id as string) || "1";
 
-  const [locale, setLocale] = useState<"en" | "ar">("en");
-  // Persist the language only after the saved choice has been read (avoids overwriting it on mount).
-  const [langReady, setLangReady] = useState(false);
+  const [locale, setLocale] = usePageLocale();
   const t = translations[locale];
+  const money = (value: number) => sar(value, locale);
+  // The first bookable day shown in Riyadh, read once (a date picker cannot go before it).
+  const [todayKey] = useState(() => riyadhDateKey(new Date()));
 
   const [selectedServices, setSelectedServices] = useState<ServiceItem[]>([]);
   const selectedService = selectedServices[0] || null;
@@ -316,6 +347,9 @@ export default function ShopDetailsPage() {
   const [authPhone, setAuthPhone] = useState("");
   const [authOtpCode, setAuthOtpCode] = useState("");
   const [authOtpSent, setAuthOtpSent] = useState(false);
+  const [authConsentTerms, setAuthConsentTerms] = useState(false);
+  const [authTerms, setAuthTerms] = useState<AgreementLookup>({ state: "loading" });
+  const [authVerifiedUserId, setAuthVerifiedUserId] = useState<string | null>(null);
   const [authConsentWhatsapp, setAuthConsentWhatsapp] = useState(false);
   const [authConsentMarketing, setAuthConsentMarketing] = useState(false);
   const [authModalError, setAuthModalError] = useState("");
@@ -487,22 +521,6 @@ export default function ShopDetailsPage() {
     };
   }, [shopId, locale]);
 
-  // Synchronize direction with locale
-  useEffect(() => {
-    const savedLang = localStorage.getItem("primora_lang") as "en" | "ar";
-    if (savedLang === "en" || savedLang === "ar") {
-      setLocale(savedLang);
-    }
-    setLangReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (!langReady) return;
-    localStorage.setItem("primora_lang", locale);
-    document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
-    document.documentElement.lang = locale;
-  }, [locale, langReady]);
-
 
   useEffect(() => {
     async function loadClientProfiles() {
@@ -660,7 +678,7 @@ export default function ShopDetailsPage() {
           discount: Number(data.discount_amount),
           fundingSource: data.funding_source
         });
-        setCouponMessage(locale === "ar" ? `تم تطبيق الكوبون! وفرت ${data.discount_amount} ريال` : `Coupon applied! Saved ${data.discount_amount} SAR`);
+        setCouponMessage(locale === "ar" ? `تم تطبيق الكوبون! وفرت ${money(data.discount_amount)}` : `Coupon applied! Saved ${money(data.discount_amount)}`);
         addToast(locale === "ar" ? "تم تطبيق الكوبون بنجاح" : "Coupon applied successfully", "success");
       } else {
         const reason = locale === "ar" ? "هذا الكوبون غير صالح لهذا الحجز" : "This promo code is not valid for this booking";
@@ -694,7 +712,7 @@ export default function ShopDetailsPage() {
       }
       const balance = Number(data.remaining_balance || 0);
       setAppliedGiftCard({ code: data.code, amount: balance });
-      setGiftCardMessage(locale === "ar" ? `رصيد البطاقة ${balance} ريال، يُخصم عند تأكيد الحجز` : `Card balance ${balance} SAR, applied when the booking is created`);
+      setGiftCardMessage(locale === "ar" ? `رصيد البطاقة ${money(balance)}، يُخصم عند تأكيد الحجز` : `Card balance ${money(balance)}, applied when the booking is created`);
     } catch (err: any) {
       const msg = err.message || "Failed to apply gift card";
       setGiftCardMessage(msg);
@@ -768,18 +786,18 @@ export default function ShopDetailsPage() {
       }
       const preferredStaffId = selectedSpecialist?.id && selectedSpecialist.id !== "any" ? selectedSpecialist.id : null;
       const { data, error } = await supabase.rpc("join_waitlist", {
-        target_branch_id: shop.id,
-        target_service_id: selectedService.id,
-        target_date: selectedDate,
-        preferred_employee_id: preferredStaffId,
-        preferred_time_start: waitlistStartTime || null,
-        preferred_time_end: waitlistEndTime || null
+        p_branch_id: shop.branchId,
+        p_service_id: selectedService.id,
+        p_employee_id: preferredStaffId,
+        p_preferred_date: selectedDate,
+        p_preferred_time_start: waitlistStartTime || null,
+        p_preferred_time_end: waitlistEndTime || null
       });
       if (error) throw error;
       addToast(
         locale === "ar"
-          ? `تم انضمامك لقائمة الانتظار بنجاح! ترتيبك في القائمة: #${data?.queue_position || 1}`
-          : `Joined waitlist successfully! Your queue position: #${data?.queue_position || 1}`,
+          ? `تم انضمامك لقائمة الانتظار بنجاح! ترتيبك في القائمة: #${data?.position ?? 1}`
+          : `Joined waitlist successfully! Your queue position: #${data?.position ?? 1}`,
         "success"
       );
       setShowWaitlistModal(false);
@@ -792,7 +810,7 @@ export default function ShopDetailsPage() {
   };
 
   const toggleLanguage = () => {
-    setLocale((prev) => (prev === "en" ? "ar" : "en"));
+    setLocale(locale === "en" ? "ar" : "en");
   };
 
   const shop: ShopItem = loadedShop ?? {
@@ -803,15 +821,27 @@ export default function ShopDetailsPage() {
   };
   const filteredServices = loadedServices;
 
-  // Hook to preselect service from query parameter (?service=service_id)
+  // Preselect the service named in the link (?service=<id>, "Book again" in the customer portal) once the provider has loaded.
+  // It runs once per link, so changing the language (which reloads the provider) does not undo the visitor's own choices; a
+  // service that is no longer offered says so instead of silently showing nothing selected.
   useEffect(() => {
-    if (serviceId && filteredServices.length > 0) {
-      const match = filteredServices.find(s => s.id === serviceId);
-      if (match) {
-        setSelectedService(match);
-      }
-    }
-  }, [serviceId, filteredServices]);
+    let active = true;
+    lookupPublishedAgreement("customer_terms", errorMessage).then((result) => {
+      if (active) setAuthTerms(result);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const preselectedFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!serviceId || shopLoadState !== "ready" || preselectedFor.current === serviceId) return;
+    preselectedFor.current = serviceId;
+    const match = filteredServices.find((s) => s.id === serviceId);
+    if (match) setSelectedService(match);
+    else addToast(t.bookAgainMissing, "info");
+  }, [serviceId, shopLoadState, filteredServices, t.bookAgainMissing]);
 
   // Hook to restore pending booking selection from sessionStorage (G16)
   useEffect(() => {
@@ -930,7 +960,7 @@ export default function ShopDetailsPage() {
   const prayerWindowsForDay = selectedDate ? getPrayerWindowsForDate(selectedDate).list : [];
 
   const getAvailableSlots = () =>
-    dbSlots.map((iso) => ({ slot: iso, label: formatSlotLabel(iso), available: true, prayerLocked: false, prayerName: "" }));
+    dbSlots.map((iso) => ({ slot: iso, label: formatSlotLabel(iso, locale), available: true, prayerLocked: false, prayerName: "" }));
 
   // Estimate only; the server prices the booking (fee rules, discounts, VAT, deposit policy).
   const calculateEscrowSplit = () => {
@@ -959,6 +989,10 @@ export default function ShopDetailsPage() {
       setAuthModalError(locale === "ar" ? "يرجى إدخال رقم جوال سعودي صالح (05xxxxxxxx)" : "Please enter a valid Saudi mobile number (05XXXXXXXX)");
       return;
     }
+    if (!authConsentTerms || authTerms.state !== "ready") {
+      setAuthModalError(t.authTermsRequired);
+      return;
+    }
     setAuthModalLoading(true);
     setAuthModalError("");
     try {
@@ -969,7 +1003,7 @@ export default function ShopDetailsPage() {
       if (otpError) throw otpError;
       setAuthOtpSent(true);
     } catch (err: unknown) {
-      setAuthModalError(err instanceof Error ? err.message : "Failed to transmit OTP.");
+      setAuthModalError(errorMessage(err));
     } finally {
       setAuthModalLoading(false);
     }
@@ -985,51 +1019,50 @@ export default function ShopDetailsPage() {
       setAuthModalError(locale === "ar" ? "أدخل رمز التحقق المكون من 6 أرقام" : "Enter the 6-digit code");
       return;
     }
+    if (!authConsentTerms || authTerms.state !== "ready") {
+      setAuthModalError(t.authTermsRequired);
+      return;
+    }
     setAuthModalLoading(true);
     setAuthModalError("");
     try {
-      const { data, error: verifyError } = await supabase.auth.verifyOtp({
-        phone: digits,
-        token: authOtpCode.trim(),
-        type: "sms",
+      // A number that was already verified (the consent write failed on the last try) is not verified again: the one-time code is spent.
+      let verifiedUserId = authVerifiedUserId;
+      if (!verifiedUserId) {
+        const { data, error: verifyError } = await supabase.auth.verifyOtp({
+          phone: digits,
+          token: authOtpCode.trim(),
+          type: "sms",
+        });
+        if (verifyError || !data.user) {
+          throw verifyError ?? new Error("Invalid verification code.");
+        }
+        verifiedUserId = data.user.id;
+        setAuthVerifiedUserId(verifiedUserId);
+      }
+      // The consent tables refuse direct writes; record_consents stores the choices against the terms version that was shown.
+      // A failure stays in the dialog with a retry: the booking does not continue and no "accepted" state is claimed.
+      const purposes = ["terms_privacy"];
+      if (authConsentWhatsapp) purposes.push("whatsapp");
+      if (authConsentMarketing) purposes.push("marketing");
+      const { error: consentError } = await supabase.rpc("record_consents", {
+        p_purposes: purposes,
+        p_status: "granted",
+        p_document_version: authTerms.agreement.version,
+        p_method: "inline_booking_modal",
       });
-      if (verifyError || !data.user) {
-        throw verifyError ?? new Error("Invalid verification code.");
+      if (consentError) {
+        setAuthModalError(`${t.authConsentFailed} ${errorMessage(consentError)}`);
+        return;
       }
-      try {
-        await supabase.from("consents").insert([
-          {
-            user_id: data.user.id,
-            purpose: "terms_privacy",
-            status: "granted",
-            document_version: "v1.0",
-            method: "inline_booking_modal",
-          },
-          ...(authConsentWhatsapp ? [{
-            user_id: data.user.id,
-            purpose: "whatsapp",
-            status: "granted",
-            document_version: "v1.0",
-            method: "inline_booking_modal",
-          }] : []),
-          ...(authConsentMarketing ? [{
-            user_id: data.user.id,
-            purpose: "marketing",
-            status: "granted",
-            document_version: "v1.0",
-            method: "inline_booking_modal",
-          }] : []),
-        ]);
-      } catch (cErr) {
-        console.warn("Consent registration notice:", cErr);
-      }
+      setAuthVerifiedUserId(null);
       setShowAuthModal(false);
       addToast(locale === "ar" ? "تم التحقق بنجاح! جاري إكمال الحجز..." : "Verified successfully! Completing your booking...", "success");
       setTimeout(() => {
         handleBook();
       }, 300);
     } catch (err: unknown) {
-      setAuthModalError(err instanceof Error ? err.message : "Verification failed.");
+      setAuthModalError(errorMessage(err));
     } finally {
       setAuthModalLoading(false);
     }
@@ -1174,20 +1207,22 @@ export default function ShopDetailsPage() {
         
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-4">
-            <Link href="/services" className="text-stone-700 hover:text-stone-950 transition">
-              <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <Link href="/services" aria-label={t.discover} className="text-stone-700 hover:text-stone-950 transition">
+              <svg aria-hidden="true" className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </Link>
-            <Link href="/login" className="text-stone-700 hover:text-stone-950 transition">
-              <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <Link href="/login" aria-label={locale === "ar" ? "تسجيل الدخول" : "Log in"} className="text-stone-700 hover:text-stone-950 transition">
+              <svg aria-hidden="true" className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </Link>
           </div>
           <div className="h-4 w-px bg-stone-200"></div>
           <button
+            type="button"
             onClick={toggleLanguage}
+            aria-label={locale === "en" ? "Switch the language to Arabic" : "تغيير اللغة إلى الإنجليزية"}
             className="px-3.5 py-1.5 rounded-lg border border-stone-200 bg-stone-50 text-[10px] font-extrabold hover:border-black transition"
           >
             {locale === "en" ? "العربية" : "English"}
@@ -1360,7 +1395,7 @@ export default function ShopDetailsPage() {
                     </h2>
                     {selectedServices.length > 0 && (
                       <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-stone-900 text-stone-50 rounded-full">
-                        {selectedServices.length} {t.multiServiceCart} ({totalCombinedDuration} {t.mins} • {totalCombinedPrice} SAR)
+                        {selectedServices.length} {t.multiServiceCart} ({totalCombinedDuration} {t.mins} • {money(totalCombinedPrice)})
                       </span>
                     )}
                   </div>
@@ -1373,62 +1408,59 @@ export default function ShopDetailsPage() {
                     {filteredServices.map((srv) => {
                       const isSelected = selectedServices.some((s) => s.id === srv.id);
                       return (
-                        <div
+                        <button
+                          type="button"
                           key={srv.id}
+                          aria-pressed={isSelected}
                           onClick={() => handleToggleService(srv)}
-                          className={`bg-white border rounded-2xl p-5 cursor-pointer transition duration-150 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+                          className={`w-full text-start bg-white border rounded-2xl p-5 cursor-pointer transition duration-150 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950 ${
                             isSelected
                               ? "border-stone-950 shadow-sm ring-1 ring-stone-950"
                               : "border-stone-200 hover:border-stone-400"
                           }`}
                         >
-                          <div className="flex items-start gap-4">
-                            <div className="w-16 h-16 rounded-xl overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-100">
+                          <span className="flex items-start gap-4">
+                            <span className="block w-16 h-16 rounded-xl overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-100">
                               {srv.image ? (
-                                <img src={srv.image} alt={srv.name[locale]} className="w-full h-full object-cover" />
+                                <img src={srv.image} alt="" className="w-full h-full object-cover" />
                               ) : (
-                                <div className="w-full h-full flex items-center justify-center text-lg font-serif font-black text-stone-400">
+                                <span aria-hidden="true" className="w-full h-full flex items-center justify-center text-lg font-serif font-black text-stone-400">
                                   {srv.name[locale].charAt(0)}
-                                </div>
+                                </span>
                               )}
-                            </div>
-                            <div className={`space-y-1 ${isRTL ? "text-right" : "text-left"}`}>
-                              <div className="flex items-center gap-2">
-                                <h3 className="font-bold text-stone-900 text-sm">{srv.name[locale]}</h3>
+                            </span>
+                            <span className="block space-y-1 text-start">
+                              <span className="flex items-center gap-2">
+                                <span className="font-bold text-stone-900 text-sm">{srv.name[locale]}</span>
                                 {isSelected && (
-                                  <span className="inline-flex items-center text-[9px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                                  <span aria-hidden="true" className="inline-flex items-center text-[9px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
                                     ✓
                                   </span>
                                 )}
-                              </div>
-                              <p className="text-[10px] text-stone-400 font-semibold">
+                              </span>
+                              <span className="block text-[10px] text-stone-400 font-semibold">
                                 {srv.duration} {t.mins} • <span className="uppercase">{srv.category}</span>
-                              </p>
+                              </span>
                               <span className={`inline-block text-[8px] font-extrabold uppercase px-2 py-0.5 rounded ${
                                 srv.serviceType === "mobile" ? "bg-stone-100 text-stone-600" : "bg-stone-900 text-stone-50"
                               }`}>
                                 {srv.serviceType === "mobile" ? (locale === "ar" ? "خدمة منزلية" : "Home Service") : (locale === "ar" ? "في الصالون" : "At Venue")}
                               </span>
-                            </div>
-                          </div>
-                          <div className={`flex flex-col items-end flex-shrink-0 ${isRTL ? "sm:items-start" : "sm:items-end"}`}>
-                            <span className="text-base font-black text-stone-950">{srv.price} SAR</span>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleToggleService(srv);
-                              }}
+                            </span>
+                          </span>
+                          <span className="flex flex-col items-start sm:items-end flex-shrink-0">
+                            <span className="block text-base font-black text-stone-950">{money(srv.price)}</span>
+                            <span
                               className={`mt-2 text-[9px] font-bold px-2.5 py-1 rounded-lg border transition ${
                                 isSelected
                                   ? "bg-stone-950 text-white border-stone-950"
-                                  : "bg-stone-50 text-stone-700 border-stone-200 hover:border-stone-400"
+                                  : "bg-stone-50 text-stone-700 border-stone-200"
                               }`}
                             >
                               {isSelected ? t.removeService : t.addService}
-                            </button>
-                          </div>
-                        </div>
+                            </span>
+                          </span>
+                        </button>
                       );
                     })}
                   </div>
@@ -1442,7 +1474,9 @@ export default function ShopDetailsPage() {
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* Any Available Professional (G20) */}
-                      <div
+                      <button
+                        type="button"
+                        aria-pressed={selectedSpecialist?.id === "any"}
                         onClick={() => {
                           setSelectedSpecialist({
                             id: "any",
@@ -1453,76 +1487,78 @@ export default function ShopDetailsPage() {
                           });
                           setSelectedSlot("");
                         }}
-                        className={`bg-white border rounded-2xl p-4 cursor-pointer transition duration-150 flex items-center gap-4 ${
+                        className={`w-full text-start bg-white border rounded-2xl p-4 cursor-pointer transition duration-150 flex items-center gap-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950 ${
                           selectedSpecialist?.id === "any"
                             ? "border-stone-950 shadow-sm ring-2 ring-[#D1AF47]"
                             : "border-stone-200 hover:border-stone-400"
                         }`}
                       >
-                        <div className="w-12 h-12 rounded-full overflow-hidden bg-[#D1AF47]/15 flex items-center justify-center flex-shrink-0 border border-[#D1AF47]/40 text-[#D1AF47]">
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                        <span className="w-12 h-12 rounded-full overflow-hidden bg-[#D1AF47]/15 flex items-center justify-center flex-shrink-0 border border-[#D1AF47]/40 text-[#D1AF47]">
+                          <svg aria-hidden="true" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2m-10 0a4 4 0 11-8 0 4 4 0 018 0zm13-3h-6a3 3 0 00-3 3v2h12v-2a3 3 0 00-3-3z" />
                           </svg>
-                        </div>
-                        <div className={`space-y-0.5 ${isRTL ? "text-right" : "text-left"}`}>
-                          <h4 className="font-bold text-stone-900 text-xs">
+                        </span>
+                        <span className="block space-y-0.5 text-start">
+                          <span className="block font-bold text-stone-900 text-xs">
                             {locale === "ar" ? "أي أخصائي متاح" : "Any Available Professional"}
-                          </h4>
-                          <p className="text-[10px] text-stone-400 font-semibold">
+                          </span>
+                          <span className="block text-[10px] text-stone-400 font-semibold">
                             {locale === "ar" ? "الأسرع توفراً من الفريق" : "First available specialist"}
-                          </p>
+                          </span>
                           <span className="text-[9px] text-[#D1AF47] font-black uppercase tracking-wider block">
                             {locale === "ar" ? "موصى به" : "Recommended"}
                           </span>
-                        </div>
-                      </div>
+                        </span>
+                      </button>
 
                       {shop.specialists.map((spec) => (
-                        <div
+                        <button
+                          type="button"
                           key={spec.id}
+                          aria-pressed={selectedSpecialist?.id === spec.id}
                           onClick={() => {
                             setSelectedSpecialist(spec);
                             setSelectedSlot("");
                           }}
-                          className={`bg-white border rounded-2xl p-4 cursor-pointer transition duration-150 flex items-start gap-4 ${
+                          className={`w-full text-start bg-white border rounded-2xl p-4 cursor-pointer transition duration-150 flex items-start gap-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950 ${
                             selectedSpecialist?.id === spec.id
                               ? "border-stone-950 shadow-sm ring-1 ring-stone-950"
                               : "border-stone-200 hover:border-stone-400"
                           }`}
                         >
-                          <div className="w-12 h-12 rounded-full overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-200">
+                          <span className="block w-12 h-12 rounded-full overflow-hidden bg-stone-100 flex-shrink-0 border border-stone-200">
                             {spec.avatar ? (
-                              <img src={spec.avatar} alt={spec.name[locale]} className="w-full h-full object-cover" />
+                              <img src={spec.avatar} alt="" className="w-full h-full object-cover" />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center text-sm font-black text-stone-500">
+                              <span aria-hidden="true" className="w-full h-full flex items-center justify-center text-sm font-black text-stone-500">
                                 {spec.name[locale].charAt(0)}
-                              </div>
+                              </span>
                             )}
-                          </div>
-                          <div className={`space-y-1 flex-1 ${isRTL ? "text-right" : "text-left"}`}>
-                            <div className="flex items-center justify-between">
-                              <h4 className="font-bold text-stone-900 text-xs">{spec.name[locale]}</h4>
+                          </span>
+                          <span className="block space-y-1 flex-1 text-start">
+                            <span className="flex items-center justify-between">
+                              <span className="font-bold text-stone-900 text-xs">{spec.name[locale]}</span>
                               {spec.rating !== null && (
                                 <span className="text-[9px] text-[hsl(45,60%,50%)] font-extrabold">★ {spec.rating}</span>
                               )}
-                            </div>
-                            <p className="text-[10px] text-stone-500 font-semibold">{spec.role[locale]}</p>
+                            </span>
+                            <span className="block text-[10px] text-stone-500 font-semibold">{spec.role[locale]}</span>
                             {spec.experienceYears && (
-                              <p className="text-[9px] text-[#9A741F] font-bold">
+                              <span className="block text-[9px] text-[#9A741F] font-bold">
                                 {locale === "ar" ? `خبرة ${spec.experienceYears} سنوات` : `${spec.experienceYears} yrs exp`}
-                              </p>
+                              </span>
                             )}
                             {spec.specialties && spec.specialties.length > 0 && (
-                              <div className="flex flex-wrap gap-1 pt-0.5">
+                              <span className="flex flex-wrap gap-1 pt-0.5">
                                 {spec.specialties.map((tag, sIdx) => (
                                   <span key={sIdx} className="text-[8px] bg-stone-100 text-stone-700 font-medium px-1.5 py-0.5 rounded">
                                     {tag}
                                   </span>
                                 ))}
-                              </div>
+                              </span>
                             )}
-                          </div>
-                        </div>
+                          </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1564,7 +1600,7 @@ export default function ShopDetailsPage() {
                         </div>
                       </div>
                       <div className={`flex flex-col items-end flex-shrink-0 ${isRTL ? "sm:items-start" : "sm:items-end"}`}>
-                        <span className="text-lg font-black text-stone-950">{pkg.price} SAR</span>
+                        <span className="text-lg font-black text-stone-950">{money(pkg.price)}</span>
                         <button
                           onClick={() => handlePurchasePackage(pkg)}
                           disabled={isLoading}
@@ -1643,7 +1679,7 @@ export default function ShopDetailsPage() {
                         <div key={srv.id} className="bg-white border border-stone-200/80 rounded-lg p-2 flex items-center justify-between gap-2">
                           <div>
                             <h4 className="font-bold text-xs text-stone-900">{srv.name[locale]}</h4>
-                            <p className="text-[10px] text-stone-400">{srv.duration} {t.mins} • {srv.price} SAR</p>
+                            <p className="text-[10px] text-stone-400">{srv.duration} {t.mins} • {money(srv.price)}</p>
                           </div>
                           <button
                             type="button"
@@ -1688,9 +1724,11 @@ export default function ShopDetailsPage() {
 
                   {/* Date selection input */}
                   <div className="space-y-2">
-                    <h3 className="font-bold text-xs text-stone-850">{t.selectDateTitle}</h3>
+                    <label htmlFor="shop-date" className="block font-bold text-xs text-stone-850">{t.selectDateTitle}</label>
                     <input
+                      id="shop-date"
                       type="date"
+                      min={todayKey}
                       value={selectedDate}
                       onChange={(e) => {
                         setSelectedDate(e.target.value);
@@ -1723,7 +1761,7 @@ export default function ShopDetailsPage() {
                           </div>
                           <p className="text-[9px] text-stone-600 leading-normal">
                             {prayerWindowsForDay
-                              .map((w: any) => `${locale === "ar" ? w.nameAr : w.nameEn} ${formatSlotLabel(w.start.toISOString())}–${formatSlotLabel(w.end.toISOString())}`)
+                              .map((w: any) => `${locale === "ar" ? w.nameAr : w.nameEn} ${formatSlotLabel(w.start.toISOString(), locale)}–${formatSlotLabel(w.end.toISOString(), locale)}`)
                               .join(" · ")}
                           </p>
                         </div>
@@ -1746,6 +1784,7 @@ export default function ShopDetailsPage() {
                             <button
                               key={slot}
                               type="button"
+                              aria-pressed={isSelected}
                               disabled={isDisabled}
                               onClick={() => {
                                 setSelectedSlot(slot);
@@ -1784,10 +1823,11 @@ export default function ShopDetailsPage() {
 
                   {/* Dependents / Pets Selector */}
                   <div className="space-y-1.5 border-t border-stone-150 pt-4">
-                    <label className={`text-[10px] uppercase font-bold text-stone-400 block ${isRTL ? "text-right" : "text-left"}`}>
+                    <label htmlFor="shop-client-profile" className={`text-[10px] uppercase font-bold text-stone-400 block ${isRTL ? "text-right" : "text-left"}`}>
                       {locale === "ar" ? "تعيين تابع / حيوان أليف (اختياري)" : "Assign Dependent / Pet (Optional)"}
                     </label>
                     <select
+                      id="shop-client-profile"
                       value={selectedClientProfileId}
                       onChange={(e) => setSelectedClientProfileId(e.target.value)}
                       className={`w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs text-stone-700 outline-none focus:border-stone-950 font-bold ${isRTL ? "text-right" : "text-left"}`}
@@ -1903,8 +1943,8 @@ export default function ShopDetailsPage() {
                           </div>
                           <p className="text-[9px] text-amber-800">
                             {locale === "ar"
-                              ? `خصم حتى ${Math.round(maxRedeemablePoints * loyaltySettings.sarPerPoint * 100) / 100} ريال`
-                              : `Redeem for up to ${Math.round(maxRedeemablePoints * loyaltySettings.sarPerPoint * 100) / 100} SAR off`}
+                              ? `خصم حتى ${money(Math.round(maxRedeemablePoints * loyaltySettings.sarPerPoint * 100) / 100)}`
+                              : `Redeem for up to ${money(Math.round(maxRedeemablePoints * loyaltySettings.sarPerPoint * 100) / 100)} off`}
                           </p>
                         </div>
                         <button
@@ -1926,35 +1966,35 @@ export default function ShopDetailsPage() {
                   <div className="border-t border-stone-150 pt-4 space-y-2.5 text-xs text-stone-500 font-semibold">
                     <div className="flex justify-between">
                       <span>{t.priceLabel}</span>
-                      <span className="text-stone-900 font-bold">{splits.grossTotal} SAR</span>
+                      <span className="text-stone-900 font-bold">{money(splits.grossTotal)}</span>
                     </div>
                     {splits.discount > 0 && (
                       <div className="flex justify-between text-[11px] text-emerald-600 font-bold">
                         <span>{locale === "ar" ? "الخصم (كوبون / نقاط)" : "Discount (promo / points)"}</span>
-                        <span>-{splits.discount} SAR</span>
+                        <span>-{money(splits.discount)}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-[10px] text-stone-400">
                       <span>{locale === "ar" ? "ضريبة القيمة المضافة 15%" : "VAT 15%"}</span>
-                      <span>{splits.vat} SAR</span>
+                      <span>{money(splits.vat)}</span>
                     </div>
                     {splits.gift > 0 && (
                       <div className="flex justify-between text-[11px] text-emerald-600 font-bold">
                         <span>{locale === "ar" ? "بطاقة الهدية" : "Gift card"}</span>
-                        <span>-{splits.gift} SAR</span>
+                        <span>-{money(splits.gift)}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-[10px] text-stone-400">
                       <span>{t.depositLabel}{customerEligibility?.requiresPrepayment ? "" : ` (${shop.depositPercentage}%)`}</span>
-                      <span>{splits.deposit} SAR</span>
+                      <span>{money(splits.deposit)}</span>
                     </div>
                     <div className="flex justify-between text-[10px] text-stone-400">
                       <span>{t.venueBalanceLabel}</span>
-                      <span>{splits.balance} SAR</span>
+                      <span>{money(splits.balance)}</span>
                     </div>
                     <div className="border-t border-stone-100 pt-3 flex justify-between text-sm font-black text-stone-950">
                       <span>{t.dueNowLabel}</span>
-                      <span className="text-[hsl(45,60%,45%)]">{splits.deposit} SAR</span>
+                      <span className="text-[hsl(45,60%,45%)]">{money(splits.deposit)}</span>
                     </div>
                     <p className="text-[9px] text-stone-400 font-normal">
                       {locale === "ar" ? "تقدير؛ السعر النهائي يُحسب عند إنشاء الحجز." : "Estimate; the final price is calculated when the booking is created."}
@@ -2022,7 +2062,7 @@ export default function ShopDetailsPage() {
                     disabled={isLoading || !selectedDate || !selectedSlot || !selectedSpecialist || !!customerEligibility?.isBlocked}
                     className="w-full py-3 bg-stone-900 hover:bg-stone-850 text-stone-50 font-bold uppercase tracking-wider text-xs rounded-xl transition shadow-sm disabled:opacity-45"
                   >
-                    {isLoading ? "..." : `${t.payButton} (${splits.deposit} SAR)`}
+                    {isLoading ? "..." : `${t.payButton} (${money(splits.deposit)})`}
                   </button>
                 </div>
               ) : (
@@ -2086,11 +2126,11 @@ export default function ShopDetailsPage() {
 
       {/* WAITLIST MODAL (G44) */}
       {showWaitlistModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-stone-200 space-y-6">
+        <PublicDialog label={t.waitlistModalTitle} onClose={() => setShowWaitlistModal(false)} canClose={!isSubmittingWaitlist}>
+          <div className="space-y-6">
             <div className="flex items-center justify-between border-b border-stone-150 pb-4">
               <div className="flex items-center gap-2">
-                <span className="p-2 rounded-xl bg-amber-50 text-amber-700 font-bold">
+                <span aria-hidden="true" className="p-2 rounded-xl bg-amber-50 text-amber-700 font-bold">
                   ⏱
                 </span>
                 <h3 className="font-serif font-black text-stone-900 text-lg">
@@ -2098,10 +2138,12 @@ export default function ShopDetailsPage() {
                 </h3>
               </div>
               <button
+                type="button"
                 onClick={() => setShowWaitlistModal(false)}
-                className="text-stone-400 hover:text-stone-700 p-1 rounded-lg"
+                aria-label={t.closeDialog}
+                className="text-stone-400 hover:text-stone-700 p-1 rounded-lg focus-visible:outline-2 focus-visible:outline-stone-950"
               >
-                ✕
+                <span aria-hidden="true">✕</span>
               </button>
             </div>
 
@@ -2112,7 +2154,9 @@ export default function ShopDetailsPage() {
             <div className="space-y-4 text-xs font-semibold text-stone-700">
               <div className="bg-stone-50 p-3.5 rounded-2xl border border-stone-200/70 space-y-1">
                 <span className="text-[10px] text-stone-400 uppercase font-bold block">{t.selectDateTitle}</span>
-                <p className="font-bold text-stone-900">{selectedDate || (locale === "ar" ? "لم يتم تحديد تاريخ" : "No date selected")}</p>
+                <p className="font-bold text-stone-900">
+                  {selectedDate ? formatBookingDate(`${selectedDate}T12:00:00+03:00`, locale) : (locale === "ar" ? "لم يتم تحديد تاريخ" : "No date selected")}
+                </p>
                 {selectedService && (
                   <p className="text-[10px] text-stone-500 pt-1">
                     {selectedService.name[locale]} ({totalCombinedDuration} {t.mins})
@@ -2122,10 +2166,11 @@ export default function ShopDetailsPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase font-bold text-stone-500 block">
+                  <label htmlFor="waitlist-start" className="text-[10px] uppercase font-bold text-stone-500 block">
                     {t.preferredTimeStart}
                   </label>
                   <input
+                    id="waitlist-start"
                     type="time"
                     value={waitlistStartTime}
                     onChange={(e) => setWaitlistStartTime(e.target.value)}
@@ -2133,10 +2178,11 @@ export default function ShopDetailsPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase font-bold text-stone-500 block">
+                  <label htmlFor="waitlist-end" className="text-[10px] uppercase font-bold text-stone-500 block">
                     {t.preferredTimeEnd}
                   </label>
                   <input
+                    id="waitlist-end"
                     type="time"
                     value={waitlistEndTime}
                     onChange={(e) => setWaitlistEndTime(e.target.value)}
@@ -2150,7 +2196,8 @@ export default function ShopDetailsPage() {
               <button
                 type="button"
                 onClick={() => setShowWaitlistModal(false)}
-                className="flex-1 py-3 border border-stone-200 rounded-xl text-xs font-bold text-stone-600 hover:bg-stone-50 transition"
+                disabled={isSubmittingWaitlist}
+                className="flex-1 py-3 border border-stone-200 rounded-xl text-xs font-bold text-stone-600 hover:bg-stone-50 transition disabled:opacity-50"
               >
                 {locale === "ar" ? "إلغاء" : "Cancel"}
               </button>
@@ -2164,31 +2211,76 @@ export default function ShopDetailsPage() {
               </button>
             </div>
           </div>
-        </div>
+        </PublicDialog>
       )}
 
       {/* AUTH OTP MODAL */}
       {showAuthModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-stone-200 space-y-5">
+        <PublicDialog
+          label={locale === "ar" ? "التحقق من رقم الجوال" : "Verify Mobile Number"}
+          onClose={() => setShowAuthModal(false)}
+          canClose={!authModalLoading}
+        >
+          <div className="space-y-5">
             <div className="flex items-center justify-between border-b border-stone-150 pb-3">
               <h3 className="font-serif font-black text-stone-900 text-base">
                 {locale === "ar" ? "التحقق من رقم الجوال" : "Verify Mobile Number"}
               </h3>
-              <button onClick={() => setShowAuthModal(false)} className="text-stone-400 hover:text-stone-700">✕</button>
+              <button
+                type="button"
+                onClick={() => setShowAuthModal(false)}
+                aria-label={t.closeDialog}
+                className="text-stone-400 hover:text-stone-700 p-1 rounded-lg focus-visible:outline-2 focus-visible:outline-stone-950"
+              >
+                <span aria-hidden="true">✕</span>
+              </button>
             </div>
             {!authOtpSent ? (
               <div className="space-y-4">
                 <p className="text-xs text-stone-500">
                   {locale === "ar" ? "أدخل رقم الجوال لتأكيد الحجز وتلقي تنبيهات الموعد عبر الواتساب:" : "Enter your Saudi phone number to complete booking and receive WhatsApp updates:"}
                 </p>
-                <input
-                  type="tel"
-                  placeholder="05XXXXXXXX"
-                  value={authPhone}
-                  onChange={(e) => setAuthPhone(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-stone-900 outline-none focus:border-stone-950"
-                />
+                <div>
+                  <label htmlFor="auth-phone" className="block text-[10px] uppercase font-bold text-stone-500 mb-1.5">
+                    {locale === "ar" ? "رقم الجوال" : "Mobile number"}
+                  </label>
+                  <input
+                    id="auth-phone"
+                    type="tel"
+                    dir="ltr"
+                    autoComplete="tel"
+                    placeholder="05XXXXXXXX"
+                    value={authPhone}
+                    onChange={(e) => setAuthPhone(e.target.value)}
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-stone-900 outline-none focus:border-stone-950"
+                  />
+                </div>
+                {authTerms.state === "loading" && (
+                  <p role="status" className="text-[11px] text-stone-500">{t.authTermsLoading}</p>
+                )}
+                {authTerms.state === "unpublished" && (
+                  <p role="alert" className="text-[11px] font-bold text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3">{t.authTermsUnpublished}</p>
+                )}
+                {authTerms.state === "error" && (
+                  <p role="alert" className="text-[11px] font-bold text-red-700 bg-red-50 border border-red-200 rounded-xl p-3">{t.authTermsError} {authTerms.message}</p>
+                )}
+                <label className="flex items-start gap-2 text-[11px] text-stone-700">
+                  <input
+                    type="checkbox"
+                    checked={authConsentTerms}
+                    onChange={(e) => setAuthConsentTerms(e.target.checked)}
+                    required
+                    aria-required="true"
+                    className="mt-0.5 accent-stone-900"
+                  />
+                  <span>
+                    {t.authTermsBefore}{" "}
+                    <Link href="/terms" target="_blank" className="font-bold underline text-stone-900">{t.authTermsLink}</Link>{" "}
+                    {t.authTermsMid}{" "}
+                    <Link href="/privacy" target="_blank" className="font-bold underline text-stone-900">{t.authPrivacyLink}</Link>
+                    {authTerms.state === "ready" ? ` (${t.authTermsVersion} ${authTerms.agreement.version})` : ""}
+                  </span>
+                </label>
                 <label className="flex items-start gap-2 text-[11px] text-stone-600">
                   <input type="checkbox" checked={authConsentWhatsapp} onChange={(e) => setAuthConsentWhatsapp(e.target.checked)} className="mt-0.5 accent-stone-900" />
                   <span>{locale === "ar" ? "أوافق على استلام تأكيد الحجز والتذكيرات عبر واتساب." : "Send my booking confirmation and reminders on WhatsApp."}</span>
@@ -2197,41 +2289,48 @@ export default function ShopDetailsPage() {
                   <input type="checkbox" checked={authConsentMarketing} onChange={(e) => setAuthConsentMarketing(e.target.checked)} className="mt-0.5 accent-stone-900" />
                   <span>{locale === "ar" ? "أوافق على استلام العروض التسويقية (اختياري)." : "Send me offers and promotions (optional)."}</span>
                 </label>
-                {authModalError && <p className="text-xs text-red-600 font-bold">{authModalError}</p>}
+                {authModalError && <p role="alert" className="text-xs text-red-600 font-bold">{authModalError}</p>}
                 <button
                   type="button"
                   onClick={handleModalSendOtp}
-                  disabled={authModalLoading}
-                  className="w-full py-3 bg-stone-950 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
+                  disabled={authModalLoading || authTerms.state !== "ready" || !authConsentTerms}
+                  className="w-full py-3 bg-stone-950 text-white rounded-xl text-xs font-bold uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {authModalLoading ? "..." : (locale === "ar" ? "إرسال رمز التحقق" : "Send Verification Code")}
                 </button>
               </div>
             ) : (
               <div className="space-y-4">
-                <p className="text-xs text-stone-500">
-                  {locale === "ar" ? "أدخل رمز التحقق (OTP) المرسل إلى جوالك:" : "Enter the 6-digit OTP sent to your phone:"}
-                </p>
-                <input
-                  type="text"
-                  maxLength={6}
-                  value={authOtpCode}
-                  onChange={(e) => setAuthOtpCode(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-center text-lg font-mono font-bold tracking-widest text-stone-900 outline-none focus:border-stone-950"
-                />
-                {authModalError && <p className="text-xs text-red-600 font-bold">{authModalError}</p>}
+                <div>
+                  <label htmlFor="auth-otp" className="block text-xs text-stone-500 mb-2">
+                    {locale === "ar" ? "أدخل رمز التحقق (OTP) المرسل إلى جوالك:" : "Enter the 6-digit OTP sent to your phone:"}
+                  </label>
+                  <input
+                    id="auth-otp"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    dir="ltr"
+                    maxLength={6}
+                    value={authOtpCode}
+                    onChange={(e) => setAuthOtpCode(e.target.value)}
+                    disabled={authVerifiedUserId !== null}
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-center text-lg font-mono font-bold tracking-widest text-stone-900 outline-none focus:border-stone-950 disabled:opacity-60"
+                  />
+                </div>
+                {authModalError && <p role="alert" className="text-xs text-red-600 font-bold">{authModalError}</p>}
                 <button
                   type="button"
                   onClick={handleModalVerifyOtp}
                   disabled={authModalLoading}
-                  className="w-full py-3 bg-stone-950 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
+                  className="w-full py-3 bg-stone-950 text-white rounded-xl text-xs font-bold uppercase tracking-wider disabled:opacity-50"
                 >
-                  {authModalLoading ? "..." : (locale === "ar" ? "تأكيد ومتابعة الحجز" : "Confirm & Continue")}
+                  {authModalLoading ? "..." : authVerifiedUserId ? t.authRetryConsent : (locale === "ar" ? "تأكيد ومتابعة الحجز" : "Confirm & Continue")}
                 </button>
               </div>
             )}
           </div>
-        </div>
+        </PublicDialog>
       )}
 
       <ToastContainer toasts={toasts} onRemove={removeToast} />

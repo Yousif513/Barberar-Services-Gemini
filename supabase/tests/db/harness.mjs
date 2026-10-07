@@ -1,7 +1,10 @@
 // Database test harness: a Supabase-shaped Postgres (PGlite) with every migration applied.
 // Mirrors the Supabase details that matter for authorization: extensions live in the
-// "extensions" schema, anon/authenticated/service_role exist, public objects are granted to
-// them by default privileges, and auth.uid()/auth.jwt() read request.jwt.claims.
+// "extensions" schema, anon/authenticated/service_role exist, functions are executable by default
+// (as on Supabase), and auth.uid()/auth.jwt() read request.jwt.claims.
+// Tables, views and sequences are NOT granted to the client roles by default: current Supabase
+// projects start with no Data API privileges, so every table must carry explicit grants
+// (see 20261006220000_explicit_data_api_grants.sql). Granting them here would hide a missing grant.
 import { PGlite } from "@electric-sql/pglite";
 import { btree_gist } from "@electric-sql/pglite/contrib/btree_gist";
 import { pgcrypto } from "@electric-sql/pglite/contrib/pgcrypto";
@@ -26,9 +29,7 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 GRANT anon, authenticated, service_role TO postgres;
 GRANT USAGE ON SCHEMA public, extensions TO anon, authenticated, service_role;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA extensions TO anon, authenticated, service_role;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon, authenticated, service_role;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
 CREATE SCHEMA IF NOT EXISTS auth;
 CREATE TABLE IF NOT EXISTS auth.users (
   instance_id uuid, id uuid PRIMARY KEY DEFAULT gen_random_uuid(), aud text, role text,
@@ -56,10 +57,15 @@ export function migrationFiles() {
 
 // Applies every migration in its own transaction, as `supabase db push` does, and stops at
 // the first failure so a broken chain is reported exactly as the CLI would report it.
-export async function createMigratedDb() {
+// activateDemo: the migrations leave the three demo salons switched off (nobody can book a salon that does not exist), but the
+// tests need salons that can be booked, so the harness turns them on explicitly. Pass false to test the migrated state itself.
+export async function createMigratedDb({ activateDemo = true } = {}) {
   const db = new PGlite({ extensions: { btree_gist, pgcrypto, uuid_ossp } });
   await db.exec(BOOTSTRAP);
   await db.exec(`ALTER DATABASE postgres SET search_path TO "$user", public, extensions; SET search_path TO "$user", public, extensions;`);
+  // A hosted Supabase session runs in UTC. The tests must too, so a time of day compared in the session time zone instead of
+  // Asia/Riyadh fails here the way it fails in production (it used to pass on a developer machine set to UTC+3).
+  await db.exec(`ALTER DATABASE postgres SET timezone TO 'UTC'; SET TIME ZONE 'UTC';`);
   for (const m of migrationFiles()) {
     try {
       await db.exec("BEGIN;");
@@ -69,6 +75,11 @@ export async function createMigratedDb() {
       await db.exec("ROLLBACK;").catch(() => {});
       throw new Error(`Migration ${m.name} failed: ${error.message}`);
     }
+  }
+  if (activateDemo) {
+    await db.exec(`select set_config('request.jwt.claims', '{"role":"service_role"}', false);
+      update public.providers set status = 'active', is_verified = true where id = any (public.demo_provider_ids());
+      select set_config('request.jwt.claims', '', false);`);
   }
   return db;
 }
@@ -122,7 +133,7 @@ export async function createUser(db, { role = "customer", phone = null, verified
 
 // A future date (Riyadh) on which the given employee has working hours.
 export async function nextWorkingDate(db, employeeId, minDaysAhead = 3) {
-  const rows = await sys(db, `select distinct day_of_week from employee_availability where employee_id = $1`, [employeeId]);
+  const rows = await sys(db, `select distinct day_of_week from employee_availability where employee_id = $1 and is_working_day`, [employeeId]);
   const days = rows.map((r) => r.day_of_week);
   let d = new Date(Date.now() + minDaysAhead * 86400000);
   for (let i = 0; i < 14 && !days.includes(d.getUTCDay()); i += 1) d = new Date(d.getTime() + 86400000);

@@ -3,60 +3,71 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
 
 const translations = {
   en: {
     backHome: "Back to Home",
     privacy: "Privacy Policy",
     title: "Privacy & Data Protection",
-    subtitle: "Commitment to Saudi Personal Data Protection Law (PDPL) principles",
+    subtitle: "How Primora handles your personal data and how to exercise your data rights.",
     section1Title: "1. Data Collection",
     section1Desc: "We collect customer contact information, appointment preferences, in-app messages, and service address details. Card details are entered on Tap Payments' hosted page and are never received or stored by Primora.",
-    section2Title: "2. Personal Data Protection Principles",
-    section2Desc: "Primora is committed to data protection principles under the Saudi PDPL. We process personal data transparently based on user consent and legitimate service delivery needs. Users may contact our team to exercise data subject rights including access, correction, or deletion requests.",
+    section2Title: "2. How We Use Your Data",
+    section2Desc: "We process personal data to deliver the booking service, and for optional purposes such as WhatsApp messages and offers only where you gave consent. You can ask for access, correction, export or erasure of your data with the request form below.",
     section3Title: "3. Share & Disclosure",
-    section3Desc: "Client location and contact numbers are only shared with the selected service specialist once a booking is confirmed, and are protected through secure platform access. We never sell or distribute your personal records to third-party marketing companies.",
-    dsrTitle: "Exercise Your PDPL Data Rights",
-    dsrDesc: "Submit a statutory Data Subject Request. In accordance with the Saudi PDPL, our team fulfills verified requests within a 30-day statutory deadline.",
+    section3Desc: "Your location and contact number are shared only with the specialist you selected, once a booking is confirmed. We do not sell your personal records to third-party marketing companies.",
+    dsrBadge: "Data request",
+    dsrTitle: "Exercise Your Data Rights",
+    dsrDesc: "Submit a request about your personal data. A due date 30 days after you submit is recorded on the request, and our team reviews it.",
     reqTypeLabel: "Request Type",
-    reqAccess: "Access to Personal Records (حق الوصول)",
-    reqRectify: "Rectify / Update Information (حق التصحيح)",
-    reqErase: "Erasure / Destruction of Data (حق الإتلاف / المحو)",
-    reqExport: "Data Portability / Export (حق نقل البيانات)",
+    reqAccess: "Access to my personal records",
+    reqRectify: "Correct or update my information",
+    reqErase: "Erase my data",
+    reqExport: "Export my data",
     detailsLabel: "Request Details & Context",
     detailsPlaceholder: "Describe your request or specify records you wish to access or update...",
-    submitBtn: "Submit Statutory Request",
+    submitBtn: "Submit Request",
     submittingBtn: "Submitting...",
-    loginPrompt: "Please sign in to your Primora account before submitting a Data Subject Request.",
+    loginPrompt: "Please sign in to your Primora account before submitting a data request.",
     loginBtn: "Sign In to Submit",
-    dsrSuccess: "Your request has been officially recorded with a 30-day statutory due date. Reference: ",
+    dsrSuccess: "Your request was recorded. Due date:",
+    dsrExisting: "You already have an open request of this kind. Its due date is",
+    dsrReference: "Reference:",
+    dsrFailed: "The request could not be recorded:",
+    contact: "For questions about your personal data, use the request form above or write to",
     footerText: "Built for Riyadh, Saudi Arabia. All rights reserved."
   },
   ar: {
     backHome: "العودة للرئيسية",
     privacy: "سياسة الخصوصية",
     title: "الخصوصية وحماية البيانات",
-    subtitle: "الالتزام بمبادئ نظام حماية البيانات الشخصية السعودي (PDPL)",
+    subtitle: "كيف تتعامل بريمورا مع بياناتك الشخصية وكيف تمارس حقوقك.",
     section1Title: "1. جمع البيانات",
     section1Desc: "نجمع معلومات الاتصال وتفضيلات المواعيد والرسائل داخل المنصة وتفاصيل عنوان تقديم الخدمة. تُدخل بيانات البطاقة في صفحة Tap Payments المستضافة ولا تستلمها بريمورا ولا تخزنها.",
-    section2Title: "2. مبادئ حماية البيانات الشخصية",
-    section2Desc: "تلتزم بريمورا بتطبيق مبادئ حماية البيانات الشخصية وفقاً للأنظمة المعمول بها في المملكة. تتم معالجة بياناتك بشفافية لتقديم خدمات المنصة وبناءً على موافقتك. يمكنك التواصل مع فريقنا لممارسة حقوق صاحب البيانات بما في ذلك طلب الوصول أو التصحيح أو الحذف.",
+    section2Title: "2. كيف نستخدم بياناتك",
+    section2Desc: "نعالج بياناتك الشخصية لتقديم خدمة الحجز، ولأغراض اختيارية مثل رسائل واتساب والعروض فقط عند موافقتك. يمكنك طلب الاطلاع على بياناتك أو تصحيحها أو تصديرها أو محوها عبر نموذج الطلب أدناه.",
     section3Title: "3. المشاركة والإفصاح",
-    section3Desc: "يتم مشاركة موقع العميل وبيانات الاتصال فقط مع الأخصائي المختار بعد تأكيد الحجز وحمايتها عبر قنوات وصول آمنة. نحن لا نبيع أو نشارك سجلاتك الشخصية لشركات التسويق الخارجية.",
-    dsrTitle: "ممارسة حقوق صاحب البيانات (نظام PDPL)",
-    dsrDesc: "يمكنك تقديم طلب رسمي لممارسة حقوقك النظامية. تلتزم المنصة بالاستجابة للطلبات المعتمدة خلال المهلة النظامية المحددة بـ 30 يوماً.",
+    section3Desc: "تُشارَك بيانات موقعك ورقم جوالك مع الأخصائي الذي اخترته فقط بعد تأكيد الحجز. نحن لا نبيع سجلاتك الشخصية لشركات التسويق الخارجية.",
+    dsrBadge: "طلب بيانات",
+    dsrTitle: "ممارسة حقوقك في بياناتك",
+    dsrDesc: "قدّم طلباً بخصوص بياناتك الشخصية. يُسجَّل على الطلب موعد استحقاق بعد 30 يوماً من تقديمه، ويراجعه فريقنا.",
     reqTypeLabel: "نوع الطلب",
-    reqAccess: "حق الوصول والاطلاع على البيانات الشخصية",
-    reqRectify: "حق تصحيح وتحديث البيانات",
-    reqErase: "حق الإتلاف / محو البيانات الشخصية",
-    reqExport: "حق نقل البيانات الشخصية (Portability)",
+    reqAccess: "الاطلاع على بياناتي الشخصية",
+    reqRectify: "تصحيح بياناتي أو تحديثها",
+    reqErase: "محو بياناتي",
+    reqExport: "تصدير بياناتي",
     detailsLabel: "تفاصيل ومبررات الطلب",
     detailsPlaceholder: "اذكر تفاصيل طلبك أو السجلات المحددة المطلوب الاطلاع عليها أو معالجتها...",
-    submitBtn: "إرسال الطلب النظامي",
+    submitBtn: "إرسال الطلب",
     submittingBtn: "جاري الإرسال...",
-    loginPrompt: "يرجى تسجيل الدخول بحسابك في بريمورا لتقديم طلب ممارسة حقوق صاحب البيانات.",
+    loginPrompt: "يرجى تسجيل الدخول بحسابك في بريمورا لتقديم طلب بخصوص بياناتك.",
     loginBtn: "تسجيل الدخول للتقديم",
-    dsrSuccess: "تم تسجيل طلبك رسمياً وتعيين مهلة الرد النظامية (30 يوماً). رقم الطلب: ",
+    dsrSuccess: "تم تسجيل طلبك. موعد الاستحقاق:",
+    dsrExisting: "لديك طلب مفتوح من هذا النوع بالفعل. موعد استحقاقه",
+    dsrReference: "المرجع:",
+    dsrFailed: "تعذر تسجيل الطلب:",
+    contact: "للاستفسار عن بياناتك الشخصية استخدم نموذج الطلب أعلاه أو راسلنا على",
     footerText: "صمم خصيصاً للرياض، المملكة العربية السعودية. جميع الحقوق محفوظة."
   }
 };
@@ -68,7 +79,7 @@ export default function PrivacyPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionSuccess, setSubmissionSuccess] = useState("");
   const [submissionError, setSubmissionError] = useState("");
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ id: string } | null>(null);
   const t = translations[locale];
 
   useEffect(() => {
@@ -100,23 +111,24 @@ export default function PrivacyPage() {
     setSubmissionError("");
 
     try {
-      const { data, error } = await supabase
-        .from("data_subject_requests")
-        .insert({
-          user_id: user.id,
-          request_type: requestType,
-          details: details.trim() || null,
-          status: "pending"
-        })
-        .select("id")
-        .single();
+      // The table refuses direct inserts: submit_data_request sets the owner, the status and the 30-day due date (Riyadh date)
+      // on the server, and returns the request that is already open when the same kind was submitted before.
+      const { data, error } = await supabase.rpc("submit_data_request", {
+        p_request_type: requestType,
+        p_details: details.trim() || null,
+      });
 
       if (error) throw error;
 
-      setSubmissionSuccess(`${t.dsrSuccess} ${data.id}`);
+      const result = data as { created?: boolean; id?: string; due_date?: string } | null;
+      if (!result?.id) throw new Error(t.dsrFailed);
+      const due = result.due_date
+        ? new Intl.DateTimeFormat(locale === "ar" ? "ar-SA" : "en-GB", { dateStyle: "long", timeZone: "Asia/Riyadh" }).format(new Date(`${result.due_date}T12:00:00+03:00`))
+        : "";
+      setSubmissionSuccess(`${result.created === false ? t.dsrExisting : t.dsrSuccess} ${due}. ${t.dsrReference} ${result.id}`);
       setDetails("");
     } catch (err: unknown) {
-      setSubmissionError(err instanceof Error ? err.message : "Failed to record request.");
+      setSubmissionError(`${t.dsrFailed} ${errorMessage(err)}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -173,19 +185,19 @@ export default function PrivacyPage() {
         {/* DSR Interactive Form (G13) */}
         <div className="rounded-2xl border border-[#A57C32]/30 bg-white p-6 sm:p-8 shadow-sm space-y-6">
           <div>
-            <span className="text-[10px] font-black uppercase tracking-wider text-[#A57C32]">Saudi PDPL Compliance</span>
+            <span className="text-[10px] font-black uppercase tracking-wider text-[#A57C32]">{t.dsrBadge}</span>
             <h3 className="text-lg font-serif font-bold text-stone-900 mt-1">{t.dsrTitle}</h3>
             <p className="text-xs text-stone-600 leading-relaxed mt-1">{t.dsrDesc}</p>
           </div>
 
           {submissionSuccess && (
-            <div className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-xs font-semibold text-emerald-800">
+            <div role="status" className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-xs font-semibold text-emerald-800">
               {submissionSuccess}
             </div>
           )}
 
           {submissionError && (
-            <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-xs font-semibold text-red-800">
+            <div role="alert" className="rounded-xl border border-red-300 bg-red-50 p-4 text-xs font-semibold text-red-800">
               {submissionError}
             </div>
           )}
@@ -203,10 +215,10 @@ export default function PrivacyPage() {
           ) : (
             <form onSubmit={handleDsrSubmit} className="space-y-4">
               <div>
-                <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-2">
+                <span id="dsr-type-label" className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-2">
                   {t.reqTypeLabel}
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                </span>
+                <div role="group" aria-labelledby="dsr-type-label" className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                   {[
                     ["access", t.reqAccess],
                     ["rectification", t.reqRectify],
@@ -216,8 +228,9 @@ export default function PrivacyPage() {
                     <button
                       key={val}
                       type="button"
-                      onClick={() => setRequestType(val as any)}
-                      className={`rounded-xl border px-3.5 py-2.5 text-right font-medium transition ${
+                      aria-pressed={requestType === val}
+                      onClick={() => setRequestType(val as typeof requestType)}
+                      className={`rounded-xl border px-3.5 py-2.5 text-start font-medium transition focus-visible:outline-2 focus-visible:outline-[#A57C32] ${
                         requestType === val
                           ? "border-[#A57C32] bg-[#A57C32]/10 text-stone-900 font-bold"
                           : "border-stone-200 bg-stone-50 text-stone-600 hover:bg-stone-100"
@@ -230,15 +243,17 @@ export default function PrivacyPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-2">
+                <label htmlFor="dsr-details" className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-2">
                   {t.detailsLabel}
                 </label>
                 <textarea
+                  id="dsr-details"
                   rows={3}
+                  maxLength={2000}
                   value={details}
                   onChange={(e) => setDetails(e.target.value)}
                   placeholder={t.detailsPlaceholder}
-                  className="w-full rounded-xl border border-stone-200 bg-stone-50 p-3 text-xs outline-none focus:border-[#A57C32] focus:bg-white text-stone-900"
+                  className="w-full rounded-xl border border-stone-200 bg-stone-50 p-3 text-xs outline-none focus:border-[#A57C32] focus:bg-white focus-visible:outline-2 focus-visible:outline-[#A57C32] text-stone-900"
                   required
                 />
               </div>
@@ -256,7 +271,7 @@ export default function PrivacyPage() {
 
         {/* Contact DPO Callout */}
         <div className="bg-stone-100 border border-stone-200 p-6 rounded-2xl text-xs text-stone-600 font-light leading-relaxed">
-          If you have questions regarding your personal logs or wish to speak with our compliance team, please contact our Riyadh Data Protection Officer at <span className="font-bold text-stone-900">privacy@primora.com</span>.
+          {t.contact} <span dir="ltr" className="font-bold text-stone-900">privacy@primora.com</span>.
         </div>
 
       </main>

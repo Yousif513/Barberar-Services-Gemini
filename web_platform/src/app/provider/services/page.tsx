@@ -2,6 +2,7 @@
 
 import React, { useCallback, useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { useConfirm } from "@/components/modal";
 
 const translations = {
   en: {
@@ -110,6 +111,7 @@ type CategoryOption = {
 
 export default function ProviderServicesPage() {
   const [lang, setLang] = useState<"en" | "ar">("ar");
+  const [confirmNode, askConfirm] = useConfirm(lang);
 
   useEffect(() => {
     const checkLang = () => {
@@ -376,7 +378,7 @@ export default function ProviderServicesPage() {
   const deleteService = async (service: ProviderServiceRow) => {
     const label = lang === "ar" ? service.name_ar : service.name_en;
     const message = serviceCopy.confirmDelete.replace("{name}", label);
-    if (typeof window !== "undefined" && !window.confirm(message)) return;
+    if (!(await askConfirm({ title: t.delete, intro: message, confirmLabel: t.delete, tone: "danger" }))) return;
 
     try {
       setSaving(true);
@@ -743,6 +745,7 @@ export default function ProviderServicesPage() {
           </div>
         </div>
       )}
+      {confirmNode}
     </div>
   );
 }

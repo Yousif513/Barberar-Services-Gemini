@@ -15,8 +15,8 @@ const arabicFont = IBM_Plex_Sans_Arabic({
 const languageBootstrap = `try{var l=localStorage.getItem("primora_lang");if(l==="ar"||l==="en"){var d=document.documentElement;d.lang=l;d.dir=l==="ar"?"rtl":"ltr";}}catch(e){}`;
 
 export const metadata: Metadata = {
-  title: "PRIMORA - Luxury Beauty & Grooming Marketplace",
-  description: "Book verified beauty salons, barber shops, spas and wellness professionals across Saudi Arabia.",
+  title: "PRIMORA - Beauty & Grooming Marketplace",
+  description: "Book beauty salons, barber shops, spas and wellness professionals across Saudi Arabia.",
 };
 
 export default function RootLayout({

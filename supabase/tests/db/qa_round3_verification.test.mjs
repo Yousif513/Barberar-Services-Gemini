@@ -186,7 +186,8 @@ describe("a staff day off", () => {
     for (const user of [customer, ROLES.anon, owner2]) assert.equal(await slots(user), 0);
     assert.equal(await outcome(as(db, customer, `select * from create_booking(target_employee_id => $1, target_service_id => $2, target_scheduled_at => $3, request_source => 'marketplace')`, [SEED.employee1, svc.id, slot])), "23P01");
     for (const [name, user, expected] of [["customer", customer, 0], ["visitor", ROLES.anon, 0], ["other owner", owner2, 0], ["owner", owner1, 1], ["staff member", employee, 1], ["administrator", admin, 1]]) {
-      assert.equal((await as(db, user, `select id from employee_time_off`)).length, expected, name);
+      // A visitor holds no privilege on the table at all, so the read is refused instead of returning no rows.
+      assert.equal((await as(db, user, `select id from employee_time_off`).catch(() => [])).length, expected, name);
     }
   });
 });

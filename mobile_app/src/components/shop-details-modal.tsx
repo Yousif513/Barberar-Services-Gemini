@@ -81,7 +81,7 @@ export function ShopDetailsModal({
       estimateNote: "Final amount is confirmed by the server at checkout.",
       policyHeading: "Cancellation policy",
       policy: (h: number, late: number, noShow: number) =>
-        `Free cancellation up to ${h} hours before the appointment. Later cancellations: ${late}% of the price. No-show: ${noShow}% of the price.`,
+        `Free cancellation up to ${h} hours before the appointment. Later cancellations: ${late}% of the deposit is kept. No-show: ${noShow}% of the deposit is kept.`,
       payBtn: "Confirm & continue to payment",
       confirmBtn: "Confirm booking",
       close: "Close",
@@ -132,7 +132,7 @@ export function ShopDetailsModal({
       estimateNote: "يؤكد الخادم المبلغ النهائي عند الدفع.",
       policyHeading: "سياسة الإلغاء",
       policy: (h: number, late: number, noShow: number) =>
-        `الإلغاء مجاني حتى ${h} ساعة قبل الموعد. الإلغاء المتأخر: ${late}% من السعر. عدم الحضور: ${noShow}% من السعر.`,
+        `الإلغاء مجاني حتى ${h} ساعة قبل الموعد. الإلغاء المتأخر: يُحتجز ${late}% من العربون. عدم الحضور: يُحتجز ${noShow}% من العربون.`,
       payBtn: "تأكيد والمتابعة للدفع",
       confirmBtn: "تأكيد الحجز",
       close: "إغلاق",
@@ -233,7 +233,8 @@ export function ShopDetailsModal({
     const price = selectedService.price;
     const vat = Math.round(price * VAT_RATE * 100) / 100;
     const total = Math.round((price + vat) * 100) / 100;
-    const deposit = Math.round(total * details.depositPercentage) / 100;
+    // The server takes the deposit on the price before VAT (booking_create_internal), not on the VAT-inclusive total.
+    const deposit = Math.round(price * details.depositPercentage) / 100;
     return { price, vat, total, deposit, balance: Math.round((total - deposit) * 100) / 100 };
   }, [selectedService, details]);
 

@@ -1,0 +1,199 @@
+# FIX-PROV report (provider portal)
+
+Branch `wp/fixprov`, worktree `primora-wp-fixprov`. Status per defect is updated after every commit group.
+
+| Defect | Status | Commit | Test |
+|---|---|---|---|
+| R8 invented staff/services | fixed | group 1 | `web_platform/tests/provider-portal-guards.test.mjs` (no demo data, empty state) |
+| R50 employee profile fields, portfolio | fixed (URL + client consent; no file uploader, see below) | group 1 | same file, "edits the profile columns" |
+| C-D13 pay rules editor | fixed (editor); payroll export pending | group 1 | same file |
+
+## Group 1: team page
+
+* Deleted `demoStaffMembers`, `demoServiceOptions` and `demoProfileFor` (stock photos, invented phone/email, invented
+  earnings, rating and booking counts). Earnings and completed bookings come from `employee_earnings_summary`; when that
+  query fails the tiles show a dash and the page names the reason. The average-rating tile and per-card rating were removed:
+  `reviews` has no per-professional link, so there is no honest number to show.
+* Empty roster renders "Add your first professional" with a button.
+* Employee form edits `bio_en`, `bio_ar`, `years_of_experience`, `specialties`, `instagram_handle` (validated).
+* `employee_portfolios` dialog (`provider/_components/employee-extras.tsx`): https image link plus a mandatory client-consent
+  tick (writes `customer_consent_confirmed = true`). A binary uploader needs a Storage bucket and policies that do not exist in the
+  repository, so it is not built; the integrator can add a bucket and swap the URL field.
+* `employee_commission_rules` editor: base salary, service and product commission, optional Saudi IBAN (`SA` + 22 digits).
+  Nothing is pre-filled: rates are business decisions and stay unset until the owner types them. Writes go through the existing
+  owner RLS policy (the audit trigger records the change).
+* Delete uses the shared confirmation instead of `window.confirm`, and falls back to deactivation only for a foreign-key
+  violation (previously any error was reported as "deactivated").
+* The four hand-made modal layers use `ProviderDialog` (shared `ModalOverlay`: focus trap, Escape, inert background).
+
+## Group 2: counter booking (database), settings, policy, hours, context, my day
+
+| Defect | Status | Test |
+|---|---|---|
+| C-D15 database: `create_walk_in_booking` notes and payment method | fixed | `supabase/tests/db/fixprov_walk_in.test.mjs` (10 tests: stored, defaults, method refused, note length, replay conflict, anonymous/customer/other owner refused, staff-only read, no direct writes, audit trigger) |
+| R5/R6 follow-up: private columns through commands | fixed in screens | `provider-portal-guards.test.mjs` "reads private columns only through the owner commands" |
+| D-27 booking policy card | fixed (UI); command is FIX-DBA's | guard test "saves the booking policy through its command" |
+| R16 hours form (overnight shift, per professional) | fixed | guard test "lets the hours form express an overnight shift" |
+| R18 `my_provider_context()` + employee screen | fixed (layout + `/provider/my-day`); owner-only screens keep their own owner lookup (see below) | `supabase/tests/db/fixprov_context.test.mjs` (5 tests) |
+
+* `create_walk_in_booking` gained `p_notes`; `p_payment_method` is now validated against `payment_methods` (enabled, offered to customers, not the
+  wallet). Method and note are stored in the new staff-only table `walk_in_booking_details` (not on `bookings`, which the phone-linked customer can read).
+  The function was patched in place from `pg_get_functiondef`. Adding a parameter changes the signature, so the one regprocedure literal in
+  `20261007900300_delegated_access_scope.sql` (which patches this function) was updated to the nine-argument signature. **Integrator: that is a one-line
+  edit in another package's migration; if 900300 changed in `claude-code`, re-apply the same one-line signature change.**
+* `caller_is_provider_staff(uuid)` is an answer-only wrapper so policies can ask "is the caller staff of this provider" (clients cannot execute `is_provider_staff`).
+* Settings: business phone via `get_provider_private_profile`; staff phone and email via `get_provider_staff_contacts` (FIX-DBA). The invented 09:00-22:00 hours
+  and the 20% deposit default are gone. The weekly hours are applied through `HoursApplyDialog`: it lists every active professional, leaves those with their own
+  schedule unticked, and writes only the ticked ones. A closing time before the opening time is an overnight shift (equal times are refused).
+* Booking policy card: four bounded fields, plain-language preview from `policySentences` (the same sentences customers see), "not confirmed yet" banner until
+  `policy_confirmed_at` is set by the command.
+* Layout: business and role come from `my_provider_context` (`ProviderContextProvider`); an employee gets one navigation entry ("My day") and is redirected to it
+  from every management screen. `/provider/my-day`: today's appointments (Riyadh day), check in / complete / no-show (reason dialog) through
+  `employee_update_booking_status`, and own earnings from `employee_earnings_summary`.
+* Deferred for R18: the other owner screens still resolve the business with `providers.owner_id`. They are owner-only surfaces (the layout keeps employees off them),
+  so a delegated manager without an owned business still sees them empty; converting each screen to `useProviderContext` is mechanical and listed under "not done".
+* `scripts/ui-schema-baseline.json` lists exactly the four mismatches that exist only because FIX-DBA's functions/column are not in this worktree:
+  `set_provider_booking_policy`, `get_provider_private_profile`, `get_provider_staff_contacts`, `providers.policy_confirmed_at`. The integrator removes them on merge.
+
+## Group 3: closures, seasons and leave (R16)
+
+* `/provider/time-off` (reached from Settings, no extra navigation entry): closures (type, branch scope, bilingual reason; a count of existing bookings in the range is shown in a
+  confirmation before closing, and nothing is cancelled for the owner), seasonal schedules (overnight and second shift, pause/resume, delete), and team leave (approve or reject
+  pending requests, record approved leave). Employees ask for leave from `/provider/my-day` (always sent as `pending`: the column defaults to approved and the existing
+  `trg_enforce_leave_approval` trigger refuses self-approval).
+* No new migration: the existing tables, policies and trigger already enforce the rules. `supabase/tests/db/fixprov_schedule_exceptions.test.mjs` (14 tests) pins them for every
+  role: owner, other provider's owner, employee, colleague, customer, anonymous. Pure checks live in `src/lib/schedule-exceptions.mjs` (`tests/schedule-exceptions.test.mjs`).
+* Not done: rejecting leave does not record a reason (the table has no column for it and I did not widen the schema); a closure does not list the affected bookings, only counts them.
+
+## Group 4: calendar (R4, C-D15 screen)
+
+* Drag and drop and a new keyboard control ("Move to another time" in the details dialog, free slots only) both call `reschedule_booking`. Nothing on the calendar changes
+  until the command accepts the move; a refusal is shown (in the dialog and as the page error) and the appointment stays where it was.
+* Walk-in dialog: the name is always a text input, with an optional selector of people who have booked this business before (it used to list 100 customers of the whole
+  platform); phone is normalised (`+9665XXXXXXXX`) and sent so a verified customer is linked; payment method comes from `payment_methods` (no hard-coded cash); notes are sent
+  as `p_notes`; the invented "Walk-in Customer", "Styling Service", "Fahad Al-Malki", the initial 150 SAR price and the seeded "Stylist Break & Sanitation" blockout are gone.
+  Walk-in details (name, phone, private note, payment method) show in the appointment dialog.
+* Cancelling now asks for a reason in `CommandDialog` (it used to cancel on one click with a constant reason). The modals use `ProviderDialog`; double mirroring was replaced by logical utilities.
+* Tests: `tests/phone-and-slots.test.mjs` (28), guard tests "calendar (R4, C-D15)".
+
+## Group 5: dashboard honesty and a real QR code (D-28, R27, D-09)
+
+| Defect | Status | Test |
+|---|---|---|
+| D-09 QR is hand-placed rectangles; print page calls api.qrserver.com and writes the unescaped name | fixed: local SVG from `toqr`, escaped print page | `web_platform/tests/qr.test.mjs` (finder patterns, timing, dark module, a valid BCH format word with both copies equal, escaping), guard test |
+| D-28 invented defaults ("Elite Barbershop", "EB", 3 services, 4 staff, policy ticked, fallback slug) | fixed | guard tests + `supabase/tests/db/fixprov_dashboard.test.mjs` |
+| R27 walk-ins counted as non-home bookings; unbounded bookings select; hasPolicy true | fixed (`source = 'walk_in'`; one aggregate command; checklist from rows) | `fixprov_dashboard.test.mjs` (7 tests: walk-ins by source, revenue, checklist, occupancy with overnight and second shifts and leave, role refusals, share-kit idempotency and audit) |
+
+* Migration `20261007102000_provider_dashboard_summary.sql`: `get_provider_dashboard_summary(provider)` (owner, administrator or a delegate holding `reports`, wide scope) and
+  `record_share_kit_use(provider)` (owner only, first use remembered and audited once, replay answers unchanged). It adds `providers.share_kit_used_at`, and
+  `policy_confirmed_at` idempotently (FIX-DBA adds the same column; `ADD COLUMN IF NOT EXISTS`). `share_kit_used_at` is never selected by a client, so FIX-DBA's column-level
+  grants need no change.
+* Occupancy was "confirmed bookings of all time over active staff x 8". It is now today's booked minutes over today's scheduled minutes in Riyadh time (second shift included,
+  an overnight shift counted past midnight, approved leave and closures excluded) and is a dash when nobody is scheduled.
+* QR: `toqr` 0.1.1 (MIT) was already in the lockfile through Expo; I added it to `web_platform/package.json` and the matching workspace line of `package-lock.json`
+  (`npm install --package-lock-only`, no node_modules change). `src/lib/qr-svg.mjs` draws it as one SVG path with a four-module quiet zone.
+* When the figures cannot be read the KPI strip shows dashes and the error banner names the reason (the "Unavailable" demo label is gone). The "0% Commission" badge,
+  "0% Commission Guarantee", "15% Saved" and "G43 Verified" labels were removed; the explainer now states what the fee rules do (direct clients are exempt from the marketplace first-visit fee).
+* Verification limit: a QR cannot be scanned in the test run, so the tests prove the structure a scanner locks on to (finders, timing, format information). Scan it once in a browser.
+
+## Group 6: provider promo codes (R9)
+
+* The screen wrote `provider_promos`, which nothing reads, so every code answered "not valid for this booking". Migration `20261007103000_provider_promo_codes.sql` adds three owner-only
+  commands over `promotional_codes` (the table `booking_create_internal` and `validate_and_apply_coupon` read): `create_provider_promo_code` (provider-funded, code 4-20
+  characters, percentage 0-100 or flat up to 10,000 SAR, end date in the future, optional redemption limit and minimum order, at most 50 active codes, a duplicate is answered
+  without saying who holds the code, audited), `list_provider_promo_codes`, and `set_provider_promo_code_active` (idempotent, audited).
+* **Scope decision (as instructed): `booking_create_internal` is unchanged, so only "all customers" codes ship.** The screen's "VIP only", "first-time bookers" and "loyal clients"
+  audiences are gone (nothing enforced them) and the form says so. Enforcing "new clients only" needs a change to the booking core with `is_first_visit`; it is listed under not done.
+* `provider_promos` is left in place and unread. Dropping it or migrating its rows is the owner's call (the table also sits on the public-catalogue lists of two existing tests).
+* The page lost its invented figures ("Est. Revenue Lift = redemptions x 180", an average discount that defaulted to 15%), the in-memory enable/disable toggle that never reached the
+  server (now `set_provider_promo_code_active`, error shown on failure), and English-only strings.
+* Tests: `supabase/tests/db/fixprov_promo_codes.test.mjs` (10 tests, including a customer redeeming the code through `create_booking`, the redemption count, expiry/exhaustion/switched-off
+  refusals, validation, and anonymous / customer / other owner / employee refusals). `negative-authorization.test.mjs` asserted that the page queries `provider_promos`
+  (the defect); it now asserts the owner command.
+* The migration hygiene test from the integrator (`migration_hygiene.test.mjs`) is copied into this worktree and passes: my migrations use dollar quoting and `chr(13) || chr(10)`
+  (no E-string with a backslash-escaped quote).
+
+## Group 7: client import and the block dialog (R36, C-D26)
+
+| Defect | Status | Test |
+|---|---|---|
+| R36 CSV import robustness | fixed | `web_platform/tests/client-import.test.mjs` (12 tests: quotes, doubled quotes, line breaks in quotes, CRLF, BOM, English and Arabic header, comma/semicolon/tab, Arabic-Indic digits, 966/00966/5xx forms, rows without phone rejected with line and reason, duplicates, length limits, 2000-row cap), `supabase/tests/db/fixprov_client_import.test.mjs` (6 tests) |
+| C-D26 provider block with one click and a constant reason | fixed | guard tests "client import and blocking"; the server already required a reason (`toggle_customer_block`) |
+
+* `src/lib/client-import.mjs` is a pure parser (RFC 4180 quoting, delimiter detection, header skip, `normalizeSaudiMobile` from `src/lib/phone.mjs`). The screen accepts a file or a paste, shows a live
+  summary ("N ready", a list of rejected lines with the reason in Arabic or English) and sends only valid, normalized rows. The English-only label "CSV Data (Name, Phone, Notes)" and the three hard-coded
+  error strings are translated.
+* `import_provider_clients` is patched in place (`20261007104000_import_clients_phone_forms.sql`): Arabic-Indic digits are translated, 00966/966/5xxxxxxxx/05xxxxxxxx become `+9665xxxxxxxx`, and a row with no
+  or an invalid phone is skipped. Before, an Arabic-digit number became empty and was stored with no phone, so the (provider, phone) key could not de-duplicate it.
+* Blocking opens `CommandDialog` (danger tone, reason required, the server records it with the actor); unblocking confirms in the same dialog. The block list changes on screen only after the command succeeds.
+
+## Group 8: payroll summary (C-D13)
+
+* `provider/reports` no longer builds CSV strings by hand: the analytics export and the payroll export use the shared escaper (`src/lib/csv.mjs`) and a Blob download (`encodeURI` of a data URI broke
+  on `#`). The payroll file is built by `src/lib/payroll-summary.mjs`: names are escaped, `emp.role` (undefined) is replaced by the title, a professional without pay rules is flagged in a status column and
+  their rule-based amounts are blank (never `null`, never zero), and the label and tooltip say **"Payroll summary (not a WPS file)"**; the Mudad/WPS wording is removed from both languages. The Arabic
+  header row and statuses are Arabic.
+* A failed export is shown through `CommandResult` instead of `alert()`.
+* The rules editor on the team page (Pay rules, group 1) is linked from the reports note.
+* Tests: `web_platform/tests/payroll-summary.test.mjs` (7), guard tests "reports exports".
+
+## Group 9: inventory and chain screens, services dialog, pricing claims (C-D28, D-22)
+
+* `provider/inventory`, `inventory-controls` and `chain` no longer call `window.confirm`/`prompt`: receive, stock change and availability use `useConfirm`, cancelling an order uses `CommandDialog`
+  with a required reason, disabling access uses `useConfirm`. `provider/services` (delete) likewise. A guard test now forbids native dialogs anywhere under `provider/**`.
+* Every failed write names the server's reason (`describeServerError`, `_components/server-errors.ts`) in the reader's language; every message the P3 commands can raise has an Arabic form
+  (`tests/server-errors.test.mjs` reads the messages out of the two migrations and fails when one is untranslated). A refused session shows `ForbiddenNotice`.
+* The permission group has a `<legend>`. The low-stock metric and the row flag use the same rule (available = on hand minus reserved, at or below the reorder point).
+* D-22 on `provider/pricing` only: "Booking Guarantee / ضمان الحجز المعتمد", "Bank-Grade Encryption" and "PCI-DSS Compliant via Tap" are replaced by factual statements (deposit and cancellation terms;
+  card details are entered on the payment provider's page). The page still illustrates a fixed 15% platform fee and 85% payout: that is a business-rate statement (R34) and needs the owner's `fee_rules`;
+  deferred. The landing, about, security and privacy pages are outside this package.
+
+## Late finding: walk-in details read scope
+
+The existing cross-tenant sweep (`qa_adversarial.test.mjs`) showed that an ordinary stylist of the same provider could read `walk_in_booking_details` (private notes and payment method). The policy now
+admits the owner, administrators and delegates holding the bookings permission only (`can_access_provider_operation(..., 'bookings')`, which is branch-loose; the stricter `can_access_provider_wide`
+only exists from 20261007900300, after this migration). The helper `caller_is_provider_staff` was removed.
+
+## Final status by defect id
+
+| Id | Status | Where |
+|---|---|---|
+| R4 calendar drag and drop | fixed | group 4; `reschedule_booking`, keyboard "Move to", error leaves the calendar unchanged |
+| R5/R6 follow-ups (FIX-DBA read commands) | fixed in the screens | group 2; baseline lists the three FIX-DBA rpcs |
+| R8 invented staff and services | fixed | group 1 |
+| R9 provider promo codes | fixed for "all customers" codes; "new clients only" segment deferred (needs a change to `booking_create_internal`, out of scope) | group 6 |
+| R16 closures, seasons, leave, overnight hours, per-professional hours | fixed | groups 2 and 3 |
+| R18 `my_provider_context` and employee portal | fixed for layout, navigation, `/provider/my-day`; the other owner screens keep their owner lookup (deferred, see below) | group 2 |
+| D-27 booking policy card | fixed (UI); the command is FIX-DBA's | group 2 |
+| D-28 / R27 / D-09 dashboard honesty and QR | fixed | group 5 |
+| R36 CSV import | fixed | group 7 |
+| R50 employee profile fields and portfolio | fixed with an https image link and a mandatory client-consent tick; a file uploader (needs a Storage bucket) and the monthly "PRIMORA brought you" message job are deferred | group 1 |
+| C-D13 payroll export and pay-rules editor | fixed | groups 1 and 8 |
+| C-D15 walk-in screen and `create_walk_in_booking` | fixed | groups 2 and 4 |
+| C-D26 block dialog (provider side) | fixed; `admin_save_promo_code` belongs to another package | group 7 |
+| C-D28 inventory and chain | fixed | group 9 |
+| D-22 claims on provider/pricing | fixed for the three claims; fixed 15%/85% illustration deferred | group 9 |
+
+## Deferred, with the reason
+
+* Converting every owner screen from `providers.owner_id` to `useProviderContext` (R18): mechanical, but touches 14 pages; the layout already keeps employees off them.
+* "New clients only" promo codes: needs `booking_create_internal` to read a segment (core function; not changed).
+* Leave rejection reason; list of the bookings hit by a closure (only a count is shown).
+* Portfolio file upload and the monthly summary job (R50).
+* `provider_promos` table: left in place and unread.
+* Not verifiable here: scanning the QR with a camera, the browser console on `/provider/*` (no hosted Supabase; the dev build was not run), `npm run build --workspace=web_platform` (not run in this worktree; the integrator builds after merging).
+
+## Verification (this worktree, after the last commit)
+
+* `node --test "supabase/tests/db/**/*.test.mjs"`: 308 tests, 308 pass (includes `migration_hygiene.test.mjs`, 6 new `fixprov_*.test.mjs` files).
+* `npm run test --workspace=web_platform`: 297 tests, 297 pass.
+* `npx tsc --noEmit -p web_platform`: no errors.
+* `npx eslint` over every changed file (via the JSON formatter): 0 errors; warnings per file are at or below the count before my change (all pre-existing `any`, effect and unused-variable warnings).
+* `node scripts/verify-ui-schema.mjs`: 94 rpc calls and 195 select strings checked, 3 mismatches, all in the baseline: `set_provider_booking_policy`, `get_provider_private_profile`, `get_provider_staff_contacts` (FIX-DBA's functions are not in this worktree; the integrator removes the baseline entries on merge).
+
+## Files touched outside my own directories
+
+* `supabase/migrations/20261007900300_delegated_access_scope.sql`: one line, the regprocedure of `create_walk_in_booking` now has the ninth argument (`text`) because the function gained `p_notes`.
+* `package.json` of `web_platform` and `package-lock.json`: `toqr@^0.1.1` (already in the lockfile through Expo) added to `web_platform`.
+* `web_platform/src/lib/` new files only (`phone.mjs`, `calendar-slots.mjs`, `schedule-exceptions.mjs`, `client-import.mjs`, `payroll-summary.mjs`, `qr-svg.mjs`); `web_platform/tests/negative-authorization.test.mjs` (one assertion followed the R9 fix); `scripts/ui-schema-baseline.json`.
+* Migrations: `20261007100000_walk_in_booking_details`, `101000_my_provider_context`, `102000_provider_dashboard_summary`, `103000_provider_promo_codes`, `104000_import_clients_phone_forms`.

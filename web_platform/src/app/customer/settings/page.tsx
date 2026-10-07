@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import { errorMessage } from "@/lib/error-message";
+import { useOperationsLocale } from "@/components/operations-ui";
 
 const translations = {
   en: {
@@ -24,6 +26,12 @@ const translations = {
     whatsappConsent: "WhatsApp appointment reminders & booking updates",
     marketingConsent: "Promotional beauty offers and exclusive discounts",
     photosConsent: "Before & after styling photos in provider portfolio",
+    pdplConsents: "Saudi PDPL Consents",
+    consentGranted: "Consent recorded.",
+    consentWithdrawn: "Consent withdrawn.",
+    consentFailed: "Your consent choice was not saved and has been reverted:",
+    consentsLoadFailed: "Your saved consent choices could not be loaded, so they cannot be changed right now:",
+    consentsLoading: "Loading your consent choices...",
     phoneVerified: "Verified",
     phoneUnverified: "Unverified",
     dataRightsTitle: "Saudi PDPL Data Subject Rights",
@@ -56,6 +64,12 @@ const translations = {
     whatsappConsent: "تنبيهات وتذكير المواعيد عبر واتساب",
     marketingConsent: "استلام العروض الخاصة والتخفيضات الترويجية",
     photosConsent: "الموافقة على عرض صور النتائج في معرض أعمال المزود",
+    pdplConsents: "الموافقات وفق نظام حماية البيانات الشخصية",
+    consentGranted: "تم تسجيل الموافقة.",
+    consentWithdrawn: "تم سحب الموافقة.",
+    consentFailed: "لم يُحفظ اختيارك للموافقة وتمت إعادته إلى حالته السابقة:",
+    consentsLoadFailed: "تعذر تحميل اختياراتك المحفوظة للموافقة، لذلك لا يمكن تغييرها الآن:",
+    consentsLoading: "جارٍ تحميل اختيارات الموافقة...",
     phoneVerified: "موثق",
     phoneUnverified: "غير موثق",
     dataRightsTitle: "حقوق صاحب البيانات (نظام حماية البيانات الشخصية PDPL)",
@@ -72,53 +86,34 @@ const translations = {
 };
 
 export default function CustomerSettingsPage() {
-  const [locale, setLocale] = useState<"en" | "ar">("ar");
+  const locale = useOperationsLocale();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   // Profile Form States
   const [profile, setProfile] = useState({
-    firstName: "Yousif",
-    lastName: "Al-Saud",
-    email: "yousif@primora.com",
-    phone: "+966 50 123 4567",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
     phoneVerified: false
   });
 
-  // Consents states (G13)
+  // Consents states (G13). The toggles stay locked until the saved choices are read, so an unread state is never shown as "off".
   const [whatsappConsent, setWhatsappConsent] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [photosConsent, setPhotosConsent] = useState(false);
+  const [consentsReady, setConsentsReady] = useState(false);
+  const [consentsError, setConsentsError] = useState("");
+  const [consentBusy, setConsentBusy] = useState<string | null>(null);
 
   // Preference States
   const [emailNotif, setEmailNotif] = useState(true);
   const [smsNotif, setSmsNotif] = useState(true);
   const [pushNotif, setPushNotif] = useState(true);
 
-  // Dependents States
-  const [dependents, setDependents] = useState<any[]>([
-    { id: "1", name: "Faisal Al-Saud", relation: "Son", age: 12 },
-    { id: "2", name: "Sara Al-Saud", relation: "Spouse", age: 34 }
-  ]);
-
-  const [newDep, setNewDep] = useState({ name: "", relation: "", age: "" });
-  const [showAddDepForm, setShowAddDepForm] = useState(false);
-
   const t = translations[locale];
-
-  // Sync language with document root
-  useEffect(() => {
-    const handleLangSync = () => {
-      const currentLang = document.documentElement.lang as "en" | "ar";
-      if (currentLang === "en" || currentLang === "ar") {
-        setLocale(currentLang);
-      }
-    };
-    handleLangSync();
-    const interval = setInterval(handleLangSync, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     loadProfile();
@@ -148,62 +143,62 @@ export default function CustomerSettingsPage() {
         });
       }
 
-      // Load Consents
-      const { data: consentsData } = await supabase
+      // Load Consents: a failed read locks the toggles instead of showing every purpose as withdrawn.
+      const { data: consentsData, error: consentsReadError } = await supabase
         .from("consents")
         .select("purpose, status")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
-      if (consentsData && consentsData.length > 0) {
-        const latestWhatsapp = consentsData.find(c => c.purpose === "whatsapp");
-        const latestMarketing = consentsData.find(c => c.purpose === "marketing");
-        const latestPhotos = consentsData.find(c => c.purpose === "photos_portfolio");
-        if (latestWhatsapp) setWhatsappConsent(latestWhatsapp.status === "granted");
-        if (latestMarketing) setMarketingConsent(latestMarketing.status === "granted");
-        if (latestPhotos) setPhotosConsent(latestPhotos.status === "granted");
-      }
-
-      // Load Dependents
-      const { data: depData } = await supabase
-        .from("client_profiles")
-        .select("id, name, type, metadata")
-        .eq("client_id", user.id);
-      
-      if (depData && depData.length > 0) {
-        setDependents(depData.map((dep: any) => ({
-          id: dep.id,
-          name: dep.name,
-          relation: dep.type,
-          age: dep.metadata?.age ?? ""
-        })));
+      if (consentsReadError) {
+        setConsentsReady(false);
+        setConsentsError(errorMessage(consentsReadError));
+      } else {
+        const latest = (purpose: string) => consentsData?.find(c => c.purpose === purpose);
+        setWhatsappConsent(latest("whatsapp")?.status === "granted");
+        setMarketingConsent(latest("marketing")?.status === "granted");
+        setPhotosConsent(latest("photos_portfolio")?.status === "granted");
+        setConsentsError("");
+        setConsentsReady(true);
       }
     } catch (err: any) {
-      console.warn("Using default settings profile due to local sandbox session:", err.message);
+      console.warn("Failed to load account settings:", err.message);
+      setError(err?.message || "Failed to load your account settings.");
+      // The consent toggles stay locked and say why, instead of waiting for a read that will not happen.
+      setConsentsError((previous: string) => previous || errorMessage(err));
     } finally {
       setLoading(false);
     }
   }
 
-  const handleConsentToggle = async (purpose: "whatsapp" | "marketing" | "photos_portfolio", currentVal: boolean) => {
-    const nextVal = !currentVal;
-    if (purpose === "whatsapp") setWhatsappConsent(nextVal);
-    if (purpose === "marketing") setMarketingConsent(nextVal);
-    if (purpose === "photos_portfolio") setPhotosConsent(nextVal);
+  const setConsentValue = (purpose: "whatsapp" | "marketing" | "photos_portfolio", value: boolean) => {
+    if (purpose === "whatsapp") setWhatsappConsent(value);
+    if (purpose === "marketing") setMarketingConsent(value);
+    if (purpose === "photos_portfolio") setPhotosConsent(value);
+  };
 
+  // record_consent returns { error } instead of throwing, so the result is read before anything is reported: a refused
+  // withdrawal must not look withdrawn (PDPL), so the toggle goes back and the reason is shown.
+  const handleConsentToggle = async (purpose: "whatsapp" | "marketing" | "photos_portfolio", currentVal: boolean) => {
+    if (consentBusy) return;
+    const nextVal = !currentVal;
+    setConsentBusy(purpose);
+    setSuccess("");
+    setError("");
+    setConsentValue(purpose, nextVal);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      await supabase.from("consents").insert({
-        user_id: user.id,
-        purpose,
-        status: nextVal ? "granted" : "withdrawn",
-        document_version: "v1.0",
-        method: "settings_toggle"
+      const { error: consentError } = await supabase.rpc("record_consent", {
+        p_purpose: purpose,
+        p_status: nextVal ? "granted" : "withdrawn",
+        p_method: "settings_toggle",
       });
-      setSuccess(locale === "ar" ? "تم تحديث تفضيلات الموافقة بنجاح" : "Consent preferences updated successfully.");
+      if (consentError) throw consentError;
+      setSuccess(nextVal ? t.consentGranted : t.consentWithdrawn);
     } catch (e) {
-      console.warn("Failed to record consent toggle:", e);
+      setConsentValue(purpose, currentVal);
+      setError(`${t.consentFailed} ${errorMessage(e)}`);
+    } finally {
+      setConsentBusy(null);
     }
   };
 
@@ -235,57 +230,6 @@ export default function CustomerSettingsPage() {
     }
   }
 
-  async function addDependent(e: React.FormEvent) {
-    e.preventDefault();
-    if (!newDep.name || !newDep.relation) return;
-
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user");
-
-      const { data, error: depError } = await supabase
-        .from("client_profiles")
-        .insert({
-          client_id: user.id,
-          name: newDep.name,
-          type: newDep.relation,
-          metadata: { age: parseInt(newDep.age) || null }
-        })
-        .select("id, name, type, metadata")
-        .single();
-
-      if (depError) throw depError;
-      setDependents(prev => [...prev, {
-        id: data.id,
-        name: data.name,
-        relation: data.type,
-        age: data.metadata?.age ?? ""
-      }]);
-      setNewDep({ name: "", relation: "", age: "" });
-      setShowAddDepForm(false);
-    } catch (err: any) {
-      console.warn("Failed to add dependent profile:", err.message);
-      setError(err.message || "Failed to add dependent profile.");
-    }
-  }
-
-  async function removeDependent(id: string) {
-    setError("");
-    setDependents(prev => prev.filter(d => d.id !== id));
-
-    if (id === "1" || id === "2") return;
-
-    const { error: deleteError } = await supabase
-      .from("client_profiles")
-      .delete()
-      .eq("id", id);
-
-    if (deleteError) {
-      setError(deleteError.message);
-      await loadProfile();
-    }
-  }
-
   return (
     <div className="space-y-8 font-sans">
       {/* HEADER */}
@@ -295,13 +239,13 @@ export default function CustomerSettingsPage() {
       </div>
 
       {success && (
-        <div className="bg-green-50 border border-green-200 text-green-800 text-xs rounded-xl p-4 font-bold">
+        <div role="status" className="bg-green-50 border border-green-200 text-green-800 text-xs rounded-xl p-4 font-bold">
           {success}
         </div>
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl p-4 font-bold">
+        <div role="alert" className="bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl p-4 font-bold">
           {error}
         </div>
       )}
@@ -315,8 +259,9 @@ export default function CustomerSettingsPage() {
           <form onSubmit={saveProfile} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.firstName}</label>
+                <label htmlFor="settings-first-name" className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.firstName}</label>
                 <input
+                  id="settings-first-name"
                   type="text"
                   value={profile.firstName}
                   onChange={(e) => setProfile(prev => ({ ...prev, firstName: e.target.value }))}
@@ -324,8 +269,9 @@ export default function CustomerSettingsPage() {
                 />
               </div>
               <div>
-                <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.lastName}</label>
+                <label htmlFor="settings-last-name" className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.lastName}</label>
                 <input
+                  id="settings-last-name"
                   type="text"
                   value={profile.lastName}
                   onChange={(e) => setProfile(prev => ({ ...prev, lastName: e.target.value }))}
@@ -335,8 +281,9 @@ export default function CustomerSettingsPage() {
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.email}</label>
+              <label htmlFor="settings-email" className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.email}</label>
               <input
+                id="settings-email"
                 type="email"
                 disabled
                 value={profile.email}
@@ -346,7 +293,7 @@ export default function CustomerSettingsPage() {
 
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="text-[10px] uppercase font-bold text-gray-400 block">{t.phone}</label>
+                <label htmlFor="settings-phone" className="text-[10px] uppercase font-bold text-gray-400 block">{t.phone}</label>
                 <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
                   profile.phoneVerified ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
                 }`}>
@@ -354,6 +301,7 @@ export default function CustomerSettingsPage() {
                 </span>
               </div>
               <input
+                id="settings-phone"
                 type="text"
                 value={profile.phone}
                 onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))}
@@ -376,12 +324,12 @@ export default function CustomerSettingsPage() {
 
           <div className="space-y-4">
             <div>
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-2">{t.language}</label>
+              <label htmlFor="settings-language" className="text-[10px] uppercase font-bold text-gray-400 block mb-2">{t.language}</label>
               <select
+                id="settings-language"
                 value={locale}
                 onChange={(e) => {
                   const val = e.target.value as "en" | "ar";
-                  setLocale(val);
                   document.documentElement.lang = val;
                   document.documentElement.dir = val === "ar" ? "rtl" : "ltr";
                 }}
@@ -426,12 +374,15 @@ export default function CustomerSettingsPage() {
               </label>
 
               <div className="pt-3 border-t border-gray-100 space-y-3">
-                <span className="text-[10px] uppercase font-bold text-[#A57C32] block">Saudi PDPL Consents</span>
-                
+                <span className="text-[10px] uppercase font-bold text-[#A57C32] block">{t.pdplConsents}</span>
+                {!consentsReady && !consentsError && <p className="text-[11px] text-gray-500">{t.consentsLoading}</p>}
+                {consentsError && <p role="alert" className="text-[11px] font-semibold text-red-700">{t.consentsLoadFailed} {consentsError}</p>}
+
                 <label className="flex items-start gap-2.5 text-xs text-gray-700 font-medium cursor-pointer">
                   <input
                     type="checkbox"
                     checked={whatsappConsent}
+                    disabled={!consentsReady || consentBusy !== null}
                     onChange={() => handleConsentToggle("whatsapp", whatsappConsent)}
                     className="mt-0.5 rounded border-gray-300 text-[#A57C32] focus:ring-0"
                   />
@@ -442,6 +393,7 @@ export default function CustomerSettingsPage() {
                   <input
                     type="checkbox"
                     checked={marketingConsent}
+                    disabled={!consentsReady || consentBusy !== null}
                     onChange={() => handleConsentToggle("marketing", marketingConsent)}
                     className="mt-0.5 rounded border-gray-300 text-[#A57C32] focus:ring-0"
                   />
@@ -452,6 +404,7 @@ export default function CustomerSettingsPage() {
                   <input
                     type="checkbox"
                     checked={photosConsent}
+                    disabled={!consentsReady || consentBusy !== null}
                     onChange={() => handleConsentToggle("photos_portfolio", photosConsent)}
                     className="mt-0.5 rounded border-gray-300 text-[#A57C32] focus:ring-0"
                   />
@@ -475,7 +428,7 @@ export default function CustomerSettingsPage() {
       {/* ADVANCED & FAMILY PORTALS */}
       <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-6">
         <div>
-          <h3 className={`font-bold text-sm text-gray-800 border-b border-gray-100 pb-3 ${locale === "ar" ? "text-right" : "text-left"}`}>
+          <h3 className="font-bold text-sm text-gray-800 border-b border-gray-100 pb-3 text-start">
             {t.advancedSection}
           </h3>
         </div>
@@ -483,7 +436,7 @@ export default function CustomerSettingsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* DEPENDENTS MANAGER CARD */}
           <div className="border border-stone-200 hover:border-[hsl(45,60%,55%)] rounded-xl p-5 bg-stone-50/50 hover:bg-stone-50/20 transition duration-300 flex flex-col justify-between">
-            <div className={locale === "ar" ? "text-right" : "text-left"}>
+            <div className="text-start">
               <h4 className="font-bold text-xs text-stone-900 tracking-wide uppercase">
                 {t.dependentsCardTitle}
               </h4>
@@ -491,7 +444,7 @@ export default function CustomerSettingsPage() {
                 {t.dependentsCardDesc}
               </p>
             </div>
-            <div className={`mt-6 pt-3 border-t border-stone-100 flex ${locale === "ar" ? "justify-start" : "justify-end"}`}>
+            <div className="mt-6 pt-3 border-t border-stone-100 flex justify-end">
               <Link
                 href="/customer/dependents"
                 className="px-4 py-2 bg-stone-900 hover:bg-stone-850 text-white font-bold text-[10px] uppercase tracking-wider rounded-lg transition"
@@ -503,7 +456,7 @@ export default function CustomerSettingsPage() {
 
           {/* DEVELOPER API CONSOLE CARD */}
           <div className="border border-stone-200 hover:border-[hsl(45,60%,55%)] rounded-xl p-5 bg-stone-50/50 hover:bg-stone-50/20 transition duration-300 flex flex-col justify-between">
-            <div className={locale === "ar" ? "text-right" : "text-left"}>
+            <div className="text-start">
               <h4 className="font-bold text-xs text-stone-900 tracking-wide uppercase">
                 {t.developerCardTitle}
               </h4>
@@ -511,7 +464,7 @@ export default function CustomerSettingsPage() {
                 {t.developerCardDesc}
               </p>
             </div>
-            <div className={`mt-6 pt-3 border-t border-stone-100 flex ${locale === "ar" ? "justify-start" : "justify-end"}`}>
+            <div className="mt-6 pt-3 border-t border-stone-100 flex justify-end">
               <Link
                 href="/developer"
                 className="px-4 py-2 bg-[hsl(45,60%,45%)] hover:bg-[hsl(45,60%,40%)] text-white font-bold text-[10px] uppercase tracking-wider rounded-lg transition"

@@ -16,7 +16,7 @@ describe("anonymous access", () => {
   it("exposes only read-only discovery functions to anonymous visitors", async () => {
     const allowed = new Set([
       "get_available_slots", "get_branch_available_slots", "get_branch_schedule_with_prayer_pauses",
-      "search_marketplace_providers", "normalize_arabic",
+      "search_marketplace_providers", "normalize_arabic", "provider_rating_summaries",
     ]);
     const rows = await sys(db, `
       select distinct p.proname
@@ -64,10 +64,14 @@ describe("verification and onboarding", () => {
   });
 
   it("activates an approved provider and refuses incomplete applications", async () => {
+    // Applications are closed until the provider agreement is published, and approval needs the applicant's acceptance of it.
+    const agreement = (await sys(db, `select id, version, status from legal_agreements where agreement_key = 'provider_agreement' order by created_at limit 1`))[0];
+    if (agreement.status === "draft") await as(db, admin, `select admin_publish_agreement($1, 'Reviewed by counsel 2026-10-07')`, [agreement.id]);
     const applicant = await createUser(db);
+    await as(db, ROLES.user(applicant), `select record_agreement_acceptance('provider_agreement', $1)`, [agreement.version]);
     const insert = (lat) => as(db, ROLES.user(applicant),
-      `insert into provider_applications (user_id, business_name_en, business_name_ar, contact_email, contact_phone, district, address_text, latitude, longitude, cr_number, tax_number)
-       values ($1, 'Malqa Cuts', 'قصات الملقا', 'a@b.sa', '+966500001234', 'Al Malqa', 'King Fahd Rd', $2, $3, '1010202020', '300012345600003') returning id`,
+      `insert into provider_applications (user_id, business_name_en, business_name_ar, contact_email, contact_phone, city, district, address_text, latitude, longitude, cr_number, tax_number)
+       values ($1, 'Malqa Cuts', 'قصات الملقا', 'a@b.sa', '+966500001234', 'Riyadh', 'Al Malqa', 'King Fahd Rd', $2, $3, '1010202020', '300012345600003') returning id`,
       [applicant, lat, lat === null ? null : 46.6]).then((r) => r[0].id);
     const noLocation = await insert(null);
     await expectError(as(db, admin, `select approve_provider_application($1, 'Documents checked')`, [noLocation]), /location/);
