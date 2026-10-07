@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { AppPressable } from "@/components/app-pressable";
+import { useLocale } from "@/lib/locale";
 import {
   StyleSheet,
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   Modal,
   Linking,
   ActivityIndicator,
@@ -13,6 +14,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../lib/supabase";
 import { errorMessage } from "@/lib/error-message";
+import { subscribeBookingsChanged } from "@/lib/payment-return";
 
 type BookingStatus = "pending_payment" | "confirmed" | "completed" | "cancelled" | "no_show";
 
@@ -29,7 +31,7 @@ interface BookingRow {
 const UPCOMING: BookingStatus[] = ["pending_payment", "confirmed"];
 
 export default function BookingsScreen() {
-  const [lang, setLang] = useState<"en" | "ar">("ar");
+  const { lang, setLang } = useLocale();
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
   const [selectedBooking, setSelectedBooking] = useState<BookingRow | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -116,7 +118,8 @@ export default function BookingsScreen() {
     setLoading(true);
     setLoadError("");
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user ?? null;
       setSignedIn(Boolean(user));
       if (!user) {
         setBookings([]);
@@ -154,7 +157,11 @@ export default function BookingsScreen() {
   useEffect(() => {
     loadBookings();
     const { data: sub } = supabase.auth.onAuthStateChange(() => loadBookings());
-    return () => sub.subscription.unsubscribe();
+    const stopWatching = subscribeBookingsChanged(() => loadBookings());
+    return () => {
+      sub.subscription.unsubscribe();
+      stopWatching();
+    };
   }, [loadBookings]);
 
   const handleCancelBooking = async (id: string) => {
@@ -204,25 +211,29 @@ export default function BookingsScreen() {
           <Text style={styles.titleText}>{t.title}</Text>
           <Text style={styles.subtitleText}>{t.subtitle}</Text>
         </View>
-        <TouchableOpacity style={styles.langBadge} onPress={() => setLang(l => l === "en" ? "ar" : "en")}>
+        <AppPressable label={lang === "en" ? "Switch to Arabic" : "التبديل إلى الإنجليزية"} style={styles.langBadge} onPress={() => setLang(l => l === "en" ? "ar" : "en")}>
           <Text style={styles.langText}>{lang === "en" ? "العربية" : "EN"}</Text>
-        </TouchableOpacity>
+        </AppPressable>
       </View>
 
       {/* TABS */}
       <View style={[styles.tabContainer, isRTL && styles.rtlRow]}>
-        <TouchableOpacity
+        <AppPressable
+          role="tab"
+          selected={activeTab === "upcoming"}
           style={[styles.tabButton, activeTab === "upcoming" && styles.tabActive]}
           onPress={() => setActiveTab("upcoming")}
         >
           <Text style={[styles.tabLabel, activeTab === "upcoming" && styles.tabLabelActive]}>{t.upcoming}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
+        </AppPressable>
+        <AppPressable
+          role="tab"
+          selected={activeTab === "past"}
           style={[styles.tabButton, activeTab === "past" && styles.tabActive]}
           onPress={() => setActiveTab("past")}
         >
           <Text style={[styles.tabLabel, activeTab === "past" && styles.tabLabelActive]}>{t.past}</Text>
-        </TouchableOpacity>
+        </AppPressable>
       </View>
 
       {/* LIST */}
@@ -236,9 +247,9 @@ export default function BookingsScreen() {
         ) : loadError ? (
           <View style={styles.emptyView}>
             <Text style={styles.emptyText}>{t.loadFailed}: {loadError}</Text>
-            <TouchableOpacity style={styles.btnSecondary} onPress={loadBookings}>
+            <AppPressable style={styles.btnSecondary} onPress={loadBookings}>
               <Text style={styles.btnSecondaryLabel}>{t.retry}</Text>
-            </TouchableOpacity>
+            </AppPressable>
           </View>
         ) : filtered.length === 0 ? (
           <View style={styles.emptyView}>
@@ -279,18 +290,18 @@ export default function BookingsScreen() {
               </View>
 
               <View style={[styles.cardActions, isRTL && styles.rtlRow]}>
-                <TouchableOpacity style={styles.btnSecondary} onPress={() => setSelectedBooking(item)}>
+                <AppPressable style={styles.btnSecondary} onPress={() => setSelectedBooking(item)}>
                   <Text style={styles.btnSecondaryLabel}>{t.details}</Text>
-                </TouchableOpacity>
+                </AppPressable>
 
                 {item.status === "pending_payment" && (
-                  <TouchableOpacity style={styles.btnDark} disabled={busy} onPress={() => handlePayNow(item.id)}>
+                  <AppPressable style={styles.btnDark} disabled={busy} onPress={() => handlePayNow(item.id)}>
                     <Text style={styles.btnDarkLabel}>{t.payNow}</Text>
-                  </TouchableOpacity>
+                  </AppPressable>
                 )}
 
                 {UPCOMING.includes(item.status) && new Date(item.scheduledAt).getTime() > Date.now() && (
-                  <TouchableOpacity
+                  <AppPressable
                     style={styles.btnPrimary}
                     onPress={() => {
                       setSelectedBooking(item);
@@ -298,7 +309,7 @@ export default function BookingsScreen() {
                     }}
                   >
                     <Text style={styles.btnPrimaryLabel}>{t.cancel}</Text>
-                  </TouchableOpacity>
+                  </AppPressable>
                 )}
               </View>
             </View>
@@ -336,9 +347,9 @@ export default function BookingsScreen() {
                 </View>
               </View>
 
-              <TouchableOpacity style={styles.modalBtnClose} onPress={() => setSelectedBooking(null)}>
+              <AppPressable style={styles.modalBtnClose} onPress={() => setSelectedBooking(null)}>
                 <Text style={styles.modalBtnCloseLabel}>{t.close}</Text>
-              </TouchableOpacity>
+              </AppPressable>
             </View>
           </View>
         </Modal>
@@ -353,16 +364,18 @@ export default function BookingsScreen() {
               <Text style={styles.modalDesc}>{t.confirmCancelDesc}</Text>
 
               <View style={[styles.modalActionRow, isRTL && styles.rtlRow]}>
-                <TouchableOpacity style={styles.modalBtnCancel} disabled={busy} onPress={() => setShowCancelModal(false)}>
+                <AppPressable style={styles.modalBtnCancel} disabled={busy} onPress={() => setShowCancelModal(false)}>
                   <Text style={styles.modalBtnCancelLabel}>{t.close}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
+                </AppPressable>
+                <AppPressable
+                  label={t.yesCancel}
+                  busy={busy}
                   style={styles.modalBtnConfirm}
                   disabled={busy}
                   onPress={() => handleCancelBooking(selectedBooking.id)}
                 >
                   {busy ? <ActivityIndicator color="#fff" /> : <Text style={styles.modalBtnConfirmLabel}>{t.yesCancel}</Text>}
-                </TouchableOpacity>
+                </AppPressable>
               </View>
             </View>
           </View>

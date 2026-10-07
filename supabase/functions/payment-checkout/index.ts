@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders, json, MissingConfigError, resolveCaller, serviceClient } from "../_shared/http.ts"
+import { buildRedirectUrl } from "../_shared/return-url.ts"
 
 // Creates a Tap charge for something the signed-in user owes. The amount always comes from the
 // database record, never from the browser.
@@ -123,7 +124,7 @@ serve(async (req) => {
         },
         source: { id: "src_all" },
         post: { url: webhookUrl },
-        redirect: { url: `${appUrl}${payable.redirectPath}` },
+        redirect: { url: buildRedirectUrl(appUrl, payable.redirectPath, body?.returnUrl) },
       }),
     })
     const charge = await response.json().catch(() => ({}))
