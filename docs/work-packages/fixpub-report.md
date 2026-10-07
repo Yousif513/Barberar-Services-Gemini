@@ -25,7 +25,6 @@ integrator does them after all merges.
 | R35 `/services` filters on the server, pages, no `reviews` select | fixed | group 6 | guard tests in `no-mock-data.test.mjs` ("services catalogue is searched, filtered and paged on the server"), UI-vs-schema check |
 | C-D21 discover: no invented map pins; plus found while there: category slugs that matched nothing, "distance" measured from the city centre, failed search shown as "no salons", stock photo per salon, clickable `div` cards | fixed | group 7 | guard tests in `no-mock-data.test.mjs` ("discover map draws only what the data places"), UI-vs-schema check |
 
-(The table is appended after every commit group.)
 
 ## Group 1: login (D-17, D-11 login half, D-23 login half)
 
@@ -162,3 +161,40 @@ minimum, SAR 40 maximum, none on repeat visits). It matches `fee_rules` today, b
   duration) argument; the page will pass it once it exists.
 - `record_consent` (patched in `20261007010400`) still falls back to the literal `'v1.0'` when no `customer_terms` row is published and the caller
   passes no version. The screens now refuse to record when nothing is published, but the database should raise instead of defaulting.
+
+## Verification (commands run in `primora-wp-fixpub`, results)
+
+| Command | Result |
+|---|---|
+| `npx tsc --noEmit -p web_platform` | exit 0, no output |
+| `npx eslint <the 18 changed .ts/.tsx files>` (from `web_platform/`) | 0 errors, 40 warnings; the same pre-existing files had 56 warnings on the base commit `e3c8598` (`<img>`, `any`, set-state-in-effect that were already there); the 4 new files add none |
+| `npm run test --workspace=web_platform` | tests 220, pass 220, fail 0 (base: 195; +25 guard tests, -2 stale cases) |
+| `node scripts/verify-ui-schema.mjs` | **fails before it checks anything on this CRLF checkout**: `Migration 20261007900300_delegated_access_scope.sql failed: patch_function: pattern not found in is_provider_staff(uuid,uuid)` (its helper normalises line endings in the function body but not in its own `$from$` pattern; identical on the base commit). With an LF copy of that single file (restored afterwards, the tree is clean): `checked 89 rpc calls and 190 select strings (8 dynamic calls not checked); 0 mismatches, 0 in the baseline` |
+| `npm run build --workspace=web_platform` | fails only because Turbopack rejects the `node_modules` junction (`Symlink [project]/node_modules is invalid, it points out of the filesystem root`); the integrator builds after merging |
+
+Not run: the database suite (this package changes no SQL), `npm run typecheck:mobile` (no mobile change), a browser pass (the dev server hits the same junction
+limit). Keyboard and screen-reader behaviour is therefore reasoned from the markup and from `ModalOverlay` (focus move/trap/restore, Escape, inert background), not observed.
+
+## What the integrator must do or decide
+
+1. **Booking calls** in `shop/[id]/page.tsx` (`getPrayerWindowsForDate`, `fetchSlots`, `handleBook`, the `create_booking` / `create_multi_service_booking` arguments) are untouched;
+   apply FIX-BOOKING's prayer-window and attribution-token changes there (`fixbooking-report.md` was not in the tree when I looked). Separate hunks: my edits sit at least
+   ten lines away from those blocks. The page still falls back to the centre of Riyadh for prayer times when a branch has no coordinates (`coordinates` default): FIX-BOOKING's call.
+2. **R25/R26** (global locale provider, double RTL mirroring) skipped as instructed. `usePageLocale` (new `src/lib/use-page-locale.ts`) is the single-file stand-in used by
+   login, become-provider and the shop page; swap it for `useLocale()` and delete it. The 1-second language polling remains on privacy, about, security, terms, discover, services and
+   `category-providers.tsx`.
+3. **Database needs** (no SQL written here): (a) `record_consent` must raise instead of defaulting to the literal `'v1.0'` when no `customer_terms` is published; (b)
+   `get_branch_available_slots` needs a service list / combined duration argument for any-professional multi-service bookings (R24); (c) the harness migration
+   `20261007900300_delegated_access_scope.sql` should normalise CRLF in its `patch_function` pattern like `20261007010400` does; (d) executing DB tests for slots, closures, leave
+   and seasons (R29) belong to the database packages.
+4. **Owner decisions**: the fee sentence in terms/security section 3 (20% first marketplace visit, SAR 10-40) and the mailboxes `privacy@primora.com` / `support@primora.com` are typed into page copy
+   and need either confirmation (`declaredStatic[]`) or a move into the published agreements / `platform_settings`.
+5. Email sign-up that needs confirmation cannot record consent (no session yet); a post-confirmation consent prompt belongs to the customer portal package (the customer settings page
+   still inserts into `consents` directly, D-11's other half).
+
+## Files touched outside the pages I own
+
+- New shared files: `web_platform/src/lib/published-agreement.ts`, `web_platform/src/lib/use-page-locale.ts`, `web_platform/src/components/public-dialog.tsx`.
+- Copy-only edits: `web_platform/src/app/categories/{barber,hair,makeup,spa}/page.tsx`, `web_platform/src/app/layout.tsx` (title and description).
+- Tests: `web_platform/tests/no-mock-data.test.mjs` (+25 guard tests), `web_platform/tests/negative-authorization.test.mjs` (two stale cases deleted, one assertion updated).
+- No migrations, no changes under `customer/**`, `provider/**`, `admin/**`, `mobile_app/**`, `supabase/**`.
