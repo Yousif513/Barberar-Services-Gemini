@@ -63,10 +63,9 @@ CREATE TRIGGER trg_sync_profile_phone_from_auth
 -- same international form. Patched in place so the rest of handle_new_user stays as the latest migration left it.
 DROP FUNCTION IF EXISTS pg_temp.patch_function(regprocedure, text, text);
 CREATE OR REPLACE FUNCTION pg_temp.patch_function(p_sig regprocedure, p_from text, p_to text) RETURNS void LANGUAGE plpgsql AS $patch$
-DECLARE v_def text := replace(pg_get_functiondef(p_sig), E'
-', E'
-'); -- a checkout with Windows line endings stores them in function bodies
+DECLARE v_def text := replace(pg_get_functiondef(p_sig), E'\r\n', E'\n'); -- a checkout with Windows line endings stores them in function bodies
 BEGIN
+  p_from := replace(p_from, E'\r\n', E'\n'); p_to := replace(p_to, E'\r\n', E'\n'); -- the migration file itself may have been checked out with CRLF
   IF position(p_from IN v_def) = 0 THEN RAISE EXCEPTION 'patch_function: pattern not found in %', p_sig; END IF;
   EXECUTE replace(v_def, p_from, p_to);
 END $patch$;
