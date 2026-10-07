@@ -82,7 +82,7 @@ describe("owner workflows", () => {
 
   it("deactivates a product reversibly and audits catalog changes", async () => {
     await as(db, owner, `update inventory_products set is_active = false where id = $1`, [product]);
-    await expectError(adjust(owner, 1), /Forbidden/);
+    await expectError(adjust(owner, 1), /Product is inactive/);
     await as(db, owner, `update inventory_products set is_active = true where id = $1`, [product]);
     await adjust(owner, 1);
     const audit = await sys(db, `select count(*)::int n from admin_audit_logs where action = 'inventory_products.update'`);
