@@ -192,3 +192,39 @@ export function bookAgainHref(providerId, serviceId) {
   if (!providerId) return null;
   return serviceId ? `/shop/${providerId}?service=${encodeURIComponent(serviceId)}` : `/shop/${providerId}`;
 }
+
+/**
+ * The state a customer sees for one wallet ledger row, from the booking it belongs to. A cancelled booking that kept a
+ * late fee is not "refunded"; a visit that has not happened yet is "upcoming"; nothing is "held in escrow".
+ * @param {{ status?: unknown, scheduled_at?: string | null, deposit_required?: unknown, cancellation_fee?: unknown, refund_amount?: unknown }} booking
+ * @param {Date} now
+ * @returns {"pending" | "upcoming" | "completed" | "refunded" | "partly_refunded" | "fee_kept" | "no_charge"}
+ */
+export function walletEntryStatus(booking, now) {
+  const status = bookingStatusKey(booking.status);
+  if (status === "cancelled" || status === "no_show") {
+    const settled = settlementKey(booking);
+    return settled === "refunded" || settled === "partly_refunded" || settled === "fee_kept" ? settled : "no_charge";
+  }
+  if (status === "pending_payment") return "pending";
+  if (status === "confirmed" && booking.scheduled_at && new Date(booking.scheduled_at).getTime() > now.getTime()) return "upcoming";
+  return "completed";
+}
+
+/**
+ * Deposits the customer has paid for confirmed visits that have not happened yet, net of anything refunded. Completed
+ * visits waiting for payout, refund-pending rows and tips are not "upcoming deposits".
+ * @param {Array<{ entry_type?: string | null, total_captured?: unknown, refunded_amount?: unknown, booking?: { status?: unknown, scheduled_at?: string | null } | null }>} entries
+ * @param {Date} now
+ * @returns {number} SAR
+ */
+export function upcomingDepositTotal(entries, now) {
+  let cents = 0;
+  for (const entry of entries) {
+    if ((entry.entry_type ?? "booking_payment") !== "booking_payment" || !entry.booking) continue;
+    if (bookingStatusKey(entry.booking.status) !== "confirmed" || !entry.booking.scheduled_at) continue;
+    if (new Date(entry.booking.scheduled_at).getTime() <= now.getTime()) continue;
+    cents += Math.max(0, toCents(entry.total_captured) - toCents(entry.refunded_amount));
+  }
+  return cents / 100;
+}

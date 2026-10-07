@@ -117,3 +117,33 @@ describe("dates and links", () => {
     assert.equal(bookAgainHref(null, "s1"), null);
   });
 });
+
+import { walletEntryStatus, upcomingDepositTotal } from "../src/lib/booking-display.mjs";
+
+describe("wallet ledger rows (C-D18)", () => {
+  const now = new Date("2026-10-07T10:00:00Z");
+  const future = "2026-10-12T10:00:00Z";
+  const past = "2026-10-01T10:00:00Z";
+
+  it("labels a cancelled booking that kept a late fee as fee kept, never refunded", () => {
+    assert.equal(walletEntryStatus({ status: "cancelled", cancellation_fee: 10, refund_amount: 10 }, now), "partly_refunded");
+    assert.equal(walletEntryStatus({ status: "cancelled", cancellation_fee: 20, refund_amount: 0 }, now), "fee_kept");
+    assert.equal(walletEntryStatus({ status: "cancelled", cancellation_fee: 0, refund_amount: 20 }, now), "refunded");
+    assert.equal(walletEntryStatus({ status: "confirmed", scheduled_at: future }, now), "upcoming");
+    assert.equal(walletEntryStatus({ status: "confirmed", scheduled_at: past }, now), "completed");
+    assert.equal(walletEntryStatus({ status: "completed", scheduled_at: past }, now), "completed");
+  });
+
+  it("sums only confirmed, future visits, net of refunds, and ignores completed, cancelled and tip rows", () => {
+    const entries = [
+      { entry_type: "booking_payment", total_captured: 20, refunded_amount: 0, booking: { status: "confirmed", scheduled_at: future } },
+      { entry_type: "booking_payment", total_captured: 30, refunded_amount: 5, booking: { status: "confirmed", scheduled_at: future } },
+      { entry_type: "booking_payment", total_captured: 40, refunded_amount: 0, booking: { status: "completed", scheduled_at: past } },
+      { entry_type: "booking_payment", total_captured: 50, refunded_amount: 50, booking: { status: "cancelled", scheduled_at: future } },
+      { entry_type: "tip", total_captured: 10, refunded_amount: 0, booking: { status: "confirmed", scheduled_at: future } },
+      { entry_type: "booking_payment", total_captured: 60, refunded_amount: 0, booking: { status: "confirmed", scheduled_at: past } },
+    ];
+    assert.equal(upcomingDepositTotal(entries, now), 45);
+    assert.equal(upcomingDepositTotal([], now), 0);
+  });
+});
