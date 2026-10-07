@@ -136,20 +136,14 @@ $$;
 DROP FUNCTION IF EXISTS pg_temp.patch_function(regprocedure, text[], text[]);
 CREATE FUNCTION pg_temp.patch_function(p_sig regprocedure, p_from text[], p_to text[]) RETURNS void LANGUAGE plpgsql AS $helper$
 DECLARE
-  v_def text := replace(pg_get_functiondef(p_sig), $e$
-$e$, $e$
-$e$);
+  v_def text := replace(pg_get_functiondef(p_sig), chr(13) || chr(10), chr(10));
   i int;
 BEGIN
   FOR i IN 1 .. COALESCE(array_length(p_from, 1), 0) LOOP
-    IF position(replace(p_from[i], $e$
-$e$, $e$
-$e$) IN v_def) = 0 THEN
+    IF position(replace(p_from[i], chr(13) || chr(10), chr(10)) IN v_def) = 0 THEN
       RAISE EXCEPTION 'patch_function: pattern % not found in %', i, p_sig;
     END IF;
-    v_def := replace(v_def, replace(p_from[i], $e$
-$e$, $e$
-$e$), p_to[i]);
+    v_def := replace(v_def, replace(p_from[i], chr(13) || chr(10), chr(10)), p_to[i]);
   END LOOP;
   EXECUTE v_def;
 END
