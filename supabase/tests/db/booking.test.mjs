@@ -123,7 +123,7 @@ describe("booking engine", () => {
   });
 
   it("customer late cancellation keeps the provider's fee; provider cancellation refunds everything", async () => {
-    await sys(db, `update providers set free_cancellation_hours = 2000 where id = $1`, [SEED.provider1]);
+    await sys(db, `update providers set free_cancellation_hours = 720 where id = $1`, [SEED.provider1]);
     let slot = await firstSlot(db, customer, SEED.employee1, date, svc.duration);
     let b = await book(customer, slot);
     await confirmPayment(b);
@@ -148,7 +148,7 @@ describe("booking engine", () => {
       [SEED.employee1, date, svc.duration]);
     const b = await book(customer, slots[0].slot_start, { source: "link" });
     await confirmPayment(b);
-    await sys(db, `update providers set free_cancellation_hours = 2000 where id = $1`, [SEED.provider1]);
+    await sys(db, `update providers set free_cancellation_hours = 720 where id = $1`, [SEED.provider1]);
     const target = slots[slots.length - 1].slot_start;
     await expectError(as(db, customer, `select reschedule_booking($1, $2)`, [b.id, target]), /Rescheduling closes/);
     const moved = (await as(db, owner1, `select reschedule_booking($1, $2) r`, [b.id, target]))[0].r;

@@ -7,6 +7,12 @@ Tests: `supabase/tests/db/fixdba_*.test.mjs`.
 |---|---|---|---|
 | D-08 bounds on provider money terms | fixed | `20261007010000_provider_booking_policy.sql` | `fixdba_booking_policy.test.mjs` (D-08 suites) |
 | D-27 `set_provider_booking_policy` | fixed | `20261007010000_provider_booking_policy.sql` | `fixdba_booking_policy.test.mjs` (D-27 suite) |
+| D-13 reminder never after the visit | fixed | `20261007010100_reminder_never_after_visit.sql` | `fixdba_reminders.test.mjs` |
+| D-07 branch coordinates | fixed (DB part) | `20261007010200_provider_applications_integrity.sql` | `fixdba_applications_agreements.test.mjs` ("D-25 / D-07 / D-12", "D-12 + D-07") |
+| D-25 application constraints | fixed | `20261007010200_provider_applications_integrity.sql` | same file |
+| D-12 agreement acceptance | fixed (DB part) | `20261007010200_...`, `20261007010300_agreement_evidence.sql` | same file |
+| D-24 agreement evidence | fixed | `20261007010300_agreement_evidence.sql` | same file ("D-24") |
+| D-15 consent / data-request evidence | fixed (DB part) | `20261007010400_consent_and_request_evidence.sql` | `fixdba_consent_evidence.test.mjs` |
 
 ## D-08 / D-27 notes
 
@@ -18,3 +24,25 @@ Tests: `supabase/tests/db/fixdba_*.test.mjs`.
 - New delegate permission key: `settings` (inside `provider_memberships.permissions`). `can_access_provider_operation` only knows `inventory/bookings/staff/reports` and belongs to another package, so the command checks the membership itself.
 - Direct owner writes of the four columns remain possible but bounded and floored (the provider settings screen still saves the deposit that way until it calls the command). Blocking direct writes is a one-line follow-up once that screen is migrated.
 - Not changed (other packages own it): `cancel_booking` reads the provider's *current* policy, so a policy change also applies to bookings made earlier under the old terms.
+
+## D-13
+
+`claim_message_batch` is patched in place: a `reminder_*` message whose booking starts within 15 minutes (or has begun) is closed as `expired` (new
+allowed value of `message_queue.status`) instead of being delivered late, and `reminder_2h` is exempt from the 22:00-09:00 Riyadh quiet hours (the earlier
+pipeline, `20261003230000:591`, exempted it; the rewrite in `20261005020000` lost that). The quiet-hours branch cannot be driven to a chosen clock time in
+PGlite, so the test asserts the clock-independent outcomes and, for the deferred case, branches on the real Riyadh hour.
+
+## D-07 / D-25 / D-12 / D-24 (applications and agreements)
+
+- `provider_applications`: defaults of `latitude`, `longitude` and `city` removed; pending applications still holding exactly 24.7136 / 46.6753 are cleared (approval then asks for a real location); coordinates both-or-neither and in range; one open (`pending`/`under_review`) application per applicant (older open duplicates are closed as superseded by the migration); `trade_license_url` must be https (a stored non-https link is moved into `admin_notes` as plain text and cleared; same check added to `providers.trade_license_url`).
+- A BEFORE INSERT trigger refuses an application while no `provider_agreement` is published (error 22023 "The provider agreement has not been published yet, so applications are closed"), stamps `agreement_id` / `agreement_version`, and nulls the review fields a client could have supplied. `agreed_at` is stamped when `record_agreement_acceptance` records the acceptance (the become-provider page inserts the application first and accepts second, so the stamp follows the acceptance). The service role bypasses the stamp (fixtures, Edge Functions).
+- `agreement_acceptances`: INSERT policy dropped and INSERT/UPDATE/DELETE revoked from the client roles; BEFORE UPDATE trigger makes rows immutable even for the service role; `record_agreement_acceptance` (patched in place) validates the method and returns the existing row on a repeat.
+- `legal_agreements`: trigger forbids editing a published or archived version (only `published -> archived` is allowed, which is what `admin_publish_agreement` does) and deleting a non-draft version.
+- `approve_provider_application` (patched in place) refuses while no provider agreement is published and until the applicant has an acceptance row for the published version, then still requires the location.
+- Existing tests adapted because they relied on the old behaviour: `booking.test.mjs` used `free_cancellation_hours = 2000` to force a late cancellation (now 720, the maximum, still longer than any lead time used there); `trust.test.mjs` "activates an approved provider" now publishes the provider agreement, has the applicant accept it and passes `city` (no default any more).
+- Web: `become-provider/page.tsx` must (a) send `latitude`/`longitude`/`city` collected from the applicant instead of the hard-coded `city: "Riyadh"`, (b) call `record_agreement_acceptance` and show "agreement not yet published" when the insert fails with 22023, (c) handle 23505 (an open application already exists) and 23514 (https link only). `admin/providers/provider-management.tsx:1290` can keep rendering the link: only https values exist now.
+
+## D-15
+
+`consents` and `data_subject_requests` lose their INSERT policies and the client roles lose INSERT (and UPDATE/DELETE on `consents`). Commands: `record_consent` (patched in place: validates `method` `^[a-z0-9_]{1,50}$` and version format, records the published `customer_terms` version for `terms_privacy`), new `record_consents(p_purposes text[], p_status, p_document_version, p_method)` (atomic, up to 5 purposes), new `submit_data_request(p_request_type, p_details)` (server status `pending`, due date = Riyadh date + 30, replay returns the open request of the same kind, audited without the free text).
+Callers that insert directly today and must move to the commands (other packages own them): `web_platform/src/app/login/page.tsx:69`, `web_platform/src/app/customer/settings/page.tsx:195`, `web_platform/src/app/shop/[id]/page.tsx:1000`, `mobile_app/src/app/profile.tsx:240` (consents -> `record_consents`), `web_platform/src/app/privacy/page.tsx:104` (data requests -> `submit_data_request`).
