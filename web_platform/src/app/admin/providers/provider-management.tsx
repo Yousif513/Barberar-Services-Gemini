@@ -701,17 +701,10 @@ export default function AdminProviderManagement() {
           id,
           business_name_en,
           business_name_ar,
-          contact_email,
-          contact_phone,
           type,
           status,
           is_verified,
-          cr_number,
           cr_verification_status,
-          commission_percentage,
-          trade_license_url,
-          admin_notes,
-          last_activity_at,
           created_at,
           branches (
             id,
@@ -745,6 +738,12 @@ export default function AdminProviderManagement() {
         .order("created_at", { ascending: false });
       if (dbError) throw dbError;
 
+      // Contact details, registration numbers, commission and the review notes are not readable from the table by signed-in users;
+      // administrators read them through one audited command.
+      const privateResult = await supabase.rpc("admin_provider_private_directory");
+      if (privateResult.error) throw privateResult.error;
+      const privateById = new Map(((privateResult.data ?? []) as Array<{ provider_id: string }>).map((row) => [row.provider_id, row]));
+
       // Branch and employee figures come from their own views. If either fails nothing is estimated in
       // its place: the screen says so and shows no figures.
       const [branchResult, employeeResult] = await Promise.all([
@@ -760,7 +759,7 @@ export default function AdminProviderManagement() {
         branchFigures = Object.fromEntries(((branchResult.data ?? []) as BranchPerformanceRow[]).map((row) => [row.branch_id, tallyFromBranchRow(row)]));
         employeeFigures = Object.fromEntries(((employeeResult.data ?? []) as EmployeePerformanceRow[]).map((row) => [row.employee_id, figuresFromEmployeeRow(row)]));
       }
-      setProviders(((data ?? []) as unknown as ProviderRow[]).map((row) => normalizeProvider(row, branchFigures, employeeFigures)));
+      setProviders(((data ?? []) as unknown as ProviderRow[]).map((row) => normalizeProvider({ ...row, ...(privateById.get(row.id) ?? {}) } as ProviderRow, branchFigures, employeeFigures)));
     } catch (loadError) {
       setProviders([]);
       setError(`${t.loadFailed} ${errorMessage(loadError)}`.trim());
