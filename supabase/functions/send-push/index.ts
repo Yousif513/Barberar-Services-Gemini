@@ -5,7 +5,8 @@
 // Called by the scheduler with the service role key:  POST { "limit": 50 }  (limit optional, 1 to 200).
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { corsHeaders as sharedCorsHeaders, serviceClient, MissingConfigError } from "../_shared/http.ts"
+import { MissingConfigError, serviceClient } from "../_shared/http.ts"
+import { corsHeaders as sharedCorsHeaders } from "../_shared/http.ts"
 
 type ClaimedPush = {
   queue_id: string

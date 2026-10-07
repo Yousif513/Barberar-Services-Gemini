@@ -47,3 +47,35 @@ Branch `wp/adm1`. Migration range `20261008100000` to `20261008149999`. Newest i
 
 - `admin/reports/page.tsx`: a read-only "Booking funnel and events" card under the exports. It follows the exported period, calls `admin_get_event_counts(start, end)` (no table read), and lists per event: source (server or app), events in the period, the busiest single day's people count and the days with events, with the server funnel steps first (confirmed, payment received, completed, cancelled, no-show). The people figure is the busiest day on purpose: people on different days cannot be summed. A failed read shows the reason with a retry, an empty period says so, a period over 365 days or a reversed range explains itself instead of calling the server. The report page itself was not rewritten; the card is added to it.
 - Test: wiring guard in `adm1-admin-wiring.test.mjs`. The command is covered by `fixdbb_analytics_events.test.mjs`.
+
+## Verification (run in this worktree, results as observed)
+
+| Command | Result |
+|---|---|
+| `node --test "supabase/tests/db/**/*.test.mjs"` | 612 tests, 611 pass, 0 fail, 1 skipped (`adm1_api_settings_screen`, see below); includes the admin command matrix over every `admin_*` function, `data_api_grants` and `migration_hygiene` |
+| `node --test supabase/tests/db/adm1_*.test.mjs` | pass (application CR view 2, promo codes 8, roles/flags/fee rules 10; API settings skipped) |
+| `npm run test --workspace=web_platform` | 332 tests, 332 pass (new guard file `tests/adm1-admin-wiring.test.mjs`, 10 tests) |
+| `npm run test:admin-controls` | passed |
+| `npm run test:security-core` | passed |
+| `npx tsc --noEmit -p web_platform` | no errors |
+| `npx eslint <changed files>` from `web_platform/` | 0 errors, 30 warnings, all of the kinds the files already had (`any`, effect dependencies); `ledger`/`notifications`/`provider-management` have the same count as before |
+| `node scripts/verify-ui-schema.mjs` | **1 mismatch** on this branch: `rpc("admin_set_api_setting")` does not exist because the developer API migration (`20261006090000_api_keys.sql`, branch `wp/api`) is not in this worktree. With that migration copied in temporarily (not committed), the script reports 0 mismatches and `adm1_api_settings_screen.test.mjs` and the command matrix pass (20 tests, 0 skipped); the file was removed again. So the mismatch disappears on merge. |
+
+Not run: `npm run build --workspace=web_platform` and `npm run typecheck:mobile` (not in the requested list); the Deno Edge Functions (`wathq-verify`, `send-push`) cannot run here (no Deno); nothing was tried in a browser.
+
+## Edge Functions
+
+- `wathq-verify` and `send-push` are thin and unrun. Their static guards (`verify-security-core`, `negative-authorization` send-push CORS rule) pass; `send-push` keeps `import { corsHeaders as sharedCorsHeaders } from "../_shared/http.ts"` on its own line because a test looks for that exact text.
+
+## Files touched outside the admin console (for the integrator)
+
+- Tests changed because behaviour changed on purpose: `supabase/tests/db/booking_engine_coupons.test.mjs` (a customer's direct UPDATE on `promotional_codes` is now refused), `qa_defect_fixes.test.mjs` and `security_hardening.test.mjs` (fee rules change through `admin_save_fee_rule`), `web_platform/tests/admin-console-guards.test.mjs` (redirect table needs 9 entries, not 10, since `/admin/roles` is a screen).
+- `web_platform/next.config.ts`: removed the `/admin/roles` redirect. `web_platform/src/app/admin/layout.tsx`: two navigation entries.
+- Migrations: `20261008100000_adm1_application_cr_view.sql`, `20261008100100_adm1_admin_promo_code_commands.sql`, `20261008100200_adm1_roles_flags_fee_rules.sql` (none replaces an existing function).
+
+## Deferred or open
+
+- Unsetting an `api.*` setting from the screen (see item 5).
+- Provider roles cannot be changed from the role screen on purpose.
+- A browser pass of the new screens (RTL layout, keyboard order, console errors) has not been done.
+- Owner decisions flagged: fee-rule ceiling of 50 percent, the meaning of provider-funded platform-wide promo codes, who approves fee changes.

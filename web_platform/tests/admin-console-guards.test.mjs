@@ -53,7 +53,7 @@ describe("admin console guards", () => {
   it("retired admin addresses redirect on the server instead of shipping redirect-only pages", () => {
     const config = read("web_platform/next.config.ts");
     const sources = [...config.matchAll(/source: "(\/admin\/[a-z-]+)"/g)].map((match) => match[1]);
-    assert.ok(sources.length >= 10, "the redirect table lists the retired addresses");
+    assert.ok(sources.length >= 9, "the redirect table lists the retired addresses"); // 9 since /admin/roles became a screen (ADM1)
     for (const source of sources) {
       assert.ok(!existsSync(join(repoRoot, ADMIN_ROOT, source.replace("/admin/", ""), "page.tsx")), `${source} must not also be a page`);
     }
