@@ -16,6 +16,7 @@ run the whole DB suite.
 | R15 / G23 | fixed (DB part; provider screens deferred to the screen packages) | `20261007080000_booking_buffers_processing_variants.sql` | `booking_engine_buffers_variants.test.mjs` |
 | R42 / G37 | fixed (radius); travel buffer deferred | `20261007091000_home_service_radius.sql` | `booking_engine_home_radius.test.mjs` |
 | C-D10 / D10 | fixed (DB part; claim screen deferred) | `20261007092000_waitlist_exclusive_claim.sql` | `booking_engine_waitlist.test.mjs` |
+| D19 / C-D19 | fixed (DB part; shop/customer screens deferred) | `20261007093000_packages_linked_to_bookings.sql` | `booking_engine_packages.test.mjs` |
 | R24 / C-D16 | fixed (DB part; shop page and mobile pass the list) | `20261007090000_branch_slots_any_professional.sql` | `booking_engine_branch_slots.test.mjs`, `qa_adversarial.test.mjs` (allow-list updated) |
 
 ## Callers cheat-sheet (current signatures; every new argument is optional and last, named arguments keep old callers working)
@@ -38,7 +39,8 @@ Pass these by NAME through PostgREST (`supabase.rpc(name, { ... })`). Argument n
 - New owner commands: `create_provider_share_token(p_provider_id, p_source, p_label, p_expires_at)`, `revoke_provider_share_token(p_token_id, p_reason)`; table `provider_share_tokens` (owner read).
 - New customer command: `claim_waitlist_slot(p_waitlist_id)` returns the held slot; scheduler-only: `expire_waitlist_claims()`.
 - Slot display: format with `ar-SA`/`en` and `timeZone: 'Asia/Riyadh'`; amounts in SAR only.
-- Items 7b-7f (packages, coupon limit, loyalty, wallet credit and referral, gift card message) add further arguments; they are listed in their sections below as they land.
+- 7b: `create_booking` and `create_multi_service_booking` take **`request_user_package_id`** (uuid of the customer's `user_packages` row; last argument).
+- Items 7c-7f ( coupon limit, loyalty, wallet credit and referral, gift card message) add further arguments; they are listed in their sections below as they land.
 
 ## 1. D-21 / R3 prayer windows and the Riyadh clock (fixed)
 
@@ -187,3 +189,18 @@ Screens (not touched): the shop page must handle `?claim_waitlist=<id>` (call `c
 / the same id in `create_multi_service_booking`), and the waitlist join form must collect WhatsApp consent (`record_consent('whatsapp')`) and show the new refusal messages.
 Follow-up for the messaging owner: `booking_message_variables.rebook_url` still ends with `?source=whatsapp`; after item 3 a `source` in the URL no longer makes a booking provider-sourced,
 so provider "rebook" links must carry a provider share token (`?ref=<token>`) to stay fee-free (not changed here: that function is not in this package).
+
+## 7b. D19 / C-D19 packages linked to bookings (fixed in the database)
+
+Reproduced by construction: `booking_create_internal` had no package input, so a package holder paid the deposit like anybody else, and `redeem_package_session`
+accepted a booking that did not contain the package's service.
+- `create_booking(..., request_user_package_id)` / `create_multi_service_booking(..., request_user_package_id)` / `booking_create_internal(..., p_user_package_id)`: the package must be the
+  caller's own (`P0002` otherwise), `active`, with a session left, not expiring before the appointment, of the same provider, and cover a service of the visit
+  (`packages.service_id`; NULL = a package for any service, which covers the FIRST service of the visit: owner decision, say so in the package screen).
+- The covered service's price is taken off like a discount (`bookings.discount_amount`), recorded in `bookings.package_covered_amount` and `bookings.user_package_id`; coupons and loyalty apply
+  to the remainder; VAT only on the remainder; nothing left to collect = `confirmed` immediately. One session is reserved (`remaining_sessions - 1`, `package_redemptions` row with the booking).
+- `booking_release_discounts` returns the session and marks the redemption `reversed_at` (new column), once (the function was already idempotent through `discounts_released_at`).
+- `redeem_package_session` (provider staff, bookings made without a package) requires the booking to contain the package's service and ignores reversed redemptions.
+- Not changed: the platform commission is still calculated on the pre-discount subtotal, as for coupons; the owner should decide whether a package-covered service carries a commission at redemption
+  (the package sale may already have carried one). A fully covered booking is `confirmed` without a ledger capture, like a gift-card-covered one.
+- Screens: customer "my packages" -> "book with this package" (pass `request_user_package_id`), provider package form (the covered service), show "covered by package" from `package_covered_amount`.
