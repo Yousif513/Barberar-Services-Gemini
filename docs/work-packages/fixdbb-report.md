@@ -15,3 +15,4 @@ something these migrations depend on.
 | C-D29 | fixed | (see git log: "C-D29") | `fixdbb_inventory.test.mjs` "C-D29" |
 | C-D21b | fixed | next commit "C-D21b" | `fixdbb_inventory.test.mjs` "C-D21b" (5 tests: 1,000 stays 1,000 after a cost edit to 50; 100@10 + 100@20 = 200@15; transfer carries the average; cost audit with reason; role refusals) |
 | C-D22 | fixed | next commit "C-D22" | `fixdbb_inventory.test.mjs` "C-D22" (waste/negative adjust/transfer on inactive product; own message for an increase; role refusals; deactivation refused with open orders) |
+| C-D27 | fixed | next commit "C-D27" | `fixdbb_inventory.test.mjs` "C-D27" (request-id receipt, content dedupe without id, merged lines, different-cost refusal, approved-order cancel rights, reserve/release commands writing quantity_reserved, role refusals) |

@@ -194,3 +194,116 @@ describe("C-D22: an inactive product still allows waste and transfer of what is 
     assert.equal((await sys(db, `select is_active from inventory_products where id = $1`, [product]))[0].is_active, false);
   });
 });
+
+// ---- C-D27: purchase orders and reservations -------------------------------------------------------------------------------
+
+const createOrder = (actor, supplier, items, requestId = null) =>
+  as(db, actor, `select create_supplier_purchase_order($1, $2, $3, 'Order for the idempotency tests', $4::jsonb, $5) r`,
+    [SEED.provider1, SEED.branch1, supplier, JSON.stringify(items), requestId]).then((rows) => rows[0].r);
+const orderCount = async (supplier) => Number((await sys(db, `select count(*)::int n from supplier_purchase_orders where supplier_id = $1`, [supplier]))[0].n);
+
+describe("C-D27: purchase order creation", () => {
+  it("returns the first order again for the same request id, and refuses the id for another content or another person", async () => {
+    const supplier = await makeSupplier();
+    const product = await makeProduct(supplier, 10, "Idempotent product");
+    const items = [{ product_id: product, quantity: 4, unit_cost_sar: 10 }];
+    const request = rid();
+    const first = await createOrder(owner, supplier, items, request);
+    const second = await createOrder(owner, supplier, items, request);
+    assert.equal(second.id, first.id);
+    assert.equal(await orderCount(supplier), 1);
+    await expectError(createOrder(owner, supplier, [{ product_id: product, quantity: 5, unit_cost_sar: 10 }], request), /already used/);
+    await expectError(createOrder(delegate, supplier, items, request), /already used/);
+  });
+
+  it("de-duplicates two identical calls that carry no request id (the current screen)", async () => {
+    const supplier = await makeSupplier();
+    const product = await makeProduct(supplier, 10, "Double click product");
+    const items = [{ product_id: product, quantity: 2, unit_cost_sar: 10 }];
+    const a = await createOrder(owner, supplier, items);
+    const b = await createOrder(owner, supplier, items);
+    assert.equal(a.id, b.id);
+    assert.equal(await orderCount(supplier), 1);
+    const other = await createOrder(owner, supplier, [{ product_id: product, quantity: 3, unit_cost_sar: 10 }]);
+    assert.notEqual(other.id, a.id, "a different order is a different order");
+  });
+
+  it("merges a product listed twice and refuses the same product at two costs, creating nothing", async () => {
+    const supplier = await makeSupplier();
+    const product = await makeProduct(supplier, 10, "Merged product");
+    const order = await createOrder(owner, supplier, [
+      { product_id: product, quantity: 2, unit_cost_sar: 10 }, { product_id: product, quantity: 3, unit_cost_sar: 10 }]);
+    assert.equal(Number(order.subtotal_sar), 50);
+    const lines = await sys(db, `select quantity::float8 q from supplier_purchase_order_items where purchase_order_id = $1`, [order.id]);
+    assert.deepEqual(lines, [{ q: 5 }]);
+    const before = await orderCount(supplier);
+    await expectError(createOrder(owner, supplier, [
+      { product_id: product, quantity: 1, unit_cost_sar: 10 }, { product_id: product, quantity: 1, unit_cost_sar: 11 }]), /different unit costs/);
+    assert.equal(await orderCount(supplier), before);
+  });
+
+  it("refuses anonymous callers, strangers and a different provider owner", async () => {
+    const supplier = await makeSupplier();
+    const product = await makeProduct(supplier, 10, "Guarded order product");
+    const items = [{ product_id: product, quantity: 1, unit_cost_sar: 10 }];
+    await expectError(createOrder(ROLES.anon, supplier, items), /permission denied|Authentication/i);
+    await expectError(createOrder(stranger, supplier, items), /Not authorized/);
+    await expectError(createOrder(ROLES.user(SEED.owner2), supplier, items), /Not authorized/);
+    assert.equal(await orderCount(supplier), 0);
+  });
+
+  it("lets a delegate cancel a submitted order but not one the owner approved; the owner and an administrator can", async () => {
+    const supplier = await makeSupplier();
+    const product = await makeProduct(supplier, 10, "Cancel rights product");
+    const items = [{ product_id: product, quantity: 1, unit_cost_sar: 10 }];
+    const submitted = await createOrder(delegate, supplier, items);
+    await as(db, delegate, `select transition_supplier_purchase_order($1, 'submit')`, [submitted.id]);
+    await as(db, delegate, `select transition_supplier_purchase_order($1, 'cancel', 'Delegate changed their mind')`, [submitted.id]);
+    const approved = await createOrder(owner, supplier, [{ product_id: product, quantity: 2, unit_cost_sar: 10 }]);
+    for (const action of ["submit", "approve"]) await as(db, owner, `select transition_supplier_purchase_order($1, $2)`, [approved.id, action]);
+    await expectError(as(db, delegate, `select transition_supplier_purchase_order($1, 'cancel', 'Delegate cancelling an approved order')`, [approved.id]), /owner or administrator can cancel/);
+    await as(db, admin, `select transition_supplier_purchase_order($1, 'cancel', 'Administrator cancelling an approved order')`, [approved.id]);
+    const again = await createOrder(owner, supplier, [{ product_id: product, quantity: 3, unit_cost_sar: 10 }]);
+    for (const action of ["submit", "approve"]) await as(db, owner, `select transition_supplier_purchase_order($1, $2)`, [again.id, action]);
+    await as(db, owner, `select transition_supplier_purchase_order($1, 'cancel', 'Owner cancelling an approved order')`, [again.id]);
+    assert.equal((await sys(db, `select status from supplier_purchase_orders where id = $1`, [again.id]))[0].status, "cancelled");
+  });
+});
+
+describe("C-D27: reservations are written by commands and respected by the stock commands", () => {
+  const reserved = async (product) => Number((await sys(db, `select quantity_reserved::float8 q from branch_inventory_stock where branch_id = $1 and product_id = $2`, [SEED.branch1, product]))[0].q);
+  it("reserves and releases with receipts, keeps reserved stock out of waste and transfers, and refuses overdrafts", async () => {
+    const supplier = await makeSupplier();
+    const product = await makeProduct(supplier, 10, "Reserved product");
+    await orderFlow(supplier, product, 20, 10);
+    const request = rid();
+    const reserve = (qty, id = rid(), actor = owner) => as(db, actor, `select reserve_inventory_stock($1, $2, $3, 'Held for the wedding party', $4) r`, [SEED.branch1, product, qty, id]).then((r) => r[0].r);
+    assert.equal(Number((await reserve(5, request)).quantity_reserved), 5);
+    assert.equal(Number((await reserve(5, request)).quantity_reserved), 5, "the same request id is not applied twice");
+    assert.equal(await reserved(product), 5);
+    await expectError(as(db, owner, `select reserve_inventory_stock($1, $2, 6, 'Held for the wedding party', $3)`, [SEED.branch1, product, request]), /already used/);
+    await expectError(reserve(16), /Insufficient unreserved stock/);
+    await expectError(as(db, owner, `select adjust_branch_inventory_stock($1, $2, -16, 'Throw away reserved stock', 'waste', $3)`, [SEED.branch1, product, rid()]), /Insufficient unreserved stock/);
+    await expectError(as(db, owner, `select transfer_branch_inventory_stock($1, $2, $3, 16, 'Move reserved stock away', $4)`, [SEED.branch1, await secondBranchId(), product, rid()]), /Insufficient unreserved stock/);
+    const release = (qty, actor = owner) => as(db, actor, `select release_inventory_stock($1, $2, $3, 'Party cancelled', $4) r`, [SEED.branch1, product, qty, rid()]).then((r) => r[0].r);
+    assert.equal(Number((await release(2)).quantity_reserved), 3);
+    await expectError(release(4), /more than is reserved/);
+    await expectError(reserve(0), /Valid quantity/);
+    await expectError(reserve(1.0005), /Valid quantity/);
+    assert.equal(await reserved(product), 3);
+  });
+
+  it("refuses reservations to anonymous callers, strangers and a different provider owner", async () => {
+    const supplier = await makeSupplier();
+    const product = await makeProduct(supplier, 10, "Guarded reserved product");
+    await orderFlow(supplier, product, 5, 10);
+    const probe = (actor, fn) => as(db, actor, `select ${fn}($1, $2, 1, 'Scope probe for reservations', $3)`, [SEED.branch1, product, rid()]);
+    for (const fn of ["reserve_inventory_stock", "release_inventory_stock"]) {
+      await expectError(probe(ROLES.anon, fn), /permission denied/i);
+      await expectError(probe(stranger, fn), /Forbidden/);
+      await expectError(probe(ROLES.user(SEED.owner2), fn), /Forbidden/);
+    }
+    await probe(delegate, "reserve_inventory_stock");
+    await probe(admin, "release_inventory_stock");
+  });
+});
