@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
 import { sar } from "@/components/operations-ui";
+import MakeRegularButton from "@/components/make-regular";
 import {
   receiptAmounts, bookingStatusKey, bookingStatusTone, settlementKey, policyFromProvider, policySentences,
   formatBookingDateTime, isSuccessfulBooking,
@@ -608,6 +609,8 @@ export default function BookingConfirmationPage() {
             <span>{t.addToCalendar}</span>
           </button>
           )}
+
+          <MakeRegularButton booking={booking} className="w-full rounded-xl border border-[#C29A4C]/40 bg-white py-3 text-center text-xs font-black text-[#6B4F17] transition hover:bg-[#F8F3E4]" />
 
           <div className="grid grid-cols-2 gap-3">
             <Link
