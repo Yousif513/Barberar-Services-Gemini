@@ -13,6 +13,7 @@ import { PublicDialog } from "@/components/public-dialog";
 import { formatBookingDate, formatBookingTime, riyadhDateKey } from "@/lib/booking-display.mjs";
 import { lookupPublishedAgreement, type AgreementLookup } from "@/lib/published-agreement";
 import { usePageLocale } from "@/lib/use-page-locale";
+import { attributionRefToken, recordBookingAttribution } from "@/lib/attribution";
 
 export const dynamic = "force-dynamic";
 
@@ -492,6 +493,9 @@ export default function ShopDetailsPage() {
         const loyalty = settingRes.data?.value as any;
         if (!cancelled) {
           setLoadedShop(shopData);
+          // A share link can name one professional (?pro=<id>); the visitor still chooses the service and the time.
+          const sharedPro = shopData.specialists.find((sp) => sp.id === searchParams?.get("pro"));
+          if (sharedPro) setSelectedSpecialist(sharedPro);
           setLoadedServices(servicesData);
           setProviderPackages(packagesData);
           setProviderReviews(reviewsData);
@@ -1119,6 +1123,7 @@ export default function ShopDetailsPage() {
           target_scheduled_at: selectedSlot,
           services_payload: selectedServices.map((s) => ({ service_id: s.id })),
           request_source: bookingSource,
+          request_source_token: attributionRefToken(shop.id),
           request_coupon_code: appliedCoupon?.code || null,
           request_gift_card_code: appliedGiftCard?.code || null,
           request_loyalty_points: redeemLoyalty ? redeemPoints : 0,
@@ -1138,6 +1143,7 @@ export default function ShopDetailsPage() {
           request_branch_id: shop.branchId,
           request_client_profile_id: selectedClientProfileId || null,
           request_source: bookingSource,
+          request_source_token: attributionRefToken(shop.id),
           request_coupon_code: appliedCoupon?.code || null,
           request_gift_card_code: appliedGiftCard?.code || null,
           request_loyalty_points: redeemLoyalty ? redeemPoints : 0,
@@ -1151,6 +1157,7 @@ export default function ShopDetailsPage() {
       }
 
       sessionStorage.removeItem("primora_pending_booking");
+      void recordBookingAttribution(supabase, bookedBookingId, shop.id);
 
       // Nothing to collect online (0% deposit or a gift card covers it): the booking is already confirmed.
       if (bookedStatus === "confirmed") {

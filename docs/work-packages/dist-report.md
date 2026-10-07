@@ -31,3 +31,30 @@ Migration `supabase/migrations/20261008600000_distribution_booking_attribution.s
 Tests: `supabase/tests/db/distribution.test.mjs` (19 tests: customer-only write, once, every field validated at the command and at the table, token channel, fee
 untouched, RLS, owner / delegate / admin allowed, other provider's owner / employee / delegate without reports / customers / anonymous / service role refused,
 aggregate keys pinned and no personal data, UTC session with a 23:59 Riyadh booking).
+
+## Stage 2: web (commit "dist: share kit, shop metadata and JSON-LD, attribution capture")
+
+- `web_platform/src/lib/distribution.mjs` (pure, tested): link building (`buildShareLink` / `buildDeepLink`: `ref` share key, `src` channel, `utm_source|medium|campaign`,
+  `service`, `pro`), label sanitising identical to the database pattern, `parseAttributionParams` (src, then utm_source, then referrer host; labels the database would refuse
+  are dropped, the path loses its query string, the referrer is reduced to a host), `buildProviderJsonLd`, `openingHoursFromShifts`, `priceRangeFrom`, `serializeJsonLd`
+  (`<`, `>`, `&`, U+2028/2029 written as unicode escapes).
+- `web_platform/src/lib/attribution.ts`: `captureAttribution` (sessionStorage, per shop, at most 10 shops), `attributionRefToken`, `recordBookingAttribution` (best effort:
+  the booking already exists, so a failure is logged and returned, never thrown).
+- `/provider/share` (`web_platform/src/app/provider/share/page.tsx`): link builder per channel (link, QR, WhatsApp, Instagram) x service x professional x campaign, creates and
+  revokes the provider's share keys (`create_provider_share_token` / `revoke_provider_share_token`, reason dialog through `CommandDialog`), copy, WhatsApp share, Web Share for
+  Instagram with a copy fallback, QR rendered locally with the existing `qr-svg.mjs` (download SVG, print), and the attribution report from `provider_bookings_by_channel`
+  (7 / 30 / 90 days; totals, by channel with share bar, by campaign; loading, empty, error and forbidden states; AR/EN, RTL).
+- Shop layout (`web_platform/src/app/shop/[id]/layout.tsx`): metadata now has canonical, `alternates.languages` (ar-SA, en-US, x-default; the language is chosen on the page so all
+  point to the same address), Open Graph with images, Twitter card, robots, and a `HealthAndBeautyBusiness` JSON-LD script with a `ReserveAction`. Secondary reads that fail are
+  logged and that fact is left out; nothing is invented. A suspended or rejected shop is `noindex`.
+- `web_platform/src/app/sitemap.ts`: the shop list is read page by page (the API caps a response at `max_rows = 1000`, so the old `.limit(5000)` silently stopped at 1000 shops);
+  suspended and rejected shops are left out; `lastModified` uses `last_activity_at`; language alternates added. `robots.ts` already allows `/shop/*` and points at the sitemap: unchanged.
+
+### Files touched outside this package's own files (for the integrator)
+
+- `web_platform/src/app/shop/[id]/page.tsx` (another package owns it): +1 import, +2 lines `request_source_token: attributionRefToken(shop.id)` (single and multi-service booking:
+  FIX-BOOKING's screen note says the page must forward the `?ref=` key, otherwise a share-kit link would never be provider-sourced), +1 line
+  `void recordBookingAttribution(supabase, bookedBookingId, shop.id)` after the booking exists, +3 lines inside the existing loader that pick `?pro=<employee id>`. The capture itself
+  lives in the layout (`attribution-capture.tsx`), not in the page. If the page owner has already changed the booking calls, keep their version and these two lines only.
+- `web_platform/src/app/provider/layout.tsx`: one nav entry (`share`, both languages) and its icon.
+- `web_platform/src/app/shop/[id]/layout.tsx` and `web_platform/src/app/sitemap.ts`: edited (they are the metadata files this package was asked to extend).

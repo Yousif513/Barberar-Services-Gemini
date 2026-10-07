@@ -29,6 +29,7 @@ const translations = {
     intake: "Intake & Patch Tests",
     packages: "Wellness Packages",
     memberships: "Memberships",
+    share: "Share & Reach",
     jobs: "Find Job Leads",
     customers: "Customers",
     reviews: "Reviews",
@@ -65,6 +66,7 @@ const translations = {
     intake: "الاستمارات واختبار الحساسية",
     packages: "باقات العافية",
     memberships: "العضويات",
+    share: "المشاركة والانتشار",
     jobs: "فرص العمل المتاحة",
     messages: "الرسائل",
     customers: "العملاء",
@@ -126,6 +128,13 @@ const getNavIcon = (path: string) => {
     return (
       <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M20 7.5l-8-4-8 4m16 0l-8 4m8-4v9l-8 4m0-9L4 7.5m8 4v9M4 7.5v9l8 4" />
+      </svg>
+    );
+  }
+  if (path.includes("share")) {
+    return (
+      <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
       </svg>
     );
   }
@@ -293,6 +302,7 @@ function ProviderShell({
     { name: t.intake, path: "/provider/intake" },
     { name: t.packages, path: "/provider/packages" },
     { name: t.memberships, path: "/provider/memberships" },
+    { name: t.share, path: "/provider/share" },
     { name: t.jobs, path: "/provider/jobs" },
     { name: t.wallet, path: "/provider/wallet" },
     { name: t.messages, path: "/provider/messages" },
