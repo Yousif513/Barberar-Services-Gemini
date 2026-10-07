@@ -72,7 +72,6 @@ type Integration = {
   enabled: boolean;
   env: "test" | "live";
   key_masked: string | null;
-  api_key?: string | null;
   base_url?: string | null;
   platform_area?: string | null;
   description?: string | null;
@@ -89,7 +88,6 @@ type IntegrationForm = {
   category: string;
   platform_area: string;
   base_url: string;
-  api_key: string;
   key_masked: string;
   webhook_url: string;
   status: "connected" | "disconnected";
@@ -118,13 +116,15 @@ const extraTranslations = {
     created: "API integration added.",
     updated: "API integration updated.",
     deleted: "API integration disabled.",
-    required: "Add an API name, base URL, API key, and integration section.",
+    required: "Add an API name, base URL and integration section.",
     confirmDelete: "Disable {name}? It stops being used; its configuration stays in the registry and can be re-enabled.",
     activeCount: "Active APIs",
     configuredCount: "Configured keys",
     liveCount: "Live mode",
     sectionCount: "Sections linked",
-    keyHint: "Stored key is masked after save. Enter a new key only when rotating credentials.",
+    keyHint: "Credentials are Edge Function secrets and are never stored or entered here. The key hint below only helps identify which key is in use.",
+    keyHintLabel: "Key hint (last 4 characters)",
+    hintInvalid: "The key hint may only contain bullets and the last four characters of the key. Never paste a full key here.",
     search: "Search APIs, sections, or base URLs...",
     allSections: "All sections",
     allPlatform: "All platform",
@@ -148,13 +148,15 @@ const extraTranslations = {
     created: "تمت إضافة التكامل.",
     updated: "تم تحديث التكامل.",
     deleted: "تم تعطيل التكامل.",
-    required: "أضف اسم API والرابط والمفتاح وقسم التكامل.",
+    required: "أضف اسم API والرابط وقسم التكامل.",
     confirmDelete: "تعطيل {name}؟ يتوقف استخدامه ويبقى إعداده في السجل ويمكن إعادة تفعيله.",
     activeCount: "API مفعلة",
     configuredCount: "مفاتيح مهيأة",
     liveCount: "وضع مباشر",
     sectionCount: "أقسام مربوطة",
-    keyHint: "يظهر المفتاح مقنعاً بعد الحفظ. أدخل مفتاحاً جديداً فقط عند تدوير الاعتمادات.",
+    keyHint: "بيانات الاعتماد أسرار في بيئة Edge Function ولا تُخزَّن أو تُدخَل هنا. تلميح المفتاح أدناه يساعد فقط على معرفة المفتاح المستخدم.",
+    keyHintLabel: "تلميح المفتاح (آخر 4 أحرف)",
+    hintInvalid: "يقبل تلميح المفتاح نقاطاً وآخر أربعة أحرف من المفتاح فقط. لا تلصق المفتاح كاملاً هنا.",
     search: "ابحث عن API أو قسم أو رابط...",
     allSections: "كل الأقسام",
     allPlatform: "كل المنصة",
@@ -201,7 +203,6 @@ const blankForm = (): IntegrationForm => ({
   category: "payments",
   platform_area: "all",
   base_url: "",
-  api_key: "",
   key_masked: "",
   webhook_url: "",
   status: "disconnected",
@@ -219,12 +220,10 @@ const slugifyKey = (value: string) =>
     .replace(/^_+|_+$/g, "")
     .slice(0, 48) || `api_${Date.now()}`;
 
-const maskApiKey = (value: string) => {
-  const clean = value.trim();
-  if (!clean) return "";
-  if (clean.length <= 8) return `${clean.slice(0, 2)}••••${clean.slice(-2)}`;
-  return `${clean.slice(0, 6)}••••••${clean.slice(-4)}`;
-};
+// The registry never holds a credential: real keys are Edge Function secrets. Only an identification hint (bullets and the
+// last four characters) may be stored, and the database refuses anything longer.
+const KEY_HINT_PATTERN = /^[*•]{0,12}[A-Za-z0-9]{0,4}$/;
+const INTEGRATION_COLUMNS = "id, key, name, category, status, enabled, env, key_masked, webhook_url, last_checked_at, updated_at, base_url, platform_area, description, created_at, supported_payment_method_keys";
 
 const platformLabel = (value: string | null | undefined, lang: "en" | "ar") => {
   const labels: Record<string, { en: string; ar: string }> = {
@@ -265,7 +264,7 @@ export default function AdminIntegrations() {
   useEffect(() => {
     (async () => {
       try {
-        const { data, error: loadError } = await supabase.from("integrations").select("*").order("category").order("name");
+        const { data, error: loadError } = await supabase.from("integrations").select(INTEGRATION_COLUMNS).order("category").order("name");
         if (loadError) throw loadError;
         setItems(((data ?? []) as Integration[]).map(normalizeIntegration));
       } catch {
@@ -328,7 +327,6 @@ export default function AdminIntegrations() {
       category: item.category || "payments",
       platform_area: item.platform_area || "all",
       base_url: item.base_url || "",
-      api_key: "",
       key_masked: item.key_masked || "",
       webhook_url: item.webhook_url || "",
       status: item.status || "disconnected",
@@ -345,10 +343,14 @@ export default function AdminIntegrations() {
     event?.preventDefault();
     const isEdit = Boolean(form.id);
     const key = form.key || slugifyKey(form.name);
-    const masked = form.api_key.trim() ? maskApiKey(form.api_key) : form.key_masked;
+    const hint = form.key_masked.trim();
 
-    if (!form.name.trim() || !form.base_url.trim() || !form.category || (!isEdit && !form.api_key.trim())) {
+    if (!form.name.trim() || !form.base_url.trim() || !form.category) {
       setError(xt.required);
+      return;
+    }
+    if (!KEY_HINT_PATTERN.test(hint)) {
+      setError(xt.hintInvalid);
       return;
     }
 
@@ -361,7 +363,7 @@ export default function AdminIntegrations() {
       category: form.category,
       platform_area: form.platform_area,
       base_url: form.base_url.trim(),
-      key_masked: masked || null,
+      key_masked: hint || null,
       webhook_url: form.webhook_url.trim() || null,
       status: form.status,
       enabled: form.enabled,
@@ -370,15 +372,13 @@ export default function AdminIntegrations() {
       supported_payment_method_keys: form.category === "payments" ? form.supported_payment_method_keys : []
     };
 
-    if (form.api_key.trim()) payload.api_key = form.api_key.trim();
-
     try {
       if (isEdit) {
         const { data, error: updateError } = await supabase
           .from("integrations")
           .update(payload)
           .eq("id", form.id)
-          .select("*")
+          .select(INTEGRATION_COLUMNS)
           .single();
         if (updateError) throw updateError;
         setItems((prev) => prev.map((item) => (item.id === form.id ? normalizeIntegration(data as Integration) : item)));
@@ -388,7 +388,7 @@ export default function AdminIntegrations() {
         const { data, error: insertError } = await supabase
           .from("integrations")
           .insert(payload)
-          .select("*")
+          .select(INTEGRATION_COLUMNS)
           .single();
         if (insertError) throw insertError;
         setItems((prev) => [normalizeIntegration(data as Integration), ...prev.filter((item) => item.key !== key)]);
@@ -444,7 +444,7 @@ export default function AdminIntegrations() {
 
   const stats = [
     { label: xt.activeCount, value: items.filter((item) => item.enabled).length },
-    { label: xt.configuredCount, value: items.filter((item) => item.key_masked || item.api_key).length },
+    { label: xt.configuredCount, value: items.filter((item) => item.key_masked).length },
     { label: xt.liveCount, value: items.filter((item) => item.env === "live").length },
     { label: xt.sectionCount, value: new Set(items.map((item) => item.category)).size }
   ];
@@ -635,12 +635,8 @@ export default function AdminIntegrations() {
                 <input value={form.base_url} onChange={(event) => setForm((prev) => ({ ...prev, base_url: event.target.value }))} placeholder="https://api.example.com" className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" dir="ltr" />
               </label>
               <label className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.apiKey}</span>
-                <input value={form.api_key} onChange={(event) => setForm((prev) => ({ ...prev, api_key: event.target.value, key_masked: event.target.value ? maskApiKey(event.target.value) : prev.key_masked }))} placeholder={form.key_masked || "sk_live_..."} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" dir="ltr" />
-              </label>
-              <label className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{t.keys}</span>
-                <input value={form.key_masked} onChange={(event) => setForm((prev) => ({ ...prev, key_masked: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" dir="ltr" />
+                <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.keyHintLabel}</span>
+                <input value={form.key_masked} maxLength={16} placeholder="••••1234" onChange={(event) => setForm((prev) => ({ ...prev, key_masked: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" dir="ltr" />
               </label>
               <label className="space-y-2">
                 <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.section}</span>

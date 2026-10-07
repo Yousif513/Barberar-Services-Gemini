@@ -126,10 +126,14 @@ describe("what anonymous visitors can read", () => {
     assert.ok((await as(db, ROLES.anon, `select search_marketplace_providers(null) r`))[0].r.total_count > 0);
   });
 
-  it("does not change what the provider owner and the administrator can read", async () => {
-    assert.match((await as(db, owner, `select admin_notes from providers where id = $1`, [SEED.provider1]))[0].admin_notes, /internal/);
-    assert.match((await as(db, admin, `select admin_notes from providers where id = $1`, [SEED.provider1]))[0].admin_notes, /internal/);
-    assert.equal((await as(db, owner, `select phone, email from employees where branch_id = $1`, [SEED.branch1])).length > 0, true, "the owner still reads their own staff contact details");
+  it("serves what the provider owner and the administrator need through commands, not through the table (R10)", async () => {
+    // Signed-in users no longer read the internal columns directly, whoever they are (20261007010900_provider_staff_column_privileges.sql).
+    for (const user of [owner, admin]) {
+      await assert.rejects(as(db, user, `select admin_notes from providers where id = $1`, [SEED.provider1]), /permission denied/);
+      await assert.rejects(as(db, user, `select phone, email from employees where branch_id = $1`, [SEED.branch1]), /permission denied/);
+    }
+    assert.match((await as(db, admin, `select admin_notes from admin_provider_private_directory() where provider_id = $1`, [SEED.provider1]))[0].admin_notes, /internal/);
+    assert.equal((await as(db, owner, `select phone, email from get_provider_staff_contacts()`)).length > 0, true, "the owner still reads their own staff contact details");
   });
 });
 
