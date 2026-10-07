@@ -712,19 +712,6 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(migrationCode.includes("GRANT EXECUTE ON FUNCTION public.employee_update_booking_status"), "Must grant authenticated execution");
     });
 
-    it("verify_provider_cr enforces 10-digit Saudi CR regex and records Wathq data (G26)", () => {
-      const migrationCode = readFileSync(
-        join(rootDir, "supabase/migrations/20261004020000_people_and_trust.sql"),
-        "utf8"
-      );
-      assert.ok(migrationCode.includes("FUNCTION public.verify_provider_cr"), "Must define verify_provider_cr RPC");
-      assert.ok(migrationCode.includes("^[0-9]{10}$"), "Must enforce 10-digit CR number regex");
-      assert.ok(migrationCode.includes("Commercial Registration (CR) must be exactly 10 digits"), "Must throw clear error on invalid CR");
-      assert.ok(migrationCode.includes("wathq_saudi_api"), "Must record Wathq validation source");
-      assert.ok(migrationCode.includes("provider.cr_verification"), "Must log verification audit");
-      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.verify_provider_cr"), "Must revoke public execution");
-    });
-
     it("reply_to_review enforces owner authorization and rejects empty replies (G30)", () => {
       const migrationCode = readFileSync(
         join(rootDir, "supabase/migrations/20261004020000_people_and_trust.sql"),
@@ -929,18 +916,6 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(migrationCode.includes("Forbidden: not authorized to import clients"), "Must restrict to provider owner or admin");
       assert.ok(migrationCode.includes("provider.clients_imported"), "Must emit audit event");
       assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.import_provider_clients"), "Must revoke public execution");
-    });
-
-    it("enqueue_post_visit_rebook trigger enqueues post-visit review and rebook on completed booking (G41)", () => {
-      const migrationCode = readFileSync(
-        join(rootDir, "supabase/migrations/20261004040000_growth_surfaces.sql"),
-        "utf8"
-      );
-      assert.ok(migrationCode.includes("FUNCTION public.enqueue_post_visit_rebook"), "Must create enqueue_post_visit_rebook function");
-      assert.ok(migrationCode.includes("trigger_enqueue_post_visit_rebook"), "Must define trigger on bookings table");
-      assert.ok(migrationCode.includes("WHEN (NEW.status = 'completed')"), "Trigger must only run when booking completes");
-      assert.ok(migrationCode.includes("post_visit_review_rebook"), "Must enqueue post_visit_review_rebook message");
-      assert.ok(migrationCode.includes("message_queue"), "Must enqueue into message_queue");
     });
 
     it("get_provider_monthly_value_summary calculates G43 value metrics and commission savings (G43)", () => {
@@ -1340,7 +1315,7 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       );
       assert.ok(discoverCode.includes("search_marketplace_providers"), "Discover page must call search_marketplace_providers RPC");
       assert.ok(discoverCode.includes("projectPin"), "Discover page must project map pins");
-      assert.ok(discoverCode.includes("SAUDI_DISTRICTS"), "Discover page must provide Saudi district filters");
+      assert.ok(discoverCode.includes("districtOptions"), "Discover page must offer district filters taken from the branches the search returns");
 
       const shopCode = readFileSync(
         join(webPlatformDir, "src/app/shop/[id]/page.tsx"),

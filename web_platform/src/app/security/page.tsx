@@ -6,28 +6,40 @@ import Link from "next/link";
 const translations = {
   en: {
     backHome: "Back to Home",
-    security: "VAT & Payments Compliance",
-    title: "Secure Payouts & Invoicing",
+    security: "VAT and Payments",
+    title: "Payments and Invoices",
     subtitle: "How we handle VAT, payments and your data",
     section1Title: "1. VAT (15%) & Tax Breakdown",
-    section1Desc: "Every transaction processed on the Primora platform includes a transparent breakdown reflecting the 15% Value-Added Tax (VAT) in accordance with Saudi tax regulations. Detailed digital receipts and transaction summaries are accessible in customer and provider portals.",
-    section2Title: "2. Payment Security & Encryption",
+    section1Desc: "Every booking shows the 15% Value-Added Tax (VAT) as a separate line. Digital receipts and transaction summaries are available in the customer and provider portals.",
+    section2Title: "2. Card Payments and Connections",
     section2Desc: "Card payments are entered on Tap Payments' hosted page, so Primora never receives or stores your card number. Connections to Primora use HTTPS encryption.",
     section3Title: "3. Fees and Payouts",
-    section3Desc: "Bookings a provider brings from its own clients carry no commission. A new client found through the Primora marketplace carries a 20% commission on the first visit (minimum SAR 10, maximum SAR 40); repeat visits from that client carry none. Each booking is recorded in the ledger and the provider's share is paid out to its verified bank account after the visit is completed.",
+    section3Desc: "Bookings a provider brings from its own clients carry no commission. A new client found through the Primora marketplace carries a 20% commission on the first visit (minimum SAR 10, maximum SAR 40); repeat visits from that client carry none. Each booking is recorded in the ledger. The provider's share becomes payable after the visit is completed and is paid out to its registered bank account when the provider requests a payout.",
+    sealCardLabel: "Card details",
+    sealCardText: "Entered on Tap's page",
+    sealVatLabel: "VAT 15%",
+    sealVatText: "Shown on every booking",
+    sealConnLabel: "Connection",
+    sealConnText: "HTTPS",
     footerText: "Built for Riyadh, Saudi Arabia. All rights reserved."
   },
   ar: {
     backHome: "العودة للرئيسية",
-    security: "الامتثال الضريبي والمدفوعات",
-    title: "المدفوعات والفواتير الآمنة",
+    security: "الضريبة والمدفوعات",
+    title: "المدفوعات والفواتير",
     subtitle: "كيف نتعامل مع ضريبة القيمة المضافة والمدفوعات وبياناتك",
     section1Title: "1. ضريبة القيمة المضافة (15%) وتفاصيل الفواتير",
-    section1Desc: "تتضمن كل معاملة على منصة بريمورا تفصيلاً مالياً دقيقاً يوضح ضريبة القيمة المضافة (15%) طبقاً للأنظمة واللوائح الضريبية السعودية. وتتاح إيصالات الدفع الرقمية وسجلات المعاملات مباشرة عبر لوحات تحكم العملاء ومقدمي الخدمة.",
-    section2Title: "2. أمان وتشفير المدفوعات",
+    section1Desc: "يظهر في كل حجز بند مستقل لضريبة القيمة المضافة (15%). وتتوفر الإيصالات الرقمية وملخصات المعاملات في بوابتي العميل ومقدم الخدمة.",
+    section2Title: "2. الدفع بالبطاقة والاتصال",
     section2Desc: "تُدخل بيانات البطاقة في صفحة Tap Payments المستضافة، لذلك لا تستلم بريمورا رقم بطاقتك ولا تخزنه. الاتصال ببريمورا مشفر عبر HTTPS.",
     section3Title: "3. الرسوم وصرف المستحقات",
-    section3Desc: "لا عمولة على الحجوزات التي يجلبها مقدم الخدمة من عملائه. العميل الجديد القادم من سوق بريمورا عليه عمولة 20% في الزيارة الأولى (بحد أدنى 10 ر.س وأقصى 40 ر.س) ولا عمولة على زياراته المتكررة. تُسجل كل عملية حجز في دفتر الأستاذ وتُصرف حصة مقدم الخدمة إلى حسابه البنكي الموثق بعد اكتمال الزيارة.",
+    section3Desc: "لا عمولة على الحجوزات التي يجلبها مقدم الخدمة من عملائه. العميل الجديد القادم من سوق بريمورا عليه عمولة 20% في الزيارة الأولى (بحد أدنى 10 ر.س وأقصى 40 ر.س) ولا عمولة على زياراته المتكررة. يُسجَّل كل حجز في دفتر الحسابات. تصبح حصة مقدم الخدمة مستحقة بعد اكتمال الزيارة، وتُحوَّل إلى حسابه البنكي المسجّل عندما يطلب التحويل.",
+    sealCardLabel: "بيانات البطاقة",
+    sealCardText: "تُدخل في صفحة Tap",
+    sealVatLabel: "ضريبة 15%",
+    sealVatText: "تظهر في كل حجز",
+    sealConnLabel: "الاتصال",
+    sealConnText: "HTTPS",
     footerText: "صمم خصيصاً للرياض، المملكة العربية السعودية. جميع الحقوق محفوظة."
   }
 };
@@ -99,16 +111,16 @@ export default function SecurityPage() {
         {/* Security Seals */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-4 text-center">
           <div className="border border-stone-200 p-4 rounded-2xl bg-white space-y-1">
-            <span className="text-[10px] uppercase font-bold text-stone-400 block">PCI-DSS</span>
-            <span className="text-xs font-bold text-stone-950 block">GATEWAY COMPLIANT</span>
+            <span className="text-[10px] uppercase font-bold text-stone-400 block">{t.sealCardLabel}</span>
+            <span className="text-xs font-bold text-stone-950 block">{t.sealCardText}</span>
           </div>
           <div className="border border-stone-200 p-4 rounded-2xl bg-white space-y-1">
-            <span className="text-[10px] uppercase font-bold text-stone-400 block">VAT 15%</span>
-            <span className="text-xs font-bold text-stone-950 block">TAX BREAKDOWN</span>
+            <span className="text-[10px] uppercase font-bold text-stone-400 block">{t.sealVatLabel}</span>
+            <span className="text-xs font-bold text-stone-950 block">{t.sealVatText}</span>
           </div>
           <div className="border border-stone-200 p-4 rounded-2xl bg-white space-y-1 col-span-2 sm:col-span-1">
-            <span className="text-[10px] uppercase font-bold text-stone-400 block">Encryption</span>
-            <span className="text-xs font-bold text-stone-950 block">TLS 1.3 SECURE SSL</span>
+            <span className="text-[10px] uppercase font-bold text-stone-400 block">{t.sealConnLabel}</span>
+            <span className="text-xs font-bold text-stone-950 block">{t.sealConnText}</span>
           </div>
         </div>
 
