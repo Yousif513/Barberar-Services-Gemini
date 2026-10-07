@@ -93,7 +93,8 @@ export default function MessagesScreen() {
   const loadThreads = useCallback(async () => {
     setLoadError("");
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user ?? null;
       setUserId(user?.id ?? null);
       if (!user) {
         setThreads([]);

@@ -53,6 +53,7 @@ export default function ProfileScreen() {
 
   const [user, setUser] = useState<User | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [offlineLaunch, setOfflineLaunch] = useState(false);
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [userPackages, setUserPackages] = useState<UserPackageItem[]>([]);
   const [packagesError, setPackagesError] = useState("");
@@ -197,7 +198,7 @@ export default function ProfileScreen() {
   useEffect(() => {
     // getSession() reads the stored session without the network, so a launch with no signal still shows the signed-in account.
     supabase.auth.getSession().then(({ data, error }) => {
-      if (!data.session && error?.name === "AuthRetryableFetchError") showToast(t.offline, "info");
+      setOfflineLaunch(!data.session && error?.name === "AuthRetryableFetchError");
       loadAccount(data.session?.user ?? null);
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -297,6 +298,9 @@ export default function ProfileScreen() {
           <View style={styles.card}>
             <Text style={[styles.sectionTitle, isRTL && styles.textRight]}>{t.signInTitle}</Text>
             <Text style={[styles.walletDesc, { color: "#78716c" }, isRTL && styles.textRight]}>{t.signInDesc}</Text>
+            {offlineLaunch && (
+              <Text style={[styles.walletDesc, { color: "#b91c1c" }, isRTL && styles.textRight]}>{t.offline}</Text>
+            )}
             {!isSupabaseConfigured && (
               <Text style={[styles.walletDesc, { color: "#b91c1c" }, isRTL && styles.textRight]}>{t.serviceUnavailable}</Text>
             )}

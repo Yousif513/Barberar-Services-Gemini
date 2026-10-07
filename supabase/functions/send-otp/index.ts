@@ -35,7 +35,16 @@ serve(async (req) => {
     const whatsappProvider = Deno.env.get("WHATSAPP_PROVIDER")
     const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID")
     const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN")
-    const twilioWhatsappSender = Deno.env.get("TWILIO_WHATSAPP_SENDER") || "whatsapp:+14155238886"
+    // Sender, brand and validity come from the environment only: there is no fallback sender number or brand name.
+    const twilioWhatsappSender = Deno.env.get("TWILIO_WHATSAPP_SENDER")
+    const brand = Deno.env.get("OTP_BRAND_NAME")
+    const validMinutes = Number(Deno.env.get("OTP_VALID_MINUTES"))
+    if (!twilioWhatsappSender || !brand || !Number.isInteger(validMinutes) || validMinutes < 1) {
+      return new Response(
+        JSON.stringify({ error: "OTP sender, brand or validity is not configured on this environment." }),
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    }
 
     if (whatsappProvider === "twilio" && twilioAccountSid && twilioAuthToken) {
       // Twilio WhatsApp API Request
@@ -45,7 +54,7 @@ serve(async (req) => {
       const formData = new URLSearchParams()
       formData.append("To", `whatsapp:${phone}`)
       formData.append("From", twilioWhatsappSender)
-      formData.append("Body", `Your Beauty & Grooming login code is: ${code}. Valid for 3 minutes. / رمز الدخول الخاص بك هو: ${code}`)
+      formData.append("Body", `Your ${brand} login code is: ${code}. Valid for ${validMinutes} minutes. / رمز الدخول إلى ${brand}: ${code}. صالح لمدة ${validMinutes} دقيقة.`)
 
       const response = await fetch(url, {
         method: "POST",
