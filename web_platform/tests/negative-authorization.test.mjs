@@ -539,17 +539,15 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(pushCode.includes("Authorization"), "Must verify caller authorization");
     });
 
-    it("developer console hashes tokens with SHA-256 and removes simulated accounts (G40, G69)", () => {
-      const devCode = readFileSync(
-        join(webPlatformDir, "src/app/developer/page.tsx"),
-        "utf8"
-      );
-      assert.ok(devCode.includes("hashToken"), "Must have SHA-256 hashToken function");
-      assert.ok(devCode.includes("SHA-256"), "Must use SHA-256 algorithm");
-      assert.ok(!devCode.includes("dev-mock-profile"), "Must remove mock developer profile");
-      assert.ok(!devCode.includes("tk-mock-1"), "Must remove mock API tokens");
-      assert.ok(!devCode.includes("wh-mock-1"), "Must remove mock webhooks");
-      assert.ok(devCode.includes("is_approved: false"), "Must require admin audit/approval for tokens");
+    it("developer console no longer creates or hashes tokens in the browser (G40, G69)", () => {
+      // The placeholder page generated a token with crypto.getRandomValues, hashed it in the browser and inserted it into
+      // api_tokens from a React handler. G69 replaced it: keys are created and hashed by the database (create_api_key),
+      // and the old address only redirects. web_platform/tests/developer-console.test.mjs checks the new screens.
+      const old = readFileSync(join(webPlatformDir, "src/app/developer/page.tsx"), "utf8");
+      assert.ok(old.includes('redirect("/provider/developer")'), "The old address must only redirect to the console");
+      for (const gone of ["hashToken", "crypto.subtle", "getRandomValues", "api_tokens", "pk_live_", "is_approved", "dev-mock-profile", "tk-mock-1", "wh-mock-1"]) {
+        assert.ok(!old.includes(gone), `The old developer page must not contain ${gone}`);
+      }
     });
 
     it("admin screens enforce SAR-only currency without dollar signs (G32)", () => {

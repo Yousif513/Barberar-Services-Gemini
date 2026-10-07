@@ -42,3 +42,8 @@ enabled = false
 # verifies every charge against Tap before invoking service-role database work.
 [functions.payment-webhook]
 verify_jwt = false
+
+# Provider API keys are not Supabase JWTs. public-api authenticates every request itself
+# (authenticate_api_key: hashed key, scopes, expiry, rate limit) and sends no CORS headers.
+[functions.public-api]
+verify_jwt = false

@@ -1,0 +1,239 @@
+[
+ {
+  "url": "https://example.com/hooks/primora",
+  "ok": true
+ },
+ {
+  "url": "https://hooks.example.co.uk/a/b?token=abc#frag",
+  "ok": true
+ },
+ {
+  "url": "HTTPS://Example.COM/Hook",
+  "ok": true
+ },
+ {
+  "url": "https://example.com:443/hook",
+  "ok": true
+ },
+ {
+  "url": "https://example.com./hook",
+  "ok": true
+ },
+ {
+  "url": "https://sub-domain.example.org",
+  "ok": true
+ },
+ {
+  "url": "https://xn--bcher-kva.de/hook",
+  "ok": true
+ },
+ {
+  "url": "https://example.com/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "ok": true
+ },
+ {
+  "url": "",
+  "ok": false,
+  "reason": "malformed"
+ },
+ {
+  "url": " https://example.com/",
+  "ok": false,
+  "reason": "malformed"
+ },
+ {
+  "url": "https://example.com/ ",
+  "ok": false,
+  "reason": "malformed"
+ },
+ {
+  "url": "https://exa mple.com/",
+  "ok": false,
+  "reason": "malformed"
+ },
+ {
+  "url": "https://",
+  "ok": false,
+  "reason": "malformed"
+ },
+ {
+  "url": "//example.com/hook",
+  "ok": false,
+  "reason": "malformed"
+ },
+ {
+  "url": "example.com/hook",
+  "ok": false,
+  "reason": "malformed"
+ },
+ {
+  "url": "https://example.com/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "ok": false,
+  "reason": "too_long"
+ },
+ {
+  "url": "http://example.com/hook",
+  "ok": false,
+  "reason": "not_https"
+ },
+ {
+  "url": "ftp://example.com/hook",
+  "ok": false,
+  "reason": "not_https"
+ },
+ {
+  "url": "javascript:alert(1)",
+  "ok": false,
+  "reason": "not_https"
+ },
+ {
+  "url": "file:///etc/passwd",
+  "ok": false,
+  "reason": "not_https"
+ },
+ {
+  "url": "https://user:pass@example.com/hook",
+  "ok": false,
+  "reason": "credentials"
+ },
+ {
+  "url": "https://user@example.com/hook",
+  "ok": false,
+  "reason": "credentials"
+ },
+ {
+  "url": "https://example.com:443@evil.example/",
+  "ok": false,
+  "reason": "credentials"
+ },
+ {
+  "url": "https://example.com:8443/hook",
+  "ok": false,
+  "reason": "port"
+ },
+ {
+  "url": "https://example.com:80/hook",
+  "ok": false,
+  "reason": "port"
+ },
+ {
+  "url": "https://example.com:22/",
+  "ok": false,
+  "reason": "port"
+ },
+ {
+  "url": "https://127.0.0.1/",
+  "ok": false,
+  "reason": "ip_literal"
+ },
+ {
+  "url": "https://10.0.0.5/hook",
+  "ok": false,
+  "reason": "ip_literal"
+ },
+ {
+  "url": "https://169.254.169.254/latest/meta-data/",
+  "ok": false,
+  "reason": "ip_literal"
+ },
+ {
+  "url": "https://8.8.8.8/",
+  "ok": false,
+  "reason": "ip_literal"
+ },
+ {
+  "url": "https://[::1]/",
+  "ok": false,
+  "reason": "ip_literal"
+ },
+ {
+  "url": "https://[2001:4860:4860::8888]/",
+  "ok": false,
+  "reason": "ip_literal"
+ },
+ {
+  "url": "https://[::ffff:127.0.0.1]/",
+  "ok": false,
+  "reason": "ip_literal"
+ },
+ {
+  "url": "https://2130706433/",
+  "ok": false,
+  "reason": "ip_literal"
+ },
+ {
+  "url": "https://0x7f000001/",
+  "ok": false,
+  "reason": "ip_literal"
+ },
+ {
+  "url": "https://0x7f.0x0.0x0.0x1/",
+  "ok": false,
+  "reason": "ip_literal"
+ },
+ {
+  "url": "https://017700000001/",
+  "ok": false,
+  "reason": "ip_literal"
+ },
+ {
+  "url": "https://127.1/",
+  "ok": false,
+  "reason": "ip_literal"
+ },
+ {
+  "url": "https://localhost/",
+  "ok": false,
+  "reason": "single_label"
+ },
+ {
+  "url": "https://intranet/hook",
+  "ok": false,
+  "reason": "single_label"
+ },
+ {
+  "url": "https://printer.local/hook",
+  "ok": false,
+  "reason": "local_host"
+ },
+ {
+  "url": "https://api.localhost/hook",
+  "ok": false,
+  "reason": "local_host"
+ },
+ {
+  "url": "https://metadata.google.internal/computeMetadata/v1/",
+  "ok": false,
+  "reason": "local_host"
+ },
+ {
+  "url": "https://router.lan/",
+  "ok": false,
+  "reason": "local_host"
+ },
+ {
+  "url": "https://host.home.arpa/",
+  "ok": false,
+  "reason": "local_host"
+ },
+ {
+  "url": "https://service.corp/",
+  "ok": false,
+  "reason": "local_host"
+ },
+ {
+  "url": "https://hook.test/",
+  "ok": false,
+  "reason": "local_host"
+ },
+ {
+  "url": "https://hook.example/",
+  "ok": false,
+  "reason": "local_host"
+ },
+ {
+  "url": "https://hidden.onion/",
+  "ok": false,
+  "reason": "local_host"
+ }
+]

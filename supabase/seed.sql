@@ -139,4 +139,11 @@ INSERT INTO public.transactional_ledger (id, booking_id, payment_intent_id, tota
 INSERT INTO public.delivery_jobs (id, booking_id, pickup_address, delivery_address, pickup_latitude, pickup_longitude, delivery_latitude, delivery_longitude, carrier_id, status, estimated_delivery_time, delivery_metadata) VALUES
 ('d0000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000001', 'صالون إيليت - حي الملقا، طريق أنس بن مالك، الرياض', 'حي العليا، شارع التحلية، فيلا 14، الرياض', 24.796300, 46.611100, 24.711200, 46.674400, NULL, 'pending', NOW() + INTERVAL '1 hour', '{"distance": "8.4 km", "item": "Beard Sculpting Balm & Premium Aftershave"}');
 
+
+-- 14. DEVELOPER API: no seed data on purpose.
+-- API keys (api_keys) and webhook endpoints are created by a provider owner through the console, and their
+-- credentials exist in plaintext only in the create response. A seeded key or signing secret would be a
+-- plaintext credential in the repository, and the old rows here could not apply anyway (invalid UUID
+-- literals, columns that do not exist).
+
 SELECT set_config('request.jwt.claims', '', false);

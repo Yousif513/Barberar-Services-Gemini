@@ -24,6 +24,7 @@ const translations = {
     resources: "Rooms & Resources",
     inventory: "Inventory & Suppliers",
     chain: "Chain Operations",
+    developer: "Developer API",
     recurring: "Regular Appointments",
     packages: "Wellness Packages",
     jobs: "Find Job Leads",
@@ -57,6 +58,7 @@ const translations = {
     resources: "الغرف والموارد",
     inventory: "المخزون والموردون",
     chain: "عمليات الفروع",
+    developer: "واجهة المطورين",
     recurring: "المواعيد المنتظمة",
     packages: "باقات العافية",
     jobs: "فرص العمل المتاحة",
@@ -186,6 +188,13 @@ const getNavIcon = (path: string) => {
       </svg>
     );
   }
+  if (path.includes("developer")) {
+    return (
+      <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+      </svg>
+    );
+  }
   if (path.includes("settings")) {
     return (
       <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -275,6 +284,7 @@ function ProviderShell({
     { name: t.resources, path: "/provider/resources" },
     { name: t.inventory, path: "/provider/inventory" },
     { name: t.chain, path: "/provider/chain" },
+    { name: t.developer, path: "/provider/developer" },
     { name: t.recurring, path: "/provider/recurring" },
     { name: t.packages, path: "/provider/packages" },
     { name: t.jobs, path: "/provider/jobs" },
