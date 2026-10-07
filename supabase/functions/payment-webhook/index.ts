@@ -41,12 +41,19 @@ serve(async (req) => {
     if (purchaseType !== "booking") {
       const purchaseId = charge.metadata?.purchase_id
       if (!purchaseId) return json({ received: true, status: "skipped" })
-      const { data, error } = await db.rpc("confirm_purchase_payment", {
-        p_purchase_type: purchaseType,
-        p_purchase_id: purchaseId,
-        p_payment_intent_id: chargeId,
-        p_amount: amount,
-      })
+      // A membership has its own confirmation (idempotent on the charge id, amount-checked against the sold price).
+      const { data, error } = purchaseType === "membership"
+        ? await db.rpc("confirm_membership_payment", {
+            p_membership_id: purchaseId,
+            p_payment_intent_id: chargeId,
+            p_amount: amount,
+          })
+        : await db.rpc("confirm_purchase_payment", {
+            p_purchase_type: purchaseType,
+            p_purchase_id: purchaseId,
+            p_payment_intent_id: chargeId,
+            p_amount: amount,
+          })
       if (error) throw error
       return json({ success: true, result: data })
     }
