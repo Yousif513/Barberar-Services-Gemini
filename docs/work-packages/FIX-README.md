@@ -53,3 +53,7 @@ tests per role) and the invariants section. Additional points for fixes:
 - Delete invented data (arrays of fake people, ratings, cards, slots) rather than hiding it; render an honest empty or error state in both languages.
 - Do not touch another package's files except for the one-line wiring a fix needs; if two fixes need the same file, the package that owns the page in your task does it.
 - Commit after each coherent group of fixes with the Co-Authored-By trailer; never push; keep the report current (write it after the first group of fixes, then append).
+
+## Migration syntax rule found on the real stack
+
+Never write `E'...'` strings that contain a backslash-escaped quote (`'`) in a migration. The Supabase CLI splits a file into statements with its own lexer, cuts such a string in the middle and the server answers "unterminated quoted string" (the in-memory test database accepts it, so tests stay green while `supabase db reset` fails). Use dollar quoting (`$q$ ... $q$`) for patch patterns and any text with quotes. `supabase/tests/db/migration_hygiene.test.mjs` fails on it. Two migrations may not share a version.
