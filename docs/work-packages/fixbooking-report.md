@@ -11,6 +11,7 @@ run the whole DB suite.
 | Defect | Status | Migration | Test |
 |---|---|---|---|
 | D-21 / R3 | fixed | `20261007050000_booking_prayer_windows_riyadh_time.sql` | `booking_engine_prayer_windows.test.mjs` |
+| D-16 / R21 | fixed | `20261007060000_scheduling_overnight_and_seasons.sql` | `booking_engine_overnight_schedules.test.mjs` |
 
 ## 1. D-21 / R3 prayer windows and the Riyadh clock (fixed)
 
@@ -35,3 +36,20 @@ Callers (for the screen packages):
   pass the SAME arrays they pass to `get_available_slots` as `prayer_window_starts` and `prayer_window_ends` (ISO timestamps) on
   `create_booking`, `create_multi_service_booking` and `reschedule_booking`. Omitting them is valid and means "no prayer pause".
 - Slot display: format with `ar-SA`/`en` and `timeZone: 'Asia/Riyadh'` (R24, screen part).
+
+## 2. D-16 / R21 overnight second shifts and seasons (fixed)
+
+Reproduced on the base commit (9 of 15 new assertions failed): a split shift 09-13 + 21-02 gave nothing after midnight, a seasonal 21-02 gave nothing
+after midnight, a season turned a weekly day off into a working day, and leave on the evening did not cancel the overnight shift.
+
+`get_available_slots` is owned by this package; its three copy-pasted loops (previous-day first shift, shift 1, shift 2) are replaced by ONE loop
+over the shifts of the previous day and of the target day (same signature, same privileges, same 30-minute grid, same conflict rule, item 1's
+prayer rule kept). It reads the day through the new internal `employee_day_schedule(employee, provider, branch, date)`:
+- whether the employee works a weekday always comes from the weekly `employee_availability` row, so a seasonal schedule changes hours, never days off
+  (`seasonal_schedules` has no per-weekday column; the employee's own working days are the weekdays);
+- the hours of a day come from the seasonal schedule that applied on THAT day (branch-specific first, then the latest start), else from the weekly row;
+- each of the two shifts is overnight when its end is not after its start; the part after Riyadh midnight is offered on the next date;
+- a shift of the previous day only spills over when the employee was not on approved leave and the provider/branch was not closed on that day;
+- a spill-over slot continues the 30-minute grid of its shift (a 21:15 shift continues at 00:15, the old code restarted the grid at 00:00).
+
+Not changed: how a closure or leave on the target day removes the whole day (including the morning spill-over of the evening before).
