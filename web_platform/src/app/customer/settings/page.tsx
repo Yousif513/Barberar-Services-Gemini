@@ -164,6 +164,8 @@ export default function CustomerSettingsPage() {
     } catch (err: any) {
       console.warn("Failed to load account settings:", err.message);
       setError(err?.message || "Failed to load your account settings.");
+      // The consent toggles stay locked and say why, instead of waiting for a read that will not happen.
+      setConsentsError((previous: string) => previous || errorMessage(err));
     } finally {
       setLoading(false);
     }

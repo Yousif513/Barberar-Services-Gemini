@@ -30,6 +30,8 @@ mapping (`bookingStatusKey`, `bookingStatusLabel`, `settlementKey`), provider po
 | C-D18 other invented or false wallet content | fixed | same | removed: "Secured" badge, "Equivalent Value = points / 10" (an invented rate), the fake `REF-PRIMORA` code shown when the referral RPC fails (now an error and a disabled Copy button), the `https://primora.sa` share-URL fallback, a hard-coded 25 SAR (now `reward_per_friend_sar` from the RPC, generic wording when absent), the dead "WhatsApp gift notification queued" success branch, and the claim that wallet credit is "auto-applied during checkout" (no database function spends `wallet_credits`: see Needs). A failed ledger, credit, gift-card or loyalty read now shows an error instead of an empty list. Payments to the customer are no longer printed as "+": deposits and tips are outflows |
 | D21 leftovers | partly | same | Fake cards and dependents were already removed by the integrator; wallet invented content removed as above. `discover/page.tsx:198-199` (map pins for branches without coordinates) is outside this package's files: deferred to the owner of `discover/**` |
 | R22 on wallet | fixed | same | gift-card dialog moved to `ModalPortal`/`ModalOverlay` (`role="dialog"`, labelled inputs, `aria-pressed` presets, own error line); table headers have `scope="col"` and are translated; `dir` prop removed (the document already sets it) |
+| R22 on the remaining customer pages | fixed (customer scope) | see git log (`fixcust: a11y`) | `dependents` and `jobs`: every sibling `<label>` is now bound to its control (`htmlFor`/`id`); `dashboard`, `messages`, `search`: the bare inputs have `aria-label`. No customer page has a card that acts as a button (no `div onClick`) or a hand-made modal left. The service and specialist cards on `shop/[id]` and its modals are outside this package |
+| Double mirroring on touched pages | fixed | same | `dependents` (3 `flex-row-reverse` on top of `dir=rtl` removed, `isRTL ? text-right : text-left` became `text-start`), `jobs` (`text-left sm:text-right` became `text-start sm:text-end`), `settings`, `reviews`, `wallet`, `bookings`: logical utilities only; `customer/layout.tsx` still has its own `flex-row-reverse` (not this package's file) |
 
 Receipt details: `subtotal_price, discount_amount, tax_amount, total_price, deposit_required, gift_card_amount,
 cancellation_fee, refund_amount` are selected; amount due = `total_price + tax_amount`; venue balance = due - deposit - gift card;
@@ -40,3 +42,37 @@ Settings page extras: profile inputs now have `htmlFor`/`id`, the 1 s `setInterv
 `useOperationsLocale()`, locale-conditional `text-right`/`justify-start` classes became `text-start`/`justify-end`, and the dead
 dependents add/remove handlers (still carrying the invented ids "1"/"2") were deleted. The email/SMS/push checkboxes on that page are
 local state only (no table stores channel preferences): deferred, reported here so they are not mistaken for working controls.
+
+## Verification (run in `primora-wp-fixcust`, branch `wp/fixcust`)
+
+| Command | Result |
+|---------|--------|
+| `npx tsc --noEmit -p web_platform` | exit 0, no output |
+| `cd web_platform && npx eslint <12 changed .tsx/.mjs files and 3 new tests>` | 0 errors; warnings 70 in total, every file at or below its count on the base commit (confirmation 3 to 1, bookings 25 to 21, settings 11 to 3, reviews 10 to 9, the rest unchanged; the two new `.mjs` files 0) |
+| `npm run test --workspace=web_platform` | 195 tests, 195 pass, 0 fail (new: `booking-display.test.mjs` 15, `prayer-windows.test.mjs` 2, `customer-portal-guards.test.mjs` 7) |
+| `node scripts/verify-ui-schema.mjs` | `checked 83 rpc calls and 193 select strings (7 dynamic calls not checked); 0 mismatches, 0 in the baseline` (covers `record_consent`, `cancel_booking`, `reschedule_booking`, `get_available_slots` with the prayer-window arguments, and the new selects on `bookings`, `transactional_ledger`, `providers`, `branches`) |
+| `npm run test:security-core`, `npm run test:admin-controls` | both passed |
+| `npm run build --workspace=web_platform` | see the last line of this section |
+
+## Needs from other packages (no migration written here)
+
+1. **Spending wallet credit.** Nothing in the database sets `wallet_credits.is_spent` or applies a credit to a booking, so the wallet now says
+   credits cannot be used at checkout yet. A SECURITY DEFINER command that consumes credit inside `create_booking` (or beside it) is needed before that copy changes.
+2. **Shop page `?service=`.** "Book Again" links to `/shop/<provider_id>?service=<service_id>`; `shop/[id]/page.tsx` (not this package) must read the parameter to preselect the service.
+3. **Other consent writes** with the same ignore-the-error pattern: `login/page.tsx:69-72` and `shop/[id]/page.tsx:1000-1025` should call `record_consent` and read `{ error }` as `customer/settings` now does.
+4. **`discover/page.tsx:198-199`** still invents map pins for branches without coordinates (C-D21).
+5. **`booking_message_variables`** base URL and path (R43 SQL half) belongs to the messaging package.
+6. **Email/SMS/push checkboxes** on `customer/settings` are not stored anywhere (no table keeps channel preferences); they stay as local state until a preferences table and command exist.
+7. The cancel preview approximates the captured amount with `deposit_required` for a confirmed booking, because `booking_captured_amount` is not callable by customers. The figures after the call are the server's (`cancellation_fee`, `refund_amount` of the returned row). A read-only preview command would make the "before" figure exact.
+
+## Decisions
+
+- Receipt VAT line shows the stored `tax_amount`; no VAT rate literal is printed on the receipt.
+- A status the page does not know is shown as "Unknown", never printed raw.
+- The gift-card amount presets (50/100/200/500 SAR) and the 50 SAR minimum were left: the database enforces 50-5000, and the presets are interface choices, not business values.
+- No browser session against live data was possible (no hosted Supabase); behaviour is proven by the executed helper tests, the source guards and the schema check, not by a click-through.
+
+## Files touched outside `web_platform/src/app/customer/**` and the new files
+
+- `web_platform/tests/negative-authorization.test.mjs`: one assertion (P2-B "Frontend integration") required the false copy "100% of your tip goes directly to your specialist"; it now requires the corrected copy and forbids the old claim.
+- New: `web_platform/src/lib/booking-display.mjs`, `web_platform/src/lib/prayer-windows.mjs`, `web_platform/tests/booking-display.test.mjs`, `web_platform/tests/prayer-windows.test.mjs`, `web_platform/tests/customer-portal-guards.test.mjs`, this report.
