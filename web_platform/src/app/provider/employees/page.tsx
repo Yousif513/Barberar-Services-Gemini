@@ -6,6 +6,7 @@ import { errorMessage } from "@/lib/error-message";
 import { useConfirm } from "@/components/modal";
 import { ProviderDialog } from "../_components/dialog";
 import { CommissionRulesDialog, PortfolioDialog } from "../_components/employee-extras";
+import { ProfessionalLinkAction } from "../_components/professional-link";
 
 const translations = {
   en: {
@@ -1066,6 +1067,7 @@ export default function ProviderEmployeesPage() {
                 <button type="button" onClick={() => setPortfolioFor(member)} className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-xs font-semibold text-[#344054] outline-2 outline-offset-2 outline-transparent transition hover:border-[#D1AF47]/40 hover:bg-gray-50 focus-visible:outline-[#9B7928]">
                   {x.portfolio}
                 </button>
+                <ProfessionalLinkAction lang={lang} providerId={providerId} employeeId={member.id} />
               </div>
             </div>
           );

@@ -25,3 +25,10 @@ follower reads their own follows, nobody else reads follows); every write is a c
 
 `supabase/tests/db/professional_identity.test.mjs`: 56 tests, all passing (run on its own in about 13 s).
 The three anon allow-lists (`qa_adversarial`, `trust`, `inventory_workflows`) now list `public_professional_profile`.
+
+## Stage 3: web screens (done)
+
+`/pro/[handle]` (public, follow button, language toggle, server metadata), `/provider/identity` (profile form with live handle check,
+publish / unpublish, portfolio, pending invitations accept / decline, workplaces with end, follower count), `/customer/following`
+(booking links, per-professional move notice toggle, unfollow), and the employee-list action `ProfessionalLinkAction` (invite,
+withdraw, end) behind one import and one element in `provider/employees/page.tsx`. Guard tests: `web_platform/tests/professional-identity-screens.test.mjs`.
