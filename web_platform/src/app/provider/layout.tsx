@@ -6,12 +6,17 @@ import { usePathname, useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/auth-guard";
 import { CommandResult, signOutFailedText, useOperationsLocale } from "@/components/operations-ui";
 import { supabase } from "@/lib/supabase";
+import { ProviderContextProvider, useProviderContext } from "./_components/provider-context";
 import { clearDevRole } from "@/lib/dev-access";
 
 // Localized Navigation Strings
 const translations = {
   en: {
     dashboard: "Dashboard",
+    myDay: "My day",
+    loadingBusiness: "Loading your business…",
+    contextFailed: "Your business could not be loaded: ",
+    tryAgain: "Try again",
     calendar: "Calendar",
     bookings: "Bookings",
     services: "Services",
@@ -40,6 +45,10 @@ const translations = {
   },
   ar: {
     dashboard: "لوحة التحكم",
+    myDay: "يومي",
+    loadingBusiness: "جارٍ تحميل بيانات نشاطك…",
+    contextFailed: "تعذر تحميل بيانات نشاطك: ",
+    tryAgain: "إعادة المحاولة",
     calendar: "التقويم",
     bookings: "الحجوزات",
     services: "الخدمات",
@@ -77,7 +86,7 @@ const getNavIcon = (path: string) => {
       </svg>
     );
   }
-  if (path.includes("calendar")) {
+  if (path.includes("calendar") || path.includes("my-day")) {
     return (
       <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -193,7 +202,7 @@ const getNavIcon = (path: string) => {
 // Keep navigation groups anchored to their destination as tabs are added.
 const separatorAfterPaths = ["/provider/jobs", "/provider/customers"];
 
-export default function ProviderLayout({
+function ProviderShell({
   children,
 }: {
   children: React.ReactNode;
@@ -216,20 +225,17 @@ export default function ProviderLayout({
   // The phone menu closes on navigation because it is keyed to the path it was opened on.
   const [navOpenPath, setNavOpenPath] = useState<string | null>(null);
   const navOpen = navOpenPath === pathname;
-  const [business, setBusiness] = useState<{ en: string; ar: string } | null>(null);
-
+  // The business and the person's role come from my_provider_context, not from owner_id: an employee owns nothing.
+  const providerState = useProviderContext();
+  const providerCtx = providerState.status === "ready" ? providerState.context : null;
+  const business = providerCtx && providerCtx.role !== "none"
+    ? { en: providerCtx.businessNameEn || providerCtx.businessNameAr, ar: providerCtx.businessNameAr || providerCtx.businessNameEn }
+    : null;
+  const isEmployee = providerCtx?.role === "employee";
+  const onMyDay = pathname.startsWith("/provider/my-day");
   useEffect(() => {
-    let cancelled = false;
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user || cancelled) return;
-      const { data: provider } = await supabase
-        .from("providers").select("business_name_en, business_name_ar").eq("owner_id", data.user.id).maybeSingle();
-      if (!cancelled && provider) {
-        setBusiness({ en: provider.business_name_en || provider.business_name_ar || "", ar: provider.business_name_ar || provider.business_name_en || "" });
-      }
-    });
-    return () => { cancelled = true; };
-  }, []);
+    if (isEmployee && !onMyDay) router.replace("/provider/my-day");
+  }, [isEmployee, onMyDay, router]);
 
   // Local scope: leaving this device must not end the person's sessions on their other devices. A failure is shown,
   // and they stay signed in, because the session is still on this device.
@@ -259,7 +265,7 @@ export default function ProviderLayout({
     document.documentElement.lang = next;
   };
 
-  const navItems = [
+  const ownerNav = [
     { name: t.dashboard, path: "/provider/dashboard" },
     { name: t.calendar, path: "/provider/calendar" },
     { name: t.bookings, path: "/provider/bookings" },
@@ -278,6 +284,8 @@ export default function ProviderLayout({
     { name: t.reports, path: "/provider/reports" },
     { name: t.settings, path: "/provider/settings" },
   ];
+  // A professional works from one screen; the owner's management screens stay hidden from them (and refuse them in the database).
+  const navItems = isEmployee ? [{ name: t.myDay, path: "/provider/my-day" }] : ownerNav;
 
   return (
     <AuthGuard allowedRoles={["provider_owner", "provider_employee"]}>
@@ -291,7 +299,7 @@ export default function ProviderLayout({
         <div className="primora-dashboard-sidebar relative flex h-full w-full flex-col overflow-hidden rounded-[28px] border border-[#E0C46A]/60 bg-[radial-gradient(circle_at_22%_0%,rgba(224,196,106,0.22),transparent_36%),linear-gradient(160deg,#221C12_0%,#171814_46%,#2B2417_100%)] p-5 text-[#F8F5EA] shadow-[0_24px_70px_rgba(16,18,15,0.22),0_0_46px_rgba(209,175,71,0.24)] md:w-[280px]">
           {/* Logo and phone menu toggle */}
           <div className="flex flex-shrink-0 flex-row items-center justify-between gap-3">
-          <Link href="/" className={`flex flex-shrink-0 items-center gap-2.5 px-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+          <Link href="/" className={`flex flex-shrink-0 items-center gap-2.5 px-2 flex-row`}>
             <svg className="w-5.5 h-5.5 text-[#D1AF47]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
             </svg>
@@ -328,7 +336,7 @@ export default function ProviderLayout({
                       isActive
                         ? "border border-[#E0C46A]/50 bg-[#D1AF47]/20 text-[#F4E7B6] shadow-[0_0_34px_rgba(209,175,71,0.34),inset_0_0_18px_rgba(244,231,182,0.08)]"
                         : "text-[#EFE7D8] hover:bg-[#ffffff]/[0.08] hover:text-white"
-                    } ${isRTL ? "flex-row-reverse text-right" : "flex-row text-left"}`}
+                    } flex-row text-start`}
                   >
                     <span className={`flex-shrink-0 transition-colors duration-300 ${isActive ? "text-[#E0C46A]" : "text-[#C8BFAE] group-hover:text-[#E0C46A]"}`}>
                       {getNavIcon(item.path)}
@@ -360,13 +368,13 @@ export default function ProviderLayout({
               href="/provider/settings"
               className="flex items-center justify-between p-3 bg-[#14120E]/80 border border-[#E0C46A]/60 rounded-2xl group hover:border-[#E0C46A]/70 transition-all duration-300 shadow-[0_0_38px_rgba(209,175,71,0.24),inset_0_0_18px_rgba(244,231,182,0.08)]"
             >
-              <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <div className={`flex items-center gap-3 flex-row`}>
                 <div className="w-8 h-8 rounded-xl bg-[#D1AF47]/15 border border-[#D1AF47]/40 flex items-center justify-center text-[#F4E7B6] group-hover:text-[#D1AF47] transition duration-300">
                   <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 0A5 5 0 1110.12 10.12l3.536-3.536m0 0L20 4M9 15l-3 3m0 0l-3-3m3 3V9" />
                   </svg>
                 </div>
-                <div className={`text-left ${isRTL ? "text-right" : "text-left"}`}>
+                <div className={`text-left text-start`}>
                   <h5 className="text-[11px] font-bold text-[#F4E7B6] leading-none">{t.needHelp}</h5>
                   <p className="text-[9px] text-[#EFE7D8] font-semibold mt-0.5">{t.contactSupport}</p>
                 </div>
@@ -377,12 +385,12 @@ export default function ProviderLayout({
             </Link>
 
             {/* User Initials Avatar & Logout */}
-            <div className={`flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-[#ffffff]/[0.03] px-2 py-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <div className={`flex items-center gap-2.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <div className={`flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-[#ffffff]/[0.03] px-2 py-2 flex-row`}>
+              <div className={`flex items-center gap-2.5 flex-row`}>
                 <div className="w-9 h-9 rounded-full bg-[#F4E7B6]/15 border border-[#D1AF47]/25 flex items-center justify-center text-[#F4E7B6] font-bold text-sm flex-shrink-0">
                   {(business?.[locale] || "").trim().charAt(0).toUpperCase() || "•"}
                 </div>
-                <div className={`hidden md:block ${isRTL ? "text-left" : "text-right"}`}>
+                <div className={`hidden md:block text-end`}>
                   <p className="text-[9px] text-[#D0C5AF] uppercase font-bold tracking-widest leading-none mb-0.5">{t.partnerHub}</p>
                   <p className="text-xs font-black text-white leading-tight truncate max-w-[110px]">{business?.[locale] || ""}</p>
                 </div>
@@ -416,7 +424,7 @@ export default function ProviderLayout({
           {/* Spacer keeps the controls on the end side; there is no global search to offer here. */}
           <div aria-hidden="true" />
 
-          <div className={`flex items-center gap-6 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+          <div className={`flex items-center gap-6 flex-row`}>
             {/* Language Switcher Button */}
             <button
               onClick={toggleLanguage}
@@ -426,8 +434,8 @@ export default function ProviderLayout({
             </button>
 
             {/* Profile Menu */}
-            <div className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-              <div className={`hidden sm:block ${isRTL ? "text-left" : "text-right"}`}>
+            <div className={`flex items-center gap-4 flex-row`}>
+              <div className={`hidden sm:block text-end`}>
                 <p className="text-[10px] text-[#667085] font-semibold uppercase tracking-[0.15em] leading-none mb-1">{t.welcome}</p>
                 <p className="text-sm font-bold text-[#101828] tracking-wide">{business?.[locale] || ""}</p>
               </div>
@@ -442,11 +450,28 @@ export default function ProviderLayout({
       )}
         {/* ── PAGES WRAPPER ── */}
         <main className="primora-dashboard-content flex-1 p-5 md:overflow-y-auto">
-          {children}
+          {providerState.status === "loading" ? (
+            <p role="status" className="p-6 text-sm font-semibold text-[#667085]">{t.loadingBusiness}</p>
+          ) : providerState.status === "error" ? (
+            <div role="alert" className="m-6 rounded-2xl border border-[#FECDCA] bg-[#FEF3F2] p-5 text-sm font-semibold text-[#B42318]">
+              <p>{t.contextFailed}{providerState.message}</p>
+              <button type="button" onClick={providerState.retry} className="mt-3 rounded-xl border border-[#B42318] bg-white px-4 py-2 text-xs font-black text-[#B42318] focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.tryAgain}</button>
+            </div>
+          ) : isEmployee && !onMyDay ? null : (
+            children
+          )}
         </main>
       </div>
 
     </div>
     </AuthGuard>
+  );
+}
+
+export default function ProviderLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <ProviderContextProvider>
+      <ProviderShell>{children}</ProviderShell>
+    </ProviderContextProvider>
   );
 }

@@ -66,8 +66,8 @@ const translations = {
     splitSubtitle: "Card payments are processed by Tap Payments.",
     payoutTimeline: "Payout Transfer Schedule",
     payoutTimelineDesc: "Completed appointments trigger automated payout transfers directly into your registered local IBAN (Riyad Bank, SNB, Al Rajhi, etc.) via scheduled banking batches.",
-    securedEscrow: "Booking Guarantee",
-    securedEscrowDesc: "Guards against customer no-shows and salon cancellations in accordance with clear cancellation policies.",
+    securedEscrow: "Deposit protection policy",
+    securedEscrowDesc: "Your deposit and cancellation terms decide what is kept when a customer cancels late or does not come.",
     
     // Checkout
     checkoutTitle: "Secure Plan Subscription",
@@ -144,8 +144,8 @@ const translations = {
     splitSubtitle: "تتم معالجة مدفوعات البطاقات عبر Tap Payments.",
     payoutTimeline: "جدول تحويل المستحقات",
     payoutTimelineDesc: "تؤدي المواعيد المكتملة إلى تحويلات مستحقات تلقائية مباشرة إلى حسابك المصرفي المحلي المسجل (بنك الرياض، الأهلي SNB، الراجحي، إلخ) عبر دفعات بنكية مجدولة.",
-    securedEscrow: "ضمان الحجز المعتمد",
-    securedEscrowDesc: "حماية ضد عدم حضور العملاء وإلغاءات الصالون وفقاً لسياسات الإلغاء الشفافة.",
+    securedEscrow: "سياسة حماية العربون",
+    securedEscrowDesc: "تحدد شروط العربون والإلغاء لديك ما يُحتفظ به عند الإلغاء المتأخر أو عدم الحضور.",
     
     // Checkout
     checkoutTitle: "الاشتراك الآمن في الخطة",
@@ -872,10 +872,10 @@ export default function PricingPage() {
                     </div>
                     <div>
                       <h4 className="text-xs font-bold text-[#101828]">
-                        {locale === "en" ? "Bank-Grade Encryption" : "تشفير مصرفي آمن"}
+                        {locale === "en" ? "Card payments on Tap's hosted page" : "الدفع بالبطاقة عبر صفحة Tap المستضافة"}
                       </h4>
                       <p className="text-[10px] text-[#667085]">
-                        {locale === "en" ? "PCI-DSS Compliant via Tap Payments" : "متوافق مع معايير الأمان عبر Tap Payments"}
+                        {locale === "en" ? "Card details are entered on the payment provider's page, never on PRIMORA" : "تُدخل بيانات البطاقة في صفحة مزود الدفع وليس في بريمورا"}
                       </p>
                     </div>
                   </div>

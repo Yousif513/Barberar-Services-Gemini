@@ -565,7 +565,7 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       const promoCode = readFileSync(join(webPlatformDir, "src/app/provider/promotions/page.tsx"), "utf8");
       assert.ok(!promoCode.includes('"promo-1"'), "Must not use mock promo-1");
       assert.ok(!promoCode.includes('"promo-2"'), "Must not use mock promo-2");
-      assert.ok(promoCode.includes('from("provider_promos")'), "Must query real provider_promos");
+      assert.ok(promoCode.includes('rpc("list_provider_promo_codes"'), "Must read the codes checkout redeems (promotional_codes) through the owner command");
 
       const custCode = readFileSync(join(webPlatformDir, "src/app/provider/customers/page.tsx"), "utf8");
       assert.ok(!custCode.includes('"cust-1"'), "Must not use mock cust-1");

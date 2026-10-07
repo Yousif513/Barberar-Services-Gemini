@@ -2,6 +2,10 @@
 
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
+import { useConfirm } from "@/components/modal";
+import { ProviderDialog } from "../_components/dialog";
+import { CommissionRulesDialog, PortfolioDialog } from "../_components/employee-extras";
 
 const translations = {
   en: {
@@ -80,12 +84,16 @@ type StaffMember = {
   workType: WorkType;
   workTypeLabel: string;
   totalEarnings: number;
-  rating: number;
   completedBookings: number;
   assignedServiceNames: string[];
   availability: string;
   serviceIds: string[];
   availabilityRows: ShiftRow[];
+  bioEn: string;
+  bioAr: string;
+  years: number | null;
+  specialties: string[];
+  instagram: string;
 };
 
 type StaffForm = {
@@ -100,6 +108,11 @@ type StaffForm = {
   photoUrl: string;
   workType: WorkType;
   isActive: boolean;
+  bioEn: string;
+  bioAr: string;
+  years: string;
+  specialties: string;
+  instagram: string;
 };
 
 type BranchOption = {
@@ -133,35 +146,51 @@ const defaultShiftRows = (): ShiftRow[] =>
     end: "21:00"
   }));
 
-const employeePhotoPool = [
-  "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1618077360395-f3068be8e001?q=80&w=400&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=400&auto=format&fit=crop"
-];
-
-const workTypeSequence: WorkType[] = ["in_shop", "remote", "both"];
-
-const hashText = (value: string) =>
-  value.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
-
-const demoProfileFor = (id: string, name: string, index: number, servicesCount: number) => {
-  const hash = hashText(`${id}-${name}-${index}`);
-  const normalizedName = (name || "employee")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ".")
-    .replace(/^\.+|\.+$/g, "") || "employee";
-
-  return {
-    photoUrl: employeePhotoPool[hash % employeePhotoPool.length],
-    phone: `+966 5${String(10000000 + (hash % 89999999)).slice(0, 8)}`,
-    email: `${normalizedName}@primora.team`,
-    workType: workTypeSequence[hash % workTypeSequence.length],
-    totalEarnings: 6200 + (hash % 38) * 420 + servicesCount * 350,
-    rating: Number((4.55 + (hash % 40) / 100).toFixed(1)),
-    completedBookings: 42 + (hash % 76) + servicesCount * 4
-  };
+const extraCopy = {
+  en: {
+    bioEn: "Bio (English)",
+    bioAr: "Bio (Arabic)",
+    years: "Years of experience",
+    specialties: "Specialties (comma separated)",
+    instagram: "Instagram handle",
+    payRules: "Pay rules",
+    portfolio: "Portfolio",
+    earningsFailed: "Earnings could not be loaded: ",
+    contactsFailed: "Phone numbers and emails could not be loaded: ",
+    invalidYears: "Years of experience must be a whole number from 0 to 60.",
+    invalidInstagram: "The Instagram handle may use letters, digits, dots and underscores only (30 characters at most).",
+    deleteTitle: "Delete this professional?",
+    deleteIntro: "Their bookings are kept. If they have booking history they are deactivated instead of deleted.",
+    emptyHeading: "Add your first professional",
+    emptyBody: "Nobody is on your team yet. Add a professional, then assign services and weekly shifts so customers can book them.",
+    notSet: "Not set",
+    about: "About",
+    experience: "Experience",
+    yearsSuffix: "years",
+    deactivateFailed: "The professional could not be deleted or deactivated: ",
+  },
+  ar: {
+    bioEn: "النبذة (إنجليزي)",
+    bioAr: "النبذة (عربي)",
+    years: "سنوات الخبرة",
+    specialties: "التخصصات (مفصولة بفواصل)",
+    instagram: "حساب إنستغرام",
+    payRules: "قواعد الأجر",
+    portfolio: "معرض الأعمال",
+    earningsFailed: "تعذر تحميل الأرباح: ",
+    contactsFailed: "تعذر تحميل أرقام الهواتف والبريد: ",
+    invalidYears: "سنوات الخبرة رقم صحيح من 0 إلى 60.",
+    invalidInstagram: "حساب إنستغرام يقبل الحروف والأرقام والنقطة والشرطة السفلية فقط (30 حرفاً كحد أقصى).",
+    deleteTitle: "حذف هذا الأخصائي؟",
+    deleteIntro: "تبقى حجوزاته. إذا كان لديه سجل حجوزات فيُعطَّل بدلاً من الحذف.",
+    emptyHeading: "أضف أول أخصائي لديك",
+    emptyBody: "لا يوجد أحد في فريقك بعد. أضف أخصائياً ثم عيّن له الخدمات والمناوبات الأسبوعية ليتمكن العملاء من حجزه.",
+    notSet: "غير محدد",
+    about: "نبذة",
+    experience: "الخبرة",
+    yearsSuffix: "سنوات",
+    deactivateFailed: "تعذر حذف الأخصائي أو تعطيله: ",
+  },
 };
 
 export default function ProviderEmployeesPage() {
@@ -305,8 +334,18 @@ export default function ProviderEmployeesPage() {
     email: "",
     photoUrl: "",
     workType: "in_shop",
-    isActive: true
+    isActive: true,
+    bioEn: "",
+    bioAr: "",
+    years: "",
+    specialties: "",
+    instagram: ""
   });
+  const x = extraCopy[lang];
+  const [confirmNode, askConfirm] = useConfirm(lang);
+  const [earningsOk, setEarningsOk] = useState(true);
+  const [rulesFor, setRulesFor] = useState<StaffMember | null>(null);
+  const [portfolioFor, setPortfolioFor] = useState<StaffMember | null>(null);
 
   const [providerId, setProviderId] = useState("");
   const [branches, setBranches] = useState<BranchOption[]>([]);
@@ -343,7 +382,7 @@ export default function ProviderEmployeesPage() {
     return `${labels[first.day]} - ${labels[last.day]} (${first.start} - ${last.end})`;
   }, [lang, teamCopy.closed]);
 
-  const normalizeStaffMember = useCallback((employee: any, index = 0, serviceOptions: ServiceOption[] = []): StaffMember => {
+  const normalizeStaffMember = useCallback((employee: any, serviceOptions: ServiceOption[] = [], earnings: Record<string, { earned: number; bookings: number }> = {}, contacts: Record<string, { phone: string; email: string }> = {}): StaffMember => {
     const serviceIds = (employee.employee_services || [])
       .map((row: any) => row.service_id as string)
       .filter(Boolean);
@@ -359,7 +398,7 @@ export default function ProviderEmployeesPage() {
     });
     const displayName = lang === "ar" ? employee.name_ar || employee.name_en : employee.name_en || employee.name_ar;
     const title = lang === "ar" ? employee.title_ar || employee.title_en : employee.title_en || employee.title_ar;
-    const profile = demoProfileFor(employee.id || String(index), displayName || employee.name_en || "Staff", index, serviceIds.length);
+    const workType: WorkType = employee.work_type === "remote" || employee.work_type === "both" ? employee.work_type : "in_shop";
     const assignedServiceNames = serviceOptions
       .filter((service) => serviceIds.includes(service.id))
       .map((service) => service.name);
@@ -377,18 +416,22 @@ export default function ProviderEmployeesPage() {
       statusLabel: employee.is_active ? t.active : t.inactive,
       servicesCount: serviceIds.length,
       avatar: String(displayName || "S").trim().charAt(0).toUpperCase(),
-      photoUrl: employee.photo_url || profile.photoUrl,
-      phone: employee.phone || profile.phone,
-      email: employee.email || profile.email,
-      workType: employee.work_type || profile.workType,
-      workTypeLabel: getWorkTypeLabel(employee.work_type || profile.workType),
-      totalEarnings: profile.totalEarnings,
-      rating: profile.rating,
-      completedBookings: profile.completedBookings,
+      photoUrl: employee.photo_url || "",
+      phone: contacts[employee.id]?.phone || "",
+      email: contacts[employee.id]?.email || "",
+      workType,
+      workTypeLabel: getWorkTypeLabel(workType),
+      totalEarnings: earnings[employee.id]?.earned ?? 0,
+      completedBookings: earnings[employee.id]?.bookings ?? 0,
       assignedServiceNames,
       availability: summarizeAvailability(availabilityRows),
       serviceIds,
-      availabilityRows
+      availabilityRows,
+      bioEn: employee.bio_en || "",
+      bioAr: employee.bio_ar || "",
+      years: typeof employee.years_of_experience === "number" ? employee.years_of_experience : null,
+      specialties: Array.isArray(employee.specialties) ? employee.specialties : [],
+      instagram: employee.instagram_handle || ""
     };
   }, [getWorkTypeLabel, lang, summarizeAvailability, t.active, t.inactive]);
 
@@ -482,9 +525,12 @@ export default function ProviderEmployeesPage() {
           title_ar,
           is_active,
           photo_url,
-          phone,
-          email,
           work_type,
+          bio_en,
+          bio_ar,
+          years_of_experience,
+          specialties,
+          instagram_handle,
           employee_services ( service_id ),
           employee_availability ( day_of_week, start_time, end_time, is_working_day )
         `)
@@ -492,7 +538,37 @@ export default function ProviderEmployeesPage() {
         .order("created_at", { ascending: false });
 
       if (staffError) throw staffError;
-      setLiveStaffMembers((staffData || []).map((employee, index) => normalizeStaffMember(employee, index, normalizedServices)));
+      const staffIds = (staffData || []).map((employee) => employee.id as string);
+      const earnings: Record<string, { earned: number; bookings: number }> = {};
+      if (staffIds.length > 0) {
+        const { data: earningRows, error: earningsError } = await supabase
+          .from("employee_earnings_summary")
+          .select("employee_id, total_completed_bookings, total_employee_earnings")
+          .in("employee_id", staffIds);
+        if (earningsError) {
+          setEarningsOk(false);
+          setError(extraCopy[lang].earningsFailed + errorMessage(earningsError));
+        } else {
+          setEarningsOk(true);
+          for (const row of earningRows || []) {
+            const current = earnings[row.employee_id] || { earned: 0, bookings: 0 };
+            current.earned += Number(row.total_employee_earnings || 0);
+            current.bookings += Number(row.total_completed_bookings || 0);
+            earnings[row.employee_id] = current;
+          }
+        }
+      }
+      // Phone and email are private columns; the owner (or a delegate with the staff permission) reads them through this command.
+      const contacts: Record<string, { phone: string; email: string }> = {};
+      if (staffIds.length > 0) {
+        const { data: contactRows, error: contactsError } = await supabase.rpc("get_provider_staff_contacts", { p_provider_id: providerInfo.id });
+        if (contactsError) {
+          setError(extraCopy[lang].contactsFailed + errorMessage(contactsError));
+        } else {
+          for (const row of contactRows || []) contacts[row.employee_id] = { phone: row.phone || "", email: row.email || "" };
+        }
+      }
+      setLiveStaffMembers((staffData || []).map((employee) => normalizeStaffMember(employee, normalizedServices, earnings, contacts)));
     } catch (err) {
       console.error("Error loading team roster:", err);
       setError(teamCopy.loadFailed);
@@ -531,7 +607,12 @@ export default function ProviderEmployeesPage() {
       email: member.email,
       photoUrl: member.photoUrl,
       workType: member.workType,
-      isActive: member.status === "active"
+      isActive: member.status === "active",
+      bioEn: member.bioEn,
+      bioAr: member.bioAr,
+      years: member.years === null ? "" : String(member.years),
+      specialties: member.specialties.join(", "),
+      instagram: member.instagram
     });
     setStaffModalOpen(true);
   };
@@ -544,6 +625,16 @@ export default function ProviderEmployeesPage() {
   const saveStaff = async () => {
     if (!staffForm.branchId || !staffForm.nameEn.trim() || !staffForm.nameAr.trim()) {
       setError(teamCopy.required);
+      return;
+    }
+    const yearsText = staffForm.years.trim();
+    if (yearsText !== "" && !(/^\d{1,2}$/.test(yearsText) && Number(yearsText) <= 60)) {
+      setError(extraCopy[lang].invalidYears);
+      return;
+    }
+    const handle = staffForm.instagram.trim().replace(/^@/, "");
+    if (handle !== "" && !/^[A-Za-z0-9._]{1,30}$/.test(handle)) {
+      setError(extraCopy[lang].invalidInstagram);
       return;
     }
 
@@ -560,7 +651,12 @@ export default function ProviderEmployeesPage() {
         photo_url: staffForm.photoUrl.trim() || null,
         phone: staffForm.phone.trim() || null,
         email: staffForm.email.trim() || null,
-        work_type: staffForm.workType
+        work_type: staffForm.workType,
+        bio_en: staffForm.bioEn.trim() || null,
+        bio_ar: staffForm.bioAr.trim() || null,
+        years_of_experience: yearsText === "" ? null : Number(yearsText),
+        specialties: staffForm.specialties.split(/[,،]/).map((item) => item.trim()).filter(Boolean),
+        instagram_handle: handle || null
       };
 
       const result = staffForm.id
@@ -573,15 +669,21 @@ export default function ProviderEmployeesPage() {
       await loadTeamData();
     } catch (err) {
       console.error("Error saving staff member:", err);
-      setError(teamCopy.saveFailed);
+      setError(`${teamCopy.saveFailed} ${errorMessage(err)}`);
     } finally {
       setSaving(false);
     }
   };
 
   const deleteStaff = async (member: StaffMember) => {
-    const message = teamCopy.confirmDelete.replace("{name}", member.name);
-    if (typeof window !== "undefined" && !window.confirm(message)) return;
+    const confirmed = await askConfirm({
+      title: extraCopy[lang].deleteTitle,
+      intro: extraCopy[lang].deleteIntro,
+      facts: [{ label: teamCopy.nameEn, value: member.name }],
+      confirmLabel: teamCopy.delete,
+      tone: "danger"
+    });
+    if (!confirmed) return;
 
     try {
       setSaving(true);
@@ -593,6 +695,7 @@ export default function ProviderEmployeesPage() {
         .eq("id", member.id);
 
       if (deleteError) {
+        if (deleteError.code !== "23503") throw deleteError;
         const { error: deactivateError } = await supabase
           .from("employees")
           .update({ is_active: false })
@@ -606,7 +709,7 @@ export default function ProviderEmployeesPage() {
       await loadTeamData();
     } catch (err) {
       console.error("Error deleting staff member:", err);
-      setError(teamCopy.deleteFailed);
+      setError(extraCopy[lang].deactivateFailed + errorMessage(err));
     } finally {
       setSaving(false);
     }
@@ -654,7 +757,7 @@ export default function ProviderEmployeesPage() {
       await loadTeamData();
     } catch (err) {
       console.error("Error saving service assignments:", err);
-      setError(teamCopy.servicesFailed);
+      setError(`${teamCopy.servicesFailed} ${errorMessage(err)}`);
     } finally {
       setSaving(false);
     }
@@ -700,76 +803,25 @@ export default function ProviderEmployeesPage() {
       await loadTeamData();
     } catch (err) {
       console.error("Error saving staff shifts:", err);
-      setError(teamCopy.shiftsFailed);
+      setError(`${teamCopy.shiftsFailed} ${errorMessage(err)}`);
     } finally {
       setSaving(false);
     }
   };
 
-  const demoServiceOptions = useMemo<ServiceOption[]>(() => services.length > 0 ? services : [
-    { id: "demo-classic", name: lang === "ar" ? "قص شعر كلاسيكي" : "Classic Haircut", price: 45 },
-    { id: "demo-beard", name: lang === "ar" ? "تحديد اللحية" : "Beard Sculpt", price: 30 },
-    { id: "demo-facial", name: lang === "ar" ? "تنظيف البشرة" : "Express Facial", price: 80 },
-    { id: "demo-spa", name: lang === "ar" ? "حمام مغربي" : "Moroccan Bath", price: 90 }
-  ], [lang, services]);
-
-  const demoStaffMembers = useMemo(() => {
-    const rows = [
-      {
-        id: "demo-omar",
-        branch_id: "demo-branch",
-        name_en: "Omar Khaled",
-        name_ar: "عمر خالد",
-        title_en: "Master Barber",
-        title_ar: "حلاق خبير",
-        is_active: true,
-        employee_services: demoServiceOptions.slice(0, 3).map((service) => ({ service_id: service.id })),
-        employee_availability: []
-      },
-      {
-        id: "demo-yousef",
-        branch_id: "demo-branch",
-        name_en: "Yousef Adel",
-        name_ar: "يوسف عادل",
-        title_en: "Beard Specialist",
-        title_ar: "أخصائي لحية",
-        is_active: true,
-        employee_services: demoServiceOptions.slice(0, 2).map((service) => ({ service_id: service.id })),
-        employee_availability: []
-      },
-      {
-        id: "demo-karim",
-        branch_id: "demo-branch",
-        name_en: "Karim Saad",
-        name_ar: "كريم سعد",
-        title_en: "Grooming Expert",
-        title_ar: "خبير عناية",
-        is_active: true,
-        employee_services: demoServiceOptions.slice(1, 4).map((service) => ({ service_id: service.id })),
-        employee_availability: []
-      }
-    ];
-
-    return rows.map((employee, index) => normalizeStaffMember(employee, index, demoServiceOptions));
-  }, [demoServiceOptions, normalizeStaffMember]);
-
-  const staffMembers = loading || liveStaffMembers.length > 0 ? liveStaffMembers : demoStaffMembers;
+  const staffMembers = liveStaffMembers;
 
   const employeeMetrics = useMemo(() => {
     const totalEarnings = staffMembers.reduce((sum, member) => sum + member.totalEarnings, 0);
     const completedBookings = staffMembers.reduce((sum, member) => sum + member.completedBookings, 0);
-    const averageRating = staffMembers.length
-      ? staffMembers.reduce((sum, member) => sum + member.rating, 0) / staffMembers.length
-      : 0;
     const bestPerformer = staffMembers.reduce<StaffMember | null>((best, member) => {
       if (!best) return member;
-      return member.totalEarnings + member.completedBookings * 40 > best.totalEarnings + best.completedBookings * 40 ? member : best;
+      return member.totalEarnings > best.totalEarnings || (member.totalEarnings === best.totalEarnings && member.completedBookings > best.completedBookings) ? member : best;
     }, null);
 
     return {
       totalEarnings,
       completedBookings,
-      averageRating,
       bestPerformer,
       activeEmployees: staffMembers.filter((member) => member.status === "active").length,
       remoteEmployees: staffMembers.filter((member) => member.workType === "remote" || member.workType === "both").length,
@@ -812,11 +864,10 @@ export default function ProviderEmployeesPage() {
       )}
 
       {/* Employee Performance Dashboard */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-7">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
         {[
-          { label: teamCopy.totalEarnings, value: formatMoney(employeeMetrics.totalEarnings), accent: "text-[#D1AF47]" },
+          { label: teamCopy.totalEarnings, value: earningsOk ? formatMoney(employeeMetrics.totalEarnings) : "—", accent: "text-[#D1AF47]" },
           { label: teamCopy.completedBookings, value: employeeMetrics.completedBookings.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"), accent: "text-[#101828]" },
-          { label: teamCopy.averageRating, value: employeeMetrics.averageRating.toFixed(1), accent: "text-[#22C55E]" },
           { label: teamCopy.bestPerformer, value: employeeMetrics.bestPerformer?.name || "—", accent: "text-[#9A741F]" },
           { label: teamCopy.activeEmployees, value: employeeMetrics.activeEmployees.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"), accent: "text-[#22C55E]" },
           { label: teamCopy.remoteEmployees, value: employeeMetrics.remoteEmployees.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"), accent: "text-[#344054]" },
@@ -835,7 +886,9 @@ export default function ProviderEmployeesPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
         {!loading && staffMembers.length === 0 && (
           <div className="md:col-span-2 lg:col-span-3 rounded-[24px] bg-white border border-[#ECECEC] p-8 text-center text-sm text-[#667085] shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-            {teamCopy.noStaff}
+            <h3 className="text-base font-black text-[#101828]">{extraCopy[lang].emptyHeading}</h3>
+            <p className="mx-auto mt-2 max-w-md leading-6">{extraCopy[lang].emptyBody}</p>
+            <button type="button" onClick={openAddStaff} className="mt-4 rounded-xl bg-[#D1AF47] px-5 py-2.5 text-sm font-black text-[#070B12] outline-2 outline-offset-2 outline-transparent hover:bg-[#E0C46A] focus-visible:outline-[#9B7928]">{t.addStaff}</button>
           </div>
         )}
         {staffMembers.map((member) => {
@@ -872,17 +925,20 @@ export default function ProviderEmployeesPage() {
                     <div className="relative flex-shrink-0">
                       <div className="relative w-14 h-14 overflow-hidden rounded-full bg-white border-2 border-[#D1AF47]/30 flex items-center justify-center text-[#D1AF47] font-bold text-lg tracking-wider group-hover:border-[#D1AF47] transition-all duration-300">
                         <span>{member.avatar}</span>
-                        <img
-                          src={member.photoUrl}
-                          alt={member.name}
-                          className="absolute inset-0 h-full w-full object-cover"
-                          onError={(event) => {
-                            event.currentTarget.style.display = "none";
-                          }}
-                        />
+                        {member.photoUrl && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={member.photoUrl}
+                            alt={member.name}
+                            className="absolute inset-0 h-full w-full object-cover"
+                            onError={(event) => {
+                              event.currentTarget.style.display = "none";
+                            }}
+                          />
+                        )}
                       </div>
                       {/* Avatar Status Dot */}
-                      <span className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white ${dotColorClass} ${isActive ? "animate-pulse" : ""}`} />
+                      <span className={`absolute bottom-0 end-0 w-3.5 h-3.5 rounded-full border-2 border-white ${dotColorClass} ${isActive ? "animate-pulse" : ""}`} />
                     </div>
                     
                     <div>
@@ -896,7 +952,7 @@ export default function ProviderEmployeesPage() {
                         <span className="rounded-full border border-[#D1AF47]/20 bg-[#D1AF47]/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-[#D1AF47]">
                           {member.workTypeLabel}
                         </span>
-                        <span className="text-[10px] font-semibold text-[#667085]">{member.phone}</span>
+                        <span dir="ltr" className="text-[10px] font-semibold text-[#667085]">{member.phone || x.notSet}</span>
                       </div>
                     </div>
                   </div>
@@ -913,14 +969,10 @@ export default function ProviderEmployeesPage() {
 
                 {/* Details Section */}
                 <div className="space-y-4">
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     <div className="rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] p-3">
                       <span className="block text-[9px] font-black uppercase tracking-widest text-[#667085]">{teamCopy.earnings}</span>
-                      <strong className="mt-1 block text-xs font-black text-[#D1AF47]">{formatMoney(member.totalEarnings)}</strong>
-                    </div>
-                    <div className="rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] p-3">
-                      <span className="block text-[9px] font-black uppercase tracking-widest text-[#667085]">{teamCopy.rating}</span>
-                      <strong className="mt-1 block text-xs font-black text-[#22C55E]">★ {member.rating.toFixed(1)}</strong>
+                      <strong className="mt-1 block text-xs font-black text-[#D1AF47]">{earningsOk ? formatMoney(member.totalEarnings) : "—"}</strong>
                     </div>
                     <div className="rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] p-3">
                       <span className="block text-[9px] font-black uppercase tracking-widest text-[#667085]">{teamCopy.bookings}</span>
@@ -957,7 +1009,7 @@ export default function ProviderEmployeesPage() {
                       </svg>
                       <span className="text-xs text-[#344054] font-medium">{teamCopy.email}</span>
                     </div>
-                    <span className="max-w-[170px] truncate text-xs font-bold text-[#101828]">{member.email}</span>
+                    <span dir="ltr" className="max-w-[170px] truncate text-xs font-bold text-[#101828]">{member.email || x.notSet}</span>
                   </div>
 
                   {/* Availability */}
@@ -1008,6 +1060,12 @@ export default function ProviderEmployeesPage() {
                   </svg>
                   {teamCopy.delete}
                 </button>
+                <button type="button" onClick={() => setRulesFor(member)} className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-xs font-semibold text-[#344054] outline-2 outline-offset-2 outline-transparent transition hover:border-[#D1AF47]/40 hover:bg-gray-50 focus-visible:outline-[#9B7928]">
+                  {x.payRules}
+                </button>
+                <button type="button" onClick={() => setPortfolioFor(member)} className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-xs font-semibold text-[#344054] outline-2 outline-offset-2 outline-transparent transition hover:border-[#D1AF47]/40 hover:bg-gray-50 focus-visible:outline-[#9B7928]">
+                  {x.portfolio}
+                </button>
               </div>
             </div>
           );
@@ -1015,8 +1073,7 @@ export default function ProviderEmployeesPage() {
       </div>
 
       {staffModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#101828]/40 px-4 py-8 backdrop-blur-sm">
-          <div className="w-full max-w-2xl rounded-[28px] border border-[#ECECEC] bg-white p-6 shadow-[0_12px_40px_rgba(0,0,0,0.02)]">
+          <ProviderDialog label={staffForm.id ? teamCopy.editStaffTitle : teamCopy.addStaffTitle} onClose={() => setStaffModalOpen(false)} wide>
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-xl font-black text-[#101828]">
@@ -1066,6 +1123,26 @@ export default function ProviderEmployeesPage() {
                   <option value="both" className="bg-white text-[#101828]">{teamCopy.both}</option>
                 </select>
               </label>
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
+                {x.years}
+                <input inputMode="numeric" dir="ltr" value={staffForm.years} onChange={(event) => setStaffForm((form) => ({ ...form, years: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus-visible:border-[#D1AF47]/60" />
+              </label>
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
+                {x.instagram}
+                <input dir="ltr" value={staffForm.instagram} onChange={(event) => setStaffForm((form) => ({ ...form, instagram: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus-visible:border-[#D1AF47]/60" />
+              </label>
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085] sm:col-span-2">
+                {x.specialties}
+                <input value={staffForm.specialties} onChange={(event) => setStaffForm((form) => ({ ...form, specialties: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus-visible:border-[#D1AF47]/60" />
+              </label>
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
+                {x.bioEn}
+                <textarea rows={3} dir="ltr" value={staffForm.bioEn} onChange={(event) => setStaffForm((form) => ({ ...form, bioEn: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus-visible:border-[#D1AF47]/60" />
+              </label>
+              <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
+                {x.bioAr}
+                <textarea rows={3} dir="rtl" value={staffForm.bioAr} onChange={(event) => setStaffForm((form) => ({ ...form, bioAr: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus-visible:border-[#D1AF47]/60" />
+              </label>
               <label className="space-y-2 text-xs font-bold uppercase tracking-wider text-[#667085] sm:col-span-2">
                 {teamCopy.branch}
                 <select value={staffForm.branchId} onChange={(event) => setStaffForm((form) => ({ ...form, branchId: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] px-4 py-3 text-sm normal-case tracking-normal text-[#101828] outline-none focus:border-[#D1AF47]/60">
@@ -1088,15 +1165,13 @@ export default function ProviderEmployeesPage() {
                 {saving ? teamCopy.saving : teamCopy.save}
               </button>
             </div>
-          </div>
-        </div>
+          </ProviderDialog>
       )}
 
       {profileModalOpen && activeMember && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#101828]/40 px-4 py-8 backdrop-blur-sm">
-          <div className="w-full max-w-2xl overflow-hidden rounded-[28px] border border-[#ECECEC] bg-white shadow-[0_12px_40px_rgba(0,0,0,0.02)]">
+          <ProviderDialog label={activeMember.name} onClose={() => setProfileModalOpen(false)} wide flush>
             <div className="relative h-36 bg-gradient-to-br from-[#F4E7B6]/40 via-[#FDFBF7] to-[#F5EEE0] border-b border-[#ECECEC]">
-              <button onClick={() => setProfileModalOpen(false)} className="absolute right-5 top-5 rounded-full border border-[#ECECEC] bg-white px-3 py-1 text-xs font-bold text-[#344054] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
+              <button onClick={() => setProfileModalOpen(false)} className="absolute end-5 top-5 rounded-full border border-[#ECECEC] bg-white px-3 py-1 text-xs font-bold text-[#344054] hover:border-[#D1AF47]/40 hover:text-[#D1AF47]">
                 {teamCopy.cancel}
               </button>
             </div>
@@ -1104,7 +1179,12 @@ export default function ProviderEmployeesPage() {
               <div className="-mt-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                 <div className="flex items-end gap-4">
                   <div className="relative h-24 w-24 overflow-hidden rounded-[28px] border-2 border-[#D1AF47]/50 bg-white shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
-                    <img src={activeMember.photoUrl} alt={activeMember.name} className="h-full w-full object-cover" />
+                    {activeMember.photoUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={activeMember.photoUrl} alt={activeMember.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center text-2xl font-black text-[#D1AF47]">{activeMember.avatar}</span>
+                    )}
                   </div>
                   <div className="pb-1">
                     <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#D1AF47]">{teamCopy.employeeDetails}</p>
@@ -1120,11 +1200,11 @@ export default function ProviderEmployeesPage() {
               <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] p-4">
                   <span className="text-[9px] font-black uppercase tracking-widest text-[#667085]">{teamCopy.earnings}</span>
-                  <strong className="mt-2 block text-lg font-black text-[#D1AF47]">{formatMoney(activeMember.totalEarnings)}</strong>
+                  <strong className="mt-2 block text-lg font-black text-[#D1AF47]">{earningsOk ? formatMoney(activeMember.totalEarnings) : "—"}</strong>
                 </div>
                 <div className="rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] p-4">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-[#667085]">{teamCopy.rating}</span>
-                  <strong className="mt-2 block text-lg font-black text-[#22C55E]">★ {activeMember.rating.toFixed(1)}</strong>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-[#667085]">{x.experience}</span>
+                  <strong className="mt-2 block text-lg font-black text-[#101828]">{activeMember.years === null ? "—" : `${activeMember.years} ${x.yearsSuffix}`}</strong>
                 </div>
                 <div className="rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] p-4">
                   <span className="text-[9px] font-black uppercase tracking-widest text-[#667085]">{teamCopy.bookings}</span>
@@ -1135,8 +1215,9 @@ export default function ProviderEmployeesPage() {
               <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] p-4">
                   <h4 className="text-[10px] font-black uppercase tracking-[0.18em] text-[#667085]">{teamCopy.contact}</h4>
-                  <p className="mt-3 text-sm font-bold text-[#101828]">{activeMember.phone}</p>
-                  <p className="mt-1 text-xs font-semibold text-[#344054]">{activeMember.email}</p>
+                  <p dir="ltr" className="mt-3 text-sm font-bold text-[#101828]">{activeMember.phone || x.notSet}</p>
+                  <p dir="ltr" className="mt-1 text-xs font-semibold text-[#344054]">{activeMember.email || x.notSet}</p>
+                  {activeMember.instagram && <p dir="ltr" className="mt-1 text-xs font-semibold text-[#344054]">@{activeMember.instagram}</p>}
                 </div>
                 <div className="rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] p-4">
                   <h4 className="text-[10px] font-black uppercase tracking-[0.18em] text-[#667085]">{teamCopy.statusAndMode}</h4>
@@ -1144,6 +1225,18 @@ export default function ProviderEmployeesPage() {
                   <p className="mt-1 text-xs font-semibold text-[#344054]">{activeMember.workTypeLabel}</p>
                 </div>
               </div>
+
+              {(lang === "ar" ? activeMember.bioAr || activeMember.bioEn : activeMember.bioEn || activeMember.bioAr) && (
+                <div className="mt-5 rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] p-4">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.18em] text-[#667085]">{x.about}</h4>
+                  <p className="mt-3 text-sm leading-6 text-[#344054]">{lang === "ar" ? activeMember.bioAr || activeMember.bioEn : activeMember.bioEn || activeMember.bioAr}</p>
+                  {activeMember.specialties.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {activeMember.specialties.map((item) => <span key={item} className="rounded-full border border-[#ECECEC] bg-[#F3F4F6] px-3 py-1 text-xs font-bold text-[#344054]">{item}</span>)}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="mt-5 rounded-2xl border border-[#ECECEC] bg-[#F9FAFB] p-4">
                 <h4 className="text-[10px] font-black uppercase tracking-[0.18em] text-[#667085]">{t.assignedServices}</h4>
@@ -1156,13 +1249,19 @@ export default function ProviderEmployeesPage() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </ProviderDialog>
+      )}
+
+      {confirmNode}
+      {rulesFor && providerId && (
+        <CommissionRulesDialog lang={lang} providerId={providerId} employeeId={rulesFor.id} employeeName={rulesFor.name} onClose={() => setRulesFor(null)} onSaved={() => setSuccess(teamCopy.saved)} />
+      )}
+      {portfolioFor && (
+        <PortfolioDialog lang={lang} employeeId={portfolioFor.id} employeeName={portfolioFor.name} onClose={() => setPortfolioFor(null)} />
       )}
 
       {servicesModalOpen && activeMember && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#101828]/40 px-4 py-8 backdrop-blur-sm">
-          <div className="w-full max-w-xl rounded-[28px] border border-[#ECECEC] bg-white p-6 shadow-[0_12px_40px_rgba(0,0,0,0.02)]">
+          <ProviderDialog label={teamCopy.servicesTitle} onClose={() => setServicesModalOpen(false)}>
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-xl font-black text-[#101828]">{teamCopy.servicesTitle}</h3>
@@ -1198,13 +1297,11 @@ export default function ProviderEmployeesPage() {
                 {saving ? teamCopy.saving : teamCopy.save}
               </button>
             </div>
-          </div>
-        </div>
+          </ProviderDialog>
       )}
 
       {shiftsModalOpen && activeMember && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#101828]/40 px-4 py-8 backdrop-blur-sm">
-          <div className="w-full max-w-2xl rounded-[28px] border border-[#ECECEC] bg-white p-6 shadow-[0_12px_40px_rgba(0,0,0,0.02)]">
+          <ProviderDialog label={teamCopy.shiftsTitle} onClose={() => setShiftsModalOpen(false)} wide>
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-xl font-black text-[#101828]">{teamCopy.shiftsTitle}</h3>
@@ -1236,8 +1333,7 @@ export default function ProviderEmployeesPage() {
                 {saving ? teamCopy.saving : teamCopy.save}
               </button>
             </div>
-          </div>
-        </div>
+          </ProviderDialog>
       )}
     </div>
   );

@@ -4,7 +4,9 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { InventoryControls } from "./inventory-controls";
 import { readAllOperationsRows } from "@/lib/operations-data";
-import { useOperationsLocale } from "@/components/operations-ui";
+import { ForbiddenNotice, isForbidden, useOperationsLocale } from "@/components/operations-ui";
+import { CommandDialog, useConfirm } from "@/components/modal";
+import { describeServerError } from "../_components/server-errors";
 
 type Branch = {
   id: string;
@@ -121,7 +123,7 @@ const translations = {
     noOrders: "No purchase orders yet.",
     required: "Complete the required fields first.",
     sar: "SAR"
-    , operations: "Stock & supply operations", retry: "Retry", cancellationReason: "Why cancel this order?", confirmReceive: "Receive this order into branch stock?", confirmCancel: "Cancel this purchase order?"
+    , operations: "Stock & supply operations", retry: "Retry", cancellationReason: "Why cancel this order?", cancelOrderConfirm: "Cancel order", confirmReceive: "Receive this order into branch stock?", confirmCancel: "Cancel this purchase order?"
   },
   ar: {
     title: "المخزون والموردون",
@@ -176,7 +178,7 @@ const translations = {
     noOrders: "لا توجد طلبات شراء بعد.",
     required: "أكمل الحقول المطلوبة أولا.",
     sar: "ريال"
-    , operations: "عمليات المخزون والتوريد", retry: "إعادة المحاولة", cancellationReason: "ما سبب إلغاء الطلب؟", confirmReceive: "استلام هذا الطلب في مخزون الفرع؟", confirmCancel: "إلغاء طلب الشراء؟"
+    , operations: "عمليات المخزون والتوريد", retry: "إعادة المحاولة", cancellationReason: "ما سبب إلغاء الطلب؟", cancelOrderConfirm: "إلغاء الطلب", confirmReceive: "استلام هذا الطلب في مخزون الفرع؟", confirmCancel: "إلغاء طلب الشراء؟"
   }
 };
 
@@ -184,6 +186,9 @@ const numberValue = (value: unknown) => Number(value || 0);
 
 export default function ProviderInventoryPage() {
   const lang = useOperationsLocale();
+  const [confirmNode, askConfirm] = useConfirm(lang);
+  const [forbidden, setForbidden] = useState(false);
+  const [cancelFor, setCancelFor] = useState<PurchaseOrder | null>(null);
   const [providerId, setProviderId] = useState("");
   const [canApprove, setCanApprove] = useState(false);
   const [branches, setBranches] = useState<Branch[]>([]);
@@ -361,11 +366,12 @@ export default function ProviderInventoryPage() {
     } catch (err) {
       console.error("Inventory operations load failed:", err);
       setBranches([]); setSuppliers([]); setProducts([]); setStockRows([]); setOrders([]);
-      setError(`${t.loadFailed} ${err && typeof err === "object" && "message" in err ? String(err.message) : ""}`);
+      setForbidden(isForbidden(err));
+      setError(`${t.loadFailed} ${describeServerError(err, lang)}`);
     } finally {
       setLoading(false);
     }
-  }, [t.loadFailed, t.noProvider]);
+  }, [t.loadFailed, t.noProvider, lang]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -402,7 +408,7 @@ export default function ProviderInventoryPage() {
       await loadInventory();
     } catch (err) {
       console.error("Supplier save failed:", err);
-      setError(t.saveFailed);
+      setError(`${t.saveFailed} ${describeServerError(err, lang)}`);
     } finally {
       setSaving(false);
     }
@@ -447,7 +453,7 @@ export default function ProviderInventoryPage() {
       await loadInventory();
     } catch (err) {
       console.error("Product save failed:", err);
-      setError(t.saveFailed);
+      setError(`${t.saveFailed} ${describeServerError(err, lang)}`);
     } finally {
       setSaving(false);
     }
@@ -481,37 +487,40 @@ export default function ProviderInventoryPage() {
       await loadInventory();
     } catch (err) {
       console.error("Purchase order create failed:", err);
-      setError(t.saveFailed);
+      setError(`${t.saveFailed} ${describeServerError(err, lang)}`);
     } finally {
       setSaving(false);
     }
   };
 
-  const transitionOrder = async (order: PurchaseOrder, action: "submit" | "approve" | "receive" | "cancel") => {
-    let reason: string | null = action === "receive" ? t.receiveReason : null;
-    if (action === "receive" && !window.confirm(t.confirmReceive)) return;
-    if (action === "cancel") {
-      if (!window.confirm(t.confirmCancel)) return;
-      reason = window.prompt(t.cancellationReason);
-      if (!reason || reason.trim().length < 3) return;
-    }
+  // One command runs every purchase-order transition. It answers with the server's reason (translated) or null on success,
+  // so the dialog that asked for a reason can stay open and keep what was typed.
+  const runTransition = async (order: PurchaseOrder, action: "submit" | "approve" | "receive" | "cancel", reason: string | null): Promise<string | null> => {
     clearMessages();
-    try {
-      setSaving(true);
-      const { error: rpcError } = await supabase.rpc("transition_supplier_purchase_order", {
-        p_order_id: order.id,
-        p_action: action,
-        p_reason: reason
-      });
-      if (rpcError) throw rpcError;
-      setSuccess(t.orderUpdated);
-      await loadInventory();
-    } catch (err) {
-      console.error("Purchase order transition failed:", err);
-      setError(t.saveFailed);
-    } finally {
-      setSaving(false);
+    setSaving(true);
+    const { error: rpcError } = await supabase.rpc("transition_supplier_purchase_order", {
+      p_order_id: order.id,
+      p_action: action,
+      p_reason: reason
+    });
+    setSaving(false);
+    if (rpcError) return describeServerError(rpcError, lang);
+    setSuccess(t.orderUpdated);
+    await loadInventory();
+    return null;
+  };
+
+  const transitionOrder = async (order: PurchaseOrder, action: "submit" | "approve" | "receive" | "cancel") => {
+    if (action === "cancel") {
+      setCancelFor(order);
+      return;
     }
+    if (action === "receive") {
+      const yes = await askConfirm({ title: t.confirmReceive, confirmLabel: t.receive });
+      if (!yes) return;
+    }
+    const message = await runTransition(order, action, action === "receive" ? t.receiveReason : null);
+    if (message) setError(`${t.saveFailed} ${message}`);
   };
 
   const activeProducts = products.filter((product) => product.is_active);
@@ -563,7 +572,8 @@ export default function ProviderInventoryPage() {
         </div>
       </div>
 
-      {error && <div role="alert" className="rounded-2xl border border-[#FF5D73]/20 bg-[#FF5D73]/10 p-4 text-sm font-bold text-[#B42318]">{error} <button onClick={() => void loadInventory()} className="underline">{t.retry}</button></div>}
+      {forbidden && <ForbiddenNotice locale={lang} />}
+      {error && !forbidden && <div role="alert" className="rounded-2xl border border-[#FF5D73]/20 bg-[#FF5D73]/10 p-4 text-sm font-bold text-[#B42318]">{error} <button onClick={() => void loadInventory()} className="underline">{t.retry}</button></div>}
       {success && <div className="rounded-2xl border border-[#3DDC84]/20 bg-[#3DDC84]/10 p-4 text-sm font-bold text-[#15803D]">{success}</div>}
 
       {providerId && dataLoaded && <InventoryControls lang={lang} providerId={providerId} branches={branches} suppliers={suppliers} products={products} stock={stockRows} reload={loadInventory} onReorder={(branchId, product, quantity) => {
@@ -728,7 +738,7 @@ export default function ProviderInventoryPage() {
                   <tbody>
                     {stockRows.map((row) => {
                       const reorderPoint = numberValue(row.reorder_point_override ?? row.inventory_products?.default_reorder_point);
-                      const isLow = reorderPoint > 0 && numberValue(row.quantity_on_hand) <= reorderPoint;
+                      const isLow = reorderPoint > 0 && numberValue(row.quantity_on_hand) - numberValue(row.quantity_reserved) <= reorderPoint;
                       return (
                         <tr key={row.id} className="border-b border-[#ECECEC]/70">
                           <td className="px-3 py-3 font-bold text-[#101828]">{productName(row.inventory_products)}</td>
@@ -784,6 +794,18 @@ export default function ProviderInventoryPage() {
         </div>
       </section>
       </>)}
+      {confirmNode}
+      {cancelFor && (
+        <CommandDialog
+          locale={lang}
+          tone="danger"
+          title={t.confirmCancel}
+          reasonLabel={t.cancellationReason}
+          confirmLabel={t.cancelOrderConfirm}
+          onConfirm={(reason) => runTransition(cancelFor, "cancel", reason)}
+          onClose={() => setCancelFor(null)}
+        />
+      )}
     </div>
   );
 }

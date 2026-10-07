@@ -2,6 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import Link from "next/link";
+import { errorMessage } from "@/lib/error-message";
+import { csvCell, downloadCsv } from "@/lib/csv.mjs";
+import { payrollSummaryCsv } from "@/lib/payroll-summary.mjs";
+import { CommandResult } from "@/components/operations-ui";
 
 interface StaffPerformanceRow {
   employee_id: string;
@@ -77,7 +82,7 @@ interface MultiBranchSummary {
 const translations = {
   en: {
     title: "Analytics & Operations",
-    subtitle: "Real-time revenue, salon performance KPIs, multi-branch rollup, and Saudi WPS payroll export.",
+    subtitle: "Real-time revenue, salon performance KPIs, multi-branch rollup, and a payroll summary.",
     grossRevenue: "Gross Revenue",
     platformFees: "Platform Fees",
     netEarnings: "Net Payout",
@@ -87,7 +92,12 @@ const translations = {
     repeatRate: "Repeat Client Retention",
     uniqueClients: "Unique Clients",
     exportBtn: "Export Analytics (CSV)",
-    wpsExportBtn: "WPS Payroll Export (Mudad CSV)",
+    wpsExportBtn: "Payroll summary (CSV, not a WPS file)",
+    payrollNote: "A spreadsheet of what each professional earned in the period, from the pay rules you set. It is not a Wage Protection System file: the bank layout is not built. Professionals without pay rules are flagged and left out of the amounts.",
+    payrollRulesLink: "Set pay rules",
+    payrollFailed: "The payroll summary was not exported: ",
+    payrollEmpty: "No professionals were returned for this period.",
+    analyticsFailed: "The analytics were not exported: ",
     staffPerformance: "Specialist Performance Overview",
     staffName: "Staff Member",
     bookingsCompleted: "Completed Bookings",
@@ -121,7 +131,7 @@ const translations = {
     firstTimeVsRepeat: "First-Time vs Repeat Clients",
     firstTime: "New Clients",
     repeat: "Returning Clients",
-    downloadingWps: "Exporting WPS...",
+    downloadingWps: "Exporting...",
   },
   ar: {
     title: "التحليلات والعمليات التشغيلية",
@@ -135,7 +145,12 @@ const translations = {
     repeatRate: "معدل ولاء وعودة العملاء",
     uniqueClients: "العملاء الفريدين",
     exportBtn: "تصدير التحليلات (CSV)",
-    wpsExportBtn: "تصدير مسير الرواتب (حماية الأجور WPS)",
+    wpsExportBtn: "ملخص الرواتب (CSV، وليس ملف حماية أجور)",
+    payrollNote: "جدول بما حققه كل أخصائي في الفترة بحسب قواعد الأجر التي حددتها. وهو ليس ملفاً لنظام حماية الأجور: تنسيق البنك غير مبني بعد. الأخصائيون بلا قواعد أجر يُشار إليهم ويُستبعدون من المبالغ.",
+    payrollRulesLink: "حدد قواعد الأجر",
+    payrollFailed: "لم يُصدَّر ملخص الرواتب: ",
+    payrollEmpty: "لم تُرجَع أي بيانات أخصائيين لهذه الفترة.",
+    analyticsFailed: "لم تُصدَّر التحليلات: ",
     staffPerformance: "أداء الموظفين والأخصائيين",
     staffName: "الموظف",
     bookingsCompleted: "الحجوزات المكتملة",
@@ -169,7 +184,7 @@ const translations = {
     firstTimeVsRepeat: "العملاء الجدد مقابل المتكررين",
     firstTime: "عملاء جدد",
     repeat: "عملاء متكررين",
-    downloadingWps: "جاري تصدير حماية الأجور...",
+    downloadingWps: "جارٍ التصدير...",
   }
 };
 
@@ -198,6 +213,7 @@ export default function ProviderReportsPage() {
   const [analytics, setAnalytics] = useState<DetailedAnalytics | null>(null);
   const [multiBranch, setMultiBranch] = useState<MultiBranchSummary | null>(null);
   const [exportingWps, setExportingWps] = useState(false);
+  const [exportError, setExportError] = useState("");
 
   const t = translations[locale];
 
@@ -301,46 +317,41 @@ export default function ProviderReportsPage() {
     loadReportData(startDate, endDate);
   };
 
-  // Export Standard Analytics CSV
+  // Export Standard Analytics CSV (shared escaper, so a name that starts with = or contains a comma cannot break or run in a spreadsheet)
   const handleExportAnalyticsCsv = () => {
     if (!analytics) return;
-
-    let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-    csvContent += "PRIMORA Provider Analytics Report\n";
-    csvContent += `Period,${analytics.start_date} to ${analytics.end_date}\n`;
-    csvContent += `Gross Revenue (SAR),${analytics.gross_revenue_sar}\n`;
-    csvContent += `Platform Fees (SAR),${analytics.platform_fees_sar}\n`;
-    csvContent += `Net Earnings (SAR),${analytics.net_earnings_sar}\n`;
-    csvContent += `Total Bookings,${analytics.total_bookings}\n`;
-    csvContent += `Completed Bookings,${analytics.completed_bookings}\n`;
-    csvContent += `Completion Rate (%),${analytics.completion_rate_pct}%\n`;
-    csvContent += `No-Show Rate (%),${analytics.no_show_rate_pct}%\n`;
-    csvContent += `Repeat Retention (%),${analytics.repeat_rate_pct}%\n\n`;
-
-    csvContent += "Staff Performance\n";
-    csvContent += "Staff Name (EN),Staff Name (AR),Role,Completed Bookings,Revenue Generated (SAR)\n";
-    analytics.staff_performance.forEach((s) => {
-      csvContent += `"${s.name_en}","${s.name_ar}","${s.role}",${s.completed_bookings},${s.revenue_sar}\n`;
-    });
-
-    csvContent += "\nPopular Services\n";
-    csvContent += "Service (EN),Service (AR),Category,Bookings Count,Revenue (SAR)\n";
-    analytics.popular_services.forEach((srv) => {
-      csvContent += `"${srv.name_en}","${srv.name_ar}","${srv.category}",${srv.bookings_count},${srv.revenue_sar}\n`;
-    });
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `primora_analytics_${analytics.start_date}_${analytics.end_date}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      const lines: Array<Array<string | number | null | undefined>> = [
+        ["PRIMORA Provider Analytics Report"],
+        ["Period", `${analytics.start_date} to ${analytics.end_date}`],
+        ["Gross Revenue (SAR)", analytics.gross_revenue_sar],
+        ["Platform Fees (SAR)", analytics.platform_fees_sar],
+        ["Net Earnings (SAR)", analytics.net_earnings_sar],
+        ["Total Bookings", analytics.total_bookings],
+        ["Completed Bookings", analytics.completed_bookings],
+        ["Completion Rate (%)", analytics.completion_rate_pct],
+        ["No-Show Rate (%)", analytics.no_show_rate_pct],
+        ["Repeat Retention (%)", analytics.repeat_rate_pct],
+        [],
+        ["Staff Performance"],
+        ["Staff Name (EN)", "Staff Name (AR)", "Role", "Completed Bookings", "Revenue Generated (SAR)"],
+        ...analytics.staff_performance.map((s) => [s.name_en, s.name_ar, s.role, s.completed_bookings, s.revenue_sar]),
+        [],
+        ["Popular Services"],
+        ["Service (EN)", "Service (AR)", "Category", "Bookings Count", "Revenue (SAR)"],
+        ...analytics.popular_services.map((srv) => [srv.name_en, srv.name_ar, srv.category, srv.bookings_count, srv.revenue_sar]),
+      ];
+      downloadCsv(`primora_analytics_${analytics.start_date}_${analytics.end_date}.csv`, `\uFEFF${lines.map((row) => row.map(csvCell).join(",")).join("\r\n")}\r\n`);
+    } catch (err) {
+      setExportError(t.analyticsFailed + errorMessage(err));
+    }
   };
 
-  // Export Wages Protection System (WPS / Mudad) Payroll CSV (G55)
+  // Payroll summary (C-D13). Not a Wage Protection System file: that bank layout is not built, and the label says so.
+  // Amounts come from the pay rules the owner set; a professional without rules is flagged and gets no invented figures.
   const handleExportWpsPayrollCsv = async () => {
     if (!providerId) return;
+    setExportError("");
 
     try {
       setExportingWps(true);
@@ -351,30 +362,13 @@ export default function ProviderReportsPage() {
       });
 
       if (wpsErr) throw wpsErr;
-      if (!data || !data.payroll_entries) {
-        throw new Error("No payroll entries returned");
-      }
+      const entries = ((data && data.payroll_entries) || []) as Array<Record<string, unknown>>;
+      if (entries.length === 0) throw new Error(t.payrollEmpty);
 
-      const entries = data.payroll_entries as any[];
-
-      // Mudad / WPS Compliant CSV format
-      let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-      csvContent += "Employee ID,Staff Name,Role,Branch,IBAN,Completed Bookings,Service Revenue (SAR),Commission Rate (%),Commission Earned (SAR),Tips (SAR),Base Salary (SAR),Total Net Payout (SAR)\n";
-
-      entries.forEach((emp) => {
-        csvContent += `"${emp.employee_id}","${emp.name_en} / ${emp.name_ar}","${emp.role}","${emp.branch}","${emp.wps_iban}",${emp.completed_bookings},${emp.service_revenue_sar},${emp.commission_rate_pct}%,${emp.commission_earned_sar},${emp.tips_earned_sar},${emp.base_salary_sar},${emp.total_payout_sar}\n`;
-      });
-
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `primora_wps_payroll_${startDate}_${endDate}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (err: any) {
-      console.error("WPS export error:", err);
-      alert(locale === "ar" ? `فشل تصدير مسير الرواتب: ${err.message}` : `WPS Export failed: ${err.message}`);
+      downloadCsv(`primora_payroll_summary_${startDate}_${endDate}.csv`, payrollSummaryCsv(entries, locale));
+    } catch (err: unknown) {
+      console.error("Payroll summary export error:", err);
+      setExportError(t.payrollFailed + errorMessage(err));
     } finally {
       setExportingWps(false);
     }
@@ -383,7 +377,7 @@ export default function ProviderReportsPage() {
   const isRTL = locale === "ar";
 
   return (
-    <div className={`space-y-8 font-sans ${isRTL ? "text-right" : "text-left"}`} dir={isRTL ? "rtl" : "ltr"}>
+    <div className={`space-y-8 font-sans text-start`} dir={isRTL ? "rtl" : "ltr"}>
       {/* HEADER */}
       <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6 border-b border-[#ECECEC] pb-6">
         <div>
@@ -392,6 +386,9 @@ export default function ProviderReportsPage() {
         </div>
 
         {/* DATE FILTERS & EXPORT ACTIONS */}
+        <p className="max-w-xl text-xs leading-5 text-[#667085] xl:order-last xl:basis-full">
+          {t.payrollNote} <Link href="/provider/employees" className="font-bold text-[#9A741F] underline">{t.payrollRulesLink}</Link>
+        </p>
         <div className="flex flex-wrap items-center gap-3">
           {/* Multi-Branch toggle if multiple branches exist */}
           {multiBranch && multiBranch.total_branches > 1 && (
@@ -486,13 +483,13 @@ export default function ProviderReportsPage() {
             )}
           </div>
 
-          {/* WPS Payroll CSV Button (G55) */}
+          {/* Payroll summary CSV button (G55) */}
           <button
             type="button"
             onClick={handleExportWpsPayrollCsv}
             disabled={exportingWps}
             className="flex items-center gap-2 px-4 py-2 bg-stone-900 hover:bg-stone-800 text-stone-50 font-bold text-xs rounded-2xl transition shadow-sm disabled:opacity-50"
-            title="Saudi Wages Protection System / Mudad CSV export"
+            title={t.payrollNote}
           >
             <svg className="w-4 h-4 text-[#D1AF47]" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -763,6 +760,7 @@ export default function ProviderReportsPage() {
           </div>
         </div>
       )}
+      <CommandResult error={exportError} locale={locale} onDismiss={() => setExportError("")} />
     </div>
   );
 }
