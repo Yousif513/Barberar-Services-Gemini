@@ -534,7 +534,8 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         "utf8"
       );
       assert.ok(!pushCode.includes('"Access-Control-Allow-Origin": "*"'), "Forbidden: wildcard CORS in send-push");
-      assert.ok(pushCode.includes("getCorsHeaders"), "Must use dynamic CORS allowlist helper");
+      assert.ok(pushCode.includes('corsHeaders as sharedCorsHeaders } from "../_shared/http.ts"'), "Must use the shared exact-origin CORS allowlist");
+      assert.ok(!/endsWith\(["']\.vercel\.app["']\)|endsWith\(["']primora\.sa["']\)/.test(pushCode), "Forbidden: suffix origin matching in send-push");
       assert.ok(pushCode.includes("Authorization"), "Must verify caller authorization");
     });
 
