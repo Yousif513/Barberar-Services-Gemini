@@ -13,7 +13,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { User } from "@supabase/supabase-js";
-import { supabase } from "../lib/supabase";
+import { supabase, isSupabaseConfigured } from "../lib/supabase";
+import { consentsToRecord } from "@/lib/consent";
 import { Toast } from "../components/toast";
 import { errorMessage } from "@/lib/error-message";
 
@@ -84,6 +85,9 @@ export default function ProfileScreen() {
       invalidCode: "Please enter the 6-digit code.",
       codeSent: "Verification code sent by SMS.",
       signedIn: "Signed in.",
+      offline: "No connection. Your account will appear when you are back online.",
+      consentNotSaved: "Signed in, but your consent could not be saved. It will be asked for again at your next sign-in.",
+      serviceUnavailable: "The service is not configured. Sign-in is unavailable.",
       signOut: "Sign out",
       customerDetails: "Customer Information",
       nameLabel: "Full Name",
@@ -116,6 +120,9 @@ export default function ProfileScreen() {
       invalidCode: "يرجى إدخال الرمز المكون من 6 أرقام.",
       codeSent: "تم إرسال رمز التحقق برسالة نصية.",
       signedIn: "تم تسجيل الدخول.",
+      offline: "لا يوجد اتصال. سيظهر حسابك عند عودة الاتصال.",
+      consentNotSaved: "تم تسجيل الدخول، لكن تعذر حفظ موافقتك. سنطلبها منك عند تسجيل الدخول التالي.",
+      serviceUnavailable: "الخدمة غير مهيأة. تسجيل الدخول غير متاح.",
       signOut: "تسجيل الخروج",
       customerDetails: "بيانات العميل",
       nameLabel: "الاسم الكامل",
@@ -188,7 +195,11 @@ export default function ProfileScreen() {
   }, []);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => loadAccount(data.user ?? null));
+    // getSession() reads the stored session without the network, so a launch with no signal still shows the signed-in account.
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (!data.session && error?.name === "AuthRetryableFetchError") showToast(t.offline, "info");
+      loadAccount(data.session?.user ?? null);
+    });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       loadAccount(session?.user ?? null);
     });
@@ -196,6 +207,10 @@ export default function ProfileScreen() {
   }, [loadAccount]);
 
   const handleSendCode = async () => {
+    if (!isSupabaseConfigured) {
+      showToast(t.serviceUnavailable, "error");
+      return;
+    }
     const formatted = normalizeSaudiPhone(phone);
     if (!formatted.startsWith("+9665") || formatted.length !== 13) {
       showToast(t.invalidPhone, "error");
@@ -232,18 +247,23 @@ export default function ProfileScreen() {
       });
       if (error || !data.user) throw error ?? new Error(t.invalidCode);
 
-      const consents = [
-        { user_id: data.user.id, purpose: "terms_privacy", status: "granted", document_version: "v1.0", method: "mobile_auth_form" },
-      ];
-      if (whatsappConsent) {
-        consents.push({ user_id: data.user.id, purpose: "whatsapp", status: "granted", document_version: "v1.0", method: "mobile_auth_form" });
+      // The customer is signed in from here on, so a consent that cannot be saved is reported, not thrown: the next sign-in
+      // asks again because nothing granted is on record. The server stamps the published terms version itself.
+      const { data: existing } = await supabase.from("consents").select("purpose, status, created_at").eq("user_id", data.user.id);
+      const purposes = consentsToRecord(existing ?? [], whatsappConsent);
+      let consentSaved = true;
+      if (purposes.length > 0) {
+        const { error: consentError } = await supabase.rpc("record_consents", {
+          p_purposes: purposes,
+          p_status: "granted",
+          p_method: "mobile_auth_form",
+        });
+        consentSaved = !consentError;
       }
-      const { error: consentError } = await supabase.from("consents").insert(consents);
-      if (consentError) throw consentError;
 
       setOtpCode("");
       setOtpSent(false);
-      showToast(t.signedIn, "success");
+      showToast(consentSaved ? t.signedIn : t.consentNotSaved, consentSaved ? "success" : "info");
     } catch (err) {
       showToast(errorMessage(err), "error");
     } finally {
@@ -277,6 +297,9 @@ export default function ProfileScreen() {
           <View style={styles.card}>
             <Text style={[styles.sectionTitle, isRTL && styles.textRight]}>{t.signInTitle}</Text>
             <Text style={[styles.walletDesc, { color: "#78716c" }, isRTL && styles.textRight]}>{t.signInDesc}</Text>
+            {!isSupabaseConfigured && (
+              <Text style={[styles.walletDesc, { color: "#b91c1c" }, isRTL && styles.textRight]}>{t.serviceUnavailable}</Text>
+            )}
             <View style={styles.cardDivider} />
 
             <Text style={[styles.infoLabel, isRTL && styles.textRight]}>{t.phoneLabel}</Text>
