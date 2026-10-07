@@ -21,22 +21,16 @@ DROP FUNCTION IF EXISTS pg_temp.evolve_function(regprocedure, text, text[], text
 CREATE FUNCTION pg_temp.evolve_function(p_old regprocedure, p_new_signature text, p_from text[], p_to text[])
 RETURNS void LANGUAGE plpgsql AS $helper$
 DECLARE
-  v_def text := replace(pg_get_functiondef(p_old), $e$
-$e$, $e$
-$e$);
+  v_def text := replace(pg_get_functiondef(p_old), chr(13) || chr(10), chr(10));
   v_new regprocedure;
   v_grantee text;
   i int;
 BEGIN
   FOR i IN 1 .. COALESCE(array_length(p_from, 1), 0) LOOP
-    IF position(replace(p_from[i], $e$
-$e$, $e$
-$e$) IN v_def) = 0 THEN
+    IF position(replace(p_from[i], chr(13) || chr(10), chr(10)) IN v_def) = 0 THEN
       RAISE EXCEPTION 'evolve_function: pattern % not found in %', i, p_old;
     END IF;
-    v_def := replace(v_def, replace(p_from[i], $e$
-$e$, $e$
-$e$), p_to[i]);
+    v_def := replace(v_def, replace(p_from[i], chr(13) || chr(10), chr(10)), p_to[i]);
   END LOOP;
   EXECUTE v_def;                               -- a new overload when the argument list changed, an in-place patch otherwise
   v_new := to_regprocedure(p_new_signature);
@@ -96,9 +90,7 @@ GRANT EXECUTE ON FUNCTION public.assert_prayer_windows(timestamptz[], timestampt
 DO $$
 DECLARE
   v_sig regprocedure := 'public.get_available_slots(uuid, date, integer, timestamptz[], timestamptz[])'::regprocedure;
-  v_def text := replace(pg_get_functiondef(v_sig), $e$
-$e$, $e$
-$e$);
+  v_def text := replace(pg_get_functiondef(v_sig), chr(13) || chr(10), chr(10));
   v_new text;
   v_copies int;
 BEGIN

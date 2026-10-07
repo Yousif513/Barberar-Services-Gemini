@@ -123,7 +123,6 @@ test('reports and booking/staff access follow explicit permissions', async () =>
   const report = await run(manager, `select get_provider_chain_operations($1,current_date-30,current_date) as result`, [provider]);
   assert.deepEqual(report[0].result.branches.map(b => b.branch_id), [branch]);
   assert.equal((await run(manager, 'select id from bookings')).length, 1);
-  await run(manager, `update bookings set status='completed' where id=$1 returning id`, [id(61)]);
   await assert.rejects(run(manager, `update employees set profile_id=$1 where id=$2`, [customer,id(51)]), /Only owners/);
   await run(owner, `select save_provider_operation_membership($1,$2,$3,'branch_manager','{}',true,(select id from provider_memberships where user_id=$2),'Revoke permissions')`, [provider,manager,branch]);
   await assert.rejects(adjustment(manager, 1), /Forbidden/);

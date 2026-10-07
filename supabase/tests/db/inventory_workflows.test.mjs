@@ -82,7 +82,7 @@ describe("owner workflows", () => {
 
   it("deactivates a product reversibly and audits catalog changes", async () => {
     await as(db, owner, `update inventory_products set is_active = false where id = $1`, [product]);
-    await expectError(adjust(owner, 1), /Forbidden/);
+    await expectError(adjust(owner, 1), /Product is inactive/);
     await as(db, owner, `update inventory_products set is_active = true where id = $1`, [product]);
     await adjust(owner, 1);
     const audit = await sys(db, `select count(*)::int n from admin_audit_logs where action = 'inventory_products.update'`);
@@ -173,7 +173,8 @@ describe("admin oversight", () => {
 describe("booking safeguards survive P3", () => {
   it("anonymous visitors still can execute only discovery functions", async () => {
     const allowed = new Set(["get_available_slots", "get_branch_available_slots", "get_branch_schedule_with_prayer_pauses",
-      "search_marketplace_providers", "normalize_arabic", "provider_rating_summaries"]);
+      "search_marketplace_providers", "normalize_arabic", "provider_rating_summaries",
+      "track_analytics_event"]); // D-26: insert-only client event recorder
     const rows = await sys(db, `
       select distinct p.proname from pg_proc p
       cross join lateral aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
