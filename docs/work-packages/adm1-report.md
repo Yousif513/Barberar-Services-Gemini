@@ -12,3 +12,9 @@ Branch `wp/adm1`. Migration range `20261008100000` to `20261008149999`. Newest i
 ## Item 2: send-push claims batches - done
 
 - `supabase/functions/send-push/index.ts` now calls `claim_push_batch(p_limit)` and sends only the tokens and texts that come back (title and body carry Arabic and English because users have no language preference), then reports each queue entry with `complete_push_delivery` (invalid tokens: Expo `DeviceNotRegistered`). The caller check (`Bearer <service role key>`) and the shared CORS are unchanged. Not run (no Deno).
+
+## Item 3: failed financial lists (R31) - done
+
+- `admin/ledger/page.tsx`: payout requests, reconciliation runs and provider fee invoices each keep their own error string (`requestsError`, `reconError`, `feeInvoicesError`), set from the failed query and cleared on the next try; the table shows the reason (`role="alert"`, both languages) with a Retry button that re-runs that query. The old `console.warn` plus empty list is gone. Zero rows still shows the honest empty row.
+- `admin/notifications/page.tsx`: the message-log query and the two queue-count queries now read their `error`; a failure shows the reason and a Retry button instead of an empty log with zero counts.
+- Test: `web_platform/tests/adm1-admin-wiring.test.mjs` (source wiring guard). Not exercised in a browser here.

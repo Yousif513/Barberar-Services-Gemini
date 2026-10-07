@@ -93,7 +93,9 @@ const translations = {
     releasedPayouts: "Released Payout",
     employee: "Stylist / Employee",
     totalEarnings: "Total Earnings",
-    noRecords: "No records found."
+    noRecords: "No records found.",
+    listFailed: "This list could not be loaded, so an empty table would be wrong: {reason}",
+    retry: "Retry"
   },
   ar: {
     title: "السجل والتقارير المالية",
@@ -181,7 +183,9 @@ const translations = {
     releasedPayouts: "المبالغ المحولة فعلياً",
     employee: "الموظف / الأخصائي",
     totalEarnings: "إجمالي الأرباح",
-    noRecords: "لا توجد سجلات حالياً."
+    noRecords: "لا توجد سجلات حالياً.",
+    listFailed: "تعذّر تحميل هذه القائمة، لذا فإظهار جدول فارغ سيكون مضللاً: {reason}",
+    retry: "إعادة المحاولة"
   }
 };
 
@@ -523,6 +527,10 @@ export default function AdminLedger() {
   const [payoutRequests, setPayoutRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [requestsLoading, setRequestsLoading] = useState(true);
+  // A failed query is an error with a retry; only a successful query with zero rows is an empty table.
+  const [requestsError, setRequestsError] = useState("");
+  const [reconError, setReconError] = useState("");
+  const [feeInvoicesError, setFeeInvoicesError] = useState("");
   const [processingRequestId, setProcessingRequestId] = useState("");
   const [money, setMoney] = useState<MoneyAction | null>(null);
   const [success, setSuccess] = useState("");
@@ -636,6 +644,7 @@ export default function AdminLedger() {
   const loadPayoutRequests = async () => {
     try {
       setRequestsLoading(true);
+      setRequestsError("");
       const { data, error: dbError } = await supabase
         .from("payout_requests")
         .select(`
@@ -659,7 +668,7 @@ export default function AdminLedger() {
       setPayoutRequests(data || []);
     } catch (err) {
       setPayoutRequests([]);
-      console.warn("Payout request load warning:", err);
+      setRequestsError(errorMessage(err));
     } finally {
       setRequestsLoading(false);
     }
@@ -708,6 +717,7 @@ export default function AdminLedger() {
   const loadReconciliationRuns = async () => {
     try {
       setReconLoading(true);
+      setReconError("");
       const { data, error: dbError } = await supabase
         .from("psp_reconciliation_runs")
         .select("*")
@@ -715,7 +725,7 @@ export default function AdminLedger() {
       if (dbError) throw dbError;
       setReconciliationRuns(data || []);
     } catch (err) {
-      console.warn("Reconciliation runs load warning:", err);
+      setReconError(errorMessage(err));
       setReconciliationRuns([]);
     } finally {
       setReconLoading(false);
@@ -725,6 +735,7 @@ export default function AdminLedger() {
   const loadFeeInvoices = async () => {
     try {
       setFeeInvoicesLoading(true);
+      setFeeInvoicesError("");
       const { data, error: dbError } = await supabase
         .from("provider_fee_invoices")
         .select(`
@@ -751,7 +762,7 @@ export default function AdminLedger() {
       if (dbError) throw dbError;
       setProviderFeeInvoices(data || []);
     } catch (err) {
-      console.warn("Fee invoices load warning:", err);
+      setFeeInvoicesError(errorMessage(err));
       setProviderFeeInvoices([]);
     } finally {
       setFeeInvoicesLoading(false);
@@ -1144,6 +1155,13 @@ export default function AdminLedger() {
                   <tr>
                     <td colSpan={7} className="py-8 text-center text-gray-400 font-bold">{t.loading}</td>
                   </tr>
+                ) : requestsError ? (
+                  <tr>
+                    <td colSpan={7} className="py-8 text-center">
+                      <p role="alert" className="font-bold text-[#B42318]">{t.listFailed.replace("{reason}", requestsError)}</p>
+                      <button type="button" onClick={() => void loadPayoutRequests()} className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-xs font-bold text-gray-800 hover:border-gray-500">{t.retry}</button>
+                    </td>
+                  </tr>
                 ) : payoutRequests.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="py-8 text-center text-gray-400 font-bold">{t.noPayoutRequests}</td>
@@ -1429,6 +1447,13 @@ export default function AdminLedger() {
                     <tr>
                       <td colSpan={8} className="py-8 text-center text-gray-400 font-bold">{t.loading}</td>
                     </tr>
+                  ) : reconError ? (
+                    <tr>
+                      <td colSpan={8} className="py-8 text-center">
+                        <p role="alert" className="font-bold text-[#B42318]">{t.listFailed.replace("{reason}", reconError)}</p>
+                        <button type="button" onClick={() => void loadReconciliationRuns()} className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-xs font-bold text-gray-800 hover:border-gray-500">{t.retry}</button>
+                      </td>
+                    </tr>
                   ) : reconciliationRuns.length === 0 ? (
                     <tr>
                       <td colSpan={8} className="py-8 text-center text-gray-400 font-bold">{t.noReconRuns}</td>
@@ -1492,6 +1517,13 @@ export default function AdminLedger() {
                   {feeInvoicesLoading ? (
                     <tr>
                       <td colSpan={8} className="py-8 text-center text-gray-400 font-bold">{t.loading}</td>
+                    </tr>
+                  ) : feeInvoicesError ? (
+                    <tr>
+                      <td colSpan={8} className="py-8 text-center">
+                        <p role="alert" className="font-bold text-[#B42318]">{t.listFailed.replace("{reason}", feeInvoicesError)}</p>
+                        <button type="button" onClick={() => void loadFeeInvoices()} className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-xs font-bold text-gray-800 hover:border-gray-500">{t.retry}</button>
+                      </td>
                     </tr>
                   ) : providerFeeInvoices.length === 0 ? (
                     <tr>

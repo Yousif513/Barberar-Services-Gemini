@@ -37,3 +37,23 @@ describe("ADM1 item 2: send-push sends only what claim_push_batch returns", () =
     assert.doesNotMatch(push, /const \{ title, body, token, data \}/, "the caller no longer chooses recipient or text");
   });
 });
+
+describe("ADM1 item 3: failed financial lists are errors with a retry, not empty tables", () => {
+  const ledger = read("web_platform/src/app/admin/ledger/page.tsx");
+  const notifications = read("web_platform/src/app/admin/notifications/page.tsx");
+  it("the ledger records each list failure and offers a retry for payout requests, reconciliation runs and fee invoices", () => {
+    for (const [state, loader] of [["requestsError", "loadPayoutRequests"], ["reconError", "loadReconciliationRuns"], ["feeInvoicesError", "loadFeeInvoices"]]) {
+      assert.ok(ledger.includes(`set${state[0].toUpperCase()}${state.slice(1)}(errorMessage(err))`), `${state} is set from the failure`);
+      assert.ok(ledger.includes(`onClick={() => void ${loader}()}`), `${loader} is the retry`);
+    }
+    assert.doesNotMatch(ledger, /console\.warn\("(Payout request|Reconciliation runs|Fee invoices) load warning/);
+    assert.match(ledger, /listFailed: "تعذّر/);
+  });
+  it("the message log reads every query's error and shows it with a retry", () => {
+    assert.match(notifications, /if \(logsFailure\) throw logsFailure/);
+    assert.match(notifications, /setLogsError\(/);
+    assert.match(notifications, /onClick=\{\(\) => void loadData\(\)\}/);
+    assert.doesNotMatch(notifications, /console\.warn\("Failed to load message log data/);
+    assert.match(notifications, /logsFailed: "تعذّر/);
+  });
+});
