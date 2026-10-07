@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { AppPressable } from "@/components/app-pressable";
 import { useLocale } from "@/lib/locale";
 import {
   StyleSheet,
   View,
   Text,
-  TouchableOpacity,
   ScrollView,
   TextInput,
   Switch,
@@ -265,9 +265,9 @@ export default function ProfileScreen() {
         <View>
           <Text style={[styles.titleText, isRTL && styles.textRight]}>{t.profileTitle}</Text>
         </View>
-        <TouchableOpacity style={styles.langBadge} onPress={() => setLang(l => (l === "en" ? "ar" : "en"))}>
+        <AppPressable label={lang === "en" ? "Switch to Arabic" : "التبديل إلى الإنجليزية"} style={styles.langBadge} onPress={() => setLang(l => (l === "en" ? "ar" : "en"))}>
           <Text style={styles.langText}>{lang === "en" ? "العربية" : "EN"}</Text>
-        </TouchableOpacity>
+        </AppPressable>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -301,9 +301,9 @@ export default function ProfileScreen() {
                   <Text style={[styles.infoLabel, { flex: 1 }, isRTL && styles.textRight]}>{t.whatsapp}</Text>
                   <Switch value={whatsappConsent} onValueChange={setWhatsappConsent} />
                 </View>
-                <TouchableOpacity style={styles.modalBtnConfirm} disabled={busy} onPress={handleSendCode}>
+                <AppPressable label={t.sendCode} busy={busy} style={styles.modalBtnConfirm} disabled={busy} onPress={handleSendCode}>
                   {busy ? <ActivityIndicator color="#fff" /> : <Text style={styles.modalBtnConfirmLabel}>{t.sendCode}</Text>}
-                </TouchableOpacity>
+                </AppPressable>
               </>
             )}
 
@@ -319,12 +319,12 @@ export default function ProfileScreen() {
                   onChangeText={(v) => setOtpCode(v.replace(/\D/g, ""))}
                 />
                 <View style={[styles.modalActionRow, isRTL && styles.rtlRow]}>
-                  <TouchableOpacity style={styles.modalBtnCancel} disabled={busy} onPress={() => { setOtpSent(false); setOtpCode(""); }}>
+                  <AppPressable style={styles.modalBtnCancel} disabled={busy} onPress={() => { setOtpSent(false); setOtpCode(""); }}>
                     <Text style={styles.modalBtnCancelLabel}>{t.changeNumber}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.modalBtnConfirm} disabled={busy} onPress={handleVerify}>
+                  </AppPressable>
+                  <AppPressable label={t.verify} busy={busy} style={styles.modalBtnConfirm} disabled={busy} onPress={handleVerify}>
                     {busy ? <ActivityIndicator color="#fff" /> : <Text style={styles.modalBtnConfirmLabel}>{t.verify}</Text>}
-                  </TouchableOpacity>
+                  </AppPressable>
                 </View>
               </>
             )}
@@ -337,9 +337,9 @@ export default function ProfileScreen() {
             <View style={styles.card}>
               <View style={[styles.sectionHeaderRow, isRTL && styles.rtlRow]}>
                 <Text style={styles.sectionTitle}>{t.customerDetails}</Text>
-                <TouchableOpacity style={styles.btnAddCard} onPress={handleSignOut}>
+                <AppPressable style={styles.btnAddCard} onPress={handleSignOut}>
                   <Text style={styles.btnAddCardText}>{t.signOut}</Text>
-                </TouchableOpacity>
+                </AppPressable>
               </View>
               <View style={styles.cardDivider} />
 

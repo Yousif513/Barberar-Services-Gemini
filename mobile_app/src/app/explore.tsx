@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { AppPressable } from "@/components/app-pressable";
 import { useLocale } from "@/lib/locale";
 import {
   StyleSheet,
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   ScrollView,
   FlatList,
   ActivityIndicator
@@ -162,14 +162,16 @@ export default function ExploreScreen() {
       showsHorizontalScrollIndicator={false}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
-        <TouchableOpacity
+        <AppPressable
+          role="radio"
+          selected={active === item.id}
           onPress={() => onSelect(item.id)}
           style={[variant === "filter" ? styles.filterChip : styles.locChip, active === item.id && (variant === "filter" ? styles.activeChip : styles.activeLocChip)]}
         >
           <Text style={[variant === "filter" ? styles.chipText : styles.locChipText, active === item.id && (variant === "filter" ? styles.activeChipText : styles.activeLocChipText)]}>
             {item.label}
           </Text>
-        </TouchableOpacity>
+        </AppPressable>
       )}
       contentContainerStyle={[variant === "filter" ? styles.chipList : styles.locChipList, isAr && styles.rtlRow]}
     />
@@ -187,9 +189,9 @@ export default function ExploreScreen() {
             <Text style={[styles.title, isAr && styles.rtlText]}>{t.title}</Text>
             <Text style={[styles.subtitle, isAr && styles.rtlText]}>{t.subtitle}</Text>
           </View>
-          <TouchableOpacity onPress={toggleLanguage} style={styles.langBtn}>
+          <AppPressable onPress={toggleLanguage} style={styles.langBtn}>
             <Text style={styles.langBtnText}>{t.langBtn}</Text>
-          </TouchableOpacity>
+          </AppPressable>
         </View>
 
         <View style={[styles.searchContainer, isAr && styles.rtlRow]}>
@@ -206,8 +208,10 @@ export default function ExploreScreen() {
         <View style={{ flexDirection: isAr ? "row-reverse" : "row", marginTop: 12 }}>
           <View style={{ flexDirection: isAr ? "row-reverse" : "row", backgroundColor: "hsl(220,12%,14%)", borderRadius: 8, padding: 2 }}>
             {(["list", "map"] as const).map((mode) => (
-              <TouchableOpacity
+              <AppPressable
                 key={mode}
+                role="tab"
+                selected={viewMode === mode}
                 onPress={() => {
                   setViewMode(mode);
                   setSelectedMapShop(null);
@@ -217,7 +221,7 @@ export default function ExploreScreen() {
                 <Text style={{ fontSize: 11, fontWeight: "bold", color: viewMode === mode ? "hsl(220,15%,8%)" : "hsl(0,0%,80%)" }}>
                   {mode === "list" ? t.listView : t.mapView}
                 </Text>
-              </TouchableOpacity>
+              </AppPressable>
             ))}
           </View>
         </View>
@@ -252,9 +256,9 @@ export default function ExploreScreen() {
       {loadState === "error" && (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>{t.loadFailed}: {loadError}</Text>
-          <TouchableOpacity onPress={() => setReloadKey((k) => k + 1)} style={[styles.mapOverlayBookBtn, { marginTop: 12 }]}>
+          <AppPressable onPress={() => setReloadKey((k) => k + 1)} style={[styles.mapOverlayBookBtn, { marginTop: 12 }]}>
             <Text style={styles.mapOverlayBookText}>{t.retry}</Text>
-          </TouchableOpacity>
+          </AppPressable>
         </View>
       )}
 
@@ -284,8 +288,9 @@ export default function ExploreScreen() {
               )}
 
               {pins.map((pin) => (
-                <TouchableOpacity
+                <AppPressable
                   key={pin.provider.branchId}
+                  label={pin.provider.name[lang]}
                   onPress={() => setSelectedMapShop(pin.provider)}
                   style={[styles.mapPinContainer, { left: pin.left as any, top: pin.top as any }]}
                 >
@@ -295,7 +300,7 @@ export default function ExploreScreen() {
                   <View style={styles.pinPulseRing} />
                   <View style={styles.pinGlowInner} />
                   <View style={styles.pinDot} />
-                </TouchableOpacity>
+                </AppPressable>
               ))}
 
               {selectedMapShop && (
@@ -310,12 +315,12 @@ export default function ExploreScreen() {
                     <Text style={[styles.mapOverlayRating, isAr && styles.rtlText]}>{ratingText(selectedMapShop)}</Text>
                   </View>
                   <View style={{ gap: 6, justifyContent: "center" }}>
-                    <TouchableOpacity onPress={() => setSelectedProvider(selectedMapShop)} style={styles.mapOverlayBookBtn}>
+                    <AppPressable onPress={() => setSelectedProvider(selectedMapShop)} style={styles.mapOverlayBookBtn}>
                       <Text style={styles.mapOverlayBookText}>{t.bookNow}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setSelectedMapShop(null)} style={styles.mapOverlayCloseBtn}>
+                    </AppPressable>
+                    <AppPressable onPress={() => setSelectedMapShop(null)} style={styles.mapOverlayCloseBtn}>
                       <Text style={styles.mapOverlayCloseText}>{t.close}</Text>
-                    </TouchableOpacity>
+                    </AppPressable>
                   </View>
                 </View>
               )}
@@ -327,7 +332,7 @@ export default function ExploreScreen() {
           data={providers}
           keyExtractor={(item) => item.branchId}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.card} onPress={() => setSelectedProvider(item)}>
+            <AppPressable style={styles.card} onPress={() => setSelectedProvider(item)}>
               <View style={styles.cardContent}>
                 <View style={[styles.cardHeader, isAr && styles.rtlRow]}>
                   <Text style={styles.cardName}>{item.name[lang]}</Text>
@@ -341,7 +346,7 @@ export default function ExploreScreen() {
                   <Text style={styles.cardRating}>{ratingText(item)}</Text>
                 </View>
               </View>
-            </TouchableOpacity>
+            </AppPressable>
           )}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>

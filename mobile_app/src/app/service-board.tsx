@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { AppPressable } from "@/components/app-pressable";
 import { useLocale } from "@/lib/locale";
 import {
   StyleSheet,
   View,
   Text,
-  TouchableOpacity,
   ScrollView,
   TextInput,
   Modal,
@@ -346,17 +346,17 @@ export default function ServiceBoardScreen() {
           <Text style={[styles.titleText, isRTL && styles.textRight]}>{t.title}</Text>
           <Text style={[styles.subText, isRTL && styles.textRight]}>{t.subtitle}</Text>
         </View>
-        <TouchableOpacity style={styles.langBadge} onPress={() => setLang(l => (l === "en" ? "ar" : "en"))}>
+        <AppPressable label={lang === "en" ? "Switch to Arabic" : "التبديل إلى الإنجليزية"} style={styles.langBadge} onPress={() => setLang(l => (l === "en" ? "ar" : "en"))}>
           <Text style={styles.langText}>{lang === "en" ? "العربية" : "EN"}</Text>
-        </TouchableOpacity>
+        </AppPressable>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* POST CARE BUTTON */}
         {userId && !providerId && (
-          <TouchableOpacity style={styles.postBtn} onPress={() => setShowPostModal(true)} disabled={categories.length === 0}>
+          <AppPressable style={styles.postBtn} onPress={() => setShowPostModal(true)} disabled={categories.length === 0}>
             <Text style={styles.postBtnText}>{t.postBtn}</Text>
-          </TouchableOpacity>
+          </AppPressable>
         )}
 
         {loading ? (
@@ -366,9 +366,9 @@ export default function ServiceBoardScreen() {
         ) : loadError ? (
           <View style={{ paddingVertical: 32, alignItems: "center", gap: 12 }}>
             <Text style={[styles.noBidsText, { textAlign: "center" }]}>{t.loadFailed}: {loadError}</Text>
-            <TouchableOpacity style={styles.submitBidBtn} onPress={loadServiceRequests}>
+            <AppPressable style={styles.submitBidBtn} onPress={loadServiceRequests}>
               <Text style={styles.submitBidBtnText}>{t.retry}</Text>
-            </TouchableOpacity>
+            </AppPressable>
           </View>
         ) : posts.length === 0 ? (
           <Text style={[styles.noBidsText, { textAlign: "center", paddingVertical: 32 }]}>{t.empty}</Text>
@@ -424,13 +424,13 @@ export default function ServiceBoardScreen() {
                     <Text style={[styles.bidNotes, isRTL && styles.textRight]}>{bid.notes}</Text>
                     
                     {post.status === "open" && bid.status === "pending" && post.customerId === userId && (
-                      <TouchableOpacity
+                      <AppPressable
                         style={styles.acceptBidBtn}
                         disabled={submitting}
                         onPress={() => handleAcceptBid(bid.id)}
                       >
                         <Text style={styles.acceptBidBtnText}>{t.acceptBidBtn}</Text>
-                      </TouchableOpacity>
+                      </AppPressable>
                     )}
 
                     {bid.status === "accepted" && (
@@ -446,7 +446,7 @@ export default function ServiceBoardScreen() {
                 )}
 
                 {post.status === "open" && providerId && post.customerId !== userId && post.bids.length === 0 && (
-                  <TouchableOpacity
+                  <AppPressable
                     style={styles.submitBidBtn}
                     onPress={() => {
                       setActivePost(post);
@@ -454,7 +454,7 @@ export default function ServiceBoardScreen() {
                     }}
                   >
                     <Text style={styles.submitBidBtnText}>{t.submitBidBtn}</Text>
-                  </TouchableOpacity>
+                  </AppPressable>
                 )}
 
                 {post.status === "open" && providerId && post.bids.length > 0 && (
@@ -462,9 +462,9 @@ export default function ServiceBoardScreen() {
                 )}
 
                 {post.status === "open" && post.customerId === userId && (
-                  <TouchableOpacity style={styles.submitBidBtn} disabled={submitting} onPress={() => handleCancelPost(post.id)}>
+                  <AppPressable style={styles.submitBidBtn} disabled={submitting} onPress={() => handleCancelPost(post.id)}>
                     <Text style={styles.submitBidBtnText}>{t.cancelRequest}</Text>
-                  </TouchableOpacity>
+                  </AppPressable>
                 )}
               </View>
             ))}
@@ -512,15 +512,17 @@ export default function ServiceBoardScreen() {
               <Text style={[styles.inputLabel, isRTL && styles.textRight]}>{t.reqCategoryLabel}</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[{ gap: 8, paddingVertical: 4 }, isRTL && styles.rtlRow]}>
                 {categories.map((cat) => (
-                  <TouchableOpacity
+                  <AppPressable
                     key={cat.id}
+                    role="radio"
+                    selected={newCategoryId === cat.id}
                     onPress={() => setNewCategoryId(cat.id)}
                     style={[styles.modalBtnCancel, newCategoryId === cat.id && styles.modalBtnConfirm, { flex: 0, paddingHorizontal: 12 }]}
                   >
                     <Text style={newCategoryId === cat.id ? styles.modalBtnConfirmLabel : styles.modalBtnCancelLabel}>
                       {isRTL ? cat.name_ar : cat.name_en}
                     </Text>
-                  </TouchableOpacity>
+                  </AppPressable>
                 ))}
               </ScrollView>
 
@@ -543,12 +545,12 @@ export default function ServiceBoardScreen() {
               />
 
               <View style={[styles.modalActionRow, isRTL && styles.rtlRow]}>
-                <TouchableOpacity style={styles.modalBtnCancel} onPress={() => setShowPostModal(false)}>
+                <AppPressable style={styles.modalBtnCancel} onPress={() => setShowPostModal(false)}>
                   <Text style={styles.modalBtnCancelLabel}>{t.cancel}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.modalBtnConfirm} disabled={submitting} onPress={handlePostRequest}>
+                </AppPressable>
+                <AppPressable label={t.submit} busy={submitting} style={styles.modalBtnConfirm} disabled={submitting} onPress={handlePostRequest}>
                   <Text style={styles.modalBtnConfirmLabel}>{t.submit}</Text>
-                </TouchableOpacity>
+                </AppPressable>
               </View>
             </ScrollView>
           </View>
@@ -584,12 +586,12 @@ export default function ServiceBoardScreen() {
               />
 
               <View style={[styles.modalActionRow, isRTL && styles.rtlRow]}>
-                <TouchableOpacity style={styles.modalBtnCancel} onPress={() => setShowBidModal(false)}>
+                <AppPressable style={styles.modalBtnCancel} onPress={() => setShowBidModal(false)}>
                   <Text style={styles.modalBtnCancelLabel}>{t.cancel}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.modalBtnConfirm} disabled={submitting} onPress={handleSubmitBid}>
+                </AppPressable>
+                <AppPressable label={t.submit} busy={submitting} style={styles.modalBtnConfirm} disabled={submitting} onPress={handleSubmitBid}>
                   <Text style={styles.modalBtnConfirmLabel}>{t.submit}</Text>
-                </TouchableOpacity>
+                </AppPressable>
               </View>
             </ScrollView>
           </View>

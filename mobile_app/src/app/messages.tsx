@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { AppPressable } from "@/components/app-pressable";
 import { useLocale } from "@/lib/locale";
 import {
   StyleSheet,
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   ScrollView,
   FlatList,
   KeyboardAvoidingView,
@@ -216,9 +216,9 @@ export default function MessagesScreen() {
           <Text style={[styles.titleText, isRTL && styles.textRight]}>{t.title}</Text>
           <Text style={[styles.subtitleText, isRTL && styles.textRight]}>{t.subtitle}</Text>
         </View>
-        <TouchableOpacity style={styles.langBadge} onPress={() => setLang(l => (l === "en" ? "ar" : "en"))}>
+        <AppPressable label={lang === "en" ? "Switch to Arabic" : "التبديل إلى الإنجليزية"} style={styles.langBadge} onPress={() => setLang(l => (l === "en" ? "ar" : "en"))}>
           <Text style={styles.langText}>{lang === "en" ? "العربية" : "EN"}</Text>
-        </TouchableOpacity>
+        </AppPressable>
       </View>
 
       {/* SEARCH */}
@@ -245,9 +245,9 @@ export default function MessagesScreen() {
         ) : loadError ? (
           <View style={styles.emptyView}>
             <Text style={styles.emptyText}>{t.loadFailed}: {loadError}</Text>
-            <TouchableOpacity style={styles.chatSendBtn} onPress={() => { setLoading(true); loadThreads(); }}>
+            <AppPressable style={styles.chatSendBtn} onPress={() => { setLoading(true); loadThreads(); }}>
               <Text style={styles.chatSendBtnText}>{t.retry}</Text>
-            </TouchableOpacity>
+            </AppPressable>
           </View>
         ) : filteredThreads.length === 0 ? (
           <View style={styles.emptyView}>
@@ -255,7 +255,7 @@ export default function MessagesScreen() {
           </View>
         ) : (
           filteredThreads.map(item => (
-            <TouchableOpacity
+            <AppPressable
               key={item.id}
               style={styles.threadCard}
               onPress={() => openThread(item)}
@@ -280,7 +280,7 @@ export default function MessagesScreen() {
                   {item.unread && <View style={styles.unreadDot} />}
                 </View>
               </View>
-            </TouchableOpacity>
+            </AppPressable>
           ))
         )}
       </ScrollView>
@@ -291,12 +291,13 @@ export default function MessagesScreen() {
           <SafeAreaView style={styles.chatContainer}>
             {/* CHAT HEADER */}
             <View style={[styles.chatHeader, isRTL && styles.rtlRow]}>
-              <TouchableOpacity
+              <AppPressable
+                label={t.back}
                 style={[styles.chatHeaderBtn, isRTL && styles.rtlRow]}
                 onPress={() => setSelectedThread(null)}
               >
                 <Text style={styles.chatHeaderBtnLabel}>{isRTL ? "→" : "←"} {t.back}</Text>
-              </TouchableOpacity>
+              </AppPressable>
 
               <View style={styles.chatHeaderTitleContainer}>
                 <Text style={styles.chatHeaderName}>{selectedThread.name[lang]}</Text>
@@ -364,9 +365,9 @@ export default function MessagesScreen() {
                   maxLength={2000}
                   multiline
                 />
-                <TouchableOpacity style={styles.chatSendBtn} disabled={sending} onPress={handleSendMessage}>
+                <AppPressable label={t.send} busy={sending} style={styles.chatSendBtn} disabled={sending} onPress={handleSendMessage}>
                   {sending ? <ActivityIndicator color="#fff" /> : <Text style={styles.chatSendBtnText}>{t.send}</Text>}
-                </TouchableOpacity>
+                </AppPressable>
               </View>
             </KeyboardAvoidingView>
           </SafeAreaView>
