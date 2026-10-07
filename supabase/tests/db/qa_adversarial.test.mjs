@@ -55,8 +55,9 @@ describe("client-executable functions are accounted for", () => {
     const callable = (await functionsFor("anon")).map((f) => f.signature.split("(")[0]).sort();
     assert.deepEqual(callable, [
       "get_available_slots", "get_branch_available_slots", "get_branch_schedule_with_prayer_pauses",
-      "normalize_arabic", "provider_rating_summaries", "search_marketplace_providers",
+      "normalize_arabic", "provider_rating_summaries", "public_professional_profile", "search_marketplace_providers",
       "track_analytics_event", // D-26: insert-only client event recorder (validated, rate limited, no personal keys)
+      // public_professional_profile (G75) is the public professional page; it answers NULL for anything not published
     ], "a new function granted to anon must be added here deliberately, with a reason");
   });
 

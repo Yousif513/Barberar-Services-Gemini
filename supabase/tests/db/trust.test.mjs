@@ -18,6 +18,7 @@ describe("anonymous access", () => {
       "get_available_slots", "get_branch_available_slots", "get_branch_schedule_with_prayer_pauses",
       "search_marketplace_providers", "normalize_arabic", "provider_rating_summaries",
       "track_analytics_event", // D-26: insert-only client event recorder, validated and rate limited
+      "public_professional_profile", // G75: the public professional page; answers NULL for anything not published
 
     ]);
     const rows = await sys(db, `
