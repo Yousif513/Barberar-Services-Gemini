@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { generateZatcaXml } from "@/lib/zatca";
 
 const translations = {
   en: {
@@ -243,42 +242,6 @@ export default function CustomerBookingsPage() {
       setDisputeError(err?.message || (locale === "ar" ? "فشل فتح النزاع" : "Failed to open dispute"));
     } finally {
       setDisputeLoading(false);
-    }
-  };
-
-  // Builds the XML only from the invoice issued by the server (seller VAT number from the provider).
-  const handleDownloadInvoice = (bk: any) => {
-    if (!invoiceData?.invoice_number || !invoiceData?.seller_vat_number) return;
-    try {
-      const issued = new Date(invoiceData.issue_date || invoiceData.created_at);
-      const xmlString = generateZatcaXml({
-        invoiceId: invoiceData.invoice_number,
-        uuid: invoiceData.id,
-        issueDate: issued.toISOString().split('T')[0],
-        issueTime: issued.toISOString().split('T')[1].slice(0, 8),
-        sellerName: invoiceData.seller_name,
-        sellerVatNumber: invoiceData.seller_vat_number,
-        sellerAddress: locale === "ar" ? bk.branches?.name_ar : bk.branches?.name_en,
-        items: [
-          {
-            name: locale === "ar" ? bk.services?.name_ar : bk.services?.name_en,
-            price: Number(invoiceData.subtotal_sar),
-            vatRate: 0.15
-          }
-        ]
-      });
-
-      const blob = new Blob([xmlString], { type: "text/xml" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `ZATCA-invoice-${bk.id.substring(0, 8)}.xml`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (e) {
-      console.error("Failed to generate ZATCA XML:", e);
     }
   };
 
@@ -951,7 +914,7 @@ export default function CustomerBookingsPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500 font-semibold">{t.sellerVat}</span>
-                <span className="font-mono font-bold text-gray-800">300000000000003</span>
+                <span className="font-mono font-bold text-gray-800" dir="ltr">{invoiceData.seller_vat_number}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500 font-semibold">{t.service}</span>
@@ -990,13 +953,6 @@ export default function CustomerBookingsPage() {
             )}
 
             <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => handleDownloadInvoice(invoiceModalTarget)}
-                className="flex-1 py-2.5 bg-stone-100 hover:bg-stone-200 border border-stone-200 text-stone-900 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5"
-              >
-                <span>Download XML</span>
-              </button>
               <button
                 type="button"
                 onClick={() => {

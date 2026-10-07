@@ -79,10 +79,10 @@ export default function CustomerSettingsPage() {
 
   // Profile Form States
   const [profile, setProfile] = useState({
-    firstName: "Yousif",
-    lastName: "Al-Saud",
-    email: "yousif@primora.com",
-    phone: "+966 50 123 4567",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
     phoneVerified: false
   });
 
@@ -97,10 +97,7 @@ export default function CustomerSettingsPage() {
   const [pushNotif, setPushNotif] = useState(true);
 
   // Dependents States
-  const [dependents, setDependents] = useState<any[]>([
-    { id: "1", name: "Faisal Al-Saud", relation: "Son", age: 12 },
-    { id: "2", name: "Sara Al-Saud", relation: "Spouse", age: 34 }
-  ]);
+  const [dependents, setDependents] = useState<any[]>([]);
 
   const [newDep, setNewDep] = useState({ name: "", relation: "", age: "" });
   const [showAddDepForm, setShowAddDepForm] = useState(false);
@@ -179,7 +176,8 @@ export default function CustomerSettingsPage() {
         })));
       }
     } catch (err: any) {
-      console.warn("Using default settings profile due to local sandbox session:", err.message);
+      console.warn("Failed to load account settings:", err.message);
+      setError(err?.message || "Failed to load your account settings.");
     } finally {
       setLoading(false);
     }

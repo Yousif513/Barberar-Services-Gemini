@@ -12,8 +12,6 @@ const translations = {
     escrowSubtitle: "Paid deposits for visits that have not happened yet",
     loyaltyTitle: "Total Loyalty Points",
     loyaltySubtitle: "Redeemable during checkout across salons",
-    linkedCards: "Saved Payment Methods",
-    addCard: "Add Card",
     transactionsTitle: "Transaction History",
     noTransactions: "No transactions found in your history.",
     invoice: "Invoice",
@@ -23,7 +21,6 @@ const translations = {
     statusHeld: "UPCOMING VISIT",
     topUp: "Top Up",
     bookingDeposit: "Booking Deposit",
-    cardNotice: "Cards are added securely during checkout.",
     topUpNotice: "Wallet top-up is not enabled yet. Booking deposits are paid during checkout.",
     currency: "SAR",
     referralTitle: "Invite Friends & Earn 25 SAR",
@@ -48,8 +45,6 @@ const translations = {
     escrowSubtitle: "عربون مدفوع لزيارات لم تتم بعد",
     loyaltyTitle: "إجمالي نقاط الولاء",
     loyaltySubtitle: "قابلة للاستبدال أثناء الدفع لدى الصالونات",
-    linkedCards: "وسائل الدفع المحفوظة",
-    addCard: "إضافة بطاقة",
     transactionsTitle: "سجل المعاملات",
     noTransactions: "لا يوجد سجل معاملات للمحفظة.",
     invoice: "فاتورة",
@@ -113,9 +108,6 @@ export default function CustomerWalletPage() {
   const t = translations[locale];
   const walletActions = {
     bookingDeposit: locale === "ar" ? "عربون حجز" : "Booking Deposit",
-    cardNotice: locale === "ar"
-      ? "تتم إضافة البطاقات بأمان أثناء الدفع."
-      : "Cards are added securely during checkout.",
     topUpNotice: locale === "ar"
       ? "شحن المحفظة غير مفعل حاليا. تدفع عربونات الحجز أثناء الدفع."
       : "Wallet top-up is not enabled yet. Booking deposits are paid during checkout."
@@ -328,11 +320,6 @@ export default function CustomerWalletPage() {
     }
   };
 
-  const savedCards = [
-    { brand: "Mada", last4: "4920", expiry: "12/28", holder: "YOUSIF AL-SAUD" },
-    { brand: "Visa / Apple Pay", last4: "7701", expiry: "09/27", holder: "YOUSIF AL-SAUD" }
-  ];
-
   const isRTL = locale === "ar";
 
   return (
@@ -540,35 +527,6 @@ export default function CustomerWalletPage() {
             ))}
           </div>
         )}
-      </div>
-
-      {/* CARDS & PAYMENT METHODS */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="font-bold text-sm text-gray-800">{t.linkedCards}</h3>
-          <button
-            onClick={() => showWalletNotice(walletActions.cardNotice)}
-            className="text-xs font-bold text-[hsl(45,60%,55%)] hover:underline"
-          >
-            {t.addCard}
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {savedCards.map((card, idx) => (
-            <div key={idx} className="bg-gray-50 border border-gray-200/60 rounded-xl p-4 flex items-center justify-between hover:border-gray-400 transition duration-150">
-              <div className="space-y-1">
-                <span className="text-[9px] uppercase font-bold text-gray-400 block">{card.brand}</span>
-                <span className="text-xs font-bold text-gray-800 block">•••• •••• •••• {card.last4}</span>
-                <span className="text-[9px] text-gray-500 font-semibold block">{card.holder}</span>
-              </div>
-              <div className="text-right">
-                <span className="text-[10px] text-gray-400 font-bold block">EXP</span>
-                <span className="text-xs font-bold text-gray-700 block mt-0.5">{card.expiry}</span>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* TRANSACTION HISTORY */}

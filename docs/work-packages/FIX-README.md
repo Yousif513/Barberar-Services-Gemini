@@ -25,7 +25,9 @@ So: when your fix changes an existing SQL function, patch the **latest definitio
 
 ```sql
 CREATE OR REPLACE FUNCTION pg_temp.patch_function(p_sig regprocedure, p_from text, p_to text) RETURNS void LANGUAGE plpgsql AS $$
-DECLARE v_def text := pg_get_functiondef(p_sig);
+DECLARE v_def text := replace(pg_get_functiondef(p_sig), E'
+', E'
+');  -- bodies keep the CRLF of a Windows checkout
 BEGIN
   IF position(p_from IN v_def) = 0 THEN RAISE EXCEPTION 'patch_function: pattern not found in %', p_sig; END IF;
   EXECUTE replace(v_def, p_from, p_to);
@@ -35,7 +37,7 @@ END $$;
 
 `CREATE OR REPLACE` keeps the function's existing privileges. Several packages change the same migration chain in parallel, so keep each patch
 small and specific; if a patch needs a big rewrite of a function that another package owns (see the ownership list in your task), stop and put it in your report instead.
-The pattern must be an exact substring of what `pg_get_functiondef` prints (view it in a PGlite session first).
+The pattern must be an exact substring of what `pg_get_functiondef` prints once CRLF is normalised (view it in a PGlite session first). Always `DROP FUNCTION IF EXISTS pg_temp.patch_function(regprocedure, text, text);` before creating it: the migration runner keeps one session, and an earlier migration's helper with other parameter names would make `CREATE OR REPLACE` fail.
 
 ## Rules that still apply
 

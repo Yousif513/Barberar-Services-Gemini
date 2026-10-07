@@ -57,7 +57,9 @@ export function migrationFiles() {
 
 // Applies every migration in its own transaction, as `supabase db push` does, and stops at
 // the first failure so a broken chain is reported exactly as the CLI would report it.
-export async function createMigratedDb() {
+// activateDemo: the migrations leave the three demo salons switched off (nobody can book a salon that does not exist), but the
+// tests need salons that can be booked, so the harness turns them on explicitly. Pass false to test the migrated state itself.
+export async function createMigratedDb({ activateDemo = true } = {}) {
   const db = new PGlite({ extensions: { btree_gist, pgcrypto, uuid_ossp } });
   await db.exec(BOOTSTRAP);
   await db.exec(`ALTER DATABASE postgres SET search_path TO "$user", public, extensions; SET search_path TO "$user", public, extensions;`);
@@ -73,6 +75,11 @@ export async function createMigratedDb() {
       await db.exec("ROLLBACK;").catch(() => {});
       throw new Error(`Migration ${m.name} failed: ${error.message}`);
     }
+  }
+  if (activateDemo) {
+    await db.exec(`select set_config('request.jwt.claims', '{"role":"service_role"}', false);
+      update public.providers set status = 'active', is_verified = true where id = any (public.demo_provider_ids());
+      select set_config('request.jwt.claims', '', false);`);
   }
   return db;
 }
