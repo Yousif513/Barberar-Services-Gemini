@@ -115,7 +115,7 @@ describe("group booking screens", () => {
     }
     assert.match(files.customer, /<CommandDialog/);
     assert.match(files.provider, /<CommandDialog/);
-    assert.match(files.provider, /reasonRequired\n/, "a provider's cancellation needs a reason, as the server requires");
+    assert.match(files.provider, /reasonRequired\s/, "a provider's cancellation needs a reason, as the server requires");
   });
 
   it("limit what they read from the server and show loading, empty and error states", () => {
