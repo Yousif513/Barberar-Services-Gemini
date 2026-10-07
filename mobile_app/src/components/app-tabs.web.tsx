@@ -14,30 +14,34 @@ import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 
 import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
+import { TAB_LABELS } from '@/lib/locale-core';
+import { useLocale } from '@/lib/locale';
 
 export default function AppTabs() {
+  const { lang } = useLocale();
+  const tabLabels = TAB_LABELS[lang];
   return (
     <Tabs>
       <TabSlot style={{ height: '100%' }} />
       <TabList asChild>
         <CustomTabList>
           <TabTrigger name="home" href="/" asChild>
-            <TabButton>Home</TabButton>
+            <TabButton>{tabLabels.home}</TabButton>
           </TabTrigger>
           <TabTrigger name="explore" href="/explore" asChild>
-            <TabButton>Explore</TabButton>
+            <TabButton>{tabLabels.explore}</TabButton>
           </TabTrigger>
           <TabTrigger name="bookings" href="/bookings" asChild>
-            <TabButton>Bookings</TabButton>
+            <TabButton>{tabLabels.bookings}</TabButton>
           </TabTrigger>
           <TabTrigger name="messages" href="/messages" asChild>
-            <TabButton>Messages</TabButton>
+            <TabButton>{tabLabels.messages}</TabButton>
           </TabTrigger>
           <TabTrigger name="service-board" href="/service-board" asChild>
-            <TabButton>Board</TabButton>
+            <TabButton>{tabLabels.board}</TabButton>
           </TabTrigger>
           <TabTrigger name="profile" href="/profile" asChild>
-            <TabButton>Profile</TabButton>
+            <TabButton>{tabLabels.profile}</TabButton>
           </TabTrigger>
         </CustomTabList>
       </TabList>
