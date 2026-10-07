@@ -33,10 +33,10 @@ describe("administrator writes to money and configuration tables", () => {
     assert.equal(Number(row.details.changes.provider_share.after), 5090);
     assert.equal(row.details.changes.payout_status.after, "released");
 
-    const rule = (await sys(db, `select id from fee_rules limit 1`))[0];
+    const rule = (await sys(db, `select id from fee_rules where channel = 'marketplace' and is_first_visit = true`))[0];
     assert.ok(rule, "the seeded fee rules exist");
     const feeBefore = await count("fee_rules.update");
-    await as(db, admin, `update fee_rules set fee_percentage = fee_percentage + 1 where id = $1`, [rule.id]);
+    await as(db, admin, `select admin_save_fee_rule('marketplace', true, 11, 10, 40, true, 'Audit coverage test', null, $1)`, [rule.id]);  // ADM1: the command is the only write path
     assert.equal(await count("fee_rules.update"), feeBefore + 1, "fee changes are recorded");
   });
 
