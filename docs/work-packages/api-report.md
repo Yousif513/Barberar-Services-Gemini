@@ -166,9 +166,9 @@ in `deliver-webhooks`; delivery log page 25 (console); `currency: 'SAR'` and tim
 | `node --test supabase/tests/db/api_read_functions.test.mjs` | 22 pass, 0 fail |
 | `node --test supabase/tests/db/public_api_end_to_end.test.mjs` | 10 pass, 0 fail (the real router against the real migrated database) |
 | `node --test web_platform/tests/api-router.test.mjs web_platform/tests/api-params-pagination.test.mjs web_platform/tests/webhook-signature.test.mjs web_platform/tests/webhook-url.test.mjs web_platform/tests/developer-console.test.mjs` (pure modules and console) | 136 pass, 0 fail |
-| `node --test "supabase/tests/db/**/*.test.mjs"` (whole DB suite) | 661 pass, 0 fail |
+| `node --test "supabase/tests/db/**/*.test.mjs"` (whole DB suite, after merging `claude-code` at `504114b`) | 753 pass, 0 fail |
 | `node --test supabase/tests/inventory.test.mjs` | 10 pass, 0 fail |
-| `npm run test --workspace=web_platform` | 458 pass, 0 fail |
+| `npm run test --workspace=web_platform` | 466 pass, 0 fail |
 | `npm run test:security-core` | passed (now also checks `public-api`, `deliver-webhooks`, the router and `config.toml`) |
 | `npm run test:admin-controls` | passed |
 | `npx tsc --noEmit -p web_platform` | exit 0 |
@@ -190,7 +190,7 @@ console guard test was written against the old page.
 * `supabase/seed.sql`: section 14 (a plaintext-looking token and webhook secret, with invalid UUID literals and nonexistent columns, which could never have applied) replaced by a comment. Merge conflict with `claude-code`'s `set_config` line resolved by keeping both.
 * `supabase/config.toml`: `[functions.public-api] verify_jwt = false`.
 * `scripts/verify-security-core.mjs`: four entries added (public-api, api-router, deliver-webhooks, config.toml).
-* `web_platform/src/app/provider/layout.tsx`: one nav entry ("Developer API" / "واجهة المطورين") plus its icon.
+* `web_platform/src/app/provider/layout.tsx`: one nav entry ("Developer API" / "واجهة المطورين") plus its icon. The last merge conflicted with the recurring-appointments entry added by another package in the same three places; both entries are kept.
 * `web_platform/src/app/customer/settings/page.tsx`: the developer card and its six strings removed.
 * `web_platform/src/app/developer/page.tsx`: replaced by a redirect.
 * `web_platform/tests/negative-authorization.test.mjs`: the guard that asserted the old page's client-side hashing and `is_approved: false` replaced by one asserting the old page is gone.
