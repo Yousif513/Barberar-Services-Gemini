@@ -47,7 +47,7 @@ describe("prayer windows and the Riyadh clock (D-21 / R3)", () => {
     const list = await slots(SEED.employee1, svc.duration);
     // The old fallback removed slots around 03:45, 12:00, 15:30, 18:45 and 20:15 read in UTC (06:30, 07:00, 15:00, 18:30, 21:30 ... Riyadh).
     for (const t of ["06:30", "07:00", "15:00", "18:30", "21:30"]) assert.ok(list.includes(t), `${t} should be listed, got ${list.join(" ")}`);
-    const fallbackSource = (await sys(db, `select pg_get_functiondef('public.get_available_slots(uuid,date,integer,timestamptz[],timestamptz[])'::regprocedure) d`))[0].d;
+    const fallbackSource = (await sys(db, `select pg_get_functiondef(oid) d from pg_proc where pronamespace = 'public'::regnamespace and proname = 'get_available_slots'`))[0].d;
     assert.ok(!/v_slot_time::time|v_slot_end::time|'12:20:00'/.test(fallbackSource), "no clock comparison in the session time zone may remain");
   });
 

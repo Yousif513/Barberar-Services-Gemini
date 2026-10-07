@@ -13,6 +13,7 @@ run the whole DB suite.
 | D-21 / R3 | fixed | `20261007050000_booking_prayer_windows_riyadh_time.sql` | `booking_engine_prayer_windows.test.mjs` |
 | D-16 / R21 | fixed | `20261007060000_scheduling_overnight_and_seasons.sql` | `booking_engine_overnight_schedules.test.mjs` |
 | D-02 / C-D8 | fixed | `20261007070000_booking_source_attribution_tokens.sql` | `booking_engine_attribution.test.mjs`, `booking.test.mjs` (updated) |
+| R15 / G23 | fixed (DB part; provider screens deferred to the screen packages) | `20261007080000_booking_buffers_processing_variants.sql` | `booking_engine_buffers_variants.test.mjs` |
 
 ## 1. D-21 / R3 prayer windows and the Riyadh clock (fixed)
 
@@ -75,3 +76,29 @@ Screens (not touched here): `web_platform/src/app/shop/[id]/page.tsx:1049-1051` 
 (the same on mobile `shop-details-modal.tsx` / `marketplace.ts`); the provider share-kit screen must call `create_provider_share_token` / `revoke_provider_share_token`,
 list `provider_share_tokens` and build links `/shop/<id>?ref=<token>` (QR encodes the same link).
 Decision for the owner: tokens are stored in clear because the provider must be able to re-display the link/QR; they are an attribution marker, not a credential.
+
+## 4. R15 / G23 buffers, processing time, variants (fixed in the database)
+
+Reproduced on the base commit: with `buffer_after_minutes = 60`, after a 09:00 booking `get_available_slots` still listed 09:30 10:00 10:30.
+
+Decisions (the owner can change them; they are encoded in `booking_visit_profile` and `booking_create_internal`):
+- A visit occupies the professional for `[start - blocked_before, start + duration + blocked_after)`. `blocked_before` = `buffer_before_minutes` of the FIRST service;
+  `blocked_after` = for every service `processing_time_minutes + buffer_after_minutes`, plus the `buffer_before_minutes` of every later service.
+  Processing time is treated as occupied time (the professional cannot serve someone else meanwhile): conservative, never double books.
+- `bookings.duration_minutes` stays the visible length (calendar end, price). The blocked minutes are new columns `bookings.blocked_before_minutes` /
+  `blocked_after_minutes`; `set_booking_window` (a trigger function outside the six owned functions, changed because the exclusion constraint is built on
+  `booking_window`) folds them into the window, so concurrency is guarded by the existing exclusion constraint too. Existing rows have 0/0 and keep their window.
+- The visible duration must fit the shift; the buffers need not.
+- A variant (`service_variants`) replaces the service's duration and price for that booking (employee `custom_*` applies only to the plain service); it must belong to the
+  service and be active (`22023` "The selected option is not available for this service"). `booking_services.variant_id` records it.
+- `get_available_slots` gained three trailing optional arguments: `p_buffer_before_minutes`, `p_buffer_after_minutes`, `p_ignore_booking_id`. Its conflict test is now the
+  stored `booking_window` overlap with the candidate's blocked window (identical to the old test when no buffers exist).
+- New internal `booking_visit_profile(employee, service_ids, variant_ids)` returns validity, total duration, price and blocked minutes for one professional; the
+  any-professional resolution in `booking_create_internal` uses it (item 5 reuses it for `get_branch_available_slots`).
+- `reschedule_booking` now checks the move with `get_available_slots(..., p_ignore_booking_id => the booking)` and its own blocked minutes. This removes the old "the only thing
+  in the way is the booking itself" exception, which also accepted a move to before the shift start (reproduced by the new test: 08:30 was allowed, now refused).
+- `services` got a CHECK that the three minute columns are not negative.
+
+New arguments for the screens: `create_booking(request_variant_id uuid)`; `create_multi_service_booking` reads an optional `variant_id` in each `services_payload` item.
+Provider screens (services form: buffer before/after, processing time; variants CRUD) and the shop page (variant picker, send `variant_id`, show the effective duration)
+are not part of this package. Slot listing for a buffered service: pass the same blocked minutes to `get_available_slots` (or use `get_branch_available_slots`, item 5).
