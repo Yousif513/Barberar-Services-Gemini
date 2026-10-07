@@ -3,8 +3,8 @@
 import CategoryProviders from "@/components/category-providers";
 
 const copy = {
-  en: { category: "Wellness & Spa", title: "Luxury Spas & Hammams in Riyadh", subtitle: "Rejuvenate your body and mind. Book verified wellness retreats, custom massage rooms, and steam baths." },
-  ar: { category: "المنتجعات الصحية والعافية", title: "حمامات وسبا العافية الفاخرة بالرياض", subtitle: "استعد نشاط وحيوية جسدك وذهنك. احجز غرف المساج المتخصصة، والحمامات المغربية، والمنتجعات الصحية بالرياض." },
+  en: { category: "Wellness & Spa", title: "Spas & Wellness", subtitle: "Book wellness retreats, massage rooms and steam baths." },
+  ar: { category: "المنتجعات الصحية والعافية", title: "السبا والعافية", subtitle: "احجز المنتجعات الصحية وغرف المساج والحمامات المغربية." },
 };
 
 export default function SpaCategoryPage() {

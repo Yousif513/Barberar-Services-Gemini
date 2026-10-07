@@ -618,7 +618,7 @@ export default function BecomeProviderRootPage() {
           ) : existingApp && existingApp.status === "approved" ? (
             <div className="rounded-3xl border border-[#ABEFC6] bg-[#ECFDF3] p-8 sm:p-12 text-center space-y-4">
               <span className="rounded-full bg-[#12B76A] px-3 py-1 text-[10px] font-black uppercase text-white">
-                {isRTL ? "معتمد ومفعل" : "Approved & Active"}
+                {isRTL ? "تمت الموافقة والتفعيل" : "Approved & Active"}
               </span>
               <h3 className="font-serif text-2xl font-black text-[#027A48]">{t.approvedTitle}</h3>
               <p className="text-sm text-stone-700 max-w-lg mx-auto leading-relaxed">{t.approvedMsg}</p>

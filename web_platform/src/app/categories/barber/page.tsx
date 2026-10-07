@@ -3,8 +3,8 @@
 import CategoryProviders from "@/components/category-providers";
 
 const copy = {
-  en: { category: "Grooming & Barbering", title: "Master Barbershops & Haircuts in Riyadh", subtitle: "Instantly book Riyadh's highest-rated unisex grooming lounges, beard specialists, and master stylists." },
-  ar: { category: "العناية والحلاقة", title: "محلات الحلاقة وقص الشعر المتميزة بالرياض", subtitle: "احجز فوراً في أرقى صالونات الحلاقة والعناية بالبشرة واللحية الرجالية والنسائية بالرياض." },
+  en: { category: "Grooming & Barbering", title: "Barbershops & Haircuts", subtitle: "Book unisex grooming lounges, beard specialists and stylists near you." },
+  ar: { category: "العناية والحلاقة", title: "محلات الحلاقة وقص الشعر", subtitle: "احجز في صالونات الحلاقة والعناية بالبشرة واللحية الرجالية والنسائية القريبة منك." },
 };
 
 export default function BarberCategoryPage() {

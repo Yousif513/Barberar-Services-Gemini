@@ -10,11 +10,12 @@ const translations = {
     title: "Marketplace Terms & Rules",
     subtitle: "Rules governing payments, booking settlements, and cancellation policies",
     section1Title: "1. Online Booking & Payment Processing",
-    section1Desc: "When a customer books on Primora, the deposit is paid by card through Tap Payments. The service provider is paid out after the appointment is marked complete, according to the marketplace settlement terms.",
+    section1Desc: "When a customer books on Primora, the deposit is paid by card through Tap Payments. The provider's share is recorded in the ledger and is paid out to the provider's registered bank account when the provider requests a payout.",
     section2Title: "2. Client Cancellation & Refunds",
     section2Desc: "Each shop sets its free-cancellation window and its late-cancellation and no-show fees. They are shown on the shop page before you book and apply automatically when you cancel. If the shop cancels, you receive a full refund.",
     section3Title: "3. Fees and Payouts",
-    section3Desc: "Bookings a provider brings from its own clients carry no commission. A new client found through the Primora marketplace carries a 20% commission on the first visit (minimum SAR 10, maximum SAR 40); repeat visits from that client carry none. Each booking is recorded in the ledger and the provider's share is paid out to its verified bank account after the visit is completed.",
+    section3Desc: "Bookings a provider brings from its own clients carry no commission. A new client found through the Primora marketplace carries a 20% commission on the first visit (minimum SAR 10, maximum SAR 40); repeat visits from that client carry none. Each booking is recorded in the ledger. The provider's share becomes payable after the visit is completed and is paid out to its registered bank account when the provider requests a payout.",
+    help: "For help with a booking, open it in your dashboard bookings tab, or write to",
     footerText: "Built for Riyadh, Saudi Arabia. All rights reserved."
   },
   ar: {
@@ -23,11 +24,12 @@ const translations = {
     title: "شروط وقواعد المنصة",
     subtitle: "القواعد المنظمة للمدفوعات، تسوية الحجوزات وسياسات الإلغاء",
     section1Title: "1. الحجز والدفع الإلكتروني",
-    section1Desc: "عند الحجز على بريمورا يدفع العميل العربون بالبطاقة عبر Tap Payments. وتُصرف مستحقات مقدم الخدمة بعد تأكيد اكتمال الموعد وفقاً لشروط التسوية في المنصة.",
+    section1Desc: "عند الحجز على بريمورا يدفع العميل العربون بالبطاقة عبر Tap Payments. وتُسجَّل حصة مقدم الخدمة في دفتر الحسابات وتُحوَّل إلى حسابه البنكي المسجّل عندما يطلب التحويل.",
     section2Title: "2. إلغاء الموعد واسترداد الأموال",
     section2Desc: "يحدد كل مركز مدة الإلغاء المجاني ورسوم الإلغاء المتأخر وعدم الحضور، وتظهر في صفحة المركز قبل الحجز وتُطبق تلقائياً عند الإلغاء. وإذا ألغى المركز الموعد تسترد المبلغ كاملاً.",
     section3Title: "3. الرسوم وصرف المستحقات",
-    section3Desc: "لا عمولة على الحجوزات التي يجلبها مقدم الخدمة من عملائه. العميل الجديد القادم من سوق بريمورا عليه عمولة 20% في الزيارة الأولى (بحد أدنى 10 ر.س وأقصى 40 ر.س) ولا عمولة على زياراته المتكررة. تُسجل كل عملية حجز في دفتر الأستاذ وتُصرف حصة مقدم الخدمة إلى حسابه البنكي الموثق بعد اكتمال الزيارة.",
+    section3Desc: "لا عمولة على الحجوزات التي يجلبها مقدم الخدمة من عملائه. العميل الجديد القادم من سوق بريمورا عليه عمولة 20% في الزيارة الأولى (بحد أدنى 10 ر.س وأقصى 40 ر.س) ولا عمولة على زياراته المتكررة. يُسجَّل كل حجز في دفتر الحسابات. تصبح حصة مقدم الخدمة مستحقة بعد اكتمال الزيارة، وتُحوَّل إلى حسابه البنكي المسجّل عندما يطلب التحويل.",
+    help: "للمساعدة في حجز، افتحه من تبويب الحجوزات في لوحتك، أو راسلنا على",
     footerText: "صمم خصيصاً للرياض، المملكة العربية السعودية. جميع الحقوق محفوظة."
   }
 };
@@ -98,7 +100,7 @@ export default function TermsPage() {
 
         {/* Callout */}
         <div className="bg-stone-100 border border-stone-200 p-6 rounded-2xl text-xs text-stone-600 font-light leading-relaxed">
-          For help resolving disputes or submitting cancel claims, please navigate to your dashboard bookings tab or contact our arbitration desk at <span className="font-bold text-stone-900">support@primora.com</span>.
+          {t.help} <span dir="ltr" className="font-bold text-stone-900">support@primora.com</span>.
         </div>
 
       </main>

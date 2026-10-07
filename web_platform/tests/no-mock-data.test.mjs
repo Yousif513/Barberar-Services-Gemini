@@ -98,3 +98,98 @@ describe("release path contains no mock data", () => {
     }
   });
 });
+
+// ---- public pages: nothing the platform does not implement may be promised -------------------------------------------------
+// The landing, about, security, privacy, terms, provider-application, login, discover, services and booking pages are what a
+// stranger reads before trusting the platform with money and personal data. Nothing in the repository implements a booking
+// guarantee, a hygiene certification, escrow, or a PCI/PDPL certification of PRIMORA itself (a hosted payment page makes the
+// gateway, not PRIMORA, PCI-scoped), so those words stay out of the copy in both languages. Reword to what happens instead
+// ("deposit paid through Tap's hosted page").
+const PUBLIC_PAGE = /^web_platform\/src\/(app\/(page|layout)\.tsx|app\/(about|security|privacy|terms|become-provider|login|discover|services|shop|categories)\/|components\/category-providers\.tsx)/;
+const publicFiles = files.filter((f) => PUBLIC_PAGE.test(f.path));
+
+const UNBACKED_CLAIMS = [
+  { pattern: /ضمان|تضمن\b|نضمن|الضمان/, why: "an Arabic guarantee (الضمان) claim" },
+  { pattern: /شهادة النظافة|شهادة اعتماد|شهادة معتمدة/, why: "an Arabic hygiene-certificate (شهادة النظافة) claim" },
+  { pattern: /متوافق|معتمد/, why: "an Arabic compliant/approved (متوافق، معتمد) claim" },
+  { pattern: /\bguarantee[sd]?\b|\bguaranteeing\b/i, why: "a guarantee claim" },
+  { pattern: /\bcertified\b|\bcertification\b/i, why: "a certification claim" },
+  { pattern: /\bcompliant\b|\bcompliance\b/i, why: "a compliance claim" },
+  { pattern: /bank[- ]grade/i, why: "a bank-grade security claim" },
+  { pattern: /\bPCI(-| )?DSS\b/i, why: "a PCI-DSS statement about PRIMORA" },
+  { pattern: /\bvetted\b|top 1%|أفضل 1%|نخبة مصفاة/i, why: "a vetting claim the review process does not back" },
+  { pattern: /\b24\/7\b|thousands of /i, why: "an availability or scale claim nothing measures" },
+  { pattern: /\bTLS 1\.3\b/i, why: "a protocol version the platform does not control" },
+];
+
+describe("public pages promise only what the platform does", () => {
+  for (const rule of UNBACKED_CLAIMS) {
+    it(`have no ${rule.why}`, () => {
+      const hits = publicFiles.filter((f) => rule.pattern.test(f.code)).map((f) => f.path);
+      assert.deepEqual(hits, [], `${rule.why} found in: ${hits.join(", ")}`);
+    });
+  }
+
+  it("quote no commission rate or plan price that is typed into the page", () => {
+    // Fee rates and plan prices come from fee_rules / subscription_plans (or the signed agreement), never from page copy.
+    const marketing = publicFiles.filter((f) => /^web_platform\/src\/app\/(page\.tsx|about\/|become-provider\/)/.test(f.path));
+    const hits = marketing.filter((f) => /\d+(\.\d+)?\s*%\s*(platform\s*)?commission|commission[^"\n]{0,30}\d+\s*%|\b\d{2,4}\s*(SAR|ريال)\s*\/\s*(month|شهر)/i.test(f.code)).map((f) => f.path);
+    assert.deepEqual(hits, [], `typed fee or price in: ${hits.join(", ")}`);
+  });
+
+  it("show no featured listing or price that is written into the landing page", () => {
+    const code = files.find((f) => f.path === "web_platform/src/app/page.tsx").code;
+    assert.ok(!/Starting from \d+ SAR|تبدأ من \d+ ريال|Riyadh Apothecary/.test(code), "the landing page must not invent a featured space or a price");
+  });
+});
+
+describe("consent and data requests are written through their commands", () => {
+  const byPath = Object.fromEntries(files.map((f) => [f.path, f.code]));
+
+  it("login, the booking dialog and the privacy page never insert into the evidence tables", () => {
+    for (const path of ["web_platform/src/app/login/page.tsx", "web_platform/src/app/shop/[id]/page.tsx", "web_platform/src/app/privacy/page.tsx", "web_platform/src/app/become-provider/page.tsx"]) {
+      assert.ok(!/from\("consents"\)\s*\.(insert|upsert|update)/.test(byPath[path]), `${path} must record consent through record_consents`);
+      assert.ok(!/from\("data_subject_requests"\)\s*\.(insert|upsert|update)/.test(byPath[path]), `${path} must file requests through submit_data_request`);
+      assert.ok(!/from\("agreement_acceptances"\)\s*\.(insert|upsert|update)/.test(byPath[path]), `${path} must record acceptance through record_agreement_acceptance`);
+      assert.ok(!/document_version:\s*["']v1\.0["']/.test(byPath[path]), `${path} must send the published agreement version, not a typed one`);
+    }
+    assert.ok(byPath["web_platform/src/app/login/page.tsx"].includes('rpc("record_consents"'));
+    assert.ok(byPath["web_platform/src/app/shop/[id]/page.tsx"].includes('rpc("record_consents"'));
+    assert.ok(byPath["web_platform/src/app/privacy/page.tsx"].includes('rpc("submit_data_request"'));
+    assert.ok(byPath["web_platform/src/app/become-provider/page.tsx"].includes('rpc("record_agreement_acceptance"'));
+  });
+
+  it("a failed consent write is surfaced, not swallowed", () => {
+    for (const path of ["web_platform/src/app/login/page.tsx", "web_platform/src/app/shop/[id]/page.tsx"]) {
+      assert.ok(!/Consent registration notice/.test(byPath[path]), `${path} must not log-and-continue on a failed consent`);
+      assert.ok(/consentError/.test(byPath[path]), `${path} must read the error of the consent command`);
+    }
+  });
+
+  it("the booking dialog asks for the terms with a required, linked checkbox", () => {
+    const code = byPath["web_platform/src/app/shop/[id]/page.tsx"];
+    assert.ok(code.includes('href="/terms"') && code.includes('href="/privacy"') && code.includes("authConsentTerms"), "terms and privacy links with a terms checkbox");
+    assert.ok(/authConsentTerms[\s\S]{0,400}required/.test(code), "the terms checkbox is required");
+  });
+});
+
+describe("the booking page is operable by keyboard and screen reader", () => {
+  const code = files.find((f) => f.path === "web_platform/src/app/shop/[id]/page.tsx").code;
+
+  it("has no clickable div cards and no hand-made overlay", () => {
+    assert.ok(!/<div[^>]*onClick=/.test(code), "an element with a click handler must be a button");
+    assert.ok(!code.includes("fixed inset-0"), "dialogs go through PublicDialog (ModalOverlay)");
+    assert.ok(code.includes("<PublicDialog"), "the waitlist and phone dialogs use the shared dialog");
+  });
+
+  it("names its controls", () => {
+    assert.ok(code.includes('htmlFor="shop-date"') && code.includes("min={todayKey}"), "the date input is labelled and has a minimum");
+    assert.ok((code.match(/aria-pressed=/g) || []).length >= 4, "service, specialist and slot choices expose their state");
+    assert.ok(code.includes("aria-label={t.closeDialog}"), "dialog close buttons are named");
+  });
+
+  it("formats times and money through the shared formatters", () => {
+    assert.ok(!code.includes('toLocaleTimeString("en-US"'), "slot times follow the page language and Riyadh time");
+    assert.ok(!/\} SAR\b/.test(code), "amounts go through sar()");
+  });
+});

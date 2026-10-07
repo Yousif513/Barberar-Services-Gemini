@@ -19,6 +19,9 @@ integrator does them after all merges.
 | R24 slot labels `ar-SA` / `Asia/Riyadh` and SAR through one formatter | fixed | group 4 | tsc |
 | R24 any-professional duration (combined duration and service list into `get_branch_available_slots`) | deferred, needs a database change (see below) | - | - |
 | "Book again" preselects `?service=<id>` | fixed (once per link, with a message when the service is gone) | group 4 | tsc |
+| D-22 / R34 landing, about, security, terms, discover, shop footer, category pages, layout metadata: unbacked claims (EN + AR) | fixed | group 5 | `web_platform/tests/no-mock-data.test.mjs` "public pages promise only what the platform does" (11 term rules) |
+| R29 stale source-text tests (`verify_provider_cr`, `enqueue_post_visit_rebook` / `post_visit_review_rebook`) | the two named cases deleted, the rest kept | group 5 | `npm run test --workspace=web_platform` |
+| R29 executing tests for slots, closures, leave, seasons | deferred: DB tests belong to the database packages (no migrations or DB test files in this package) | - | - |
 
 (The table is appended after every commit group.)
 
@@ -92,6 +95,32 @@ integrator does them after all merges.
 - NOT touched (FIX-BOOKING's area): `getPrayerWindowsForDate`, `fetchSlots`, `handleBook` and the `create_booking` / `create_multi_service_booking`
   calls. `docs/work-packages/fixbooking-report.md` did not exist yet when I reached the booking call (only `fixcust-report.md` and `fixdba-report.md`
   were present in the primora-fix tree), so the call is unchanged. The integrator must apply the prayer-window and attribution-token changes there.
+
+## Group 5: unbacked public claims and the guard
+
+What was removed or reworded, in both languages:
+
+| Where | Before | After |
+|---|---|---|
+| Landing | "Top 1% Vetted", "Verified Artists", "certified home-service professionals", "Hygiene Certified / strict hygiene protocols 100%", "24/7 Dedicated Help / local support", AR "payment by trusted guarantee" (escrow), "thousands of ...", "Riyadh Geofenced", an invented "Featured Space: Riyadh Apothecary & Spa, from 150 SAR" card | "Reviewed Providers / checked before listing", "Prayer-Time Scheduling", "Message Your Provider", "Book with a Deposit ... pay the deposit by card through Tap", "Home Service"; the hero card says "Book online" and shows no listing or price |
+| About | "Top 1% Vetted Talent", "passes verified identity checks, portfolio evaluations", "Primora guarantees a vetted, secure, and exceptional experience", "Secure Payment Settlement ... paid out after the appointment", "Geofenced Convenience", sanitation guidelines followed by everyone | "Reviewed Providers" (applications are reviewed by our team, customers rate visits), "Deposits Through Tap" (ledger, payout on request), "Home Service", "each provider sets its own hygiene practices" |
+| Security | "VAT & Payments Compliance", "Secure Payouts", seals "PCI-DSS GATEWAY COMPLIANT" and "TLS 1.3 SECURE SSL" (English only) | "VAT and Payments", seals "Card details: entered on Tap's page", "VAT 15%: shown on every booking", "Connection: HTTPS" (translated) |
+| Terms | provider "paid out after the appointment is marked complete", "verified bank account", an English-only "arbitration desk" callout | "payable after the visit, paid out on the provider's payout request to its registered bank account"; callout translated and without the arbitration claim |
+| Privacy | see group 2 | |
+| Shop footer, layout title and description, discover and the four category pages | "Luxury ... premier ... selective clients", "verified", "certified stylists", "finest", "highest-rated" | neutral descriptions |
+
+Guard: `no-mock-data.test.mjs` now scans the public pages (`app/page.tsx`, `layout.tsx`, `about`, `security`, `privacy`, `terms`, `become-provider`, `login`,
+`discover`, `services`, `shop`, `categories`, `components/category-providers.tsx`) for guarantee / certified / certification / compliant / compliance /
+bank-grade / PCI-DSS / vetted / top 1% / 24/7 / thousands of / TLS 1.3, and for the Arabic terms ضمان، شهادة النظافة، متوافق، معتمد (and نخبة مصفاة،
+أفضل 1%). It also checks that no commission rate or plan price is typed into the landing, about and provider-application pages, that the landing
+page invents no featured listing, that login / booking dialog / privacy / provider application never write to `consents`, `data_subject_requests` or
+`agreement_acceptances` directly and never send a typed `v1.0`, that failed consent writes are not swallowed, that the booking dialog has a required linked
+terms checkbox, and that the booking page has no clickable `div`, no hand-made `fixed inset-0` overlay, labelled date input with `min`, `aria-pressed`
+choices, named close buttons, and no `toLocaleTimeString("en-US")` or `} SAR` amounts.
+
+Left on purpose, owner decision needed: section 3 of the terms and security pages still states the marketplace fee (20% on a new client's first visit, SAR 10
+minimum, SAR 40 maximum, none on repeat visits). It matches `fee_rules` today, but `fee_rules` is only readable by signed-in users and is seeded
+"subject to commercial confirmation"; the text belongs in the published agreement, not in page copy. The page is unchanged until the owner confirms.
 
 ## Needs from other packages
 
