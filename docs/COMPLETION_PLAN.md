@@ -13,12 +13,21 @@ no mock or invented data; owner-priced features ship disabled and unset; unverif
 
 ## A. Review and repair of earlier deliverables
 
-| Id | Scope | Reviewer report | Status |
-|----|-------|-----------------|--------|
-| A1 | Gemini P0 gaps G01-G19 verified against the code | `docs/reviews/2026-10-06-gap-verification-A-p0.md` | running |
-| A2 | Gemini P1 gaps G20-G43, mobile, portals | `docs/reviews/2026-10-06-gap-verification-B-p1-mobile-portals.md` | running |
-| A3 | Gemini P2 gaps G44-G64 and Codex P3 inventory/supply/chain | `docs/reviews/2026-10-06-gap-verification-C-p2-codex-p3.md` | running |
-| A4 | Fix every defect the three reports list (critical first), with tests | review fix migrations from `20261006220000` | waiting on A1-A3 |
+The three reviews are done and committed: `docs/reviews/2026-10-06-gap-verification-{A-p0,B-p1-mobile-portals,C-p2-codex-p3}.md`
+(A: 29 defects, B: 50, C: 36 including P3). Result: no gap G01-G64 meets the "complete" bar; the database layer is strong, screens and
+public pages carried invented data, dead controls and calls that could not run. Fix packages (each owns a disjoint set of files; defect
+lists extracted into `docs/work-packages/defects/<package>.md`):
+
+| Package | Scope | Status |
+|---------|-------|--------|
+| integrator (done, committed) | explicit Data API grants (fresh Supabase had no table privileges), working seed, real-stack smoke test, UI-vs-schema check in CI, phone verification trigger (D-01, D-06), demo data switched off (D-19), real category pages (R2), invoice VAT (R1), screens that could not load (R5, R6, R13, R14), no invented cards/profile (D-05), no baked-in dead project (D-18), mobile session persistence, deploy gate | done |
+| fixdba | consent/agreement evidence, policy bounds + `set_provider_booking_policy`, reminder expiry, column exposure (R10), reviews (R11, R28), home-service address (R12), integrations secrets, waitlist/promo policies | queued |
+| fixbooking | slots and time zone (R3/D-21), overnight shifts, buffers/variants (G23), source attribution (D-02), geofence, waitlist claim, packages-to-booking, coupons, loyalty, referral/wallet | queued |
+| fixcust | receipt, cancel/reschedule, consent writes, wallet copy, reviews deep link, accessibility on customer pages | queued |
+| fixprov | calendar reschedule, closures/leave/seasons UI, employee portal (R18), dashboard honesty and real QR, promos, CSV import, payroll export, walk-in, inventory dialogs | queued |
+| fixdbb | authorization scoping (`is_provider_staff`), offboarding, P3 valuation/idempotency/audit, fee invoices, subscriptions, invoice hash lock, analytics events | queued |
+| fixpub | login i18n, public claims, shop page a11y/terms consent/slot format, /services search, locale provider | queued |
+| fixmobile | deposit/fee copy, payment return to the app, language/RTL, accessibility, session start | queued |
 
 ## B. Remaining roadmap (master gap table `docs/competitive-research/12-prioritized-backlog.md`)
 
@@ -52,10 +61,10 @@ language switch; Arabic load errors on Packages and Services. Status: queued beh
 
 | Id | Item | Status |
 |----|------|--------|
-| D1 | Local Supabase stack (Docker): apply every migration plus seed on real Postgres 15, smoke the API | in progress |
-| D2 | Mobile session persistence (AsyncStorage) | queued |
+| D1 | Local Supabase stack (Docker): apply every migration plus seed on real Postgres 15, smoke the API | done: all migrations and the seed apply; `scripts/smoke-local-supabase.mjs` 19/19; CI runs it |
+| D2 | Mobile session persistence (keychain, not AsyncStorage) | done, with unit tests |
 | D3 | Home-service booking UI | queued |
-| D4 | CI gate before production deploy (Vercel deploys only after CI) | queued |
+| D4 | CI gate before production deploy (Vercel deploys only after CI) | done (`vercel.json` ignoreCommand + tests); the owner can add GITHUB_TOKEN in Vercel for private repos |
 | D5 | Expo / React Native advisories check | queued |
 
 ## E. Release gate (never claim production-ready unless all hold)
