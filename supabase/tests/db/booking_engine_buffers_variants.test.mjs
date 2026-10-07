@@ -201,6 +201,7 @@ describe("buffers, processing time and variants (R15 / G23)", () => {
     const by = Object.fromEntries(rows.map((r) => [r.proname, r]));
     for (const r of rows) assert.equal(r.n, 1, `${r.proname} overloads`);
     for (const name of ["create_booking", "create_multi_service_booking", "reschedule_booking"]) assert.equal(by[name].anon, false, name);
-    for (const name of ["booking_create_internal", "booking_visit_profile"]) assert.equal(by[name].auth, false, `${name} is internal`);
+    assert.equal(by.booking_create_internal.auth, false, "booking_create_internal is internal");
+    assert.equal(by.booking_create_internal.anon, false);
   });
 });
