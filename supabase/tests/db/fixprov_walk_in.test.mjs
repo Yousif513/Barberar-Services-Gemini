@@ -74,13 +74,16 @@ describe("create_walk_in_booking keeps method and notes (C-D15)", () => {
     await expectError(walkIn(owner2, { when }), /Not authorized/);
   });
 
-  it("shows the details only to the provider's staff, never to another provider, a customer or a visitor", async () => {
+  it("shows the details only to the owner, a booking manager or an administrator, never to a stylist, another provider, a customer or a visitor", async () => {
     const r = await walkIn(owner1, { when: await future(18), notes: "visible to staff only" });
     const rowsFor = async (user) => as(db, user, `select booking_id from walk_in_booking_details where booking_id = $1`, [r.booking_id]);
     assert.equal((await rowsFor(owner1)).length, 1);
     assert.equal((await rowsFor(owner2)).length, 0);
     assert.equal((await rowsFor(customer)).length, 0);
     await assert.rejects(rowsFor(ROLES.anon), /permission denied/);
+    const stylist = ROLES.user(await createUser(db, { role: "provider_employee" }));
+    await sys(db, `update employees set profile_id = $1 where id = $2`, [stylist.sub, SEED.employee1]);
+    assert.equal((await rowsFor(stylist)).length, 0, "an ordinary stylist does not read the owner's private notes");
     const admin = await createUser(db, { role: "admin" });
     assert.equal((await rowsFor(ROLES.user(admin))).length, 1);
   });

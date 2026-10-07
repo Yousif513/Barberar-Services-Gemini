@@ -16,22 +16,13 @@ CREATE TABLE IF NOT EXISTS public.walk_in_booking_details (
 CREATE INDEX IF NOT EXISTS idx_walk_in_details_provider ON public.walk_in_booking_details (provider_id);
 ALTER TABLE public.walk_in_booking_details ENABLE ROW LEVEL SECURITY;
 
--- is_provider_staff() is for commands only (clients cannot execute it), so policies ask through this answer-only wrapper.
-CREATE OR REPLACE FUNCTION public.caller_is_provider_staff(p_provider_id UUID)
-RETURNS BOOLEAN
-LANGUAGE sql
-STABLE
-SECURITY DEFINER
-SET search_path = public
-AS $fn$ SELECT COALESCE(public.is_provider_staff(p_provider_id, auth.uid()), FALSE) $fn$;
-REVOKE ALL ON FUNCTION public.caller_is_provider_staff(UUID) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.caller_is_provider_staff(UUID) TO authenticated, service_role;
-
--- Read-only for the provider's staff and administrators; rows are written only by create_walk_in_booking.
+-- Read-only for the owner, an administrator and a delegate holding the bookings permission; an ordinary stylist does not read the
+-- owner's private notes. Rows are written only by create_walk_in_booking.
 DROP POLICY IF EXISTS "Provider staff read walk-in details" ON public.walk_in_booking_details;
-CREATE POLICY "Provider staff read walk-in details"
+DROP POLICY IF EXISTS "Owner and booking managers read walk-in details" ON public.walk_in_booking_details;
+CREATE POLICY "Owner and booking managers read walk-in details"
   ON public.walk_in_booking_details FOR SELECT TO authenticated
-  USING (public.is_admin() OR public.caller_is_provider_staff(provider_id));
+  USING (public.is_admin() OR public.can_access_provider_operation(provider_id, NULL, 'bookings'));
 
 DO $migrate$
 DECLARE

@@ -29,6 +29,7 @@ describe("provider portal contains no invented records", () => {
   const rules = [
     { pattern: /demoStaffMembers|demoServiceOptions|demoProfileFor|\bdemo-(omar|yousef|karim|classic|beard|facial|spa|branch)\b/, why: "invented staff or services (R8)" },
     { pattern: /images\.unsplash\.com/, why: "stock photos presented as a person" },
+    { pattern: /\b(window\.)?(confirm|prompt|alert)\(/, why: "native dialogs" },
     { pattern: /api\.qrserver\.com/, why: "a third-party QR service (D-09)" },
     { pattern: /elite-barbershop|Elite Barbershop/, why: "an invented business or share link (D-28)" },
     { pattern: /G43 Verified|15% Saved|Commission Guarantee/, why: "ticket labels and unbacked rates on the dashboard" },
@@ -213,5 +214,33 @@ describe("reports exports (C-D13)", () => {
     assert.ok(!/Mudad|WPS Payroll Export|حماية الأجور WPS/.test(reports()));
     assert.match(reports(), /not a WPS file/);
     assert.ok(reports().includes("CommandResult"));
+  });
+});
+
+describe("inventory and chain screens (C-D28)", () => {
+  const inventory = () => byPath("inventory/page.tsx").code;
+  const controls = () => byPath("inventory/inventory-controls.tsx").code;
+  const chain = () => byPath("chain/page.tsx").code;
+  it("use no native dialogs and ask through the shared dialogs", () => {
+    for (const code of [inventory(), controls(), chain()]) assert.ok(!/\b(window\.)?(confirm|prompt|alert)\(/.test(code));
+    assert.ok(inventory().includes("CommandDialog") && inventory().includes("useConfirm"));
+    assert.ok(controls().includes("useConfirm") && chain().includes("useConfirm"));
+  });
+  it("show the server's reason in the reader's language and a forbidden state", () => {
+    assert.ok(inventory().includes("describeServerError") && chain().includes("describeServerError"));
+    assert.ok(!/setError\(t\.saveFailed\);/.test(inventory()), "a failed write names the reason");
+    assert.ok(inventory().includes("ForbiddenNotice") && chain().includes("ForbiddenNotice"));
+  });
+  it("gives the permission group a legend and counts low stock the same way in the metric and the row", () => {
+    assert.match(chain(), /<legend/);
+    assert.match(inventory(), /quantity_on_hand\) - numberValue\(row\.quantity_reserved\) <= reorderPoint/);
+  });
+});
+
+describe("pricing page claims (D-22)", () => {
+  it("makes no guarantee, certification or compliance claim in either language", () => {
+    const pricing = byPath("pricing/page.tsx").code;
+    assert.ok(!/Booking Guarantee|Bank-Grade|PCI-DSS Compliant|ضمان الحجز|تشفير مصرفي|متوافق مع معايير/.test(pricing));
+    assert.match(pricing, /hosted page|صفحة Tap المستضافة/);
   });
 });

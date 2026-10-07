@@ -136,3 +136,64 @@ Branch `wp/fixprov`, worktree `primora-wp-fixprov`. Status per defect is updated
 * A failed export is shown through `CommandResult` instead of `alert()`.
 * The rules editor on the team page (Pay rules, group 1) is linked from the reports note.
 * Tests: `web_platform/tests/payroll-summary.test.mjs` (7), guard tests "reports exports".
+
+## Group 9: inventory and chain screens, services dialog, pricing claims (C-D28, D-22)
+
+* `provider/inventory`, `inventory-controls` and `chain` no longer call `window.confirm`/`prompt`: receive, stock change and availability use `useConfirm`, cancelling an order uses `CommandDialog`
+  with a required reason, disabling access uses `useConfirm`. `provider/services` (delete) likewise. A guard test now forbids native dialogs anywhere under `provider/**`.
+* Every failed write names the server's reason (`describeServerError`, `_components/server-errors.ts`) in the reader's language; every message the P3 commands can raise has an Arabic form
+  (`tests/server-errors.test.mjs` reads the messages out of the two migrations and fails when one is untranslated). A refused session shows `ForbiddenNotice`.
+* The permission group has a `<legend>`. The low-stock metric and the row flag use the same rule (available = on hand minus reserved, at or below the reorder point).
+* D-22 on `provider/pricing` only: "Booking Guarantee / ضمان الحجز المعتمد", "Bank-Grade Encryption" and "PCI-DSS Compliant via Tap" are replaced by factual statements (deposit and cancellation terms;
+  card details are entered on the payment provider's page). The page still illustrates a fixed 15% platform fee and 85% payout: that is a business-rate statement (R34) and needs the owner's `fee_rules`;
+  deferred. The landing, about, security and privacy pages are outside this package.
+
+## Late finding: walk-in details read scope
+
+The existing cross-tenant sweep (`qa_adversarial.test.mjs`) showed that an ordinary stylist of the same provider could read `walk_in_booking_details` (private notes and payment method). The policy now
+admits the owner, administrators and delegates holding the bookings permission only (`can_access_provider_operation(..., 'bookings')`, which is branch-loose; the stricter `can_access_provider_wide`
+only exists from 20261007900300, after this migration). The helper `caller_is_provider_staff` was removed.
+
+## Final status by defect id
+
+| Id | Status | Where |
+|---|---|---|
+| R4 calendar drag and drop | fixed | group 4; `reschedule_booking`, keyboard "Move to", error leaves the calendar unchanged |
+| R5/R6 follow-ups (FIX-DBA read commands) | fixed in the screens | group 2; baseline lists the three FIX-DBA rpcs |
+| R8 invented staff and services | fixed | group 1 |
+| R9 provider promo codes | fixed for "all customers" codes; "new clients only" segment deferred (needs a change to `booking_create_internal`, out of scope) | group 6 |
+| R16 closures, seasons, leave, overnight hours, per-professional hours | fixed | groups 2 and 3 |
+| R18 `my_provider_context` and employee portal | fixed for layout, navigation, `/provider/my-day`; the other owner screens keep their owner lookup (deferred, see below) | group 2 |
+| D-27 booking policy card | fixed (UI); the command is FIX-DBA's | group 2 |
+| D-28 / R27 / D-09 dashboard honesty and QR | fixed | group 5 |
+| R36 CSV import | fixed | group 7 |
+| R50 employee profile fields and portfolio | fixed with an https image link and a mandatory client-consent tick; a file uploader (needs a Storage bucket) and the monthly "PRIMORA brought you" message job are deferred | group 1 |
+| C-D13 payroll export and pay-rules editor | fixed | groups 1 and 8 |
+| C-D15 walk-in screen and `create_walk_in_booking` | fixed | groups 2 and 4 |
+| C-D26 block dialog (provider side) | fixed; `admin_save_promo_code` belongs to another package | group 7 |
+| C-D28 inventory and chain | fixed | group 9 |
+| D-22 claims on provider/pricing | fixed for the three claims; fixed 15%/85% illustration deferred | group 9 |
+
+## Deferred, with the reason
+
+* Converting every owner screen from `providers.owner_id` to `useProviderContext` (R18): mechanical, but touches 14 pages; the layout already keeps employees off them.
+* "New clients only" promo codes: needs `booking_create_internal` to read a segment (core function; not changed).
+* Leave rejection reason; list of the bookings hit by a closure (only a count is shown).
+* Portfolio file upload and the monthly summary job (R50).
+* `provider_promos` table: left in place and unread.
+* Not verifiable here: scanning the QR with a camera, the browser console on `/provider/*` (no hosted Supabase; the dev build was not run), `npm run build --workspace=web_platform` (not run in this worktree; the integrator builds after merging).
+
+## Verification (this worktree, after the last commit)
+
+* `node --test "supabase/tests/db/**/*.test.mjs"`: 308 tests, 308 pass (includes `migration_hygiene.test.mjs`, 6 new `fixprov_*.test.mjs` files).
+* `npm run test --workspace=web_platform`: 297 tests, 297 pass.
+* `npx tsc --noEmit -p web_platform`: no errors.
+* `npx eslint` over every changed file (via the JSON formatter): 0 errors; warnings per file are at or below the count before my change (all pre-existing `any`, effect and unused-variable warnings).
+* `node scripts/verify-ui-schema.mjs`: 94 rpc calls and 195 select strings checked, 3 mismatches, all in the baseline: `set_provider_booking_policy`, `get_provider_private_profile`, `get_provider_staff_contacts` (FIX-DBA's functions are not in this worktree; the integrator removes the baseline entries on merge).
+
+## Files touched outside my own directories
+
+* `supabase/migrations/20261007900300_delegated_access_scope.sql`: one line, the regprocedure of `create_walk_in_booking` now has the ninth argument (`text`) because the function gained `p_notes`.
+* `package.json` of `web_platform` and `package-lock.json`: `toqr@^0.1.1` (already in the lockfile through Expo) added to `web_platform`.
+* `web_platform/src/lib/` new files only (`phone.mjs`, `calendar-slots.mjs`, `schedule-exceptions.mjs`, `client-import.mjs`, `payroll-summary.mjs`, `qr-svg.mjs`); `web_platform/tests/negative-authorization.test.mjs` (one assertion followed the R9 fix); `scripts/ui-schema-baseline.json`.
+* Migrations: `20261007100000_walk_in_booking_details`, `101000_my_provider_context`, `102000_provider_dashboard_summary`, `103000_provider_promo_codes`, `104000_import_clients_phone_forms`.
