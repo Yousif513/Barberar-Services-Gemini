@@ -64,3 +64,14 @@ Branch `wp/fixprov`, worktree `primora-wp-fixprov`. Status per defect is updated
 * No new migration: the existing tables, policies and trigger already enforce the rules. `supabase/tests/db/fixprov_schedule_exceptions.test.mjs` (14 tests) pins them for every
   role: owner, other provider's owner, employee, colleague, customer, anonymous. Pure checks live in `src/lib/schedule-exceptions.mjs` (`tests/schedule-exceptions.test.mjs`).
 * Not done: rejecting leave does not record a reason (the table has no column for it and I did not widen the schema); a closure does not list the affected bookings, only counts them.
+
+## Group 4: calendar (R4, C-D15 screen)
+
+* Drag and drop and a new keyboard control ("Move to another time" in the details dialog, free slots only) both call `reschedule_booking`. Nothing on the calendar changes
+  until the command accepts the move; a refusal is shown (in the dialog and as the page error) and the appointment stays where it was.
+* Walk-in dialog: the name is always a text input, with an optional selector of people who have booked this business before (it used to list 100 customers of the whole
+  platform); phone is normalised (`+9665XXXXXXXX`) and sent so a verified customer is linked; payment method comes from `payment_methods` (no hard-coded cash); notes are sent
+  as `p_notes`; the invented "Walk-in Customer", "Styling Service", "Fahad Al-Malki", the initial 150 SAR price and the seeded "Stylist Break & Sanitation" blockout are gone.
+  Walk-in details (name, phone, private note, payment method) show in the appointment dialog.
+* Cancelling now asks for a reason in `CommandDialog` (it used to cancel on one click with a constant reason). The modals use `ProviderDialog`; double mirroring was replaced by logical utilities.
+* Tests: `tests/phone-and-slots.test.mjs` (28), guard tests "calendar (R4, C-D15)".

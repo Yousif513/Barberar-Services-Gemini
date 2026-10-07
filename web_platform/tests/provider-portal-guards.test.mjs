@@ -124,3 +124,26 @@ describe("closures, seasons and leave (R16)", () => {
     assert.ok(byPath("my-day/page.tsx").code.includes("MyLeaveSection"));
   });
 });
+
+describe("calendar (R4, C-D15)", () => {
+  const calendar = () => byPath("calendar/page.tsx").code;
+  it("moves an appointment only through reschedule_booking and never edits the list on drop", () => {
+    assert.ok(calendar().includes('rpc("reschedule_booking"'));
+    const drop = calendar().slice(calendar().indexOf("onDrop="), calendar().indexOf("onDrop=") + 600);
+    assert.ok(drop.includes("moveAppointment") && !drop.includes("setAppointments"), "a drop calls the command and does not change the list itself");
+    assert.match(calendar(), /id="move-slot"/, "a keyboard path exists in the details dialog");
+  });
+  it("sends the phone, payment method and notes of a walk-in and has no English-only fallback", () => {
+    const code = calendar();
+    assert.match(code, /p_customer_phone: phone/);
+    assert.match(code, /p_payment_method: bookPayment/);
+    assert.match(code, /p_notes: bookNotes/);
+    assert.ok(!code.includes("Walk-in Customer") && !code.includes('p_payment_method: "cash"'));
+  });
+  it("offers only this business's past customers and asks why before cancelling", () => {
+    const code = calendar();
+    assert.ok(!/\.eq\("role", "customer"\)/.test(code), "the platform's customers are not listed");
+    assert.match(code, /<CommandDialog/);
+    assert.ok(!/flex-row-reverse/.test(code), "no double mirroring");
+  });
+});
