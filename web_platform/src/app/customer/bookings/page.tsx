@@ -7,6 +7,7 @@ import { errorMessage } from "@/lib/error-message";
 import { sar, useOperationsLocale } from "@/components/operations-ui";
 import { CommandDialog, ModalOverlay, ModalPortal } from "@/components/modal";
 import MakeRegularButton from "@/components/make-regular";
+import IntakeLink from "@/components/intake-link";
 import {
   receiptAmounts, bookingStatusLabel, policyFromProvider, policySentences, cancellationPreview,
   formatBookingDate, formatBookingTime, formatBookingDateTime, riyadhDateKey, bookAgainHref,
@@ -747,6 +748,7 @@ export default function CustomerBookingsPage() {
                         <span>{t.tipStaffBtn}</span>
                       </button>
                     )}
+                    <IntakeLink bookingId={bk.id} status={bk.status} className="flex-1 lg:flex-initial px-4 py-2 bg-white hover:bg-[#F8F3E4] text-[#6B4F17] border border-[#C29A4C]/40 font-bold text-xs rounded-xl transition duration-150 text-center" />
                     {bookAgainHref(bk.branches?.providers?.id, bk.services?.id) && (
                       <Link
                         href={bookAgainHref(bk.branches?.providers?.id, bk.services?.id) as string}
