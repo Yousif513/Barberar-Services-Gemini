@@ -58,3 +58,40 @@ aggregate keys pinned and no personal data, UTC session with a 23:59 Riyadh book
   lives in the layout (`attribution-capture.tsx`), not in the page. If the page owner has already changed the booking calls, keep their version and these two lines only.
 - `web_platform/src/app/provider/layout.tsx`: one nav entry (`share`, both languages) and its icon.
 - `web_platform/src/app/shop/[id]/layout.tsx` and `web_platform/src/app/sitemap.ts`: edited (they are the metadata files this package was asked to extend).
+
+## Decisions and defaults
+
+- Channel is a CHECK on text (not a Postgres enum): same set, easier to extend in a later migration. Replays of `record_booking_attribution` return `already_recorded` (first write wins)
+  instead of an error, so a lost response can be retried safely.
+- A booking made through the provider's QR / WhatsApp / Instagram share key is attributed to that channel (`verified_by_token`); a plain `link` key does not name a channel, the browser's report
+  stands. This keeps the provider honest about where their own keys led without making any claim about fees.
+- Default UTM labels per share channel: instagram -> social, whatsapp -> messaging, qr -> print, link -> referral (editable under "Advanced labels"). They are conventions, not business values.
+- Attribution window: the booking must be at most 24 hours old when its source is recorded (the screen records it immediately after creating the booking).
+- Aggregates are not audited (no money, no person); administrator counts are counts only (`admin_booking_channel_counts`). Walk-ins are reported separately and never count as unattributed.
+- JSON-LD states: names, description, images/logo, the first active branch's public address text, city and coordinates, aggregate rating from published reviews
+  (`provider_rating_summaries`), `priceRange` from active services' base prices (`SAR 50-200`, not VAT-inclusive), opening hours derived from the staff schedules (the union of the active
+  professionals' shifts per weekday; this is when somebody is scheduled, not a separately declared opening time), and a `ReserveAction` whose target is the shop deep link
+  `?src=google&utm_source=google&utm_medium=structured-data` (no share key, so the public page never publishes a provider key). Not stated, because the database does not hold them as public
+  facts: telephone and e-mail (`contact_phone` / `contact_email` are private contact details), country (`addressCountry`).
+
+## Verification (all run in `primora-wp-dist`)
+
+| Command | Result |
+|---|---|
+| `node --test supabase/tests/db/distribution.test.mjs` | 19 / 19 pass |
+| `node --test "supabase/tests/db/**/*.test.mjs"` (whole DB suite, includes data_api_grants, migration_hygiene, admin_security_matrix) | 858 tests, 858 pass, 0 fail |
+| `npm run test --workspace=web_platform` | 517 tests, 517 pass (26 are `tests/distribution.test.mjs`) |
+| `node scripts/verify-ui-schema.mjs` | 150 rpc calls, 215 select strings, 0 mismatches |
+| `npx tsc --noEmit -p web_platform` | 0 errors |
+| `npx eslint` on every changed web file (from `web_platform/`) | 0 errors; the new files add no warnings and `shop/[id]/page.tsx` keeps its 28 pre-existing warnings |
+| `npm run build --workspace=web_platform` | not verifiable here: Turbopack stops with "Symlink [project]/node_modules is invalid, it points out of the filesystem root" (the worktree's `node_modules` is a junction). The integrator builds after merging. |
+
+## Could not verify / external dependencies
+
+- No browser or hosted Supabase here: the share-kit page, the layout's server rendering and Google's Rich Results Test were not exercised. The page's queries and rpc argument names are
+  checked against the migrated schema by `verify-ui-schema`, and the pure builders (links, capture parsing, JSON-LD) by node tests, but the first real render is the integrator's check.
+- "Reserve with Google" partner feeds (bookable-inventory feed, merchant and services feeds, real-time booking server) are NOT built: they require Google's approval and a signed partner
+  agreement, plus a production endpoint Google can reach. Until then the `ReserveAction` JSON-LD and the Google Business Profile booking link (a share link of the `link` channel pasted into the
+  profile) are the supported deep-link route. Instagram has no booking partner API in scope; the kit covers bio link, story link sticker and Web Share.
+- Known limits: marketplace-internal traffic (a customer coming from PRIMORA's own search) has no channel of its own in the decided list, so it is counted under `direct`; the
+  platform-wide admin counts exist as a command with tests but no admin screen yet (deferred, the brief asked for the command only); the mobile app does not capture or record attribution.
