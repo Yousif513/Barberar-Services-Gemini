@@ -9,7 +9,6 @@ const adminRedirects = [
       { source: "/admin/locations", destination: "/admin/branches", permanent: false },
       { source: "/admin/orders", destination: "/admin/bookings", permanent: false },
       { source: "/admin/payments", destination: "/admin/ledger", permanent: false },
-      { source: "/admin/roles", destination: "/admin/employees", permanent: false },
       { source: "/admin/rooms", destination: "/admin/branches", permanent: false },
       { source: "/admin/system-logs", destination: "/admin/audit-logs", permanent: false },
       { source: "/admin/teams", destination: "/admin/employees", permanent: false },

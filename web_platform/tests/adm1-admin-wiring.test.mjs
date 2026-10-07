@@ -70,3 +70,34 @@ describe("ADM1 item 4: coupons change only through the reasoned commands", () =>
     assert.match(coupons, /perCustomerLabel: "مرات الاستخدام لكل عميل"/, "Arabic copy for the new fields");
   });
 });
+
+describe("ADM1 item 5 and 7: roles, flags and fee rules are screens over the commands, reachable from the navigation", () => {
+  const roles = read("web_platform/src/app/admin/roles/page.tsx");
+  const rules = read("web_platform/src/app/admin/platform-rules/page.tsx");
+  const layout = read("web_platform/src/app/admin/layout.tsx");
+  const config = read("web_platform/next.config.ts");
+
+  it("the role screen lists through admin_role_directory and changes roles through set_user_role with the reason", () => {
+    assert.match(roles, /rpc\("admin_role_directory"/);
+    assert.match(roles, /rpc\("set_user_role", \{ target_user_id: person\.id, target_role: next, p_reason: reason \}\)/);
+    assert.doesNotMatch(roles, /\.from\("profiles"\)\s*\.(update|upsert|insert)/);
+    assert.match(roles, /<CommandDialog/);
+    assert.match(roles, /selfHint: "لا يمكنك/, "Arabic copy for the self-change refusal");
+  });
+
+  it("flags, fee rules and API settings change only through their commands", () => {
+    for (const command of ["admin_set_feature_flag", "admin_save_fee_rule", "admin_set_api_setting"]) assert.ok(rules.includes(`rpc("${command}"`), command);
+    assert.doesNotMatch(rules, /\.from\("(platform_feature_flags|fee_rules|platform_settings)"\)\s*\.(update|upsert|insert|delete)/);
+    assert.match(rules, /confirmWord=\{flagPending\.next/, "turning a flag on needs the flag name typed");
+    assert.match(rules, /retry/i);
+    assert.match(rules, /apiIntro: "حدود/);
+  });
+
+  it("both screens are in the navigation in both languages and /admin/roles is no longer redirected away", () => {
+    assert.match(layout, /nameKey: "roles", path: "\/admin\/roles"/);
+    assert.match(layout, /nameKey: "platformRules", path: "\/admin\/platform-rules"/);
+    assert.match(layout, /platformRules: "Platform Rules"/);
+    assert.match(layout, /platformRules: "قواعد المنصة"/);
+    assert.doesNotMatch(config, /source: "\/admin\/roles"/);
+  });
+});
