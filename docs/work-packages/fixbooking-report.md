@@ -12,6 +12,7 @@ run the whole DB suite.
 |---|---|---|---|
 | D-21 / R3 | fixed | `20261007050000_booking_prayer_windows_riyadh_time.sql` | `booking_engine_prayer_windows.test.mjs` |
 | D-16 / R21 | fixed | `20261007060000_scheduling_overnight_and_seasons.sql` | `booking_engine_overnight_schedules.test.mjs` |
+| D-02 / C-D8 | fixed | `20261007070000_booking_source_attribution_tokens.sql` | `booking_engine_attribution.test.mjs`, `booking.test.mjs` (updated) |
 
 ## 1. D-21 / R3 prayer windows and the Riyadh clock (fixed)
 
@@ -53,3 +54,24 @@ prayer rule kept). It reads the day through the new internal `employee_day_sched
 - a spill-over slot continues the 30-minute grid of its shift (a 21:15 shift continues at 00:15, the old code restarted the grid at 00:00).
 
 Not changed: how a closure or leave on the target day removes the whole day (including the morning spill-over of the evening before).
+
+## 3. D-02 / C-D8 the caller no longer chooses `bookings.source` (fixed)
+
+Reproduced on the base commit: `booking.test.mjs` "charges no platform fee on provider-sourced bookings" asserted that `request_source => 'link'` with no
+proof gave a 0.00 platform fee (probe E4: `marketplace` 17.00, `qr` 0.00, `import` 0.00). That test now asserts the secure behaviour (and a second one asserts the
+claimed channel pays the marketplace fee).
+
+- New table `provider_share_tokens` (provider, channel link|qr|whatsapp|instagram, random 64-hex token, label, optional expiry, revoked_at/by/reason). RLS: the
+  owning provider and administrators read; there is no write policy. Grants through `grant_data_api_access`, audit trigger attached.
+- Owner commands `create_provider_share_token(p_provider_id, p_source, p_label, p_expires_at)` (returns the token once more on read: owners read it from the table)
+  and `revoke_provider_share_token(p_token_id, p_reason)` (reason 3+ chars, idempotent). Owner or administrator only; anyone else gets `P0002` not found;
+  anonymous is refused by privilege; at most 50 live tokens per provider; both write an audit row (`provider.share_token_created` / `_revoked`).
+- `resolve_booking_source` (internal) decides the channel: a live token of THAT provider gives the token's channel (the claimed `request_source` is ignored); `import` is
+  accepted only for a customer matching a `provider_client_contacts` row of that provider (verified phone or matched profile); everything else, including `walk_in`, is `marketplace`.
+- `booking_create_internal` gets `p_source_token`; `create_booking` / `create_multi_service_booking` get `request_source_token text DEFAULT NULL` (last argument).
+  `request_source` is still accepted and still only a hint (import). `bookings.source_token_id` records which token produced a provider-sourced booking.
+
+Screens (not touched here): `web_platform/src/app/shop/[id]/page.tsx:1049-1051` must stop reading `?source=`, read `?ref=<token>` and pass it as `request_source_token`
+(the same on mobile `shop-details-modal.tsx` / `marketplace.ts`); the provider share-kit screen must call `create_provider_share_token` / `revoke_provider_share_token`,
+list `provider_share_tokens` and build links `/shop/<id>?ref=<token>` (QR encodes the same link).
+Decision for the owner: tokens are stored in clear because the provider must be able to re-display the link/QR; they are an attribution marker, not a credential.
