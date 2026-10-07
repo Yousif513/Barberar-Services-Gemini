@@ -17,6 +17,8 @@ describe("anonymous access", () => {
     const allowed = new Set([
       "get_available_slots", "get_branch_available_slots", "get_branch_schedule_with_prayer_pauses",
       "search_marketplace_providers", "normalize_arabic", "provider_rating_summaries",
+      "track_analytics_event", // D-26: insert-only client event recorder, validated and rate limited
+
     ]);
     const rows = await sys(db, `
       select distinct p.proname
@@ -57,7 +59,7 @@ describe("verification and onboarding", () => {
     const manual = (await sys(db, `select cr_verification_status, cr_wathq_data->>'source' src from providers where id = $1`, [SEED.provider1]))[0];
     assert.equal(manual.cr_verification_status, "manually_reviewed");
     assert.equal(manual.src, "manual_admin_review");
-    await as(db, ROLES.service, `select record_wathq_cr_verification($1, '1010101010', true, '{"status":"active"}'::jsonb)`, [SEED.provider1]);
+    await as(db, ROLES.service, `select record_wathq_cr_verification($1, '1010101010', true, jsonb_build_object('status', 'active', 'crName', (select business_name_en from providers where id = $1)))`, [SEED.provider1]);
     const wathq = (await sys(db, `select cr_verification_status, cr_wathq_data->>'source' src from providers where id = $1`, [SEED.provider1]))[0];
     assert.equal(wathq.cr_verification_status, "verified");
     assert.equal(wathq.src, "wathq_api");
@@ -78,6 +80,8 @@ describe("verification and onboarding", () => {
     await as(db, admin, `select reject_provider_application($1, 'Missing location')`, [noLocation]);
     const app = await insert(24.8);
     await expectError(as(db, owner1, `select approve_provider_application($1, 'Documents checked')`, [app]), /Administrator/);
+    await expectError(as(db, admin, `select approve_provider_application($1, 'Documents checked')`, [app]), /commercial registration must be verified/);
+    await as(db, admin, `select admin_confirm_application_cr($1, 'CR document reviewed, registered name matches the applicant')`, [app]);
     const r = (await as(db, admin, `select approve_provider_application($1, 'Documents checked') r`, [app]))[0].r;
     const p = (await sys(db, `select status, is_verified, description_en, vat_number, cr_number from providers where id = $1`, [r.provider_id]))[0];
     assert.equal(p.status, "active");
