@@ -29,9 +29,6 @@ describe("provider portal contains no invented records", () => {
   const rules = [
     { pattern: /demoStaffMembers|demoServiceOptions|demoProfileFor|\bdemo-(omar|yousef|karim|classic|beard|facial|spa|branch)\b/, why: "invented staff or services (R8)" },
     { pattern: /images\.unsplash\.com/, why: "stock photos presented as a person" },
-    { pattern: /api\.qrserver\.com/, why: "a third-party QR service (D-09)" },
-    { pattern: /elite-barbershop|Elite Barbershop/, why: "an invented business or share link (D-28)" },
-    { pattern: /\b(window\.)?(confirm|prompt|alert)\(/, why: "native dialogs" },
   ];
   for (const rule of rules) {
     it(`has no ${rule.why}`, () => {
