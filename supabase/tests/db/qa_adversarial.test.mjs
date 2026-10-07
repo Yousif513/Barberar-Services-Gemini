@@ -56,6 +56,7 @@ describe("client-executable functions are accounted for", () => {
     assert.deepEqual(callable, [
       "get_available_slots", "get_branch_available_slots", "get_branch_schedule_with_prayer_pauses",
       "normalize_arabic", "provider_rating_summaries", "search_marketplace_providers",
+      "track_analytics_event", // D-26: insert-only client event recorder (validated, rate limited, no personal keys)
     ], "a new function granted to anon must be added here deliberately, with a reason");
   });
 
