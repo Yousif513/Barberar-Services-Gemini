@@ -126,7 +126,7 @@ export async function createUser(db, { role = "customer", phone = null, verified
 
 // A future date (Riyadh) on which the given employee has working hours.
 export async function nextWorkingDate(db, employeeId, minDaysAhead = 3) {
-  const rows = await sys(db, `select distinct day_of_week from employee_availability where employee_id = $1`, [employeeId]);
+  const rows = await sys(db, `select distinct day_of_week from employee_availability where employee_id = $1 and is_working_day`, [employeeId]);
   const days = rows.map((r) => r.day_of_week);
   let d = new Date(Date.now() + minDaysAhead * 86400000);
   for (let i = 0; i < 14 && !days.includes(d.getUTCDay()); i += 1) d = new Date(d.getTime() + 86400000);

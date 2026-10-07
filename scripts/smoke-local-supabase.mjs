@@ -231,6 +231,12 @@ await check("every table in public has row-level security and every base table h
   );
 });
 
+await check("ratings of providers are public and computed from published reviews", async () => {
+  const r = await rpc("provider_rating_summaries", { p_provider_ids: ["a0000000-0000-0000-0000-000000000001"] });
+  assert.equal(r.status, 200, JSON.stringify(r.json));
+  assert.ok(Array.isArray(r.json));
+});
+
 await check("no client role holds TRUNCATE, REFERENCES or TRIGGER, and anonymous visitors hold no write privilege", async () => {
   assert.equal(psql(`select count(*) from pg_class c join pg_namespace n on n.oid = c.relnamespace
                      cross join (values ('anon'),('authenticated'),('service_role')) r(rolname) cross join (values ('TRUNCATE'),('REFERENCES'),('TRIGGER')) p(priv)

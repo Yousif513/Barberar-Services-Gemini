@@ -41,6 +41,9 @@ jobs:
       - name: Inventory and supply tests
         run: npm run test:inventory
 
+      - name: Screens only ask the database for what exists (rpc arguments, columns, embeds)
+        run: npm run test:ui-schema
+
       - name: Mobile unit tests (session storage)
         run: npm run test:mobile
 

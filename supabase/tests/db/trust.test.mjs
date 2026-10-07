@@ -16,7 +16,7 @@ describe("anonymous access", () => {
   it("exposes only read-only discovery functions to anonymous visitors", async () => {
     const allowed = new Set([
       "get_available_slots", "get_branch_available_slots", "get_branch_schedule_with_prayer_pauses",
-      "search_marketplace_providers", "normalize_arabic",
+      "search_marketplace_providers", "normalize_arabic", "provider_rating_summaries",
     ]);
     const rows = await sys(db, `
       select distinct p.proname

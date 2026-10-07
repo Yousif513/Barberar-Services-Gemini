@@ -147,11 +147,11 @@ export default function ProviderSettingsPage() {
   const [success, setSuccess] = useState("");
 
   // Business Profile States
-  const [businessNameEn, setBusinessNameEn] = useState("Elite Grooming Lounge");
-  const [businessNameAr, setBusinessNameAr] = useState("صالون إيليت الرجالي");
-  const [descriptionEn, setDescriptionEn] = useState("Premium salon and grooming shop catering to Riyadh's selective clients.");
-  const [descriptionAr, setDescriptionAr] = useState("صالون حلاقة وعناية رجالية فاخرة تلبي تفضيلات عملاء الرياض المميزين.");
-  const [phone, setPhone] = useState("+966 11 456 7890");
+  const [businessNameEn, setBusinessNameEn] = useState("");
+  const [businessNameAr, setBusinessNameAr] = useState("");
+  const [descriptionEn, setDescriptionEn] = useState("");
+  const [descriptionAr, setDescriptionAr] = useState("");
+  const [phone, setPhone] = useState("");
 
   // Geofence Radius
   const [radius, setRadius] = useState(0);
@@ -227,19 +227,11 @@ export default function ProviderSettingsPage() {
 
       const { data: providerInfo, error: fetchError } = await supabase
         .from("providers")
-        .select("business_name_en, business_name_ar, description_en, description_ar, phone, deposit_percentage")
+        .select("business_name_en, business_name_ar, description_en, description_ar, contact_phone, deposit_percentage")
         .eq("owner_id", user.id)
         .maybeSingle();
 
       if (fetchError) throw fetchError;
-
-      const { data: profileInfo, error: profileError } = await supabase
-        .from("profiles")
-        .select("phone_number")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if (profileError) throw profileError;
 
       if (providerInfo) {
         setBusinessNameEn(providerInfo.business_name_en || "");
@@ -249,11 +241,7 @@ export default function ProviderSettingsPage() {
         if (providerInfo.deposit_percentage != null) setDepositPercentage(Number(providerInfo.deposit_percentage));
       }
 
-      if (profileInfo?.phone_number) {
-        setPhone(profileInfo.phone_number);
-      } else if (providerInfo?.phone) {
-        setPhone(providerInfo.phone);
-      }
+      setPhone(providerInfo?.contact_phone || "");
 
       // Branches carry the home-service radius; staff schedules (employee_availability) drive bookable hours.
       const { data: ownerProvider } = await supabase.from("providers").select("id").eq("owner_id", user.id).maybeSingle();
@@ -320,18 +308,12 @@ export default function ProviderSettingsPage() {
           business_name_en: businessNameEn,
           business_name_ar: businessNameAr,
           description_en: descriptionEn,
-          description_ar: descriptionAr
+          description_ar: descriptionAr,
+          contact_phone: phone.trim() || null
         })
         .eq("owner_id", user.id);
 
       if (updateError) throw updateError;
-
-      const { error: phoneError } = await supabase
-        .from("profiles")
-        .update({ phone_number: phone })
-        .eq("id", user.id);
-
-      if (phoneError) throw phoneError;
 
       setSuccess(t.savedMsg);
       setTimeout(() => setSuccess(""), 4000);

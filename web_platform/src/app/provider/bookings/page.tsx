@@ -122,7 +122,7 @@ export default function ProviderBookingsPage() {
               status,
               total_price,
               services ( name_en, name_ar ),
-              profiles ( first_name, last_name, phone ),
+              profiles ( first_name, last_name, phone_number ),
               employees ( id, name_en, name_ar )
             `)
             .in("branch_id", branchIds)
@@ -391,7 +391,7 @@ export default function ProviderBookingsPage() {
                           <span className="font-bold text-[#101828] block text-sm tracking-wide">
                             {bk.profiles?.first_name} {bk.profiles?.last_name}
                           </span>
-                          <span className="text-[11px] text-[#667085] block mt-1 tracking-wider font-mono">{bk.profiles?.phone}</span>
+                          <span className="text-[11px] text-[#667085] block mt-1 tracking-wider font-mono">{bk.profiles?.phone_number}</span>
                         </td>
 
                         {/* Service Info */}
@@ -498,7 +498,7 @@ export default function ProviderBookingsPage() {
                       <h4 className="font-bold text-[#101828] text-base tracking-wide">
                         {bk.profiles?.first_name} {bk.profiles?.last_name}
                       </h4>
-                      <p className="text-xs text-[#667085] mt-0.5 tracking-wider font-mono">{bk.profiles?.phone}</p>
+                      <p className="text-xs text-[#667085] mt-0.5 tracking-wider font-mono">{bk.profiles?.phone_number}</p>
                     </div>
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-bold border uppercase tracking-wider ${badge.bg} ${badge.text} ${badge.border}`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />

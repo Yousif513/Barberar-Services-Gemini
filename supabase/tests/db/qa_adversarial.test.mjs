@@ -55,7 +55,7 @@ describe("client-executable functions are accounted for", () => {
     const callable = (await functionsFor("anon")).map((f) => f.signature.split("(")[0]).sort();
     assert.deepEqual(callable, [
       "get_available_slots", "get_branch_available_slots", "get_branch_schedule_with_prayer_pauses",
-      "normalize_arabic", "search_marketplace_providers",
+      "normalize_arabic", "provider_rating_summaries", "search_marketplace_providers",
     ], "a new function granted to anon must be added here deliberately, with a reason");
   });
 

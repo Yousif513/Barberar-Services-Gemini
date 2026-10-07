@@ -768,18 +768,18 @@ export default function ShopDetailsPage() {
       }
       const preferredStaffId = selectedSpecialist?.id && selectedSpecialist.id !== "any" ? selectedSpecialist.id : null;
       const { data, error } = await supabase.rpc("join_waitlist", {
-        target_branch_id: shop.id,
-        target_service_id: selectedService.id,
-        target_date: selectedDate,
-        preferred_employee_id: preferredStaffId,
-        preferred_time_start: waitlistStartTime || null,
-        preferred_time_end: waitlistEndTime || null
+        p_branch_id: shop.branchId,
+        p_service_id: selectedService.id,
+        p_employee_id: preferredStaffId,
+        p_preferred_date: selectedDate,
+        p_preferred_time_start: waitlistStartTime || null,
+        p_preferred_time_end: waitlistEndTime || null
       });
       if (error) throw error;
       addToast(
         locale === "ar"
-          ? `تم انضمامك لقائمة الانتظار بنجاح! ترتيبك في القائمة: #${data?.queue_position || 1}`
-          : `Joined waitlist successfully! Your queue position: #${data?.queue_position || 1}`,
+          ? `تم انضمامك لقائمة الانتظار بنجاح! ترتيبك في القائمة: #${data?.position ?? 1}`
+          : `Joined waitlist successfully! Your queue position: #${data?.position ?? 1}`,
         "success"
       );
       setShowWaitlistModal(false);
