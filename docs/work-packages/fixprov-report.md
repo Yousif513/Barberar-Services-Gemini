@@ -126,3 +126,13 @@ Branch `wp/fixprov`, worktree `primora-wp-fixprov`. Status per defect is updated
 * `import_provider_clients` is patched in place (`20261007104000_import_clients_phone_forms.sql`): Arabic-Indic digits are translated, 00966/966/5xxxxxxxx/05xxxxxxxx become `+9665xxxxxxxx`, and a row with no
   or an invalid phone is skipped. Before, an Arabic-digit number became empty and was stored with no phone, so the (provider, phone) key could not de-duplicate it.
 * Blocking opens `CommandDialog` (danger tone, reason required, the server records it with the actor); unblocking confirms in the same dialog. The block list changes on screen only after the command succeeds.
+
+## Group 8: payroll summary (C-D13)
+
+* `provider/reports` no longer builds CSV strings by hand: the analytics export and the payroll export use the shared escaper (`src/lib/csv.mjs`) and a Blob download (`encodeURI` of a data URI broke
+  on `#`). The payroll file is built by `src/lib/payroll-summary.mjs`: names are escaped, `emp.role` (undefined) is replaced by the title, a professional without pay rules is flagged in a status column and
+  their rule-based amounts are blank (never `null`, never zero), and the label and tooltip say **"Payroll summary (not a WPS file)"**; the Mudad/WPS wording is removed from both languages. The Arabic
+  header row and statuses are Arabic.
+* A failed export is shown through `CommandResult` instead of `alert()`.
+* The rules editor on the team page (Pay rules, group 1) is linked from the reports note.
+* Tests: `web_platform/tests/payroll-summary.test.mjs` (7), guard tests "reports exports".

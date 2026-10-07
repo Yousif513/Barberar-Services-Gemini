@@ -202,3 +202,16 @@ describe("client import and blocking (R36, C-D26)", () => {
     assert.match(customers(), /p_reason: blockTarget\.blocked \? "" : reason/);
   });
 });
+
+describe("reports exports (C-D13)", () => {
+  const reports = () => byPath("reports/page.tsx").code;
+  it("builds files with the shared escaper and a Blob download, never a data URI", () => {
+    assert.ok(reports().includes("downloadCsv") && reports().includes("payrollSummaryCsv"));
+    assert.ok(!/data:text\/csv|encodeURI/.test(reports()));
+  });
+  it("no longer calls the payroll file a Mudad or WPS export, and reports failures without alert()", () => {
+    assert.ok(!/Mudad|WPS Payroll Export|حماية الأجور WPS/.test(reports()));
+    assert.match(reports(), /not a WPS file/);
+    assert.ok(reports().includes("CommandResult"));
+  });
+});
