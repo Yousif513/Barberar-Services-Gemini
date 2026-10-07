@@ -13,6 +13,12 @@ Tests: `supabase/tests/db/fixdba_*.test.mjs`.
 | D-12 agreement acceptance | fixed (DB part) | `20261007010200_...`, `20261007010300_agreement_evidence.sql` | same file |
 | D-24 agreement evidence | fixed | `20261007010300_agreement_evidence.sql` | same file ("D-24") |
 | D-15 consent / data-request evidence | fixed (DB part) | `20261007010400_consent_and_request_evidence.sql` | `fixdba_consent_evidence.test.mjs` |
+| R11 hidden reviews public | fixed | `20261007010500_reviews_visibility_and_forging.sql` | `fixdba_access_hardening.test.mjs` (R11) |
+| R28 forged provider reply | fixed | `20261007010500_reviews_visibility_and_forging.sql` | same file (R28) |
+| C-D6 promo code enumeration | fixed | `20261007010600_promo_codes_and_waitlist_access.sql` | same file (C-D6) |
+| C-D10b waitlist rewriting + `cancel_waitlist_entry` | fixed | `20261007010600_promo_codes_and_waitlist_access.sql` | same file (C-D10b) |
+| C-D3b integrations.api_key | fixed (DB + `admin/integrations/page.tsx`) | `20261007010700_integration_secrets_and_payment_view.sql` | same file (C-D3b) |
+| C-D24 accepted_payment_methods | fixed (view hardened; routing not built, see below) | `20261007010700_integration_secrets_and_payment_view.sql` | same file (C-D24) |
 
 ## D-08 / D-27 notes
 
@@ -46,3 +52,15 @@ PGlite, so the test asserts the clock-independent outcomes and, for the deferred
 
 `consents` and `data_subject_requests` lose their INSERT policies and the client roles lose INSERT (and UPDATE/DELETE on `consents`). Commands: `record_consent` (patched in place: validates `method` `^[a-z0-9_]{1,50}$` and version format, records the published `customer_terms` version for `terms_privacy`), new `record_consents(p_purposes text[], p_status, p_document_version, p_method)` (atomic, up to 5 purposes), new `submit_data_request(p_request_type, p_details)` (server status `pending`, due date = Riyadh date + 30, replay returns the open request of the same kind, audited without the free text).
 Callers that insert directly today and must move to the commands (other packages own them): `web_platform/src/app/login/page.tsx:69`, `web_platform/src/app/customer/settings/page.tsx:195`, `web_platform/src/app/shop/[id]/page.tsx:1000`, `mobile_app/src/app/profile.tsx:240` (consents -> `record_consents`), `web_platform/src/app/privacy/page.tsx:104` (data requests -> `submit_data_request`).
+
+## R11 / R28 (reviews)
+
+`"Public read reviews"` (USING true) is replaced by two policies: published reviews for `anon` and `authenticated`, and, for `authenticated` only, the review's author, administrators and the staff of the reviewed business (owner, active membership, active employee: written inline because `is_provider_staff` is not executable by signed-in users, so a policy cannot call it). INSERT is now a column privilege (`booking_id, customer_id, rating, comment`) and the policy also requires the reply, moderation and `moderated_by` fields to be empty, so a customer can no longer write `reply_comment`, a moderation status or a back-dated `created_at`. The only caller (`customer/reviews/page.tsx:143`) sends exactly those columns. `provider_rating_summaries` already filters published reviews and runs with the caller's rights, so ratings stay consistent.
+
+## C-D6 / C-D10b
+
+`promotional_codes` is readable by administrators only (the only web reader is `admin/coupons`; checkout uses the SECURITY DEFINER `validate_and_apply_coupon` and `booking_create_internal`). `waitlists`: the open UPDATE policy is dropped and UPDATE/DELETE revoked from the client roles; `cancel_waitlist_entry(p_id, p_reason)` lets the customer cancel their own entry, the owner or a delegate holding the `bookings` permission (via `can_access_provider_operation`) cancel an entry of their branch, and an administrator cancel with a reason; a stranger gets `P0002`, a claimed or expired entry `22023`, a repeat `changed=false`; audited as `waitlist.cancelled` (customer-supplied text is not logged). No web or mobile code reads or writes `waitlists` directly (grep), so no screen change is needed.
+
+## C-D3b / C-D24
+
+`integrations.api_key` is dropped after turning whatever was stored into a hint (`••••` plus the last four letters or digits, so `key_masked` carries no prefix any more). A CHECK keeps `key_masked` to bullets plus at most four characters, so a secret cannot be stored there. `admin/integrations/page.tsx` no longer selects `*` (named columns), no longer has an API-key input or sends `api_key`, validates the hint, and states in both languages that credentials are Edge Function secrets. `accepted_payment_methods` is now `security_invoker` and not readable by `anon`. Not built (product decision): routing checkout by `gateway_key` through this view; the checkout still always creates a Tap charge, so the "connected" toggles and method tick-boxes in the integrations screen still change nothing at checkout (the view is the hook for it once decided). Note that under `security_invoker` a non-administrator sees only methods that do not need a gateway row, because `integrations` is administrator-only.
