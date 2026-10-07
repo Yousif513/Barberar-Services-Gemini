@@ -28,6 +28,7 @@ const translations = {
     recurring: "Regular Appointments",
     groups: "Group Bookings",
     intake: "Intake & Patch Tests",
+    identity: "Professional Identity",
     packages: "Wellness Packages",
     memberships: "Memberships",
     share: "Share & Reach",
@@ -66,6 +67,7 @@ const translations = {
     recurring: "المواعيد المنتظمة",
     groups: "الحجوزات الجماعية",
     intake: "الاستمارات واختبار الحساسية",
+    identity: "الهوية المهنية",
     packages: "باقات العافية",
     memberships: "العضويات",
     share: "المشاركة والانتشار",
@@ -291,6 +293,7 @@ function ProviderShell({
     document.documentElement.lang = next;
   };
 
+  const identityItem = { name: t.identity, path: "/provider/identity" };
   const ownerNav = [
     { name: t.dashboard, path: "/provider/dashboard" },
     { name: t.calendar, path: "/provider/calendar" },
@@ -310,6 +313,7 @@ function ProviderShell({
     { name: t.wallet, path: "/provider/wallet" },
     { name: t.messages, path: "/provider/messages" },
     { name: t.employees, path: "/provider/employees" },
+    identityItem,
     { name: t.customers, path: "/provider/customers" },
     { name: t.reviews, path: "/provider/reviews" },
     { name: t.promotions, path: "/provider/promotions" },
@@ -317,7 +321,7 @@ function ProviderShell({
     { name: t.settings, path: "/provider/settings" },
   ];
   // A professional works from one screen; the owner's management screens stay hidden from them (and refuse them in the database).
-  const navItems = isEmployee ? [{ name: t.myDay, path: "/provider/my-day" }] : ownerNav;
+  const navItems = isEmployee ? [{ name: t.myDay, path: "/provider/my-day" }, identityItem] : ownerNav;
 
   return (
     <AuthGuard allowedRoles={["provider_owner", "provider_employee"]}>
