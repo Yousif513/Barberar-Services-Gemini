@@ -70,3 +70,39 @@ describe("provider dialogs", () => {
     assert.ok(existsSync(join(webRoot, "src", "components", "modal.tsx")));
   });
 });
+
+describe("who the portal is for (R18, R5/R6 follow-ups, D-27, R16 hours)", () => {
+  it("asks the database for the business and role instead of owner_id in the layout", () => {
+    const layout = byPath("provider/layout.tsx").code;
+    assert.ok(!layout.includes('eq("owner_id"'), "the layout no longer looks the business up by owner_id");
+    assert.ok(byPath("_components/provider-context.tsx").code.includes('rpc("my_provider_context")'));
+    assert.match(layout, /\/provider\/my-day/);
+  });
+  it("has one employee screen that acts only through the status command and reads own earnings", () => {
+    const page = byPath("my-day/page.tsx").code;
+    assert.ok(page.includes("employee_update_booking_status"));
+    assert.ok(page.includes("employee_earnings_summary"));
+    assert.ok(!/from\("bookings"\)\s*\.update/.test(page), "no direct booking status write");
+  });
+  it("reads private columns only through the owner commands", () => {
+    assert.ok(byPath("settings/page.tsx").code.includes('rpc("get_provider_private_profile"'));
+    assert.ok(!/select\([^)]*contact_phone/.test(byPath("settings/page.tsx").code));
+    const employees = byPath("employees/page.tsx").code;
+    assert.ok(employees.includes('rpc("get_provider_staff_contacts"'));
+    assert.ok(!/\.select\(`[^`]*\bphone\b/.test(employees), "employees.phone is no longer selected");
+  });
+  it("saves the booking policy through its command and never invents a default", () => {
+    const card = byPath("_components/booking-policy-card.tsx").code;
+    assert.ok(card.includes('rpc("set_provider_booking_policy"'));
+    assert.ok(!/useState\(\s*(20|24|50|100)\s*\)/.test(card));
+    assert.ok(!byPath("settings/page.tsx").code.includes("depositPercentage"));
+  });
+  it("lets the hours form express an overnight shift and asks whom it applies to", () => {
+    const apply = byPath("_components/hours-apply.tsx").code;
+    assert.match(apply, /close < day\.open|day\.close < day\.open/);
+    assert.match(apply, /custom/);
+    const settings = byPath("settings/page.tsx").code;
+    assert.ok(!settings.includes("Closing time must be after opening time"));
+    assert.ok(settings.includes("HoursApplyDialog"));
+  });
+});
