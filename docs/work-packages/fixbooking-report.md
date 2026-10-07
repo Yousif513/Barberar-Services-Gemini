@@ -19,6 +19,7 @@ run the whole DB suite.
 | D19 / C-D19 | fixed (DB part; shop/customer screens deferred) | `20261007093000_packages_linked_to_bookings.sql` | `booking_engine_packages.test.mjs` |
 | D5 / C-D5 | fixed (DB part; admin coupon screen deferred) | `20261007094000_coupon_per_customer_limit.sql` | `booking_engine_coupons.test.mjs` |
 | D12 / C-D12 | fixed | `20261007095000_loyalty_spend_equals_discount.sql` | `booking_engine_loyalty.test.mjs` |
+| D4 part b / C-D4 wallet spend | fixed (DB part; wallet/checkout screens deferred) | `20261007096000_wallet_credit_spend.sql` | `booking_engine_wallet_credit.test.mjs` |
 | R24 / C-D16 | fixed (DB part; shop page and mobile pass the list) | `20261007090000_branch_slots_any_professional.sql` | `booking_engine_branch_slots.test.mjs`, `qa_adversarial.test.mjs` (allow-list updated) |
 
 ## Callers cheat-sheet (current signatures; every new argument is optional and last, named arguments keep old callers working)
@@ -42,6 +43,7 @@ Pass these by NAME through PostgREST (`supabase.rpc(name, { ... })`). Argument n
 - New customer command: `claim_waitlist_slot(p_waitlist_id)` returns the held slot; scheduler-only: `expire_waitlist_claims()`.
 - Slot display: format with `ar-SA`/`en` and `timeZone: 'Asia/Riyadh'`; amounts in SAR only.
 - 7b: `create_booking` and `create_multi_service_booking` take **`request_user_package_id`** (uuid of the customer's `user_packages` row; last argument).
+- 7e: `create_booking` and `create_multi_service_booking` take **`request_wallet_credit_amount`** (numeric SAR, two decimals; last argument).
 - Items 7c-7f ( coupon limit, loyalty, wallet credit and referral, gift card message) add further arguments; they are listed in their sections below as they land.
 
 ## 1. D-21 / R3 prayer windows and the Riyadh clock (fixed)
@@ -224,3 +226,17 @@ Reproduced with the reviewer's numbers (1,000 points at 0.5 SAR on an 85.00 serv
 balance deduction, the `redemption` ledger row, `bookings.loyalty_points_redeemed` and the release on cancellation (exactly those points come back) all agree. A programme without a positive
 `sar_per_point` can no longer be redeemed ("Loyalty redemption is not available"). The minimum-points and balance checks still apply to the REQUESTED points.
 Screens: the checkout can show "N points will be used" from the preview (the booking returns `loyalty_points_redeemed`); no argument changed.
+
+## 7e-1. D4 (b) / C-D4 wallet credit can be spent (fixed in the database)
+
+Reproduced by construction: no function ever read `wallet_credits.is_spent`; the wallet screen promised "auto-applied as discount during checkout" but nothing applied it.
+- `create_booking(..., request_wallet_credit_amount)` / `create_multi_service_booking(..., request_wallet_credit_amount)` / `booking_create_internal(..., p_wallet_credit_amount)` (SAR, 2 decimals;
+  NULL or 0 = none; more than the usable credit = `22023` "Not enough wallet credit"; negative or fractional cents = "not valid"). Usable = the caller's own, not spent, not expired, remaining > 0.
+- The credit is a payment instrument like a gift card: it reduces what is due after VAT and the gift card, never exceeds it, and the deposit shrinks with it (fully covered = confirmed at once).
+  The amount applied is `bookings.wallet_credit_amount`; the screen should send `LEAST(balance, due)` and show the applied amount from the booking.
+- Oldest credit first under row locks. New `wallet_credits.remaining_amount` (backfilled; set on insert by a trigger) allows partial use; `is_spent` is true only at 0. Every use is a row of the new table
+  `wallet_credit_redemptions` (customer and admin read; no client writes). `booking_release_discounts` restores the amount exactly once on cancellation or hold expiry.
+- Completion: `trigger_on_booking_completed_rewards` writes a `wallet_credit_settlement` ledger entry (provider_share = the credit used, platform_share 0, payout pending), the same mechanism as the gift-card and
+  platform-funded coupon settlements, so the provider is not paid less because of platform marketing money. The new entry type is appended to the current `transactional_ledger_entry_type_check` list, whatever it holds.
+  DECISION FOR THE OWNER: confirm that the platform funds wallet credit (assumed: referral and promotion credit are platform marketing spend).
+- Screens: `web_platform/src/app/customer/wallet/page.tsx` must show `remaining_amount` (not `amount`) and drop the "auto-applied" promise or send the amount at checkout.
