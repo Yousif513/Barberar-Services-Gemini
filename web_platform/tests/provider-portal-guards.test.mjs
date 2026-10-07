@@ -29,6 +29,9 @@ describe("provider portal contains no invented records", () => {
   const rules = [
     { pattern: /demoStaffMembers|demoServiceOptions|demoProfileFor|\bdemo-(omar|yousef|karim|classic|beard|facial|spa|branch)\b/, why: "invented staff or services (R8)" },
     { pattern: /images\.unsplash\.com/, why: "stock photos presented as a person" },
+    { pattern: /api\.qrserver\.com/, why: "a third-party QR service (D-09)" },
+    { pattern: /elite-barbershop|Elite Barbershop/, why: "an invented business or share link (D-28)" },
+    { pattern: /G43 Verified|15% Saved|Commission Guarantee/, why: "ticket labels and unbacked rates on the dashboard" },
   ];
   for (const rule of rules) {
     it(`has no ${rule.why}`, () => {
@@ -145,5 +148,24 @@ describe("calendar (R4, C-D15)", () => {
     assert.ok(!/\.eq\("role", "customer"\)/.test(code), "the platform's customers are not listed");
     assert.match(code, /<CommandDialog/);
     assert.ok(!/flex-row-reverse/.test(code), "no double mirroring");
+  });
+});
+
+describe("dashboard honesty and the real QR (D-28, R27, D-09)", () => {
+  const dashboard = () => byPath("dashboard/page.tsx").code;
+  it("reads figures from one server summary, not from every booking in the browser", () => {
+    assert.ok(dashboard().includes('rpc("get_provider_dashboard_summary"'));
+    assert.ok(!dashboard().includes('from("bookings")'), "no booking rows are pulled into the page");
+  });
+  it("starts every checklist step unticked and derives each from rows", () => {
+    assert.match(dashboard(), /hasHours: false,\s*servicesCount: 0,\s*staffCount: 0,\s*hasPolicy: false,\s*linkShared: false/);
+    assert.ok(!/hasPolicy: true|hasHours: true|servicesCount: 3|staffCount: 4/.test(dashboard()));
+    assert.ok(dashboard().includes('rpc("record_share_kit_use"'));
+  });
+  it("draws the QR locally and builds links only for a real business id", () => {
+    assert.ok(dashboard().includes("qrSvgPath"));
+    assert.ok(dashboard().includes("printableQrHtml"));
+    assert.match(dashboard(), /const shareBase = providerId && origin/);
+    assert.ok(!dashboard().includes("document.write(`<html>"), "the print page is built by the escaping helper");
   });
 });

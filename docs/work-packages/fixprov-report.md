@@ -75,3 +75,23 @@ Branch `wp/fixprov`, worktree `primora-wp-fixprov`. Status per defect is updated
   Walk-in details (name, phone, private note, payment method) show in the appointment dialog.
 * Cancelling now asks for a reason in `CommandDialog` (it used to cancel on one click with a constant reason). The modals use `ProviderDialog`; double mirroring was replaced by logical utilities.
 * Tests: `tests/phone-and-slots.test.mjs` (28), guard tests "calendar (R4, C-D15)".
+
+## Group 5: dashboard honesty and a real QR code (D-28, R27, D-09)
+
+| Defect | Status | Test |
+|---|---|---|
+| D-09 QR is hand-placed rectangles; print page calls api.qrserver.com and writes the unescaped name | fixed: local SVG from `toqr`, escaped print page | `web_platform/tests/qr.test.mjs` (finder patterns, timing, dark module, a valid BCH format word with both copies equal, escaping), guard test |
+| D-28 invented defaults ("Elite Barbershop", "EB", 3 services, 4 staff, policy ticked, fallback slug) | fixed | guard tests + `supabase/tests/db/fixprov_dashboard.test.mjs` |
+| R27 walk-ins counted as non-home bookings; unbounded bookings select; hasPolicy true | fixed (`source = 'walk_in'`; one aggregate command; checklist from rows) | `fixprov_dashboard.test.mjs` (7 tests: walk-ins by source, revenue, checklist, occupancy with overnight and second shifts and leave, role refusals, share-kit idempotency and audit) |
+
+* Migration `20261007102000_provider_dashboard_summary.sql`: `get_provider_dashboard_summary(provider)` (owner, administrator or a delegate holding `reports`, wide scope) and
+  `record_share_kit_use(provider)` (owner only, first use remembered and audited once, replay answers unchanged). It adds `providers.share_kit_used_at`, and
+  `policy_confirmed_at` idempotently (FIX-DBA adds the same column; `ADD COLUMN IF NOT EXISTS`). `share_kit_used_at` is never selected by a client, so FIX-DBA's column-level
+  grants need no change.
+* Occupancy was "confirmed bookings of all time over active staff x 8". It is now today's booked minutes over today's scheduled minutes in Riyadh time (second shift included,
+  an overnight shift counted past midnight, approved leave and closures excluded) and is a dash when nobody is scheduled.
+* QR: `toqr` 0.1.1 (MIT) was already in the lockfile through Expo; I added it to `web_platform/package.json` and the matching workspace line of `package-lock.json`
+  (`npm install --package-lock-only`, no node_modules change). `src/lib/qr-svg.mjs` draws it as one SVG path with a four-module quiet zone.
+* When the figures cannot be read the KPI strip shows dashes and the error banner names the reason (the "Unavailable" demo label is gone). The "0% Commission" badge,
+  "0% Commission Guarantee", "15% Saved" and "G43 Verified" labels were removed; the explainer now states what the fee rules do (direct clients are exempt from the marketplace first-visit fee).
+* Verification limit: a QR cannot be scanned in the test run, so the tests prove the structure a scanner locks on to (finders, timing, format information). Scan it once in a browser.

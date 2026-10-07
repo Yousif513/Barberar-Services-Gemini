@@ -6,6 +6,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePrayerTimes } from "@/lib/use-prayer-times";
 import { errorMessage } from "@/lib/error-message";
+import { riyadhDateKey } from "@/lib/booking-display.mjs";
+import { printableQrHtml, qrSvgPath } from "@/lib/qr-svg.mjs";
+import { useProviderContext } from "../_components/provider-context";
 
 // Destinations the provider header search can jump to.
 const SEARCH_TARGETS: { en: string; ar: string; href: string }[] = [
@@ -112,7 +115,7 @@ type DashboardStats = {
   revenue: number;
   bookings: number;
   customers: number;
-  occupancy: number;
+  occupancy: number | null;
   activeStaff: number;
   totalStaff: number;
   avgRating: number;
@@ -125,7 +128,7 @@ const emptyDashboardStats: DashboardStats = {
   revenue: 0,
   bookings: 0,
   customers: 0,
-  occupancy: 0,
+  occupancy: null,
   activeStaff: 0,
   totalStaff: 0,
   avgRating: 0,
@@ -137,7 +140,10 @@ const emptyDashboardStats: DashboardStats = {
 export default function ProviderDashboardPage() {
   const router = useRouter();
   const [locale, setLocale] = useState<"en" | "ar">("en");
-  const [businessName, setBusinessName] = useState("Elite Barbershop");
+  const providerState = useProviderContext();
+  const ownerProviderId = providerState.status === "ready" && providerState.context.role === "owner" ? providerState.context.providerId : null;
+  const [printFailed, setPrintFailed] = useState(false);
+  const [shareFailure, setShareFailure] = useState("");
   const [coords, setCoords] = useState({ lat: 24.7136, lng: 46.6753 });
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -155,17 +161,29 @@ export default function ProviderDashboardPage() {
   const [origin, setOrigin] = useState("");
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedInstagram, setCopiedInstagram] = useState(false);
+  // Every step starts unticked and is derived from rows (get_provider_dashboard_summary); nothing is assumed.
   const [setupState, setSetupState] = useState({
-    hasHours: true,
-    servicesCount: 3,
-    staffCount: 4,
-    hasPolicy: true,
+    hasHours: false,
+    servicesCount: 0,
+    staffCount: 0,
+    hasPolicy: false,
     linkShared: false,
   });
 
   const isRTL = locale === "ar";
+  const businessName = providerState.status === "ready"
+    ? (isRTL ? providerState.context.businessNameAr || providerState.context.businessNameEn : providerState.context.businessNameEn || providerState.context.businessNameAr)
+    : "";
+  const contextProblem = providerState.status === "error"
+    ? providerState.message
+    : providerState.status === "ready" && !ownerProviderId
+      ? (isRTL ? "لا يوجد نشاط تجاري مملوك لهذا الحساب." : "No business is owned by this account.")
+      : "";
+  const effectiveMode = contextProblem ? "error" : statsMode;
+  const effectiveError = contextProblem || statsError;
+  const businessInitials = businessName.split(/\s+/).filter(Boolean).slice(0, 2).map((word) => word.charAt(0).toUpperCase()).join("") || "•";
   const t = translations[locale];
-  const flip = isRTL ? "flex-row-reverse" : "flex-row";
+  const flip = "flex-row";
 
   const searchResults = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -191,128 +209,76 @@ export default function ProviderDashboardPage() {
   }, []);
 
   useEffect(() => {
-    async function load() {
+    if (providerState.status !== "ready" || !ownerProviderId) return;
+    let live = true;
+    void (async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          setStatsMode("error");
-          setStatsError(isRTL ? "يرجى تسجيل الدخول." : "Please sign in.");
-          return;
+        setProviderId(ownerProviderId);
+        const { data: branches, error: branchError } = await supabase
+          .from("branches")
+          .select("id, latitude, longitude")
+          .eq("provider_id", ownerProviderId)
+          .order("created_at", { ascending: true });
+        if (branchError) throw branchError;
+        const branch = branches?.[0];
+        if (live && branch && branch.latitude && branch.longitude) {
+          setCoords({ lat: Number(branch.latitude), lng: Number(branch.longitude) });
         }
-        const { data: provider } = await supabase
-          .from("providers")
-          .select("id, business_name_en, business_name_ar")
-          .eq("owner_id", user.id)
-          .maybeSingle();
-        if (provider) {
-          setProviderId(provider.id);
-          setBusinessName(isRTL ? provider.business_name_ar : provider.business_name_en);
-          const { data: branches } = await supabase
-            .from("branches")
-            .select("id, latitude, longitude")
-            .eq("provider_id", provider.id)
-            .order("created_at", { ascending: true });
-          const branch = branches?.[0];
-          if (branch && branch.latitude && branch.longitude) {
-            setCoords({ lat: Number(branch.latitude), lng: Number(branch.longitude) });
-          }
-          const branchIds = (branches || []).map((item) => item.id).filter(Boolean);
-          if (branchIds.length === 0) {
-            setDashboardStats(emptyDashboardStats);
-            setSetupState({
-              hasHours: false,
-              servicesCount: 0,
-              staffCount: 0,
-              hasPolicy: true,
-              linkShared: false,
-            });
-            setStatsMode("live");
-            return;
-          }
 
-          const [bookingsResult, employeesResult, reviewsResult, servicesCountResult] = await Promise.all([
-            supabase
-              .from("bookings")
-              .select("status, total_price, customer_id, is_home_service")
-              .in("branch_id", branchIds),
-            supabase
-              .from("employees")
-              .select("id, is_active")
-              .in("branch_id", branchIds),
-            supabase
-              .from("reviews")
-              .select("rating")
-              .eq("provider_id", provider.id),
-            supabase
-              .from("services")
-              .select("id", { count: "exact", head: true })
-              .eq("provider_id", provider.id),
-          ]);
+        const { data: summary, error: summaryError } = await supabase.rpc("get_provider_dashboard_summary", { p_provider_id: ownerProviderId });
+        if (summaryError) throw summaryError;
+        if (!live) return;
+        const bookings = summary?.bookings ?? {};
+        const staff = summary?.staff ?? {};
+        const ratings = summary?.ratings ?? {};
+        const revenue = Number(bookings.revenue || 0);
+        const completed = Number(bookings.completed || 0);
+        setDashboardStats({
+          revenue,
+          bookings: Number(bookings.bookings || 0),
+          customers: Number(bookings.customers || 0),
+          occupancy: summary?.occupancy_percent === null || summary?.occupancy_percent === undefined ? null : Number(summary.occupancy_percent),
+          activeStaff: Number(staff.active || 0),
+          totalStaff: Number(staff.total || 0),
+          avgRating: Number(ratings.average || 0),
+          reviewCount: Number(ratings.count || 0),
+          walkins: Number(bookings.walk_ins || 0),
+          avgTicket: completed ? revenue / completed : 0,
+        });
+        setSetupState({
+          hasHours: Number(staff.with_hours || 0) > 0,
+          servicesCount: Number(summary?.services_count || 0),
+          staffCount: Number(staff.active || 0),
+          hasPolicy: Boolean(summary?.policy_confirmed_at),
+          linkShared: Boolean(summary?.share_kit_used_at),
+        });
+        setStatsMode("live");
 
-          if (bookingsResult.error) throw bookingsResult.error;
-          if (employeesResult.error) throw employeesResult.error;
-          if (reviewsResult.error) throw reviewsResult.error;
-
-          const bookings = bookingsResult.data || [];
-          const employees = employeesResult.data || [];
-          const reviews = reviewsResult.data || [];
-          const completedBookings = bookings.filter((booking: any) => booking.status === "completed");
-          const revenue = completedBookings.reduce((sum: number, booking: any) => sum + Number(booking.total_price || 0), 0);
-          const activeWorkload = bookings.filter((booking: any) => booking.status === "confirmed" || booking.status === "pending_payment").length;
-          const totalStaff = employees.length;
-          const activeStaff = employees.filter((employee: any) => employee.is_active).length;
-          const reviewCount = reviews.length;
-          const avgRating = reviewCount ? reviews.reduce((sum: number, review: any) => sum + Number(review.rating || 0), 0) / reviewCount : 0;
-          const uniqueCustomers = new Set(bookings.map((booking: any) => booking.customer_id).filter(Boolean)).size;
-          const capacityBase = Math.max(activeStaff * 8, 1);
-
-          setDashboardStats({
-            revenue,
-            bookings: bookings.length,
-            customers: uniqueCustomers,
-            occupancy: Math.min(100, (activeWorkload / capacityBase) * 100),
-            activeStaff,
-            totalStaff,
-            avgRating,
-            reviewCount,
-            walkins: bookings.filter((booking: any) => !booking.is_home_service).length,
-            avgTicket: completedBookings.length ? revenue / completedBookings.length : 0,
+        const { data: valData, error: valueError } = await supabase.rpc("get_provider_monthly_value_summary", {
+          p_provider_id: ownerProviderId,
+          p_month_date: riyadhDateKey(new Date()),
+        });
+        if (!live) return;
+        if (valueError) {
+          setValueSummary(null);
+        } else if (valData && typeof valData === "object") {
+          setValueSummary({
+            new_clients_acquired: Number(valData.new_clients_acquired || 0),
+            marketplace_bookings: Number(valData.marketplace_bookings || 0),
+            direct_link_bookings: Number(valData.direct_link_bookings || 0),
+            total_gmv_sar: Number(valData.total_gmv_sar || 0),
+            commission_saved_sar: Number(valData.commission_saved_sar || 0),
           });
-          setSetupState({
-            hasHours: branchIds.length > 0,
-            servicesCount: servicesCountResult?.count || 0,
-            staffCount: totalStaff,
-            hasPolicy: true,
-            linkShared: false,
-          });
-          setStatsMode("live");
-
-          try {
-            const { data: valData } = await supabase.rpc("get_provider_monthly_value_summary", {
-              p_provider_id: provider.id,
-              p_month_date: new Date().toISOString().split("T")[0],
-            });
-            if (valData && typeof valData === "object") {
-              setValueSummary({
-                new_clients_acquired: Number(valData.new_clients_acquired || 0),
-                marketplace_bookings: Number(valData.marketplace_bookings || 0),
-                direct_link_bookings: Number(valData.direct_link_bookings || 0),
-                total_gmv_sar: Number(valData.total_gmv_sar || 0),
-                commission_saved_sar: Number(valData.commission_saved_sar || 0),
-              });
-            }
-          } catch (valErr) {
-            console.warn("Could not load provider value summary:", valErr);
-          }
         }
       } catch (err) {
+        if (!live) return;
         setDashboardStats(emptyDashboardStats);
         setStatsError(errorMessage(err));
         setStatsMode("error");
       }
-    }
-    load();
-  }, [isRTL]);
+    })();
+    return () => { live = false; };
+  }, [providerState.status, ownerProviderId]);
 
   const {
     nextPrayer,
@@ -363,42 +329,88 @@ export default function ProviderDashboardPage() {
   const money = (value: number) => `${compactNumber(value)} SAR`;
   const percent = (value: number) => `${value.toLocaleString(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 1 })}%`;
 
+  const live = effectiveMode === "live";
+  const dash = "—";
+  const liveTag = live ? t.live : "";
   const kpis = [
-    { label: t.revenue, value: money(dashboardStats.revenue), change: statsMode === "live" ? t.live : t.demoData, tone: statsMode === "live" ? "text-[#22C55E]" : "text-[#D1AF47]" },
-    { label: t.bookings, value: compactNumber(dashboardStats.bookings), change: statsMode === "live" ? t.live : t.demoData, tone: "text-[#22C55E]" },
-    { label: t.customers, value: compactNumber(dashboardStats.customers), change: statsMode === "live" ? t.live : t.demoData, tone: "text-[#22C55E]" },
-    { label: t.occupancy, value: percent(dashboardStats.occupancy), change: dashboardStats.occupancy > 85 ? t.highLoad : (locale === "ar" ? "مستقر" : "Stable"), tone: dashboardStats.occupancy > 85 ? "text-[#EF4444]" : "text-[#D1AF47]" },
-    { label: t.staffOnline, value: `${dashboardStats.activeStaff} / ${dashboardStats.totalStaff}`, change: t.live, tone: "text-[#22C55E]" },
-    { label: t.reviews, value: `${dashboardStats.avgRating.toFixed(1)} ★`, change: compactNumber(dashboardStats.reviewCount), tone: "text-[#22C55E]" },
-    { label: t.walkins, value: compactNumber(dashboardStats.walkins), change: statsMode === "live" ? t.live : t.demoData, tone: "text-[#22C55E]" },
-    { label: t.avgTicket, value: money(dashboardStats.avgTicket), change: locale === "ar" ? "مستقر" : "Stable", tone: "text-[#D1AF47]" },
+    { label: t.revenue, value: live ? money(dashboardStats.revenue) : dash, change: liveTag, tone: "text-[#22C55E]" },
+    { label: t.bookings, value: live ? compactNumber(dashboardStats.bookings) : dash, change: liveTag, tone: "text-[#22C55E]" },
+    { label: t.customers, value: live ? compactNumber(dashboardStats.customers) : dash, change: liveTag, tone: "text-[#22C55E]" },
+    { label: t.occupancy, value: live && dashboardStats.occupancy !== null ? percent(dashboardStats.occupancy) : dash, change: live && (dashboardStats.occupancy ?? 0) > 85 ? t.highLoad : "", tone: "text-[#EF4444]" },
+    { label: t.staffOnline, value: live ? `${dashboardStats.activeStaff} / ${dashboardStats.totalStaff}` : dash, change: liveTag, tone: "text-[#22C55E]" },
+    { label: t.reviews, value: live && dashboardStats.reviewCount > 0 ? `${dashboardStats.avgRating.toFixed(1)} ★` : dash, change: live ? compactNumber(dashboardStats.reviewCount) : "", tone: "text-[#22C55E]" },
+    { label: t.walkins, value: live ? compactNumber(dashboardStats.walkins) : dash, change: liveTag, tone: "text-[#22C55E]" },
+    { label: t.avgTicket, value: live ? money(dashboardStats.avgTicket) : dash, change: "", tone: "text-[#D1AF47]" },
   ];
 
-  const bookingUrl = `${origin || "https://primora.sa"}/shop/${providerId || "elite-barbershop"}?source=link`;
-  const qrUrl = `${origin || "https://primora.sa"}/shop/${providerId || "elite-barbershop"}?source=qr`;
-  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
-    isRTL
-      ? `احجز موعدك مباشرة لدى ${businessName} عبر الرابط المعتمد: ${origin || "https://primora.sa"}/shop/${providerId || "elite-barbershop"}?source=whatsapp`
-      : `Book your direct appointment with ${businessName}: ${origin || "https://primora.sa"}/shop/${providerId || "elite-barbershop"}?source=whatsapp`
-  )}`;
+  // Links are built only once the business id is known and never point at a made-up shop.
+  const shareBase = providerId && origin ? `${origin}/shop/${providerId}` : null;
+  const bookingUrl = shareBase ? `${shareBase}?source=link` : "";
+  const qrUrl = shareBase ? `${shareBase}?source=qr` : "";
+  const whatsappUrl = shareBase
+    ? `https://wa.me/?text=${encodeURIComponent(
+        isRTL
+          ? `احجز موعدك مباشرة لدى ${businessName} عبر الرابط المعتمد: ${shareBase}?source=whatsapp`
+          : `Book your direct appointment with ${businessName}: ${shareBase}?source=whatsapp`
+      )}`
+    : "";
+  const qrDrawing = useMemo(() => (qrUrl ? qrSvgPath(qrUrl) : null), [qrUrl]);
 
-  const handleCopyLink = () => {
-    if (typeof navigator !== "undefined" && navigator.clipboard) {
-      navigator.clipboard.writeText(bookingUrl);
-    }
-    setCopiedLink(true);
+  // The first time the owner copies, shares or prints the link it is remembered on the server, so the checklist step
+  // stays ticked on every device. A failure is shown instead of ticking the step.
+  const rememberShare = async () => {
+    if (!providerId || setupState.linkShared) return;
+    const { error: shareError } = await supabase.rpc("record_share_kit_use", { p_provider_id: providerId });
+    if (shareError) { setShareFailure(errorMessage(shareError)); return; }
+    setShareFailure("");
     setSetupState((prev) => ({ ...prev, linkShared: true }));
-    setTimeout(() => setCopiedLink(false), 2500);
   };
 
-  const handleCopyInstagram = () => {
-    const bioText = `🔗 Book online: ${origin || "https://primora.sa"}/shop/${providerId || "elite-barbershop"}?source=instagram`;
-    if (typeof navigator !== "undefined" && navigator.clipboard) {
-      navigator.clipboard.writeText(bioText);
+  const copyText = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      return false;
     }
-    setCopiedInstagram(true);
-    setSetupState((prev) => ({ ...prev, linkShared: true }));
-    setTimeout(() => setCopiedInstagram(false), 2500);
+  };
+
+  const handleCopyLink = async () => {
+    if (!bookingUrl) return;
+    const copied = await copyText(bookingUrl);
+    setCopiedLink(copied);
+    setShareFailure(copied ? "" : (isRTL ? "تعذر النسخ تلقائياً. حدد الرابط وانسخه يدوياً." : "Could not copy automatically. Select the link and copy it by hand."));
+    if (copied) {
+      void rememberShare();
+      setTimeout(() => setCopiedLink(false), 2500);
+    }
+  };
+
+  const handleCopyInstagram = async () => {
+    if (!shareBase) return;
+    const copied = await copyText(`🔗 ${isRTL ? "احجز عبر الإنترنت" : "Book online"}: ${shareBase}?source=instagram`);
+    setCopiedInstagram(copied);
+    setShareFailure(copied ? "" : (isRTL ? "تعذر النسخ تلقائياً." : "Could not copy automatically."));
+    if (copied) {
+      void rememberShare();
+      setTimeout(() => setCopiedInstagram(false), 2500);
+    }
+  };
+
+  const printQr = () => {
+    if (!qrUrl) return;
+    const w = window.open("", "_blank");
+    if (!w) { setPrintFailed(true); return; }
+    setPrintFailed(false);
+    w.document.write(printableQrHtml({
+      title: businessName,
+      caption: isRTL ? "امسح الرمز للحجز عبر الإنترنت" : "Scan to book online",
+      url: qrUrl,
+      printLabel: isRTL ? "طباعة" : "Print",
+      lang: isRTL ? "ar" : "en",
+    }));
+    w.document.close();
+    void rememberShare();
   };
 
   const setupSteps = [
@@ -407,7 +419,7 @@ export default function ProviderDashboardPage() {
       title: t.stepHours,
       desc: t.stepHoursDesc,
       completed: setupState.hasHours,
-      href: "/provider/calendar",
+      href: "/provider/settings",
     },
     {
       id: "services",
@@ -421,7 +433,7 @@ export default function ProviderDashboardPage() {
       title: t.stepStaff,
       desc: t.stepStaffDesc,
       completed: setupState.staffCount > 0,
-      href: "/provider/team",
+      href: "/provider/employees",
     },
     {
       id: "policy",
@@ -441,11 +453,11 @@ export default function ProviderDashboardPage() {
   const completedStepsCount = setupSteps.filter((s) => s.completed).length;
 
   return (
-    <div dir={isRTL ? "rtl" : "ltr"} className={`relative flex min-h-full flex-col gap-4 p-1 pb-10 text-[#101828] font-sans ${isRTL ? "text-right" : "text-left"}`}>
+    <div dir={isRTL ? "rtl" : "ltr"} className={`relative flex min-h-full flex-col gap-4 p-1 pb-10 text-[#101828] font-sans text-start`}>
       {/* HEADER */}
       <header className="flex flex-shrink-0 flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className={`flex items-center gap-3 ${flip}`}>
-          <div className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-2xl bg-gradient-to-tr from-[#D1AF47] to-[#E0C46A] text-xs font-black text-[#101828] shadow-[0_0_20px_rgba(209,175,71,0.18)]">EB</div>
+          <div className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-2xl bg-gradient-to-tr from-[#D1AF47] to-[#E0C46A] text-xs font-black text-[#101828] shadow-[0_0_20px_rgba(209,175,71,0.18)]">{businessInitials}</div>
           <div>
             <h1 className="font-serif text-lg font-black leading-tight lg:text-xl">{businessName}</h1>
             <div className={`flex items-center gap-1.5 ${flip}`}>
@@ -469,7 +481,7 @@ export default function ProviderDashboardPage() {
               />
             </label>
             {searchOpen && searchResults.length > 0 && (
-              <div className={`absolute top-full z-50 mt-2 w-full overflow-hidden rounded-2xl border border-[#ECECEC] bg-white shadow-[0_12px_40px_rgba(0,0,0,0.02)] ${isRTL ? "text-right" : "text-left"}`}>
+              <div className={`absolute top-full z-50 mt-2 w-full overflow-hidden rounded-2xl border border-[#ECECEC] bg-white shadow-[0_12px_40px_rgba(0,0,0,0.02)] text-start`}>
                 {searchResults.map((item) => (
                   <button
                     key={item.href}
@@ -535,7 +547,7 @@ export default function ProviderDashboardPage() {
                 </div>
                 <p className="mt-1.5 text-[11px] text-[#667085] line-clamp-2">{step.desc}</p>
               </div>
-              <span className={`mt-2 text-[10px] font-bold text-[#D1AF47] group-hover:underline ${isRTL ? "text-left" : "text-right"}`}>
+              <span className={`mt-2 text-[10px] font-bold text-[#D1AF47] group-hover:underline text-end`}>
                 {step.completed ? (isRTL ? "تعديل ←" : "Edit →") : (isRTL ? "إعداد ←" : "Configure →")}
               </span>
             </Link>
@@ -544,12 +556,12 @@ export default function ProviderDashboardPage() {
       </section>
 
       {/* PUBLIC BOOKING URL & SHARE KIT (P0-C G03) */}
+      {shareBase && (
       <section id="share-kit" className={`${cardBase} p-5 border-[#ECECEC] bg-white`}>
         <div className={`flex flex-col gap-2 md:flex-row md:items-start md:justify-between ${flip}`}>
           <div>
             <div className={`flex items-center gap-2 ${flip}`}>
-              <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-black uppercase text-emerald-700">0% Commission</span>
-              <h2 className="font-serif text-base font-black text-[#101828]">{t.shareKitTitle}</h2>
+                            <h2 className="font-serif text-base font-black text-[#101828]">{t.shareKitTitle}</h2>
             </div>
             <p className="mt-1 text-xs text-[#667085]">{t.shareKitDesc}</p>
           </div>
@@ -571,7 +583,7 @@ export default function ProviderDashboardPage() {
                 />
                 <button
                   type="button"
-                  onClick={handleCopyLink}
+                  onClick={() => void handleCopyLink()}
                   className="rounded-lg bg-[#101828] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#22C55E]"
                 >
                   {copiedLink ? t.copied : t.copyLink}
@@ -597,7 +609,7 @@ export default function ProviderDashboardPage() {
 
                 <button
                   type="button"
-                  onClick={handleCopyInstagram}
+                  onClick={() => void handleCopyInstagram()}
                   className="inline-flex items-center gap-2 rounded-xl bg-pink-50 border border-pink-200 px-3.5 py-2 text-xs font-bold text-pink-700 transition hover:bg-pink-100"
                 >
                   <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
@@ -608,61 +620,39 @@ export default function ProviderDashboardPage() {
 
             {/* Explainer callout */}
             <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-3 text-xs text-amber-900">
-              <strong className="font-bold">{isRTL ? "ميزة العمولة 0%:" : "0% Commission Guarantee:"}</strong>{" "}
+              <strong className="font-bold">{isRTL ? "العملاء المباشرون:" : "Direct clients:"}</strong>{" "}
               {isRTL
-                ? "جميع العملاء الذين يحجزون عبر رابطك أو رمز QR الخاص بك يُسجلون تحت قنواتك المباشرة، وتُعفى حجوزاتهم بالكامل من عمولة المنصة."
-                : "Clients booking via your personal link or QR code are tagged as private direct clients, exempting all their bookings from platform marketplace commissions."}
+                ? "يُسجَّل العملاء الذين يحجزون عبر رابطك أو رمز QR الخاص بك كعملائك المباشرين، ولا تُطبَّق عليهم رسوم أول زيارة عبر السوق."
+                : "Clients who book through your link or QR code are recorded as your direct clients; the marketplace first-visit fee does not apply to them."}
+              {shareFailure && <span role="alert" className="mt-1 block font-semibold text-[#B42318]">{shareFailure}</span>}
             </div>
           </div>
 
           {/* QR Code Card */}
           <div className="flex flex-col items-center justify-center rounded-2xl border border-[#ECECEC] bg-[#FDFCF8] p-4 text-center lg:col-span-4">
             <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#667085] mb-2">{t.qrTitle}</h3>
-            {/* SVG QR Code Pattern */}
             <div className="rounded-xl bg-white p-3 shadow-sm border border-[#ECECEC]">
-              <svg className="h-32 w-32 text-[#101828]" viewBox="0 0 100 100" fill="currentColor">
-                {/* QR corners */}
-                <rect x="10" y="10" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="4" rx="2" />
-                <rect x="16" y="16" width="12" height="12" fill="currentColor" rx="1" />
-                <rect x="66" y="10" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="4" rx="2" />
-                <rect x="72" y="16" width="12" height="12" fill="currentColor" rx="1" />
-                <rect x="10" y="66" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="4" rx="2" />
-                <rect x="16" y="72" width="12" height="12" fill="currentColor" rx="1" />
-                {/* QR sample data blocks */}
-                <rect x="42" y="14" width="6" height="6" fill="#D1AF47" />
-                <rect x="52" y="14" width="6" height="6" fill="currentColor" />
-                <rect x="42" y="24" width="6" height="6" fill="currentColor" />
-                <rect x="52" y="34" width="6" height="6" fill="#D1AF47" />
-                <rect x="14" y="44" width="6" height="6" fill="currentColor" />
-                <rect x="24" y="44" width="6" height="6" fill="currentColor" />
-                <rect x="34" y="44" width="6" height="6" fill="#D1AF47" />
-                <rect x="44" y="44" width="12" height="12" fill="currentColor" rx="2" />
-                <rect x="64" y="44" width="6" height="6" fill="currentColor" />
-                <rect x="74" y="44" width="6" height="6" fill="currentColor" />
-                <rect x="42" y="64" width="6" height="6" fill="#D1AF47" />
-                <rect x="52" y="74" width="6" height="6" fill="currentColor" />
-                <rect x="64" y="64" width="6" height="6" fill="currentColor" />
-                <rect x="74" y="74" width="6" height="6" fill="#D1AF47" />
-                <rect x="84" y="64" width="6" height="6" fill="currentColor" />
-                <rect x="64" y="84" width="16" height="6" fill="currentColor" />
-              </svg>
+              {qrDrawing && (
+                <svg className="h-32 w-32" viewBox={`0 0 ${qrDrawing.size} ${qrDrawing.size}`} role="img" aria-label={t.qrTitle} shapeRendering="crispEdges">
+                  <rect width={qrDrawing.size} height={qrDrawing.size} fill="#ffffff" />
+                  <path d={qrDrawing.d} fill="#101828" />
+                </svg>
+              )}
             </div>
             <p className="mt-2 text-[10px] font-mono text-gray-400 break-all">{qrUrl}</p>
             <button
               type="button"
-              onClick={() => {
-                const w = window.open("", "_blank");
-                if (w) {
-                  w.document.write(`<html><body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;"><h2>${businessName}</h2><p>Scan to Book Online</p><img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrUrl)}" width="300" height="300" /><br/><button onclick="window.print()">Print QR</button></body></html>`);
-                }
-              }}
+              onClick={printQr}
               className="mt-2 text-[11px] font-bold text-[#D1AF47] hover:underline"
             >
               {isRTL ? "طباعة رمز QR للعرض في الصالون" : "Print Salon QR Display"}
             </button>
+            {printFailed && <p role="alert" className="mt-1 text-[11px] font-semibold text-[#B42318]">{isRTL ? "منع المتصفح فتح نافذة الطباعة. اسمح بالنوافذ المنبثقة لهذا الموقع." : "The browser blocked the print window. Allow pop-ups for this site."}</p>}
           </div>
         </div>
       </section>
+
+      )}
 
       {/* PRIMORA BROUGHT YOU THIS MONTH (P1-E G43) */}
       <section className={`${cardBase} p-5 border-[#D1AF47]/30 bg-gradient-to-br from-amber-500/[0.03] via-white to-transparent`}>
@@ -671,7 +661,7 @@ export default function ProviderDashboardPage() {
             <div className={`flex items-center gap-2 ${flip}`}>
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#D1AF47]/20 text-[#8A6F1C] text-xs font-black">⚡</span>
               <h2 className="font-serif text-base font-black text-[#101828]">{t.valueSummaryTitle}</h2>
-              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-700">G43 Verified</span>
+              
             </div>
             <p className="mt-1 text-xs text-[#667085]">{t.valueSummarySubtitle}</p>
           </div>
@@ -681,7 +671,7 @@ export default function ProviderDashboardPage() {
           <div className="rounded-xl border border-[#ECECEC] bg-white p-4 shadow-sm hover:border-[#D1AF47]/40 transition-colors">
             <span className="text-[10px] uppercase font-bold text-[#667085] tracking-wider block">{t.newClientsAcquired}</span>
             <div className="mt-2 flex items-baseline justify-between">
-              <span className="text-2xl font-black text-[#101828]">{valueSummary?.new_clients_acquired ?? 0}</span>
+              <span className="text-2xl font-black text-[#101828]">{valueSummary ? valueSummary.new_clients_acquired : "—"}</span>
               <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">{isRTL ? "عملاء لأول مرة" : "First-time"}</span>
             </div>
           </div>
@@ -689,15 +679,15 @@ export default function ProviderDashboardPage() {
           <div className="rounded-xl border border-[#ECECEC] bg-white p-4 shadow-sm hover:border-[#D1AF47]/40 transition-colors">
             <span className="text-[10px] uppercase font-bold text-[#667085] tracking-wider block">{t.directLinkBookings}</span>
             <div className="mt-2 flex items-baseline justify-between">
-              <span className="text-2xl font-black text-[#101828]">{valueSummary?.direct_link_bookings ?? 0}</span>
-              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">0% Fee</span>
+              <span className="text-2xl font-black text-[#101828]">{valueSummary ? valueSummary.direct_link_bookings : "—"}</span>
+              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">{isRTL ? "مباشر" : "Direct"}</span>
             </div>
           </div>
 
           <div className="rounded-xl border border-[#ECECEC] bg-white p-4 shadow-sm hover:border-[#D1AF47]/40 transition-colors">
             <span className="text-[10px] uppercase font-bold text-[#667085] tracking-wider block">{t.totalGmv}</span>
             <div className="mt-2 flex items-baseline justify-between">
-              <span className="text-2xl font-black text-[#101828]">{(valueSummary?.total_gmv_sar ?? 0).toLocaleString()} <span className="text-xs font-semibold text-gray-500">{t.currency}</span></span>
+              <span className="text-2xl font-black text-[#101828]">{valueSummary ? valueSummary.total_gmv_sar.toLocaleString() : "—"} <span className="text-xs font-semibold text-gray-500">{t.currency}</span></span>
               <span className="text-[10px] font-bold text-[#8A6F1C] bg-amber-50 px-2 py-0.5 rounded-full">{isRTL ? "إجمالي الحجوزات" : "Gross Bookings"}</span>
             </div>
           </div>
@@ -705,16 +695,16 @@ export default function ProviderDashboardPage() {
           <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-4 shadow-sm">
             <span className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider block">{t.commissionSaved}</span>
             <div className="mt-2 flex items-baseline justify-between">
-              <span className="text-2xl font-black text-emerald-700">{(valueSummary?.commission_saved_sar ?? 0).toLocaleString()} <span className="text-xs font-semibold text-emerald-600">{t.currency}</span></span>
-              <span className="text-[10px] font-bold text-emerald-700 bg-white border border-emerald-200 px-2 py-0.5 rounded-full">15% Saved</span>
+              <span className="text-2xl font-black text-emerald-700">{valueSummary ? valueSummary.commission_saved_sar.toLocaleString() : "—"} <span className="text-xs font-semibold text-emerald-600">{t.currency}</span></span>
+              
             </div>
           </div>
         </div>
       </section>
 
-      {statsMode === "error" && (
+      {effectiveMode === "error" && (
         <div className="rounded-[20px] border border-[#FF5D73]/20 bg-[#FF5D73]/10 p-4 text-xs text-[#EF4444]">
-          {isRTL ? "تعذر تحميل مؤشرات الأداء: " : "Could not load your performance figures: "}{statsError}
+          {isRTL ? "تعذر تحميل مؤشرات الأداء: " : "Could not load your performance figures: "}{effectiveError}
         </div>
       )}
 
