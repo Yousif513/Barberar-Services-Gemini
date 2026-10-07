@@ -193,3 +193,33 @@ describe("the booking page is operable by keyboard and screen reader", () => {
     assert.ok(!/\} SAR\b/.test(code), "amounts go through sar()");
   });
 });
+
+describe("the services catalogue is searched, filtered and paged on the server", () => {
+  const code = files.find((f) => f.path === "web_platform/src/app/services/page.tsx").code;
+
+  it("asks the marketplace search for shops and never downloads reviews", () => {
+    assert.ok(code.includes('rpc("search_marketplace_providers"'), "shops come from search_marketplace_providers");
+    assert.ok(code.includes("p_limit: PAGE_SIZE") && code.includes("p_offset: offset"), "shops are paged");
+    assert.ok(!code.includes('from("reviews")'), "ratings come from the search and provider_rating_summaries, not from every review");
+    assert.ok(code.includes('rpc("provider_rating_summaries"'), "service ratings come from the summary function");
+  });
+
+  it("pages and filters the services query instead of downloading the catalogue", () => {
+    assert.ok(code.includes(".range(offset, offset + PAGE_SIZE - 1)"), "services are fetched one page at a time");
+    assert.ok(/\{ count: "exact" \}/.test(code), "the total is counted by the server");
+    assert.ok(code.includes("categories.slug") && code.includes("is_home_service_eligible") && code.includes("base_price"), "category, home service and price filter in the query");
+  });
+
+  it("invents no men's and women's versions of a provider's service", () => {
+    assert.ok(!/for Men|للرجال|للسيدات|genderedService|inferServiceGender|expandGenderedServices/.test(code), "a service is shown as its provider wrote it");
+  });
+
+  it("opens the service detail as a named modal dialog", () => {
+    assert.ok(code.includes('role="dialog"') && code.includes("<ModalOverlay") && code.includes("aria-modal"), "the drawer is a dialog");
+    assert.ok(!code.includes("fixed inset-0 z-50"), "no hand-made overlay");
+  });
+
+  it("shows a failed query as an error with a retry, not as an empty list", () => {
+    assert.ok(code.includes("shopsFailed") && code.includes("servicesFailed") && code.includes("setRetry"), "errors name the reason and offer a retry");
+  });
+});

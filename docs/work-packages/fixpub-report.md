@@ -22,6 +22,7 @@ integrator does them after all merges.
 | D-22 / R34 landing, about, security, terms, discover, shop footer, category pages, layout metadata: unbacked claims (EN + AR) | fixed | group 5 | `web_platform/tests/no-mock-data.test.mjs` "public pages promise only what the platform does" (11 term rules) |
 | R29 stale source-text tests (`verify_provider_cr`, `enqueue_post_visit_rebook` / `post_visit_review_rebook`) | the two named cases deleted, the rest kept | group 5 | `npm run test --workspace=web_platform` |
 | R29 executing tests for slots, closures, leave, seasons | deferred: DB tests belong to the database packages (no migrations or DB test files in this package) | - | - |
+| R35 `/services` filters on the server, pages, no `reviews` select | fixed | group 6 | guard tests in `no-mock-data.test.mjs` ("services catalogue is searched, filtered and paged on the server"), UI-vs-schema check |
 
 (The table is appended after every commit group.)
 
@@ -121,6 +122,24 @@ choices, named close buttons, and no `toLocaleTimeString("en-US")` or `} SAR` am
 Left on purpose, owner decision needed: section 3 of the terms and security pages still states the marketplace fee (20% on a new client's first visit, SAR 10
 minimum, SAR 40 maximum, none on repeat visits). It matches `fee_rules` today, but `fee_rules` is only readable by signed-in users and is seeded
 "subject to commercial confirmation"; the text belongs in the published agreement, not in page copy. The page is unchanged until the owner confirms.
+
+## Group 6: `/services` (R35)
+
+- Shops come from `rpc("search_marketplace_providers", { p_query, p_category, p_limit: 24, p_offset })` (normalised Arabic search, category, real
+  rating and review count in the same answer). Services come from a paged query (`.range`, `count: "exact"`) filtered by category, home service and price
+  band on the server, with ordering by featured/sort order or price; the service search is an `ilike` on name and description in both languages. Both lists
+  have "show more" with "showing N of TOTAL", a loading state, an empty state and an error state that names the reason and offers a retry. The search box is
+  debounced (300 ms). Service ratings come from `provider_rating_summaries(uuid[])` for the providers on the current page; the `reviews` table is no longer
+  read at all, so ratings no longer degrade past 1,000 rows.
+- Deleted invented content in the same file (it could not be paged honestly): `inferServiceGender`, the "for Men" / "for Women" duplicates of each
+  provider's service with generated descriptions and stock photos, the per-gender image tables, the gender filter and chips, the "Rating" sort (it cannot be
+  ordered on the server), the per-shop stock photo chosen by guessed gender (shops show an initial tile instead) and the "home service" chip on shops (the
+  search function does not return it).
+- Behaviour changes to know about: the price and home-service filters apply to services only (the shops list says so when they are active); searching a
+  provider's name finds the shop in the Shops list, and the service list matches service text only; Arabic search in the service list is plain `ilike` (the shop
+  list normalises Arabic spelling on the server).
+- The service detail drawer is a named modal dialog (`ModalPortal` + `ModalOverlay`): focus moves in and stays, Escape closes, the page behind is inert; all
+  prices go through `sar()`; filter and category buttons expose `aria-pressed`.
 
 ## Needs from other packages
 
