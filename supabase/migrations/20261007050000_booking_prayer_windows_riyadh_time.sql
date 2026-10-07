@@ -21,16 +21,22 @@ DROP FUNCTION IF EXISTS pg_temp.evolve_function(regprocedure, text, text[], text
 CREATE FUNCTION pg_temp.evolve_function(p_old regprocedure, p_new_signature text, p_from text[], p_to text[])
 RETURNS void LANGUAGE plpgsql AS $helper$
 DECLARE
-  v_def text := replace(pg_get_functiondef(p_old), E'\r\n', E'\n');
+  v_def text := replace(pg_get_functiondef(p_old), $e$
+$e$, $e$
+$e$);
   v_new regprocedure;
   v_grantee text;
   i int;
 BEGIN
   FOR i IN 1 .. COALESCE(array_length(p_from, 1), 0) LOOP
-    IF position(replace(p_from[i], E'\r\n', E'\n') IN v_def) = 0 THEN
+    IF position(replace(p_from[i], $e$
+$e$, $e$
+$e$) IN v_def) = 0 THEN
       RAISE EXCEPTION 'evolve_function: pattern % not found in %', i, p_old;
     END IF;
-    v_def := replace(v_def, replace(p_from[i], E'\r\n', E'\n'), p_to[i]);
+    v_def := replace(v_def, replace(p_from[i], $e$
+$e$, $e$
+$e$), p_to[i]);
   END LOOP;
   EXECUTE v_def;                               -- a new overload when the argument list changed, an in-place patch otherwise
   v_new := to_regprocedure(p_new_signature);
@@ -90,7 +96,9 @@ GRANT EXECUTE ON FUNCTION public.assert_prayer_windows(timestamptz[], timestampt
 DO $$
 DECLARE
   v_sig regprocedure := 'public.get_available_slots(uuid, date, integer, timestamptz[], timestamptz[])'::regprocedure;
-  v_def text := replace(pg_get_functiondef(v_sig), E'\r\n', E'\n');
+  v_def text := replace(pg_get_functiondef(v_sig), $e$
+$e$, $e$
+$e$);
   v_new text;
   v_copies int;
 BEGIN
@@ -112,16 +120,22 @@ SELECT pg_temp.evolve_function(
   'public.booking_create_internal(uuid, uuid, uuid, uuid[], timestamptz, boolean, numeric, numeric, text, uuid, text, text, text, integer)'::regprocedure,
   'public.booking_create_internal(uuid, uuid, uuid, uuid[], timestamptz, boolean, numeric, numeric, text, uuid, text, text, text, integer, timestamptz[], timestamptz[])',
   ARRAY[
-    E'p_loyalty_points integer)\n RETURNS bookings',
-    E'           WHERE es.employee_id = e.id AND es.service_id = ANY(p_service_ids))\n        ) sl',
-    E'SELECT 1 FROM public.get_available_slots(v_employee_id, v_date, v_duration) sl',
-    E'  IF p_service_ids IS NULL OR array_length(p_service_ids, 1) IS NULL THEN'
+    $e$p_loyalty_points integer)
+ RETURNS bookings$e$,
+    $e$           WHERE es.employee_id = e.id AND es.service_id = ANY(p_service_ids))
+        ) sl$e$,
+    $e$SELECT 1 FROM public.get_available_slots(v_employee_id, v_date, v_duration) sl$e$,
+    $e$  IF p_service_ids IS NULL OR array_length(p_service_ids, 1) IS NULL THEN$e$
   ],
   ARRAY[
-    E'p_loyalty_points integer, p_prayer_window_starts timestamp with time zone[] DEFAULT NULL::timestamp with time zone[], p_prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[])\n RETURNS bookings',
-    E'           WHERE es.employee_id = e.id AND es.service_id = ANY(p_service_ids)),\n          p_prayer_window_starts, p_prayer_window_ends\n        ) sl',
-    E'SELECT 1 FROM public.get_available_slots(v_employee_id, v_date, v_duration, p_prayer_window_starts, p_prayer_window_ends) sl',
-    E'  PERFORM public.assert_prayer_windows(p_prayer_window_starts, p_prayer_window_ends);\n  IF p_service_ids IS NULL OR array_length(p_service_ids, 1) IS NULL THEN'
+    $e$p_loyalty_points integer, p_prayer_window_starts timestamp with time zone[] DEFAULT NULL::timestamp with time zone[], p_prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[])
+ RETURNS bookings$e$,
+    $e$           WHERE es.employee_id = e.id AND es.service_id = ANY(p_service_ids)),
+          p_prayer_window_starts, p_prayer_window_ends
+        ) sl$e$,
+    $e$SELECT 1 FROM public.get_available_slots(v_employee_id, v_date, v_duration, p_prayer_window_starts, p_prayer_window_ends) sl$e$,
+    $e$  PERFORM public.assert_prayer_windows(p_prayer_window_starts, p_prayer_window_ends);
+  IF p_service_ids IS NULL OR array_length(p_service_ids, 1) IS NULL THEN$e$
   ]);
 
 -- ---------------------------------------------------------------------------
@@ -131,36 +145,53 @@ SELECT pg_temp.evolve_function(
   'public.create_booking(uuid, uuid, timestamptz, boolean, numeric, numeric, uuid, text, text, text, integer, uuid, text)'::regprocedure,
   'public.create_booking(uuid, uuid, timestamptz, boolean, numeric, numeric, uuid, text, text, text, integer, uuid, text, timestamptz[], timestamptz[])',
   ARRAY[
-    E')\n RETURNS bookings',
-    E'    request_loyalty_points\n  );'
+    $e$)
+ RETURNS bookings$e$,
+    $e$    request_loyalty_points
+  );$e$
   ],
   ARRAY[
-    E', prayer_window_starts timestamp with time zone[] DEFAULT NULL::timestamp with time zone[], prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[])\n RETURNS bookings',
-    E'    request_loyalty_points, prayer_window_starts, prayer_window_ends\n  );'
+    $e$, prayer_window_starts timestamp with time zone[] DEFAULT NULL::timestamp with time zone[], prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[])
+ RETURNS bookings$e$,
+    $e$    request_loyalty_points, prayer_window_starts, prayer_window_ends
+  );$e$
   ]);
 
 SELECT pg_temp.evolve_function(
   'public.create_multi_service_booking(uuid, uuid, timestamptz, jsonb, boolean, text, text, text, text, integer, numeric, numeric, uuid)'::regprocedure,
   'public.create_multi_service_booking(uuid, uuid, timestamptz, jsonb, boolean, text, text, text, text, integer, numeric, numeric, uuid, timestamptz[], timestamptz[])',
   ARRAY[
-    E')\n RETURNS jsonb',
-    E'    request_loyalty_points\n  );'
+    $e$)
+ RETURNS jsonb$e$,
+    $e$    request_loyalty_points
+  );$e$
   ],
   ARRAY[
-    E', prayer_window_starts timestamp with time zone[] DEFAULT NULL::timestamp with time zone[], prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[])\n RETURNS jsonb',
-    E'    request_loyalty_points, prayer_window_starts, prayer_window_ends\n  );'
+    $e$, prayer_window_starts timestamp with time zone[] DEFAULT NULL::timestamp with time zone[], prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[])
+ RETURNS jsonb$e$,
+    $e$    request_loyalty_points, prayer_window_starts, prayer_window_ends
+  );$e$
   ]);
 
 SELECT pg_temp.evolve_function(
   'public.reschedule_booking(uuid, timestamptz, uuid, text)'::regprocedure,
   'public.reschedule_booking(uuid, timestamptz, uuid, text, timestamptz[], timestamptz[])',
   ARRAY[
-    E'reschedule_reason text DEFAULT NULL::text)\n RETURNS jsonb',
-    E'  PERFORM set_config(''primora.reschedule_in_progress'', ''on'', true);\n\n  IF NOT EXISTS (\n    SELECT 1 FROM public.get_available_slots(v_employee, v_date, v_booking.duration_minutes) sl'
+    $e$reschedule_reason text DEFAULT NULL::text)
+ RETURNS jsonb$e$,
+    $e$  PERFORM set_config('primora.reschedule_in_progress', 'on', true);
+
+  IF NOT EXISTS (
+    SELECT 1 FROM public.get_available_slots(v_employee, v_date, v_booking.duration_minutes) sl$e$
   ],
   ARRAY[
-    E'reschedule_reason text DEFAULT NULL::text, prayer_window_starts timestamp with time zone[] DEFAULT NULL::timestamp with time zone[], prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[])\n RETURNS jsonb',
-    E'  PERFORM public.assert_prayer_windows(prayer_window_starts, prayer_window_ends);\n  PERFORM set_config(''primora.reschedule_in_progress'', ''on'', true);\n\n  IF NOT EXISTS (\n    SELECT 1 FROM public.get_available_slots(v_employee, v_date, v_booking.duration_minutes, prayer_window_starts, prayer_window_ends) sl'
+    $e$reschedule_reason text DEFAULT NULL::text, prayer_window_starts timestamp with time zone[] DEFAULT NULL::timestamp with time zone[], prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[])
+ RETURNS jsonb$e$,
+    $e$  PERFORM public.assert_prayer_windows(prayer_window_starts, prayer_window_ends);
+  PERFORM set_config('primora.reschedule_in_progress', 'on', true);
+
+  IF NOT EXISTS (
+    SELECT 1 FROM public.get_available_slots(v_employee, v_date, v_booking.duration_minutes, prayer_window_starts, prayer_window_ends) sl$e$
   ]);
 
 DROP FUNCTION IF EXISTS pg_temp.evolve_function(regprocedure, text, text[], text[]);

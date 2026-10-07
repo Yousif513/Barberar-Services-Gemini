@@ -95,16 +95,22 @@ DROP FUNCTION IF EXISTS pg_temp.evolve_function(regprocedure, text, text[], text
 CREATE FUNCTION pg_temp.evolve_function(p_old regprocedure, p_new_signature text, p_from text[], p_to text[])
 RETURNS void LANGUAGE plpgsql AS $helper$
 DECLARE
-  v_def text := replace(pg_get_functiondef(p_old), E'\r\n', E'\n');
+  v_def text := replace(pg_get_functiondef(p_old), $e$
+$e$, $e$
+$e$);
   v_new regprocedure;
   v_grantee text;
   i int;
 BEGIN
   FOR i IN 1 .. COALESCE(array_length(p_from, 1), 0) LOOP
-    IF position(replace(p_from[i], E'\r\n', E'\n') IN v_def) = 0 THEN
+    IF position(replace(p_from[i], $e$
+$e$, $e$
+$e$) IN v_def) = 0 THEN
       RAISE EXCEPTION 'evolve_function: pattern % not found in %', i, p_old;
     END IF;
-    v_def := replace(v_def, replace(p_from[i], E'\r\n', E'\n'), p_to[i]);
+    v_def := replace(v_def, replace(p_from[i], $e$
+$e$, $e$
+$e$), p_to[i]);
   END LOOP;
   EXECUTE v_def;
   v_new := to_regprocedure(p_new_signature);
@@ -133,10 +139,23 @@ SELECT pg_temp.evolve_function(
   'public.booking_release_discounts(uuid)'::regprocedure,
   'public.booking_release_discounts(uuid)',
   ARRAY[
-    E'  FOR v_redemption IN\n    SELECT * FROM public.package_redemptions'
+    $e$  FOR v_redemption IN
+    SELECT * FROM public.package_redemptions$e$
   ],
   ARRAY[
-    E'  FOR v_redemption IN\n    SELECT * FROM public.wallet_credit_redemptions\n    WHERE booking_id = p_booking_id AND reversed_at IS NULL\n    FOR UPDATE\n  LOOP\n    UPDATE public.wallet_credits\n    SET remaining_amount = LEAST(COALESCE(remaining_amount, 0) + v_redemption.amount, amount), is_spent = FALSE\n    WHERE id = v_redemption.wallet_credit_id;\n    UPDATE public.wallet_credit_redemptions SET reversed_at = now() WHERE id = v_redemption.id;\n  END LOOP;\n\n  FOR v_redemption IN\n    SELECT * FROM public.package_redemptions'
+    $e$  FOR v_redemption IN
+    SELECT * FROM public.wallet_credit_redemptions
+    WHERE booking_id = p_booking_id AND reversed_at IS NULL
+    FOR UPDATE
+  LOOP
+    UPDATE public.wallet_credits
+    SET remaining_amount = LEAST(COALESCE(remaining_amount, 0) + v_redemption.amount, amount), is_spent = FALSE
+    WHERE id = v_redemption.wallet_credit_id;
+    UPDATE public.wallet_credit_redemptions SET reversed_at = now() WHERE id = v_redemption.id;
+  END LOOP;
+
+  FOR v_redemption IN
+    SELECT * FROM public.package_redemptions$e$
   ]);
 
 -- Completion: the platform owes the provider the part of the visit paid with wallet credit
@@ -144,10 +163,22 @@ SELECT pg_temp.evolve_function(
   'public.trigger_on_booking_completed_rewards()'::regprocedure,
   'public.trigger_on_booking_completed_rewards()',
   ARRAY[
-    E'  IF NEW.customer_id IS NULL THEN\n    RETURN NEW;\n  END IF;'
+    $e$  IF NEW.customer_id IS NULL THEN
+    RETURN NEW;
+  END IF;$e$
   ],
   ARRAY[
-    E'  IF NEW.wallet_credit_amount > 0 THEN\n    INSERT INTO public.transactional_ledger (booking_id, provider_id, entry_type, payment_intent_id,\n                                             total_captured, platform_share, provider_share, payout_status)\n    VALUES (NEW.id, v_provider_id, ''wallet_credit_settlement'', ''wallet-settlement:'' || NEW.id::text,\n            0, 0, NEW.wallet_credit_amount, ''pending'')\n    ON CONFLICT (payment_intent_id) DO NOTHING;\n  END IF;\n\n  IF NEW.customer_id IS NULL THEN\n    RETURN NEW;\n  END IF;'
+    $e$  IF NEW.wallet_credit_amount > 0 THEN
+    INSERT INTO public.transactional_ledger (booking_id, provider_id, entry_type, payment_intent_id,
+                                             total_captured, platform_share, provider_share, payout_status)
+    VALUES (NEW.id, v_provider_id, 'wallet_credit_settlement', 'wallet-settlement:' || NEW.id::text,
+            0, 0, NEW.wallet_credit_amount, 'pending')
+    ON CONFLICT (payment_intent_id) DO NOTHING;
+  END IF;
+
+  IF NEW.customer_id IS NULL THEN
+    RETURN NEW;
+  END IF;$e$
   ]);
 
 -- The booking core
@@ -155,44 +186,121 @@ SELECT pg_temp.evolve_function(
   'public.booking_create_internal(uuid, uuid, uuid, uuid[], timestamptz, boolean, numeric, numeric, text, uuid, text, text, text, integer, timestamptz[], timestamptz[], text, uuid[], uuid, uuid)'::regprocedure,
   'public.booking_create_internal(uuid, uuid, uuid, uuid[], timestamptz, boolean, numeric, numeric, text, uuid, text, text, text, integer, timestamptz[], timestamptz[], text, uuid[], uuid, uuid, numeric)',
   ARRAY[
-    E'p_user_package_id uuid DEFAULT NULL::uuid)\n RETURNS bookings',
-    E'  v_package_discount NUMERIC(10,2) := 0;\nBEGIN',
-    E'  IF v_full_prepayment THEN\n    v_deposit := v_taxable + v_tax - v_gift_amount;\n  ELSE\n    v_deposit := LEAST(\n      ROUND(v_taxable * COALESCE(v_provider.deposit_percentage, 20) / 100.0, 2),\n      v_taxable + v_tax - v_gift_amount\n    );\n  END IF;',
-    E'      user_package_id, package_covered_amount\n    ) VALUES (',
-    E'      v_pack.id, v_package_discount\n    )',
-    E'  -- The package session is reserved with the booking'
+    $e$p_user_package_id uuid DEFAULT NULL::uuid)
+ RETURNS bookings$e$,
+    $e$  v_package_discount NUMERIC(10,2) := 0;
+BEGIN$e$,
+    $e$  IF v_full_prepayment THEN
+    v_deposit := v_taxable + v_tax - v_gift_amount;
+  ELSE
+    v_deposit := LEAST(
+      ROUND(v_taxable * COALESCE(v_provider.deposit_percentage, 20) / 100.0, 2),
+      v_taxable + v_tax - v_gift_amount
+    );
+  END IF;$e$,
+    $e$      user_package_id, package_covered_amount
+    ) VALUES ($e$,
+    $e$      v_pack.id, v_package_discount
+    )$e$,
+    $e$  -- The package session is reserved with the booking$e$
   ],
   ARRAY[
-    E'p_user_package_id uuid DEFAULT NULL::uuid, p_wallet_credit_amount numeric DEFAULT NULL::numeric)\n RETURNS bookings',
-    E'  v_package_discount NUMERIC(10,2) := 0;\n  v_wallet_amount NUMERIC(10,2) := 0;\n  v_wallet_available NUMERIC(10,2) := 0;\n  v_wallet_left NUMERIC(10,2);\n  v_take NUMERIC(10,2);\n  v_credit RECORD;\nBEGIN',
-    E'  -- Wallet credit is a payment instrument like a gift card: oldest credits first, never more than is still due.\n  IF COALESCE(p_wallet_credit_amount, 0) <> 0 THEN\n    IF p_wallet_credit_amount < 0 OR p_wallet_credit_amount <> ROUND(p_wallet_credit_amount, 2) THEN\n      RAISE EXCEPTION ''The wallet credit amount is not valid'' USING ERRCODE = ''22023'';\n    END IF;\n    SELECT COALESCE(SUM(wc.remaining), 0) INTO v_wallet_available\n    FROM (\n      SELECT COALESCE(c.remaining_amount, c.amount) AS remaining\n      FROM public.wallet_credits c\n      WHERE c.customer_id = p_customer_id AND NOT c.is_spent AND COALESCE(c.remaining_amount, c.amount) > 0\n        AND (c.expires_at IS NULL OR c.expires_at > now())\n      ORDER BY c.created_at, c.id\n      FOR UPDATE\n    ) wc;\n    IF p_wallet_credit_amount > v_wallet_available THEN\n      RAISE EXCEPTION ''Not enough wallet credit'' USING ERRCODE = ''22023'';\n    END IF;\n    v_wallet_amount := LEAST(p_wallet_credit_amount, GREATEST(v_taxable + v_tax - v_gift_amount, 0));\n  END IF;\n\n  IF v_full_prepayment THEN\n    v_deposit := v_taxable + v_tax - v_gift_amount - v_wallet_amount;\n  ELSE\n    v_deposit := LEAST(\n      ROUND(v_taxable * COALESCE(v_provider.deposit_percentage, 20) / 100.0, 2),\n      v_taxable + v_tax - v_gift_amount - v_wallet_amount\n    );\n  END IF;',
-    E'      user_package_id, package_covered_amount, wallet_credit_amount\n    ) VALUES (',
-    E'      v_pack.id, v_package_discount, v_wallet_amount\n    )',
-    E'  -- The wallet credit is consumed oldest first (the rows were locked above), one redemption row per credit used.\n  IF v_wallet_amount > 0 THEN\n    v_wallet_left := v_wallet_amount;\n    FOR v_credit IN\n      SELECT c.id, COALESCE(c.remaining_amount, c.amount) AS remaining\n      FROM public.wallet_credits c\n      WHERE c.customer_id = p_customer_id AND NOT c.is_spent AND COALESCE(c.remaining_amount, c.amount) > 0\n        AND (c.expires_at IS NULL OR c.expires_at > now())\n      ORDER BY c.created_at, c.id\n      FOR UPDATE\n    LOOP\n      EXIT WHEN v_wallet_left <= 0;\n      v_take := LEAST(v_credit.remaining, v_wallet_left);\n      UPDATE public.wallet_credits\n      SET remaining_amount = v_credit.remaining - v_take, is_spent = (v_credit.remaining - v_take) <= 0\n      WHERE id = v_credit.id;\n      INSERT INTO public.wallet_credit_redemptions (wallet_credit_id, booking_id, customer_id, amount)\n      VALUES (v_credit.id, v_booking.id, p_customer_id, v_take);\n      v_wallet_left := v_wallet_left - v_take;\n    END LOOP;\n  END IF;\n\n  -- The package session is reserved with the booking'
+    $e$p_user_package_id uuid DEFAULT NULL::uuid, p_wallet_credit_amount numeric DEFAULT NULL::numeric)
+ RETURNS bookings$e$,
+    $e$  v_package_discount NUMERIC(10,2) := 0;
+  v_wallet_amount NUMERIC(10,2) := 0;
+  v_wallet_available NUMERIC(10,2) := 0;
+  v_wallet_left NUMERIC(10,2);
+  v_take NUMERIC(10,2);
+  v_credit RECORD;
+BEGIN$e$,
+    $e$  -- Wallet credit is a payment instrument like a gift card: oldest credits first, never more than is still due.
+  IF COALESCE(p_wallet_credit_amount, 0) <> 0 THEN
+    IF p_wallet_credit_amount < 0 OR p_wallet_credit_amount <> ROUND(p_wallet_credit_amount, 2) THEN
+      RAISE EXCEPTION 'The wallet credit amount is not valid' USING ERRCODE = '22023';
+    END IF;
+    SELECT COALESCE(SUM(wc.remaining), 0) INTO v_wallet_available
+    FROM (
+      SELECT COALESCE(c.remaining_amount, c.amount) AS remaining
+      FROM public.wallet_credits c
+      WHERE c.customer_id = p_customer_id AND NOT c.is_spent AND COALESCE(c.remaining_amount, c.amount) > 0
+        AND (c.expires_at IS NULL OR c.expires_at > now())
+      ORDER BY c.created_at, c.id
+      FOR UPDATE
+    ) wc;
+    IF p_wallet_credit_amount > v_wallet_available THEN
+      RAISE EXCEPTION 'Not enough wallet credit' USING ERRCODE = '22023';
+    END IF;
+    v_wallet_amount := LEAST(p_wallet_credit_amount, GREATEST(v_taxable + v_tax - v_gift_amount, 0));
+  END IF;
+
+  IF v_full_prepayment THEN
+    v_deposit := v_taxable + v_tax - v_gift_amount - v_wallet_amount;
+  ELSE
+    v_deposit := LEAST(
+      ROUND(v_taxable * COALESCE(v_provider.deposit_percentage, 20) / 100.0, 2),
+      v_taxable + v_tax - v_gift_amount - v_wallet_amount
+    );
+  END IF;$e$,
+    $e$      user_package_id, package_covered_amount, wallet_credit_amount
+    ) VALUES ($e$,
+    $e$      v_pack.id, v_package_discount, v_wallet_amount
+    )$e$,
+    $e$  -- The wallet credit is consumed oldest first (the rows were locked above), one redemption row per credit used.
+  IF v_wallet_amount > 0 THEN
+    v_wallet_left := v_wallet_amount;
+    FOR v_credit IN
+      SELECT c.id, COALESCE(c.remaining_amount, c.amount) AS remaining
+      FROM public.wallet_credits c
+      WHERE c.customer_id = p_customer_id AND NOT c.is_spent AND COALESCE(c.remaining_amount, c.amount) > 0
+        AND (c.expires_at IS NULL OR c.expires_at > now())
+      ORDER BY c.created_at, c.id
+      FOR UPDATE
+    LOOP
+      EXIT WHEN v_wallet_left <= 0;
+      v_take := LEAST(v_credit.remaining, v_wallet_left);
+      UPDATE public.wallet_credits
+      SET remaining_amount = v_credit.remaining - v_take, is_spent = (v_credit.remaining - v_take) <= 0
+      WHERE id = v_credit.id;
+      INSERT INTO public.wallet_credit_redemptions (wallet_credit_id, booking_id, customer_id, amount)
+      VALUES (v_credit.id, v_booking.id, p_customer_id, v_take);
+      v_wallet_left := v_wallet_left - v_take;
+    END LOOP;
+  END IF;
+
+  -- The package session is reserved with the booking$e$
   ]);
 
 SELECT pg_temp.evolve_function(
   'public.create_booking(uuid, uuid, timestamptz, boolean, numeric, numeric, uuid, text, text, text, integer, uuid, text, timestamptz[], timestamptz[], text, uuid, uuid, uuid)'::regprocedure,
   'public.create_booking(uuid, uuid, timestamptz, boolean, numeric, numeric, uuid, text, text, text, integer, uuid, text, timestamptz[], timestamptz[], text, uuid, uuid, uuid, numeric)',
   ARRAY[
-    E'request_user_package_id uuid DEFAULT NULL::uuid)\n RETURNS bookings',
-    E'    request_waitlist_claim_id, request_user_package_id\n  );'
+    $e$request_user_package_id uuid DEFAULT NULL::uuid)
+ RETURNS bookings$e$,
+    $e$    request_waitlist_claim_id, request_user_package_id
+  );$e$
   ],
   ARRAY[
-    E'request_user_package_id uuid DEFAULT NULL::uuid, request_wallet_credit_amount numeric DEFAULT NULL::numeric)\n RETURNS bookings',
-    E'    request_waitlist_claim_id, request_user_package_id, request_wallet_credit_amount\n  );'
+    $e$request_user_package_id uuid DEFAULT NULL::uuid, request_wallet_credit_amount numeric DEFAULT NULL::numeric)
+ RETURNS bookings$e$,
+    $e$    request_waitlist_claim_id, request_user_package_id, request_wallet_credit_amount
+  );$e$
   ]);
 
 SELECT pg_temp.evolve_function(
   'public.create_multi_service_booking(uuid, uuid, timestamptz, jsonb, boolean, text, text, text, text, integer, numeric, numeric, uuid, timestamptz[], timestamptz[], text, uuid, uuid)'::regprocedure,
   'public.create_multi_service_booking(uuid, uuid, timestamptz, jsonb, boolean, text, text, text, text, integer, numeric, numeric, uuid, timestamptz[], timestamptz[], text, uuid, uuid, numeric)',
   ARRAY[
-    E'request_user_package_id uuid DEFAULT NULL::uuid)\n RETURNS jsonb',
-    E'    request_waitlist_claim_id, request_user_package_id\n  );'
+    $e$request_user_package_id uuid DEFAULT NULL::uuid)
+ RETURNS jsonb$e$,
+    $e$    request_waitlist_claim_id, request_user_package_id
+  );$e$
   ],
   ARRAY[
-    E'request_user_package_id uuid DEFAULT NULL::uuid, request_wallet_credit_amount numeric DEFAULT NULL::numeric)\n RETURNS jsonb',
-    E'    request_waitlist_claim_id, request_user_package_id, request_wallet_credit_amount\n  );'
+    $e$request_user_package_id uuid DEFAULT NULL::uuid, request_wallet_credit_amount numeric DEFAULT NULL::numeric)
+ RETURNS jsonb$e$,
+    $e$    request_waitlist_claim_id, request_user_package_id, request_wallet_credit_amount
+  );$e$
   ]);
 
 DROP FUNCTION IF EXISTS pg_temp.evolve_function(regprocedure, text, text[], text[]);

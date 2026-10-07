@@ -190,16 +190,22 @@ DROP FUNCTION IF EXISTS pg_temp.evolve_function(regprocedure, text, text[], text
 CREATE FUNCTION pg_temp.evolve_function(p_old regprocedure, p_new_signature text, p_from text[], p_to text[])
 RETURNS void LANGUAGE plpgsql AS $helper$
 DECLARE
-  v_def text := replace(pg_get_functiondef(p_old), E'\r\n', E'\n');
+  v_def text := replace(pg_get_functiondef(p_old), $e$
+$e$, $e$
+$e$);
   v_new regprocedure;
   v_grantee text;
   i int;
 BEGIN
   FOR i IN 1 .. COALESCE(array_length(p_from, 1), 0) LOOP
-    IF position(replace(p_from[i], E'\r\n', E'\n') IN v_def) = 0 THEN
+    IF position(replace(p_from[i], $e$
+$e$, $e$
+$e$) IN v_def) = 0 THEN
       RAISE EXCEPTION 'evolve_function: pattern % not found in %', i, p_old;
     END IF;
-    v_def := replace(v_def, replace(p_from[i], E'\r\n', E'\n'), p_to[i]);
+    v_def := replace(v_def, replace(p_from[i], $e$
+$e$, $e$
+$e$), p_to[i]);
   END LOOP;
   EXECUTE v_def;
   v_new := to_regprocedure(p_new_signature);
@@ -227,44 +233,71 @@ SELECT pg_temp.evolve_function(
   'public.booking_create_internal(uuid, uuid, uuid, uuid[], timestamptz, boolean, numeric, numeric, text, uuid, text, text, text, integer, timestamptz[], timestamptz[])'::regprocedure,
   'public.booking_create_internal(uuid, uuid, uuid, uuid[], timestamptz, boolean, numeric, numeric, text, uuid, text, text, text, integer, timestamptz[], timestamptz[], text)',
   ARRAY[
-    E'p_prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[])\n RETURNS bookings',
-    E'  v_source TEXT;\n',
-    E'  v_source := LOWER(COALESCE(NULLIF(TRIM(p_source), \'\'), \'marketplace\'));\n  IF v_source NOT IN (\'marketplace\', \'link\', \'qr\', \'whatsapp\', \'instagram\', \'import\') THEN\n    -- walk_in is created only by staff through create_walk_in_booking\n    v_source := \'marketplace\';\n  END IF;\n',
-    E'  v_eligibility := public.check_customer_booking_eligibility(v_provider_id, p_customer_id);',
-    E'      client_profile_id, source, is_first_visit\n    ) VALUES (',
-    E'      p_client_profile_id, v_source, v_first_visit\n    )'
+    $e$p_prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[])
+ RETURNS bookings$e$,
+    $e$  v_source TEXT;
+$e$,
+    $e$  v_source := LOWER(COALESCE(NULLIF(TRIM(p_source), ''), 'marketplace'));
+  IF v_source NOT IN ('marketplace', 'link', 'qr', 'whatsapp', 'instagram', 'import') THEN
+    -- walk_in is created only by staff through create_walk_in_booking
+    v_source := 'marketplace';
+  END IF;
+$e$,
+    $e$  v_eligibility := public.check_customer_booking_eligibility(v_provider_id, p_customer_id);$e$,
+    $e$      client_profile_id, source, is_first_visit
+    ) VALUES ($e$,
+    $e$      p_client_profile_id, v_source, v_first_visit
+    )$e$
   ],
   ARRAY[
-    E'p_prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[], p_source_token text DEFAULT NULL::text)\n RETURNS bookings',
-    E'  v_source TEXT;\n  v_source_token_id UUID;\n',
-    E'  -- The channel is resolved below, once the provider is known (D-02): the caller can no longer pick a fee-free source.\n  v_source := \'marketplace\';\n',
-    E'  SELECT rs.source, rs.token_id INTO v_source, v_source_token_id\n  FROM public.resolve_booking_source(v_provider_id, p_customer_id, p_source, p_source_token) rs;\n\n  v_eligibility := public.check_customer_booking_eligibility(v_provider_id, p_customer_id);',
-    E'      client_profile_id, source, is_first_visit, source_token_id\n    ) VALUES (',
-    E'      p_client_profile_id, v_source, v_first_visit, v_source_token_id\n    )'
+    $e$p_prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[], p_source_token text DEFAULT NULL::text)
+ RETURNS bookings$e$,
+    $e$  v_source TEXT;
+  v_source_token_id UUID;
+$e$,
+    $e$  -- The channel is resolved below, once the provider is known (D-02): the caller can no longer pick a fee-free source.
+  v_source := 'marketplace';
+$e$,
+    $e$  SELECT rs.source, rs.token_id INTO v_source, v_source_token_id
+  FROM public.resolve_booking_source(v_provider_id, p_customer_id, p_source, p_source_token) rs;
+
+  v_eligibility := public.check_customer_booking_eligibility(v_provider_id, p_customer_id);$e$,
+    $e$      client_profile_id, source, is_first_visit, source_token_id
+    ) VALUES ($e$,
+    $e$      p_client_profile_id, v_source, v_first_visit, v_source_token_id
+    )$e$
   ]);
 
 SELECT pg_temp.evolve_function(
   'public.create_booking(uuid, uuid, timestamptz, boolean, numeric, numeric, uuid, text, text, text, integer, uuid, text, timestamptz[], timestamptz[])'::regprocedure,
   'public.create_booking(uuid, uuid, timestamptz, boolean, numeric, numeric, uuid, text, text, text, integer, uuid, text, timestamptz[], timestamptz[], text)',
   ARRAY[
-    E'prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[])\n RETURNS bookings',
-    E'request_loyalty_points, prayer_window_starts, prayer_window_ends\n  );'
+    $e$prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[])
+ RETURNS bookings$e$,
+    $e$request_loyalty_points, prayer_window_starts, prayer_window_ends
+  );$e$
   ],
   ARRAY[
-    E'prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[], request_source_token text DEFAULT NULL::text)\n RETURNS bookings',
-    E'request_loyalty_points, prayer_window_starts, prayer_window_ends, request_source_token\n  );'
+    $e$prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[], request_source_token text DEFAULT NULL::text)
+ RETURNS bookings$e$,
+    $e$request_loyalty_points, prayer_window_starts, prayer_window_ends, request_source_token
+  );$e$
   ]);
 
 SELECT pg_temp.evolve_function(
   'public.create_multi_service_booking(uuid, uuid, timestamptz, jsonb, boolean, text, text, text, text, integer, numeric, numeric, uuid, timestamptz[], timestamptz[])'::regprocedure,
   'public.create_multi_service_booking(uuid, uuid, timestamptz, jsonb, boolean, text, text, text, text, integer, numeric, numeric, uuid, timestamptz[], timestamptz[], text)',
   ARRAY[
-    E'prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[])\n RETURNS jsonb',
-    E'request_loyalty_points, prayer_window_starts, prayer_window_ends\n  );'
+    $e$prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[])
+ RETURNS jsonb$e$,
+    $e$request_loyalty_points, prayer_window_starts, prayer_window_ends
+  );$e$
   ],
   ARRAY[
-    E'prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[], request_source_token text DEFAULT NULL::text)\n RETURNS jsonb',
-    E'request_loyalty_points, prayer_window_starts, prayer_window_ends, request_source_token\n  );'
+    $e$prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[], request_source_token text DEFAULT NULL::text)
+ RETURNS jsonb$e$,
+    $e$request_loyalty_points, prayer_window_starts, prayer_window_ends, request_source_token
+  );$e$
   ]);
 
 DROP FUNCTION IF EXISTS pg_temp.evolve_function(regprocedure, text, text[], text[]);

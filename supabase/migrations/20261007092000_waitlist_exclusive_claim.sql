@@ -207,16 +207,22 @@ DROP FUNCTION IF EXISTS pg_temp.evolve_function(regprocedure, text, text[], text
 CREATE FUNCTION pg_temp.evolve_function(p_old regprocedure, p_new_signature text, p_from text[], p_to text[])
 RETURNS void LANGUAGE plpgsql AS $helper$
 DECLARE
-  v_def text := replace(pg_get_functiondef(p_old), E'\r\n', E'\n');
+  v_def text := replace(pg_get_functiondef(p_old), $e$
+$e$, $e$
+$e$);
   v_new regprocedure;
   v_grantee text;
   i int;
 BEGIN
   FOR i IN 1 .. COALESCE(array_length(p_from, 1), 0) LOOP
-    IF position(replace(p_from[i], E'\r\n', E'\n') IN v_def) = 0 THEN
+    IF position(replace(p_from[i], $e$
+$e$, $e$
+$e$) IN v_def) = 0 THEN
       RAISE EXCEPTION 'evolve_function: pattern % not found in %', i, p_old;
     END IF;
-    v_def := replace(v_def, replace(p_from[i], E'\r\n', E'\n'), p_to[i]);
+    v_def := replace(v_def, replace(p_from[i], $e$
+$e$, $e$
+$e$), p_to[i]);
   END LOOP;
   EXECUTE v_def;
   v_new := to_regprocedure(p_new_signature);
@@ -245,12 +251,16 @@ SELECT pg_temp.evolve_function(
   'public.backfill_waitlist_on_cancellation()'::regprocedure,
   'public.backfill_waitlist_on_cancellation()',
   ARRAY[
-    E'  SET status = ''notified'', notified_at = now(), expires_at = now() + interval ''15 minutes''\n  WHERE id = v_candidate.id;',
-    E'''expires_minutes'', ''15'');'
+    $e$  SET status = 'notified', notified_at = now(), expires_at = now() + interval '15 minutes'
+  WHERE id = v_candidate.id;$e$,
+    $e$'expires_minutes', '15');$e$
   ],
   ARRAY[
-    E'  SET status = ''notified'', notified_at = now(), expires_at = now() + make_interval(mins => public.waitlist_claim_minutes()),\n      held_employee_id = OLD.employee_id, held_window = OLD.booking_window, held_slot_start = OLD.scheduled_at,\n      held_from_booking_id = OLD.id\n  WHERE id = v_candidate.id;',
-    E'''expires_minutes'', public.waitlist_claim_minutes()::text);'
+    $e$  SET status = 'notified', notified_at = now(), expires_at = now() + make_interval(mins => public.waitlist_claim_minutes()),
+      held_employee_id = OLD.employee_id, held_window = OLD.booking_window, held_slot_start = OLD.scheduled_at,
+      held_from_booking_id = OLD.id
+  WHERE id = v_candidate.id;$e$,
+    $e$'expires_minutes', public.waitlist_claim_minutes()::text);$e$
   ]);
 
 -- join_waitlist: a verified phone and WhatsApp consent, Riyadh calendar date
@@ -258,10 +268,17 @@ SELECT pg_temp.evolve_function(
   'public.join_waitlist(uuid, uuid, uuid, date, time, time)'::regprocedure,
   'public.join_waitlist(uuid, uuid, uuid, date, time, time)',
   ARRAY[
-    E'    IF p_preferred_date < CURRENT_DATE THEN'
+    $e$    IF p_preferred_date < CURRENT_DATE THEN$e$
   ],
   ARRAY[
-    E'    IF NOT EXISTS (SELECT 1 FROM public.profiles pr WHERE pr.id = v_user_id AND pr.phone_verified AND pr.phone_number IS NOT NULL) THEN\n        RAISE EXCEPTION ''Verify your phone number to join a waitlist, so that we can message you when a slot opens'' USING ERRCODE = ''22023'';\n    END IF;\n    IF NOT public.has_active_consent(v_user_id, ''whatsapp'') THEN\n        RAISE EXCEPTION ''Allow WhatsApp messages to join a waitlist: the offer is sent by message'' USING ERRCODE = ''22023'';\n    END IF;\n\n    IF p_preferred_date < (now() AT TIME ZONE ''Asia/Riyadh'')::date THEN'
+    $e$    IF NOT EXISTS (SELECT 1 FROM public.profiles pr WHERE pr.id = v_user_id AND pr.phone_verified AND pr.phone_number IS NOT NULL) THEN
+        RAISE EXCEPTION 'Verify your phone number to join a waitlist, so that we can message you when a slot opens' USING ERRCODE = '22023';
+    END IF;
+    IF NOT public.has_active_consent(v_user_id, 'whatsapp') THEN
+        RAISE EXCEPTION 'Allow WhatsApp messages to join a waitlist: the offer is sent by message' USING ERRCODE = '22023';
+    END IF;
+
+    IF p_preferred_date < (now() AT TIME ZONE 'Asia/Riyadh')::date THEN$e$
   ]);
 
 -- get_available_slots: a window held for another customer's waitlist offer is not available
@@ -269,10 +286,18 @@ SELECT pg_temp.evolve_function(
   'public.get_available_slots(uuid, date, integer, timestamptz[], timestamptz[], integer, integer, uuid)'::regprocedure,
   'public.get_available_slots(uuid, date, integer, timestamptz[], timestamptz[], integer, integer, uuid)',
   ARRAY[
-    E'            AND b.id IS DISTINCT FROM p_ignore_booking_id\n        ) THEN'
+    $e$            AND b.id IS DISTINCT FROM p_ignore_booking_id
+        ) THEN$e$
   ],
   ARRAY[
-    E'            AND b.id IS DISTINCT FROM p_ignore_booking_id\n        ) AND NOT EXISTS (\n          SELECT 1 FROM public.waitlists w\n          WHERE w.status = ''notified'' AND w.expires_at > now()\n            AND w.held_employee_id = target_employee_id\n            AND w.held_window && tstzrange(v_slot_time - v_before, v_slot_end + v_after, ''[)'')\n            AND w.customer_id IS DISTINCT FROM auth.uid()\n        ) THEN'
+    $e$            AND b.id IS DISTINCT FROM p_ignore_booking_id
+        ) AND NOT EXISTS (
+          SELECT 1 FROM public.waitlists w
+          WHERE w.status = 'notified' AND w.expires_at > now()
+            AND w.held_employee_id = target_employee_id
+            AND w.held_window && tstzrange(v_slot_time - v_before, v_slot_end + v_after, '[)')
+            AND w.customer_id IS DISTINCT FROM auth.uid()
+        ) THEN$e$
   ]);
 
 -- booking_create_internal: the offer id, validation, and using the offer up
@@ -280,42 +305,88 @@ SELECT pg_temp.evolve_function(
   'public.booking_create_internal(uuid, uuid, uuid, uuid[], timestamptz, boolean, numeric, numeric, text, uuid, text, text, text, integer, timestamptz[], timestamptz[], text, uuid[])'::regprocedure,
   'public.booking_create_internal(uuid, uuid, uuid, uuid[], timestamptz, boolean, numeric, numeric, text, uuid, text, text, text, integer, timestamptz[], timestamptz[], text, uuid[], uuid)',
   ARRAY[
-    E'p_variant_ids uuid[] DEFAULT NULL::uuid[])\n RETURNS bookings',
-    E'  v_blocked_after INT := 0;\nBEGIN',
-    E'  PERFORM public.assert_prayer_windows(p_prayer_window_starts, p_prayer_window_ends);\n',
-    E'  SELECT NOT EXISTS (\n    SELECT 1 FROM public.bookings b\n    JOIN public.branches br ON br.id = b.branch_id\n',
-    E'  IF v_coupon.id IS NOT NULL AND v_coupon_discount > 0 THEN\n    UPDATE public.promotional_codes SET redeemed_count'
+    $e$p_variant_ids uuid[] DEFAULT NULL::uuid[])
+ RETURNS bookings$e$,
+    $e$  v_blocked_after INT := 0;
+BEGIN$e$,
+    $e$  PERFORM public.assert_prayer_windows(p_prayer_window_starts, p_prayer_window_ends);
+$e$,
+    $e$  SELECT NOT EXISTS (
+    SELECT 1 FROM public.bookings b
+    JOIN public.branches br ON br.id = b.branch_id
+$e$,
+    $e$  IF v_coupon.id IS NOT NULL AND v_coupon_discount > 0 THEN
+    UPDATE public.promotional_codes SET redeemed_count$e$
   ],
   ARRAY[
-    E'p_variant_ids uuid[] DEFAULT NULL::uuid[], p_waitlist_claim_id uuid DEFAULT NULL::uuid)\n RETURNS bookings',
-    E'  v_blocked_after INT := 0;\n  v_claim public.waitlists;\nBEGIN',
-    E'  PERFORM public.assert_prayer_windows(p_prayer_window_starts, p_prayer_window_ends);\n  IF p_waitlist_claim_id IS NOT NULL AND v_employee_id IS NULL THEN\n    -- a claimed offer is for the professional whose slot was freed\n    SELECT w.held_employee_id INTO v_employee_id FROM public.waitlists w WHERE w.id = p_waitlist_claim_id AND w.customer_id = p_customer_id;\n  END IF;\n',
-    E'  IF p_waitlist_claim_id IS NOT NULL THEN\n    SELECT * INTO v_claim FROM public.waitlists w WHERE w.id = p_waitlist_claim_id AND w.customer_id = p_customer_id FOR UPDATE;\n    IF v_claim.id IS NULL OR v_claim.status <> \'notified\' OR v_claim.expires_at IS NULL OR v_claim.expires_at <= now() THEN\n      RAISE EXCEPTION \'This waitlist offer is no longer open\' USING ERRCODE = \'22023\';\n    END IF;\n    IF v_claim.held_employee_id IS DISTINCT FROM v_employee_id OR v_claim.held_slot_start IS DISTINCT FROM p_scheduled_at\n       OR NOT (v_claim.service_id = ANY(p_service_ids)) THEN\n      RAISE EXCEPTION \'This waitlist offer is for a different professional, service or time\' USING ERRCODE = \'22023\';\n    END IF;\n  END IF;\n\n  SELECT NOT EXISTS (\n    SELECT 1 FROM public.bookings b\n    JOIN public.branches br ON br.id = b.branch_id\n',
-    E'  -- A waitlist offer held for this customer is used up by the booking of its slot (with or without the offer id).\n  UPDATE public.waitlists w SET status = \'claimed\', claimed_booking_id = v_booking.id\n  WHERE w.customer_id = p_customer_id AND w.status = \'notified\' AND w.expires_at > now()\n    AND w.held_employee_id = v_employee_id AND w.held_window && v_booking.booking_window\n    AND (p_waitlist_claim_id IS NULL OR w.id = p_waitlist_claim_id);\n\n  IF v_coupon.id IS NOT NULL AND v_coupon_discount > 0 THEN\n    UPDATE public.promotional_codes SET redeemed_count'
+    $e$p_variant_ids uuid[] DEFAULT NULL::uuid[], p_waitlist_claim_id uuid DEFAULT NULL::uuid)
+ RETURNS bookings$e$,
+    $e$  v_blocked_after INT := 0;
+  v_claim public.waitlists;
+BEGIN$e$,
+    $e$  PERFORM public.assert_prayer_windows(p_prayer_window_starts, p_prayer_window_ends);
+  IF p_waitlist_claim_id IS NOT NULL AND v_employee_id IS NULL THEN
+    -- a claimed offer is for the professional whose slot was freed
+    SELECT w.held_employee_id INTO v_employee_id FROM public.waitlists w WHERE w.id = p_waitlist_claim_id AND w.customer_id = p_customer_id;
+  END IF;
+$e$,
+    $e$  IF p_waitlist_claim_id IS NOT NULL THEN
+    SELECT * INTO v_claim FROM public.waitlists w WHERE w.id = p_waitlist_claim_id AND w.customer_id = p_customer_id FOR UPDATE;
+    IF v_claim.id IS NULL OR v_claim.status <> 'notified' OR v_claim.expires_at IS NULL OR v_claim.expires_at <= now() THEN
+      RAISE EXCEPTION 'This waitlist offer is no longer open' USING ERRCODE = '22023';
+    END IF;
+    IF v_claim.held_employee_id IS DISTINCT FROM v_employee_id OR v_claim.held_slot_start IS DISTINCT FROM p_scheduled_at
+       OR NOT (v_claim.service_id = ANY(p_service_ids)) THEN
+      RAISE EXCEPTION 'This waitlist offer is for a different professional, service or time' USING ERRCODE = '22023';
+    END IF;
+  END IF;
+
+  SELECT NOT EXISTS (
+    SELECT 1 FROM public.bookings b
+    JOIN public.branches br ON br.id = b.branch_id
+$e$,
+    $e$  -- A waitlist offer held for this customer is used up by the booking of its slot (with or without the offer id).
+  UPDATE public.waitlists w SET status = 'claimed', claimed_booking_id = v_booking.id
+  WHERE w.customer_id = p_customer_id AND w.status = 'notified' AND w.expires_at > now()
+    AND w.held_employee_id = v_employee_id AND w.held_window && v_booking.booking_window
+    AND (p_waitlist_claim_id IS NULL OR w.id = p_waitlist_claim_id);
+
+  IF v_coupon.id IS NOT NULL AND v_coupon_discount > 0 THEN
+    UPDATE public.promotional_codes SET redeemed_count$e$
   ]);
 
 SELECT pg_temp.evolve_function(
   'public.create_booking(uuid, uuid, timestamptz, boolean, numeric, numeric, uuid, text, text, text, integer, uuid, text, timestamptz[], timestamptz[], text, uuid)'::regprocedure,
   'public.create_booking(uuid, uuid, timestamptz, boolean, numeric, numeric, uuid, text, text, text, integer, uuid, text, timestamptz[], timestamptz[], text, uuid, uuid)',
   ARRAY[
-    E'request_variant_id uuid DEFAULT NULL::uuid)\n RETURNS bookings',
-    E'CASE WHEN request_variant_id IS NULL THEN NULL ELSE ARRAY[request_variant_id] END\n  );'
+    $e$request_variant_id uuid DEFAULT NULL::uuid)
+ RETURNS bookings$e$,
+    $e$CASE WHEN request_variant_id IS NULL THEN NULL ELSE ARRAY[request_variant_id] END
+  );$e$
   ],
   ARRAY[
-    E'request_variant_id uuid DEFAULT NULL::uuid, request_waitlist_claim_id uuid DEFAULT NULL::uuid)\n RETURNS bookings',
-    E'CASE WHEN request_variant_id IS NULL THEN NULL ELSE ARRAY[request_variant_id] END,\n    request_waitlist_claim_id\n  );'
+    $e$request_variant_id uuid DEFAULT NULL::uuid, request_waitlist_claim_id uuid DEFAULT NULL::uuid)
+ RETURNS bookings$e$,
+    $e$CASE WHEN request_variant_id IS NULL THEN NULL ELSE ARRAY[request_variant_id] END,
+    request_waitlist_claim_id
+  );$e$
   ]);
 
 SELECT pg_temp.evolve_function(
   'public.create_multi_service_booking(uuid, uuid, timestamptz, jsonb, boolean, text, text, text, text, integer, numeric, numeric, uuid, timestamptz[], timestamptz[], text)'::regprocedure,
   'public.create_multi_service_booking(uuid, uuid, timestamptz, jsonb, boolean, text, text, text, text, integer, numeric, numeric, uuid, timestamptz[], timestamptz[], text, uuid)',
   ARRAY[
-    E'request_source_token text DEFAULT NULL::text)\n RETURNS jsonb',
-    E'request_source_token, v_variants\n  );'
+    $e$request_source_token text DEFAULT NULL::text)
+ RETURNS jsonb$e$,
+    $e$request_source_token, v_variants
+  );$e$
   ],
   ARRAY[
-    E'request_source_token text DEFAULT NULL::text, request_waitlist_claim_id uuid DEFAULT NULL::uuid)\n RETURNS jsonb',
-    E'request_source_token, v_variants,\n    request_waitlist_claim_id\n  );'
+    $e$request_source_token text DEFAULT NULL::text, request_waitlist_claim_id uuid DEFAULT NULL::uuid)
+ RETURNS jsonb$e$,
+    $e$request_source_token, v_variants,
+    request_waitlist_claim_id
+  );$e$
   ]);
 
 DROP FUNCTION IF EXISTS pg_temp.evolve_function(regprocedure, text, text[], text[]);

@@ -136,14 +136,20 @@ $$;
 DROP FUNCTION IF EXISTS pg_temp.patch_function(regprocedure, text[], text[]);
 CREATE FUNCTION pg_temp.patch_function(p_sig regprocedure, p_from text[], p_to text[]) RETURNS void LANGUAGE plpgsql AS $helper$
 DECLARE
-  v_def text := replace(pg_get_functiondef(p_sig), E'\r\n', E'\n');
+  v_def text := replace(pg_get_functiondef(p_sig), $e$
+$e$, $e$
+$e$);
   i int;
 BEGIN
   FOR i IN 1 .. COALESCE(array_length(p_from, 1), 0) LOOP
-    IF position(replace(p_from[i], E'\r\n', E'\n') IN v_def) = 0 THEN
+    IF position(replace(p_from[i], $e$
+$e$, $e$
+$e$) IN v_def) = 0 THEN
       RAISE EXCEPTION 'patch_function: pattern % not found in %', i, p_sig;
     END IF;
-    v_def := replace(v_def, replace(p_from[i], E'\r\n', E'\n'), p_to[i]);
+    v_def := replace(v_def, replace(p_from[i], $e$
+$e$, $e$
+$e$), p_to[i]);
   END LOOP;
   EXECUTE v_def;
 END
@@ -153,12 +159,38 @@ $helper$;
 SELECT pg_temp.patch_function(
   'public.trigger_on_booking_completed_rewards()'::regprocedure,
   ARRAY[
-    E'  IF COALESCE((v_referral->>''enabled'')::boolean, FALSE) THEN\n    SELECT * INTO v_ref FROM public.customer_referrals\n    WHERE referee_id = NEW.customer_id AND status = ''pending''\n    ORDER BY created_at LIMIT 1 FOR UPDATE;\n\n    IF v_ref.id IS NOT NULL THEN\n',
-    E'      UPDATE public.customer_referrals\n      SET status = ''rewarded'''
+    $e$  IF COALESCE((v_referral->>'enabled')::boolean, FALSE) THEN
+    SELECT * INTO v_ref FROM public.customer_referrals
+    WHERE referee_id = NEW.customer_id AND status = 'pending'
+    ORDER BY created_at LIMIT 1 FOR UPDATE;
+
+    IF v_ref.id IS NOT NULL THEN
+$e$,
+    $e$      UPDATE public.customer_referrals
+      SET status = 'rewarded'$e$
   ],
   ARRAY[
-    E'  IF COALESCE((v_referral->>''enabled'')::boolean, FALSE)\n     AND COALESCE((v_referral->>''reward_sar'')::numeric, 0) > 0\n     AND NEW.source IS DISTINCT FROM ''walk_in''\n     AND NEW.total_price >= COALESCE((v_referral->>''min_qualifying_sar'')::numeric, 0) THEN\n    SELECT * INTO v_ref FROM public.customer_referrals\n    WHERE referee_id = NEW.customer_id AND status = ''pending''\n    ORDER BY created_at LIMIT 1 FOR UPDATE;\n\n    -- A referrer who already collected the maximum number of rewards in the last 30 days earns nothing more: the referral is closed, nobody is paid.\n    IF v_ref.id IS NOT NULL AND (v_referral->>''max_rewards_per_referrer_30d'') IS NOT NULL AND (\n      SELECT COUNT(*) FROM public.customer_referrals r\n      WHERE r.referrer_id = v_ref.referrer_id AND r.status = ''rewarded'' AND r.rewarded_at > now() - interval ''30 days''\n    ) >= (v_referral->>''max_rewards_per_referrer_30d'')::int THEN\n      UPDATE public.customer_referrals SET status = ''disqualified'', qualifying_booking_id = NEW.id WHERE id = v_ref.id;\n      v_ref.id := NULL;\n    END IF;\n\n    IF v_ref.id IS NOT NULL THEN\n',
-    E'      UPDATE public.customer_referrals\n      SET status = ''rewarded'''
+    $e$  IF COALESCE((v_referral->>'enabled')::boolean, FALSE)
+     AND COALESCE((v_referral->>'reward_sar')::numeric, 0) > 0
+     AND NEW.source IS DISTINCT FROM 'walk_in'
+     AND NEW.total_price >= COALESCE((v_referral->>'min_qualifying_sar')::numeric, 0) THEN
+    SELECT * INTO v_ref FROM public.customer_referrals
+    WHERE referee_id = NEW.customer_id AND status = 'pending'
+    ORDER BY created_at LIMIT 1 FOR UPDATE;
+
+    -- A referrer who already collected the maximum number of rewards in the last 30 days earns nothing more: the referral is closed, nobody is paid.
+    IF v_ref.id IS NOT NULL AND (v_referral->>'max_rewards_per_referrer_30d') IS NOT NULL AND (
+      SELECT COUNT(*) FROM public.customer_referrals r
+      WHERE r.referrer_id = v_ref.referrer_id AND r.status = 'rewarded' AND r.rewarded_at > now() - interval '30 days'
+    ) >= (v_referral->>'max_rewards_per_referrer_30d')::int THEN
+      UPDATE public.customer_referrals SET status = 'disqualified', qualifying_booking_id = NEW.id WHERE id = v_ref.id;
+      v_ref.id := NULL;
+    END IF;
+
+    IF v_ref.id IS NOT NULL THEN
+$e$,
+    $e$      UPDATE public.customer_referrals
+      SET status = 'rewarded'$e$
   ]);
 
 DROP FUNCTION IF EXISTS pg_temp.patch_function(regprocedure, text[], text[]);

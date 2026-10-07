@@ -47,14 +47,20 @@ GRANT EXECUTE ON FUNCTION public.branch_serves_location(uuid, numeric, numeric) 
 DROP FUNCTION IF EXISTS pg_temp.patch_function(regprocedure, text[], text[]);
 CREATE FUNCTION pg_temp.patch_function(p_sig regprocedure, p_from text[], p_to text[]) RETURNS void LANGUAGE plpgsql AS $helper$
 DECLARE
-  v_def text := replace(pg_get_functiondef(p_sig), E'\r\n', E'\n');
+  v_def text := replace(pg_get_functiondef(p_sig), $e$
+$e$, $e$
+$e$);
   i int;
 BEGIN
   FOR i IN 1 .. COALESCE(array_length(p_from, 1), 0) LOOP
-    IF position(replace(p_from[i], E'\r\n', E'\n') IN v_def) = 0 THEN
+    IF position(replace(p_from[i], $e$
+$e$, $e$
+$e$) IN v_def) = 0 THEN
       RAISE EXCEPTION 'patch_function: pattern % not found in %', i, p_sig;
     END IF;
-    v_def := replace(v_def, replace(p_from[i], E'\r\n', E'\n'), p_to[i]);
+    v_def := replace(v_def, replace(p_from[i], $e$
+$e$, $e$
+$e$), p_to[i]);
   END LOOP;
   EXECUTE v_def;
 END
@@ -64,13 +70,34 @@ SELECT pg_temp.patch_function(
   'public.booking_create_internal(uuid, uuid, uuid, uuid[], timestamptz, boolean, numeric, numeric, text, uuid, text, text, text, integer, timestamptz[], timestamptz[], text, uuid[])'::regprocedure,
   ARRAY[
     -- the any-professional pick only considers branches that serve the address
-    E'      AND e.is_active\n      AND (p_branch_id IS NULL OR e.branch_id = p_branch_id)\n',
+    $e$      AND e.is_active
+      AND (p_branch_id IS NULL OR e.branch_id = p_branch_id)
+$e$,
     -- the chosen professional's branch must serve the address
-    E'  IF v_branch_id IS NULL THEN\n    RAISE EXCEPTION ''The selected professional does not work at this provider'' USING ERRCODE = ''22023'';\n  END IF;\n'
+    $e$  IF v_branch_id IS NULL THEN
+    RAISE EXCEPTION 'The selected professional does not work at this provider' USING ERRCODE = '22023';
+  END IF;
+$e$
   ],
   ARRAY[
-    E'      AND e.is_active\n      AND (p_branch_id IS NULL OR e.branch_id = p_branch_id)\n      AND (NOT COALESCE(p_home_service, FALSE) OR public.branch_serves_location(e.branch_id, p_home_lat, p_home_lng))\n',
-    E'  IF v_branch_id IS NULL THEN\n    RAISE EXCEPTION ''The selected professional does not work at this provider'' USING ERRCODE = ''22023'';\n  END IF;\n\n  IF COALESCE(p_home_service, FALSE) THEN\n    IF p_home_lat NOT BETWEEN -90 AND 90 OR p_home_lng NOT BETWEEN -180 AND 180 THEN\n      RAISE EXCEPTION ''The home-visit coordinates are not valid'' USING ERRCODE = ''22023'';\n    END IF;\n    IF NOT public.branch_serves_location(v_branch_id, p_home_lat, p_home_lng) THEN\n      RAISE EXCEPTION ''This address is outside the branch home-visit area of % km'',\n        (SELECT b.geofence_radius_km FROM public.branches b WHERE b.id = v_branch_id) USING ERRCODE = ''22023'';\n    END IF;\n  END IF;\n'
+    $e$      AND e.is_active
+      AND (p_branch_id IS NULL OR e.branch_id = p_branch_id)
+      AND (NOT COALESCE(p_home_service, FALSE) OR public.branch_serves_location(e.branch_id, p_home_lat, p_home_lng))
+$e$,
+    $e$  IF v_branch_id IS NULL THEN
+    RAISE EXCEPTION 'The selected professional does not work at this provider' USING ERRCODE = '22023';
+  END IF;
+
+  IF COALESCE(p_home_service, FALSE) THEN
+    IF p_home_lat NOT BETWEEN -90 AND 90 OR p_home_lng NOT BETWEEN -180 AND 180 THEN
+      RAISE EXCEPTION 'The home-visit coordinates are not valid' USING ERRCODE = '22023';
+    END IF;
+    IF NOT public.branch_serves_location(v_branch_id, p_home_lat, p_home_lng) THEN
+      RAISE EXCEPTION 'This address is outside the branch home-visit area of % km',
+        (SELECT b.geofence_radius_km FROM public.branches b WHERE b.id = v_branch_id) USING ERRCODE = '22023';
+    END IF;
+  END IF;
+$e$
   ]);
 
 DROP FUNCTION IF EXISTS pg_temp.patch_function(regprocedure, text[], text[]);

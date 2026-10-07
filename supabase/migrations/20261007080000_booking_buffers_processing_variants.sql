@@ -103,16 +103,22 @@ DROP FUNCTION IF EXISTS pg_temp.evolve_function(regprocedure, text, text[], text
 CREATE FUNCTION pg_temp.evolve_function(p_old regprocedure, p_new_signature text, p_from text[], p_to text[])
 RETURNS void LANGUAGE plpgsql AS $helper$
 DECLARE
-  v_def text := replace(pg_get_functiondef(p_old), E'\r\n', E'\n');
+  v_def text := replace(pg_get_functiondef(p_old), $e$
+$e$, $e$
+$e$);
   v_new regprocedure;
   v_grantee text;
   i int;
 BEGIN
   FOR i IN 1 .. COALESCE(array_length(p_from, 1), 0) LOOP
-    IF position(replace(p_from[i], E'\r\n', E'\n') IN v_def) = 0 THEN
+    IF position(replace(p_from[i], $e$
+$e$, $e$
+$e$) IN v_def) = 0 THEN
       RAISE EXCEPTION 'evolve_function: pattern % not found in %', i, p_old;
     END IF;
-    v_def := replace(v_def, replace(p_from[i], E'\r\n', E'\n'), p_to[i]);
+    v_def := replace(v_def, replace(p_from[i], $e$
+$e$, $e$
+$e$), p_to[i]);
   END LOOP;
   EXECUTE v_def;
   v_new := to_regprocedure(p_new_signature);
@@ -143,14 +149,24 @@ SELECT pg_temp.evolve_function(
   'public.get_available_slots(uuid, date, integer, timestamptz[], timestamptz[])'::regprocedure,
   'public.get_available_slots(uuid, date, integer, timestamptz[], timestamptz[], integer, integer, uuid)',
   ARRAY[
-    E'prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[])\n RETURNS TABLE(slot_start timestamp with time zone)',
-    E'  v_duration INTERVAL := make_interval(mins => service_duration_minutes);\n',
-    E'            AND b.scheduled_at < v_slot_end\n            AND (b.scheduled_at + make_interval(mins => b.duration_minutes)) > v_slot_time\n'
+    $e$prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[])
+ RETURNS TABLE(slot_start timestamp with time zone)$e$,
+    $e$  v_duration INTERVAL := make_interval(mins => service_duration_minutes);
+$e$,
+    $e$            AND b.scheduled_at < v_slot_end
+            AND (b.scheduled_at + make_interval(mins => b.duration_minutes)) > v_slot_time
+$e$
   ],
   ARRAY[
-    E'prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[], p_buffer_before_minutes integer DEFAULT 0, p_buffer_after_minutes integer DEFAULT 0, p_ignore_booking_id uuid DEFAULT NULL::uuid)\n RETURNS TABLE(slot_start timestamp with time zone)',
-    E'  v_duration INTERVAL := make_interval(mins => service_duration_minutes);\n  v_before INTERVAL := make_interval(mins => GREATEST(COALESCE(p_buffer_before_minutes, 0), 0));\n  v_after INTERVAL := make_interval(mins => GREATEST(COALESCE(p_buffer_after_minutes, 0), 0));\n',
-    E'            AND b.booking_window && tstzrange(v_slot_time - v_before, v_slot_end + v_after, \'[)\')\n            AND b.id IS DISTINCT FROM p_ignore_booking_id\n'
+    $e$prayer_window_ends timestamp with time zone[] DEFAULT NULL::timestamp with time zone[], p_buffer_before_minutes integer DEFAULT 0, p_buffer_after_minutes integer DEFAULT 0, p_ignore_booking_id uuid DEFAULT NULL::uuid)
+ RETURNS TABLE(slot_start timestamp with time zone)$e$,
+    $e$  v_duration INTERVAL := make_interval(mins => service_duration_minutes);
+  v_before INTERVAL := make_interval(mins => GREATEST(COALESCE(p_buffer_before_minutes, 0), 0));
+  v_after INTERVAL := make_interval(mins => GREATEST(COALESCE(p_buffer_after_minutes, 0), 0));
+$e$,
+    $e$            AND b.booking_window && tstzrange(v_slot_time - v_before, v_slot_end + v_after, '[)')
+            AND b.id IS DISTINCT FROM p_ignore_booking_id
+$e$
   ]);
 
 -- ---------------------------------------------------------------------------
@@ -160,29 +176,83 @@ SELECT pg_temp.evolve_function(
   'public.booking_create_internal(uuid, uuid, uuid, uuid[], timestamptz, boolean, numeric, numeric, text, uuid, text, text, text, integer, timestamptz[], timestamptz[], text)'::regprocedure,
   'public.booking_create_internal(uuid, uuid, uuid, uuid[], timestamptz, boolean, numeric, numeric, text, uuid, text, text, text, integer, timestamptz[], timestamptz[], text, uuid[])',
   ARRAY[
-    E'p_source_token text DEFAULT NULL::text)\n RETURNS bookings',
-    E'  v_seq INT := 0;\nBEGIN',
-    E'  PERFORM public.assert_prayer_windows(p_prayer_window_starts, p_prayer_window_ends);\n',
-    E'        SELECT 1 FROM public.get_available_slots(\n          e.id, v_date,\n          (SELECT SUM(COALESCE(es.custom_duration_minutes, s.base_duration_minutes))::int\n           FROM public.employee_services es JOIN public.services s ON s.id = es.service_id\n           WHERE es.employee_id = e.id AND es.service_id = ANY(p_service_ids)),\n          p_prayer_window_starts, p_prayer_window_ends\n        ) sl\n        WHERE sl.slot_start = p_scheduled_at',
-    E'    SELECT s.id, COALESCE(es.custom_duration_minutes, s.base_duration_minutes) AS duration,\n           COALESCE(es.custom_price, s.base_price) AS price, ord.n\n    FROM unnest(p_service_ids) WITH ORDINALITY AS ord(service_id, n)\n    JOIN public.services s ON s.id = ord.service_id\n',
-    E'    v_duration := v_duration + v_item.duration;\n    v_subtotal := v_subtotal + v_item.price;\n  END LOOP;',
-    E'get_available_slots(v_employee_id, v_date, v_duration, p_prayer_window_starts, p_prayer_window_ends) sl',
-    E'      client_profile_id, source, is_first_visit, source_token_id\n    ) VALUES (',
-    E'      p_client_profile_id, v_source, v_first_visit, v_source_token_id\n    )',
-    E'    INSERT INTO public.booking_services (booking_id, service_id, employee_id, sequence_order, duration_minutes, price)\n    VALUES (v_booking.id, v_item.id, v_employee_id, v_item.n, v_item.duration, v_item.price);'
+    $e$p_source_token text DEFAULT NULL::text)
+ RETURNS bookings$e$,
+    $e$  v_seq INT := 0;
+BEGIN$e$,
+    $e$  PERFORM public.assert_prayer_windows(p_prayer_window_starts, p_prayer_window_ends);
+$e$,
+    $e$        SELECT 1 FROM public.get_available_slots(
+          e.id, v_date,
+          (SELECT SUM(COALESCE(es.custom_duration_minutes, s.base_duration_minutes))::int
+           FROM public.employee_services es JOIN public.services s ON s.id = es.service_id
+           WHERE es.employee_id = e.id AND es.service_id = ANY(p_service_ids)),
+          p_prayer_window_starts, p_prayer_window_ends
+        ) sl
+        WHERE sl.slot_start = p_scheduled_at$e$,
+    $e$    SELECT s.id, COALESCE(es.custom_duration_minutes, s.base_duration_minutes) AS duration,
+           COALESCE(es.custom_price, s.base_price) AS price, ord.n
+    FROM unnest(p_service_ids) WITH ORDINALITY AS ord(service_id, n)
+    JOIN public.services s ON s.id = ord.service_id
+$e$,
+    $e$    v_duration := v_duration + v_item.duration;
+    v_subtotal := v_subtotal + v_item.price;
+  END LOOP;$e$,
+    $e$get_available_slots(v_employee_id, v_date, v_duration, p_prayer_window_starts, p_prayer_window_ends) sl$e$,
+    $e$      client_profile_id, source, is_first_visit, source_token_id
+    ) VALUES ($e$,
+    $e$      p_client_profile_id, v_source, v_first_visit, v_source_token_id
+    )$e$,
+    $e$    INSERT INTO public.booking_services (booking_id, service_id, employee_id, sequence_order, duration_minutes, price)
+    VALUES (v_booking.id, v_item.id, v_employee_id, v_item.n, v_item.duration, v_item.price);$e$
   ],
   ARRAY[
-    E'p_source_token text DEFAULT NULL::text, p_variant_ids uuid[] DEFAULT NULL::uuid[])\n RETURNS bookings',
-    E'  v_seq INT := 0;\n  v_blocked_before INT := 0;\n  v_blocked_after INT := 0;\nBEGIN',
-    E'  PERFORM public.assert_prayer_windows(p_prayer_window_starts, p_prayer_window_ends);\n  IF p_variant_ids IS NOT NULL AND COALESCE(array_length(p_variant_ids, 1), 0) > COALESCE(array_length(p_service_ids, 1), 0) THEN\n    RAISE EXCEPTION \'At most one option per selected service can be given\' USING ERRCODE = \'22023\';\n  END IF;\n',
-    E'        SELECT 1 FROM public.booking_visit_profile(e.id, p_service_ids, p_variant_ids) vp\n        CROSS JOIN LATERAL public.get_available_slots(\n          e.id, v_date, vp.total_duration_minutes,\n          p_prayer_window_starts, p_prayer_window_ends, vp.blocked_before_minutes, vp.blocked_after_minutes\n        ) sl\n        WHERE vp.is_valid AND sl.slot_start = p_scheduled_at',
-    E'    SELECT s.id, COALESCE(sv.duration_minutes, es.custom_duration_minutes, s.base_duration_minutes) AS duration,\n           COALESCE(sv.price_sar, es.custom_price, s.base_price) AS price, ord.n, sv.id AS variant_id,\n           COALESCE(s.buffer_before_minutes, 0) AS buf_before, COALESCE(s.buffer_after_minutes, 0) AS buf_after,\n           COALESCE(s.processing_time_minutes, 0) AS processing\n    FROM unnest(p_service_ids) WITH ORDINALITY AS ord(service_id, n)\n    JOIN public.services s ON s.id = ord.service_id\n    LEFT JOIN public.service_variants sv ON sv.id = p_variant_ids[ord.n::int] AND sv.service_id = s.id AND sv.is_active\n',
-    E'    IF p_variant_ids IS NOT NULL AND p_variant_ids[v_item.n::int] IS NOT NULL AND v_item.variant_id IS NULL THEN\n      RAISE EXCEPTION \'The selected option is not available for this service\' USING ERRCODE = \'22023\';\n    END IF;\n    v_duration := v_duration + v_item.duration;\n    v_subtotal := v_subtotal + v_item.price;\n    -- Buffers and processing time keep the professional occupied around the visit (R15): the buffer before the first service,
-    -- and after the visit everything else (processing time, buffers after, the buffer before each later service).\n    IF v_item.n = 1 THEN\n      v_blocked_before := v_item.buf_before;\n    ELSE\n      v_blocked_after := v_blocked_after + v_item.buf_before;\n    END IF;\n    v_blocked_after := v_blocked_after + v_item.processing + v_item.buf_after;\n  END LOOP;',
-    E'get_available_slots(v_employee_id, v_date, v_duration, p_prayer_window_starts, p_prayer_window_ends, v_blocked_before, v_blocked_after) sl',
-    E'      client_profile_id, source, is_first_visit, source_token_id, blocked_before_minutes, blocked_after_minutes\n    ) VALUES (',
-    E'      p_client_profile_id, v_source, v_first_visit, v_source_token_id, v_blocked_before, v_blocked_after\n    )',
-    E'    INSERT INTO public.booking_services (booking_id, service_id, employee_id, sequence_order, duration_minutes, price, variant_id)\n    VALUES (v_booking.id, v_item.id, v_employee_id, v_item.n, v_item.duration, v_item.price, v_item.variant_id);'
+    $e$p_source_token text DEFAULT NULL::text, p_variant_ids uuid[] DEFAULT NULL::uuid[])
+ RETURNS bookings$e$,
+    $e$  v_seq INT := 0;
+  v_blocked_before INT := 0;
+  v_blocked_after INT := 0;
+BEGIN$e$,
+    $e$  PERFORM public.assert_prayer_windows(p_prayer_window_starts, p_prayer_window_ends);
+  IF p_variant_ids IS NOT NULL AND COALESCE(array_length(p_variant_ids, 1), 0) > COALESCE(array_length(p_service_ids, 1), 0) THEN
+    RAISE EXCEPTION 'At most one option per selected service can be given' USING ERRCODE = '22023';
+  END IF;
+$e$,
+    $e$        SELECT 1 FROM public.booking_visit_profile(e.id, p_service_ids, p_variant_ids) vp
+        CROSS JOIN LATERAL public.get_available_slots(
+          e.id, v_date, vp.total_duration_minutes,
+          p_prayer_window_starts, p_prayer_window_ends, vp.blocked_before_minutes, vp.blocked_after_minutes
+        ) sl
+        WHERE vp.is_valid AND sl.slot_start = p_scheduled_at$e$,
+    $e$    SELECT s.id, COALESCE(sv.duration_minutes, es.custom_duration_minutes, s.base_duration_minutes) AS duration,
+           COALESCE(sv.price_sar, es.custom_price, s.base_price) AS price, ord.n, sv.id AS variant_id,
+           COALESCE(s.buffer_before_minutes, 0) AS buf_before, COALESCE(s.buffer_after_minutes, 0) AS buf_after,
+           COALESCE(s.processing_time_minutes, 0) AS processing
+    FROM unnest(p_service_ids) WITH ORDINALITY AS ord(service_id, n)
+    JOIN public.services s ON s.id = ord.service_id
+    LEFT JOIN public.service_variants sv ON sv.id = p_variant_ids[ord.n::int] AND sv.service_id = s.id AND sv.is_active
+$e$,
+    $e$    IF p_variant_ids IS NOT NULL AND p_variant_ids[v_item.n::int] IS NOT NULL AND v_item.variant_id IS NULL THEN
+      RAISE EXCEPTION 'The selected option is not available for this service' USING ERRCODE = '22023';
+    END IF;
+    v_duration := v_duration + v_item.duration;
+    v_subtotal := v_subtotal + v_item.price;
+    -- Buffers and processing time keep the professional occupied around the visit (R15): the buffer before the first service,
+    -- and after the visit everything else (processing time, buffers after, the buffer before each later service).
+    IF v_item.n = 1 THEN
+      v_blocked_before := v_item.buf_before;
+    ELSE
+      v_blocked_after := v_blocked_after + v_item.buf_before;
+    END IF;
+    v_blocked_after := v_blocked_after + v_item.processing + v_item.buf_after;
+  END LOOP;$e$,
+    $e$get_available_slots(v_employee_id, v_date, v_duration, p_prayer_window_starts, p_prayer_window_ends, v_blocked_before, v_blocked_after) sl$e$,
+    $e$      client_profile_id, source, is_first_visit, source_token_id, blocked_before_minutes, blocked_after_minutes
+    ) VALUES ($e$,
+    $e$      p_client_profile_id, v_source, v_first_visit, v_source_token_id, v_blocked_before, v_blocked_after
+    )$e$,
+    $e$    INSERT INTO public.booking_services (booking_id, service_id, employee_id, sequence_order, duration_minutes, price, variant_id)
+    VALUES (v_booking.id, v_item.id, v_employee_id, v_item.n, v_item.duration, v_item.price, v_item.variant_id);$e$
   ]);
 
 -- Both loops of booking_create_internal (pricing, then the booking_services rows) share one select list; the shared text is replaced in both,
@@ -195,26 +265,40 @@ SELECT pg_temp.evolve_function(
   'public.create_booking(uuid, uuid, timestamptz, boolean, numeric, numeric, uuid, text, text, text, integer, uuid, text, timestamptz[], timestamptz[], text)'::regprocedure,
   'public.create_booking(uuid, uuid, timestamptz, boolean, numeric, numeric, uuid, text, text, text, integer, uuid, text, timestamptz[], timestamptz[], text, uuid)',
   ARRAY[
-    E'request_source_token text DEFAULT NULL::text)\n RETURNS bookings',
-    E'prayer_window_starts, prayer_window_ends, request_source_token\n  );'
+    $e$request_source_token text DEFAULT NULL::text)
+ RETURNS bookings$e$,
+    $e$prayer_window_starts, prayer_window_ends, request_source_token
+  );$e$
   ],
   ARRAY[
-    E'request_source_token text DEFAULT NULL::text, request_variant_id uuid DEFAULT NULL::uuid)\n RETURNS bookings',
-    E'prayer_window_starts, prayer_window_ends, request_source_token,\n    CASE WHEN request_variant_id IS NULL THEN NULL ELSE ARRAY[request_variant_id] END\n  );'
+    $e$request_source_token text DEFAULT NULL::text, request_variant_id uuid DEFAULT NULL::uuid)
+ RETURNS bookings$e$,
+    $e$prayer_window_starts, prayer_window_ends, request_source_token,
+    CASE WHEN request_variant_id IS NULL THEN NULL ELSE ARRAY[request_variant_id] END
+  );$e$
   ]);
 
 SELECT pg_temp.evolve_function(
   'public.create_multi_service_booking(uuid, uuid, timestamptz, jsonb, boolean, text, text, text, text, integer, numeric, numeric, uuid, timestamptz[], timestamptz[], text)'::regprocedure,
   'public.create_multi_service_booking(uuid, uuid, timestamptz, jsonb, boolean, text, text, text, text, integer, numeric, numeric, uuid, timestamptz[], timestamptz[], text)',
   ARRAY[
-    E'  v_ids UUID[];\n',
-    E'  SELECT array_agg((item->>''service_id'')::uuid ORDER BY n)\n  INTO v_ids\n',
-    E'prayer_window_starts, prayer_window_ends, request_source_token\n  );'
+    $e$  v_ids UUID[];
+$e$,
+    $e$  SELECT array_agg((item->>'service_id')::uuid ORDER BY n)
+  INTO v_ids
+$e$,
+    $e$prayer_window_starts, prayer_window_ends, request_source_token
+  );$e$
   ],
   ARRAY[
-    E'  v_ids UUID[];\n  v_variants UUID[];\n',
-    E'  SELECT array_agg((item->>''service_id'')::uuid ORDER BY n), array_agg(NULLIF(item->>''variant_id'', '''')::uuid ORDER BY n)\n  INTO v_ids, v_variants\n',
-    E'prayer_window_starts, prayer_window_ends, request_source_token, v_variants\n  );'
+    $e$  v_ids UUID[];
+  v_variants UUID[];
+$e$,
+    $e$  SELECT array_agg((item->>'service_id')::uuid ORDER BY n), array_agg(NULLIF(item->>'variant_id', '')::uuid ORDER BY n)
+  INTO v_ids, v_variants
+$e$,
+    $e$prayer_window_starts, prayer_window_ends, request_source_token, v_variants
+  );$e$
   ]);
 
 -- ---------------------------------------------------------------------------
@@ -224,12 +308,25 @@ SELECT pg_temp.evolve_function(
   'public.reschedule_booking(uuid, timestamptz, uuid, text, timestamptz[], timestamptz[])'::regprocedure,
   'public.reschedule_booking(uuid, timestamptz, uuid, text, timestamptz[], timestamptz[])',
   ARRAY[
-    E'get_available_slots(v_employee, v_date, v_booking.duration_minutes, prayer_window_starts, prayer_window_ends) sl',
-    E'  ) AND NOT (\n    -- The only thing occupying the new slot is this booking itself (same professional, overlapping move).\n    v_employee = v_booking.employee_id\n    AND tstzrange(v_booking.scheduled_at, v_booking.scheduled_at + make_interval(mins => v_booking.duration_minutes))\n        && tstzrange(new_scheduled_at, new_scheduled_at + make_interval(mins => v_booking.duration_minutes))\n    AND NOT EXISTS (\n      SELECT 1 FROM public.bookings b\n      WHERE b.employee_id = v_employee AND b.id <> v_booking.id\n        AND b.status IN (''pending_payment'', ''confirmed'')\n        AND tstzrange(b.scheduled_at, b.scheduled_at + make_interval(mins => b.duration_minutes))\n            && tstzrange(new_scheduled_at, new_scheduled_at + make_interval(mins => v_booking.duration_minutes))\n    )\n  ) THEN'
+    $e$get_available_slots(v_employee, v_date, v_booking.duration_minutes, prayer_window_starts, prayer_window_ends) sl$e$,
+    $e$  ) AND NOT (
+    -- The only thing occupying the new slot is this booking itself (same professional, overlapping move).
+    v_employee = v_booking.employee_id
+    AND tstzrange(v_booking.scheduled_at, v_booking.scheduled_at + make_interval(mins => v_booking.duration_minutes))
+        && tstzrange(new_scheduled_at, new_scheduled_at + make_interval(mins => v_booking.duration_minutes))
+    AND NOT EXISTS (
+      SELECT 1 FROM public.bookings b
+      WHERE b.employee_id = v_employee AND b.id <> v_booking.id
+        AND b.status IN ('pending_payment', 'confirmed')
+        AND tstzrange(b.scheduled_at, b.scheduled_at + make_interval(mins => b.duration_minutes))
+            && tstzrange(new_scheduled_at, new_scheduled_at + make_interval(mins => v_booking.duration_minutes))
+    )
+  ) THEN$e$
   ],
   ARRAY[
-    E'get_available_slots(v_employee, v_date, v_booking.duration_minutes, prayer_window_starts, prayer_window_ends,\n                                             v_booking.blocked_before_minutes, v_booking.blocked_after_minutes, v_booking.id) sl',
-    E'  ) THEN'
+    $e$get_available_slots(v_employee, v_date, v_booking.duration_minutes, prayer_window_starts, prayer_window_ends,
+                                             v_booking.blocked_before_minutes, v_booking.blocked_after_minutes, v_booking.id) sl$e$,
+    $e$  ) THEN$e$
   ]);
 
 DROP FUNCTION IF EXISTS pg_temp.evolve_function(regprocedure, text, text[], text[]);
