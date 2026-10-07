@@ -21,6 +21,7 @@ run the whole DB suite.
 | D12 / C-D12 | fixed | `20261007095000_loyalty_spend_equals_discount.sql` | `booking_engine_loyalty.test.mjs` |
 | D4 part b / C-D4 wallet spend | fixed (DB part; wallet/checkout screens deferred) | `20261007096000_wallet_credit_spend.sql` | `booking_engine_wallet_credit.test.mjs` |
 | D4 (a, c) and D4b referral rules | fixed (DB part; login `?ref` capture and wallet copy deferred) | `20261007097000_referral_rules.sql` | `booking_engine_referrals.test.mjs` |
+| D14 / C-D14 | fixed for reachable recipients (decision pending for non-users) | `20261007098000_gift_card_received_message.sql` | `booking_engine_gift_card_message.test.mjs` |
 | R24 / C-D16 | fixed (DB part; shop page and mobile pass the list) | `20261007090000_branch_slots_any_professional.sql` | `booking_engine_branch_slots.test.mjs`, `qa_adversarial.test.mjs` (allow-list updated) |
 
 ## Callers cheat-sheet (current signatures; every new argument is optional and last, named arguments keep old callers working)
@@ -256,3 +257,15 @@ default and the seeded setting.
 - `trigger_on_booking_completed_rewards` pays only for a booking whose source is not `walk_in` and whose `total_price` reaches the minimum, only while `enabled` and `reward_sar > 0`, once, and respects the cap.
 - Screens (not touched): `web_platform/src/app/login/page.tsx` must read `?ref`, keep it through sign-up and call `apply_referral_code` once after sign-in; `customer/wallet/page.tsx` must drop the hard-coded SAR 25
   (EN lines ~29-30, AR ~62-63) and read `reward_per_friend_sar`, hiding the card while `programme_active` is false.
+
+## 7f. D14 / C-D14 gift card received message (fixed for registered recipients)
+
+Reproduced by reading the code and the base queue (no message template or queue write referenced a gift card; the new test fails without the migration).
+- New `message_templates` rows `gift_card_received` (ar, en; utility; `is_transactional = true`; Meta template name `primora_gift_card_received`, which must be approved in WhatsApp Manager;
+  `body_param_keys` follow the placeholders: recipient_name, sender_name, amount, gift_code, expires_date, gift_message).
+- Additive trigger `trigger_enqueue_gift_card_received` on `gift_cards` (pending_payment -> active, i.e. the payment webhook through `confirm_purchase_payment`, which is not touched) queues the message once for the
+  recipient when their phone number (normalised like the client import: `05xxxxxxxx` -> `+9665xxxxxxxx`) belongs to a verified profile; the sender message is cut at 300 characters, an empty one becomes "-".
+  `gift_cards.recipient_notice_status` ('queued' | 'not_reachable'), `recipient_notice_queued_at`, `recipient_notice_queue_id` record the outcome for the screen.
+- LIMIT (decision for the owner and legal review): the dispatcher only sends to a verified registered user with an active WhatsApp consent. A recipient without an account is marked `not_reachable` and nothing is
+  queued; the purchaser must pass the code on (the gift-card screen must say so, and the "Send" wording should become "Create gift card" until messaging non-users is approved under PDPL).
+  A recipient with an account but no WhatsApp consent is queued and then skipped by the dispatcher (`skipped_no_consent`), as for every other message.
