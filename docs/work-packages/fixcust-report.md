@@ -52,7 +52,7 @@ local state only (no table stores channel preferences): deferred, reported here 
 | `npm run test --workspace=web_platform` | 195 tests, 195 pass, 0 fail (new: `booking-display.test.mjs` 15, `prayer-windows.test.mjs` 2, `customer-portal-guards.test.mjs` 7) |
 | `node scripts/verify-ui-schema.mjs` | `checked 83 rpc calls and 193 select strings (7 dynamic calls not checked); 0 mismatches, 0 in the baseline` (covers `record_consent`, `cancel_booking`, `reschedule_booking`, `get_available_slots` with the prayer-window arguments, and the new selects on `bookings`, `transactional_ledger`, `providers`, `branches`) |
 | `npm run test:security-core`, `npm run test:admin-controls` | both passed |
-| `npm run build --workspace=web_platform` | see the last line of this section |
+| `npm run build --workspace=web_platform` | fails before compiling any page: `Symlink [project]/node_modules is invalid, it points out of the filesystem root` (Turbopack and the junctioned `node_modules`; the README anticipates this). Not caused by the changes: the integrator builds after merging. `tsc` and the Suspense wrapper around `useSearchParams` are the stand-in checks |
 
 ## Needs from other packages (no migration written here)
 
