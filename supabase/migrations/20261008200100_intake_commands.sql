@@ -686,15 +686,15 @@ CREATE OR REPLACE FUNCTION public.withdraw_health_data_consent() RETURNS JSONB
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE
   v_uid UUID := auth.uid();
-  v_started TIMESTAMPTZ := clock_timestamp();
+  v_before INTEGER;
   v_n INTEGER;
 BEGIN
   IF v_uid IS NULL THEN
     RAISE EXCEPTION 'Authentication required' USING ERRCODE = '28000';
   END IF;
+  SELECT count(*)::integer INTO v_before FROM public.intake_submissions WHERE customer_id = v_uid AND status = 'submitted';
   PERFORM public.record_consent('health_data', 'withdrawn', 'v1.0', 'web_form');
-  SELECT count(*)::integer INTO v_n FROM public.intake_submissions
-   WHERE customer_id = v_uid AND removal_reason = 'consent_withdrawn' AND answers_removed_at >= v_started;
+  SELECT v_before - count(*)::integer INTO v_n FROM public.intake_submissions WHERE customer_id = v_uid AND status = 'submitted';
   RETURN jsonb_build_object('withdrawn', TRUE, 'answers_removed', v_n);
 END $$;
 REVOKE ALL ON FUNCTION public.withdraw_health_data_consent() FROM PUBLIC, anon, authenticated;
