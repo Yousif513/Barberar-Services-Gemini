@@ -156,6 +156,7 @@ const extraCopy = {
     payRules: "Pay rules",
     portfolio: "Portfolio",
     earningsFailed: "Earnings could not be loaded: ",
+    contactsFailed: "Phone numbers and emails could not be loaded: ",
     invalidYears: "Years of experience must be a whole number from 0 to 60.",
     invalidInstagram: "The Instagram handle may use letters, digits, dots and underscores only (30 characters at most).",
     deleteTitle: "Delete this professional?",
@@ -177,6 +178,7 @@ const extraCopy = {
     payRules: "قواعد الأجر",
     portfolio: "معرض الأعمال",
     earningsFailed: "تعذر تحميل الأرباح: ",
+    contactsFailed: "تعذر تحميل أرقام الهواتف والبريد: ",
     invalidYears: "سنوات الخبرة رقم صحيح من 0 إلى 60.",
     invalidInstagram: "حساب إنستغرام يقبل الحروف والأرقام والنقطة والشرطة السفلية فقط (30 حرفاً كحد أقصى).",
     deleteTitle: "حذف هذا الأخصائي؟",
@@ -380,7 +382,7 @@ export default function ProviderEmployeesPage() {
     return `${labels[first.day]} - ${labels[last.day]} (${first.start} - ${last.end})`;
   }, [lang, teamCopy.closed]);
 
-  const normalizeStaffMember = useCallback((employee: any, serviceOptions: ServiceOption[] = [], earnings: Record<string, { earned: number; bookings: number }> = {}): StaffMember => {
+  const normalizeStaffMember = useCallback((employee: any, serviceOptions: ServiceOption[] = [], earnings: Record<string, { earned: number; bookings: number }> = {}, contacts: Record<string, { phone: string; email: string }> = {}): StaffMember => {
     const serviceIds = (employee.employee_services || [])
       .map((row: any) => row.service_id as string)
       .filter(Boolean);
@@ -415,8 +417,8 @@ export default function ProviderEmployeesPage() {
       servicesCount: serviceIds.length,
       avatar: String(displayName || "S").trim().charAt(0).toUpperCase(),
       photoUrl: employee.photo_url || "",
-      phone: employee.phone || "",
-      email: employee.email || "",
+      phone: contacts[employee.id]?.phone || "",
+      email: contacts[employee.id]?.email || "",
       workType,
       workTypeLabel: getWorkTypeLabel(workType),
       totalEarnings: earnings[employee.id]?.earned ?? 0,
@@ -523,8 +525,6 @@ export default function ProviderEmployeesPage() {
           title_ar,
           is_active,
           photo_url,
-          phone,
-          email,
           work_type,
           bio_en,
           bio_ar,
@@ -558,7 +558,17 @@ export default function ProviderEmployeesPage() {
           }
         }
       }
-      setLiveStaffMembers((staffData || []).map((employee) => normalizeStaffMember(employee, normalizedServices, earnings)));
+      // Phone and email are private columns; the owner (or a delegate with the staff permission) reads them through this command.
+      const contacts: Record<string, { phone: string; email: string }> = {};
+      if (staffIds.length > 0) {
+        const { data: contactRows, error: contactsError } = await supabase.rpc("get_provider_staff_contacts", { p_provider_id: providerInfo.id });
+        if (contactsError) {
+          setError(extraCopy[lang].contactsFailed + errorMessage(contactsError));
+        } else {
+          for (const row of contactRows || []) contacts[row.employee_id] = { phone: row.phone || "", email: row.email || "" };
+        }
+      }
+      setLiveStaffMembers((staffData || []).map((employee) => normalizeStaffMember(employee, normalizedServices, earnings, contacts)));
     } catch (err) {
       console.error("Error loading team roster:", err);
       setError(teamCopy.loadFailed);

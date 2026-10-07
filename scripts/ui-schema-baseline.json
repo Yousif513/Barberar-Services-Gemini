@@ -1,1 +1,6 @@
-[]
+[
+  "web_platform/src/app/provider/_components/booking-policy-card.tsx | from(\"providers\").select | column \"policy_confirmed_at\" is not in providers",
+  "web_platform/src/app/provider/_components/booking-policy-card.tsx | rpc(\"set_provider_booking_policy\") | the function does not exist",
+  "web_platform/src/app/provider/employees/page.tsx | rpc(\"get_provider_staff_contacts\") | the function does not exist",
+  "web_platform/src/app/provider/settings/page.tsx | rpc(\"get_provider_private_profile\") | the function does not exist"
+]
