@@ -82,3 +82,45 @@ Web or mobile queries that read a hidden column (found by grepping every hidden 
 2. `web_platform/src/app/provider/settings/page.tsx:230` selects `contact_phone` from `providers` - the whole query now fails with "permission denied"; must read `get_provider_private_profile()` (the update at `:312` is unaffected). NOT edited here (provider screen package).
 3. `web_platform/src/app/provider/employees/page.tsx:475-486` selects `phone, email` from `employees` - must read `get_provider_staff_contacts()` and merge by `employee_id`. NOT edited here.
 Until 2 and 3 are merged, those two screens cannot load their data. `node scripts/verify-ui-schema.mjs` does not check column privileges and reports 0 mismatches.
+
+## Verification (run from the worktree, after the last commit)
+
+| Command | Result |
+|---|---|
+| `node --test supabase/tests/db/fixdba_*.test.mjs` (7 files: booking_policy, reminders, applications_agreements, consent_evidence, access_hardening, home_address, column_privileges) | 85 tests, 85 pass |
+| `node --test "supabase/tests/db/**/*.test.mjs"` (whole DB suite) | 330 tests, 330 pass, 0 fail |
+| `node --test supabase/tests/inventory.test.mjs` | 10 tests, 10 pass |
+| `node scripts/verify-ui-schema.mjs` | 83 rpc calls and 194 select strings checked, 0 mismatches |
+| `npx tsc --noEmit -p .` (in `web_platform`) | exit 0, no output |
+| `npx eslint src/app/admin/integrations/page.tsx src/app/admin/providers/provider-management.tsx --quiet` | exit 0, no errors |
+| `node --test "tests/**/*.test.mjs"` (in `web_platform`), `node scripts/verify-security-core.mjs`, `node scripts/verify-admin-controls.mjs` | 171/171 pass; both scripts report passed |
+
+Every new test was written against the defect first (the policy, constraint or missing command) and fails on the base commit for the reason the review gives (for example `deposit_percentage = 0` accepted, a customer inserting `reply_comment`, `select vat_number` returning a row, an acceptance back-dated 400 days). I did not run each test against the base commit one by one; the base-commit failures follow from the migrations being absent.
+
+## Existing tests changed, and why
+
+- `booking.test.mjs` lines 126 and 151: `free_cancellation_hours = 2000` (an unbounded value) became `720`, the new maximum; still longer than any lead time those tests use.
+- `trust.test.mjs` "activates an approved provider...": publishes the provider agreement, has the applicant accept it, passes `city` (no default any more).
+- `data_api_grants.test.mjs`: `accepted_payment_methods` removed from the anonymous catalogue (anonymous SELECT was revoked).
+- `security_hardening.test.mjs` "does not change what the provider owner and the administrator can read" asserted the exact behaviour R10 removes; it now asserts the table read is refused and the commands serve the same data.
+
+## Not done / needs another package
+
+- D-07 / D-12 / D-25 screens: `become-provider/page.tsx` still hard-codes `city: "Riyadh"`, sends no coordinates, and records the agreement only after inserting the application. With the new rules the insert fails (22023) until the provider agreement is published, and approval fails until location and acceptance exist. The page needs: a city and location input (or geocoded address), the "agreement not yet published" state, and a clear message for 23505 (open application exists) and 23514 (https link only). The owner's admin screen needs a way to enter a location for an application that has none (an administrator can UPDATE `latitude`/`longitude` on `provider_applications` through the existing policy).
+- D-27 screens: provider settings card for `set_provider_booking_policy`, and the dashboard "Policy" step from `policy_confirmed_at IS NOT NULL`. The delegate permission key is `settings` in `provider_memberships.permissions` (no screen sets it yet).
+- D-15 screens: five callers must move to `record_consents` / `submit_data_request` (listed above), otherwise consent and data-request inserts now fail with 42501.
+- R10 screens: `provider/settings/page.tsx:230` and `provider/employees/page.tsx:475-486` (listed above).
+- R12: no UI exists for home service; the reveal command is `get_booking_address_secure`.
+- C-D24: routing checkout by `gateway_key` is not built (product decision); the integrations screen's "connected" and method tick-boxes still do not change checkout.
+- D-25: a private Storage bucket for the trade licence (the review's "better" option) is not built; the https-only CHECK is.
+- Real Postgres 15 was not available (PGlite only); statements were kept to standard Postgres (`ALTER VIEW ... SET (security_invoker)`, column grants, deferrable FK, `pg_get_functiondef` patches). The migration chain has not been run against the hosted project (unreachable from here).
+
+## Files touched outside `supabase/migrations/2026100701*` and `supabase/tests/db/fixdba_*`
+
+- `web_platform/src/app/admin/integrations/page.tsx` (C-D3b), `web_platform/src/app/admin/providers/provider-management.tsx` (R10, select list and one RPC call)
+- `supabase/tests/db/booking.test.mjs`, `trust.test.mjs`, `data_api_grants.test.mjs`, `security_hardening.test.mjs` (see above)
+- `docs/work-packages/fixdba-report.md`
+
+## Functions patched in place (pg_temp.patch_function, no copies pasted)
+
+`admin_update_platform_setting`, `claim_message_batch`, `record_agreement_acceptance`, `approve_provider_application` (uuid, text, numeric), `record_consent`, `get_booking_address_secure`. `admin_provider_performance` (a view) was re-created with identical columns. Untouched on purpose: `booking_create_internal`, `get_available_slots`, `create_walk_in_booking`, `is_provider_staff`, the inventory functions.
