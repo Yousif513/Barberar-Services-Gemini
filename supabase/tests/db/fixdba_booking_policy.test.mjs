@@ -23,6 +23,8 @@ before(async () => {
     const id = await createUser(db, { role: "customer" });
     await sys(db, `insert into provider_memberships (user_id, provider_id, branch_id, role, permissions) values ($1, $2, $3, $4, $5::jsonb)`,
       [id, SEED.provider1, branch, role, JSON.stringify(permissions)]);
+    // A delegation belongs to registered staff: the person is an employee of the provider too (the command that grants it requires that).
+    await sys(db, `insert into employees (branch_id, profile_id, name_en, name_ar) values ($1, $2, 'Delegate', 'مفوّض')`, [SEED.branch1, id]);
     return ROLES.user(id);
   };
   delegate = await member("manager", { settings: true }, null);
