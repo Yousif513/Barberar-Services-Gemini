@@ -89,7 +89,7 @@ SELECT pg_temp.patch_function('public.get_provider_monthly_value_summary(uuid, d
   $to$IF NOT public.can_access_provider_wide(p_provider_id, 'reports') THEN$to$);
 
 -- Walk-in bookings and package sessions: the owner, an employee, an administrator, or a delegate with the bookings permission.
-SELECT pg_temp.patch_function('public.create_walk_in_booking(uuid, uuid, uuid, text, text, text, numeric, timestamp with time zone)'::regprocedure,
+SELECT pg_temp.patch_function('public.create_walk_in_booking(uuid, uuid, uuid, text, text, text, numeric, timestamp with time zone, text)'::regprocedure,
   $from$IF NOT (public.is_provider_staff(v_provider_id, v_user_id) OR public.is_admin()) THEN$from$,
   $to$IF NOT (public.is_provider_staff(v_provider_id, v_user_id) OR public.is_admin() OR public.can_access_provider_operation(v_provider_id, NULL, 'bookings')) THEN$to$);
 
