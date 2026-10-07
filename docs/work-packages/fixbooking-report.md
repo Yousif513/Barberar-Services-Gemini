@@ -46,7 +46,12 @@ Pass these by NAME through PostgREST (`supabase.rpc(name, { ... })`). Argument n
 - Slot display: format with `ar-SA`/`en` and `timeZone: 'Asia/Riyadh'`; amounts in SAR only.
 - 7b: `create_booking` and `create_multi_service_booking` take **`request_user_package_id`** (uuid of the customer's `user_packages` row; last argument).
 - 7e: `create_booking` and `create_multi_service_booking` take **`request_wallet_credit_amount`** (numeric SAR, two decimals; last argument).
-- Items 7c-7f ( coupon limit, loyalty, wallet credit and referral, gift card message) add further arguments; they are listed in their sections below as they land.
+- 7c/7d/7f add no argument. 7e adds **`request_wallet_credit_amount`** (above). Final order of the optional trailing arguments of `create_booking`: `prayer_window_starts, prayer_window_ends,
+  request_source_token, request_variant_id, request_waitlist_claim_id, request_user_package_id, request_wallet_credit_amount`; of `create_multi_service_booking`: `prayer_window_starts, prayer_window_ends,
+  request_source_token, request_waitlist_claim_id, request_user_package_id, request_wallet_credit_amount` (variants travel in `services_payload`). Always call them with named arguments.
+- Other changed contracts: `claim_waitlist_slot` (returns the held slot, no longer flips the row), `join_waitlist` (verified phone + WhatsApp consent required),
+  `get_or_create_referral_code` (adds `programme_active`, reward from settings), `apply_referral_code` (refuses when the programme is inactive, for customers with history, reverse referrals),
+  `promotional_codes.per_customer_limit` / `first_booking_only`, `bookings.user_package_id` / `package_covered_amount` / `wallet_credit_amount` / `source_token_id` / `blocked_*_minutes`.
 
 ## 1. D-21 / R3 prayer windows and the Riyadh clock (fixed)
 
@@ -97,7 +102,7 @@ claimed channel pays the marketplace fee).
 
 - New table `provider_share_tokens` (provider, channel link|qr|whatsapp|instagram, random 64-hex token, label, optional expiry, revoked_at/by/reason). RLS: the
   owning provider and administrators read; there is no write policy. Grants through `grant_data_api_access`, audit trigger attached.
-- Owner commands `create_provider_share_token(p_provider_id, p_source, p_label, p_expires_at)` (returns the token once more on read: owners read it from the table)
+- Owner commands `create_provider_share_token(p_provider_id, p_source, p_label, p_expires_at)` (returns the token; the owner can read it again from the table)
   and `revoke_provider_share_token(p_token_id, p_reason)` (reason 3+ chars, idempotent). Owner or administrator only; anyone else gets `P0002` not found;
   anonymous is refused by privilege; at most 50 live tokens per provider; both write an audit row (`provider.share_token_created` / `_revoked`).
 - `resolve_booking_source` (internal) decides the channel: a live token of THAT provider gives the token's channel (the claimed `request_source` is ignored); `import` is
@@ -269,3 +274,39 @@ Reproduced by reading the code and the base queue (no message template or queue 
 - LIMIT (decision for the owner and legal review): the dispatcher only sends to a verified registered user with an active WhatsApp consent. A recipient without an account is marked `not_reachable` and nothing is
   queued; the purchaser must pass the code on (the gift-card screen must say so, and the "Send" wording should become "Create gift card" until messaging non-users is approved under PDPL).
   A recipient with an account but no WhatsApp consent is queued and then skipped by the dispatcher (`skipped_no_consent`), as for every other message.
+
+## Verification (worktree primora-wp-fixbooking, branch wp/fixbooking, final commit)
+
+| Command | Result |
+|---|---|
+| `node --test "supabase/tests/db/**/*.test.mjs"` | 375 tests, 375 pass, 0 fail (before this package: 245) |
+| the new files `supabase/tests/db/booking_engine_*.test.mjs` (13 files) | 129 tests: 11 prayer windows, 15 overnight, 12 attribution, 15 buffers/variants, 10 branch slots, 8 home radius, 9 waitlist, 10 packages, 7 coupons, 8 loyalty, 8 wallet, 9 referrals, 7 gift card; plus 1 test added to `booking.test.mjs` |
+| `node --test supabase/tests/inventory.test.mjs` | 10 pass, 0 fail |
+| `node scripts/verify-ui-schema.mjs` | checked 82 rpc calls and 195 select strings, 0 mismatches |
+| `npm run test --workspace=web_platform` | 171 pass, 0 fail |
+| `npm run test:security-core` / `npm run test:admin-controls` | both "verification passed" |
+
+Every defect was reproduced first (a failing assertion, or a script on the base commit for D-21, R15, D10, R42) and the same test passes after the fix.
+Not run here: `npm run typecheck:mobile`, `npm run build --workspace=web_platform`, eslint (no TypeScript or page was changed). Real Postgres 15 and pg_cron were not available: the migrations were proven
+on PGlite only, so the `cron.schedule` block (guarded by `pg_available_extensions`) is unproven there; `acldefault` / `aclexplode` exist in Postgres 15.
+
+## Files touched outside the six owned functions (for the integrator)
+
+- Migrations added, in order (all `2026100705..098000`, one topic each): `050000` prayer windows, `060000` overnight/seasons, `070000` attribution tokens, `080000` buffers/variants, `090000` branch slots,
+  `091000` home radius, `092000` waitlist claim, `093000` packages, `094000` coupons, `095000` loyalty, `096000` wallet spend, `097000` referral rules, `098000` gift card message.
+- Existing functions patched in place from their latest definition (not among the six, but required by the defects): `set_booking_window` (trigger function), `booking_release_discounts`,
+  `redeem_package_session`, `claim_waitlist_slot` (rewritten, same signature), `join_waitlist`, `backfill_waitlist_on_cancellation`, `trigger_on_booking_completed_rewards`, `get_or_create_referral_code`,
+  `apply_referral_code` (rewritten, same signatures). If another package pasted a full copy of any of these later in the chain, its patch point fails loudly (each patch raises when its pattern is missing)
+  or silently drops mine; re-apply from these files.
+- Tables changed: `bookings` (+8 columns), `booking_services.variant_id`, `waitlists` (+5), `package_redemptions.reversed_at`, `wallet_credits.remaining_amount`, `promotional_codes` (+2), `gift_cards` (+3),
+  `customer_referrals.reward_amount` default dropped, `services` buffers CHECK; new: `provider_share_tokens`, `wallet_credit_redemptions`; ledger entry type `wallet_credit_settlement` added to its CHECK.
+- Existing tests edited: `booking.test.mjs` (the old test that asserted the fee loophole now asserts the token rule), `qa_adversarial.test.mjs` (allow-list of public definer functions: `get_branch_available_slots`
+  added, `get_available_slots` removed because it now mentions `auth.uid()` for the waitlist hold).
+
+## Deferred or open (with the reason)
+
+- Screens: every item above lists what the shop page, customer bookings/wallet/login, admin coupons and provider screens must send or show; none was edited (not in this package).
+- R42 travel buffer (needs a routing provider and an owner decision on speeds); wallet-credit funding and the referral/coupon/package business numbers (owner); messaging non-registered gift recipients (legal, PDPL).
+- `booking_message_variables.rebook_url` still ends with `?source=whatsapp`: provider rebook links must carry a provider share token to stay fee-free (messaging owner).
+- The platform commission on package-covered services, and whether home-visit offering should require a configured radius, are product decisions (see 7b and 6).
+- Customers can list active coupon codes (policy owner), and `has_active_consent` stays the known consent oracle (policy owner); neither changed.
