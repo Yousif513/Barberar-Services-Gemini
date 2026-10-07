@@ -162,7 +162,7 @@ describe("buying a membership", () => {
     const read = (u) => as(db, u, `select id from memberships where id = $1`, [m.membership_id]);
     assert.equal((await read(customer)).length, 1);
     assert.equal((await read(owner1)).length, 1);
-    assert.equal((await read(staff1)).length, 1);
+    assert.equal((await read(staff1)).length, 0, "a plain employee reads members through the audited list function, not the table");
     assert.equal((await read(stranger)).length, 0);
     assert.equal((await read(owner2)).length, 0);
     assert.equal((await read(staff2)).length, 0);

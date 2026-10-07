@@ -120,7 +120,9 @@ ALTER TABLE public.memberships ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.membership_payments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.membership_redemptions ENABLE ROW LEVEL SECURITY;
 
--- is_provider_staff is deliberately not executable by clients; policies ask about the signed-in user only through this wrapper.
+-- is_provider_staff is deliberately not executable by clients; the commands below ask about the signed-in user through this wrapper.
+-- Table reads are narrower on purpose: only the owner, an administrator or a delegate with the bookings permission read member rows directly
+-- (can_access_provider_operation); a plain employee works through list_provider_memberships and redeem_membership_visit, which are audited.
 CREATE OR REPLACE FUNCTION public.is_membership_staff(p_provider_id UUID)
 RETURNS BOOLEAN
 LANGUAGE sql
@@ -140,7 +142,7 @@ CREATE POLICY membership_plans_read ON public.membership_plans FOR SELECT TO aut
   USING (
     is_active
     OR public.is_admin()
-    OR public.is_membership_staff(provider_id)
+    OR public.can_access_provider_operation(provider_id, NULL, 'bookings')
   );
 
 DROP POLICY IF EXISTS membership_plan_services_read ON public.membership_plan_services;
@@ -151,7 +153,7 @@ DROP POLICY IF EXISTS memberships_read ON public.memberships;
 CREATE POLICY memberships_read ON public.memberships FOR SELECT TO authenticated
   USING (
     customer_id = auth.uid()
-    OR public.is_membership_staff(provider_id)
+    OR public.can_access_provider_operation(provider_id, NULL, 'bookings')
   );
 
 DROP POLICY IF EXISTS membership_payments_read ON public.membership_payments;
@@ -166,7 +168,7 @@ DROP POLICY IF EXISTS membership_redemptions_read ON public.membership_redemptio
 CREATE POLICY membership_redemptions_read ON public.membership_redemptions FOR SELECT TO authenticated
   USING (
     customer_id = auth.uid()
-    OR public.is_membership_staff(provider_id)
+    OR public.can_access_provider_operation(provider_id, NULL, 'bookings')
   );
 
 -- ---------------------------------------------------------------------------
