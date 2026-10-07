@@ -6,6 +6,10 @@ export type PublishedAgreement = {
   version: string;
   title_en: string;
   title_ar: string;
+  summary_en?: string | null;
+  summary_ar?: string | null;
+  content_en?: string;
+  content_ar?: string;
 };
 
 export type AgreementLookup =
@@ -20,10 +24,10 @@ export type AgreementLookup =
  * offer the checkbox and refuse to record anything when none is published (the owner publishes it in the admin console).
  * Returns null when nothing is published; throws the Supabase error when the read fails.
  */
-export async function fetchPublishedAgreement(agreementKey: string): Promise<PublishedAgreement | null> {
+export async function fetchPublishedAgreement(agreementKey: string, withText = false): Promise<PublishedAgreement | null> {
   const { data, error } = await supabase
     .from("legal_agreements")
-    .select("id, agreement_key, version, title_en, title_ar")
+    .select(withText ? "id, agreement_key, version, title_en, title_ar, summary_en, summary_ar, content_en, content_ar" : "id, agreement_key, version, title_en, title_ar")
     .eq("agreement_key", agreementKey)
     .eq("status", "published")
     .order("published_at", { ascending: false, nullsFirst: false })
@@ -33,9 +37,9 @@ export async function fetchPublishedAgreement(agreementKey: string): Promise<Pub
   return (data as PublishedAgreement | null) ?? null;
 }
 
-export async function lookupPublishedAgreement(agreementKey: string, describe: (error: unknown) => string): Promise<AgreementLookup> {
+export async function lookupPublishedAgreement(agreementKey: string, describe: (error: unknown) => string, withText = false): Promise<AgreementLookup> {
   try {
-    const agreement = await fetchPublishedAgreement(agreementKey);
+    const agreement = await fetchPublishedAgreement(agreementKey, withText);
     return agreement ? { state: "ready", agreement } : { state: "unpublished" };
   } catch (error) {
     return { state: "error", message: describe(error) };

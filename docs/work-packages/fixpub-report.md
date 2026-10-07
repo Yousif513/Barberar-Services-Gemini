@@ -12,6 +12,8 @@ integrator does them after all merges.
 | D-11 / D-23 login consent via `record_consents` | fixed (login) | group 1 | UI-vs-schema check |
 | D-15 caller: privacy data request via `submit_data_request` | fixed | group 2 | UI-vs-schema check (86 rpc calls, 0 mismatches) |
 | D-22 privacy page: "Saudi PDPL Compliance" headline and PDPL / statutory claims | fixed (EN + AR) | group 2 | guard test extended in group 5 |
+| D-07 / D-12 / D-25 callers: become-provider city, coordinates, agreement-not-published state, acceptance evidence | fixed | group 3 | UI-vs-schema check |
+| R34 become-provider: 15% commission text, "Growth" feature list, 299 SAR hard-coded price | fixed (plans read from `subscription_plans`, no rate quoted) | group 3 | guard test extended in group 5 |
 
 (The table is appended after every commit group.)
 
@@ -42,6 +44,25 @@ integrator does them after all merges.
 - Request-type buttons have `aria-pressed`, the group is labelled, the textarea is labelled and capped at 2000 characters (the server limit).
 - Open decision for the owner: `privacy@primora.com` (privacy page) and `support@primora.com` (terms page) are hard-coded contact addresses with no
   entry in `declaredStatic[]`; confirm the mailboxes exist or move them to `platform_settings`.
+
+## Group 3: become-provider (D-07, D-12, D-25 callers, R34 pricing)
+
+- City is a required input (the hard-coded `"Riyadh"` is gone); latitude and longitude are optional, both-or-neither and range-checked (matching
+  `provider_applications_coordinates_range`), with a "use my current location" button. The trade licence link is `type="url"` and must be https
+  (matching `provider_applications_trade_license_https`).
+- The published `provider_agreement` is read on load (with its text, shown in a `<details>` the applicant can open). While none is published, or when
+  the read fails, the form shows an explicit "applications are closed" / error state and the submit button is disabled (the server also refuses with
+  22023). Submission records the acceptance first through `record_agreement_acceptance(p_agreement_key, p_version, p_method)` (idempotent) and then
+  inserts the application; the server stamps `status`, `agreement_id`, `agreement_version` and `agreed_at` (the client no longer sends `status`).
+  The old code silently skipped the acceptance when nothing was published.
+- A second open application is reported ("you already have an open application", SQLSTATE 23505 from `provider_applications_one_open_per_applicant`);
+  an application in `under_review` is now shown as under review (before, the form was shown and the insert failed).
+- Pricing: the hard-coded "15% platform commission", "299 SAR / month" and the feature list nothing gates are removed. The plan cards are read from
+  `subscription_plans` (anon-readable): name, price through the shared `sar()` formatter, branch / staff / SMS limits, with loading, empty and error
+  states. No commission rate is quoted on the public page: `fee_rules` is readable by signed-in users only and its seed says "subject to commercial
+  confirmation", so the page says fees are stated in the Provider Agreement and the provider dashboard.
+- Other: all labelled inputs are associated (`htmlFor`/`id`), icon links and the language switch have names, `as any` removed, load failure of the
+  existing application is surfaced instead of swallowed, page language through the shared `usePageLocale` hook.
 
 ## Needs from other packages
 
