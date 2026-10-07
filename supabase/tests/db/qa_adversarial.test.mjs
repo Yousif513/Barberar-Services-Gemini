@@ -66,8 +66,8 @@ describe("client-executable functions are accounted for", () => {
       .filter((f) => !/auth\.uid\(\)|is_admin\(\)|auth\.jwt\(\)|service_role|can_access_provider_operation|is_booking_staff/.test(f.body))
       .map((f) => f.signature.split("(")[0])
       .sort();
-    assert.deepEqual(unguarded, ["get_available_slots", "get_branch_available_slots", "get_branch_schedule_with_prayer_pauses", "has_active_consent", "search_marketplace_providers"],
-      "the public catalogue functions (slot listings, schedules, search) are open to visitors on purpose; has_active_consent is the known consent oracle gap");
+    assert.deepEqual(unguarded, ["get_branch_available_slots", "get_branch_schedule_with_prayer_pauses", "has_active_consent", "search_marketplace_providers"],
+      "the public catalogue functions (slot listings, schedules, search) are open to visitors on purpose (get_available_slots mentions auth.uid() only to keep a waitlist hold for its holder, which is not an authorization check); has_active_consent is the known consent oracle gap");
   });
 
   it("confirm_booking_payment and the other service-role commands refuse an administrator, an owner, a customer and a visitor", async () => {

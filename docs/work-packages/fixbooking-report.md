@@ -15,6 +15,7 @@ run the whole DB suite.
 | D-02 / C-D8 | fixed | `20261007070000_booking_source_attribution_tokens.sql` | `booking_engine_attribution.test.mjs`, `booking.test.mjs` (updated) |
 | R15 / G23 | fixed (DB part; provider screens deferred to the screen packages) | `20261007080000_booking_buffers_processing_variants.sql` | `booking_engine_buffers_variants.test.mjs` |
 | R42 / G37 | fixed (radius); travel buffer deferred | `20261007091000_home_service_radius.sql` | `booking_engine_home_radius.test.mjs` |
+| C-D10 / D10 | fixed (DB part; claim screen deferred) | `20261007092000_waitlist_exclusive_claim.sql` | `booking_engine_waitlist.test.mjs` |
 | R24 / C-D16 | fixed (DB part; shop page and mobile pass the list) | `20261007090000_branch_slots_any_professional.sql` | `booking_engine_branch_slots.test.mjs`, `qa_adversarial.test.mjs` (allow-list updated) |
 
 ## 1. D-21 / R3 prayer windows and the Riyadh clock (fixed)
@@ -138,3 +139,29 @@ branch's service area (the new tests fail on the base and pass now).
 - DEFERRED: the travel buffer. `calculate-travel` is an Edge Function that needs a routing provider over the network; the booking transaction must not call out, and a
   travel speed is an owner decision. A provider can already add a fixed travel allowance through `services.buffer_before_minutes` (item 4).
 - Screens: show the radius to the customer (public `branches.geofence_radius_km`, latitude, longitude) and refuse client-side before submit; the server message above is the backstop.
+
+## 7a. C-D10 / D10 waitlist exclusive claim (fixed in the database)
+
+Reproduced on the base commit (script, not kept): after a cancellation the first waitlister became `notified` and a stranger's `create_booking` for the same slot
+returned `pending_payment`; an expired claim raised and rolled its own `expired` update back.
+- Holding: when the cancellation trigger notifies a waitlister it now records the freed window (`waitlists.held_employee_id`, `held_window`, `held_slot_start`,
+  `held_from_booking_id`). `get_available_slots` leaves that window out for everyone except the holder (`w.customer_id IS DISTINCT FROM auth.uid()`), and booking validation,
+  the any-professional pick and reschedule all go through it, so the hold is one rule in one place.
+- Using the offer: `create_booking(..., request_waitlist_claim_id)` / `create_multi_service_booking(..., request_waitlist_claim_id)` (new LAST argument of both; the claim
+  must be the caller's own open unexpired offer for the same professional, one of the booked services and the exact slot; `22023` otherwise). The holder booking the held window
+  without passing the id uses the offer up as well. The entry becomes `claimed`, `claimed_booking_id` is set.
+- `claim_waitlist_slot(offer)` validates and returns `{success, slot_start, employee_id, service_id, branch_id, expires_at, seconds_left}`; other people's offers are `P0002`;
+  an overdue offer returns `{success:false, status:'expired'}` after sweeping (it no longer raises, so the expiry is persisted). It no longer flips the row to `claimed`
+  (the booking does).
+- `expire_waitlist_claims()` (service role only) / internal `waitlist_sweep()` mark overdue offers `expired` and offer the same slot to the next `active` entry (same branch, date,
+  service, window covers the slot, not the customer who just let it expire) when the slot is still free and in the future, queueing `waitlist_slot_opened`. Scheduled every minute
+  with pg_cron (`primora-expire-waitlist-claims`) where pg_cron exists; otherwise an external scheduler must call it (NOTICE raised).
+- `platform_settings.waitlist_claim_minutes` sets the window; unset keeps the existing 15 minutes the customer copy promises (the old literal `15` in the trigger and in the
+  message variable is gone). DECISION for the owner: whether 15 is the right number.
+- `join_waitlist` now requires a verified phone number and an active WhatsApp consent (`22023` with a clear message otherwise) and compares the date on the Riyadh calendar.
+- Test list adjustment: `qa_adversarial.test.mjs` "known open definers" no longer lists `get_available_slots` (it now mentions `auth.uid()` for the hold; that is not an authorization check).
+
+Screens (not touched): the shop page must handle `?claim_waitlist=<id>` (call `claim_waitlist_slot`, show the countdown from `seconds_left`, book with `request_waitlist_claim_id`
+/ the same id in `create_multi_service_booking`), and the waitlist join form must collect WhatsApp consent (`record_consent('whatsapp')`) and show the new refusal messages.
+Follow-up for the messaging owner: `booking_message_variables.rebook_url` still ends with `?source=whatsapp`; after item 3 a `source` in the URL no longer makes a booking provider-sourced,
+so provider "rebook" links must carry a provider share token (`?ref=<token>`) to stay fee-free (not changed here: that function is not in this package).
