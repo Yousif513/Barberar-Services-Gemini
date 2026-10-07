@@ -40,10 +40,7 @@ const translations = {
     advancedSection: "Advanced & Family Profiles",
     dependentsCardTitle: "Dependents & Pets Manager",
     dependentsCardDesc: "Add and manage profiles for family members, patients, or pets to book services on their behalf.",
-    dependentsCardBtn: "Manage Profiles",
-    developerCardTitle: "Developer API Console",
-    developerCardDesc: "Register sandbox applications, generate client access tokens, and configure Webhook subscriptions.",
-    developerCardBtn: "Open Console"
+    dependentsCardBtn: "Manage Profiles"
   },
   ar: {
     title: "الإعدادات",
@@ -78,10 +75,7 @@ const translations = {
     advancedSection: "الملفات العائلية والخدمات المتقدمة",
     dependentsCardTitle: "إدارة التابعين والأليفة",
     dependentsCardDesc: "إضافة وإدارة الملفات الشخصية لأفراد عائلتك أو الحيوانات الأليفة للحجز نيابة عنهم.",
-    dependentsCardBtn: "إدارة الملفات الشخصية",
-    developerCardTitle: "منصة المطورين (API)",
-    developerCardDesc: "تسجيل تطبيقات الاختبار، إنشاء رموز الوصول (Tokens)، وإعداد اشتراكات الويب هوك (Webhooks).",
-    developerCardBtn: "فتح منصة المطورين"
+    dependentsCardBtn: "إدارة الملفات الشخصية"
   }
 };
 
@@ -450,26 +444,6 @@ export default function CustomerSettingsPage() {
                 className="px-4 py-2 bg-stone-900 hover:bg-stone-850 text-white font-bold text-[10px] uppercase tracking-wider rounded-lg transition"
               >
                 {t.dependentsCardBtn}
-              </Link>
-            </div>
-          </div>
-
-          {/* DEVELOPER API CONSOLE CARD */}
-          <div className="border border-stone-200 hover:border-[hsl(45,60%,55%)] rounded-xl p-5 bg-stone-50/50 hover:bg-stone-50/20 transition duration-300 flex flex-col justify-between">
-            <div className="text-start">
-              <h4 className="font-bold text-xs text-stone-900 tracking-wide uppercase">
-                {t.developerCardTitle}
-              </h4>
-              <p className="text-[10px] text-stone-500 mt-2 font-normal leading-relaxed">
-                {t.developerCardDesc}
-              </p>
-            </div>
-            <div className="mt-6 pt-3 border-t border-stone-100 flex justify-end">
-              <Link
-                href="/developer"
-                className="px-4 py-2 bg-[hsl(45,60%,45%)] hover:bg-[hsl(45,60%,40%)] text-white font-bold text-[10px] uppercase tracking-wider rounded-lg transition"
-              >
-                {t.developerCardBtn}
               </Link>
             </div>
           </div>
