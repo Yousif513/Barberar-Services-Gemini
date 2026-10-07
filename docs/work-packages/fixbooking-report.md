@@ -20,6 +20,7 @@ run the whole DB suite.
 | D5 / C-D5 | fixed (DB part; admin coupon screen deferred) | `20261007094000_coupon_per_customer_limit.sql` | `booking_engine_coupons.test.mjs` |
 | D12 / C-D12 | fixed | `20261007095000_loyalty_spend_equals_discount.sql` | `booking_engine_loyalty.test.mjs` |
 | D4 part b / C-D4 wallet spend | fixed (DB part; wallet/checkout screens deferred) | `20261007096000_wallet_credit_spend.sql` | `booking_engine_wallet_credit.test.mjs` |
+| D4 (a, c) and D4b referral rules | fixed (DB part; login `?ref` capture and wallet copy deferred) | `20261007097000_referral_rules.sql` | `booking_engine_referrals.test.mjs` |
 | R24 / C-D16 | fixed (DB part; shop page and mobile pass the list) | `20261007090000_branch_slots_any_professional.sql` | `booking_engine_branch_slots.test.mjs`, `qa_adversarial.test.mjs` (allow-list updated) |
 
 ## Callers cheat-sheet (current signatures; every new argument is optional and last, named arguments keep old callers working)
@@ -240,3 +241,18 @@ Reproduced by construction: no function ever read `wallet_credits.is_spent`; the
   platform-funded coupon settlements, so the provider is not paid less because of platform marketing money. The new entry type is appended to the current `transactional_ledger_entry_type_check` list, whatever it holds.
   DECISION FOR THE OWNER: confirm that the platform funds wallet credit (assumed: referral and promotion credit are platform marketing spend).
 - Screens: `web_platform/src/app/customer/wallet/page.tsx` must show `remaining_amount` (not `amount`) and drop the "auto-applied" promise or send the amount at checkout.
+
+## 7e-2. D4 / D4b referral rules (fixed in the database)
+
+Reproduced by reading the code and the base behaviour (no invented numbers remain): the amount 25 was a literal in `apply_referral_code`, `get_or_create_referral_code`, the `customer_referrals.reward_amount`
+default and the seeded setting.
+- Settings (`platform_settings.referral_program`, edited in the console): `enabled`, `reward_sar` (UNSET or 0 = no payout and codes cannot be applied: "The referral programme is not active"),
+  `min_qualifying_sar` (optional), `max_rewards_per_referrer_30d` (optional; a referral over the cap becomes `disqualified` and nobody is paid). The seeded `reward_sar: 25` is removed while the row is still the
+  untouched seed, and the table default is dropped. DECISION FOR THE OWNER: set the amount, the minimum and the cap before enabling the programme.
+- `get_or_create_referral_code()` returns `programme_active`, `reward_per_friend_sar` (NULL unless active), `min_qualifying_sar`, plus the old keys; codes are `REF-` + 8 random hex characters retried on a
+  unique violation (existing codes are kept), so the permanent failure after a collision is gone.
+- `apply_referral_code(p_referral_code)`: only for a customer with no confirmed or completed booking ("new customers only"), refuses a reverse referral (A used B's code, B tries A's), still 23505 for a second code,
+  and snapshots the amount from the setting.
+- `trigger_on_booking_completed_rewards` pays only for a booking whose source is not `walk_in` and whose `total_price` reaches the minimum, only while `enabled` and `reward_sar > 0`, once, and respects the cap.
+- Screens (not touched): `web_platform/src/app/login/page.tsx` must read `?ref`, keep it through sign-up and call `apply_referral_code` once after sign-in; `customer/wallet/page.tsx` must drop the hard-coded SAR 25
+  (EN lines ~29-30, AR ~62-63) and read `reward_per_friend_sar`, hiding the card while `programme_active` is false.
