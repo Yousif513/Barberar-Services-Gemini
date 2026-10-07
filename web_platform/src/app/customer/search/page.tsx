@@ -144,6 +144,7 @@ export default function CustomerSearchPage() {
           </svg>
           <input
             type="text"
+            aria-label={t.searchPlaceholder}
             placeholder={t.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

@@ -209,26 +209,26 @@ export default function CustomerDependentsPage() {
   return (
     <div className="space-y-8 font-sans">
       {/* Navigation link back to settings */}
-      <div className={isRTL ? "text-right" : "text-left"}>
+      <div className="text-start">
         <Link href="/customer/settings" className="text-xs font-bold text-[hsl(45,60%,55%)] hover:underline">
           {t.backSettings}
         </Link>
       </div>
 
       {/* Header */}
-      <div className={isRTL ? "text-right" : "text-left"}>
+      <div className="text-start">
         <h2 className="text-2xl font-bold tracking-tight text-stone-900 font-serif">{t.title}</h2>
         <p className="text-sm text-stone-500 mt-1">{t.subtitle}</p>
       </div>
 
       {success && (
-        <div className={`bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl p-4 font-semibold ${isRTL ? "text-right" : "text-left"}`}>
+        <div className={`bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl p-4 font-semibold text-start`}>
           {success}
         </div>
       )}
 
       {error && (
-        <div className={`bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl p-4 font-semibold ${isRTL ? "text-right" : "text-left"}`}>
+        <div className={`bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl p-4 font-semibold text-start`}>
           {error}
         </div>
       )}
@@ -237,7 +237,7 @@ export default function CustomerDependentsPage() {
         
         {/* PROFILES LIST */}
         <div className="lg:col-span-2 bg-white border border-stone-200 rounded-2xl p-6 shadow-sm space-y-6">
-          <div className={`flex items-center justify-between border-b border-stone-100 pb-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+          <div className={`flex items-center justify-between border-b border-stone-100 pb-3`}>
             <h3 className="font-bold text-sm text-stone-900">{isRTL ? "الملفات المسجلة" : "Registered Profiles"}</h3>
             {!showForm && (
               <button
@@ -261,8 +261,8 @@ export default function CustomerDependentsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {profiles.map(p => (
                 <div key={p.id} className="p-4 border border-stone-100 rounded-xl bg-stone-50/50 hover:bg-stone-50 transition relative flex flex-col justify-between">
-                  <div className={isRTL ? "text-right" : "text-left"}>
-                    <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                  <div className="text-start">
+                    <div className={`flex items-center gap-2`}>
                       <h4 className="font-bold text-xs text-stone-900">{p.name}</h4>
                       <span className="px-2 py-0.5 text-[8px] font-extrabold uppercase bg-amber-500/10 text-[hsl(45,60%,50%)] border border-amber-500/20 rounded">
                         {p.type === "pet" ? t.typePet : p.type === "patient" ? t.typePatient : t.typeDependent}
@@ -302,26 +302,26 @@ export default function CustomerDependentsPage() {
         {/* ADD PROFILE FORM */}
         {showForm && (
           <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm space-y-6 lg:sticky lg:top-24">
-            <h3 className={`font-bold text-sm text-stone-900 border-b border-stone-100 pb-3 ${isRTL ? "text-right" : "text-left"}`}>{t.addProfile}</h3>
+            <h3 className={`font-bold text-sm text-stone-900 border-b border-stone-100 pb-3 text-start`}>{t.addProfile}</h3>
 
             <form onSubmit={handleSaveProfile} className="space-y-4">
               <div>
-                <label className={`text-[10px] uppercase font-bold text-stone-400 block mb-1 ${isRTL ? "text-right" : "text-left"}`}>{t.nameLabel}</label>
-                <input
+                <label htmlFor="dependent-nameLabel" className={`text-[10px] uppercase font-bold text-stone-400 block mb-1 text-start`}>{t.nameLabel}</label>
+                <input id="dependent-nameLabel"
                   type="text"
                   required
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  className={`w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-stone-700 font-semibold ${isRTL ? "text-right" : "text-left"}`}
+                  className={`w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-stone-700 font-semibold text-start`}
                 />
               </div>
 
               <div>
-                <label className={`text-[10px] uppercase font-bold text-stone-400 block mb-1 ${isRTL ? "text-right" : "text-left"}`}>{t.typeLabel}</label>
-                <select
+                <label htmlFor="dependent-typeLabel" className={`text-[10px] uppercase font-bold text-stone-400 block mb-1 text-start`}>{t.typeLabel}</label>
+                <select id="dependent-typeLabel"
                   value={type}
                   onChange={e => setType(e.target.value as any)}
-                  className={`w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-stone-750 font-semibold ${isRTL ? "text-right" : "text-left"}`}
+                  className={`w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-stone-750 font-semibold text-start`}
                 >
                   <option value="dependent">{t.typeDependent}</option>
                   <option value="pet">{t.typePet}</option>
@@ -330,21 +330,21 @@ export default function CustomerDependentsPage() {
               </div>
 
               <div>
-                <label className={`text-[10px] uppercase font-bold text-stone-400 block mb-1 ${isRTL ? "text-right" : "text-left"}`}>{t.dobLabel}</label>
-                <input
+                <label htmlFor="dependent-dobLabel" className={`text-[10px] uppercase font-bold text-stone-400 block mb-1 text-start`}>{t.dobLabel}</label>
+                <input id="dependent-dobLabel"
                   type="date"
                   value={dob}
                   onChange={e => setDob(e.target.value)}
-                  className={`w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-stone-700 font-semibold ${isRTL ? "text-right" : "text-left"}`}
+                  className={`w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-stone-700 font-semibold text-start`}
                 />
               </div>
 
               <div>
-                <label className={`text-[10px] uppercase font-bold text-stone-400 block mb-1 ${isRTL ? "text-right" : "text-left"}`}>{t.genderLabel}</label>
-                <select
+                <label htmlFor="dependent-genderLabel" className={`text-[10px] uppercase font-bold text-stone-400 block mb-1 text-start`}>{t.genderLabel}</label>
+                <select id="dependent-genderLabel"
                   value={gender}
                   onChange={e => setGender(e.target.value)}
-                  className={`w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-stone-750 font-semibold ${isRTL ? "text-right" : "text-left"}`}
+                  className={`w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-stone-750 font-semibold text-start`}
                 >
                   <option value="">{isRTL ? "-- اختر الجنس --" : "-- Select Gender --"}</option>
                   <option value="male">{t.genderMale}</option>
@@ -354,16 +354,16 @@ export default function CustomerDependentsPage() {
               </div>
 
               <div>
-                <label className={`text-[10px] uppercase font-bold text-stone-400 block mb-1 ${isRTL ? "text-right" : "text-left"}`}>{t.medicalLabel}</label>
-                <textarea
+                <label htmlFor="dependent-medicalLabel" className={`text-[10px] uppercase font-bold text-stone-400 block mb-1 text-start`}>{t.medicalLabel}</label>
+                <textarea id="dependent-medicalLabel"
                   value={medicalInfo}
                   onChange={e => setMedicalInfo(e.target.value)}
                   rows={3}
-                  className={`w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-stone-700 font-light ${isRTL ? "text-right" : "text-left"}`}
+                  className={`w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-stone-700 font-light text-start`}
                 />
               </div>
 
-              <div className={`flex gap-3 pt-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <div className={`flex gap-3 pt-2`}>
                 <button
                   type="submit"
                   disabled={saving}

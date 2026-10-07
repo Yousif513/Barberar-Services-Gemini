@@ -1244,7 +1244,8 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       );
       assert.ok(customerBookingsCode.includes("add_booking_tip"), "Customer bookings must wire add_booking_tip RPC");
       assert.ok(customerBookingsCode.includes('purchaseType: "tip"'), "Tips are paid through checkout before they count");
-      assert.ok(customerBookingsCode.includes("100% of your tip goes directly to your specialist"), "Customer bookings must highlight 100% to specialist notice");
+      assert.ok(customerBookingsCode.includes("The full tip is paid to the provider for the specialist who served you"), "Customer bookings must say the tip is paid to the provider with no platform commission (the ledger credits the provider, not the specialist)");
+      assert.ok(!customerBookingsCode.includes("goes directly to your specialist"), "Customer bookings must not claim tips go directly to the specialist");
 
       const shopCode = readFileSync(
         join(webPlatformDir, "src/app/shop/[id]/page.tsx"),

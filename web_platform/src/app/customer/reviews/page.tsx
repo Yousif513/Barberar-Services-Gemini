@@ -1,8 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { trackEvent } from "@/lib/analytics";
+import { errorMessage } from "@/lib/error-message";
+import { useOperationsLocale } from "@/components/operations-ui";
+import { formatBookingDate } from "@/lib/booking-display.mjs";
 
 const translations = {
   en: {
@@ -20,7 +24,15 @@ const translations = {
     service: "Service",
     provider: "Provider",
     date: "Date",
-    comments: "Comments"
+    comments: "Comments",
+    cancel: "Cancel",
+    loading: "Loading reviews...",
+    loadFailed: "Your reviews could not be loaded:",
+    saveFailed: "Your review was not saved; what you wrote is kept so you can try again:",
+    saving: "Saving...",
+    star: "{n} of 5 stars",
+    bookingAlreadyReviewed: "You have already reviewed that visit. Your review is listed below.",
+    bookingNotReviewable: "That visit cannot be reviewed: only your own completed visits can be."
   },
   ar: {
     title: "تقييماتي",
@@ -37,12 +49,34 @@ const translations = {
     service: "الخدمة",
     provider: "مزود الخدمة",
     date: "التاريخ",
-    comments: "التعليقات"
+    comments: "التعليقات",
+    cancel: "إلغاء",
+    loading: "جارٍ تحميل التقييمات...",
+    loadFailed: "تعذر تحميل تقييماتك:",
+    saveFailed: "لم يُحفظ تقييمك، وقد أبقينا ما كتبته لتحاول مرة أخرى:",
+    saving: "جارٍ الحفظ...",
+    star: "{n} من 5 نجوم",
+    bookingAlreadyReviewed: "لقد قيّمت تلك الزيارة من قبل. تقييمك مدرج أدناه.",
+    bookingNotReviewable: "لا يمكن تقييم تلك الزيارة: يمكن تقييم زياراتك المكتملة فقط."
   }
 };
 
+// useSearchParams needs a Suspense boundary in the App Router, so the page body sits one level down.
 export default function CustomerReviewsPage() {
-  const [locale, setLocale] = useState<"en" | "ar">("ar");
+  return (
+    <Suspense fallback={null}>
+      <CustomerReviews />
+    </Suspense>
+  );
+}
+
+function CustomerReviews() {
+  const locale = useOperationsLocale();
+  // The post-visit message links here with ?booking=<id>: that visit's review form opens on arrival.
+  const bookingParam = useSearchParams().get("booking");
+  const bookingParamHandled = useRef(false);
+  const [bookingNotice, setBookingNotice] = useState("");
+  const [saving, setSaving] = useState(false);
   const [myReviews, setMyReviews] = useState<any[]>([]);
   const [pendingReviews, setPendingReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,19 +89,6 @@ export default function CustomerReviewsPage() {
   const [comment, setComment] = useState("");
 
   const t = translations[locale];
-
-  // Sync language with document root
-  useEffect(() => {
-    const handleLangSync = () => {
-      const currentLang = document.documentElement.lang as "en" | "ar";
-      if (currentLang === "en" || currentLang === "ar") {
-        setLocale(currentLang);
-      }
-    };
-    handleLangSync();
-    const interval = setInterval(handleLangSync, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     loadData();
@@ -124,17 +145,35 @@ export default function CustomerReviewsPage() {
       const unreviewed = (completedBookings || []).filter(b => !reviewedBookingIds.has(b.id));
       setPendingReviews(unreviewed);
 
-    } catch (err: any) {
+      // Open the form for the visit named in ?booking= (once), or say why it cannot be reviewed.
+      if (bookingParam && !bookingParamHandled.current) {
+        bookingParamHandled.current = true;
+        if (unreviewed.some(b => b.id === bookingParam)) {
+          setActivePendingId(bookingParam);
+          setRating(5);
+          setComment("");
+          setBookingNotice("");
+        } else if (reviewedBookingIds.has(bookingParam)) {
+          setBookingNotice(translations[locale].bookingAlreadyReviewed);
+        } else {
+          setBookingNotice(translations[locale].bookingNotReviewable);
+        }
+      }
+
+    } catch (err) {
       setMyReviews([]);
       setPendingReviews([]);
-      setError(err?.message || String(err));
+      setError(`${translations[locale].loadFailed} ${errorMessage(err)}`);
     } finally {
       setLoading(false);
     }
   }
 
   async function submitReview(bookingId: string) {
+    if (saving) return;
     try {
+      setSaving(true);
+      setError("");
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
@@ -162,9 +201,11 @@ export default function CustomerReviewsPage() {
       
       // Reload lists
       loadData();
-    } catch (err: any) {
+    } catch (err) {
       // Keep the rating and comment so the customer can retry.
-      setError(err?.message || String(err));
+      setError(`${t.saveFailed} ${errorMessage(err)}`);
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -177,14 +218,20 @@ export default function CustomerReviewsPage() {
       </div>
 
       {successMsg && (
-        <div className="bg-green-50 border border-green-200 text-green-800 text-xs rounded-xl p-4 font-bold">
+        <div role="status" className="bg-green-50 border border-green-200 text-green-800 text-xs rounded-xl p-4 font-bold">
           {successMsg}
         </div>
       )}
 
+      {bookingNotice && (
+        <div role="status" className="bg-stone-50 border border-stone-200 text-stone-700 text-xs rounded-xl p-4">
+          {bookingNotice}
+        </div>
+      )}
+
       {error && (
-        <div className="bg-stone-50 border border-stone-200 text-stone-700 text-xs rounded-xl p-4">
-          Notice: {error}
+        <div role="alert" className="bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl p-4">
+          {error}
         </div>
       )}
 
@@ -206,12 +253,13 @@ export default function CustomerReviewsPage() {
                       {locale === "ar" ? b.services?.name_ar : b.services?.name_en}
                     </h4>
                     <p className="text-[10px] text-stone-400 mt-0.5">
-                      {new Date(b.scheduled_at).toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {formatBookingDate(b.scheduled_at, locale)}
                     </p>
                   </div>
 
                   {activePendingId !== b.id ? (
                     <button
+                      type="button"
                       onClick={() => {
                         setActivePendingId(b.id);
                         setRating(5);
@@ -223,10 +271,11 @@ export default function CustomerReviewsPage() {
                     </button>
                   ) : (
                     <button
+                      type="button"
                       onClick={() => setActivePendingId(null)}
                       className="px-3 py-1.5 border border-stone-750 text-xs text-stone-400 rounded-lg hover:text-white"
                     >
-                      Cancel
+                      {t.cancel}
                     </button>
                   )}
                 </div>
@@ -236,16 +285,18 @@ export default function CustomerReviewsPage() {
                   <div className="mt-6 pt-6 border-t border-stone-850 space-y-4">
                     {/* Star Rating Toggle */}
                     <div>
-                      <label className="text-[10px] uppercase font-bold text-stone-400 block mb-2">{t.rating}</label>
-                      <div className="flex items-center gap-1.5">
+                      <span id={`review-rating-${b.id}`} className="text-[10px] uppercase font-bold text-stone-400 block mb-2">{t.rating}</span>
+                      <div role="group" aria-labelledby={`review-rating-${b.id}`} className="flex items-center gap-1.5">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
                             key={star}
                             type="button"
+                            aria-pressed={star === rating}
+                            aria-label={t.star.replace("{n}", String(star))}
                             onClick={() => setRating(star)}
-                            className="text-lg transition focus:outline-none"
+                            className="text-lg transition focus-visible:outline-2 focus-visible:outline-[hsl(45,60%,55%)]"
                           >
-                            <span className={star <= rating ? "text-[hsl(45,60%,55%)]" : "text-stone-700"}>★</span>
+                            <span aria-hidden="true" className={star <= rating ? "text-[hsl(45,60%,55%)]" : "text-stone-700"}>★</span>
                           </button>
                         ))}
                       </div>
@@ -253,8 +304,9 @@ export default function CustomerReviewsPage() {
 
                     {/* Comment Area */}
                     <div>
-                      <label className="text-[10px] uppercase font-bold text-stone-400 block mb-2">{t.comments}</label>
+                      <label htmlFor={`review-comment-${b.id}`} className="text-[10px] uppercase font-bold text-stone-400 block mb-2">{t.comments}</label>
                       <textarea
+                        id={`review-comment-${b.id}`}
                         rows={3}
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
@@ -264,10 +316,12 @@ export default function CustomerReviewsPage() {
                     </div>
 
                     <button
+                      type="button"
+                      disabled={saving}
                       onClick={() => submitReview(b.id)}
-                      className="w-full py-2.5 bg-white text-black font-bold text-xs rounded-lg hover:bg-stone-100 transition"
+                      className="w-full py-2.5 bg-white text-black font-bold text-xs rounded-lg hover:bg-stone-100 transition disabled:opacity-60"
                     >
-                      {t.submitReview}
+                      {saving ? t.saving : t.submitReview}
                     </button>
                   </div>
                 )}
@@ -282,7 +336,7 @@ export default function CustomerReviewsPage() {
         <h3 className="font-bold text-sm text-gray-800 mb-6">{t.submittedTitle}</h3>
 
         {loading ? (
-          <div className="text-center py-12 text-sm text-gray-400">Loading reviews...</div>
+          <div role="status" className="text-center py-12 text-sm text-gray-400">{t.loading}</div>
         ) : myReviews.length === 0 ? (
           <div className="text-center py-12 text-gray-400 text-xs font-semibold">{t.noReviews}</div>
         ) : (
@@ -301,8 +355,8 @@ export default function CustomerReviewsPage() {
                     </h4>
                   </div>
                   
-                  <div className="text-right">
-                    <div className="flex items-center justify-end gap-1">
+                  <div className="text-end">
+                    <div role="img" aria-label={t.star.replace("{n}", String(rev.rating))} className="flex items-center justify-end gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <span
                           key={star}
@@ -313,7 +367,7 @@ export default function CustomerReviewsPage() {
                       ))}
                     </div>
                     <span className="text-[10px] text-gray-400 block mt-1">
-                      {new Date(rev.created_at).toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {formatBookingDate(rev.created_at, locale)}
                     </span>
                   </div>
                 </div>
