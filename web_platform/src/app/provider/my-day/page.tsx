@@ -9,6 +9,7 @@ import { CommandDialog } from "@/components/modal";
 import { bookingStatusLabel, formatBookingDate, formatBookingTime, riyadhDateKey } from "@/lib/booking-display.mjs";
 import { useProviderContext } from "../_components/provider-context";
 import { providerGhostButton, providerPrimaryButton } from "../_components/dialog";
+import { MyLeaveSection } from "../_components/my-leave";
 
 const copy = {
   en: {
@@ -260,6 +261,8 @@ export default function MyDayPage() {
           </dl>
         )}
       </section>
+
+      <MyLeaveSection lang={locale} employeeId={state.context.employeeId as string} />
 
       {noShowFor && (
         <CommandDialog

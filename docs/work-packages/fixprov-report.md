@@ -54,3 +54,13 @@ Branch `wp/fixprov`, worktree `primora-wp-fixprov`. Status per defect is updated
   so a delegated manager without an owned business still sees them empty; converting each screen to `useProviderContext` is mechanical and listed under "not done".
 * `scripts/ui-schema-baseline.json` lists exactly the four mismatches that exist only because FIX-DBA's functions/column are not in this worktree:
   `set_provider_booking_policy`, `get_provider_private_profile`, `get_provider_staff_contacts`, `providers.policy_confirmed_at`. The integrator removes them on merge.
+
+## Group 3: closures, seasons and leave (R16)
+
+* `/provider/time-off` (reached from Settings, no extra navigation entry): closures (type, branch scope, bilingual reason; a count of existing bookings in the range is shown in a
+  confirmation before closing, and nothing is cancelled for the owner), seasonal schedules (overnight and second shift, pause/resume, delete), and team leave (approve or reject
+  pending requests, record approved leave). Employees ask for leave from `/provider/my-day` (always sent as `pending`: the column defaults to approved and the existing
+  `trg_enforce_leave_approval` trigger refuses self-approval).
+* No new migration: the existing tables, policies and trigger already enforce the rules. `supabase/tests/db/fixprov_schedule_exceptions.test.mjs` (14 tests) pins them for every
+  role: owner, other provider's owner, employee, colleague, customer, anonymous. Pure checks live in `src/lib/schedule-exceptions.mjs` (`tests/schedule-exceptions.test.mjs`).
+* Not done: rejecting leave does not record a reason (the table has no column for it and I did not widen the schema); a closure does not list the affected bookings, only counts them.

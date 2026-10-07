@@ -106,3 +106,21 @@ describe("who the portal is for (R18, R5/R6 follow-ups, D-27, R16 hours)", () =>
     assert.ok(settings.includes("HoursApplyDialog"));
   });
 });
+
+describe("closures, seasons and leave (R16)", () => {
+  it("has screens for all three tables and reaches them from the settings page", () => {
+    const sections = byPath("_components/time-off-sections.tsx").code;
+    for (const table of ["provider_closures", "seasonal_schedules", "employee_time_off"]) assert.ok(sections.includes(table), table);
+    assert.ok(byPath("time-off/page.tsx").code.includes("ClosuresSection"));
+    assert.ok(byPath("settings/page.tsx").code.includes("/provider/time-off"));
+  });
+  it("warns before closing over existing bookings and confirms deletions with the shared dialog", () => {
+    const sections = byPath("_components/time-off-sections.tsx").code;
+    assert.match(sections, /affectedTitle/);
+    assert.match(sections, /useConfirm/);
+  });
+  it("sends a professional's own leave request as pending, never relying on the default", () => {
+    assert.match(byPath("_components/my-leave.tsx").code, /status: "pending"/);
+    assert.ok(byPath("my-day/page.tsx").code.includes("MyLeaveSection"));
+  });
+});
