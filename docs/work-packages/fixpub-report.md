@@ -168,7 +168,7 @@ minimum, SAR 40 maximum, none on repeat visits). It matches `fee_rules` today, b
 |---|---|
 | `npx tsc --noEmit -p web_platform` | exit 0, no output |
 | `npx eslint <the 18 changed .ts/.tsx files>` (from `web_platform/`) | 0 errors, 40 warnings; the same pre-existing files had 56 warnings on the base commit `e3c8598` (`<img>`, `any`, set-state-in-effect that were already there); the 4 new files add none |
-| `npm run test --workspace=web_platform` | tests 220, pass 220, fail 0 (base: 195; +25 guard tests, -2 stale cases) |
+| `npm run test --workspace=web_platform` | tests 220, pass 220, fail 0 (base: 195; +27 guard tests, -2 stale cases) |
 | `node scripts/verify-ui-schema.mjs` | **fails before it checks anything on this CRLF checkout**: `Migration 20261007900300_delegated_access_scope.sql failed: patch_function: pattern not found in is_provider_staff(uuid,uuid)` (its helper normalises line endings in the function body but not in its own `$from$` pattern; identical on the base commit). With an LF copy of that single file (restored afterwards, the tree is clean): `checked 89 rpc calls and 190 select strings (8 dynamic calls not checked); 0 mismatches, 0 in the baseline` |
 | `npm run build --workspace=web_platform` | fails only because Turbopack rejects the `node_modules` junction (`Symlink [project]/node_modules is invalid, it points out of the filesystem root`); the integrator builds after merging |
 
@@ -196,5 +196,5 @@ limit). Keyboard and screen-reader behaviour is therefore reasoned from the mark
 
 - New shared files: `web_platform/src/lib/published-agreement.ts`, `web_platform/src/lib/use-page-locale.ts`, `web_platform/src/components/public-dialog.tsx`.
 - Copy-only edits: `web_platform/src/app/categories/{barber,hair,makeup,spa}/page.tsx`, `web_platform/src/app/layout.tsx` (title and description).
-- Tests: `web_platform/tests/no-mock-data.test.mjs` (+25 guard tests), `web_platform/tests/negative-authorization.test.mjs` (two stale cases deleted, one assertion updated).
+- Tests: `web_platform/tests/no-mock-data.test.mjs` (+27 guard tests), `web_platform/tests/negative-authorization.test.mjs` (two stale cases deleted, one assertion updated).
 - No migrations, no changes under `customer/**`, `provider/**`, `admin/**`, `mobile_app/**`, `supabase/**`.
