@@ -14,6 +14,11 @@ integrator does them after all merges.
 | D-22 privacy page: "Saudi PDPL Compliance" headline and PDPL / statutory claims | fixed (EN + AR) | group 2 | guard test extended in group 5 |
 | D-07 / D-12 / D-25 callers: become-provider city, coordinates, agreement-not-published state, acceptance evidence | fixed | group 3 | UI-vs-schema check |
 | R34 become-provider: 15% commission text, "Growth" feature list, 299 SAR hard-coded price | fixed (plans read from `subscription_plans`, no rate quoted) | group 3 | guard test extended in group 5 |
+| D-23 / D-11 booking modal: required linked terms checkbox, consent through `record_consents`, retry on failure | fixed | group 4 | UI-vs-schema check (87 rpc calls) |
+| R22 / D25 shop page: service and specialist cards are `<button aria-pressed>`, labelled date input with `min`, named icon links and close buttons, both dialogs through `ModalOverlay` | fixed | group 4 | tsc, eslint (28 warnings, same as base), manual DOM review |
+| R24 slot labels `ar-SA` / `Asia/Riyadh` and SAR through one formatter | fixed | group 4 | tsc |
+| R24 any-professional duration (combined duration and service list into `get_branch_available_slots`) | deferred, needs a database change (see below) | - | - |
+| "Book again" preselects `?service=<id>` | fixed (once per link, with a message when the service is gone) | group 4 | tsc |
 
 (The table is appended after every commit group.)
 
@@ -64,7 +69,34 @@ integrator does them after all merges.
 - Other: all labelled inputs are associated (`htmlFor`/`id`), icon links and the language switch have names, `as any` removed, load failure of the
   existing application is surfaced instead of swallowed, page language through the shared `usePageLocale` hook.
 
+## Group 4: booking page (`shop/[id]/page.tsx`)
+
+- Consent: the phone-verification dialog now has a required terms/privacy checkbox that links to `/terms` and `/privacy` and shows the version that is
+  published for `customer_terms` (read on page load). The checkbox, and the send-code button, stay disabled while no terms are published or when the
+  read fails (an alert says which). After the code is verified the choices are written with
+  `rpc("record_consents", { p_purposes, p_status: "granted", p_document_version: <published version>, p_method: "inline_booking_modal" })`.
+  If the write fails the dialog keeps the error and the number stays verified (`authVerifiedUserId`): the button becomes "retry saving consent" and
+  the spent one-time code is not asked for again; the booking only continues after the consent is stored. The old unchecked `.insert` and the literal
+  `v1.0` are gone.
+- Keyboard and screen reader (R22 / D25): service and specialist cards are real buttons with `aria-pressed` (spans inside, no nested buttons),
+  the date input has a `<label htmlFor>` and `min` = today in Riyadh, the dependents select and the dialog fields are labelled, slot buttons have
+  `aria-pressed`, the header icon links and the language switch are named, decorative SVGs are `aria-hidden`. The waitlist and phone dialogs use the new
+  `components/public-dialog.tsx` (`ModalPortal` + `ModalOverlay` + `role="dialog" aria-modal aria-label`): focus moves in and is trapped, Escape closes
+  (not while a request is running), the page behind is inert and focus returns to the opener; the close buttons are named.
+- R24: slot labels come from `formatBookingTime` (`ar-SA` or `en-GB`, `Asia/Riyadh`, the shared formatter of the customer portal); all money on the page
+  goes through `sar()` from `operations-ui` (the Arabic coupon and gift-card messages no longer say "ريال" next to an English "SAR").
+- Language: the page uses `usePageLocale` (no localStorage-then-setState effect). The remaining `setInterval` language polling on other public pages
+  is part of R25 and is left to the integrator.
+- "Book again": the existing preselect effect re-ran on every provider reload (a language switch undid the visitor's choices) and did nothing when the
+  service had been removed; it now runs once per link, after the provider has loaded, and shows a message when the service is no longer offered.
+- NOT touched (FIX-BOOKING's area): `getPrayerWindowsForDate`, `fetchSlots`, `handleBook` and the `create_booking` / `create_multi_service_booking`
+  calls. `docs/work-packages/fixbooking-report.md` did not exist yet when I reached the booking call (only `fixcust-report.md` and `fixdba-report.md`
+  were present in the primora-fix tree), so the call is unchanged. The integrator must apply the prayer-window and attribution-token changes there.
+
 ## Needs from other packages
 
+- `get_branch_available_slots` takes one `target_service_id` and uses that service's duration; with "any professional" and several services in the cart it
+  lists times that `create_multi_service_booking` then rejects. The page cannot fix this on its own: the function needs a service list (or combined
+  duration) argument; the page will pass it once it exists.
 - `record_consent` (patched in `20261007010400`) still falls back to the literal `'v1.0'` when no `customer_terms` row is published and the caller
   passes no version. The screens now refuse to record when nothing is published, but the database should raise instead of defaulting.
