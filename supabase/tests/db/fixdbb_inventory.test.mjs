@@ -140,3 +140,57 @@ describe("C-D21b: stock valuation uses the recorded moving-average cost", () => 
     assert.equal(Number(byAdmin.unit_cost_sar), 12);
   });
 });
+
+// ---- C-D22: deactivated products keep their stock manageable -----------------------------------------------------------------
+
+let costingBranch;
+const secondBranchId = async () => {
+  if (costingBranch) return costingBranch;
+  const rows = await sys(db, `select id from branches where provider_id = $1 and id <> $2 order by id limit 1`, [SEED.provider1, SEED.branch1]);
+  costingBranch = rows[0]?.id ?? (await sys(db, `insert into branches (provider_id, name_en, name_ar, address_text_en, address_text_ar, latitude, longitude)
+    values ($1, 'Second Stockroom', 'مستودع ثان', 'Riyadh', 'الرياض', 24.7, 46.7) returning id`, [SEED.provider1]))[0].id;
+  return costingBranch;
+};
+
+describe("C-D22: an inactive product still allows waste and transfer of what is left", () => {
+  it("lets waste, a negative adjustment and a transfer through, and refuses only an increase with its own message", async () => {
+    const supplier = await makeSupplier();
+    const product = await makeProduct(supplier, 10, "Retired product");
+    await orderFlow(supplier, product, 20, 10);
+    await as(db, owner, `update inventory_products set is_active = false where id = $1`, [product]);
+    const second = await secondBranchId();
+    await as(db, owner, `select adjust_branch_inventory_stock($1, $2, -2, 'Expired stock written off', 'waste', $3)`, [SEED.branch1, product, rid()]);
+    await as(db, owner, `select adjust_branch_inventory_stock($1, $2, -1, 'Recount found one fewer', 'adjustment', $3)`, [SEED.branch1, product, rid()]);
+    await as(db, owner, `select transfer_branch_inventory_stock($1, $2, $3, 7, 'Move the leftovers away', $4)`, [SEED.branch1, second, product, rid()]);
+    assert.equal((await stockRow(SEED.branch1, product)).q, 10);
+    assert.equal((await stockRow(second, product)).q, 7);
+    await expectError(as(db, owner, `select adjust_branch_inventory_stock($1, $2, 5, 'Found stock', 'adjustment', $3)`, [SEED.branch1, product, rid()]), /Product is inactive/);
+  });
+
+  it("does not open the commands to people without inventory scope, inactive product or not", async () => {
+    const supplier = await makeSupplier();
+    const product = await makeProduct(supplier, 10, "Retired guarded product");
+    await orderFlow(supplier, product, 5, 10);
+    await as(db, owner, `update inventory_products set is_active = false where id = $1`, [product]);
+    const waste = (actor) => as(db, actor, `select adjust_branch_inventory_stock($1, $2, -1, 'Scope probe on a retired product', 'waste', $3)`, [SEED.branch1, product, rid()]);
+    await expectError(waste(ROLES.anon), /permission denied|Forbidden|Authentication/i);
+    await expectError(waste(stranger), /Forbidden/);
+    await expectError(waste(ROLES.user(SEED.owner2)), /Forbidden/);
+    await waste(delegate);
+    await waste(admin);
+    assert.equal((await stockRow(SEED.branch1, product)).q, 3);
+  });
+
+  it("refuses deactivation while a draft, submitted or approved order lists the product, and allows it once the order is cancelled or received", async () => {
+    const supplier = await makeSupplier();
+    const product = await makeProduct(supplier, 10, "Ordered product");
+    const [{ r }] = await as(db, owner, `select create_supplier_purchase_order($1, $2, $3, 'Open order blocking deactivation', $4::jsonb) r`,
+      [SEED.provider1, SEED.branch1, supplier, JSON.stringify([{ product_id: product, quantity: 3, unit_cost_sar: 10 }])]);
+    await expectError(as(db, owner, `update inventory_products set is_active = false where id = $1`, [product]), /open purchase orders/);
+    await as(db, owner, `select transition_supplier_purchase_order($1, 'submit')`, [r.id]);
+    await expectError(as(db, owner, `update inventory_products set is_active = false where id = $1`, [product]), /open purchase orders/);
+    await as(db, owner, `select transition_supplier_purchase_order($1, 'cancel', 'Order no longer needed')`, [r.id]);
+    await as(db, owner, `update inventory_products set is_active = false where id = $1`, [product]);
+    assert.equal((await sys(db, `select is_active from inventory_products where id = $1`, [product]))[0].is_active, false);
+  });
+});
