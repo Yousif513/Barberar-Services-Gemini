@@ -36,11 +36,11 @@ CREATE POLICY "Provider staff read walk-in details"
 DO $migrate$
 DECLARE
   v_old regprocedure := 'public.create_walk_in_booking(uuid, uuid, uuid, text, text, text, numeric, timestamp with time zone)'::regprocedure;
-  v_def text := replace(pg_get_functiondef(v_old), E'\r\n', E'\n');
+  v_def text := replace(pg_get_functiondef(v_old), chr(13) || chr(10), chr(10));
   v_new text := v_def;
   v_header_from text := 'p_scheduled_at timestamp with time zone DEFAULT NULL::timestamp with time zone)';
-  v_check_anchor text := E'  SELECT s.id, COALESCE(es.custom_duration_minutes, s.base_duration_minutes) AS duration,';
-  v_audit_anchor text := E'  PERFORM public.write_audit_log(''provider.walk_in_created'',';
+  v_check_anchor text := $q$  SELECT s.id, COALESCE(es.custom_duration_minutes, s.base_duration_minutes) AS duration,$q$;
+  v_audit_anchor text := $q$  PERFORM public.write_audit_log('provider.walk_in_created',$q$;
 BEGIN
   IF position(v_header_from IN v_new) = 0 THEN RAISE EXCEPTION 'create_walk_in_booking: parameter list not recognised'; END IF;
   IF position(v_check_anchor IN v_new) = 0 THEN RAISE EXCEPTION 'create_walk_in_booking: service lookup not found'; END IF;

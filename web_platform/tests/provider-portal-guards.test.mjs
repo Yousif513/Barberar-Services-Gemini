@@ -169,3 +169,20 @@ describe("dashboard honesty and the real QR (D-28, R27, D-09)", () => {
     assert.ok(!dashboard().includes("document.write(`<html>"), "the print page is built by the escaping helper");
   });
 });
+
+describe("promo codes (R9)", () => {
+  const promotions = () => byPath("promotions/page.tsx").code;
+  it("creates, lists and switches codes through the owner commands that write the table checkout reads", () => {
+    for (const command of ["create_provider_promo_code", "list_provider_promo_codes", "set_provider_promo_code_active"]) {
+      assert.ok(promotions().includes(command), command);
+    }
+    assert.ok(!promotions().includes("provider_promos"), "the unread table is not written");
+    assert.ok(!/from\("promotional_codes"\)/.test(promotions()), "no direct table access");
+  });
+  it("offers no audience that checkout cannot enforce and estimates no revenue", () => {
+    assert.ok(!/target_segment|targetSegment|Est\. Revenue Lift|\* 180/.test(promotions()));
+  });
+  it("shows a failed toggle instead of flipping the row in memory", () => {
+    assert.ok(!/setPromos\(prev => prev\.map/.test(promotions()));
+  });
+});

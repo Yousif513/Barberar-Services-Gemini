@@ -95,3 +95,20 @@ Branch `wp/fixprov`, worktree `primora-wp-fixprov`. Status per defect is updated
 * When the figures cannot be read the KPI strip shows dashes and the error banner names the reason (the "Unavailable" demo label is gone). The "0% Commission" badge,
   "0% Commission Guarantee", "15% Saved" and "G43 Verified" labels were removed; the explainer now states what the fee rules do (direct clients are exempt from the marketplace first-visit fee).
 * Verification limit: a QR cannot be scanned in the test run, so the tests prove the structure a scanner locks on to (finders, timing, format information). Scan it once in a browser.
+
+## Group 6: provider promo codes (R9)
+
+* The screen wrote `provider_promos`, which nothing reads, so every code answered "not valid for this booking". Migration `20261007103000_provider_promo_codes.sql` adds three owner-only
+  commands over `promotional_codes` (the table `booking_create_internal` and `validate_and_apply_coupon` read): `create_provider_promo_code` (provider-funded, code 4-20
+  characters, percentage 0-100 or flat up to 10,000 SAR, end date in the future, optional redemption limit and minimum order, at most 50 active codes, a duplicate is answered
+  without saying who holds the code, audited), `list_provider_promo_codes`, and `set_provider_promo_code_active` (idempotent, audited).
+* **Scope decision (as instructed): `booking_create_internal` is unchanged, so only "all customers" codes ship.** The screen's "VIP only", "first-time bookers" and "loyal clients"
+  audiences are gone (nothing enforced them) and the form says so. Enforcing "new clients only" needs a change to the booking core with `is_first_visit`; it is listed under not done.
+* `provider_promos` is left in place and unread. Dropping it or migrating its rows is the owner's call (the table also sits on the public-catalogue lists of two existing tests).
+* The page lost its invented figures ("Est. Revenue Lift = redemptions x 180", an average discount that defaulted to 15%), the in-memory enable/disable toggle that never reached the
+  server (now `set_provider_promo_code_active`, error shown on failure), and English-only strings.
+* Tests: `supabase/tests/db/fixprov_promo_codes.test.mjs` (10 tests, including a customer redeeming the code through `create_booking`, the redemption count, expiry/exhaustion/switched-off
+  refusals, validation, and anonymous / customer / other owner / employee refusals). `negative-authorization.test.mjs` asserted that the page queries `provider_promos`
+  (the defect); it now asserts the owner command.
+* The migration hygiene test from the integrator (`migration_hygiene.test.mjs`) is copied into this worktree and passes: my migrations use dollar quoting and `chr(13) || chr(10)`
+  (no E-string with a backslash-escaped quote).
