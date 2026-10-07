@@ -1,9 +1,9 @@
 // G65 Memberships: plans, purchase through the payment webhook, visits redeemed against bookings, expiry and reminders.
 // Weight is on money: a membership is paid only by a service-role confirmation, the amounts equal a package sale, and a plan edit never
 // reaches a membership that was already sold.
-import { before, describe, it } from "node:test";
+import { afterEach, before, describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { as, createMigratedDb, createUser, expectError, ROLES, SEED, serviceFor, sys } from "./harness.mjs";
+import { as, createMigratedDb, createUser, expectError, nextWorkingDate, ROLES, SEED, serviceFor, sys } from "./harness.mjs";
 
 let db;
 let svcA;
@@ -335,5 +335,305 @@ describe("renewing and cancelling", () => {
     assert.equal((await mem(id)).status, "cancelled");
     assert.equal((await ledgerFor(intent)).length, 1);
     assert.equal(money((await ledgerFor(intent))[0].provider_share), 300);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+// Redeeming included visits, voiding, expiry, reminders
+// ---------------------------------------------------------------------------------------------------------------------------------
+describe("redeeming included visits", () => {
+  let date;
+  let admin;
+  let other;
+  const riyadh = (hhmm) => `${date}T${hhmm}:00+03:00`;
+  const book = async (hhmm, { services = [svcA.id], user = customer, status = "confirmed" } = {}) => {
+    const r = await as(db, user,
+      `select create_multi_service_booking(target_branch_id => $1, target_employee_id => $2, target_scheduled_at => $3, services_payload => $4::jsonb) r`,
+      [SEED.branch1, SEED.employee1, riyadh(hhmm), JSON.stringify(services.map((id) => ({ service_id: id })))]).then((x) => x[0].r);
+    if (status !== "pending_payment") await sys(db, `update bookings set status = $2::booking_status where id = $1`, [r.booking_id, status]);
+    return r.booking_id;
+  };
+  const redeem = (user, membershipId, bookingId, notes = null) => as(db, user, `select redeem_membership_visit($1, $2, $3) r`, [membershipId, bookingId, notes]).then((r) => r[0].r);
+  const left = async (id) => (await mem(id)).visits_remaining;
+  const redemptions = async (id) => sys(db, `select * from membership_redemptions where membership_id = $1 order by redeemed_at`, [id]);
+
+  before(async () => {
+    date = await nextWorkingDate(db, SEED.employee1);
+    for (const s of [svcA, svcB]) await sys(db, `update services set base_duration_minutes = 30 where id = $1`, [s.id]);
+    await sys(db, `update employee_services set custom_duration_minutes = null where service_id in ($1, $2)`, [svcA.id, svcB.id]);
+    await sys(db, `update employee_availability set start_time = '09:00', end_time = '17:00', is_working_day = true, has_second_shift = false,
+                     second_start_time = null, second_end_time = null where employee_id = $1 and day_of_week = extract(dow from $2::date)::int`, [SEED.employee1, date]);
+    admin = ROLES.user(await createUser(db, { role: "admin" }));
+    other = ROLES.user(await createUser(db));
+  });
+
+  afterEach(async () => {
+    const open = await sys(db, `select id, customer_id from bookings where employee_id = $1 and status in ('pending_payment', 'confirmed')`, [SEED.employee1]);
+    for (const b of open) await as(db, ROLES.user(b.customer_id), `select cancel_booking($1, 'test cleanup')`, [b.id]);
+  });
+
+  it("the provider owner and an active employee redeem a visit against the member's booking; the balance drops and no money moves", async () => {
+    const id = await paidMembership();
+    const ledgerBefore = (await sys(db, `select count(*)::int n from transactional_ledger`))[0].n;
+    const b1 = await book("09:00");
+    const b2 = await book("10:00");
+    const r1 = await redeem(owner1, id, b1, "first cut");
+    assert.equal(r1.visits_remaining, 3);
+    const r2 = await redeem(staff1, id, b2);
+    assert.equal(r2.visits_remaining, 2);
+    assert.equal(await left(id), 2);
+    const rows = await redemptions(id);
+    assert.deepEqual(rows.map((r) => r.booking_id), [b1, b2]);
+    assert.equal(rows[0].redeemed_by, SEED.owner1);
+    assert.equal(rows[0].notes, "first cut");
+    assert.equal((await sys(db, `select count(*)::int n from transactional_ledger`))[0].n, ledgerBefore, "revenue is recognised at purchase; a redemption writes no ledger row");
+    // the member sees the balance and the history; strangers see nothing
+    assert.equal((await as(db, customer, `select id from membership_redemptions where membership_id = $1`, [id])).length, 2);
+    assert.equal((await as(db, stranger, `select id from membership_redemptions where membership_id = $1`, [id])).length, 0);
+    assert.equal((await as(db, owner2, `select id from membership_redemptions where membership_id = $1`, [id])).length, 0);
+  });
+
+  it("refuses everyone who is not this provider's staff: the member, a stranger, anonymous, the other provider's owner and staff", async () => {
+    const id = await paidMembership();
+    const b = await book("09:00");
+    await expectError(redeem(customer, id, b), /Only the provider staff/);
+    await expectError(redeem(stranger, id, b), /Membership not found/);
+    await expectError(redeem(owner2, id, b), /Membership not found/);
+    await expectError(redeem(staff2, id, b), /Membership not found/);
+    await expectError(redeem(ROLES.anon, id, b), /permission denied/);
+    await expectError(as(db, ROLES.service, `select redeem_membership_visit($1, $2, null)`, [id, b]), /Authentication required/);
+    assert.equal(await left(id), 4);
+    assert.equal((await redemptions(id)).length, 0);
+  });
+
+  it("an administrator can redeem; a membership of another provider cannot be used on this provider's booking", async () => {
+    const id = await paidMembership();
+    const b = await book("09:00");
+    assert.equal((await redeem(admin, id, b)).visits_remaining, 3);
+    const plan2 = (await createPlan(owner2, { provider: SEED.provider2, all: true, services: [] })).plan_id;
+    await activatePlan(owner2, plan2);
+    const m2 = await buy(customer, plan2);
+    await confirm(m2.membership_id, "chg_mem_p2", 300);
+    const b2 = await book("10:00");
+    await expectError(redeem(owner2, m2.membership_id, b2), /does not belong to this member at this provider/);
+    assert.equal(await left(m2.membership_id), 4);
+  });
+
+  it("checks the booking: owner, status, covered service, one live redemption per booking, and a visit needs a booking", async () => {
+    const id = await paidMembership();
+    await expectError(redeem(owner1, id, null), /booking is required/);
+    await expectError(redeem(owner1, id, "00000000-0000-4000-8000-000000000999"), /does not belong to this member/);
+    const foreign = await book("09:00", { user: other });
+    await expectError(redeem(owner1, id, foreign), /does not belong to this member/);
+    const pending = await book("10:00", { status: "pending_payment" });
+    await expectError(redeem(owner1, id, pending), /confirmed or completed/);
+    const wrongService = await book("11:00", { services: [svcB.id] });
+    await expectError(redeem(owner1, id, wrongService), /does not cover the services/);
+    const good = await book("12:00");
+    await redeem(owner1, id, good);
+    await expectError(redeem(owner1, id, good), /already recorded for this booking/);
+    const m2 = await paidMembership();
+    await expectError(redeem(owner1, m2, good), /already recorded for this booking/);
+    assert.equal(await left(id), 3);
+    assert.equal(await left(m2), 4);
+    const completed = await book("13:00", { status: "completed" });
+    assert.equal((await redeem(owner1, id, completed)).visits_remaining, 2);
+    await sys(db, `update bookings set status = 'cancelled' where id = $1`, [completed]);
+  });
+
+  it("an all-services plan covers any service, and the sold terms (not the edited plan) decide coverage", async () => {
+    const planId = await livePlan();
+    const id = await paidMembership({ planId });
+    await as(db, owner1, `select provider_update_membership_plan($1, 'Gold', 'ذهبي', null, null, 999, 90, 20, false, $2::uuid[])`, [planId, [svcB.id]]);
+    const bB = await book("09:00", { services: [svcB.id] });
+    await expectError(redeem(owner1, id, bB), /does not cover the services/);
+    const bA = await book("10:00", { services: [svcA.id] });
+    assert.equal((await redeem(owner1, id, bA)).visits_remaining, 3);
+    const all = await paidMembership({ plan: { all: true, services: [] } });
+    assert.equal((await redeem(owner1, all, bB)).visits_remaining, 3);
+  });
+
+  it("two redemptions at once cannot overspend the last visit, and the same booking cannot be redeemed twice at once", async () => {
+    const id = await paidMembership({ plan: { visits: 1 } });
+    const b1 = await book("09:00");
+    const b2 = await book("10:00");
+    const settled = await Promise.allSettled([redeem(owner1, id, b1), redeem(staff1, id, b2), redeem(owner1, id, b1)]);
+    assert.equal(settled.filter((s) => s.status === "fulfilled").length, 1, settled.map((s) => s.reason?.message ?? "ok").join(" | "));
+    assert.equal(await left(id), 0);
+    assert.equal((await redemptions(id)).length, 1);
+    await expectError(redeem(owner1, id, b2), /No included visits remain|already recorded/);
+
+    const id2 = await paidMembership();
+    const b3 = await book("11:00");
+    const dup = await Promise.allSettled([redeem(owner1, id2, b3), redeem(owner1, id2, b3)]);
+    assert.equal(dup.filter((s) => s.status === "fulfilled").length, 1);
+    assert.equal(await left(id2), 3);
+  });
+
+  it("refuses a pending, cancelled, expired or not yet started membership and one that is out of visits", async () => {
+    const b = await book("09:00");
+    const pending = (await buy(customer, await livePlan())).membership_id;
+    await expectError(redeem(owner1, pending, b), /not active/);
+    const cancelled = await paidMembership();
+    await as(db, customer, `select cancel_membership($1, 'stop')`, [cancelled]);
+    await expectError(redeem(owner1, cancelled, b), /not active/);
+    const expired = await paidMembership();
+    await sys(db, `update memberships set period_end = now() - interval '1 minute' where id = $1`, [expired]);
+    await expectError(redeem(owner1, expired, b), /has expired/);
+    const future = await paidMembership();
+    await sys(db, `update memberships set period_start = now() + interval '1 day', period_end = now() + interval '31 days' where id = $1`, [future]);
+    await expectError(redeem(owner1, future, b), /has not started/);
+    const spent = await paidMembership();
+    await sys(db, `update memberships set visits_remaining = 0 where id = $1`, [spent]);
+    await expectError(redeem(owner1, spent, b), /No included visits remain/);
+    assert.equal((await redemptions(pending)).length + (await redemptions(cancelled)).length + (await redemptions(expired)).length, 0);
+  });
+
+  it("voiding a visit needs a reason and the provider's staff, gives the visit back once, and frees the booking", async () => {
+    const id = await paidMembership();
+    const b = await book("09:00");
+    await redeem(owner1, id, b);
+    const red = (await redemptions(id))[0];
+    const voidIt = (user, reason = "recorded by mistake") => as(db, user, `select void_membership_redemption($1, $2) r`, [red.id, reason]).then((r) => r[0].r);
+    await expectError(voidIt(owner1, "x"), /reason of at least 3/);
+    await expectError(voidIt(customer), /Only the provider staff/);
+    await expectError(voidIt(stranger), /Redemption not found/);
+    await expectError(voidIt(owner2), /Redemption not found/);
+    await expectError(voidIt(staff2), /Redemption not found/);
+    await expectError(voidIt(ROLES.anon), /permission denied/);
+    assert.equal(await left(id), 3);
+    assert.equal((await voidIt(staff1)).visits_remaining, 4);
+    assert.equal((await voidIt(owner1)).replayed, true);
+    assert.equal(await left(id), 4, "a second void does not give a second visit back");
+    const row = (await sys(db, `select voided_by, void_reason from membership_redemptions where id = $1`, [red.id]))[0];
+    assert.equal(row.voided_by, staff1.sub);
+    assert.equal(row.void_reason, "recorded by mistake");
+    assert.equal((await redeem(owner1, id, b)).visits_remaining, 3, "the booking can be redeemed again after a void");
+  });
+
+  it("a void on an ended membership does not hand a visit back", async () => {
+    const id = await paidMembership();
+    const b = await book("09:00");
+    await redeem(owner1, id, b);
+    await sys(db, `update memberships set status = 'expired' where id = $1`, [id]);
+    const red = (await redemptions(id))[0];
+    const r = (await as(db, owner1, `select void_membership_redemption($1, 'late correction') r`, [red.id]))[0].r;
+    assert.equal(r.visits_remaining, 3);
+    assert.equal(await left(id), 3);
+  });
+
+  it("every privileged action leaves an audit event", async () => {
+    const id = await paidMembership();
+    const b = await book("09:00");
+    await redeem(owner1, id, b);
+    const red = (await redemptions(id))[0];
+    await as(db, owner1, `select void_membership_redemption($1, 'audit check')`, [red.id]);
+    const actions = (await sys(db, `select action from admin_audit_logs where target_id = $1`, [id])).map((r) => r.action);
+    for (const a of ["purchase.paid", "membership.visit_redeemed", "membership.visit_voided", "membership.purchase_started"]) assert.ok(actions.includes(a), `${a} in ${actions}`);
+  });
+
+  it("the member list is for the provider's staff only, names the members and records the read; redeemable bookings follow the same rule", async () => {
+    const id = await paidMembership();
+    const b = await book("09:00");
+    const list = (user, provider = SEED.provider1) => as(db, user, `select * from list_provider_memberships($1)`, [provider]);
+    const rows = await list(owner1);
+    assert.ok(rows.some((r) => r.membership_id === id && r.status === "active" && r.visits_remaining === 4));
+    assert.ok(Number(rows[0].total_count) >= 1);
+    assert.equal((await list(staff1)).length, rows.length);
+    await expectError(list(owner2), /Provider not found/);
+    await expectError(list(customer), /Provider not found/);
+    await expectError(list(stranger), /Provider not found/);
+    await expectError(list(ROLES.anon), /permission denied/);
+    await expectError(as(db, owner1, `select * from list_provider_memberships($1, 'bogus')`, [SEED.provider1]), /Unknown membership status/);
+    assert.ok((await sys(db, `select 1 from admin_audit_logs where action = 'membership.members_listed' and target_id = $1`, [SEED.provider1])).length >= 1);
+    const eligible = await as(db, owner1, `select * from list_membership_redeemable_bookings($1)`, [id]);
+    assert.ok(eligible.some((e) => e.booking_id === b));
+    await redeem(owner1, id, b);
+    assert.ok(!(await as(db, owner1, `select * from list_membership_redeemable_bookings($1)`, [id])).some((e) => e.booking_id === b));
+    await expectError(as(db, owner2, `select * from list_membership_redeemable_bookings($1)`, [id]), /Membership not found/);
+    await expectError(as(db, customer, `select * from list_membership_redeemable_bookings($1)`, [id]), /Membership not found/);
+  });
+});
+
+describe("expiry and reminders", () => {
+  const run = (user, sql, params = []) => as(db, user, sql, params).then((r) => r[0].r);
+  const atFixedInstant = async (claims, fn) => db.transaction(async (tx) => {
+    await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify(claims)]);
+    return fn(tx);
+  });
+
+  it("expire_memberships ends exactly the memberships whose period is over; the end instant itself is already over", async () => {
+    const live = await paidMembership();
+    const over = await paidMembership();
+    const edge = await paidMembership();
+    const pending = (await buy(customer, await livePlan())).membership_id;
+    await sys(db, `update memberships set period_end = now() - interval '1 second' where id = $1`, [over]);
+    await sys(db, `update memberships set period_end = now() + interval '1 hour' where id = $1`, [live]);
+    const result = await atFixedInstant({ role: "service_role" }, async (tx) => {
+      await tx.query(`update memberships set period_end = now() where id = $1`, [edge]);
+      return (await tx.query(`select expire_memberships() r`)).rows[0].r;
+    });
+    assert.ok(result.expired >= 2);
+    assert.equal((await mem(over)).status, "expired");
+    assert.equal((await mem(edge)).status, "expired");
+    assert.equal((await mem(live)).status, "active");
+    assert.equal((await mem(pending)).status, "pending_payment");
+    assert.equal((await run(ROLES.service, `select expire_memberships() r`)).expired, 0, "running it again changes nothing");
+  });
+
+  it("a visit at the end instant is refused, one just before it is accepted", async () => {
+    const id = await paidMembership();
+    const date = await nextWorkingDate(db, SEED.employee1, 5);
+    const b = (await as(db, customer,
+      `select create_multi_service_booking(target_branch_id => $1, target_employee_id => $2, target_scheduled_at => $3, services_payload => $4::jsonb) r`,
+      [SEED.branch1, SEED.employee1, `${date}T15:00:00+03:00`, JSON.stringify([{ service_id: svcA.id }])]))[0].r.booking_id;
+    await sys(db, `update bookings set status = 'confirmed' where id = $1`, [b]);
+    const refused = await atFixedInstant({ role: "authenticated", sub: SEED.owner1 }, async (tx) => {
+      await tx.query(`update memberships set period_end = now() where id = $1`, [id]);
+      try { await tx.query(`select redeem_membership_visit($1, $2, null)`, [id, b]); return "accepted"; } catch (e) { return e.message; }
+    });
+    assert.match(refused, /has expired/);
+    await sys(db, `update memberships set period_end = now() + interval '5 minutes' where id = $1`, [id]);
+    assert.equal((await as(db, owner1, `select redeem_membership_visit($1, $2, null) r`, [id, b]))[0].r.visits_remaining, 3);
+    await as(db, customer, `select cancel_booking($1, 'cleanup')`, [b]);
+  });
+
+  it("only the service role or an administrator may expire or remind; everyone else is refused", async () => {
+    const admin = ROLES.user(await createUser(db, { role: "admin" }));
+    for (const u of [customer, owner1, staff1, stranger]) {
+      await expectError(as(db, u, `select expire_memberships()`), /Service role or administrator required/);
+      await expectError(as(db, u, `select send_membership_expiry_reminders(3)`), /Service role or administrator required/);
+    }
+    await expectError(as(db, ROLES.anon, `select expire_memberships()`), /permission denied/);
+    await expectError(as(db, ROLES.anon, `select send_membership_expiry_reminders(3)`), /permission denied/);
+    assert.equal((await run(admin, `select expire_memberships() r`)).success, true);
+    assert.equal((await run(admin, `select send_membership_expiry_reminders(3) r`)).success, true);
+  });
+
+  it("reminds each member once, only inside the lead time you pass, and not when a paid renewal already follows", async () => {
+    const soon = await paidMembership();
+    const later = await paidMembership();
+    const renewed = await paidMembership();
+    await sys(db, `update memberships set period_end = now() + interval '2 days' where id = $1`, [soon]);
+    await sys(db, `update memberships set period_end = now() + interval '20 days' where id = $1`, [later]);
+    await sys(db, `update memberships set period_end = now() + interval '2 days' where id = $1`, [renewed]);
+    const renewal = (await as(db, customer, `select renew_membership($1, $2) r`, [renewed, key()]))[0].r;
+    await confirm(renewal.membership_id, "chg_renewal_rem", 300);
+    await expectError(as(db, ROLES.service, `select send_membership_expiry_reminders(null)`), /between 1 and 60/);
+    await expectError(as(db, ROLES.service, `select send_membership_expiry_reminders(0)`), /between 1 and 60/);
+    await expectError(as(db, ROLES.service, `select send_membership_expiry_reminders(61)`), /between 1 and 60/);
+    const notices = (id) => sys(db, `select title_en, title_ar, body_en, body_ar from notifications where data->>'membership_id' = $1 and data->>'kind' = 'expiry_reminder'`, [id]);
+    assert.equal((await run(ROLES.service, `select send_membership_expiry_reminders(1) r`)).reminded, 0, "too early for a one day lead");
+    const first = await run(ROLES.service, `select send_membership_expiry_reminders(3) r`);
+    assert.ok(first.reminded >= 1);
+    assert.equal((await notices(soon)).length, 1);
+    assert.equal((await notices(later)).length, 0);
+    assert.equal((await notices(renewed)).length, 0, "a paid renewal already follows");
+    const n = (await notices(soon))[0];
+    assert.ok(n.title_en && n.title_ar && n.body_en && n.body_ar, "both languages");
+    assert.equal((await run(ROLES.service, `select send_membership_expiry_reminders(3) r`)).reminded, 0, "once per membership");
+    assert.equal((await notices(soon)).length, 1);
+    assert.equal((await run(ROLES.service, `select send_membership_expiry_reminders(30) r`)).reminded >= 1, true);
+    assert.equal((await notices(later)).length, 1);
   });
 });
