@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocale } from "@/lib/locale";
 import {
   StyleSheet,
   View,
@@ -40,7 +41,7 @@ interface Post {
 type Category = { id: string; name_en: string; name_ar: string };
 
 export default function ServiceBoardScreen() {
-  const [lang, setLang] = useState<"en" | "ar">("ar");
+  const { lang, setLang } = useLocale();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -105,7 +106,13 @@ export default function ServiceBoardScreen() {
       successPost: "Request published. Verified providers can now send offers.",
       successBid: "Proposal submitted successfully.",
       acceptedSuccess: "Offer accepted. The other offers were declined.",
-      errorFill: "Please fill in all fields."
+      errorFill: "Please fill in all fields.",
+      phTitle: "Service you need",
+      phDesc: "Describe what you need and where",
+      phBudget: "Budget (SAR)",
+      phDate: "Date (YYYY-MM-DD)",
+      phBid: "Your price (SAR)",
+      phBidNotes: "Describe your qualifications and your offer"
     },
     ar: {
       title: "لوحة الطلبات الخدمية",
@@ -145,7 +152,13 @@ export default function ServiceBoardScreen() {
       successPost: "تم نشر طلب الخدمة بنجاح.",
       successBid: "تم تقديم عرض السعر بنجاح.",
       acceptedSuccess: "تم قبول العرض والتعاقد بنجاح.",
-      errorFill: "يرجى تعبئة جميع الحقول المطلوبة."
+      errorFill: "يرجى تعبئة جميع الحقول المطلوبة.",
+      phTitle: "الخدمة التي تحتاجها",
+      phDesc: "صف ما تحتاجه وأين",
+      phBudget: "الميزانية (ر.س)",
+      phDate: "التاريخ (YYYY-MM-DD)",
+      phBid: "سعرك (ر.س)",
+      phBidNotes: "صف مؤهلاتك وعرضك"
     }
   }[lang];
 
@@ -471,7 +484,7 @@ export default function ServiceBoardScreen() {
                 style={[styles.modalInput, isRTL && styles.textRight]}
                 value={newTitle}
                 onChangeText={setNewTitle}
-                placeholder="e.g. Silk Blowdry"
+                placeholder={t.phTitle}
                 placeholderTextColor="#a8a29e"
               />
 
@@ -482,7 +495,7 @@ export default function ServiceBoardScreen() {
                 onChangeText={setNewDesc}
                 multiline
                 numberOfLines={3}
-                placeholder="e.g. Need mobile service at home..."
+                placeholder={t.phDesc}
                 placeholderTextColor="#a8a29e"
               />
 
@@ -492,7 +505,7 @@ export default function ServiceBoardScreen() {
                 value={newBudget}
                 onChangeText={setNewBudget}
                 keyboardType="numeric"
-                placeholder="500"
+                placeholder={t.phBudget}
                 placeholderTextColor="#a8a29e"
               />
 
@@ -525,7 +538,7 @@ export default function ServiceBoardScreen() {
                 style={[styles.modalInput, isRTL && styles.textRight]}
                 value={newDate}
                 onChangeText={setNewDate}
-                placeholder="YYYY-MM-DD"
+                placeholder={t.phDate}
                 placeholderTextColor="#a8a29e"
               />
 
@@ -555,7 +568,7 @@ export default function ServiceBoardScreen() {
                 value={bidPrice}
                 onChangeText={setBidPrice}
                 keyboardType="numeric"
-                placeholder="e.g. 450"
+                placeholder={t.phBid}
                 placeholderTextColor="#a8a29e"
               />
 
@@ -566,7 +579,7 @@ export default function ServiceBoardScreen() {
                 onChangeText={setBidNotes}
                 multiline
                 numberOfLines={3}
-                placeholder="Describe your qualifications & package offer..."
+                placeholder={t.phBidNotes}
                 placeholderTextColor="#a8a29e"
               />
 

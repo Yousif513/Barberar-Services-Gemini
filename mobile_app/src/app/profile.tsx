@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useLocale } from "@/lib/locale";
 import {
   StyleSheet,
   View,
@@ -44,7 +45,7 @@ const normalizeSaudiPhone = (raw: string): string => {
 };
 
 export default function ProfileScreen() {
-  const [lang, setLang] = useState<"en" | "ar">("ar");
+  const { lang, setLang } = useLocale();
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState<"success" | "info" | "error">("success");
   const [toastVisible, setToastVisible] = useState(false);

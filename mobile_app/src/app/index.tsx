@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useLocale } from "@/lib/locale";
 import {
   StyleSheet,
   View,
@@ -16,7 +17,7 @@ import { errorMessage } from "@/lib/error-message";
 type LoadState = "loading" | "ready" | "error";
 
 export default function HomeScreen() {
-  const [lang, setLang] = useState<"en" | "ar">("ar");
+  const { lang, setLang } = useLocale();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [categories, setCategories] = useState<Category[]>([]);

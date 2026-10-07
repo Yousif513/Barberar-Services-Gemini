@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useLocale } from "@/lib/locale";
 import {
   StyleSheet,
   View,
@@ -33,7 +34,7 @@ interface Thread {
 }
 
 export default function MessagesScreen() {
-  const [lang, setLang] = useState<"en" | "ar">("ar");
+  const { lang, setLang } = useLocale();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
   const [inputText, setInputText] = useState("");

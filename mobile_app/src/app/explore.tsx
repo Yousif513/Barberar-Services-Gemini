@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocale } from "@/lib/locale";
 import {
   StyleSheet,
   View,
@@ -36,7 +37,7 @@ function projectPins(providers: MarketplaceProvider[]) {
 }
 
 export default function ExploreScreen() {
-  const [lang, setLang] = useState<"en" | "ar">("ar");
+  const { lang, setLang } = useLocale();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [selectedCity, setSelectedCity] = useState("all");

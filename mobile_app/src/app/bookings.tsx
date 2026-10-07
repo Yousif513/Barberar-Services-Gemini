@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useLocale } from "@/lib/locale";
 import {
   StyleSheet,
   View,
@@ -30,7 +31,7 @@ interface BookingRow {
 const UPCOMING: BookingStatus[] = ["pending_payment", "confirmed"];
 
 export default function BookingsScreen() {
-  const [lang, setLang] = useState<"en" | "ar">("ar");
+  const { lang, setLang } = useLocale();
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
   const [selectedBooking, setSelectedBooking] = useState<BookingRow | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);

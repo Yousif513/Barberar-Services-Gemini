@@ -96,6 +96,7 @@ export function ShopDetailsModal({
       bookingFailed: "Booking failed",
       bookingConfirmed: "Booking confirmed",
       bookingConfirmedText: "Nothing is due online. Details are in your bookings.",
+      okLabel: "OK",
       paymentFailed: "Your time is held, but the payment page could not be opened. Open it again from your bookings before the hold expires.",
       loadFailed: "Could not load this shop",
       retry: "Try again",
@@ -147,6 +148,7 @@ export function ShopDetailsModal({
       bookingFailed: "تعذر إتمام الحجز",
       bookingConfirmed: "تم تأكيد الحجز",
       bookingConfirmedText: "لا يوجد مبلغ مستحق عبر الإنترنت. التفاصيل في حجوزاتك.",
+      okLabel: "حسناً",
       paymentFailed: "تم حجز الموعد مؤقتاً، لكن تعذر فتح صفحة الدفع. افتحها من حجوزاتك قبل انتهاء مهلة الحجز.",
       loadFailed: "تعذر تحميل بيانات المركز",
       retry: "إعادة المحاولة",
@@ -267,7 +269,7 @@ export function ShopDetailsModal({
 
       if (booking.status === "confirmed") {
         notifyBookingsChanged();
-        Alert.alert(t.bookingConfirmed, t.bookingConfirmedText, [{ text: "OK", onPress: onClose }]);
+        Alert.alert(t.bookingConfirmed, t.bookingConfirmedText, [{ text: t.okLabel, onPress: onClose }]);
         return;
       }
 
