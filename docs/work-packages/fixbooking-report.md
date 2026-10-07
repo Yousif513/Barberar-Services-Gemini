@@ -18,6 +18,28 @@ run the whole DB suite.
 | C-D10 / D10 | fixed (DB part; claim screen deferred) | `20261007092000_waitlist_exclusive_claim.sql` | `booking_engine_waitlist.test.mjs` |
 | R24 / C-D16 | fixed (DB part; shop page and mobile pass the list) | `20261007090000_branch_slots_any_professional.sql` | `booking_engine_branch_slots.test.mjs`, `qa_adversarial.test.mjs` (allow-list updated) |
 
+## Callers cheat-sheet (current signatures; every new argument is optional and last, named arguments keep old callers working)
+
+Pass these by NAME through PostgREST (`supabase.rpc(name, { ... })`). Argument names are exactly as written.
+
+- `create_booking(target_employee_id, target_service_id, target_scheduled_at, request_home_service, request_home_address_lat, request_home_address_lng, request_client_profile_id,
+  request_source, request_coupon_code, request_gift_card_code, request_loyalty_points, request_branch_id, request_home_address_text,`
+  **`prayer_window_starts, prayer_window_ends`** (timestamptz[], the SAME arrays sent to `get_available_slots`; omit = no prayer pause), **`request_source_token`** (text, the `?ref=` value of a provider
+  share link; `request_source` is no longer trusted), **`request_variant_id`** (uuid), **`request_waitlist_claim_id`** (uuid from `?claim_waitlist=`)`)`
+- `create_multi_service_booking(target_branch_id, target_employee_id, target_scheduled_at, services_payload, request_home_service, request_home_address_text, request_source, request_coupon_code,
+  request_gift_card_code, request_loyalty_points, request_home_address_lat, request_home_address_lng, request_client_profile_id,` **`prayer_window_starts, prayer_window_ends, request_source_token,
+  request_waitlist_claim_id`**`)`; `services_payload` items are `{ "service_id": uuid, "variant_id": uuid|null }` in visit order.
+- `reschedule_booking(target_booking_id, new_scheduled_at, new_employee_id, reschedule_reason,` **`prayer_window_starts, prayer_window_ends`**`)`.
+- `get_available_slots(target_employee_id, target_date, service_duration_minutes, prayer_window_starts, prayer_window_ends,` **`p_buffer_before_minutes, p_buffer_after_minutes, p_ignore_booking_id`**`)`:
+  for a service with buffers/processing time prefer `get_branch_available_slots`, which computes them.
+- `get_branch_available_slots(target_branch_id, target_service_id, target_date, prayer_window_starts, prayer_window_ends,` **`p_service_ids, p_variant_ids, p_duration_minutes`**`)` returns
+  `slot_start, available_employee_count, candidate_employee_ids, candidate_duration_minutes`. Send `p_service_ids` (all selected services in order) and `p_variant_ids` (aligned, NULL = none);
+  `p_duration_minutes` is ignored on purpose (see item 5).
+- New owner commands: `create_provider_share_token(p_provider_id, p_source, p_label, p_expires_at)`, `revoke_provider_share_token(p_token_id, p_reason)`; table `provider_share_tokens` (owner read).
+- New customer command: `claim_waitlist_slot(p_waitlist_id)` returns the held slot; scheduler-only: `expire_waitlist_claims()`.
+- Slot display: format with `ar-SA`/`en` and `timeZone: 'Asia/Riyadh'`; amounts in SAR only.
+- Items 7b-7f (packages, coupon limit, loyalty, wallet credit and referral, gift card message) add further arguments; they are listed in their sections below as they land.
+
 ## 1. D-21 / R3 prayer windows and the Riyadh clock (fixed)
 
 Reproduced on the base commit under the UTC harness: with a 06:00-23:30 shift `get_available_slots` listed no 06:30, 15:00, 18:30 or 21:30 (the
