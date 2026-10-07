@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
 import { downloadCsv, toCsv } from "@/lib/csv.mjs";
@@ -206,6 +206,152 @@ const builders: Record<ReportKey, (range: Range, lang: OperationsLocale) => Prom
   provider_settlements: buildProviderSettlements,
 };
 
+// ---------------------------------------------------------------------------
+// Funnel: read-only counts from analytics_events through admin_get_event_counts (events per Riyadh day with the number of
+// different people). It follows the period chosen above. Nothing is estimated: a failed read says so, a period with no events
+// says so, and the people figure is the busiest single day because people on different days cannot be added together.
+// ---------------------------------------------------------------------------
+const FUNNEL_MAX_DAYS = 366;
+const FUNNEL_ORDER = ["booking_confirmed", "payment_succeeded", "booking_completed", "booking_cancelled", "booking_no_show"];
+type EventCount = { day: string; event: string; source: string; events: number | string; people: number | string };
+type FunnelRow = { event: string; source: string; events: number; busiestDayPeople: number; days: number };
+
+const funnelCopy = {
+  en: {
+    title: "Booking funnel and events",
+    detail: "Events recorded by the server (bookings and payments) and by the apps in the period chosen above, counted per event. Counts by day are in Riyadh time.",
+    loading: "Loading events...",
+    failed: "The events could not be loaded: {reason}",
+    retry: "Retry",
+    empty: "No events were recorded in this period.",
+    tooLong: "Choose a period of at most {n} days to see the funnel.",
+    badRange: "Choose a start date that is not after the end date to see the funnel.",
+    event: "Event",
+    source: "Source",
+    events: "Events",
+    people: "Most people in one day",
+    days: "Days with events",
+    server: "Server",
+    client: "App",
+    names: {
+      booking_confirmed: "Booking confirmed",
+      payment_succeeded: "Payment received",
+      booking_completed: "Booking completed",
+      booking_cancelled: "Booking cancelled",
+      booking_no_show: "Customer did not attend",
+    } as Record<string, string>,
+  },
+  ar: {
+    title: "مسار الحجز والأحداث",
+    detail: "الأحداث التي سجّلها الخادم (الحجوزات والمدفوعات) والتطبيقات في الفترة المختارة أعلاه، معدودة لكل حدث. العدّ اليومي بتوقيت الرياض.",
+    loading: "جارٍ تحميل الأحداث...",
+    failed: "تعذّر تحميل الأحداث: {reason}",
+    retry: "إعادة المحاولة",
+    empty: "لم تُسجَّل أحداث في هذه الفترة.",
+    tooLong: "اختر فترة لا تزيد على {n} يوماً لعرض المسار.",
+    badRange: "اختر تاريخ بداية لا يتجاوز تاريخ النهاية لعرض المسار.",
+    event: "الحدث",
+    source: "المصدر",
+    events: "الأحداث",
+    people: "أكثر عدد أشخاص في يوم واحد",
+    days: "أيام فيها أحداث",
+    server: "الخادم",
+    client: "التطبيق",
+    names: {
+      booking_confirmed: "تأكيد الحجز",
+      payment_succeeded: "استلام الدفعة",
+      booking_completed: "اكتمال الحجز",
+      booking_cancelled: "إلغاء الحجز",
+      booking_no_show: "عدم حضور العميل",
+    } as Record<string, string>,
+  },
+};
+
+function FunnelSection({ range, lang }: { range: Range; lang: OperationsLocale }) {
+  const t = funnelCopy[lang];
+  const numberFormat = lang === "ar" ? "ar-SA" : "en-US";
+  const rangeProblem = !range.from || !range.to || range.from > range.to ? t.badRange : daysBetween(range) >= FUNNEL_MAX_DAYS ? fill(t.tooLong, { n: FUNNEL_MAX_DAYS }) : "";
+  const [state, setState] = useState<{ key: string; rows: FunnelRow[] | null; error: string }>({ key: "", rows: null, error: "" });
+  const [reload, setReload] = useState(0);
+  const key = `${range.from}|${range.to}|${reload}`;
+
+  useEffect(() => {
+    if (rangeProblem) return;
+    let cancelled = false;
+    void (async () => {
+      const { data, error } = await supabase.rpc("admin_get_event_counts", { p_start_date: range.from, p_end_date: range.to });
+      if (cancelled) return;
+      if (error) {
+        setState({ key, rows: null, error: errorMessage(error) });
+        return;
+      }
+      const byEvent = new Map<string, FunnelRow>();
+      for (const item of (data ?? []) as EventCount[]) {
+        const id = `${item.event}|${item.source}`;
+        const row = byEvent.get(id) ?? { event: item.event, source: item.source, events: 0, busiestDayPeople: 0, days: 0 };
+        row.events += num(item.events);
+        row.busiestDayPeople = Math.max(row.busiestDayPeople, num(item.people));
+        row.days += 1;
+        byEvent.set(id, row);
+      }
+      const rank = (event: string) => (FUNNEL_ORDER.includes(event) ? FUNNEL_ORDER.indexOf(event) : FUNNEL_ORDER.length);
+      setState({ key, rows: [...byEvent.values()].sort((a, b) => rank(a.event) - rank(b.event) || b.events - a.events || a.event.localeCompare(b.event)), error: "" });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [range.from, range.to, rangeProblem, key]);
+
+  const current = state.key === key ? state : null;
+  return (
+    <section aria-labelledby="funnel-title" className="rounded-2xl border border-[#ECECEC] bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
+      <h3 id="funnel-title" className="text-sm font-black leading-snug text-gray-900">{t.title}</h3>
+      <p className="mt-2 text-xs font-semibold leading-relaxed text-[#667085]">{t.detail}</p>
+      <div className="mt-4" aria-live="polite">
+        {rangeProblem ? (
+          <p className="text-xs font-semibold text-gray-500">{rangeProblem}</p>
+        ) : !current ? (
+          <p className="text-xs font-bold text-gray-400">{t.loading}</p>
+        ) : current.error ? (
+          <div>
+            <p role="alert" className="text-xs font-bold text-[#B42318]">{fill(t.failed, { reason: current.error })}</p>
+            <button type="button" onClick={() => setReload((value) => value + 1)} className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-xs font-bold text-gray-800 hover:border-gray-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928]">{t.retry}</button>
+          </div>
+        ) : !current.rows || current.rows.length === 0 ? (
+          <p className="text-xs font-semibold text-gray-500">{t.empty}</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[520px] text-xs">
+              <thead className="border-b border-[#ECECEC] bg-[#FAF9F6] text-[10px] font-extrabold uppercase tracking-wider text-gray-500">
+                <tr>
+                  <th scope="col" className="px-4 py-3 text-start">{t.event}</th>
+                  <th scope="col" className="px-4 py-3 text-start">{t.source}</th>
+                  <th scope="col" className="px-4 py-3 text-start">{t.events}</th>
+                  <th scope="col" className="px-4 py-3 text-start">{t.people}</th>
+                  <th scope="col" className="px-4 py-3 text-start">{t.days}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#F5F5F5] font-semibold text-gray-700">
+                {current.rows.map((row) => (
+                  <tr key={`${row.event}|${row.source}`}>
+                    <td className="px-4 py-3 font-bold text-gray-900">
+                      {t.names[row.event] ?? <span dir="ltr" className="font-mono">{row.event}</span>}
+                    </td>
+                    <td className="px-4 py-3">{row.source === "server" ? t.server : t.client}</td>
+                    <td className="px-4 py-3">{row.events.toLocaleString(numberFormat)}</td>
+                    <td className="px-4 py-3">{row.busiestDayPeople.toLocaleString(numberFormat)}</td>
+                    <td className="px-4 py-3">{row.days.toLocaleString(numberFormat)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function AdminReports() {
   const lang = useOperationsLocale();
   const t = translations[lang];
@@ -298,6 +444,8 @@ export default function AdminReports() {
           </section>
         ))}
       </div>
+
+      <FunnelSection range={range} lang={lang} />
     </div>
   );
 }

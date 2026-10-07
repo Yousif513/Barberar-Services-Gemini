@@ -42,3 +42,8 @@ Branch `wp/adm1`. Migration range `20261008100000` to `20261008149999`. Newest i
 ## Item 7: navigation - done
 
 - `admin/layout.tsx`: "Roles & Permissions" (`/admin/roles`) and "Platform Rules" (`/admin/platform-rules`) in the Management section, both languages. `next.config.ts`: the old `/admin/roles` to `/admin/employees` redirect was removed because it would have hidden the new screen (nothing else retired).
+
+## Item 6: funnel on admin/reports - done
+
+- `admin/reports/page.tsx`: a read-only "Booking funnel and events" card under the exports. It follows the exported period, calls `admin_get_event_counts(start, end)` (no table read), and lists per event: source (server or app), events in the period, the busiest single day's people count and the days with events, with the server funnel steps first (confirmed, payment received, completed, cancelled, no-show). The people figure is the busiest day on purpose: people on different days cannot be summed. A failed read shows the reason with a retry, an empty period says so, a period over 365 days or a reversed range explains itself instead of calling the server. The report page itself was not rewritten; the card is added to it.
+- Test: wiring guard in `adm1-admin-wiring.test.mjs`. The command is covered by `fixdbb_analytics_events.test.mjs`.

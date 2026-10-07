@@ -101,3 +101,14 @@ describe("ADM1 item 5 and 7: roles, flags and fee rules are screens over the com
     assert.doesNotMatch(config, /source: "\/admin\/roles"/);
   });
 });
+
+describe("ADM1 item 6: the funnel is a read-only card on the reports screen", () => {
+  const reports = read("web_platform/src/app/admin/reports/page.tsx");
+  it("reads admin_get_event_counts for the chosen period, shows failures with a retry and both languages", () => {
+    assert.match(reports, /rpc\("admin_get_event_counts", \{ p_start_date: range\.from, p_end_date: range\.to \}\)/);
+    assert.match(reports, /<FunnelSection range=\{range\} lang=\{lang\} \/>/);
+    assert.match(reports, /failed: "تعذّر تحميل الأحداث/);
+    assert.match(reports, /t\.retry/);
+    assert.doesNotMatch(reports, /from\("analytics_events"\)/, "the card uses the command, not the table");
+  });
+});
