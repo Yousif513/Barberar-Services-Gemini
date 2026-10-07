@@ -2,26 +2,10 @@
 // Deno Edge Function for sending WhatsApp/SMS OTP authentication codes
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-
-function getCorsHeaders(req: Request) {
-  const origin = req.headers.get("origin") || ""
-  const allowedOriginEnv = Deno.env.get("APP_ORIGIN")
-  const isAllowed =
-    (allowedOriginEnv && origin === allowedOriginEnv) ||
-    origin === "http://localhost:3000" ||
-    origin === "http://127.0.0.1:3000" ||
-    origin.endsWith(".vercel.app") ||
-    origin.endsWith("primora.sa")
-
-  return {
-    "Access-Control-Allow-Origin": isAllowed ? origin : (allowedOriginEnv || "http://localhost:3000"),
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-  }
-}
+import { corsHeaders as sharedCorsHeaders } from "../_shared/http.ts"
 
 serve(async (req) => {
-  const corsHeaders = getCorsHeaders(req)
+  const corsHeaders = sharedCorsHeaders(req)
 
   // Handle CORS preflight request
   if (req.method === 'OPTIONS') {

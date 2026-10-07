@@ -19,9 +19,9 @@ export type AuthStorage = {
   removeItem(key: string): Promise<void>;
 };
 
-// Characters per part. Arabic letters take two bytes each, so 900 characters stay under the 2 KB the keychain tolerates
-// for any text a session can contain.
-export const PART_SIZE = 900;
+// UTF-16 units per part. A unit takes at most three bytes in UTF-8 (Arabic letters take two, an emoji takes four bytes for two
+// units), so 600 units stay under the 2 KB the keychain tolerates for any text a session can contain.
+export const PART_SIZE = 600;
 
 const countKey = (key: string) => `${key}.parts`;
 const partKey = (key: string, index: number) => `${key}.${index}`;
@@ -51,7 +51,15 @@ export function createChunkedStorage(keychain: KeychainLike, storeOptions?: unkn
     async setItem(key, value) {
       const previous = await readCount(key);
       const parts: string[] = [];
-      for (let start = 0; start < value.length; start += partSize) parts.push(value.slice(start, start + partSize));
+      // Never cut between the two halves of a surrogate pair (an emoji in the user's name, for example): a part that ends in a
+      // lone half would come back corrupted when the parts are joined.
+      for (let start = 0; start < value.length;) {
+        let end = Math.min(start + partSize, value.length);
+        const last = value.charCodeAt(end - 1);
+        if (end < value.length && last >= 0xd800 && last <= 0xdbff && end - start > 1) end -= 1;
+        parts.push(value.slice(start, end));
+        start = end;
+      }
       if (parts.length === 0) parts.push("");
       for (let index = 0; index < parts.length; index += 1) {
         await keychain.setItemAsync(partKey(key, index), parts[index], storeOptions);

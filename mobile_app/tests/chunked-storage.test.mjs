@@ -96,6 +96,20 @@ describe("the auth session storage for the phone", () => {
     assert.equal(await storage.getItem("two"), "2");
   });
 
+  it("never cuts an emoji in half when it falls on a part boundary", async () => {
+    const keychain = fakeKeychain();
+    const storage = createChunkedStorage(keychain);
+    for (let pad = PART_SIZE - 3; pad <= PART_SIZE + 1; pad += 1) {
+      const value = "a".repeat(pad) + "\u{1F600}\u{1F600}" + "b".repeat(20);
+      await storage.setItem(KEY, value);
+      assert.equal(await storage.getItem(KEY), value, `pad ${pad}`);
+      for (const [name, part] of keychain.map) {
+        if (name.endsWith(".parts")) continue;
+        assert.ok(!/[\ud800-\udbff]$/.test(part) && !/^[\udc00-\udfff]/.test(part), `${name} has a lone surrogate half`);
+      }
+    }
+  });
+
   it("stores an empty string as an empty string, not as signed out", async () => {
     const storage = createChunkedStorage(fakeKeychain());
     await storage.setItem(KEY, "");
