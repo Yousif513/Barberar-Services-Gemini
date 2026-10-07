@@ -1315,7 +1315,7 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       );
       assert.ok(discoverCode.includes("search_marketplace_providers"), "Discover page must call search_marketplace_providers RPC");
       assert.ok(discoverCode.includes("projectPin"), "Discover page must project map pins");
-      assert.ok(discoverCode.includes("SAUDI_DISTRICTS"), "Discover page must provide Saudi district filters");
+      assert.ok(discoverCode.includes("districtOptions"), "Discover page must offer district filters taken from the branches the search returns");
 
       const shopCode = readFileSync(
         join(webPlatformDir, "src/app/shop/[id]/page.tsx"),

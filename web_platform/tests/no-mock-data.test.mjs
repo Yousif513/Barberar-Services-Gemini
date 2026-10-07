@@ -223,3 +223,25 @@ describe("the services catalogue is searched, filtered and paged on the server",
     assert.ok(code.includes("shopsFailed") && code.includes("servicesFailed") && code.includes("setRetry"), "errors name the reason and offer a retry");
   });
 });
+
+describe("the discover map draws only what the data places", () => {
+  const code = files.find((f) => f.path === "web_platform/src/app/discover/page.tsx").code;
+
+  it("draws no pin for a branch without coordinates", () => {
+    assert.ok(!/index \* 0\.0\d|idx\)|projectPin\([^)]*,\s*idx/.test(code), "no pin position may be derived from a list index");
+    assert.ok(/if \(!pos\) return null/.test(code), "a branch without a position gets no pin");
+    assert.ok(code.includes("noMapLocation") && code.includes("notOnMap"), "such a branch is listed and counted as not on the map");
+  });
+
+  it("measures distance from the visitor, never from the city centre, and shows no stock photo per salon", () => {
+    assert.ok(!/p_user_lat:\s*cityCenter/.test(code), "the city centre is not the visitor's position");
+    assert.ok(code.includes("p_user_lat: userPosition?.lat"), "distance needs a shared position");
+    assert.ok(!code.includes("images.unsplash.com"), "no stock photo stands in for a salon");
+  });
+
+  it("filters by the categories the admin manages and reports a failed search", () => {
+    assert.ok(code.includes('.from("categories")') && !/slug: "haircuts"|slug: "massage"/.test(code), "category slugs come from the database");
+    assert.ok(code.includes("loadFailed") && code.includes("setRetry"), "a failed search is an error with a retry, not an empty list");
+    assert.ok(!/<div[^>]*onClick=/.test(code), "salon cards are buttons, not clickable divs");
+  });
+});

@@ -23,6 +23,7 @@ integrator does them after all merges.
 | R29 stale source-text tests (`verify_provider_cr`, `enqueue_post_visit_rebook` / `post_visit_review_rebook`) | the two named cases deleted, the rest kept | group 5 | `npm run test --workspace=web_platform` |
 | R29 executing tests for slots, closures, leave, seasons | deferred: DB tests belong to the database packages (no migrations or DB test files in this package) | - | - |
 | R35 `/services` filters on the server, pages, no `reviews` select | fixed | group 6 | guard tests in `no-mock-data.test.mjs` ("services catalogue is searched, filtered and paged on the server"), UI-vs-schema check |
+| C-D21 discover: no invented map pins; plus found while there: category slugs that matched nothing, "distance" measured from the city centre, failed search shown as "no salons", stock photo per salon, clickable `div` cards | fixed | group 7 | guard tests in `no-mock-data.test.mjs` ("discover map draws only what the data places"), UI-vs-schema check |
 
 (The table is appended after every commit group.)
 
@@ -140,6 +141,19 @@ minimum, SAR 40 maximum, none on repeat visits). It matches `fee_rules` today, b
   list normalises Arabic spelling on the server).
 - The service detail drawer is a named modal dialog (`ModalPortal` + `ModalOverlay`): focus moves in and stays, Escape closes, the page behind is inert; all
   prices go through `sar()`; filter and category buttons expose `aria-pressed`.
+
+## Group 7: `/discover` (C-D21)
+
+- A pin is drawn only for a branch that has numeric coordinates inside the selected city's box. Before, a branch without coordinates (or with an
+  out-of-box one, clamped to the edge) got a position made from its list index. Such branches stay in the list with a "no map location" note and are counted in the
+  map caption; the map is labelled as schematic (its road lines are a drawing, not a basemap).
+- Found while there and fixed: the category pills used slugs (`haircuts`, `haircolor`, `massage`, `skincare`, `nails`) that exist in no database row, so any category
+  filter returned nothing - the pills now come from `categories`. "N km away" was measured from a fixed city centre passed as the user's position; distance now
+  needs the visitor to share a position (a "distance from me" button). The fixed district lists are gone: district pills come from the branches the search
+  returns. A failed search was logged to the console and shown as "no salons found"; it is now an error with the reason and a retry. The stock photo used for every
+  salon is replaced by an initial tile. Salon cards were clickable `div`s; the selection is a `<button aria-pressed>` and the link to the shop is separate. Prices go
+  through `sar()`.
+- `negative-authorization.test.mjs` asserted the literal `SAUDI_DISTRICTS`; that single assertion now checks `districtOptions` (the behaviour that replaced it).
 
 ## Needs from other packages
 
