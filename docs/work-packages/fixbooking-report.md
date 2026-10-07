@@ -18,6 +18,7 @@ run the whole DB suite.
 | C-D10 / D10 | fixed (DB part; claim screen deferred) | `20261007092000_waitlist_exclusive_claim.sql` | `booking_engine_waitlist.test.mjs` |
 | D19 / C-D19 | fixed (DB part; shop/customer screens deferred) | `20261007093000_packages_linked_to_bookings.sql` | `booking_engine_packages.test.mjs` |
 | D5 / C-D5 | fixed (DB part; admin coupon screen deferred) | `20261007094000_coupon_per_customer_limit.sql` | `booking_engine_coupons.test.mjs` |
+| D12 / C-D12 | fixed | `20261007095000_loyalty_spend_equals_discount.sql` | `booking_engine_loyalty.test.mjs` |
 | R24 / C-D16 | fixed (DB part; shop page and mobile pass the list) | `20261007090000_branch_slots_any_professional.sql` | `booking_engine_branch_slots.test.mjs`, `qa_adversarial.test.mjs` (allow-list updated) |
 
 ## Callers cheat-sheet (current signatures; every new argument is optional and last, named arguments keep old callers working)
@@ -215,3 +216,11 @@ Reproduced by the reviewer's probe (one customer, one unlimited 50 percent code,
 - DECISION FOR THE OWNER: the default of 1 now applies to every existing code; reusable codes must be set to NULL or a higher number.
 - Screens: `web_platform/src/app/admin/coupons/page.tsx` must expose both fields; the checkout should map the two new messages.
 - Observation for the policy owner (not changed): any signed-in customer can SELECT the active rows of `promotional_codes` (the new test found 9 visible rows), i.e. all code strings are enumerable.
+
+## 7d. D12 / C-D12 loyalty deduction equals the capped discount (fixed)
+
+Reproduced with the reviewer's numbers (1,000 points at 0.5 SAR on an 85.00 service): before, discount 85.00 and balance 0; now discount 85.00, 170 points spent, balance 830 (test).
+`booking_create_internal` sets `v_loyalty_points := LEAST(requested, CEIL(discount / sar_per_point))` after the cap (the cap also respects what a package or coupon leaves payable), so the
+balance deduction, the `redemption` ledger row, `bookings.loyalty_points_redeemed` and the release on cancellation (exactly those points come back) all agree. A programme without a positive
+`sar_per_point` can no longer be redeemed ("Loyalty redemption is not available"). The minimum-points and balance checks still apply to the REQUESTED points.
+Screens: the checkout can show "N points will be used" from the preview (the booking returns `loyalty_points_redeemed`); no argument changed.
