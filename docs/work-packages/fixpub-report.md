@@ -10,6 +10,8 @@ integrator does them after all merges.
 |---|---|---|---|
 | D-17 login i18n + dir | fixed | group 1 | `tsc`, eslint, schema check (see Verification) |
 | D-11 / D-23 login consent via `record_consents` | fixed (login) | group 1 | UI-vs-schema check |
+| D-15 caller: privacy data request via `submit_data_request` | fixed | group 2 | UI-vs-schema check (86 rpc calls, 0 mismatches) |
+| D-22 privacy page: "Saudi PDPL Compliance" headline and PDPL / statutory claims | fixed (EN + AR) | group 2 | guard test extended in group 5 |
 
 (The table is appended after every commit group.)
 
@@ -28,6 +30,18 @@ integrator does them after all merges.
 - Limitation, not fixed here: when email sign-up needs confirmation (no session yet) there is no `auth.uid()`, so no consent can be written; the
   message tells the person that the choices are saved only after signing in and accepting again. A post-confirmation consent gate belongs to the
   customer portal package.
+
+## Group 2: privacy page (data request caller, claims)
+
+- `privacy/page.tsx` calls `rpc("submit_data_request", { p_request_type, p_details })`; the success text shows the server's `due_date` (Riyadh date,
+  `ar-SA`/`en-GB`, `Asia/Riyadh`) and the reference, and says so when an open request of the same kind already exists (`created: false`). A failure is shown
+  in a `role="alert"` box and the typed details are kept.
+- Wording: the "Saudi PDPL Compliance" label, "statutory request", "statutory deadline", "committed to data protection principles under the Saudi PDPL" and
+  "protected through secure platform access" are gone in both languages; the contact callout was English-only and named a "Riyadh Data Protection
+  Officer" and "compliance team": it is now translated and says only that the request form or `privacy@primora.com` can be used.
+- Request-type buttons have `aria-pressed`, the group is labelled, the textarea is labelled and capped at 2000 characters (the server limit).
+- Open decision for the owner: `privacy@primora.com` (privacy page) and `support@primora.com` (terms page) are hard-coded contact addresses with no
+  entry in `declaredStatic[]`; confirm the mailboxes exist or move them to `platform_settings`.
 
 ## Needs from other packages
 
