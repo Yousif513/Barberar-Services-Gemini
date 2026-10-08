@@ -40,30 +40,31 @@ ALTER TABLE public.branches ADD COLUMN IF NOT EXISTS timezone TEXT;
 CREATE INDEX IF NOT EXISTS idx_branches_country ON public.branches (country_code);
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- Resolvers. STABLE SQL; SECURITY DEFINER so that they read the configuration whatever the caller's row policy.
+-- Resolvers. STABLE SQL, SECURITY INVOKER: a signed-in caller resolves what it may read (an open country), while the SECURITY
+-- DEFINER commands that call them run as the owner and resolve every country.
 -- ---------------------------------------------------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.country_vat_rate(p_country TEXT)
-RETURNS NUMERIC LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+RETURNS NUMERIC LANGUAGE sql STABLE SET search_path = public AS $$
   SELECT c.vat_rate_percent FROM public.countries c WHERE c.code = upper(btrim(p_country))
 $$;
 
 CREATE OR REPLACE FUNCTION public.country_timezone(p_country TEXT)
-RETURNS TEXT LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+RETURNS TEXT LANGUAGE sql STABLE SET search_path = public AS $$
   SELECT c.timezone FROM public.countries c WHERE c.code = upper(btrim(p_country))
 $$;
 
 CREATE OR REPLACE FUNCTION public.country_is_active(p_country TEXT)
-RETURNS BOOLEAN LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+RETURNS BOOLEAN LANGUAGE sql STABLE SET search_path = public AS $$
   SELECT COALESCE((SELECT c.active FROM public.countries c WHERE c.code = upper(btrim(p_country))), FALSE)
 $$;
 
 CREATE OR REPLACE FUNCTION public.branch_country(p_branch_id UUID)
-RETURNS TEXT LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+RETURNS TEXT LANGUAGE sql STABLE SET search_path = public AS $$
   SELECT b.country_code FROM public.branches b WHERE b.id = p_branch_id
 $$;
 
 CREATE OR REPLACE FUNCTION public.branch_timezone(p_branch_id UUID)
-RETURNS TEXT LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+RETURNS TEXT LANGUAGE sql STABLE SET search_path = public AS $$
   SELECT COALESCE(NULLIF(btrim(b.timezone), ''), c.timezone)
   FROM public.branches b JOIN public.countries c ON c.code = b.country_code
   WHERE b.id = p_branch_id
@@ -72,13 +73,13 @@ $$;
 -- A provider's country is the country of its oldest branch (its head office). A provider that has no branch yet is in the
 -- platform's home market, Saudi Arabia: the same value the branches.country_code column defaults to.
 CREATE OR REPLACE FUNCTION public.provider_country(p_provider_id UUID)
-RETURNS TEXT LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+RETURNS TEXT LANGUAGE sql STABLE SET search_path = public AS $$
   SELECT COALESCE((SELECT b.country_code FROM public.branches b WHERE b.provider_id = p_provider_id ORDER BY b.created_at, b.id LIMIT 1), 'SA')
 $$;
 
 -- The time zone of a provider: its country's (a provider with branches in several zones uses its head office's).
 CREATE OR REPLACE FUNCTION public.provider_timezone(p_provider_id UUID)
-RETURNS TEXT LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+RETURNS TEXT LANGUAGE sql STABLE SET search_path = public AS $$
   SELECT public.country_timezone(public.provider_country(p_provider_id))
 $$;
 

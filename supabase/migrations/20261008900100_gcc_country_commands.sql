@@ -41,6 +41,13 @@ BEGIN
     RAISE EXCEPTION 'Unknown time zone %', p_timezone USING ERRCODE = '22023';
   END IF;
 
+  -- Every amount the platform stores (booking totals, the ledger, wallets, payouts, Tap charges) is denominated in SAR. A country
+  -- may be prepared in another currency, but opening it would label dirhams or dinars as riyals, so it is refused until the
+  -- money model holds more than one currency (an owner decision, see docs/work-packages/gcc-report.md).
+  IF p_active AND upper(btrim(p_currency_code)) <> 'SAR' THEN
+    RAISE EXCEPTION 'A country can be opened only when it uses SAR: payments, the ledger and payouts do not hold another currency yet' USING ERRCODE = '22023';
+  END IF;
+
   PERFORM pg_advisory_xact_lock(hashtext('countries'));
   SELECT * INTO v_before FROM public.countries WHERE code = v_code FOR UPDATE;
   -- The platform always keeps one open country: closing the last one would stop every booking.
