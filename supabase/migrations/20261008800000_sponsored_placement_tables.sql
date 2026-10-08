@@ -80,8 +80,9 @@ SELECT pg_temp.patch_function('public.admin_update_platform_setting(text, jsonb,
   ELSIF p_key = 'referral_program' THEN$q$);
 
 -- The settings read as one validated object. configured is true only when the master switch is on AND all three values are valid.
+-- SECURITY INVOKER on purpose: platform_settings is readable by everyone, so this needs no elevated rights (and no identity check).
 CREATE OR REPLACE FUNCTION public.sponsored_config() RETURNS JSONB
-LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$
+LANGUAGE plpgsql STABLE SET search_path = public AS $$
 DECLARE
   v_enabled JSONB;
   v_price JSONB;

@@ -55,7 +55,7 @@ describe("client-executable functions are accounted for", () => {
     const callable = (await functionsFor("anon")).map((f) => f.signature.split("(")[0]).sort();
     assert.deepEqual(callable, [
       "get_available_slots", "get_branch_available_slots", "get_branch_schedule_with_prayer_pauses",
-      "normalize_arabic", "provider_rating_summaries", "public_professional_profile", "search_marketplace_providers",
+      "get_sponsored_placements", "normalize_arabic", "provider_rating_summaries", "public_professional_profile", "record_sponsored_click", "search_marketplace_providers",
       "track_analytics_event", // D-26: insert-only client event recorder (validated, rate limited, no personal keys)
       // public_professional_profile (G75) is the public professional page; it answers NULL for anything not published
     ], "a new function granted to anon must be added here deliberately, with a reason");
@@ -68,8 +68,8 @@ describe("client-executable functions are accounted for", () => {
       .filter((f) => !/auth\.uid\(\)|is_admin\(\)|auth\.jwt\(\)|service_role|can_access_provider_operation|can_access_provider_wide|is_booking_staff/.test(f.body))
       .map((f) => f.signature.split("(")[0])
       .sort();
-    assert.deepEqual(unguarded, ["get_branch_available_slots", "get_branch_schedule_with_prayer_pauses", "has_active_consent", "search_marketplace_providers"],
-      "the public catalogue functions (slot listings, schedules, search) are open to visitors on purpose (get_available_slots mentions auth.uid() only to keep a waitlist hold for its holder, which is not an authorization check); has_active_consent is the known consent oracle gap");
+    assert.deepEqual(unguarded, ["get_branch_available_slots", "get_branch_schedule_with_prayer_pauses", "get_sponsored_placements", "has_active_consent", "search_marketplace_providers"],
+      "the public catalogue functions (slot listings, schedules, search) are open to visitors on purpose (get_available_slots mentions auth.uid() only to keep a waitlist hold for its holder, which is not an authorization check); has_active_consent is the known consent oracle gap; get_sponsored_placements (G63) is the labelled sponsored block of the discover page and is public on purpose");
   });
 
   it("confirm_booking_payment and the other service-role commands refuse an administrator, an owner, a customer and a visitor", async () => {
