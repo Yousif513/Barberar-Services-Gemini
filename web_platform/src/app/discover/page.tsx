@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { trackEvent } from "@/lib/analytics";
 import { errorMessage } from "@/lib/error-message";
 import { sar } from "@/components/operations-ui";
+import SponsoredPlacements from "@/components/sponsored-placements";
 
 interface DiscoveredBranch {
   branch_id: string;
@@ -443,6 +444,8 @@ export default function DiscoverPage() {
               </button>
             )}
           </div>
+
+          <SponsoredPlacements locale={locale} city={selectedCity} category={selectedCategory} />
 
           {loading ? (
             <div role="status" className="flex-1 flex flex-col items-center justify-center p-12 text-center space-y-3">
