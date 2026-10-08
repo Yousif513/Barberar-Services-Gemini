@@ -47,3 +47,8 @@ verify_jwt = false
 # (authenticate_api_key: hashed key, scopes, expiry, rate limit) and sends no CORS headers.
 [functions.public-api]
 verify_jwt = false
+
+# Meta cannot send a Supabase JWT. whatsapp-inbound authenticates every POST itself: HMAC-SHA256 of the raw body with the app secret
+# (X-Hub-Signature-256, constant-time compare), and the GET subscription handshake with a verify token. Nothing is processed without them.
+[functions.whatsapp-inbound]
+verify_jwt = false
