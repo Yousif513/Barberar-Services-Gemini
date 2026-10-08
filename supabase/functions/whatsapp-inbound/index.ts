@@ -5,7 +5,8 @@ import { hashCustomerId, verifyMetaSignature, verifySubscription } from "../_sha
 import { parseWebhookPayload, type InboundMessage } from "../_shared/whatsapp-payload.ts"
 import { makeAdhanClock } from "../_shared/whatsapp-prayer.ts"
 import { riyadhYmd } from "../_shared/whatsapp-intent.ts"
-import { respond, type AvailabilityPort, type EngineContext } from "../_shared/whatsapp-engine.ts"
+import { respond, type AvailabilityPort } from "../_shared/whatsapp-engine.ts"
+import { toEngineContext } from "../_shared/whatsapp-context.ts"
 
 // Receives WhatsApp Cloud API webhooks for the receptionist (G60). Deployed with verify_jwt = false (config.toml): Meta does not send a
 // Supabase JWT, so the HMAC signature of the raw body (X-Hub-Signature-256, app secret) is the authentication. Nothing from the body is
@@ -22,19 +23,6 @@ const reply = (body: unknown, status = 200): Response =>
   new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } })
 
 type Db = ReturnType<typeof serviceClient>
-
-function mapContext(raw: any): EngineContext {
-  return {
-    provider: { id: raw.provider.id, name_ar: raw.provider.name_ar, name_en: raw.provider.name_en, bookable: raw.provider.bookable === true },
-    handoffEnabled: raw.channel?.handoff_enabled !== false,
-    services: (raw.services ?? []).map((s: any) => ({ id: s.id, name_ar: s.name_ar, name_en: s.name_en, price: s.price ?? null })),
-    branches: (raw.branches ?? []).map((b: any) => ({
-      id: b.id, name_ar: b.name_ar, name_en: b.name_en, address_ar: b.address_ar ?? null, address_en: b.address_en ?? null,
-      latitude: b.latitude, longitude: b.longitude, hours: Array.isArray(b.hours) ? b.hours : [],
-    })),
-    publicAppUrl: typeof raw.public_app_url === "string" && raw.public_app_url ? raw.public_app_url : null,
-  }
-}
 
 // Free times come from the same database function the shop page calls, with the same prayer windows.
 function availabilityPort(db: Db): AvailabilityPort {
@@ -77,7 +65,7 @@ async function processMessage(db: Db, message: InboundMessage, pepper: string): 
   if (contextError) throw contextError
 
   const result = await respond(
-    { text: message.body ?? "", now, state: ingest.state, previousLocale: ingest.locale === "en" ? "en" : "ar", context: mapContext(rawContext) },
+    { text: message.body ?? "", now, state: ingest.state, previousLocale: ingest.locale === "en" ? "en" : "ar", context: toEngineContext(rawContext) },
     availabilityPort(db),
     clock,
   )

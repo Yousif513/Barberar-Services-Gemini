@@ -14,7 +14,7 @@ function toHex(buffer: ArrayBuffer): string {
 export async function hmacSha256HexBytes(secret: string, body: Uint8Array | string): Promise<string> {
   const key = await crypto.subtle.importKey("raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"])
   const data = typeof body === "string" ? encoder.encode(body) : body
-  return toHex(await crypto.subtle.sign("HMAC", key, data))
+  return toHex(await crypto.subtle.sign("HMAC", key, data as BufferSource))
 }
 
 /** The hex digest of a well-formed `sha256=<64 hex>` header, lower-cased; null for anything else. */

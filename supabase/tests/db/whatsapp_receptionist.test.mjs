@@ -1,7 +1,12 @@
 import { before, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { as, createMigratedDb, createUser, expectError, ROLES, SEED, sys } from "./harness.mjs";
+import * as adhan from "adhan";
+import { as, createMigratedDb, createUser, expectError, nextWorkingDate, ROLES, SEED, sys } from "./harness.mjs";
+import { respond } from "../../functions/_shared/whatsapp-engine.ts";
+import { toEngineContext } from "../../functions/_shared/whatsapp-context.ts";
+import { makeAdhanClock } from "../../functions/_shared/whatsapp-prayer.ts";
+import { riyadhMinutes, riyadhYmd } from "../../functions/_shared/whatsapp-intent.ts";
 
 // G60 WhatsApp receptionist against the full migrated schema (UTC session, no default table privileges):
 // the channel, idempotent ingest, opt-out, the reply window and retention settings, hand-off, the queue hand-over to the dispatcher,
@@ -588,5 +593,66 @@ describe("the receptionist's view of the business", () => {
     const withUrl = await as(db, service, `select whatsapp_provider_context($1, current_date) r`, [id]).then((r) => r[0].r);
     assert.equal(withUrl.public_app_url, "https://primora.example");
     await sys(db, `update platform_settings set value = 'null'::jsonb where key = 'public_app_url'`);
+  });
+});
+
+describe("end to end: the real rules engine on the migrated schema", () => {
+  it("answers an Arabic booking request with real free times and the booking link, then hands the reply to the dispatcher", async () => {
+    await setSetting("whatsapp.session_window_hours", 24);
+    await sys(db, `update platform_settings set value = '"https://primora.example"'::jsonb where key = 'public_app_url'`);
+    const date = await nextWorkingDate(db, SEED.employee1, 3);
+    const [svc] = await sys(db, `select s.id, s.name_ar from services s join employee_services es on es.service_id = s.id
+                                  where es.employee_id = $1 and s.provider_id = $2 and s.is_active order by s.id limit 1`, [SEED.employee1, SEED.provider1]);
+    const text = `أبغى حجز ${svc.name_ar} ${date}`;
+    const wa = waOf(77);
+    const id = wamid();
+    const ingested = await ingest(id, text, { wa });
+    assert.equal(ingested.run_engine, true);
+
+    const raw = await as(db, service, `select whatsapp_provider_context($1, $2::date) r`, [ingested.channel_id, riyadhYmd(new Date())]).then((r) => r[0].r);
+    const context = toEngineContext(raw);
+    const calls = [];
+    const port = {
+      async slots(q) {
+        calls.push(q);
+        const rows = await as(db, service, `select slot_start from get_branch_available_slots($1, $2, $3::date, $4::timestamptz[], $5::timestamptz[])`,
+          [q.branchId, q.serviceId, q.ymd, q.prayerWindows.starts, q.prayerWindows.ends]);
+        return rows.map((r) => new Date(r.slot_start).toISOString());
+      },
+    };
+    const result = await respond({ text, now: new Date(), state: ingested.state, previousLocale: "ar", context }, port, makeAdhanClock(adhan));
+
+    assert.equal(result.intent, "booking");
+    assert.equal(result.status, "bot");
+    assert.equal(result.state.service_id, svc.id);
+    assert.ok(calls.length > 0 && calls.every((c) => c.prayerWindows.starts.length === 6), "every lookup carried the shop's six prayer windows");
+    const offered = result.state.date;
+    assert.ok(result.reply.includes(`https://primora.example/shop/${SEED.provider1}?service=${svc.id}&date=${offered}&src=whatsapp`), result.reply);
+    const lines = result.reply.split("\n").filter((l) => l.startsWith("• "));
+    assert.ok(lines.length >= 1 && lines.length <= 3, result.reply);
+
+    // Every option is a start time the database itself lists for that day (so it is bookable and outside the prayer pauses).
+    const listed = new Set((await port.slots({ branchId: context.branches[0].id, serviceId: svc.id, ymd: offered,
+      prayerWindows: calls.find((c) => c.ymd === offered).prayerWindows })).map((iso) => riyadhMinutes(new Date(iso))));
+    for (const line of lines) {
+      const m = /(\d{1,2}):(\d{2}) (ص|م)/.exec(line);
+      assert.ok(m, line);
+      const minutes = ((Number(m[1]) % 12) + (m[3] === "م" ? 12 : 0)) * 60 + Number(m[2]);
+      assert.ok(listed.has(minutes), `${line} is a time the database lists`);
+    }
+    const bookingsBefore = await count("bookings");
+
+    const turned = await turn(ingested.conversation_id, id, { state: result.state, status: result.status, intent: result.intent, locale: result.locale, reply: result.reply });
+    assert.equal(turned.enqueued, true);
+    const claimed = await as(db, service, `select claim_whatsapp_session_batch(50) r`).then((r) => r[0].r);
+    const mine = claimed.messages.find((m) => m.conversation_id === ingested.conversation_id);
+    assert.equal(mine.text, result.reply);
+    assert.equal(mine.to, wa);
+    await as(db, service, `select complete_whatsapp_session_delivery($1, true, 'wamid.e2e.1', null) r`, [mine.queue_id]);
+
+    // The receptionist never books and never takes payment.
+    assert.equal(await count("bookings"), bookingsBefore);
+    await sys(db, `update platform_settings set value = 'null'::jsonb where key = 'public_app_url'`);
+    await setSetting("whatsapp.session_window_hours", null);
   });
 });
