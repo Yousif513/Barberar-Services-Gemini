@@ -470,3 +470,44 @@ describe("LLM adapter (interface only)", () => {
     assert.equal(await applyParaphrase(broken, { text: original, locale: "en", intent: "booking" }), original);
   });
 });
+
+describe("Cloud API request bodies and the Edge Functions' wiring", async () => {
+  const { buildTemplateBody, buildTextBody, extractMessageId } = await import("../../supabase/functions/_shared/whatsapp-send.ts");
+  const { readFileSync } = await import("node:fs");
+  const root = new URL("../../", import.meta.url);
+  const read = (path) => readFileSync(new URL(path, root), "utf8");
+
+  it("builds a free-form text body and a template body", () => {
+    assert.deepEqual(buildTextBody({ to: "+966501234567", text: "hi" }), {
+      messaging_product: "whatsapp", recipient_type: "individual", to: "966501234567", type: "text", text: { preview_url: true, body: "hi" } });
+    assert.deepEqual(buildTemplateBody({ to: "966501234567", template: "primora_booking_confirmation", language: "ar", body_params: ["a", "b"] }).template.components,
+      [{ type: "body", parameters: [{ type: "text", text: "a" }, { type: "text", text: "b" }] }]);
+    assert.deepEqual(buildTemplateBody({ to: "1", template: "t", language: "en" }).template.components, []);
+  });
+  it("a send counts only when Meta returned a message id", () => {
+    assert.equal(extractMessageId({ messages: [{ id: "wamid.X" }] }), "wamid.X");
+    for (const bad of [null, {}, { messages: [] }, { messages: [{}] }, { error: { code: 1 } }, { messages: [{ id: "" }] }]) assert.equal(extractMessageId(bad), null);
+  });
+  it("whatsapp-inbound verifies the signature before it reads anything, trusts no number from the body, and returns 500 so Meta retries", () => {
+    const source = read("supabase/functions/whatsapp-inbound/index.ts");
+    assert.ok(source.indexOf("verifyMetaSignature(") < source.indexOf("JSON.parse("), "the signature is checked before the body is parsed");
+    assert.ok(source.includes('"X-Hub-Signature-256"') && source.includes("WHATSAPP_APP_SECRET") && source.includes("WHATSAPP_VERIFY_TOKEN"));
+    assert.ok(source.includes("whatsapp_ingest_message") && source.includes("whatsapp_record_turn") && source.includes("get_branch_available_slots"));
+    assert.ok(!/Access-Control-Allow-Origin/i.test(source), "a service-role function sends no wildcard CORS header");
+    assert.ok(!source.includes("insert(") && !source.includes("create_booking"), "the receptionist never creates a booking");
+    assert.ok(/status\s*===\s*"missing_secret"|reason === "missing_secret"/.test(source), "an unconfigured secret refuses instead of accepting");
+    assert.match(read("supabase/config.toml"), /\[functions\.whatsapp-inbound\]\s*\nverify_jwt = false/);
+  });
+  it("dispatch-messages sends receptionist replies from the channel's own number and reports each outcome", () => {
+    const source = read("supabase/functions/dispatch-messages/index.ts");
+    assert.ok(source.includes("claim_whatsapp_session_batch") && source.includes("complete_whatsapp_session_delivery") && source.includes("message.phone_number_id"));
+    assert.ok(source.includes("complete_message_delivery") && source.includes("graph.facebook.com"));
+  });
+  it("Edge Function logic that tests rely on lives in pure modules with no Deno globals or remote imports", () => {
+    for (const file of ["whatsapp-intent", "whatsapp-reply", "whatsapp-engine", "whatsapp-signature", "whatsapp-payload", "whatsapp-prayer", "whatsapp-send", "whatsapp-llm-adapter"]) {
+      const source = read(`supabase/functions/_shared/${file}.ts`);
+      assert.ok(!/Deno\./.test(source), `${file} uses a Deno global`);
+      assert.ok(!/from\s+["']https?:/.test(source), `${file} has a remote import`);
+    }
+  });
+});

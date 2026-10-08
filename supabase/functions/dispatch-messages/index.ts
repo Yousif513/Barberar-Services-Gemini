@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders, json, MissingConfigError, resolveCaller, serviceClient } from "../_shared/http.ts"
+import { buildTextBody, extractMessageId } from "../_shared/whatsapp-send.ts"
 
 // Sends queued WhatsApp messages through the WhatsApp Cloud API.
 // The database (claim_message_batch) applies phone verification, consent and quiet hours and
@@ -77,11 +78,53 @@ serve(async (req) => {
       else sent += 1
     }
 
+    // Free-form replies of the WhatsApp receptionist (G60). The database hands over only replies that are still allowed: it re-checks the
+    // customer's opt-out and the reply window at this moment, and each reply is sent from the phone number of the provider's own channel.
+    let sessionSent = 0
+    let sessionFailed = 0
+    const { data: session, error: sessionError } = await db.rpc("claim_whatsapp_session_batch", { p_batch_size: batchSize })
+    if (sessionError) throw sessionError
+    for (const message of session?.messages ?? []) {
+      let sessionExternalId: string | null = null
+      let sessionFailure: string | null = null
+      try {
+        const response = await fetch(`https://graph.facebook.com/${version}/${message.phone_number_id}/messages`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+          body: JSON.stringify(buildTextBody({ to: message.to, text: message.text })),
+        })
+        const result = await response.json().catch(() => ({}))
+        sessionExternalId = extractMessageId(result)
+        if (!response.ok || !sessionExternalId) {
+          sessionFailure = `WhatsApp API ${response.status}: ${String(result?.error?.code ?? "")} ${String(result?.error?.message ?? "").slice(0, 300)}`.trim()
+          sessionExternalId = null
+        }
+      } catch (sendError) {
+        sessionFailure = sendError instanceof Error ? sendError.message : "WhatsApp request failed"
+      }
+      const { error: sessionCompleteError } = await db.rpc("complete_whatsapp_session_delivery", {
+        p_queue_id: message.queue_id,
+        p_succeeded: !sessionFailure,
+        p_external_id: sessionExternalId,
+        p_error: sessionFailure,
+      })
+      if (sessionCompleteError) throw sessionCompleteError
+      if (sessionFailure) sessionFailed += 1
+      else sessionSent += 1
+    }
+
+    // Retention: does nothing while whatsapp.message_retention_days is unset.
+    const { error: purgeError } = await db.rpc("whatsapp_purge_expired_messages")
+    if (purgeError) console.error("[dispatch-messages] whatsapp purge failed", purgeError.message)
+
     return json(req, {
       sent,
       failed,
       deferred_quiet_hours: batch?.deferred_quiet_hours ?? 0,
       skipped: batch?.skipped ?? 0,
+      whatsapp_replies_sent: sessionSent,
+      whatsapp_replies_failed: sessionFailed,
+      whatsapp_replies_skipped: session?.skipped ?? 0,
     })
   } catch (error) {
     if (error instanceof MissingConfigError) return json(req, { error: error.message }, 503)
