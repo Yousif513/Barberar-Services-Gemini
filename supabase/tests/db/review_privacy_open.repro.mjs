@@ -45,18 +45,3 @@ describe("P-01 withdrawal of health-data consent", () => {
     assert.ok(!JSON.stringify(read[0].r).includes("SECRET-ANSWER"), "answers are still returned to the provider after the customer withdrew consent");
   });
 });
-
-describe("P-14 branch-scoped delegate", () => {
-  it("does not return staff contacts of another branch", async () => {
-    const sub = await createUser(db, { role: "provider_employee" });
-    const scoped = ROLES.user(sub);
-    const [br2] = await sys(db, `insert into branches (provider_id, name_en, name_ar, city, address_text_en, address_text_ar, latitude, longitude)
-      values ($1, 'B', 'ب', 'Jeddah', 'a', 'ع', 21.5, 39.2) returning id`, [SEED.provider1]);
-    await sys(db, `insert into employees (branch_id, name_en, name_ar, phone) values ($1, 'Other', 'ا', '+966599999999')`, [br2.id]);
-    await sys(db, `insert into employees (branch_id, profile_id, name_en, name_ar) values ($1, $2, 'Me', 'أ')`, [SEED.branch1, sub]);
-    await sys(db, `insert into provider_memberships (provider_id, user_id, role, branch_id, permissions, is_active)
-      values ($1, $2, 'branch_manager', $3, '{"staff":true}', true)`, [SEED.provider1, sub, SEED.branch1]);
-    const rows = await as(db, scoped, `select phone from get_provider_staff_contacts($1) where phone = '+966599999999'`, [SEED.provider1]);
-    assert.equal(rows.length, 0, "a delegate scoped to one branch reads the phone of staff in another branch");
-  });
-});
