@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useConfirm } from "@/components/modal";
+import { useOperationsLocale } from "@/components/operations-ui";
 
 const translations = {
   en: {
@@ -48,7 +49,8 @@ export default function AdminBranches() {
   const [branches, setBranches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [lang, setLang] = useState<"en" | "ar">("ar");
+  // The language follows the admin shell (<html lang>), the same source the other operator screens use.
+  const lang = useOperationsLocale();
 
   const t = translations[lang];
   const isRTL = lang === "ar";

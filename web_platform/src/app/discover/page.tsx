@@ -600,8 +600,8 @@ export default function DiscoverPage() {
               <line x1="0" y1="520" x2="1000" y2="520" stroke="#1F2733" strokeWidth="1.5" />
 
               {/* District text watermarks */}
-              <text x="500" y="340" textAnchor="middle" fill="#3D4A5C" fontSize="18" fontWeight="bold" letterSpacing="4">
-                {selectedCity.toUpperCase()}
+              <text x="500" y="340" textAnchor="middle" fill="#3D4A5C" fontSize="18" fontWeight="bold" letterSpacing={locale === "ar" ? 0 : 4}>
+                {selectedCity === "Jeddah" ? t.cityJeddah : selectedCity === "Riyadh" ? t.cityRiyadh : selectedCity}
               </text>
             </svg>
           </div>

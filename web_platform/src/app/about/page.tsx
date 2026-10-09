@@ -19,6 +19,7 @@ const translations = {
     pillar2Desc: "Deposits are paid by card on Tap Payments' hosted page. Each booking is recorded in a ledger, and providers request payouts to their registered bank account.",
     pillar3Title: "Home Service",
     pillar3Desc: "Providers can offer appointments at the customer's address, and the booking shows where the visit takes place.",
+    hygieneLabel: "Operational Integrity",
     hygieneTitle: "Professional Service Standards",
     hygieneDesc: "Each provider sets and maintains its own hygiene practices. Our team reviews every provider application before it goes live, and customer ratings and reviews are shown on the provider page.",
     footerText: "Built for Riyadh, Saudi Arabia. All rights reserved."
@@ -38,6 +39,7 @@ const translations = {
     pillar2Desc: "يُدفع العربون بالبطاقة في صفحة Tap Payments المستضافة. يُسجَّل كل حجز في دفتر حسابات، ويطلب مقدمو الخدمة تحويل مستحقاتهم إلى حسابهم البنكي المسجّل.",
     pillar3Title: "خدمة منزلية",
     pillar3Desc: "يمكن لمقدمي الخدمة تقديم مواعيد في عنوان العميل، ويوضح الحجز مكان الزيارة.",
+    hygieneLabel: "النزاهة التشغيلية",
     hygieneTitle: "معايير الخدمة المهنية",
     hygieneDesc: "يحدد كل مقدم خدمة ممارسات النظافة لديه ويلتزم بها. يراجع فريقنا كل طلب انضمام قبل ظهوره، وتظهر تقييمات العملاء ومراجعاتهم في صفحة مقدم الخدمة.",
     footerText: "صمم خصيصاً للرياض، المملكة العربية السعودية. جميع الحقوق محفوظة."
@@ -137,7 +139,7 @@ export default function AboutPage() {
         {/* Service standards banner */}
         <div className="bg-stone-950 text-white rounded-3xl p-8 sm:p-12 space-y-4 relative overflow-hidden border border-stone-900 shadow-md">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[hsla(45,60%,55%,0.04)] rounded-full blur-3xl" />
-          <span className="text-[9px] uppercase font-bold text-[hsl(45,60%,55%)] tracking-wider">Operational Integrity</span>
+          <span className="text-[9px] uppercase font-bold text-[hsl(45,60%,55%)] tracking-wider">{t.hygieneLabel}</span>
           <h3 className="text-lg sm:text-xl font-serif text-white">{t.hygieneTitle}</h3>
           <p className="text-xs text-stone-400 leading-relaxed max-w-xl font-light">
             {t.hygieneDesc}
