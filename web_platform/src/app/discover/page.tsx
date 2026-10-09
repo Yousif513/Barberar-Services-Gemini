@@ -5,6 +5,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { trackEvent } from "@/lib/analytics";
 import { errorMessage } from "@/lib/error-message";
+import { loadExpandedCategorySlugs } from "@/lib/category-tree";
 import { sar } from "@/components/operations-ui";
 import SponsoredPlacements from "@/components/sponsored-placements";
 
@@ -167,18 +168,41 @@ export default function DiscoverPage() {
 
   useEffect(() => {
     let active = true;
-    supabase
-      .rpc("search_marketplace_providers", {
-        p_query: searchQuery.trim() || null,
-        p_category: selectedCategory,
-        p_city: selectedCity,
-        p_district: selectedDistrict,
-        // Distances are measured from the visitor, and only when the visitor shared a position: a city centre is not "where you are".
-        p_user_lat: userPosition?.lat ?? null,
-        p_user_lng: userPosition?.lng ?? null,
-        p_limit: 30,
-        p_offset: 0,
-      })
+    // A parent category covers its children: providers list services in the leaf categories, and the search matches a
+    // service's own category exactly, so one search runs per slug and the answers are merged by branch.
+    const searchAll = async () => {
+      let slugs = [selectedCategory];
+      if (selectedCategory !== "all") {
+        const expanded = await loadExpandedCategorySlugs([selectedCategory]);
+        if (expanded.error) return { data: null, error: { message: expanded.error } };
+        slugs = expanded.slugs;
+      }
+      const answers = await Promise.all(
+        slugs.map((slug) =>
+          supabase.rpc("search_marketplace_providers", {
+            p_query: searchQuery.trim() || null,
+            p_category: slug,
+            p_city: selectedCity,
+            p_district: selectedDistrict,
+            // Distances are measured from the visitor, and only when the visitor shared a position: a city centre is not "where you are".
+            p_user_lat: userPosition?.lat ?? null,
+            p_user_lng: userPosition?.lng ?? null,
+            p_limit: 30,
+            p_offset: 0,
+          }),
+        ),
+      );
+      const failed = answers.find((answer) => answer.error);
+      if (failed?.error) return { data: null, error: failed.error };
+      if (answers.length === 1) return { data: answers[0].data, error: null };
+      const merged = new Map<string, DiscoveredBranch>();
+      for (const answer of answers) {
+        for (const row of (Array.isArray(answer.data?.providers) ? answer.data.providers : []) as DiscoveredBranch[]) merged.set(row.branch_id, row);
+      }
+      const providers = [...merged.values()].sort((a, b) => (a.distance_km ?? Infinity) - (b.distance_km ?? Infinity));
+      return { data: { providers }, error: null };
+    };
+    searchAll()
       .then(({ data, error }) => {
         if (!active) return;
         if (error) {
@@ -576,8 +600,8 @@ export default function DiscoverPage() {
               <line x1="0" y1="520" x2="1000" y2="520" stroke="#1F2733" strokeWidth="1.5" />
 
               {/* District text watermarks */}
-              <text x="500" y="340" textAnchor="middle" fill="#3D4A5C" fontSize="18" fontWeight="bold" letterSpacing="4">
-                {selectedCity.toUpperCase()}
+              <text x="500" y="340" textAnchor="middle" fill="#3D4A5C" fontSize="18" fontWeight="bold" letterSpacing={locale === "ar" ? 0 : 4}>
+                {selectedCity === "Jeddah" ? t.cityJeddah : selectedCity === "Riyadh" ? t.cityRiyadh : selectedCity}
               </text>
             </svg>
           </div>

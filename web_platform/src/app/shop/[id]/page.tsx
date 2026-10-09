@@ -1552,7 +1552,7 @@ export default function ShopDetailsPage() {
                             <span className="block text-[10px] text-stone-500 font-semibold">{spec.role[locale]}</span>
                             {spec.experienceYears && (
                               <span className="block text-[9px] text-[#9A741F] font-bold">
-                                {locale === "ar" ? `خبرة ${spec.experienceYears} سنوات` : `${spec.experienceYears} yrs exp`}
+                                {locale === "ar" ? `خبرة ${spec.experienceYears} ${Number(spec.experienceYears) === 1 ? "سنة" : "سنوات"}` : `${spec.experienceYears} ${Number(spec.experienceYears) === 1 ? "yr" : "yrs"} exp`}
                               </span>
                             )}
                             {spec.specialties && spec.specialties.length > 0 && (

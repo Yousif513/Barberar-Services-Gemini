@@ -7,6 +7,8 @@ const copy = {
   ar: { category: "العناية والحلاقة", title: "محلات الحلاقة وقص الشعر", subtitle: "احجز في صالونات الحلاقة والعناية بالبشرة واللحية الرجالية والنسائية القريبة منك." },
 };
 
+const categorySlugs = ["barber-hair", "grooming-barbering"];
+
 export default function BarberCategoryPage() {
-  return <CategoryProviders categorySlug="barber-hair" copy={copy} />;
+  return <CategoryProviders categorySlugs={categorySlugs} copy={copy} />;
 }

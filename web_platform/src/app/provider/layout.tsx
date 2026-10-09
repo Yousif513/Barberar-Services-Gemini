@@ -246,6 +246,12 @@ function ProviderShell({
   useEffect(() => {
     let cancelled = false;
     void (async () => {
+      // No session means nothing to count, and the request would only return 401.
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        if (!cancelled) setUnreadMessages(0);
+        return;
+      }
       const { count, error } = await supabase.from("conversations").select("id", { count: "exact", head: true }).eq("unread_for_provider", true);
       if (!cancelled) setUnreadMessages(error ? 0 : (count ?? 0));
     })();

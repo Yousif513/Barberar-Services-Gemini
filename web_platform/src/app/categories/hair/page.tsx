@@ -7,6 +7,8 @@ const copy = {
   ar: { category: "تصفيف وتلوين الشعر", title: "صالونات وأخصائيو الشعر", subtitle: "احجز جلسات تلوين الشعر وتصفيفه وعلاجاته لدى الصالونات والمصففين القريبين منك." },
 };
 
+const categorySlugs = ["barber-hair", "hair-styling"];
+
 export default function HairCategoryPage() {
-  return <CategoryProviders categorySlug="barber-hair" copy={copy} />;
+  return <CategoryProviders categorySlugs={categorySlugs} copy={copy} />;
 }
