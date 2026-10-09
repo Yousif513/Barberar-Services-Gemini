@@ -48,11 +48,16 @@ describe("generate_provider_monthly_fee_invoice", () => {
     // more activity arrives after the invoice was issued: the invoice must not change
     await sys(db, `insert into bookings (customer_id, branch_id, employee_id, service_id, status, scheduled_at, duration_minutes, subtotal_price, total_price, tax_amount, deposit_required, platform_commission)
       values ($1, $2, $3, $4, 'completed', ${lastMonthSql} + interval '7 hours', 30, 100, 100, 0, 0, 40)`, [customer.sub, SEED.branch1, SEED.employee1, svc.id]);
+    // FIX-MONEY M-04: the issued invoice is untouched; the new activity is billed on a supplementary invoice of the same month, once.
     const again = await generate(admin, month);
-    assert.equal(again.already_issued, true);
-    assert.equal(again.status, "paid");
+    assert.equal(again.already_issued, undefined);
+    assert.notEqual(again.invoice_id, first.invoice_id);
+    assert.equal(Number(again.commission_sar), 40);
+    const repeat = await generate(admin, month);
+    assert.equal(repeat.already_issued, true);
+    assert.equal(repeat.invoice_id, again.invoice_id);
     const [row] = await sys(db, `select status, platform_commission_sar::float8 c, paid_at is not null as has_paid_at, (select count(*)::int from provider_fee_invoices where provider_id = $1) n from provider_fee_invoices where id = $2`, [SEED.provider1, first.invoice_id]);
-    assert.deepEqual(row, { status: "paid", c: 50, has_paid_at: true, n: 1 });
+    assert.deepEqual(row, { status: "paid", c: 50, has_paid_at: true, n: 2 });
   });
 
   it("is refused to every non-administrator role", async () => {

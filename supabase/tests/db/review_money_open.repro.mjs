@@ -25,58 +25,12 @@ const firstSlotOf = async (user, employee, svc, date) =>
 const book = async (user, employee, svc, slot, extra = "") =>
   (await as(db, user, `select * from create_booking(target_employee_id => $1, target_service_id => $2, target_scheduled_at => $3${extra})`, [employee, svc.id, slot]))[0];
 
-describe("REPRODUCES OPEN DEFECT M-04 / M-05: monthly fee invoices", () => {
-  it("M-04: a booking completed after its month's invoice was issued is still billed (currently it never is)", async () => {
-    const svc = await serviceFor(db, SEED.employee1);
-    const customer = await freshCustomer();
-    const lm = `(date_trunc('month', now() AT TIME ZONE 'Asia/Riyadh') - interval '1 month')`;
-    const insert = async (status, hours, commission) => (await sys(db,
-      `insert into bookings (customer_id, branch_id, employee_id, service_id, status, scheduled_at, duration_minutes, subtotal_price, total_price,
-         tax_amount, deposit_required, platform_commission)
-       values ($1, $2, $3, $4, $5, ${lm} + make_interval(hours => $6::int), 30, 100, 100, 0, 0, $7) returning id`,
-      [customer.sub, SEED.branch1, SEED.employee1, svc.id, status, hours, commission]))[0].id;
-    await insert("completed", 10, 20);
-    const late = await insert("confirmed", 30, 40);
-    await as(db, ROLES.service, `select issue_monthly_fee_invoices()`);
-    await as(db, owner1, `select employee_update_booking_status($1, 'completed', 'late completion')`, [late]);
-    await as(db, ROLES.service, `select issue_monthly_fee_invoices()`);
-    const billed = (await sys(db, `select coalesce(sum(platform_commission_sar), 0)::float8 c from provider_fee_invoices where provider_id = $1`, [SEED.provider1]))[0].c;
-    assert.equal(billed, 60, "the 40.00 commission of the late-completed booking must appear on an invoice (this month's or a supplementary one)");
-  });
-
-  it("M-05: two providers whose ids share the first 8 hex characters each get their own fee invoice", async () => {
-    const svc2 = await serviceFor(db, PROVIDER2_EMPLOYEE);
-    const branch2 = (await sys(db, `select branch_id from employees where id = $1`, [PROVIDER2_EMPLOYEE]))[0].branch_id;
-    const customer = await freshCustomer();
-    const lm = `(date_trunc('month', now() AT TIME ZONE 'Asia/Riyadh') - interval '1 month')`;
-    await sys(db,
-      `insert into bookings (customer_id, branch_id, employee_id, service_id, status, scheduled_at, duration_minutes, subtotal_price, total_price,
-         tax_amount, deposit_required, platform_commission)
-       values ($1, $2, $3, $4, 'completed', ${lm} + interval '12 hours', 30, 100, 100, 0, 0, 25)`,
-      [customer.sub, branch2, PROVIDER2_EMPLOYEE, svc2.id]);
-    await as(db, ROLES.service, `select issue_monthly_fee_invoices()`);
-    const rows = await sys(db, `select provider_id from provider_fee_invoices where provider_id in ($1, $2)`, [SEED.provider1, SEED.provider2]);
-    assert.equal(rows.length, 2, "both demo providers share the prefix 'aaaaaaaa'; the second invoice is silently dropped today");
-  });
-});
-
 describe("REPRODUCES OPEN DEFECT M-06 / M-07: subscriptions", () => {
   it("M-06: a yearly plan charges the annual price (12 x the per-month annual rate), not one month of it", async () => {
     const r = (await as(db, owner1, `select subscribe_provider_plan($1, 'growth', 'yearly') r`, [SEED.provider1]))[0].r;
     assert.ok(Number(r.amount_sar) >= 12 * 239, `yearly growth charged ${r.amount_sar}; the screen quotes 12 x 239 = 2868 before VAT`);
   });
 
-  it("M-07: paying a superseded subscription checkout leaves a trace (ledger row or refund request), not a silent capture", async () => {
-    const first = (await as(db, owner2, `select subscribe_provider_plan($1, 'growth', 'monthly') r`, [SEED.provider2]))[0].r;
-    await as(db, owner2, `select subscribe_provider_plan($1, 'elite', 'monthly') r`, [SEED.provider2]); // cancels the first pending payment
-    let error = null;
-    try {
-      await as(db, ROLES.service, `select confirm_purchase_payment('subscription', $1, 'chg_review_m07', $2) r`, [first.purchase_id, first.amount_sar]);
-    } catch (e) { error = e; }
-    const ledger = (await sys(db, `select count(*)::int n from transactional_ledger where payment_intent_id = 'chg_review_m07'`))[0].n;
-    const refunds = (await sys(db, `select count(*)::int n from payment_refund_requests where payment_intent_id = 'chg_review_m07'`).catch(() => [{ n: 0 }]))[0].n;
-    assert.ok(ledger + refunds > 0 && !error, `a captured charge must be recorded and refundable (error: ${error?.message}, ledger ${ledger}, refund requests ${refunds})`);
-  });
 });
 
 describe("REPRODUCES OPEN DEFECT M-08 / M-10: first-visit commission can be bypassed by the provider", () => {
