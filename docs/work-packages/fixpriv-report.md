@@ -11,6 +11,7 @@ Migration range 20261009200000 .. 20261009249999. Tests: `supabase/tests/db/fixp
 | P-09 | fixed | see git log "P-09" | fixpriv_platform_settings.test.mjs |
 | P-10 | fixed | see git log "P-10" | fixpriv_public_places.test.mjs |
 | P-08 | fixed | see git log "P-08" | fixpriv_home_address_window.test.mjs |
+| P-11 | fixed (version); method/ip not changed | see git log "P-11" | fixpriv_consent_version.test.mjs |
 
 ## P-02
 - `20261009200000_fixpriv_consent_oracle.sql`: `has_active_consent(uuid,text)` now raises `42501 Not authorized` when a signed-in caller asks about someone else and is not an administrator. Service role, jobs and definer-internal calls without a signed-in user (`auth.uid()` NULL) are unchanged. This replaces the (3-line, language sql) function body with a plpgsql body of the same signature; privileges are re-stated.
@@ -35,3 +36,6 @@ Migration range 20261009200000 .. 20261009249999. Tests: `supabase/tests/db/fixp
 
 ## P-08 (fixed)
 `20261009200700_fixpriv_home_address_staff_window.sql`: new platform setting `address.staff_read_days` (null = unset, private). Staff (owner, assigned employee, delegate) read a home address only until the appointment end + 1 day + that many extra days (unset = 0), both through the table policy and through `get_booking_address_secure` (patched in place; after the window it answers an "Address no longer available" text and no coordinates). The customer, administrators (audited) and the service role are not limited. An administrator or service-role read no longer stamps `booking_home_addresses.revealed_at`. New helpers `address_staff_read_days()` (definer) and `home_address_staff_window_open(booking)` (invoker). Owner decision: how long after a visit salon staff may still see the address (a refund or dispute dispute window is the usual reason to extend). Test: `fixpriv_home_address_window.test.mjs`.
+
+## P-11 (fixed for the version; method and ip/user agent left)
+`20261009200800_fixpriv_consent_notice_version.sql`: `record_consent` (patched in place; `record_consents` calls it) now stores the server-side published version for every purpose (customer terms for `terms_privacy`, the privacy notice for the rest) and `unpublished` while none is published. All three legal documents are still `draft` in the seed, so today every new consent row says `unpublished`: the owner must publish the privacy notice and customer terms for versions to appear. The client's version argument is still validated but ignored. `method` stays a validated client label (screens send `settings_toggle`, `web_auth_form`, ...; it describes the channel, not what was agreed). `ip_address` and `user_agent` stay empty: a SECURITY DEFINER function behind PostgREST has no reliable access to them; capturing them needs an Edge Function in front of consent (owner/legal decision whether the data is wanted at all under PDPL data minimisation). Test: `fixpriv_consent_version.test.mjs`.
