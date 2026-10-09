@@ -26,7 +26,14 @@
       "Google Maps Platform (travel time, calculate-travel function)",
       "Unifonic / Twilio (OTP and SMS, registered but disconnected)"
     ],
-    "operationalObjectives": [],
+    "operationalObjectives": [
+      "Verify provider applications (including the commercial registration check) and suspend or reinstate providers with a recorded reason",
+      "Move money only through reasoned, audited server commands: payout review and release, refund retry, dispute decisions",
+      "Answer customer privacy requests inside the 30-day due date and correct customer records with a recorded reason",
+      "Configure the platform's rates and switches (fee rules, feature flags, API limits, sponsored placement) with a reason on every change",
+      "See what needs attention now: queues with counts, oldest waiting time and money at stake",
+      "Leave an audit record of who changed what and why, and review it"
+    ],
     "stack": {
       "frontend": "Next.js 16.2.9 (React 19.2.4, App Router, Tailwind 4, all-client 'use client')",
       "backend": "none — no Next.js route handlers, no server actions, no middleware; Supabase Edge Functions (Deno) only",
@@ -2073,6 +2080,49 @@
           "owner": "",
           "reviewStatus": "reviewed",
           "reviewedBy": "sec-claude-release-review"
+        },
+        {
+          "id": "customer.submit-data-request",
+          "outcome": "File a privacy request (access, rectification, erasure, export) and get its due date",
+          "kind": "command",
+          "roles": [
+            "customer"
+          ],
+          "risk": "moderate",
+          "status": "in-progress",
+          "rationale": "submit_data_request sets owner, status and a due date 30 days ahead in Riyadh on the server, returns the open request instead of a duplicate, and audits; the table refuses direct inserts. It only files the request: access/export and erasure themselves are not built (gap no-customer-data-rights-path). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/privacy"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261007010400_consent_and_request_evidence.sql#L83"
+          ],
+          "authorizationPolicies": [
+            "supabase/tests/db/fixdba_consent_evidence.test.mjs#L69"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261007010400_consent_and_request_evidence.sql#L115"
+          ],
+          "safeguards": [
+            "supabase/tests/db/fixdba_consent_evidence.test.mjs#L88"
+          ],
+          "dataBinding": "postgres:public.data_subject_requests",
+          "idempotency": "A second request of the same kind returns the open one.",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [
+            "supabase/tests/db/fixdba_consent_evidence.test.mjs"
+          ],
+          "evidence": [
+            "supabase/tests/db/fixdba_consent_evidence.test.mjs#L74",
+            "web_platform/src/app/privacy/page.tsx#L116"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
         }
       ]
     },
@@ -2839,6 +2889,43 @@
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "payment-method.list",
+          "outcome": "See the payment methods, their gateway and whether each is operational",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "in-progress",
+          "rationale": "Reads payment_methods (select *) and the payment integrations with a load error shown. Signed-in customers can also read the enabled rows including admin_note and gateway_key (gap public-read-policies-expose-internal-provider-and-staff-columns). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/ledger"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [
+            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L83"
+          ],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.payment_methods",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [
+            "supabase/tests/db/security_hardening.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/ledger/page.tsx#L248",
+            ".admin-console/evidence/architect-reconcile-claude/probe-results.txt#L1"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
         }
       ]
     },
@@ -2971,6 +3058,85 @@
           "evidence": [
             "web_platform/src/app/admin/settings/page.tsx#L159",
             "supabase/tests/db/release_controls.test.mjs#L58"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "settings.list",
+          "outcome": "See the current value, approval and last change of the editable platform settings",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "in-progress",
+          "rationale": "The settings screen reads booking hold minutes, loyalty and referral values with their approval stamp through the administrator read policy; a failed read shows an error, a distinct forbidden notice and a retry. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/settings"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [
+            "supabase/migrations/20261009200500_fixpriv_platform_settings_public_allowlist.sql#L21"
+          ],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.platform_settings",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [
+            "supabase/tests/db/fixpriv_platform_settings.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/settings/page.tsx#L110",
+            "supabase/tests/db/fixpriv_platform_settings.test.mjs#L19"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "settings.api-limits",
+          "outcome": "Set the developer API limits (requests per minute, key lifetime, webhook retries) with a recorded reason",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "admin_set_api_setting validates each of five keys, requires a reason and audits; the screen lists the five values and shows an unset one as not set. The numeric bounds are the implementer's, not confirmed by the owner. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/platform-rules"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261006090000_api_keys.sql#L60"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261006090000_api_keys.sql#L109"
+          ],
+          "auditEvents": [],
+          "safeguards": [
+            "supabase/tests/db/adm1_api_settings_screen.test.mjs#L20"
+          ],
+          "dataBinding": "postgres:public.platform_settings",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "Set the previous value again.",
+          "tests": [
+            "supabase/tests/db/adm1_api_settings_screen.test.mjs",
+            "web_platform/tests/adm1-admin-wiring.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/platform-rules/page.tsx#L323",
+            "supabase/tests/db/adm1_api_settings_screen.test.mjs#L20"
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
@@ -3767,7 +3933,7 @@
           ]
         }
       ],
-      "retention": "Disputes are kept; the decision, reason and any refund request stay linked to the booking.",
+      "retention": "Disputes are kept. The console state 'open' stands for the database statuses opened and under_review; a closed dispute has status resolved_refund, resolved_rejected or closed.",
       "capabilities": [
         {
           "id": "dispute.list",
@@ -4092,29 +4258,8 @@
       "sourceOfTruth": "postgres:public.sponsored_attributions (fees per new client), sponsored_campaigns",
       "sensitivity": "confidential",
       "tenantScoped": true,
-      "lifecycleStates": [
-        "accrued",
-        "waived",
-        "void"
-      ],
-      "lifecycleTransitions": [
-        {
-          "from": "accrued",
-          "to": "void",
-          "command": "sponsored.void-attribution",
-          "actorRoles": [
-            "admin"
-          ]
-        },
-        {
-          "from": "accrued",
-          "to": "waived",
-          "command": "sponsored.void-attribution",
-          "actorRoles": [
-            "admin"
-          ]
-        }
-      ],
+      "lifecycleStates": [],
+      "lifecycleTransitions": [],
       "retention": "Campaigns, clicks and attributions are kept for billing; fees are added to the monthly provider fee invoice.",
       "capabilities": [
         {
@@ -4629,8 +4774,11 @@
         "request documents"
       ],
       "status": "in-progress",
-      "rationale": "Filterable on /admin/providers but has no aging, no SLA, no escalation and no owner. 'Request documents' does not exist.",
-      "tests": []
+      "rationale": "The dashboard counts provider applications with the oldest waiting time (admin_dashboard_overview, admin_dashboard.test.mjs) and /admin/providers lists applications with the Wathq commercial registration check and manual review before approval (fixdbb_wathq_name_check.test.mjs). No SLA or escalation exists: OWNER QUESTION: how many days may an application wait before it is escalated, and to whom? 'Request documents' still does not exist. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests named in this record.",
+      "tests": [
+        "supabase/tests/db/admin_dashboard.test.mjs",
+        "supabase/tests/db/fixdbb_wathq_name_check.test.mjs"
+      ]
     },
     {
       "id": "payout-approval",
@@ -4647,8 +4795,11 @@
         "mark paid"
       ],
       "status": "in-progress",
-      "rationale": "Real queue on /admin/ledger. No aging indicator, no SLA, no breach signal, no amount-based ordering, no maker-checker separation - the same admin can approve any amount.",
-      "tests": []
+      "rationale": "The dashboard shows payout requests with the oldest waiting time and money at stake; review and release run through reasoned commands in dialogs (release_controls.test.mjs, qa_defect_fixes.test.mjs). Still no SLA or breach signal, and no second approver (gap no-separation-of-duties; owner question there). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests named in this record.",
+      "tests": [
+        "supabase/tests/db/admin_dashboard.test.mjs",
+        "supabase/tests/db/release_controls.test.mjs"
+      ]
     },
     {
       "id": "refund-arbitration",
@@ -4664,9 +4815,12 @@
         "reject",
         "execute"
       ],
-      "status": "discovered",
-      "rationale": "Table and RLS exist; no screen reads it. /admin/disputes synthesises a substitute queue from low-star reviews instead.",
-      "tests": []
+      "status": "in-progress",
+      "rationale": "/admin/disputes now reads payment_disputes (no synthesised queue) and decides through resolve_booking_dispute with a reason; the dashboard counts opened and under-review disputes with the oldest waiting time. No SLA, and no screen status filter or empty message. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests named in this record.",
+      "tests": [
+        "supabase/tests/db/money.test.mjs",
+        "supabase/tests/db/admin_dashboard.test.mjs"
+      ]
     },
     {
       "id": "failed-payment",
@@ -4681,9 +4835,11 @@
         "retry capture",
         "cancel and release the slot"
       ],
-      "status": "discovered",
-      "rationale": "No queue exists. set_booking_window (20260615182811:417) creates the exclusion window, so a stuck pending_payment booking holds an employee slot indefinitely with no operator control to release it.",
-      "tests": []
+      "status": "in-progress",
+      "rationale": "Partly built: the dashboard counts expired unpaid holds and an operator can release them with a reason (admin_release_expired_holds, release_controls.test.mjs). There is still no list of failed or stuck payments to work item by item. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests named in this record.",
+      "tests": [
+        "supabase/tests/db/release_controls.test.mjs"
+      ]
     },
     {
       "id": "webhook-failure",
@@ -4698,7 +4854,7 @@
         "replay"
       ],
       "status": "discovered",
-      "rationale": "payment-webhook returns 500 on failure (:64) and nothing records the attempt. A dropped webhook leaves a paid customer with an unconfirmed booking and no operator signal. /admin/webhooks redirects to the activity feed.",
+      "rationale": "Unchanged: payment-webhook still answers 500 on failure and records nothing (payment-webhook/index.ts), and /admin/webhooks redirects to the audit log (next.config.ts). Outbound provider webhooks have a delivery log for providers, not for operators. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests named in this record.",
       "tests": []
     }
   ],
@@ -4716,14 +4872,10 @@
         "postgres:public.admin_audit_logs",
         "postgres:public.profiles"
       ],
-      "capabilities": [],
-      "actions": [
-        "Refresh",
-        "Open a queue",
-        "Open a figure",
-        "View all bookings",
-        "View all operator actions"
+      "capabilities": [
+        "dashboard.overview"
       ],
+      "actions": [],
       "states": [
         "loading",
         "populated",
@@ -4735,7 +4887,7 @@
       "responsive": true,
       "accessibilityStatus": "in-progress",
       "status": "in-progress",
-      "rationale": "Rebuilt by impl-claude-release-gaps as an exception router on admin_dashboard_overview(): eight work queues (count, oldest waiting time, money at stake, overdue PDPL requests, stalled refunds) each opening the screen that handles it, PSP reconciliation status, live SAR figures, latest bookings and operator actions. Each source fails independently with its reason. Checked in English and Arabic at 375 px and 1280 px against dev roles and a local verification-only mock API; signed-in hosted data unverified; unreviewed.",
+      "rationale": "Exception router over admin_dashboard_overview with independent source failures. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
       "tests": [
         "supabase/tests/db/admin_dashboard.test.mjs"
       ]
@@ -4782,12 +4934,12 @@
         "populated",
         "empty",
         "error",
-        "forbidden"
+        "success"
       ],
       "responsive": true,
       "accessibilityStatus": "in-progress",
       "status": "in-progress",
-      "rationale": "Reworked by impl-claude-release-gaps: real branch and employee figures, status changes as a reasoned server command, edit dialog that writes only changed fields and keeps input on failure, honest failure states, no guessed attributes. Checked in English and Arabic (RTL) at 375 px and 1280 px against a local verification-only mock API; hosted data unverified; unreviewed.",
+      "rationale": "Provider operations screen. Corrected: the page has no distinct forbidden notice (provider-management.tsx never uses ForbiddenNotice), so forbidden is removed from its states; success notices exist (setNotice). Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
       "tests": [
         "supabase/tests/db/provider_operations.test.mjs",
         "web_platform/tests/admin-console-guards.test.mjs"
@@ -4811,27 +4963,34 @@
       ],
       "capabilities": [
         "ledger.list",
-        "ledger.release-payout",
         "ledger.vat-report",
+        "ledger.release-payout",
         "payout.list",
         "payout.approve",
         "payout.reject",
         "payout.mark-paid",
+        "payment-method.list",
         "payment-method.toggle",
         "payment-method.set-default"
       ],
       "actions": [],
       "states": [
+        "loading",
         "populated",
-        "validation",
+        "empty",
         "error",
+        "validation",
         "success"
       ],
       "responsive": false,
       "accessibilityStatus": "planned",
       "status": "in-progress",
-      "rationale": "The console's money surface, 1108 lines carrying four unrelated jobs. Reads are real. Every write is an unconfirmed, unaudited, non-transactional browser mutation. VAT and settlement tables silently substitute invented figures on an empty result (:515-537). Unmasked IBAN is rendered to every admin.",
-      "tests": []
+      "rationale": "Ledger, payouts and payment methods. Payout commands run in reasoned dialogs; lists show errors with retry (adm1 item 3). No distinct forbidden notice on this screen. Payment-method writes are direct and the default switch is two writes (gap payment-method-default-switch-is-two-browser-writes-with-no-reason). Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
+      "tests": [
+        "supabase/tests/db/release_controls.test.mjs",
+        "web_platform/tests/adm1-admin-wiring.test.mjs",
+        "web_platform/tests/negative-authorization.test.mjs"
+      ]
     },
     {
       "id": "admin-services",
@@ -4853,15 +5012,27 @@
         "service.delete",
         "service.set-featured"
       ],
-      "actions": [],
+      "actions": [
+        "Create or edit a service",
+        "Switch on or off",
+        "Feature",
+        "Change price",
+        "Archive"
+      ],
       "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
         "success"
       ],
       "responsive": false,
       "accessibilityStatus": "planned",
       "status": "in-progress",
-      "rationale": "The best-implemented screen: real reads, real writes, optimistic updates with rollback on error (:329, :355, :380), confirmation before delete (:302). Missing only audit.",
-      "tests": []
+      "rationale": "Catalogue screen; writes are direct, rolled back on failure, audited by trigger, without a reason; whole catalogue loaded without paging. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
+      "tests": [
+        "supabase/tests/db/release_controls.test.mjs"
+      ]
     },
     {
       "id": "admin-integrations",
@@ -4880,15 +5051,24 @@
         "integration.upsert",
         "integration.delete"
       ],
-      "actions": [],
+      "actions": [
+        "Create or edit",
+        "Enable or disable",
+        "Disable"
+      ],
       "states": [
+        "populated",
+        "empty",
+        "error",
         "success"
       ],
       "responsive": false,
       "accessibilityStatus": "planned",
       "status": "in-progress",
-      "rationale": "Only screen that writes audit rows (:296-301, best-effort with a swallowing catch). All 44 Arabic strings in the file are double-encoded mojibake, so the page is unreadable in Arabic.",
-      "tests": []
+      "rationale": "Integrations registry. Has no loading state: the empty message shows until the first read returns. Client-written second audit log (gap integration-audit-log-accepts-client-written-rows). Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
+      "tests": [
+        "supabase/tests/db/fixdba_access_hardening.test.mjs"
+      ]
     },
     {
       "id": "admin-coupons",
@@ -4906,15 +5086,25 @@
         "coupon.toggle",
         "coupon.delete"
       ],
-      "actions": [],
+      "actions": [
+        "Create or edit a code",
+        "Activate or deactivate with a reason"
+      ],
       "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
         "success"
       ],
       "responsive": false,
       "accessibilityStatus": "planned",
       "status": "in-progress",
-      "rationale": "Real reads and writes. Hard DELETE wired straight to an onClick with no confirmation (:291 -> :206).",
-      "tests": []
+      "rationale": "Coupons change only through the reasoned commands; hard delete removed. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
+      "tests": [
+        "supabase/tests/db/adm1_promo_code_commands.test.mjs",
+        "web_platform/tests/adm1-admin-wiring.test.mjs"
+      ]
     },
     {
       "id": "admin-bookings",
@@ -5018,15 +5208,23 @@
         "branch.list",
         "branch.toggle-active"
       ],
-      "actions": [],
+      "actions": [
+        "Deactivate or reactivate a branch"
+      ],
       "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
         "success"
       ],
       "responsive": false,
       "accessibilityStatus": "planned",
       "status": "in-progress",
-      "rationale": "Real read and toggle; no confirmation on deactivation, no audit, no room or resource management despite /admin/rooms existing as a redirect.",
-      "tests": []
+      "rationale": "Branch list with confirmed toggle. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
+      "tests": [
+        "supabase/tests/db/security_hardening.test.mjs"
+      ]
     },
     {
       "id": "admin-disputes",
@@ -5038,16 +5236,29 @@
       "dataSources": [
         "postgres:public.payment_disputes"
       ],
-      "capabilities": [],
-      "actions": [],
+      "capabilities": [
+        "dispute.list",
+        "dispute.resolve"
+      ],
+      "actions": [
+        "Uphold and refund",
+        "Decline dispute"
+      ],
       "states": [
+        "loading",
+        "populated",
+        "error",
         "success"
       ],
       "responsive": false,
       "accessibilityStatus": "planned",
       "status": "in-progress",
-      "rationale": "Reads payment_disputes and resolves through resolve_booking_dispute; no synthesized disputes or mock fallback (impl-claude-release-gaps reassessment of current source). Unreviewed.",
-      "tests": []
+      "rationale": "Disputes read from payment_disputes and decided in a reasoned dialog. An empty list renders nothing (no empty message). The invented one-star rating was removed in this pass. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
+      "tests": [
+        "supabase/tests/db/money.test.mjs",
+        "supabase/tests/db/qa_defect_fixes.test.mjs",
+        "web_platform/tests/admin-console-guards.test.mjs"
+      ]
     },
     {
       "id": "admin-activity",
@@ -5061,20 +5272,18 @@
         "public.providers"
       ],
       "capabilities": [
-        "audit.search"
+        "activity.feed"
       ],
       "actions": [],
       "states": [
-        "loading",
         "populated",
         "empty",
-        "error",
-        "forbidden"
+        "error"
       ],
       "responsive": false,
       "accessibilityStatus": "planned",
       "status": "in-progress",
-      "rationale": "Fallback events removed; failures render the reason and labels say what is counted (impl-claude-release-gaps). Unreviewed.",
+      "rationale": "Corrected: no loading state (the empty message and zero counters show until the read returns), no forbidden notice, and a 'Live' badge on a one-time read. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
       "tests": []
     },
     {
@@ -5092,12 +5301,7 @@
       "capabilities": [
         "employee.list"
       ],
-      "actions": [
-        "Search",
-        "Filter by provider",
-        "Filter by status",
-        "Change page"
-      ],
+      "actions": [],
       "states": [
         "loading",
         "populated",
@@ -5109,7 +5313,7 @@
       "responsive": true,
       "accessibilityStatus": "in-progress",
       "status": "in-progress",
-      "rationale": "Rebuilt by impl-claude-release-gaps as a read-only, server-paginated directory; the earlier screen was entirely invented. Checked in English and Arabic (RTL) at 375 px against a local verification-only mock API (paging, search, filters, filtered-empty); hosted data unverified; unreviewed.",
+      "rationale": "Read-only list: search, filters and paging only, no state-changing action. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
       "tests": [
         "supabase/tests/db/provider_operations.test.mjs"
       ]
@@ -5122,21 +5326,33 @@
         "admin"
       ],
       "dataSources": [
-        "none - the screen has no data source; all values are literals in the page file"
+        "postgres:public.reviews",
+        "postgres:public.profiles"
       ],
       "capabilities": [
         "review.moderate-queue",
         "review.hide"
       ],
-      "actions": [],
+      "actions": [
+        "Hide",
+        "Flag",
+        "Restore"
+      ],
       "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
         "success"
       ],
       "responsive": false,
       "accessibilityStatus": "planned",
-      "status": "blocked",
-      "rationale": "DECORATIVE. Three hardcoded reviews (:55-59) and literal counters '1,248' and '4.8 / 5.0' (:80-88). public.reviews exists with an admin policy and is never queried.",
-      "tests": []
+      "status": "in-progress",
+      "rationale": "The invented reviews are gone; reads reviews and moderates through moderate_review in a reasoned dialog. Success path of the command has no executing test. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
+      "tests": [
+        "supabase/tests/db/qa_defect_fixes.test.mjs",
+        "web_platform/tests/admin-console-guards.test.mjs"
+      ]
     },
     {
       "id": "admin-taxes",
@@ -5150,19 +5366,23 @@
       ],
       "capabilities": [
         "settings.vat-rate",
-        "settings.commission"
+        "fee-rule.list"
       ],
       "actions": [],
       "states": [
+        "loading",
         "populated",
         "empty",
-        "error"
+        "error",
+        "forbidden"
       ],
       "responsive": true,
       "accessibilityStatus": "in-progress",
       "status": "in-progress",
-      "rationale": "Read-only by design (impl-claude-release-gaps): VAT and the live fee_rules the server applies, with loading, empty and error states. Rates change only by reviewed migration with owner approval. Unreviewed.",
-      "tests": []
+      "rationale": "Read-only fee rules plus a typed-in VAT figure and out-of-date how-to text (gap taxes-literals-presented-as-server-facts). Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
+      "tests": [
+        "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs"
+      ]
     },
     {
       "id": "admin-settings",
@@ -5175,7 +5395,8 @@
         "postgres:public.platform_settings"
       ],
       "capabilities": [
-        "settings.platform"
+        "settings.platform",
+        "settings.list"
       ],
       "actions": [],
       "states": [
@@ -5183,12 +5404,13 @@
         "populated",
         "validation",
         "error",
+        "forbidden",
         "success"
       ],
       "responsive": true,
       "accessibilityStatus": "in-progress",
       "status": "in-progress",
-      "rationale": "Edits booking hold time, loyalty and referral values only through admin_update_platform_setting (validated, reason required, owner-approval stamp, audited); direct writes are revoked (impl-claude-release-gaps). Loyalty and referral values themselves await the owner. Unreviewed.",
+      "rationale": "Hold minutes, loyalty and referral settings through the reasoned command. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
       "tests": [
         "supabase/tests/db/release_controls.test.mjs"
       ]
@@ -5206,7 +5428,8 @@
         "postgres:public.provider_settlement_summary"
       ],
       "capabilities": [
-        "ledger.export"
+        "ledger.export",
+        "analytics.funnel"
       ],
       "actions": [
         "Choose period",
@@ -5225,7 +5448,7 @@
       "responsive": true,
       "accessibilityStatus": "in-progress",
       "status": "in-progress",
-      "rationale": "Rebuilt by impl-claude-release-gaps: real CSV exports with audit-before-delivery, row cap, formula-safe cells and Arabic or English headers. Exercised in the browser against a local verification-only mock API (files captured, audit failure blocks the download, empty and invalid periods refused); hosted data and phone width not verified; unreviewed.",
+      "rationale": "Audited CSV exports and the funnel card. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
       "tests": [
         "supabase/tests/db/release_controls.test.mjs",
         "web_platform/tests/csv-export.test.mjs"
@@ -5239,17 +5462,27 @@
         "admin"
       ],
       "dataSources": [
-        "none - the screen has no data source; all values are literals in the page file"
+        "postgres:public.packages",
+        "postgres:public.user_packages"
       ],
-      "capabilities": [],
-      "actions": [],
+      "capabilities": [
+        "package.list",
+        "package.toggle"
+      ],
+      "actions": [
+        "Switch a package on or off"
+      ],
       "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
         "success"
       ],
       "responsive": false,
       "accessibilityStatus": "planned",
-      "status": "blocked",
-      "rationale": "DECORATIVE. Imports Supabase but never uses it; three hardcoded packages under the comment 'Offline fallback simulator' (:60). public.packages exists in 20260613030000_wellness_expansion.sql and is never queried.",
+      "status": "in-progress",
+      "rationale": "Real reads, but administrators cannot see inactive packages or vouchers and the toggle changes zero rows while reporting success (gap admin-packages-screen-controls-reach-no-rows). Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
       "tests": []
     },
     {
@@ -5260,18 +5493,34 @@
         "admin"
       ],
       "dataSources": [
-        "public.integrations"
+        "postgres:public.message_log",
+        "postgres:public.message_queue"
       ],
-      "capabilities": [],
-      "actions": [],
+      "capabilities": [
+        "notification.broadcast",
+        "notification.log",
+        "notification.dispatch"
+      ],
+      "actions": [
+        "Send a broadcast",
+        "Run the dispatcher"
+      ],
       "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
         "success"
       ],
       "responsive": false,
       "accessibilityStatus": "planned",
-      "status": "blocked",
-      "rationale": "ORPHANED AND SIMULATED. Absent from the sidebar (admin/layout.tsx:201-238); reachable only from a dashboard quick action. Always passes simulate:true (:114) to send-notification, and sends no userId, so the function 400s and every broadcast is recorded 'simulated'. The public.notifications table it would write to does not exist in any migration.",
-      "tests": []
+      "status": "in-progress",
+      "rationale": "No longer simulated: broadcast is a real command and the log is read from message_log. In the sidebar. No reason or preview before sending (gap notification-broadcast-has-no-reason-or-preview). Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
+      "tests": [
+        "supabase/tests/db/admin.test.mjs",
+        "web_platform/tests/adm1-admin-wiring.test.mjs",
+        "web_platform/tests/negative-authorization.test.mjs"
+      ]
     },
     {
       "id": "admin-help",
@@ -5283,57 +5532,17 @@
       "dataSources": [
         "none - the screen has no data source; all values are literals in the page file"
       ],
-      "capabilities": [],
+      "capabilities": [
+        "support.contact"
+      ],
       "actions": [],
       "states": [
-        "success"
+        "populated"
       ],
       "responsive": false,
       "accessibilityStatus": "planned",
       "status": "blocked",
-      "rationale": "Static FAQ, absent from the sidebar. Line 21 states 'Every arbitration action is written to the audit log', which is false.",
-      "tests": []
-    },
-    {
-      "id": "admin-payments-redirect",
-      "route": "/admin/payments",
-      "purpose": "Redirects to /admin/ledger",
-      "roles": [
-        "admin"
-      ],
-      "dataSources": [
-        "none - the screen has no data source; all values are literals in the page file"
-      ],
-      "capabilities": [],
-      "actions": [],
-      "states": [
-        "success"
-      ],
-      "responsive": false,
-      "accessibilityStatus": "planned",
-      "status": "not-applicable",
-      "rationale": "NOT A SCREEN ANY MORE (impl-claude-release-gaps, 2026-10-04): Now one entry of the redirects() table in web_platform/next.config.ts (/admin/payments -> /admin/ledger); the page that carried the marker comments is gone.",
-      "tests": []
-    },
-    {
-      "id": "admin-redirect-stubs",
-      "route": "/admin/{analytics,audit-logs,commissions,locations,orders,roles,rooms,system-logs,teams,webhooks}",
-      "purpose": "Ten identical client-side redirect stubs",
-      "roles": [
-        "admin"
-      ],
-      "dataSources": [
-        "none - the screen has no data source; all values are literals in the page file"
-      ],
-      "capabilities": [],
-      "actions": [],
-      "states": [
-        "success"
-      ],
-      "responsive": false,
-      "accessibilityStatus": "planned",
-      "status": "not-applicable",
-      "rationale": "NOT A SCREEN ANY MORE (impl-claude-release-gaps, 2026-10-04): Now a server-side redirects() table in web_platform/next.config.ts: there are no pages and nothing to render.",
+      "rationale": "Static page; the support contacts are unconfirmed (see the open gap on the help page) so the capability is blocked on the owner. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
       "tests": []
     },
     {
@@ -5439,13 +5648,12 @@
         "filtered-empty",
         "populated",
         "error",
-        "forbidden",
         "success"
       ],
       "responsive": false,
       "accessibilityStatus": "planned",
       "status": "in-progress",
-      "rationale": "Implemented and compiled; browser verification and hosted schema deployment remain unverified.",
+      "rationale": "Corrected: forbidden removed from states; a refusal appears as the server's message in a generic error alert, not as a distinct forbidden notice. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
       "tests": [
         "supabase/tests/inventory.test.mjs"
       ]
@@ -5476,12 +5684,13 @@
         "empty",
         "filtered-empty",
         "error",
+        "forbidden",
         "success"
       ],
       "responsive": true,
       "accessibilityStatus": "in-progress",
       "status": "in-progress",
-      "rationale": "New (impl-claude-release-gaps). Paginated queue with gateway errors, attempt counts and a reasoned retry (admin_retry_refund_request, then process-refund). Checked in English and Arabic at 375 px and 1280 px against a local verification-only mock API; hosted data unverified; unreviewed.",
+      "rationale": "Refund queue with audited retry and reopen. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
       "tests": [
         "supabase/tests/db/admin_dashboard.test.mjs"
       ]
@@ -5500,26 +5709,202 @@
       "capabilities": [
         "audit.search"
       ],
-      "actions": [
-        "Search action",
-        "Filter target type",
-        "Filter dates",
-        "Expand details",
-        "Change page"
-      ],
+      "actions": [],
       "states": [
         "loading",
         "populated",
         "empty",
         "filtered-empty",
-        "error"
+        "error",
+        "forbidden"
       ],
       "responsive": true,
       "accessibilityStatus": "in-progress",
       "status": "in-progress",
-      "rationale": "Real page (impl-claude-release-gaps) replacing a redirect to the booking feed: server-side pagination, action, target and Riyadh date filters, actor names, reason column, expandable details. Unreviewed.",
+      "rationale": "Read-only audit search; has a distinct forbidden notice. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
       "tests": [
         "supabase/tests/db/release_controls.test.mjs"
+      ]
+    },
+    {
+      "id": "admin-platform-rules",
+      "route": "/admin/platform-rules",
+      "purpose": "Switch feature flags, edit marketplace fee rules and set API limits, each with a reason",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "postgres:public.platform_feature_flags",
+        "postgres:public.fee_rules",
+        "postgres:public.platform_settings"
+      ],
+      "capabilities": [
+        "feature-flag.list",
+        "feature-flag.set",
+        "fee-rule.list",
+        "fee-rule.save",
+        "settings.api-limits"
+      ],
+      "actions": [
+        "Switch a flag",
+        "Save a fee rule",
+        "Set an API limit"
+      ],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "forbidden",
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "in-progress",
+      "rationale": "No client table writes; failed lists show an error with a retry. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
+      "tests": [
+        "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs",
+        "supabase/tests/db/adm1_api_settings_screen.test.mjs",
+        "web_platform/tests/adm1-admin-wiring.test.mjs"
+      ]
+    },
+    {
+      "id": "admin-roles",
+      "route": "/admin/roles",
+      "purpose": "Find administrators and staff and grant or remove the administrator role with a reason",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "postgres:public.profiles"
+      ],
+      "capabilities": [
+        "role.directory",
+        "role.set-administrator"
+      ],
+      "actions": [
+        "Search",
+        "Change page",
+        "Make administrator",
+        "Remove administrator"
+      ],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "forbidden",
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "in-progress",
+      "rationale": "Real screen replacing the old redirect. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
+      "tests": [
+        "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs",
+        "web_platform/tests/adm1-admin-wiring.test.mjs"
+      ]
+    },
+    {
+      "id": "admin-sponsored",
+      "route": "/admin/sponsored",
+      "purpose": "Review sponsored placement fees, void or waive one, and configure the mechanism",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "postgres:public.sponsored_attributions",
+        "postgres:public.sponsored_campaigns",
+        "postgres:public.platform_settings"
+      ],
+      "capabilities": [
+        "sponsored.overview",
+        "sponsored.configure",
+        "sponsored.void-attribution"
+      ],
+      "actions": [
+        "Choose month",
+        "Void or waive a fee",
+        "Change a setting"
+      ],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "forbidden",
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "in-progress",
+      "rationale": "Off until configured; any administrator can set the price (see sponsored.configure). Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
+      "tests": [
+        "supabase/tests/db/sponsored.test.mjs",
+        "web_platform/tests/sponsored-screens.test.mjs"
+      ]
+    },
+    {
+      "id": "admin-whatsapp",
+      "route": "/admin/whatsapp",
+      "purpose": "See receptionist channel counts and confirm a provider's WhatsApp number",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "postgres:public.whatsapp_channels"
+      ],
+      "capabilities": [
+        "whatsapp.overview",
+        "whatsapp.verify-channel"
+      ],
+      "actions": [
+        "Confirm a number"
+      ],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "forbidden",
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "in-progress",
+      "rationale": "Counts only; no message bodies. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
+      "tests": [
+        "supabase/tests/db/whatsapp_receptionist.test.mjs",
+        "web_platform/tests/whatsapp-screens.test.mjs"
+      ]
+    },
+    {
+      "id": "customer-privacy",
+      "route": "/privacy",
+      "purpose": "A customer files a privacy request and sees its due date",
+      "roles": [
+        "customer"
+      ],
+      "dataSources": [
+        "postgres:public.data_subject_requests"
+      ],
+      "capabilities": [
+        "customer.submit-data-request"
+      ],
+      "actions": [
+        "Submit a privacy request"
+      ],
+      "states": [
+        "populated",
+        "error",
+        "success"
+      ],
+      "responsive": false,
+      "accessibilityStatus": "planned",
+      "status": "in-progress",
+      "rationale": "Public page with a signed-in form; creates the obligation admin-customers works. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
+      "tests": [
+        "supabase/tests/db/fixdba_consent_evidence.test.mjs"
       ]
     }
   ],
@@ -5541,8 +5926,11 @@
       "reconciliation": "transactional_ledger.payment_intent_id has a UNIQUE constraint (20260615182811:563) which prevents duplicate capture. There is no reconciliation screen, no mismatch queue, and no way to compare Tap's charge list against the ledger.",
       "monitoring": "integrations.last_checked_at is stamped opportunistically by admin/notifications/page.tsx:124. No health check, no alerting, no failure queue.",
       "status": "in-progress",
-      "rationale": "Capture path is sound. Refund path is unauthenticated, mis-modelled and unreachable from the console.",
-      "tests": []
+      "rationale": "Capture path is sound. The refund path is authenticated (administrator or scheduler; negative-authorization.test.mjs) and reachable from /admin/refunds. Daily reconciliation runs exist on the ledger screen (run_daily_psp_reconciliation). Open: unknown refund outcomes and Tap idempotency (gap refund-outcomes-that-cannot-be-known-have-no-recovery) and which system is authoritative when Tap and the ledger disagree (OWNER QUESTION: which wins, and who resolves a mismatch?). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests named in this record.",
+      "tests": [
+        "web_platform/tests/negative-authorization.test.mjs",
+        "supabase/tests/db/money.test.mjs"
+      ]
     },
     {
       "id": "expo-push",
@@ -5559,9 +5947,11 @@
       "failureHandling": "send-notification/index.ts has no authentication and no role check and acts with the service-role key (:17,:30). Any caller holding the public publishable key can push an arbitrary title and body to any userId. Delivery failures are collected but never retried.",
       "reconciliation": "none",
       "monitoring": "none - the public.notifications table it inserts into (:46) does not exist in any migration, so every persistence attempt fails and is swallowed at :55-57",
-      "status": "blocked",
-      "rationale": "Unauthenticated broadcast primitive with no backing table and no console surface.",
-      "tests": []
+      "status": "in-progress",
+      "rationale": "No longer an unauthenticated primitive: push tokens are registered by a command, notifications are queued in a table, send-push claims batches and Expo is not shown as connected until switched on (fixdbb_push_notifications.test.mjs, adm1-admin-wiring.test.mjs). No console surface shows push failures. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests named in this record.",
+      "tests": [
+        "supabase/tests/db/fixdbb_push_notifications.test.mjs"
+      ]
     },
     {
       "id": "sms-otp",
@@ -5673,41 +6063,40 @@
       "status": "passed",
       "threshold": "Project build succeeds",
       "evidence": [
-        ".admin-console/evidence/qa-claude-release-gate/r3-gate-build-lint-typecheck.txt#L8"
+        ".admin-console/evidence/architect-reconcile-claude/gate-summary.txt#L52"
       ],
-      "rationale": "Round 4: build exit 0 (Next.js 16.3.8) after the allow-list migration and the provider dialogs."
+      "rationale": "Re-run 2026-10-09 after the dispute screen edit: web build exit 0."
     },
     {
       "id": "typecheck",
       "status": "passed",
       "threshold": "Configured type checks succeed",
       "evidence": [
-        ".admin-console/evidence/qa-claude-release-gate/r3-gate-build-lint-typecheck.txt#L9",
-        ".admin-console/evidence/qa-claude-release-gate/r3-gate-build-lint-typecheck.txt#L24"
+        ".admin-console/evidence/architect-reconcile-claude/gate-summary.txt#L44"
       ],
-      "rationale": "Round 4: typecheck:mobile exit 0, web TypeScript pass inside the build."
+      "rationale": "Re-run 2026-10-09: typecheck:mobile exit 0; web type checking runs inside the build."
     },
     {
       "id": "lint",
       "status": "passed",
       "threshold": "Configured lint checks succeed",
       "evidence": [
-        ".admin-console/evidence/qa-claude-release-gate/r3-gate-build-lint-typecheck.txt#L16",
-        ".admin-console/evidence/qa-claude-release-gate/r3-gate-build-lint-typecheck.txt#L19"
+        ".admin-console/evidence/architect-reconcile-claude/gate-summary.txt#L47",
+        ".admin-console/evidence/architect-reconcile-claude/gate-summary.txt#L48"
       ],
-      "rationale": "Round 4: lint exit 0, web 0 errors and 390 warnings, mobile 0 errors and 14 warnings."
+      "rationale": "Re-run 2026-10-09: web 0 errors and 310 warnings, mobile 0 errors and 14 warnings."
     },
     {
       "id": "tests",
       "status": "passed",
       "threshold": "Required automated tests succeed",
       "evidence": [
-        ".admin-console/evidence/qa-claude-release-gate/r3-gate-test-db.txt#L347",
-        ".admin-console/evidence/qa-claude-release-gate/r3-gate-test-inventory-web.txt#L17",
-        ".admin-console/evidence/qa-claude-release-gate/r3-gate-test-inventory-web.txt#L210",
-        ".admin-console/evidence/qa-claude-release-gate/r3-gate-source-guards.txt#L5"
+        ".admin-console/evidence/architect-reconcile-claude/gate-summary.txt#L4",
+        ".admin-console/evidence/architect-reconcile-claude/gate-summary.txt#L10",
+        ".admin-console/evidence/architect-reconcile-claude/gate-summary.txt#L27",
+        ".admin-console/evidence/architect-reconcile-claude/gate-summary.txt#L30"
       ],
-      "rationale": "Round 4: test:db 217 of 217, test:inventory 10 of 10, web 156 of 156, security-core, admin-controls and p3-compat exit 0. Green means the suites pass; the repro file holds 4 cases that fail today (signed-in column visibility, invoice buyer name and integration URL secrets in the audit log, staff widening approved leave)."
+      "rationale": "Re-run 2026-10-09 on the merged tree: test:db 1155 of 1155, web 714 of 714, inventory 10, edge 8, mobile 27, ui-schema 0 mismatches, security-core, admin-controls and p3-compat exit 0. Green means the suites pass, not that every gap is closed; the older repro file of known failures is outside the suite and was not re-run."
     },
     {
       "id": "browser",
@@ -5716,7 +6105,7 @@
       "evidence": [
         ".admin-console/evidence/qa-claude-release-gate/r3-browser-session-stand-in.txt#L6"
       ],
-      "rationale": "Partial only: admin role against a verification-only stand-in (ledger payout dialogs, bookings directory, phone drawer this round; 22 routes, dialogs and deep links in round 1). Not done: provider and customer roles, any hosted session, the ledger release-item, dispute and review dialogs (the stand-in does not serve them)."
+      "rationale": "Pending and not run in this pass. The last partial run (admin role, stand-in server) predates the new roles, platform-rules, sponsored, WhatsApp, supply and customers screens; no provider or customer role was ever driven in a browser."
     },
     {
       "id": "accessibility",
@@ -5736,7 +6125,7 @@
         ".admin-console/evidence/qa-claude-release-gate/r4-allow-list-probes.txt#L12",
         "supabase/tests/db/qa_open_defects.repro.mjs#L45"
       ],
-      "rationale": "Round 4: the round 3 leaks of message variables, customer notes and leave reasons into the audit log are closed and verified. Still failing: the audit allow-list logs invoices.buyer_name and integration webhook and base URLs in clear (audit-redaction-is-a-short-deny-list, re-opened), staff can widen approved leave (staff-can-approve-their-own-leave, re-opened), signed-in accounts read internal provider columns (public-read-policies-expose-internal-provider-and-staff-columns), plus the owner-decision gaps (separation of duties, MFA, direct money-table writes, IBAN visibility, PDPL scope). Hosted policies and Deno runtime behaviour are not verified."
+      "rationale": "Still failing, for current reasons: owner-decision gaps (separation of duties, MFA and step-up, IBAN visibility, PDPL scope, direct money-table writes, self-approved referral and loyalty values), admin reads of personal and bank data that bypass audited commands, unknown refund outcomes, and the payment-method columns still readable by signed-in accounts. Closed since the last note: signed-in access to internal provider and staff columns. Hosted policies and Deno runtime behaviour were not verified."
     },
     {
       "id": "performance",
@@ -5745,14 +6134,14 @@
       "evidence": [
         ".admin-console/evidence/qa-claude-release-gate/r3-database-probes.txt#L19"
       ],
-      "rationale": "No budget measured. The one timing taken this round is a finding, not a pass: an administrator-session insert of 4,000 rows is about seven times slower than the service role because of the per-row audit trigger (bulk-administrator-writes-write-one-audit-row-per-affected-row)."
+      "rationale": "Pending: no budget was defined or measured. Owner question: what response-time and volume budget must the console meet?"
     }
   ],
   "decisions": [
     {
       "id": "profile-regulated",
       "decision": "Model PRIMORA at the 'regulated' profile.",
-      "reason": "The platform holds Saudi VAT/ZATCA tax records, provider IBANs, customer PII and payment references, and moves real money through Tap. ZATCA record-keeping obligations and Saudi PDPL both apply. A lower profile would let assumed decisions and missing audit pass a release gate.",
+      "reason": "OWNER QUESTION: confirm PRIMORA is to be run at the regulated profile (ZATCA VAT records, bank details, customer personal data, Tap payments). The profile sets what a release gate demands; a lower one needs a recorded owner decision. Original reason: ZATCA and Saudi PDPL both apply to the data held; a lower profile would let assumed decisions and missing audit pass.",
       "evidence": [
         "supabase/migrations/20260703140000_accountant_payouts_ledger.sql",
         "supabase/migrations/20260620181924_provider_payout_requests.sql",
@@ -5812,7 +6201,7 @@
     {
       "id": "migration-application-unverified",
       "decision": "Record which migrations are applied to the live Supabase project as UNVERIFIED, and treat 20260615182811_harden_auth_and_booking_core.sql as the single highest-stakes unknown.",
-      "reason": "The Supabase MCP server is unauthenticated in this session and the live database was never queried, so no applied-migration state could be observed. If 20260615182811 is not applied, the DROP at line 57 has not run and 'Public read on profiles USING (true)' from 20260613010000_triggers_rls.sql:44 is still in force - which would make every customer name, email and phone number readable by any anonymous visitor. Every other RLS finding in this audit is conditional on that file being applied.",
+      "reason": "OWNER QUESTION: which migrations are applied to the hosted Supabase project, and is the hardening migration 20260615182811 among them? This pass must not touch the hosted project, so nothing was observed. Every row-policy finding assumes the migrations in this repository are what runs.",
       "evidence": [
         "supabase/migrations/20260613010000_triggers_rls.sql#L44",
         "supabase/migrations/20260615182811_harden_auth_and_booking_core.sql#L57"
@@ -5880,7 +6269,7 @@
     {
       "id": "provider-recorded-commission-display-only",
       "decision": "Show providers.commission_percentage as a read-only 'Recorded commission %' with a note that it sets no price, and stop collecting it when approving an application.",
-      "reason": "Pricing takes commission from fee_rules through calculate_booking_platform_commission; the stored percentage changes no price, so an editable field misled operators. Whether to remove the column, repurpose it or keep it as a record is a business-model decision for the platform owner.",
+      "reason": "OWNER QUESTION: should providers.commission_percentage be removed, repurposed or kept as a record? Pricing reads fee_rules. approve_provider_application still accepts a commission argument from direct callers (default 15) that nothing uses; it should be ignored once you decide.",
       "evidence": [
         "supabase/migrations/20261005120000_admin_provider_operations.sql#L2"
       ],
@@ -5892,7 +6281,7 @@
     {
       "id": "sec-dashboard-aggregates-need-no-per-call-audit",
       "decision": "Treat admin_dashboard_overview as an aggregate read that does not need an audit entry per call, while every read that returns individual customer, bank or ledger rows must be audited.",
-      "reason": "The overview returns counts, oldest-waiting timestamps and SAR totals only; the review confirmed by test that it contains no name, email, phone or free text. Auditing every landing-page load would bury the entries that matter. Proposed by the security pass; a human must confirm because it narrows the regulated-profile privileged-read rule.",
+      "reason": "OWNER QUESTION: is it acceptable that admin_dashboard_overview (counts, oldest-waiting times and SAR totals, no names or free text, proved by admin_dashboard.test.mjs) is not audited per call, while every read of individual customer, bank or ledger rows must be? This narrows the regulated-profile privileged-read rule, so a human must confirm.",
       "evidence": [
         "supabase/tests/db/admin_security_matrix.test.mjs#L254",
         "supabase/migrations/20261005090000_admin_dashboard_overview.sql#L98"
@@ -5900,6 +6289,19 @@
       "status": "assumed",
       "appliesTo": [
         "refund.list"
+      ]
+    },
+    {
+      "id": "redirect-entries-are-not-screens",
+      "decision": "Remove the entries admin-payments-redirect and admin-redirect-stubs from screens[]; the old addresses are rows of the server redirect table in web_platform/next.config.ts.",
+      "reason": "They render nothing and expose no capability; keeping them forced a release error for a page that does not exist. /admin/roles and /admin/audit-logs are real screens now and are not redirected.",
+      "evidence": [
+        "web_platform/next.config.ts#L7",
+        "web_platform/tests/adm1-admin-wiring.test.mjs#L96"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "admin-dashboard"
       ]
     }
   ],
@@ -6112,7 +6514,7 @@
       "severity": "high",
       "description": "A single 'admin' role holds catalog authority, unlimited money authority and integration-configuration authority. There is no finance role, no support role, no read-only analyst, no monetary threshold, no maker-checker on payouts and no MFA or step-up on any command. /admin/roles - which promises role administration - redirects to a decorative employees page.",
       "status": "blocked",
-      "rationale": "BLOCKED ON OWNER DECISION: whether money approvals need a second operator (maker-checker) given how many admins the platform has. Every money command is audited with actor and reason meanwhile. REMEDY: split admin into at least finance-operator, support-agent and platform-admin with scoped RLS predicates; require a second approver above a monetary threshold on payout.mark-paid.",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): STILL BLOCKED on the owner. Screens now exist for roles (/admin/roles) and fee rules, but every command is still open to the single administrator role: payout release, refund retry, fee-rule changes, role grants, sponsored price. OWNER QUESTIONS: (1) is one administrator allowed to approve their own money movement, or must a second person approve above a monetary threshold (what amount in SAR)? (2) may any administrator grant the administrator role, or only the owner or a second administrator? (3) do you want finance, support and read-only analyst roles split from the administrator role? Prior note kept: every money command is audited with actor and reason meanwhile.",
       "evidence": [
         "supabase/migrations/20260613000000_init_schema.sql#L7",
         "web_platform/src/app/admin/roles/page.tsx#L9",
@@ -7594,6 +7996,38 @@
         "web_platform/src/app/admin/disputes/page.tsx#L86",
         "web_platform/src/app/admin/disputes/page.tsx#L110"
       ]
+    },
+    {
+      "id": "money-capability-reviews-predate-the-money-patches",
+      "severity": "medium",
+      "description": "ledger.release-payout, payout.approve, payout.mark-paid, refund.execute and refund.retry carry review states from before the money review patches: admin_release_payout, claim_refund_request and complete_refund_request were changed by 20261009141000_payout_after_visit.sql (deposits payable only after the visit, a refund after payout books a provider receivable). The suites pass, but no independent reviewer has re-read the changed commands.",
+      "status": "open",
+      "rationale": "FOUND BY architect-reconcile-claude (2026-10-09). An architect may not set review states, so they were left as recorded; treat them as stale. BUILD WORK: an independent QA or security pass over those three functions, then restore or reset the review states.",
+      "evidence": [
+        "supabase/migrations/20261009141000_payout_after_visit.sql#L66",
+        "supabase/migrations/20261009141000_payout_after_visit.sql#L105"
+      ]
+    },
+    {
+      "id": "admin-api-key-revocation-has-no-console-surface",
+      "severity": "medium",
+      "description": "admin_revoke_api_key exists so an administrator can revoke a provider's compromised developer API key, but nothing in /admin calls it; the only way is a direct database call.",
+      "status": "open",
+      "rationale": "FOUND BY architect-reconcile-claude (2026-10-09): grep of web_platform/src finds no caller. Part of the unmodeled developer API domain.",
+      "evidence": [
+        "supabase/migrations/20261006090000_api_keys.sql#L322"
+      ]
+    },
+    {
+      "id": "activity-screen-shows-empty-while-loading-and-labels-a-single-read-live",
+      "severity": "low",
+      "description": "/admin/activity has no loading state: until the first read returns it shows the empty message and zero counters, which is indistinguishable from a quiet platform, and a green pulsing 'Live' badge sits on data that is read once.",
+      "status": "open",
+      "rationale": "FOUND BY architect-reconcile-claude (2026-10-09) reading activity/page.tsx; integrations/page.tsx has the same missing loading state. BUILD WORK: a loading state and an honest label.",
+      "evidence": [
+        "web_platform/src/app/admin/activity/page.tsx#L155",
+        "web_platform/src/app/admin/integrations/page.tsx#L503"
+      ]
     }
   ],
   "declaredStatic": [
@@ -8023,6 +8457,46 @@
         ".admin-console/worklog/harvester-claude-release-run.md"
       ],
       "status": "promoted"
+    },
+    {
+      "id": "manifest-set-turns-object-fields-into-strings",
+      "observation": "set on an object-valued field such as a capability's entityStates stores the value as a string, which the lifecycle checks ignore; fixing a wrong object needs a way to replace objects or delete and re-add an item.",
+      "category": "tooling",
+      "proposedChange": "",
+      "evidence": [],
+      "status": "open"
+    },
+    {
+      "id": "script-cannot-delete-an-item",
+      "observation": "add and set cannot remove a screen, capability or entity, so retiring a non-screen (redirect entry) means rewriting a whole array with set.",
+      "category": "tooling",
+      "proposedChange": "",
+      "evidence": [],
+      "status": "open"
+    },
+    {
+      "id": "evidence-content-scan-rejects-ordinary-source-files",
+      "observation": "The placeholder scan reads the whole cited file, so a React file with an input placeholder attribute cannot be cited as evidence for a fixed gap; cite a test instead.",
+      "category": "friction",
+      "proposedChange": "",
+      "evidence": [],
+      "status": "open"
+    },
+    {
+      "id": "reconciliation-vs-architect-boundary",
+      "observation": "The architect prompt forbids setting capabilities past planned and review states, but a reconciliation of a stale manifest needs statuses corrected; used in-progress for built-and-unreviewed and left review states alone.",
+      "category": "incorrect-guidance",
+      "proposedChange": "",
+      "evidence": [],
+      "status": "open"
+    },
+    {
+      "id": "manifest-went-stale-after-parallel-work-packages",
+      "observation": "About 195 commits of new admin screens and fixes landed without manifest updates; a hook or CI check that fails when a new admin route or admin_ command has no manifest entry would have caught it.",
+      "category": "gap",
+      "proposedChange": "",
+      "evidence": [],
+      "status": "open"
     }
   ],
   "agents": [
@@ -8131,8 +8605,8 @@
       "role": "architect",
       "ownsCapabilities": [],
       "ownsScreens": [],
-      "status": "active",
-      "notes": "Reconciliation of the manifest with the code after ~195 commits (adm1 admin screens, wp/* packages, fixdba, fixmoney, fixpriv). Manifest edits only through add and set; no application code changed.",
+      "status": "done",
+      "notes": "Reconciled the manifest with the code on 2026-10-09: 7 named gaps re-read, 9 more gaps resolved or narrowed, 12 gaps filed, stale capabilities and screens corrected, new screens and entities modeled. One small code change (invented dispute rating). Worklog: .admin-console/worklog/architect-reconcile-claude.md",
       "worklog": ".admin-console/worklog/architect-reconcile-claude.md"
     }
   ]

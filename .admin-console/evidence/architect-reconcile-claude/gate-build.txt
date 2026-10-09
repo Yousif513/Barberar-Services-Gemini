@@ -4,19 +4,19 @@
 
 ▲ Next.js 16.3.8 (Turbopack)
 - Environments: .env.local
-✓ Running next.config.ts took 148ms
+✓ Running next.config.ts took 28ms
 
   Creating an optimized production build ...
-✓ Compiled successfully in 1569ms
+✓ Compiled successfully in 1452ms
   Running TypeScript ...
-  Finished TypeScript in 1346ms ...
+  Finished TypeScript in 1615ms ...
   Collecting page data using 23 workers ...
   Generating static pages using 23 workers (0/96) ...
   Generating static pages using 23 workers (24/96) 
   Generating static pages using 23 workers (48/96) 
   Generating static pages using 23 workers (72/96) 
 [sitemap] could not list providers: column providers.last_activity_at does not exist
-✓ Generating static pages using 23 workers (96/96) in 1833ms
+✓ Generating static pages using 23 workers (96/96) in 1725ms
   Finalizing page optimization ...
 
 Route (app)                               Revalidate  Expire
