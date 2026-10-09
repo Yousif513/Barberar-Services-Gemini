@@ -250,8 +250,8 @@ export default function Home() {
       </div>
 
       {/* 2. HEADER */}
-      <header className="bg-[#FBF8F1]/92 border-b border-[#D8C99F]/45 py-5 px-6 sm:px-12 flex items-center justify-between sticky top-0 z-50 shadow-[0_10px_30px_rgba(21,18,13,0.06)] backdrop-blur-md">
-        <Link href="/" className="text-2xl font-serif font-black tracking-widest text-[#10120F] hover:text-[#B8952E] transition flex-shrink-0">
+      <header className="bg-[#FBF8F1]/92 border-b border-[#D8C99F]/45 py-4 sm:py-5 px-4 sm:px-12 gap-2 flex items-center justify-between sticky top-0 z-50 shadow-[0_10px_30px_rgba(21,18,13,0.06)] backdrop-blur-md">
+        <Link href="/" className="text-2xl font-serif font-black tracking-widest text-[#10120F] hover:text-[#B8952E] transition flex-shrink-0 text-xl sm:text-2xl">
           PRIMORA
         </Link>
         <nav className="hidden lg:flex items-center justify-center gap-8 text-xs font-bold uppercase tracking-wider text-[#746B5D] flex-1 mx-8">
@@ -262,8 +262,8 @@ export default function Home() {
           <Link href="/about" className="hover:text-[#B8952E] transition-colors">{t.aboutUs}</Link>
         </nav>
         
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-4">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-6">
+          <div className="hidden sm:flex items-center gap-4">
             {/* Search Icon */}
             <Link href="/services" className="text-[#746B5D] hover:text-[#B8952E] transition">
               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -278,20 +278,20 @@ export default function Home() {
             </Link>
           </div>
           
-          <div className="h-4 w-px bg-[#D8C99F]/65"></div>
+          <div className="hidden sm:block h-4 w-px bg-[#D8C99F]/65"></div>
 
           {/* Lang button & Signin/Signup */}
-          <div className="flex items-center gap-4">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
             <button
               onClick={toggleLanguage}
-              className="px-3 py-1.5 rounded-full border border-[#D8C99F]/75 bg-white/60 text-[10px] uppercase tracking-wider font-extrabold text-[#746B5D] hover:border-[#D1AF47] hover:text-[#10120F] transition"
+              className="px-2.5 sm:px-3 py-1.5 rounded-full border border-[#D8C99F]/75 bg-white/60 text-[10px] uppercase tracking-wider font-extrabold text-[#746B5D] hover:border-[#D1AF47] hover:text-[#10120F] transition"
             >
               {locale === "en" ? "العربية" : "English"}
             </button>
             <Link href="/login" className="text-xs font-bold uppercase tracking-wider text-[#746B5D] hover:text-[#10120F] transition">
               {t.login}
             </Link>
-            <Link href="/login" className="bg-[#10120F] font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-full hover:bg-[#B8952E] transition shadow-[0_10px_24px_rgba(16,18,15,0.12)] text-[#F7F3EA]">
+            <Link href="/login" className="bg-[#10120F] font-bold text-xs uppercase tracking-wider px-3.5 sm:px-5 py-2.5 rounded-full whitespace-nowrap hover:bg-[#B8952E] transition shadow-[0_10px_24px_rgba(16,18,15,0.12)] text-[#F7F3EA]">
               {t.signup}
             </Link>
           </div>

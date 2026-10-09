@@ -574,10 +574,10 @@ export default function CustomerBookingsPage() {
       )}
 
       {/* TABS */}
-      <div className="flex border-b border-gray-200">
+      <div className="flex w-full max-w-full overflow-x-auto border-b border-gray-200">
         <button
           onClick={() => setActiveTab("upcoming")}
-          className={`pb-4 px-6 text-xs font-bold uppercase tracking-wider transition-all border-b-2 -mb-px ${
+          className={`min-w-0 flex-1 sm:flex-none pb-4 px-2 sm:px-6 text-xs font-bold uppercase tracking-wider transition-all border-b-2 -mb-px ${
             activeTab === "upcoming"
               ? "border-black text-black"
               : "border-transparent text-gray-400 hover:text-gray-600"
@@ -587,7 +587,7 @@ export default function CustomerBookingsPage() {
         </button>
         <button
           onClick={() => setActiveTab("past")}
-          className={`pb-4 px-6 text-xs font-bold uppercase tracking-wider transition-all border-b-2 -mb-px ${
+          className={`min-w-0 flex-1 sm:flex-none pb-4 px-2 sm:px-6 text-xs font-bold uppercase tracking-wider transition-all border-b-2 -mb-px ${
             activeTab === "past"
               ? "border-black text-black"
               : "border-transparent text-gray-400 hover:text-gray-600"
@@ -597,7 +597,7 @@ export default function CustomerBookingsPage() {
         </button>
         <button
           onClick={() => setActiveTab("cancelled")}
-          className={`pb-4 px-6 text-xs font-bold uppercase tracking-wider transition-all border-b-2 -mb-px ${
+          className={`min-w-0 flex-1 sm:flex-none pb-4 px-2 sm:px-6 text-xs font-bold uppercase tracking-wider transition-all border-b-2 -mb-px ${
             activeTab === "cancelled"
               ? "border-black text-black"
               : "border-transparent text-gray-400 hover:text-gray-600"
