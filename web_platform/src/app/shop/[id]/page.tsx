@@ -393,7 +393,7 @@ export default function ShopDetailsPage() {
             .eq("provider_id", shopId).eq("is_active", true).order("sort_order", { ascending: true }),
           supabase.from("packages").select("id, name_en, name_ar, description_en, description_ar, price, session_count, expires_in_days")
             .eq("provider_id", shopId).eq("is_active", true),
-          supabase.from("reviews").select("id, rating, comment, created_at, reply_comment, moderation_status, employee_id, profiles(first_name, last_name)")
+          supabase.from("reviews").select("id, rating, comment, created_at, reply_comment, moderation_status, employee_id, profiles!reviews_customer_id_fkey(first_name, last_name)")
             .eq("provider_id", shopId).order("created_at", { ascending: false }).limit(50),
           supabase.from("platform_settings").select("value").eq("key", "loyalty_program").maybeSingle(),
         ]);

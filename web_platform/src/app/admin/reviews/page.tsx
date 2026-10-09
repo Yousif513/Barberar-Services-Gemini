@@ -84,7 +84,7 @@ export default function AdminReviews() {
           moderation_status,
           reply_comment,
           reply_created_at,
-          customer:profiles(first_name, last_name),
+          customer:profiles!reviews_customer_id_fkey(first_name, last_name),
           provider:providers(business_name_en, business_name_ar),
           employee:employees(name_en, name_ar)
         `)

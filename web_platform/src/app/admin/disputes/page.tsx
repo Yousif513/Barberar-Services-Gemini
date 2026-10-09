@@ -89,7 +89,7 @@ export default function AdminDisputes() {
           reason,
           status,
           created_at,
-          customer:profiles(first_name, last_name),
+          customer:profiles!payment_disputes_customer_id_fkey(first_name, last_name),
           provider:providers(business_name_en, business_name_ar),
           booking:bookings(id, status, scheduled_at)
         `)

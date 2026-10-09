@@ -111,6 +111,21 @@ describe("wallet credit spend (D4 / C-D4)", () => {
     assert.ok(a && c);
   });
 
+  it("a payment that arrives after the hold was released is a conflict, so restored wallet credit cannot be used twice (M-03)", async () => {
+    await credit(SEED.customer, 30, { daysOld: 1 });
+    const b = await book(30);
+    assert.ok(Number(b.deposit_required) > 0, "a deposit is still due after the credit");
+    // the sweeper cancels the unpaid hold and gives the discounts back
+    await sys(db, `update bookings set status = 'cancelled', cancelled_by = 'system', cancelled_at = now() where id = $1`, [b.id]);
+    await sys(db, `select booking_release_discounts($1)`, [b.id]);
+    assert.deepEqual((await rows()).map((r) => [money(r.remaining_amount), r.is_spent]), [[30, false]], "the credit is spendable again");
+    const late = (await as(db, ROLES.service, `select confirm_booking_payment($1, 'chg_late_wallet', $2) r`, [b.id, b.deposit_required]))[0].r;
+    assert.equal(late.conflict, true, "the late payment is refunded, the booking is not resurrected");
+    assert.equal((await sys(db, `select status from bookings where id = $1`, [b.id]))[0].status, "cancelled");
+    assert.deepEqual((await rows()).map((r) => [money(r.remaining_amount), r.is_spent]), [[30, false]], "the credit was not consumed twice");
+    assert.equal((await sys(db, `select count(*)::int n from refund_requests where idempotency_key = 'late:chg_late_wallet'`))[0].n, 1);
+  });
+
   it("the platform settles the credit with the provider when the visit is completed", async () => {
     await credit(SEED.customer, 30);
     const past = (await sys(db,

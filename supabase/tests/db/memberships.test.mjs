@@ -229,8 +229,17 @@ describe("confirm_membership_payment (webhook): money", () => {
 
     const gone = await buy(customer, await livePlan());
     await as(db, customer, `select cancel_membership($1, 'changed my mind')`, [gone.membership_id]);
-    await expectError(confirm(gone.membership_id, "chg_late", 300), /not awaiting payment/);
-    assert.equal((await ledgerFor("chg_late")).length, 0);
+    // M-01: the capture is not lost and the webhook is not failed for ever: it is recorded and its refund is queued
+    const late = await confirm(gone.membership_id, "chg_late", 300);
+    assert.equal(late.conflict, true);
+    assert.equal(late.status, "refund_required");
+    assert.equal((await ledgerFor("chg_late")).length, 1);
+    assert.equal((await ledgerFor("chg_late"))[0].payout_status, "refund_pending");
+    assert.equal((await sys(db, `select count(*)::int n from refund_requests where idempotency_key = 'late:chg_late'`))[0].n, 1);
+    const replayed = await confirm(gone.membership_id, "chg_late", 300);
+    assert.equal(replayed.conflict, true, "a retried webhook is answered, not failed");
+    assert.equal((await sys(db, `select count(*)::int n from refund_requests where idempotency_key = 'late:chg_late'`))[0].n, 1, "one refund only");
+    assert.equal((await mem(gone.membership_id)).status, "cancelled");
 
     // an intent that already carries a booking payment cannot be replayed against a membership either
     const m3 = await buy(customer, await livePlan());
@@ -404,6 +413,14 @@ describe("redeeming included visits", () => {
     await expectError(as(db, ROLES.service, `select redeem_membership_visit($1, $2, null)`, [id, b]), /Authentication required/);
     assert.equal(await left(id), 4);
     assert.equal((await redemptions(id)).length, 0);
+  });
+
+  it("refuses a visit that falls after the membership period has ended (M-02)", async () => {
+    const m = await paidMembership();
+    const bookingId = await book("10:00");
+    await sys(db, `update memberships set period_end = now() + interval '1 day' where id = $1`, [m]);
+    await expectError(redeem(owner1, m, bookingId), /outside the period/);
+    assert.equal(await left(m), (await mem(m)).visits_per_period, "no visit was used");
   });
 
   it("an administrator can redeem; a membership of another provider cannot be used on this provider's booking", async () => {
@@ -593,7 +610,8 @@ describe("expiry and reminders", () => {
       try { await tx.query(`select redeem_membership_visit($1, $2, null)`, [id, b]); return "accepted"; } catch (e) { return e.message; }
     });
     assert.match(refused, /has expired/);
-    await sys(db, `update memberships set period_end = now() + interval '5 minutes' where id = $1`, [id]);
+    // still inside the period at the moment of the call, and the visit itself falls inside it (M-02)
+    await sys(db, `update memberships set period_end = (select scheduled_at + interval '1 hour' from bookings where id = $2) where id = $1`, [id, b]);
     assert.equal((await as(db, owner1, `select redeem_membership_visit($1, $2, null) r`, [id, b]))[0].r.visits_remaining, 3);
     await as(db, customer, `select cancel_booking($1, 'cleanup')`, [b]);
   });

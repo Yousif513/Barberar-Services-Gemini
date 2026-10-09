@@ -55,6 +55,11 @@ serve(async (req) => {
             p_amount: amount,
           })
       if (error) throw error
+      // A membership payment that arrived after the membership could no longer be sold: the database recorded the capture and queued its refund.
+      if (purchaseType === "membership" && data?.conflict && data?.refund_request_id && !data?.replay) {
+        const outcome = await processRefundRequest(db, tapSecretKey, data.refund_request_id)
+        return json({ received: true, status: "refund_for_conflict", membership_id: purchaseId, refund: outcome })
+      }
       return json({ success: true, result: data })
     }
 

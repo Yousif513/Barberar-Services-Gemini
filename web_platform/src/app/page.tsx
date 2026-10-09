@@ -203,11 +203,11 @@ export default function Home() {
         .order("sort_order")
         .limit(5);
       if (error || !data?.length) return;
-      const providerIds = [...new Set(data.map((r) => r.provider_id))];
-      const { data: reviewRows } = await supabase
-        .from("reviews")
-        .select("provider_id, rating, moderation_status")
-        .in("provider_id", providerIds);
+      // Platform catalogue entries have no provider yet (provider_id is null): they have no reviews to ask for and no shop to open.
+      const providerIds = [...new Set(data.map((r) => r.provider_id).filter((id): id is string => Boolean(id)))];
+      const { data: reviewRows } = providerIds.length
+        ? await supabase.from("reviews").select("provider_id, rating, moderation_status").in("provider_id", providerIds)
+        : { data: [] as { provider_id: string; rating: number | string; moderation_status: string | null }[] };
       const published = (reviewRows || []).filter((r) => (r.moderation_status || "published") === "published");
       setFeaturedRows(data.map((r) => {
         const cat = r.categories as unknown as { slug?: string; name_en?: string; name_ar?: string } | null;
@@ -231,7 +231,8 @@ export default function Home() {
 
   const bestSellers = useMemo(() => featuredRows.map((r) => ({
     id: r.id,
-    href: `/shop/${r.provider_id}`,
+    // a service that belongs to a provider opens that provider's shop; a catalogue entry opens the search
+    href: r.provider_id ? `/shop/${r.provider_id}` : "/discover",
     name: locale === "ar" ? r.name_ar : r.name_en,
     category: locale === "ar" ? r.category_ar : r.category_en,
     rating: r.rating,
@@ -506,9 +507,6 @@ export default function Home() {
                     className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" 
                   />
                   {/* Badge */}
-                  <span className="absolute top-2.5 left-2.5 bg-[#10120F] text-[#F4E7B6] text-[8px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-full border border-[#D1AF47]/30">
-                    {locale === "ar" ? "شائع" : "Popular"}
-                  </span>
                 </div>
 
                 {/* Details */}

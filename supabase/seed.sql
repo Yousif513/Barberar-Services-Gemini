@@ -63,9 +63,9 @@ INSERT INTO public.providers (id, owner_id, type, business_name_en, business_nam
 
 
 -- 4. INSERT BRANCHES (Riyadh districts)
-INSERT INTO public.branches (id, provider_id, name_en, name_ar, address_text_en, address_text_ar, latitude, longitude, geofence_radius_km) VALUES
-('b0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', 'Al-Malqa Branch', 'فرع الملقا', 'Anas Bin Malik Road, Al-Malqa, Riyadh', 'طريق أنس بن مالك، حي الملقا، الرياض', 24.796300, 46.611100, 5.00),
-('b0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000002', 'Olaya Branch', 'فرع العليا', 'Tahlia Street, Olaya, Riyadh', 'شارع التحلية، حي العليا، الرياض', 24.711200, 46.674400, 5.00);
+INSERT INTO public.branches (id, provider_id, name_en, name_ar, address_text_en, address_text_ar, latitude, longitude, geofence_radius_km, city, district) VALUES
+('b0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', 'Al-Malqa Branch', 'فرع الملقا', 'Anas Bin Malik Road, Al-Malqa, Riyadh', 'طريق أنس بن مالك، حي الملقا، الرياض', 24.796300, 46.611100, 5.00, 'Riyadh', 'Al-Malqa'),
+('b0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000002', 'Olaya Branch', 'فرع العليا', 'Tahlia Street, Olaya, Riyadh', 'شارع التحلية، حي العليا، الرياض', 24.711200, 46.674400, 5.00, 'Riyadh', 'Olaya');
 
 
 -- 5. INSERT STAFF EMPLOYEES

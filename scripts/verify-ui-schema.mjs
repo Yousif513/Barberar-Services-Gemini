@@ -49,6 +49,13 @@ for (const f of schema.fks) {
   const m = f.def.match(/FOREIGN KEY \((\w+)\) REFERENCES (\w+)\(/);
   if (m) fkMap.set(`${f.tbl.replace("public.", "")}.${m[1]}`, m[2]);
 }
+// every foreign key as an edge between two tables: an embed between two tables that have more than one is ambiguous (PostgREST answers 300)
+const edges = [];
+for (const f of schema.fks) {
+  const m = f.def.match(/FOREIGN KEY \((\w+)\) REFERENCES (\w+)\(/);
+  if (m) edges.push({ from: f.tbl.replace("public.", ""), to: m[2] });
+}
+const relationshipsBetween = (a, b) => edges.filter((e) => (e.from === a && e.to === b) || (e.from === b && e.to === a)).length;
 const funcs = new Map();
 for (const f of schema.funcs) {
   const parts = splitTop(f.args);
@@ -125,7 +132,12 @@ function checkSelect(table, sel, where, problems) {
       if (head.includes(":")) head = head.split(":")[1].trim();
       const [name] = head.split("!");
       let ref = null;
-      if (tables.has(name)) ref = name;
+      if (tables.has(name)) {
+        ref = name;
+        if (!head.includes("!") && relationshipsBetween(table, name) > 1) {
+          problems.push({ where, call: `from("${table}").select`, problem: `embed "${name}" is ambiguous: ${relationshipsBetween(table, name)} foreign keys link ${table} and ${name}; name one with ${name}!<constraint>` });
+        }
+      }
       else if (fkMap.has(`${table}.${name}`)) ref = fkMap.get(`${table}.${name}`);
       else {
         problems.push({ where, call: `from("${table}").select`, problem: `embed "${name}" does not resolve to a table` });
