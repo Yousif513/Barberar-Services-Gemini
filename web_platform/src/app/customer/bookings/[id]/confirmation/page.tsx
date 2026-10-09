@@ -530,7 +530,7 @@ export default function BookingConfirmationPage() {
                   <dd className="font-serif font-black">-{sar(amounts.giftCard, locale)}</dd>
                 </div>
               )}
-              {amounts.deposit > 0 && (
+              {amounts.deposit > 0 && !isClosed && (
                 <div className="flex justify-between text-xs font-semibold text-emerald-700">
                   <dt>{isPending ? t.depositDue : t.depositPaid}</dt>
                   <dd className="font-serif font-black">{isPending ? "" : "-"}{sar(amounts.deposit, locale)}</dd>

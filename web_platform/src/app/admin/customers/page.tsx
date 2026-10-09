@@ -331,7 +331,7 @@ function CustomersScreen() {
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      const select = "id, user_id, request_type, status, details, due_date, admin_notes, reviewed_at, created_at, profiles ( first_name, last_name )";
+      const select = "id, user_id, request_type, status, details, due_date, admin_notes, reviewed_at, created_at, profiles!data_subject_requests_user_id_fkey ( first_name, last_name )";
       const [open, closed, consentResult] = await Promise.all([
         supabase.from("data_subject_requests").select(select, { count: "exact" }).in("status", ["pending", "in_progress"]).order("due_date", { ascending: true }).range(0, OPEN_REQUEST_LIMIT - 1),
         supabase.from("data_subject_requests").select(select).in("status", ["completed", "rejected"]).order("reviewed_at", { ascending: false }).range(0, CLOSED_REQUEST_LIMIT - 1),
