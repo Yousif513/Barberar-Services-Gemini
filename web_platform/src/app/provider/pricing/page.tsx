@@ -76,7 +76,7 @@ const translations = {
     madaApplePay: "Mada / Apple Pay / Credit Card",
     summary: "Order Summary",
     subtotal: "Subtotal",
-    vat: "VAT (15%)",
+    quoteUnavailable: "Price unavailable",
     total: "Total Due",
     payNow: "Proceed to Secure Payment",
     processing: "Redirecting to secure Tap Payments gateway...",
@@ -154,7 +154,7 @@ const translations = {
     madaApplePay: "مدى / أبل باي / بطاقة ائتمان",
     summary: "ملخص الطلب",
     subtotal: "المجموع الفرعي",
-    vat: "ضريبة القيمة المضافة (15%)",
+    quoteUnavailable: "السعر غير متاح",
     total: "المبلغ الإجمالي",
     payNow: "المتابعة إلى بوابة الدفع الآمنة",
     processing: "جاري التحويل لبوابة الدفع الآمنة Tap Payments...",
@@ -176,6 +176,9 @@ export default function PricingPage() {
   const [providerId, setProviderId] = useState<string | null>(null);
   const [currentSubscription, setCurrentSubscription] = useState<any | null>(null);
   const [checkoutError, setCheckoutError] = useState("");
+  // The price comes from the database (quote_provider_plan), the same function that sets the amount charged.
+  const [quote, setQuote] = useState<{ total_sar: number; monthly_rate_sar: number; months: number } | null>(null);
+  const [quoteError, setQuoteError] = useState(false);
 
   const checkoutRef = useRef<HTMLDivElement>(null);
 
@@ -224,6 +227,21 @@ export default function PricingPage() {
     }
     loadCurrentSubscription();
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const planId = selectedPlan === "basic" ? "starter" : selectedPlan;
+    setQuote(null);
+    setQuoteError(false);
+    supabase
+      .rpc("quote_provider_plan", { p_plan_id: planId, p_billing_interval: billingCycle === "annual" ? "yearly" : "monthly" })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error || !data) { setQuoteError(true); return; }
+        setQuote({ total_sar: Number(data.total_sar), monthly_rate_sar: Number(data.monthly_rate_sar), months: Number(data.months) });
+      });
+    return () => { cancelled = true; };
+  }, [selectedPlan, billingCycle]);
 
   const handleSelectPlan = (plan: "basic" | "growth" | "elite") => {
     setSelectedPlan(plan);
@@ -301,29 +319,12 @@ export default function PricingPage() {
   // Pricing calculations based on selections
   const getPricingDetails = () => {
     const isAnnual = billingCycle === "annual";
-    let basePricePerMonth = 0;
-    let title = "";
-    
-    if (selectedPlan === "basic") {
-      basePricePerMonth = 0;
-      title = t.basicName;
-    } else if (selectedPlan === "growth") {
-      basePricePerMonth = isAnnual ? 239 : 299;
-      title = t.growthName;
-    } else if (selectedPlan === "elite") {
-      basePricePerMonth = isAnnual ? 639 : 799;
-      title = t.eliteName;
-    }
-
-    const subtotal = isAnnual ? basePricePerMonth * 12 : basePricePerMonth;
-    const vat = parseFloat((subtotal * 0.15).toFixed(2));
-    const total = parseFloat((subtotal + vat).toFixed(2));
-
+    const title = selectedPlan === "basic" ? t.basicName : selectedPlan === "growth" ? t.growthName : t.eliteName;
+    // The amount charged is the server quote (annual billing = 12 x the monthly rate for annual billing); nothing is added on the screen.
+    const total = quote ? quote.total_sar : null;
     return {
       title,
-      basePricePerMonth,
-      subtotal,
-      vat,
+      subtotal: total,
       total,
       isAnnual
     };
@@ -917,16 +918,12 @@ export default function PricingPage() {
                     
                     <div className="flex justify-between text-[#667085]">
                       <span>{t.subtotal}</span>
-                      <span className="text-[#101828] font-medium">{pricingDetails.subtotal} {t.sar}</span>
-                    </div>
-                    <div className="flex justify-between text-[#667085]">
-                      <span>{t.vat}</span>
-                      <span className="text-[#101828] font-medium">{pricingDetails.vat} {t.sar}</span>
+                      <span className="text-[#101828] font-medium">{pricingDetails.subtotal !== null ? `${pricingDetails.subtotal} ${t.sar}` : (quoteError ? t.quoteUnavailable : "…")}</span>
                     </div>
 
                     <div className="border-t border-[#D1AF47]/20 pt-3 flex justify-between text-sm">
                       <span className="text-[#101828] font-bold">{t.total}</span>
-                      <span className="text-[#D1AF47] font-black">{pricingDetails.total} {t.sar}</span>
+                      <span className="text-[#D1AF47] font-black">{pricingDetails.total !== null ? `${pricingDetails.total} ${t.sar}` : (quoteError ? t.quoteUnavailable : "…")}</span>
                     </div>
                   </div>
                 </div>

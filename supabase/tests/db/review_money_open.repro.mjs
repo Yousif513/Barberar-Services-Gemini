@@ -25,14 +25,6 @@ const firstSlotOf = async (user, employee, svc, date) =>
 const book = async (user, employee, svc, slot, extra = "") =>
   (await as(db, user, `select * from create_booking(target_employee_id => $1, target_service_id => $2, target_scheduled_at => $3${extra})`, [employee, svc.id, slot]))[0];
 
-describe("REPRODUCES OPEN DEFECT M-06 / M-07: subscriptions", () => {
-  it("M-06: a yearly plan charges the annual price (12 x the per-month annual rate), not one month of it", async () => {
-    const r = (await as(db, owner1, `select subscribe_provider_plan($1, 'growth', 'yearly') r`, [SEED.provider1]))[0].r;
-    assert.ok(Number(r.amount_sar) >= 12 * 239, `yearly growth charged ${r.amount_sar}; the screen quotes 12 x 239 = 2868 before VAT`);
-  });
-
-});
-
 describe("REPRODUCES OPEN DEFECT M-08 / M-10: first-visit commission can be bypassed by the provider", () => {
   it("M-08: a zero-price walk-in linked to a customer's verified phone does not remove the first-visit commission", async () => {
     const svc = await serviceFor(db, SEED.employee1);

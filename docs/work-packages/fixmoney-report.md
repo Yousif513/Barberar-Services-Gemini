@@ -16,3 +16,9 @@ Migration note M-04: invoices issued before the migration did not record what th
 month is stamped as billed by that month's original invoice. A booking completed after its (pre-migration) invoice cannot be told apart from the rest
 (no completed_at exists); the integrator should compare `total_bookings_count` of old invoices with the actual count on production data and bill any difference by hand
 (`update bookings set fee_invoice_id = null where id = ...` then run `issue_monthly_fee_invoices`).
+| M-06 yearly subscription undercharged | fixed (migration 20261009120000: `quote_provider_plan(plan, interval)`; `subscribe_provider_plan` charges its `total_sar`; yearly = `price_yearly_sar` x 12; provider pricing screen reads the same RPC, its hard-coded 299/239/799/639 table and the screen-only 15% VAT row are removed) | see git log | fixmoney_subscription_quote.test.mjs |
+
+OWNER MUST CONFIRM (M-06): the seeded `price_yearly_sar` (growth 239, elite 639) is treated as a PER-MONTH rate billed annually (239 = 299 x 0.8), as the old screen did, so
+an annual growth subscription now charges 2,868.00 SAR and elite 7,668.00 SAR. If the intended annual price is the stored number itself, change the single
+`months` multiplier for yearly in `quote_provider_plan` (and nothing else; the screen follows). The quote adds NO VAT: the old screen displayed a 15% VAT row that was never
+charged; it was removed rather than invented (VAT on platform fees is owner item M-11).
