@@ -3,6 +3,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders as sharedCorsHeaders } from "../_shared/http.ts"
+import { serviceKeyMatches } from "../_shared/request-guards.ts"
 
 serve(async (req) => {
   const corsHeaders = sharedCorsHeaders(req)
@@ -15,7 +16,7 @@ serve(async (req) => {
   try {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
     const authorization = req.headers.get("Authorization")
-    if (!serviceKey || authorization !== `Bearer ${serviceKey}`) {
+    if (!serviceKeyMatches((authorization ?? "").replace(/^Bearer\s+/i, ""), serviceKey)) {
       return new Response(
         JSON.stringify({ error: "Unauthorized." }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
