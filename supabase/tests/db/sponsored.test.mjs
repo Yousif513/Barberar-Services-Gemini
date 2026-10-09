@@ -54,6 +54,13 @@ const launch = async (owner, provider, over = {}) => {
 };
 const place = (user = ROLES.anon, city = null, category = null, limit = null) =>
   as(db, user, `select get_sponsored_placements($1, $2, $3) r`, [city, category, limit]).then((r) => r[0].r);
+// FIX-MONEY M-12: the search is a pure read; the trusted server-side caller records what it displayed, in display order.
+const placeAndRecord = async () => {
+  const r = await place();
+  const ids = r.placements.map((x) => x.campaign_id);
+  if (ids.length) await as(db, ROLES.service, `select record_sponsored_impressions($1::uuid[])`, [ids]);
+  return r;
+};
 const click = (user, campaignId) => as(db, user, `select record_sponsored_click($1) r`, [campaignId]).then((r) => r[0].r);
 const campaignRow = (id) => sys(db, `select * from sponsored_campaigns where id = $1`, [id]).then((r) => r[0]);
 const attributionFor = (bookingId) => sys(db, `select * from sponsored_attributions where booking_id = $1`, [bookingId]).then((r) => r[0]);
@@ -286,7 +293,7 @@ describe("placements: fair rotation, always labelled", () => {
   it("rotates least recently shown first, one place per search, and records the show time", async () => {
     const seen = [];
     for (let i = 0; i < 6; i += 1) {
-      const r = await place();
+      const r = await placeAndRecord();
       assert.equal(r.configured, true);
       assert.equal(r.placements.length, 1);
       seen.push(r.placements[0].campaign_id);
@@ -324,7 +331,7 @@ describe("placements: fair rotation, always labelled", () => {
     await setSetting("sponsored.max_slots_per_search", 2);
     const counts = new Map();
     for (let i = 0; i < 6; i += 1) {
-      for (const p of (await place()).placements) counts.set(p.campaign_id, (counts.get(p.campaign_id) ?? 0) + 1);
+      for (const p of (await placeAndRecord()).placements) counts.set(p.campaign_id, (counts.get(p.campaign_id) ?? 0) + 1);
     }
     for (const id of [c1, c2, c3]) assert.equal(counts.get(id), 4);
     await setSetting("sponsored.max_slots_per_search", 3);
