@@ -11,6 +11,18 @@ Standing constraints: preserve Codex, Claude and Gemini work; no history rewrite
 `master`; no destructive or irreversible production operation (the hosted Supabase project is never touched);
 no mock or invented data; owner-priced features ship disabled and unset; unverifiable things are reported as unverified.
 
+## Status as of 2026-10-09 (supersedes the per-row "queued" markers below)
+
+Every fix package (fixcust, fixdba, fixbooking, fixpub, fixprov, fixmobile, fixdbb, fixqa, fixmoney, fixpriv) and every
+roadmap package (REC, API, INTAKE, ADM1, MEMBER, GROUP, DIST, PRO, GCC, AI/WhatsApp, SPONSOR) is merged into `claude-code`;
+reports are in `docs/work-packages/*-report.md`, independent reviews in `docs/reviews/2026-10-08-*.md`.
+Not built on purpose: G68 white-label, G73 own SAMA licence, G74 kiosk. Verified on the merged tree: DB suite 1165/1165,
+inventory 10/10, edge guards 8/8, web 714/714, mobile 27/27, ui-schema 0 mismatches, security-core and admin-controls pass,
+typecheck:mobile, web tsc, eslint (0 errors), web build, and on a real local Postgres 15: reset + seed + smoke 19/19 + `db lint`.
+Release gate section E is NOT met: `validate --phase release` still reports open items (screens and work queues not yet
+marked implemented, owner and legal decisions); no production-ready claim is made. Open owner decisions and unverifiable
+items are listed in `.coworking_changelog.md` (entry 2026-10-08).
+
 ## A. Review and repair of earlier deliverables
 
 The three reviews are done and committed: `docs/reviews/2026-10-06-gap-verification-{A-p0,B-p1-mobile-portals,C-p2-codex-p3}.md`
