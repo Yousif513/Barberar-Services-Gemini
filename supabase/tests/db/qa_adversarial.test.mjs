@@ -77,7 +77,8 @@ describe("client-executable functions are accounted for", () => {
     const serviceOnly = (await functionsFor("authenticated"))
       .filter((f) => f.definer && /<> 'service_role'/.test(f.body) && !/is_admin\(\)|auth\.uid\(\)/.test(f.body))
       .map((f) => f.signature);
-    assert.deepEqual(serviceOnly.map((s) => s.split("(")[0]), ["confirm_booking_payment"]);
+    // FIX-MONEY M-22: confirm_booking_payment is no longer even executable by authenticated, so no service-role-only command is left in the client-executable set.
+    assert.deepEqual(serviceOnly.map((s) => s.split("(")[0]), []);
     for (const [name, user] of [["administrator", admin], ["provider owner", owner1], ["customer", customer], ["visitor", ROLES.anon]]) {
       assert.equal(
         await outcome(as(db, user, `select confirm_booking_payment($1, 'chg_probe', 1)`, [ZERO])),
