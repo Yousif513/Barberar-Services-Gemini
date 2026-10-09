@@ -10,6 +10,7 @@ Migration range 20261009200000 .. 20261009249999. Tests: `supabase/tests/db/fixp
 | P-04 | fixed (anon read, client writes); signed-in read residual | see git log "P-04" | fixpriv_employee_identity.test.mjs |
 | P-09 | fixed | see git log "P-09" | fixpriv_platform_settings.test.mjs |
 | P-10 | fixed | see git log "P-10" | fixpriv_public_places.test.mjs |
+| P-08 | fixed | see git log "P-08" | fixpriv_home_address_window.test.mjs |
 
 ## P-02
 - `20261009200000_fixpriv_consent_oracle.sql`: `has_active_consent(uuid,text)` now raises `42501 Not authorized` when a signed-in caller asks about someone else and is not an administrator. Service role, jobs and definer-internal calls without a signed-in user (`auth.uid()` NULL) are unchanged. This replaces the (3-line, language sql) function body with a plpgsql body of the same signature; privileges are re-stated.
@@ -31,3 +32,6 @@ Migration range 20261009200000 .. 20261009249999. Tests: `supabase/tests/db/fixp
 
 ## P-10 (fixed)
 `20261009200600_fixpriv_public_provider_places.sql`: `branches`, `employee_availability`, `provider_closures` follow `providers.is_verified` for visitors; signed-in users additionally read through new `can_read_provider_place(provider, branch)` (verified, the provider's staff/owner/delegates, administrators, or a customer who has a booking at that branch, so history survives a suspension). Writes untouched. Test: `fixpriv_public_places.test.mjs`. Full DB suite after P-09/P-10: 1095 tests, 0 failures.
+
+## P-08 (fixed)
+`20261009200700_fixpriv_home_address_staff_window.sql`: new platform setting `address.staff_read_days` (null = unset, private). Staff (owner, assigned employee, delegate) read a home address only until the appointment end + 1 day + that many extra days (unset = 0), both through the table policy and through `get_booking_address_secure` (patched in place; after the window it answers an "Address no longer available" text and no coordinates). The customer, administrators (audited) and the service role are not limited. An administrator or service-role read no longer stamps `booking_home_addresses.revealed_at`. New helpers `address_staff_read_days()` (definer) and `home_address_staff_window_open(booking)` (invoker). Owner decision: how long after a visit salon staff may still see the address (a refund or dispute dispute window is the usual reason to extend). Test: `fixpriv_home_address_window.test.mjs`.
