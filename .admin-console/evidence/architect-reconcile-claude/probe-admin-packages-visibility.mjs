@@ -1,0 +1,13 @@
+import { createMigratedDb, as, sys, createUser, ROLES, SEED } from "../../../supabase/tests/db/harness.mjs";
+const db = await createMigratedDb();
+const admin = ROLES.user(await createUser(db, { role: "admin" }));
+await sys(db, `insert into packages (provider_id, name_en, name_ar, price, session_count, is_active) values ($1,'P','ب',100,3,false)`, [SEED.provider1]).catch(e=>console.log("ins",e.message));
+const sel = await as(db, admin, `select id, is_active from packages`);
+console.log("admin sees packages rows:", sel.length);
+const upd = await as(db, admin, `update packages set is_active = true returning id`).catch(e=>e.message);
+console.log("admin update returns:", JSON.stringify(upd));
+const up = await as(db, admin, `select count(*)::int c from user_packages`).catch(e=>e.message);
+console.log("admin user_packages:", JSON.stringify(up));
+const pr = await as(db, admin, `select count(*)::int c from package_redemptions`).catch(e=>e.message);
+console.log("admin redemptions:", JSON.stringify(pr));
+process.exit(0);

@@ -1,0 +1,126 @@
+
+> web_platform@0.1.0 build
+> next build
+
+▲ Next.js 16.3.8 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 148ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 1569ms
+  Running TypeScript ...
+  Finished TypeScript in 1346ms ...
+  Collecting page data using 23 workers ...
+  Generating static pages using 23 workers (0/96) ...
+  Generating static pages using 23 workers (24/96) 
+  Generating static pages using 23 workers (48/96) 
+  Generating static pages using 23 workers (72/96) 
+[sitemap] could not list providers: column providers.last_activity_at does not exist
+✓ Generating static pages using 23 workers (96/96) in 1833ms
+  Finalizing page optimization ...
+
+Route (app)                               Revalidate  Expire
+┌ ○ /
+├ ○ /_not-found
+├ ○ /about
+├ ○ /admin
+├ ○ /admin/activity
+├ ○ /admin/audit-logs
+├ ○ /admin/bookings
+├ ○ /admin/branches
+├ ○ /admin/coupons
+├ ○ /admin/customers
+├ ○ /admin/disputes
+├ ○ /admin/employees
+├ ○ /admin/help
+├ ○ /admin/integrations
+├ ○ /admin/ledger
+├ ○ /admin/notifications
+├ ○ /admin/packages
+├ ○ /admin/platform-rules
+├ ○ /admin/providers
+├ ○ /admin/refunds
+├ ○ /admin/reports
+├ ○ /admin/reviews
+├ ○ /admin/roles
+├ ○ /admin/services
+├ ○ /admin/settings
+├ ○ /admin/sponsored
+├ ○ /admin/supply
+├ ○ /admin/taxes
+├ ○ /admin/whatsapp
+├ ○ /become-provider
+├ ○ /categories/barber
+├ ○ /categories/hair
+├ ○ /categories/makeup
+├ ○ /categories/spa
+├ ○ /customer/book
+├ ○ /customer/bookings
+├ ƒ /customer/bookings/[id]/confirmation
+├ ƒ /customer/bookings/[id]/intake
+├ ○ /customer/dashboard
+├ ○ /customer/dependents
+├ ○ /customer/favorites
+├ ○ /customer/following
+├ ○ /customer/group
+├ ○ /customer/jobs
+├ ○ /customer/memberships
+├ ○ /customer/messages
+├ ○ /customer/notifications
+├ ○ /customer/packages
+├ ○ /customer/reviews
+├ ○ /customer/search
+├ ○ /customer/series
+├ ○ /customer/settings
+├ ○ /customer/wallet
+├ ○ /developer
+├ ○ /discover
+├ ○ /login
+├ ○ /privacy
+├ ƒ /pro/[handle]
+├ ○ /provider/become
+├ ○ /provider/bookings
+├ ○ /provider/calendar
+├ ○ /provider/chain
+├ ○ /provider/customers
+├ ○ /provider/dashboard
+├ ○ /provider/developer
+├ ○ /provider/employees
+├ ○ /provider/groups
+├ ○ /provider/identity
+├ ○ /provider/intake
+├ ○ /provider/inventory
+├ ○ /provider/jobs
+├ ○ /provider/memberships
+├ ○ /provider/messages
+├ ○ /provider/my-day
+├ ○ /provider/packages
+├ ○ /provider/pricing
+├ ○ /provider/promote
+├ ○ /provider/promotions
+├ ○ /provider/recurring
+├ ○ /provider/reports
+├ ○ /provider/resources
+├ ○ /provider/reviews
+├ ○ /provider/services
+├ ○ /provider/settings
+├ ○ /provider/share
+├ ○ /provider/staff-management
+├ ○ /provider/team
+├ ○ /provider/time-off
+├ ○ /provider/wallet
+├ ○ /provider/whatsapp
+├ ○ /robots.txt
+├ ○ /security
+├ ○ /service-board
+├ ○ /services
+├ ƒ /shop/[id]
+├ ○ /sitemap.xml                                  1h      1y
+├ ○ /store
+└ ○ /terms
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+exit=0

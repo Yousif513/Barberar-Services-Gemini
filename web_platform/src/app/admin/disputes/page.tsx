@@ -13,7 +13,6 @@ const translations = {
     error: "Error",
     disputedAmount: "Disputed Amount",
     bookingId: "Booking ID",
-    flaggedRating: "Flagged Review Rating",
     disputeDetail: "Dispute Detail / Reason",
     selectAction: "Refund the customer or reject the dispute",
     declineRefund: "Decline Refund",
@@ -34,7 +33,6 @@ const translations = {
     error: "خطأ",
     disputedAmount: "المبلغ المتنازع عليه",
     bookingId: "رقم الحجز",
-    flaggedRating: "التقييم المعلم",
     disputeDetail: "تفاصيل / سبب النزاع",
     selectAction: "اختر إجراءً لتحرير مبلغ الضمان أو رفض بلاغ المخالفة",
     declineRefund: "رفض الاسترجاع",
@@ -109,7 +107,6 @@ export default function AdminDisputes() {
             provider: (lang === "ar" ? prov?.business_name_ar : prov?.business_name_en) || prov?.business_name_en || t.independent,
             amount: `${d.disputed_amount_sar || 0} ${lang === "ar" ? "ريال" : "SAR"}`,
             reason: d.reason || t.noDetail,
-            rating: 1,
             status: d.status === "resolved_refund" ? "REFUNDED" : d.status === "resolved_rejected" ? "DECLINED" : "OPEN"
           };
         }));
@@ -289,10 +286,7 @@ export default function AdminDisputes() {
                     </span>
                   </div>
                   <p className="text-[10px] text-gray-500 font-semibold mt-2.5 uppercase tracking-widest">
-                    {t.bookingId}: <span className="font-mono text-gray-900 font-bold">{d.bookingId.substring(0, 8)}...</span> | {t.flaggedRating}: {" "}
-                    <span className="text-[#D1AF47] font-bold tracking-widest">
-                      {"★".repeat(d.rating)}{"☆".repeat(5 - d.rating)}
-                    </span>
+                    {t.bookingId}: <span className="font-mono text-gray-900 font-bold">{d.bookingId.substring(0, 8)}...</span>
                   </p>
                 </div>
                 

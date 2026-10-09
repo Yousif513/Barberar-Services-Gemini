@@ -1,0 +1,77 @@
+=== npm run test:inventory
+✔ transfers conserve stock and retry exactly once (6.8134ms)
+✔ stock commands reject foreign branches, insufficient and reserved balances (7.5567ms)
+✔ managers are branch scoped and cannot approve orders or escalate delegation (17.0331ms)
+✔ reports and booking/staff access follow explicit permissions (12.2215ms)
+✔ disabled memberships deny access and reject direct membership writes (3.2986ms)
+✔ admin oversight is real, paginated, audited and honest on empty results (12.1833ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1269.9697
+exit=0
+=== npm run test:edge
+✔ readBodyLimited (2.4684ms)
+▶ wiring
+  ✔ send-otp and send-push compare the service key with serviceKeyMatches (2.2348ms)
+  ✔ resolveCaller no longer compares the service key with === (0.2477ms)
+  ✔ whatsapp-inbound checks Content-Length before it reads the body (0.4838ms)
+✔ wiring (3.1332ms)
+ℹ tests 8
+ℹ suites 4
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 105.1235
+exit=0
+=== npm run test:security-core
+
+> beauty-grooming-marketplace@1.0.0 test:security-core
+> node scripts/verify-security-core.mjs
+
+Security core verification passed.
+exit=0
+=== npm run test:admin-controls
+
+> beauty-grooming-marketplace@1.0.0 test:admin-controls
+> node scripts/verify-admin-controls.mjs
+
+Admin controls verification passed.
+exit=0
+=== npm run test:p3-compat
+
+> beauty-grooming-marketplace@1.0.0 test:p3-compat
+> node scripts/verify-p3-migration-compatibility.mjs
+
+Applied 43 migrations from origin/claude-code and 2 P3 migrations in isolated Postgres.
+Full-chain owner writes, scoped delegation, duplicate retry and revoked-permission denial passed.
+exit=0
+=== npm run test:ui-schema
+
+> beauty-grooming-marketplace@1.0.0 test:ui-schema
+> node scripts/verify-ui-schema.mjs
+
+checked 196 rpc calls and 228 select strings (17 dynamic calls not checked); 0 mismatches, 0 in the baseline
+exit=0
+=== npm run test:mobile
+▶ payment return address allow-list
+  ✔ uses the scheme that mobile_app/app.json declares (1.9605ms)
+  ✔ accepts only the app's own screens (0.1022ms)
+  ✔ keeps the web default when no or a refused return address is sent (0.0706ms)
+  ✔ sends the customer to the app screen and keeps the purchase query (0.0614ms)
+✔ payment return address allow-list (3.0414ms)
+ℹ tests 27
+ℹ suites 5
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 134.7619
+exit=0

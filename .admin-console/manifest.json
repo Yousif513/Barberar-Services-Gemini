@@ -521,8 +521,8 @@
             "admin"
           ],
           "risk": "low",
-          "status": "discovered",
-          "rationale": "REAL. admin/branches/page.tsx:64 reads public.branches.",
+          "status": "in-progress",
+          "rationale": "Reads branches with their provider; a failed read shows an error and an empty table, never invented rows (branches/page.tsx). Selects all rows with no paging (gap no-pagination-or-server-side-filtering). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "active",
@@ -534,15 +534,19 @@
             "/admin/branches"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
+          "authorizationPolicies": [
+            "supabase/migrations/20260621214926_refine_branch_mutation_policies.sql#L21"
+          ],
           "auditEvents": [],
           "safeguards": [],
-          "dataBinding": {},
+          "dataBinding": "postgres:public.branches",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
           "tests": [],
-          "evidence": [],
+          "evidence": [
+            "web_platform/src/app/admin/branches/page.tsx#L67"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -553,9 +557,9 @@
           "roles": [
             "admin"
           ],
-          "risk": "moderate",
-          "status": "discovered",
-          "rationale": "REAL BUT UNSAFE. admin/branches/page.tsx:113-114 writes is_active with no confirmation. Deactivating a venue affects live bookings; nothing warns about them and nothing is audited.",
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "Deactivating or reactivating a venue now asks first and names the impact (existing bookings stay, new ones stop) in a confirmation dialog; the write is a direct table update that rolls back its on-screen state on failure and is recorded by the administrator audit trigger with before and after values. No operator reason is captured and the number of affected future bookings is not shown. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "active"
@@ -568,15 +572,27 @@
             "/admin/branches"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "authorizationPolicies": [
+            "supabase/migrations/20260621214926_refine_branch_mutation_policies.sql#L21"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
+            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+          ],
+          "safeguards": [
+            "web_platform/src/app/admin/branches/page.tsx#L114"
+          ],
+          "dataBinding": "postgres:public.branches",
           "idempotency": "",
           "concurrency": "",
-          "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "recovery": "Reactivate the branch with the same control.",
+          "tests": [
+            "supabase/tests/db/security_hardening.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/branches/page.tsx#L129",
+            "supabase/tests/db/security_hardening.test.mjs#L43"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         }
@@ -622,8 +638,8 @@
             "admin"
           ],
           "risk": "low",
-          "status": "discovered",
-          "rationale": "REAL. admin/services/page.tsx:169-171 reads public.services with its category join and real duplicate counting at :177-182.",
+          "status": "in-progress",
+          "rationale": "Reads services with their category; an empty catalogue is an empty table and a failed read shows its reason (services/page.tsx, comment in loadServices). Selects the whole catalogue with no paging. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "active",
@@ -635,15 +651,19 @@
             "/admin/services"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
+          "authorizationPolicies": [
+            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L50"
+          ],
           "auditEvents": [],
           "safeguards": [],
-          "dataBinding": {},
+          "dataBinding": "postgres:public.services",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
           "tests": [],
-          "evidence": [],
+          "evidence": [
+            "web_platform/src/app/admin/services/page.tsx#L171"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -655,8 +675,8 @@
             "admin"
           ],
           "risk": "moderate",
-          "status": "discovered",
-          "rationale": "REAL. admin/services/page.tsx:283 (update) and :286 (insert) with surfaced errors. This page is the reference implementation for the rest of the console.",
+          "status": "in-progress",
+          "rationale": "Saves with surfaced errors and the dialog stays open on failure. The write is a direct table update by an administrator, recorded by the audit trigger with before and after values and the actor. No operator reason is captured. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "active",
@@ -671,15 +691,27 @@
             "/admin/services"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "authorizationPolicies": [
+            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L50"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
+            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+          ],
+          "safeguards": [
+            "web_platform/src/app/admin/services/page.tsx#L290"
+          ],
+          "dataBinding": "postgres:public.services",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "supabase/tests/db/release_controls.test.mjs"
+          ],
+          "evidence": [
+            "supabase/tests/db/release_controls.test.mjs#L17",
+            "web_platform/src/app/admin/services/page.tsx#L259"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -691,8 +723,8 @@
             "admin"
           ],
           "risk": "moderate",
-          "status": "discovered",
-          "rationale": "REAL AND CORRECT. admin/services/page.tsx:314-335 applies the change optimistically, writes it, and rolls the UI back at :329 when the write fails. The only rollback-on-error pattern in the console.",
+          "status": "in-progress",
+          "rationale": "Applies the change on screen first and rolls it back when the write fails (the only optimistic update that rolls back). The write is a direct table update by an administrator, recorded by the audit trigger with before and after values and the actor. No operator reason is captured. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "active"
@@ -705,15 +737,27 @@
             "/admin/services"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "authorizationPolicies": [
+            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L50"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
+            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+          ],
+          "safeguards": [
+            "web_platform/src/app/admin/services/page.tsx#L290"
+          ],
+          "dataBinding": "postgres:public.services",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "supabase/tests/db/release_controls.test.mjs"
+          ],
+          "evidence": [
+            "supabase/tests/db/release_controls.test.mjs#L17",
+            "web_platform/src/app/admin/services/page.tsx#L259"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -725,8 +769,8 @@
             "admin"
           ],
           "risk": "high",
-          "status": "discovered",
-          "rationale": "REAL WITH ROLLBACK, NO AUDIT. admin/services/page.tsx:364-386 writes base_price with rollback at :380. Nothing records who changed a price or what it was before.",
+          "status": "in-progress",
+          "rationale": "Rolls the on-screen price back when the write fails; the audit row carries the old and new base_price (release_controls.test.mjs asserts both values). The write is a direct table update by an administrator, recorded by the audit trigger with before and after values and the actor. No operator reason is captured. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "active",
@@ -741,15 +785,27 @@
             "/admin/services"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "authorizationPolicies": [
+            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L50"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
+            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+          ],
+          "safeguards": [
+            "web_platform/src/app/admin/services/page.tsx#L290"
+          ],
+          "dataBinding": "postgres:public.services",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "supabase/tests/db/release_controls.test.mjs"
+          ],
+          "evidence": [
+            "supabase/tests/db/release_controls.test.mjs#L17",
+            "web_platform/src/app/admin/services/page.tsx#L259"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -761,8 +817,8 @@
             "admin"
           ],
           "risk": "high",
-          "status": "discovered",
-          "rationale": "REAL BUT HARD DELETE. admin/services/page.tsx:307 issues a DELETE. window.confirm at :302 is the safeguard and the list is reloaded on failure at :309. No soft delete, no archive, no audit; historical bookings reference the row.",
+          "status": "in-progress",
+          "rationale": "The hard DELETE is gone: the control is now 'Archive', behind a confirmation that names the service, and it only sets is_active to false, so booking history keeps its service row and the service can be switched back on. Audited by the trigger; no reason captured. The id keeps its old name. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "active",
@@ -774,15 +830,27 @@
             "/admin/services"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "authorizationPolicies": [
+            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L50"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
+            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+          ],
+          "safeguards": [
+            "web_platform/src/app/admin/services/page.tsx#L298"
+          ],
+          "dataBinding": "postgres:public.services",
           "idempotency": "",
           "concurrency": "",
-          "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "recovery": "Switch the service back on with service.toggle-active.",
+          "tests": [
+            "supabase/tests/db/release_controls.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/services/page.tsx#L308",
+            "supabase/tests/db/release_controls.test.mjs#L17"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -794,8 +862,8 @@
             "admin"
           ],
           "risk": "moderate",
-          "status": "discovered",
-          "rationale": "REAL WITH ROLLBACK. admin/services/page.tsx:339-361 writes featured_on_landing / featured_in_services with rollback at :355. Commercially significant placement with no audit.",
+          "status": "in-progress",
+          "rationale": "Rolls the on-screen switch back when the write fails. The write is a direct table update by an administrator, recorded by the audit trigger with before and after values and the actor. No operator reason is captured. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "active"
@@ -808,15 +876,27 @@
             "/admin/services"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "authorizationPolicies": [
+            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L50"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
+            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+          ],
+          "safeguards": [
+            "web_platform/src/app/admin/services/page.tsx#L290"
+          ],
+          "dataBinding": "postgres:public.services",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "supabase/tests/db/release_controls.test.mjs"
+          ],
+          "evidence": [
+            "supabase/tests/db/release_controls.test.mjs#L17",
+            "web_platform/src/app/admin/services/page.tsx#L259"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         }
@@ -885,9 +965,9 @@
           "roles": [
             "admin"
           ],
-          "risk": "low",
-          "status": "discovered",
-          "rationale": "REAL WITH A FABRICATION DEFECT. admin/bookings/page.tsx:129-141 reads public.bookings with joins; but :145-176 substitutes three hardcoded demo bookings (with fake SAR revenue and fake customer names) whenever the query returns zero rows, so an empty or RLS-blocked table renders as a healthy marketplace.",
+          "risk": "moderate",
+          "status": "in-progress",
+          "rationale": "The directory is server-paged and searchable (admin_booking_directory: status, Riyadh date range, booking id, invoice number, customer or provider; at most 100 rows per page; totals describe every match) and every listing is recorded as a privileged read without the search text. The demo-booking fallback in the old note is gone: a failed load shows an error and no rows (bookings/page.tsx). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "pending_payment",
@@ -901,16 +981,29 @@
           "uiRoutes": [
             "/admin/bookings"
           ],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "serverOperations": [
+            "supabase/migrations/20261005180000_admin_booking_directory.sql#L8"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261005180000_admin_booking_directory.sql#L35"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261005180000_admin_booking_directory.sql#L93"
+          ],
+          "safeguards": [
+            "supabase/tests/db/booking_directory.test.mjs#L61"
+          ],
+          "dataBinding": "postgres:public.bookings",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "supabase/tests/db/booking_directory.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/bookings/page.tsx#L264",
+            "supabase/tests/db/booking_directory.test.mjs#L101"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -978,9 +1071,9 @@
           "roles": [
             "admin"
           ],
-          "risk": "low",
-          "status": "discovered",
-          "rationale": "MISSING. There is no /admin/bookings/[id] route. The list is the only view; there is no drill-down from any dashboard number to a record.",
+          "risk": "moderate",
+          "status": "in-progress",
+          "rationale": "Detail today is the tax-invoice panel opened from a booking row: it reads the invoice by booking id on demand and shows the ZATCA value as text (no drawn QR, see gap invoice-qr-image-not-drawn-locally). The read is a direct table read allowed by the administrator invoice policy and is not audited, and there is no full booking timeline (history of status changes, payments, refunds) for the booking. Partial by design of the screen, not a fabricated one. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "pending_payment",
@@ -993,15 +1086,19 @@
           },
           "uiRoutes": [],
           "serverOperations": [],
-          "authorizationPolicies": [],
+          "authorizationPolicies": [
+            "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L135"
+          ],
           "auditEvents": [],
           "safeguards": [],
-          "dataBinding": {},
+          "dataBinding": "postgres:public.invoices",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
           "tests": [],
-          "evidence": [],
+          "evidence": [
+            "web_platform/src/app/admin/bookings/page.tsx#L403"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -1095,8 +1192,8 @@
             "admin"
           ],
           "risk": "moderate",
-          "status": "discovered",
-          "rationale": "REAL. admin/ledger/page.tsx:446-458 reads public.transactional_ledger and surfaces a load error at :463 without substituting fake rows. This is the strongest read path in the console.",
+          "status": "in-progress",
+          "rationale": "Reads transactional_ledger with the provider and shows a load failure as an error with a retry; no rows are invented (negative-authorization.test.mjs 'admin/ledger never falls back to mock demo records'). The ledger table is read without paging. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "pending",
@@ -1109,15 +1206,22 @@
             "/admin/ledger"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
+          "authorizationPolicies": [
+            "supabase/migrations/20260615182811_harden_auth_and_booking_core.sql#L203"
+          ],
           "auditEvents": [],
           "safeguards": [],
-          "dataBinding": {},
+          "dataBinding": "postgres:public.transactional_ledger",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "web_platform/tests/negative-authorization.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/ledger/page.tsx#L621",
+            "web_platform/tests/negative-authorization.test.mjs#L132"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -1181,8 +1285,8 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "discovered",
-          "rationale": "MISSING FROM THE CONSOLE. Only supabase/functions/process-refund/index.ts:101 writes payout_status='refunded', and nothing in the repository invokes that function. The admin console cannot record a refund against the ledger at all.",
+          "status": "not-applicable",
+          "rationale": "By design the console cannot mark a ledger row refunded by hand. A refund is a refund_requests row that the refund service sends to Tap, and complete_refund_request alone adds to refunded_amount and sets payout_status to refunded in one transaction (20261005010000_review_fix_money.sql); operators work it from /admin/refunds (refund.list, refund.retry) and the dispute decision (dispute.resolve). The old gap ('nothing records a refund against the ledger') is closed by that path. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "pending",
@@ -1202,7 +1306,10 @@
           "concurrency": "",
           "recovery": "",
           "tests": [],
-          "evidence": [],
+          "evidence": [
+            "supabase/migrations/20261005010000_review_fix_money.sql#L647",
+            "web_platform/src/app/admin/refunds/page.tsx#L247"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -1214,8 +1321,8 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "discovered",
-          "rationale": "REAL READ, FABRICATED FALLBACK. admin/ledger/page.tsx:507 reads public.monthly_vat_summary, but :515-518 substitutes invented VAT totals (862.50 SAR / 2185.00 SAR) whenever the view returns zero rows - not only on error. An operator can read fabricated tax figures believing they are the platform's books. No export or download exists.",
+          "status": "in-progress",
+          "rationale": "The fabricated VAT totals are gone: the screen reads monthly_vat_summary and a zero-row month is an empty state, a failed read an error (negative-authorization.test.mjs 'admin/ledger never falls back'). The downloadable form is ledger.export. The VAT rate itself is not shown here (see gap taxes-literals-presented-as-server-facts). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "pending",
@@ -1231,12 +1338,17 @@
           "authorizationPolicies": [],
           "auditEvents": [],
           "safeguards": [],
-          "dataBinding": {},
+          "dataBinding": "postgres:public.monthly_vat_summary",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "web_platform/tests/negative-authorization.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/ledger/page.tsx#L683",
+            "web_platform/tests/negative-authorization.test.mjs#L132"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -1339,9 +1451,9 @@
           "roles": [
             "admin"
           ],
-          "risk": "moderate",
-          "status": "discovered",
-          "rationale": "REAL. admin/ledger/page.tsx:473-490 reads public.payout_requests joined to providers. On error it sets an empty list (:495), which reads as 'no requests' rather than 'could not load'. Unmasked IBAN is rendered to every admin.",
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "Reads payout_requests with the provider; a failed read now shows an error with a retry instead of an empty queue (adm1-admin-wiring.test.mjs 'failed financial lists are errors with a retry'). The IBAN is masked on screen but selected in full into the browser (gap iban-unmasked-to-every-admin, blocked on the owner). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "requested",
@@ -1355,15 +1467,22 @@
             "/admin/ledger"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
+          "authorizationPolicies": [
+            "supabase/migrations/20260620182904_refine_payout_request_policies.sql#L36"
+          ],
           "auditEvents": [],
           "safeguards": [],
-          "dataBinding": {},
+          "dataBinding": "postgres:public.payout_requests",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "web_platform/tests/adm1-admin-wiring.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/ledger/page.tsx#L644",
+            "web_platform/tests/adm1-admin-wiring.test.mjs#L44"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -1426,8 +1545,8 @@
             "admin"
           ],
           "risk": "high",
-          "status": "discovered",
-          "rationale": "REAL BUT UNSAFE. Same path as payout.approve; the admin_note is a hardcoded English string at admin/ledger/page.tsx:582, so no operator reason is ever captured.",
+          "status": "in-progress",
+          "rationale": "Rejecting a request is admin_review_payout_request with a reason entered in a CommandDialog (the hard-coded English note is gone); valid transitions only, the audit entry carries the reason (release_controls.test.mjs 'approves and rejects only through valid transitions with a reason'). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "requested"
@@ -1439,16 +1558,30 @@
           "uiRoutes": [
             "/admin/ledger"
           ],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "serverOperations": [
+            "web_platform/src/app/admin/ledger/page.tsx#L836"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261005080000_release_gap_controls.sql#L90"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261005080000_release_gap_controls.sql#L12"
+          ],
+          "safeguards": [
+            "supabase/tests/db/release_controls.test.mjs#L39"
+          ],
+          "dataBinding": "postgres:public.payout_requests",
           "idempotency": "",
           "concurrency": "",
-          "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "recovery": "A rejected request is final; the provider files a new one.",
+          "tests": [
+            "supabase/tests/db/release_controls.test.mjs",
+            "supabase/tests/db/security_hardening.test.mjs"
+          ],
+          "evidence": [
+            "supabase/tests/db/release_controls.test.mjs#L39",
+            "supabase/tests/db/security_hardening.test.mjs#L105"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -2091,8 +2224,8 @@
             "admin"
           ],
           "risk": "moderate",
-          "status": "discovered",
-          "rationale": "FABRICATED. admin/reviews/page.tsx:55-59 hardcodes three reviews with invented Saudi customer names, and the headline counters at :80-88 are the literal strings 1,248 and 4.8 / 5.0. The page never imports Supabase, although public.reviews exists with an 'Admins manage reviews' policy.",
+          "status": "in-progress",
+          "rationale": "The invented reviews and literal counters are gone: the screen reads public.reviews with moderation_status, customer, provider and reply, and shows a load failure as an error (reviews/page.tsx). Selects every review with no paging. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "published"
@@ -2103,15 +2236,19 @@
             "/admin/reviews"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
+          "authorizationPolicies": [
+            "supabase/migrations/20260615182811_harden_auth_and_booking_core.sql#L210"
+          ],
           "auditEvents": [],
           "safeguards": [],
-          "dataBinding": {},
+          "dataBinding": "postgres:public.reviews",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
           "tests": [],
-          "evidence": [],
+          "evidence": [
+            "web_platform/src/app/admin/reviews/page.tsx#L78"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -2123,8 +2260,8 @@
             "admin"
           ],
           "risk": "high",
-          "status": "discovered",
-          "rationale": "FABRICATED. handleStatus at admin/reviews/page.tsx:62-64 changes a local string. Nothing is written, and public.reviews has no moderation-state column to write to.",
+          "status": "in-progress",
+          "rationale": "Hiding, flagging or restoring a review is the server command moderate_review, which requires an administrator and a reason (one character is refused), writes the review.moderated audit entry, and is reached through a dialog that shows the review and captures the reason; a refusal stays in the dialog. Tests cover the refusal of a one-character reason and the dialog wiring; there is no executing test of the success path or of a non-administrator being refused. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "published"
@@ -2134,16 +2271,30 @@
           "uiRoutes": [
             "/admin/reviews"
           ],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "serverOperations": [
+            "supabase/migrations/20261005020000_review_fix_trust_growth.sql#L503"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20260615182811_harden_auth_and_booking_core.sql#L210"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261005020000_review_fix_trust_growth.sql#L527"
+          ],
+          "safeguards": [
+            "web_platform/tests/admin-console-guards.test.mjs#L310"
+          ],
+          "dataBinding": "postgres:public.reviews",
           "idempotency": "",
           "concurrency": "",
-          "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "recovery": "Restore the review with the same command.",
+          "tests": [
+            "supabase/tests/db/qa_defect_fixes.test.mjs",
+            "web_platform/tests/admin-console-guards.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/reviews/page.tsx#L108",
+            "supabase/tests/db/qa_defect_fixes.test.mjs#L339"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         }
@@ -2187,8 +2338,8 @@
             "admin"
           ],
           "risk": "low",
-          "status": "discovered",
-          "rationale": "REAL. admin/coupons/page.tsx:113 reads public.promotional_codes.",
+          "status": "in-progress",
+          "rationale": "Reads promotional_codes through the administrator read policy added when client writes were removed; a failed read shows an error. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "active",
@@ -2200,15 +2351,21 @@
             "/admin/coupons"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
+          "authorizationPolicies": [
+            "supabase/migrations/20261007010600_promo_codes_and_waitlist_access.sql#L13"
+          ],
           "auditEvents": [],
           "safeguards": [],
-          "dataBinding": {},
+          "dataBinding": "postgres:public.promotional_codes",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "supabase/tests/db/adm1_promo_code_commands.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/coupons/page.tsx#L199"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -2220,8 +2377,8 @@
             "admin"
           ],
           "risk": "high",
-          "status": "discovered",
-          "rationale": "REAL. admin/coupons/page.tsx:175-176 update/insert with surfaced errors. Directly controls discount value with no approval and no audit.",
+          "status": "in-progress",
+          "rationale": "Create and edit go through admin_save_promo_code: administrator only, reason required, input validated (22023), a duplicate name refused (23505), the audit entry carries the reason, and no client can write the table directly. The screen has no table write left (adm1-admin-wiring.test.mjs). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "active",
@@ -2235,16 +2392,30 @@
           "uiRoutes": [
             "/admin/coupons"
           ],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "serverOperations": [
+            "supabase/migrations/20261008100100_adm1_admin_promo_code_commands.sql#L7"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261008100100_adm1_admin_promo_code_commands.sql#L150"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261008100100_adm1_admin_promo_code_commands.sql#L108"
+          ],
+          "safeguards": [
+            "supabase/tests/db/adm1_promo_code_commands.test.mjs#L67"
+          ],
+          "dataBinding": "postgres:public.promotional_codes",
           "idempotency": "",
           "concurrency": "",
-          "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "recovery": "Edit the code again, or deactivate it with coupon.toggle.",
+          "tests": [
+            "supabase/tests/db/adm1_promo_code_commands.test.mjs",
+            "web_platform/tests/adm1-admin-wiring.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/coupons/page.tsx#L257",
+            "supabase/tests/db/adm1_promo_code_commands.test.mjs#L35"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -2256,8 +2427,8 @@
             "admin"
           ],
           "risk": "moderate",
-          "status": "discovered",
-          "rationale": "REAL. admin/coupons/page.tsx:204-208. No audit event.",
+          "status": "in-progress",
+          "rationale": "Switching a code on or off goes through admin_set_promo_code_active with a reason; it is idempotent and audits each change once (adm1_promo_code_commands.test.mjs). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "active"
@@ -2269,16 +2440,30 @@
           "uiRoutes": [
             "/admin/coupons"
           ],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "serverOperations": [
+            "supabase/migrations/20261008100100_adm1_admin_promo_code_commands.sql#L117"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261008100100_adm1_admin_promo_code_commands.sql#L151"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261008100100_adm1_admin_promo_code_commands.sql#L108"
+          ],
+          "safeguards": [
+            "supabase/tests/db/adm1_promo_code_commands.test.mjs#L105"
+          ],
+          "dataBinding": "postgres:public.promotional_codes",
           "idempotency": "",
           "concurrency": "",
-          "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "recovery": "Switch it back with the same command.",
+          "tests": [
+            "supabase/tests/db/adm1_promo_code_commands.test.mjs",
+            "web_platform/tests/adm1-admin-wiring.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/coupons/page.tsx#L289",
+            "web_platform/tests/adm1-admin-wiring.test.mjs#L63"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -2290,8 +2475,8 @@
             "admin"
           ],
           "risk": "high",
-          "status": "discovered",
-          "rationale": "REAL BUT UNSAFE. admin/coupons/page.tsx:209-213 issues a hard DELETE wired directly to the onClick at :291 with NO confirmation dialog of any kind. One misclick permanently destroys a promotion and its redemption history.",
+          "status": "not-applicable",
+          "rationale": "Deletion is deliberately not offered. The old unconfirmed hard DELETE was removed: no client can delete from promotional_codes (adm1_promo_code_commands.test.mjs 'no client can write the table directly any more' asserts a delete is refused) and the screen's 'Deactivate' control calls the reasoned command admin_set_promo_code_active, so a promotion and its redemption history are kept. Covered by coupon.toggle. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "active",
@@ -2311,7 +2496,9 @@
           "concurrency": "",
           "recovery": "",
           "tests": [],
-          "evidence": [],
+          "evidence": [
+            "supabase/tests/db/adm1_promo_code_commands.test.mjs#L93"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         }
@@ -2356,8 +2543,8 @@
             "admin"
           ],
           "risk": "moderate",
-          "status": "discovered",
-          "rationale": "REAL. admin/integrations/page.tsx reads public.integrations across seven queries. All 44 Arabic strings in this file are double-encoded mojibake (e.g. :151), so the page is unreadable in the platform's primary locale.",
+          "status": "in-progress",
+          "rationale": "Reads the integrations registry; a failed load says so instead of showing nothing. The Arabic text is no longer double-encoded (gap arabic-mojibake-integrations fixed). The registry holds no secret: key_masked refuses key-shaped values (fixdba_access_hardening.test.mjs 'C-D3b'). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "connected",
@@ -2370,15 +2557,22 @@
             "/admin/integrations"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
+          "authorizationPolicies": [
+            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L122"
+          ],
           "auditEvents": [],
           "safeguards": [],
-          "dataBinding": {},
+          "dataBinding": "postgres:public.integrations",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "supabase/tests/db/fixdba_access_hardening.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/integrations/page.tsx#L267",
+            "supabase/tests/db/fixdba_access_hardening.test.mjs#L158"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -2390,8 +2584,8 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "discovered",
-          "rationale": "REAL AND AUDITED. admin/integrations/page.tsx:309 writes then calls audit() at :296-301. This is the only audited command in the console - and the audit insert is best-effort, silently swallowed by the bare catch at :300, so an audit failure is invisible.",
+          "status": "in-progress",
+          "rationale": "Enabling or disabling an integration is a direct update with the on-screen state rolled back on failure and an administrator audit-trigger record with before and after values. No operator reason is captured. The screen also writes a second, client-supplied row to integration_audit_log and swallows its failure (gap integration-audit-log-accepts-client-written-rows). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "disconnected"
@@ -2404,15 +2598,27 @@
             "/admin/integrations"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "authorizationPolicies": [
+            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L122"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
+            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+          ],
+          "safeguards": [
+            "supabase/tests/db/fixdba_access_hardening.test.mjs#L158"
+          ],
+          "dataBinding": "postgres:public.integrations",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "supabase/tests/db/fixdba_access_hardening.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/integrations/page.tsx#L303",
+            "supabase/tests/db/security_hardening.test.mjs#L43"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -2424,8 +2630,8 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "discovered",
-          "rationale": "REAL AND AUDITED. admin/integrations/page.tsx:384 / :394 with audit calls. Changes which payment gateway takes customer money.",
+          "status": "in-progress",
+          "rationale": "Creating or editing an integration is a direct write; key_masked refuses anything shaped like a real key (23514), and the audit trigger records the change. No operator reason is captured. The screen also writes a second, client-supplied row to integration_audit_log and swallows its failure (gap integration-audit-log-accepts-client-written-rows). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "connected",
@@ -2440,15 +2646,27 @@
             "/admin/integrations"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "authorizationPolicies": [
+            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L122"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
+            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+          ],
+          "safeguards": [
+            "supabase/tests/db/fixdba_access_hardening.test.mjs#L158"
+          ],
+          "dataBinding": "postgres:public.integrations",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "supabase/tests/db/fixdba_access_hardening.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/integrations/page.tsx#L303",
+            "supabase/tests/db/security_hardening.test.mjs#L43"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -2460,8 +2678,8 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "discovered",
-          "rationale": "REAL, CONFIRMED AND AUDITED. admin/integrations/page.tsx:409 confirmation, :413 hard DELETE, :415 audit. The best-guarded destructive action in the console; still a hard delete with no restore.",
+          "status": "in-progress",
+          "rationale": "Deleting is now 'Disable' behind a confirmation naming the integration: it sets enabled to false, so nothing is destroyed and the row can be re-enabled. No operator reason is captured. The screen also writes a second, client-supplied row to integration_audit_log and swallows its failure (gap integration-audit-log-accepts-client-written-rows). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "connected",
@@ -2474,15 +2692,27 @@
             "/admin/integrations"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "authorizationPolicies": [
+            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L122"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
+            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+          ],
+          "safeguards": [
+            "supabase/tests/db/fixdba_access_hardening.test.mjs#L158"
+          ],
+          "dataBinding": "postgres:public.integrations",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "supabase/tests/db/fixdba_access_hardening.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/integrations/page.tsx#L303",
+            "supabase/tests/db/security_hardening.test.mjs#L43"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         }
@@ -2526,8 +2756,8 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "discovered",
-          "rationale": "REAL, UNAUDITED. admin/ledger/page.tsx:228 writes payment_methods.enabled. Controls what customers can pay with; no confirmation, no audit, and it is on the Ledger screen rather than a settings surface.",
+          "status": "in-progress",
+          "rationale": "Enabling or disabling a payment method now asks first (CommandDialog naming the method) and is rolled back on screen when the write fails; the write is a direct table update recorded by the audit trigger. No operator reason is captured. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "disabled"
@@ -2540,15 +2770,27 @@
             "/admin/ledger"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "authorizationPolicies": [
+            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L83"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
+            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+          ],
+          "safeguards": [
+            "web_platform/src/app/admin/ledger/page.tsx#L275"
+          ],
+          "dataBinding": "postgres:public.payment_methods",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "supabase/tests/db/security_hardening.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/ledger/page.tsx#L277",
+            "supabase/tests/db/security_hardening.test.mjs#L43"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -2560,8 +2802,8 @@
             "admin"
           ],
           "risk": "high",
-          "status": "discovered",
-          "rationale": "REAL, UNAUDITED, NON-ATOMIC. admin/ledger/page.tsx:244-247 clears is_default on every other row and then sets it on one, in two separate statements with no transaction. A failure between them leaves the platform with no default payment method.",
+          "status": "in-progress",
+          "rationale": "Still two separate browser writes (clear every other default, then set one), see gap payment-method-default-switch-is-two-browser-writes-with-no-reason; a confirmation now precedes it and the on-screen state rolls back on failure, and the audit trigger records each row change. Not atomic, no reason. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "enabled"
@@ -2574,15 +2816,27 @@
             "/admin/ledger"
           ],
           "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "authorizationPolicies": [
+            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L83"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
+            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+          ],
+          "safeguards": [
+            "web_platform/src/app/admin/ledger/page.tsx#L289"
+          ],
+          "dataBinding": "postgres:public.payment_methods",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "supabase/tests/db/security_hardening.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/ledger/page.tsx#L297",
+            "supabase/tests/db/security_hardening.test.mjs#L43"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         }
@@ -2608,8 +2862,8 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "discovered",
-          "rationale": "DECORATIVE. admin/taxes/page.tsx:73 is an uncontrolled input with defaultValue={15}; handleSave at :50 only sets a success string. No settings table exists in any migration, so there is nothing to write to. An operator can change the displayed VAT rate, be told it saved, and change nothing.",
+          "status": "deferred",
+          "rationale": "No screen edits the VAT rate and the decorative input is gone. The server reads it from countries.vat_rate_percent (country_vat_rate), which only the command admin_upsert_country can change and that command has no screen (gap country-commands-have-no-console-surface). OWNER QUESTION: should the VAT rate ever be editable by an operator, and who approves a change? It is a legal value (Saudi 15 percent today); until answered it stays deferred. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "active"
@@ -2630,7 +2884,10 @@
           "concurrency": "",
           "recovery": "",
           "tests": [],
-          "evidence": [],
+          "evidence": [
+            "supabase/migrations/20261008900000_gcc_country_configuration.sql#L46",
+            "web_platform/src/app/admin/taxes/page.tsx#L17"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -2642,8 +2899,8 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "discovered",
-          "rationale": "DECORATIVE. Same page and same no-op save. The real default (15.00) is hardcoded in the database trigger protect_provider_control_fields at 20260615182811_harden_auth_and_booking_core.sql:143 and can only be changed by a migration.",
+          "status": "not-applicable",
+          "rationale": "There is no single platform commission setting. The commission is a fee rule per booking channel and visit type (fee_rules) that the booking engine reads; operators change it through fee-rule.save on /admin/platform-rules, and /admin/taxes shows the active rules. The old hard-coded 15 percent default only applies when no rule matches (the 'built-in 15 percent' the save command's refusal message names). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "active"
@@ -2664,7 +2921,9 @@
           "concurrency": "",
           "recovery": "",
           "tests": [],
-          "evidence": [],
+          "evidence": [
+            "supabase/migrations/20261008100200_adm1_roles_flags_fee_rules.sql#L128"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -2676,8 +2935,8 @@
             "admin"
           ],
           "risk": "high",
-          "status": "discovered",
-          "rationale": "DECORATIVE. admin/settings/page.tsx uses uncontrolled defaultValue inputs (:64, :69, :78) and handleSave at :42 sets a success message only. Nothing is read and nothing is written.",
+          "status": "in-progress",
+          "rationale": "The decorative form is gone. The screen reads three platform settings (booking hold minutes, loyalty programme, referral programme) and saves each through admin_update_platform_setting with a required reason, validation and an audit entry; the operator's input stays in the form when the server refuses. Known limit: the same administrator who edits a value that requires owner approval is recorded as its approver (gap referral-and-loyalty-values-self-approved-and-unbounded, owner decision). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "active"
@@ -2689,16 +2948,30 @@
           "uiRoutes": [
             "/admin/settings"
           ],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "serverOperations": [
+            "supabase/migrations/20261005080000_release_gap_controls.sql#L133"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261009200500_fixpriv_platform_settings_public_allowlist.sql#L21"
+          ],
+          "auditEvents": [
+            "supabase/tests/db/release_controls.test.mjs#L68"
+          ],
+          "safeguards": [
+            "supabase/tests/db/release_controls.test.mjs#L58"
+          ],
+          "dataBinding": "postgres:public.platform_settings",
           "idempotency": "",
           "concurrency": "",
-          "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "recovery": "Set the previous value again; the audit entry holds the old value.",
+          "tests": [
+            "supabase/tests/db/release_controls.test.mjs",
+            "supabase/tests/db/fixpriv_platform_settings.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/settings/page.tsx#L159",
+            "supabase/tests/db/release_controls.test.mjs#L58"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         }
@@ -2707,7 +2980,7 @@
     {
       "id": "audit-event",
       "name": "Administrative audit event",
-      "sourceOfTruth": "postgres:public.integration_audit_log (integrations only; no general audit table exists)",
+      "sourceOfTruth": "postgres:public.admin_audit_logs (operator actions; integration_audit_log is a second, client-written log, see gap integration-audit-log-accepts-client-written-rows)",
       "sensitivity": "restricted",
       "tenantScoped": false,
       "lifecycleStates": [
@@ -2769,8 +3042,8 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "discovered",
-          "rationale": "ABSENT. Exactly one of roughly 30 state-changing admin commands writes an audit row (integration.toggle/upsert/delete via admin/integrations/page.tsx:296). Provider approval and suspension, commission changes, payout release, ledger release, price changes, coupon deletion and payment-method changes are all silent. There is no general audit table in any migration.",
+          "status": "in-progress",
+          "rationale": "Audit rows are now emitted in two ways: the trigger trg_audit_admin_write records every operator insert, update and delete on every table an administrator policy can write (with actor, before and after values by per-table allow-list, and the reason set by the command), and reasoned commands write named entries with write_audit_log. security_hardening.test.mjs derives the writable tables from the policies and fails when one lacks the trigger. Open: refused and failed attempts are not recorded, service-key function paths leave no operator entry, and nothing makes the log tamper-evident (gaps refused-and-failed-admin-actions-are-not-recorded, service-key-edge-function-paths-leave-no-audit-entry, audit-trail-is-not-tamper-evident-beyond-rls). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
           "entityStates": {
             "from": [
               "recorded"
@@ -2780,16 +3053,32 @@
             ]
           },
           "uiRoutes": [],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": {},
+          "serverOperations": [
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
+            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+          ],
+          "authorizationPolicies": [
+            "supabase/tests/db/admin_security_matrix.test.mjs#L169"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13"
+          ],
+          "safeguards": [
+            "supabase/tests/db/security_hardening.test.mjs#L43"
+          ],
+          "dataBinding": "postgres:public.admin_audit_logs",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "supabase/tests/db/security_hardening.test.mjs",
+            "supabase/tests/db/release_controls.test.mjs",
+            "supabase/tests/db/admin_security_matrix.test.mjs"
+          ],
+          "evidence": [
+            "supabase/tests/db/security_hardening.test.mjs#L43",
+            "supabase/tests/db/release_controls.test.mjs#L17"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         }
@@ -3090,6 +3379,1236 @@
           "owner": "",
           "reviewStatus": "reviewed",
           "reviewedBy": "sec-claude-release-review"
+        }
+      ]
+    },
+    {
+      "id": "feature-flag",
+      "name": "Platform feature flag",
+      "sourceOfTruth": "postgres:public.platform_feature_flags",
+      "sensitivity": "internal",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "off",
+        "on"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "off",
+          "to": "on",
+          "command": "feature-flag.set",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "on",
+          "to": "off",
+          "command": "feature-flag.set",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "Flags are kept; every change is recorded in admin_audit_logs with the reason.",
+      "capabilities": [
+        {
+          "id": "feature-flag.list",
+          "outcome": "See every platform feature flag and whether it is on",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "low",
+          "status": "in-progress",
+          "rationale": "The flags are read from platform_feature_flags with a load error and retry; a flag nobody has set is shown as not set, never as a default. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/platform-rules"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [
+            "supabase/migrations/20261008100200_adm1_roles_flags_fee_rules.sql#L227"
+          ],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.platform_feature_flags",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs",
+            "web_platform/tests/adm1-admin-wiring.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/platform-rules/page.tsx#L218",
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L74"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "feature-flag.set",
+          "outcome": "Switch a feature flag on or off with a recorded reason",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "admin_set_feature_flag needs an administrator and a reason of at least 3 characters, refuses an unknown flag and a null value, is idempotent and audits one entry per real change; no client can write the table (writes revoked). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [
+              "off",
+              "on"
+            ],
+            "to": [
+              "off",
+              "on"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/platform-rules"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261008100200_adm1_roles_flags_fee_rules.sql#L94"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261008100200_adm1_roles_flags_fee_rules.sql#L105"
+          ],
+          "auditEvents": [
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L75"
+          ],
+          "safeguards": [
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L87"
+          ],
+          "dataBinding": "postgres:public.platform_feature_flags",
+          "idempotency": "Setting a flag to the value it has changes nothing and writes no second audit entry.",
+          "concurrency": "",
+          "recovery": "Switch the flag back; the audit entry records who changed it and why.",
+          "tests": [
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs",
+            "web_platform/tests/adm1-admin-wiring.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/platform-rules/page.tsx#L268",
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L75"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "fee-rule",
+      "name": "Marketplace fee rule",
+      "sourceOfTruth": "postgres:public.fee_rules",
+      "sensitivity": "confidential",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "active",
+        "inactive"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "inactive",
+          "to": "active",
+          "command": "fee-rule.save",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "Rules are kept; each change is recorded in admin_audit_logs with the old values and the reason.",
+      "capabilities": [
+        {
+          "id": "fee-rule.list",
+          "outcome": "See the platform fee rules per booking channel and visit type",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "in-progress",
+          "rationale": "Administrators read fee_rules through a read-only policy (the write policy was dropped); a failed read shows an error with a retry. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/platform-rules"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [
+            "supabase/migrations/20261008100200_adm1_roles_flags_fee_rules.sql#L225"
+          ],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.fee_rules",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs",
+            "web_platform/tests/adm1-admin-wiring.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/platform-rules/page.tsx#L224",
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L100"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "fee-rule.save",
+          "outcome": "Change or add a marketplace fee rule with a recorded reason",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "rationale": "admin_save_fee_rule is the only write path: administrator only, reason required, percentage 0 to 50, minimum 0 to 1000 SAR, maximum between the minimum and 1000 or empty, a marketplace rule cannot be switched off, the provider's own channels carry no fee and cannot be changed, a duplicate channel and visit type is refused (23505), and the old values stay in the audit entry. A single administrator can still change the platform's revenue rate without a second approver (owner question in gap no-separation-of-duties); the 0 to 50 and 1000 SAR bounds were chosen by the implementer and are not confirmed by the owner. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [
+              "active",
+              "inactive"
+            ],
+            "to": [
+              "active"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/platform-rules"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261008100200_adm1_roles_flags_fee_rules.sql#L128"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261008100200_adm1_roles_flags_fee_rules.sql#L105"
+          ],
+          "auditEvents": [
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L102"
+          ],
+          "safeguards": [
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L114"
+          ],
+          "dataBinding": "postgres:public.fee_rules",
+          "idempotency": "Saving the same values changes nothing new.",
+          "concurrency": "",
+          "recovery": "Save the previous values again; the audit entry holds them.",
+          "tests": [
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs",
+            "web_platform/tests/adm1-admin-wiring.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/platform-rules/page.tsx#L300",
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L102"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "role-assignment",
+      "name": "Administrator and staff role assignment",
+      "sourceOfTruth": "postgres:public.profiles (role)",
+      "sensitivity": "restricted",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "customer",
+        "provider_owner",
+        "admin"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "customer",
+          "to": "admin",
+          "command": "role.set-administrator",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "admin",
+          "to": "customer",
+          "command": "role.set-administrator",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "Role changes are kept in admin_audit_logs with before, after and the reason.",
+      "capabilities": [
+        {
+          "id": "role.directory",
+          "outcome": "Find administrators, staff and (by search) customers and see their roles",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "admin_role_directory pages on the server, lists customers only when searched for (at least 3 characters), and records that the directory was read without the search text. Lists names and emails, hence high. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": "{\"from\": [\"customer\", \"provider_owner\", \"admin\"], \"to\": []}",
+          "uiRoutes": [
+            "/admin/roles"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261008100200_adm1_roles_flags_fee_rules.sql#L17"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261008100200_adm1_roles_flags_fee_rules.sql#L40"
+          ],
+          "auditEvents": [
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L44"
+          ],
+          "safeguards": [
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L44"
+          ],
+          "dataBinding": "postgres:public.profiles",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs",
+            "web_platform/tests/adm1-admin-wiring.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/roles/page.tsx#L195",
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L32"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "role.set-administrator",
+          "outcome": "Grant or remove the administrator role with a recorded reason",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "rationale": "set_user_role needs a reason of at least 3 characters, refuses changing your own role, refuses removing the last administrator under an advisory lock and writes an audit entry with before, after and reason. No second approver and no recent re-authentication (owner decisions, gaps no-separation-of-duties and admin-sessions-have-no-mfa-or-step-up). Provider roles are created by approving an application, not here. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [
+              "customer",
+              "admin"
+            ],
+            "to": [
+              "customer",
+              "admin"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/roles"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L393"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L240"
+          ],
+          "auditEvents": [
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L66"
+          ],
+          "safeguards": [
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L61"
+          ],
+          "dataBinding": "postgres:public.profiles",
+          "idempotency": "",
+          "concurrency": "Concurrent changes are serialised by an advisory lock so the last administrator cannot be removed twice at once.",
+          "recovery": "Grant or remove the role again; the audit entry records who and why.",
+          "tests": [
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs",
+            "supabase/tests/db/qa_round3_verification.test.mjs",
+            "web_platform/tests/adm1-admin-wiring.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/roles/page.tsx#L224",
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L61"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "dispute",
+      "name": "Customer payment dispute",
+      "sourceOfTruth": "postgres:public.payment_disputes",
+      "sensitivity": "restricted",
+      "tenantScoped": true,
+      "lifecycleStates": [
+        "open",
+        "resolved_refund",
+        "resolved_rejected"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "open",
+          "to": "resolved_refund",
+          "command": "dispute.resolve",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "open",
+          "to": "resolved_rejected",
+          "command": "dispute.resolve",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "Disputes are kept; the decision, reason and any refund request stay linked to the booking.",
+      "capabilities": [
+        {
+          "id": "dispute.list",
+          "outcome": "See the customer disputes awaiting a decision and past decisions",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "Reads payment_disputes with customer, provider and booking; a failed read shows an error. The invented one-star rating that every row displayed was removed in this pass (gap dispute-screen-showed-an-invented-one-star-rating). Selects all rows with no paging. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/disputes"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [
+            "supabase/migrations/20261004030000_money_depth_and_compliance.sql#L13"
+          ],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.payment_disputes",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [
+            "supabase/tests/db/money.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/disputes/page.tsx#L83"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "dispute.resolve",
+          "outcome": "Decide a dispute: refund the customer or reject, with a recorded reason",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "rationale": "resolve_booking_dispute requires an administrator and a reason (one character is refused), creates the refund request on a refund decision and audits; the screen opens a CommandDialog naming the dispute, customer, provider and amount and keeps the typed reason when the server refuses (admin-console-guards.test.mjs). No second approver for a refund decision. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [
+              "open"
+            ],
+            "to": [
+              "resolved_refund",
+              "resolved_rejected"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/disputes"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261005010000_review_fix_money.sql#L1022"
+          ],
+          "authorizationPolicies": [
+            "supabase/tests/db/money.test.mjs#L152"
+          ],
+          "auditEvents": [],
+          "safeguards": [
+            "supabase/tests/db/qa_defect_fixes.test.mjs#L339"
+          ],
+          "dataBinding": "postgres:public.payment_disputes",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "A decision is final in the console; a refund follows refund-request.retry.",
+          "tests": [
+            "supabase/tests/db/money.test.mjs",
+            "supabase/tests/db/qa_defect_fixes.test.mjs",
+            "web_platform/tests/admin-console-guards.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/disputes/page.tsx#L142",
+            "supabase/tests/db/money.test.mjs#L152"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "package",
+      "name": "Service package",
+      "sourceOfTruth": "postgres:public.packages",
+      "sensitivity": "internal",
+      "tenantScoped": true,
+      "lifecycleStates": [
+        "active",
+        "inactive"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "active",
+          "to": "inactive",
+          "command": "package.toggle",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "Packages are kept; sold vouchers live in user_packages.",
+      "capabilities": [
+        {
+          "id": "package.list",
+          "outcome": "See the service packages providers sell and how many vouchers are live",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "low",
+          "status": "discovered",
+          "rationale": "Does not work as described: administrators have no read policy on packages beyond the public one (active only) or on user_packages, so inactive packages and the voucher counter are invisible (gap admin-packages-screen-controls-reach-no-rows). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/packages"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.packages",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [
+            ".admin-console/evidence/architect-reconcile-claude/probe-results.txt#L1",
+            "web_platform/src/app/admin/packages/page.tsx#L76"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "package.toggle",
+          "outcome": "Switch a package on or off",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "discovered",
+          "rationale": "Does not work: the update matches zero rows for an administrator and the page reports success anyway (gap admin-packages-screen-controls-reach-no-rows). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [
+              "active",
+              "inactive"
+            ],
+            "to": [
+              "active",
+              "inactive"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/packages"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.packages",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [
+            ".admin-console/evidence/architect-reconcile-claude/probe-results.txt#L1",
+            "web_platform/src/app/admin/packages/page.tsx#L121"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "notification-broadcast",
+      "name": "Broadcast notification and message queue",
+      "sourceOfTruth": "postgres:public.message_queue, public.message_log",
+      "sensitivity": "restricted",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "queued",
+        "sent",
+        "delivered",
+        "failed",
+        "skipped"
+      ],
+      "lifecycleTransitions": [],
+      "retention": "Message logs are kept; recipient phone numbers and bodies are personal data with no retention rule yet.",
+      "capabilities": [
+        {
+          "id": "notification.broadcast",
+          "outcome": "Send an in-app and WhatsApp broadcast to an audience of customers or providers",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "admin_broadcast_notification is administrator only, validates the audience and message, honours consent (WhatsApp only with WhatsApp and marketing consent) and writes one audit entry with the counts. The screen sends from a form with no confirmation, recipient count, reason or second approver (gap notification-broadcast-has-no-reason-or-preview). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/notifications"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261005040000_review_fix_admin_broadcast.sql#L16"
+          ],
+          "authorizationPolicies": [
+            "supabase/tests/db/admin.test.mjs#L14"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261005040000_review_fix_admin_broadcast.sql#L82"
+          ],
+          "safeguards": [
+            "supabase/tests/db/admin.test.mjs#L37"
+          ],
+          "dataBinding": "postgres:public.message_queue",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "Queued WhatsApp messages cannot be recalled from the console.",
+          "tests": [
+            "supabase/tests/db/admin.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/notifications/page.tsx#L222",
+            "supabase/tests/db/admin.test.mjs#L20"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "notification.log",
+          "outcome": "See recent messages sent, queued and skipped, with cost",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "Reads message_log (recipient phone, body, cost) and queue counts through administrator read policies, limited to the newest 50 rows; each failed query is shown as an error with a retry (adm1-admin-wiring.test.mjs 'the message log reads every query's error'). The read of recipient phone numbers is direct and unaudited (gap admin-reads-of-personal-and-bank-data-bypass-the-audited-commands). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/notifications"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [
+            "supabase/migrations/20261003230000_whatsapp_messaging_pipeline.sql#L182"
+          ],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.message_log",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [
+            "web_platform/tests/adm1-admin-wiring.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/notifications/page.tsx#L163",
+            "web_platform/tests/adm1-admin-wiring.test.mjs#L52"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "notification.dispatch",
+          "outcome": "Run the message dispatcher now for a batch of queued messages",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "in-progress",
+          "rationale": "Invokes the dispatch-messages function with a batch size; the function accepts an administrator or the service role, respects quiet hours, phone verification and consent, and counts a message as sent only when WhatsApp returns a message id (negative-authorization.test.mjs 'dispatch-messages edge function validates admin/service_role and CORS'). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/notifications"
+          ],
+          "serverOperations": [
+            "supabase/functions/dispatch-messages/index.ts#L1"
+          ],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.message_queue",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [
+            "web_platform/tests/negative-authorization.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/notifications/page.tsx#L253",
+            "web_platform/tests/negative-authorization.test.mjs#L470"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "sponsored-placement",
+      "name": "Sponsored placement (labelled, paid per new client)",
+      "sourceOfTruth": "postgres:public.sponsored_attributions (fees per new client), sponsored_campaigns",
+      "sensitivity": "confidential",
+      "tenantScoped": true,
+      "lifecycleStates": [
+        "accrued",
+        "waived",
+        "void"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "accrued",
+          "to": "void",
+          "command": "sponsored.void-attribution",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "accrued",
+          "to": "waived",
+          "command": "sponsored.void-attribution",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "Campaigns, clicks and attributions are kept for billing; fees are added to the monthly provider fee invoice.",
+      "capabilities": [
+        {
+          "id": "sponsored.overview",
+          "outcome": "See sponsored campaigns, accrued fees and the attributions for a month",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "in-progress",
+          "rationale": "admin_sponsored_overview returns the settings, campaigns and attributions for a month to administrators only; the screen shows the server's reason on failure and a distinct forbidden notice (sponsored.test.mjs and sponsored-screens.test.mjs). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": "{\"from\": [\"accrued\", \"waived\", \"void\"], \"to\": []}",
+          "uiRoutes": [
+            "/admin/sponsored"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261008800100_sponsored_placement_commands.sql#L386"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261008800100_sponsored_placement_commands.sql#L437"
+          ],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.sponsored_attributions",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [
+            "supabase/tests/db/sponsored.test.mjs",
+            "web_platform/tests/sponsored-screens.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/sponsored/page.tsx#L108",
+            "supabase/tests/db/sponsored.test.mjs#L144"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "sponsored.configure",
+          "outcome": "Switch sponsored placement on and set its price, slot count and attribution window",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "rationale": "Uses admin_update_platform_setting with a reason and validation (slots 1 to 10, window 1 to 365 days, price in SAR); the mechanism does nothing while any value is unset (sponsored.test.mjs 'refuses to run while ANY one setting is unset'). The four settings are flagged requires_owner_approval, but the command records the editing administrator as the approver, so any single administrator can set the price providers pay (same defect as gap referral-and-loyalty-values-self-approved-and-unbounded). OWNER QUESTION: the price per new client and who may change it. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/sponsored"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261005080000_release_gap_controls.sql#L133"
+          ],
+          "authorizationPolicies": [
+            "supabase/tests/db/sponsored.test.mjs#L151"
+          ],
+          "auditEvents": [],
+          "safeguards": [
+            "supabase/tests/db/sponsored.test.mjs#L162"
+          ],
+          "dataBinding": "postgres:public.platform_settings",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "Set the previous value; switching it off stops accrual.",
+          "tests": [
+            "supabase/tests/db/sponsored.test.mjs",
+            "web_platform/tests/sponsored-screens.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/sponsored/page.tsx#L139",
+            "supabase/tests/db/sponsored.test.mjs#L151"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "sponsored.void-attribution",
+          "outcome": "Void or waive a sponsored fee that should not be charged, with a reason",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "rationale": "admin_void_sponsored_attribution is administrator only, needs a reason and an action of void or waive, refuses an unknown attribution and repeats idempotently (sponsored.test.mjs lines around 'duplicate customer account'). The screen uses a CommandDialog. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": "{\"from\": [\"accrued\"], \"to\": [\"void\", \"waived\"]}",
+          "uiRoutes": [
+            "/admin/sponsored"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261008800100_sponsored_placement_commands.sql#L352"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261008800100_sponsored_placement_commands.sql#L383"
+          ],
+          "auditEvents": [
+            "supabase/tests/db/sponsored.test.mjs#L590"
+          ],
+          "safeguards": [
+            "supabase/tests/db/sponsored.test.mjs#L590"
+          ],
+          "dataBinding": "postgres:public.sponsored_attributions",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "A voided fee is not charged; it cannot be restored from the console.",
+          "tests": [
+            "supabase/tests/db/sponsored.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/sponsored/page.tsx#L146",
+            "supabase/tests/db/sponsored.test.mjs#L585"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "whatsapp-channel",
+      "name": "Provider WhatsApp receptionist channel",
+      "sourceOfTruth": "postgres:public.whatsapp_channels",
+      "sensitivity": "confidential",
+      "tenantScoped": true,
+      "lifecycleStates": [
+        "unverified",
+        "verified"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "unverified",
+          "to": "verified",
+          "command": "whatsapp.verify-channel",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "Channels and message bodies are kept; bodies are deleted after STOP and on resolve (fixpriv).",
+      "capabilities": [
+        {
+          "id": "whatsapp.overview",
+          "outcome": "See how many receptionist channels, conversations and handoffs exist and which numbers await verification",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "in-progress",
+          "rationale": "admin_whatsapp_overview returns counts and the channels awaiting verification to administrators only; everyone else and anonymous callers are refused (whatsapp_receptionist.test.mjs). Counts only, no message bodies. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/whatsapp"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261008700100_whatsapp_receptionist_commands.sql#L787"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261008700100_whatsapp_receptionist_commands.sql#L816"
+          ],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.whatsapp_channels",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [
+            "supabase/tests/db/whatsapp_receptionist.test.mjs",
+            "web_platform/tests/whatsapp-screens.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/whatsapp/page.tsx#L37",
+            "supabase/tests/db/whatsapp_receptionist.test.mjs#L565"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "whatsapp.verify-channel",
+          "outcome": "Confirm that a provider's WhatsApp number was checked, with a reason",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "in-progress",
+          "rationale": "admin_set_whatsapp_channel_verified requires an administrator, a reason, a boolean flag and an existing channel, and audits whatsapp.channel_verification (whatsapp_receptionist.test.mjs 'only an administrator can confirm it, with a reason'). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [
+              "unverified"
+            ],
+            "to": [
+              "verified"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/whatsapp"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261008700100_whatsapp_receptionist_commands.sql#L819"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261008700100_whatsapp_receptionist_commands.sql#L854"
+          ],
+          "auditEvents": [
+            "supabase/tests/db/whatsapp_receptionist.test.mjs#L125"
+          ],
+          "safeguards": [
+            "supabase/tests/db/whatsapp_receptionist.test.mjs#L106"
+          ],
+          "dataBinding": "postgres:public.whatsapp_channels",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "Not reversible from the console; verification is not undone by a second command.",
+          "tests": [
+            "supabase/tests/db/whatsapp_receptionist.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/whatsapp/page.tsx#L48",
+            "supabase/tests/db/whatsapp_receptionist.test.mjs#L106"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "country",
+      "name": "Operating country (currency, time zone, VAT)",
+      "sourceOfTruth": "postgres:public.countries",
+      "sensitivity": "internal",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "inactive",
+        "active"
+      ],
+      "lifecycleTransitions": [],
+      "retention": "Countries are kept; branches reference them.",
+      "capabilities": [
+        {
+          "id": "country.list",
+          "outcome": "See the countries the platform operates in with currency, time zone and VAT rate",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "low",
+          "status": "planned",
+          "rationale": "No screen reads countries; the VAT rate shown on /admin/taxes is typed in the page (gap taxes-literals-presented-as-server-facts, country-commands-have-no-console-surface). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.countries",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [
+            "supabase/tests/db/countries.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261008900000_gcc_country_configuration.sql#L18"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "country.configure",
+          "outcome": "Open or change a country and assign a branch to it, with a reason",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "planned",
+          "rationale": "admin_upsert_country and admin_set_branch_country exist (reasoned, administrator only, SAR-only opening safeguard) but have no screen. OWNER QUESTION: may an operator open a country or change a VAT rate, and who approves? Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [],
+          "serverOperations": [
+            "supabase/migrations/20261008900100_gcc_country_commands.sql#L5",
+            "supabase/migrations/20261008900100_gcc_country_commands.sql#L80"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261008900100_gcc_country_commands.sql#L118"
+          ],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.countries",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [
+            "supabase/tests/db/countries.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261008900100_gcc_country_commands.sql#L5"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "operations-dashboard",
+      "name": "Operations overview figures",
+      "sourceOfTruth": "postgres:public.admin_dashboard_overview()",
+      "sensitivity": "confidential",
+      "tenantScoped": false,
+      "lifecycleStates": [],
+      "lifecycleTransitions": [],
+      "retention": "Computed on read; nothing is stored.",
+      "capabilities": [
+        {
+          "id": "dashboard.overview",
+          "outcome": "See what needs attention now: queues with counts, oldest waiting time and money at stake, and live SAR figures",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "in-progress",
+          "rationale": "admin_dashboard_overview returns counts, oldest-waiting timestamps and SAR totals only (no names, emails or free text, proved by admin_dashboard.test.mjs) to administrators only; each source on the screen fails independently with its reason. The aggregate read is not audited per call (decision sec-dashboard-aggregates-need-no-per-call-audit, assumed, awaiting a human). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261005090000_admin_dashboard_overview.sql#L8"
+          ],
+          "authorizationPolicies": [
+            "supabase/tests/db/admin_dashboard.test.mjs#L36"
+          ],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.admin_dashboard_overview()",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [
+            "supabase/tests/db/admin_dashboard.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/page.tsx#L258",
+            "supabase/tests/db/admin_dashboard.test.mjs#L48"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "activity.feed",
+          "outcome": "Glance at the latest bookings and newly registered providers",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "low",
+          "status": "in-progress",
+          "rationale": "Reads the six newest bookings and four newest providers directly and words them into a feed; a failed read shows the reason. It is a convenience view, not the audit trail (that is audit.search on /admin/audit-logs). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/activity"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.bookings, public.providers",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [
+            "web_platform/src/app/admin/activity/page.tsx#L71"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "analytics-event",
+      "name": "Customer funnel event",
+      "sourceOfTruth": "postgres:public.analytics_events",
+      "sensitivity": "internal",
+      "tenantScoped": false,
+      "lifecycleStates": [],
+      "lifecycleTransitions": [],
+      "retention": "Events are written by the server only; no retention rule has been decided.",
+      "capabilities": [
+        {
+          "id": "analytics.funnel",
+          "outcome": "See how many visitors reached each step of the booking funnel in a period",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "low",
+          "status": "in-progress",
+          "rationale": "admin_get_event_counts returns counts per event for a date range to administrators only and refuses a reversed range (fixdbb_analytics_events.test.mjs); the card on /admin/reports shows the failure with a retry (adm1-admin-wiring.test.mjs). Counts only. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/reports"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261007150900_analytics_events.sql#L102"
+          ],
+          "authorizationPolicies": [
+            "supabase/tests/db/fixdbb_analytics_events.test.mjs#L93"
+          ],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.analytics_events",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [
+            "supabase/tests/db/fixdbb_analytics_events.test.mjs",
+            "web_platform/tests/adm1-admin-wiring.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/reports/page.tsx#L282",
+            "web_platform/tests/adm1-admin-wiring.test.mjs#L107"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "support-contact",
+      "name": "Operator support contacts",
+      "sourceOfTruth": "none - the contacts are typed into the page (see the support-contacts gap)",
+      "sensitivity": "internal",
+      "tenantScoped": false,
+      "lifecycleStates": [],
+      "lifecycleTransitions": [],
+      "retention": "Not applicable until a source exists.",
+      "capabilities": [
+        {
+          "id": "support.contact",
+          "outcome": "Reach platform support during an incident from the console",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "low",
+          "status": "blocked",
+          "rationale": "BLOCKED ON THE OWNER: the page links to a WhatsApp number and a mailbox written into the page and no one has confirmed them. Needs the real support channels and an approver (see the open gap about the help page support contacts). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/help"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "none",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [
+            "web_platform/src/app/admin/help/page.tsx#L70"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
         }
       ]
     }
@@ -4496,10 +6015,14 @@
       "severity": "critical",
       "description": "There is no export, anonymisation, deletion or legal-hold capability for customer personal data anywhere in the console, the migrations or the edge functions, on a platform holding Saudi customer names, emails, phone numbers, booking history and private messages.",
       "status": "blocked",
-      "rationale": "BLOCKED ON OWNER/LEGAL DECISION (impl-claude-release-gaps, 2026-10-04): what a PDPL access/export or erasure request must cover (profile, bookings, invoices, messages, reviews, consents, dependents, wallet) and what ZATCA retention requires us to keep has not been decided, and AGENTS.md reserves that interpretation for a human. The console can now work a request through start, completion or refusal with the operator's own note (admin_update_data_request) and clear profile details through admin_clear_customer_profile; it no longer offers a partial JSON file as a 'PDPL export'. A real export command and a retention-aware erasure wait on the data inventory and decision recorded in pdpl-erasure-scope-undecided.",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): STILL BLOCKED on a legal decision; progress since the audit is real but partial. Customers can now file a request: privacy/page.tsx calls submit_data_request (20261007010400_consent_and_request_evidence.sql#L83, guarded by no-mock-data.test.mjs 'login, the booking dialog and the privacy page never insert into the evidence tables'); operators work the queue on /admin/customers with admin_update_data_request and can clear profile details with admin_clear_customer_profile (customer_directory.test.mjs, release_controls.test.mjs); consent withdrawal for intake health data blanks every stored answer (fixpriv_intake_withdrawal.test.mjs). STILL MISSING: a data-access/export command and a retention-aware erasure of auth identity, booking contact fields, invoices, messages and reviews. OWNER/LEGAL QUESTIONS: (1) which data classes must a PDPL access/export request return (profile, bookings, invoices, messages, reviews, consents, wallet, dependants)? (2) which must erasure remove or anonymise, and which must be kept for ZATCA record-keeping (invoices, how many years) or a legal hold? (3) who may approve an erasure and within what time (the table enforces a 30-day due date)? Until these are answered no console command can be built correctly.",
       "evidence": [
+        "supabase/migrations/20261007010400_consent_and_request_evidence.sql#L83",
+        "supabase/migrations/20261005140000_admin_customer_directory.sql#L109",
         "supabase/migrations/20261005110000_admin_clear_customer_profile.sql#L12",
-        "supabase/tests/db/release_controls.test.mjs#L96"
+        "web_platform/src/app/admin/customers/page.tsx#L456",
+        "supabase/tests/db/fixpriv_intake_withdrawal.test.mjs#L33",
+        "supabase/tests/db/release_controls.test.mjs#L115"
       ]
     },
     {
@@ -4696,36 +6219,37 @@
       "severity": "medium",
       "description": "Every admin list selects all rows with no limit, no pagination and no server-side filtering; sorting and searching happen in the browser over the full result set. Ledger, bookings, customers and services will all degrade and eventually hit Supabase's max_rows ceiling as the marketplace grows.",
       "status": "open",
-      "rationale": "REMEDY: add range-based pagination and push filters and sorts into the query.",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): PARTLY FIXED, still open. Server-side paging and filtering now exist on bookings (admin_booking_directory, booking_directory.test.mjs), customers (admin_customer_overview), employees (range + count), refunds (range + count + status filter), roles (admin_role_directory), supply (get_admin_supply_overview, page size 20) and the audit log. STILL SELECTING EVERYTHING with no range and exposed to max_rows = 1000: services (admin/services/page.tsx), branches, coupons, reviews, disputes, packages, integrations, the ledger lists (transactional_ledger, payout_requests, reconciliation runs, fee invoices) and the message log is capped at 50 with no paging. BUILD WORK: server-side range, count and search on those lists.",
       "evidence": [
-        "web_platform/src/app/admin/ledger/page.tsx#L458",
-        "web_platform/src/app/admin/bookings/page.tsx#L141",
-        "web_platform/src/app/admin/customers/page.tsx#L79",
-        "supabase/config.toml"
+        "web_platform/src/app/admin/bookings/page.tsx#L264",
+        "web_platform/src/app/admin/refunds/page.tsx#L214",
+        "web_platform/src/app/admin/employees/page.tsx#L170",
+        "web_platform/src/app/admin/services/page.tsx#L173",
+        "web_platform/src/app/admin/reviews/page.tsx#L91",
+        "web_platform/src/app/admin/disputes/page.tsx#L94"
       ]
     },
     {
       "id": "committed-anon-key-and-dead-diagnostic",
       "severity": "low",
       "description": "The Supabase publishable key is hardcoded as a fallback in the client library. It is a publishable key so exposure is expected, but it makes isSupabaseConfigured unconditionally true, which turns the missing-key diagnostic immediately below it into dead code that can never fire.",
-      "status": "open",
-      "rationale": "REMEDY: drop the fallback, derive isSupabaseConfigured from configuredAnonKey alone, and let the diagnostic work.",
+      "status": "fixed",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): the hard-coded publishable key and project URL fallback are gone. isSupabaseConfigured is now Boolean(configuredUrl && configuredAnonKey), the client points at an unresolvable .invalid address when unconfigured, and the browser diagnostic can fire (web_platform/src/lib/supabase.ts). Verified by reading the file; no executing test covers this module.",
       "evidence": [
-        "web_platform/src/lib/supabase.ts#L30",
-        "web_platform/src/lib/supabase.ts#L34",
-        "web_platform/src/lib/supabase.ts#L57"
+        "web_platform/src/lib/supabase.ts#L21",
+        "web_platform/src/lib/supabase.ts#L23",
+        "web_platform/src/lib/supabase.ts#L42"
       ]
     },
     {
       "id": "accepted-payment-methods-view-lacks-security-invoker",
       "severity": "low",
       "description": "accepted_payment_methods is the only one of the five views created without WITH (security_invoker = true), and the only one granted to anon. It therefore bypasses RLS on the admin-only integrations table. The exposed columns (gateway name, status, enabled, env) are operational metadata rather than credentials, and the underlying payment_methods rows are publicly readable by policy anyway, so this looks deliberate - but it is an inconsistency worth closing.",
-      "status": "open",
-      "rationale": "REMEDY: add WITH (security_invoker = true) and confirm the anon read still resolves through the existing public-read policy on payment_methods.",
+      "status": "fixed",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): the view is now security_invoker and closed to anon (ALTER VIEW ... SET (security_invoker = true) and REVOKE ALL FROM anon in 20261007010700_integration_secrets_and_payment_view.sql); fixdba_access_hardening.test.mjs 'C-D24: accepted_payment_methods' asserts the reloption, that anon is refused and that a signed-in customer can read it.",
       "evidence": [
-        "supabase/migrations/20260714170000_link_payment_methods_to_integrations.sql#L61",
-        "supabase/migrations/20260714170000_link_payment_methods_to_integrations.sql#L93",
-        "supabase/migrations/20260703140000_accountant_payouts_ledger.sql#L11"
+        "supabase/migrations/20261007010700_integration_secrets_and_payment_view.sql#L26",
+        "supabase/tests/db/fixdba_access_hardening.test.mjs#L178"
       ]
     },
     {
@@ -4993,24 +6517,28 @@
       "severity": "high",
       "description": "At the regulated profile privileged reads must be audited. admin_customer_overview (customers.listed), get_admin_supply_overview and admin_record_export are audited, but the admin SELECT policies on profiles, consents, data_subject_requests, payout_requests, transactional_ledger and employees remain, so one PostgREST call returns the same data with no audit row. Reproduction: as an admin, select id, first_name, last_name, email, phone_number from profiles where role = 'customer' returns every customer and admin_audit_logs is unchanged (3 rows before and after). The console itself reads the data-requests queue, consents and payout_requests (IBAN and bank name in full) directly. Report exports are built in the browser from direct table reads and audited by a call whose row count the browser supplies (admin_record_export p_row_count), so audit-before-delivery is enforced by page code only. The IBAN masking in /admin/ledger is cosmetic because payout_requests.iban is still selected in full into the browser (see iban-unmasked-to-every-admin).",
       "status": "open",
-      "rationale": "REMEDY: remove the broad admin SELECT policies on personal and bank tables and serve the console from audited SECURITY DEFINER read commands that mask by default (IBAN last four, reveal with a reason and an audit row) and page their results; build exports in a command that returns the rows and writes the audit entry in the same call so the audited count is the delivered count. If the owner accepts direct reads, record a confirmed decision naming the human approver. This does not replace the owner decision on IBAN visibility.",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): STILL OPEN, narrowed. Re-proved on the migrated schema (probe-results.txt): administrators still hold broad SELECT policies on profiles ('Admins read profiles'), consents, data_subject_requests, payout_requests and employees, and the console still reads them directly - /admin/customers selects data_subject_requests and consents (customers/page.tsx) and /admin/ledger selects payout_requests including bank_name and iban in full (ledger/page.tsx), so the IBAN masking on screen is cosmetic. Report exports are still assembled in the browser from direct reads and audited by admin_record_export with a browser-supplied row count (reports/page.tsx). CLOSED since the audit: provider internals and staff contacts are now served only through audited commands, and even an administrator cannot select them from the table (fixdba_column_privileges.test.mjs 'returns every provider's internals to an administrator and records it'). OWNER QUESTION (shared with iban-unmasked-to-every-admin): accept direct administrator reads of these tables, recording a named approver, or move them behind masked, audited, paged read commands? BUILD WORK once decided: drop the admin SELECT policies on profiles/consents/data_subject_requests/payout_requests/employees, add masked audited read commands, build exports in a command that audits the delivered row count.",
       "evidence": [
-        "supabase/migrations/20260615182811_harden_auth_and_booking_core.sql#L85",
-        "supabase/migrations/20261005140000_admin_customer_directory.sql#L86",
-        "supabase/migrations/20261005130000_admin_report_exports.sql#L32",
-        "web_platform/src/app/admin/customers/page.tsx#L261",
-        "web_platform/src/app/admin/ledger/page.tsx#L539"
+        ".admin-console/evidence/architect-reconcile-claude/probe-results.txt#L1",
+        "web_platform/src/app/admin/customers/page.tsx#L336",
+        "web_platform/src/app/admin/ledger/page.tsx#L655",
+        "web_platform/src/app/admin/reports/page.tsx#L382",
+        "supabase/tests/db/fixdba_column_privileges.test.mjs#L102"
       ]
     },
     {
       "id": "public-read-policies-expose-internal-provider-and-staff-columns",
-      "severity": "high",
+      "severity": "medium",
       "description": "Row policies are public but not column-aware. 'Public read on verified providers' (roles public) with default column grants lets an anonymous caller holding only the publishable key read, for every verified provider, admin_notes (internal operator notes), cr_wathq_data (registry response), commission_percentage, cr_number, vat_number, trade_license_url and contact details. 'Public read on active employees' exposes every active employee's phone and email. 'Public read enabled payment methods' exposes payment_methods.admin_note and gateway_key. Reproduction on the migrated test database: after an admin saves provider notes, an anon session running select admin_notes, cr_wathq_data, commission_percentage from providers where id = <verified provider> receives them, and select name_en, phone, email from employees where is_active returns staff phone numbers and emails. The console writes provider notes (provider.notes) as internal text.",
       "status": "open",
-      "rationale": "PARTLY FIXED IN SOURCE (impl-claude-release-gaps, 2026-10-06, unreviewed): the anonymous role can no longer read provider admin notes, registry data, commission, registration and contact columns, staff phone and email, or payment-method notes and gateway keys, and the public marketplace still works. STILL OPEN: every signed-in user (customer, provider, administrator share one database role) can read those columns of other providers and staff, because Postgres column privileges cannot tell them apart. REMEDY: move the internal columns to an administrator-only table, or serve them through administrator-only commands, and decide with the owner whether staff phone and email may be visible to signed-in customers at all.",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09) against the migrated schema and the tests; severity lowered from high to medium. FIXED SINCE THE AUDIT: (1) anonymous visitors cannot read provider internals, staff phone/email or payment-method notes and gateway keys (security_hardening.test.mjs 'keeps the public marketplace columns'); (2) SIGNED-IN accounts - customers, other providers, the owner and administrators - can no longer read providers.admin_notes, cr_wathq_data, commission_percentage, cr_number, vat_number, trade_license_url, contact_phone, contact_email, last_activity_at or employees.phone/email: column-level SELECT in 20261007010900_provider_staff_column_privileges.sql, proved by fixdba_column_privileges.test.mjs ('refuses each hidden provider column to a customer, a stranger, another business and the business itself', 'refuses phone and email of every employee'); the people who may see them use the audited commands get_provider_private_profile, admin_provider_private_directory and get_provider_staff_contacts. STILL OPEN: payment_methods.admin_note and gateway_key are still granted to the signed-in role and the policy 'Public read enabled payment methods' returns enabled rows to every signed-in account (probe-results.txt, probe-payment-method-column-grants: authenticated can SELECT admin_note and gateway_key, anon cannot). The gateway key names a gateway, not a secret (the integrations table holds none: fixdba_access_hardening.test.mjs 'C-D3b'), and admin_note currently holds a fixed sentence, but the column exists to hold operator notes, so any note an administrator writes there is readable by every signed-in customer. BUILD WORK: REVOKE SELECT (admin_note, gateway_key) FROM authenticated and read them for the console through an administrator command (the ledger screen selects * from payment_methods).",
       "evidence": [
-        "supabase/migrations/20261005150000_security_review_hardening.sql#L133",
-        "supabase/tests/db/security_hardening.test.mjs#L112"
+        "supabase/migrations/20261007010900_provider_staff_column_privileges.sql#L33",
+        "supabase/tests/db/fixdba_column_privileges.test.mjs#L41",
+        "supabase/tests/db/fixdba_column_privileges.test.mjs#L54",
+        "supabase/tests/db/security_hardening.test.mjs#L112",
+        ".admin-console/evidence/architect-reconcile-claude/probe-results.txt#L1",
+        "web_platform/src/app/admin/ledger/page.tsx#L248"
       ]
     },
     {
@@ -5030,11 +6558,12 @@
       "severity": "high",
       "description": "claim_refund_request moves a refund to 'processing' and adds an attempt; only 'pending' and 'failed' rows can be claimed again, and admin_retry_refund_request refuses 'processing'. If process-refund dies, or complete_refund_request fails (refunds.ts throws), after Tap accepted the refund, the row stays 'processing' for ever: the console shows 'The gateway is processing this refund' with no action, money has left and the ledger is unchanged. Reproduced locally: after one claim a second claim returns claimed=false and the operator retry fails with 'A processing refund cannot be retried'. Separately refunds.ts records any thrown fetch error (timeout, connection reset) as a definite refusal, sets the row to 'failed' and lets the scheduler and the operator retry, so a refund Tap executed can be sent again; the shared idempotency key protects that only while Tap honours it (not verifiable from this machine). The dashboard counts processing refunds but never flags a stale one.",
       "status": "open",
-      "rationale": "PARTLY FIXED IN SOURCE (impl-claude-release-gaps, 2026-10-06, unreviewed): the claim time is recorded, the dashboard counts refunds stuck in progress for over 15 minutes, and an audited operator command reopens one (the next attempt reuses the same idempotency key). STILL OPEN: network errors and timeouts are still recorded as definite refusals rather than an unknown outcome, and nothing looks the refund up at the gateway; Tap's idempotency window and refund lookup must be confirmed with the provider before retries can be trusted. ORIGINAL REMEDY: add an 'unknown' outcome that is never auto-retried; resolve unknown refunds by lookup at Tap by idempotency key or metadata.refund_request_id; show stale and unknown refunds on the dashboard.",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): STILL OPEN, re-read and unchanged. supabase/functions/_shared/refunds.ts has had no commit since the audit (git log 26c0ef8..HEAD lists none for refunds.ts, process-refund or reconcile-psp); a fetch error is still recorded as a definite refusal (the catch block sets failure and the request is completed as failed), there is no 'unknown' outcome and nothing looks the refund up at Tap. The partial fix (claim time, 15-minute stuck flag, audited admin_reopen_stuck_refund) stands. OWNER/PROVIDER QUESTION: does Tap honour the refund idempotency key for a repeated request, for how long, and does Tap expose a refund lookup by idempotency key or metadata.refund_request_id? Retry-after-timeout cannot be made safe until that is confirmed with Tap. BUILD WORK after the answer: an 'unknown' refund state that is never auto-retried, a gateway lookup command, and a dashboard flag for unknown refunds.",
       "evidence": [
+        "supabase/functions/_shared/refunds.ts#L48",
+        "supabase/functions/_shared/refunds.ts#L12",
         "supabase/migrations/20261005150000_security_review_hardening.sql#L208",
-        "supabase/tests/db/security_hardening.test.mjs#L158",
-        "supabase/tests/db/security_hardening.test.mjs#L168"
+        "supabase/tests/db/security_hardening.test.mjs#L140"
       ]
     },
     {
@@ -5054,12 +6583,12 @@
       "severity": "high",
       "description": "admin_update_platform_setting stamps approved_by = auth.uid() for settings flagged requires_owner_approval, so the administrator who edits a referral or loyalty value is also its approver; both settings were seeded 'disabled until the owner approves the values'. Validation only requires non-negative numbers, so one administrator can set referral_program.reward_sar or loyalty points_per_sar to any amount and enable it; every referral reward then inserts platform-funded wallet_credits for both customers, which are spendable as money. Nothing bounds the amount and nobody else approves it. Needs an owner decision on limits and on who approves; a human must decide.",
       "status": "open",
-      "rationale": "REMEDY: enforce maximum values in the command (reward amount, points ratio, redemption value) agreed with the owner, make approved_by a different principal than the editor (owner or a second administrator) and keep the setting disabled until that approval exists, and alert on enablement. The thresholds are a business decision and must not be chosen in code by an agent.",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): STILL OPEN, unchanged in substance. admin_update_platform_setting still sets approved_by = auth.uid() for a setting flagged requires_owner_approval, so the administrator who edits the value is its approver, and it still validates only that referral amounts and loyalty ratios are not negative (20261005080000_release_gap_controls.sql). What improved: the invented 25 SAR reward was removed from the seed and an unset reward_sar now means no payout (20261007097000_referral_rules.sql), and an optional per-referrer cap exists (max_rewards_per_referrer_30d, unset = no cap). What did not: no upper bound on reward_sar, points_per_sar or sar_per_point, no second approver, and the cap is optional. OWNER DECISION NEEDED (exact questions): (1) the maximum reward_sar per side, the maximum referral rewards per referrer per 30 days, the maximum points_per_sar and sar_per_point; (2) who must approve enabling referral or loyalty - the platform owner personally, or a second administrator? An agent must not choose these thresholds.",
       "evidence": [
-        "supabase/migrations/20261005080000_release_gap_controls.sql#L172",
         "supabase/migrations/20261005080000_release_gap_controls.sql#L188",
-        "supabase/migrations/20261005000000_review_fix_booking_core.sql#L36",
-        "supabase/migrations/20261005000000_review_fix_booking_core.sql#L1806"
+        "supabase/migrations/20261005080000_release_gap_controls.sql#L179",
+        "supabase/migrations/20261007097000_referral_rules.sql#L16",
+        "web_platform/src/app/admin/settings/page.tsx#L159"
       ]
     },
     {
@@ -5114,23 +6643,25 @@
       "id": "payout-request-insert-bypasses-balance-and-iban-checks",
       "severity": "medium",
       "description": "A provider owner can INSERT into payout_requests directly: the policy checks only ownership, so the balance check and the SA-plus-22-digit IBAN check in request_provider_payout are skipped. Reproduced locally: an owner with a zero available balance inserted a 1,000,000 SAR request with an arbitrary IBAN string and it appears as 'requested'. Release is still bounded by the ledger, but the queue, the dashboard 'money at stake' figure and the approver's view are polluted and admin_review_payout_request does not validate either field. provider-payout-bypasses-balance-check was marked fixed for the edge function only.",
-      "status": "open",
-      "rationale": "REMEDY: revoke INSERT on payout_requests from client roles (writes only through request_provider_payout) or enforce the IBAN pattern and available-balance rule in a trigger, and validate both in admin_review_payout_request.",
+      "status": "fixed",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): client roles no longer hold INSERT on payout_requests and no insert policy remains (20261009144000_revoke_unneeded_write_grants.sql, M-23; probe-results.txt shows only SELECT, UPDATE, DELETE policies). fixmoney_grants.test.mjs 'payout requests can no longer be inserted directly; the command still works' asserts the privilege is false, an owner's direct insert is refused with permission denied, and request_provider_payout still enforces the balance.",
       "evidence": [
-        "supabase/migrations/20260620182904_refine_payout_request_policies.sql#L19",
-        "supabase/migrations/20261005010000_review_fix_money.sql#L702",
-        "supabase/migrations/20261005080000_release_gap_controls.sql#L93"
+        "supabase/migrations/20261009144000_revoke_unneeded_write_grants.sql#L21",
+        "supabase/tests/db/fixmoney_grants.test.mjs#L40",
+        ".admin-console/evidence/architect-reconcile-claude/probe-results.txt#L1"
       ]
     },
     {
       "id": "provider-approval-needs-no-reason-or-verified-registration",
       "severity": "medium",
       "description": "approve_provider_application activates a provider immediately (status 'active', listed and able to take payments and request payouts) and promotes the applicant to provider_owner, but takes no reason, does not require the commercial registration to be verified or reviewed (cr_verification_status), and accepts an operator-chosen commission percentage argument. provider.approve is high risk; the audit entry records ids only. reject_provider_application does require a reason.",
-      "status": "open",
-      "rationale": "REMEDY: require a reason or checklist on approval, require cr_verification_status verified or manually_reviewed before activation, ignore the commission argument (see provider-recorded-commission-display-only), and record the checks in the audit details.",
+      "status": "fixed",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): approve_provider_application now requires a reason of at least 3 characters and records it in the audit entry (20261005170000_qa_release_gate_fixes.sql), and refuses an application that states a commercial registration number until the registration is verified at Wathq or manually reviewed by an administrator (20261007151000_wathq_name_check.sql); fixdbb_wathq_name_check.test.mjs 'refuses approval until the CR is verified or manually reviewed, then approves and hands the result to the provider'. The console passes the reason (provider-management.tsx). RESIDUAL, not claimed fixed: the function still accepts an operator-supplied p_commission_percentage argument (default 15) for direct callers; the console no longer sends it. That is tracked by decision provider-recorded-commission-display-only, which waits on the owner.",
       "evidence": [
-        "supabase/migrations/20261005020000_review_fix_trust_growth.sql#L120",
-        "supabase/migrations/20261005020000_review_fix_trust_growth.sql#L151"
+        "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L736",
+        "supabase/migrations/20261007151000_wathq_name_check.sql#L177",
+        "supabase/tests/db/fixdbb_wathq_name_check.test.mjs#L74",
+        "web_platform/tests/adm1-admin-wiring.test.mjs#L15"
       ]
     },
     {
@@ -5149,10 +6680,11 @@
       "severity": "medium",
       "description": "20260704082805_live_demo_seed_messages.sql inserts four confirmed auth.users (three provider owners and a customer, all sharing one bcrypt hash) and three verified, active demo providers with branches into whatever database the migrations are applied to, including production. AGENTS.md keeps demo data in seed.sql, outside the release path. If the hosted project has this migration applied, real customers can find and book the demo providers and the demo owners can sign in if anyone knows the password behind the hash (the hash is the widely copied Supabase example string; 16 trivial passwords did not match it, which proves nothing about the real one). Hosted state was not observable from this machine.",
       "status": "open",
-      "rationale": "REMEDY: confirm on the hosted project that these users, providers and branches do not exist (or remove them with an audited migration), and move demo data to supabase/seed.sql so migrations never create accounts.",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): PARTLY MITIGATED, still open. The migration chain still creates the demo accounts and salons, but 20261007900200_demo_data_inert.sql switches them off everywhere (salons suspended and unverified, accounts banned), refuses booking them, and adds the administrator command admin_purge_demo_data that refuses unless the rows are untouched and unbooked; demo_data.test.mjs covers all four behaviours. NOT DONE: the demo rows still exist in any database built from the migrations, and the hosted project was not observed (this pass must not touch it). OWNER QUESTION: may admin_purge_demo_data be run on the hosted project, and who confirms no real person booked a demo salon?",
       "evidence": [
-        "supabase/migrations/20260704082805_live_demo_seed_messages.sql#L262",
-        "supabase/migrations/20260704082805_live_demo_seed_messages.sql#L290"
+        "supabase/migrations/20261007900200_demo_data_inert.sql#L1",
+        "supabase/tests/db/demo_data.test.mjs#L19",
+        "supabase/tests/db/demo_data.test.mjs#L57"
       ]
     },
     {
@@ -5160,11 +6692,11 @@
       "severity": "low",
       "description": "The shared allow-list that fronts every service-role function includes http://localhost:3000 in all environments, so a page served from a developer machine is an accepted browser origin in production; resolveCaller, send-otp and send-push compare the service key with === or !== against the bearer token instead of a constant-time comparison. Neither is exploitable without the token, and wildcard CORS is correctly absent.",
       "status": "open",
-      "rationale": "REMEDY: build the allow-list from APP_ORIGIN only outside development and compare secrets with a constant-time function.",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): HALF FIXED. The service key is now compared in constant time (serviceKeyMatches -> timingSafeEqualText, used by resolveCaller, send-otp and send-push; request-guards.test.mjs 'serviceKeyMatches' and the 'wiring' tests). STILL OPEN: the shared allow-list in functions/_shared/http.ts still contains http://localhost:3000 in every environment. BUILD WORK: build the allow-list from APP_ORIGIN and add localhost only when the function runs locally.",
       "evidence": [
-        "supabase/functions/_shared/http.ts#L4",
-        "supabase/functions/_shared/http.ts#L53",
-        "supabase/functions/send-otp/index.ts#L34"
+        "supabase/functions/_shared/http.ts#L8",
+        "supabase/functions/_shared/http.ts#L54",
+        "supabase/tests/request-guards.test.mjs#L8"
       ]
     },
     {
@@ -5182,33 +6714,35 @@
       "id": "has-active-consent-answers-for-any-user",
       "severity": "low",
       "description": "has_active_consent(p_user_id, p_purpose) is executable by every signed-in user and answers for any user id, so a user who learns another user's id can learn whether that person consented to WhatsApp or marketing. Ids are unguessable, which is why this is low.",
-      "status": "open",
-      "rationale": "REMEDY: restrict it to service_role or require p_user_id = auth.uid() or an administrator.",
+      "status": "fixed",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): has_active_consent now raises 'Not authorized' (42501) when a signed-in caller asks about another user who is not themselves an administrator (20261009200000_fixpriv_consent_oracle.sql); fixpriv_consent_reviews.test.mjs 'P-02 has_active_consent' asserts a customer reads their own answer and a different customer is refused. The service role (no auth.uid) is unchanged by design.",
       "evidence": [
-        "supabase/migrations/20261003200000_phone_identity_and_consents.sql#L164",
-        "supabase/migrations/20261003200000_phone_identity_and_consents.sql#L189"
+        "supabase/migrations/20261009200000_fixpriv_consent_oracle.sql#L5",
+        "supabase/tests/db/fixpriv_consent_reviews.test.mjs#L32"
       ]
     },
     {
       "id": "qr-print-window-writes-business-name-as-html",
       "severity": "low",
       "description": "The provider dashboard's 'Print Salon QR Display' opens a same-origin window and calls document.write with the business name interpolated unescaped, so a name containing markup runs script in the signed-in viewer's origin and can read the session token. The name is set by the provider owner (and applicants), so the realistic victims are the owner themselves and staff who open the same dashboard. Outside the admin console but on the same origin and storage.",
-      "status": "open",
-      "rationale": "REMEDY: build the window with DOM text nodes or escape the name before writing.",
+      "status": "fixed",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): the print window is built by printableQrHtml, which escapes every interpolated text with escapeHtml (web_platform/src/lib/qr-svg.mjs) and draws the QR locally; qr.test.mjs 'escapes the business name and never calls a third party' feeds a script tag as the title and asserts it is not emitted. The dashboard writes only that escaped document (provider/dashboard/page.tsx).",
       "evidence": [
-        "web_platform/src/app/provider/dashboard/page.tsx#L656"
+        "web_platform/src/lib/qr-svg.mjs#L42",
+        "web_platform/src/lib/qr-svg.mjs#L53",
+        "web_platform/tests/qr.test.mjs#L96"
       ]
     },
     {
       "id": "admin-views-keep-default-anon-and-write-grants",
       "severity": "low",
       "description": "Views created before the console work (admin_data_subject_requests_view, admin_provider_applications_view, admin_provider_performance, employee_earnings_summary, monthly_vat_summary, provider_settlement_summary) still carry Supabase's default grants: SELECT for anon and INSERT, UPDATE, DELETE for authenticated. They are security_invoker and joins or aggregates, so row policy holds today and no data was returned to anon, but one policy change or one simple view would expose them. The two views added in this pass were correctly closed.",
-      "status": "open",
-      "rationale": "REMEDY: REVOKE ALL on these views from PUBLIC, anon and authenticated, then GRANT SELECT to authenticated.",
+      "status": "fixed",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): the six named views no longer grant SELECT to anon or INSERT/UPDATE to signed-in users. Proved by executing has_table_privilege on the migrated schema (probe-results.txt, probe-payout-insert-view-grants-consent-templates: anon_sel, auth_ins and auth_upd are all false for admin_data_subject_requests_view, admin_provider_applications_view, admin_provider_performance, employee_earnings_summary, monthly_vat_summary, provider_settlement_summary); the explicit-grants migration states that views are readable by signed-in users and the service role only (20261006220000_explicit_data_api_grants.sql). Note: the proof is a probe run committed as evidence, not a test in the suite.",
       "evidence": [
-        "supabase/migrations/20261003200000_phone_identity_and_consents.sql#L265",
-        "supabase/migrations/20261003210000_supply_and_agreements.sql#L635",
-        "supabase/migrations/20261005120000_admin_provider_operations.sql#L118"
+        ".admin-console/evidence/architect-reconcile-claude/probe-results.txt#L1",
+        ".admin-console/evidence/architect-reconcile-claude/probe-payout-insert-view-grants-consent-templates.mjs#L11",
+        "supabase/migrations/20261006220000_explicit_data_api_grants.sql#L17"
       ]
     },
     {
@@ -5228,10 +6762,14 @@
       "severity": "high",
       "description": "Administrator policies are still FOR ALL on transactional_ledger, wallet_credits, gift_cards, fee_rules, loyalty tables and others. Every such write is now audited, but one credential can still change ledger amounts, fee percentages and balances, and then raise, approve and release a payout. Which of these writes are legitimate, and whether they should be append-only or need a second approver and recent re-authentication, is the owner's decision.",
       "status": "blocked",
-      "rationale": "BLOCKED ON OWNER DECISION. REMEDY once decided: drop the FOR ALL administrator policies on ledger, wallet credit, gift card and loyalty ledger rows to SELECT, keep the writes in audited commands that require a reason, and add a second approver and aal2 step-up for payout release and fee changes (see no-separation-of-duties and admin-sessions-have-no-mfa-or-step-up).",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): STILL BLOCKED on the owner decision, with one table removed from the list. Re-proved on the migrated schema (probe-results.txt, probe-admin-write-policies-and-grants): the policies 'Admins manage ledger' (transactional_ledger), 'Admins manage wallet credits', 'Admins manage gift cards' and 'Admins manage loyalty ledger' are still FOR ALL for administrators and `authenticated` holds INSERT, UPDATE and DELETE on them; payout_requests keeps UPDATE and DELETE for administrators (INSERT was removed, fixmoney_grants.test.mjs). CLOSED: fee_rules - the administrator write policy was dropped and the table is read-only for clients; fee percentages change only through admin_save_fee_rule, which needs a reason, is bounded (0-50 percent, 0-1000 SAR) and is audited (20261008100200_adm1_roles_flags_fee_rules.sql; adm1_roles_flags_fee_rules.test.mjs 'refuses values outside the bounds ... and no client writes the table'). Every remaining write is audited row by row (security_hardening.test.mjs 'cover every table an administrator policy can write'), but one credential can still change ledger amounts and balances and then raise, approve and release a payout. OWNER QUESTION: which direct administrator writes on transactional_ledger, wallet_credits, gift_cards and loyalty_points_ledger are legitimate? Should these tables be read-only for clients, with all writes through reasoned, audited commands that also need a second approver and recent re-authentication above a monetary threshold (what threshold in SAR)?",
       "evidence": [
-        "supabase/migrations/20261005150000_security_review_hardening.sql#L76",
-        "supabase/tests/db/security_hardening.test.mjs#L22"
+        ".admin-console/evidence/architect-reconcile-claude/probe-results.txt#L1",
+        ".admin-console/evidence/architect-reconcile-claude/probe-admin-write-policies-and-grants.mjs#L1",
+        "supabase/migrations/20261008100200_adm1_roles_flags_fee_rules.sql#L225",
+        "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L114",
+        "supabase/tests/db/fixmoney_grants.test.mjs#L40",
+        "supabase/tests/db/security_hardening.test.mjs#L43"
       ]
     },
     {
@@ -5429,9 +6967,12 @@
       "severity": "medium",
       "description": "The Taxes screen presents 'VAT 15%', 'Tips: 0%', 'If no active rule matches a booking source, the server applies 15%' and 'No municipality or service fee is added' as the rates the server applies, but they are literals in the page: none is read from a source and none is registered in declaredStatic[] with a reason and approver (the only registered static is the P3 catalog vocabulary). The VAT rate itself appears as a literal in at least nine places across the SQL migrations rather than as one setting. The commission table is live. The loading line has no role=status and the load error has no Retry button, unlike the other screens.",
       "status": "open",
-      "rationale": "PARTLY FIXED IN SOURCE (impl-claude-release-gaps, 2026-10-06, unreviewed): the loading line is a status message and a failed read has a Try again action. STILL OPEN: the VAT 15%, 0% tips and 'no other fee' statements are still literals in the page: registering them in declaredStatic[] needs a named human approver, or the rate must come from one setting that the SQL also reads. REVIEWER'S ORIGINAL REMEDY: register each literal in declaredStatic[] with the owner who approved it, or read the rate from one authoritative setting that the SQL also uses; add role=status to the loading line and a Retry action to the error.",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): STILL OPEN, changed shape. The commission rows are now read from fee_rules (taxes/page.tsx) with a load error, retry and forbidden state, so they are server facts. Two literals remain: the VAT card shows '15%' typed into the page, and the 'How to change a rate' text says rates change only through a reviewed migration, which has been untrue since /admin/platform-rules can change marketplace fee rules. The server VAT rate lives in countries.vat_rate_percent (country_vat_rate), not in this page. BUILD WORK: read the VAT rate from the country configuration and correct the how-to text. OWNER QUESTION: confirm 15 percent is the rate the platform must display for Saudi Arabia, or register it in declaredStatic with an approver.",
       "evidence": [
-        "web_platform/src/app/admin/taxes/page.tsx#L59"
+        "web_platform/src/app/admin/taxes/page.tsx#L17",
+        "web_platform/src/app/admin/taxes/page.tsx#L30",
+        "web_platform/src/app/admin/taxes/page.tsx#L63",
+        "supabase/migrations/20261008900000_gcc_country_configuration.sql#L46"
       ]
     },
     {
@@ -5606,8 +7147,10 @@
       "severity": "medium",
       "description": "The invoice screen no longer sends the tax record to an outside service, so it shows the encoded ZATCA value as text instead of a drawn QR image. An operator cannot scan the invoice from the screen, and the provider dashboard's printable booking-page QR still uses the outside service.",
       "status": "open",
-      "rationale": "BLOCKED ON A DEPENDENCY DECISION. REMEDY: draw the QR in the browser with a small encoder (toqr 0.1.1, MIT, is already in the lockfile through the Expo CLI) or generate an SVG on the server; adding a direct dependency changes package.json and the lockfile, so it needs the owner's approval; verify by scanning the result with a ZATCA-capable reader.",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): the dependency blocker has moved. A direct dependency on toqr was added to web_platform/package.json and web_platform/src/lib/qr-svg.mjs now draws a QR locally (commit 17bc17d, used by the provider dashboard and share kit, qr.test.mjs). The admin invoice panel still shows the ZATCA value as text (admin/bookings/page.tsx qrNotRendered) and does not use qrSvgPath. BUILD WORK: draw the invoice QR with qrSvgPath and scan it with a ZATCA-capable reader. OWNER CONFIRMATION: the toqr dependency was added without a recorded approval in decisions[]; please confirm it is accepted.",
       "evidence": [
+        "web_platform/package.json#L18",
+        "web_platform/src/lib/qr-svg.mjs#L25",
         "web_platform/src/app/admin/bookings/page.tsx#L60"
       ]
     },
@@ -5673,11 +7216,15 @@
       "id": "administrator-role-grants-have-no-screen-reason-or-last-admin-guard",
       "severity": "high",
       "description": "set_user_role(user, role) is the only way to make or remove an administrator. It has no console screen and no capability in the manifest, takes no reason, needs no second approver, and has no guard against removing the last administrator or oneself. Granting admin is recorded by the row audit trigger (role before and after, no reason). Demoting yourself is not recorded at all, because the trigger decides 'operator action' from is_admin() after the update has already removed the role. Removing the last administrator leaves nobody able to run the console.",
-      "status": "open",
-      "rationale": "PARTLY FIXED IN SOURCE (impl-claude-release-gaps, 2026-10-06, round 3, unreviewed): set_user_role needs a reason, refuses to change the caller's own role, refuses to remove the last administrator, serializes concurrent changes and writes an audit entry with the roles before and after and the reason (a demotion by direct write is recorded too). STILL OPEN: there is still no console screen for granting or revoking the administrator role, and no second approver or recent re-authentication: who may grant administrator access and how it is approved are owner decisions (see admin-sessions-have-no-mfa-or-step-up and no-separation-of-duties). PREVIOUS RATIONALE: FOUND BY qa-claude-release-gate, reproduced: an administrator promoted a customer to admin (one audit row, no reason), demoted another administrator (audited), and as the only administrator demoted themself with set_user_role (accepted, zero administrators left, no audit row). Access grants are a high-risk command class that needs reason capture, an audit entry in every case and a last-administrator guard. REMEDY: give role administration a screen and a reasoned command (reason, never the last admin, always audited, ideally second approver and recent re-authentication per admin-sessions-have-no-mfa-or-step-up) and revoke direct EXECUTE on set_user_role.  QA-VERIFIED round 3 (qa-claude-release-gate, 2026-10-06, executing suites and stand-in browser; hosted project not contacted): the command part is closed: a reason of three characters, never the caller's own role, a last-administrator check inside an advisory lock, an audit entry with before, after and the reason, no overload without a reason, and a direct profile role write is refused. The remaining part (no screen, no second approver) is described honestly above and stays open.",
+      "status": "fixed",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): the three defects named in the title are closed, so this gap is marked fixed; the two residual items it used to carry are tracked by their own owner-decision gaps (a second approver for role grants: no-separation-of-duties; recent re-authentication: admin-sessions-have-no-mfa-or-step-up). SCREEN: /admin/roles is a real screen (admin/roles/page.tsx) that lists people through admin_role_directory (server-paged, audited, customers listed only on search) and grants or removes the administrator role through set_user_role in a CommandDialog that requires a reason and shows the server's refusal; it is no longer a redirect (adm1-admin-wiring.test.mjs 'the role screen lists through admin_role_directory and changes roles through set_user_role with the reason', 'both screens are in the navigation ... /admin/roles is no longer redirected away'). REASON AND GUARDS: set_user_role requires a reason of at least 3 characters, refuses your own role, refuses removing the last administrator under an advisory lock, and writes an audit entry with before, after and reason (adm1_roles_flags_fee_rules.test.mjs 'grants and removes the administrator role with a reason, never your own'; qa_round3_verification.test.mjs). NOT DONE and not claimed: a second approver or step-up for the grant. OWNER QUESTION (recorded on no-separation-of-duties): may any single administrator grant the administrator role, or must a second administrator or the owner approve?",
       "evidence": [
-        "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L393",
-        "supabase/tests/db/qa_defect_fixes.test.mjs#L188"
+        "web_platform/src/app/admin/roles/page.tsx#L224",
+        "web_platform/src/app/admin/roles/page.tsx#L195",
+        "supabase/migrations/20261008100200_adm1_roles_flags_fee_rules.sql#L17",
+        "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L61",
+        "web_platform/tests/adm1-admin-wiring.test.mjs#L80",
+        "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L33"
       ]
     },
     {
@@ -5777,11 +7324,12 @@
       "severity": "low",
       "description": "Anyone, signed in or not, can read every WhatsApp message template (14 rows of operational copy) and every platform_settings row, including approved_by (the identifier of the administrator who approved the last change to a setting that requires owner approval). The templates are the company's outbound wording; the approver id is internal.",
       "status": "open",
-      "rationale": "FOUND BY qa-claude-release-gate in the anonymous read sweep (suite test 'shows an anonymous visitor only the public catalogue', which lists both tables as accepted public reads until this is decided). REMEDY: if the booking pages need only the hold minutes and loyalty switch, expose those through a view or function and restrict the base tables to signed-in staff.",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): HALF FIXED. platform_settings is now public only for an allow-list of keys (is_public, default false; policy 'Public reads public platform settings', plus 'Admins read all platform settings'): fixpriv_platform_settings.test.mjs, 20261009200500_fixpriv_platform_settings_public_allowlist.sql. message_templates: anonymous visitors hold no table privilege (the policy that names them grants nothing: data_api_grants.test.mjs), but every SIGNED-IN account can still read all templates (probe-results.txt). STILL OPEN: restrict message_templates to administrators and the service role, or record that the outbound wording is intentionally readable by signed-in users.",
       "evidence": [
-        "supabase/migrations/20261003230000_whatsapp_messaging_pipeline.sql#L72",
-        "supabase/migrations/20261005000000_review_fix_booking_core.sql#L28",
-        "supabase/tests/db/qa_adversarial.test.mjs#L413"
+        "supabase/migrations/20261009200500_fixpriv_platform_settings_public_allowlist.sql#L7",
+        "supabase/tests/db/fixpriv_platform_settings.test.mjs#L19",
+        "supabase/tests/db/data_api_grants.test.mjs#L49",
+        ".admin-console/evidence/architect-reconcile-claude/probe-results.txt#L1"
       ]
     },
     {
@@ -5833,10 +7381,11 @@
       "severity": "medium",
       "description": "platform_feature_flags (including payments_marketplace_split, which makes payment-checkout refuse every charge when switched on), fee_rules (the commission and VAT rates every booking is priced with; the Taxes screen shows them read-only), subscription_plans and provider_subscriptions (what providers pay for plans, and whether a payment is pending) have no screen and no command. Changing any of them means a migration or SQL by an engineer.",
       "status": "open",
-      "rationale": "FOUND BY qa-claude-release-gate by searching the console for each table. Changing commission or VAT rates is an owner decision (AGENTS.md); a controlled way to do it (reasoned, audited, second approver) is still an operator need, and the read side for flags and plan subscriptions needs no decision. The capabilities settings.vat-rate and settings.commission are discovered but unbuilt.",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): HALF BUILT. Feature flags, marketplace fee rules and the API limits now have a screen, /admin/platform-rules, over audited reasoned commands admin_set_feature_flag, admin_save_fee_rule and admin_set_api_setting with no client table writes (adm1_roles_flags_fee_rules.test.mjs, adm1_api_settings_screen.test.mjs, adm1-admin-wiring.test.mjs 'flags, fee rules and API settings change only through their commands'). STILL MISSING: a console surface for subscription plans (subscription_plans has an administrator policy but no admin screen; plan prices and limits change only by direct database access). BUILD WORK: a plans screen with a reasoned, audited command. OWNER NOTE: plan prices are a pricing decision.",
       "evidence": [
-        "web_platform/src/app/admin/taxes/page.tsx#L63",
-        "supabase/functions/payment-checkout/index.ts#L101"
+        "web_platform/src/app/admin/platform-rules/page.tsx#L300",
+        "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L100",
+        "web_platform/tests/adm1-admin-wiring.test.mjs#L88"
       ]
     },
     {
@@ -5945,6 +7494,105 @@
         "web_platform/src/app/admin/ledger/page.tsx#L824",
         "web_platform/src/app/admin/ledger/page.tsx#L674",
         "supabase/tests/db/qa_round3_verification.test.mjs#L161"
+      ]
+    },
+    {
+      "id": "admin-packages-screen-controls-reach-no-rows",
+      "severity": "medium",
+      "description": "/admin/packages reads and switches packages and counts sold vouchers, but no policy lets an administrator see an inactive package, change any package, or read user_packages. Reproduced on the migrated schema as an administrator: select from packages returns 0 rows when the only package is inactive, update packages set is_active = true returns 0 rows, select count from user_packages returns 0. The page's toggle calls update().eq('id') and reports success when no error is returned, so zero rows changed is shown as 'updated', and the voucher counter silently shows 0.",
+      "status": "open",
+      "rationale": "FOUND BY architect-reconcile-claude (2026-10-09). The only policies on packages are 'Owners manage packages' (providers) and 'Public read on packages' (is_active = true); user_packages has only 'Customers view own packages' (probe-results.txt, probe-admin-packages-visibility). The page never checks how many rows an update changed. BUILD WORK: either give administrators a read policy and an audited, reasoned toggle command (and a voucher count command), or remove the toggle and the counters and show the screen read-only; and make every console write that can match zero rows say so instead of reporting success. Package pricing and whether the platform may switch a provider's package off is a business decision for the owner.",
+      "evidence": [
+        ".admin-console/evidence/architect-reconcile-claude/probe-results.txt#L1",
+        ".admin-console/evidence/architect-reconcile-claude/probe-admin-packages-visibility.mjs#L1",
+        "web_platform/src/app/admin/packages/page.tsx#L121",
+        "web_platform/src/app/admin/packages/page.tsx#L100"
+      ]
+    },
+    {
+      "id": "help-page-hard-codes-support-contacts",
+      "severity": "medium",
+      "description": "/admin/help links the operator to a WhatsApp number written into the page (wa.me/966500000000, a number that looks like a placeholder and is also the test number in supabase/config.toml) and to mailto:support@primora.sa, described as the priority line for operational incidents. Nothing registers these values in declaredStatic and nobody has approved them.",
+      "status": "open",
+      "rationale": "FOUND BY architect-reconcile-claude (2026-10-09). OWNER QUESTION: what are the real support WhatsApp number and mailbox for incidents, and who approves them? BUILD WORK once answered: read them from platform_settings (is_public allow-list) or register them in declaredStatic with the approver, and add the screen's capability, states and tests.",
+      "evidence": [
+        "web_platform/src/app/admin/help/page.tsx#L70",
+        "web_platform/src/app/admin/help/page.tsx#L74",
+        "supabase/config.toml#L32"
+      ]
+    },
+    {
+      "id": "country-commands-have-no-console-surface",
+      "severity": "medium",
+      "description": "admin_upsert_country and admin_set_branch_country (country, currency, time zone and VAT rate configuration) exist as reasoned administrator commands but nothing in /admin calls them, so the platform's country configuration changes only by calling the database directly. The VAT card on /admin/taxes does not read it either.",
+      "status": "open",
+      "rationale": "FOUND BY architect-reconcile-claude (2026-10-09): grep over web_platform/src/app/admin finds no use of either command. Modeled as entity country, capabilities country.list and country.configure, status planned. OWNER QUESTION: may an operator open a new country, and who approves a VAT rate or currency change (the SAR-only opening safeguard in the commands applies today)? A VAT rate is a legal value.",
+      "evidence": [
+        "supabase/migrations/20261008900100_gcc_country_commands.sql#L5",
+        "supabase/migrations/20261008900100_gcc_country_commands.sql#L80",
+        "supabase/tests/db/countries.test.mjs#L88"
+      ]
+    },
+    {
+      "id": "provider-and-customer-surfaces-added-since-the-audit-are-not-modeled",
+      "severity": "medium",
+      "description": "About two dozen provider-portal and customer pages and the tables behind them were built after the manifest was written (intake forms, memberships, group bookings, recurring appointments, professional identity, share kit and attribution, developer API keys and webhooks, WhatsApp receptionist inbox, sponsored promotion, purchase orders and stock). Only the P3 inventory screens and their administrator oversight are in the manifest. The administrative obligations these create (abuse of health-data intake forms, disputed memberships, webhook abuse, receptionist misrouting, API key revocation on behalf of a provider) have not been derived into capabilities.",
+      "status": "open",
+      "rationale": "FOUND BY architect-reconcile-claude (2026-10-09) by listing web_platform/src/app/provider and the migrations after 20261007. This pass modeled only the new /admin screens (platform rules, roles, sponsored placement, WhatsApp oversight) and recorded the rest as not modeled rather than guessing. BUILD WORK: an architect pass over those domains applying the capability completeness test, starting with the ones that hold personal data (intake answers, client imports, WhatsApp message bodies) and the ones that move money (memberships, sponsored fees, group booking deposits).",
+      "evidence": [
+        "web_platform/src/app/provider/intake/page.tsx#L1",
+        "web_platform/src/app/provider/memberships/page.tsx#L1",
+        "web_platform/src/app/provider/developer/page.tsx#L1",
+        "supabase/migrations/20261008200000_intake_tables_and_consent.sql#L1",
+        "supabase/migrations/20261008300000_memberships_core.sql#L1"
+      ]
+    },
+    {
+      "id": "notification-broadcast-has-no-reason-or-preview",
+      "severity": "medium",
+      "description": "/admin/notifications sends a broadcast to a whole audience (in-app and WhatsApp) through admin_broadcast_notification from a form with no confirmation step, no recipient count before sending, no reason and no second person; only the aftermath count is shown. The command audits that a broadcast happened (notification.broadcast) but cannot be undone once messages are queued. The same screen lists recipient phone numbers and message bodies from message_log by a direct read that is not audited.",
+      "status": "open",
+      "rationale": "FOUND BY architect-reconcile-claude (2026-10-09). Positive: the command honours consent (WhatsApp only with WhatsApp and marketing consent, admin.test.mjs 'writes in-app notifications and queues WhatsApp only with ...') and is administrator-only. BUILD WORK: a CommandDialog with the audience, the exact recipient count and a reason, a server-side maximum audience per send, and an audited read for the message log. OWNER QUESTION: what is the largest audience one administrator may message without a second approver?",
+      "evidence": [
+        "web_platform/src/app/admin/notifications/page.tsx#L215",
+        "supabase/migrations/20261005040000_review_fix_admin_broadcast.sql#L82",
+        "supabase/tests/db/admin.test.mjs#L20",
+        "web_platform/src/app/admin/notifications/page.tsx#L163"
+      ]
+    },
+    {
+      "id": "payment-method-default-switch-is-two-browser-writes-with-no-reason",
+      "severity": "medium",
+      "description": "Making a payment method the platform default clears is_default on every other row and then sets it on one, as two separate PostgREST writes from the browser handler, so a failure between them leaves the platform with no default; enabling, disabling and re-pointing a method at a gateway are direct table writes with a confirmation but no operator reason. They are audited row by row by the trigger. This is the money-mutation-in-the-browser pattern from AGENTS.md defect 3 applied to payment configuration.",
+      "status": "open",
+      "rationale": "FOUND BY architect-reconcile-claude (2026-10-09) re-reading admin/ledger/page.tsx; the older note on payment-method.set-default is still true. BUILD WORK: one reasoned, audited, atomic command (set default, enable, change gateway) and revoke the administrator write policy on payment_methods. Which gateway a payment method may be pointed at is a financial-control decision for the owner.",
+      "evidence": [
+        "web_platform/src/app/admin/ledger/page.tsx#L297",
+        "web_platform/src/app/admin/ledger/page.tsx#L325",
+        ".admin-console/evidence/architect-reconcile-claude/probe-results.txt#L1"
+      ]
+    },
+    {
+      "id": "integration-audit-log-accepts-client-written-rows",
+      "severity": "medium",
+      "description": "The /admin/integrations screen writes its own audit rows straight into integration_audit_log with a client-supplied actor_id and free-text change, swallowing any failure ('audit is best-effort'). The policy 'Admins write integration audit log' lets any administrator insert rows with any actor, and the table is excluded from the automatic audit trigger. The authoritative record is admin_audit_logs (the trigger covers integrations), so the second log is both forgeable and redundant.",
+      "status": "open",
+      "rationale": "FOUND BY architect-reconcile-claude (2026-10-09): integrations/page.tsx writes the row in audit(), the table grants INSERT to authenticated (20260714153000_expand_integrations_registry.sql) and the trigger helper skips it (20261006000000_attach_admin_audit_trigger_helper.sql). BUILD WORK: stop writing it from the browser, revoke INSERT for clients, and read integration history from admin_audit_logs.",
+      "evidence": [
+        "web_platform/src/app/admin/integrations/page.tsx#L296",
+        "supabase/migrations/20260714153000_expand_integrations_registry.sql#L58",
+        "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L31"
+      ]
+    },
+    {
+      "id": "dispute-screen-showed-an-invented-one-star-rating",
+      "severity": "low",
+      "description": "Every row on /admin/disputes displayed a flagged review rating of one star because the row mapper wrote rating: 1 for every dispute; payment_disputes holds no rating. An operator arbitrating a refund saw a fabricated fact.",
+      "status": "fixed",
+      "rationale": "FOUND AND FIXED BY architect-reconcile-claude (2026-10-09) as a small safe change: the invented property and the line that rendered it were removed from admin/disputes/page.tsx, with the two unused translation strings. The remaining hard-coded fallback label for a missing customer name is cosmetic. Verified by reading the file and by the web suite, lint and build re-run after the edit (evidence files in this folder).",
+      "evidence": [
+        "web_platform/src/app/admin/disputes/page.tsx#L86",
+        "web_platform/src/app/admin/disputes/page.tsx#L110"
       ]
     }
   ],
@@ -6477,6 +8125,15 @@
       "status": "done",
       "notes": "Independent QA and release-gate pass, rounds 1 to 4. Round 4 re-ran every gate (DB 217/217, web 156/156, lint 0 errors, build clean), attacked the audit allow-list, the leave trigger and the booking answers by execution, re-opened audit-redaction-is-a-short-deny-list and staff-can-approve-their-own-leave, confirmed four gaps closed, cleared booking.transition and kept audit.search contested. validate and coverage exit 1. Worklog: .admin-console/worklog/qa-claude-release-gate.md",
       "worklog": ".admin-console/worklog/qa-claude-release-gate.md"
+    },
+    {
+      "id": "architect-reconcile-claude",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "active",
+      "notes": "Reconciliation of the manifest with the code after ~195 commits (adm1 admin screens, wp/* packages, fixdba, fixmoney, fixpriv). Manifest edits only through add and set; no application code changed.",
+      "worklog": ".admin-console/worklog/architect-reconcile-claude.md"
     }
   ]
 }
