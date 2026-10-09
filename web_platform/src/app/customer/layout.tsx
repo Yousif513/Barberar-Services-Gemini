@@ -154,6 +154,12 @@ export default function CustomerLayout({
   useEffect(() => {
     let cancelled = false;
     void (async () => {
+      // Signed out (or mid sign-in) there is nothing to count and the request would only come back 401.
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        if (!cancelled) setUnreadMessages(0);
+        return;
+      }
       const { count, error } = await supabase.from("conversations").select("id", { count: "exact", head: true }).eq("unread_for_customer", true);
       if (!cancelled) setUnreadMessages(error ? 0 : (count ?? 0));
     })();
@@ -379,10 +385,12 @@ export default function CustomerLayout({
               </button>
 
               <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <div className={`text-right hidden sm:block ${isRTL ? "text-left" : "text-right"}`}>
-                  <p className="text-[10px] text-gray-400 font-bold leading-none mb-1">{t.welcome}</p>
-                  <p className="text-xs font-bold text-gray-900 leading-tight">{firstName}</p>
-                </div>
+                {firstName.trim() && (
+                  <div className={`text-right hidden sm:block ${isRTL ? "text-left" : "text-right"}`}>
+                    <p className="text-[10px] text-gray-400 font-bold leading-none mb-1">{t.welcome}</p>
+                    <p className="text-xs font-bold text-gray-900 leading-tight">{firstName}</p>
+                  </div>
+                )}
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E8E8E8] bg-[#F4E7B6] text-sm font-black text-[#9A7B1E] shadow-[0_0_15px_rgba(209,175,71,0.1)]">
                   {firstName.trim().charAt(0).toUpperCase() || "•"}
                 </div>

@@ -20,3 +20,14 @@
 
 ## Q-08 dev switcher (already holds, no change)
 `web_platform/src/lib/dev-access.ts` returns false in production builds, off localhost/127.0.0.1/[::1], and unless `NEXT_PUBLIC_ENABLE_DEV_ACCESS === "true"`; `components/dev-role-switcher.tsx:75` and the login page both go through it. Operational note: never set that variable in Vercel.
+
+## Q-06, Q-13, Q-14
+- Q-06 `provider/bookings`: a successful status command (confirm, seat in chair, complete, cancel, no-show) now shows a bilingual `role="status"` message; the error banner is `role="alert"`. A reason prompt was not added: `employee_update_booking_status` takes none and the check-in is not a privileged reversal.
+- Q-13 `customer/layout.tsx` and `provider/layout.tsx`: the unread-conversations count is skipped (and reset to 0) when `auth.getSession()` has no session, so no 401 after sign-out.
+- Q-14: the customer header no longer prints "Welcome back," with an empty name (hidden until a first name exists); "1 yrs exp" now singular (EN and AR) on the shop page.
+- Not done (Q-14): shop header Log-in icon for signed-in visitors, Arabic-first document title, wallet Top Up button disabled state, forgot-password path (needs an auth flow decision), audit-log noise (server side). `/services` category chips left as is (paged merge would need a SQL change: have `search_marketplace_providers` accept a parent slug and include children).
+
+## Verification
+- `npx tsc --noEmit -p web_platform`: clean. `npx eslint` on every changed file: 0 errors (existing warnings only).
+- `npm run test --workspace=web_platform`: 714 pass, 0 fail. `node scripts/verify-ui-schema.mjs`: 0 mismatches.
+- NOT visually verified: no dev server was started from this worktree (junctioned node_modules), so Q-10 and Q-11 were judged from the CSS only; please re-check at 375px in EN and AR.
