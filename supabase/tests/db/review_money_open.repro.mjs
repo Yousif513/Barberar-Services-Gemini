@@ -26,18 +26,6 @@ const book = async (user, employee, svc, slot, extra = "") =>
   (await as(db, user, `select * from create_booking(target_employee_id => $1, target_service_id => $2, target_scheduled_at => $3${extra})`, [employee, svc.id, slot]))[0];
 
 describe("REPRODUCES OPEN DEFECT M-08 / M-10: first-visit commission can be bypassed by the provider", () => {
-  it("M-08: a zero-price walk-in linked to a customer's verified phone does not remove the first-visit commission", async () => {
-    const svc = await serviceFor(db, SEED.employee1);
-    const date = await nextWorkingDate(db, SEED.employee1, 3);
-    const phone = "+966500000123";
-    const target = await freshCustomer({ phone, verified: true });
-    const control = await freshCustomer();
-    const controlBooking = await book(control, SEED.employee1, svc, await firstSlotOf(control, SEED.employee1, svc, date));
-    await as(db, owner1, `select create_walk_in_booking($1, $2, $3, 'x', $4, 'cash', 0) r`, [SEED.branch1, SEED.employee1, svc.id, phone]);
-    const targetBooking = await book(target, SEED.employee1, svc, await lastSlot(target, SEED.employee1, svc, date));
-    assert.equal(Number(targetBooking.platform_commission), Number(controlBooking.platform_commission),
-      "the customer is still new to the marketplace; commission must equal the control customer's");
-  });
 
   it("M-10: a provider-created 'imported client' row does not make a first marketplace visit fee-free", async () => {
     const svc = await serviceFor(db, SEED.employee1);

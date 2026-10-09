@@ -22,3 +22,5 @@ OWNER MUST CONFIRM (M-06): the seeded `price_yearly_sar` (growth 239, elite 639)
 an annual growth subscription now charges 2,868.00 SAR and elite 7,668.00 SAR. If the intended annual price is the stored number itself, change the single
 `months` multiplier for yearly in `quote_provider_plan` (and nothing else; the screen follows). The quote adds NO VAT: the old screen displayed a 15% VAT row that was never
 charged; it was removed rather than invented (VAT on platform fees is owner item M-11).
+| M-08 walk-in removes first-visit commission | fixed (migration 20261009130000: the first-visit test in `booking_create_internal` and `handle_booking_first_visit_detection` ignores `source = 'walk_in'` and `total_price = 0` bookings) | see git log | fixmoney_first_visit.test.mjs |
+| M-14 walk-ins billed as sponsored acquisitions | fixed (same migration: `sponsored_attribute_completed_booking` skips walk-ins and ignores them when deciding "new client") | see git log | fixmoney_first_visit.test.mjs |
