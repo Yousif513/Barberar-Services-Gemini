@@ -56,3 +56,39 @@ Owner / legal question to answer: may a salon keep a pre-treatment questionnaire
 
 ## P-13 (fixed; Google Maps disclosure is an owner decision)
 New pure module `supabase/functions/_shared/request-guards.ts` (`serviceKeyMatches`, `declaredLengthExceeds`, `readBodyLimited`), tested without Deno in `supabase/tests/request-guards.test.mjs` (new script `npm run test:edge`, also part of `npm test`). `resolveCaller` in `_shared/http.ts` compares the service key with `serviceKeyMatches` (the existing `timingSafeEqualText`, no early exit, an unset key never matches) instead of `===`; `send-otp` and `send-push` had the same flaw (`authorization !== Bearer <key>`) and use it too. `whatsapp-inbound` refuses an oversized `Content-Length` with 413 before reading anything and then reads at most 1 MiB from the stream (a chunked body with no length is cut off at the limit) instead of `req.arrayBuffer()`. Not verified here: Deno runtime behaviour (no Deno available); the helper is plain TypeScript used by the same imports. Owner decision, not done: `calculate-travel` sends customer coordinates to Google Maps; the privacy notice must name Google as a recipient and the purpose (home-service travel pricing) before it is published, and the consent screen for home-service bookings should say so.
+
+## P-05 and P-07 (infrastructure decisions; nothing built, by instruction)
+- **P-05** (WhatsApp channel ownership is a manual administrator click; first claimant of a `phone_number_id` wins; "already connected to another business" is also an existence oracle). Recommended: (1) verify ownership through the Graph API (`GET /{phone_number_id}` with the salon's access token proves the id belongs to a WABA the salon controls) and a one-time code sent to the display number and typed back; (2) in `provider_save_whatsapp_channel` answer a conflict with the same generic message used for any invalid id, so it no longer reveals that another business holds the number; (3) let an administrator release a mistaken claim. Needs a Meta app, an access-token store and an Edge Function: not built here.
+- **P-07** (webhook delivery SSRF residual: names such as `x.nip.io` pass the static URL rules; the DNS check is skipped when `Deno.resolveDns` is missing and is check-then-connect otherwise). Recommended: deliver webhooks through an egress proxy or network policy that blocks private, link-local and metadata ranges at connect time (so a DNS answer that changes between check and connect cannot reach them), refuse delivery when the runtime cannot resolve, and keep an allow-list option per endpoint. Cannot be verified without the hosted Edge Runtime.
+- **P-15** (outside privacy, flaky invoice chain order) not in this package's list; not touched.
+
+## Owner decisions collected from this package
+1. Publish the privacy notice and customer terms so consent rows carry a real version (P-11).
+2. Legal: may a salon retain pre-treatment questionnaires for a fixed period after the customer withdraws consent (P-01)? Also set `intake.retention_days` and schedule the purge.
+3. Set `whatsapp.message_retention_days` (P-06) and decide whether resolved conversations should keep their text for any period (today bodies are deleted on resolve and on STOP).
+4. Set `address.staff_read_days` (P-08); unset means staff lose the home address one day after the visit.
+5. Disclose Google Maps as a recipient of customer coordinates in the privacy notice (P-13), and decide whether `ip_address`/`user_agent` should be captured for consent evidence (P-11).
+6. Review the reserved handle word list (P-12) and the public-settings allow-list (P-09: `UPDATE platform_settings SET is_public = TRUE WHERE key = ...` is the only way a key becomes public).
+7. Staff login linking (P-04): approve an invite/accept command; until then `employees.profile_id` is set by support only.
+
+## Residuals left on purpose
+- Signed-in users (`authenticated`) can still select `reviews.customer_id/booking_id/moderated_by` and `employees.profile_id`; screens for customers, providers and admins read them. Closing that needs those screens moved to role-scoped RPCs first.
+- Plain employees (no delegation) can read patch tests and staff contacts of their whole provider; only delegated branch managers were scoped (P-14).
+
+## Verification (run in the worktree, node_modules is a junction to the main checkout)
+| Command | Result |
+|---|---|
+| `node --test "supabase/tests/db/**/*.test.mjs"` | 1116 tests, 1116 pass, 0 fail |
+| `node --test supabase/tests/inventory.test.mjs supabase/tests/request-guards.test.mjs` | 18 tests, 18 pass |
+| `npm run test --workspace=web_platform` | 714 tests, 714 pass |
+| `npm run test:security-core` | passed (marker for send-push updated to `serviceKeyMatches`) |
+| `node scripts/verify-ui-schema.mjs` | 195 rpc calls and 227 select strings checked, 0 mismatches |
+| `npx tsc --noEmit -p web_platform` | exit 0 |
+| `npm run typecheck:mobile` | exit 0 |
+| `npm run build --workspace=web_platform` | not run (junctioned node_modules may stop Turbopack; the integrator builds after merging) |
+| eslint | not run on the changed files: the only app files touched are `shop/[id]/page.tsx` (one query and one mapping) and `mobile_app/src/lib/marketplace.ts`; types are checked above |
+
+Not verified: hosted Supabase (PostgREST column-privilege behaviour with embedded selects, the Auth hook), Deno runtime for the Edge Function edits, browser rendering of the review lists after the RPC change.
+
+## Files touched outside the privacy tables (for the integrator)
+`web_platform/src/app/shop/[id]/page.tsx`, `mobile_app/src/lib/marketplace.ts` (reviews through `public_provider_reviews`), `supabase/functions/_shared/http.ts`, `send-otp/index.ts`, `send-push/index.ts`, `whatsapp-inbound/index.ts`, new `_shared/request-guards.ts`, `package.json` (script `test:edge`), `scripts/verify-security-core.mjs`, existing tests changed to the new rules: `qa_adversarial`, `data_api_grants`, `inventory_workflows`, `trust`, `booking`, `delegated_access`, `intake` (db) and `web_platform/tests/adm1-admin-wiring.test.mjs`. Migrations 20261009200000 .. 20261009201100.

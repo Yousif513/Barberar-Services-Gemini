@@ -30,7 +30,9 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
   SELECT COALESCE((SELECT CASE WHEN jsonb_typeof(value) = 'number' AND (value #>> '{}') ~ '^[0-9]{1,4}$' THEN (value #>> '{}')::integer END
-                     FROM public.platform_settings WHERE key = 'address.staff_read_days'), 0);
+                     FROM public.platform_settings
+                    WHERE key = 'address.staff_read_days'
+                      AND (auth.uid() IS NOT NULL OR COALESCE(auth.jwt()->>'role', '') = 'service_role')), 0);
 $$;
 REVOKE ALL ON FUNCTION public.address_staff_read_days() FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.address_staff_read_days() TO authenticated, service_role;

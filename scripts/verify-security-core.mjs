@@ -98,7 +98,7 @@ const checks = [
   },
   {
     file: "supabase/functions/send-push/index.ts",
-    require: ["SUPABASE_SERVICE_ROLE_KEY", 'authorization !== `Bearer ${serviceKey}`'],
+    require: ["SUPABASE_SERVICE_ROLE_KEY", "serviceKeyMatches(", "!serviceKeyMatches("],
   },
 ];
 
