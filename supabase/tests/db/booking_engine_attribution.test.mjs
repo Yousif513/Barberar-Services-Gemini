@@ -119,13 +119,20 @@ describe("booking source attribution (D-02 / C-D8)", () => {
     b = await book(importedCustomer, { source: "import" });
     assert.equal(b.source, "marketplace");
     await cancel(importedCustomer, b);
-    // on this provider's list, matched by the verified phone number
-    await sys(db, `insert into provider_client_contacts (provider_id, full_name, phone, consent_confirmed_at) values ($1, 'Imported', '+966500000777', now())`, [SEED.provider1]);
+    // on this provider's list through the import command, but the import is not reviewed yet (FIX-MONEY M-10): marketplace
+    const imp = (await as(db, owner1, `select import_provider_clients($1, '[{"name":"Imported","phone":"+966500000777"}]'::jsonb, true) r`, [SEED.provider1]))[0].r;
+    b = await book(importedCustomer, { source: "import" });
+    assert.equal(b.source, "marketplace");
+    await cancel(importedCustomer, b);
+    // reviewed by an administrator, matched by the verified phone number
+    const reviewer = ROLES.user(await createUser(db, { role: "admin" }));
+    await as(db, reviewer, `select admin_review_client_import($1, 'checked the consent evidence')`, [imp.import_id]);
     b = await book(importedCustomer, { source: "import" });
     assert.equal(b.source, "import");
     assert.equal(Number(b.platform_commission), 0);
     await cancel(importedCustomer, b);
     // an unverified phone does not match
+    await sys(db, `update provider_client_contacts set matched_profile_id = null where provider_id = $1 and phone = '+966500000777'`, [SEED.provider1]); // match by phone only
     await sys(db, `update profiles set phone_verified = false where id = $1`, [importedCustomer.sub]);
     b = await book(importedCustomer, { source: "import" });
     assert.equal(b.source, "marketplace");

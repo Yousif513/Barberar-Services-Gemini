@@ -25,19 +25,6 @@ const firstSlotOf = async (user, employee, svc, date) =>
 const book = async (user, employee, svc, slot, extra = "") =>
   (await as(db, user, `select * from create_booking(target_employee_id => $1, target_service_id => $2, target_scheduled_at => $3${extra})`, [employee, svc.id, slot]))[0];
 
-describe("REPRODUCES OPEN DEFECT M-08 / M-10: first-visit commission can be bypassed by the provider", () => {
-
-  it("M-10: a provider-created 'imported client' row does not make a first marketplace visit fee-free", async () => {
-    const svc = await serviceFor(db, SEED.employee1);
-    const date = await nextWorkingDate(db, SEED.employee1, 4);
-    const phone = "+966500000555";
-    const customer = await freshCustomer({ phone, verified: true });
-    await as(db, owner1, `insert into provider_client_contacts (provider_id, full_name, phone, consent_confirmed_at) values ($1, 'Lead', $2, now())`, [SEED.provider1, phone]);
-    const b = await book(customer, SEED.employee1, svc, await firstSlotOf(customer, SEED.employee1, svc, date), ", request_source => 'import'");
-    assert.ok(Number(b.platform_commission) > 0, `claimed import with a contact row created seconds ago gave commission ${b.platform_commission}`);
-  });
-});
-
 describe("REPRODUCES OPEN DEFECT M-09: payouts of unperformed bookings", () => {
   it("M-09: the deposit of a future booking is not payable, so a provider cancellation can still be refunded", async () => {
     const admin = ROLES.user(await createUser(db, { role: "admin" }));
