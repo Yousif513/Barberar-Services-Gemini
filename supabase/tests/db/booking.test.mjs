@@ -285,6 +285,7 @@ describe("booking engine", () => {
 
   it("keeps block reasons and other customers' eligibility private", async () => {
     const blocked = await createUser(db);
+    await sys(db, `insert into conversations (customer_id, provider_id) values ($1, $2)`, [blocked, SEED.provider1]); // P-03: a block needs a relationship with the provider
     await as(db, owner1, `select toggle_customer_block($1, $2, 'abusive messages', true)`, [SEED.provider1, blocked]);
     const self = (await as(db, ROLES.user(blocked), `select check_customer_booking_eligibility($1, $2) r`, [SEED.provider1, blocked]))[0].r;
     assert.equal(self.is_blocked, true);

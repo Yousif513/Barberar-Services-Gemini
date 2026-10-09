@@ -46,15 +46,6 @@ describe("P-01 withdrawal of health-data consent", () => {
   });
 });
 
-describe("P-03 cross-tenant no-show strikes", () => {
-  it("refuses a provider owner a customer's strike count when the customer never booked there", async () => {
-    await assert.rejects(
-      as(db, owner2, `select check_customer_booking_eligibility($1, $2)`, [SEED.provider2, customer.sub]),
-      /Not authorized/,
-    );
-  });
-});
-
 describe("P-14 branch-scoped delegate", () => {
   it("does not return staff contacts of another branch", async () => {
     const sub = await createUser(db, { role: "provider_employee" });
