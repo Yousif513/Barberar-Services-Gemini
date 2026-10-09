@@ -52,3 +52,12 @@ describe("M-12: sponsored placement reads", () => {
     assert.equal((await as(db, ROLES.service, `select record_sponsored_impressions(array[$1]::uuid[]) n`, [campaign]))[0].n, 1);
   });
 });
+
+describe("M-13: the sponsored new-client decision is serialised per (provider, customer)", () => {
+  it("takes an advisory lock on provider and customer before deciding (a two-session race cannot be run on PGlite)", async () => {
+    const def = (await sys(db, `select pg_get_functiondef('public.sponsored_attribute_completed_booking()'::regprocedure) d`))[0].d.replace(/\r/g, "");
+    const lock = def.indexOf("sponsored-new-client:");
+    assert.ok(lock > 0);
+    assert.ok(lock < def.indexOf("v_new := NOT EXISTS"), "the lock precedes the decision");
+  });
+});

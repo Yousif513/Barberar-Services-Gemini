@@ -41,3 +41,46 @@ Open for M-12: nothing calls `record_sponsored_impressions` yet (the shop search
 | M-23 write grants broader than policies | fixed as far as policies allow (same migration: INSERT/UPDATE/DELETE revoked from `authenticated` wherever no permissive policy for that command applies to it; before: 56 tables with INSERT/UPDATE and 52 with DELETE, after: 54/54/50; `payout_requests` loses INSERT, so only `request_provider_payout` creates requests) | see git log | fixmoney_grants.test.mjs (catalog-driven: fails when a privilege has no policy behind it) |
 
 Note on M-23: most money tables keep their client privileges because their only write policy is the administrator policy (`is_admin()`), which applies to the role `authenticated`; their privileges are needed for an administrator who writes through the Data API. Removing them is a design change (every administrator write through a command) and is not done here.
+| M-13 sponsored new-client lock per campaign | fixed in code (migration 20261009145000: advisory lock on (provider, customer) before the decision) | see git log | fixmoney_sponsored_read_only.test.mjs (source order only; the two-session race cannot be run on PGlite) |
+
+## Not done, and why
+
+| Item | Status |
+|------|--------|
+| M-17 open unpaid series/group holds per customer | deferred (needs a per-provider cap setting: business value, owner) |
+| M-19 plan limits fail open; plan change forfeits paid time | deferred (proration is an owner decision) |
+| M-20 package session plus membership visit on one booking | deferred (by code reading only, not reproduced; not attempted for budget) |
+| M-01..M-03 (memberships, wallet credit) | already fixed in the base commit, not redone |
+
+## Owner / legal decisions (not mine, listed for the owner)
+
+- M-11: VAT 15 percent hard-coded on platform fees (`generate_provider_monthly_fee_invoice`) and the 15 percent fallback commission when no fee rule matches; whether commission is VAT-inclusive; fail closed on a missing rule.
+- M-15: VAT on sponsored fees, and invoicing a sponsored fee for a provider with no later completed booking.
+- M-18: credit notes / correction mechanism for tax invoices and the global invoice sequence (ZATCA counter rules).
+- M-21: late-cancellation fee avoidable by paying with credit/gift card/coupon (policy).
+- M-06: intended annual subscription price (see above). M-09: whether package/membership/gift-card sales and bookings need a payout holding period (none exists in `platform_settings`).
+
+## Verification (run in the worktree, node_modules junction, no npm install)
+
+| Command | Result |
+|---------|--------|
+| `node --test "supabase/tests/db/**/*.test.mjs"` | 1106 tests, 1106 pass, 0 fail (includes the new fixmoney_*.test.mjs files) |
+| `node --test supabase/tests/inventory.test.mjs` | 10 pass, 0 fail |
+| `node scripts/verify-ui-schema.mjs` | checked 194 rpc calls and 229 select strings; 0 mismatches |
+| `npm run test --workspace=web_platform` | 714 pass, 0 fail |
+| `npm run test:security-core` | Security core verification passed |
+| `npx tsc --noEmit -p web_platform` | exit 0 (provider/pricing page touched) |
+
+Not run: `npm run build --workspace=web_platform` and eslint (junctioned node_modules); the integrator builds after merging. Edge Function change (payment-webhook) is read-only verified: no Deno here.
+
+## Files touched outside fixmoney_* and the new migrations
+
+- `supabase/functions/payment-webhook/index.ts` (refund_request_id handling for every non-booking purchase type)
+- `web_platform/src/app/provider/pricing/page.tsx` (price from `quote_provider_plan`, hard-coded prices and the screen-only VAT row removed)
+- Tests updated for intended behaviour changes: `fixdbb_fee_invoices.test.mjs` (late activity now yields a supplementary invoice), `booking_engine_attribution.test.mjs` (import goes through the command and a review), `sponsored.test.mjs` (rotation recorded through `record_sponsored_impressions`), `qa_adversarial.test.mjs` (no service-role-only command left for `authenticated`)
+- `supabase/tests/db/review_money_open.repro.mjs` deleted (all seven reproductions now pass as normal tests)
+
+## Migrations (timestamps 20261009100000 .. 20261009145000)
+
+100000 purchase_capture_conflicts, 110000 fee_invoice_carry_forward, 120000 subscription_price_quote, 130000 walk_ins_are_not_first_visits, 140000 import_channel_review,
+141000 payout_after_visit, 142000 sponsored_placements_read_only, 143000 invoice_chain_integrity, 144000 revoke_unneeded_write_grants, 145000 sponsored_new_client_lock.
