@@ -175,7 +175,7 @@ describe("booking safeguards survive P3", () => {
     const allowed = new Set(["get_available_slots", "get_branch_available_slots", "get_branch_schedule_with_prayer_pauses",
       "search_marketplace_providers", "normalize_arabic", "provider_rating_summaries",
       "track_analytics_event", // D-26: insert-only client event recorder
-      "public_professional_profile", // G75: the public professional page
+      "public_professional_profile", "public_provider_reviews", // G75: the public professional page; P-02: reviews with a reviewer display and no identifiers
       "get_sponsored_placements", "record_sponsored_click"]); // G63: the labelled sponsored block and its click counter (public by design)
     const rows = await sys(db, `
       select distinct p.proname from pg_proc p

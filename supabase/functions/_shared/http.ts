@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.108.1"
+import { serviceKeyMatches } from "./request-guards.ts"
 
 // Origins allowed to call functions from a browser. APP_ORIGIN adds a deployment origin.
 const ALLOWED_ORIGINS = [
@@ -50,7 +51,7 @@ export async function resolveCaller(req: Request): Promise<Caller | null> {
   const header = req.headers.get("Authorization") || ""
   const token = header.replace(/^Bearer\s+/i, "")
   if (!token) return null
-  if (token === Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) return { kind: "service" }
+  if (serviceKeyMatches(token, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"))) return { kind: "service" }
 
   const admin = serviceClient()
   const { data, error } = await admin.auth.getUser(token)

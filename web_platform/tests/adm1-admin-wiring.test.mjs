@@ -33,7 +33,7 @@ describe("ADM1 item 2: send-push sends only what claim_push_batch returns", () =
   it("claims a batch, reports every outcome and keeps the service-role caller check", () => {
     assert.match(push, /claim_push_batch/);
     assert.match(push, /complete_push_delivery/);
-    assert.match(push, /authorization !== `Bearer \$\{serviceKey\}`/);
+    assert.match(push, /!serviceKeyMatches\(/); // P-13: a timing-safe comparison of the service key, never ===
     assert.doesNotMatch(push, /const \{ title, body, token, data \}/, "the caller no longer chooses recipient or text");
   });
 });

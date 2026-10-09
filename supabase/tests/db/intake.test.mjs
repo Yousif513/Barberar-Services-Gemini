@@ -497,7 +497,7 @@ describe("enforcement", () => {
 });
 
 describe("withdrawal, deletion and retention", () => {
-  it("blanks the answers of future bookings on withdrawal, keeps a tombstone, and keeps past ones", async () => {
+  it("blanks the answers of future AND past bookings on withdrawal and keeps a tombstone (P-01)", async () => {
     const customer = await newCustomer();
     await consent(customer);
     const future = await makeBooking(customer);
@@ -505,9 +505,10 @@ describe("withdrawal, deletion and retention", () => {
     const fs = await submit(customer, future.id);
     const ps = await submit(customer, past.id);
     const r = await call(customer, `select withdraw_health_data_consent() r`);
-    assert.equal(r.answers_removed, 1);
+    assert.equal(r.answers_removed, 2);
     assert.equal(await count("intake_answers", "submission_id = $1", [fs.submission_id]), 0);
-    assert.equal(await count("intake_answers", "submission_id = $1", [ps.submission_id]), 1, "a past submission stays until deleted or purged");
+    assert.equal(await count("intake_answers", "submission_id = $1", [ps.submission_id]), 0, "a past submission is blanked too");
+    assert.equal((await read(owner, past.id)).answers, null);
     const [tomb] = await sys(db, `select status, removal_reason, answers_removed_at, template_version from intake_submissions where id = $1`, [fs.submission_id]);
     assert.equal(tomb.status, "withdrawn");
     assert.equal(tomb.removal_reason, "consent_withdrawn");

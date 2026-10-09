@@ -7,6 +7,7 @@ import { makeAdhanClock } from "../_shared/whatsapp-prayer.ts"
 import { riyadhYmd } from "../_shared/whatsapp-intent.ts"
 import { respond, type AvailabilityPort } from "../_shared/whatsapp-engine.ts"
 import { toEngineContext } from "../_shared/whatsapp-context.ts"
+import { declaredLengthExceeds, readBodyLimited } from "../_shared/request-guards.ts"
 
 // Receives WhatsApp Cloud API webhooks for the receptionist (G60). Deployed with verify_jwt = false (config.toml): Meta does not send a
 // Supabase JWT, so the HMAC signature of the raw body (X-Hub-Signature-256, app secret) is the authentication. Nothing from the body is
@@ -92,8 +93,10 @@ serve(async (req) => {
     }
     if (req.method !== "POST") return reply({ error: "Method not allowed." }, 405)
 
-    const raw = new Uint8Array(await req.arrayBuffer())
-    if (raw.byteLength > MAX_BODY_BYTES) return reply({ error: "Payload too large." }, 413)
+    // Refuse an oversized body before reading it: the declared length first, then the bytes actually received (chunked uploads declare none).
+    if (declaredLengthExceeds(req.headers.get("Content-Length"), MAX_BODY_BYTES)) return reply({ error: "Payload too large." }, 413)
+    const raw = await readBodyLimited(req.body, MAX_BODY_BYTES)
+    if (raw === null) return reply({ error: "Payload too large." }, 413)
     const signature = await verifyMetaSignature({
       appSecret: Deno.env.get("WHATSAPP_APP_SECRET"),
       rawBody: raw,

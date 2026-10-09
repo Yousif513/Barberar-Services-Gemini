@@ -92,6 +92,7 @@ describe("walk-in bookings and customer strikes", () => {
 
   it("keep a customer's block and strike details from people with no booking role at the provider", async () => {
     const blocked = await createUser(db);
+    await sys(db, `insert into conversations (customer_id, provider_id) values ($1, $2)`, [blocked, SEED.provider1]); // P-03: a block needs a relationship with the provider
     await as(db, owner, `select toggle_customer_block($1, $2, 'abusive messages', true)`, [SEED.provider1, blocked]);
     const seen = async (user) => (await as(db, user, `select check_customer_booking_eligibility($1, $2) r`, [SEED.provider1, blocked]))[0].r;
     assert.equal((await seen(owner)).block_reason, "abusive messages");
