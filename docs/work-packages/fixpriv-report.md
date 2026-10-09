@@ -8,6 +8,8 @@ Migration range 20261009200000 .. 20261009249999. Tests: `supabase/tests/db/fixp
 | P-03 | fixed | see git log "P-03" | fixpriv_eligibility.test.mjs |
 | P-14 | fixed (links: not reproduced) | see git log "P-14" | fixpriv_delegate_scope.test.mjs |
 | P-04 | fixed (anon read, client writes); signed-in read residual | see git log "P-04" | fixpriv_employee_identity.test.mjs |
+| P-09 | fixed | see git log "P-09" | fixpriv_platform_settings.test.mjs |
+| P-10 | fixed | see git log "P-10" | fixpriv_public_places.test.mjs |
 
 ## P-02
 - `20261009200000_fixpriv_consent_oracle.sql`: `has_active_consent(uuid,text)` now raises `42501 Not authorized` when a signed-in caller asks about someone else and is not an administrator. Service role, jobs and definer-internal calls without a signed-in user (`auth.uid()` NULL) are unchanged. This replaces the (3-line, language sql) function body with a plpgsql body of the same signature; privileges are re-stated.
@@ -23,3 +25,9 @@ Migration range 20261009200000 .. 20261009249999. Tests: `supabase/tests/db/fixp
 
 ## P-04 (fixed for visitors and for writes; signed-in read residual)
 `20261009200400_fixpriv_employee_identity_link.sql`: anon lost SELECT on `employees.profile_id`. Owners and delegates lost the right to INSERT/UPDATE `profile_id` through the Data API (table-wide INSERT/UPDATE replaced by column grants without it), so an owner can no longer bind an arbitrary user to a salon. No screen or command writes the column today (the staff form's payload has no `profile_id`; linking is done by the service role), so no screen changes. The platform has no employee invitation/acceptance command: the professional-workplace invitations (G75) bind a professional profile, not `employees.profile_id`. Recommended follow-up (owner decision): an `invite_employee_login` / `accept_employee_invitation` pair; until then the link stays a support action. Residual: signed-in users still read `profile_id` of active staff (the owner's staff screen selects it and the public-read policy covers active staff); fix by exposing a `has_login` boolean to that screen and then revoking the column from `authenticated`. Test: `fixpriv_employee_identity.test.mjs`.
+
+## P-09 (fixed)
+`20261009200500_fixpriv_platform_settings_public_allowlist.sql`: new `platform_settings.is_public BOOLEAN NOT NULL DEFAULT FALSE`; the old `USING (true)` policy is replaced by "visitors and signed-in users read rows where is_public" plus "administrators read all". Seeded public: `loyalty_program`, `referral_program`, `booking_hold_minutes`, `tip_limits`, `gift_card_limits`, `minimum_online_deposit_percentage`, `public_app_url`, `whatsapp.session_window_hours` and the five `api.*` limits (the keys the shop, customer dashboard, WhatsApp and developer screens read directly). Private: `no_show_strike_policy`, `intake.retention_days`, `whatsapp.message_retention_days`, all `sponsored.*`. The admin screens (settings, platform-rules) read through the admin policy; SECURITY DEFINER functions are unaffected. Making a future key public is a deliberate `UPDATE ... SET is_public = TRUE` in a migration (`admin_update_platform_setting` does not change the flag). Test: `fixpriv_platform_settings.test.mjs`.
+
+## P-10 (fixed)
+`20261009200600_fixpriv_public_provider_places.sql`: `branches`, `employee_availability`, `provider_closures` follow `providers.is_verified` for visitors; signed-in users additionally read through new `can_read_provider_place(provider, branch)` (verified, the provider's staff/owner/delegates, administrators, or a customer who has a booking at that branch, so history survives a suspension). Writes untouched. Test: `fixpriv_public_places.test.mjs`. Full DB suite after P-09/P-10: 1095 tests, 0 failures.
