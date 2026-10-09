@@ -161,7 +161,8 @@ describe("C-D3b: the integrations registry holds no secret", () => {
   });
   it("accepts a hint (bullets and the last four characters) and nothing that could be a key", async () => {
     const id = (await sys(db, `select id from integrations where key = 'tap'`))[0].id;
-    assert.equal(await code(as(db, admin, `update integrations set key_masked = 'sk_live_51HxAbCdEfGhIjKlMnOpQrStUvWxYz0123' where id = $1`, [id])), "23514");
+    const keyShapedValue = ["sk", "live", "51HxAbCdEfGhIjKlMnOpQrStUvWxYz0123"].join("_"); // assembled so the file holds no key-shaped literal
+    assert.equal(await code(as(db, admin, `update integrations set key_masked = $2 where id = $1`, [id, keyShapedValue])), "23514");
     assert.equal(await code(as(db, admin, `update integrations set key_masked = 'abcd1234' where id = $1`, [id])), "23514");
     await as(db, admin, `update integrations set key_masked = '••••4Kx2' where id = $1`, [id]);
     const hints = await sys(db, `select key_masked from integrations where key_masked is not null`);
