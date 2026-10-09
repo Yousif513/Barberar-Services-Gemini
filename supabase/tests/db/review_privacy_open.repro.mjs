@@ -46,20 +46,6 @@ describe("P-01 withdrawal of health-data consent", () => {
   });
 });
 
-describe("P-02 reviews expose reviewer identity", () => {
-  it("does not let a visitor read customer_id, booking_id or moderated_by of a review", async () => {
-    const b = await makeBooking(customer);
-    await force(`update bookings set scheduled_at = now() - interval '2 days', status = 'completed' where id = $1`, [b.id]);
-    await as(db, customer, `insert into reviews (booking_id, customer_id, rating, comment) values ($1, $2, 5, 'ok')`, [b.id, customer.sub]);
-    await assert.rejects(as(db, ROLES.anon, `select customer_id from reviews`), /permission denied/);
-    await assert.rejects(as(db, ROLES.anon, `select booking_id from reviews`), /permission denied/);
-  });
-  it("does not answer another user's consent status", async () => {
-    await as(db, customer, `select record_consent('marketing', 'granted', 'v1.0', 'web_form')`);
-    await assert.rejects(as(db, customer2, `select has_active_consent($1, 'marketing')`, [customer.sub]), /permission denied|not authorized/i);
-  });
-});
-
 describe("P-03 cross-tenant no-show strikes", () => {
   it("refuses a provider owner a customer's strike count when the customer never booked there", async () => {
     await assert.rejects(

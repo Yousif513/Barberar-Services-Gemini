@@ -18,7 +18,7 @@ const WITHHELD = ["inventory_products:DELETE", "inventory_suppliers:DELETE", "pr
 // The public catalogue: relations an anonymous visitor may read at table level (rows are still limited by policy).
 const ANONYMOUS_CATALOGUE = [
   "branches", "categories", "employee_availability", "employee_portfolios", "employee_services",
-  "legal_agreements", "packages", "platform_settings", "provider_closures", "provider_promos", "resources", "reviews",
+  "legal_agreements", "packages", "platform_settings", "provider_closures", "provider_promos", "resources",
   "seasonal_schedules", "service_resources", "service_variants", "services", "subscription_plans",
 ];
 
