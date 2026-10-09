@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { loadExpandedCategorySlugs } from "@/lib/category-tree";
 
 type Locale = "en" | "ar";
 
@@ -61,7 +62,7 @@ const text = {
 
 // A public category page lists the providers the marketplace search returns for that category: real ratings and real prices,
 // or an honest empty state. The page never invents a business.
-export default function CategoryProviders({ categorySlug, queries, copy }: { categorySlug?: string; queries?: string[]; copy: Record<Locale, CategoryCopy> }) {
+export default function CategoryProviders({ categorySlugs, queries, copy }: { categorySlugs?: string[]; queries?: string[]; copy: Record<Locale, CategoryCopy> }) {
   const [locale, setLocale] = useState<Locale>("ar");
   const [providers, setProviders] = useState<ProviderRow[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
@@ -81,9 +82,20 @@ export default function CategoryProviders({ categorySlug, queries, copy }: { cat
 
   const load = useCallback(async () => {
     setStatus("loading");
-    // One search per term (a category by slug, or service-name terms in both languages); the answers are merged by branch.
-    const searches = (queries && queries.length > 0 ? queries : [null]).map((query) =>
-      supabase.rpc("search_marketplace_providers", { p_query: query, p_category: categorySlug ?? "all", p_limit: 24, p_offset: 0 }),
+    // A category page covers its top-level categories and every child category, because providers list services in the leaves.
+    let slugs: string[] = ["all"];
+    if (categorySlugs && categorySlugs.length > 0) {
+      const expanded = await loadExpandedCategorySlugs(categorySlugs);
+      if (expanded.error) {
+        setErrorMessage(expanded.error);
+        setStatus("error");
+        return;
+      }
+      slugs = expanded.slugs;
+    }
+    // One search per term and category slug (service-name terms in both languages); the answers are merged by branch.
+    const searches = (queries && queries.length > 0 ? queries : [null]).flatMap((query) =>
+      slugs.map((slug) => supabase.rpc("search_marketplace_providers", { p_query: query, p_category: slug, p_limit: 24, p_offset: 0 })),
     );
     const answers = await Promise.all(searches);
     const failed = answers.find((answer) => answer.error);
@@ -98,7 +110,7 @@ export default function CategoryProviders({ categorySlug, queries, copy }: { cat
     }
     setProviders([...merged.values()]);
     setStatus("ready");
-  }, [categorySlug, queries]);
+  }, [categorySlugs, queries]);
 
   useEffect(() => {
     // Loading starts from the effect so the first paint is the loading state.

@@ -7,6 +7,8 @@ const copy = {
   ar: { category: "المنتجعات الصحية والعافية", title: "السبا والعافية", subtitle: "احجز المنتجعات الصحية وغرف المساج والحمامات المغربية." },
 };
 
+const categorySlugs = ["spa-wellness"];
+
 export default function SpaCategoryPage() {
-  return <CategoryProviders categorySlug="spa-wellness" copy={copy} />;
+  return <CategoryProviders categorySlugs={categorySlugs} copy={copy} />;
 }
