@@ -45,7 +45,7 @@ type ApprovalRow = {
 };
 type Review = { id: string; approval_request_id: string; amount_sar: Numeric; justification: string; executed_at: string; due_at: string; signed_off_at: string | null; reviewer_name: string | null; document_reference: string | null; overdue: boolean; can_sign_off?: boolean };
 type Setting = { key: string; value: Numeric; description_en: string; description_ar: string; updated_at: string };
-type Alert = { id: string; kind: string; details: Record<string, unknown>; created_at: string; can_acknowledge?: boolean };
+type Alert = { id: string; kind: string; user_id: string | null; details: Record<string, unknown>; created_at: string; can_acknowledge?: boolean };
 type Inbox = {
   counts: Record<string, Numeric>;
   matching: Numeric;
@@ -65,7 +65,8 @@ type Dialog =
   | { type: "break-glass"; row: ApprovalRow }
   | { type: "review"; review: Review }
   | { type: "setting"; setting: Setting }
-  | { type: "alert"; alert: Alert };
+  | { type: "alert"; alert: Alert }
+  | { type: "lift"; alert: Alert };
 
 const translations = {
   en: {
@@ -160,7 +161,12 @@ const translations = {
       iban_change_requested: "Provider bank account change requested",
       health_break_glass: "Health-intake answers opened through break-glass",
       mfa_factor_added: "Authenticator added to an administrator account",
+      iban_reveal_limit_reached: "IBAN reveal ceiling reached (20 in 24 hours)",
     } as Record<string, string>,
+    liftReveals: "Allow 10 more reveals",
+    liftTitle: "Allow this administrator 10 more IBAN reveals today",
+    liftIntro: "Reveals stop at 20 in 24 hours. Allowing more is recorded in your name and needs a fresh authenticator code. You cannot allow more for yourself.",
+    liftReason: "Why are more reveals needed? (at least 15 characters)",
     settingNames: {
       refund_single_approval_sar: "Single refund needing a second approver",
       refund_daily_cumulative_sar: "Daily refund total per administrator",
@@ -265,7 +271,12 @@ const translations = {
       iban_change_requested: "طلب تغيير الحساب البنكي لمزود",
       health_break_glass: "فُتحت إجابات الاستبيان الصحي عبر إجراء الطوارئ",
       mfa_factor_added: "أُضيف تطبيق مصادقة إلى حساب مسؤول",
+      iban_reveal_limit_reached: "بلوغ الحد الأعلى لكشف الآيبان (20 خلال 24 ساعة)",
     } as Record<string, string>,
+    liftReveals: "السماح بـ 10 عمليات كشف إضافية",
+    liftTitle: "السماح لهذا المسؤول بـ 10 عمليات كشف آيبان إضافية اليوم",
+    liftIntro: "يتوقف كشف الآيبان عند 20 مرة خلال 24 ساعة. السماح بالمزيد يُسجَّل باسمك ويحتاج رمزاً جديداً من تطبيق المصادقة. لا يمكنك السماح بالمزيد لنفسك.",
+    liftReason: "لماذا تلزم عمليات كشف إضافية؟ (15 حرفاً على الأقل)",
     settingNames: {
       refund_single_approval_sar: "استرداد واحد يحتاج معتمداً ثانياً",
       refund_daily_cumulative_sar: "إجمالي الاسترداد اليومي لكل مسؤول",
@@ -414,6 +425,10 @@ function ApprovalsScreen() {
       const { error } = await supabase.rpc("admin_request_setting_change", { p_key: dialog.setting.key, p_value: Number(extra), p_reason: reason });
       message = error ? errorMessage(error) : null;
       if (!message) setSuccess(t.proposedDone);
+    } else if (dialog.type === "lift") {
+      const { error } = await supabase.rpc("admin_lift_iban_reveal_limit", { p_user_id: dialog.alert.user_id, p_reason: reason });
+      message = error ? errorMessage(error) : null;
+      if (!message) setSuccess(t.done);
     } else if (dialog.type === "alert") {
       const { error } = await supabase.rpc("admin_acknowledge_security_alert", { p_alert_id: dialog.alert.id, p_note: reason });
       message = error ? errorMessage(error) : null;
@@ -493,6 +508,8 @@ function ApprovalsScreen() {
           minReasonLength: 10,
           confirmLabel: t.propose,
         };
+      case "lift":
+        return { title: t.liftTitle, intro: t.liftIntro, facts: [{ label: t.columnRequest, value: t.alertKinds[dialog.alert.kind] ?? dialog.alert.kind }], reasonLabel: t.liftReason, minReasonLength: 15, confirmLabel: t.liftReveals };
       case "alert":
         return { title: t.alertTitle, facts: [{ label: t.columnRequest, value: t.alertKinds[dialog.alert.kind] ?? dialog.alert.kind }], reasonLabel: t.alertReason, minReasonLength: 10, confirmLabel: t.acknowledge };
     }
@@ -677,6 +694,9 @@ function ApprovalsScreen() {
                           <span className="block text-[11px] text-[#B54708]">{operationsDate(alert.created_at, lang)}</span>
                         </span>
                         {inbox.can_acknowledge_alerts && alert.can_acknowledge !== false && <button type="button" onClick={() => setDialog({ type: "alert", alert })} className={`${smallButton} border-[#FEC84B] bg-white text-[#93370D]`}>{t.acknowledge}</button>}
+                        {inbox.can_acknowledge_alerts && alert.can_acknowledge !== false && (alert.kind === "iban_reveal_limit_reached" || alert.kind === "iban_reveal_volume") && alert.user_id && (
+                          <button type="button" onClick={() => setDialog({ type: "lift", alert })} className={`${smallButton} border-[#FEC84B] bg-white text-[#93370D]`}>{t.liftReveals}</button>
+                        )}
                         {inbox.can_acknowledge_alerts && alert.can_acknowledge === false && <span className="max-w-[140px] text-[10px] text-[#B54708]">{t.ownAlert}</span>}
                       </li>
                     ))}

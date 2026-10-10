@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
+import { isReauthRequired } from "@/lib/step-up";
 import { useConfirm } from "@/components/modal";
 import { DialogError, ProviderDialog, providerFieldClass, providerGhostButton, providerLabelClass, providerPrimaryButton } from "./dialog";
 
@@ -17,6 +18,18 @@ const copy = {
     productCommission: "Product commission (%)",
     iban: "Salary IBAN (optional)",
     ibanHint: "Saudi IBAN: SA followed by 22 digits. Stored for payroll only.",
+    ibanNew: "New salary IBAN (leave empty to keep the current one)",
+    ibanCurrent: "Account on file: {masked}",
+    ibanNone: "No salary account on file.",
+    ibanRemove: "Remove the salary account on file",
+    revealReason: "Why do you need the full number?",
+    revealButton: "Show the full number for 60 seconds",
+    revealing: "Checking…",
+    revealHide: "Hide",
+    revealShown: "Full number (hidden in {n} s)",
+    revealReauth: "For your security, sign in again (within the last 10 minutes) to see the full account number.",
+    revealFailed: "The number could not be shown: ",
+    revealReasonShort: "Give a reason of at least 5 characters.",
     invalidAmount: "Enter a number that is zero or more.",
     invalidRate: "Enter a rate between 0 and 100.",
     invalidIban: "A Saudi IBAN is SA followed by 22 digits.",
@@ -51,6 +64,18 @@ const copy = {
     productCommission: "عمولة المنتجات (%)",
     iban: "رقم الآيبان للراتب (اختياري)",
     ibanHint: "الآيبان السعودي: SA يتبعه 22 رقماً. يُحفظ لأغراض الرواتب فقط.",
+    ibanNew: "آيبان الراتب الجديد (اتركه فارغاً للإبقاء على الحالي)",
+    ibanCurrent: "الحساب المحفوظ: {masked}",
+    ibanNone: "لا يوجد حساب راتب محفوظ.",
+    ibanRemove: "حذف حساب الراتب المحفوظ",
+    revealReason: "لماذا تحتاج الرقم كاملاً؟",
+    revealButton: "إظهار الرقم كاملاً لمدة 60 ثانية",
+    revealing: "جارٍ التحقق…",
+    revealHide: "إخفاء",
+    revealShown: "الرقم كاملاً (يختفي خلال {n} ث)",
+    revealReauth: "لحمايتك، سجّل الدخول من جديد (خلال آخر 10 دقائق) لعرض رقم الحساب كاملاً.",
+    revealFailed: "تعذر عرض الرقم: ",
+    revealReasonShort: "اكتب سبباً من 5 أحرف على الأقل.",
     invalidAmount: "أدخل رقماً لا يقل عن صفر.",
     invalidRate: "أدخل نسبة بين 0 و100.",
     invalidIban: "الآيبان السعودي هو SA يتبعه 22 رقماً.",
@@ -92,7 +117,17 @@ export function CommissionRulesDialog({ lang, providerId, employeeId, employeeNa
   const [salary, setSalary] = useState("");
   const [rate, setRate] = useState("");
   const [productRate, setProductRate] = useState("");
+  // GOV-FIX M-5: the full salary IBAN is never read back. The screen shows the masked copy, a new number replaces it, and the
+  // full number appears only through reveal_employee_wps_iban (fresh sign-in, reason, audited) for 60 seconds.
   const [iban, setIban] = useState("");
+  const [maskedIban, setMaskedIban] = useState<string | null>(null);
+  const [ruleExists, setRuleExists] = useState(false);
+  const [removeIban, setRemoveIban] = useState(false);
+  const [revealReason, setRevealReason] = useState("");
+  const [revealed, setRevealed] = useState<{ iban: string; until: number } | null>(null);
+  const [revealBusy, setRevealBusy] = useState(false);
+  const [revealError, setRevealError] = useState("");
+  const [clock, setClock] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [failure, setFailure] = useState("");
@@ -103,7 +138,7 @@ export function CommissionRulesDialog({ lang, providerId, employeeId, employeeNa
     void (async () => {
       const { data, error } = await supabase
         .from("employee_commission_rules")
-        .select("base_salary_sar, commission_rate, product_commission_rate, wps_iban")
+        .select("base_salary_sar, commission_rate, product_commission_rate, wps_iban_masked")
         .eq("employee_id", employeeId)
         .maybeSingle();
       if (!live) return;
@@ -112,12 +147,36 @@ export function CommissionRulesDialog({ lang, providerId, employeeId, employeeNa
         setSalary(String(data.base_salary_sar ?? ""));
         setRate(String(data.commission_rate ?? ""));
         setProductRate(String(data.product_commission_rate ?? ""));
-        setIban(data.wps_iban ?? "");
+        setMaskedIban(data.wps_iban_masked ?? null);
+        setRuleExists(true);
       }
       setLoading(false);
     })();
     return () => { live = false; };
   }, [employeeId, t.loadFailed]);
+
+  useEffect(() => {
+    if (!revealed) return;
+    const timer = window.setInterval(() => {
+      const current = Date.now();
+      setClock(current);
+      if (current >= revealed.until) setRevealed(null);
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [revealed]);
+
+  const reveal = async () => {
+    if (revealReason.trim().length < 5) { setRevealError(t.revealReasonShort); return; }
+    setRevealBusy(true);
+    setRevealError("");
+    const { data, error } = await supabase.rpc("reveal_employee_wps_iban", { p_employee_id: employeeId, p_reason: revealReason.trim() });
+    setRevealBusy(false);
+    if (error) { setRevealError(isReauthRequired(error) ? t.revealReauth : t.revealFailed + errorMessage(error)); return; }
+    const shown = data as { iban: string; expires_at: string };
+    const until = Math.min(new Date(shown.expires_at).getTime(), Date.now() + 60000);
+    setClock(Date.now());
+    setRevealed({ iban: shown.iban, until });
+  };
 
   const num = (value: string) => (value.trim() === "" ? NaN : Number(value));
   const salaryProblem = !(num(salary) >= 0);
@@ -131,15 +190,19 @@ export function CommissionRulesDialog({ lang, providerId, employeeId, employeeNa
     if (salaryProblem || rateProblem || productProblem || ibanProblem || saving) return;
     setSaving(true);
     setFailure("");
-    const { error } = await supabase.from("employee_commission_rules").upsert({
-      employee_id: employeeId,
-      provider_id: providerId,
+    // The full number is not readable, so an upsert (which reads what it sets) is refused: insert a new rule, update an
+    // existing one, and send the IBAN only when it changes.
+    const values: Record<string, unknown> = {
       base_salary_sar: num(salary),
       commission_rate: num(rate),
       product_commission_rate: num(productRate),
-      wps_iban: iban.trim() === "" ? null : normalizeIban(iban),
       updated_at: new Date().toISOString(),
-    }, { onConflict: "employee_id" });
+    };
+    if (iban.trim() !== "") values.wps_iban = normalizeIban(iban);
+    else if (removeIban) values.wps_iban = null;
+    const { error } = ruleExists
+      ? await supabase.from("employee_commission_rules").update(values).eq("employee_id", employeeId)
+      : await supabase.from("employee_commission_rules").insert({ employee_id: employeeId, provider_id: providerId, ...values });
     setSaving(false);
     if (error) { setFailure(t.saveFailed + errorMessage(error)); return; }
     onSaved();
@@ -169,9 +232,40 @@ export function CommissionRulesDialog({ lang, providerId, employeeId, employeeNa
             {attempted && productProblem && <p className="mt-1 text-xs font-semibold text-[#B42318]">{t.invalidRate}</p>}
           </div>
           <div className="sm:col-span-2">
-            <label className={providerLabelClass} htmlFor="rules-iban">{t.iban}</label>
-            <input id="rules-iban" dir="ltr" autoComplete="off" disabled={loading || saving} value={iban} onChange={(e) => setIban(e.target.value)} aria-invalid={attempted && ibanProblem} aria-describedby="rules-iban-hint" className={`${providerFieldClass} font-mono`} />
+            <p className="mb-2 text-xs font-semibold text-[#344054]">
+              {maskedIban ? <>{t.ibanCurrent.split("{masked}")[0]}<bdi dir="ltr" className="font-mono">{maskedIban}</bdi>{t.ibanCurrent.split("{masked}")[1]}</> : t.ibanNone}
+            </p>
+            {maskedIban && (
+              <div className="mb-3 rounded-xl border border-[#ECECEC] bg-[#F9F7F1] p-3">
+                {revealed ? (
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span>
+                      <span className="block text-[11px] font-bold text-[#667085]">{t.revealShown.replace("{n}", String(Math.max(0, Math.ceil((revealed.until - (clock || revealed.until)) / 1000))))}</span>
+                      <bdi dir="ltr" className="select-all font-mono text-sm font-black text-[#101828]">{revealed.iban.replace(/(.{4})/g, "$1 ").trim()}</bdi>
+                    </span>
+                    <button type="button" onClick={() => setRevealed(null)} className={providerGhostButton}>{t.revealHide}</button>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap items-end gap-2">
+                    <div className="min-w-[180px] flex-1">
+                      <label className={providerLabelClass} htmlFor="rules-reveal-reason">{t.revealReason}</label>
+                      <input id="rules-reveal-reason" disabled={revealBusy} value={revealReason} onChange={(e) => setRevealReason(e.target.value)} className={providerFieldClass} />
+                    </div>
+                    <button type="button" onClick={() => void reveal()} disabled={revealBusy} className={providerGhostButton}>{revealBusy ? t.revealing : t.revealButton}</button>
+                  </div>
+                )}
+                {revealError && <p role="alert" className="mt-2 text-xs font-semibold text-[#B42318]">{revealError}</p>}
+              </div>
+            )}
+            <label className={providerLabelClass} htmlFor="rules-iban">{maskedIban ? t.ibanNew : t.iban}</label>
+            <input id="rules-iban" dir="ltr" autoComplete="off" disabled={loading || saving || removeIban} value={iban} onChange={(e) => setIban(e.target.value)} aria-invalid={attempted && ibanProblem} aria-describedby="rules-iban-hint" className={`${providerFieldClass} font-mono`} />
             <p id="rules-iban-hint" className="mt-1 text-xs text-[#667085]">{t.ibanHint}</p>
+            {maskedIban && (
+              <label className="mt-2 flex items-center gap-2 text-xs font-semibold text-[#344054]">
+                <input type="checkbox" checked={removeIban} disabled={loading || saving} onChange={(e) => { setRemoveIban(e.target.checked); if (e.target.checked) setIban(""); }} className="h-4 w-4 accent-[#9B7928]" />
+                {t.ibanRemove}
+              </label>
+            )}
             {attempted && ibanProblem && <p className="mt-1 text-xs font-semibold text-[#B42318]">{t.invalidIban}</p>}
           </div>
         </div>

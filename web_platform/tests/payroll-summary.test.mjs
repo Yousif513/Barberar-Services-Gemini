@@ -3,11 +3,11 @@ import assert from "node:assert/strict";
 import { payrollSummaryCsv } from "../src/lib/payroll-summary.mjs";
 
 const configured = {
-  employee_id: "e1", name_en: "Omar, \"Ace\" Khaled", name_ar: "عمر خالد", title_en: "Barber", branch: "Olaya", rule_configured: true, wps_iban: "SA0380000000608010167519",
+  employee_id: "e1", name_en: "Omar, \"Ace\" Khaled", name_ar: "عمر خالد", title_en: "Barber", branch: "Olaya", rule_configured: true, wps_iban_masked: "SA** **** **** **** **** 7519",
   completed_bookings: 12, service_revenue_sar: 1800, commission_rate_pct: 20, commission_earned_sar: 360, tips_earned_sar: 45, base_salary_sar: 3000, total_payout_sar: 3405,
 };
 const unconfigured = {
-  employee_id: "e2", name_en: "=HYPERLINK(\"http://x\")", name_ar: "سارة", title_en: null, branch: "Olaya", rule_configured: false, wps_iban: null,
+  employee_id: "e2", name_en: "=HYPERLINK(\"http://x\")", name_ar: "سارة", title_en: null, branch: "Olaya", rule_configured: false, wps_iban_masked: null,
   completed_bookings: 4, service_revenue_sar: 600, commission_rate_pct: null, commission_earned_sar: null, tips_earned_sar: 10, base_salary_sar: null, total_payout_sar: null,
 };
 
@@ -32,6 +32,11 @@ describe("payrollSummaryCsv (C-D13)", () => {
   });
   it("shows the configured professional's amounts as numbers", () => {
     assert.ok(lines[1].includes(",12,1800,20,360,45,3000,3405,Pay rules set"));
+  });
+  it("carries the salary IBAN only in its masked form (GOV-FIX M-5)", () => {
+    assert.ok(lines[1].includes("SA** **** **** **** **** 7519"));
+    assert.ok(!/SA\d{22}/.test(csv));
+    assert.ok(lines[0].includes("IBAN (masked)"));
   });
   it("is not presented as a WPS file", () => {
     assert.ok(!/wps|mudad/i.test(csv.split("\r\n")[0]));

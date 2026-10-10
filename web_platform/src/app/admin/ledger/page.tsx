@@ -500,8 +500,10 @@ const commandCopy = {
     reveal: "Reveal IBAN",
     revealTitle: "Reveal the full IBAN",
     revealIntro: "Finance and owners only. The IBAN is shown once for 60 seconds and is never stored in the console or the audit log; the reveal and your reason are audited. Needs a fresh authenticator code.",
-    revealReason: "Reason with a ticket or payout reference (at least 15 characters)",
+    revealReason: "Reason with a ticket (PAY-1042, #5521) or this provider's payout request id (at least 15 characters)",
     revealedTitle: "IBAN of {name}",
+    revealedNotApproved: "NOT APPROVED – do not pay. Shown masked until a second administrator approves it.",
+    revealLimit: "You have reached the most IBAN reveals allowed in 24 hours ({n}). Another owner can allow more from Approvals.",
     revealedActive: "Approved account",
     revealedPending: "Account waiting for approval",
     revealedHolder: "Account holder",
@@ -546,8 +548,10 @@ const commandCopy = {
     reveal: "كشف الآيبان",
     revealTitle: "كشف الآيبان كاملاً",
     revealIntro: "للمالية والمالك فقط. يظهر الآيبان مرة واحدة لمدة 60 ثانية ولا يُحفظ في اللوحة ولا في سجل التدقيق؛ ويُسجَّل الكشف وسببه. يحتاج رمزاً جديداً من تطبيق المصادقة.",
-    revealReason: "السبب مع رقم تذكرة أو مرجع تحويل (15 حرفاً على الأقل)",
+    revealReason: "السبب مع رقم تذكرة (PAY-1042 أو ‎#5521) أو معرّف طلب صرف لهذا المزود (15 حرفاً على الأقل)",
     revealedTitle: "آيبان {name}",
+    revealedNotApproved: "غير معتمد – لا تحوّل إليه. يظهر مخفياً جزئياً حتى يعتمده مسؤول ثانٍ.",
+    revealLimit: "بلغت الحد الأعلى لكشف الآيبان خلال 24 ساعة ({n}). يمكن لمالك آخر السماح بالمزيد من صفحة الاعتمادات.",
     revealedActive: "الحساب المعتمد",
     revealedPending: "حساب بانتظار الاعتماد",
     revealedHolder: "اسم صاحب الحساب",
@@ -557,7 +561,8 @@ const commandCopy = {
     notProvided: "غير متوفر",
   },
 };
-type RevealedAccount = { iban: string; bank_name: string; account_holder_name: string | null };
+// GOV-FIX L-3: an account waiting for approval comes back masked only (iban_masked, approved false); nobody may pay it.
+type RevealedAccount = { iban?: string; iban_masked?: string; approved?: boolean; bank_name: string; account_holder_name: string | null };
 type Revealed = { name: string; expiresAt: number; active: RevealedAccount | null; pending: RevealedAccount | null };
 type MoneyAction =
   | { kind: "reveal"; request: any; providerName: string }
@@ -881,7 +886,9 @@ export default function AdminLedger() {
   const runReveal = async (request: any, providerName: string, reason: string): Promise<string | null> => {
     const { data, error: rpcError } = await supabase.rpc("reveal_provider_iban", { p_provider_id: request.provider_id, p_reason: reason });
     if (rpcError) return errorMessage(rpcError);
-    const shown = data as { expires_at: string; active: RevealedAccount | null; pending: RevealedAccount | null };
+    const shown = data as { expires_at: string; active: RevealedAccount | null; pending: RevealedAccount | null; refused?: boolean; ceiling?: number };
+    // GOV-FIX L-2: past the 24-hour ceiling nothing is revealed (the server records the refusal and raises an alert).
+    if (shown.refused) return commandCopy[lang].revealLimit.replace("{n}", String(shown.ceiling ?? ""));
     setRevealed({ name: providerName, expiresAt: Math.min(new Date(shown.expires_at).getTime(), Date.now() + 60000), active: shown.active, pending: shown.pending });
     setRevealClock(Date.now());
     return null;
@@ -894,7 +901,14 @@ export default function AdminLedger() {
     const account = (label: string, value: RevealedAccount | null) => value && (
       <div className="rounded-xl border border-[#ECECEC] bg-[#F9F7F1] p-3">
         <p className="text-[11px] font-black text-[#667085]">{label}</p>
-        <p dir="ltr" className="mt-1 select-all break-all font-mono text-base font-black text-[#101828]">{value.iban.replace(/(.{4})/g, "$1 ").trim()}</p>
+        {value.iban ? (
+          <p dir="ltr" className="mt-1 select-all break-all font-mono text-base font-black text-[#101828]">{value.iban.replace(/(.{4})/g, "$1 ").trim()}</p>
+        ) : (
+          <>
+            <p dir="ltr" className="mt-1 break-all font-mono text-base font-black text-[#667085]">{value.iban_masked}</p>
+            <p role="note" className="mt-1 text-xs font-black text-[#B42318]">{c.revealedNotApproved}</p>
+          </>
+        )}
         <p className="mt-1 text-xs text-[#475467]">{c.revealedBank}: {value.bank_name} · {c.revealedHolder}: {value.account_holder_name || c.notProvided}</p>
       </div>
     );
