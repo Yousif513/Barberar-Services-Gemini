@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { EffectiveFeeTerms } from "@/components/effective-fee-terms";
 
 const translations = {
   en: {
@@ -12,8 +13,9 @@ const translations = {
     pricingModel: "How We Calculate Transaction Splits",
     platformFee: "Platform Commission",
     partnerPayout: "Partner Payout Share",
-    feeDesc: "Bookings from your own clients (your link, QR code or imported contacts) carry no commission. A new client who finds you on the Primora marketplace carries a 20% commission on the first visit (minimum SAR 10, maximum SAR 40); repeat visits from that client carry no commission. No monthly subscription is required for basic accounts.",
-    payoutDesc: "The remaining 85% is routed straight to your salon's local bank account. As soon as the customer's appointment is completed and marked off in your dashboard calendar, the ledger releases the funds according to the payout settlement schedule.",
+    feeDesc: "Bookings from your own clients (your link, QR code or imported contacts) carry no platform fee. Marketplace bookings carry the platform fee shown in your fee terms above, computed from the fee rules in force on your account, plus VAT on that fee where applicable. A fee increase is announced at least 30 days before it applies.",
+    payoutDesc: "What remains after the platform fee and the VAT on it is paid to your approved bank account once the visit is completed, according to the payout schedule.",
+    planFeeNote: "Same platform fee terms on every plan",
     noUpfront: "Zero Setup or Upfront Fees",
     noUpfrontDesc: "Registering, listing your services catalog, and setting up staff availability calendars are 100% free. We only succeed when you acquire bookings.",
     footerText: "Built for Riyadh, Saudi Arabia. All rights reserved.",
@@ -90,8 +92,9 @@ const translations = {
     pricingModel: "كيف نحسب تقسيمات العمليات المالية",
     platformFee: "عمولة المنصة",
     partnerPayout: "حصة الشريك ومقدم الخدمة",
-    feeDesc: "لا عمولة على حجوزات عملائك (رابطك أو رمز QR أو جهات الاتصال المستوردة). العميل الجديد القادم من سوق بريمورا عليه عمولة 20% في الزيارة الأولى (بحد أدنى 10 ر.س وأقصى 40 ر.س)، ولا عمولة على زياراته المتكررة. لا يلزم اشتراك شهري للحسابات الأساسية.",
-    payoutDesc: "يتم توجيه الـ 85% المتبقية مباشرة إلى الحساب البنكي لصالونك أو عملك. بمجرد اكتمال موعد العميل ووضع علامة اكتمال في تقويم لوحة التحكم، يحرر نظام الدفع الأموال وفقاً لجدول التسوية المعتمد.",
+    feeDesc: "لا رسوم منصة على حجوزات عملائك (رابطك أو رمز QR أو جهات الاتصال المستوردة). حجوزات السوق عليها رسوم المنصة الموضحة في شروط الرسوم أعلاه، محسوبة من قواعد الرسوم السارية على حسابك، مع ضريبة القيمة المضافة على هذه الرسوم حيثما تنطبق. أي زيادة في الرسوم يُعلن عنها قبل 30 يوماً على الأقل من تطبيقها.",
+    payoutDesc: "يُحوَّل ما يتبقى بعد رسوم المنصة والضريبة عليها إلى حسابك البنكي المعتمد بعد اكتمال الزيارة، وفق جدول التحويلات.",
+    planFeeNote: "شروط رسوم المنصة نفسها في كل الخطط",
     noUpfront: "بدون أي رسوم إعداد أو تأسيس مسبقة",
     noUpfrontDesc: "التسجيل، وإدراج قائمة خدماتك، وإعداد تقويم توافر موظفيك مجاني 100%. نحن ننجح فقط عندما تستقبل حجوزات فعلية.",
     footerText: "صمم خصيصاً للرياض، المملكة العربية السعودية. جميع الحقوق محفوظة.",
@@ -504,7 +507,7 @@ export default function PricingPage() {
               <div className="border-t border-[#ECECEC] pt-4 space-y-2">
                 <div className="flex items-center gap-2 text-xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47] shadow-[0_0_6px_rgba(209,175,71,0.8)]" />
-                  <span className="text-[#344054]">10% {t.platformFee} (Discounted!)</span>
+                  <span className="text-[#344054]">{t.planFeeNote}</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-[#344054]">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />
@@ -563,7 +566,7 @@ export default function PricingPage() {
               <div className="border-t border-[rgba(255,255,255,0.06)] pt-4 space-y-2">
                 <div className="flex items-center gap-2 text-xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47]" />
-                  <span>Custom Platform Commission</span>
+                  <span>{t.planFeeNote}</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-[#344054]">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />
@@ -651,27 +654,8 @@ export default function PricingPage() {
             </p>
           </div>
           
-          {/* Visual Dynamic Split Ledger Bar */}
-          <div className="space-y-4 pt-4">
-            <div className="h-6 w-full bg-[#1A2236] rounded-full overflow-hidden flex p-1 border border-[rgba(255,255,255,0.08)]">
-              <div 
-                className="bg-gradient-to-r from-[#D1AF47] to-[#B8952E] rounded-full h-full flex items-center justify-center text-[10px] font-black text-[#070B12] transition-all duration-500 shadow-[0_0_12px_rgba(209,175,71,0.4)]"
-                style={{ width: "15%" }}
-              >
-                15%
-              </div>
-              <div 
-                className="bg-gradient-to-r from-[#172033] to-[#25324D] rounded-full h-full flex items-center justify-end px-3 text-[10px] font-black text-[#101828] transition-all duration-500 flex-1"
-              >
-                85%
-              </div>
-            </div>
-            
-            <div className="flex justify-between items-center text-xs font-bold text-[#667085] px-2">
-              <span className="text-[#D1AF47]">{t.platformFee} (15%)</span>
-              <span className="text-[#101828]">{t.partnerPayout} (85%)</span>
-            </div>
-          </div>
+          {/* D-D3: the effective platform fee from the fee rules in force, VAT on the fee and a worked example (no fixed split). */}
+          <EffectiveFeeTerms locale={locale} mode="provider" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
             <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] p-6 rounded-2xl border border-[rgba(255,255,255,0.04)] space-y-3">

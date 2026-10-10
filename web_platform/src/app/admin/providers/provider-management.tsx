@@ -7,6 +7,7 @@ import { CommandDialog, ModalOverlay } from "@/components/modal";
 import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
 import { CommandResult, sar } from "@/components/operations-ui";
+import { EffectiveFeeTerms } from "@/components/effective-fee-terms";
 import { oneOf, writeUrlState } from "@/lib/url-state";
 
 type Locale = "en" | "ar";
@@ -1432,13 +1433,6 @@ export default function AdminProviderManagement() {
                   />
                 </label>
               ))}
-              <div className="space-y-2 text-[11px] font-black uppercase tracking-widest text-[#667085]">
-                <span>{t.recordedCommission}</span>
-                <div className="rounded-2xl border border-[#ECECEC] bg-gray-50 px-4 py-3 text-sm normal-case tracking-normal text-gray-900">
-                  {editing.recordedCommission === null ? "—" : `${editing.recordedCommission.toLocaleString(numberFormat)}%`}
-                </div>
-                <div className="text-[11px] font-semibold normal-case tracking-normal text-[#667085]">{t.recordedCommissionNote}</div>
-              </div>
             </div>
             <div className="mt-6 flex justify-end gap-3">
               <button type="button" onClick={() => setEditing(null)} className="rounded-xl border border-[#ECECEC] px-5 py-2.5 text-xs font-black text-[#667085] focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.cancel}</button>
@@ -1588,11 +1582,10 @@ export default function AdminProviderManagement() {
                 </div>
               )}
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {[
                   [t.applicationStatus, t[detail.applicationStatus]],
                   [t.accountStatus, t[detail.accountStatus]],
-                  [t.recordedCommission, detail.recordedCommission === null ? "—" : `${detail.recordedCommission.toLocaleString(numberFormat)}%`],
                 ].map(([label, value]) => (
                   <div key={label} className={cardBase}>
                     <span className="text-[11px] font-black uppercase tracking-widest text-[#667085]">{label}</span>
@@ -1600,7 +1593,8 @@ export default function AdminProviderManagement() {
                   </div>
                 ))}
               </div>
-              <div className="-mt-2 text-[11px] font-semibold text-[#667085]">{t.recordedCommissionNote}</div>
+              {/* D-D3: the effective platform fee from the fee rules in force, never a free-standing commission percentage. */}
+              <EffectiveFeeTerms locale={isRTL ? "ar" : "en"} providerId={detail.id} mode="admin" />
 
               {/* Wathq CR Verification (G26) */}
               <div className="rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">

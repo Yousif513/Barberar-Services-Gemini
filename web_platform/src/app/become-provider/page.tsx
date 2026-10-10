@@ -51,7 +51,13 @@ const translations = {
     spa: "Spa & Wellness",
     freelancer: "Specialist / Freelancer",
     crLabel: "Commercial Registration (CR) Number",
-    taxLabel: "Tax / VAT Registration Number",
+    taxLabel: "VAT registration number (15 digits, starts and ends with 3)",
+    vatStatusLabel: "VAT registration *",
+    vatRegistered: "My business is registered for VAT",
+    vatNotRegistered: "My business is not registered for VAT",
+    vatStatusRequired: "Say whether your business is registered for VAT.",
+    vatNumberInvalid: "A VAT number has 15 digits and starts and ends with 3.",
+    vatStatusHint: "This decides how invoices are issued for your bookings. PRIMORA verifies the number with ZATCA.",
     contactEmailLabel: "Business Email",
     contactPhoneLabel: "Business Phone (+966)",
     cityLabel: "City",
@@ -140,7 +146,13 @@ const translations = {
     spa: "سبا وعافية",
     freelancer: "أخصائي / عمل حر",
     crLabel: "رقم السجل التجاري",
-    taxLabel: "الرقم الضريبي (15 رقماً)",
+    taxLabel: "الرقم الضريبي (15 رقماً يبدأ وينتهي بالرقم 3)",
+    vatStatusLabel: "التسجيل في ضريبة القيمة المضافة *",
+    vatRegistered: "منشأتي مسجلة في ضريبة القيمة المضافة",
+    vatNotRegistered: "منشأتي غير مسجلة في ضريبة القيمة المضافة",
+    vatStatusRequired: "حدد ما إذا كانت منشأتك مسجلة في ضريبة القيمة المضافة.",
+    vatNumberInvalid: "الرقم الضريبي 15 رقماً يبدأ وينتهي بالرقم 3.",
+    vatStatusHint: "يحدد هذا طريقة إصدار الفواتير لحجوزاتك. تتحقق بريمورا من الرقم لدى هيئة الزكاة والضريبة والجمارك.",
     contactEmailLabel: "البريد الإلكتروني للنشاط",
     contactPhoneLabel: "رقم جوال التواصل (+966)",
     cityLabel: "المدينة",
@@ -228,6 +240,7 @@ export default function BecomeProviderRootPage() {
     businessType: "salon" as "salon" | "barbershop" | "spa" | "freelancer",
     crNumber: "",
     taxNumber: "",
+    vatStatus: "" as "" | "registered" | "not_registered",
     contactEmail: "",
     contactPhone: "",
     city: "",
@@ -365,6 +378,15 @@ export default function BecomeProviderRootPage() {
       setSubmitError(t.tradeLicenseInvalid);
       return;
     }
+    // D-D3: the VAT status is captured at onboarding; a registered business gives a well-formed number.
+    if (!appForm.vatStatus) {
+      setSubmitError(t.vatStatusRequired);
+      return;
+    }
+    if (appForm.vatStatus === "registered" && !/^3\d{13}3$/.test(appForm.taxNumber.replace(/\s+/g, ""))) {
+      setSubmitError(t.vatNumberInvalid);
+      return;
+    }
     if (!appForm.agreed) {
       setSubmitError(t.agreementRequired);
       return;
@@ -388,7 +410,8 @@ export default function BecomeProviderRootPage() {
         business_name_ar: appForm.businessNameAr.trim(),
         business_type: appForm.businessType,
         cr_number: appForm.crNumber.trim() || null,
-        tax_number: appForm.taxNumber.trim() || null,
+        tax_number: appForm.vatStatus === "registered" ? appForm.taxNumber.replace(/\s+/g, "") : null,
+        vat_registration_status: appForm.vatStatus,
         contact_email: appForm.contactEmail.trim() || currentUser.email,
         contact_phone: appForm.contactPhone.trim(),
         city: appForm.city.trim(),
@@ -716,15 +739,33 @@ export default function BecomeProviderRootPage() {
                     className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs text-stone-900 outline-none focus:border-stone-900 focus:bg-white"
                   />
                 </div>
-                <div>
-                  <label htmlFor="bp-taxLabel" className="block text-xs font-bold text-stone-700 mb-1.5">{t.taxLabel}</label>
-                  <input id="bp-taxLabel"
-                    type="text"
-                    value={appForm.taxNumber}
-                    onChange={(e) => setAppForm((prev) => ({ ...prev, taxNumber: e.target.value }))}
-                    placeholder="3000XXXXXXXXXXX"
-                    className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs text-stone-900 outline-none focus:border-stone-900 focus:bg-white"
-                  />
+                <div className="space-y-3">
+                  <fieldset className="space-y-1.5">
+                    <legend className="block text-xs font-bold text-stone-700 mb-1.5">{t.vatStatusLabel}</legend>
+                    <label className="flex items-center gap-2 text-xs text-stone-800">
+                      <input type="radio" name="bp-vat-status" checked={appForm.vatStatus === "registered"} onChange={() => setAppForm((prev) => ({ ...prev, vatStatus: "registered" }))} />
+                      {t.vatRegistered}
+                    </label>
+                    <label className="flex items-center gap-2 text-xs text-stone-800">
+                      <input type="radio" name="bp-vat-status" checked={appForm.vatStatus === "not_registered"} onChange={() => setAppForm((prev) => ({ ...prev, vatStatus: "not_registered", taxNumber: "" }))} />
+                      {t.vatNotRegistered}
+                    </label>
+                    <p className="text-[11px] text-stone-500">{t.vatStatusHint}</p>
+                  </fieldset>
+                  {appForm.vatStatus === "registered" ? (
+                    <div>
+                      <label htmlFor="bp-taxLabel" className="block text-xs font-bold text-stone-700 mb-1.5">{t.taxLabel} *</label>
+                      <input id="bp-taxLabel"
+                        type="text"
+                        dir="ltr"
+                        inputMode="numeric"
+                        value={appForm.taxNumber}
+                        onChange={(e) => setAppForm((prev) => ({ ...prev, taxNumber: e.target.value }))}
+                        placeholder="3000XXXXXXXXXXX"
+                        className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs text-stone-900 outline-none focus:border-stone-900 focus:bg-white"
+                      />
+                    </div>
+                  ) : null}
                 </div>
               </div>
 
