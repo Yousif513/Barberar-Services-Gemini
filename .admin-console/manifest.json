@@ -4198,7 +4198,8 @@
             "/admin/roles"
           ],
           "serverOperations": [
-            "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L393"
+            "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L393",
+            "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#admin_set_console_role"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L240"
@@ -4216,13 +4217,15 @@
           "tests": [
             "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs",
             "supabase/tests/db/qa_round3_verification.test.mjs",
-            "web_platform/tests/adm1-admin-wiring.test.mjs"
+            "web_platform/tests/adm1-admin-wiring.test.mjs",
+            "supabase/tests/db/govfix_h2_role_grants.test.mjs"
           ],
           "evidence": [
             "web_platform/src/app/admin/roles/page.tsx#L224",
-            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L61"
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L61",
+            "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql"
           ],
-          "owner": "impl-govfix-claude",
+          "owner": "",
           "reviewStatus": "unreviewed"
         }
       ]
@@ -5113,23 +5116,30 @@
           ],
           "serverOperations": [
             "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L594",
-            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L257"
+            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L257",
+            "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#admin_set_console_role",
+            "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#gov_exec_role_change"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L440",
-            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L247"
+            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L247",
+            "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#console_role_change_adds_privilege",
+            "supabase/migrations/20261010430000_govfix_sessions_step_up_and_lows.sql#admin_role"
           ],
           "auditEvents": [
-            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L656"
+            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L656",
+            "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#record_admin_role_history"
           ],
           "safeguards": [
             "supabase/tests/db/gov1_console_roles_mfa.test.mjs#L141",
-            "supabase/tests/db/gov1_console_roles_mfa.test.mjs#L152"
+            "supabase/tests/db/gov1_console_roles_mfa.test.mjs#L152",
+            "supabase/tests/db/govfix_h2_role_grants.test.mjs"
           ],
           "dataBinding": "postgres:public.admin_role_assignments",
           "tests": [
             "supabase/tests/db/gov1_console_roles_mfa.test.mjs",
-            "web_platform/tests/gov1-governance-screens.test.mjs"
+            "web_platform/tests/gov1-governance-screens.test.mjs",
+            "supabase/tests/db/govfix_h2_role_grants.test.mjs"
           ],
           "evidence": [
             "web_platform/src/app/admin/roles/page.tsx",
@@ -5138,7 +5148,7 @@
           "idempotency": "",
           "concurrency": "pg_advisory_xact_lock('primora.set_user_role') serialises role changes",
           "recovery": "",
-          "owner": "impl-govfix-claude"
+          "owner": ""
         },
         {
           "id": "gov.mfa",
@@ -5159,13 +5169,18 @@
           "serverOperations": [
             "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L285",
             "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L679",
-            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L770"
+            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L770",
+            "supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql#alert_admin_mfa_factor_added",
+            "supabase/migrations/20261010430000_govfix_sessions_step_up_and_lows.sql#session_is_live"
           ],
           "authorizationPolicies": [
-            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L247"
+            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L247",
+            "supabase/migrations/20261010430000_govfix_sessions_step_up_and_lows.sql#admin_role",
+            "supabase/migrations/20261010430000_govfix_sessions_step_up_and_lows.sql#require_recent_login"
           ],
           "auditEvents": [
-            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L51"
+            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L51",
+            "supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql#alert_admin_mfa_factor_added"
           ],
           "safeguards": [
             "supabase/tests/db/gov1_console_roles_mfa.test.mjs#L109",
@@ -5174,7 +5189,9 @@
           "dataBinding": "auth.mfa_factors and the session JWT (aal, amr) via public.mfa_verification_failures",
           "tests": [
             "supabase/tests/db/gov1_console_roles_mfa.test.mjs",
-            "web_platform/tests/gov1-governance-screens.test.mjs"
+            "web_platform/tests/gov1-governance-screens.test.mjs",
+            "supabase/tests/db/govfix_h3_m6_contacts_and_factors.test.mjs",
+            "supabase/tests/db/govfix_step_up_and_lows.test.mjs"
           ],
           "evidence": [
             "web_platform/src/app/login/mfa/page.tsx",
@@ -5185,7 +5202,7 @@
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "owner": "impl-govfix-claude"
+          "owner": ""
         },
         {
           "id": "gov.approvals",
@@ -5208,10 +5225,13 @@
             "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L380",
             "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L650",
             "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L341",
-            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L281"
+            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L281",
+            "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#admin_approval_inbox",
+            "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#governance_decider_refusal"
           ],
           "authorizationPolicies": [
-            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L411"
+            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L411",
+            "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#governance_decider_refusal"
           ],
           "auditEvents": [
             "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L432"
@@ -5225,7 +5245,8 @@
           "tests": [
             "supabase/tests/db/gov1_maker_checker.test.mjs",
             "supabase/tests/db/money.test.mjs",
-            "web_platform/tests/gov1-governance-screens.test.mjs"
+            "web_platform/tests/gov1-governance-screens.test.mjs",
+            "supabase/tests/db/govfix_h2_role_grants.test.mjs"
           ],
           "evidence": [
             "web_platform/src/app/admin/approvals/page.tsx",
@@ -5234,7 +5255,7 @@
           "idempotency": "one pending request per (kind, target); execution keeps admin_release_payout's idempotency key",
           "concurrency": "row lock on the request; partial unique index on pending (kind, target_id)",
           "recovery": "a rejected or cancelled request changes nothing; a failed execution rolls the decision back",
-          "owner": "impl-govfix-claude"
+          "owner": ""
         },
         {
           "id": "gov.break-glass",
@@ -5253,7 +5274,8 @@
           ],
           "serverOperations": [
             "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L496",
-            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L567"
+            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L567",
+            "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#governance_break_glass_blocked_until"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L496"
@@ -5262,19 +5284,22 @@
             "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L557"
           ],
           "safeguards": [
-            "supabase/tests/db/gov1_maker_checker.test.mjs"
+            "supabase/tests/db/gov1_maker_checker.test.mjs",
+            "supabase/tests/db/govfix_h2_role_grants.test.mjs"
           ],
           "dataBinding": "postgres:public.break_glass_reviews",
           "tests": [
-            "supabase/tests/db/gov1_maker_checker.test.mjs"
+            "supabase/tests/db/gov1_maker_checker.test.mjs",
+            "supabase/tests/db/govfix_h2_role_grants.test.mjs"
           ],
           "evidence": [
-            "web_platform/src/app/admin/approvals/page.tsx"
+            "web_platform/src/app/admin/approvals/page.tsx",
+            "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql"
           ],
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "owner": "impl-govfix-claude"
+          "owner": ""
         },
         {
           "id": "gov.iban-reveal",
@@ -5292,13 +5317,18 @@
             "/admin/ledger"
           ],
           "serverOperations": [
-            "supabase/migrations/20261010120000_gov1_iban_controls.sql#L363"
+            "supabase/migrations/20261010120000_gov1_iban_controls.sql#L363",
+            "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql#reveal_provider_iban",
+            "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql#reveal_employee_wps_iban",
+            "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql#admin_lift_iban_reveal_limit"
           ],
           "authorizationPolicies": [
-            "supabase/migrations/20261010120000_gov1_iban_controls.sql#L93"
+            "supabase/migrations/20261010120000_gov1_iban_controls.sql#L93",
+            "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql#iban_reveal_ceiling"
           ],
           "auditEvents": [
-            "supabase/migrations/20261010120000_gov1_iban_controls.sql#L393"
+            "supabase/migrations/20261010120000_gov1_iban_controls.sql#L393",
+            "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql#reveal_employee_wps_iban"
           ],
           "safeguards": [
             "supabase/tests/db/gov1_iban.test.mjs#L58",
@@ -5307,16 +5337,18 @@
           "dataBinding": "postgres:public.provider_payout_destinations",
           "tests": [
             "supabase/tests/db/gov1_iban.test.mjs",
-            "web_platform/tests/gov1-governance-screens.test.mjs"
+            "web_platform/tests/gov1-governance-screens.test.mjs",
+            "supabase/tests/db/govfix_wps_iban_and_reveal.test.mjs"
           ],
           "evidence": [
             "web_platform/src/app/admin/ledger/page.tsx",
-            "supabase/tests/db/gov1_iban.test.mjs#L37"
+            "supabase/tests/db/gov1_iban.test.mjs#L37",
+            "web_platform/src/app/provider/_components/employee-extras.tsx"
           ],
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "owner": "impl-govfix-claude"
+          "owner": ""
         },
         {
           "id": "gov.iban-change",
@@ -5337,7 +5369,9 @@
           ],
           "serverOperations": [
             "supabase/migrations/20261010120000_gov1_iban_controls.sql#L149",
-            "supabase/migrations/20261010120000_gov1_iban_controls.sql#L211"
+            "supabase/migrations/20261010120000_gov1_iban_controls.sql#L211",
+            "supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql#gov_request_payout_destination",
+            "supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql#queue_governance_notice"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261010120000_gov1_iban_controls.sql#L149"
@@ -5352,7 +5386,8 @@
           "dataBinding": "postgres:public.provider_payout_destinations",
           "tests": [
             "supabase/tests/db/gov1_iban.test.mjs",
-            "web_platform/tests/gov1-governance-screens.test.mjs"
+            "web_platform/tests/gov1-governance-screens.test.mjs",
+            "supabase/tests/db/govfix_h3_m6_contacts_and_factors.test.mjs"
           ],
           "evidence": [
             "web_platform/src/app/provider/wallet/page.tsx",
@@ -5361,7 +5396,7 @@
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "owner": "impl-govfix-claude"
+          "owner": ""
         },
         {
           "id": "gov.audited-reads",
@@ -5396,15 +5431,22 @@
             "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L449",
             "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L642",
             "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L788",
-            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L976"
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L976",
+            "supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql#admin_recent_bookings",
+            "supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql#admin_list_refund_requests",
+            "supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql#admin_list_disputes",
+            "supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql#admin_list_reviews",
+            "supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql#admin_provider_private_directory"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L71",
             "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L194",
-            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L248"
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L248",
+            "supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql"
           ],
           "auditEvents": [
-            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L109"
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L109",
+            "supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql#gov2_log_read"
           ],
           "safeguards": [
             "supabase/tests/db/gov2_audited_reads.test.mjs#L85",
@@ -5419,15 +5461,20 @@
           "tests": [
             "supabase/tests/db/gov2_audited_reads.test.mjs",
             "supabase/tests/db/admin_dashboard.test.mjs",
-            "web_platform/tests/admin-console-guards.test.mjs"
+            "web_platform/tests/admin-console-guards.test.mjs",
+            "supabase/tests/db/govfix_gov2_remaining_reads.test.mjs"
           ],
           "evidence": [
             "supabase/tests/db/gov2_audited_reads.test.mjs#L112",
             "web_platform/src/app/admin/customers/page.tsx",
             "web_platform/src/app/admin/ledger/page.tsx",
-            "web_platform/src/app/admin/reports/page.tsx"
+            "web_platform/src/app/admin/reports/page.tsx",
+            "web_platform/src/app/admin/refunds/page.tsx",
+            "web_platform/src/app/admin/disputes/page.tsx",
+            "web_platform/src/app/admin/reviews/page.tsx",
+            "web_platform/src/app/admin/packages/page.tsx"
           ],
-          "owner": "impl-govfix-claude",
+          "owner": "",
           "reviewStatus": "unreviewed"
         }
       ]
@@ -7361,6 +7408,59 @@
       "appliesTo": [
         "reward-program.enable"
       ]
+    },
+    {
+      "id": "govfix-adopt-security-review-fixes",
+      "decision": "The recommended fixes in docs/reviews/2026-10-10-security-gov1.md are the plan of record for GOV-FIX, with the report's parameters: 72-hour cooling-off for a new approver, 30-day independence from the person who assigned your role, break-glass closed 7 days after an approver is demoted or removed, 48-hour pause on bank-account changes after a verified contact change, IBAN reveal ceiling 20 per 24 hours (+10 per lift by another owner), jwt_expiry 900, max 2 MFA factors.",
+      "reason": "Dispatch for impl-govfix-claude: fix every remaining finding using the report's recommended fix.",
+      "evidence": [
+        "docs/reviews/2026-10-10-security-gov1.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "gov.console-roles",
+        "gov.approvals",
+        "gov.break-glass",
+        "gov.iban-reveal",
+        "gov.mfa"
+      ]
+    },
+    {
+      "id": "govfix-privileged-permission-set",
+      "decision": "ASSUMED: a console role change needs a different owner's approval when the new role adds any of money.*, iban.approve, iban.reveal, roles.manage, mfa.reset, settings.manage, alerts.acknowledge, break_glass.use, break_glass.review, rewards.approve, health.break_glass (in practice: any grant of owner or finance). Changes that add none (to analyst or operations, owner -> finance, removal) apply at once so containment stays fast.",
+      "reason": "The report names money.*, iban.approve, roles.manage, break_glass.*; the other governance and reveal permissions carry the same self-dealing risk.",
+      "evidence": [
+        "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "gov.console-roles",
+        "role.set-administrator"
+      ]
+    },
+    {
+      "id": "govfix-wps-iban-reveal-rights",
+      "decision": "ASSUMED: staff salary IBANs are masked for everyone; the full number is revealed for 60 seconds, audited without the number, to the provider's owner after a sign-in in the last 10 minutes, and to finance/owner with step-up and a ticket reference. Operations and analyst never.",
+      "reason": "Gap employee-wps-iban-not-masked asked for an owner decision on who may see staff IBANs; this is the narrowest reading that keeps payroll workable. Owner confirmation pending.",
+      "evidence": [
+        "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "gov.iban-reveal"
+      ]
+    },
+    {
+      "id": "govfix-reveal-ceiling-answers-not-raises",
+      "decision": "At the IBAN reveal ceiling reveal_provider_iban answers {refused: true} (no account data) instead of raising, so the security alert and the audit event it writes are committed; the ledger screen shows the refusal.",
+      "reason": "An exception would roll back the alert the report asks for.",
+      "evidence": [
+        "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "gov.iban-reveal"
+      ]
     }
   ],
   "gaps": [
@@ -9092,7 +9192,7 @@
       "severity": "high",
       "description": "Out-of-band notices required by D-Q5 (break-glass), Q3 (IBAN change to the provider's channels) and Q6 (MFA lockout and reset) are queued as public.governance_notifications rows (email and sms per recipient) but no worker sends them; they stay 'pending'.",
       "status": "open",
-      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). BUILD WORK: an Edge Function on a schedule (service_role) that resolves the recipient's verified email/phone at send time, sends through the configured provider, and marks sent/failed. Needs the owner to choose and configure the email/SMS provider (external credentials).",
+      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). PARTLY ADDRESSED BY impl-govfix-claude 7e0f1ed (GOV-1 review H-3): recipients now come from Auth-verified contacts, old and new, snapshotted into governance_notifications.destination; an account with none gets a 'skipped' row. STILL OPEN: no sender reads the outbox; every notice stays 'pending'. Needs the owner to choose and configure the email/SMS provider (external credentials), then a scheduled service-role Edge Function.",
       "evidence": [
         "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L118"
       ]
@@ -9102,7 +9202,7 @@
       "severity": "high",
       "description": "The hosted project must enable TOTP enrolment/verification, set sessions to 12 hours absolute and 30 minutes inactivity, and enable the MFA verification attempt hook with pg-functions://postgres/public/hook_mfa_verification_attempt. Supabase session limits apply to every user of the project, including customers and providers, not only administrators.",
       "status": "blocked",
-      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). OWNER ACTION: dashboard settings (sessions and the MFA hook are paid-plan features) and a decision whether customer sessions may also end after 12 hours / 30 minutes idle; if not, admin-only limits must move into is_admin() using auth.sessions. Local config.toml already carries the values.",
+      "rationale": "Hosted Auth settings (TOTP, 12h/30m sessions, the MFA verification hook) must match supabase/config.toml. GOV-FIX adds jwt_expiry = 900 (M-2) and max_enrolled_factors = 2 (M-6) to the same list. Owner action in the hosted dashboard.",
       "evidence": [
         "supabase/config.toml#L26"
       ]
@@ -9131,10 +9231,11 @@
       "id": "export-step-up-is-not-server-enforced",
       "severity": "medium",
       "description": "Q6 requires step-up before data export; console exports are built in the browser from reads and only recorded afterwards (admin_record_export), so a step-up there would come after the data left the server.",
-      "status": "open",
-      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). BUILD WORK (PRIV package): server-side export functions that require require_recent_mfa() and log row count and filter (Q4 item 4).",
+      "status": "fixed",
+      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). FIXED: GOV-2 built server exports with step-up (admin_export_finance_report) and revoked client execute on admin_record_export; impl-govfix-claude 9a695ad (M-3) added step-up to admin_record_export as well.",
       "evidence": [
-        "web_platform/src/app/admin/ledger/page.tsx"
+        "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql",
+        "supabase/migrations/20261010430000_govfix_sessions_step_up_and_lows.sql"
       ]
     },
     {
@@ -9161,10 +9262,11 @@
       "id": "employee-wps-iban-not-masked",
       "severity": "medium",
       "description": "employee_commission_rules.wps_iban (staff payroll IBAN) is still readable in full by the provider owner and by administrators; Q3 covered provider payout IBANs only.",
-      "status": "open",
-      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). Needs an owner decision on who may see staff IBANs, then the same masking pattern.",
+      "status": "fixed",
+      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). FIXED BY impl-govfix-claude 21d7585 (GOV-1 review M-5): masked everywhere, audited reveal; reveal rights are an assumed decision (govfix-wps-iban-reveal-rights) awaiting owner confirmation.",
       "evidence": [
-        "web_platform/src/app/provider/_components/employee-extras.tsx"
+        "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql",
+        "supabase/tests/db/govfix_wps_iban_and_reveal.test.mjs"
       ]
     },
     {
@@ -9191,10 +9293,11 @@
       "id": "gov2-remaining-direct-admin-reads",
       "severity": "high",
       "description": "Console sessions still read some customer-linked tables directly: bookings (customer_id, notes; dashboard and activity read it), refund_requests and payment_refund_requests, payment_disputes, reviews, customer_loyalty, loyalty_points_ledger, customer_favorites, customer_referrals, coupon_redemptions, package_redemptions, user_packages, booking_tips, and admin_audit_logs details. admin_provider_private_directory (provider contacts) is gated by is_admin() only, so analyst and finance read it.",
-      "status": "open",
-      "rationale": "FOUND BY impl-gov2-claude (2026-10-10). Outside GOV-2's listed table set; same pattern applies (restrictive policy plus an audited function per screen).",
+      "status": "fixed",
+      "rationale": "FOUND BY impl-gov2-claude (2026-10-10). FIXED BY impl-govfix-claude 249ad7e/8148889: restrictive select policies on bookings, refund_requests, payment_refund_requests, payment_disputes, reviews (unpublished), customer_loyalty, loyalty_points_ledger, customer_favorites, customer_referrals, coupon_redemptions, package_redemptions, user_packages, booking_tips; audited reads admin_recent_bookings, admin_list_refund_requests, admin_list_disputes, admin_list_reviews, admin_package_usage_summary, admin_branch_performance_report; admin_provider_private_directory needs personal.read and is logged. admin_audit_logs remains a direct read (gap audit-log-read-directly-by-every-console-role).",
       "evidence": [
-        "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L194"
+        "supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql",
+        "supabase/tests/db/govfix_gov2_remaining_reads.test.mjs"
       ]
     },
     {
@@ -9336,6 +9439,248 @@
       "evidence": [
         "docs/legal/2026-10-10-adopted-decisions.md"
       ]
+    },
+    {
+      "id": "sec-gov1-c1-money-tables-writable-directly",
+      "severity": "critical",
+      "description": "C-1: finance and owner wrote money tables directly (no step-up, second person or idempotency). (docs/reviews/2026-10-10-security-gov1.md)",
+      "status": "fixed",
+      "rationale": "FIXED BY impl-money-claude in 967d7b5 (MONEY-1), verified 2026-10-10 by impl-govfix-claude against the live local DB: authenticated holds no INSERT/DELETE on transactional_ledger or wallet_credits and money.write no longer exists.",
+      "evidence": [
+        "supabase/migrations/20261010300000_money_append_only_and_corrections.sql",
+        "supabase/tests/db/money_append_only.test.mjs"
+      ]
+    },
+    {
+      "id": "sec-gov1-c2-operations-mints-balance-through-bookings",
+      "severity": "critical",
+      "description": "C-2: operations minted provider balance by editing booking money columns. (docs/reviews/2026-10-10-security-gov1.md)",
+      "status": "fixed",
+      "rationale": "FIXED BY impl-money-claude in 967d7b5 (MONEY-1); verified: protect_booking_immutable_fields freezes wallet_credit_amount and the other money columns.",
+      "evidence": [
+        "supabase/migrations/20261010300000_money_append_only_and_corrections.sql",
+        "supabase/tests/db/money_append_only.test.mjs"
+      ]
+    },
+    {
+      "id": "sec-gov1-h1-analyst-writes-through-definer-helpers",
+      "severity": "high",
+      "description": "H-1: analyst and finance wrote provider-side data through SECURITY DEFINER commands whose helpers admitted every console role, and wathq-verify, dispatch-messages and deliver-webhooks accepted any console role. (docs/reviews/2026-10-10-security-gov1.md)",
+      "status": "fixed",
+      "rationale": "FIXED: provider helpers by impl-gov2-claude (6b1ed8b); remaining membership writes by impl-govfix-claude 4ad7de7 (membership_staff_can_write needs operations.write); Edge Functions require their action's console permission (consoleCallerDecision). Negative tests: memberships.test.mjs H-1 case, supabase/tests/console-permission.test.mjs. Edge Functions not deployed or run in a Deno runtime here.",
+      "evidence": [
+        "supabase/migrations/20261010400000_govfix_h1_membership_writes_need_operations.sql",
+        "supabase/functions/_shared/console-permission.ts",
+        "supabase/tests/console-permission.test.mjs",
+        "supabase/tests/db/memberships.test.mjs"
+      ]
+    },
+    {
+      "id": "sec-gov1-h2-self-approval-by-proxy",
+      "severity": "high",
+      "description": "H-2: an owner created their own approver in one call, or demoted the others to unlock break-glass. (docs/reviews/2026-10-10-security-gov1.md)",
+      "status": "fixed",
+      "rationale": "FIXED BY impl-govfix-claude f5248e0: privileged grants are role_change requests a different owner approves (never break-glass), 72-hour cooling-off, no deciding for the person who assigned your role within 30 days, break-glass closed 7 days after an approver is demoted or removed (admin_role_history). Both report reproductions now fail (govfix_h2_role_grants.test.mjs).",
+      "evidence": [
+        "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql",
+        "supabase/tests/db/govfix_h2_role_grants.test.mjs",
+        "web_platform/src/app/admin/approvals/page.tsx",
+        "web_platform/src/app/admin/roles/page.tsx"
+      ]
+    },
+    {
+      "id": "sec-gov1-h3-notices-to-unverified-contacts",
+      "severity": "high",
+      "description": "H-3: out-of-band notices went to self-editable profile contacts. (docs/reviews/2026-10-10-security-gov1.md)",
+      "status": "fixed",
+      "rationale": "FIXED BY impl-govfix-claude 7e0f1ed: recipients from auth.users verified email/phone only, snapshotted, previous verified contacts (30 days) notified too, bank-account change refused 48 hours after a verified contact change, address hidden from console reads. The report reproduction (profile email/phone set by the account holder) now receives nothing. Delivery: no sender exists (gap governance-notifications-have-no-delivery-worker stays open).",
+      "evidence": [
+        "supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql",
+        "supabase/tests/db/govfix_h3_m6_contacts_and_factors.test.mjs"
+      ]
+    },
+    {
+      "id": "sec-gov1-h4-single-person-ledger-settlement",
+      "severity": "high",
+      "description": "H-4: one finance user settled any ledger row with no second person. (docs/reviews/2026-10-10-security-gov1.md)",
+      "status": "fixed",
+      "rationale": "FIXED BY impl-money-claude in 967d7b5 (ledger_settlement approval with bank reference and approved account); verified admin_release_ledger_item routes through ledger_settlement.",
+      "evidence": [
+        "supabase/migrations/20261010300000_money_append_only_and_corrections.sql"
+      ]
+    },
+    {
+      "id": "sec-gov1-m1-refund-cap-race",
+      "severity": "medium",
+      "description": "M-1: the daily cumulative refund cap could be raced. (docs/reviews/2026-10-10-security-gov1.md)",
+      "status": "fixed",
+      "rationale": "FIXED BY impl-money-claude in 967d7b5: advisory lock in refund_needs_approval (called by every refund path).",
+      "evidence": [
+        "supabase/migrations/20261010300000_money_append_only_and_corrections.sql"
+      ]
+    },
+    {
+      "id": "sec-gov1-m2-revoked-sessions-keep-power",
+      "severity": "medium",
+      "description": "M-2: an access token kept console power after MFA reset or sign-out until it expired. (docs/reviews/2026-10-10-security-gov1.md)",
+      "status": "fixed",
+      "rationale": "FIXED BY impl-govfix-claude 9a695ad: admin_role() requires the JWT session_id to exist in auth.sessions (not past not_after); jwt_expiry 900. Live check on the local stack: is_admin true, then false after the session row is deleted. Local Auth was not restarted, so the 900-second expiry is in config only (hosted setting: hosted-auth-settings-must-match-gov1).",
+      "evidence": [
+        "supabase/migrations/20261010430000_govfix_sessions_step_up_and_lows.sql",
+        "supabase/config.toml",
+        "supabase/tests/db/gov1_console_roles_mfa.test.mjs"
+      ]
+    },
+    {
+      "id": "sec-gov1-m3-step-up-missing",
+      "severity": "medium",
+      "description": "M-3: step-up missing on Q6-listed commands. (docs/reviews/2026-10-10-security-gov1.md)",
+      "status": "fixed",
+      "rationale": "FIXED BY impl-govfix-claude 9a695ad: step-up added to admin_update_data_request, admin_save_promo_code, admin_set_promo_code_active, admin_void_sponsored_attribution, admin_review_payout_request, admin_set_api_setting, admin_revoke_api_key, admin_record_export; admin_save_fee_rule no longer exists and run_daily_psp_reconciliation already had it. Stale-code test per command.",
+      "evidence": [
+        "supabase/migrations/20261010430000_govfix_sessions_step_up_and_lows.sql",
+        "supabase/tests/db/govfix_step_up_and_lows.test.mjs"
+      ]
+    },
+    {
+      "id": "sec-gov1-m4-break-glass-review-not-independent",
+      "severity": "medium",
+      "description": "M-4: the owner who used break-glass could sign off its review and acknowledge alerts about themselves. (docs/reviews/2026-10-10-security-gov1.md)",
+      "status": "fixed",
+      "rationale": "FIXED BY impl-govfix-claude f5248e0: sign-off refused for the actor, acknowledgement refused when the alert is about the caller or an action they took; the inbox hides those buttons.",
+      "evidence": [
+        "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql",
+        "supabase/tests/db/gov1_maker_checker.test.mjs",
+        "supabase/tests/db/gov1_console_roles_mfa.test.mjs"
+      ]
+    },
+    {
+      "id": "sec-gov1-m5-employee-wps-iban-unmasked",
+      "severity": "medium",
+      "description": "M-5: staff salary IBANs readable in full by every console role and the provider. (docs/reviews/2026-10-10-security-gov1.md)",
+      "status": "fixed",
+      "rationale": "FIXED BY impl-govfix-claude 21d7585: column unreadable, stored masked copy, payroll summary masked, audited 60-second reveal (provider owner with fresh sign-in; finance/owner with step-up and ticket). Who may reveal is an ASSUMED decision (decision govfix-wps-iban-reveal-rights).",
+      "evidence": [
+        "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql",
+        "supabase/tests/db/govfix_wps_iban_and_reveal.test.mjs",
+        "web_platform/src/app/provider/_components/employee-extras.tsx"
+      ]
+    },
+    {
+      "id": "sec-gov1-m6-mfa-factor-persistence",
+      "severity": "medium",
+      "description": "M-6: an MFA factor added from a stolen session went unnoticed. (docs/reviews/2026-10-10-security-gov1.md)",
+      "status": "fixed",
+      "rationale": "FIXED BY impl-govfix-claude 7e0f1ed: trigger on auth.mfa_factors raises mfa_factor_added, audits and notifies; max_enrolled_factors 2 in config.toml (hosted setting still owner action).",
+      "evidence": [
+        "supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql",
+        "supabase/tests/db/govfix_h3_m6_contacts_and_factors.test.mjs",
+        "supabase/config.toml"
+      ]
+    },
+    {
+      "id": "sec-gov1-l1-purge-check-dead",
+      "severity": "low",
+      "description": "L-1: purge_expired_audit_logs compared current_user inside SECURITY DEFINER. (docs/reviews/2026-10-10-security-gov1.md)",
+      "status": "fixed",
+      "rationale": "FIXED BY impl-govfix-claude 9a695ad: checks session_user; test with a login role other than the owner.",
+      "evidence": [
+        "supabase/migrations/20261010430000_govfix_sessions_step_up_and_lows.sql",
+        "supabase/tests/db/govfix_step_up_and_lows.test.mjs"
+      ]
+    },
+    {
+      "id": "sec-gov1-l2-weak-reveal-references",
+      "severity": "low",
+      "description": "L-2: IBAN reveal accepted weak references and had no ceiling. (docs/reviews/2026-10-10-security-gov1.md)",
+      "status": "fixed",
+      "rationale": "FIXED BY impl-govfix-claude 21d7585: ticket code (letters-hyphen-3+ digits), #3+ digits, or a real payout/approval id of the provider; hard ceiling 20 per 24 hours, +10 per lift by a different owner (admin_lift_iban_reveal_limit), alert at the ceiling.",
+      "evidence": [
+        "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql",
+        "supabase/tests/db/govfix_wps_iban_and_reveal.test.mjs"
+      ]
+    },
+    {
+      "id": "sec-gov1-l3-pending-iban-revealed",
+      "severity": "low",
+      "description": "L-3: the reveal returned the unapproved pending IBAN in full. (docs/reviews/2026-10-10-security-gov1.md)",
+      "status": "fixed",
+      "rationale": "FIXED BY impl-govfix-claude 21d7585: pending account returned masked with approved=false; the ledger shows NOT APPROVED – do not pay.",
+      "evidence": [
+        "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql",
+        "web_platform/src/app/admin/ledger/page.tsx"
+      ]
+    },
+    {
+      "id": "sec-gov1-l4-reauth-any-amr",
+      "severity": "low",
+      "description": "L-4: require_recent_login accepted any amr method. (docs/reviews/2026-10-10-security-gov1.md)",
+      "status": "fixed",
+      "rationale": "FIXED BY impl-govfix-claude 9a695ad: only password, otp, totp, phone, webauthn, sso/saml and oauth count; recovery, invite, magiclink, token_refresh, email_change and anonymous do not. Whether GoTrue adds a fresh amr entry on refresh was not confirmed against GoTrue source; the allowlist makes it irrelevant.",
+      "evidence": [
+        "supabase/migrations/20261010430000_govfix_sessions_step_up_and_lows.sql",
+        "supabase/tests/db/govfix_step_up_and_lows.test.mjs"
+      ]
+    },
+    {
+      "id": "sole-owner-cannot-grant-approver-roles",
+      "severity": "high",
+      "description": "After GOV-FIX H-2 a grant of owner or finance needs a different owner's approval and break-glass never applies, so a console with a single owner cannot add a second owner or any finance user from the console.",
+      "status": "blocked",
+      "rationale": "OWNER DECISION: name a second owner, provisioned once by a named engineer through a reviewed migration or SQL session with an audit entry, or accept that a sole owner adds approvers only that way. Local stack has two administrators (owner, finance).",
+      "evidence": [
+        "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql"
+      ]
+    },
+    {
+      "id": "audit-log-read-directly-by-every-console-role",
+      "severity": "medium",
+      "description": "admin_audit_logs is still read directly by every console role (audit-logs screen, dashboard), and its details hold reasons and target ids; GOV-2's remaining-reads gap listed it. Not changed in GOV-FIX (the task named bookings, refunds, disputes, reviews, loyalty/redemptions and the provider directory).",
+      "status": "open",
+      "rationale": "BUILD WORK: an audited, paged admin_list_audit_logs with a permission (owner/finance?) and switch /admin/audit-logs and the dashboard; needs an owner choice on which roles review the audit log.",
+      "evidence": [
+        "web_platform/src/app/admin/audit-logs/page.tsx"
+      ]
+    },
+    {
+      "id": "contact-change-history-has-no-retention",
+      "severity": "low",
+      "description": "account_contact_changes keeps replaced verified emails and phones (needed to notify the old channel); no retention purge exists.",
+      "status": "open",
+      "rationale": "BUILD WORK: purge rows older than 30 days on a schedule (only the last 30 days are used); needs the retention period confirmed under PDPL.",
+      "evidence": [
+        "supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql"
+      ]
+    },
+    {
+      "id": "govfix-screens-not-browser-verified-with-totp",
+      "severity": "medium",
+      "description": "The role-grant approval, break-glass closed notice, reveal-limit lift, staff IBAN reveal and the switched audited-read screens were checked by typecheck, web tests and live PostgREST calls with a locally signed aal2 session, not clicked through with a real TOTP sign-in.",
+      "status": "open",
+      "rationale": "VERIFY: ux-reviewer with a real TOTP sign-in over /admin/approvals, /admin/roles, /admin/refunds, /admin/disputes, /admin/reviews, /admin/packages, /admin/providers, /provider/employees.",
+      "evidence": [
+        "web_platform/src/app/admin/approvals/page.tsx"
+      ]
+    },
+    {
+      "id": "local-auth-config-not-reloaded-after-govfix",
+      "severity": "low",
+      "description": "supabase/config.toml now sets jwt_expiry 900 and max_enrolled_factors 2, but the local Auth container was not restarted in this pass (the dev server and stack were left running), so local sessions still use the old values.",
+      "status": "open",
+      "rationale": "ACTION: restart the local stack (supabase stop/start, never db reset) when convenient; the hosted project needs the same values (hosted-auth-settings-must-match-gov1).",
+      "evidence": [
+        "supabase/config.toml"
+      ]
+    },
+    {
+      "id": "reviews-moderation-list-shows-newest-200",
+      "severity": "low",
+      "description": "admin_list_reviews is paged on the server, but /admin/reviews requests only the newest 200 and has no paging control yet.",
+      "status": "open",
+      "rationale": "BUILD WORK: add paging (Previous/Next with total) to /admin/reviews.",
+      "evidence": [
+        "web_platform/src/app/admin/reviews/page.tsx"
+      ]
     }
   ],
   "declaredStatic": [
@@ -9355,6 +9700,66 @@
       "approvedBy": "Owner, adopted decisions 2026-10-10 (D4)",
       "evidence": [
         "docs/legal/2026-10-10-privacy-decision-memo.md#L219"
+      ]
+    },
+    {
+      "id": "govfix-approver-cooling-off-72h",
+      "path": "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#gov_exec_role_change",
+      "value": "72 hours",
+      "reason": "GOV-1 review H-2 recommended fix 2.",
+      "approvedBy": "Security review recommendation (docs/reviews/2026-10-10-security-gov1.md) adopted by the dispatch; owner confirmation pending",
+      "evidence": [
+        "docs/reviews/2026-10-10-security-gov1.md"
+      ]
+    },
+    {
+      "id": "govfix-assigner-independence-30d",
+      "path": "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#governance_decider_refusal",
+      "value": "30 days",
+      "reason": "GOV-1 review H-2 recommended fix 3.",
+      "approvedBy": "Security review recommendation (docs/reviews/2026-10-10-security-gov1.md) adopted by the dispatch; owner confirmation pending",
+      "evidence": [
+        "docs/reviews/2026-10-10-security-gov1.md"
+      ]
+    },
+    {
+      "id": "govfix-break-glass-demotion-lock-7d",
+      "path": "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#governance_break_glass_blocked_until",
+      "value": "7 days",
+      "reason": "GOV-1 review H-2 recommended fix 4.",
+      "approvedBy": "Security review recommendation (docs/reviews/2026-10-10-security-gov1.md) adopted by the dispatch; owner confirmation pending",
+      "evidence": [
+        "docs/reviews/2026-10-10-security-gov1.md"
+      ]
+    },
+    {
+      "id": "govfix-contact-change-iban-pause-48h",
+      "path": "supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql#gov_request_payout_destination",
+      "value": "48 hours",
+      "reason": "GOV-1 review H-3 recommended fix.",
+      "approvedBy": "Security review recommendation (docs/reviews/2026-10-10-security-gov1.md) adopted by the dispatch; owner confirmation pending",
+      "evidence": [
+        "docs/reviews/2026-10-10-security-gov1.md"
+      ]
+    },
+    {
+      "id": "govfix-previous-contact-window-30d",
+      "path": "supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql#queue_governance_notice",
+      "value": "30 days",
+      "reason": "How long a replaced verified contact keeps receiving governance notices (Q3 old and new channels).",
+      "approvedBy": "Security review recommendation (docs/reviews/2026-10-10-security-gov1.md) adopted by the dispatch; owner confirmation pending",
+      "evidence": [
+        "docs/reviews/2026-10-10-security-gov1.md"
+      ]
+    },
+    {
+      "id": "govfix-iban-reveal-ceiling",
+      "path": "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql#iban_reveal_ceiling",
+      "value": "20 per 24 hours, +10 per lift",
+      "reason": "GOV-1 review L-2 recommended hard stop at 20 lifted by another owner.",
+      "approvedBy": "Security review recommendation (docs/reviews/2026-10-10-security-gov1.md) adopted by the dispatch; owner confirmation pending",
+      "evidence": [
+        "docs/reviews/2026-10-10-security-gov1.md"
       ]
     }
   ],
@@ -9901,6 +10306,56 @@
         "supabase/migrations/20261010320000_money_reward_programs.sql"
       ],
       "status": "open"
+    },
+    {
+      "id": "fix-readme-missing-in-checkout",
+      "observation": "The dispatch asked to read FIX-README.md, which does not exist in the primora-fix checkout; the review report and worklogs carried the needed context.",
+      "category": "friction",
+      "proposedChange": "Dispatches should name files that exist or say they are optional.",
+      "evidence": [
+        "docs/reviews/2026-10-10-security-gov1.md"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "raise-rolls-back-the-alert",
+      "observation": "An alert or audit row written just before RAISE EXCEPTION is rolled back with it; a 'refuse and alert' control must answer a refusal value (or log from another transaction) instead of raising.",
+      "category": "gap",
+      "proposedChange": "Add to security-governance.md: refusal-with-alert must not raise in the same transaction.",
+      "evidence": [
+        "docs/reviews/2026-10-10-security-gov1.md"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "upsert-needs-select-on-set-columns",
+      "observation": "Making a column unreadable (column SELECT revoked) breaks PostgREST upserts that set it: ON CONFLICT DO UPDATE needs SELECT on the columns it sets. Screens must insert or update explicitly.",
+      "category": "new-pattern",
+      "proposedChange": "Note in stack-adapters (Supabase): masking a column by revoking SELECT requires replacing upserts on it.",
+      "evidence": [
+        "docs/reviews/2026-10-10-security-gov1.md"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "session-check-needs-harness-session",
+      "observation": "Requiring the JWT session_id to exist in auth.sessions (revocation) means every test harness that forges claims must also create the session row; hand-built claims in tests silently lost console power.",
+      "category": "new-pattern",
+      "proposedChange": "Recommend the harness owns session creation and that forged-claims helpers include session_id.",
+      "evidence": [
+        "docs/reviews/2026-10-10-security-gov1.md"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "restrictive-read-breaks-security-invoker-views",
+      "observation": "A restrictive console-read policy on a base table empties every security_invoker view over it for console sessions (admin_branch_performance silently returned zeros); each such view needs a definer report function before the policy lands.",
+      "category": "gap",
+      "proposedChange": "Add to admin-data-model.md: before restricting a table, list security_invoker views over it and the screens that read them.",
+      "evidence": [
+        "docs/reviews/2026-10-10-security-gov1.md"
+      ],
+      "status": "open"
     }
   ],
   "agents": [
@@ -10043,18 +10498,9 @@
     {
       "id": "impl-govfix-claude",
       "role": "implementer",
-      "ownsCapabilities": [
-        "gov.console-roles",
-        "gov.mfa",
-        "gov.approvals",
-        "gov.break-glass",
-        "gov.iban-reveal",
-        "gov.iban-change",
-        "gov.audited-reads",
-        "role.set-administrator"
-      ],
+      "ownsCapabilities": [],
       "ownsScreens": [],
-      "status": "active",
+      "status": "handed-off",
       "notes": "Fixes remaining GOV-1 security review findings (H-1, H-2, H-3, M-2..M-6, L-1..L-4) and closes gov2-remaining-direct-admin-reads.",
       "worklog": ".admin-console/worklog/impl-govfix-claude.md"
     }
