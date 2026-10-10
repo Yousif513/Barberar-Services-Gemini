@@ -7,8 +7,9 @@ import { CommandResult, ForbiddenNotice, isForbidden, operationsDate, operations
 import { CommandDialog, ModalOverlay } from "@/components/modal";
 
 // Platform switches and rates: feature flags, marketplace fee rules and the API limits. Every change is a server command
-// that needs the operator's reason and is recorded in the audit log (admin_set_feature_flag, admin_save_fee_rule,
-// admin_set_api_setting); nothing here writes a table. A list that fails to load says so and offers a retry, and a
+// that needs the operator's reason and is recorded in the audit log (admin_set_feature_flag, admin_set_api_setting); a fee
+// change is a pending request a different administrator approves (admin_propose_fee_rule_change, D-Q8): it adds a new,
+// effective-dated version and never edits the old one. Nothing here writes a table. A list that fails to load says so and offers a retry, and a
 // value nobody has set is shown as not set, never as a made-up default.
 
 const API_KEYS = [
@@ -29,10 +30,15 @@ type FeeRule = {
   max_fee_sar: number | string | null;
   is_active: boolean;
   description: string | null;
+  effective_from: string;
+  effective_to: string | null;
+  in_force: boolean;
+  scheduled: boolean;
 };
+type PendingFee = { id: string; summary: { is_first_visit: boolean | null; increase: boolean; effective_from: string; after: { fee_percentage: number; min_fee_sar: number; max_fee_sar: number | null } }; requested_at: string; reason: string };
 type ApiSetting = { key: string; value: unknown; updated_at: string | null };
 type Section<T> = { rows: T[] | null; error: string; forbidden: boolean };
-type RuleForm = { id: string | null; firstVisit: boolean; percentage: string; min: string; max: string; description: string; reason: string };
+type RuleForm = { id: string | null; firstVisit: boolean; percentage: string; min: string; max: string; description: string; reason: string; effectiveDate: string };
 
 const translations = {
   en: {
@@ -62,7 +68,20 @@ const translations = {
     flagOffDone: "The flag was turned off.",
     updated: "Updated",
     feesTitle: "Marketplace fee rules",
-    feesIntro: "What the platform charges on a booking that comes through the marketplace. Bookings that come through a provider's own link, QR code, WhatsApp, Instagram, walk-in or imported client are always free of platform fee, so those rows are shown but cannot be changed. Changing a rate affects new bookings only and needs the owner's approval.",
+    feesIntro: "What the platform charges on a booking that comes through the marketplace. Bookings that come through a provider's own link, QR code, WhatsApp, Instagram, walk-in or imported client are always free of platform fee, so those rows are shown but cannot be changed. A change is a new version from a start date: it applies to bookings made from that date only, a different administrator must approve it, and an increase starts at least 30 days after approval so providers are told in time. VAT is charged on the platform fee.",
+    columnFrom: "In force from",
+    columnTo: "Until",
+    inForce: "In force",
+    scheduledState: "Scheduled",
+    ended: "Ended",
+    proposeChange: "Propose a change",
+    effectiveLabel: "Start date (Riyadh)",
+    effectiveHint: "A lower fee can start today. A higher fee must start at least 30 days after it is approved.",
+    effectiveInvalid: "Choose a start date from today on.",
+    ruleSent: "The fee change was sent for approval. A different administrator approves it in Approvals.",
+    pendingTitle: "Waiting for approval",
+    increaseBadge: "Increase: 30 days notice",
+    vatNote: "Plus VAT on this fee",
     feesEmpty: "There are no fee rules.",
     columnChannel: "Channel",
     columnVisit: "Visit",
@@ -88,11 +107,11 @@ const translations = {
     descriptionLabel: "Description (optional)",
     ruleReason: "Reason for this change",
     ruleReasonHint: "Recorded in the audit log with your name.",
-    ruleSaved: "The fee rule was saved.",
+    ruleSaved: "The fee change was sent for approval.",
     percentInvalid: "Enter a percentage from 0 to 50.",
     minInvalid: "Enter a minimum from 0 to 1000.",
     maxInvalid: "The maximum is empty or between the minimum and 1000.",
-    reasonShort: "Enter a reason of at least 3 characters.",
+    reasonShort: "Enter a reason of at least 10 characters.",
     apiTitle: "API limits",
     apiIntro: "Limits for the provider developer API. A limit nobody has set is shown as not set, and the capability that depends on it stays off until you set it.",
     apiEmpty: "These settings are not in this database yet. Apply the developer API migrations first.",
@@ -139,7 +158,20 @@ const translations = {
     flagOffDone: "تم إيقاف المفتاح.",
     updated: "آخر تحديث",
     feesTitle: "قواعد رسوم السوق",
-    feesIntro: "ما تتقاضاه المنصة على الحجز القادم من السوق. الحجوزات القادمة من رابط المزود أو رمز QR أو واتساب أو إنستغرام أو العميل الحاضر أو قائمة العملاء المستوردة تكون دائماً بلا رسوم منصة، لذلك تظهر صفوفها دون إمكانية تعديلها. تغيير النسبة يسري على الحجوزات الجديدة فقط ويحتاج إلى موافقة المالك.",
+    feesIntro: "ما تتقاضاه المنصة على الحجز القادم من السوق. الحجوزات القادمة من رابط المزود أو رمز QR أو واتساب أو إنستغرام أو العميل الحاضر أو قائمة العملاء المستوردة تكون دائماً بلا رسوم منصة، لذلك تظهر صفوفها دون إمكانية تعديلها. التغيير نسخة جديدة تبدأ من تاريخ محدد: تسري على الحجوزات من ذلك التاريخ فقط، ويجب أن يعتمدها مسؤول آخر، والزيادة تبدأ بعد 30 يوماً على الأقل من الاعتماد ليُبلَّغ المزودون في الوقت المناسب. تُضاف ضريبة القيمة المضافة على رسوم المنصة.",
+    columnFrom: "سارية من",
+    columnTo: "حتى",
+    inForce: "سارية",
+    scheduledState: "مجدولة",
+    ended: "منتهية",
+    proposeChange: "اقتراح تغيير",
+    effectiveLabel: "تاريخ البدء (بتوقيت الرياض)",
+    effectiveHint: "يمكن أن تبدأ الرسوم الأقل اليوم. أما الرسوم الأعلى فتبدأ بعد 30 يوماً على الأقل من اعتمادها.",
+    effectiveInvalid: "اختر تاريخ بدء من اليوم فصاعداً.",
+    ruleSent: "أُرسل تغيير الرسوم للاعتماد. يعتمده مسؤول آخر من صفحة الاعتمادات.",
+    pendingTitle: "بانتظار الاعتماد",
+    increaseBadge: "زيادة: إشعار 30 يوماً",
+    vatNote: "تضاف ضريبة القيمة المضافة على هذه الرسوم",
     feesEmpty: "لا توجد قواعد رسوم.",
     columnChannel: "القناة",
     columnVisit: "الزيارة",
@@ -165,11 +197,11 @@ const translations = {
     descriptionLabel: "الوصف (اختياري)",
     ruleReason: "سبب هذا التغيير",
     ruleReasonHint: "يُسجَّل في سجل التدقيق باسمك.",
-    ruleSaved: "تم حفظ قاعدة الرسوم.",
+    ruleSaved: "أُرسل تغيير الرسوم للاعتماد.",
     percentInvalid: "أدخل نسبة من 0 إلى 50.",
     minInvalid: "أدخل حداً أدنى من 0 إلى 1000.",
     maxInvalid: "الحد الأقصى فارغ أو بين الحد الأدنى و1000.",
-    reasonShort: "اكتب سبباً لا يقل عن 3 أحرف.",
+    reasonShort: "اكتب سبباً لا يقل عن 10 أحرف.",
     apiTitle: "حدود واجهة البرمجة",
     apiIntro: "حدود واجهة برمجة المزودين. الحد الذي لم يحدده أحد يظهر «غير محدد»، وتبقى الخاصية المعتمدة عليه متوقفة حتى تحدده.",
     apiEmpty: "هذه الإعدادات غير موجودة في قاعدة البيانات بعد. طبّق ترحيلات واجهة البرمجة أولاً.",
@@ -195,6 +227,8 @@ const fill = (template: string, values: Record<string, string | number>) =>
   Object.entries(values).reduce((text, [key, value]) => text.replace(`{${key}}`, String(value)), template);
 const emptySection = <T,>(): Section<T> => ({ rows: null, error: "", forbidden: false });
 const API_VALUE = /^([1-9][0-9]{0,5}|1000000)$/;
+// Today in Riyadh as YYYY-MM-DD (the start date picker works in the platform's time zone).
+const riyadhToday = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Riyadh", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
 
 export default function AdminPlatformRules() {
   const lang = useOperationsLocale();
@@ -204,6 +238,8 @@ export default function AdminPlatformRules() {
 
   const [flags, setFlags] = useState<Section<Flag>>(emptySection);
   const [rules, setRules] = useState<Section<FeeRule>>(emptySection);
+  const [pendingFees, setPendingFees] = useState<PendingFee[]>([]);
+  const [vatRate, setVatRate] = useState<number | null>(null);
   const [apiSettings, setApiSettings] = useState<Section<ApiSetting>>(emptySection);
   const [loading, setLoading] = useState({ flags: true, rules: true, api: true });
   const [flagPending, setFlagPending] = useState<{ flag: Flag; next: boolean } | null>(null);
@@ -221,8 +257,11 @@ export default function AdminPlatformRules() {
   }, []);
   const loadRules = useCallback(async () => {
     setLoading((value) => ({ ...value, rules: true }));
-    const { data, error } = await supabase.from("fee_rules").select("id, channel, is_first_visit, fee_percentage, min_fee_sar, max_fee_sar, is_active, description").order("channel").order("is_first_visit", { ascending: false });
-    setRules(error ? { rows: null, error: errorMessage(error), forbidden: isForbidden(error) } : { rows: (data ?? []) as FeeRule[], error: "", forbidden: false });
+    const { data, error } = await supabase.rpc("admin_fee_rule_versions");
+    const page = (data ?? null) as { versions: FeeRule[]; pending: PendingFee[]; vat_rate_percent: number | null } | null;
+    setRules(error ? { rows: null, error: errorMessage(error), forbidden: isForbidden(error) } : { rows: page?.versions ?? [], error: "", forbidden: false });
+    setPendingFees(error ? [] : page?.pending ?? []);
+    setVatRate(error || page?.vat_rate_percent === null || page?.vat_rate_percent === undefined ? null : Number(page.vat_rate_percent));
     setLoading((value) => ({ ...value, rules: false }));
   }, []);
   const loadApi = useCallback(async () => {
@@ -283,6 +322,7 @@ export default function AdminPlatformRules() {
         max: rule?.max_fee_sar === null || rule === null ? "" : String(Number(rule.max_fee_sar)),
         description: rule?.description ?? "",
         reason: "",
+        effectiveDate: riyadhToday(),
       });
     };
 
@@ -294,19 +334,21 @@ export default function AdminPlatformRules() {
     if (ruleForm.percentage.trim() === "" || !Number.isFinite(percentage) || percentage < 0 || percentage > 50) { setRuleError(t.percentInvalid); return; }
     if (ruleForm.min.trim() === "" || !Number.isFinite(min) || min < 0 || min > 1000) { setRuleError(t.minInvalid); return; }
     if (max !== null && (!Number.isFinite(max) || max < min || max > 1000)) { setRuleError(t.maxInvalid); return; }
-    if (ruleForm.reason.trim().length < 3) { setRuleError(t.reasonShort); return; }
+    if (ruleForm.reason.trim().length < 10) { setRuleError(t.reasonShort); return; }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(ruleForm.effectiveDate) || ruleForm.effectiveDate < riyadhToday()) { setRuleError(t.effectiveInvalid); return; }
+    // Today means now; a later date means the start of that day in Riyadh.
+    const effectiveFrom = ruleForm.effectiveDate === riyadhToday() ? new Date().toISOString() : `${ruleForm.effectiveDate}T00:00:00+03:00`;
     setRuleSaving(true);
     setRuleError("");
-    const { error } = await supabase.rpc("admin_save_fee_rule", {
+    const { error } = await supabase.rpc("admin_propose_fee_rule_change", {
       p_channel: "marketplace",
       p_is_first_visit: ruleForm.firstVisit,
       p_fee_percentage: percentage,
       p_min_fee_sar: min,
       p_max_fee_sar: max,
-      p_is_active: true,
+      p_effective_from: effectiveFrom,
       p_reason: ruleForm.reason.trim(),
       p_description: ruleForm.description.trim() || null,
-      p_id: ruleForm.id,
     });
     setRuleSaving(false);
     if (error) {
@@ -314,7 +356,7 @@ export default function AdminPlatformRules() {
       return;
     }
     setRuleForm(null);
-    setSuccess(t.ruleSaved);
+    setSuccess(t.ruleSent);
     await loadRules();
   };
 
@@ -327,7 +369,7 @@ export default function AdminPlatformRules() {
     return null;
   };
 
-  const marketplaceRules = (rules.rows ?? []).filter((rule) => rule.channel === "marketplace");
+  const marketplaceRules = (rules.rows ?? []).filter((rule) => rule.channel === "marketplace" && (rule.in_force || rule.scheduled));
   const missingVisits = rules.rows ? [true, false].filter((first) => !marketplaceRules.some((rule) => rule.is_first_visit === first)) : [];
   const forbidden = flags.forbidden || rules.forbidden || apiSettings.forbidden;
 
@@ -386,6 +428,8 @@ export default function AdminPlatformRules() {
                         <th scope="col" className={`${cell} text-start`}>{t.columnPercent}</th>
                         <th scope="col" className={`${cell} text-start`}>{t.columnMin}</th>
                         <th scope="col" className={`${cell} text-start`}>{t.columnMax}</th>
+                        <th scope="col" className={`${cell} text-start`}>{t.columnFrom}</th>
+                        <th scope="col" className={`${cell} text-start`}>{t.columnTo}</th>
                         <th scope="col" className={`${cell} text-start`}>{t.columnState}</th>
                         <th scope="col" className={`${cell} text-start`}>{t.columnActions}</th>
                       </tr>
@@ -399,17 +443,22 @@ export default function AdminPlatformRules() {
                             <td colSpan={3} className={`${cell} text-gray-500`}>{t.always0}</td>
                           ) : (
                             <>
-                              <td className={cell}>{Number(rule.fee_percentage).toLocaleString(numberFormat)}%</td>
+                              <td className={cell}>
+                                {Number(rule.fee_percentage).toLocaleString(numberFormat)}%
+                                {vatRate !== null && Number(rule.fee_percentage) > 0 ? <span className="block text-[10px] font-semibold text-gray-500">{t.vatNote} ({vatRate.toLocaleString(numberFormat)}%)</span> : null}
+                              </td>
                               <td className={cell}>{sar(Number(rule.min_fee_sar), lang)}</td>
                               <td className={cell}>{rule.max_fee_sar === null ? t.noMax : sar(Number(rule.max_fee_sar), lang)}</td>
                             </>
                           )}
+                          <td className={cell}>{operationsDate(rule.effective_from, lang)}</td>
+                          <td className={cell}>{rule.effective_to ? operationsDate(rule.effective_to, lang) : "—"}</td>
                           <td className={cell}>
-                            <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-black ${rule.is_active ? "bg-[#ECFDF3] text-[#027A48]" : "bg-stone-100 text-stone-700"}`}>{rule.is_active ? t.active : t.inactive}</span>
+                            <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-black ${rule.in_force ? "bg-[#ECFDF3] text-[#027A48]" : rule.scheduled ? "bg-[#FFFAEB] text-[#B54708]" : "bg-stone-100 text-stone-700"}`}>{rule.in_force ? t.inForce : rule.scheduled ? t.scheduledState : t.ended}</span>
                           </td>
                           <td className={cell}>
-                            {directChannel(rule.channel) ? "—" : (
-                              <button type="button" onClick={() => openRule(rule, rule.is_first_visit === true)} aria-label={`${t.edit}: ${visitLabel(rule.is_first_visit)}`} className={`${smallButton} border-gray-300 bg-white text-gray-900 hover:border-[#D1AF47]`}>{t.edit}</button>
+                            {directChannel(rule.channel) || !rule.in_force ? "—" : (
+                              <button type="button" onClick={() => openRule(rule, rule.is_first_visit === true)} aria-label={`${t.proposeChange}: ${visitLabel(rule.is_first_visit)}`} className={`${smallButton} border-gray-300 bg-white text-gray-900 hover:border-[#D1AF47]`}>{t.proposeChange}</button>
                             )}
                           </td>
                         </tr>
@@ -418,6 +467,21 @@ export default function AdminPlatformRules() {
                   </table>
                 </div>
               ))}
+              {pendingFees.length > 0 && !loading.rules ? (
+                <div className="border-t border-[#ECECEC] p-4">
+                  <h4 className="text-xs font-black text-gray-900">{t.pendingTitle}</h4>
+                  <ul className="mt-2 space-y-2">
+                    {pendingFees.map((item) => (
+                      <li key={item.id} className="flex flex-wrap items-center gap-2 text-xs font-semibold text-gray-700">
+                        <span>{visitLabel(item.summary.is_first_visit)}:</span>
+                        <span>{Number(item.summary.after.fee_percentage).toLocaleString(numberFormat)}% · {sar(Number(item.summary.after.min_fee_sar), lang)} – {item.summary.after.max_fee_sar === null ? t.noMax : sar(Number(item.summary.after.max_fee_sar), lang)}</span>
+                        <span>{t.columnFrom}: {operationsDate(item.summary.effective_from, lang)}</span>
+                        {item.summary.increase ? <span className="rounded-full bg-[#FFFAEB] px-2 py-0.5 text-[10px] font-black text-[#B54708]">{t.increaseBadge}</span> : null}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
               {missingVisits.length > 0 && !loading.rules ? (
                 <div className="flex flex-wrap gap-2 border-t border-[#ECECEC] p-4">
                   {missingVisits.map((first) => (
@@ -513,6 +577,11 @@ export default function AdminPlatformRules() {
                 <input type="number" min="0" max="1000" step="0.01" value={ruleForm.max} onChange={(event) => setRuleForm({ ...ruleForm, max: event.target.value })} className={operationsInput} />
               </label>
               <label className="flex flex-col gap-2 text-xs font-semibold text-[#667085] sm:col-span-3">
+                <span>{t.effectiveLabel}</span>
+                <input type="date" dir="ltr" min={riyadhToday()} value={ruleForm.effectiveDate} onChange={(event) => setRuleForm({ ...ruleForm, effectiveDate: event.target.value })} aria-describedby="rule-effective-hint" className={operationsInput} />
+                <span id="rule-effective-hint" className="text-[11px]">{t.effectiveHint}</span>
+              </label>
+              <label className="flex flex-col gap-2 text-xs font-semibold text-[#667085] sm:col-span-3">
                 <span>{t.descriptionLabel}</span>
                 <input maxLength={300} value={ruleForm.description} onChange={(event) => setRuleForm({ ...ruleForm, description: event.target.value })} className={operationsInput} />
               </label>
@@ -525,7 +594,7 @@ export default function AdminPlatformRules() {
             {ruleError ? <p role="alert" className="mt-4 rounded-xl border border-[#FEE4E2] bg-[#FEF3F2] p-3 text-xs font-bold text-[#B42318]">{ruleError}</p> : null}
             <div className="mt-6 flex justify-end gap-3">
               <button type="button" onClick={() => setRuleForm(null)} disabled={ruleSaving} className={`rounded-xl border border-gray-200 px-5 py-2 text-xs font-black text-gray-600 hover:text-gray-900 ${focusRing}`}>{t.cancel}</button>
-              <button type="button" onClick={() => void saveRule()} disabled={ruleSaving} className={`rounded-xl bg-[#D1AF47] px-5 py-2 text-xs font-black text-gray-950 hover:bg-[#E0C46A] disabled:opacity-60 ${focusRing}`}>{ruleSaving ? t.saving : t.save}</button>
+              <button type="button" onClick={() => void saveRule()} disabled={ruleSaving} className={`rounded-xl bg-[#D1AF47] px-5 py-2 text-xs font-black text-gray-950 hover:bg-[#E0C46A] disabled:opacity-60 ${focusRing}`}>{ruleSaving ? t.saving : t.proposeChange}</button>
             </div>
           </div>
         </ModalOverlay>

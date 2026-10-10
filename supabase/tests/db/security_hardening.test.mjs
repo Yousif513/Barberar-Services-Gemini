@@ -47,9 +47,12 @@ describe("administrator writes to money and configuration tables", () => {
 
     const rule = (await sys(db, `select id from fee_rules where channel = 'marketplace' and is_first_visit = true`))[0];
     assert.ok(rule, "the seeded fee rules exist");
-    const feeBefore = await count("fee_rules.update");
-    await as(db, admin, `select admin_save_fee_rule('marketplace', true, 11, 10, 40, true, 'Audit coverage test', null, $1)`, [rule.id]);  // ADM1: the command is the only write path
-    assert.equal(await count("fee_rules.update"), feeBefore + 1, "fee changes are recorded");
+    const feeBefore = await count("fee_rules.insert");
+    // MONEY (D-Q8): the two-person, effective-dated change is the only write path.
+    const checker = ROLES.user(await createUser(db, { role: "admin", adminRole: "finance" }));
+    const asked = (await as(db, admin, `select admin_propose_fee_rule_change('marketplace', true, 11, 10, 40, now(), 'Audit coverage test for fees') r`))[0].r;
+    await as(db, checker, `select admin_decide_approval($1, 'approve', 'Checked the agreement')`, [asked.approval_id]);
+    assert.equal(await count("fee_rules.insert"), feeBefore + 1, "fee changes are recorded");
   });
 
   it("cover every table an administrator policy can write", async () => {

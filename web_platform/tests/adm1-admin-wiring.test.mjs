@@ -88,7 +88,7 @@ describe("ADM1 item 5 and 7: roles, flags and fee rules are screens over the com
   });
 
   it("flags, fee rules and API settings change only through their commands", () => {
-    for (const command of ["admin_set_feature_flag", "admin_save_fee_rule", "admin_set_api_setting"]) assert.ok(rules.includes(`rpc("${command}"`), command);
+    for (const command of ["admin_set_feature_flag", "admin_propose_fee_rule_change", "admin_set_api_setting"]) assert.ok(rules.includes(`rpc("${command}"`), command);
     assert.doesNotMatch(rules, /\.from\("(platform_feature_flags|fee_rules|platform_settings)"\)\s*\.(update|upsert|insert|delete)/);
     assert.match(rules, /confirmWord=\{flagPending\.next/, "turning a flag on needs the flag name typed");
     assert.match(rules, /retry/i);

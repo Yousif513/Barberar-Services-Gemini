@@ -16,9 +16,6 @@ const denied = /permission denied|Administrator access required/i;
 const directory = (user, role = null, search = null, limit = 25, offset = 0) =>
   as(db, user, `select admin_role_directory($1, $2, $3, $4) r`, [role, search, limit, offset]).then((rows) => rows[0].r);
 const flag = (user, key, on, reason = "Owner confirmed the legal opinion") => as(db, user, `select admin_set_feature_flag($1, $2, $3) r`, [key, on, reason]).then((rows) => rows[0].r);
-const rule = (user, a = {}) => as(db, user,
-  `select admin_save_fee_rule(p_channel => $1, p_is_first_visit => $2, p_fee_percentage => $3, p_min_fee_sar => $4, p_max_fee_sar => $5, p_is_active => $6, p_reason => $7, p_description => $8, p_id => $9) r`,
-  [a.channel ?? "marketplace", "first" in a ? a.first : true, a.pct ?? 12, a.min ?? 5, "max" in a ? a.max : 30, a.active ?? true, a.reason ?? "Approved by the owner on the call", a.description ?? null, a.id ?? null]).then((rows) => rows[0].r);
 const audits = (action, targetId = null) => sys(db, `select details from admin_audit_logs where action = $1 and ($2::uuid is null or target_id = $2) order by created_at`, [action, targetId]);
 
 before(async () => {
@@ -97,47 +94,15 @@ describe("admin_set_feature_flag", () => {
   });
 });
 
-describe("admin_save_fee_rule", () => {
-  let first;
-  it("changes the marketplace first-visit rule with a reason, keeps the old values in the audit, and the engine uses it", async () => {
-    first = (await sys(db, `select id from fee_rules where channel = 'marketplace' and is_first_visit = true`))[0].id;
-    const r = await rule(admin, { id: first, pct: 12.5, min: 5, max: 30 });
-    assert.equal(r.created, false);
-    const [row] = await sys(db, `select fee_percentage, min_fee_sar, max_fee_sar, is_active from fee_rules where id = $1`, [first]);
-    assert.deepEqual([Number(row.fee_percentage), Number(row.min_fee_sar), Number(row.max_fee_sar), row.is_active], [12.5, 5, 30, true]);
-    const [entry] = await audits("fee_rule.updated", first);
-    assert.equal(Number(entry.details.fee_percentage_after), 12.5);
-    assert.ok("fee_percentage_before" in entry.details);
-    assert.equal(entry.details.reason, "Approved by the owner on the call");
-  });
-
-  it("refuses values outside the bounds, switching a marketplace rule off, and the provider's own channels", async () => {
-    await expectError(rule(admin, { id: first, reason: "no" }), /reason of at least 3/);
-    await expectError(rule(admin, { id: first, pct: 51 }), /between 0 and 50/);
-    await expectError(rule(admin, { id: first, pct: -1 }), /between 0 and 50/);
-    await expectError(rule(admin, { id: first, min: -1 }), /minimum fee/);
-    await expectError(rule(admin, { id: first, min: 10, max: 5 }), /maximum fee/);
-    await expectError(rule(admin, { id: first, active: false }), /cannot be switched off/);
-    await expectError(rule(admin, { id: first, channel: "qr" }), /own channels/);
-    await expectError(rule(admin, { id: first, channel: "tiktok" }), /Unknown booking channel/);
-    await expectError(rule(admin, { id: first, first: false }), /keeps its channel and visit type/);
-    await expectError(rule(admin, { id: "00000000-0000-4000-8000-0000000000cc" }), /not found/);
-    assert.equal(Number((await sys(db, `select fee_percentage from fee_rules where id = $1`, [first]))[0].fee_percentage), 12.5);
-  });
-
-  it("adds a missing rule once and answers a duplicate with 23505", async () => {
-    await sys(db, `delete from fee_rules where channel = 'marketplace' and is_first_visit = false`);
-    const created = await rule(admin, { first: false, pct: 0, min: 0, max: 0 });
-    assert.equal(created.created, true);
-    await expectError(rule(admin, { first: false }), /already exists/);
-  });
-
-  it("refuses everyone who is not an administrator, and no client writes the table", async () => {
-    for (const actor of outsiders()) await expectError(rule(actor, { id: first }), denied);
+describe("fee rules (MONEY, D-Q8)", () => {
+  it("are no longer changed by one administrator in one call: admin_save_fee_rule is gone and no client writes the table", async () => {
+    assert.equal((await sys(db, `select count(*)::int n from pg_proc where proname = 'admin_save_fee_rule'`))[0].n, 0);
     for (const actor of [admin, owner1, customer]) {
       await expectError(as(db, actor, `update fee_rules set fee_percentage = 0`), /permission denied|row-level security/);
       await expectError(as(db, actor, `delete from fee_rules`), /permission denied|row-level security/);
     }
     assert.ok((await as(db, admin, `select 1 from fee_rules`)).length > 0, "administrators still read every rule");
+    // The two-person, effective-dated change is tested in money_pending_changes.test.mjs.
   });
 });
+

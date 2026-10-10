@@ -329,11 +329,13 @@ describe("the audit log keeps values only where they are operational", () => {
 
   it("still records money and configuration values in full", async () => {
     const id = (await sys(db, `select id from fee_rules where channel = 'marketplace' and is_first_visit = true`))[0].id;
-    // ADM1: fee rules change through admin_save_fee_rule (the audit trigger still records the values in full).
-    await as(db, admin, `select admin_save_fee_rule('marketplace', true, 12.5, 10, 40, true, 'Audit value test', null, $1)`, [id]);
-    const [row] = await sys(db, `select details from admin_audit_logs where action = 'fee_rules.update' and target_id = $1 order by created_at desc limit 1`, [id]);
+    // MONEY (D-Q8): a fee change is a new version approved by a second administrator; the audit trigger records the values in full.
+    const asked = (await as(db, admin, `select admin_propose_fee_rule_change('marketplace', true, 12.5, 10, 40, now(), 'Audit value test for fees') r`))[0].r;
+    const done = (await as(db, admin2, `select admin_decide_approval($1, 'approve', 'Owner confirmed the lower fee') r`, [asked.approval_id]))[0].r;
+    const [row] = await sys(db, `select details from admin_audit_logs where action = 'fee_rules.insert' and target_id = $1 order by created_at desc limit 1`, [done.result.fee_rule_id]);
     assert.equal(Number(row.details.changes.fee_percentage.after), 12.5);
-    assert.ok("before" in row.details.changes.fee_percentage);
+    const [closed] = await sys(db, `select details from admin_audit_logs where action = 'fee_rules.update' and target_id = $1 order by created_at desc limit 1`, [id]);
+    assert.ok("before" in closed.details.changes.effective_to);
   });
 
   it("itemises the first few rows of a bulk administrator write and then says the rest were not itemised", async () => {
