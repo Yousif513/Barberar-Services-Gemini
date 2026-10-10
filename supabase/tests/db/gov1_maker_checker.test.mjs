@@ -193,11 +193,15 @@ describe("owner break-glass", () => {
     await expectError(as(dbs, helper, `select admin_break_glass_execute($1, 'Only administrator; provider waiting on rent payment')`, [asked.approval_id]), denied);
   });
 
-  it("is signed off by a named independent reviewer with a document reference", async () => {
+  it("is signed off by a named independent reviewer with a document reference, never by the owner who used it (GOV-FIX M-4)", async () => {
     const [review] = await sys(dbs, `select id from break_glass_reviews limit 1`);
-    await expectError(as(dbs, solo, `select admin_sign_off_break_glass($1, 'Al', 'REF-1')`, [review.id]), /reviewer/);
-    await expectError(as(dbs, solo, `select admin_sign_off_break_glass($1, 'External accountant', '')`, [review.id]), /document reference/);
-    const signed = (await as(dbs, solo, `select admin_sign_off_break_glass($1, 'Noura Al-Qahtani (external accountant)', 'AUD-2026-118') r`, [review.id]))[0].r;
+    // The finance administrator added in the previous test records the review; the owner who used break-glass cannot.
+    const [helperRow] = await sys(dbs, `select user_id from admin_role_assignments where admin_role = 'finance' limit 1`);
+    const reviewer = ROLES.user(helperRow.user_id);
+    await expectError(as(dbs, solo, `select admin_sign_off_break_glass($1, 'Noura Al-Qahtani (external accountant)', 'AUD-2026-118')`, [review.id]), /another administrator records/);
+    await expectError(as(dbs, reviewer, `select admin_sign_off_break_glass($1, 'Al', 'REF-1')`, [review.id]), /reviewer/);
+    await expectError(as(dbs, reviewer, `select admin_sign_off_break_glass($1, 'External accountant', '')`, [review.id]), /document reference/);
+    const signed = (await as(dbs, reviewer, `select admin_sign_off_break_glass($1, 'Noura Al-Qahtani (external accountant)', 'AUD-2026-118') r`, [review.id]))[0].r;
     assert.equal(signed.signed_off, true);
     const [audit] = await sys(dbs, `select details from admin_audit_logs where action = 'break_glass.reviewed'`);
     assert.equal(audit.details.document_reference, "AUD-2026-118");

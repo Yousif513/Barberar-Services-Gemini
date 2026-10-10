@@ -131,9 +131,12 @@ describe("step-up within 5 minutes", () => {
 describe("admin_set_console_role", () => {
   it("assigns, changes and removes console roles with a reason, audited, alerted and notified", async () => {
     const person = await createUser(db, { phone: "+966555000901" });
-    const made = await setRole(owner, person, "finance");
-    assert.deepEqual([made.admin_role, made.changed], ["finance", true]);
+    // GOV-FIX H-2: finance adds money and IBAN rights, so it waits for a different owner.
+    const asked = await setRole(owner, person, "finance");
+    assert.deepEqual([asked.status, asked.changed], ["pending_approval", false]);
+    await as(db, owner2, `select admin_decide_approval($1, 'approve', 'Confirmed with HR and the finance lead')`, [asked.approval_id]);
     assert.equal((await sys(db, `select role from profiles where id = $1`, [person]))[0].role, "admin");
+    assert.equal((await sys(db, `select admin_role from admin_role_assignments where user_id = $1`, [person]))[0].admin_role, "finance");
     assert.equal((await setRole(owner, person, "finance")).changed, false, "the same role again changes nothing");
     await setRole(owner, person, "operations", "Moved to operations this week");
     const [audit] = await sys(db, `select details from admin_audit_logs where action = 'admin.console_role_changed' and target_id = $1 order by created_at desc limit 1`, [person]);
@@ -163,9 +166,13 @@ describe("admin_set_console_role", () => {
     await expectError(as(db2, solo, `select set_user_role($1, 'customer', 'Stepping back from ownership')`, [solo.sub]), /your own role/);
     await expectError(as(db2, other, `select set_user_role($1, 'customer', 'Removing the only owner')`, [solo.sub]), denied);
     await expectError(as(db2, other, `select admin_set_console_role($1, 'analyst', 'Removing the only owner')`, [solo.sub]), denied);
-    await as(db2, solo, `select admin_set_console_role($1, 'owner', 'Second owner for holiday cover')`, [other.sub]);
-    await as(db2, other, `select admin_set_console_role($1, 'finance', 'Owner moves to the finance desk')`, [solo.sub]);
-    assert.deepEqual((await sys(db2, `select admin_role from admin_role_assignments where user_id = $1`, [solo.sub]))[0].admin_role, "finance");
+    // GOV-FIX H-2: a sole owner cannot make a second owner alone; the grant waits for a different owner and break-glass never applies.
+    const asked = (await as(db2, solo, `select admin_set_console_role($1, 'owner', 'Second owner for holiday cover') r`, [other.sub]))[0].r;
+    assert.equal(asked.status, "pending_approval");
+    await expectError(as(db2, solo, `select admin_decide_approval($1, 'approve', 'Approving my own request')`, [asked.approval_id]), /your own request/);
+    await expectError(as(db2, solo, `select admin_break_glass_execute($1, 'Nobody else can approve this role change')`, [asked.approval_id]), /never available/);
+    await expectError(as(db2, other, `select admin_decide_approval($1, 'approve', 'Approving my own promotion')`, [asked.approval_id]), /cannot decide/);
+    assert.equal((await sys(db2, `select admin_role from admin_role_assignments where user_id = $1`, [other.sub]))[0].admin_role, "finance");
   });
 });
 
@@ -209,11 +216,27 @@ describe("MFA lockout (Supabase MFA verification hook)", () => {
 
 describe("security alerts", () => {
   it("are acknowledged by an owner with a note, once", async () => {
-    const [alert] = await sys(db, `select id from security_alerts where acknowledged_at is null order by created_at limit 1`);
+    const [alert] = await sys(db, `select id from security_alerts where acknowledged_at is null and kind = 'mfa_lockout' order by created_at limit 1`);
     await expectError(as(db, finance, `select admin_acknowledge_security_alert($1, 'Reviewed with the owner')`, [alert.id]), denied);
     await expectError(as(db, owner, `select admin_acknowledge_security_alert($1, 'ok')`, [alert.id]), /at least 10/);
     assert.equal((await as(db, owner, `select admin_acknowledge_security_alert($1, 'Reviewed with the team') r`, [alert.id]))[0].r.changed, true);
     assert.equal((await as(db, owner, `select admin_acknowledge_security_alert($1, 'Reviewed with the team') r`, [alert.id]))[0].r.changed, false);
     await expectError(as(db, owner, `update security_alerts set acknowledged_at = null where id = $1`, [alert.id]), /permission denied/);
+  });
+});
+
+describe("GOV-FIX M-4: nobody clears an alert about themselves", () => {
+  it("refuses the owner who reset MFA or changed a role, and the person the alert is about; another owner acknowledges", async () => {
+    const [reset] = await sys(db, `select id from security_alerts where kind = 'mfa_reset' and details->>'reset_by' = $1 and acknowledged_at is null limit 1`, [owner.sub]);
+    await expectError(as(db, owner, `select admin_acknowledge_security_alert($1, 'Reviewed my own reset')`, [reset.id]), /another owner acknowledges/);
+    assert.equal((await as(db, owner2, `select admin_acknowledge_security_alert($1, 'Checked the ticket and the caller') r`, [reset.id]))[0].r.changed, true);
+
+    const person = await createUser(db);
+    await setRole(owner, person, "analyst", "Joined the analytics team");
+    const [changed] = await sys(db, `select id from security_alerts where kind = 'console_role_changed' and user_id = $1`, [person]);
+    await expectError(as(db, owner, `select admin_acknowledge_security_alert($1, 'Reviewed my own change')`, [changed.id]), /another owner acknowledges/);
+    const inbox = (await as(db, owner, `select admin_approval_inbox('pending', 5, 0) r`))[0].r;
+    assert.equal(inbox.open_alerts.find((a) => a.id === changed.id).can_acknowledge, false, "the inbox hides the button the server refuses");
+    assert.equal((await as(db, owner2, `select admin_acknowledge_security_alert($1, 'Confirmed with the team lead') r`, [changed.id]))[0].r.changed, true);
   });
 });

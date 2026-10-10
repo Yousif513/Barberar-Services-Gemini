@@ -20,7 +20,7 @@ type Status = (typeof STATUSES)[number];
 type Numeric = number | string | null;
 type ApprovalRow = {
   id: string;
-  kind: "payout_release" | "refund" | "iban_change" | "setting_change" | "ledger_settlement" | "ledger_adjustment" | "fee_rule_change" | "payout_hold" | "reward_program";
+  kind: "payout_release" | "refund" | "iban_change" | "setting_change" | "ledger_settlement" | "ledger_adjustment" | "fee_rule_change" | "payout_hold" | "reward_program" | "role_change";
   status: string;
   target_id: string | null;
   amount_sar: Numeric;
@@ -39,10 +39,13 @@ type ApprovalRow = {
   can_decide: boolean;
   can_cancel: boolean;
   can_break_glass: boolean;
+  target_name?: string | null;
+  decide_blocked_reason?: string | null;
+  break_glass_blocked_until?: string | null;
 };
-type Review = { id: string; approval_request_id: string; amount_sar: Numeric; justification: string; executed_at: string; due_at: string; signed_off_at: string | null; reviewer_name: string | null; document_reference: string | null; overdue: boolean };
+type Review = { id: string; approval_request_id: string; amount_sar: Numeric; justification: string; executed_at: string; due_at: string; signed_off_at: string | null; reviewer_name: string | null; document_reference: string | null; overdue: boolean; can_sign_off?: boolean };
 type Setting = { key: string; value: Numeric; description_en: string; description_ar: string; updated_at: string };
-type Alert = { id: string; kind: string; details: Record<string, unknown>; created_at: string };
+type Alert = { id: string; kind: string; details: Record<string, unknown>; created_at: string; can_acknowledge?: boolean };
 type Inbox = {
   counts: Record<string, Numeric>;
   matching: Numeric;
@@ -71,7 +74,12 @@ const translations = {
     tabs: { pending: "Waiting", approved: "Approved", rejected: "Rejected", cancelled: "Withdrawn" },
     kinds: { payout_release: "Payout release", refund: "Refund", iban_change: "Bank account change", setting_change: "Threshold change",
       ledger_settlement: "Manual ledger settlement", ledger_adjustment: "Ledger correction", fee_rule_change: "Fee rule change",
-      payout_hold: "Payout hold", reward_program: "Reward programme change" },
+      payout_hold: "Payout hold", reward_program: "Reward programme change", role_change: "Console role grant" },
+    consoleRoles: { owner: "Owner", finance: "Finance", operations: "Operations", analyst: "Analyst (read-only)" } as Record<string, string>,
+    noConsoleRole: "No console role",
+    breakGlassClosedUntil: "Break-glass closed until {date}: an administrator who could approve this was demoted or removed",
+    ownAlert: "About you or your action: another owner acknowledges it",
+    ownBreakGlass: "You used this break-glass: another administrator records the review",
     describeParts: { increase: "increase, 30 days notice", from: "from", place: "place hold", lift: "lift hold", enable: "enable", disable: "disable",
       reference: "bank reference", provider: "provider", platform: "platform", tap: "Tap object" },
     columnRequest: "Request",
@@ -170,7 +178,12 @@ const translations = {
     tabs: { pending: "بانتظار القرار", approved: "معتمدة", rejected: "مرفوضة", cancelled: "مسحوبة" },
     kinds: { payout_release: "صرف تحويل", refund: "استرداد", iban_change: "تغيير حساب بنكي", setting_change: "تغيير حد",
       ledger_settlement: "تسوية قيد يدوية", ledger_adjustment: "تصحيح قيد", fee_rule_change: "تغيير قاعدة رسوم",
-      payout_hold: "إيقاف التحويلات", reward_program: "تغيير برنامج مكافآت" },
+      payout_hold: "إيقاف التحويلات", reward_program: "تغيير برنامج مكافآت", role_change: "منح دور في لوحة الإدارة" },
+    consoleRoles: { owner: "المالك", finance: "المالية", operations: "العمليات", analyst: "محلل (قراءة فقط)" } as Record<string, string>,
+    noConsoleRole: "بلا دور في لوحة الإدارة",
+    breakGlassClosedUntil: "إجراء الطوارئ مغلق حتى {date}: خُفّض دور مسؤول كان يمكنه الاعتماد أو أُزيل",
+    ownAlert: "يتعلق بك أو بإجراء قمت به: يقرّ به مالك آخر",
+    ownBreakGlass: "أنت من استخدم إجراء الطوارئ: يسجّل المراجعةَ مسؤول آخر",
     describeParts: { increase: "زيادة، إشعار 30 يوماً", from: "من", place: "إيقاف", lift: "رفع الإيقاف", enable: "تفعيل", disable: "إيقاف",
       reference: "المرجع البنكي", provider: "المزود", platform: "المنصة", tap: "معرّف Tap" },
     columnRequest: "الطلب",
@@ -350,6 +363,10 @@ function ApprovalsScreen() {
     }
     if (row.kind === "payout_hold") {
       return [providerName(row), s.action === "lift" ? d.lift : d.place].filter(Boolean).join(" · ");
+    }
+    if (row.kind === "role_change") {
+      const role = (value: unknown) => (typeof value === "string" && value ? t.consoleRoles[value] ?? value : t.noConsoleRole);
+      return [row.target_name || t.unnamed, `${role(s.role_before)} → ${role(s.role_after)}`].join(" · ");
     }
     if (row.kind === "reward_program") {
       return [text(s.program), s.enabled ? d.enable : d.disable, s.reward_value_sar === null || s.reward_value_sar === undefined ? "" : sar(toNumber(s.reward_value_sar as Numeric), lang)].filter(Boolean).join(" · ");
@@ -580,7 +597,8 @@ function ApprovalsScreen() {
                               {row.can_decide && <button type="button" onClick={() => setDialog({ type: "decide", row, decision: "reject" })} className={`${smallButton} border-[#FECDCA] bg-[#FEF3F2] text-[#B42318]`}>{t.reject}</button>}
                               {row.can_cancel && <button type="button" onClick={() => setDialog({ type: "cancel", row })} className={`${smallButton} border-gray-300 bg-white text-gray-800`}>{t.withdraw}</button>}
                               {row.can_break_glass && <button type="button" onClick={() => setDialog({ type: "break-glass", row })} className={`${smallButton} border-[#B42318] bg-white text-[#B42318]`}>{t.breakGlass}</button>}
-                              {!row.can_decide && !row.can_cancel && <span className="text-[11px] text-gray-500">{t.noRight}</span>}
+                              {!row.can_decide && !row.can_cancel && <span className="text-[11px] text-gray-500">{row.decide_blocked_reason || t.noRight}</span>}
+                              {row.can_cancel && row.break_glass_blocked_until ? <span className="w-full text-[10px] font-bold text-[#B54708]">{fill(t.breakGlassClosedUntil, { date: operationsDate(row.break_glass_blocked_until, lang) })}</span> : null}
                               {row.can_cancel && !row.can_break_glass && <span className="w-full text-[10px] text-gray-500">{t.yours}</span>}
                             </span>
                           ) : null}
@@ -617,7 +635,8 @@ function ApprovalsScreen() {
                         ) : (
                           <div className="mt-2 flex flex-wrap items-center gap-2">
                             <span className={review.overdue ? "font-black text-[#B42318]" : "text-gray-500"}>{review.overdue ? t.overdue : fill(t.reviewDue, { date: operationsDate(review.due_at, lang) })}</span>
-                            {inbox.can_review_break_glass && <button type="button" onClick={() => setDialog({ type: "review", review })} className={`${smallButton} border-gray-300 bg-white`}>{t.signOff}</button>}
+                            {inbox.can_review_break_glass && review.can_sign_off !== false && <button type="button" onClick={() => setDialog({ type: "review", review })} className={`${smallButton} border-gray-300 bg-white`}>{t.signOff}</button>}
+                            {inbox.can_review_break_glass && review.can_sign_off === false && <span className="text-[11px] text-gray-500">{t.ownBreakGlass}</span>}
                           </div>
                         )}
                       </li>
@@ -655,7 +674,8 @@ function ApprovalsScreen() {
                           <span className="block font-bold text-[#93370D]">{t.alertKinds[alert.kind] ?? alert.kind}</span>
                           <span className="block text-[11px] text-[#B54708]">{operationsDate(alert.created_at, lang)}</span>
                         </span>
-                        {inbox.can_acknowledge_alerts && <button type="button" onClick={() => setDialog({ type: "alert", alert })} className={`${smallButton} border-[#FEC84B] bg-white text-[#93370D]`}>{t.acknowledge}</button>}
+                        {inbox.can_acknowledge_alerts && alert.can_acknowledge !== false && <button type="button" onClick={() => setDialog({ type: "alert", alert })} className={`${smallButton} border-[#FEC84B] bg-white text-[#93370D]`}>{t.acknowledge}</button>}
+                        {inbox.can_acknowledge_alerts && alert.can_acknowledge === false && <span className="max-w-[140px] text-[10px] text-[#B54708]">{t.ownAlert}</span>}
                       </li>
                     ))}
                   </ul>

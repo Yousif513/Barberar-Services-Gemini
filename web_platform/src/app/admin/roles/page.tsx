@@ -100,7 +100,7 @@ const translations = {
     mfaOff: "Not enrolled",
     mfaLocked: "Locked (10 wrong codes)",
     roleTitle: "Change the console role of {name}",
-    roleIntro: "The new role applies at the person's next request. Changing roles needs a fresh code from your authenticator app; the person is notified.",
+    roleIntro: "A role that adds no money or governance rights applies at the person's next request. Owner and Finance wait for a different owner's approval. Changing roles needs a fresh code from your authenticator app; the person is notified.",
     removeTitle: "Remove {name} from the console",
     removeIntro: "The account becomes a customer account and loses console access at once. The last owner cannot be removed.",
     mfaTitle: "Reset two-step verification for {name}",
@@ -109,6 +109,7 @@ const translations = {
     roleReason: "Why is the role changing? (at least 10 characters)",
     mfaDone: "Two-step verification was reset; the person enrols again at the next sign-in.",
     roleDone: "The console role was changed.",
+    roleRequested: "This role adds money, bank-account or governance rights, so a different owner must approve it in Approvals. It applies once approved, and the person can decide requests only 72 hours later.",
   },
   ar: {
     title: "المسؤولون والأدوار",
@@ -172,7 +173,7 @@ const translations = {
     mfaOff: "غير مفعّل",
     mfaLocked: "مقفل (10 رموز خاطئة)",
     roleTitle: "تغيير دور {name} في لوحة الإدارة",
-    roleIntro: "يسري الدور الجديد من الطلب التالي للشخص. تغيير الأدوار يحتاج رمزاً جديداً من تطبيق المصادقة لديك، ويُبلَّغ الشخص.",
+    roleIntro: "الدور الذي لا يضيف صلاحيات مالية أو حوكمة يسري من الطلب التالي للشخص. أما المالك والمالية فينتظران اعتماد مالك آخر. تغيير الأدوار يحتاج رمزاً جديداً من تطبيق المصادقة لديك، ويُبلَّغ الشخص.",
     removeTitle: "إزالة {name} من لوحة الإدارة",
     removeIntro: "يصبح الحساب حساب عميل ويفقد الوصول إلى لوحة الإدارة فوراً. لا يمكن إزالة آخر مالك.",
     mfaTitle: "إعادة ضبط التحقق بخطوتين لـ {name}",
@@ -181,6 +182,7 @@ const translations = {
     roleReason: "ما سبب تغيير الدور؟ (10 أحرف على الأقل)",
     mfaDone: "تمت إعادة ضبط التحقق بخطوتين؛ يضيف الشخص تطبيقه من جديد عند الدخول التالي.",
     roleDone: "تم تغيير الدور في لوحة الإدارة.",
+    roleRequested: "هذا الدور يضيف صلاحيات مالية أو مصرفية أو صلاحيات حوكمة، لذا يجب أن يعتمده مالك آخر في صفحة الاعتمادات. يسري بعد الاعتماد، ولا يبت الشخص في الطلبات إلا بعد 72 ساعة.",
   },
 };
 
@@ -285,9 +287,11 @@ function RolesScreen() {
       setSuccess(t.mfaDone);
     } else {
       const { person, next } = pending;
-      const { error } = await supabase.rpc("admin_set_console_role", { p_user_id: person.id, p_admin_role: next, p_reason: reason });
+      const { data, error } = await supabase.rpc("admin_set_console_role", { p_user_id: person.id, p_admin_role: next, p_reason: reason });
       if (error) return errorMessage(error);
-      setSuccess(next === null ? t.revokeDone : person.role === "admin" ? t.roleDone : t.grantDone);
+      // GOV-FIX H-2: a grant of owner or finance is recorded as a request for a different owner, not applied.
+      const outcome = data as { status?: string } | null;
+      setSuccess(outcome?.status === "pending_approval" ? t.roleRequested : next === null ? t.revokeDone : person.role === "admin" ? t.roleDone : t.grantDone);
     }
     setReloadKey((key) => key + 1);
     return null;
