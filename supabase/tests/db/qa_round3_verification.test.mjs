@@ -172,7 +172,8 @@ describe("payout requests", () => {
     for (const [name, user] of [["owner", owner1], ["administrator", admin]]) {
       assert.equal(await outcome(as(db, user, `insert into payout_requests (provider_id, requested_by, amount, bank_name, iban) values ($1, $2, 1, 'B', 'SA0380000000608010167519')`, [SEED.provider1, user.sub])), "42501", name);
     }
-    assert.equal((await as(db, owner1, `update payout_requests set amount = 1, iban = 'SA4420000001234567891234' where provider_id = $1 returning id`, [SEED.provider1])).length, 0);
+    // GOV-1: the IBAN column is not even selectable or updatable by a client any more (permission denied), which also changes nothing.
+    assert.equal((await as(db, owner1, `update payout_requests set amount = 1, iban = 'SA4420000001234567891234' where provider_id = $1 returning id`, [SEED.provider1]).catch(() => [])).length, 0);
     assert.equal((await as(db, owner1, `delete from payout_requests where provider_id = $1 returning id`, [SEED.provider1])).length, 0);
   });
 });

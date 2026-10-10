@@ -95,9 +95,9 @@ describe("payout requests", () => {
   });
 
   it("keep the amount and bank details the provider asked for, even against an administrator", async () => {
-    await expectError(as(db, admin, `update payout_requests set iban = 'SA4420000001234567891234' where id = $1`, [request]), /cannot be changed/);
-    await expectError(as(db, admin, `update payout_requests set bank_name = 'Other Bank' where id = $1`, [request]), /cannot be changed/);
-    await expectError(as(db, admin, `update payout_requests set amount = 9000 where id = $1`, [request]), /cannot be changed/);
+    await expectError(as(db, admin, `update payout_requests set iban = 'SA4420000001234567891234' where id = $1`, [request]), /cannot be changed|permission denied/);
+    await expectError(as(db, admin, `update payout_requests set bank_name = 'Other Bank' where id = $1`, [request]), /cannot be changed|permission denied/);
+    await expectError(as(db, admin, `update payout_requests set amount = 9000 where id = $1`, [request]), /cannot be changed|permission denied/);
     const row = (await sys(db, `select iban, bank_name, amount from payout_requests where id = $1`, [request]))[0];
     assert.deepEqual([row.iban, row.bank_name, Number(row.amount)], ["SA0380000000608010167519", "Test Bank", 250]);
   });

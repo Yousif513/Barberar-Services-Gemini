@@ -1,6 +1,7 @@
 import { before, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { as, createMigratedDb, createUser, firstSlot, nextWorkingDate, ROLES, SEED, serviceFor, sys } from "./harness.mjs";
+import { approvedDestination, releaseWithApproval } from "./gov1_fixtures.mjs";
 
 // Independent adversarial pass (qa-claude-release-gate) over the database command surface.
 // The database is the only authorization boundary this console has (no middleware, no route handler),
@@ -38,6 +39,7 @@ before(async () => {
   await sys(db, `update employees set profile_id = $1 where id = $2`, [employee1.sub, SEED.employee1]);
   await sys(db, `update employees set profile_id = $1 where id = $2`, [employee2.sub, SEED.employee2]);
   await sys(db, `update providers set status = 'active' where id in ($1, $2)`, [SEED.provider1, SEED.provider2]);
+  await approvedDestination(db, SEED.provider1, "SA0380000000608010167519");
 });
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -176,7 +178,7 @@ describe("replayed commands have one effect", () => {
   it("releasing the same payout twice with the same key pays once", async () => {
     await ledgerRow(120);
     const request = await payoutRequest(80);
-    const first = (await as(db, admin, `select admin_release_payout($1, 'qa-key-1', 'first') r`, [request]))[0].r;
+    const first = await releaseWithApproval(db, admin, request, 'qa-key-1', 'first');
     assert.equal(first.status, "success");
     const second = (await as(db, admin, `select admin_release_payout($1, 'qa-key-1', 'first') r`, [request]))[0].r;
     assert.equal(second.idempotent, true);
@@ -187,7 +189,7 @@ describe("replayed commands have one effect", () => {
   it("releasing a paid payout again under a different key is refused, not paid twice", async () => {
     await ledgerRow(120);
     const request = await payoutRequest(60);
-    await as(db, admin, `select admin_release_payout($1, 'qa-key-2', 'Bank transfer made')`, [request]);
+    await releaseWithApproval(db, admin, request, 'qa-key-2', 'Bank transfer made');
     const allocations = (await sys(db, `select count(*)::int n, coalesce(sum(amount), 0)::numeric s from payout_allocations where payout_request_id = $1`, [request]))[0];
     assert.equal(await outcome(as(db, admin, `select admin_release_payout($1, 'qa-key-3', 'Bank transfer made')`, [request])), "23505");
     const after = (await sys(db, `select count(*)::int n, coalesce(sum(amount), 0)::numeric s from payout_allocations where payout_request_id = $1`, [request]))[0];
@@ -197,7 +199,7 @@ describe("replayed commands have one effect", () => {
 
   it("a payout that the ledger cannot cover is refused whole and allocates nothing", async () => {
     const request = await payoutRequest(9999999);
-    assert.equal(await outcome(as(db, admin, `select admin_release_payout($1, 'qa-key-4', 'Bank transfer made')`, [request])), "22023");
+    assert.equal(await outcome(releaseWithApproval(db, admin, request, 'qa-key-4', 'Bank transfer made')), "22023");
     assert.equal((await sys(db, `select count(*)::int n from payout_allocations where payout_request_id = $1`, [request]))[0].n, 0);
     assert.notEqual((await sys(db, `select status from payout_requests where id = $1`, [request]))[0].status, "paid");
   });

@@ -1,6 +1,7 @@
 import { before, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { as, createMigratedDb, createUser, expectError, firstSlot, nextWorkingDate, ROLES, SEED, serviceFor, sys } from "./harness.mjs";
+import { approvedDestination, releaseWithApproval } from "./gov1_fixtures.mjs";
 
 let db;
 let svc;
@@ -115,9 +116,10 @@ describe("refunds, payouts and reports", () => {
                      values ($1, 'package_sale', $2, $3::numeric, 0, $3::numeric, 'pending')`, [prov, `chg_payout_${amount}`, amount]);
     }
     const owner = ROLES.user(other);
+    await approvedDestination(db, prov, 'SA0380000000608010167519');
     const first = (await as(db, owner, `select * from request_provider_payout($1, 70, 'SNB', 'SA0380000000608010167519')`, [prov]))[0];
     await expectError(as(db, owner, `select request_provider_payout($1, 40, 'SNB', 'SA0380000000608010167519')`, [prov]), /exceeds the available balance/);
-    const released = (await as(db, admin, `select admin_release_payout($1, 'release-1', 'Bank transfer made') r`, [first.id]))[0].r;
+    const released = await releaseWithApproval(db, admin, first.id, 'release-1', 'Bank transfer made');
     assert.equal(released.status, "success");
     assert.equal((await as(db, admin, `select admin_release_payout($1, 'release-1', 'Bank transfer made') r`, [first.id]))[0].r.status, "already_processed");
     const rows = await sys(db, `select provider_share, payout_status from transactional_ledger where provider_id = $1 order by provider_share`, [prov]);

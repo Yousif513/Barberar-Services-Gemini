@@ -2,6 +2,7 @@
 import { before, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { as, createMigratedDb, createUser, expectError, nextWorkingDate, ROLES, SEED, serviceFor, sys } from "./harness.mjs";
+import { approvedDestination, releaseWithApproval } from "./gov1_fixtures.mjs";
 
 const owner1 = ROLES.user(SEED.owner1);
 const owner2 = ROLES.user(SEED.owner2);
@@ -15,6 +16,7 @@ before(async () => {
   db = await createMigratedDb();
   svc = await serviceFor(db, SEED.employee1);
   admin = ROLES.user(await createUser(db, { role: "admin" }));
+  await approvedDestination(db, SEED.provider1, IBAN);
 });
 
 const balance = async (provider = SEED.provider1) => Number((await sys(db, `select provider_available_balance($1) b`, [provider]))[0].b);
@@ -50,7 +52,7 @@ describe("M-09: money for a visit that has not happened is not withdrawable", ()
     const future = await paidBooking({ days: 7, deposit: 40, commission: 10 });
     const avail = await balance();
     const req = (await as(db, owner1, `select * from request_provider_payout($1, $2, 'Bank', $3)`, [SEED.provider1, avail, IBAN]))[0];
-    await as(db, admin, `select admin_release_payout($1, 'fm-release-1', 'pay the performed visits')`, [req.id]);
+    await releaseWithApproval(db, admin, req.id, 'fm-release-1', 'pay the performed visits');
     const rows = await sys(db, `select booking_id, payout_status from transactional_ledger where booking_id = any ($1::uuid[]) order by booking_id`, [[done.id, future.id]]);
     assert.equal(rows.find((r) => r.booking_id === future.id).payout_status, "pending", "the unperformed booking's deposit stays pending");
     assert.equal(rows.find((r) => r.booking_id === done.id).payout_status, "released");
@@ -78,7 +80,7 @@ describe("M-09: a refund after payout books a receivable instead of failing", ()
     await complete(b.id);
     const startBalance = await balance();
     const req = (await as(db, owner1, `select * from request_provider_payout($1, $2, 'Bank', $3)`, [SEED.provider1, startBalance, IBAN]))[0];
-    await as(db, admin, `select admin_release_payout($1, 'fm-release-2', 'pay out everything')`, [req.id]);
+    await releaseWithApproval(db, admin, req.id, 'fm-release-2', 'pay out everything');
     assert.equal(await balance(), 0);
     assert.equal((await sys(db, `select payout_status from transactional_ledger where booking_id = $1`, [b.id]))[0].payout_status, "released");
 
@@ -104,7 +106,7 @@ describe("M-09: a refund after payout books a receivable instead of failing", ()
     await complete(next.id); // provider share 90
     assert.equal(await balance(), 90 - startBalance);
     const req2 = (await as(db, owner1, `select * from request_provider_payout($1, $2, 'Bank', $3)`, [SEED.provider1, 90 - startBalance, IBAN]))[0];
-    await as(db, admin, `select admin_release_payout($1, 'fm-release-3', 'pay the net')`, [req2.id]);
+    await releaseWithApproval(db, admin, req2.id, 'fm-release-3', 'pay the net');
     assert.equal((await sys(db, `select status from provider_receivables where refund_request_id = $1`, [refundId]))[0].status, "settled");
     assert.equal(await balance(), 0, "the ledger rows were consumed by the payout plus the recovered receivable");
   });
@@ -113,7 +115,7 @@ describe("M-09: a refund after payout books a receivable instead of failing", ()
     const b = await paidBooking({ days: -3, deposit: 40, commission: 10 });
     await complete(b.id);
     const req = (await as(db, owner1, `select * from request_provider_payout($1, $2, 'Bank', $3)`, [SEED.provider1, await balance(), IBAN]))[0];
-    await as(db, admin, `select admin_release_payout($1, 'fm-release-4', 'pay out')`, [req.id]);
+    await releaseWithApproval(db, admin, req.id, 'fm-release-4', 'pay out');
     const refundId = (await as(db, admin, `select admin_create_refund_request($1, 10, 'goodwill after payout') id`, [b.id]))[0].id;
     await as(db, ROLES.service, `select claim_refund_request($1)`, [refundId]);
     await as(db, ROLES.service, `select complete_refund_request($1, false, null, 'gateway refused')`, [refundId]);

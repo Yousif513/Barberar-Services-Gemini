@@ -105,7 +105,9 @@ describe("client roles hold no more than they need", () => {
       select c.relname from pg_class c join pg_namespace n on n.oid = c.relnamespace
       where n.nspname = 'public' and c.relkind = 'r'
         and not (has_table_privilege('service_role', c.oid, 'INSERT') and has_table_privilege('service_role', c.oid, 'UPDATE') and has_table_privilege('service_role', c.oid, 'DELETE') and has_table_privilege('service_role', c.oid, 'SELECT'))`);
-    assert.deepEqual(rows, [], "the service role works on every table");
+    // GOV-1 (Q4 item 5): the audit log is append-only for every role, the service role included (insert and select only).
+    assert.deepEqual(rows, [{ relname: "admin_audit_logs" }], "the service role works on every table except the append-only audit log");
+    assert.equal((await sys(db, `select has_table_privilege('service_role', 'public.admin_audit_logs', 'INSERT') and has_table_privilege('service_role', 'public.admin_audit_logs', 'SELECT') ok`))[0].ok, true);
   });
 });
 

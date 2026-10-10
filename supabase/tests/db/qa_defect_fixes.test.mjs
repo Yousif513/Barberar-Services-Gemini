@@ -150,7 +150,7 @@ describe("a payout request only comes from the provider's own request", () => {
     assert.equal(await outcome(as(db, owner2, `select request_provider_payout($1, 100, 'Test Bank', $2)`, [SEED.provider1, IBAN])), "42501");
     const made = (await as(db, owner1, `select * from request_provider_payout($1, 100, 'Test Bank', $2)`, [SEED.provider1, IBAN]))[0];
     assert.equal(made.status, "requested");
-    assert.equal(made.iban, IBAN);
+    assert.equal(made.iban, `SA** **** **** **** **** ${IBAN.slice(-4)}`, "GOV-1 (Q3): the command answers with the masked IBAN only");
   });
 });
 
