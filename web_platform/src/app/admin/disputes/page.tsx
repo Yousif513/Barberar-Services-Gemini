@@ -139,12 +139,19 @@ export default function AdminDisputes() {
 
   const runDecision = async (disputeId: string, action: "REFUNDED" | "RESOLVED" | "DECLINED", reason: string): Promise<string | null> => {
     const resolution = action === "REFUNDED" ? "resolved_refund" : "resolved_rejected";
-    const { error: rpcError } = await supabase.rpc("resolve_booking_dispute", {
+    const { data: decided, error: rpcError } = await supabase.rpc("resolve_booking_dispute", {
       p_dispute_id: disputeId,
       p_resolution: resolution,
       p_admin_notes: reason
     });
     if (rpcError) return rpcError.message || t.errorMsg;
+    // D-Q5: a refund at or above the threshold waits for a second administrator; the dispute stays open until then.
+    if ((decided as { status?: string } | null)?.status === "pending_approval") {
+      setSuccess(lang === "ar"
+        ? "الاسترداد يتجاوز الحد، فسُجّل للاعتماد: يعتمده مسؤول ثانٍ من شاشة الاعتمادات، ويبقى النزاع مفتوحاً حتى ذلك."
+        : "The refund is above the threshold, so it was recorded for approval: a second administrator approves it in Approvals; the dispute stays open until then.");
+      return null;
+    }
     setDisputes((prev) => prev.map((row) => (row.id === disputeId ? { ...row, status: action } : row)));
     setSuccess(`${t.successMsg} ${action}!`);
     return null;

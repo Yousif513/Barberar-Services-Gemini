@@ -82,6 +82,20 @@ export function AuthGuard({
         return;
       }
 
+      // GOV-1 / Q6: the database refuses an administrator session that has not verified an authenticator code (aal2), so
+      // the console sends the administrator to enrol or enter one instead of showing screens that would all be refused.
+      if (role === "admin") {
+        const { data: assurance, error: assuranceError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+        if (assuranceError) {
+          if (active) setCheckFailed(true);
+          return;
+        }
+        if (assurance?.currentLevel !== "aal2") {
+          router.replace(`/login/mfa?next=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+          return;
+        }
+      }
+
       if (active) {
         setIsAuthorized(true);
       }

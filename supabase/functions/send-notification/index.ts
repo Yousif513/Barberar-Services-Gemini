@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.108.1"
-import { corsHeaders as sharedCorsHeaders } from "../_shared/http.ts"
+import { adminSessionAllows, corsHeaders as sharedCorsHeaders } from "../_shared/http.ts"
 
 serve(async (req) => {
   const corsHeaders = sharedCorsHeaders(req)
@@ -55,7 +55,8 @@ serve(async (req) => {
           .eq("id", user.id)
           .single()
 
-        if (profile?.role !== "admin") {
+        // GOV-1 / Q6: an administrator counts only in an aal2 console session with the operations permission.
+        if (profile?.role !== "admin" || !(await adminSessionAllows(token, "operations.write"))) {
           return new Response(JSON.stringify({ 
             error: "Forbidden. Only trusted server-side events or administrators may target other users." 
           }), {

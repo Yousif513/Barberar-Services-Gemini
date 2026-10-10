@@ -7,6 +7,7 @@ import { AuthGuard } from "@/components/auth-guard";
 import { supabase } from "@/lib/supabase";
 import { clearDevRole } from "@/lib/dev-access";
 import { useOperationsLocale } from "@/components/operations-ui";
+import { StepUpDialog } from "@/components/step-up-dialog";
 
 
 const translations = {
@@ -16,6 +17,12 @@ const translations = {
     finance: "Financial Control",
     ledger: "Ledger & Splits",
     refunds: "Refunds",
+    approvals: "Approvals",
+    consoleRoleOwner: "Owner",
+    consoleRoleFinance: "Finance",
+    consoleRoleOperations: "Operations",
+    consoleRoleAnalyst: "Analyst (read-only)",
+    idleSignedOut: "You were signed out after 30 minutes without activity.",
     employees: "Staff & Teams",
     branches: "Venues & Rooms",
     dashboard: "Dashboard",
@@ -73,6 +80,12 @@ const translations = {
     finance: "الرقابة المالية",
     ledger: "دفتر الحسابات والعمولات",
     refunds: "المبالغ المستردة",
+    approvals: "الاعتمادات",
+    consoleRoleOwner: "المالك",
+    consoleRoleFinance: "المالية",
+    consoleRoleOperations: "العمليات",
+    consoleRoleAnalyst: "محلل (قراءة فقط)",
+    idleSignedOut: "تم تسجيل خروجك بعد 30 دقيقة دون نشاط.",
     employees: "الموظفون",
     branches: "الفروع والغرف والمواقع",
     dashboard: "لوحة المتابعة",
@@ -135,6 +148,8 @@ const getNavIcon = (nameKey: string) => {
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>;
     case "activity":
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+    case "approvals":
+      return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>;
     case "ledger":
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 11h.01M12 14h.01M12 17h.01M15 11h.01M15 14h.01M15 17h.01M9 11h.01" /></svg>;
     case "refunds":
@@ -264,6 +279,47 @@ export default function AdminLayout({
   }, []);
   const displayName = accountName || t.adminAccount;
 
+  // The console role in force (GOV-1). It only labels the account; every command is decided by the database.
+  const [consoleRole, setConsoleRole] = useState("");
+  useEffect(() => {
+    let cancelled = false;
+    void supabase.rpc("admin_session_state").then(({ data }) => {
+      const role = (data as { console_role?: string | null } | null)?.console_role;
+      if (!cancelled && role) setConsoleRole(role);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  const consoleRoleLabel: Record<string, string> = {
+    owner: t.consoleRoleOwner,
+    finance: t.consoleRoleFinance,
+    operations: t.consoleRoleOperations,
+    analyst: t.consoleRoleAnalyst,
+  };
+
+  // Q6: a console session ends after 30 minutes without activity on this device (Supabase also ends idle sessions server-side
+  // through [auth.sessions] inactivity_timeout; this closes the screen at the same moment).
+  useEffect(() => {
+    const IDLE_MS = 30 * 60 * 1000;
+    let timer = 0;
+    const reset = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        void supabase.auth.signOut({ scope: "local" }).finally(() => {
+          router.replace(`/login?returnUrl=${encodeURIComponent(window.location.pathname)}&reason=idle`);
+        });
+      }, IDLE_MS);
+    };
+    const events = ["pointerdown", "keydown", "wheel", "touchstart"] as const;
+    events.forEach((name) => window.addEventListener(name, reset, { passive: true }));
+    reset();
+    return () => {
+      window.clearTimeout(timer);
+      events.forEach((name) => window.removeEventListener(name, reset));
+    };
+  }, [router]);
+
   // The phone drawer does not exist on a wide screen: widening the window closes it, so the page behind it is never
   // left inert with no drawer to leave.
   useEffect(() => {
@@ -313,6 +369,7 @@ export default function AdminLayout({
     {
       titleKey: "finance",
       items: [
+        { nameKey: "approvals", path: "/admin/approvals" },
         { nameKey: "ledger", path: "/admin/ledger" },
         { nameKey: "refunds", path: "/admin/refunds" },
         { nameKey: "reports", path: "/admin/reports" }
@@ -465,7 +522,7 @@ export default function AdminLayout({
               </div>
             </div>
             <div className={`min-w-0 ${isRTL ? "text-right" : "text-left"}`}>
-              <p className="text-[11px] text-[#B8B2A4] uppercase font-bold tracking-widest leading-none mb-0.5">{t.adminHub}</p>
+              <p className="text-[11px] text-[#B8B2A4] uppercase font-bold tracking-widest leading-none mb-0.5">{consoleRoleLabel[consoleRole] || t.adminHub}</p>
               <p className="text-xs font-black text-white leading-tight truncate max-w-[120px]">{displayName}</p>
             </div>
           </div>
@@ -495,6 +552,7 @@ export default function AdminLayout({
 
   return (
     <AuthGuard allowedRoles={["admin"]}>
+      <StepUpDialog />
       <div className="primora-dashboard-skin flex flex-col md:flex-row bg-[#F7F6F3] text-black font-sans selection:bg-[#D1AF47] selection:text-white md:h-screen md:overflow-hidden">
         
         <a

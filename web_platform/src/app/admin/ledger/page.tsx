@@ -47,6 +47,7 @@ const translations = {
     requestProcessingMsg: "Payout request moved to processing.",
     requestRejectedMsg: "Payout request rejected.",
     requestPaidMsg: "Payout request marked paid and ledger rows released.",
+    requestPendingApprovalMsg: "Payout recorded for approval: a second administrator approves it in Approvals, which pays it.",
     requestActionError: "Failed to update payout request.",
     noLedgerCoverage: "No pending ledger rows were found for this provider.",
     noLedgerRows: "No captured ledger rows yet.",
@@ -137,6 +138,7 @@ const translations = {
     requestProcessingMsg: "تم نقل طلب التحويل إلى قيد المعالجة.",
     requestRejectedMsg: "تم رفض طلب التحويل.",
     requestPaidMsg: "تم تعليم طلب التحويل كمدفوع وتحرير سجلات الدفعات.",
+    requestPendingApprovalMsg: "سُجّل التحويل للاعتماد: يعتمده مسؤول ثانٍ من شاشة الاعتمادات، وعندها يُصرف.",
     requestActionError: "فشل تحديث طلب التحويل.",
     noLedgerCoverage: "لم يتم العثور على سجلات دفعات معلقة لهذا المزود.",
     noLedgerRows: "لا توجد سجلات مالية مقبوضة بعد.",
@@ -468,7 +470,7 @@ const commandCopy = {
     rejectIntro: "The request is closed as rejected; the provider has to make a new request.",
     rejectConfirm: "Reject request",
     payTitle: "Mark this payout as paid",
-    payIntro: "Confirm the bank transfer was made. The provider's pending ledger shares are allocated to this request and released; this cannot be undone from the console.",
+    payIntro: "Every payout needs a second administrator: this records your release for approval, and the approval allocates the provider's pending ledger shares and marks it paid. Payouts to a bank account approved in the last 48 hours wait for the hold to end.",
     payConfirm: "Mark as paid",
     factEntry: "Ledger entry",
     factCaptured: "Captured",
@@ -484,6 +486,19 @@ const commandCopy = {
     processingFor: "Move payout request {id} to processing",
     payFor: "Mark payout request {id} as paid",
     rejectFor: "Reject payout request {id}",
+    revealFor: "Reveal the IBAN of {name}",
+    reveal: "Reveal IBAN",
+    revealTitle: "Reveal the full IBAN",
+    revealIntro: "Finance and owners only. The IBAN is shown once for 60 seconds and is never stored in the console or the audit log; the reveal and your reason are audited. Needs a fresh authenticator code.",
+    revealReason: "Reason with a ticket or payout reference (at least 15 characters)",
+    revealedTitle: "IBAN of {name}",
+    revealedActive: "Approved account",
+    revealedPending: "Account waiting for approval",
+    revealedHolder: "Account holder",
+    revealedBank: "Bank",
+    revealedExpires: "Hidden in {n} s",
+    hideNow: "Hide now",
+    notProvided: "Not provided",
   },
   ar: {
     reasonLabel: "السبب (يُسجل في سجل التدقيق)",
@@ -498,7 +513,7 @@ const commandCopy = {
     rejectIntro: "يُغلق الطلب كمرفوض، وعلى مقدم الخدمة تقديم طلب جديد.",
     rejectConfirm: "رفض الطلب",
     payTitle: "تسجيل هذا الطلب كمدفوع",
-    payIntro: "أكّد أن التحويل البنكي تم. تُخصَّص حصص مقدم الخدمة المعلّقة في الدفتر لهذا الطلب وتُصرف؛ ولا يمكن التراجع عن ذلك من لوحة الإدارة.",
+    payIntro: "كل تحويل يحتاج مسؤولاً ثانياً: يُسجَّل صرفك للاعتماد، وعند الاعتماد تُخصَّص حصص مقدم الخدمة المعلّقة ويُسجَّل الطلب مدفوعاً. التحويل إلى حساب بنكي اعتُمد خلال آخر 48 ساعة ينتظر انتهاء فترة التعليق.",
     payConfirm: "تسجيل كمدفوع",
     factEntry: "قيد الدفتر",
     factCaptured: "المبلغ المحصّل",
@@ -514,9 +529,25 @@ const commandCopy = {
     processingFor: "نقل طلب الصرف {id} إلى المعالجة",
     payFor: "تسجيل طلب الصرف {id} كمدفوع",
     rejectFor: "رفض طلب الصرف {id}",
+    revealFor: "كشف آيبان {name}",
+    reveal: "كشف الآيبان",
+    revealTitle: "كشف الآيبان كاملاً",
+    revealIntro: "للمالية والمالك فقط. يظهر الآيبان مرة واحدة لمدة 60 ثانية ولا يُحفظ في اللوحة ولا في سجل التدقيق؛ ويُسجَّل الكشف وسببه. يحتاج رمزاً جديداً من تطبيق المصادقة.",
+    revealReason: "السبب مع رقم تذكرة أو مرجع تحويل (15 حرفاً على الأقل)",
+    revealedTitle: "آيبان {name}",
+    revealedActive: "الحساب المعتمد",
+    revealedPending: "حساب بانتظار الاعتماد",
+    revealedHolder: "اسم صاحب الحساب",
+    revealedBank: "البنك",
+    revealedExpires: "يختفي خلال {n} ث",
+    hideNow: "إخفاء الآن",
+    notProvided: "غير متوفر",
   },
 };
+type RevealedAccount = { iban: string; bank_name: string; account_holder_name: string | null };
+type Revealed = { name: string; expiresAt: number; active: RevealedAccount | null; pending: RevealedAccount | null };
 type MoneyAction =
+  | { kind: "reveal"; request: any; providerName: string }
   | { kind: "release"; item: any }
   | { kind: "review"; request: any; decision: "processing" | "rejected" }
   | { kind: "pay"; request: any };
@@ -533,6 +564,17 @@ export default function AdminLedger() {
   const [feeInvoicesError, setFeeInvoicesError] = useState("");
   const [processingRequestId, setProcessingRequestId] = useState("");
   const [money, setMoney] = useState<MoneyAction | null>(null);
+  // Q3: a revealed IBAN lives only in this state, for at most 60 seconds, and is never written anywhere else.
+  const [revealed, setRevealed] = useState<Revealed | null>(null);
+  const [revealClock, setRevealClock] = useState(0);
+  useEffect(() => {
+    if (!revealed) return;
+    const tick = window.setInterval(() => {
+      if (Date.now() >= revealed.expiresAt) setRevealed(null);
+      else setRevealClock(Date.now());
+    }, 1000);
+    return () => window.clearInterval(tick);
+  }, [revealed]);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [lang, setLang] = useState<"en" | "ar">("ar");
@@ -594,12 +636,6 @@ export default function AdminLedger() {
       year: "numeric"
     });
 
-  const maskIban = (iban: string) => {
-    const clean = (iban || "").replace(/\s/g, "").toUpperCase();
-    if (clean.length <= 8) return clean;
-    return `${clean.slice(0, 4)} **** **** ${clean.slice(-4)}`;
-  };
-
   const requestStatusLabel = (status: string) => {
     if (status === "processing") return t.statusProcessing;
     if (status === "paid") return t.statusPaid;
@@ -652,7 +688,7 @@ export default function AdminLedger() {
           provider_id,
           amount,
           bank_name,
-          iban,
+          iban_masked,
           status,
           admin_note,
           requested_at,
@@ -848,22 +884,81 @@ export default function AdminLedger() {
   const runPayRequest = async (request: any, reason: string): Promise<string | null> => {
     // Stable per request, so a retry after a lost response cannot pay twice.
     const idempotencyKey = `payout_release_${request.id}`;
-    const { error: rpcError } = await supabase.rpc("admin_release_payout", {
+    const { data: released, error: rpcError } = await supabase.rpc("admin_release_payout", {
       p_payout_request_id: request.id,
       p_idempotency_key: idempotencyKey,
       p_reason: reason,
     });
     if (rpcError) return errorMessage(rpcError) || t.requestActionError;
     setError("");
-    setSuccess(t.requestPaidMsg);
+    // D-Q5: the release waits for a second administrator unless this call executed an approved request.
+    setSuccess((released as { status?: string } | null)?.status === "pending_approval" ? t.requestPendingApprovalMsg : t.requestPaidMsg);
     await Promise.all([loadLedger(), loadPayoutRequests()]);
     return null;
+  };
+
+  const runReveal = async (request: any, providerName: string, reason: string): Promise<string | null> => {
+    const { data, error: rpcError } = await supabase.rpc("reveal_provider_iban", { p_provider_id: request.provider_id, p_reason: reason });
+    if (rpcError) return errorMessage(rpcError);
+    const shown = data as { expires_at: string; active: RevealedAccount | null; pending: RevealedAccount | null };
+    setRevealed({ name: providerName, expiresAt: Math.min(new Date(shown.expires_at).getTime(), Date.now() + 60000), active: shown.active, pending: shown.pending });
+    setRevealClock(Date.now());
+    return null;
+  };
+
+  const renderRevealed = () => {
+    if (!revealed) return null;
+    const c = commandCopy[lang];
+    const seconds = Math.max(0, Math.ceil((revealed.expiresAt - (revealClock || Date.now())) / 1000));
+    const account = (label: string, value: RevealedAccount | null) => value && (
+      <div className="rounded-xl border border-[#ECECEC] bg-[#F9F7F1] p-3">
+        <p className="text-[11px] font-black text-[#667085]">{label}</p>
+        <p dir="ltr" className="mt-1 select-all break-all font-mono text-base font-black text-[#101828]">{value.iban.replace(/(.{4})/g, "$1 ").trim()}</p>
+        <p className="mt-1 text-xs text-[#475467]">{c.revealedBank}: {value.bank_name} · {c.revealedHolder}: {value.account_holder_name || c.notProvided}</p>
+      </div>
+    );
+    return (
+      <div role="dialog" aria-modal="false" aria-label={c.revealedTitle.replace("{name}", revealed.name)} dir={lang === "ar" ? "rtl" : "ltr"}
+        className="fixed inset-x-4 bottom-4 z-[9500] mx-auto max-w-lg rounded-[24px] border border-[#D1AF47]/50 bg-white p-5 text-start shadow-2xl">
+        <div className="flex items-start justify-between gap-3">
+          <p className="font-serif text-lg font-black text-[#101828]">{c.revealedTitle.replace("{name}", revealed.name)}</p>
+          <span role="timer" aria-live="off" className="shrink-0 rounded-full bg-[#FFFAEB] px-2.5 py-1 text-[11px] font-black text-[#B54708]">{c.revealedExpires.replace("{n}", String(seconds))}</span>
+        </div>
+        <div className="mt-3 space-y-2">
+          {account(c.revealedActive, revealed.active)}
+          {account(c.revealedPending, revealed.pending)}
+        </div>
+        <div className="mt-3 flex justify-end">
+          <button type="button" onClick={() => setRevealed(null)} className="rounded-xl border border-[#D0D5DD] px-4 py-2 text-sm font-bold text-[#344054] focus-visible:outline-2 focus-visible:outline-[#9B7928]">{c.hideNow}</button>
+        </div>
+      </div>
+    );
   };
 
   const renderMoneyDialog = () => {
     if (!money) return null;
     const c = commandCopy[lang];
     const close = () => setMoney(null);
+    if (money.kind === "reveal") {
+      const { request, providerName } = money;
+      return (
+        <CommandDialog
+          locale={lang}
+          title={c.revealTitle}
+          intro={c.revealIntro}
+          facts={[
+            { label: c.factPayee, value: providerName },
+            { label: c.factBank, value: `${request.bank_name} · ${request.iban_masked ?? ""}` },
+            { label: c.factRequest, value: String(request.id).slice(0, 8).toUpperCase() },
+          ]}
+          reasonLabel={c.revealReason}
+          minReasonLength={15}
+          confirmLabel={c.reveal}
+          onConfirm={(reason) => runReveal(request, providerName, reason)}
+          onClose={close}
+        />
+      );
+    }
     const sarText = (value: unknown) => `${formatMoney(value as number)} ${lang === "ar" ? "ريال" : "SAR"}`;
     if (money.kind === "release") {
       const { item } = money;
@@ -894,7 +989,7 @@ export default function AdminLedger() {
       { label: c.factRequest, value: String(request.id).slice(0, 8).toUpperCase() },
       { label: c.factPayee, value: providerName },
       { label: c.factAmount, value: sarText(request.amount) },
-      { label: c.factBank, value: `${request.bank_name} · ${maskIban(request.iban)}` },
+      { label: c.factBank, value: `${request.bank_name} · ${request.iban_masked ?? ""}` },
       { label: c.factStatus, value: requestStatusLabel(request.status) },
     ];
     if (money.kind === "pay") {
@@ -994,6 +1089,7 @@ export default function AdminLedger() {
         }}
       />
       {renderMoneyDialog()}
+      {renderRevealed()}
 
       {/* ──────────────────────────────────────────────────────── */}
       {/* 0. PAYMENT METHODS REGISTRY TAB                          */}
@@ -1190,7 +1286,15 @@ export default function AdminLedger() {
                         </td>
                         <td className="py-4 px-6">
                           <p className="font-bold text-gray-900">{request.bank_name}</p>
-                          <p className="mt-1 font-mono text-[9px] text-gray-400">{maskIban(request.iban)}</p>
+                          <p dir="ltr" className="mt-1 font-mono text-[9px] text-gray-400">{request.iban_masked}</p>
+                          <button
+                            type="button"
+                            aria-label={commandCopy[lang].revealFor.replace("{name}", String(providerName))}
+                            onClick={() => setMoney({ kind: "reveal", request, providerName: String(providerName) })}
+                            className="mt-1 text-[9px] font-black uppercase tracking-wider text-[#725517] underline focus-visible:outline-2 focus-visible:outline-[#9B7928]"
+                          >
+                            {commandCopy[lang].reveal}
+                          </button>
                         </td>
                         <td className="py-4 px-6">
                           <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-block ${requestStatusClass(request.status)}`}>

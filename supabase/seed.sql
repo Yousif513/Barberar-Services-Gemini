@@ -55,6 +55,28 @@ INSERT INTO public.profiles (id, role, first_name, last_name, email, phone_numbe
 ON CONFLICT (id) DO UPDATE SET role = EXCLUDED.role, first_name = EXCLUDED.first_name, last_name = EXCLUDED.last_name,
   email = EXCLUDED.email, phone_number = EXCLUDED.phone_number, language_preference = EXCLUDED.language_preference;
 
+-- 2b. LOCAL ADMINISTRATORS (GOV-1): one owner and one finance account, so maker-checker (a different person approves) can be
+-- exercised locally. No password is seeded; set one through the Auth admin API or Studio. Each must enrol an authenticator
+-- app (TOTP) at first sign-in: the database refuses administrator sessions below aal2.
+INSERT INTO auth.users (instance_id, id, aud, role, email, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at, confirmation_token, recovery_token, email_change_token_new, email_change)
+SELECT '00000000-0000-0000-0000-000000000000', u.id, 'authenticated', 'authenticated', u.email, NOW(),
+       '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, NOW(), NOW(), '', '', '', ''
+FROM (VALUES
+  ('00000000-0000-0000-0000-000000000901'::uuid, 'admin.owner@primora.local'),
+  ('00000000-0000-0000-0000-000000000902'::uuid, 'admin.finance@primora.local')
+) AS u(id, email)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.profiles (id, role, first_name, last_name, email, language_preference) VALUES
+('00000000-0000-0000-0000-000000000901', 'admin', 'Local', 'Owner', 'admin.owner@primora.local', 'ar'),
+('00000000-0000-0000-0000-000000000902', 'admin', 'Local', 'Finance', 'admin.finance@primora.local', 'ar')
+ON CONFLICT (id) DO UPDATE SET role = EXCLUDED.role, first_name = EXCLUDED.first_name, last_name = EXCLUDED.last_name, email = EXCLUDED.email;
+
+INSERT INTO public.admin_role_assignments (user_id, admin_role, reason) VALUES
+('00000000-0000-0000-0000-000000000901', 'owner', 'Local development owner account'),
+('00000000-0000-0000-0000-000000000902', 'finance', 'Local development finance account')
+ON CONFLICT (user_id) DO UPDATE SET admin_role = EXCLUDED.admin_role, reason = EXCLUDED.reason;
+
 
 -- 3. INSERT PROVIDER PROFILES
 INSERT INTO public.providers (id, owner_id, type, business_name_en, business_name_ar, description_en, description_ar, logo_url, cover_image_url, is_verified, commission_percentage, status) VALUES

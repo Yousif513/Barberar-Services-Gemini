@@ -305,7 +305,9 @@ describe("admin console guards", () => {
     for (const needle of ['"admin_release_ledger_item"', '"admin_release_payout"', '"admin_review_payout_request"']) {
       assert.ok(ledger.includes(needle), `the ledger runs ${needle}`);
     }
-    assert.equal((ledger.match(/p_reason: reason/g) ?? []).length, 3, "all three ledger commands send the reason from the dialog");
+    // GOV-1 (Q3): the fourth is reveal_provider_iban, which also needs a referenced reason.
+    assert.ok(ledger.includes('"reveal_provider_iban", { p_provider_id: request.provider_id, p_reason: reason }'), "an IBAN is revealed only with a reason");
+    assert.equal((ledger.match(/p_reason: reason/g) ?? []).length, 4, "all four ledger commands send the reason from the dialog");
     assert.ok(ledger.includes("confirmWord={Number(request.amount || 0).toFixed(2)}"), "paying out needs the amount typed");
     assert.ok(page("/disputes").includes("<CommandDialog") && page("/reviews").includes("<CommandDialog"), "dispute decisions and review moderation use the dialog");
     const providers = files.find((f) => f.path === `${ADMIN_ROOT}/providers/provider-management.tsx`).code;

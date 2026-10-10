@@ -9,10 +9,11 @@ import { CommandDialog } from "@/components/modal";
 import { oneOf, writeUrlState } from "@/lib/url-state";
 
 // Administrators and staff. The list is one server page at a time (admin_role_directory, which also records that the
-// directory was read, without the search text). A role changes only through set_user_role: it needs the operator's
-// reason, refuses your own account and refuses removing the last administrator, and the screen shows the server's
-// refusal as written. Provider roles are created by approving an application, so this screen only grants and removes
-// the administrator role.
+// directory was read, without the search text). Console roles (GOV-1 / D-Q5: owner, finance, operations, analyst) change only
+// through admin_set_console_role: owner only, a reason of at least 10 characters, a fresh authenticator code, never your own
+// account and never the last owner; the screen shows the server's refusal as written. An owner can also reset another
+// administrator's two-step verification (admin_reset_mfa, reason and fresh code). Provider roles are created by approving an
+// application, so this screen only manages console roles.
 
 const PAGE_SIZE = 25;
 const VIEWS = ["staff", "admin", "provider_owner", "provider_employee", "customer"] as const;
@@ -27,14 +28,19 @@ type RoleRow = {
   created_at: string;
   provider_name_en: string | null;
   provider_name_ar: string | null;
+  console_role: ConsoleRole | null;
+  mfa_enrolled: boolean | null;
+  mfa_locked: boolean | null;
 };
+const CONSOLE_ROLES = ["owner", "finance", "operations", "analyst"] as const;
+type ConsoleRole = (typeof CONSOLE_ROLES)[number];
 type Directory = { counts: Record<string, Numeric>; matching: Numeric; rows: RoleRow[] };
-type Pending = { person: RoleRow; next: "admin" | "customer" };
+type Pending = { person: RoleRow; next: ConsoleRole | null } | { person: RoleRow; resetMfa: true };
 
 const translations = {
   en: {
     title: "Administrators & Roles",
-    subtitle: "Who can operate the console and who works for a provider. Granting or removing the administrator role needs a reason and is recorded in the audit log.",
+    subtitle: "Who can operate the console, with which console role, and who works for a provider. Only an owner changes console roles or resets two-step verification; each change needs a reason and a fresh authenticator code and is recorded in the audit log.",
     viewStaff: "Administrators and staff",
     viewAdmin: "Administrators",
     viewOwner: "Provider owners",
@@ -77,10 +83,36 @@ const translations = {
     revokeDone: "The administrator role was removed.",
     unnamed: "Unnamed account",
     count: "{n} people",
+    columnConsoleRole: "Console role",
+    columnMfa: "Two-step verification",
+    consoleRoles: { owner: "Owner", finance: "Finance", operations: "Operations", analyst: "Analyst (read-only)" } as Record<ConsoleRole, string>,
+    consoleRoleHints: {
+      owner: "Everything, including roles, settings and break-glass",
+      finance: "Payouts, refunds, ledger, IBAN reveal and approval",
+      operations: "Providers, bookings, customers and reviews; no money",
+      analyst: "Read-only",
+    } as Record<ConsoleRole, string>,
+    chooseRole: "Console role for {name}",
+    apply: "Apply",
+    removeAccess: "Remove from console",
+    resetMfa: "Reset two-step verification",
+    mfaOn: "Enrolled",
+    mfaOff: "Not enrolled",
+    mfaLocked: "Locked (10 wrong codes)",
+    roleTitle: "Change the console role of {name}",
+    roleIntro: "The new role applies at the person's next request. Changing roles needs a fresh code from your authenticator app; the person is notified.",
+    removeTitle: "Remove {name} from the console",
+    removeIntro: "The account becomes a customer account and loses console access at once. The last owner cannot be removed.",
+    mfaTitle: "Reset two-step verification for {name}",
+    mfaIntro: "Removes their authenticator app and ends all their sessions; at the next sign-in they enrol a new one. Use it for a lost phone or a lockout after 10 wrong codes. Needs a fresh code from your own app.",
+    mfaReason: "Why is the reset needed? (at least 10 characters, include the ticket)",
+    roleReason: "Why is the role changing? (at least 10 characters)",
+    mfaDone: "Two-step verification was reset; the person enrols again at the next sign-in.",
+    roleDone: "The console role was changed.",
   },
   ar: {
     title: "المسؤولون والأدوار",
-    subtitle: "من يشغّل لوحة الإدارة ومن يعمل لدى مزود خدمة. منح دور المسؤول أو سحبه يحتاج إلى سبب ويُسجَّل في سجل التدقيق.",
+    subtitle: "من يشغّل لوحة الإدارة وبأي دور، ومن يعمل لدى مزود خدمة. المالك وحده يغيّر الأدوار أو يعيد ضبط التحقق بخطوتين؛ وكل تغيير يحتاج سبباً ورمزاً جديداً من تطبيق المصادقة ويُسجَّل في سجل التدقيق.",
     viewStaff: "المسؤولون والموظفون",
     viewAdmin: "المسؤولون",
     viewOwner: "ملّاك المزودين",
@@ -123,6 +155,32 @@ const translations = {
     revokeDone: "تم سحب دور المسؤول.",
     unnamed: "حساب بلا اسم",
     count: "{n} شخص",
+    columnConsoleRole: "الدور في لوحة الإدارة",
+    columnMfa: "التحقق بخطوتين",
+    consoleRoles: { owner: "المالك", finance: "المالية", operations: "العمليات", analyst: "محلل (قراءة فقط)" } as Record<ConsoleRole, string>,
+    consoleRoleHints: {
+      owner: "كل شيء، بما فيه الأدوار والإعدادات وإجراء الطوارئ",
+      finance: "التحويلات والاسترداد ودفتر الحسابات وكشف الآيبان واعتماده",
+      operations: "المزودون والحجوزات والعملاء والتقييمات؛ دون أموال",
+      analyst: "قراءة فقط",
+    } as Record<ConsoleRole, string>,
+    chooseRole: "دور {name} في لوحة الإدارة",
+    apply: "تطبيق",
+    removeAccess: "إزالة من لوحة الإدارة",
+    resetMfa: "إعادة ضبط التحقق بخطوتين",
+    mfaOn: "مفعّل",
+    mfaOff: "غير مفعّل",
+    mfaLocked: "مقفل (10 رموز خاطئة)",
+    roleTitle: "تغيير دور {name} في لوحة الإدارة",
+    roleIntro: "يسري الدور الجديد من الطلب التالي للشخص. تغيير الأدوار يحتاج رمزاً جديداً من تطبيق المصادقة لديك، ويُبلَّغ الشخص.",
+    removeTitle: "إزالة {name} من لوحة الإدارة",
+    removeIntro: "يصبح الحساب حساب عميل ويفقد الوصول إلى لوحة الإدارة فوراً. لا يمكن إزالة آخر مالك.",
+    mfaTitle: "إعادة ضبط التحقق بخطوتين لـ {name}",
+    mfaIntro: "يزيل تطبيق المصادقة لديه وينهي كل جلساته؛ وعند الدخول التالي يضيف تطبيقاً جديداً. استخدمه عند فقد الهاتف أو القفل بعد 10 رموز خاطئة. يحتاج رمزاً جديداً من تطبيقك.",
+    mfaReason: "لماذا تلزم إعادة الضبط؟ (10 أحرف على الأقل، اذكر رقم التذكرة)",
+    roleReason: "ما سبب تغيير الدور؟ (10 أحرف على الأقل)",
+    mfaDone: "تمت إعادة ضبط التحقق بخطوتين؛ يضيف الشخص تطبيقه من جديد عند الدخول التالي.",
+    roleDone: "تم تغيير الدور في لوحة الإدارة.",
   },
 };
 
@@ -156,6 +214,7 @@ function RolesScreen() {
   const [forbidden, setForbidden] = useState(false);
   const [selfId, setSelfId] = useState<string | null>(null);
   const [pending, setPending] = useState<Pending | null>(null);
+  const [choice, setChoice] = useState<Record<string, ConsoleRole>>({});
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
@@ -220,13 +279,20 @@ function RolesScreen() {
 
   const changeRole = async (reason: string): Promise<string | null> => {
     if (!pending) return null;
-    const { person, next } = pending;
-    const { error } = await supabase.rpc("set_user_role", { target_user_id: person.id, target_role: next, p_reason: reason });
-    if (error) return errorMessage(error);
-    setSuccess(next === "admin" ? t.grantDone : t.revokeDone);
+    if ("resetMfa" in pending) {
+      const { error } = await supabase.rpc("admin_reset_mfa", { p_user_id: pending.person.id, p_reason: reason });
+      if (error) return errorMessage(error);
+      setSuccess(t.mfaDone);
+    } else {
+      const { person, next } = pending;
+      const { error } = await supabase.rpc("admin_set_console_role", { p_user_id: person.id, p_admin_role: next, p_reason: reason });
+      if (error) return errorMessage(error);
+      setSuccess(next === null ? t.revokeDone : person.role === "admin" ? t.roleDone : t.grantDone);
+    }
     setReloadKey((key) => key + 1);
     return null;
   };
+  const consoleRoleOf = (person: RoleRow) => (person.console_role ? t.consoleRoles[person.console_role] : "—");
 
   const rows = directory?.rows ?? [];
   const matching = toNumber(directory?.matching);
@@ -295,12 +361,14 @@ function RolesScreen() {
               <p className="p-8 text-center text-xs font-semibold text-gray-500">{t.empty}</p>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[720px] text-xs">
+                <table className="w-full min-w-[980px] text-xs">
                   <thead className="border-b border-[#ECECEC] bg-[#FAF9F6] text-[10px] font-extrabold uppercase tracking-wider text-gray-500">
                     <tr>
                       <th scope="col" className={`${cell} text-start`}>{t.columnPerson}</th>
                       <th scope="col" className={`${cell} text-start`}>{t.columnEmail}</th>
                       <th scope="col" className={`${cell} text-start`}>{t.columnRole}</th>
+                      <th scope="col" className={`${cell} text-start`}>{t.columnConsoleRole}</th>
+                      <th scope="col" className={`${cell} text-start`}>{t.columnMfa}</th>
                       <th scope="col" className={`${cell} text-start`}>{t.columnProvider}</th>
                       <th scope="col" className={`${cell} text-start`}>{t.columnSince}</th>
                       <th scope="col" className={`${cell} text-start`}>{t.columnActions}</th>
@@ -317,15 +385,41 @@ function RolesScreen() {
                           <td className={cell}>
                             <span className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-black ${person.role === "admin" ? "bg-[#101828] text-[#F4E7B6]" : "bg-stone-100 text-stone-700"}`}>{roleLabel(person.role)}</span>
                           </td>
+                          <td className={cell}>
+                            {person.role === "admin" ? <span title={person.console_role ? t.consoleRoleHints[person.console_role] : undefined}>{consoleRoleOf(person)}</span> : "—"}
+                          </td>
+                          <td className={cell}>
+                            {person.role !== "admin" ? "—" : person.mfa_locked ? <span className="font-black text-[#B42318]">{t.mfaLocked}</span> : person.mfa_enrolled ? <span className="text-green-800">{t.mfaOn}</span> : <span className="text-[#B54708]">{t.mfaOff}</span>}
+                          </td>
                           <td className={cell}>{providerName || "—"}</td>
                           <td className={`${cell} whitespace-nowrap text-[11px] text-gray-500`}>{operationsDate(person.created_at, lang)}</td>
                           <td className={cell}>
                             {mine ? (
                               <span className="text-[11px] font-bold text-gray-500" title={t.selfHint}>{t.self}</span>
-                            ) : person.role === "admin" ? (
-                              <button type="button" onClick={() => setPending({ person, next: "customer" })} className={`${smallButton} border-[#FECDCA] bg-[#FEF3F2] text-[#B42318]`} aria-label={`${t.revoke}: ${personName(person)}`}>{t.revoke}</button>
+                            ) : person.role === "admin" || person.role === "customer" ? (
+                              <span className="flex flex-wrap items-center gap-1.5">
+                                <select
+                                  aria-label={fill(t.chooseRole, { name: personName(person) })}
+                                  value={choice[person.id] ?? person.console_role ?? "analyst"}
+                                  onChange={(event) => setChoice((current) => ({ ...current, [person.id]: event.target.value as ConsoleRole }))}
+                                  className={`rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-[11px] font-bold ${focusRing}`}
+                                >
+                                  {CONSOLE_ROLES.map((role) => <option key={role} value={role}>{t.consoleRoles[role]}</option>)}
+                                </select>
+                                <button type="button"
+                                  disabled={(choice[person.id] ?? person.console_role ?? "analyst") === person.console_role}
+                                  onClick={() => setPending({ person, next: choice[person.id] ?? person.console_role ?? "analyst" })}
+                                  className={`${smallButton} border-gray-300 bg-white text-gray-900 hover:border-[#D1AF47]`}
+                                  aria-label={`${person.role === "admin" ? t.apply : t.grant}: ${personName(person)}`}>{person.role === "admin" ? t.apply : t.grant}</button>
+                                {person.role === "admin" && (
+                                  <button type="button" onClick={() => setPending({ person, next: null })} className={`${smallButton} border-[#FECDCA] bg-[#FEF3F2] text-[#B42318]`} aria-label={`${t.removeAccess}: ${personName(person)}`}>{t.removeAccess}</button>
+                                )}
+                                {person.role === "admin" && (person.mfa_enrolled || person.mfa_locked) && (
+                                  <button type="button" onClick={() => setPending({ person, resetMfa: true })} className={`${smallButton} border-gray-300 bg-white text-gray-800`} aria-label={`${t.resetMfa}: ${personName(person)}`}>{t.resetMfa}</button>
+                                )}
+                              </span>
                             ) : (
-                              <button type="button" onClick={() => setPending({ person, next: "admin" })} className={`${smallButton} border-gray-300 bg-white text-gray-900 hover:border-[#D1AF47]`} aria-label={`${t.grant}: ${personName(person)}`}>{t.grant}</button>
+                              <span className="text-[11px] text-gray-400">—</span>
                             )}
                           </td>
                         </tr>
@@ -348,19 +442,34 @@ function RolesScreen() {
         </>
       )}
 
-      {pending && (
+      {pending && "resetMfa" in pending && (
         <CommandDialog
           locale={lang}
-          tone={pending.next === "customer" ? "danger" : "default"}
-          title={fill(pending.next === "admin" ? t.grantTitle : t.revokeTitle, { name: personName(pending.person) })}
-          intro={pending.next === "admin" ? t.grantIntro : t.revokeIntro}
+          tone="danger"
+          title={fill(t.mfaTitle, { name: personName(pending.person) })}
+          intro={t.mfaIntro}
+          facts={[{ label: t.factPerson, value: personName(pending.person) }, { label: t.columnConsoleRole, value: consoleRoleOf(pending.person) }]}
+          reasonLabel={t.mfaReason}
+          minReasonLength={10}
+          confirmLabel={t.resetMfa}
+          onConfirm={changeRole}
+          onClose={() => setPending(null)}
+        />
+      )}
+      {pending && !("resetMfa" in pending) && (
+        <CommandDialog
+          locale={lang}
+          tone={pending.next === null ? "danger" : "default"}
+          title={fill(pending.next === null ? t.removeTitle : pending.person.role === "admin" ? t.roleTitle : t.grantTitle, { name: personName(pending.person) })}
+          intro={pending.next === null ? t.removeIntro : pending.person.role === "admin" ? t.roleIntro : t.grantIntro}
           facts={[
             { label: t.factPerson, value: personName(pending.person) },
-            { label: t.factRole, value: roleLabel(pending.person.role) },
-            { label: t.factNewRole, value: roleLabel(pending.next === "admin" ? "admin" : "customer") },
+            { label: t.factRole, value: pending.person.role === "admin" ? consoleRoleOf(pending.person) : roleLabel(pending.person.role) },
+            { label: t.factNewRole, value: pending.next === null ? roleLabel("customer") : `${t.consoleRoles[pending.next]} — ${t.consoleRoleHints[pending.next]}` },
           ]}
-          reasonLabel={t.reasonLabel}
-          confirmLabel={pending.next === "admin" ? t.grantConfirm : t.revokeConfirm}
+          reasonLabel={t.roleReason}
+          minReasonLength={10}
+          confirmLabel={pending.next === null ? t.revokeConfirm : pending.person.role === "admin" ? t.apply : t.grantConfirm}
           onConfirm={changeRole}
           onClose={() => setPending(null)}
         />

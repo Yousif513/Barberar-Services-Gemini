@@ -77,9 +77,11 @@ describe("ADM1 item 5 and 7: roles, flags and fee rules are screens over the com
   const layout = read("web_platform/src/app/admin/layout.tsx");
   const config = read("web_platform/next.config.ts");
 
-  it("the role screen lists through admin_role_directory and changes roles through set_user_role with the reason", () => {
+  it("the role screen lists through admin_role_directory and changes console roles through admin_set_console_role with the reason", () => {
     assert.match(roles, /rpc\("admin_role_directory"/);
-    assert.match(roles, /rpc\("set_user_role", \{ target_user_id: person\.id, target_role: next, p_reason: reason \}\)/);
+    // GOV-1 (D-Q5): owner, finance, operations and analyst replace the single administrator role; MFA reset is a reasoned command too.
+    assert.match(roles, /rpc\("admin_set_console_role", \{ p_user_id: person\.id, p_admin_role: next, p_reason: reason \}\)/);
+    assert.match(roles, /rpc\("admin_reset_mfa", \{ p_user_id: pending\.person\.id, p_reason: reason \}\)/);
     assert.doesNotMatch(roles, /\.from\("profiles"\)\s*\.(update|upsert|insert)/);
     assert.match(roles, /<CommandDialog/);
     assert.match(roles, /selfHint: "لا يمكنك/, "Arabic copy for the self-change refusal");

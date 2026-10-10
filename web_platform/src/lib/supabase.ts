@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { requestStepUp, responseHint } from "@/lib/step-up";
 
 /*
  * Supabase browser client.
@@ -49,7 +50,22 @@ const globalForSupabase = globalThis as typeof globalThis & {
   primoraSupabaseClient?: SupabaseClient;
 };
 
-export const supabase =
+// GOV-1 step-up: a database command refused with the hint "step_up_required" asks the operator for a fresh authenticator code
+// (StepUpDialog) and is sent once more with the refreshed session. Every other response passes through untouched.
+async function stepUpAwareFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  const response = await fetch(input, init);
+  if (response.status !== 401 && response.status !== 403) return response;
+  const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+  if (!url.includes("/rest/v1/") || (await responseHint(response)) !== "step_up_required") return response;
+  if (!(await requestStepUp())) return response;
+  const { data } = await supabase.auth.getSession();
+  if (!data.session) return response;
+  const headers = new Headers(init?.headers ?? (input instanceof Request ? input.headers : undefined));
+  headers.set("Authorization", `Bearer ${data.session.access_token}`);
+  return fetch(input, { ...init, headers });
+}
+
+export const supabase: SupabaseClient =
   globalForSupabase.primoraSupabaseClient ??
   createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
@@ -57,6 +73,7 @@ export const supabase =
       autoRefreshToken: true,
       detectSessionInUrl: true,
     },
+    global: { fetch: stepUpAwareFetch },
   });
 
 if (process.env.NODE_ENV !== "production") {

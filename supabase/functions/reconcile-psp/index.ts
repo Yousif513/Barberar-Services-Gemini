@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { corsHeaders, json, MissingConfigError, resolveCaller, serviceClient } from "../_shared/http.ts"
+import { corsHeaders, json, MissingConfigError, resolveCaller, serviceClient, adminSessionAllows, bearerToken } from "../_shared/http.ts"
 
 // Daily PSP reconciliation: totals the captured charges and refunds Tap reports for a Riyadh
 // calendar day and asks the database to compare them with the ledger (run_daily_psp_reconciliation).
@@ -33,6 +33,10 @@ serve(async (req) => {
     const caller = await resolveCaller(req)
     if (!caller) return json(req, { error: "Authentication required." }, 401)
     if (caller.kind === "user") return json(req, { error: "Administrative access required." }, 403)
+    // D-Q5: reconciliation is a money action; operations and analyst hold no money permission.
+    if (caller.kind === "admin" && !(await adminSessionAllows(bearerToken(req), "money.ledger"))) {
+      return json(req, { error: "Your console role cannot run reconciliation." }, 403)
+    }
 
     const apiKey = Deno.env.get("TAP_SECRET_KEY")
     if (!apiKey) return json(req, { error: "Tap is not configured (TAP_SECRET_KEY)." }, 503)
