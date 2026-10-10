@@ -413,8 +413,8 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "deferred",
-          "rationale": "DEFERRED pending an owner decision (provider-recorded-commission-display-only): pricing takes commission from fee_rules, so the stored percentage changes no price and is no longer editable.",
+          "status": "not-applicable",
+          "rationale": "D-D3 (adopted 2026-10-10): no free-standing commission % is set or shown; the effective platform fee comes from the fee rules (fee.effective-display, money.pending-change). providers.commission_percentage is no longer displayed; it is not read by pricing.",
           "entityStates": {
             "from": [
               "approved",
@@ -438,7 +438,7 @@
           "recovery": "",
           "tests": [],
           "evidence": [],
-          "owner": "impl-money-claude",
+          "owner": "",
           "reviewStatus": "unreviewed"
         },
         {
@@ -526,24 +526,43 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "planned",
-          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "status": "in-progress",
+          "rationale": "D-D3: VAT registration status captured at onboarding (registered with a 15-digit number starting and ending with 3, or not registered; table CHECK), copied to the provider on approval, changed only by provider_set_vat_status (owner, recent sign-in) which resets verification to unverified; direct writes refused by trigger. ZATCA verification is external (gap). In-progress, unreviewed.",
           "entityStates": {
             "from": [],
             "to": []
           },
-          "uiRoutes": [],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": "",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
-          "tests": [],
-          "evidence": [],
-          "owner": "impl-money-claude",
+          "uiRoutes": [
+            "/become-provider",
+            "/provider/pricing",
+            "/admin/providers"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010340000_money_effective_fee_and_vat_status.sql#L75"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010340000_money_effective_fee_and_vat_status.sql#L88",
+            "supabase/migrations/20261010340000_money_effective_fee_and_vat_status.sql#L44"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261010340000_money_effective_fee_and_vat_status.sql#L108"
+          ],
+          "safeguards": [
+            "supabase/tests/db/money_fee_terms_vat.test.mjs#L65"
+          ],
+          "dataBinding": "postgres:public.providers",
+          "idempotency": "setting the same status again is harmless",
+          "concurrency": "FOR UPDATE on the provider row",
+          "recovery": "the owner sets the status again",
+          "tests": [
+            "supabase/tests/db/money_fee_terms_vat.test.mjs",
+            "web_platform/tests/money-screens.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/become-provider/page.tsx",
+            "supabase/tests/db/money_fee_terms_vat.test.mjs#L98"
+          ],
+          "owner": "",
           "reviewStatus": "unreviewed"
         }
       ]
@@ -1303,7 +1322,7 @@
           ],
           "risk": "critical",
           "status": "in-progress",
-          "rationale": "Server command with a required reason, per-row idempotency key and audit entry, behind a dialog that names the entry (round 3). Built by impl-claude-release-gaps; unreviewed. GOV-1 (impl-gov1-claude, 2026-10-10): admin_release_payout now records a pending approval; a different administrator with money.payout approves and the release runs in the approver's session, only to an approved payout account after its 48-hour hold. Re-review needed.",
+          "rationale": "GOV-1 review H-4: admin_release_ledger_item (manual settlement outside the payout flow) needs money.payout, step-up, a bank transfer reference, an approved payout account past its 48-hour hold, no pending account change, no payout hold, and a second administrator (approval kind ledger_settlement, executed in the approver's session). In-progress, unreviewed.",
           "entityStates": {
             "from": [
               "pending"
@@ -1316,33 +1335,32 @@
             "/admin/ledger"
           ],
           "serverOperations": [
-            "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L267"
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L605",
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L669"
           ],
           "authorizationPolicies": [
-            "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L282"
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L402"
           ],
           "auditEvents": [
-            "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L299"
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L658"
           ],
           "safeguards": [
-            "web_platform/tests/admin-console-guards.test.mjs#L303",
-            "supabase/tests/db/qa_defect_fixes.test.mjs#L175"
+            "supabase/tests/db/money_append_only.test.mjs#L204",
+            "supabase/tests/db/qa_defect_fixes.test.mjs#L189"
           ],
           "dataBinding": "postgres:public.transactional_ledger",
           "idempotency": "A stable key per ledger row; a row that is no longer pending answers already_released and changes nothing.",
           "concurrency": "The ledger row is locked FOR UPDATE, and a row already partly allocated to a payout is refused.",
           "recovery": "A release cannot be undone from the console; the audit entry records who released the share and why.",
           "tests": [
-            "supabase/tests/db/qa_adversarial.test.mjs",
+            "supabase/tests/db/money_append_only.test.mjs",
             "supabase/tests/db/qa_defect_fixes.test.mjs",
-            "supabase/tests/db/admin_security_matrix.test.mjs",
-            "supabase/tests/db/release_controls.test.mjs"
+            "supabase/tests/db/qa_adversarial.test.mjs"
           ],
           "evidence": [
-            "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L267",
-            "supabase/tests/db/qa_defect_fixes.test.mjs#L175"
+            "web_platform/src/app/admin/ledger/page.tsx#L841"
           ],
-          "owner": "impl-money-claude",
+          "owner": "",
           "reviewStatus": "unreviewed",
           "reviewedBy": "qa-claude-release-gate"
         },
@@ -1477,24 +1495,45 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "planned",
-          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "status": "in-progress",
+          "rationale": "D-Q8 + GOV-1 review C-1/C-2: no client role (anon, authenticated incl. every console role) holds INSERT/UPDATE/DELETE on transactional_ledger or the related money tables; admin manage policies became read policies; money.write removed; trg_money_append_only blocks DELETE/TRUNCATE for every role and freezes identity and amount columns; a ledger row changes only under the settling server paths (payout state, shares never grow). Booking money columns frozen except for the command that owns them. In-progress, unreviewed.",
           "entityStates": {
             "from": [],
             "to": []
           },
-          "uiRoutes": [],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": "",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
-          "tests": [],
-          "evidence": [],
-          "owner": "impl-money-claude",
+          "uiRoutes": [
+            "/admin/ledger"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L180",
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L322"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L34",
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L67"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/money_append_only.test.mjs#L43",
+            "supabase/tests/db/money_append_only.test.mjs#L92",
+            "supabase/tests/db/money_append_only.test.mjs#L123"
+          ],
+          "dataBinding": "postgres:public.transactional_ledger",
+          "idempotency": "not applicable: the control is a refusal",
+          "concurrency": "row triggers; no client write path exists",
+          "recovery": "corrections are new linked entries (ledger.adjustment); nothing is deleted",
+          "tests": [
+            "supabase/tests/db/money_append_only.test.mjs",
+            "supabase/tests/db/data_api_grants.test.mjs",
+            "supabase/tests/db/qa_round3_verification.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L271",
+            "supabase/tests/db/money_append_only.test.mjs#L61"
+          ],
+          "owner": "",
           "reviewStatus": "unreviewed"
         },
         {
@@ -1505,24 +1544,44 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "planned",
-          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "status": "in-progress",
+          "rationale": "D-Q8: a correction is a new adjustment or reversal ledger entry linked to the original (adjusts_entry_id / reverses_entry_id) with reason code, justification, maker, a different checker (approvals framework, kind ledger_adjustment, money.ledger), approval time, idempotency key and optional Tap object id; negative provider deltas become provider receivables recovered at the next payout; break-glass (sole owner, within the cap, review in 7 days) is the only one-person path. In-progress, unreviewed.",
           "entityStates": {
             "from": [],
             "to": []
           },
-          "uiRoutes": [],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": "",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
-          "tests": [],
-          "evidence": [],
-          "owner": "impl-money-claude",
+          "uiRoutes": [
+            "/admin/reconciliation",
+            "/admin/approvals"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L429",
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L541"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L459",
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L403"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L589"
+          ],
+          "safeguards": [
+            "supabase/tests/db/money_append_only.test.mjs#L150",
+            "supabase/tests/db/money_append_only.test.mjs#L227"
+          ],
+          "dataBinding": "postgres:public.transactional_ledger",
+          "idempotency": "idempotency key: one pending request per key (target md5), payment_intent_id 'adj:'||key unique after posting",
+          "concurrency": "row lock on the approval request; unique payment_intent_id",
+          "recovery": "a wrong correction is corrected by another approved adjustment",
+          "tests": [
+            "supabase/tests/db/money_append_only.test.mjs",
+            "supabase/tests/db/money_reconciliation.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L132",
+            "supabase/tests/db/money_append_only.test.mjs#L186"
+          ],
+          "owner": "",
           "reviewStatus": "unreviewed"
         }
       ]
@@ -1937,7 +1996,7 @@
             "web_platform/src/app/admin/refunds/page.tsx#L193",
             ".admin-console/evidence/qa-claude-release-gate/adversarial-suite-run.txt"
           ],
-          "owner": "impl-money-claude",
+          "owner": "",
           "reviewStatus": "contested",
           "reviewedBy": "sec-claude-release-review"
         },
@@ -1949,24 +2008,46 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "planned",
-          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "status": "in-progress",
+          "rationale": "D-Q9: refund_requests carry entitled_at and Tap's status (gateway_status/raw/at, succeeded_at); process-refund records Tap's create status; 'Check with Tap' opens for a refund still processing at Tap after 2 business days: Edge Function check-refund-status (caller authorised with money.refund + step-up via admin_begin_tap_refund_check, TAP_SECRET_KEY from env, GET /v2/refunds/{id}, pure module node-tested) then apply_tap_refund_status (service role, actor recorded); a failed or different refund opens a break. Refund SLA (initiate within 3 business days, succeed within 14 days of the notice) shown in the console. In-progress, unreviewed.",
           "entityStates": {
             "from": [],
             "to": []
           },
-          "uiRoutes": [],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": "",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
-          "tests": [],
-          "evidence": [],
-          "owner": "impl-money-claude",
+          "uiRoutes": [
+            "/admin/reconciliation"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L607",
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L636",
+            "supabase/functions/check-refund-status/index.ts",
+            "supabase/functions/_shared/tap-refund-status.ts"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L617",
+            "supabase/functions/check-refund-status/index.ts#L23"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L627",
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L566"
+          ],
+          "safeguards": [
+            "supabase/tests/db/money_reconciliation.test.mjs#L169",
+            "supabase/tests/db/money_reconciliation.test.mjs#L179"
+          ],
+          "dataBinding": "postgres:public.refund_requests",
+          "idempotency": "re-checking only records Tap's latest answer; breaks unique per (kind, subject)",
+          "concurrency": "FOR UPDATE on the refund row while recording",
+          "recovery": "money never moves here; a wrong status is corrected by the next check",
+          "tests": [
+            "supabase/tests/db/money_reconciliation.test.mjs",
+            "supabase/tests/tap-refund-status.test.mjs"
+          ],
+          "evidence": [
+            "supabase/tests/tap-refund-status.test.mjs#L72",
+            "web_platform/src/app/admin/reconciliation/page.tsx"
+          ],
+          "owner": "",
           "reviewStatus": "unreviewed"
         }
       ]
@@ -3846,7 +3927,7 @@
           ],
           "risk": "moderate",
           "status": "in-progress",
-          "rationale": "Administrators read fee_rules through a read-only policy (the write policy was dropped); a failed read shows an error with a retry. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "rationale": "The console lists every fee rule version (in force, scheduled, ended) and pending changes through admin_fee_rule_versions. In-progress, unreviewed.",
           "entityStates": {
             "from": [],
             "to": []
@@ -3854,9 +3935,11 @@
           "uiRoutes": [
             "/admin/platform-rules"
           ],
-          "serverOperations": [],
+          "serverOperations": [
+            "supabase/migrations/20261010310000_money_pending_changes.sql#L470"
+          ],
           "authorizationPolicies": [
-            "supabase/migrations/20261008100200_adm1_roles_flags_fee_rules.sql#L225"
+            "supabase/migrations/20261010310000_money_pending_changes.sql#L470"
           ],
           "auditEvents": [],
           "safeguards": [],
@@ -3865,14 +3948,13 @@
           "concurrency": "",
           "recovery": "",
           "tests": [
-            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs",
-            "web_platform/tests/adm1-admin-wiring.test.mjs"
+            "supabase/tests/db/money_pending_changes.test.mjs",
+            "web_platform/tests/money-screens.test.mjs"
           ],
           "evidence": [
-            "web_platform/src/app/admin/platform-rules/page.tsx#L224",
-            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L100"
+            "web_platform/src/app/admin/platform-rules/page.tsx#L260"
           ],
-          "owner": "impl-money-claude",
+          "owner": "",
           "reviewStatus": "unreviewed"
         },
         {
@@ -3884,7 +3966,7 @@
           ],
           "risk": "critical",
           "status": "in-progress",
-          "rationale": "admin_save_fee_rule is the only write path: administrator only, reason required, percentage 0 to 50, minimum 0 to 1000 SAR, maximum between the minimum and 1000 or empty, a marketplace rule cannot be switched off, the provider's own channels carry no fee and cannot be changed, a duplicate channel and visit type is refused (23505), and the old values stay in the audit entry. A single administrator can still change the platform's revenue rate without a second approver (owner question in gap no-separation-of-duties); the 0 to 50 and 1000 SAR bounds were chosen by the implementer and are not confirmed by the owner. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "rationale": "Replaced by the two-person, effective-dated fee change (money.pending-change): admin_save_fee_rule was dropped; the console proposes with admin_propose_fee_rule_change and a different money.config holder approves. In-progress, unreviewed.",
           "entityStates": {
             "from": [
               "active",
@@ -3898,30 +3980,29 @@
             "/admin/platform-rules"
           ],
           "serverOperations": [
-            "supabase/migrations/20261008100200_adm1_roles_flags_fee_rules.sql#L128"
+            "supabase/migrations/20261010310000_money_pending_changes.sql#L168"
           ],
           "authorizationPolicies": [
-            "supabase/migrations/20261008100200_adm1_roles_flags_fee_rules.sql#L105"
+            "supabase/migrations/20261010310000_money_pending_changes.sql#L190"
           ],
           "auditEvents": [
-            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L102"
+            "supabase/migrations/20261010310000_money_pending_changes.sql#L323"
           ],
           "safeguards": [
-            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L114"
+            "supabase/tests/db/money_pending_changes.test.mjs#L72"
           ],
           "dataBinding": "postgres:public.fee_rules",
           "idempotency": "Saving the same values changes nothing new.",
           "concurrency": "",
           "recovery": "Save the previous values again; the audit entry holds them.",
           "tests": [
-            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs",
-            "web_platform/tests/adm1-admin-wiring.test.mjs"
+            "supabase/tests/db/money_pending_changes.test.mjs",
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs"
           ],
           "evidence": [
-            "web_platform/src/app/admin/platform-rules/page.tsx#L300",
-            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L102"
+            "web_platform/src/app/admin/platform-rules/page.tsx#L343"
           ],
-          "owner": "impl-money-claude",
+          "owner": "",
           "reviewStatus": "unreviewed"
         },
         {
@@ -3932,24 +4013,46 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "planned",
-          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "status": "in-progress",
+          "rationale": "D-Q8: fee rules (fee_rule_change), payout holds (payout_hold), provider balances (ledger_adjustment) and refund thresholds (GOV-1 setting_change) change only through a pending change approved by a different administrator. Fee rules are versioned and effective-dated, prospective only, snapshotted on each booking (fee_rule_id, fee_rule_snapshot); an increase must start >= 30 days after approval and writes provider_fee_change_notices plus an in-app notification per provider. In-progress, unreviewed.",
           "entityStates": {
             "from": [],
             "to": []
           },
-          "uiRoutes": [],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": "",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
-          "tests": [],
-          "evidence": [],
-          "owner": "impl-money-claude",
+          "uiRoutes": [
+            "/admin/platform-rules",
+            "/admin/approvals"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010310000_money_pending_changes.sql#L168",
+            "supabase/migrations/20261010310000_money_pending_changes.sql#L257",
+            "supabase/migrations/20261010310000_money_pending_changes.sql#L378"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010310000_money_pending_changes.sql#L190",
+            "supabase/migrations/20261010310000_money_pending_changes.sql#L389"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261010310000_money_pending_changes.sql#L323",
+            "supabase/migrations/20261010310000_money_pending_changes.sql#L443"
+          ],
+          "safeguards": [
+            "supabase/tests/db/money_pending_changes.test.mjs#L58",
+            "supabase/tests/db/money_pending_changes.test.mjs#L109"
+          ],
+          "dataBinding": "postgres:public.fee_rules",
+          "idempotency": "one pending request per rule (channel, visit type) or provider hold",
+          "concurrency": "FOR UPDATE on the latest version at execution; stale request refused (23505)",
+          "recovery": "a further approved change; versions are never edited or deleted",
+          "tests": [
+            "supabase/tests/db/money_pending_changes.test.mjs",
+            "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261010310000_money_pending_changes.sql#L122",
+            "supabase/tests/db/money_pending_changes.test.mjs#L92"
+          ],
+          "owner": "",
           "reviewStatus": "unreviewed"
         },
         {
@@ -3960,24 +4063,41 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "planned",
-          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "status": "in-progress",
+          "rationale": "D-D3: provider pricing and the admin provider detail show the effective platform fee from the fee rules in force (percentage, minimum, maximum, effective date, scheduled changes), '+ VAT on this fee' at the platform VAT rate where applicable and a worked example on the provider's own service prices; the free-standing commission % and the invented 20%/15%/85%/10% copy were removed. In-progress, unreviewed.",
           "entityStates": {
             "from": [],
             "to": []
           },
-          "uiRoutes": [],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": "",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
-          "tests": [],
-          "evidence": [],
-          "owner": "impl-money-claude",
+          "uiRoutes": [
+            "/provider/pricing",
+            "/admin/providers"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010340000_money_effective_fee_and_vat_status.sql#L122"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010340000_money_effective_fee_and_vat_status.sql#L139"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261010310000_money_pending_changes.sql#L323"
+          ],
+          "safeguards": [
+            "supabase/tests/db/money_fee_terms_vat.test.mjs#L50"
+          ],
+          "dataBinding": "postgres:public.fee_rules",
+          "idempotency": "read only",
+          "concurrency": "read only",
+          "recovery": "read only",
+          "tests": [
+            "supabase/tests/db/money_fee_terms_vat.test.mjs",
+            "web_platform/tests/money-screens.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/components/effective-fee-terms.tsx",
+            "web_platform/tests/money-screens.test.mjs#L77"
+          ],
+          "owner": "",
           "reviewStatus": "unreviewed"
         }
       ]
@@ -5343,24 +5463,48 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "planned",
-          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "status": "in-progress",
+          "rationale": "D-Q9: Tap charges/refunds (API import, service role), Tap settlement reports and bank-statement lines (finance import, step-up) are recorded append-only; run_tap_reconciliation matches them item by item to the ledger and refund requests and settlements to bank credits, opening breaks; breaks escalate after 3 Saudi business days (Fri/Sat weekend) with owner notices. In-progress, unreviewed.",
           "entityStates": {
             "from": [],
             "to": []
           },
-          "uiRoutes": [],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": "",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
-          "tests": [],
-          "evidence": [],
-          "owner": "impl-money-claude",
+          "uiRoutes": [
+            "/admin/reconciliation"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L350",
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L249",
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L266",
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L319",
+            "supabase/functions/reconcile-psp/index.ts"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L276",
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L140"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L466",
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L241",
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L340"
+          ],
+          "safeguards": [
+            "supabase/tests/db/money_reconciliation.test.mjs#L64",
+            "supabase/tests/db/money_reconciliation.test.mjs#L146"
+          ],
+          "dataBinding": "postgres:public.reconciliation_breaks",
+          "idempotency": "events unique per (object_type, tap_object_id); one open break per (kind, subject); run row per day",
+          "concurrency": "unique indexes; FOR UPDATE on breaks during escalation",
+          "recovery": "breaks resolved by approved correction; timing differences auto-matched on Tap data",
+          "tests": [
+            "supabase/tests/db/money_reconciliation.test.mjs",
+            "supabase/tests/tap-refund-status.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/reconciliation/page.tsx",
+            "supabase/tests/db/money_reconciliation.test.mjs#L115"
+          ],
+          "owner": "",
           "reviewStatus": "unreviewed"
         },
         {
@@ -5371,24 +5515,40 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "planned",
-          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "status": "in-progress",
+          "rationale": "D-Q9: a break is resolved only by an approved ledger correction (reason reconciliation_break) citing the Tap object id; a trigger refuses any other status change to resolved; charge/refund breaks later matched by Tap's own data close as auto-matched; settlement breaks never auto-close. In-progress, unreviewed.",
           "entityStates": {
             "from": [],
             "to": []
           },
-          "uiRoutes": [],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": "",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
-          "tests": [],
-          "evidence": [],
-          "owner": "impl-money-claude",
+          "uiRoutes": [
+            "/admin/reconciliation",
+            "/admin/approvals"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L486",
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L583"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L159"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L589"
+          ],
+          "safeguards": [
+            "supabase/tests/db/money_reconciliation.test.mjs#L128"
+          ],
+          "dataBinding": "postgres:public.reconciliation_breaks",
+          "idempotency": "idempotency key per break and amounts",
+          "concurrency": "approval row lock",
+          "recovery": "a further approved correction",
+          "tests": [
+            "supabase/tests/db/money_reconciliation.test.mjs"
+          ],
+          "evidence": [
+            "supabase/tests/db/money_reconciliation.test.mjs#L82"
+          ],
+          "owner": "",
           "reviewStatus": "unreviewed"
         }
       ]
@@ -5423,24 +5583,51 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "planned",
-          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "status": "in-progress",
+          "rationale": "D-Q7: both programmes ship disabled with every value unset (invented loyalty rates removed). Enabling needs reward value, per-customer monthly cap, monthly budget, credit expiry and a published AR/EN terms version, proposed by owner/finance and approved by a different owner (rewards.approve); break-glass never applies so a sole admin cannot enable. Terms accepted at enrolment; referral vests on the first completed paid unrefunded booking within caps/budget and is reversed on refund; loyalty capped, expiring and settled to providers by the platform (funded_by=platform). In-progress, unreviewed.",
           "entityStates": {
             "from": [],
             "to": []
           },
-          "uiRoutes": [],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
-          "dataBinding": "",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
-          "tests": [],
-          "evidence": [],
-          "owner": "impl-money-claude",
+          "uiRoutes": [
+            "/admin/settings",
+            "/admin/approvals",
+            "/customer/wallet"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010320000_money_reward_programs.sql#L559",
+            "supabase/migrations/20261010320000_money_reward_programs.sql#L642",
+            "supabase/migrations/20261010320000_money_reward_programs.sql#L292",
+            "supabase/migrations/20261010320000_money_reward_programs.sql#L711"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L396",
+            "supabase/migrations/20261010320000_money_reward_programs.sql#L48"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261010320000_money_reward_programs.sql#L671",
+            "supabase/migrations/20261010320000_money_reward_programs.sql#L550"
+          ],
+          "safeguards": [
+            "supabase/tests/db/money_rewards.test.mjs#L38",
+            "supabase/tests/db/money_rewards.test.mjs#L72",
+            "supabase/tests/db/booking_engine_referrals.test.mjs#L116"
+          ],
+          "dataBinding": "postgres:public.reward_programs",
+          "idempotency": "one pending request per programme; acceptance ON CONFLICT DO NOTHING; reversal unique per credit and refund",
+          "concurrency": "row lock on the referral during vesting; approval row lock",
+          "recovery": "an approved change disables the programme; credits reversed by recorded reversal rows",
+          "tests": [
+            "supabase/tests/db/money_rewards.test.mjs",
+            "supabase/tests/db/booking_engine_referrals.test.mjs",
+            "supabase/tests/db/booking_engine_loyalty.test.mjs",
+            "web_platform/tests/money-screens.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/settings/reward-programmes.tsx",
+            "web_platform/src/components/reward-terms.tsx"
+          ],
+          "owner": "",
           "reviewStatus": "unreviewed"
         }
       ]
@@ -7065,6 +7252,115 @@
       ],
       "status": "assumed",
       "appliesTo": []
+    },
+    {
+      "id": "adopted-d-q8-money-append-only",
+      "decision": "CONFIRMED (owner, plan of record): D-Q8 final decision text of docs/legal/2026-10-10-money-governance-decision-memo.md adopted in docs/legal/2026-10-10-adopted-decisions.md: money tables append-only, corrections as linked entries with maker and a different checker, fee rules/balances/payout holds/refund thresholds through approved pending changes, fee rules effective-dated, prospective, snapshotted, 30 days notice for increases.",
+      "reason": "Owner adopted the memo texts on 2026-10-10.",
+      "evidence": [
+        "docs/legal/2026-10-10-adopted-decisions.md",
+        "supabase/migrations/20261010300000_money_append_only_and_corrections.sql",
+        "supabase/migrations/20261010310000_money_pending_changes.sql"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "money.append-only",
+        "ledger.adjustment",
+        "money.pending-change",
+        "ledger.release-payout"
+      ]
+    },
+    {
+      "id": "adopted-d-q7-rewards-governance",
+      "decision": "CONFIRMED (owner, plan of record): D-Q7 final decision text adopted. Programmes ship disabled with every value unset; enabling needs all values, published AR/EN terms and a different owner; no break-glass.",
+      "reason": "Owner adopted the memo texts on 2026-10-10.",
+      "evidence": [
+        "docs/legal/2026-10-10-adopted-decisions.md",
+        "supabase/migrations/20261010320000_money_reward_programs.sql"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "reward-program.enable"
+      ]
+    },
+    {
+      "id": "adopted-d-q9-tap-reconciliation",
+      "decision": "CONFIRMED (owner, plan of record): D-Q9 final decision text adopted: Tap authoritative for money movement, ledger for entitlements, daily reconciliation, breaks resolved only by approved adjustments citing the Tap object, escalation after 3 business days, Check with Tap after 2 business days, refunds initiated within 3 business days and succeeded within 14 days.",
+      "reason": "Owner adopted the memo texts on 2026-10-10.",
+      "evidence": [
+        "docs/legal/2026-10-10-adopted-decisions.md",
+        "supabase/migrations/20261010330000_money_tap_reconciliation.sql"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "reconciliation.daily",
+        "reconciliation.resolve-break",
+        "refund.check-with-tap"
+      ]
+    },
+    {
+      "id": "adopted-d-d3-effective-fee",
+      "decision": "CONFIRMED (owner, plan of record): D-D3 final decision text adopted: effective platform fee from fee rules plus VAT on the fee and a worked example; no free-standing commission %; provider VAT status captured at onboarding.",
+      "reason": "Owner adopted the memo texts on 2026-10-10.",
+      "evidence": [
+        "docs/legal/2026-10-10-adopted-decisions.md",
+        "supabase/migrations/20261010340000_money_effective_fee_and_vat_status.sql"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "fee.effective-display",
+        "provider.vat-status",
+        "provider.set-commission"
+      ]
+    },
+    {
+      "id": "money-system-settlement-paths-keep-in-place-state",
+      "decision": "ASSUMED: the existing server paths that settle an original ledger row (refund completion, settling an unperformed booking, payout release, manual settlement) keep updating its payout state and lowering its shares in place, under the primora.ledger_system_write marker; the trigger forbids any growth of the shares, any change to identity/captured amount and any delete. Human corrections are only new linked entries.",
+      "reason": "Rewriting refund accounting into reversal entries touches about 20 core money functions; the trigger closes value creation and deletion now. Filed as a gap for a full reversal-entry redesign.",
+      "evidence": [
+        "supabase/migrations/20261010300000_money_append_only_and_corrections.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "money.append-only"
+      ]
+    },
+    {
+      "id": "money-payment-methods-is-a-setting",
+      "decision": "ASSUMED: payment_methods (catalogue of enabled methods, labels, gateway) is an owner setting (settings.manage), not a money record; finance no longer toggles it. employee_commission_rules stays the provider's own payroll setting; console sessions only read it.",
+      "reason": "Neither table records money movement or entitlement.",
+      "evidence": [
+        "supabase/migrations/20261010300000_money_append_only_and_corrections.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "money.append-only"
+      ]
+    },
+    {
+      "id": "money-reconciliation-zero-tolerance-auto-match",
+      "decision": "ASSUMED: any difference of SAR 0.01 or more opens a break (the memo's SAR 1 queueing is a business choice; the safest default is no tolerance). A charge or refund break that Tap's own API data later matches closes as auto_matched (recorded, no edit); settlement breaks never auto-close. Saudi public holidays are not in the business-day count.",
+      "reason": "Safest default per adopted-decisions; holidays have no data source yet (gap).",
+      "evidence": [
+        "supabase/migrations/20261010330000_money_tap_reconciliation.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "reconciliation.daily",
+        "reconciliation.resolve-break"
+      ]
+    },
+    {
+      "id": "money-referral-vesting-interpretation",
+      "decision": "ASSUMED: 'first completed, paid, non-refunded booking' means the referee's first booking that is completed, has a Tap-captured booking_payment ledger row, and has no pending/processing/succeeded refund; an unpaid or refunded visit leaves the referral pending. A party who has not accepted the current terms, or has reached the monthly cap or budget, is not credited (recorded in vest_notes). Reversal on refund cancels the unspent credit; a spent part is recorded, never charged to the customer (credits are non-cash). Loyalty and wallet redemptions are settled to the provider by the platform (funded_by=platform).",
+      "reason": "Closest reading of the D-Q7 text without inventing values.",
+      "evidence": [
+        "supabase/migrations/20261010320000_money_reward_programs.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "reward-program.enable"
+      ]
     }
   ],
   "gaps": [
@@ -8930,6 +9226,116 @@
       "evidence": [
         "supabase/tests/db/gov2_audited_reads.test.mjs"
       ]
+    },
+    {
+      "id": "money-refund-accounting-mutates-original-row",
+      "severity": "medium",
+      "description": "Refund completion and unperformed-booking settlement still lower shares and move payout state on the original ledger row (guarded: shares never grow, nothing deleted, identity frozen). D-Q8 prefers reversal entries for every change.",
+      "status": "open",
+      "rationale": "FOUND BY impl-money-claude. Redesign complete_refund_request / ledger_settle_unperformed_booking and the balance readers to post reversal entries instead.",
+      "evidence": [
+        "supabase/migrations/20261010300000_money_append_only_and_corrections.sql"
+      ]
+    },
+    {
+      "id": "zatca-vat-number-verification-not-integrated",
+      "severity": "high",
+      "description": "Provider VAT numbers are format-checked only; D-D3 requires verification against ZATCA at onboarding and on change. vat_verification_status stays 'unverified'.",
+      "status": "blocked",
+      "rationale": "FOUND BY impl-money-claude. Needs a ZATCA lookup integration and credentials (owner/external).",
+      "evidence": [
+        "supabase/migrations/20261010340000_money_effective_fee_and_vat_status.sql"
+      ]
+    },
+    {
+      "id": "tap-settlement-api-import-not-built",
+      "severity": "medium",
+      "description": "Tap charges and refunds are imported from the API by reconcile-psp; Tap settlements and the bank statement are imported by finance as CSV in /admin/reconciliation. No automatic settlement or bank-feed import exists.",
+      "status": "open",
+      "rationale": "FOUND BY impl-money-claude. Tap settlement report API/endpoint and bank feed access need owner credentials.",
+      "evidence": [
+        "web_platform/src/app/admin/reconciliation/page.tsx"
+      ]
+    },
+    {
+      "id": "reconciliation-and-tap-check-not-scheduled",
+      "severity": "medium",
+      "description": "run_tap_reconciliation, escalate_reconciliation_breaks and expire_loyalty_points have no scheduler (pg_cron or a cron caller of reconcile-psp); they run when finance presses the button or opens the screen.",
+      "status": "open",
+      "rationale": "FOUND BY impl-money-claude. Schedule daily on the hosted project.",
+      "evidence": [
+        "supabase/migrations/20261010330000_money_tap_reconciliation.sql"
+      ]
+    },
+    {
+      "id": "saudi-public-holidays-not-in-business-days",
+      "severity": "low",
+      "description": "Business-day counts skip Friday and Saturday only; Saudi public holidays (Eid, National Day, Founding Day) are not excluded, so escalations and Check with Tap can open a day early around holidays.",
+      "status": "open",
+      "rationale": "FOUND BY impl-money-claude. Needs an owner-maintained holiday calendar.",
+      "evidence": [
+        "supabase/migrations/20261010330000_money_tap_reconciliation.sql"
+      ]
+    },
+    {
+      "id": "tap-refund-status-values-unconfirmed",
+      "severity": "medium",
+      "description": "Tap's retrieve-refund docs show PENDING only; the full refund status list was not confirmed, so the mapping (REFUNDED/SUCCESS succeeded; PENDING/IN_PROGRESS/INITIATED processing; FAILED/DECLINED/CANCELLED/... failed; else unknown, recorded without change) needs confirmation against Tap's API in test mode.",
+      "status": "open",
+      "rationale": "FOUND BY impl-money-claude. Verify with a Tap test key.",
+      "evidence": [
+        "supabase/functions/_shared/tap-refund-status.ts"
+      ]
+    },
+    {
+      "id": "check-refund-status-edge-not-deployed-or-run",
+      "severity": "medium",
+      "description": "The check-refund-status Edge Function and the reconcile-psp changes were not run (no Deno locally, no Tap key); only the pure module and the database commands are tested.",
+      "status": "open",
+      "rationale": "FOUND BY impl-money-claude. Serve locally with a Tap test key and exercise both functions.",
+      "evidence": [
+        "supabase/functions/check-refund-status/index.ts"
+      ]
+    },
+    {
+      "id": "money-screens-not-browser-verified-with-totp",
+      "severity": "medium",
+      "description": "/admin/reconciliation, /admin/settings (programmes), /admin/platform-rules (fee versions), /provider/pricing and /become-provider were verified by HTTP 200, typecheck, web guard tests and live PostgREST calls with locally signed aal2 sessions, not clicked through with a real TOTP sign-in.",
+      "status": "open",
+      "rationale": "FOUND BY impl-money-claude.",
+      "evidence": [
+        "web_platform/tests/money-screens.test.mjs"
+      ]
+    },
+    {
+      "id": "provider-commission-percentage-column-dead",
+      "severity": "low",
+      "description": "providers.commission_percentage (approval writes a 15.00 default) is no longer displayed or read by pricing; it should be dropped or nulled after confirming nothing else reads it.",
+      "status": "open",
+      "rationale": "FOUND BY impl-money-claude. Destructive schema change: ask the owner.",
+      "evidence": [
+        "supabase/migrations/20261010340000_money_effective_fee_and_vat_status.sql"
+      ]
+    },
+    {
+      "id": "provider-plan-prices-hard-coded-in-pricing-page",
+      "severity": "medium",
+      "description": "/provider/pricing still shows hard-coded plan prices (299/799, annual 239/639) and savings text; the charge itself comes from quote_provider_plan.",
+      "status": "open",
+      "rationale": "FOUND BY impl-money-claude while removing the commission copy; out of the MONEY scope.",
+      "evidence": [
+        "web_platform/src/app/provider/pricing/page.tsx"
+      ]
+    },
+    {
+      "id": "rewards-counsel-and-tax-before-enablement",
+      "severity": "high",
+      "description": "D-Q7: before the first enablement counsel must confirm whether a Ministry of Commerce discount licence is needed and a tax adviser the VAT treatment of credits; reward values, caps, budget, expiry and the AR/EN terms text are owner inputs (none invented).",
+      "status": "blocked",
+      "rationale": "Owner/COUNSEL action per docs/legal/2026-10-10-adopted-decisions.md.",
+      "evidence": [
+        "docs/legal/2026-10-10-adopted-decisions.md"
+      ]
     }
   ],
   "declaredStatic": [
@@ -9465,6 +9871,36 @@
         "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L194"
       ],
       "status": "open"
+    },
+    {
+      "id": "money-append-only-trigger-needs-system-path-marker",
+      "observation": "Revoking client privileges was not enough for D-Q8: definer functions run as the table owner, so a blocking trigger had to distinguish sanctioned settling paths (transaction-local GUC set by those functions) and still forbid value growth. pg_trigger_depth() > 1 let PDPL erasure cascades remove customer-side promotional rows while direct DELETEs stay refused.",
+      "category": "new-pattern",
+      "proposedChange": "In security-governance.md, describe the append-only trigger with a server-path marker plus a 'shares never grow' invariant, and the cascade allowance for erasure.",
+      "evidence": [
+        "supabase/migrations/20261010300000_money_append_only_and_corrections.sql"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "manifest-set-strings-raw",
+      "observation": "admin_console_manifest.py set coerces a JSON-quoted string into a literal with quotes and then rejects it as an invalid enum; strings must be passed raw, lists/objects as JSON.",
+      "category": "tooling",
+      "proposedChange": "Document in the implementer prompt that --value takes raw strings and JSON only for arrays/objects.",
+      "evidence": [
+        ".admin-console/manifest.json"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "python-text-mode-crlf-on-windows",
+      "observation": "Editing files with Python text mode on Windows silently converted LF to CRLF; patch_function normalises CRLF, but migrations must stay LF (gitattributes) and multi-line search patterns fail on CRLF files.",
+      "category": "friction",
+      "proposedChange": "Recommend newline='' and explicit CRLF handling in edit helpers on Windows checkouts.",
+      "evidence": [
+        "supabase/migrations/20261010320000_money_reward_programs.sql"
+      ],
+      "status": "open"
     }
   ],
   "agents": [
@@ -9598,24 +10034,9 @@
     {
       "id": "impl-money-claude",
       "role": "implementer",
-      "ownsCapabilities": [
-        "ledger.release-payout",
-        "fee-rule.save",
-        "fee-rule.list",
-        "refund.retry",
-        "provider.set-commission",
-        "money.append-only",
-        "ledger.adjustment",
-        "money.pending-change",
-        "fee.effective-display",
-        "provider.vat-status",
-        "reward-program.enable",
-        "reconciliation.daily",
-        "reconciliation.resolve-break",
-        "refund.check-with-tap"
-      ],
+      "ownsCapabilities": [],
       "ownsScreens": [],
-      "status": "active",
+      "status": "handed-off",
       "notes": "MONEY package: GOV-1 review C-1, C-2, H-4, M-1; D-Q8 append-only money tables + pending changes; D-Q7 rewards governance; D-Q9 Tap reconciliation, Check with Tap, refund SLA; D-D3 effective fee + VAT display and provider VAT status. Plan of record docs/legal/2026-10-10-adopted-decisions.md.",
       "worklog": ".admin-console/worklog/impl-money-claude.md"
     }
