@@ -473,7 +473,8 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         "utf8"
       );
       assert.ok(fnCode.includes("resolveCaller(req)"), "Must resolve the caller from the Authorization header");
-      assert.ok(fnCode.includes('caller.kind === "user"'), "Must reject non-admin users");
+      // GOV-FIX H-1: non-admin users and console roles without operations.write are refused (behaviour in supabase/tests/console-permission.test.mjs).
+      assert.ok(fnCode.includes('consoleCallerDecision(caller?.kind ?? null, true, FUNCTION_PERMISSIONS["dispatch-messages"]'), "Must require operations.write of a console caller");
       assert.ok(fnCode.includes("claim_message_batch"), "Must claim messages through the database");
       assert.ok(fnCode.includes("graph.facebook.com"), "Must send through the WhatsApp Cloud API");
       assert.ok(!fnCode.includes("wamid_"), "Must never fabricate WhatsApp message ids");

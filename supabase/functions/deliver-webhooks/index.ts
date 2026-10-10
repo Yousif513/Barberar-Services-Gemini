@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { MissingConfigError, resolveCaller, serviceClient } from "../_shared/http.ts"
+import { adminSessionAllows, bearerToken, MissingConfigError, resolveCaller, serviceClient } from "../_shared/http.ts"
+import { consoleCallerDecision, FUNCTION_PERMISSIONS } from "../_shared/console-permission.ts"
 import { DELIVERY_TIMEOUT_MS } from "../_shared/api-contract.ts"
 import { buildDeliveryRequest, classifyDeliveryError, classifyDeliveryResponse } from "../_shared/webhook-delivery.ts"
 import type { DeliveryOutcome } from "../_shared/webhook-delivery.ts"
@@ -91,8 +92,10 @@ serve(async (req) => {
   if (req.method !== "POST") return reply({ error: "Method not allowed." }, 405)
   try {
     const caller = await resolveCaller(req)
-    if (!caller) return reply({ error: "Authentication required." }, 401)
-    if (caller.kind !== "service" && caller.kind !== "admin") return reply({ error: "Administrative access required." }, 403)
+    // GOV-FIX H-1: the scheduler (service key) or a console session holding settings.manage; not every console role.
+    const decision = await consoleCallerDecision(caller?.kind ?? null, true, FUNCTION_PERMISSIONS["deliver-webhooks"],
+      (permission) => adminSessionAllows(bearerToken(req), permission))
+    if (!decision.allowed) return reply({ error: decision.error }, decision.status)
 
     const db = serviceClient()
     const settings = await db.rpc("webhook_delivery_settings")

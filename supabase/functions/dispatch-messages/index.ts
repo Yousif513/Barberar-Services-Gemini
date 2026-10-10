@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { corsHeaders, json, MissingConfigError, resolveCaller, serviceClient } from "../_shared/http.ts"
+import { adminSessionAllows, bearerToken, corsHeaders, json, MissingConfigError, resolveCaller, serviceClient } from "../_shared/http.ts"
+import { consoleCallerDecision, FUNCTION_PERMISSIONS } from "../_shared/console-permission.ts"
 import { buildTextBody, extractMessageId } from "../_shared/whatsapp-send.ts"
 
 // Sends queued WhatsApp messages through the WhatsApp Cloud API.
@@ -17,8 +18,10 @@ serve(async (req) => {
 
   try {
     const caller = await resolveCaller(req)
-    if (!caller) return json(req, { error: "Authentication required." }, 401)
-    if (caller.kind === "user") return json(req, { error: "Administrative access required." }, 403)
+    // GOV-FIX H-1: the scheduler (service key) or a console session holding operations.write; not every console role.
+    const decision = await consoleCallerDecision(caller?.kind ?? null, true, FUNCTION_PERMISSIONS["dispatch-messages"],
+      (permission) => adminSessionAllows(bearerToken(req), permission))
+    if (!decision.allowed) return json(req, { error: decision.error }, decision.status)
 
     const token = Deno.env.get("WHATSAPP_ACCESS_TOKEN")
     const phoneNumberId = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID")

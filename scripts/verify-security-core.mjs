@@ -85,7 +85,7 @@ const checks = [
     file: "supabase/functions/deliver-webhooks/index.ts",
     require: [
       "resolveCaller(req)",
-      'caller.kind !== "service" && caller.kind !== "admin"',
+      'consoleCallerDecision(caller?.kind ?? null, true, FUNCTION_PERMISSIONS["deliver-webhooks"]',
       'redirect: "manual"',
       "checkResolvedAddresses(",
       "validateWebhookUrl(",

@@ -415,6 +415,23 @@ describe("redeeming included visits", () => {
     assert.equal((await redemptions(id)).length, 0);
   });
 
+  it("GOV-FIX H-1: a console session records or voids a visit only with operations.write (analyst and finance are refused)", async () => {
+    const id = await paidMembership();
+    const b = await book("09:00");
+    const analyst = ROLES.user(await createUser(db, { role: "admin", adminRole: "analyst" }));
+    const finance = ROLES.user(await createUser(db, { role: "admin", adminRole: "finance" }));
+    const operations = ROLES.user(await createUser(db, { role: "admin", adminRole: "operations" }));
+    await expectError(redeem(analyst, id, b), /Membership not found/);
+    await expectError(redeem(finance, id, b), /Membership not found/);
+    assert.equal(await left(id), 4, "the read-only roles changed nothing");
+    assert.equal((await redeem(operations, id, b)).visits_remaining, 3);
+    const red = (await redemptions(id))[0];
+    await expectError(as(db, analyst, `select void_membership_redemption($1, 'analyst write test')`, [red.id]), /Redemption not found/);
+    await expectError(as(db, finance, `select void_membership_redemption($1, 'finance write test')`, [red.id]), /Redemption not found/);
+    assert.equal(await left(id), 3);
+    assert.equal((await as(db, operations, `select void_membership_redemption($1, 'recorded by mistake') r`, [red.id]))[0].r.visits_remaining, 4);
+  });
+
   it("refuses a visit that falls after the membership period has ended (M-02)", async () => {
     const m = await paidMembership();
     const bookingId = await book("10:00");

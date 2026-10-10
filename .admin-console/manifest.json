@@ -4222,7 +4222,7 @@
             "web_platform/src/app/admin/roles/page.tsx#L224",
             "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L61"
           ],
-          "owner": "",
+          "owner": "impl-govfix-claude",
           "reviewStatus": "unreviewed"
         }
       ]
@@ -5138,7 +5138,7 @@
           "idempotency": "",
           "concurrency": "pg_advisory_xact_lock('primora.set_user_role') serialises role changes",
           "recovery": "",
-          "owner": ""
+          "owner": "impl-govfix-claude"
         },
         {
           "id": "gov.mfa",
@@ -5185,7 +5185,7 @@
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "owner": ""
+          "owner": "impl-govfix-claude"
         },
         {
           "id": "gov.approvals",
@@ -5234,7 +5234,7 @@
           "idempotency": "one pending request per (kind, target); execution keeps admin_release_payout's idempotency key",
           "concurrency": "row lock on the request; partial unique index on pending (kind, target_id)",
           "recovery": "a rejected or cancelled request changes nothing; a failed execution rolls the decision back",
-          "owner": ""
+          "owner": "impl-govfix-claude"
         },
         {
           "id": "gov.break-glass",
@@ -5274,7 +5274,7 @@
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "owner": ""
+          "owner": "impl-govfix-claude"
         },
         {
           "id": "gov.iban-reveal",
@@ -5316,7 +5316,7 @@
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "owner": ""
+          "owner": "impl-govfix-claude"
         },
         {
           "id": "gov.iban-change",
@@ -5361,7 +5361,7 @@
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "owner": ""
+          "owner": "impl-govfix-claude"
         },
         {
           "id": "gov.audited-reads",
@@ -5427,7 +5427,7 @@
             "web_platform/src/app/admin/ledger/page.tsx",
             "web_platform/src/app/admin/reports/page.tsx"
           ],
-          "owner": "",
+          "owner": "impl-govfix-claude",
           "reviewStatus": "unreviewed"
         }
       ]
@@ -10039,6 +10039,24 @@
       "status": "handed-off",
       "notes": "MONEY package: GOV-1 review C-1, C-2, H-4, M-1; D-Q8 append-only money tables + pending changes; D-Q7 rewards governance; D-Q9 Tap reconciliation, Check with Tap, refund SLA; D-D3 effective fee + VAT display and provider VAT status. Plan of record docs/legal/2026-10-10-adopted-decisions.md.",
       "worklog": ".admin-console/worklog/impl-money-claude.md"
+    },
+    {
+      "id": "impl-govfix-claude",
+      "role": "implementer",
+      "ownsCapabilities": [
+        "gov.console-roles",
+        "gov.mfa",
+        "gov.approvals",
+        "gov.break-glass",
+        "gov.iban-reveal",
+        "gov.iban-change",
+        "gov.audited-reads",
+        "role.set-administrator"
+      ],
+      "ownsScreens": [],
+      "status": "active",
+      "notes": "Fixes remaining GOV-1 security review findings (H-1, H-2, H-3, M-2..M-6, L-1..L-4) and closes gov2-remaining-direct-admin-reads.",
+      "worklog": ".admin-console/worklog/impl-govfix-claude.md"
     }
   ]
 }

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { corsHeaders, json, MissingConfigError, resolveCaller, serviceClient } from "../_shared/http.ts"
+import { adminSessionAllows, bearerToken, corsHeaders, json, MissingConfigError, resolveCaller, serviceClient } from "../_shared/http.ts"
+import { consoleCallerDecision, FUNCTION_PERMISSIONS } from "../_shared/console-permission.ts"
 
 // Verifies a provider's Commercial Registration with the Ministry of Commerce Wathq API and
 // records the result (record_wathq_cr_verification). Admin only.
@@ -13,8 +14,10 @@ serve(async (req) => {
 
   try {
     const caller = await resolveCaller(req)
-    if (!caller) return json(req, { error: "Authentication required." }, 401)
-    if (caller.kind !== "admin") return json(req, { error: "Administrative access required." }, 403)
+    // GOV-FIX H-1: a console session is not enough; recording a CR verification needs operations.write.
+    const decision = await consoleCallerDecision(caller?.kind ?? null, false, FUNCTION_PERMISSIONS["wathq-verify"],
+      (permission) => adminSessionAllows(bearerToken(req), permission))
+    if (!decision.allowed) return json(req, { error: decision.error }, decision.status)
 
     const apiKey = Deno.env.get("WATHQ_API_KEY")
     if (!apiKey) return json(req, { error: "Wathq is not configured (WATHQ_API_KEY). Use a manual admin review instead." }, 503)
