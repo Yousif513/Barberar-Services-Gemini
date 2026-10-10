@@ -65,6 +65,13 @@ export async function decide({ env, fetchImpl = fetch, sleep = (ms) => new Promi
     log(`Not a production deployment (${env.VERCEL_ENV ?? "unknown"}): building.`);
     return "build";
   }
+  // Release hold: the code on the production branch may be ahead of the hosted database (migrations not yet applied).
+  // Production builds stay skipped, and the current live deployment stays up, until the owner sets
+  // PRIMORA_PRODUCTION_RELEASE=enabled in the Vercel project after applying the migrations.
+  if (env.PRIMORA_PRODUCTION_RELEASE !== "enabled") {
+    log("Production release is on hold (PRIMORA_PRODUCTION_RELEASE is not 'enabled'): skipping the production build. The live deployment stays as it is.");
+    return "skip";
+  }
   const owner = env.VERCEL_GIT_REPO_OWNER;
   const repo = env.VERCEL_GIT_REPO_SLUG;
   const sha = env.VERCEL_GIT_COMMIT_SHA;

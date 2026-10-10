@@ -5,7 +5,7 @@ import { DEFAULT_REQUIRED_CHECKS, decide, evaluateChecks, fetchCheckRuns } from 
 const pass = (name, at = "2026-10-07T10:00:00Z") => ({ name, status: "completed", conclusion: "success", started_at: at });
 const allPass = () => DEFAULT_REQUIRED_CHECKS.map((name) => pass(name));
 
-const productionEnv = { VERCEL_ENV: "production", VERCEL_GIT_REPO_OWNER: "o", VERCEL_GIT_REPO_SLUG: "r", VERCEL_GIT_COMMIT_SHA: "abcdef1234567890", VERCEL_CI_WAIT_SECONDS: "60" };
+const productionEnv = { VERCEL_ENV: "production", PRIMORA_PRODUCTION_RELEASE: "enabled", VERCEL_GIT_REPO_OWNER: "o", VERCEL_GIT_REPO_SLUG: "r", VERCEL_GIT_COMMIT_SHA: "abcdef1234567890", VERCEL_CI_WAIT_SECONDS: "60" };
 
 function fakeGitHub(responses) {
   let call = 0;
@@ -68,6 +68,12 @@ describe("the production build decision", () => {
     assert.equal(await decide({ env: { VERCEL_ENV: "preview" }, fetchImpl: fakeGitHub([500]), log: () => {} }), "build");
   });
 
+  it("holds production while the release switch is not enabled, even with green CI", async () => {
+    const { PRIMORA_PRODUCTION_RELEASE, ...held } = productionEnv;
+    assert.equal(await decide({ env: held, fetchImpl: fakeGitHub([allPass()]), log: () => {}, ...clock() }), "skip");
+    assert.equal(await decide({ env: { ...held, PRIMORA_PRODUCTION_RELEASE: "true" }, fetchImpl: fakeGitHub([allPass()]), log: () => {}, ...clock() }), "skip");
+  });
+
   it("builds production when CI is green", async () => {
     assert.equal(await decide({ env: productionEnv, fetchImpl: fakeGitHub([allPass()]), log: () => {}, ...clock() }), "build");
   });
@@ -95,7 +101,7 @@ describe("the production build decision", () => {
   });
 
   it("skips when the deployment carries no Git details", async () => {
-    assert.equal(await decide({ env: { VERCEL_ENV: "production" }, fetchImpl: fakeGitHub([allPass()]), log: () => {}, ...clock() }), "skip");
+    assert.equal(await decide({ env: { VERCEL_ENV: "production", PRIMORA_PRODUCTION_RELEASE: "enabled" }, fetchImpl: fakeGitHub([allPass()]), log: () => {}, ...clock() }), "skip");
   });
 
   it("honours an override of the required checks", async () => {
