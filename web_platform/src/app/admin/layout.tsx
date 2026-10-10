@@ -17,6 +17,7 @@ const translations = {
     finance: "Financial Control",
     ledger: "Ledger & Splits",
     refunds: "Refunds",
+    reconciliation: "Tap Reconciliation",
     approvals: "Approvals",
     consoleRoleOwner: "Owner",
     consoleRoleFinance: "Finance",
@@ -80,6 +81,7 @@ const translations = {
     finance: "الرقابة المالية",
     ledger: "دفتر الحسابات والعمولات",
     refunds: "المبالغ المستردة",
+    reconciliation: "التسوية مع Tap",
     approvals: "الاعتمادات",
     consoleRoleOwner: "المالك",
     consoleRoleFinance: "المالية",
@@ -152,6 +154,8 @@ const getNavIcon = (nameKey: string) => {
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>;
     case "ledger":
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 11h.01M12 14h.01M12 17h.01M15 11h.01M15 14h.01M15 17h.01M9 11h.01" /></svg>;
+    case "reconciliation":
+      return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>;
     case "refunds":
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" /></svg>;
     case "analytics":
@@ -372,6 +376,7 @@ export default function AdminLayout({
         { nameKey: "approvals", path: "/admin/approvals" },
         { nameKey: "ledger", path: "/admin/ledger" },
         { nameKey: "refunds", path: "/admin/refunds" },
+        { nameKey: "reconciliation", path: "/admin/reconciliation" },
         { nameKey: "reports", path: "/admin/reports" }
       ]
     },
