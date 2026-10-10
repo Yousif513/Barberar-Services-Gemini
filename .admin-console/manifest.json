@@ -1244,7 +1244,9 @@
           "uiRoutes": [
             "/admin/ledger"
           ],
-          "serverOperations": [],
+          "serverOperations": [
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L389"
+          ],
           "authorizationPolicies": [
             "supabase/migrations/20260615182811_harden_auth_and_booking_core.sql#L203"
           ],
@@ -1255,7 +1257,7 @@
           "concurrency": "",
           "recovery": "",
           "tests": [
-            "web_platform/tests/negative-authorization.test.mjs"
+            "supabase/tests/db/gov2_audited_reads.test.mjs"
           ],
           "evidence": [
             "web_platform/src/app/admin/ledger/page.tsx#L621",
@@ -1409,7 +1411,7 @@
             "/admin/reports"
           ],
           "serverOperations": [
-            "supabase/migrations/20261005130000_admin_report_exports.sql#L7"
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L642"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261005130000_admin_report_exports.sql#L19"
@@ -1426,9 +1428,7 @@
           "concurrency": "Not applicable: nothing is written except the audit entry.",
           "recovery": "Not applicable: exports change no data.",
           "tests": [
-            "supabase/tests/db/release_controls.test.mjs",
-            "web_platform/tests/csv-export.test.mjs",
-            "supabase/tests/db/qa_adversarial.test.mjs"
+            "supabase/tests/db/gov2_audited_reads.test.mjs"
           ],
           "evidence": [
             "supabase/migrations/20261005130000_admin_report_exports.sql#L7",
@@ -1505,7 +1505,9 @@
           "uiRoutes": [
             "/admin/ledger"
           ],
-          "serverOperations": [],
+          "serverOperations": [
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L449"
+          ],
           "authorizationPolicies": [
             "supabase/migrations/20260620182904_refine_payout_request_policies.sql#L36"
           ],
@@ -1516,7 +1518,7 @@
           "concurrency": "",
           "recovery": "",
           "tests": [
-            "web_platform/tests/adm1-admin-wiring.test.mjs"
+            "supabase/tests/db/gov2_audited_reads.test.mjs"
           ],
           "evidence": [
             "web_platform/src/app/admin/ledger/page.tsx#L644",
@@ -1889,7 +1891,8 @@
             "/admin/customers"
           ],
           "serverOperations": [
-            "supabase/migrations/20261005140000_admin_customer_directory.sql#L18"
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L307",
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L354"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261005140000_admin_customer_directory.sql#L39"
@@ -1903,7 +1906,7 @@
           "concurrency": "",
           "recovery": "",
           "tests": [
-            "supabase/tests/db/customer_directory.test.mjs"
+            "supabase/tests/db/gov2_audited_reads.test.mjs"
           ],
           "evidence": [
             "supabase/migrations/20261005140000_admin_customer_directory.sql#L18",
@@ -2192,7 +2195,7 @@
             "/admin/employees"
           ],
           "serverOperations": [
-            "supabase/migrations/20261005120000_admin_provider_operations.sql#L62"
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L788"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261005120000_admin_provider_operations.sql#L12"
@@ -2204,7 +2207,7 @@
           "concurrency": "",
           "recovery": "",
           "tests": [
-            "supabase/tests/db/provider_operations.test.mjs"
+            "supabase/tests/db/gov2_audited_reads.test.mjs"
           ],
           "evidence": [
             "supabase/migrations/20261005120000_admin_provider_operations.sql#L12",
@@ -2212,7 +2215,7 @@
             "web_platform/tests/admin-console-guards.test.mjs#L176"
           ],
           "owner": "",
-          "reviewStatus": "reviewed",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "sec-claude-release-review"
         },
         {
@@ -5071,6 +5074,73 @@
           "concurrency": "",
           "recovery": "",
           "owner": ""
+        },
+        {
+          "id": "gov.audited-reads",
+          "outcome": "Read customer personal data, provider bank data, ledger rows, invoices and messages only through audited, paged server functions; health answers only through a logged step-up break-glass",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "rationale": "Q4 + D4 final decision texts (adopted 2026-10-10). Console sessions (is_admin) get no direct SELECT on 30 personal/bank/ledger/invoice/message/staff/address/intake tables: admin permissive policies dropped and a RESTRICTIVE select policy per table (own rows excepted); write privileges revoked where no permissive write policy remains. Reads go through SECURITY DEFINER functions gated by personal.read (owner, operations) or money.ledger (owner, finance), server-paged, each writing one audit event (actor, console role, purpose from an allowlist, fields, target ids, filter, rows, IP, user agent). Exports built server-side with step-up; admin_record_export revoked. Health answers: owner-only break-glass (no DPO role). D4: dashboard KPIs and funnel cells with 1-4 people suppressed; aggregates unlogged. Built by impl-gov2-claude; unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/customers",
+            "/admin/ledger",
+            "/admin/reports",
+            "/admin/notifications",
+            "/admin/employees",
+            "/admin/providers",
+            "/admin/bookings",
+            "/admin/disputes",
+            "/admin/reviews",
+            "/admin/audit-logs",
+            "/admin"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L307",
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L389",
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L449",
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L642",
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L788",
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L976"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L71",
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L194",
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L248"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L109"
+          ],
+          "safeguards": [
+            "supabase/tests/db/gov2_audited_reads.test.mjs#L85",
+            "supabase/tests/db/gov2_audited_reads.test.mjs#L167",
+            "supabase/tests/db/gov2_audited_reads.test.mjs#L221",
+            "supabase/tests/db/gov2_audited_reads.test.mjs#L240"
+          ],
+          "dataBinding": "postgres:public.admin_audit_logs",
+          "idempotency": "Reads only; exports carry no side effect beyond one audit row per delivered file.",
+          "concurrency": "Read-only snapshots; totals and pages come from the same statement.",
+          "recovery": "Nothing to recover: no data changes; a refused read returns 42501 with HINT console_role_forbidden.",
+          "tests": [
+            "supabase/tests/db/gov2_audited_reads.test.mjs",
+            "supabase/tests/db/admin_dashboard.test.mjs",
+            "web_platform/tests/admin-console-guards.test.mjs"
+          ],
+          "evidence": [
+            "supabase/tests/db/gov2_audited_reads.test.mjs#L112",
+            "web_platform/src/app/admin/customers/page.tsx",
+            "web_platform/src/app/admin/ledger/page.tsx",
+            "web_platform/src/app/admin/reports/page.tsx"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
         }
       ]
     }
@@ -6663,6 +6733,37 @@
         "admin-governance",
         "payout-request"
       ]
+    },
+    {
+      "id": "adopted-q4-d4-audited-reads",
+      "decision": "Adopt Q4 and D4 final decision texts as built in GOV-2: no direct table SELECT for any console session on personal, bank, ledger, invoice, message, staff, address and intake tables (restrictive policy per table, own rows excepted); reads only through audited SECURITY DEFINER functions (actor, console role, purpose, fields, target ids, filter, rows, IP, user agent); exports server-built with step-up and a logged row count; aggregate tiles unlogged; cells of 1-4 people suppressed.",
+      "reason": "Owner instruction 2026-10-10 to adopt the memo final decision texts (docs/legal/2026-10-10-adopted-decisions.md).",
+      "evidence": [
+        "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql",
+        "docs/legal/2026-10-10-privacy-decision-memo.md#L175"
+      ],
+      "status": "confirmed",
+      "appliesTo": []
+    },
+    {
+      "id": "gov2-read-permission-scope",
+      "decision": "ASSUMED: personal.read is held by owner and operations only; analyst reads aggregates and non-personal operational data; finance reads money through money.ledger and customer names only for dispute resolution. Health break-glass is owner-only because no DPO console role exists.",
+      "reason": "D-Q5 says analyst is read-only and operations/analyst hold no money; PDPL minimisation (Art. 11(3)) argues against giving an analyst customer contact data. Owner to confirm.",
+      "evidence": [
+        "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L37"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "gov2-d4-queue-counts-and-staff-names",
+      "decision": "ASSUMED: dashboard work-queue counts stay visible (work items, not statistics); their money totals are suppressed under 5 rows. Console staff names are returned to any console role without a log row; any other person's name needs personal.read and is logged.",
+      "reason": "Keeps operator queues usable while meeting D4; colleagues' names are not customer personal data in scope of Q4.",
+      "evidence": [
+        "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L1056"
+      ],
+      "status": "assumed",
+      "appliesTo": []
     }
   ],
   "gaps": [
@@ -7278,8 +7379,8 @@
       "id": "admin-reads-of-personal-and-bank-data-bypass-the-audited-commands",
       "severity": "high",
       "description": "At the regulated profile privileged reads must be audited. admin_customer_overview (customers.listed), get_admin_supply_overview and admin_record_export are audited, but the admin SELECT policies on profiles, consents, data_subject_requests, payout_requests, transactional_ledger and employees remain, so one PostgREST call returns the same data with no audit row. Reproduction: as an admin, select id, first_name, last_name, email, phone_number from profiles where role = 'customer' returns every customer and admin_audit_logs is unchanged (3 rows before and after). The console itself reads the data-requests queue, consents and payout_requests (IBAN and bank name in full) directly. Report exports are built in the browser from direct table reads and audited by a call whose row count the browser supplies (admin_record_export p_row_count), so audit-before-delivery is enforced by page code only. The IBAN masking in /admin/ledger is cosmetic because payout_requests.iban is still selected in full into the browser (see iban-unmasked-to-every-admin).",
-      "status": "open",
-      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): STILL OPEN, narrowed. Re-proved on the migrated schema (probe-results.txt): administrators still hold broad SELECT policies on profiles ('Admins read profiles'), consents, data_subject_requests, payout_requests and employees, and the console still reads them directly - /admin/customers selects data_subject_requests and consents (customers/page.tsx) and /admin/ledger selects payout_requests including bank_name and iban in full (ledger/page.tsx), so the IBAN masking on screen is cosmetic. Report exports are still assembled in the browser from direct reads and audited by admin_record_export with a browser-supplied row count (reports/page.tsx). CLOSED since the audit: provider internals and staff contacts are now served only through audited commands, and even an administrator cannot select them from the table (fixdba_column_privileges.test.mjs 'returns every provider's internals to an administrator and records it'). OWNER QUESTION (shared with iban-unmasked-to-every-admin): accept direct administrator reads of these tables, recording a named approver, or move them behind masked, audited, paged read commands? BUILD WORK once decided: drop the admin SELECT policies on profiles/consents/data_subject_requests/payout_requests/employees, add masked audited read commands, build exports in a command that audits the delivered row count.",
+      "status": "fixed",
+      "rationale": "FIXED BY impl-gov2-claude (2026-10-10), unreviewed: admin SELECT policies dropped and restrictive no-console-read policies added on profiles, consents, data_subject_requests, payout_requests, transactional_ledger, employees and 24 more tables; console screens read through audited paged functions; exports built server-side with the delivered row count logged. Proof: supabase/tests/db/gov2_audited_reads.test.mjs. Remaining tables: gap gov2-remaining-direct-admin-reads.",
       "evidence": [
         ".admin-console/evidence/architect-reconcile-claude/probe-results.txt#L1",
         "web_platform/src/app/admin/customers/page.tsx#L336",
@@ -8423,8 +8524,8 @@
       "id": "analyst-read-only-not-enforced-through-shared-provider-helpers",
       "severity": "medium",
       "description": "Console permissions narrow 75 changing commands and every direct administrator table write, but commands that let an administrator through only via shared helpers (can_access_provider_wide, can_access_provider_operation and similar, which still use is_admin()) accept any console role, including analyst and finance, for provider-side changes.",
-      "status": "open",
-      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). BUILD WORK: give the helpers a write flag (or split read/write helpers) and pass admin_can('operations.write') on the write path; add negative tests per role.",
+      "status": "fixed",
+      "rationale": "FIXED BY impl-gov2-claude (2026-10-10), unreviewed: can_access_provider_operation / can_access_provider_wide admit an administrator only with admin_can('operations.write'); test 'shared provider helpers' in gov2_audited_reads.test.mjs. Other is_admin()-gated RPCs in the GOV-1 security review H-1 are not changed here.",
       "evidence": [
         "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L470"
       ]
@@ -8488,6 +8589,46 @@
       "evidence": [
         "docs/legal/2026-10-10-privacy-decision-memo.md#L163"
       ]
+    },
+    {
+      "id": "gov2-remaining-direct-admin-reads",
+      "severity": "high",
+      "description": "Console sessions still read some customer-linked tables directly: bookings (customer_id, notes; dashboard and activity read it), refund_requests and payment_refund_requests, payment_disputes, reviews, customer_loyalty, loyalty_points_ledger, customer_favorites, customer_referrals, coupon_redemptions, package_redemptions, user_packages, booking_tips, and admin_audit_logs details. admin_provider_private_directory (provider contacts) is gated by is_admin() only, so analyst and finance read it.",
+      "status": "open",
+      "rationale": "FOUND BY impl-gov2-claude (2026-10-10). Outside GOV-2's listed table set; same pattern applies (restrictive policy plus an audited function per screen).",
+      "evidence": [
+        "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L194"
+      ]
+    },
+    {
+      "id": "dpo-role-not-defined",
+      "severity": "medium",
+      "description": "Q4 item 2 names a DPO break-glass. No DPO console role exists, so read_intake_answers_break_glass is owner-only (health.break_glass). There is no console screen for it; it is callable only as an RPC.",
+      "status": "blocked",
+      "rationale": "FOUND BY impl-gov2-claude. OWNER ACTION: appoint the DPO (adopted decisions, owner actions) and decide whether to add a dpo console role.",
+      "evidence": [
+        "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L976"
+      ]
+    },
+    {
+      "id": "provider-detail-hides-inactive-staff-from-admins",
+      "severity": "low",
+      "description": "Provider detail in /admin/providers lists staff through the employees embed, which now returns only active (public catalogue) staff to a console session; inactive staff appear only in the audited /admin/employees directory.",
+      "status": "open",
+      "rationale": "FOUND BY impl-gov2-claude: side effect of the employees restrictive policy. Fix by loading the provider's staff from admin_list_employees(p_provider_id).",
+      "evidence": [
+        "web_platform/src/app/admin/providers/provider-management.tsx#L722"
+      ]
+    },
+    {
+      "id": "gov2-not-browser-verified-with-totp",
+      "severity": "medium",
+      "description": "GOV-2 screens were verified by DB tests, HTTP 200 on every admin route and live PostgREST calls with a locally signed aal2 session; they were not clicked through in a browser with a real TOTP sign-in.",
+      "status": "open",
+      "rationale": "FOUND BY impl-gov2-claude. The next ux-reviewer or qa pass should sign in with TOTP as owner, finance, operations and analyst and load each admin route.",
+      "evidence": [
+        "supabase/tests/db/gov2_audited_reads.test.mjs"
+      ]
     }
   ],
   "declaredStatic": [
@@ -8498,6 +8639,16 @@
       "reason": "Reversible catalog states defined by the database schema, rather than operational sample data.",
       "approvedBy": "User-approved P3 scope and delegated implementation choices",
       "evidence": []
+    },
+    {
+      "id": "d4-small-cell-threshold",
+      "path": "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#d4_small_cell_threshold",
+      "value": "5",
+      "reason": "D4 final decision text: cells with fewer than 5 people are suppressed; 5 is the adopted safest default (business choice).",
+      "approvedBy": "Owner, adopted decisions 2026-10-10 (D4)",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md#L219"
+      ]
     }
   ],
   "feedback": [
@@ -8995,6 +9146,24 @@
         "supabase/config.toml"
       ],
       "status": "open"
+    },
+    {
+      "id": "dev-server-down-at-dispatch",
+      "observation": "The dispatch said a dev server on :3100 serves this checkout; nothing was listening, so the implementer started one (npm run dev -- -p 3100).",
+      "category": "friction",
+      "proposedChange": "",
+      "evidence": [],
+      "status": "open"
+    },
+    {
+      "id": "restrictive-select-policy-closes-helper-paths",
+      "observation": "Dropping an admin permissive SELECT policy was not enough: shared helpers (can_access_provider_operation) and public-catalogue policies still let a console session read. A RESTRICTIVE select policy per table (NOT is_admin() OR own row) closed every route at once; dropping admin ALL policies also left orphan write privileges and restrictive write guards that the data-API grant tests flag. Also: I briefly reset two contested reviewStatus values to unreviewed with a bulk set and had to restore them.",
+      "category": "new-pattern",
+      "proposedChange": "In security-governance.md, recommend a restrictive no-direct-read policy per sensitive table plus revoking write privileges that no permissive policy backs; in the implementer prompt, warn that bulk reviewStatus sets must skip contested capabilities.",
+      "evidence": [
+        "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L194"
+      ],
+      "status": "open"
     }
   ],
   "agents": [
@@ -9115,6 +9284,15 @@
       "status": "handed-off",
       "notes": "GOV-1: admin roles owner/finance/operations/analyst, TOTP MFA with aal2 and step-up, maker-checker approvals with break-glass, IBAN masking/reveal/change control, append-only audit log. Plan of record: docs/legal/2026-10-10-adopted-decisions.md (D-Q5, Q6, Q3).",
       "worklog": ".admin-console/worklog/impl-gov1-claude.md"
+    },
+    {
+      "id": "impl-gov2-claude",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "handed-off",
+      "notes": "GOV-2: Q4 + D4 final decision texts (docs/legal/2026-10-10-privacy-decision-memo.md): no direct admin SELECT on personal/bank/ledger/invoice/message tables; audited, paged read functions; health answers only via DPO/owner break-glass; D4 small-cell suppression; analyst/operations scope.",
+      "worklog": ".admin-console/worklog/impl-gov2-claude.md"
     }
   ]
 }
