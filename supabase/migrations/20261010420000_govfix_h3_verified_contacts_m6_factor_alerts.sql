@@ -33,7 +33,9 @@ CREATE TABLE IF NOT EXISTS public.account_contact_changes (
 CREATE INDEX IF NOT EXISTS idx_account_contact_changes_user ON public.account_contact_changes (user_id, changed_at DESC);
 ALTER TABLE public.account_contact_changes ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.account_contact_changes FROM anon, authenticated;
+REVOKE UPDATE, DELETE, TRUNCATE ON public.account_contact_changes FROM service_role;
 GRANT SELECT, INSERT ON public.account_contact_changes TO service_role;
+SELECT public.attach_admin_audit_trigger('public.account_contact_changes');
 
 CREATE OR REPLACE FUNCTION public.record_account_contact_change()
 RETURNS TRIGGER

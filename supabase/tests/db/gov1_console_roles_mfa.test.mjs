@@ -111,6 +111,25 @@ describe("AAL2 sessions", () => {
   });
 });
 
+describe("GOV-FIX M-2: a revoked session loses console power at once", () => {
+  it("refuses a still-valid aal2 token whose session was deleted, expired, or belongs to someone else", async () => {
+    const admin = ROLES.user(await createUser(db, { role: "admin", adminRole: "finance" }));
+    assert.equal((await as(db, admin, `select is_admin() a`))[0].a, true);
+    const [other] = await sys(db, `insert into auth.sessions (user_id) values ($1) returning id`, [owner.sub]);
+    assert.equal((await as(db, ROLES.user(admin.sub, { session_id: other.id }), `select is_admin() a`))[0].a, false, "another account's session");
+    assert.equal((await as(db, ROLES.user(admin.sub, { session_id: "not-a-session" }), `select is_admin() a`))[0].a, false);
+    await sys(db, `update auth.sessions set not_after = now() - interval '1 second' where id = $1`, [admin.sub]);
+    assert.equal((await as(db, admin, `select is_admin() a`))[0].a, false, "past the session's time-box");
+    await sys(db, `update auth.sessions set not_after = null where id = $1`, [admin.sub]);
+    assert.equal((await as(db, admin, `select admin_can('money.payout') a`))[0].a, true);
+    await sys(db, `delete from auth.sessions where id = $1`, [admin.sub]);
+    assert.equal((await as(db, admin, `select admin_can('money.payout') a`))[0].a, false, "signed out everywhere");
+    await expectError(as(db, admin, `select admin_role_directory(null, null, 5, 0)`), denied);
+    const [state] = await as(db, admin, `select admin_session_state() s`);
+    assert.deepEqual([state.s.active, state.s.session_live], [false, false]);
+  });
+});
+
 describe("step-up within 5 minutes", () => {
   it("refuses sensitive commands after 5 minutes without a fresh code, with the hint the console reacts to", async () => {
     const person = await createUser(db);
@@ -196,9 +215,12 @@ describe("MFA lockout (Supabase MFA verification hook)", () => {
     await expectError(as(db, finance, `select admin_reset_mfa($1, 'Locked out after a phone change')`, [victim.sub]), denied);
     await expectError(as(db, owner, `select admin_reset_mfa($1, 'short')`, [victim.sub]), /at least 10/);
     const reset = (await as(db, owner, `select admin_reset_mfa($1, 'Locked out after a phone change') r`, [victim.sub]))[0].r;
-    assert.deepEqual([reset.factors_removed, reset.sessions_ended], [1, 1]);
+    assert.deepEqual([reset.factors_removed, reset.sessions_ended], [1, 2], "the factor, and both sessions (the sign-in and the one added above)");
     assert.equal((await hook(victim.sub, true)).decision, "continue");
-    assert.equal((await as(db, victim, `select is_admin() a`))[0].a, true);
+    // GOV-FIX M-2: the reset ended every session, so an access token issued before it no longer carries console power.
+    assert.equal((await as(db, victim, `select is_admin() a`))[0].a, false);
+    const [fresh] = await sys(db, `insert into auth.sessions (user_id) values ($1) returning id`, [victim.sub]);
+    assert.equal((await as(db, ROLES.user(victim.sub, { session_id: fresh.id }), `select is_admin() a`))[0].a, true, "a new sign-in works");
     const [audit] = await sys(db, `select actor_id, details from admin_audit_logs where action = 'mfa.reset' and target_id = $1`, [victim.sub]);
     assert.equal(audit.actor_id, owner.sub);
     assert.equal(audit.details.reason, "Locked out after a phone change");

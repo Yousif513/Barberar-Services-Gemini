@@ -21,7 +21,8 @@ port = 54323
 [auth]
 site_url = "http://localhost:3000"
 additional_redirect_urls = ["http://localhost:3000/*", "exp://*"]
-jwt_expiry = 3600
+# GOV-FIX M-2: an access token outlives a revoked session by at most 15 minutes (the database also checks the session).
+jwt_expiry = 900
 
 # GOV-1 / Q6 (docs/legal/2026-10-10-adopted-decisions.md): every administrator enrols an authenticator app (TOTP) and the
 # database rejects administrator sessions below aal2. The hosted project must enable the same in Authentication settings.

@@ -50,7 +50,8 @@ CREATE TABLE IF NOT EXISTS auth.mfa_factors (
   status text NOT NULL DEFAULT 'verified', created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE TABLE IF NOT EXISTS auth.sessions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL, created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL, created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now(),
+  not_after timestamptz
 );
 GRANT USAGE ON SCHEMA auth TO anon, authenticated, service_role;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA auth TO anon, authenticated, service_role;
@@ -95,8 +96,12 @@ export async function createMigratedDb({ activateDemo = true } = {}) {
 // The claims Supabase Auth puts in a signed-in user's JWT after a password sign-in followed by a TOTP verification just now:
 // assurance level aal2 and an amr entry per method with its time. Admin commands require aal2 and, for sensitive ones, a TOTP
 // verification in the last 5 minutes (GOV-1). A test that needs a weaker session passes ROLES.user(id, { aal: "aal1", amr: [...] }).
+// session_id: Supabase Auth names the session in every access token, and the console role needs that session to still exist
+// (GOV-FIX M-2). createUser opens one session per user whose id equals the user's id; a test that needs a revoked or other
+// session passes ROLES.user(id, { session_id: ... }).
 export function sessionClaims(user, nowSeconds = Math.floor(Date.now() / 1000)) {
   return {
+    session_id: user.session_id ?? user.sub,
     aal: user.aal ?? "aal2",
     amr: user.amr ?? [{ method: "totp", timestamp: nowSeconds }, { method: "password", timestamp: nowSeconds - 60 }],
   };
@@ -147,6 +152,7 @@ export async function createUser(db, { role = "customer", phone = null, verified
   const id = `c0000000-0000-4000-8000-${String(counter).padStart(12, "0")}`;
   // The sign-in email is confirmed, as it is after a normal sign-up; out-of-band notices go only to confirmed contacts (GOV-FIX H-3).
   await sys(db, `insert into auth.users (id, email, email_confirmed_at) values ($1, $2, now())`, [id, `user${counter}@test.local`]);
+  await sys(db, `insert into auth.sessions (id, user_id) values ($1, $1) on conflict (id) do nothing`, [id]);
   await sys(db, `update profiles set role = $2::user_role, phone_number = $3, phone_verified = $4 where id = $1`,
     [id, role, phone, verified]);
   if (role === "admin") {

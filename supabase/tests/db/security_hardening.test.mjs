@@ -16,7 +16,8 @@ const count = async (action) => (await auditRows(action)).length;
 // commands, which run as the table owner with the administrator's own JWT; this reproduces that context so the audit
 // trigger is still proven for them.
 const asCommandFor = (user, sql, params = []) => db.transaction(async (tx) => {
-  await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify({ role: "authenticated", sub: user.sub, aal: "aal2",
+  // session_id: the console role needs the token's session to exist (GOV-FIX M-2); the harness session id is the user id.
+  await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify({ role: "authenticated", sub: user.sub, session_id: user.sub, aal: "aal2",
     amr: [{ method: "totp", timestamp: Math.floor(Date.now() / 1000) }] })]);
   return (await tx.query(sql, params)).rows;
 });

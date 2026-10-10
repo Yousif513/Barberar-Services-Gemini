@@ -47,7 +47,10 @@ DROP POLICY IF EXISTS "Administrators read console role history" ON public.admin
 CREATE POLICY "Administrators read console role history" ON public.admin_role_history
   FOR SELECT TO authenticated USING (public.is_admin());
 SELECT public.grant_data_api_access('public.admin_role_history');
-REVOKE INSERT, UPDATE, DELETE, TRUNCATE ON public.admin_role_history FROM anon, authenticated, service_role;
+SELECT public.attach_admin_audit_trigger('public.admin_role_history');
+-- Append-only: clients never write it; the service role may add a row but never changes or removes one.
+REVOKE INSERT, UPDATE, DELETE, TRUNCATE ON public.admin_role_history FROM anon, authenticated;
+REVOKE UPDATE, DELETE, TRUNCATE ON public.admin_role_history FROM service_role;
 
 CREATE OR REPLACE FUNCTION public.record_admin_role_history()
 RETURNS TRIGGER
