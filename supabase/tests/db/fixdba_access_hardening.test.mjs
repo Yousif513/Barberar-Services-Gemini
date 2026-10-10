@@ -60,8 +60,12 @@ describe("R11: hidden reviews are not public", () => {
       assert.equal(await visible(user, hiddenId), 0);
     }
   });
-  it("still shows the hidden review to its author, the business's staff and administrators", async () => {
-    for (const user of [customer, owner1, staff, manager, admin]) assert.equal(await visible(user, hiddenId), 1);
+  it("still shows the hidden review to its author and the business's staff; administrators read it through the audited list", async () => {
+    for (const user of [customer, owner1, staff, manager]) assert.equal(await visible(user, hiddenId), 1);
+    // GOV-FIX (Q4): a console session reads unpublished reviews (and reviewer ids) only through admin_list_reviews, which is logged.
+    assert.equal(await visible(admin, hiddenId), 0);
+    const listed = (await as(db, admin, `select admin_list_reviews(null, 200, 0, 'review_moderation') r`))[0].r;
+    assert.ok(listed.rows.some((r) => r.id === hiddenId));
   });
   it("leaves the public rating summary on published reviews", async () => {
     const r = (await as(db, ROLES.anon, `select rating::float8 rating, reviews::int n from provider_rating_summaries(array[$1]::uuid[])`, [SEED.provider1]))[0];

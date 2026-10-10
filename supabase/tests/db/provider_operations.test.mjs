@@ -28,10 +28,13 @@ async function booking({ status, price = 100, commission = 20, customerId = SEED
     [customerId, branchId, employeeId, svc.id, status, price, commission, cancelledBy]))[0].id;
 }
 // GOV-2 (Q4): per-employee figures (earnings come from the ledger) reach a console session only through the audited
-// admin_employee_performance_report; the branch view holds no personal or ledger data and is still read directly.
+// admin_employee_performance_report. GOV-FIX: console sessions read no bookings directly, so the branch figures come from
+// admin_branch_performance_report (the security-invoker view would show them nothing).
 const row = async (view, key, value) => (view === "admin_employee_performance"
   ? (await as(db, admin, `select admin_employee_performance_report(null, null) r`))[0].r.find((item) => item[key] === value)
-  : (await as(db, admin, `select * from ${view} where ${key} = $1`, [value]))[0]);
+  : view === "admin_branch_performance"
+    ? (await as(db, admin, `select * from admin_branch_performance_report() where ${key} = $1`, [value]))[0]
+    : (await as(db, admin, `select * from ${view} where ${key} = $1`, [value]))[0]);
 const n = (value) => Number(value);
 
 before(async () => {
