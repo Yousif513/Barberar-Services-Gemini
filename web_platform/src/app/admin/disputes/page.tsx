@@ -80,34 +80,16 @@ export default function AdminDisputes() {
     try {
       setLoading(true);
       setError("");
-      // Try payment_disputes table first
-      const { data, error: dbError } = await supabase
-        .from("payment_disputes")
-        .select(`
-          id,
-          disputed_amount_sar,
-          reason,
-          status,
-          created_at,
-          customer_id,
-          provider:providers(business_name_en, business_name_ar),
-          booking:bookings(id, status, scheduled_at)
-        `)
-        .order("created_at", { ascending: false });
+      // GOV-FIX (Q4): disputes come from the audited admin_list_disputes; the customer's name is included only for a console
+      // role holding personal.read, otherwise the screen shows the short id.
+      const { data: listed, error: dbError } = await supabase.rpc("admin_list_disputes", { p_status: null, p_limit: 200, p_offset: 0, p_purpose: "dispute_resolution" });
 
       if (dbError) throw dbError;
+      const data = ((listed as { rows?: Array<Record<string, any>> } | null)?.rows ?? []);
 
-      if (data && data.length > 0) {
-        // GOV-2 (Q4): customer names come from the audited admin_people_names (logged with the ids it resolved), not a join.
-        const ids = [...new Set(data.map((d) => d.customer_id).filter((id): id is string => Boolean(id)))];
-        const names = new Map<string, { first_name: string | null; last_name: string | null }>();
-        if (ids.length > 0) {
-          const { data: people, error: namesError } = await supabase.rpc("admin_people_names", { p_ids: ids, p_purpose: "dispute_resolution" });
-          if (namesError) throw namesError;
-          for (const person of (people ?? []) as Array<{ id: string; first_name: string | null; last_name: string | null }>) names.set(person.id, person);
-        }
+      if (data.length > 0) {
         setDisputes(data.map(d => {
-          const cust = d.customer_id ? names.get(d.customer_id) : undefined;
+          const cust = d.customer as { first_name: string | null; last_name: string | null } | null | undefined;
           const prov = d.provider as any;
           const bk = d.booking as any;
           return {

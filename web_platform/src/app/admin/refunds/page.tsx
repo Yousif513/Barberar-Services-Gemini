@@ -206,15 +206,13 @@ export default function AdminRefundsPage() {
     const load = async () => {
       setLoading(true);
       setLoadError("");
-      let query = supabase
-        .from("refund_requests")
-        .select("id, amount, reason, source, status, attempts, error_message, created_at, processed_at, claimed_at, booking_id, bookings ( invoice_number )", { count: "exact" })
-        .order("created_at", { ascending: false })
-        .order("id", { ascending: true })
-        .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
-      if (filter === "attention") query = query.in("status", ["pending", "processing", "failed"]);
-      else if (filter !== "all") query = query.eq("status", filter);
-      const { data, error, count } = await query;
+      // GOV-FIX (Q4): the refunds queue is read through the audited, server-paged admin_list_refund_requests.
+      const { data: result, error } = await supabase.rpc("admin_list_refund_requests", {
+        p_filter: filter, p_limit: PAGE_SIZE, p_offset: (page - 1) * PAGE_SIZE, p_purpose: "finance_operations",
+      });
+      const listed = result as { total?: number | string; rows?: RefundRow[] } | null;
+      const data = listed?.rows ?? [];
+      const count = Number(listed?.total ?? 0);
       if (cancelled) return;
       if (error) {
         setRows([]);

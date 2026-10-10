@@ -29,7 +29,7 @@ type AdminService = {
 };
 
 // Booking, revenue and review totals for one branch or a whole provider. They come from
-// admin_branch_performance (bookings and published reviews); nothing here is estimated.
+// admin_branch_performance (bookings and published reviews), read through admin_branch_performance_report; nothing here is estimated.
 type Tally = {
   totalBookings: number;
   completedBookings: number;
@@ -294,6 +294,7 @@ const copy = {
     nameRequired: "Both business names are required.",
     invalidEmail: "Enter a valid email address or leave it empty.",
     loadFailed: "Could not load providers.",
+    privateHidden: "Contact details, registration numbers and internal notes are hidden for your console role (personal data needs Operations or Owner).",
     metricsFailed: "Performance figures could not be loaded, so none are shown: {reason}",
     metricsUnavailable: "Performance figures are unavailable right now.",
     applicationsFailed: "Applications could not be loaded: {reason}",
@@ -407,6 +408,7 @@ const copy = {
     nameRequired: "اسم النشاط مطلوب بالإنجليزية والعربية.",
     invalidEmail: "أدخل بريداً إلكترونياً صحيحاً أو اتركه فارغاً.",
     loadFailed: "تعذر تحميل المزودين.",
+    privateHidden: "بيانات التواصل وأرقام السجل والملاحظات الداخلية مخفية لدورك في لوحة الإدارة (البيانات الشخصية تحتاج دور العمليات أو المالك).",
     metricsFailed: "تعذر تحميل أرقام الأداء، لذا لا تُعرض أي أرقام: {reason}",
     metricsUnavailable: "أرقام الأداء غير متاحة حالياً.",
     applicationsFailed: "تعذر تحميل الطلبات: {reason}",
@@ -572,6 +574,7 @@ export default function AdminProviderManagement() {
   const [crDialog, setCrDialog] = useState<{ kind: "wathq" | "manual"; providerId: string; applicationId?: string; cr: string; name: string } | null>(null);
   const [statusPending, setStatusPending] = useState<{ provider: ProviderRecord; next: DbProviderStatus; actionLabel: string } | null>(null);
   const [metricsError, setMetricsError] = useState("");
+  const [privateHidden, setPrivateHidden] = useState(false);
   const params = useSearchParams();
   const [query, setQuery] = useState(() => params.get("q") ?? "");
   const [statusFilter, setStatusFilter] = useState<"all" | ApplicationStatus | AccountStatus>(() =>
@@ -748,14 +751,17 @@ export default function AdminProviderManagement() {
 
       // Contact details, registration numbers, commission and the review notes are not readable from the table by signed-in users;
       // administrators read them through one audited command.
-      const privateResult = await supabase.rpc("admin_provider_private_directory");
-      if (privateResult.error) throw privateResult.error;
+      // GOV-FIX (Q4): the directory needs personal.read and is logged; finance and analyst see the list without these fields.
+      const privateResult = await supabase.rpc("admin_provider_private_directory", { p_purpose: "provider_onboarding" });
+      const privateForbidden = Boolean(privateResult.error) && (privateResult.error as { hint?: string } | null)?.hint === "console_role_forbidden";
+      if (privateResult.error && !privateForbidden) throw privateResult.error;
+      setPrivateHidden(privateForbidden);
       const privateById = new Map(((privateResult.data ?? []) as Array<{ provider_id: string }>).map((row) => [row.provider_id, row]));
 
       // Branch and employee figures come from their own views. If either fails nothing is estimated in
       // its place: the screen says so and shows no figures.
       const [branchResult, employeeResult] = await Promise.all([
-        supabase.from("admin_branch_performance").select("*"),
+        supabase.rpc("admin_branch_performance_report"),
         // GOV-2 (Q4): per-employee figures (earnings come from the ledger) are read through the audited report.
         supabase.rpc("admin_employee_performance_report", { p_provider_id: null, p_purpose: "provider_onboarding" })
       ]);
@@ -1060,6 +1066,11 @@ export default function AdminProviderManagement() {
       {metricsError && (
         <div role="alert" className="rounded-xl border border-[#FEDF89] bg-[#FFFAEB] px-4 py-3 text-xs font-bold text-[#B54708]">
           {fill(t.metricsFailed, { reason: metricsError })}
+        </div>
+      )}
+      {privateHidden && (
+        <div role="note" className="rounded-xl border border-[#D0D5DD] bg-[#F9FAFB] px-4 py-3 text-xs font-bold text-[#344054]">
+          {t.privateHidden}
         </div>
       )}
 

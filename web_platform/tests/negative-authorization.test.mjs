@@ -864,7 +864,8 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         join(webPlatformDir, "src/app/admin/disputes/page.tsx"),
         "utf8"
       );
-      assert.ok(adminDisputesCode.includes("payment_disputes"), "Admin disputes must query payment_disputes table");
+      // GOV-FIX (Q4): payment_disputes is read through the audited admin_list_disputes.
+      assert.ok(adminDisputesCode.includes('rpc("admin_list_disputes"'), "Admin disputes must read payment_disputes through the audited list");
       assert.ok(adminDisputesCode.includes("resolve_booking_dispute"), "Admin disputes must call resolve_booking_dispute RPC");
       assert.ok(!adminDisputesCode.includes("d-mock-1"), "Admin disputes must have no fake mock disputes");
 

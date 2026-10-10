@@ -103,7 +103,8 @@ describe("admin console guards", () => {
     assert.ok(dashboard.includes('rpc("admin_dashboard_overview")'), "dashboard figures come from the server summary");
     assert.ok(!/May 1\d|Emma Johnson|Liam Johnson|Olivia Brown|chartPoints/.test(dashboard), "no invented people, dates or chart points");
     const refunds = page("/refunds");
-    assert.ok(refunds.includes('from("refund_requests")'), "the refund queue reads refund_requests");
+    // GOV-FIX (Q4): the queue is read through the audited, server-paged function, never refund_requests directly.
+    assert.ok(refunds.includes('rpc("admin_list_refund_requests"') && !refunds.includes('from("refund_requests")'), "the refund queue reads refund_requests through the audited list");
     assert.ok(refunds.includes('rpc("admin_retry_refund_request"'), "a retry is recorded with a reason first");
     assert.ok(refunds.includes('functions.invoke("process-refund"'), "money moves only through process-refund");
     assert.ok(refunds.includes('rpc("admin_reopen_stuck_refund"'), "a refund stuck in progress can be reopened by an operator");
@@ -128,8 +129,9 @@ describe("admin console guards", () => {
 
   it("provider management shows recorded figures and changes status through one audited command", () => {
     const providers = files.find((f) => f.path === `${ADMIN_ROOT}/providers/provider-management.tsx`).code;
-    // GOV-2: per-employee figures come from the audited report; branch figures still from their view.
-    for (const source of ['from("admin_branch_performance")', 'rpc("admin_employee_performance_report"']) {
+    // GOV-2: per-employee figures come from the audited report. GOV-FIX: branch figures from admin_branch_performance_report
+    // (console sessions read no bookings, so the security-invoker view would show them nothing).
+    for (const source of ['rpc("admin_branch_performance_report")', 'rpc("admin_employee_performance_report"']) {
       assert.ok(providers.includes(source), `performance figures must come from ${source}`);
     }
     assert.ok(providers.includes('rpc("admin_set_provider_status"'), "approve, reject, suspend and reactivate run as a server command with a reason");
@@ -254,9 +256,9 @@ describe("admin console guards", () => {
   });
 
   it("paginated lists end their sort on the row ID so rows that share a time are neither repeated nor skipped", () => {
-    for (const route of ["/audit-logs", "/refunds"]) {
-      assert.ok(/\.order\("id"/.test(page(route)), `${route} breaks ties on id`);
-    }
+    assert.ok(/\.order\("id"/.test(page("/audit-logs")), "/audit-logs breaks ties on id");
+    // GOV-FIX: the refunds list is paged on the server, which breaks ties on id.
+    assert.ok(read("supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql").includes("ORDER BY rr.created_at DESC, rr.id"), "/refunds breaks ties on id on the server");
     assert.ok(read("supabase/migrations/20261005180000_admin_booking_directory.sql").includes("ORDER BY scheduled_at DESC, id"), "the booking directory breaks ties on id on the server");
   });
 

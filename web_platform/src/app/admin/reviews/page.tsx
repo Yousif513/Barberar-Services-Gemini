@@ -74,33 +74,13 @@ export default function AdminReviews() {
     try {
       setLoading(true);
       setActionError("");
-      const { data, error } = await supabase
-        .from("reviews")
-        .select(`
-          id,
-          rating,
-          comment,
-          created_at,
-          moderation_status,
-          reply_comment,
-          reply_created_at,
-          customer_id,
-          provider:providers(business_name_en, business_name_ar),
-          employee:employees(name_en, name_ar)
-        `)
-        .order("created_at", { ascending: false });
+      // GOV-FIX (Q4): reviews in every moderation state come from the audited admin_list_reviews (operations and owner);
+      // reviewers' names are included only with personal.read. The newest 200 are shown.
+      const { data, error } = await supabase.rpc("admin_list_reviews", { p_status: null, p_limit: 200, p_offset: 0, p_purpose: "review_moderation" });
 
       if (error) throw error;
-      // GOV-2 (Q4): reviewers' names come from the audited admin_people_names (logged with the ids it resolved).
-      const rows = (data ?? []) as Array<Record<string, any>>;
-      const ids = [...new Set(rows.map((row) => row.customer_id as string | null).filter((id): id is string => Boolean(id)))];
-      const names = new Map<string, { first_name: string | null; last_name: string | null }>();
-      if (ids.length > 0) {
-        const { data: people, error: namesError } = await supabase.rpc("admin_people_names", { p_ids: ids, p_purpose: "review_moderation" });
-        if (namesError) throw namesError;
-        for (const person of (people ?? []) as Array<{ id: string; first_name: string | null; last_name: string | null }>) names.set(person.id, person);
-      }
-      setReviews(rows.map((row) => ({ ...row, customer: row.customer_id ? names.get(row.customer_id) ?? null : null })));
+      const rows = ((data as { rows?: Array<Record<string, any>> } | null)?.rows ?? []);
+      setReviews(rows);
     } catch (err: any) {
       console.warn("Failed to load live reviews:", err.message);
       setActionError(err?.message || "Failed to sync reviews from database.");

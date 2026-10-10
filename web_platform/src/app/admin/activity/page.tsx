@@ -68,12 +68,13 @@ export default function AdminActivityPage() {
     (async () => {
       try {
         const [bookingRes, providerRes] = await Promise.all([
-          supabase.from("bookings").select("id, status, total_price, created_at, services(name_en, name_ar)").order("created_at", { ascending: false }).limit(6),
+          // GOV-FIX (Q4): bookings come from the audited admin_recent_bookings, never a direct table read.
+          supabase.rpc("admin_recent_bookings", { p_limit: 6, p_purpose: "customer_support" }),
           supabase.from("providers").select("id, business_name_en, business_name_ar, is_verified, created_at").order("created_at", { ascending: false }).limit(4)
         ]);
         if (bookingRes.error) throw bookingRes.error;
         if (providerRes.error) throw providerRes.error;
-        const bookings = bookingRes.data;
+        const bookings = ((bookingRes.data as { rows?: Array<{ id: string; status: string; total_price: number | string; created_at: string; services: unknown }> } | null)?.rows ?? []);
         const providers = providerRes.data;
         const mapped: ActivityEvent[] = [];
         (bookings ?? []).forEach((b) => {

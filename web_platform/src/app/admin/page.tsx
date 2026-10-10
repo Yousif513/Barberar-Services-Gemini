@@ -263,11 +263,8 @@ export default function AdminDashboardPage() {
       setLoading(true);
       const [overviewResult, bookingsResult, auditResult, userResult] = await Promise.all([
         supabase.rpc("admin_dashboard_overview"),
-        supabase
-          .from("bookings")
-          .select("id, scheduled_at, status, total_price, services ( name_en, name_ar ), branches ( name_en, name_ar, providers ( business_name_en, business_name_ar ) )")
-          .order("created_at", { ascending: false })
-          .limit(5),
+        // GOV-FIX (Q4): console sessions read no booking rows directly; the audited admin_recent_bookings carries nothing about the customer.
+        supabase.rpc("admin_recent_bookings", { p_limit: 5, p_purpose: "customer_support" }),
         supabase
           .from("admin_audit_logs")
           .select("id, action, target_type, actor_id, created_at")
@@ -280,7 +277,7 @@ export default function AdminDashboardPage() {
       setOverview(overviewResult.error ? null : (overviewResult.data as Overview));
       setOverviewError(overviewResult.error ? errorMessage(overviewResult.error) : "");
       setOverviewForbidden(Boolean(overviewResult.error) && isForbidden(overviewResult.error));
-      setBookings(bookingsResult.error ? null : ((bookingsResult.data ?? []) as unknown as RecentBooking[]));
+      setBookings(bookingsResult.error ? null : (((bookingsResult.data as { rows?: RecentBooking[] } | null)?.rows ?? []) as RecentBooking[]));
       setBookingsError(bookingsResult.error ? errorMessage(bookingsResult.error) : "");
 
       if (auditResult.error) {
