@@ -62,6 +62,38 @@
         "url": "https://nextjs.org/docs/app/api-reference/directives/use-client",
         "checkedOn": "2026-10-04",
         "topic": "Next.js client boundary (consulted bundled node_modules/next/dist/docs/01-app/03-api-reference/01-directives/use-client.md)"
+      },
+      {
+        "appliedTo": [
+          "admin-governance"
+        ],
+        "url": "https://supabase.com/docs/guides/auth/auth-mfa",
+        "checkedOn": "2026-10-10",
+        "topic": "Supabase MFA: aal claim, amr array of {method,timestamp}, enforcing aal2 in RLS"
+      },
+      {
+        "appliedTo": [
+          "admin-governance"
+        ],
+        "url": "https://supabase.com/docs/guides/auth/auth-mfa/totp",
+        "checkedOn": "2026-10-10",
+        "topic": "supabase-js mfa.enroll/challenge/verify/listFactors/getAuthenticatorAssuranceLevel (types checked in node_modules/@supabase/auth-js 2.108.1)"
+      },
+      {
+        "appliedTo": [
+          "admin-governance"
+        ],
+        "url": "https://supabase.com/docs/guides/auth/auth-hooks/mfa-verification-hook",
+        "checkedOn": "2026-10-10",
+        "topic": "MFA verification attempt hook: input {factor_id,user_id,valid}, output decision reject/continue, supabase_auth_admin grants"
+      },
+      {
+        "appliedTo": [
+          "admin-governance"
+        ],
+        "url": "https://supabase.com/docs/guides/local-development/cli/config",
+        "checkedOn": "2026-10-10",
+        "topic": "config.toml keys: auth.mfa.totp, auth.sessions timebox/inactivity_timeout, auth.hook.mfa_verification_attempt"
       }
     ],
     "volumes": {
@@ -1240,8 +1272,8 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "implemented",
-          "rationale": "Server command with a required reason, per-row idempotency key and audit entry, behind a dialog that names the entry (round 3). Built by impl-claude-release-gaps; unreviewed.",
+          "status": "in-progress",
+          "rationale": "Server command with a required reason, per-row idempotency key and audit entry, behind a dialog that names the entry (round 3). Built by impl-claude-release-gaps; unreviewed. GOV-1 (impl-gov1-claude, 2026-10-10): admin_release_payout now records a pending approval; a different administrator with money.payout approves and the release runs in the approver's session, only to an approved payout account after its 48-hour hold. Re-review needed.",
           "entityStates": {
             "from": [
               "pending"
@@ -1281,7 +1313,7 @@
             "supabase/tests/db/qa_defect_fixes.test.mjs#L175"
           ],
           "owner": "",
-          "reviewStatus": "reviewed",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "qa-claude-release-gate"
         },
         {
@@ -1501,8 +1533,8 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "implemented",
-          "rationale": "Server command with a required reason and a transition matrix, behind a dialog that names the request (round 3). Built by impl-claude-release-gaps; unreviewed.",
+          "status": "in-progress",
+          "rationale": "Server command with a required reason and a transition matrix, behind a dialog that names the request (round 3). Built by impl-claude-release-gaps; unreviewed. GOV-1 (impl-gov1-claude, 2026-10-10): admin_review_payout_request needs money.payout (finance/owner). Re-review needed.",
           "entityStates": {
             "from": [
               "requested"
@@ -1541,7 +1573,7 @@
             "supabase/tests/db/release_controls.test.mjs#L38"
           ],
           "owner": "",
-          "reviewStatus": "reviewed",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "qa-claude-release-gate"
         },
         {
@@ -1600,8 +1632,8 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "implemented",
-          "rationale": "Allocating, idempotent, reasoned release with typed-amount confirmation (round 3). Money behaviour at the bank is outside what this repository can verify. Built by impl-claude-release-gaps; unreviewed.",
+          "status": "in-progress",
+          "rationale": "Allocating, idempotent, reasoned release with typed-amount confirmation (round 3). Money behaviour at the bank is outside what this repository can verify. Built by impl-claude-release-gaps; unreviewed. GOV-1 (impl-gov1-claude, 2026-10-10): marking paid is the approved release only; a direct status change to paid is refused by trg_guard_payout_request_paid. Re-review needed.",
           "entityStates": {
             "from": [
               "requested",
@@ -1642,7 +1674,7 @@
             "supabase/tests/db/qa_adversarial.test.mjs#L173"
           ],
           "owner": "",
-          "reviewStatus": "reviewed",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "qa-claude-release-gate"
         }
       ]
@@ -1741,7 +1773,7 @@
           ],
           "risk": "critical",
           "status": "in-progress",
-          "rationale": "process-refund authenticates the caller (admin or scheduler), claims one refund_requests row, refunds exactly its amount through Tap with the row's idempotency key and records the result in complete_refund_request inside one transaction (impl-claude-release-gaps reassessment). Gateway behaviour unverified from this machine.",
+          "rationale": "process-refund authenticates the caller (admin or scheduler), claims one refund_requests row, refunds exactly its amount through Tap with the row's idempotency key and records the result in complete_refund_request inside one transaction (impl-claude-release-gaps reassessment). Gateway behaviour unverified from this machine. GOV-1 (impl-gov1-claude, 2026-10-10): refunds >= SAR 1,000 or past SAR 5,000 per administrator per Riyadh day go through admin_request_refund / approval; money.refund and step-up required; process-refund Edge Function checks money.refund. Re-review needed.",
           "entityStates": "{\"from\": [\"pending\", \"failed\"], \"to\": [\"processing\", \"succeeded\", \"failed\"]}",
           "uiRoutes": [
             "/admin/refunds"
@@ -3209,7 +3241,7 @@
           ],
           "risk": "critical",
           "status": "in-progress",
-          "rationale": "Audit rows are now emitted in two ways: the trigger trg_audit_admin_write records every operator insert, update and delete on every table an administrator policy can write (with actor, before and after values by per-table allow-list, and the reason set by the command), and reasoned commands write named entries with write_audit_log. security_hardening.test.mjs derives the writable tables from the policies and fails when one lacks the trigger. Open: refused and failed attempts are not recorded, service-key function paths leave no operator entry, and nothing makes the log tamper-evident (gaps refused-and-failed-admin-actions-are-not-recorded, service-key-edge-function-paths-leave-no-audit-entry, audit-trail-is-not-tamper-evident-beyond-rls). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented.",
+          "rationale": "Audit rows are now emitted in two ways: the trigger trg_audit_admin_write records every operator insert, update and delete on every table an administrator policy can write (with actor, before and after values by per-table allow-list, and the reason set by the command), and reasoned commands write named entries with write_audit_log. security_hardening.test.mjs derives the writable tables from the policies and fails when one lacks the trigger. Open: refused and failed attempts are not recorded, service-key function paths leave no operator entry, and nothing makes the log tamper-evident (gaps refused-and-failed-admin-actions-are-not-recorded, service-key-edge-function-paths-leave-no-audit-entry, audit-trail-is-not-tamper-evident-beyond-rls). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented. GOV-1 (impl-gov1-claude, 2026-10-10): admin_audit_logs is append-only for every role including service_role and the owner (trigger); actor FK dropped so erasure cannot rewrite history; purge_expired_audit_logs keeps 5 years (not scheduled).",
           "entityStates": {
             "from": [
               "recorded"
@@ -3819,7 +3851,7 @@
           ],
           "risk": "high",
           "status": "in-progress",
-          "rationale": "admin_role_directory pages on the server, lists customers only when searched for (at least 3 characters), and records that the directory was read without the search text. Lists names and emails, hence high. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "rationale": "admin_role_directory pages on the server, lists customers only when searched for (at least 3 characters), and records that the directory was read without the search text. Lists names and emails, hence high. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed. GOV-1 (impl-gov1-claude, 2026-10-10): rows now carry console_role, mfa_enrolled and mfa_locked; every console role may read.",
           "entityStates": "{\"from\": [\"customer\", \"provider_owner\", \"admin\"], \"to\": []}",
           "uiRoutes": [
             "/admin/roles"
@@ -3860,7 +3892,7 @@
           ],
           "risk": "critical",
           "status": "in-progress",
-          "rationale": "set_user_role needs a reason of at least 3 characters, refuses changing your own role, refuses removing the last administrator under an advisory lock and writes an audit entry with before, after and reason. No second approver and no recent re-authentication (owner decisions, gaps no-separation-of-duties and admin-sessions-have-no-mfa-or-step-up). Provider roles are created by approving an application, not here. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "rationale": "set_user_role needs a reason of at least 3 characters, refuses changing your own role, refuses removing the last administrator under an advisory lock and writes an audit entry with before, after and reason. No second approver and no recent re-authentication (owner decisions, gaps no-separation-of-duties and admin-sessions-have-no-mfa-or-step-up). Provider roles are created by approving an application, not here. Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed. GOV-1 (impl-gov1-claude, 2026-10-10): the screen now uses admin_set_console_role (owner/finance/operations/analyst, owner only, 10-character reason, step-up, last-owner guard, alert and notice); set_user_role needs roles.manage, step-up and keeps the last owner.",
           "entityStates": {
             "from": [
               "customer",
@@ -4754,6 +4786,291 @@
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "admin-governance",
+      "name": "Administrator governance (console roles, MFA, maker-checker approvals, break-glass, IBAN control)",
+      "sourceOfTruth": "postgres:public.admin_role_assignments, public.admin_approval_requests, public.provider_payout_destinations, auth.mfa_factors",
+      "sensitivity": "restricted",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "pending",
+        "approved",
+        "rejected",
+        "executed",
+        "cancelled"
+      ],
+      "lifecycleTransitions": [],
+      "retention": "Approval requests and break-glass reviews are kept with the audit log for 5 years (Q4/Q6).",
+      "capabilities": [
+        {
+          "id": "gov.console-roles",
+          "outcome": "Assign owner, finance, operations or analyst console roles with reason, step-up and a last-owner guard",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "reviewStatus": "unreviewed",
+          "rationale": "D-Q5: four console roles in admin_role_assignments; admin_can(permission) narrows 75 changing commands and, through restrictive policies, every direct administrator table write; operations and analyst hold no money permission; analyst holds none. admin_set_console_role is owner-only with a 10-character reason, step-up, never your own account and never the last owner; audited, alerted and notified. Existing administrators were mapped to owner. Built by impl-gov1-claude 2026-10-10; unreviewed.",
+          "entityStates": "{\"from\": [\"customer\", \"analyst\", \"operations\", \"finance\", \"owner\"], \"to\": [\"customer\", \"analyst\", \"operations\", \"finance\", \"owner\"]}",
+          "uiRoutes": [
+            "/admin/roles"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L594",
+            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L257"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L440",
+            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L247"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L656"
+          ],
+          "safeguards": [
+            "supabase/tests/db/gov1_console_roles_mfa.test.mjs#L141",
+            "supabase/tests/db/gov1_console_roles_mfa.test.mjs#L152"
+          ],
+          "dataBinding": "postgres:public.admin_role_assignments",
+          "tests": [
+            "supabase/tests/db/gov1_console_roles_mfa.test.mjs",
+            "web_platform/tests/gov1-governance-screens.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/roles/page.tsx",
+            "supabase/tests/db/gov1_console_roles_mfa.test.mjs#L46"
+          ],
+          "idempotency": "",
+          "concurrency": "pg_advisory_xact_lock('primora.set_user_role') serialises role changes",
+          "recovery": "",
+          "owner": ""
+        },
+        {
+          "id": "gov.mfa",
+          "outcome": "Enrol and verify an authenticator app; every admin session must be AAL2; step-up within 5 minutes for sensitive actions; lockout after 10 failures; MFA reset by a different admin",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "reviewStatus": "unreviewed",
+          "rationale": "Q6: TOTP enrolment and challenge at /login/mfa; AuthGuard sends an administrator without aal2 there; is_admin() requires aal2 so RLS, RPCs and Edge Functions refuse aal1 sessions; require_recent_mfa() checks the amr TOTP timestamp within 5 minutes before payouts, refunds, ledger actions, deletion, export, IBAN reveal, role changes, MFA reset and break-glass; the console asks for a fresh code and repeats the request. MFA verification hook locks after 10 consecutive failures and alerts. admin_reset_mfa by a different owner with reason and step-up. Sessions 12h/30m in config.toml plus a 30-minute console idle sign-out. Unreviewed.",
+          "entityStates": "{\"from\": [\"aal1\"], \"to\": [\"aal2\", \"locked\"]}",
+          "uiRoutes": [
+            "/login/mfa",
+            "/admin/roles"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L285",
+            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L679",
+            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L770"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L247"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L51"
+          ],
+          "safeguards": [
+            "supabase/tests/db/gov1_console_roles_mfa.test.mjs#L109",
+            "supabase/tests/db/gov1_console_roles_mfa.test.mjs#L167"
+          ],
+          "dataBinding": "auth.mfa_factors and the session JWT (aal, amr) via public.mfa_verification_failures",
+          "tests": [
+            "supabase/tests/db/gov1_console_roles_mfa.test.mjs",
+            "web_platform/tests/gov1-governance-screens.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/login/mfa/page.tsx",
+            "web_platform/src/components/step-up-dialog.tsx",
+            "web_platform/src/components/auth-guard.tsx",
+            "supabase/config.toml"
+          ],
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "owner": ""
+        },
+        {
+          "id": "gov.approvals",
+          "outcome": "Request, approve or reject payouts, refunds over thresholds, IBAN changes and governance settings with a different approver",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "reviewStatus": "unreviewed",
+          "rationale": "D-Q5: admin_approval_requests; admin_release_payout records every payout for a second administrator; refunds >= SAR 1,000 or past SAR 5,000 per admin per Riyadh day (governance_settings) wait too; admin_decide_approval refuses self-approval for every role, requires the kind's permission and step-up, and runs the original command in the approver's session under a one-time token. Thresholds change only through an approved setting_change. Inbox at /admin/approvals with per-item bulk approval. Unreviewed.",
+          "entityStates": "{\"from\": [\"pending\"], \"to\": [\"approved\", \"rejected\", \"cancelled\"]}",
+          "uiRoutes": [
+            "/admin/approvals",
+            "/admin/ledger",
+            "/admin/disputes"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L380",
+            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L650",
+            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L341",
+            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L281"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L411"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L432"
+          ],
+          "safeguards": [
+            "supabase/tests/db/gov1_maker_checker.test.mjs#L56",
+            "supabase/tests/db/gov1_maker_checker.test.mjs#L80",
+            "supabase/tests/db/gov1_maker_checker.test.mjs#L98"
+          ],
+          "dataBinding": "postgres:public.admin_approval_requests",
+          "tests": [
+            "supabase/tests/db/gov1_maker_checker.test.mjs",
+            "supabase/tests/db/money.test.mjs",
+            "web_platform/tests/gov1-governance-screens.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/approvals/page.tsx",
+            "supabase/tests/db/gov1_maker_checker.test.mjs#L56"
+          ],
+          "idempotency": "one pending request per (kind, target); execution keeps admin_release_payout's idempotency key",
+          "concurrency": "row lock on the request; partial unique index on pending (kind, target_id)",
+          "recovery": "a rejected or cancelled request changes nothing; a failed execution rolls the decision back",
+          "owner": ""
+        },
+        {
+          "id": "gov.break-glass",
+          "outcome": "Owner executes an approval alone when no second eligible admin exists, with step-up, justification, daily cap, notice and 7-day review",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "reviewStatus": "unreviewed",
+          "rationale": "D-Q5: admin_break_glass_execute for an owner who is the requester when no second eligible administrator exists; step-up, justification >= 20 characters, daily cap SAR 10,000 (governance setting), out-of-band notice rows to every owner, security alert, review due in 7 days signed off with reviewer name and document reference; refused for iban_change and setting_change. Unreviewed.",
+          "entityStates": "{\"from\": [\"pending\"], \"to\": [\"approved\"]}",
+          "uiRoutes": [
+            "/admin/approvals"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L496",
+            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L567"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L496"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L557"
+          ],
+          "safeguards": [
+            "supabase/tests/db/gov1_maker_checker.test.mjs"
+          ],
+          "dataBinding": "postgres:public.break_glass_reviews",
+          "tests": [
+            "supabase/tests/db/gov1_maker_checker.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/approvals/page.tsx"
+          ],
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "owner": ""
+        },
+        {
+          "id": "gov.iban-reveal",
+          "outcome": "Reveal a provider IBAN once for 60 seconds with a referenced reason; masked everywhere else",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "reviewStatus": "unreviewed",
+          "rationale": "Q3: payout_requests.iban is no longer selectable by any client (iban_masked replaces it); provider_payout_destinations has no client privilege. reveal_provider_iban: finance/owner, step-up, reason >= 15 characters with a ticket or payout reference, returns the value with a 60-second expiry; audit event without the IBAN (actor, provider, reason, IP, user agent); alert after more than 10 reveals in 24 hours. Ledger shows it once for at most 60 seconds. Unreviewed.",
+          "entityStates": "{\"from\": [], \"to\": []}",
+          "uiRoutes": [
+            "/admin/ledger"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010120000_gov1_iban_controls.sql#L363"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010120000_gov1_iban_controls.sql#L93"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261010120000_gov1_iban_controls.sql#L393"
+          ],
+          "safeguards": [
+            "supabase/tests/db/gov1_iban.test.mjs#L58",
+            "supabase/tests/db/gov1_iban.test.mjs#L75"
+          ],
+          "dataBinding": "postgres:public.provider_payout_destinations",
+          "tests": [
+            "supabase/tests/db/gov1_iban.test.mjs",
+            "web_platform/tests/gov1-governance-screens.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/admin/ledger/page.tsx",
+            "supabase/tests/db/gov1_iban.test.mjs#L37"
+          ],
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "owner": ""
+        },
+        {
+          "id": "gov.iban-change",
+          "outcome": "Provider changes payout IBAN after re-authentication; finance approves; 48-hour hold; notices to contacts",
+          "kind": "command",
+          "roles": [
+            "admin",
+            "provider-owner"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "reviewStatus": "unreviewed",
+          "rationale": "Q3/D-Q5: provider_request_payout_destination needs the provider owner signed in within 10 minutes; a finance or owner approver (never the requester, never break-glass) activates it with a 48-hour payout hold; notices queued to the provider owner's verified channels at request, approval and rejection; payouts release only to the approved account after the hold. Wallet screen shows the masked account, its hold and pending change. Unreviewed.",
+          "entityStates": "{\"from\": [\"pending\"], \"to\": [\"active\", \"rejected\", \"cancelled\", \"superseded\"]}",
+          "uiRoutes": [
+            "/provider/wallet",
+            "/admin/approvals"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010120000_gov1_iban_controls.sql#L149",
+            "supabase/migrations/20261010120000_gov1_iban_controls.sql#L211"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010120000_gov1_iban_controls.sql#L149"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261010120000_gov1_iban_controls.sql#L141"
+          ],
+          "safeguards": [
+            "supabase/tests/db/gov1_iban.test.mjs#L86",
+            "supabase/tests/db/gov1_iban.test.mjs#L102"
+          ],
+          "dataBinding": "postgres:public.provider_payout_destinations",
+          "tests": [
+            "supabase/tests/db/gov1_iban.test.mjs",
+            "web_platform/tests/gov1-governance-screens.test.mjs"
+          ],
+          "evidence": [
+            "web_platform/src/app/provider/wallet/page.tsx",
+            "supabase/tests/db/gov1_iban.test.mjs#L102"
+          ],
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "owner": ""
         }
       ]
     }
@@ -6303,6 +6620,49 @@
       "appliesTo": [
         "admin-dashboard"
       ]
+    },
+    {
+      "id": "adopted-d-q5-roles-maker-checker",
+      "decision": "Adopt D-Q5 as written: roles owner, finance, operations, analyst; operations and analyst hold no money permission (server-enforced); a different admin approves every payout batch, every provider IBAN creation or change, any single refund >= SAR 1,000 and cumulative refunds > SAR 5,000 per admin per day; self-approval rejected by the server including for owner; owner break-glass only when no second eligible admin exists, with MFA step-up, written justification (>= 20 characters), daily cap SAR 10,000, out-of-band notification, independent review within 7 days, never for IBAN changes.",
+      "reason": "Owner adopted the Final decision text of the money-governance memo on 2026-10-10 (plan of record).",
+      "evidence": [
+        "docs/legal/2026-10-10-adopted-decisions.md#L19",
+        "docs/legal/2026-10-10-money-governance-decision-memo.md#L75"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "admin-governance",
+        "payout-request",
+        "refund-request",
+        "role-assignment"
+      ]
+    },
+    {
+      "id": "adopted-q6-mfa-step-up-sessions",
+      "decision": "Adopt Q6 as written: TOTP for every admin role before first access; sessions without aal2 rejected server-side (RLS, RPCs, Edge Functions); step-up = fresh MFA within 5 minutes from the amr timestamp before payouts, refunds, ledger adjustments, personal-data deletion, export, IBAN reveal or change, role changes, MFA reset of another user and break-glass; MFA reset only by a different admin with reason and step-up; sessions 12h absolute / 30m idle; 10 failed MFA attempts lock the account and raise an alert.",
+      "reason": "Owner adopted the Final decision text of the privacy memo on 2026-10-10 (plan of record).",
+      "evidence": [
+        "docs/legal/2026-10-10-adopted-decisions.md#L20",
+        "docs/legal/2026-10-10-privacy-decision-memo.md#L194"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "admin-governance"
+      ]
+    },
+    {
+      "id": "adopted-q3-iban",
+      "decision": "Adopt Q3 as written: IBANs returned to every client masked (SA** **** **** **** **** 1234); unmasked only through reveal_provider_iban(provider_id, reason) for finance (and owner per the adopted-decisions table), AAL2 with step-up in the last 5 minutes, reason >= 15 characters including a ticket or payout reference, shown once for <= 60 seconds, never in lists, exports or logs, append-only audit (actor, provider, reason, time, IP, user agent), alert after more than 10 reveals by one user in 24 hours; IBAN change needs provider re-authentication, a second finance approval, 48-hour hold and notices to the old and new contact channels.",
+      "reason": "Owner adopted the Final decision text on 2026-10-10. The adopted-decisions table says 'finance or owner'; the memo text says finance; owner is included because owner holds every permission (D-Q5 'Owner can do everything').",
+      "evidence": [
+        "docs/legal/2026-10-10-adopted-decisions.md#L21",
+        "docs/legal/2026-10-10-privacy-decision-memo.md#L163"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "admin-governance",
+        "payout-request"
+      ]
     }
   ],
   "gaps": [
@@ -6503,7 +6863,7 @@
       "severity": "high",
       "description": "Provider bank details are stored and rendered unmasked. payout_requests.iban is selected in full and displayed in the payout queue to every admin, with no masking, no reveal-on-demand, no privileged-read logging and no field-level restriction.",
       "status": "blocked",
-      "rationale": "BLOCKED ON OWNER DECISION: which operators may see full provider IBANs, and whether payouts need a reveal-with-reason step. Not changed by the implementer because AGENTS.md reserves sensitive-data visibility for a human. REMEDY: mask to the last four characters by default, gate full reveal behind an audited privileged-read capability, and consider column-level encryption.",
+      "rationale": "BLOCKED ON OWNER DECISION: which operators may see full provider IBANs, and whether payouts need a reveal-with-reason step. Not changed by the implementer because AGENTS.md reserves sensitive-data visibility for a human. REMEDY: mask to the last four characters by default, gate full reveal behind an audited privileged-read capability, and consider column-level encryption. ADDRESSED BY impl-gov1-claude 2026-10-10 (GOV-1 / Q3): iban not selectable by clients, reveal_provider_iban with step-up and referenced reason; awaiting security review.",
       "evidence": [
         "web_platform/src/app/admin/ledger/page.tsx#L480",
         "supabase/migrations/20260620181924_provider_payout_requests.sql"
@@ -6514,7 +6874,7 @@
       "severity": "high",
       "description": "A single 'admin' role holds catalog authority, unlimited money authority and integration-configuration authority. There is no finance role, no support role, no read-only analyst, no monetary threshold, no maker-checker on payouts and no MFA or step-up on any command. /admin/roles - which promises role administration - redirects to a decorative employees page.",
       "status": "blocked",
-      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): STILL BLOCKED on the owner. Screens now exist for roles (/admin/roles) and fee rules, but every command is still open to the single administrator role: payout release, refund retry, fee-rule changes, role grants, sponsored price. OWNER QUESTIONS: (1) is one administrator allowed to approve their own money movement, or must a second person approve above a monetary threshold (what amount in SAR)? (2) may any administrator grant the administrator role, or only the owner or a second administrator? (3) do you want finance, support and read-only analyst roles split from the administrator role? Prior note kept: every money command is audited with actor and reason meanwhile.",
+      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): STILL BLOCKED on the owner. Screens now exist for roles (/admin/roles) and fee rules, but every command is still open to the single administrator role: payout release, refund retry, fee-rule changes, role grants, sponsored price. OWNER QUESTIONS: (1) is one administrator allowed to approve their own money movement, or must a second person approve above a monetary threshold (what amount in SAR)? (2) may any administrator grant the administrator role, or only the owner or a second administrator? (3) do you want finance, support and read-only analyst roles split from the administrator role? Prior note kept: every money command is audited with actor and reason meanwhile. ADDRESSED BY impl-gov1-claude 2026-10-10 (GOV-1 / D-Q5): maker-checker approvals, break-glass, console roles; awaiting security review.",
       "evidence": [
         "supabase/migrations/20260613000000_init_schema.sql#L7",
         "web_platform/src/app/admin/roles/page.tsx#L9",
@@ -6948,7 +7308,7 @@
       "severity": "high",
       "description": "is_admin() checks only profiles.role = 'admin' for auth.uid(); it does not require a multi-factor session (aal2), and supabase/config.toml enables no MFA. A stolen or phished admin password or refresh token therefore gives platform-wide authority over money, provider status, settings and customer personal data with no second factor, no recent-authentication requirement on payout release, refund retry or profile clearing, and an access token that refreshes indefinitely. The session lives in localStorage (persistSession) and the app sends no security headers (see admin-console-sends-no-browser-security-headers). no-separation-of-duties mentions MFA but is blocked on the maker-checker decision; MFA does not depend on that decision.",
       "status": "open",
-      "rationale": "REMEDY: enable TOTP (ideally WebAuthn) MFA in the hosted project, require auth.jwt()->>'aal' = 'aal2' inside is_admin() so every admin policy and command inherits it, require recent re-authentication for the critical commands (payout release, refund retry, profile clearing, settings), set an admin session time-box and inactivity timeout, and test with a token carrying aal1. Hosted Auth configuration was not observable from this machine.",
+      "rationale": "REMEDY: enable TOTP (ideally WebAuthn) MFA in the hosted project, require auth.jwt()->>'aal' = 'aal2' inside is_admin() so every admin policy and command inherits it, require recent re-authentication for the critical commands (payout release, refund retry, profile clearing, settings), set an admin session time-box and inactivity timeout, and test with a token carrying aal1. Hosted Auth configuration was not observable from this machine. ADDRESSED BY impl-gov1-claude 2026-10-10 (GOV-1 / Q6): aal2 enforced in is_admin(), step-up, lockout hook, MFA reset; hosted settings still owner action (gap hosted-auth-settings-must-match-gov1); awaiting security review.",
       "evidence": [
         "supabase/migrations/20260615182811_harden_auth_and_booking_core.sql#L38",
         "supabase/config.toml#L21",
@@ -6973,7 +7333,7 @@
       "severity": "high",
       "description": "payout_requests is updatable by any administrator and the row is the destination of the manual bank transfer. Reproduction: after a provider requests a payout, an admin session runs update payout_requests set iban = '<other IBAN>' where id = <request>, then admin_review_payout_request and admin_release_payout both succeed; the audit row is payout_requests.update with iban: {changed: true} (no old or new value, not even the last four), no reason, and the provider is not told. Administrators can also originate a request for any provider with any IBAN (request_provider_payout allows is_admin; a direct insert is allowed too). One credential can redirect a provider's money and the log cannot show to where. Distinct from iban-unmasked-to-every-admin and no-separation-of-duties, which are owner decisions.",
       "status": "fixed",
-      "rationale": "FIXED IN SOURCE (impl-claude-release-gaps, 2026-10-06, round 3, unreviewed): payout requests have no INSERT policy at all; request_provider_payout (owner only, balance and IBAN checked) is the only way to create one, so an administrator can neither insert a request with a foreign IBAN nor originate one through the command. The UPDATE lock from round 2 stays. PREVIOUS RATIONALE: RE-OPENED BY qa-claude-release-gate (2026-10-06): the UPDATE path is locked (trg_protect_payout_request_destination, tested), but the same outcome is still one INSERT away. The INSERT policy on payout_requests is 'is_admin() OR owner', so one administrator can insert a payout request for any provider with a bank name and IBAN the provider never supplied, then release it with admin_release_payout, which allocates the provider's pending ledger share to that request and marks it paid. Reproduced: provider with 450 SAR pending, administrator inserted a 400 SAR request with a foreign IBAN and released it (status paid, ledger allocated); the audit rows record the actor and the last four IBAN digits only. REMEDY: remove the is_admin() branch from the INSERT policy so a request can only come from request_provider_payout (owner, balance and IBAN checks), and keep the separation-of-duties decision on the blocked no-separation-of-duties gap.  PREVIOUS RATIONALE: FIXED IN SOURCE (impl-claude-release-gaps, 2026-10-06, unreviewed): a trigger fixes iban, bank_name, amount and provider on a payout request once it exists, for every role except the payout function; the audit log records the last four digits of any bank account change on other tables. Administrators can still originate requests for any provider (payout-request-insert-bypasses-balance-and-iban-checks, no-separation-of-duties). REVIEWER'S ORIGINAL REMEDY: make iban, bank_name and amount immutable after insert (trigger) and allow a change only through a command that requires a reason, notifies the provider owner and records the old and new last four digits; stop administrators originating requests for other providers or require a second approver; include the IBAN last four in the payout.released audit event.  QA-VERIFIED round 3 (qa-claude-release-gate, 2026-10-06, executing suites and stand-in browser; hosted project not contacted): payout_requests has no INSERT policy at all; administrator and owner direct inserts are refused 42501; request_provider_payout is owner-only (administrator, delegated manager with every operations permission and other owners refused), refuses a second submit when the balance is spoken for, and an owner's direct edit or delete changes 0 rows. Re-adding an administrator INSERT policy fails the test.",
+      "rationale": "FIXED IN SOURCE (impl-claude-release-gaps, 2026-10-06, round 3, unreviewed): payout requests have no INSERT policy at all; request_provider_payout (owner only, balance and IBAN checked) is the only way to create one, so an administrator can neither insert a request with a foreign IBAN nor originate one through the command. The UPDATE lock from round 2 stays. PREVIOUS RATIONALE: RE-OPENED BY qa-claude-release-gate (2026-10-06): the UPDATE path is locked (trg_protect_payout_request_destination, tested), but the same outcome is still one INSERT away. The INSERT policy on payout_requests is 'is_admin() OR owner', so one administrator can insert a payout request for any provider with a bank name and IBAN the provider never supplied, then release it with admin_release_payout, which allocates the provider's pending ledger share to that request and marks it paid. Reproduced: provider with 450 SAR pending, administrator inserted a 400 SAR request with a foreign IBAN and released it (status paid, ledger allocated); the audit rows record the actor and the last four IBAN digits only. REMEDY: remove the is_admin() branch from the INSERT policy so a request can only come from request_provider_payout (owner, balance and IBAN checks), and keep the separation-of-duties decision on the blocked no-separation-of-duties gap.  PREVIOUS RATIONALE: FIXED IN SOURCE (impl-claude-release-gaps, 2026-10-06, unreviewed): a trigger fixes iban, bank_name, amount and provider on a payout request once it exists, for every role except the payout function; the audit log records the last four digits of any bank account change on other tables. Administrators can still originate requests for any provider (payout-request-insert-bypasses-balance-and-iban-checks, no-separation-of-duties). REVIEWER'S ORIGINAL REMEDY: make iban, bank_name and amount immutable after insert (trigger) and allow a change only through a command that requires a reason, notifies the provider owner and records the old and new last four digits; stop administrators originating requests for other providers or require a second approver; include the IBAN last four in the payout.released audit event.  QA-VERIFIED round 3 (qa-claude-release-gate, 2026-10-06, executing suites and stand-in browser; hosted project not contacted): payout_requests has no INSERT policy at all; administrator and owner direct inserts are refused 42501; request_provider_payout is owner-only (administrator, delegated manager with every operations permission and other owners refused), refuses a second submit when the balance is spoken for, and an owner's direct edit or delete changes 0 rows. Re-adding an administrator INSERT policy fails the test. ADDRESSED BY impl-gov1-claude 2026-10-10: UPDATE on payout_requests.iban revoked from clients and releases go only to an approved destination.",
       "evidence": [
         "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L168",
         "supabase/tests/db/qa_defect_fixes.test.mjs#L139",
@@ -7011,7 +7371,7 @@
       "severity": "medium",
       "description": "admin_audit_logs is protected only by the absence of RLS policies. anon, authenticated and service_role hold INSERT, UPDATE, DELETE and TRUNCATE at table level, there is no trigger refusing UPDATE or DELETE, and no hash chain or external copy. Reproduced locally: a service_role session can rewrite details of existing rows, and an added policy would immediately open every client role. actor_id is ON DELETE SET NULL, so deleting an account removes the actor from its history. The client roles are correctly refused today (tests added in admin_security_matrix.test.mjs).",
       "status": "open",
-      "rationale": "REMEDY: revoke INSERT, UPDATE, DELETE and TRUNCATE from anon and authenticated (and UPDATE, DELETE, TRUNCATE from service_role), add a BEFORE UPDATE OR DELETE trigger that raises, keep an actor snapshot instead of a nullable foreign key, and ship the log to an append-only sink; a hash chain is optional.",
+      "rationale": "REMEDY: revoke INSERT, UPDATE, DELETE and TRUNCATE from anon and authenticated (and UPDATE, DELETE, TRUNCATE from service_role), add a BEFORE UPDATE OR DELETE trigger that raises, keep an actor snapshot instead of a nullable foreign key, and ship the log to an append-only sink; a hash chain is optional. PARTLY ADDRESSED BY impl-gov1-claude 2026-10-10: append-only (privileges revoked from every role and a blocking trigger, table owner included). Not hash-chained.",
       "evidence": [
         "supabase/migrations/20261003210000_supply_and_agreements.sql#L9",
         "supabase/migrations/20261003210000_supply_and_agreements.sql#L21",
@@ -7836,7 +8196,7 @@
       "severity": "low",
       "description": "The Audit Log screen filters, pages and expands entries but cannot export a filtered period for an external auditor, and no retention rule says how long admin_audit_logs rows are kept or who may purge them (the table has no delete path for client roles, and nothing else is defined). integration_audit_log, the second audit table, has no screen.",
       "status": "open",
-      "rationale": "FOUND BY qa-claude-release-gate in the per-entity review (audit history: list and search yes; export, retention, archive no). Retention length is a legal decision; an audited export of the audit log itself (an export of an export record) is not.",
+      "rationale": "FOUND BY qa-claude-release-gate in the per-entity review (audit history: list and search yes; export, retention, archive no). Retention length is a legal decision; an audited export of the audit log itself (an export of an export record) is not. PARTLY ADDRESSED BY impl-gov1-claude 2026-10-10: purge_expired_audit_logs() keeps 5 years; not scheduled (gap audit-retention-purge-not-scheduled); no export.",
       "evidence": [
         "web_platform/src/app/admin/audit-logs/page.tsx#L141"
       ]
@@ -8027,6 +8387,106 @@
       "evidence": [
         "web_platform/src/app/admin/activity/page.tsx#L155",
         "web_platform/src/app/admin/integrations/page.tsx#L503"
+      ]
+    },
+    {
+      "id": "governance-notifications-have-no-delivery-worker",
+      "severity": "high",
+      "description": "Out-of-band notices required by D-Q5 (break-glass), Q3 (IBAN change to the provider's channels) and Q6 (MFA lockout and reset) are queued as public.governance_notifications rows (email and sms per recipient) but no worker sends them; they stay 'pending'.",
+      "status": "open",
+      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). BUILD WORK: an Edge Function on a schedule (service_role) that resolves the recipient's verified email/phone at send time, sends through the configured provider, and marks sent/failed. Needs the owner to choose and configure the email/SMS provider (external credentials).",
+      "evidence": [
+        "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L118"
+      ]
+    },
+    {
+      "id": "hosted-auth-settings-must-match-gov1",
+      "severity": "high",
+      "description": "The hosted project must enable TOTP enrolment/verification, set sessions to 12 hours absolute and 30 minutes inactivity, and enable the MFA verification attempt hook with pg-functions://postgres/public/hook_mfa_verification_attempt. Supabase session limits apply to every user of the project, including customers and providers, not only administrators.",
+      "status": "blocked",
+      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). OWNER ACTION: dashboard settings (sessions and the MFA hook are paid-plan features) and a decision whether customer sessions may also end after 12 hours / 30 minutes idle; if not, admin-only limits must move into is_admin() using auth.sessions. Local config.toml already carries the values.",
+      "evidence": [
+        "supabase/config.toml#L26"
+      ]
+    },
+    {
+      "id": "audit-retention-purge-not-scheduled",
+      "severity": "medium",
+      "description": "purge_expired_audit_logs() deletes audit rows older than 5 years (Q4 item 6) but nothing schedules it.",
+      "status": "open",
+      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). BUILD WORK: pg_cron (or a scheduled Edge Function as service_role) once the owner confirms the start date.",
+      "evidence": [
+        "supabase/migrations/20261010130000_gov1_audit_log_append_only.sql#L37"
+      ]
+    },
+    {
+      "id": "analyst-read-only-not-enforced-through-shared-provider-helpers",
+      "severity": "medium",
+      "description": "Console permissions narrow 75 changing commands and every direct administrator table write, but commands that let an administrator through only via shared helpers (can_access_provider_wide, can_access_provider_operation and similar, which still use is_admin()) accept any console role, including analyst and finance, for provider-side changes.",
+      "status": "open",
+      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). BUILD WORK: give the helpers a write flag (or split read/write helpers) and pass admin_can('operations.write') on the write path; add negative tests per role.",
+      "evidence": [
+        "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L470"
+      ]
+    },
+    {
+      "id": "export-step-up-is-not-server-enforced",
+      "severity": "medium",
+      "description": "Q6 requires step-up before data export; console exports are built in the browser from reads and only recorded afterwards (admin_record_export), so a step-up there would come after the data left the server.",
+      "status": "open",
+      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). BUILD WORK (PRIV package): server-side export functions that require require_recent_mfa() and log row count and filter (Q4 item 4).",
+      "evidence": [
+        "web_platform/src/app/admin/ledger/page.tsx"
+      ]
+    },
+    {
+      "id": "support-entered-iban-change-not-built",
+      "severity": "low",
+      "description": "Only the provider's owner can submit a bank account change (with re-authentication). The memo also allows support to enter it from a provider request, approved by a different finance user; that path does not exist.",
+      "status": "open",
+      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). Deferred: the provider path covers the control; add only if operations needs it.",
+      "evidence": [
+        "supabase/migrations/20261010120000_gov1_iban_controls.sql#L149"
+      ]
+    },
+    {
+      "id": "legacy-payout-requests-need-an-approved-account",
+      "severity": "medium",
+      "description": "Payout requests created before GOV-1 name an IBAN typed by the provider; they can be released only after the provider registers that account and finance approves it (48-hour hold). Release refuses with destination_not_approved until then.",
+      "status": "open",
+      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). Intended by D-Q5/Q3, but operations must tell providers with open requests. No account is created by the migration (it would be an unapproved destination).",
+      "evidence": [
+        "supabase/migrations/20261010120000_gov1_iban_controls.sql#L320"
+      ]
+    },
+    {
+      "id": "employee-wps-iban-not-masked",
+      "severity": "medium",
+      "description": "employee_commission_rules.wps_iban (staff payroll IBAN) is still readable in full by the provider owner and by administrators; Q3 covered provider payout IBANs only.",
+      "status": "open",
+      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). Needs an owner decision on who may see staff IBANs, then the same masking pattern.",
+      "evidence": [
+        "web_platform/src/app/provider/_components/employee-extras.tsx"
+      ]
+    },
+    {
+      "id": "sole-owner-mfa-lockout-has-no-console-recovery",
+      "severity": "medium",
+      "description": "MFA reset is owner-only and never for yourself, so a lone owner who loses the authenticator or is locked out can be recovered only by an engineer through the Supabase dashboard (break-glass database access).",
+      "status": "open",
+      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). Owner decision: appoint a second owner, or document the engineering recovery procedure.",
+      "evidence": [
+        "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L770"
+      ]
+    },
+    {
+      "id": "finance-role-holders-not-yet-approved",
+      "severity": "medium",
+      "description": "Q3 requires the owner's approval of who holds finance (and so may reveal IBANs) to be recorded in decisions[]. Local test accounts exist; no production holder is approved.",
+      "status": "blocked",
+      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). OWNER ACTION.",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md#L163"
       ]
     }
   ],
@@ -8497,6 +8957,44 @@
       "proposedChange": "",
       "evidence": [],
       "status": "open"
+    },
+    {
+      "id": "harness-claims-default-to-aal2",
+      "observation": "Enforcing aal2 inside is_admin() would have failed ~1,000 existing DB tests; giving the test harness's signed-in users default aal2 claims with a fresh TOTP amr entry (and explicit aal1/stale sessions in negative tests) kept every test meaningful. Worth a note in the skill's Supabase adapter: model the JWT claims the server really checks in the DB test harness.",
+      "category": "new-pattern",
+      "proposedChange": "",
+      "evidence": [
+        "supabase/tests/db/harness.mjs"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "manifest-set-takes-raw-strings",
+      "observation": "admin_console_manifest.py set --value '\"in-progress\"' is refused as an invalid enum and string fields set with json.dumps keep the quotes; plain text must be passed for strings.",
+      "category": "tooling",
+      "proposedChange": "Document in SKILL.md that set --value parses JSON for objects/arrays but stores a quoted JSON string literally (status '\"in-progress\"' is refused).",
+      "evidence": [],
+      "status": "open"
+    },
+    {
+      "id": "maker-checker-as-gate-in-existing-command",
+      "observation": "Putting the maker-checker gate inside the existing money command (record a pending request unless an approved request is executing under a one-time token) kept every existing guard (balance, idempotency, audit) on the approver's execution and needed no duplicate money logic.",
+      "category": "new-pattern",
+      "proposedChange": "",
+      "evidence": [
+        "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L281"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "supabase-restart-needed-for-auth-config",
+      "observation": "Enabling TOTP and the MFA hook locally needs supabase stop/start (auth env is fixed at container start); data survives in the docker volume, but the live stack is down for about a minute.",
+      "category": "friction",
+      "proposedChange": "",
+      "evidence": [
+        "supabase/config.toml"
+      ],
+      "status": "open"
     }
   ],
   "agents": [
@@ -8608,6 +9106,15 @@
       "status": "done",
       "notes": "Reconciled the manifest with the code on 2026-10-09: 7 named gaps re-read, 9 more gaps resolved or narrowed, 12 gaps filed, stale capabilities and screens corrected, new screens and entities modeled. One small code change (invented dispute rating). Worklog: .admin-console/worklog/architect-reconcile-claude.md",
       "worklog": ".admin-console/worklog/architect-reconcile-claude.md"
+    },
+    {
+      "id": "impl-gov1-claude",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "handed-off",
+      "notes": "GOV-1: admin roles owner/finance/operations/analyst, TOTP MFA with aal2 and step-up, maker-checker approvals with break-glass, IBAN masking/reveal/change control, append-only audit log. Plan of record: docs/legal/2026-10-10-adopted-decisions.md (D-Q5, Q6, Q3).",
+      "worklog": ".admin-console/worklog/impl-gov1-claude.md"
     }
   ]
 }

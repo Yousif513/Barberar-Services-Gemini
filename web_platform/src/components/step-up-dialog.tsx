@@ -89,9 +89,10 @@ export function StepUpDialog() {
     }
   };
 
+  // Same layer as CommandDialog: the prompt opens after the dialog that triggered it, so it stacks above it.
   return (
     <ModalPortal>
-      <ModalOverlay onClose={() => close(false)} canClose={!busy} className="fixed inset-0 z-[10000] flex items-center justify-center bg-[#101828]/60 px-4 py-8 backdrop-blur-sm">
+      <ModalOverlay onClose={() => close(false)} canClose={!busy} className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#101828]/60 px-4 py-8 backdrop-blur-sm">
         <form role="dialog" aria-modal="true" aria-labelledby={titleId} dir={locale === "ar" ? "rtl" : "ltr"} onSubmit={(event) => void submit(event)}
           className="w-full max-w-md rounded-[28px] border border-[#D1AF47]/40 bg-white p-6 text-start shadow-2xl">
           <h2 id={titleId} className="font-serif text-xl font-black text-[#101828]">{t.title}</h2>
