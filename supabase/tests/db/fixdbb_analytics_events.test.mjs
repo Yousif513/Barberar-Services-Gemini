@@ -46,11 +46,12 @@ describe("client events", () => {
     await track(ROLES.anon, "flood_event", "anon-flooder-02");
   });
 
-  it("cannot be read or written directly by clients, only read by an administrator", async () => {
+  it("cannot be read or written directly by any client, administrators included (GOV-2: only aggregate counts)", async () => {
     await expectError(as(db, ROLES.anon, `select * from analytics_events`), /permission denied/i);
     assert.equal((await as(db, customer, `select id from analytics_events`)).length, 0);
     assert.equal((await as(db, owner, `select id from analytics_events`)).length, 0);
-    assert.ok((await as(db, admin, `select id from analytics_events`)).length >= 2);
+    assert.equal((await as(db, admin, `select id from analytics_events`)).length, 0);
+    assert.ok((await sys(db, `select count(*)::int n from analytics_events`))[0].n >= 2);
     await expectError(as(db, customer, `insert into analytics_events (event, source) values ('forged_event', 'server')`), /permission denied|row-level/i);
     await expectError(as(db, admin, `update analytics_events set event = 'edited_event'`), /permission denied|row-level/i);
     await expectError(as(db, admin, `delete from analytics_events`), /permission denied|row-level/i);
@@ -92,7 +93,9 @@ describe("funnel report", () => {
   it("counts events per Riyadh day and person for an administrator only", async () => {
     const report = (await as(db, admin, `select admin_get_event_counts(current_date - 2, current_date + 1) r`))[0].r;
     const completed = report.filter((r) => r.event === "booking_completed");
-    assert.ok(completed.length >= 1 && completed.every((r) => r.source === "server" && r.people >= 1));
+    // D4: a day cell with 1 to 4 people is suppressed (no event or people figure), larger cells are shown.
+    assert.ok(completed.length >= 1 && completed.every((r) => r.source === "server"
+      && (r.suppressed ? r.people === null && r.events === null : r.people >= 5)));
     for (const actor of [ROLES.anon, customer, owner]) {
       await expectError(as(db, actor, `select admin_get_event_counts(current_date - 2, current_date)`), /permission denied|Administrator access/i);
     }

@@ -67,7 +67,8 @@ describe("client-executable functions are accounted for", () => {
     // A SECURITY DEFINER function runs as its owner. One that never asks who is calling is an open door.
     const unguarded = (await functionsFor("authenticated"))
       .filter((f) => f.definer)
-      .filter((f) => !/auth\.uid\(\)|is_admin\(\)|admin_can\(|admin_role\(\)|auth\.jwt\(\)|service_role|can_access_provider_operation|can_access_provider_wide|is_booking_staff/.test(f.body))
+      // gov2_require_read (GOV-2) is is_admin() plus admin_can() in one internal helper that no client can call.
+      .filter((f) => !/auth\.uid\(\)|is_admin\(\)|admin_can\(|admin_role\(\)|auth\.jwt\(\)|service_role|can_access_provider_operation|can_access_provider_wide|is_booking_staff|gov2_require_read\(/.test(f.body))
       .map((f) => f.signature.split("(")[0])
       .sort();
     assert.deepEqual(unguarded, ["get_branch_available_slots", "get_branch_schedule_with_prayer_pauses", "get_sponsored_placements", "public_provider_reviews", "search_marketplace_providers"],
@@ -298,22 +299,27 @@ describe("customer directory and export record", () => {
     assert.ok(!JSON.stringify(row.details).includes("Bulk_"), "the search term is not copied into the log");
   });
 
-  it("refuses an export record for an unknown report, an unbounded period or an empty file, and writes nothing", async () => {
+  // GOV-2 (Q4 item 4): the export is built on the server, so the logged row count is the delivered one, never a number the
+  // browser reports; admin_record_export is no longer callable by any client.
+  it("refuses an export for an unknown report or an unbounded period, records nothing for an empty one, and logs the delivered rows", async () => {
     const before = await auditCount();
     for (const sql of [
-      `select admin_record_export('customers_all', '2026-01-01', '2026-02-01', 10)`,
-      `select admin_record_export('payments_ledger', '2026-01-01', '2028-01-01', 10)`,
-      `select admin_record_export('payments_ledger', '2026-02-01', '2026-01-01', 10)`,
-      `select admin_record_export('payments_ledger', null, '2026-01-01', 10)`,
-      `select admin_record_export('payments_ledger', '2026-01-01', '2026-02-01', 0)`,
-      `select admin_record_export('payments_ledger', '2026-01-01', '2026-02-01', null)`,
+      `select admin_export_finance_report('customers_all', '2026-01-01', '2026-02-01')`,
+      `select admin_export_finance_report('payments_ledger', '2026-01-01', '2028-01-01')`,
+      `select admin_export_finance_report('payments_ledger', '2026-02-01', '2026-01-01')`,
+      `select admin_export_finance_report('payments_ledger', null, '2026-01-01')`,
     ]) assert.equal(await outcome(as(db, admin, sql)), "22023", sql);
     assert.equal(await auditCount(), before);
-    await as(db, admin, `select admin_record_export('vat_summary', '2026-01-01', '2026-02-01', 12)`);
+    const empty = (await as(db, admin, `select admin_export_finance_report('payments_ledger', '2001-01-01', '2001-02-01') r`))[0].r;
+    assert.equal(empty.row_count, 0);
+    assert.equal(await auditCount(), before, "an empty period delivers nothing and records nothing");
+    assert.notEqual(await outcome(as(db, admin, `select admin_record_export('vat_summary', '2026-01-01', '2026-02-01', 12)`)), "ok");
+    const delivered = (await as(db, admin, `select admin_export_finance_report('payments_ledger', current_date - 1, current_date + 1) r`))[0].r;
+    assert.ok(delivered.row_count >= 1);
     const row = (await sys(db, `select actor_id, details from admin_audit_logs where action = 'report.exported' order by created_at desc limit 1`))[0];
     assert.equal(row.actor_id, admin.sub);
-    assert.equal(row.details.report, "vat_summary");
-    assert.equal(row.details.rows, 12);
+    assert.equal(row.details.filter.report, "payments_ledger");
+    assert.equal(row.details.rows, delivered.row_count);
   });
 });
 

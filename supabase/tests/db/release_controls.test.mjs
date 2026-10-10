@@ -122,24 +122,27 @@ describe("customer profile clearing", () => {
 });
 
 describe("report exports", () => {
-  it("are recorded by administrators only, for a known report, a sensible period and at least one row", async () => {
-    const call = (user, args) => as(db, user, `select admin_record_export(${args})`);
-    await expectError(call(owner, `'payments_ledger', '2026-10-01', '2026-10-31', 12`), /Administrator access required/);
-    await expectError(call(ROLES.user(SEED.customer), `'payments_ledger', '2026-10-01', '2026-10-31', 12`), /Administrator access required/);
-    await expectError(call(ROLES.anon, `'payments_ledger', '2026-10-01', '2026-10-31', 12`), /permission denied/);
-    await expectError(call(admin, `'everything', '2026-10-01', '2026-10-31', 12`), /Unknown report/);
-    await expectError(call(admin, `'vat_summary', '2026-10-31', '2026-10-01', 12`), /valid range/);
-    await expectError(call(admin, `'vat_summary', '2024-01-01', '2026-10-01', 12`), /at most 400 days/);
-    await expectError(call(admin, `'vat_summary', '2026-10-01', '2026-10-31', 0`), /contain rows/);
+  // GOV-2 (Q4 item 4): exports are built by admin_export_finance_report on the server; the browser no longer reports a count.
+  it("are built for administrators only, for a known report and a sensible period", async () => {
+    const call = (user, args) => as(db, user, `select admin_export_finance_report(${args})`);
+    await expectError(call(owner, `'payments_ledger', '2026-10-01', '2026-10-31'`), /Administrator access required/);
+    await expectError(call(ROLES.user(SEED.customer), `'payments_ledger', '2026-10-01', '2026-10-31'`), /Administrator access required/);
+    await expectError(call(ROLES.anon, `'payments_ledger', '2026-10-01', '2026-10-31'`), /permission denied/);
+    await expectError(call(admin, `'everything', '2026-10-01', '2026-10-31'`), /Unknown report/);
+    await expectError(call(admin, `'vat_summary', '2026-10-31', '2026-10-01'`), /valid range/);
+    await expectError(call(admin, `'vat_summary', '2024-01-01', '2026-10-01'`), /at most 400 days/);
+    await expectError(as(db, admin, `select admin_record_export('vat_summary', '2026-10-01', '2026-10-31', 12)`), /permission denied/);
   });
 
   it("leave an audit entry naming the report, the period and how many rows left the system", async () => {
-    await as(db, admin, `select admin_record_export('provider_settlements', '2026-09-01', '2026-09-30', 37)`);
+    await sys(db, `insert into transactional_ledger (provider_id, entry_type, payment_intent_id, total_captured, platform_share, provider_share, payout_status)
+                   values ($1, 'package_sale', 'chg_release_export_1', 50, 5, 45, 'pending')`, [SEED.provider1]);
+    const exported = (await as(db, admin, `select admin_export_finance_report('payments_ledger', current_date - 1, current_date + 1) r`))[0].r;
     const row = (await auditRows("report.exported")).at(-1);
     assert.equal(row.actor_id, admin.sub);
-    assert.equal(row.details.report, "provider_settlements");
-    assert.equal(row.details.from, "2026-09-01");
-    assert.equal(row.details.to, "2026-09-30");
-    assert.equal(row.details.rows, 37);
+    assert.equal(row.details.filter.report, "payments_ledger");
+    assert.ok(row.details.filter.from && row.details.filter.to);
+    assert.ok(exported.row_count >= 1);
+    assert.equal(row.details.rows, exported.row_count);
   });
 });

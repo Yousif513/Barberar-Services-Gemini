@@ -40,9 +40,16 @@ describe("masking", () => {
     assert.equal(made.iban, "SA** **** **** **** **** 7519", "the command answers with the masked IBAN");
     for (const user of [owner, finance, providerOwner]) {
       await expectError(as(db, user, `select iban from payout_requests limit 1`), /permission denied/);
-      const [row] = await as(db, user, `select iban_masked, destination_id from payout_requests where id = $1`, [made.id]);
+    }
+    const [own] = await as(db, providerOwner, `select iban_masked, destination_id from payout_requests where id = $1`, [made.id]);
+    assert.equal(own.iban_masked, "SA** **** **** **** **** 7519");
+    assert.ok(own.destination_id, "the request names the approved account");
+    // GOV-2 (Q4): console sessions read payout requests through the audited list, which carries only the masked form.
+    for (const user of [owner, finance]) {
+      const list = (await as(db, user, `select admin_list_payout_requests(null, $1, 50, 0, null) r`, [SEED.provider1]))[0].r;
+      const row = list.rows.find((item) => item.id === made.id);
       assert.equal(row.iban_masked, "SA** **** **** **** **** 7519");
-      assert.ok(row.destination_id, "the request names the approved account");
+      assert.ok(!JSON.stringify(list).includes(IBAN_OLD));
     }
     for (const user of [owner, finance, providerOwner, ROLES.user(SEED.customer)]) {
       await expectError(as(db, user, `select * from provider_payout_destinations`), /permission denied/);

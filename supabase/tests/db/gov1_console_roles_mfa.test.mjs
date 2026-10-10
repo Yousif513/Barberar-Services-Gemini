@@ -37,7 +37,9 @@ describe("console roles and permissions", () => {
     const rows = await as(db, analyst, `select admin_role, permission from admin_role_permissions order by 1, 2`);
     const of = (role) => rows.filter((r) => r.admin_role === role).map((r) => r.permission);
     assert.deepEqual(of("analyst"), []);
-    assert.deepEqual(of("operations"), ["operations.write"]);
+    // GOV-2 adds the audited personal-data read (personal.read) for operations and the owner-only health break-glass.
+    assert.deepEqual(of("operations"), ["operations.write", "personal.read"]);
+    assert.ok(!of("finance").includes("personal.read") && of("owner").includes("health.break_glass") && !of("finance").includes("health.break_glass"));
     assert.ok(of("finance").includes("money.payout") && of("finance").includes("iban.reveal") && !of("finance").includes("operations.write"));
     assert.ok(of("owner").includes("roles.manage") && of("owner").includes("break_glass.use") && of("owner").includes("money.payout"));
     assert.ok(!of("finance").includes("roles.manage") && !of("finance").includes("break_glass.use"));

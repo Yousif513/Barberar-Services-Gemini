@@ -78,7 +78,7 @@ describe("administrator commands refuse every other role before doing anything e
     const found = (await gatedFunctions()).map((f) => f.proname);
     for (const name of [
       "admin_dashboard_overview", "admin_review_payout_request", "admin_update_platform_setting", "admin_release_expired_holds",
-      "admin_retry_refund_request", "admin_clear_customer_profile", "admin_set_provider_status", "admin_record_export",
+      "admin_retry_refund_request", "admin_clear_customer_profile", "admin_set_provider_status", "admin_export_finance_report",
       "admin_customer_overview", "admin_update_data_request", "admin_set_phone_verified", "admin_release_payout",
       "admin_release_ledger_item", "admin_create_refund_request", "get_admin_supply_overview", "set_user_role",
     ]) {

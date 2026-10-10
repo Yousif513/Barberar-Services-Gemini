@@ -12,6 +12,14 @@ const customer = ROLES.user(SEED.customer);
 
 const auditRows = (action) => sys(db, `select actor_id, target_id, details from admin_audit_logs where action = $1 order by created_at`, [action]);
 const count = async (action) => (await auditRows(action)).length;
+// GOV-2: console sessions can no longer write the ledger or gift cards directly. Writes still happen inside SECURITY DEFINER
+// commands, which run as the table owner with the administrator's own JWT; this reproduces that context so the audit
+// trigger is still proven for them.
+const asCommandFor = (user, sql, params = []) => db.transaction(async (tx) => {
+  await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify({ role: "authenticated", sub: user.sub, aal: "aal2",
+    amr: [{ method: "totp", timestamp: Math.floor(Date.now() / 1000) }] })]);
+  return (await tx.query(sql, params)).rows;
+});
 
 before(async () => {
   db = await createMigratedDb();
@@ -23,7 +31,8 @@ describe("administrator writes to money and configuration tables", () => {
     const ledger = (await sys(db, `insert into transactional_ledger (provider_id, entry_type, payment_intent_id, total_captured, platform_share, provider_share, payout_status)
                                    values ($1, 'package_sale', 'chg_hard_1', 100, 10, 90, 'pending') returning id`, [SEED.provider1]))[0].id;
     const before = await count("transactional_ledger.update");
-    await as(db, admin, `update transactional_ledger set provider_share = provider_share + 5000, payout_status = 'released' where id = $1`, [ledger]);
+    await expectError(as(db, admin, `update transactional_ledger set provider_share = provider_share + 5000 where id = $1`, [ledger]), /permission denied/);
+    await asCommandFor(admin, `update transactional_ledger set provider_share = provider_share + 5000, payout_status = 'released' where id = $1`, [ledger]);
     const rows = await auditRows("transactional_ledger.update");
     assert.equal(rows.length, before + 1, "the direct ledger write is recorded");
     const row = rows.at(-1);
@@ -69,7 +78,7 @@ describe("administrator writes to money and configuration tables", () => {
   it("keep only the last four digits of a bank account, and no codes or free text", async () => {
     const gift = (await sys(db, `insert into gift_cards (code, purchaser_id, recipient_name, recipient_phone, message, original_amount, remaining_balance, status)
                                  values ('GIFT-SECRET-4821', $1, 'Noura', '+966577770001', 'Happy birthday', 200, 200, 'active') returning id`, [SEED.customer]))[0];
-    await as(db, admin, `update gift_cards set code = 'GIFT-SECRET-9999', recipient_name = 'Lama', message = 'Thank you', remaining_balance = 150 where id = $1`, [gift.id]);
+    await asCommandFor(admin, `update gift_cards set code = 'GIFT-SECRET-9999', recipient_name = 'Lama', message = 'Thank you', remaining_balance = 150 where id = $1`, [gift.id]);
     const giftAudit = (await auditRows("gift_cards.update")).filter((r) => r.target_id === gift.id);
     assert.equal(giftAudit.length, 1, "the gift card write is recorded");
     assert.equal(Number(giftAudit[0].details.changes.remaining_balance.after), 150, "the balance change is visible");

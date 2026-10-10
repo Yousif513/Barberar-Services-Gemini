@@ -90,7 +90,11 @@ describe("payout release needs a second administrator", () => {
 
   it("refuses marking a payout paid by a direct table write", async () => {
     const id = await payoutFor(db);
-    await expectError(as(db, finance, `update payout_requests set status = 'paid' where id = $1`, [id]), /approved release|permission denied/);
+    // GOV-2: a console session cannot even see the row, so the write changes nothing (or is refused outright).
+    const changed = await as(db, finance, `update payout_requests set status = 'paid' where id = $1 returning id`, [id])
+      .catch((error) => (/approved release|permission denied/.test(error.message) ? [] : Promise.reject(error)));
+    assert.equal(changed.length, 0);
+    assert.notEqual((await sys(db, `select status from payout_requests where id = $1`, [id]))[0].status, "paid");
   });
 });
 

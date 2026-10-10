@@ -75,10 +75,9 @@ describe("audit.search: administrator writes are audited by behaviour, on every 
     assert.deepEqual(missing, [], "a table without the audit trigger lets an administrator change it without a trace");
   });
 
+  // GOV-2: provider_fee_invoices left this list. No client role, administrators included, can read or write it directly any
+  // more (the audited admin_list_fee_invoices serves the console); see the test after the loop.
   const cases = [
-    ["provider_fee_invoices", async () => (await sys(db, `insert into provider_fee_invoices (provider_id, invoice_number, period_start, period_end)
-      values ($1, 'FEE-FIX-1', current_date - 30, current_date) returning id`, [SEED.provider1]))[0].id,
-      (id) => `update provider_fee_invoices set status = 'paid', total_invoice_due_sar = 0 where id = '${id}'`],
     ["psp_reconciliation_runs", async () => (await sys(db, `insert into psp_reconciliation_runs (run_date, status, discrepancy_amount_sar, discrepancy_count)
       values (current_date, 'discrepant', 500, 3) returning id`))[0].id,
       (id) => `update psp_reconciliation_runs set status = 'matched', discrepancy_amount_sar = 0, discrepancy_count = 0 where id = '${id}'`],
@@ -94,6 +93,13 @@ describe("audit.search: administrator writes are audited by behaviour, on every 
       assert.ok((await auditCount()) > before, `no audit entry for a direct change to ${table}`);
     });
   }
+
+  it("refuses an administrator's direct change to provider_fee_invoices outright (GOV-2)", async () => {
+    const id = (await sys(db, `insert into provider_fee_invoices (provider_id, invoice_number, period_start, period_end)
+      values ($1, 'FEE-FIX-1', current_date - 30, current_date) returning id`, [SEED.provider1]))[0].id;
+    await assert.rejects(as(db, admin, `update provider_fee_invoices set status = 'paid', total_invoice_due_sar = 0 where id = $1 returning 1`, [id]), /permission denied/);
+    assert.notEqual((await sys(db, `select status from provider_fee_invoices where id = $1`, [id]))[0].status, "paid");
+  });
 
   it("does not record a provider's or a customer's own writes as operator actions", async () => {
     const before = await auditCount();
@@ -318,10 +324,11 @@ describe("the audit log keeps values only where they are operational", () => {
 
   it("itemises the first few rows of a bulk administrator write and then says the rest were not itemised", async () => {
     const before = await auditCount();
-    await as(db, admin, `insert into notifications (user_id, title_en, title_ar, body_en, body_ar, type) select $1, 'T' || g, 'T' || g, 'Body ' || g, 'Body ' || g, 'system' from generate_series(1, 500) g`, [SEED.customer]);
+    // GOV-2: notifications are written only by server commands now, so the bulk write uses categories.
+    await as(db, admin, `insert into categories (name_en, name_ar, slug) select 'Bulk ' || g, 'Bulk ' || g, 'qa-bulk-' || g from generate_series(1, 500) g`);
     const written = (await auditCount()) - before;
     assert.ok(written <= 6, `${written} audit rows for one statement`);
-    assert.ok((await sys(db, `select count(*)::int n from admin_audit_logs where action = 'notifications.bulk_write'`))[0].n >= 1);
+    assert.ok((await sys(db, `select count(*)::int n from admin_audit_logs where action = 'categories.bulk_write'`))[0].n >= 1);
   });
 });
 

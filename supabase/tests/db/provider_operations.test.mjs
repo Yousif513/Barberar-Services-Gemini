@@ -27,7 +27,11 @@ async function booking({ status, price = 100, commission = 20, customerId = SEED
     returning id`,
     [customerId, branchId, employeeId, svc.id, status, price, commission, cancelledBy]))[0].id;
 }
-const row = async (view, key, value) => (await as(db, admin, `select * from ${view} where ${key} = $1`, [value]))[0];
+// GOV-2 (Q4): per-employee figures (earnings come from the ledger) reach a console session only through the audited
+// admin_employee_performance_report; the branch view holds no personal or ledger data and is still read directly.
+const row = async (view, key, value) => (view === "admin_employee_performance"
+  ? (await as(db, admin, `select admin_employee_performance_report(null, null) r`))[0].r.find((item) => item[key] === value)
+  : (await as(db, admin, `select * from ${view} where ${key} = $1`, [value]))[0]);
 const n = (value) => Number(value);
 
 before(async () => {
@@ -38,11 +42,13 @@ before(async () => {
 });
 
 describe("admin visibility of employees", () => {
-  it("lets administrators read inactive employees that nobody else outside the provider can see", async () => {
+  it("lets administrators read inactive employees only through the audited directory; nobody else outside the provider sees them", async () => {
     const id = (await sys(db, `insert into employees (branch_id, name_en, name_ar, title_en, title_ar, is_active)
                                values ($1, 'Former Stylist', 'مصفف سابق', 'Stylist', 'مصفف', false) returning id`, [SEED.branch1]))[0].id;
     const visible = async (user) => (await as(db, user, `select count(*)::int c from employees where id = $1`, [id]))[0].c;
-    assert.equal(await visible(admin), 1);
+    assert.equal(await visible(admin), 0, "no direct table read for a console session");
+    const listed = (await as(db, admin, `select admin_list_employees(null, 'inactive', null, 200, 0, null) r`))[0].r;
+    assert.ok(listed.rows.some((item) => item.id === id));
     assert.equal(await visible(owner1), 1, "the owner still manages their own staff");
     assert.equal(await visible(owner2), 0);
     assert.equal(await visible(customer), 0);

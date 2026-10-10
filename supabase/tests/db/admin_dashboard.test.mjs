@@ -30,7 +30,35 @@ before(async () => {
   db = await createMigratedDb();
   svc = await serviceFor(db, SEED.employee1);
   admin = ROLES.user(await createUser(db, { role: "admin" }));
+  await seedCrowd();
 });
+
+// D4 (GOV-2) suppresses a figure that describes 1 to 4 people. These tests prove how each figure is counted, so every figure
+// starts from at least five people: five more customers with a visit today, a completed visit and a payment this week, a
+// payout request and a refund each, and enough live providers.
+async function seedCrowd() {
+  for (let i = 0; i < 5; i += 1) {
+    const person = await createUser(db, { role: "customer" });
+    const at = (sql) => sys(db, `
+      insert into bookings (customer_id, branch_id, employee_id, service_id, status, scheduled_at, duration_minutes,
+                            subtotal_price, total_price, tax_amount, deposit_required)
+      values ($1, $2, $3, $4, $5::booking_status, ${sql}, 30, 100, 115, 15, 0) returning id`,
+      [person, SEED.branch1, SEED.employee1, svc.id, sql.includes("3 days") ? "completed" : "confirmed"]);
+    await at(`date_trunc('day', now() at time zone 'Asia/Riyadh') at time zone 'Asia/Riyadh' + interval '${8 + i} hours 13 minutes'`);
+    const [done] = await at(`now() - interval '3 days' - interval '${i} hours'`);
+    const [ledger] = await sys(db, `insert into transactional_ledger (booking_id, provider_id, entry_type, payment_intent_id, total_captured, platform_share, provider_share, payout_status)
+                                   values ($1, $2, 'booking_payment', $3, 50, 5, 45, 'pending') returning id`, [done.id, SEED.provider1, `chg_crowd_${i}`]);
+    await sys(db, `insert into payout_requests (provider_id, requested_by, amount, bank_name, iban) values ($1, $2, 10, 'Test Bank', 'SA0380000000608010167519')`, [SEED.provider1, SEED.owner1]);
+    await sys(db, `insert into refund_requests (ledger_id, payment_intent_id, amount, reason, source, status, attempts, idempotency_key)
+                   values ($1, $2, 5, 'Crowd refund', 'admin', 'pending', 0, $3)`, [ledger.id, `chg_crowd_${i}`, `crowd-refund-${i}`]);
+    const providerOwner = await createUser(db, { role: "provider_owner" });
+    const [provider] = await sys(db, `insert into providers (owner_id, type, business_name_en, business_name_ar, status, is_verified)
+                                      select $1, type, 'Crowd Salon ' || $2, 'صالون ' || $2, 'active', true from providers where id = $3 returning id`,
+      [providerOwner, i, SEED.provider1]);
+    await sys(db, `insert into branches (provider_id, name_en, name_ar, address_text_en, address_text_ar, latitude, longitude)
+                   select $1, name_en, name_ar, address_text_en, address_text_ar, latitude, longitude from branches where id = $2`, [provider.id, SEED.branch1]);
+  }
+}
 
 describe("admin dashboard overview", () => {
   it("is readable by administrators only", async () => {

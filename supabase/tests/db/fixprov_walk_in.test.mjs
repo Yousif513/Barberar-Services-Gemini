@@ -74,7 +74,7 @@ describe("create_walk_in_booking keeps method and notes (C-D15)", () => {
     await expectError(walkIn(owner2, { when }), /Not authorized/);
   });
 
-  it("shows the details only to the owner, a booking manager or an administrator, never to a stylist, another provider, a customer or a visitor", async () => {
+  it("shows the details only to the owner or a booking manager, never to a stylist, another provider, a customer, a visitor or a console session", async () => {
     const r = await walkIn(owner1, { when: await future(18), notes: "visible to staff only" });
     const rowsFor = async (user) => as(db, user, `select booking_id from walk_in_booking_details where booking_id = $1`, [r.booking_id]);
     assert.equal((await rowsFor(owner1)).length, 1);
@@ -85,7 +85,8 @@ describe("create_walk_in_booking keeps method and notes (C-D15)", () => {
     await sys(db, `update employees set profile_id = $1 where id = $2`, [stylist.sub, SEED.employee1]);
     assert.equal((await rowsFor(stylist)).length, 0, "an ordinary stylist does not read the owner's private notes");
     const admin = await createUser(db, { role: "admin" });
-    assert.equal((await rowsFor(ROLES.user(admin))).length, 1);
+    // GOV-2 (Q4): walk-in client names and notes are personal data; a console session gets no direct table read.
+    assert.equal((await rowsFor(ROLES.user(admin))).length, 0);
   });
 
   it("cannot be written directly by a client", async () => {

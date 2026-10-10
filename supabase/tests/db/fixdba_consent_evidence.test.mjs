@@ -57,10 +57,12 @@ describe("D-15: consents", () => {
     assert.equal(await code(as(db, bob, `select record_consents(array[]::text[])`)), "22023");
     assert.equal(await code(as(db, ROLES.anon, `select record_consents(array['marketing'])`)), "42501");
   });
-  it("is readable by its owner and administrators, not by another user", async () => {
+  it("is readable by its owner and, through the audited admin_list_consents, by administrators; not by another user", async () => {
     const count = async (user) => (await as(db, user, `select count(*)::int c from consents`))[0].c;
     assert.ok((await count(alice)) >= 2);
-    assert.ok((await count(admin)) > (await count(alice)));
+    // GOV-2 (Q4): no direct table read for a console session; the audited function serves it.
+    assert.equal(await count(admin), 0);
+    assert.ok((await as(db, admin, `select admin_list_consents(null, 200, 0, null) r`))[0].r.total > (await count(alice)));
     assert.equal(await count(ROLES.user(SEED.owner2)), 0);
   });
 });
@@ -98,16 +100,17 @@ describe("D-15: data-subject requests", () => {
     assert.equal(await code(as(db, ROLES.anon, `select submit_data_request('export')`)), "42501");
     assert.equal(await code(as(db, ROLES.service, `select submit_data_request('export')`)), "28000", "the service role has no acting user");
   });
-  it("is visible to its owner and administrators only", async () => {
+  it("is visible to its owner, and to administrators only through the audited function", async () => {
     const visible = async (user) => (await as(db, user, `select count(*)::int c from data_subject_requests`))[0].c;
     assert.equal(await visible(alice), 2);
     assert.equal(await visible(bob), 0);
     assert.equal(await visible(ROLES.user(SEED.owner1)), 0);
-    assert.ok((await visible(admin)) >= 2);
+    assert.equal(await visible(admin), 0);
+    assert.ok((await as(db, admin, `select admin_list_data_requests('open', 200, 0, null) r`))[0].r.total >= 2);
   });
   it("still lets an administrator work the request", async () => {
     const id = (await sys(db, `select id from data_subject_requests where user_id = $1 and request_type = 'access'`, [alice.sub]))[0].id;
-    await as(db, admin, `update data_subject_requests set status = 'in_progress', admin_notes = 'Collecting data', reviewed_by = $2 where id = $1`, [id, admin.sub]);
+    await as(db, admin, `select admin_update_data_request($1, 'in_progress', 'Collecting data')`, [id]);
     assert.equal((await sys(db, `select status from data_subject_requests where id = $1`, [id]))[0].status, "in_progress");
   });
 });

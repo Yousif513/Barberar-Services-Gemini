@@ -25,7 +25,11 @@ before(async () => {
 });
 
 describe("admin_provider_applications_view carries the CR check", () => {
-  const read = (actor) => as(db, actor, `select cr_verification_status s, cr_check_data d from admin_provider_applications_view where id = $1`, [applicationId]);
+  // GOV-2 (Q4): a console session reads applications through the audited admin_list_provider_applications, not the view.
+  const read = (actor) => (actor === admin
+    ? as(db, actor, `select admin_list_provider_applications(null, 500, 0, null) r`).then((rows) =>
+        rows[0].r.rows.filter((row) => row.id === applicationId).map((row) => ({ s: row.cr_verification_status, d: row.cr_check_data })))
+    : as(db, actor, `select cr_verification_status s, cr_check_data d from admin_provider_applications_view where id = $1`, [applicationId]));
 
   it("starts unchecked and follows the recorded Wathq outcome, including the registered name", async () => {
     assert.equal((await read(admin))[0].s, "unchecked");
