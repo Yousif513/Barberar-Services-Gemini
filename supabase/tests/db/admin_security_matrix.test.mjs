@@ -29,7 +29,9 @@ async function gatedFunctions() {
     where p.pronamespace = 'public'::regnamespace and p.prosecdef and p.prorettype <> 'trigger'::regtype
       and has_function_privilege('authenticated', p.oid, 'EXECUTE')
       and (p.proname like 'admin\\_%' or p.proname like 'get\\_admin\\_%'
-           or pg_get_functiondef(p.oid) ~* 'IF NOT (public\\.)?is_admin\\(\\)\\s+THEN\\s+RAISE')
+           or pg_get_functiondef(p.oid) ~* 'IF NOT (public\\.)?(is_admin\\(\\)|admin_can\\([^)]*\\))\\s+THEN\\s+RAISE')
+      -- GOV-1 session introspection: these answer "what may I do" for any signed-in caller and change nothing.
+      and p.proname not in ('admin_can', 'admin_role', 'admin_role_of_account', 'admin_session_state', 'admin_table_write_allowed')
     order by 2`);
 }
 

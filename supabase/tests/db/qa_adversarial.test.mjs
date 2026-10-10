@@ -65,7 +65,7 @@ describe("client-executable functions are accounted for", () => {
     // A SECURITY DEFINER function runs as its owner. One that never asks who is calling is an open door.
     const unguarded = (await functionsFor("authenticated"))
       .filter((f) => f.definer)
-      .filter((f) => !/auth\.uid\(\)|is_admin\(\)|auth\.jwt\(\)|service_role|can_access_provider_operation|can_access_provider_wide|is_booking_staff/.test(f.body))
+      .filter((f) => !/auth\.uid\(\)|is_admin\(\)|admin_can\(|admin_role\(\)|auth\.jwt\(\)|service_role|can_access_provider_operation|can_access_provider_wide|is_booking_staff/.test(f.body))
       .map((f) => f.signature.split("(")[0])
       .sort();
     assert.deepEqual(unguarded, ["get_branch_available_slots", "get_branch_schedule_with_prayer_pauses", "get_sponsored_placements", "public_provider_reviews", "search_marketplace_providers"],
@@ -75,7 +75,7 @@ describe("client-executable functions are accounted for", () => {
   it("confirm_booking_payment and the other service-role commands refuse an administrator, an owner, a customer and a visitor", async () => {
     // Money is confirmed only by the payment webhook (service role). An administrator is not that identity.
     const serviceOnly = (await functionsFor("authenticated"))
-      .filter((f) => f.definer && /<> 'service_role'/.test(f.body) && !/is_admin\(\)|auth\.uid\(\)/.test(f.body))
+      .filter((f) => f.definer && /<> 'service_role'/.test(f.body) && !/is_admin\(\)|admin_can\(|auth\.uid\(\)/.test(f.body))
       .map((f) => f.signature);
     // FIX-MONEY M-22: confirm_booking_payment is no longer even executable by authenticated, so no service-role-only command is left in the client-executable set.
     assert.deepEqual(serviceOnly.map((s) => s.split("(")[0]), []);

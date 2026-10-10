@@ -42,7 +42,8 @@ before(async () => {
 
 describe("bookings change only through the commands", () => {
   it("leaves no write policy on bookings except the administrator's, and every other role's direct write changes zero rows", async () => {
-    const policies = await sys(db, `select policyname, cmd from pg_policies where schemaname = 'public' and tablename = 'bookings' and cmd <> 'SELECT'`);
+    // GOV-1 adds RESTRICTIVE policies that only narrow administrator writes to the operations console role; they grant nothing.
+    const policies = await sys(db, `select policyname, cmd from pg_policies where schemaname = 'public' and tablename = 'bookings' and cmd <> 'SELECT' and permissive = 'PERMISSIVE'`);
     assert.deepEqual(policies, [{ policyname: "Admins manage bookings", cmd: "ALL" }]);
     const booking = await paidBooking();
     for (const [name, user] of [["owner", owner1], ["assigned employee", employee], ["customer", customer], ["other owner", owner2]]) {

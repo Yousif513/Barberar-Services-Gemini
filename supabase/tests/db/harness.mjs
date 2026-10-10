@@ -44,6 +44,14 @@ CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $f$
   SELECT NULLIF(auth.jwt()->>'sub', '')::uuid $f$;
 CREATE OR REPLACE FUNCTION auth.role() RETURNS text LANGUAGE sql STABLE AS $f$
   SELECT auth.jwt()->>'role' $f$;
+-- The two Auth tables the governance commands touch (MFA factors and sessions), with the columns they use.
+CREATE TABLE IF NOT EXISTS auth.mfa_factors (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL, friendly_name text, factor_type text NOT NULL DEFAULT 'totp',
+  status text NOT NULL DEFAULT 'verified', created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS auth.sessions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL, created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now()
+);
 GRANT USAGE ON SCHEMA auth TO anon, authenticated, service_role;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA auth TO anon, authenticated, service_role;
 `;
@@ -84,12 +92,22 @@ export async function createMigratedDb({ activateDemo = true } = {}) {
   return db;
 }
 
+// The claims Supabase Auth puts in a signed-in user's JWT after a password sign-in followed by a TOTP verification just now:
+// assurance level aal2 and an amr entry per method with its time. Admin commands require aal2 and, for sensitive ones, a TOTP
+// verification in the last 5 minutes (GOV-1). A test that needs a weaker session passes ROLES.user(id, { aal: "aal1", amr: [...] }).
+export function sessionClaims(user, nowSeconds = Math.floor(Date.now() / 1000)) {
+  return {
+    aal: user.aal ?? "aal2",
+    amr: user.amr ?? [{ method: "totp", timestamp: nowSeconds }, { method: "password", timestamp: nowSeconds - 60 }],
+  };
+}
+
 // Runs SQL inside a transaction as a given Supabase role with JWT claims.
 export async function as(db, user, sql, params = []) {
   return db.transaction(async (tx) => {
     await tx.exec(`SET LOCAL ROLE ${user.role}`);
     const claims = { role: user.role };
-    if (user.sub) claims.sub = user.sub;
+    if (user.sub) Object.assign(claims, { sub: user.sub }, sessionClaims(user));
     await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify(claims)]);
     return (await tx.query(sql, params)).rows;
   });
@@ -106,7 +124,7 @@ export async function sys(db, sql, params = []) {
 export const ROLES = {
   anon: { sub: null, role: "anon" },
   service: { sub: null, role: "service_role" },
-  user: (sub) => ({ sub, role: "authenticated" }),
+  user: (sub, session = {}) => ({ sub, role: "authenticated", ...session }),
 };
 
 // Fixture ids from the demo seed migration (20260704082805_live_demo_seed_messages.sql).
@@ -122,12 +140,18 @@ export const SEED = {
 };
 
 let counter = 0;
-export async function createUser(db, { role = "customer", phone = null, verified = false } = {}) {
+// An administrator gets the console role adminRole (GOV-1: owner, finance, operations or analyst); owner by default, which is
+// what every administrator was before console roles existed.
+export async function createUser(db, { role = "customer", phone = null, verified = false, adminRole = "owner" } = {}) {
   counter += 1;
   const id = `c0000000-0000-4000-8000-${String(counter).padStart(12, "0")}`;
   await sys(db, `insert into auth.users (id, email) values ($1, $2)`, [id, `user${counter}@test.local`]);
   await sys(db, `update profiles set role = $2::user_role, phone_number = $3, phone_verified = $4 where id = $1`,
     [id, role, phone, verified]);
+  if (role === "admin") {
+    await sys(db, `insert into admin_role_assignments (user_id, admin_role, reason) values ($1, $2, 'Test fixture')
+                   on conflict (user_id) do update set admin_role = excluded.admin_role`, [id, adminRole]);
+  }
   return id;
 }
 
