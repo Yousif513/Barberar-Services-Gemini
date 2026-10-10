@@ -145,7 +145,8 @@ let counter = 0;
 export async function createUser(db, { role = "customer", phone = null, verified = false, adminRole = "owner" } = {}) {
   counter += 1;
   const id = `c0000000-0000-4000-8000-${String(counter).padStart(12, "0")}`;
-  await sys(db, `insert into auth.users (id, email) values ($1, $2)`, [id, `user${counter}@test.local`]);
+  // The sign-in email is confirmed, as it is after a normal sign-up; out-of-band notices go only to confirmed contacts (GOV-FIX H-3).
+  await sys(db, `insert into auth.users (id, email, email_confirmed_at) values ($1, $2, now())`, [id, `user${counter}@test.local`]);
   await sys(db, `update profiles set role = $2::user_role, phone_number = $3, phone_verified = $4 where id = $1`,
     [id, role, phone, verified]);
   if (role === "admin") {

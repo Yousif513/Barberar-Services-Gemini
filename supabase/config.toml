@@ -26,7 +26,7 @@ jwt_expiry = 3600
 # GOV-1 / Q6 (docs/legal/2026-10-10-adopted-decisions.md): every administrator enrols an authenticator app (TOTP) and the
 # database rejects administrator sessions below aal2. The hosted project must enable the same in Authentication settings.
 [auth.mfa]
-max_enrolled_factors = 10
+max_enrolled_factors = 2
 
 [auth.mfa.totp]
 enroll_enabled = true

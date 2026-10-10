@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ToastContainer } from "@/components/toast";
 import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
-import { isReauthRequired } from "@/lib/step-up";
+import { errorHint, isReauthRequired } from "@/lib/step-up";
 
 const translations = {
   en: {
@@ -37,6 +37,7 @@ const translations = {
     changeSubmit: "Submit for approval",
     changeSubmitted: "Bank account submitted. PRIMORA finance approves it; you are notified.",
     reauthNeeded: "For your security, sign in again (within the last 10 minutes) to change the payout bank account.",
+    contactRecentlyChanged: "Your verified email or phone changed in the last 48 hours. For your security, the payout bank account can be changed 48 hours after that change; we have told both your old and new contact.",
     signInAgain: "Sign in again",
     payoutTo: "Paid to {bank} · {iban}",
     payoutNeedsAccount: "Add a bank account and wait for its approval before requesting a payout.",
@@ -131,6 +132,7 @@ const translations = {
     changeSubmit: "إرسال للاعتماد",
     changeSubmitted: "أُرسل الحساب البنكي. تعتمده مالية PRIMORA ويصلك إشعار.",
     reauthNeeded: "لحمايتك، سجّل الدخول من جديد (خلال آخر 10 دقائق) لتغيير الحساب البنكي للتحويلات.",
+    contactRecentlyChanged: "تغيّر بريدك الإلكتروني أو جوالك الموثّق خلال آخر 48 ساعة. لحمايتك، يمكن تغيير الحساب البنكي للتحويلات بعد مرور 48 ساعة على ذلك التغيير؛ وقد أبلغنا وسيلة التواصل القديمة والجديدة.",
     signInAgain: "تسجيل الدخول من جديد",
     payoutTo: "يُحوَّل إلى {bank} · {iban}",
     payoutNeedsAccount: "أضِف حساباً بنكياً وانتظر اعتماده قبل طلب تحويل.",
@@ -489,6 +491,7 @@ export default function ProviderWalletPage() {
     setSubmittingPayout(false);
     if (rpcError) {
       if (isReauthRequired(rpcError)) setNeedsReauth(true);
+      else if (errorHint(rpcError) === "contact_recently_changed") setAccountError(t.contactRecentlyChanged);
       else setAccountError(errorMessage(rpcError));
       return;
     }

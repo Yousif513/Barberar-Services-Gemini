@@ -159,6 +159,7 @@ const translations = {
       console_role_changed: "Console role changed",
       iban_change_requested: "Provider bank account change requested",
       health_break_glass: "Health-intake answers opened through break-glass",
+      mfa_factor_added: "Authenticator added to an administrator account",
     } as Record<string, string>,
     settingNames: {
       refund_single_approval_sar: "Single refund needing a second approver",
@@ -263,6 +264,7 @@ const translations = {
       console_role_changed: "تغيّر دور في لوحة الإدارة",
       iban_change_requested: "طلب تغيير الحساب البنكي لمزود",
       health_break_glass: "فُتحت إجابات الاستبيان الصحي عبر إجراء الطوارئ",
+      mfa_factor_added: "أُضيف تطبيق مصادقة إلى حساب مسؤول",
     } as Record<string, string>,
     settingNames: {
       refund_single_approval_sar: "استرداد واحد يحتاج معتمداً ثانياً",
