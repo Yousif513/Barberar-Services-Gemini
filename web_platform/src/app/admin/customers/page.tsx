@@ -331,11 +331,11 @@ function CustomersScreen() {
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      const select = "id, user_id, request_type, status, details, due_date, admin_notes, reviewed_at, created_at, profiles!data_subject_requests_user_id_fkey ( first_name, last_name )";
+      // GOV-2 (Q4): data requests and consents are read through audited, paged functions; each read is recorded with its purpose.
       const [open, closed, consentResult] = await Promise.all([
-        supabase.from("data_subject_requests").select(select, { count: "exact" }).in("status", ["pending", "in_progress"]).order("due_date", { ascending: true }).range(0, OPEN_REQUEST_LIMIT - 1),
-        supabase.from("data_subject_requests").select(select).in("status", ["completed", "rejected"]).order("reviewed_at", { ascending: false }).range(0, CLOSED_REQUEST_LIMIT - 1),
-        supabase.from("consents").select("id, user_id, purpose, status, document_version, method, created_at").order("created_at", { ascending: false }).limit(CONSENT_LIMIT),
+        supabase.rpc("admin_list_data_requests", { p_state: "open", p_limit: OPEN_REQUEST_LIMIT, p_offset: 0, p_purpose: "privacy_request" }),
+        supabase.rpc("admin_list_data_requests", { p_state: "closed", p_limit: CLOSED_REQUEST_LIMIT, p_offset: 0, p_purpose: "privacy_request" }),
+        supabase.rpc("admin_list_consents", { p_user_id: null, p_limit: CONSENT_LIMIT, p_offset: 0, p_purpose: "privacy_request" }),
       ]);
       if (cancelled) return;
       const failure = open.error ?? closed.error;
@@ -345,15 +345,17 @@ function CustomersScreen() {
         setRequestsForbidden(isForbidden(failure));
       } else {
         setRequestsForbidden(false);
-        setRequests([...((open.data ?? []) as unknown as DataRequest[]), ...((closed.data ?? []) as unknown as DataRequest[])]);
-        setOpenRequestTotal(open.count ?? 0);
+        const openPage = open.data as { total: number; rows: DataRequest[] } | null;
+        const closedPage = closed.data as { total: number; rows: DataRequest[] } | null;
+        setRequests([...(openPage?.rows ?? []), ...(closedPage?.rows ?? [])]);
+        setOpenRequestTotal(Number(openPage?.total ?? 0));
         setRequestsError("");
       }
       if (consentResult.error) {
         setConsents(null);
         setConsentsError(errorMessage(consentResult.error));
       } else {
-        setConsents((consentResult.data ?? []) as Consent[]);
+        setConsents(((consentResult.data as { rows: Consent[] } | null)?.rows ?? []) as Consent[]);
         setConsentsError("");
       }
     })();

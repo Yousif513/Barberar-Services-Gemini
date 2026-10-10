@@ -485,8 +485,9 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         "utf8"
       );
       assert.ok(!notifCode.includes("INITIAL_HISTORY = ["), "Must not use hardcoded mock history");
-      assert.ok(notifCode.includes('from("message_log")'), "Must query live message_log");
-      assert.ok(notifCode.includes('from("message_queue")'), "Must query live message_queue");
+      // GOV-2 (Q4): the log and the queue are read through audited / aggregate server functions.
+      assert.ok(notifCode.includes('rpc("admin_list_message_log"'), "Must query the live message log through the audited function");
+      assert.ok(notifCode.includes('rpc("admin_message_queue_summary"'), "Must query live message_queue sizes");
       assert.ok(notifCode.includes('functions.invoke("dispatch-messages"'), "Must allow manual queue dispatch through the Edge Function");
       assert.ok(notifCode.includes("Quiet Hours") || notifCode.includes("ساعات الهدوء"), "Must display quiet hours metrics");
     });
@@ -871,7 +872,7 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         "utf8"
       );
       assert.ok(adminLedgerCode.includes("run_daily_psp_reconciliation"), "Admin ledger must connect to run_daily_psp_reconciliation RPC");
-      assert.ok(adminLedgerCode.includes("provider_fee_invoices"), "Admin ledger must query provider_fee_invoices table");
+      assert.ok(adminLedgerCode.includes('rpc("admin_list_fee_invoices"'), "Admin ledger must read provider fee invoices through the audited function");
       assert.ok(!adminLedgerCode.includes('"text-[#D1AF47] font-serif text-xs font-black">\n                  $'), "Ledger widget must not use dollar signs");
 
       const pricingCode = readFileSync(

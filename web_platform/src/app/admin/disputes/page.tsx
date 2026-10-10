@@ -22,6 +22,7 @@ const translations = {
     statusOpen: "OPEN",
     noDetail: "No detail provided.",
     independent: "Independent",
+    customerHidden: "Customer {id}",
     successMsg: "Dispute successfully resolved as ",
     errorMsg: "Failed to process dispute decision."
   },
@@ -42,6 +43,7 @@ const translations = {
     statusOpen: "مفتوح",
     noDetail: "لم يتم تقديم تفاصيل.",
     independent: "مستقل",
+    customerHidden: "العميل {id}",
     successMsg: "تم تسوية النزاع بنجاح كـ ",
     errorMsg: "فشلت معالجة قرار النزاع."
   }
@@ -87,7 +89,7 @@ export default function AdminDisputes() {
           reason,
           status,
           created_at,
-          customer:profiles!payment_disputes_customer_id_fkey(first_name, last_name),
+          customer_id,
           provider:providers(business_name_en, business_name_ar),
           booking:bookings(id, status, scheduled_at)
         `)
@@ -96,14 +98,22 @@ export default function AdminDisputes() {
       if (dbError) throw dbError;
 
       if (data && data.length > 0) {
+        // GOV-2 (Q4): customer names come from the audited admin_people_names (logged with the ids it resolved), not a join.
+        const ids = [...new Set(data.map((d) => d.customer_id).filter((id): id is string => Boolean(id)))];
+        const names = new Map<string, { first_name: string | null; last_name: string | null }>();
+        if (ids.length > 0) {
+          const { data: people, error: namesError } = await supabase.rpc("admin_people_names", { p_ids: ids, p_purpose: "dispute_resolution" });
+          if (namesError) throw namesError;
+          for (const person of (people ?? []) as Array<{ id: string; first_name: string | null; last_name: string | null }>) names.set(person.id, person);
+        }
         setDisputes(data.map(d => {
-          const cust = d.customer as any;
+          const cust = d.customer_id ? names.get(d.customer_id) : undefined;
           const prov = d.provider as any;
           const bk = d.booking as any;
           return {
             id: d.id,
             bookingId: bk?.id || "N/A",
-            customer: cust ? `${cust.first_name || ""} ${cust.last_name || ""}`.trim() : "Verified Client",
+            customer: (cust ? `${cust.first_name || ""} ${cust.last_name || ""}`.trim() : "") || (d.customer_id ? t.customerHidden.replace("{id}", String(d.customer_id).slice(0, 8)) : "—"),
             provider: (lang === "ar" ? prov?.business_name_ar : prov?.business_name_en) || prov?.business_name_en || t.independent,
             amount: `${d.disputed_amount_sar || 0} ${lang === "ar" ? "ريال" : "SAR"}`,
             reason: d.reason || t.noDetail,

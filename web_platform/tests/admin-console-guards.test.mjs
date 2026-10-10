@@ -128,7 +128,8 @@ describe("admin console guards", () => {
 
   it("provider management shows recorded figures and changes status through one audited command", () => {
     const providers = files.find((f) => f.path === `${ADMIN_ROOT}/providers/provider-management.tsx`).code;
-    for (const source of ['from("admin_branch_performance")', 'from("admin_employee_performance")']) {
+    // GOV-2: per-employee figures come from the audited report; branch figures still from their view.
+    for (const source of ['from("admin_branch_performance")', 'rpc("admin_employee_performance_report"']) {
       assert.ok(providers.includes(source), `performance figures must come from ${source}`);
     }
     assert.ok(providers.includes('rpc("admin_set_provider_status"'), "approve, reject, suspend and reactivate run as a server command with a reason");
@@ -163,21 +164,24 @@ describe("admin console guards", () => {
   it("report exports are real files, audited before delivery, and never cut a period short", () => {
     const reports = page("/reports");
     assert.ok(reports.includes("downloadCsv(") && reports.includes("toCsv("), "an export builds a CSV file");
-    const audited = reports.indexOf('rpc("admin_record_export"');
-    assert.ok(audited > 0 && audited < reports.indexOf("downloadCsv(file"), "the audit entry is written before the file is handed out");
-    assert.ok(reports.includes("throw auditError"), "a failed audit entry stops the download");
-    assert.ok(reports.includes("TooManyRows") && reports.includes("MAX_ROWS"), "a period with too many rows is refused rather than truncated");
+    // GOV-2 (Q4 item 4): the server builds the rows and records the delivered count before answering; the browser only
+    // formats the CSV and never reports a count of its own.
+    const built = reports.indexOf('rpc("admin_export_finance_report"');
+    assert.ok(built > 0 && built < reports.indexOf("downloadCsv(file"), "the server builds and records the export before the file is handed out");
+    assert.ok(!reports.includes('rpc("admin_record_export"'), "no browser-reported row count");
+    assert.ok(reports.includes("if (error) throw error;"), "a refused export stops the download");
+    assert.ok(reports.includes('"too_many_rows"') && reports.includes("MAX_ROWS"), "a period with too many rows is refused rather than truncated");
     assert.ok(!/setTimeout\(\(\) => setSuccess|initiated/.test(reports), "no success message without a file");
     for (const source of ["transactional_ledger", "monthly_vat_summary", "provider_settlement_summary"]) {
-      assert.ok(reports.includes(`.from("${source}")`), `${source} feeds an export`);
+      assert.ok(!reports.includes(`.from("${source}")`), `${source} is not read directly by the browser`);
     }
   });
 
   it("the employee directory reads live staff and figures and offers no edits that go nowhere", () => {
     const employees = page("/employees");
-    assert.ok(employees.includes('.from("employees")') && employees.includes('.from("admin_employee_performance")'), "staff and figures come from the database");
+    assert.ok(employees.includes('rpc("admin_list_employees"'), "staff and figures come from the audited directory (GOV-2)");
     assert.ok(!/demoEmployees|deleteEmployee|saveEmployee|openAdd/.test(employees), "no invented staff or local-only editing");
-    assert.ok(employees.includes(".range(") && employees.includes('count: "exact"'), "the list is paginated on the server");
+    assert.ok(employees.includes("p_limit: PAGE_SIZE") && employees.includes("p_offset: (page - 1) * PAGE_SIZE"), "the list is paginated on the server");
   });
 
   it("clearing a customer profile is one audited server command that claims no more than it does", () => {

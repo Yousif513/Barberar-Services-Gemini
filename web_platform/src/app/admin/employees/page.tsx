@@ -6,8 +6,8 @@ import { errorMessage } from "@/lib/error-message";
 import { ForbiddenNotice, isForbidden, operationsInput, sar, useOperationsLocale } from "@/components/operations-ui";
 
 // A read-only directory of the staff providers have registered. Providers manage their own team, so there is
-// nothing to add, edit or delete here; the figures come from admin_employee_performance (bookings, the ledger
-// and published reviews) and are left blank, never estimated, when that view cannot be read.
+// nothing to add, edit or delete here; staff and figures come from the audited admin_list_employees (bookings, the
+// ledger and published reviews); earnings are left blank, never estimated, for a role without the ledger permission.
 
 const PAGE_SIZE = 25;
 
@@ -57,7 +57,6 @@ const translations = {
     noTitle: "No title",
     loading: "Loading employees…",
     loadFailed: "Employees could not be loaded: {reason}",
-    figuresFailed: "Booking figures could not be loaded, so none are shown: {reason}",
     providersFailed: "The provider list could not be loaded, so you cannot filter by provider: {reason}",
     providersCapped: "Only the first {n} providers are listed in the filter. Search by name to find the others.",
     clearFilters: "Clear filters",
@@ -87,7 +86,6 @@ const translations = {
     noTitle: "بلا مسمى",
     loading: "جارٍ تحميل الموظفين…",
     loadFailed: "تعذّر تحميل الموظفين: {reason}",
-    figuresFailed: "تعذّر تحميل أرقام الحجوزات، لذا لا تُعرض أي أرقام: {reason}",
     providersFailed: "تعذّر تحميل قائمة مقدمي الخدمة، لذا لا يمكن التصفية بحسب مقدم الخدمة: {reason}",
     providersCapped: "تُعرض أول {n} من مقدمي الخدمة فقط في التصفية. ابحث بالاسم للوصول إلى الباقين.",
     clearFilters: "مسح التصفية",
@@ -127,7 +125,6 @@ export default function AdminEmployeesPage() {
   const [loadError, setLoadError] = useState("");
   const [loadForbidden, setLoadForbidden] = useState(false);
   const [providersError, setProvidersError] = useState("");
-  const [figuresError, setFiguresError] = useState("");
 
   // The search box applies a moment after typing stops, so each keystroke is not a query.
   useEffect(() => {
@@ -161,18 +158,16 @@ export default function AdminEmployeesPage() {
     const load = async () => {
       setLoading(true);
       setLoadError("");
-      setFiguresError("");
-      let query = supabase
-        .from("employees")
-        .select("id, name_en, name_ar, title_en, title_ar, is_active, photo_url, work_type, branches!inner ( name_en, name_ar, provider_id, providers ( business_name_en, business_name_ar ) )", { count: "exact" })
-        .order("name_en", { ascending: true })
-        .order("id", { ascending: true })
-        .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
-      if (status === "active") query = query.eq("is_active", true);
-      if (status === "inactive") query = query.eq("is_active", false);
-      if (providerId) query = query.eq("branches.provider_id", providerId);
-      if (search) query = query.or(`name_en.ilike.*${search}*,name_ar.ilike.*${search}*,title_en.ilike.*${search}*,title_ar.ilike.*${search}*`);
-      const { data, error, count } = await query;
+      // GOV-2 (Q4): staff records and their figures come from the audited admin_list_employees, one server page at a time.
+      // Earnings are money and come back empty unless the console role holds the ledger permission.
+      const { data, error } = await supabase.rpc("admin_list_employees", {
+        p_search: search || null,
+        p_status: status,
+        p_provider_id: providerId || null,
+        p_limit: PAGE_SIZE,
+        p_offset: (page - 1) * PAGE_SIZE,
+        p_purpose: "staff_administration",
+      });
       if (cancelled) return;
       if (error) {
         setRows([]);
@@ -184,24 +179,11 @@ export default function AdminEmployeesPage() {
         return;
       }
       setLoadForbidden(false);
-      const pageRows = (data ?? []) as unknown as EmployeeRow[];
+      const result = data as { total: number | string; rows: Array<EmployeeRow & { performance: Omit<PerformanceRow, "employee_id"> | null }> };
+      const pageRows = result.rows ?? [];
       setRows(pageRows);
-      setTotal(count ?? 0);
-      if (pageRows.length > 0) {
-        const performance = await supabase
-          .from("admin_employee_performance")
-          .select("employee_id, completed_bookings, employee_earnings, review_count, rating_sum")
-          .in("employee_id", pageRows.map((row) => row.id));
-        if (cancelled) return;
-        if (performance.error) {
-          setFigures(null);
-          setFiguresError(errorMessage(performance.error));
-        } else {
-          setFigures(Object.fromEntries(((performance.data ?? []) as PerformanceRow[]).map((row) => [row.employee_id, row])));
-        }
-      } else {
-        setFigures({});
-      }
+      setTotal(Number(result.total ?? 0));
+      setFigures(Object.fromEntries(pageRows.filter((row) => row.performance).map((row) => [row.id, { employee_id: row.id, ...row.performance! }])));
       setLoading(false);
     };
     void load();
@@ -276,10 +258,6 @@ export default function AdminEmployeesPage() {
         <div role="status" className="rounded-xl border border-[#FEDF89] bg-[#FFFAEB] px-4 py-3 text-xs font-bold text-[#93370D]">{fill(t.providersCapped, { n: (1000).toLocaleString(numberFormat) })}</div>
       )}
 
-      {figuresError && (
-        <div role="alert" className="rounded-xl border border-[#FEDF89] bg-[#FFFAEB] px-4 py-3 text-xs font-bold text-[#B54708]">{fill(t.figuresFailed, { reason: figuresError })}</div>
-      )}
-
       {loadError && loadForbidden ? (
         <ForbiddenNotice locale={lang} />
       ) : loadError ? (
@@ -342,7 +320,7 @@ export default function AdminEmployeesPage() {
                     <td className={`${cell} font-black text-gray-900`}>
                       {performance ? (rating === null ? "—" : `★ ${rating.toLocaleString(numberFormat, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`) : "—"}
                     </td>
-                    <td className={`${cell} whitespace-nowrap font-black text-[#9A741F]`}>{performance ? sar(Number(performance.employee_earnings ?? 0), lang) : "—"}</td>
+                    <td className={`${cell} whitespace-nowrap font-black text-[#9A741F]`}>{performance && performance.employee_earnings !== null && performance.employee_earnings !== undefined ? sar(Number(performance.employee_earnings), lang) : "—"}</td>
                   </tr>
                 );
               })}

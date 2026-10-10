@@ -400,7 +400,8 @@ function BookingsScreen() {
     if (!selectedBooking) return;
     let cancelled = false;
     const bookingId = selectedBooking.id;
-    void supabase.from("invoices").select("*").eq("booking_id", bookingId).maybeSingle().then(
+    // GOV-2 (Q2 item 4, Q4): invoices are read by finance or the owner only, through the audited admin_get_booking_invoice.
+    void supabase.rpc("admin_get_booking_invoice", { p_booking_id: bookingId, p_purpose: "finance_operations" }).then(
       ({ data, error }) => {
         if (!cancelled) setInvoiceRead({ bookingId, invoice: error ? null : (data as StoredInvoice | null), error: error ? errorMessage(error) : "" });
       },

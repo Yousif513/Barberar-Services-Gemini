@@ -23,7 +23,8 @@ const checks = [
   },
   {
     file: "web_platform/src/app/admin/ledger/page.tsx",
-    require: ['from("transactional_ledger")', 'from("payout_requests")', "handleReleasePayout", "markPayoutRequestPaid"],
+    // GOV-2 (Q4): the ledger and payout requests are read through audited server functions, never from the tables.
+    require: ['rpc("admin_list_ledger_entries"', 'rpc("admin_list_payout_requests"', "handleReleasePayout", "markPayoutRequestPaid"],
     reject: ["demo-p1", "Omar Khaled"],
   },
   {

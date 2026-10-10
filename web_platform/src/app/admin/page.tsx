@@ -35,15 +35,18 @@ type QueueRow = {
 
 type Overview = {
   generated_at: string;
+  // D4 (GOV-2): a figure that describes 1 to 4 people comes back null and is named in suppressed.
   kpis: {
-    bookings_today: number;
-    captured_7d_sar: number | string;
-    platform_share_7d_sar: number | string;
-    live_providers: number;
-    customers: number;
-    completed_30d: number;
-    finished_30d: number;
+    bookings_today: number | null;
+    captured_7d_sar: number | string | null;
+    platform_share_7d_sar: number | string | null;
+    live_providers: number | null;
+    customers: number | null;
+    completed_30d: number | null;
+    finished_30d: number | null;
+    suppressed?: string[];
   };
+  small_cell_threshold?: number;
   queues: QueueRow[];
   reconciliation: {
     latest: { run_date: string; status: string; discrepancy_amount_sar: number | string | null; created_at: string } | null;
@@ -94,6 +97,8 @@ const translations = {
     kpiProvidersHint: "Verified, with an active branch customers can find",
     kpiCustomers: "Customers",
     kpiCustomersHint: "Customer accounts on the platform",
+    kpiSuppressed: "Fewer than {n}",
+    kpiSuppressedHint: "Hidden because fewer than {n} people are behind this figure",
     kpiCompletion: "Completion rate, 30 days",
     kpiCompletionHint: "{completed} of {finished} finished visits",
     kpiCompletionNone: "No finished visits in the last 30 days",
@@ -166,6 +171,8 @@ const translations = {
     kpiProvidersHint: "موثقون ولديهم فرع نشط يمكن للعملاء العثور عليه",
     kpiCustomers: "العملاء",
     kpiCustomersHint: "حسابات العملاء على المنصة",
+    kpiSuppressed: "أقل من {n}",
+    kpiSuppressedHint: "مخفي لأن عدد الأشخاص وراء هذا الرقم أقل من {n}",
     kpiCompletion: "نسبة الإكمال، ٣٠ يوماً",
     kpiCompletionHint: "{completed} من {finished} زيارة منتهية",
     kpiCompletionNone: "لا توجد زيارات منتهية خلال آخر ٣٠ يوماً",
@@ -284,8 +291,9 @@ export default function AdminDashboardPage() {
         const actorIds = [...new Set(rows.map((row) => row.actor_id).filter((id): id is string => Boolean(id)))];
         const names = new Map<string, string>();
         if (actorIds.length > 0) {
-          const { data: people } = await supabase.from("profiles").select("id, first_name, last_name").in("id", actorIds);
-          for (const person of people ?? []) {
+          // GOV-2: names come from admin_people_names (console staff for every role; others only with personal.read, logged).
+          const { data: people } = await supabase.rpc("admin_people_names", { p_ids: actorIds, p_purpose: "audit_review" });
+          for (const person of (people ?? []) as Array<{ id: string; first_name: string | null; last_name: string | null }>) {
             names.set(person.id, [person.first_name, person.last_name].filter(Boolean).join(" "));
           }
         }
@@ -318,20 +326,29 @@ export default function AdminDashboardPage() {
     ? new Intl.DateTimeFormat(isRTL ? "ar-SA-u-ca-gregory" : "en-GB", { timeStyle: "short", timeZone: "Asia/Riyadh" }).format(new Date(overview.generated_at))
     : "";
   const kpis = overview?.kpis;
-  const completion = kpis && kpis.finished_30d > 0 ? Math.round((kpis.completed_30d / kpis.finished_30d) * 1000) / 10 : null;
+  const threshold = overview?.small_cell_threshold ?? 5;
+  const hiddenValue = fill(t.kpiSuppressed, { n: count(threshold, locale) });
+  const hiddenHint = fill(t.kpiSuppressedHint, { n: count(threshold, locale) });
+  const completion = kpis && kpis.finished_30d !== null && kpis.completed_30d !== null && kpis.finished_30d > 0
+    ? Math.round((kpis.completed_30d / kpis.finished_30d) * 1000) / 10 : null;
+  // A suppressed figure reads "Fewer than 5" with the reason, never as zero.
+  const tile = (label: string, value: number | string | null, format: (v: number | string) => string, hint: string, href: string) =>
+    value === null ? { label, value: hiddenValue, hint: hiddenHint, href } : { label, value: format(value), hint, href };
   const kpiCards = kpis
     ? [
-        { label: t.kpiBookingsToday, value: count(kpis.bookings_today, locale), hint: t.kpiBookingsTodayHint, href: "/admin/bookings" },
-        { label: t.kpiCaptured, value: sar(Number(kpis.captured_7d_sar), locale), hint: t.kpiCapturedHint, href: "/admin/ledger" },
-        { label: t.kpiCommission, value: sar(Number(kpis.platform_share_7d_sar), locale), hint: t.kpiCommissionHint, href: "/admin/ledger" },
-        { label: t.kpiProviders, value: count(kpis.live_providers, locale), hint: t.kpiProvidersHint, href: "/admin/providers" },
-        { label: t.kpiCustomers, value: count(kpis.customers, locale), hint: t.kpiCustomersHint, href: "/admin/customers" },
-        {
-          label: t.kpiCompletion,
-          value: completion === null ? "—" : `${completion.toLocaleString(isRTL ? "ar-SA" : "en-US")}%`,
-          hint: completion === null ? t.kpiCompletionNone : fill(t.kpiCompletionHint, { completed: count(kpis.completed_30d, locale), finished: count(kpis.finished_30d, locale) }),
-          href: "/admin/bookings",
-        },
+        tile(t.kpiBookingsToday, kpis.bookings_today, (v) => count(v, locale), t.kpiBookingsTodayHint, "/admin/bookings"),
+        tile(t.kpiCaptured, kpis.captured_7d_sar, (v) => sar(Number(v), locale), t.kpiCapturedHint, "/admin/ledger"),
+        tile(t.kpiCommission, kpis.platform_share_7d_sar, (v) => sar(Number(v), locale), t.kpiCommissionHint, "/admin/ledger"),
+        tile(t.kpiProviders, kpis.live_providers, (v) => count(v, locale), t.kpiProvidersHint, "/admin/providers"),
+        tile(t.kpiCustomers, kpis.customers, (v) => count(v, locale), t.kpiCustomersHint, "/admin/customers"),
+        kpis.finished_30d === null || kpis.completed_30d === null
+          ? { label: t.kpiCompletion, value: hiddenValue, hint: hiddenHint, href: "/admin/bookings" }
+          : {
+              label: t.kpiCompletion,
+              value: completion === null ? "—" : `${completion.toLocaleString(isRTL ? "ar-SA" : "en-US")}%`,
+              hint: completion === null ? t.kpiCompletionNone : fill(t.kpiCompletionHint, { completed: count(kpis.completed_30d, locale), finished: count(kpis.finished_30d, locale) }),
+              href: "/admin/bookings",
+            },
       ]
     : [];
   const latestRun = overview?.reconciliation.latest ?? null;

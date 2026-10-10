@@ -159,28 +159,21 @@ export default function AdminNotificationsPage() {
     setLogsError("");
     try {
       // 1. Fetch recent message logs
-      const { data: logsData, error: logsFailure } = await supabase
-        .from("message_log")
-        .select("id, recipient_phone, channel, template_name, locale, message_body, status, cost_sar, sent_at, error_details")
-        .order("sent_at", { ascending: false })
-        .limit(50);
+      // GOV-2 (Q4): the log is read through the audited admin_list_message_log (numbers masked to the last three digits).
+      const { data: logsData, error: logsFailure } = await supabase.rpc("admin_list_message_log", {
+        p_status: null, p_channel: null, p_limit: 50, p_offset: 0, p_purpose: "messaging_operations"
+      });
 
       if (logsFailure) throw logsFailure;
-      const logs = (logsData as MessageLogRow[]) || [];
+      const logs = ((logsData as { rows?: MessageLogRow[] } | null)?.rows ?? []) as MessageLogRow[];
       setMessageLogs(logs);
 
       // 2. Fetch queue counts
-      const { count: pendingCount, error: pendingFailure } = await supabase
-        .from("message_queue")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pending");
-
-      const { count: deferredCount, error: deferredFailure } = await supabase
-        .from("message_queue")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "deferred_quiet_hours");
-
-      if (pendingFailure || deferredFailure) throw pendingFailure ?? deferredFailure;
+      const { data: queueData, error: queueFailure } = await supabase.rpc("admin_message_queue_summary");
+      if (queueFailure) throw queueFailure;
+      const queue = queueData as { pending?: number | string; deferred?: number | string } | null;
+      const pendingCount = Number(queue?.pending ?? 0);
+      const deferredCount = Number(queue?.deferred ?? 0);
       const deliveredCount = logs.filter((l) => l.status === "delivered" || l.status === "sent").length;
       const skippedCount = logs.filter((l) => l.status.startsWith("skipped")).length;
       const totalCost = logs.reduce((sum, item) => sum + (Number(item.cost_sar) || 0), 0);

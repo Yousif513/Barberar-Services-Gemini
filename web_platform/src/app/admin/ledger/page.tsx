@@ -6,6 +6,9 @@ import { errorMessage } from "@/lib/error-message";
 import { CommandResult } from "@/components/operations-ui";
 import { CommandDialog } from "@/components/modal";
 
+// Rows per list read from the audited functions (the server caps a page at 500).
+const LIST_LIMIT = 200;
+
 const translations = {
   en: {
     title: "Financial Ledger & Statements",
@@ -27,6 +30,8 @@ const translations = {
     successMsg: "Payout released.",
     errorMsg: "Failed to release transaction payout split.",
     errorLoad: "Failed to load financial records.",
+    ledgerShowing: "Showing the latest {shown} of {total} ledger entries. Totals cover all {total}.",
+    listShowing: "Showing the latest {shown} of {total}.",
     payoutRequestsTitle: "Provider Payout Requests",
     payoutRequestsSubtitle: "Review withdrawal requests, move them into processing, reject them, or mark paid after releasing matched ledger rows.",
     requestId: "Request ID",
@@ -118,6 +123,8 @@ const translations = {
     successMsg: "تم تحرير دفعة الضمان بنجاح!",
     errorMsg: "فشل تحرير دفعة الضمان المالي.",
     errorLoad: "فشل تحميل السجلات المالية.",
+    ledgerShowing: "عرض أحدث {shown} من {total} قيداً. الإجماليات تشمل جميع القيود ({total}).",
+    listShowing: "عرض أحدث {shown} من {total}.",
     payoutRequestsTitle: "طلبات تحويل المزودين",
     payoutRequestsSubtitle: "مراجعة طلبات السحب ونقلها للمعالجة أو رفضها أو تعليمها كمدفوعة بعد تحرير سجلات الدفعات المطابقة.",
     requestId: "رقم الطلب",
@@ -555,6 +562,10 @@ type MoneyAction =
 export default function AdminLedger() {
   const [activeTab, setActiveTab] = useState<"methods" | "splits" | "requests" | "statements" | "reconciliation">("methods");
   const [ledger, setLedger] = useState<any[]>([]);
+  // GOV-2 (Q4): the ledger, payouts, statements and fee invoices come from audited, paged server functions; totals are the
+  // server's figures for every matching row, not a sum of the page shown.
+  const [ledgerTotals, setLedgerTotals] = useState<{ total: number; total_captured: number; platform_share: number; provider_share: number } | null>(null);
+  const [listTotals, setListTotals] = useState<{ payouts: number; feeInvoices: number }>({ payouts: 0, feeInvoices: 0 });
   const [payoutRequests, setPayoutRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [requestsLoading, setRequestsLoading] = useState(true);
@@ -653,25 +664,18 @@ export default function AdminLedger() {
   const loadLedger = async () => {
     try {
       setLoading(true);
-      const { data, error: dbError } = await supabase
-        .from("transactional_ledger")
-        .select(`
-          id,
-          booking_id,
-          payment_intent_id,
-          total_captured,
-          platform_share,
-          provider_share,
-          payout_status,
-          created_at
-        `)
-        .order("created_at", { ascending: false });
+      const { data, error: dbError } = await supabase.rpc("admin_list_ledger_entries", {
+        p_from: null, p_to: null, p_provider_id: null, p_payout_status: null, p_limit: LIST_LIMIT, p_offset: 0, p_purpose: "finance_operations"
+      });
 
       if (dbError) throw dbError;
-      setLedger(data || []);
+      const page = data as { total: number; total_captured: number; platform_share: number; provider_share: number; rows: any[] };
+      setLedger(page.rows ?? []);
+      setLedgerTotals({ total: Number(page.total), total_captured: Number(page.total_captured), platform_share: Number(page.platform_share), provider_share: Number(page.provider_share) });
     } catch (err) {
-      setError(t.errorLoad);
-      console.warn("Offline splits ledger warning:", err);
+      setLedger([]);
+      setLedgerTotals(null);
+      setError(`${t.errorLoad} ${errorMessage(err)}`.trim());
     } finally {
       setLoading(false);
     }
@@ -681,27 +685,14 @@ export default function AdminLedger() {
     try {
       setRequestsLoading(true);
       setRequestsError("");
-      const { data, error: dbError } = await supabase
-        .from("payout_requests")
-        .select(`
-          id,
-          provider_id,
-          amount,
-          bank_name,
-          iban_masked,
-          status,
-          admin_note,
-          requested_at,
-          processed_at,
-          providers (
-            business_name_en,
-            business_name_ar
-          )
-        `)
-        .order("requested_at", { ascending: false });
+      const { data, error: dbError } = await supabase.rpc("admin_list_payout_requests", {
+        p_status: null, p_provider_id: null, p_limit: LIST_LIMIT, p_offset: 0, p_purpose: "payout_review"
+      });
 
       if (dbError) throw dbError;
-      setPayoutRequests(data || []);
+      const page = data as { total: number; rows: any[] };
+      setPayoutRequests(page.rows ?? []);
+      setListTotals((current) => ({ ...current, payouts: Number(page.total) }));
     } catch (err) {
       setPayoutRequests([]);
       setRequestsError(errorMessage(err));
@@ -716,30 +707,30 @@ export default function AdminLedger() {
       setReportsError("");
 
       const [vatResult, settlementResult, earningsResult] = await Promise.all([
-        supabase.from("monthly_vat_summary").select("*").order("month_start", { ascending: false }),
-        supabase.from("provider_settlement_summary").select("*, providers(business_name_en, business_name_ar)").order("month_start", { ascending: false }),
-        supabase.from("employee_earnings_summary").select("*, employees(name_en, name_ar)").order("month_start", { ascending: false })
+        supabase.rpc("admin_finance_summary", { p_kind: "vat", p_from: null, p_to: null, p_provider_id: null, p_limit: LIST_LIMIT, p_offset: 0, p_purpose: "tax_reporting" }),
+        supabase.rpc("admin_finance_summary", { p_kind: "settlement", p_from: null, p_to: null, p_provider_id: null, p_limit: LIST_LIMIT, p_offset: 0, p_purpose: "finance_operations" }),
+        supabase.rpc("admin_finance_summary", { p_kind: "employee_earnings", p_from: null, p_to: null, p_provider_id: null, p_limit: LIST_LIMIT, p_offset: 0, p_purpose: "finance_operations" })
       ]);
 
       if (vatResult.error) {
         console.error("Failed to load monthly_vat_summary:", vatResult.error);
         setVatSummary([]);
       } else {
-        setVatSummary(vatResult.data || []);
+        setVatSummary((vatResult.data as { rows: any[] } | null)?.rows ?? []);
       }
 
       if (settlementResult.error) {
         console.error("Failed to load provider_settlement_summary:", settlementResult.error);
         setSettlementSummary([]);
       } else {
-        setSettlementSummary(settlementResult.data || []);
+        setSettlementSummary((settlementResult.data as { rows: any[] } | null)?.rows ?? []);
       }
 
       if (earningsResult.error) {
         console.error("Failed to load employee_earnings_summary:", earningsResult.error);
         setEarningsSummary([]);
       } else {
-        setEarningsSummary(earningsResult.data || []);
+        setEarningsSummary((earningsResult.data as { rows: any[] } | null)?.rows ?? []);
       }
       const failures = [vatResult.error, settlementResult.error, earningsResult.error].filter(Boolean).map((e) => errorMessage(e));
       if (failures.length > 0) setReportsError(failures.join(" · "));
@@ -772,31 +763,13 @@ export default function AdminLedger() {
     try {
       setFeeInvoicesLoading(true);
       setFeeInvoicesError("");
-      const { data, error: dbError } = await supabase
-        .from("provider_fee_invoices")
-        .select(`
-          id,
-          provider_id,
-          invoice_number,
-          period_start,
-          period_end,
-          total_bookings_count,
-          gross_gmv_sar,
-          deposit_captured_sar,
-          platform_commission_sar,
-          net_fee_receivable_sar,
-          vat_on_commission_sar,
-          total_invoice_due_sar,
-          status,
-          created_at,
-          providers (
-            business_name_en,
-            business_name_ar
-          )
-        `)
-        .order("created_at", { ascending: false });
+      const { data, error: dbError } = await supabase.rpc("admin_list_fee_invoices", {
+        p_status: null, p_provider_id: null, p_limit: LIST_LIMIT, p_offset: 0, p_purpose: "finance_operations"
+      });
       if (dbError) throw dbError;
-      setProviderFeeInvoices(data || []);
+      const page = data as { total: number; rows: any[] };
+      setProviderFeeInvoices(page.rows ?? []);
+      setListTotals((current) => ({ ...current, feeInvoices: Number(page.total) }));
     } catch (err) {
       setFeeInvoicesError(errorMessage(err));
       setProviderFeeInvoices([]);
@@ -1028,9 +1001,11 @@ export default function AdminLedger() {
   const flip = isRTL ? "flex-row-reverse" : "flex-row";
 
   // Calculate split summaries
-  const totalGross = ledger.reduce((sum, item) => sum + (parseFloat(item.total_captured) || 0), 0);
-  const platformTotal = ledger.reduce((sum, item) => sum + (parseFloat(item.platform_share) || 0), 0);
-  const providerTotal = ledger.reduce((sum, item) => sum + (parseFloat(item.provider_share) || 0), 0);
+  const totalGross = ledgerTotals?.total_captured ?? 0;
+  const platformTotal = ledgerTotals?.platform_share ?? 0;
+  const providerTotal = ledgerTotals?.provider_share ?? 0;
+  const showing = (template: string, shown: number, total: number) =>
+    template.replace(/\{shown\}/g, shown.toLocaleString(lang === "ar" ? "ar-SA" : "en-US")).replace(/\{total\}/g, total.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"));
 
   const cardBase = "rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] transition-all duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.035)] hover:border-[#D1AF47]/20";
 
@@ -1213,6 +1188,9 @@ export default function AdminLedger() {
                   )}
                 </tbody>
               </table>
+              {ledgerTotals && ledgerTotals.total > ledger.length && (
+                <p className="px-6 py-3 text-[11px] font-semibold text-gray-500">{showing(t.ledgerShowing, ledger.length, ledgerTotals.total)}</p>
+              )}
             </div>
           </div>
         </div>
@@ -1344,6 +1322,9 @@ export default function AdminLedger() {
                 )}
               </tbody>
             </table>
+            {payoutRequests.length > 0 && listTotals.payouts > payoutRequests.length && (
+              <p className="px-6 py-3 text-[11px] font-semibold text-gray-500">{showing(t.listShowing, payoutRequests.length, listTotals.payouts)}</p>
+            )}
           </div>
         </div>
       )}
@@ -1658,6 +1639,9 @@ export default function AdminLedger() {
                   )}
                 </tbody>
               </table>
+              {providerFeeInvoices.length > 0 && listTotals.feeInvoices > providerFeeInvoices.length && (
+                <p className="px-6 py-3 text-[11px] font-semibold text-gray-500">{showing(t.listShowing, providerFeeInvoices.length, listTotals.feeInvoices)}</p>
+              )}
             </div>
           </div>
         </div>

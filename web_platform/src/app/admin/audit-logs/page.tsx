@@ -138,7 +138,8 @@ export default function AdminAuditLogPage() {
     setTotal(count || 0);
     const ids = [...new Set(list.map((r) => r.actor_id).filter((id): id is string => Boolean(id)))];
     if (ids.length) {
-      const { data: people } = await supabase.from("profiles").select("id, first_name, last_name, email").in("id", ids);
+      // GOV-2: console staff names for every console role; anyone else only with personal.read, and that lookup is logged.
+      const { data: people } = await supabase.rpc("admin_people_names", { p_ids: ids, p_purpose: "audit_review" });
       const map: Record<string, Actor> = {};
       for (const person of (people || []) as Actor[]) map[person.id] = person;
       setActors(map);

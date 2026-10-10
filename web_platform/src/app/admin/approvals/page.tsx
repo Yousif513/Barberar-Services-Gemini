@@ -146,6 +146,7 @@ const translations = {
       break_glass_used: "Break-glass used",
       console_role_changed: "Console role changed",
       iban_change_requested: "Provider bank account change requested",
+      health_break_glass: "Health-intake answers opened through break-glass",
     } as Record<string, string>,
     settingNames: {
       refund_single_approval_sar: "Single refund needing a second approver",
@@ -240,6 +241,7 @@ const translations = {
       break_glass_used: "استُخدم إجراء الطوارئ",
       console_role_changed: "تغيّر دور في لوحة الإدارة",
       iban_change_requested: "طلب تغيير الحساب البنكي لمزود",
+      health_break_glass: "فُتحت إجابات الاستبيان الصحي عبر إجراء الطوارئ",
     } as Record<string, string>,
     settingNames: {
       refund_single_approval_sar: "استرداد واحد يحتاج معتمداً ثانياً",

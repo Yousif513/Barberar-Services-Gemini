@@ -6,12 +6,11 @@ import { errorMessage } from "@/lib/error-message";
 import { downloadCsv, toCsv } from "@/lib/csv.mjs";
 import { CommandResult, operationsInput, useOperationsLocale, type OperationsLocale } from "@/components/operations-ui";
 
-// Financial exports built from the rows the signed-in operator can already read, so row policy applies
-// unchanged. A file is handed out only after admin_record_export has written the audit entry; if that call
-// fails, nothing is delivered. A period that would produce more than MAX_ROWS rows is refused instead of
-// being cut short, because a silently truncated financial export is worse than none.
+// Financial exports are built on the server by admin_export_finance_report (GOV-2, Q4 item 4): it checks the console
+// permission (finance or owner), asks for a fresh authenticator code (Q6 step-up for exports), refuses a period of more than
+// 20,000 rows instead of cutting it short, and records the report, the period and the number of rows it delivered before the
+// file is handed out. The browser only formats the returned rows as CSV.
 
-const PAGE = 1000;
 const MAX_ROWS = 20000;
 const MAX_DAYS = 400;
 const RIYADH = "Asia/Riyadh";
@@ -29,7 +28,7 @@ const translations = {
     period: "Period",
     from: "From",
     to: "To",
-    note: "These files contain financial data. Every download is recorded in the audit log with the report, the period and the number of rows.",
+    note: "These files contain financial data and are for finance and the owner. The server builds each file, asks for a fresh authenticator code, and records the report, the period and the number of rows in the audit log.",
     download: "Download CSV",
     downloadFor: "Download CSV: {report}",
     preparing: "Preparing…",
@@ -55,7 +54,7 @@ const translations = {
     period: "الفترة",
     from: "من",
     to: "إلى",
-    note: "تحتوي هذه الملفات على بيانات مالية. يُسجل كل تنزيل في سجل التدقيق مع التقرير والفترة وعدد الصفوف.",
+    note: "تحتوي هذه الملفات على بيانات مالية وهي للمالية والمالك فقط. يبني الخادم كل ملف ويطلب رمزاً جديداً من تطبيق المصادقة ويسجل التقرير والفترة وعدد الصفوف في سجل التدقيق.",
     download: "تنزيل CSV",
     downloadFor: "تنزيل CSV: {report}",
     preparing: "جارٍ التجهيز…",
@@ -77,64 +76,28 @@ const translations = {
   },
 };
 
-class TooManyRows extends Error {}
-
 const riyadhDate = (date: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: RIYADH }).format(date);
 const riyadhStamp = (iso: string) => new Intl.DateTimeFormat("sv-SE", { timeZone: RIYADH, dateStyle: "short", timeStyle: "medium" }).format(new Date(iso));
 const monthStart = (day: string) => `${day.slice(0, 7)}-01`;
-// Riyadh has no daylight saving, so a day starts at 00:00 on a fixed +03:00 offset.
-const dayStartIso = (day: string) => new Date(`${day}T00:00:00+03:00`).toISOString();
-const nextDayStartIso = (day: string) => new Date(Date.parse(`${day}T00:00:00+03:00`) + 86400000).toISOString();
 const daysBetween = (range: Range) => Math.round((Date.parse(`${range.to}T00:00:00Z`) - Date.parse(`${range.from}T00:00:00Z`)) / 86400000);
 const num = (value: unknown) => (value === null || value === undefined ? 0 : Number(value));
 const fill = (template: string, values: Record<string, string | number>) =>
   Object.entries(values).reduce((text, [key, value]) => text.replace(`{${key}}`, String(value)), template);
 
-async function readCapped(fetchPage: (start: number, end: number) => PromiseLike<{ data: unknown[] | null; error: unknown }>): Promise<Raw[]> {
-  const rows: Raw[] = [];
-  for (let start = 0; ; start += PAGE) {
-    const { data, error } = await fetchPage(start, start + PAGE - 1);
-    if (error) throw error;
-    const page = (data ?? []) as Raw[];
-    rows.push(...page);
-    if (rows.length > MAX_ROWS) throw new TooManyRows();
-    if (page.length < PAGE) return rows;
-  }
-}
-
-async function namesFor(table: "providers" | "branches", column: "business_name_en" | "name_en", ids: string[]): Promise<Record<string, string>> {
-  const names: Record<string, string> = {};
-  const unique = [...new Set(ids.filter(Boolean))];
-  for (let i = 0; i < unique.length; i += 200) {
-    const { data, error } = await supabase.from(table).select(`id, ${column}`).in("id", unique.slice(i, i + 200));
-    if (error) throw error;
-    for (const row of (data ?? []) as unknown as Raw[]) names[String(row.id)] = String(row[column] ?? "");
-  }
-  return names;
+async function exportRows(report: ReportKey, range: Range): Promise<Raw[]> {
+  const { data, error } = await supabase.rpc("admin_export_finance_report", { p_report: report, p_from: range.from, p_to: range.to });
+  if (error) throw error;
+  return ((data as { rows?: Raw[] } | null)?.rows ?? []) as Raw[];
 }
 
 async function buildPaymentsLedger(range: Range, lang: OperationsLocale): Promise<Built> {
-  const rows = await readCapped((start, end) =>
-    supabase
-      .from("transactional_ledger")
-      .select("id, created_at, entry_type, payment_intent_id, total_captured, platform_share, provider_share, employee_share, refunded_amount, payout_status, provider_id, bookings ( invoice_number, branches ( provider_id ) )")
-      .gte("created_at", dayStartIso(range.from))
-      .lt("created_at", nextDayStartIso(range.to))
-      .order("created_at", { ascending: true })
-      .order("id", { ascending: true })
-      .range(start, end)
-  );
-  const providerOf = (row: Raw) => {
-    const booking = row.bookings as { branches?: { provider_id?: string } | null } | null;
-    return String(row.provider_id ?? booking?.branches?.provider_id ?? "");
-  };
-  const providers = await namesFor("providers", "business_name_en", rows.map(providerOf));
+  const rows = await exportRows("payments_ledger", range);
   return {
     headers: translations[lang].headers.payments_ledger,
     rows: rows.map((row) => [
       riyadhStamp(String(row.created_at)),
-      (row.bookings as { invoice_number?: number | null } | null)?.invoice_number ?? "",
-      providers[providerOf(row)] ?? "",
+      (row.invoice_number as number | null) ?? "",
+      String(row.provider_name ?? ""),
       String(row.entry_type ?? ""),
       String(row.payment_intent_id ?? ""),
       num(row.total_captured),
@@ -148,25 +111,13 @@ async function buildPaymentsLedger(range: Range, lang: OperationsLocale): Promis
 }
 
 async function buildVatSummary(range: Range, lang: OperationsLocale): Promise<Built> {
-  const rows = await readCapped((start, end) =>
-    supabase
-      .from("monthly_vat_summary")
-      .select("month_start, provider_id, branch_id, total_bookings, total_vat_collected, total_sales")
-      .gte("month_start", monthStart(range.from))
-      .lte("month_start", monthStart(range.to))
-      .order("month_start", { ascending: true })
-      .order("provider_id", { ascending: true })
-      .order("branch_id", { ascending: true })
-      .range(start, end)
-  );
-  const providers = await namesFor("providers", "business_name_en", rows.map((row) => String(row.provider_id ?? "")));
-  const branches = await namesFor("branches", "name_en", rows.map((row) => String(row.branch_id ?? "")));
+  const rows = await exportRows("vat_summary", range);
   return {
     headers: translations[lang].headers.vat_summary,
     rows: rows.map((row) => [
       String(row.month_start ?? "").slice(0, 7),
-      providers[String(row.provider_id)] ?? "",
-      branches[String(row.branch_id)] ?? "",
+      String(row.provider_name ?? ""),
+      String(row.branch_name ?? ""),
       num(row.total_bookings),
       num(row.total_sales),
       num(row.total_vat_collected),
@@ -175,22 +126,12 @@ async function buildVatSummary(range: Range, lang: OperationsLocale): Promise<Bu
 }
 
 async function buildProviderSettlements(range: Range, lang: OperationsLocale): Promise<Built> {
-  const rows = await readCapped((start, end) =>
-    supabase
-      .from("provider_settlement_summary")
-      .select("month_start, provider_id, total_transactions, gross_captured_volume, platform_share_collected, provider_share_expected, provider_share_released")
-      .gte("month_start", monthStart(range.from))
-      .lte("month_start", monthStart(range.to))
-      .order("month_start", { ascending: true })
-      .order("provider_id", { ascending: true })
-      .range(start, end)
-  );
-  const providers = await namesFor("providers", "business_name_en", rows.map((row) => String(row.provider_id ?? "")));
+  const rows = await exportRows("provider_settlements", range);
   return {
     headers: translations[lang].headers.provider_settlements,
     rows: rows.map((row) => [
       String(row.month_start ?? "").slice(0, 7),
-      providers[String(row.provider_id)] ?? "",
+      String(row.provider_name ?? ""),
       num(row.total_transactions),
       num(row.gross_captured_volume),
       num(row.platform_share_collected),
@@ -213,8 +154,9 @@ const builders: Record<ReportKey, (range: Range, lang: OperationsLocale) => Prom
 // ---------------------------------------------------------------------------
 const FUNNEL_MAX_DAYS = 366;
 const FUNNEL_ORDER = ["booking_confirmed", "payment_succeeded", "booking_completed", "booking_cancelled", "booking_no_show"];
-type EventCount = { day: string; event: string; source: string; events: number | string; people: number | string };
-type FunnelRow = { event: string; source: string; events: number; busiestDayPeople: number; days: number };
+// D4 (GOV-2): a day cell describing 1 to 4 people comes back suppressed (events and people null) and is counted apart.
+type EventCount = { day: string; event: string; source: string; events: number | string | null; people: number | string | null; suppressed?: boolean };
+type FunnelRow = { event: string; source: string; events: number; busiestDayPeople: number; days: number; suppressedDays: number };
 
 const funnelCopy = {
   en: {
@@ -231,6 +173,7 @@ const funnelCopy = {
     events: "Events",
     people: "Most people in one day",
     days: "Days with events",
+    suppressedNote: "Days on which fewer than 5 people made an event are not counted, so no one can be singled out: {n} such day(s).",
     server: "Server",
     client: "App",
     names: {
@@ -255,6 +198,7 @@ const funnelCopy = {
     events: "الأحداث",
     people: "أكثر عدد أشخاص في يوم واحد",
     days: "أيام فيها أحداث",
+    suppressedNote: "لا تُحسب الأيام التي سجل فيها أقل من 5 أشخاص أحداثاً حتى لا يمكن تمييز أحد: {n} يوم/أيام.",
     server: "الخادم",
     client: "التطبيق",
     names: {
@@ -288,9 +232,13 @@ function FunnelSection({ range, lang }: { range: Range; lang: OperationsLocale }
       const byEvent = new Map<string, FunnelRow>();
       for (const item of (data ?? []) as EventCount[]) {
         const id = `${item.event}|${item.source}`;
-        const row = byEvent.get(id) ?? { event: item.event, source: item.source, events: 0, busiestDayPeople: 0, days: 0 };
-        row.events += num(item.events);
-        row.busiestDayPeople = Math.max(row.busiestDayPeople, num(item.people));
+        const row = byEvent.get(id) ?? { event: item.event, source: item.source, events: 0, busiestDayPeople: 0, days: 0, suppressedDays: 0 };
+        if (item.suppressed) {
+          row.suppressedDays += 1;
+        } else {
+          row.events += num(item.events);
+          row.busiestDayPeople = Math.max(row.busiestDayPeople, num(item.people));
+        }
         row.days += 1;
         byEvent.set(id, row);
       }
@@ -338,8 +286,11 @@ function FunnelSection({ range, lang }: { range: Range; lang: OperationsLocale }
                       {t.names[row.event] ?? <span dir="ltr" className="font-mono">{row.event}</span>}
                     </td>
                     <td className="px-4 py-3">{row.source === "server" ? t.server : t.client}</td>
-                    <td className="px-4 py-3">{row.events.toLocaleString(numberFormat)}</td>
-                    <td className="px-4 py-3">{row.busiestDayPeople.toLocaleString(numberFormat)}</td>
+                    <td className="px-4 py-3">
+                      {row.events.toLocaleString(numberFormat)}
+                      {row.suppressedDays > 0 && <span className="mt-1 block text-[10px] font-semibold text-gray-500">{fill(t.suppressedNote, { n: row.suppressedDays.toLocaleString(numberFormat) })}</span>}
+                    </td>
+                    <td className="px-4 py-3">{row.busiestDayPeople > 0 ? row.busiestDayPeople.toLocaleString(numberFormat) : "—"}</td>
                     <td className="px-4 py-3">{row.days.toLocaleString(numberFormat)}</td>
                   </tr>
                 ))}
@@ -378,21 +329,14 @@ export default function AdminReports() {
         setMessage({ error: t.noRows });
         return;
       }
-      // Record first: no file leaves the system without an audit entry.
-      const { error: auditError } = await supabase.rpc("admin_record_export", {
-        p_report: key,
-        p_from: range.from,
-        p_to: range.to,
-        p_row_count: built.rows.length,
-      });
-      if (auditError) throw auditError;
       // The monthly reports hand out whole calendar months, so their file name carries months, not the chosen days.
       const monthly = key !== "payments_ledger";
       const file = `${key.replace(/_/g, "-")}_${monthly ? `${monthStart(range.from).slice(0, 7)}_${monthStart(range.to).slice(0, 7)}` : `${range.from}_${range.to}`}.csv`;
       downloadCsv(file, toCsv(built.headers, built.rows));
       setMessage({ success: fill(t.done, { file, rows: built.rows.length.toLocaleString(isRTL ? "ar-SA" : "en-US") }) });
     } catch (error) {
-      setMessage({ error: error instanceof TooManyRows ? fill(t.tooMany, { n: MAX_ROWS.toLocaleString(isRTL ? "ar-SA" : "en-US") }) : errorMessage(error) });
+      const tooMany = (error as { hint?: string } | null)?.hint === "too_many_rows";
+      setMessage({ error: tooMany ? fill(t.tooMany, { n: MAX_ROWS.toLocaleString(isRTL ? "ar-SA" : "en-US") }) : errorMessage(error) });
     } finally {
       setBusy("");
     }

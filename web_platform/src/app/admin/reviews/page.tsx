@@ -84,14 +84,23 @@ export default function AdminReviews() {
           moderation_status,
           reply_comment,
           reply_created_at,
-          customer:profiles!reviews_customer_id_fkey(first_name, last_name),
+          customer_id,
           provider:providers(business_name_en, business_name_ar),
           employee:employees(name_en, name_ar)
         `)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setReviews(data || []);
+      // GOV-2 (Q4): reviewers' names come from the audited admin_people_names (logged with the ids it resolved).
+      const rows = (data ?? []) as Array<Record<string, any>>;
+      const ids = [...new Set(rows.map((row) => row.customer_id as string | null).filter((id): id is string => Boolean(id)))];
+      const names = new Map<string, { first_name: string | null; last_name: string | null }>();
+      if (ids.length > 0) {
+        const { data: people, error: namesError } = await supabase.rpc("admin_people_names", { p_ids: ids, p_purpose: "review_moderation" });
+        if (namesError) throw namesError;
+        for (const person of (people ?? []) as Array<{ id: string; first_name: string | null; last_name: string | null }>) names.set(person.id, person);
+      }
+      setReviews(rows.map((row) => ({ ...row, customer: row.customer_id ? names.get(row.customer_id) ?? null : null })));
     } catch (err: any) {
       console.warn("Failed to load live reviews:", err.message);
       setActionError(err?.message || "Failed to sync reviews from database.");
@@ -211,7 +220,7 @@ export default function AdminReviews() {
           </div>
         ) : (
           reviews.map(r => {
-            const customerName = r.customer ? `${r.customer.first_name || ""} ${r.customer.last_name || ""}`.trim() : (isRTL ? "عميل موثق" : "Verified Client");
+            const customerName = r.customer ? `${r.customer.first_name || ""} ${r.customer.last_name || ""}`.trim() : (r.customer_id ? (isRTL ? `العميل ${String(r.customer_id).slice(0, 8)}` : `Customer ${String(r.customer_id).slice(0, 8)}`) : "—");
             const providerName = isRTL ? r.provider?.business_name_ar || r.provider?.business_name_en : r.provider?.business_name_en;
             const staffName = isRTL ? r.employee?.name_ar || r.employee?.name_en : r.employee?.name_en;
             const statusKey = r.moderation_status || "published";

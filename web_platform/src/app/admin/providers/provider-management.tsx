@@ -49,7 +49,8 @@ type EmployeeFigures = {
   noShowBookings: number;
   revenue: number;
   commissionAmount: number;
-  earnings: number;
+  // null when the console role holds no ledger permission (GOV-2): shown as "—", never as zero.
+  earnings: number | null;
   reviewCount: number;
   ratingSum: number;
   repeatCustomers: number;
@@ -506,7 +507,7 @@ function figuresFromEmployeeRow(row: EmployeePerformanceRow): EmployeeFigures {
     noShowBookings: num(row.no_show_bookings),
     revenue: num(row.gross_revenue),
     commissionAmount: num(row.commission_amount),
-    earnings: num(row.employee_earnings),
+    earnings: row.employee_earnings === null || row.employee_earnings === undefined ? null : num(row.employee_earnings),
     reviewCount: num(row.review_count),
     ratingSum: num(row.rating_sum),
     repeatCustomers: num(row.repeat_customers)
@@ -754,7 +755,8 @@ export default function AdminProviderManagement() {
       // its place: the screen says so and shows no figures.
       const [branchResult, employeeResult] = await Promise.all([
         supabase.from("admin_branch_performance").select("*"),
-        supabase.from("admin_employee_performance").select("*")
+        // GOV-2 (Q4): per-employee figures (earnings come from the ledger) are read through the audited report.
+        supabase.rpc("admin_employee_performance_report", { p_provider_id: null, p_purpose: "provider_onboarding" })
       ]);
       let branchFigures: Record<string, Tally> | null = null;
       let employeeFigures: Record<string, EmployeeFigures> | null = null;
@@ -778,12 +780,10 @@ export default function AdminProviderManagement() {
     setAppsLoading(true);
     setAppsError("");
     try {
-      let result = await supabase.from("admin_provider_applications_view").select("*").order("created_at", { ascending: false });
-      if (result.error) {
-        result = await supabase.from("provider_applications").select("*").order("created_at", { ascending: false });
-      }
+      // GOV-2 (Q4): applicants' names and contact details are read through the audited admin_list_provider_applications.
+      const result = await supabase.rpc("admin_list_provider_applications", { p_status: null, p_limit: 500, p_offset: 0, p_purpose: "provider_onboarding" });
       if (result.error) throw result.error;
-      setApplications((result.data as ProviderApplicationRecord[]) || []);
+      setApplications(((result.data as { rows?: ProviderApplicationRecord[] } | null)?.rows ?? []) as ProviderApplicationRecord[]);
     } catch (loadError) {
       setApplications([]);
       setAppsError(errorMessage(loadError));
@@ -1035,7 +1035,7 @@ export default function AdminProviderManagement() {
   const portalTarget = typeof document !== "undefined" ? document.body : null;
   const detailOutcomes = detail?.figures ? describeOutcomes(detail.figures) : null;
   const detailEmployeeEarnings = detail
-    ? detail.shops.flatMap((shop) => shop.employees.map((employee) => ({ employee, shop }))).filter((item) => item.employee.figures && (item.employee.figures.earnings > 0 || item.employee.figures.completedBookings > 0))
+    ? detail.shops.flatMap((shop) => shop.employees.map((employee) => ({ employee, shop }))).filter((item) => item.employee.figures && ((item.employee.figures.earnings ?? 0) > 0 || item.employee.figures.completedBookings > 0))
     : [];
   const actionButton = "rounded-xl px-3 py-2 text-[11px] font-black disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-[#9B7928]";
 
@@ -1699,7 +1699,9 @@ export default function AdminProviderManagement() {
                     <div className="mt-1 text-xs font-semibold text-[#667085]">{t.employeeEarningsSource}</div>
                   </div>
                   <strong className="font-serif text-xl font-black text-gray-900">
-                    {money(detailEmployeeEarnings.reduce((sum, item) => sum + (item.employee.figures?.earnings ?? 0), 0))}
+                    {detailEmployeeEarnings.some((item) => item.employee.figures?.earnings === null)
+                      ? "—"
+                      : money(detailEmployeeEarnings.reduce((sum, item) => sum + (item.employee.figures?.earnings ?? 0), 0))}
                   </strong>
                 </div>
                 {detailEmployeeEarnings.length === 0 ? (
@@ -1713,7 +1715,7 @@ export default function AdminProviderManagement() {
                         <div className="mt-3 grid grid-cols-2 gap-2">
                           <div className="rounded-xl bg-white p-3">
                             <span className="block text-[8px] font-black uppercase tracking-wider text-[#667085]">{t.earnings}</span>
-                            <strong className="mt-1 block text-xs font-black text-[#9A741F]">{money(employee.figures?.earnings ?? 0)}</strong>
+                            <strong className="mt-1 block text-xs font-black text-[#9A741F]">{employee.figures?.earnings === null || employee.figures?.earnings === undefined ? "—" : money(employee.figures.earnings)}</strong>
                           </div>
                           <div className="rounded-xl bg-white p-3">
                             <span className="block text-[8px] font-black uppercase tracking-wider text-[#667085]">{t.completed}</span>
@@ -1808,7 +1810,7 @@ export default function AdminProviderManagement() {
                             {figures && outcomes ? (
                               <div className="mt-3 grid grid-cols-3 gap-2 text-center">
                                 {[
-                                  [t.earnings, money(figures.earnings), "text-[#9A741F]"],
+                                  [t.earnings, figures.earnings === null ? "—" : money(figures.earnings), "text-[#9A741F]"],
                                   [t.rating, stars(outcomes.rating), "text-gray-900"],
                                   [t.completed, count(figures.completedBookings), "text-gray-900"],
                                   [t.cancelled, count(figures.cancelledBookings), "text-gray-900"],
