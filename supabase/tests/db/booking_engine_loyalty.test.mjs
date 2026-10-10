@@ -13,8 +13,13 @@ const money = (n) => Math.round(Number(n) * 100) / 100;
 const PRICE = 85;
 let slot = 0;
 
-const programme = (value) => sys(db, `insert into platform_settings (key, value) values ('loyalty_program', $1::jsonb)
-                                      on conflict (key) do update set value = excluded.value`, [JSON.stringify(value)]);
+// The runtime setting the engine reads. On the release path only an approved programme change writes it (D-Q7); this engine test
+// sets the runtime values directly as the table owner, through the same server path marker the approval uses.
+const programme = (value) => db.transaction(async (tx) => {
+  await tx.query(`select set_config('request.jwt.claims', '{"role":"service_role"}', true), set_config('primora.reward_program_write', 'on', true)`);
+  await tx.query(`insert into platform_settings (key, value) values ('loyalty_program', $1::jsonb)
+                  on conflict (key) do update set value = excluded.value`, [JSON.stringify(value)]);
+});
 const balance = async () => (await sys(db, `select points_balance n from customer_loyalty where id = $1`, [loyaltyId]))[0].n;
 const setBalance = (n) => sys(db, `update customer_loyalty set points_balance = $2 where id = $1`, [loyaltyId, n]);
 const book = (points, coupon = null) => {

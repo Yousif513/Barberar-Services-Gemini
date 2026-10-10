@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
 import { sar, useOperationsLocale } from "@/components/operations-ui";
 import { ModalOverlay, ModalPortal } from "@/components/modal";
+import { RewardTerms } from "@/components/reward-terms";
 import { formatBookingDate, walletEntryStatus, upcomingDepositTotal } from "@/lib/booking-display.mjs";
 
 const translations = {
@@ -39,8 +40,8 @@ const translations = {
     referralCodeUnavailable: "Your referral code could not be loaded right now.",
     referralTitleWith: "Invite Friends & Earn {amount}",
     referralTitleGeneric: "Invite Friends & Earn Wallet Credit",
-    referralSubtitleWith: "Share your code. When a friend completes their first service booking, you both receive {amount} in wallet credits.",
-    referralSubtitleGeneric: "Share your code. When a friend completes their first service booking, you both receive wallet credits.",
+    referralSubtitleWith: "Share your code. When a friend completes their first paid visit and it is not refunded, you both receive {amount} in wallet credits, within the programme's monthly limit.",
+    referralSubtitleGeneric: "Share your code. When a friend completes their first paid visit and it is not refunded, you both receive wallet credits, within the programme's monthly limit.",
     referralBadge: "Referral & Rewards",
     giftTitle: "Send a Gift Card",
     giftRecipient: "Recipient Name",
@@ -118,8 +119,8 @@ const translations = {
     referralCodeUnavailable: "تعذر تحميل رمز الدعوة الخاص بك الآن.",
     referralTitleWith: "ادعُ أصدقاءك واكسب {amount}",
     referralTitleGeneric: "ادعُ أصدقاءك واكسب رصيداً في المحفظة",
-    referralSubtitleWith: "شارك رمزك الخاص. عندما يكمل صديقك حجزه الأول، يحصل كلاكما على {amount} كرصيد في المحفظة.",
-    referralSubtitleGeneric: "شارك رمزك الخاص. عندما يكمل صديقك حجزه الأول، يحصل كلاكما على رصيد في المحفظة.",
+    referralSubtitleWith: "شارك رمزك الخاص. عندما يكمل صديقك أول زيارة مدفوعة ولا تُسترد، يحصل كلاكما على {amount} كرصيد في المحفظة ضمن الحد الشهري للبرنامج.",
+    referralSubtitleGeneric: "شارك رمزك الخاص. عندما يكمل صديقك أول زيارة مدفوعة ولا تُسترد، يحصل كلاكما على رصيد في المحفظة ضمن الحد الشهري للبرنامج.",
     referralBadge: "برنامج المكافآت والإحالة",
     giftTitle: "إهداء بطاقة هدية",
     giftRecipient: "اسم المستلم",
@@ -559,6 +560,12 @@ export default function CustomerWalletPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* D-Q7: enrolment means accepting the published terms of each programme */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <RewardTerms program="referral" locale={locale} />
+        <RewardTerms program="loyalty" locale={locale} />
       </div>
 
       {/* ACTIVE WALLET CREDITS BREAKDOWN (G49) */}

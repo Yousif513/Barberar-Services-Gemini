@@ -20,7 +20,7 @@ type Status = (typeof STATUSES)[number];
 type Numeric = number | string | null;
 type ApprovalRow = {
   id: string;
-  kind: "payout_release" | "refund" | "iban_change" | "setting_change";
+  kind: "payout_release" | "refund" | "iban_change" | "setting_change" | "ledger_settlement" | "ledger_adjustment" | "fee_rule_change" | "payout_hold" | "reward_program";
   status: string;
   target_id: string | null;
   amount_sar: Numeric;
@@ -69,7 +69,11 @@ const translations = {
     title: "Approvals",
     subtitle: "Actions that need a second administrator. You cannot approve your own request; the server refuses it for every role, owners included.",
     tabs: { pending: "Waiting", approved: "Approved", rejected: "Rejected", cancelled: "Withdrawn" },
-    kinds: { payout_release: "Payout release", refund: "Refund", iban_change: "Bank account change", setting_change: "Threshold change" },
+    kinds: { payout_release: "Payout release", refund: "Refund", iban_change: "Bank account change", setting_change: "Threshold change",
+      ledger_settlement: "Manual ledger settlement", ledger_adjustment: "Ledger correction", fee_rule_change: "Fee rule change",
+      payout_hold: "Payout hold", reward_program: "Reward programme change" },
+    describeParts: { increase: "increase, 30 days notice", from: "from", place: "place hold", lift: "lift hold", enable: "enable", disable: "disable",
+      reference: "bank reference", provider: "provider", platform: "platform", tap: "Tap object" },
     columnRequest: "Request",
     columnAmount: "Amount",
     columnRequestedBy: "Requested by",
@@ -164,7 +168,11 @@ const translations = {
     title: "الاعتمادات",
     subtitle: "إجراءات تحتاج إلى مسؤول ثانٍ. لا يمكنك اعتماد طلبك بنفسك؛ يرفض الخادم ذلك لكل الأدوار بما فيها المالك.",
     tabs: { pending: "بانتظار القرار", approved: "معتمدة", rejected: "مرفوضة", cancelled: "مسحوبة" },
-    kinds: { payout_release: "صرف تحويل", refund: "استرداد", iban_change: "تغيير حساب بنكي", setting_change: "تغيير حد" },
+    kinds: { payout_release: "صرف تحويل", refund: "استرداد", iban_change: "تغيير حساب بنكي", setting_change: "تغيير حد",
+      ledger_settlement: "تسوية قيد يدوية", ledger_adjustment: "تصحيح قيد", fee_rule_change: "تغيير قاعدة رسوم",
+      payout_hold: "إيقاف التحويلات", reward_program: "تغيير برنامج مكافآت" },
+    describeParts: { increase: "زيادة، إشعار 30 يوماً", from: "من", place: "إيقاف", lift: "رفع الإيقاف", enable: "تفعيل", disable: "إيقاف",
+      reference: "المرجع البنكي", provider: "المزود", platform: "المنصة", tap: "معرّف Tap" },
     columnRequest: "الطلب",
     columnAmount: "المبلغ",
     columnRequestedBy: "مقدّم الطلب",
@@ -326,6 +334,25 @@ function ApprovalsScreen() {
     }
     if (row.kind === "iban_change") {
       return [providerName(row), text(s.bank_name), text(s.iban_masked)].filter(Boolean).join(" · ");
+    }
+    const d = t.describeParts;
+    if (row.kind === "ledger_settlement") {
+      return [providerName(row), sar(toNumber(s.amount as Numeric), lang), `${d.reference}: ${text(s.bank_reference)}`].filter(Boolean).join(" · ");
+    }
+    if (row.kind === "ledger_adjustment") {
+      return [providerName(row), text(s.correction), `${d.provider} ${sar(toNumber(s.provider_share_delta as Numeric), lang)}`,
+        `${d.platform} ${sar(toNumber(s.platform_share_delta as Numeric), lang)}`, s.tap_object_id ? `${d.tap}: ${text(s.tap_object_id)}` : ""].filter(Boolean).join(" · ");
+    }
+    if (row.kind === "fee_rule_change") {
+      const after = (s.after ?? {}) as Record<string, unknown>;
+      return [`${text(after.fee_percentage)}%`, sar(toNumber(after.min_fee_sar as Numeric), lang), after.max_fee_sar === null ? "" : sar(toNumber(after.max_fee_sar as Numeric), lang),
+        `${d.from} ${text(s.effective_from).slice(0, 10)}`, s.increase ? d.increase : ""].filter(Boolean).join(" · ");
+    }
+    if (row.kind === "payout_hold") {
+      return [providerName(row), s.action === "lift" ? d.lift : d.place].filter(Boolean).join(" · ");
+    }
+    if (row.kind === "reward_program") {
+      return [text(s.program), s.enabled ? d.enable : d.disable, s.reward_value_sar === null || s.reward_value_sar === undefined ? "" : sar(toNumber(s.reward_value_sar as Numeric), lang)].filter(Boolean).join(" · ");
     }
     return [providerName(row), text(s.iban_masked)].filter(Boolean).join(" · ");
   };

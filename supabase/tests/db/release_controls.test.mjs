@@ -70,14 +70,14 @@ describe("platform settings", () => {
     assert.equal(row.details.reason, "Customers need longer to pay");
   });
 
-  it("validates loyalty values and keeps tier tables", async () => {
-    await expectError(as(db, admin, `select admin_update_platform_setting('loyalty_program', '{"enabled":true}'::jsonb, 'Launch')`), /need enabled/);
-    await as(db, admin, `select admin_update_platform_setting('loyalty_program',
-      '{"enabled":true,"points_per_sar":0.1,"sar_per_point":0.1,"min_redeem_points":100}'::jsonb, 'Owner approved launch values')`);
-    const v = (await sys(db, `select value, approved_by from platform_settings where key = 'loyalty_program'`))[0];
-    assert.equal(v.value.enabled, true);
-    assert.ok(v.value.tiers, "tier table preserved");
+  it("refuses loyalty and referral values through the generic settings command (D-Q7: only an approved programme change)", async () => {
+    for (const key of ["loyalty_program", "referral_program"]) {
+      await expectError(as(db, admin, `select admin_update_platform_setting($1, '{"enabled":true,"points_per_sar":0.1,"sar_per_point":0.1,"min_redeem_points":100}'::jsonb, 'Owner approved launch values')`, [key]),
+        /approved programme change/);
+    }
+    assert.deepEqual((await sys(db, `select value from platform_settings where key = 'loyalty_program'`))[0].value, { enabled: false });
   });
+
 });
 
 describe("operator hold release", () => {

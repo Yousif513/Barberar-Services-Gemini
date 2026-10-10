@@ -2,10 +2,11 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { ForbiddenNotice, isForbidden, useOperationsLocale } from "@/components/operations-ui";
+import { RewardProgrammes } from "./reward-programmes";
 
-// Platform settings that the database actually reads: booking hold expiry (expire_stale_booking_holds),
-// loyalty (booking pricing and reward triggers) and referral rewards. Every change goes through
-// admin_update_platform_setting, which validates the value, requires a reason and writes the audit log.
+// Platform settings that the database actually reads: booking hold expiry (expire_stale_booking_holds), changed through
+// admin_update_platform_setting, which validates the value, requires a reason and writes the audit log. Referral and loyalty
+// change only through an approved programme change (D-Q7), in RewardProgrammes below.
 type SettingRow = {
   key: string;
   value: Record<string, unknown> | number;
@@ -14,7 +15,7 @@ type SettingRow = {
   updated_at: string | null;
 };
 
-type SectionKey = "booking_hold_minutes" | "loyalty_program" | "referral_program";
+type SectionKey = "booking_hold_minutes";
 
 const translations = {
   en: {
@@ -34,20 +35,7 @@ const translations = {
     holdTitle: "Unpaid booking hold",
     holdHelp: "Minutes an unpaid booking keeps its time slot before it is released (5–120).",
     holdLabel: "Hold minutes",
-    loyaltyTitle: "Loyalty points",
-    loyaltyHelp: "Customers earn points on completed visits and can redeem them at checkout.",
-    enabled: "Enabled",
-    pointsPerSar: "Points earned per SAR",
-    sarPerPoint: "SAR value of one point",
-    minRedeem: "Minimum points to redeem",
-    referralTitle: "Referral rewards",
-    referralHelp: "Wallet credit for the referrer and the new customer after the new customer's first completed visit.",
-    rewardSar: "Reward per person (SAR)",
     holdInvalid: "Hold minutes must be a whole number from 5 to 120.",
-    pointsInvalid: "Points earned per SAR must be a number, 0 or more.",
-    valueInvalid: "The SAR value of one point must be a number, 0 or more.",
-    redeemInvalid: "Minimum points to redeem must be a whole number, 1 or more.",
-    rewardInvalid: "The reward per person must be a number, 0 or more.",
   },
   ar: {
     title: "إعدادات المنصة",
@@ -66,20 +54,7 @@ const translations = {
     holdTitle: "مهلة الحجز غير المدفوع",
     holdHelp: "عدد الدقائق التي يحتفظ فيها الحجز غير المدفوع بموعده قبل إطلاقه (5–120).",
     holdLabel: "دقائق المهلة",
-    loyaltyTitle: "نقاط الولاء",
-    loyaltyHelp: "يكسب العملاء نقاطاً عن الزيارات المكتملة ويمكنهم استبدالها عند الدفع.",
-    enabled: "مفعّل",
-    pointsPerSar: "النقاط المكتسبة لكل ريال",
-    sarPerPoint: "قيمة النقطة الواحدة بالريال",
-    minRedeem: "الحد الأدنى من النقاط للاستبدال",
-    referralTitle: "مكافآت الإحالة",
-    referralHelp: "رصيد محفظة للمُحيل وللعميل الجديد بعد أول زيارة مكتملة للعميل الجديد.",
-    rewardSar: "المكافأة لكل شخص (ر.س)",
     holdInvalid: "يجب أن تكون دقائق المهلة عدداً صحيحاً من 5 إلى 120.",
-    pointsInvalid: "يجب أن تكون النقاط المكتسبة لكل ريال رقماً لا يقل عن 0.",
-    valueInvalid: "يجب أن تكون قيمة النقطة بالريال رقماً لا يقل عن 0.",
-    redeemInvalid: "يجب أن يكون الحد الأدنى للاستبدال عدداً صحيحاً لا يقل عن 1.",
-    rewardInvalid: "يجب أن تكون المكافأة لكل شخص رقماً لا يقل عن 0.",
   },
 };
 
@@ -94,12 +69,10 @@ export default function AdminSettings() {
   // The field the last check refused, so its message sits beside it and the field is marked invalid.
   const [invalid, setInvalid] = useState<{ field: string; message: string } | null>(null);
   const [hold, setHold] = useState("");
-  const [loyalty, setLoyalty] = useState({ enabled: false, points_per_sar: "", sar_per_point: "", min_redeem_points: "" });
-  const [referral, setReferral] = useState({ enabled: false, reward_sar: "" });
-  const [reasons, setReasons] = useState<Record<SectionKey, string>>({ booking_hold_minutes: "", loyalty_program: "", referral_program: "" });
+  const [reasons, setReasons] = useState<Record<SectionKey, string>>({ booking_hold_minutes: "" });
   const [saving, setSaving] = useState<SectionKey | "">("");
   const [messages, setMessages] = useState<Record<SectionKey, { error?: string; success?: string }>>({
-    booking_hold_minutes: {}, loyalty_program: {}, referral_program: {},
+    booking_hold_minutes: {},
   });
 
   // A reload after a save is silent: the form stays on screen (and keeps focus) while the saved values are read back.
@@ -109,7 +82,7 @@ export default function AdminSettings() {
     const { data, error } = await supabase
       .from("platform_settings")
       .select("key, value, requires_owner_approval, approved_at, updated_at")
-      .in("key", ["booking_hold_minutes", "loyalty_program", "referral_program"]);
+      .in("key", ["booking_hold_minutes"]);
     if (error) {
       setLoadError(error.message);
       setLoadForbidden(isForbidden(error));
@@ -122,15 +95,6 @@ export default function AdminSettings() {
     setRows(byKey);
     const holdValue = byKey.booking_hold_minutes?.value;
     setHold(holdValue === undefined ? "" : String(holdValue));
-    const l = (byKey.loyalty_program?.value || {}) as Record<string, unknown>;
-    setLoyalty({
-      enabled: l.enabled === true,
-      points_per_sar: l.points_per_sar === undefined ? "" : String(l.points_per_sar),
-      sar_per_point: l.sar_per_point === undefined ? "" : String(l.sar_per_point),
-      min_redeem_points: l.min_redeem_points === undefined ? "" : String(l.min_redeem_points),
-    });
-    const r = (byKey.referral_program?.value || {}) as Record<string, unknown>;
-    setReferral({ enabled: r.enabled === true, reward_sar: r.reward_sar === undefined ? "" : String(r.reward_sar) });
     setLoading(false);
   }, []);
 
@@ -250,65 +214,10 @@ export default function AdminSettings() {
             })}
           </section>
 
-          <section className={cardBase} aria-labelledby="loyalty-title">
-            <h3 id="loyalty-title" className="text-sm font-black text-gray-900">{t.loyaltyTitle}</h3>
-            <p className="text-xs text-gray-500">{t.loyaltyHelp}</p>
-            <label className={`flex items-center gap-2 text-xs font-bold text-gray-800 ${isRTL ? "flex-row-reverse justify-end" : ""}`}>
-              <input type="checkbox" checked={loyalty.enabled} onChange={(e) => setLoyalty((prev) => ({ ...prev, enabled: e.target.checked }))} />
-              <span>{t.enabled}</span>
-            </label>
-            <label className={labelBase}>
-              <span>{t.pointsPerSar}</span>
-              <input {...fieldProps("points-per-sar")} type="number" min={0} step="0.01" className={inputBase} value={loyalty.points_per_sar} onChange={(e) => setLoyalty((prev) => ({ ...prev, points_per_sar: e.target.value }))} />
-              {fieldError("points-per-sar")}
-            </label>
-            <label className={labelBase}>
-              <span>{t.sarPerPoint}</span>
-              <input {...fieldProps("sar-per-point")} type="number" min={0} step="0.01" className={inputBase} value={loyalty.sar_per_point} onChange={(e) => setLoyalty((prev) => ({ ...prev, sar_per_point: e.target.value }))} />
-              {fieldError("sar-per-point")}
-            </label>
-            <label className={labelBase}>
-              <span>{t.minRedeem}</span>
-              <input {...fieldProps("min-redeem")} type="number" min={1} step={1} className={inputBase} value={loyalty.min_redeem_points} onChange={(e) => setLoyalty((prev) => ({ ...prev, min_redeem_points: e.target.value }))} />
-              {fieldError("min-redeem")}
-            </label>
-            {sectionFooter("loyalty_program", () => {
-              const value = {
-                enabled: loyalty.enabled,
-                points_per_sar: num(loyalty.points_per_sar),
-                sar_per_point: num(loyalty.sar_per_point),
-                min_redeem_points: num(loyalty.min_redeem_points),
-              };
-              if (!Number.isFinite(value.points_per_sar) || value.points_per_sar < 0) return refuse("loyalty_program", "points-per-sar", t.pointsInvalid);
-              if (!Number.isFinite(value.sar_per_point) || value.sar_per_point < 0) return refuse("loyalty_program", "sar-per-point", t.valueInvalid);
-              if (!Number.isInteger(value.min_redeem_points) || value.min_redeem_points < 1) return refuse("loyalty_program", "min-redeem", t.redeemInvalid);
-              void save("loyalty_program", value);
-            })}
-          </section>
-
-          <section className={cardBase} aria-labelledby="referral-title">
-            <h3 id="referral-title" className="text-sm font-black text-gray-900">{t.referralTitle}</h3>
-            <p className="text-xs text-gray-500">{t.referralHelp}</p>
-            <label className={`flex items-center gap-2 text-xs font-bold text-gray-800 ${isRTL ? "flex-row-reverse justify-end" : ""}`}>
-              <input type="checkbox" checked={referral.enabled} onChange={(e) => setReferral((prev) => ({ ...prev, enabled: e.target.checked }))} />
-              <span>{t.enabled}</span>
-            </label>
-            <label className={labelBase}>
-              <span>{t.rewardSar}</span>
-              <input {...fieldProps("referral-reward")} type="number" min={0} step="0.01" className={inputBase} value={referral.reward_sar} onChange={(e) => setReferral((prev) => ({ ...prev, reward_sar: e.target.value }))} />
-              {fieldError("referral-reward")}
-            </label>
-            {sectionFooter("referral_program", () => {
-              const reward = num(referral.reward_sar);
-              if (!Number.isFinite(reward) || reward < 0) {
-                refuse("referral_program", "referral-reward", t.rewardInvalid);
-                return;
-              }
-              void save("referral_program", { enabled: referral.enabled, reward_sar: reward });
-            })}
-          </section>
         </div>
       )}
+
+      <RewardProgrammes locale={lang} />
     </div>
   );
 }
