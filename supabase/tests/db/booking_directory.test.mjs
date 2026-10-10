@@ -73,7 +73,10 @@ describe("booking directory", () => {
 
   it("finds a booking by its ID, its invoice number, the customer or the provider", async () => {
     const target = await booking(omar, "confirmed", { price: 250, at: "now() - interval '200 days'" });
+    // Fixture as the table owner: the invoice number is frozen for every writer after creation (GOV-1 review C-2).
+    await sys(db, `alter table bookings disable trigger protect_booking_immutable_fields_before_update`);
     await sys(db, `update bookings set invoice_number = 70123 where id = $1`, [target.id]);
+    await sys(db, `alter table bookings enable trigger protect_booking_immutable_fields_before_update`);
     target.invoice_number = 70123;
     assert.deepEqual((await directory({ search: target.id })).rows.map((r) => r.id), [target.id], "the full booking ID, however old");
     assert.deepEqual((await directory({ search: `#${target.invoice_number}` })).rows.map((r) => r.id), [target.id], "the invoice number");

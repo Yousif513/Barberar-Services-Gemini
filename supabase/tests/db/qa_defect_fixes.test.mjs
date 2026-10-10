@@ -1,5 +1,6 @@
 import { before, describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { approvedDestination } from "./gov1_fixtures.mjs";
 import { as, createMigratedDb, createUser, firstSlot, nextWorkingDate, ROLES, SEED, serviceFor, sys } from "./harness.mjs";
 
 // Proof for the defects the independent QA pass reproduced (migration 20261005170000_qa_release_gate_fixes.sql).
@@ -15,6 +16,8 @@ const owner1 = ROLES.user(SEED.owner1);
 const owner2 = ROLES.user(SEED.owner2);
 const customer = ROLES.user(SEED.customer);
 
+// MONEY (GOV-1 review C-1/C-2): client roles hold no write privilege on bookings or money tables, so a direct write is refused.
+const deniedAsNone = (error) => (/permission denied/.test(error.message) ? [] : Promise.reject(error));
 const outcome = (promise) => promise.then(() => "ok", (error) => error.code ?? error.message);
 const auditCount = async () => (await sys(db, `select count(*)::int as n from admin_audit_logs`))[0].n;
 const auditRows = (action, target) => sys(db, `select actor_id, details from admin_audit_logs where action = $1 and target_id = $2`, [action, target]);
@@ -46,7 +49,7 @@ before(async () => {
 describe("a provider's direct write to bookings no longer bypasses the money commands", () => {
   it("cannot cancel a paid booking directly, so the customer's deposit is never left with the provider", async () => {
     const booking = await paidBooking();
-    assert.equal((await as(db, owner1, `update bookings set status = 'cancelled' where id = $1 returning id`, [booking.id])).length, 0);
+    assert.equal((await as(db, owner1, `update bookings set status = 'cancelled' where id = $1 returning id`, [booking.id]).catch(deniedAsNone)).length, 0);
     assert.equal((await sys(db, `select status from bookings where id = $1`, [booking.id]))[0].status, "confirmed");
     // The command does it properly: the customer is owed the deposit back.
     await as(db, owner1, `select cancel_booking($1, 'Provider closed for the day')`, [booking.id]);
@@ -56,7 +59,7 @@ describe("a provider's direct write to bookings no longer bypasses the money com
   it("cannot complete or mark a booking that has not started, directly or through the commands", async () => {
     const booking = await paidBooking();
     for (const status of ["completed", "no_show"]) {
-      assert.equal((await as(db, owner1, `update bookings set status = '${status}' where id = $1 returning id`, [booking.id])).length, 0, `direct ${status}`);
+      assert.equal((await as(db, owner1, `update bookings set status = '${status}' where id = $1 returning id`, [booking.id]).catch(deniedAsNone)).length, 0, `direct ${status}`);
     }
     assert.equal(await outcome(as(db, owner1, `select employee_update_booking_status($1, 'completed', 'early')`, [booking.id])), "22023");
     assert.equal(await outcome(as(db, owner1, `select mark_booking_no_show($1, 'early')`, [booking.id])), "22023");
@@ -78,9 +81,6 @@ describe("audit.search: administrator writes are audited by behaviour, on every 
   // GOV-2: provider_fee_invoices left this list. No client role, administrators included, can read or write it directly any
   // more (the audited admin_list_fee_invoices serves the console); see the test after the loop.
   const cases = [
-    ["psp_reconciliation_runs", async () => (await sys(db, `insert into psp_reconciliation_runs (run_date, status, discrepancy_amount_sar, discrepancy_count)
-      values (current_date, 'discrepant', 500, 3) returning id`))[0].id,
-      (id) => `update psp_reconciliation_runs set status = 'matched', discrepancy_amount_sar = 0, discrepancy_count = 0 where id = '${id}'`],
     ["message_templates", async () => (await sys(db, `select name || '|' || locale as id from message_templates limit 1`))[0].id,
       (id) => `update message_templates set template_body = 'changed' where name = '${id.split("|")[0]}' and locale = '${id.split("|")[1]}'`],
   ];
@@ -93,6 +93,13 @@ describe("audit.search: administrator writes are audited by behaviour, on every 
       assert.ok((await auditCount()) > before, `no audit entry for a direct change to ${table}`);
     });
   }
+
+  it("refuses an administrator's direct change to psp_reconciliation_runs outright (MONEY, GOV-1 review C-1)", async () => {
+    const id = (await sys(db, `insert into psp_reconciliation_runs (run_date, status, discrepancy_amount_sar, discrepancy_count)
+      values (current_date, 'discrepant', 500, 3) returning id`))[0].id;
+    await assert.rejects(as(db, admin, `update psp_reconciliation_runs set status = 'matched', discrepancy_amount_sar = 0 where id = $1 returning 1`, [id]), /permission denied/);
+    assert.equal((await sys(db, `select status from psp_reconciliation_runs where id = $1`, [id]))[0].status, "discrepant");
+  });
 
   it("refuses an administrator's direct change to provider_fee_invoices outright (GOV-2)", async () => {
     const id = (await sys(db, `insert into provider_fee_invoices (provider_id, invoice_number, period_start, period_end)
@@ -179,17 +186,24 @@ describe("a replayed administrator refund creates one refund", () => {
 });
 
 describe("ledger.release-payout and payout.mark-paid: money and access commands take a reason and record it", () => {
-  it("admin_release_ledger_item refuses a blank reason, changes nothing, and records the reason when it works", async () => {
+  it("admin_release_ledger_item refuses a blank reason or bank reference, changes nothing, and records both once a second administrator approves", async () => {
+    await approvedDestination(db, SEED.provider2, "SA4420000001234567891234");
     const id = (await sys(db, `insert into transactional_ledger (provider_id, entry_type, payment_intent_id, total_captured, platform_share, provider_share, payout_status)
-      values ($1, 'package_sale', 'chg_fix_reason', 100, 10, 90, 'pending') returning id`, [SEED.provider1]))[0].id;
+      values ($1, 'package_sale', 'chg_fix_reason', 100, 10, 90, 'pending') returning id`, [SEED.provider2]))[0].id;
     for (const reason of ["null", "''", "'  '", "'ab'"]) {
-      assert.equal(await outcome(as(db, admin, `select admin_release_ledger_item($1, ${reason})`, [id])), "22023", reason);
+      assert.equal(await outcome(as(db, admin, `select admin_release_ledger_item($1, ${reason}, 'TRF-8841')`, [id])), "22023", reason);
     }
+    assert.equal(await outcome(as(db, admin, `select admin_release_ledger_item($1, 'Paid by bank transfer', '')`, [id])), "22023", "a bank reference is required");
     assert.equal((await sys(db, `select payout_status from transactional_ledger where id = $1`, [id]))[0].payout_status, "pending");
-    await as(db, admin, `select admin_release_ledger_item($1, 'Paid by bank transfer, reference 8841')`, [id]);
+    const asked = (await as(db, admin, `select admin_release_ledger_item($1, 'Paid by bank transfer, reference 8841', 'TRF-8841') r`, [id]))[0].r;
+    assert.equal(asked.status, "pending_approval", "H-4: one administrator alone settles nothing");
+    assert.equal((await sys(db, `select payout_status from transactional_ledger where id = $1`, [id]))[0].payout_status, "pending");
+    await as(db, admin2, `select admin_decide_approval($1, 'approve', 'Bank statement matches')`, [asked.approval_id]);
     assert.equal((await sys(db, `select payout_status from transactional_ledger where id = $1`, [id]))[0].payout_status, "released");
     const [row] = await auditRows("ledger.manually_settled", id);
     assert.equal(row.details.reason, "Paid by bank transfer, reference 8841");
+    assert.equal(row.details.bank_reference, "TRF-8841");
+    assert.equal(row.actor_id, admin2.sub);
   });
 
   it("set_user_role needs a reason, refuses to change the caller's own role, and records who changed whom and why", async () => {

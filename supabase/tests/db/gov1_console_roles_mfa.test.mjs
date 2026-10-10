@@ -71,7 +71,11 @@ describe("console roles and permissions", () => {
     const ledger = (user) => as(db, user, `update payment_methods set enabled = enabled returning id`).catch(() => []);
     assert.equal((await ledger(operations)).length, 0, "operations has no money permission");
     assert.equal((await ledger(analyst)).length, 0);
-    assert.ok((await ledger(finance)).length > 0, "finance keeps the existing money write");
+    // MONEY: payment_methods is an owner setting (settings.manage), not a money record; finance no longer writes it directly.
+    assert.equal((await ledger(finance)).length, 0, "finance holds no direct table write");
+    assert.ok((await ledger(owner)).length > 0, "the owner keeps the payment method setting");
+    const money = (user) => as(db, user, `update customer_loyalty set points_balance = points_balance + 1000 returning id`).catch(() => []);
+    for (const user of [owner, finance, operations, analyst]) assert.equal((await money(user)).length, 0, "no console role writes a money table directly");
     assert.equal((await as(db, ROLES.user(SEED.owner1), `update providers set status = status where id = $1 returning id`, [SEED.provider1])).length, 1,
       "a provider owner's own policies still decide");
   });

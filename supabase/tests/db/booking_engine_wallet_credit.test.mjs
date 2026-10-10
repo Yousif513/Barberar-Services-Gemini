@@ -20,7 +20,13 @@ const credit = (owner, amount, { daysOld = 0, expires = "90 days", spent = false
    values ($1, $2, 'Referral reward', 'referral', $3, now() + $4::interval, now() - make_interval(days => $5::int)) returning id`,
   [owner, amount, spent, expires, daysOld]).then((r) => r[0].id);
 const rows = (owner = SEED.customer) => sys(db, `select id, amount, remaining_amount, is_spent from wallet_credits where customer_id = $1 order by created_at, id`, [owner]);
-const clear = () => sys(db, `delete from wallet_credits where customer_id in ($1, $2)`, [SEED.customer, stranger.sub]);
+// Fixture reset as the table owner: D-Q8 makes wallet credits append-only (no DELETE statement), so the reset lifts the trigger
+// for its own transaction only.
+const clear = async () => {
+  await sys(db, `alter table wallet_credits disable trigger trg_money_append_only`);
+  await sys(db, `delete from wallet_credits where customer_id in ($1, $2)`, [SEED.customer, stranger.sub]);
+  await sys(db, `alter table wallet_credits enable trigger trg_money_append_only`);
+};
 const book = (amount, { user = customer } = {}) => {
   slot += 1;
   const minutes = 9 * 60 + (slot % 14) * 30;
@@ -127,18 +133,30 @@ describe("wallet credit spend (D4 / C-D4)", () => {
   });
 
   it("the platform settles the credit with the provider when the visit is completed", async () => {
-    await credit(SEED.customer, 30);
+    const creditId = await credit(SEED.customer, 30);
     const past = (await sys(db,
       `insert into bookings (customer_id, branch_id, employee_id, service_id, status, scheduled_at, duration_minutes, subtotal_price, total_price, tax_amount,
                              deposit_required, platform_commission, source, wallet_credit_amount)
        values ($1, $2, $3, $4, 'confirmed', now() - interval '3 hours', 30, 85, 55, 8.25, 0, 0, 'link', 30) returning id`,
       [SEED.customer, SEED.branch1, SEED.employee1, svc.id]))[0];
+    // GOV-1 review C-2: the settlement follows the redemption rows, not the number on the booking.
+    await sys(db, `insert into wallet_credit_redemptions (wallet_credit_id, booking_id, customer_id, amount) values ($1, $2, $3, 30)`, [creditId, past.id, SEED.customer]);
     await as(db, owner1, `select employee_update_booking_status($1, 'completed')`, [past.id]);
     const entry = await sys(db, `select entry_type, provider_id, total_captured, platform_share, provider_share, payout_status
                                  from transactional_ledger where booking_id = $1 and entry_type = 'wallet_credit_settlement'`, [past.id]);
     assert.equal(entry.length, 1);
     assert.deepEqual([entry[0].provider_id, money(entry[0].total_captured), money(entry[0].platform_share), money(entry[0].provider_share), entry[0].payout_status],
       [SEED.provider1, 0, 0, 30, "pending"]);
+    assert.equal((await sys(db, `select funded_by from transactional_ledger where booking_id = $1 and entry_type = 'wallet_credit_settlement'`, [past.id]))[0].funded_by, "platform");
+
+    // A booking that names a wallet credit nobody redeemed settles nothing (the forged-column route of review C-2).
+    const forged = (await sys(db,
+      `insert into bookings (customer_id, branch_id, employee_id, service_id, status, scheduled_at, duration_minutes, subtotal_price, total_price, tax_amount,
+                             deposit_required, platform_commission, source, wallet_credit_amount)
+       values ($1, $2, $3, $4, 'confirmed', now() - interval '5 hours', 30, 85, 55, 8.25, 0, 0, 'link', 25000) returning id`,
+      [SEED.customer, SEED.branch1, SEED.employee1, svc.id]))[0];
+    await as(db, owner1, `select employee_update_booking_status($1, 'completed')`, [forged.id]);
+    assert.equal((await sys(db, `select count(*)::int n from transactional_ledger where booking_id = $1 and entry_type = 'wallet_credit_settlement'`, [forged.id]))[0].n, 0);
   });
 
   it("customers read their own redemptions, nobody writes them", async () => {

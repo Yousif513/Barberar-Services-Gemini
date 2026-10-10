@@ -32,14 +32,17 @@ describe("administrator writes to money and configuration tables", () => {
                                    values ($1, 'package_sale', 'chg_hard_1', 100, 10, 90, 'pending') returning id`, [SEED.provider1]))[0].id;
     const before = await count("transactional_ledger.update");
     await expectError(as(db, admin, `update transactional_ledger set provider_share = provider_share + 5000 where id = $1`, [ledger]), /permission denied/);
-    await asCommandFor(admin, `update transactional_ledger set provider_share = provider_share + 5000, payout_status = 'released' where id = $1`, [ledger]);
+    // D-Q8: even a command cannot add value to a recorded row, and outside a settling server path it cannot touch it at all.
+    await expectError(asCommandFor(admin, `update transactional_ledger set payout_status = 'released' where id = $1`, [ledger]), /append-only/);
+    await expectError(asCommandFor(admin, `with s as (select set_config('primora.ledger_system_write', 'on', true)) update transactional_ledger set provider_share = provider_share + 5000 from s where id = $1`, [ledger]), /never grow/);
+    await asCommandFor(admin, `with s as (select set_config('primora.ledger_system_write', 'on', true)) update transactional_ledger set payout_status = 'released', provider_share = provider_share - 5 from s where id = $1`, [ledger]);
     const rows = await auditRows("transactional_ledger.update");
-    assert.equal(rows.length, before + 1, "the direct ledger write is recorded");
+    assert.equal(rows.length, before + 1, "the settling write is recorded");
     const row = rows.at(-1);
     assert.equal(row.actor_id, admin.sub);
     assert.equal(row.target_id, ledger);
     assert.equal(Number(row.details.changes.provider_share.before), 90);
-    assert.equal(Number(row.details.changes.provider_share.after), 5090);
+    assert.equal(Number(row.details.changes.provider_share.after), 85);
     assert.equal(row.details.changes.payout_status.after, "released");
 
     const rule = (await sys(db, `select id from fee_rules where channel = 'marketplace' and is_first_visit = true`))[0];
@@ -59,7 +62,8 @@ describe("administrator writes to money and configuration tables", () => {
     const audited = new Set((await sys(db, `select tgrelid::regclass::text t from pg_trigger where tgname = 'trg_audit_admin_write'`)).map((r) => r.t.replace(/^public\./, "")));
     const missing = writable.filter((table) => !audited.has(table));
     assert.deepEqual(missing, [], `administrator-writable tables without the audit trigger: ${missing.join(", ")}`);
-    assert.ok(writable.length >= 25, "the list is derived from policies, not a short fixed set");
+    // MONEY (GOV-1 review C-1) removed every administrator write policy from the money tables, so the derived list is shorter.
+    assert.ok(writable.length >= 15, "the list is derived from policies, not a short fixed set");
   });
 
   it("do not copy personal values into the log, even when the command that clears them runs", async () => {
@@ -89,7 +93,9 @@ describe("administrator writes to money and configuration tables", () => {
 
     const rule = (await sys(db, `insert into employee_commission_rules (employee_id, provider_id, wps_iban) values ($1, $2, 'SA0380000000608010167519') returning id`,
       [SEED.employee1, SEED.provider1]))[0];
-    await as(db, admin, `update employee_commission_rules set wps_iban = 'SA4420000001234567891234' where id = $1`, [rule.id]);
+    // MONEY: console sessions only read the provider's payroll settings; the command context still records the change.
+    assert.equal((await as(db, admin, `update employee_commission_rules set wps_iban = 'SA4420000001234567891234' where id = $1 returning id`, [rule.id]).catch(() => [])).length, 0);
+    await asCommandFor(admin, `update employee_commission_rules set wps_iban = 'SA4420000001234567891234' where id = $1`, [rule.id]);
     const change = (await auditRows("employee_commission_rules.update")).filter((r) => r.target_id === rule.id).at(-1).details.changes.wps_iban;
     assert.deepEqual(change, { changed: true, before_last4: "7519", after_last4: "1234" });
     assert.ok(!JSON.stringify(change).includes("SA0380") && !JSON.stringify(change).includes("SA4420"), "a full account number never enters the log");

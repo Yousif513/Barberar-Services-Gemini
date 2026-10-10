@@ -438,7 +438,7 @@
           "recovery": "",
           "tests": [],
           "evidence": [],
-          "owner": "",
+          "owner": "impl-money-claude",
           "reviewStatus": "unreviewed"
         },
         {
@@ -517,6 +517,34 @@
           "owner": "",
           "reviewStatus": "contested",
           "reviewedBy": "sec-claude-release-review"
+        },
+        {
+          "id": "provider.vat-status",
+          "outcome": "Capture and validate provider VAT registration status at onboarding",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "planned",
+          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "impl-money-claude",
+          "reviewStatus": "unreviewed"
         }
       ]
     },
@@ -1314,7 +1342,7 @@
             "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L267",
             "supabase/tests/db/qa_defect_fixes.test.mjs#L175"
           ],
-          "owner": "",
+          "owner": "impl-money-claude",
           "reviewStatus": "unreviewed",
           "reviewedBy": "qa-claude-release-gate"
         },
@@ -1440,6 +1468,62 @@
           "owner": "",
           "reviewStatus": "contested",
           "reviewedBy": "sec-claude-release-review"
+        },
+        {
+          "id": "money.append-only",
+          "outcome": "Money tables are append-only; no client role writes them directly; corrections only as linked adjustments",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "planned",
+          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "impl-money-claude",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "ledger.adjustment",
+          "outcome": "Propose and approve a linked adjustment or reversal entry with a different checker",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "planned",
+          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "impl-money-claude",
+          "reviewStatus": "unreviewed"
         }
       ]
     },
@@ -1853,9 +1937,37 @@
             "web_platform/src/app/admin/refunds/page.tsx#L193",
             ".admin-console/evidence/qa-claude-release-gate/adversarial-suite-run.txt"
           ],
-          "owner": "",
+          "owner": "impl-money-claude",
           "reviewStatus": "contested",
           "reviewedBy": "sec-claude-release-review"
+        },
+        {
+          "id": "refund.check-with-tap",
+          "outcome": "Re-fetch a stuck refund status from Tap and apply it through the server; refund SLA tracking",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "planned",
+          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "impl-money-claude",
+          "reviewStatus": "unreviewed"
         }
       ]
     },
@@ -3760,7 +3872,7 @@
             "web_platform/src/app/admin/platform-rules/page.tsx#L224",
             "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L100"
           ],
-          "owner": "",
+          "owner": "impl-money-claude",
           "reviewStatus": "unreviewed"
         },
         {
@@ -3809,7 +3921,63 @@
             "web_platform/src/app/admin/platform-rules/page.tsx#L300",
             "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L102"
           ],
-          "owner": "",
+          "owner": "impl-money-claude",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "money.pending-change",
+          "outcome": "Fee rules, provider balances, payout holds and refund thresholds change only through an approved pending change",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "planned",
+          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "impl-money-claude",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "fee.effective-display",
+          "outcome": "Show the effective platform fee, VAT on the fee and a worked example to providers and admins",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "planned",
+          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "impl-money-claude",
           "reviewStatus": "unreviewed"
         }
       ]
@@ -5140,6 +5308,139 @@
             "web_platform/src/app/admin/reports/page.tsx"
           ],
           "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "reconciliation",
+      "name": "Tap reconciliation (events, settlement imports, breaks)",
+      "sourceOfTruth": "postgres:public.tap_reconciliation_breaks",
+      "sensitivity": "confidential",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "open",
+        "escalated",
+        "resolved"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "open",
+          "to": "resolved",
+          "command": "reconciliation.resolve-break",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "Kept at least 10 years with the ledger (D-Q8); never deleted.",
+      "capabilities": [
+        {
+          "id": "reconciliation.daily",
+          "outcome": "Daily match of Tap charges, refunds and settlements to the ledger, opening breaks",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "planned",
+          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "impl-money-claude",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "reconciliation.resolve-break",
+          "outcome": "Resolve a break only through an approved adjustment citing the Tap object id; escalate after 3 business days",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "planned",
+          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "impl-money-claude",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "reward-program",
+      "name": "Referral and loyalty program configuration",
+      "sourceOfTruth": "postgres:public.reward_programs",
+      "sensitivity": "confidential",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "disabled",
+        "enabled"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "disabled",
+          "to": "enabled",
+          "command": "reward-program.enable",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "Configuration history kept in admin_audit_logs and approvals.",
+      "capabilities": [
+        {
+          "id": "reward-program.enable",
+          "outcome": "Enable referral or loyalty only with all values set and a different owner approving",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "planned",
+          "rationale": "D-Q7/D-Q8/D-Q9/D-D3 adopted 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md).",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "",
+          "tests": [],
+          "evidence": [],
+          "owner": "impl-money-claude",
           "reviewStatus": "unreviewed"
         }
       ]
@@ -9293,6 +9594,30 @@
       "status": "handed-off",
       "notes": "GOV-2: Q4 + D4 final decision texts (docs/legal/2026-10-10-privacy-decision-memo.md): no direct admin SELECT on personal/bank/ledger/invoice/message tables; audited, paged read functions; health answers only via DPO/owner break-glass; D4 small-cell suppression; analyst/operations scope.",
       "worklog": ".admin-console/worklog/impl-gov2-claude.md"
+    },
+    {
+      "id": "impl-money-claude",
+      "role": "implementer",
+      "ownsCapabilities": [
+        "ledger.release-payout",
+        "fee-rule.save",
+        "fee-rule.list",
+        "refund.retry",
+        "provider.set-commission",
+        "money.append-only",
+        "ledger.adjustment",
+        "money.pending-change",
+        "fee.effective-display",
+        "provider.vat-status",
+        "reward-program.enable",
+        "reconciliation.daily",
+        "reconciliation.resolve-break",
+        "refund.check-with-tap"
+      ],
+      "ownsScreens": [],
+      "status": "active",
+      "notes": "MONEY package: GOV-1 review C-1, C-2, H-4, M-1; D-Q8 append-only money tables + pending changes; D-Q7 rewards governance; D-Q9 Tap reconciliation, Check with Tap, refund SLA; D-D3 effective fee + VAT display and provider VAT status. Plan of record docs/legal/2026-10-10-adopted-decisions.md.",
+      "worklog": ".admin-console/worklog/impl-money-claude.md"
     }
   ]
 }

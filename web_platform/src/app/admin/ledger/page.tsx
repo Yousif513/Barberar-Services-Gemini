@@ -468,7 +468,10 @@ const commandCopy = {
     reasonLabel: "Reason (recorded in the audit log)",
     payReasonLabel: "Bank transfer reference or note (recorded in the audit log)",
     releaseTitle: "Release this ledger entry",
-    releaseIntro: "The provider's share of this payment is marked released. A release cannot be undone from the console.",
+    releaseIntro: "Record that the provider's share of this entry was paid outside the payout flow. A different administrator must approve it, the provider needs an approved bank account past its 48-hour hold, and the bank transfer reference is kept with the entry.",
+    releaseReferenceLabel: "Bank transfer reference",
+    releaseReferenceError: "Enter the bank transfer reference (4 to 64 letters, digits or dashes).",
+    releasePendingMsg: "Sent for approval: a different administrator must approve this settlement.",
     releaseConfirm: "Release share",
     processingTitle: "Move this payout request to processing",
     processingIntro: "The request is accepted for processing. No money moves at this step.",
@@ -511,7 +514,10 @@ const commandCopy = {
     reasonLabel: "السبب (يُسجل في سجل التدقيق)",
     payReasonLabel: "مرجع التحويل البنكي أو ملاحظة (تُسجل في سجل التدقيق)",
     releaseTitle: "صرف هذا القيد",
-    releaseIntro: "تُسجَّل حصة مقدم الخدمة من هذه الدفعة كمصروفة. لا يمكن التراجع عن الصرف من لوحة الإدارة.",
+    releaseIntro: "تسجيل أن حصة مقدم الخدمة من هذا القيد صُرفت خارج مسار التحويلات. يجب أن يعتمدها مسؤول آخر، وأن يكون لمقدم الخدمة حساب بنكي معتمد تجاوز فترة الانتظار (48 ساعة)، ويُحفظ مرجع التحويل البنكي مع القيد.",
+    releaseReferenceLabel: "مرجع التحويل البنكي",
+    releaseReferenceError: "أدخل مرجع التحويل البنكي (من 4 إلى 64 حرفاً أو رقماً أو شرطة).",
+    releasePendingMsg: "أُرسل للاعتماد: يجب أن يعتمد مسؤول آخر هذه التسوية.",
     releaseConfirm: "صرف الحصة",
     processingTitle: "نقل طلب الصرف إلى المعالجة",
     processingIntro: "يُقبل الطلب للمعالجة. لا تنتقل أي أموال في هذه الخطوة.",
@@ -826,17 +832,19 @@ export default function AdminLedger() {
   const updatePayoutRequestStatus = (request: any, decision: "processing" | "rejected") => setMoney({ kind: "review", request, decision });
   const markPayoutRequestPaid = (request: any) => setMoney({ kind: "pay", request });
 
-  const runReleaseItem = async (item: any, reason: string): Promise<string | null> => {
+  const runReleaseItem = async (item: any, reason: string, bankReference: string): Promise<string | null> => {
     // Stable per entry, so a retry after a lost response cannot release twice.
     const idempotencyKey = `ledger_release_${item.id}`;
-    const { error: rpcError } = await supabase.rpc("admin_release_ledger_item", {
+    const { data: released, error: rpcError } = await supabase.rpc("admin_release_ledger_item", {
       p_ledger_id: item.id,
       p_reason: reason,
+      p_bank_reference: bankReference.trim(),
       p_idempotency_key: idempotencyKey,
     });
     if (rpcError) return errorMessage(rpcError) || t.errorMsg;
     setError("");
-    setSuccess(t.successMsg);
+    // GOV-1 review H-4: one administrator alone only records the request; a second one approves it in /admin/approvals.
+    setSuccess((released as { status?: string } | null)?.status === "pending_approval" ? commandCopy[lang].releasePendingMsg : t.successMsg);
     void loadLedger();
     return null;
   };
@@ -949,8 +957,9 @@ export default function AdminLedger() {
             { label: c.factDate, value: formatDate(item.created_at) },
           ]}
           reasonLabel={c.reasonLabel}
+          field={{ label: c.releaseReferenceLabel, pattern: /^[A-Za-z0-9][A-Za-z0-9 \-\/]{3,63}$/, error: c.releaseReferenceError, ltr: true }}
           confirmLabel={c.releaseConfirm}
-          onConfirm={(reason) => runReleaseItem(item, reason)}
+          onConfirm={(reason, reference) => runReleaseItem(item, reason, reference)}
           onClose={close}
         />
       );

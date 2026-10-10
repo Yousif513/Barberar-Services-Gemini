@@ -106,7 +106,18 @@ describe("client roles hold no more than they need", () => {
       where n.nspname = 'public' and c.relkind = 'r'
         and not (has_table_privilege('service_role', c.oid, 'INSERT') and has_table_privilege('service_role', c.oid, 'UPDATE') and has_table_privilege('service_role', c.oid, 'DELETE') and has_table_privilege('service_role', c.oid, 'SELECT'))`);
     // GOV-1 (Q4 item 5): the audit log is append-only for every role, the service role included (insert and select only).
-    assert.deepEqual(rows, [{ relname: "admin_audit_logs" }], "the service role works on every table except the append-only audit log");
+    // MONEY (D-Q8): money tables are append-only too; the service role keeps INSERT, UPDATE and SELECT but never deletes a row.
+    const money = ["booking_tips", "coupon_redemptions", "customer_loyalty", "customer_referrals", "fee_rules", "gift_card_redemptions", "gift_cards",
+      "invoices", "loyalty_points_ledger", "package_redemptions", "payment_disputes", "payment_refund_requests", "payout_allocations", "payout_requests",
+      "provider_fee_invoices", "provider_receivables", "psp_reconciliation_runs", "refund_requests", "transactional_ledger", "wallet_credit_redemptions",
+      "wallet_credits"];
+    const appendOnly = await sys(db, `select c.relname from pg_class c join pg_namespace n on n.oid = c.relnamespace
+      where n.nspname = 'public' and c.relkind = 'r' and has_table_privilege('service_role', c.oid, 'INSERT') and has_table_privilege('service_role', c.oid, 'SELECT')
+        and not has_table_privilege('service_role', c.oid, 'DELETE') and c.relname <> 'admin_audit_logs'`);
+    const appendOnlyNames = appendOnly.map((r) => r.relname).sort();
+    for (const table of money) assert.ok(appendOnlyNames.includes(table), `${table} is append-only for the service role`);
+    assert.deepEqual(rows.map((r) => r.relname).filter((name) => !appendOnlyNames.includes(name)), ["admin_audit_logs"],
+      "the service role works on every other table except the append-only audit log");
     assert.equal((await sys(db, `select has_table_privilege('service_role', 'public.admin_audit_logs', 'INSERT') and has_table_privilege('service_role', 'public.admin_audit_logs', 'SELECT') ok`))[0].ok, true);
   });
 });

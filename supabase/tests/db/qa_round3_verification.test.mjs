@@ -42,9 +42,10 @@ before(async () => {
 
 describe("bookings change only through the commands", () => {
   it("leaves no write policy on bookings except the administrator's, and every other role's direct write changes zero rows", async () => {
-    // GOV-1 adds RESTRICTIVE policies that only narrow administrator writes to the operations console role; they grant nothing.
+    // MONEY (GOV-1 review C-2): administrators lost their direct write too; bookings change only through the commands.
     const policies = await sys(db, `select policyname, cmd from pg_policies where schemaname = 'public' and tablename = 'bookings' and cmd <> 'SELECT' and permissive = 'PERMISSIVE'`);
-    assert.deepEqual(policies, [{ policyname: "Admins manage bookings", cmd: "ALL" }]);
+    assert.deepEqual(policies, []);
+    assert.equal((await sys(db, `select has_table_privilege('authenticated', 'public.bookings', 'UPDATE') or has_table_privilege('authenticated', 'public.bookings', 'INSERT') or has_table_privilege('authenticated', 'public.bookings', 'DELETE') as w`))[0].w, false);
     const booking = await paidBooking();
     for (const [name, user] of [["owner", owner1], ["assigned employee", employee], ["customer", customer], ["other owner", owner2]]) {
       for (const sql of [`update bookings set status = 'cancelled' where id = $1 returning id`, `update bookings set checked_in_at = now() where id = $1 returning id`, `delete from bookings where id = $1 returning id`]) {
@@ -99,7 +100,8 @@ describe("issued tax invoices against foreign-key actions and every role", () =>
       assert.equal(changed.length + removed.length, 0, name);
     }
     assert.equal(await outcome(as(db, ROLES.service, `update invoices set total_amount_sar = 1 where id = $1`, [invoice])), "22023");
-    assert.equal(await outcome(as(db, ROLES.service, `delete from invoices where id = $1`, [invoice])), "22023");
+    // D-Q8: the service role no longer holds DELETE on money tables at all.
+    assert.equal(await outcome(as(db, ROLES.service, `delete from invoices where id = $1`, [invoice])), "42501");
     assert.equal(Number((await sys(db, `select total_amount_sar from invoices where id = $1`, [invoice]))[0].total_amount_sar), 115);
   });
 
@@ -131,7 +133,7 @@ describe("command signatures", () => {
       [`select set_user_role($1, 'customer', 'Test reason here')`, [SEED.customer]],
       [`select approve_provider_application($1, 'Documents verified', 15)`, [MISSING]],
       [`select admin_release_payout($1, 'k1', 'Reason here')`, [MISSING]],
-      [`select admin_release_ledger_item($1, 'Reason here')`, [MISSING]],
+      [`select admin_release_ledger_item($1, 'Reason here', 'TRF-0001')`, [MISSING]],
       [`select admin_create_refund_request($1, 5, 'Reason here')`, [MISSING]],
       [`select admin_booking_directory(null, null, null, null, 10, 0)`, []],
     ];
@@ -174,7 +176,7 @@ describe("payout requests", () => {
     }
     // GOV-1: the IBAN column is not even selectable or updatable by a client any more (permission denied), which also changes nothing.
     assert.equal((await as(db, owner1, `update payout_requests set amount = 1, iban = 'SA4420000001234567891234' where provider_id = $1 returning id`, [SEED.provider1]).catch(() => [])).length, 0);
-    assert.equal((await as(db, owner1, `delete from payout_requests where provider_id = $1 returning id`, [SEED.provider1])).length, 0);
+    assert.equal((await as(db, owner1, `delete from payout_requests where provider_id = $1 returning id`, [SEED.provider1]).catch(() => [])).length, 0);
   });
 });
 
@@ -231,11 +233,14 @@ describe("administrator booking commands", () => {
 });
 
 describe("the all-table audit trigger", () => {
-  it("records an administrator's direct change to a reconciliation run and to a message template, and nothing for a customer", async () => {
+  it("records an administrator's direct change to a message template, refuses one to a reconciliation run, and records nothing for a customer", async () => {
     const run = (await sys(db, `insert into psp_reconciliation_runs (run_date, status, discrepancy_amount_sar, discrepancy_count) values (current_date, 'discrepant', 500, 3) returning id`))[0].id;
     const count = async () => (await sys(db, `select count(*)::int n from admin_audit_logs`))[0].n;
+    // MONEY (GOV-1 review C-1): reconciliation runs are written by the reconciliation command only.
+    await assert.rejects(as(db, admin, `update psp_reconciliation_runs set status = 'matched', discrepancy_amount_sar = 0 where id = $1`, [run]), /permission denied/);
     let before = await count();
-    await as(db, admin, `update psp_reconciliation_runs set status = 'matched', discrepancy_amount_sar = 0 where id = $1`, [run]);
+    const [template] = await sys(db, `select name, locale from message_templates limit 1`);
+    await as(db, admin, `update message_templates set template_body = template_body || ' (round 3)' where name = $1 and locale = $2`, [template.name, template.locale]);
     assert.equal((await count()) - before, 1);
     before = await count();
     await as(db, customer, `insert into customer_favorites (customer_id, provider_id) values ($1, $2)`, [SEED.customer, SEED.provider1]).catch(() => {});

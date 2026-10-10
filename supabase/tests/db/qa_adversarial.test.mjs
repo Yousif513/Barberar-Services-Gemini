@@ -207,9 +207,14 @@ describe("replayed commands have one effect", () => {
 
   it("settling a ledger row twice records one settlement", async () => {
     const id = await ledgerRow(40);
-    const first = (await as(db, admin, `select admin_release_ledger_item($1, 'qa-ledger-1') r`, [id]))[0].r;
-    assert.equal(first.status, "released");
-    const second = (await as(db, admin, `select admin_release_ledger_item($1, 'qa-ledger-1') r`, [id]))[0].r;
+    const checker = ROLES.user(await createUser(db, { role: "admin", adminRole: "finance" }));
+    const asked = (await as(db, admin, `select admin_release_ledger_item($1, 'qa-ledger-1', 'TRF-QA-1') r`, [id]))[0].r;
+    assert.equal(asked.status, "pending_approval");
+    const again = (await as(db, admin, `select admin_release_ledger_item($1, 'qa-ledger-1', 'TRF-QA-1') r`, [id]))[0].r;
+    assert.equal(again.approval_id, asked.approval_id, "one pending request per row");
+    const first = (await as(db, checker, `select admin_decide_approval($1, 'approve', 'Statement checked') r`, [asked.approval_id]))[0].r;
+    assert.equal(first.result.status, "released");
+    const second = (await as(db, admin, `select admin_release_ledger_item($1, 'qa-ledger-1', 'TRF-QA-1') r`, [id]))[0].r;
     assert.equal(second.idempotent, true);
     assert.equal((await auditRows("ledger.manually_settled", id)).length, 1);
   });
@@ -360,7 +365,7 @@ describe("booking commands refuse other people's bookings", () => {
 
   it("the owner of another provider cannot read or update the booking, its ledger row or its refunds", async () => {
     assert.equal((await as(db, owner2, `select id from bookings where id = $1`, [booking.id])).length, 0);
-    assert.equal((await as(db, owner2, `update bookings set status = 'cancelled' where id = $1 returning id`, [booking.id])).length, 0);
+    assert.equal((await as(db, owner2, `update bookings set status = 'cancelled' where id = $1 returning id`, [booking.id]).catch(() => [])).length, 0);
     assert.equal((await as(db, owner2, `select id from transactional_ledger where booking_id = $1`, [booking.id])).length, 0);
     assert.equal((await as(db, owner2, `select id from refund_requests where booking_id = $1`, [booking.id])).length, 0);
     assert.equal((await sys(db, `select status from bookings where id = $1`, [booking.id]))[0].status, "confirmed");
@@ -369,7 +374,7 @@ describe("booking commands refuse other people's bookings", () => {
   it("a provider's owner cannot change what the customer paid, who booked, or the commission", async () => {
     // The owner has no UPDATE right on bookings at all any more, so a direct write changes nothing.
     for (const column of ["total_price = 1", "platform_commission = 0", "deposit_required = 0", "discount_amount = 50", `customer_id = '${customer2.sub}'`]) {
-      assert.equal((await as(db, owner1, `update bookings set ${column} where id = $1 returning id`, [booking.id])).length, 0, column);
+      assert.equal((await as(db, owner1, `update bookings set ${column} where id = $1 returning id`, [booking.id]).catch(() => [])).length, 0, column);
     }
     const stored = (await sys(db, `select total_price, platform_commission, deposit_required, customer_id from bookings where id = $1`, [booking.id]))[0];
     assert.notEqual(Number(stored.total_price), 1);
