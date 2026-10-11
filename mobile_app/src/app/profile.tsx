@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { AppPressable } from "@/components/app-pressable";
+import { useLocale } from "@/lib/locale";
 import {
   StyleSheet,
   View,
   Text,
-  TouchableOpacity,
   ScrollView,
   TextInput,
   Switch,
@@ -12,8 +13,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { User } from "@supabase/supabase-js";
-import { supabase } from "../lib/supabase";
+import { supabase, isSupabaseConfigured } from "../lib/supabase";
+import { consentsToRecord } from "@/lib/consent";
 import { Toast } from "../components/toast";
+import { errorMessage } from "@/lib/error-message";
 
 const { width } = Dimensions.get("window");
 
@@ -43,13 +46,14 @@ const normalizeSaudiPhone = (raw: string): string => {
 };
 
 export default function ProfileScreen() {
-  const [lang, setLang] = useState<"en" | "ar">("ar");
+  const { lang, setLang } = useLocale();
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState<"success" | "info" | "error">("success");
   const [toastVisible, setToastVisible] = useState(false);
 
   const [user, setUser] = useState<User | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [offlineLaunch, setOfflineLaunch] = useState(false);
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [userPackages, setUserPackages] = useState<UserPackageItem[]>([]);
   const [packagesError, setPackagesError] = useState("");
@@ -82,6 +86,9 @@ export default function ProfileScreen() {
       invalidCode: "Please enter the 6-digit code.",
       codeSent: "Verification code sent by SMS.",
       signedIn: "Signed in.",
+      offline: "No connection. Your account will appear when you are back online.",
+      consentNotSaved: "Signed in, but your consent could not be saved. It will be asked for again at your next sign-in.",
+      serviceUnavailable: "The service is not configured. Sign-in is unavailable.",
       signOut: "Sign out",
       customerDetails: "Customer Information",
       nameLabel: "Full Name",
@@ -114,6 +121,9 @@ export default function ProfileScreen() {
       invalidCode: "يرجى إدخال الرمز المكون من 6 أرقام.",
       codeSent: "تم إرسال رمز التحقق برسالة نصية.",
       signedIn: "تم تسجيل الدخول.",
+      offline: "لا يوجد اتصال. سيظهر حسابك عند عودة الاتصال.",
+      consentNotSaved: "تم تسجيل الدخول، لكن تعذر حفظ موافقتك. سنطلبها منك عند تسجيل الدخول التالي.",
+      serviceUnavailable: "الخدمة غير مهيأة. تسجيل الدخول غير متاح.",
       signOut: "تسجيل الخروج",
       customerDetails: "بيانات العميل",
       nameLabel: "الاسم الكامل",
@@ -186,7 +196,11 @@ export default function ProfileScreen() {
   }, []);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => loadAccount(data.user ?? null));
+    // getSession() reads the stored session without the network, so a launch with no signal still shows the signed-in account.
+    supabase.auth.getSession().then(({ data, error }) => {
+      setOfflineLaunch(!data.session && error?.name === "AuthRetryableFetchError");
+      loadAccount(data.session?.user ?? null);
+    });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       loadAccount(session?.user ?? null);
     });
@@ -194,6 +208,10 @@ export default function ProfileScreen() {
   }, [loadAccount]);
 
   const handleSendCode = async () => {
+    if (!isSupabaseConfigured) {
+      showToast(t.serviceUnavailable, "error");
+      return;
+    }
     const formatted = normalizeSaudiPhone(phone);
     if (!formatted.startsWith("+9665") || formatted.length !== 13) {
       showToast(t.invalidPhone, "error");
@@ -210,7 +228,7 @@ export default function ProfileScreen() {
       setOtpSent(true);
       showToast(t.codeSent, "info");
     } catch (err) {
-      showToast(err instanceof Error ? err.message : String(err), "error");
+      showToast(errorMessage(err), "error");
     } finally {
       setBusy(false);
     }
@@ -230,20 +248,25 @@ export default function ProfileScreen() {
       });
       if (error || !data.user) throw error ?? new Error(t.invalidCode);
 
-      const consents = [
-        { user_id: data.user.id, purpose: "terms_privacy", status: "granted", document_version: "v1.0", method: "mobile_auth_form" },
-      ];
-      if (whatsappConsent) {
-        consents.push({ user_id: data.user.id, purpose: "whatsapp", status: "granted", document_version: "v1.0", method: "mobile_auth_form" });
+      // The customer is signed in from here on, so a consent that cannot be saved is reported, not thrown: the next sign-in
+      // asks again because nothing granted is on record. The server stamps the published terms version itself.
+      const { data: existing } = await supabase.from("consents").select("purpose, status, created_at").eq("user_id", data.user.id);
+      const purposes = consentsToRecord(existing ?? [], whatsappConsent);
+      let consentSaved = true;
+      if (purposes.length > 0) {
+        const { error: consentError } = await supabase.rpc("record_consents", {
+          p_purposes: purposes,
+          p_status: "granted",
+          p_method: "mobile_auth_form",
+        });
+        consentSaved = !consentError;
       }
-      const { error: consentError } = await supabase.from("consents").insert(consents);
-      if (consentError) throw consentError;
 
       setOtpCode("");
       setOtpSent(false);
-      showToast(t.signedIn, "success");
+      showToast(consentSaved ? t.signedIn : t.consentNotSaved, consentSaved ? "success" : "info");
     } catch (err) {
-      showToast(err instanceof Error ? err.message : String(err), "error");
+      showToast(errorMessage(err), "error");
     } finally {
       setBusy(false);
     }
@@ -263,9 +286,9 @@ export default function ProfileScreen() {
         <View>
           <Text style={[styles.titleText, isRTL && styles.textRight]}>{t.profileTitle}</Text>
         </View>
-        <TouchableOpacity style={styles.langBadge} onPress={() => setLang(l => (l === "en" ? "ar" : "en"))}>
+        <AppPressable label={lang === "en" ? "Switch to Arabic" : "التبديل إلى الإنجليزية"} style={styles.langBadge} onPress={() => setLang(l => (l === "en" ? "ar" : "en"))}>
           <Text style={styles.langText}>{lang === "en" ? "العربية" : "EN"}</Text>
-        </TouchableOpacity>
+        </AppPressable>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -275,6 +298,12 @@ export default function ProfileScreen() {
           <View style={styles.card}>
             <Text style={[styles.sectionTitle, isRTL && styles.textRight]}>{t.signInTitle}</Text>
             <Text style={[styles.walletDesc, { color: "#78716c" }, isRTL && styles.textRight]}>{t.signInDesc}</Text>
+            {offlineLaunch && (
+              <Text style={[styles.walletDesc, { color: "#b91c1c" }, isRTL && styles.textRight]}>{t.offline}</Text>
+            )}
+            {!isSupabaseConfigured && (
+              <Text style={[styles.walletDesc, { color: "#b91c1c" }, isRTL && styles.textRight]}>{t.serviceUnavailable}</Text>
+            )}
             <View style={styles.cardDivider} />
 
             <Text style={[styles.infoLabel, isRTL && styles.textRight]}>{t.phoneLabel}</Text>
@@ -299,9 +328,9 @@ export default function ProfileScreen() {
                   <Text style={[styles.infoLabel, { flex: 1 }, isRTL && styles.textRight]}>{t.whatsapp}</Text>
                   <Switch value={whatsappConsent} onValueChange={setWhatsappConsent} />
                 </View>
-                <TouchableOpacity style={styles.modalBtnConfirm} disabled={busy} onPress={handleSendCode}>
+                <AppPressable label={t.sendCode} busy={busy} style={styles.modalBtnConfirm} disabled={busy} onPress={handleSendCode}>
                   {busy ? <ActivityIndicator color="#fff" /> : <Text style={styles.modalBtnConfirmLabel}>{t.sendCode}</Text>}
-                </TouchableOpacity>
+                </AppPressable>
               </>
             )}
 
@@ -317,12 +346,12 @@ export default function ProfileScreen() {
                   onChangeText={(v) => setOtpCode(v.replace(/\D/g, ""))}
                 />
                 <View style={[styles.modalActionRow, isRTL && styles.rtlRow]}>
-                  <TouchableOpacity style={styles.modalBtnCancel} disabled={busy} onPress={() => { setOtpSent(false); setOtpCode(""); }}>
+                  <AppPressable style={styles.modalBtnCancel} disabled={busy} onPress={() => { setOtpSent(false); setOtpCode(""); }}>
                     <Text style={styles.modalBtnCancelLabel}>{t.changeNumber}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.modalBtnConfirm} disabled={busy} onPress={handleVerify}>
+                  </AppPressable>
+                  <AppPressable label={t.verify} busy={busy} style={styles.modalBtnConfirm} disabled={busy} onPress={handleVerify}>
                     {busy ? <ActivityIndicator color="#fff" /> : <Text style={styles.modalBtnConfirmLabel}>{t.verify}</Text>}
-                  </TouchableOpacity>
+                  </AppPressable>
                 </View>
               </>
             )}
@@ -335,9 +364,9 @@ export default function ProfileScreen() {
             <View style={styles.card}>
               <View style={[styles.sectionHeaderRow, isRTL && styles.rtlRow]}>
                 <Text style={styles.sectionTitle}>{t.customerDetails}</Text>
-                <TouchableOpacity style={styles.btnAddCard} onPress={handleSignOut}>
+                <AppPressable style={styles.btnAddCard} onPress={handleSignOut}>
                   <Text style={styles.btnAddCardText}>{t.signOut}</Text>
-                </TouchableOpacity>
+                </AppPressable>
               </View>
               <View style={styles.cardDivider} />
 

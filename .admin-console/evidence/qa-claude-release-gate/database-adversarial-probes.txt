@@ -1,0 +1,62 @@
+agent: qa-claude-release-gate
+date: 2026-10-06
+target: the full migration chain (49 files, 20260613000000 to 20261005160000) applied to PGlite, roles anon, authenticated, service_role, seeded users: administrator, provider owners 1 and 2, a provider employee, customers. Nothing was applied to the hosted project.
+results are what the database answered, not what the screens show. Tests that passed are in supabase/tests/db/qa_adversarial.test.mjs; defects are reproduced in supabase/tests/db/qa_open_defects.repro.mjs.
+
+GUESSED IDENTIFIERS AND OTHER PEOPLE'S RECORDS
+another customer cancel_booking on a real booking: refused 42501; on an unknown id: P0002 (existence is distinguishable, gap refused-booking-commands-reveal-whether-a-booking-id-exists)
+another customer open_booking_dispute, add_booking_tip, reschedule_booking on a real booking: refused 42501
+provider 2 owner employee_update_booking_status, get_provider_detailed_analytics, get_provider_monthly_value_summary, request_provider_payout, import_provider_clients, toggle_customer_block, save_provider_operation_membership on provider 1: refused 42501
+provider 2 owner reading provider 1 bookings, ledger, refund requests: 0 rows; updating the booking: 0 rows
+customer reading another customer's wallet credits, data requests, consents: 0 rows
+cross-tenant sweep over 94 tables and views with fixture rows in every table the generic seeder could fill: no stranger reads a row outside the public catalogue (test in the suite)
+
+WRONG ROLES AGAINST COMMANDS
+every admin_* command and every function that begins with an administrator check, called by provider owner, provider employee, customer, anonymous: all refused 42501 (admin_security_matrix.test.mjs, 19 tests)
+confirm_booking_payment called by administrator, owner, customer, visitor: refused 42501 (service role only)
+anonymous visitors can execute exactly five functions: search_marketplace_providers, get_branch_schedule_with_prayer_pauses, get_available_slots, get_branch_available_slots, normalize_arabic
+
+MISSING OR WEAK REASONS
+nine reasoned administrator commands refuse null, empty, blank, one and two character reasons with 22023 and change no state or audit row; a three character reason is accepted
+admin_create_refund_request, moderate_review, reject_provider_application refuse blank reasons but accept one or two characters
+cancel_booking, mark_booking_no_show, employee_update_booking_status accept null, empty, blank and one character reasons from an administrator (gap booking-commands-accept-blank-reasons-at-the-database)
+admin_release_ledger_item, admin_release_payout (optional note), set_user_role, approve_provider_application have no reason argument (repro QA-7)
+
+REPLAYS
+admin_release_payout same key twice: second call returns already processed, one allocation, one audit row
+admin_release_payout paid request, new key: refused 23505, allocations unchanged
+payout the ledger cannot cover: refused 22023, nothing allocated
+admin_release_ledger_item twice: second returns idempotent, one audit row
+admin_review_payout_request twice and admin_set_provider_status twice: second is unchanged, one audit row
+admin_retry_refund_request on a refund that ran out of attempts, clicked three times: attempts reset to 4 once
+admin_create_refund_request twice with identical arguments: TWO refund requests created (gap admin-create-refund-request-replay-creates-a-second-refund)
+
+DIRECT WRITES THAT BYPASS COMMANDS
+customer update of own profiles.role, phone_verified, phone_verified_at: refused 42501; first_name, email, phone_number allowed
+owner update of own providers.status, is_verified, commission_percentage, admin_notes, owner_id: silently reverted by trigger (row unchanged)
+owner update of bookings.total_price, platform_commission, deposit_required, discount_amount, customer_id: refused 22000
+owner update of bookings.status to cancelled on a paid booking: ACCEPTED, no refund created, deposit stays pending to provider (gap provider-direct-booking-writes-bypass-cancel-refund-and-time-guards)
+owner update of bookings.status to completed or no_show on a future booking: ACCEPTED while the commands refuse
+administrator insert into payout_requests for provider 1 with a foreign IBAN, then admin_release_payout: paid, ledger allocated (gap payout-iban-can-be-rewritten-by-an-admin-before-release)
+administrator update or delete on invoices, provider_fee_invoices, psp_reconciliation_runs, message_templates: accepted, zero audit rows (gap admin-direct-writes-to-money-tables-leave-no-audit)
+administrator update of platform_settings directly: 0 rows (direct write revoked)
+
+AUDIT
+client roles cannot insert, update, delete admin_audit_logs or execute write_audit_log (suite and matrix)
+a customer listing by admin_customer_overview is recorded as customers.listed with page and size and without the search term
+set_user_role: promotion audited without reason; self-demotion not audited; last administrator can be removed (gap administrator-role-grants-have-no-screen-reason-or-last-admin-guard)
+
+STALE AND FORGED IDENTITY
+signup metadata naming role admin or provider_owner: account is a customer
+administrator demoted in the profiles table: next admin command refused 42501, audit log reads 0 rows, direct settings write 0 rows
+
+EXPORT AND SEARCH
+admin_customer_overview page size 100000 returns 100; offset and size below zero are clamped; percent and underscore are searched literally; a partial customer id matches nothing; an exact id matches one customer
+admin_record_export refuses an unknown report, a missing or reversed period, a period over 400 days, an empty file, writes nothing when refused
+the export row count and period are asserted by the browser; the database cannot verify them (covered by admin-reads-of-personal-and-bank-data-bypass-the-audited-commands)
+
+READS BY SIGNED-IN STRANGERS (gaps filed)
+customer and competing owner read providers.admin_notes, commission_percentage, cr_number, vat_number, contact_email, cr_wathq_data; employees.phone and email (gap public-read-policies-expose-internal-provider-and-staff-columns)
+customer reads employee_time_off.reason of approved leave (gap staff-leave-reasons-readable-by-every-signed-in-account)
+anonymous reads message_templates (14 rows) and platform_settings (3 rows including approved_by)
+get_booking_address_secure raises 42703 for the customer, the owner and the administrator (gap get-booking-address-secure-fails-for-every-caller)

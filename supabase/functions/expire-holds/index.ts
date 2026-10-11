@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.108.1"
+import { adminSessionAllows } from "../_shared/http.ts"
 
 const ALLOWED_ORIGINS = [
   "https://barberar.vercel.app",
@@ -61,7 +62,8 @@ serve(async (req) => {
         .eq("id", user.id)
         .single()
 
-      if (profile?.role !== "admin") {
+      // GOV-1 / Q6: an administrator counts only in an aal2 console session with the operations permission.
+      if (profile?.role !== "admin" || !(await adminSessionAllows(token, "operations.write"))) {
         return json({ error: "Forbidden: Admin role required" }, 403, req)
       }
     }

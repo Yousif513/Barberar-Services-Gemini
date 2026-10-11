@@ -12,6 +12,8 @@ const translations = {
     markAllRead: "Mark all as read",
     noNotifications: "Your inbox is clear. No new notifications.",
     delete: "Remove",
+    markRead: "Mark Read",
+    markUnread: "Mark Unread",
     typeBooking: "Booking Alert",
     typePromo: "Offer / Promo",
     typeSystem: "System Update",
@@ -25,6 +27,8 @@ const translations = {
     markAllRead: "تحديد الكل كمقروء",
     noNotifications: "صندوق الوارد فارغ. لا توجد تنبيهات جديدة.",
     delete: "إزالة",
+    markRead: "تحديد كمقروء",
+    markUnread: "تحديد كغير مقروء",
     typeBooking: "حالة الحجز",
     typePromo: "عروض ترويجية",
     typeSystem: "تحديث النظام",
@@ -245,7 +249,7 @@ export default function CustomerNotificationsPage() {
                     {locale === "ar" ? notif.content_ar : notif.content_en}
                   </p>
                   <span className="text-[10px] text-gray-400 block font-semibold pt-1">
-                    {new Date(notif.created_at).toLocaleTimeString("en-GB", { hour: '2-digit', minute: '2-digit' })} - {new Date(notif.created_at).toLocaleDateString("en-GB", { day: 'numeric', month: 'short' })}
+                    {new Date(notif.created_at).toLocaleTimeString(locale === "ar" ? "ar-SA" : "en-GB", { hour: '2-digit', minute: '2-digit', timeZone: "Asia/Riyadh" })} - {new Date(notif.created_at).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-GB", { day: 'numeric', month: 'short', timeZone: "Asia/Riyadh" })}
                   </span>
                 </div>
               </div>
@@ -255,7 +259,7 @@ export default function CustomerNotificationsPage() {
                   onClick={() => toggleReadStatus(notif.id)}
                   className="px-3 py-1.5 border border-gray-250 bg-white text-gray-600 text-[10px] font-bold rounded-lg hover:border-black transition"
                 >
-                  {notif.is_read ? "Mark Unread" : "Mark Read"}
+                  {notif.is_read ? t.markUnread : t.markRead}
                 </button>
                 <button
                   onClick={() => removeNotification(notif.id)}

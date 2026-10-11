@@ -1,6 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { useConfirm } from "@/components/modal";
+import { useOperationsLocale } from "@/components/operations-ui";
 
 const translations = {
   en: {
@@ -47,7 +49,8 @@ export default function AdminBranches() {
   const [branches, setBranches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [lang, setLang] = useState<"en" | "ar">("ar");
+  // The language follows the admin shell (<html lang>), the same source the other operator screens use.
+  const lang = useOperationsLocale();
 
   const t = translations[lang];
   const isRTL = lang === "ar";
@@ -106,7 +109,19 @@ export default function AdminBranches() {
     void loadBranches();
   }, [lang]);
 
+  const [confirmNode, ask] = useConfirm(lang);
+
   const handleToggle = async (branch: any) => {
+    const branchName = (lang === "ar" ? branch.nameAr || branch.nameEn : branch.nameEn || branch.nameAr) || "";
+    const question = branch.active
+      ? (lang === "ar" ? `إيقاف الفرع "${branchName}"؟ يختفي من البحث ولا يقبل حجوزات جديدة؛ تبقى الحجوزات القائمة.` : `Deactivate branch "${branchName}"? It leaves search and stops taking new bookings; existing bookings stay.`)
+      : (lang === "ar" ? `إعادة تفعيل الفرع "${branchName}"؟` : `Reactivate branch "${branchName}"?`);
+    if (!(await ask({
+      title: branch.active ? (lang === "ar" ? "إيقاف الفرع" : "Deactivate this branch") : (lang === "ar" ? "إعادة تفعيل الفرع" : "Reactivate this branch"),
+      intro: question,
+      confirmLabel: branch.active ? (lang === "ar" ? "إيقاف" : "Deactivate") : (lang === "ar" ? "إعادة التفعيل" : "Reactivate"),
+      tone: branch.active ? "danger" : "default",
+    }))) return;
     try {
       setError("");
       const { error: dbError } = await supabase
@@ -117,8 +132,7 @@ export default function AdminBranches() {
       if (dbError) throw dbError;
       setBranches(prev => prev.map(item => item.id === branch.id ? { ...item, active: !branch.active } : item));
     } catch (err) {
-      setError(t.errorToggle);
-      console.warn("Admin branch toggle warning:", err);
+      setError(`${t.errorToggle} ${err instanceof Error ? err.message : ""}`.trim());
     }
   };
 
@@ -126,6 +140,7 @@ export default function AdminBranches() {
 
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className={`space-y-6 ${isRTL ? "text-right" : "text-left"}`}>
+      {confirmNode}
       <div>
         <h2 className="text-2xl font-serif font-black text-gray-900 leading-tight">{t.title}</h2>
         <p className="text-xs text-gray-500 font-semibold mt-1">{t.subtitle}</p>

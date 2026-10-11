@@ -1,15 +1,21 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { createPortal } from "react-dom";
+import { CommandDialog, ModalOverlay } from "@/components/modal";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
+import { CommandResult, sar } from "@/components/operations-ui";
+import { EffectiveFeeTerms } from "@/components/effective-fee-terms";
+import { oneOf, writeUrlState } from "@/lib/url-state";
 
 type Locale = "en" | "ar";
-type GenderScope = "male" | "female" | "both";
+type WorkType = "remote" | "in_shop" | "both";
 type ApplicationStatus = "pending" | "approved" | "rejected";
 type AccountStatus = "active" | "inactive" | "suspended";
-type WorkType = "remote" | "in_shop" | "both";
 type ProviderType = "salon_barber_shop" | "freelancer" | "salon";
+type DbProviderStatus = "pending" | "approved" | "rejected" | "suspended" | "active";
 
 type AdminService = {
   id: string;
@@ -17,10 +23,38 @@ type AdminService = {
   nameAr: string;
   categoryEn: string;
   categoryAr: string;
-  gender: GenderScope;
   price: number;
   duration: number;
   isActive: boolean;
+};
+
+// Booking, revenue and review totals for one branch or a whole provider. They come from
+// admin_branch_performance (bookings and published reviews), read through admin_branch_performance_report; nothing here is estimated.
+type Tally = {
+  totalBookings: number;
+  completedBookings: number;
+  cancelledBookings: number;
+  noShowBookings: number;
+  revenue: number;
+  commissionAmount: number;
+  revenue30d: number;
+  reviewCount: number;
+  ratingSum: number;
+};
+
+// One employee's recorded outcomes, from admin_employee_performance. earnings is what the ledger credited
+// to the employee on completed bookings (tips included).
+type EmployeeFigures = {
+  completedBookings: number;
+  cancelledBookings: number;
+  noShowBookings: number;
+  revenue: number;
+  commissionAmount: number;
+  // null when the console role holds no ledger permission (GOV-2): shown as "—", never as zero.
+  earnings: number | null;
+  reviewCount: number;
+  ratingSum: number;
+  repeatCustomers: number;
 };
 
 type AdminEmployee = {
@@ -29,23 +63,13 @@ type AdminEmployee = {
   nameAr: string;
   roleEn: string;
   roleAr: string;
-  photoUrl: string;
   assignedServiceIds: string[];
   assignedServiceNamesEn: string[];
   assignedServiceNamesAr: string[];
-  workType: WorkType;
-  earnings: number;
-  rating: number;
-  completedBookings: number;
-  // Performance metrics. Derived deterministically from booking history where
-  // available; TODO(analytics): replace with real per-employee aggregates once
-  // booking rows carry employee outcomes in the admin read model.
-  cancelledBookings: number;
-  noShowBookings: number;
-  reviewCount: number;
-  repeatCustomers: number;
-  utilizationRate: number; // 0-100, share of schedule booked
   isActive: boolean;
+  photoUrl: string;
+  workType: WorkType;
+  figures: EmployeeFigures | null;
 };
 
 type AdminShop = {
@@ -55,43 +79,38 @@ type AdminShop = {
   nameAr: string;
   addressEn: string;
   addressAr: string;
-  gender: GenderScope;
   services: AdminService[];
   employees: AdminEmployee[];
+  figures: Tally | null;
 };
 
 type ProviderRecord = {
   id: string;
-  source: "db" | "local";
-  providerName: string;
   businessNameEn: string;
   businessNameAr: string;
   contactEmail: string;
   contactPhone: string;
   type: ProviderType;
+  status: DbProviderStatus;
   applicationStatus: ApplicationStatus;
   accountStatus: AccountStatus;
-  gender: GenderScope;
   shops: AdminShop[];
   registrationDate: string;
-  commissionPercentage: number;
+  recordedCommission: number | null;
   tradeLicenseUrl: string;
   crNumber?: string;
   crVerificationStatus?: string;
   adminNotes?: string;
   lastActivity?: string;
-  performance?: {
-    totalBookings: number;
-    completedBookings: number;
-    cancelledBookings: number;
-    noShowBookings: number;
-    revenue: number;
-    commissionAmount: number;
-    rating: number;
-    reviewCount: number;
-    employeeCount: number;
-    serviceCount: number;
-  };
+  figures: Tally | null;
+};
+
+type EditDraft = {
+  businessNameEn: string;
+  businessNameAr: string;
+  contactEmail: string;
+  contactPhone: string;
+  tradeLicenseUrl: string;
 };
 
 type ProviderApplicationRecord = {
@@ -115,42 +134,42 @@ type ProviderApplicationRecord = {
   admin_notes?: string;
   reviewed_by?: string;
   reviewed_at?: string;
+  cr_verification_status?: string | null;
+  cr_check_data?: { registered_name?: string | null; name_match?: boolean | null; notes?: string | null } | null;
   created_at: string;
   updated_at: string;
 };
 
-// Per-shop performance rollup, derived from its employees + services. Kept as a
-// pure computed value (not persisted) so the demo and DB-normalized paths both
-// work without extra columns. TODO(analytics): source completed/cancelled
-// counts and revenue from admin_provider_performance view once it is applied.
-type ShopMetrics = {
-  totalBookings: number;
-  completedBookings: number;
-  cancelledBookings: number;
-  noShowBookings: number;
-  revenue: number;
-  commissionAmount: number;
-  avgServiceValue: number;
-  rating: number;
-  reviewCount: number;
-  profileCompletion: number;
-  conversionRate: number;
-  completedRate: number;
-  cancellationRate: number;
+type Numeric = number | string | null;
+
+// The audited directory functions return at most this many rows per read (SECFIX-2 R2-L4).
+const AUDITED_PAGE = 500;
+
+type BranchPerformanceRow = {
+  branch_id: string;
+  total_bookings: Numeric;
+  completed_bookings: Numeric;
+  cancelled_bookings: Numeric;
+  no_show_bookings: Numeric;
+  gross_revenue: Numeric;
+  commission_amount: Numeric;
+  revenue_30d: Numeric;
+  review_count: Numeric;
+  rating_sum: Numeric;
+  suppressed?: boolean;
 };
 
-type EmployeeEarningsSummary = {
-  employeeId: string;
-  completedBookings: number;
-  totalEarnings: number;
-  monthStart?: string;
-};
-
-type EmployeeEarningsRow = {
-  employee_id?: string | null;
-  month_start?: string | null;
-  total_completed_bookings?: number | string | null;
-  total_employee_earnings?: number | string | null;
+type EmployeePerformanceRow = {
+  employee_id: string;
+  completed_bookings: Numeric;
+  cancelled_bookings: Numeric;
+  no_show_bookings: Numeric;
+  gross_revenue: Numeric;
+  commission_amount: Numeric;
+  employee_earnings: Numeric;
+  review_count: Numeric;
+  rating_sum: Numeric;
+  repeat_customers: Numeric;
 };
 
 type ProviderServiceRow = {
@@ -173,17 +192,19 @@ type ProviderEmployeeServiceRow = {
 };
 
 type ProviderEmployeeRow = {
-  id?: string | null;
+  id: string;
   name_en?: string | null;
   name_ar?: string | null;
   title_en?: string | null;
   title_ar?: string | null;
   is_active?: boolean | null;
+  photo_url?: string | null;
+  work_type?: string | null;
   employee_services?: ProviderEmployeeServiceRow[] | null;
 };
 
 type ProviderBranchRow = {
-  id?: string | null;
+  id: string;
   name_en?: string | null;
   name_ar?: string | null;
   address_text_en?: string | null;
@@ -198,11 +219,14 @@ type ProviderRow = {
   contact_email?: string | null;
   contact_phone?: string | null;
   type?: ProviderType | string | null;
+  status?: string | null;
   is_verified?: boolean | null;
   cr_number?: string | null;
   cr_verification_status?: string | null;
   commission_percentage?: number | string | null;
   trade_license_url?: string | null;
+  admin_notes?: string | null;
+  last_activity_at?: string | null;
   created_at?: string | null;
   branches?: ProviderBranchRow[] | null;
   services?: ProviderServiceRow[] | null;
@@ -211,8 +235,14 @@ type ProviderRow = {
 const copy = {
   en: {
     title: "Providers",
-    subtitle: "Manage applications and registered providers, shops, services, employees, and performance.",
-    addProvider: "+ Add Provider",
+    subtitle: "Review applications and registered providers, their branches, services, employees and recorded performance.",
+    loading: "Loading providers…",
+    loadingApplications: "Loading applications…",
+    noProviders: "No providers yet.",
+    noMatches: "No providers match these filters.",
+    close: "Close",
+    commission: "Commission",
+    joinHint: "Providers join by application. Review new applications in the Applications tab.",
     search: "Search provider, shop, contact, or service...",
     all: "All",
     pending: "Pending",
@@ -228,60 +258,59 @@ const copy = {
     contact: "Contact",
     applicationStatus: "Application",
     accountStatus: "Account",
-    genderCategory: "Service gender",
     shopsManaged: "Shops managed",
-    registered: "Registered",
     actions: "Actions",
     view: "View",
     edit: "Edit",
-    delete: "Delete",
     approve: "Approve",
     reject: "Reject",
-    activate: "Activate",
-    deactivate: "Deactivate",
+    reopen: "Reopen",
     save: "Save",
+    saving: "Saving…",
     cancel: "Cancel",
-    providerName: "Provider name",
     businessNameEn: "Business name (EN)",
     businessNameAr: "Business name (AR)",
     email: "Email",
     phone: "Phone",
     type: "Provider type",
-    commission: "Commission %",
     tradeLicense: "Trade license URL",
-    male: "Male services",
-    female: "Female services",
-    both: "Both",
+    notProvided: "Not provided",
+    workType: "Work type",
+    remote: "Remote",
+    inShop: "In-shop",
+    remoteInShop: "Remote + in-shop",
     detailTitle: "Provider detail",
-    profile: "Profile",
     shops: "Shops",
     services: "Services",
-    workType: "Work type",
     earnings: "Earnings",
     rating: "Rating",
     completed: "Completed",
     availability: "Availability",
-    addShop: "+ Add shop",
-    addService: "+ Add service",
-    addEmployee: "+ Add employee",
-    removeShop: "Remove shop",
-    removeEmployee: "Remove employee",
-    remote: "Remote",
-    inShop: "In-shop",
-    remoteInShop: "Remote + in-shop",
-    confirmDeleteProvider: "Delete provider {name}? This removes it from the admin view and attempts database deletion for registered providers.",
-    confirmDeleteShop: "Remove shop {name} from this provider?",
-    confirmDeleteEmployee: "Remove employee {name} from this shop?",
     saved: "Provider record saved.",
-    deleted: "Provider removed.",
     updated: "Provider status updated.",
-    loadFailed: "Could not load live providers from database.",
+    statusChangedUpcoming: "Provider status updated. {n} upcoming bookings were not changed; review them in Bookings.",
+    statusDialogTitle: "{action}: {name}",
+    statusUpcomingWarning: "Bookings already scheduled with this provider are not changed or cancelled. Review them in Bookings afterwards.",
+    statusReasonLabel: "Reason (recorded in the audit log)",
+    statusFactStatus: "Current status",
+    statusFactShops: "Shops",
+    reasonTooShort: "Enter a reason of at least 3 characters.",
+    nameRequired: "Both business names are required.",
+    invalidEmail: "Enter a valid email address or leave it empty.",
+    loadFailed: "Could not load providers.",
+    privateHidden: "Contact details, registration numbers and internal notes are hidden for your console role (personal data needs Operations or Owner).",
+    metricsFailed: "Performance figures could not be loaded, so none are shown: {reason}",
+    metricsUnavailable: "Performance figures are unavailable right now.",
+    metricsSuppressed: "Fewer than 5 customers: figures are withheld so they cannot point at individual people.",
+    applicationsFailed: "Applications could not be loaded: {reason}",
+    noBranches: "This provider has no branches yet.",
+    noEmployees: "No employees on this branch.",
     activeRegistry: "Active Providers Registry",
     applicationsQueue: "Applications Review Queue",
     approveApplication: "Approve Application",
     rejectApplication: "Reject Application",
     rejectionReason: "Rejection Reason",
-    commissionPct: "Commission %",
+    approvalFeeNote: "Platform fees follow the fee rules under Taxes & Fees. No per-provider commission is applied.",
     applicant: "Applicant",
     crNumber: "CR Number",
     taxNumber: "Tax Number",
@@ -290,13 +319,15 @@ const copy = {
     suspend: "Suspend",
     reactivate: "Reactivate",
     revenue: "Revenue",
-    sortBy: "Sort by",
+    revenue30d: "Revenue, last 30 days",
     sortRecent: "Recent activity",
     sortRevenue: "Revenue (high)",
     sortRating: "Rating (high)",
-    performance: "Shop performance",
-    monthlyRevenue: "Monthly revenue",
-    commissionAmount: "Commission",
+    performance: "Recorded performance",
+    commissionCharged: "Platform commission charged",
+    commissionChargedNote: "Total commission recorded on this provider's completed bookings. It comes from the fee rules under Taxes & Fees.",
+    recordedCommission: "Recorded commission %",
+    recordedCommissionNote: "Stored on the provider record only. It does not set any price or fee.",
     completedRate: "Completion rate",
     cancellationRate: "Cancellation rate",
     totalBookings: "Total bookings",
@@ -304,30 +335,29 @@ const copy = {
     noShow: "No-show",
     reviews: "Reviews",
     profileCompletion: "Profile completion",
-    avgServiceValue: "Avg service value",
-    commissionShare: "Employee share",
+    avgServiceValue: "Avg booking value",
     repeatCustomers: "Repeat clients",
-    utilization: "Utilization",
-    topEmployees: "Top employees",
-    lowEmployees: "Needs attention",
-    employeePerformance: "Employee performance",
-    employeeEarningsSummary: "Employee earnings summary",
-    statementEarnings: "Statement earnings",
-    statementCompleted: "Statement completed",
-    noEmployeeEarnings: "No employee earnings statement rows yet.",
+    employeeEarningsSummary: "Employee earnings",
+    employeeEarningsSource: "Credited by the ledger on completed bookings, tips included.",
+    noEmployeeEarnings: "No employee earnings recorded yet.",
     adminNotes: "Admin notes",
     adminNotesHint: "Internal notes about this shop (visible to admins only).",
     saveNotes: "Save notes",
     notesSaved: "Admin notes saved.",
     financialSummary: "Financial summary",
     grossRevenue: "Gross revenue",
-    netToProvider: "Net to provider",
     lastActivity: "Last activity"
   },
   ar: {
     title: "مزودو الخدمات",
-    subtitle: "إدارة الطلبات والمزودين المعتمدين والمتاجر والخدمات والموظفين والأداء.",
-    addProvider: "+ إضافة مزود",
+    subtitle: "مراجعة الطلبات والمزودين المسجلين وفروعهم وخدماتهم وموظفيهم وأدائهم المسجل.",
+    loading: "جارٍ تحميل المزودين…",
+    loadingApplications: "جارٍ تحميل الطلبات…",
+    noProviders: "لا يوجد مزودون بعد.",
+    noMatches: "لا يوجد مزودون مطابقون.",
+    close: "إغلاق",
+    commission: "العمولة",
+    joinHint: "ينضم المزودون عبر طلب انضمام. راجع الطلبات الجديدة في تبويب الطلبات.",
     search: "ابحث عن مزود أو متجر أو تواصل أو خدمة...",
     all: "الكل",
     pending: "قيد المراجعة",
@@ -343,60 +373,59 @@ const copy = {
     contact: "التواصل",
     applicationStatus: "الطلب",
     accountStatus: "الحساب",
-    genderCategory: "فئة الخدمات",
     shopsManaged: "المتاجر",
-    registered: "تاريخ التسجيل",
     actions: "الإجراءات",
     view: "عرض",
     edit: "تعديل",
-    delete: "حذف",
     approve: "اعتماد",
     reject: "رفض",
-    activate: "تفعيل",
-    deactivate: "تعطيل",
+    reopen: "إعادة فتح",
     save: "حفظ",
+    saving: "جارٍ الحفظ…",
     cancel: "إلغاء",
-    providerName: "اسم المزود",
     businessNameEn: "اسم النشاط بالإنجليزية",
     businessNameAr: "اسم النشاط بالعربية",
     email: "البريد الإلكتروني",
     phone: "الهاتف",
     type: "نوع المزود",
-    commission: "نسبة العمولة",
     tradeLicense: "رابط السجل التجاري",
-    male: "خدمات رجالية",
-    female: "خدمات نسائية",
-    both: "كلاهما",
+    notProvided: "غير مُدخل",
+    workType: "نوع العمل",
+    remote: "عن بعد",
+    inShop: "داخل المتجر",
+    remoteInShop: "عن بعد وداخل المتجر",
     detailTitle: "تفاصيل المزود",
-    profile: "الملف",
     shops: "المتاجر",
     services: "الخدمات",
-    workType: "نوع العمل",
     earnings: "الأرباح",
     rating: "التقييم",
     completed: "المكتملة",
     availability: "التوفر",
-    addShop: "+ إضافة متجر",
-    addService: "+ إضافة خدمة",
-    addEmployee: "+ إضافة موظف",
-    removeShop: "حذف متجر",
-    removeEmployee: "حذف موظف",
-    remote: "عن بعد",
-    inShop: "داخل المتجر",
-    remoteInShop: "عن بعد وداخل المتجر",
-    confirmDeleteProvider: "حذف المزود {name}؟ سيتم حذفه من عرض الإدارة ومحاولة حذفه من قاعدة البيانات للمزودين المسجلين.",
-    confirmDeleteShop: "حذف متجر {name} من هذا المزود؟",
-    confirmDeleteEmployee: "حذف الموظف {name} من هذا المتجر؟",
     saved: "تم حفظ سجل المزود.",
-    deleted: "تم حذف المزود.",
     updated: "تم تحديث حالة المزود.",
-    loadFailed: "تعذر تحميل بيانات مزودي الخدمة من قاعدة البيانات.",
+    statusChangedUpcoming: "تم تحديث حالة المزود. لم تتغير {n} من الحجوزات القادمة؛ راجعها في صفحة الحجوزات.",
+    statusDialogTitle: "{action}: {name}",
+    statusUpcomingWarning: "لا تتغير الحجوزات المجدولة مسبقاً مع هذا المزود ولا تُلغى. راجعها في صفحة الحجوزات بعد ذلك.",
+    statusReasonLabel: "السبب (يُسجل في سجل التدقيق)",
+    statusFactStatus: "الحالة الحالية",
+    statusFactShops: "الفروع",
+    reasonTooShort: "أدخل سبباً من 3 أحرف على الأقل.",
+    nameRequired: "اسم النشاط مطلوب بالإنجليزية والعربية.",
+    invalidEmail: "أدخل بريداً إلكترونياً صحيحاً أو اتركه فارغاً.",
+    loadFailed: "تعذر تحميل المزودين.",
+    privateHidden: "بيانات التواصل وأرقام السجل والملاحظات الداخلية مخفية لدورك في لوحة الإدارة (البيانات الشخصية تحتاج دور العمليات أو المالك).",
+    metricsFailed: "تعذر تحميل أرقام الأداء، لذا لا تُعرض أي أرقام: {reason}",
+    metricsUnavailable: "أرقام الأداء غير متاحة حالياً.",
+    metricsSuppressed: "أقل من 5 عملاء: حُجبت الأرقام حتى لا تدل على أشخاص بأعينهم.",
+    applicationsFailed: "تعذر تحميل الطلبات: {reason}",
+    noBranches: "لا توجد فروع لهذا المزود بعد.",
+    noEmployees: "لا يوجد موظفون في هذا الفرع.",
     activeRegistry: "سجل مزودي الخدمة المعتمدين",
     applicationsQueue: "طابور مراجعة طلبات الانضمام",
     approveApplication: "الموافقة على الطلب",
     rejectApplication: "رفض الطلب",
     rejectionReason: "سبب الرفض",
-    commissionPct: "نسبة العمولة",
+    approvalFeeNote: "تتبع رسوم المنصة قواعد الرسوم في صفحة الضرائب والرسوم. لا تُطبق عمولة خاصة بكل مزود.",
     applicant: "مقدم الطلب",
     crNumber: "رقم السجل التجاري",
     taxNumber: "الرقم الضريبي",
@@ -405,13 +434,15 @@ const copy = {
     suspend: "إيقاف",
     reactivate: "إعادة تفعيل",
     revenue: "الإيرادات",
-    sortBy: "ترتيب حسب",
+    revenue30d: "الإيرادات، آخر ٣٠ يوماً",
     sortRecent: "النشاط الأخير",
     sortRevenue: "الإيرادات (الأعلى)",
     sortRating: "التقييم (الأعلى)",
-    performance: "أداء المتجر",
-    monthlyRevenue: "الإيراد الشهري",
-    commissionAmount: "العمولة",
+    performance: "الأداء المسجل",
+    commissionCharged: "عمولة المنصة المحتسبة",
+    commissionChargedNote: "إجمالي العمولة المسجلة على الحجوزات المكتملة لهذا المزود. تأتي من قواعد الرسوم في صفحة الضرائب والرسوم.",
+    recordedCommission: "نسبة العمولة المسجلة",
+    recordedCommissionNote: "محفوظة في سجل المزود فقط، ولا تحدد أي سعر أو رسم.",
     completedRate: "معدل الإنجاز",
     cancellationRate: "معدل الإلغاء",
     totalBookings: "إجمالي الحجوزات",
@@ -419,333 +450,168 @@ const copy = {
     noShow: "عدم حضور",
     reviews: "التقييمات",
     profileCompletion: "اكتمال الملف",
-    avgServiceValue: "متوسط قيمة الخدمة",
-    commissionShare: "حصة الموظف",
+    avgServiceValue: "متوسط قيمة الحجز",
     repeatCustomers: "عملاء متكررون",
-    utilization: "الاستغلال",
-    topEmployees: "الأفضل أداءً",
-    lowEmployees: "يحتاج متابعة",
-    employeePerformance: "أداء الموظفين",
-    employeeEarningsSummary: "ملخص أرباح الموظفين",
-    statementEarnings: "أرباح الكشف",
-    statementCompleted: "الحجوزات المكتملة",
-    noEmployeeEarnings: "لا توجد سجلات أرباح موظفين بعد.",
+    employeeEarningsSummary: "أرباح الموظفين",
+    employeeEarningsSource: "تُسجلها دفاتر الحسابات على الحجوزات المكتملة، شاملة الإكراميات.",
+    noEmployeeEarnings: "لا توجد أرباح مسجلة للموظفين بعد.",
     adminNotes: "ملاحظات الإدارة",
     adminNotesHint: "ملاحظات داخلية عن هذا المتجر (تظهر للإدارة فقط).",
     saveNotes: "حفظ الملاحظات",
     notesSaved: "تم حفظ ملاحظات الإدارة.",
     financialSummary: "الملخص المالي",
     grossRevenue: "إجمالي الإيراد",
-    netToProvider: "صافي المزود",
     lastActivity: "آخر نشاط"
   }
 };
 
-const employeePhotos = [
-  "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=400&auto=format&fit=crop"
-];
+const num = (value: Numeric | undefined) => Number(value ?? 0);
 
-const hashText = (value: string) => value.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
+const initialsOf = (name: string) =>
+  name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((word) => word.charAt(0)).join("").toUpperCase();
 
-// Map the UI's application + account status onto the provider_status enum added
-// by the admin_shop_management migration.
-function deriveDbStatus(application: ApplicationStatus, account: AccountStatus): string {
-  if (account === "suspended") return "suspended";
-  if (application === "rejected") return "rejected";
-  if (application === "pending") return "pending";
-  return account === "active" ? "active" : "approved";
+function fill(template: string, values: Record<string, string | number>) {
+  return Object.entries(values).reduce((text, [key, value]) => text.replace(`{${key}}`, String(value)), template);
 }
 
-function inferServiceGender(slug = "", category = "", name = ""): GenderScope {
-  const text = `${slug} ${category} ${name}`.toLowerCase();
-  if (/(beard|shave|barber|groom|fade|scalp)/.test(text)) return "male";
-  if (/(nail|manicure|pedicure|bridal|makeup|lashes|brow|wax)/.test(text)) return "female";
-  return "both";
-}
-
-function genderFromServices(services: AdminService[]): GenderScope {
-  const hasMale = services.some((service) => service.gender === "male" || service.gender === "both");
-  const hasFemale = services.some((service) => service.gender === "female" || service.gender === "both");
-  if (hasMale && hasFemale) return "both";
-  if (hasFemale) return "female";
-  return "male";
-}
-
-function makeEmployee(id: string, nameEn: string, nameAr: string, roleEn: string, roleAr: string, services: AdminService[], isActive = true): AdminEmployee {
-  const hash = hashText(id + nameEn);
-  const assigned = services.slice(0, Math.max(1, Math.min(3, services.length)));
-  const completedBookings = 38 + (hash % 92);
-  const earnings = 8200 + (hash % 42) * 310;
-  return {
-    id,
-    nameEn,
-    nameAr,
-    roleEn,
-    roleAr,
-    photoUrl: employeePhotos[hash % employeePhotos.length],
-    assignedServiceIds: assigned.map((service) => service.id),
-    assignedServiceNamesEn: assigned.map((service) => service.nameEn),
-    assignedServiceNamesAr: assigned.map((service) => service.nameAr),
-    workType: (["in_shop", "remote", "both"] as WorkType[])[hash % 3],
-    earnings,
-    rating: Number((4.55 + (hash % 38) / 100).toFixed(1)),
-    completedBookings,
-    cancelledBookings: hash % 6,
-    noShowBookings: hash % 4,
-    reviewCount: Math.round(completedBookings * (0.35 + (hash % 20) / 100)),
-    repeatCustomers: Math.round(completedBookings * (0.28 + (hash % 25) / 100)),
-    utilizationRate: 58 + (hash % 40),
-    isActive
-  };
-}
-
-// Average value of a completed service for an employee (revenue / completed).
-function employeeAvgServiceValue(employee: AdminEmployee): number {
-  if (!employee.completedBookings) return 0;
-  return Math.round(employee.earnings / employee.completedBookings);
-}
-
-// Employee share of revenue after the shop's commission is taken.
-function employeeCommissionShare(employee: AdminEmployee, commissionPercentage: number): number {
-  return Math.round(employee.earnings * (1 - commissionPercentage / 100));
-}
-
-// Roll a shop's employees + services up into shop-level performance numbers.
-function computeShopMetrics(shop: AdminShop, commissionPercentage: number): ShopMetrics {
-  const employees = shop.employees;
-  const completedBookings = employees.reduce((sum, e) => sum + e.completedBookings, 0);
-  const cancelledBookings = employees.reduce((sum, e) => sum + e.cancelledBookings, 0);
-  const noShowBookings = employees.reduce((sum, e) => sum + e.noShowBookings, 0);
-  const totalBookings = completedBookings + cancelledBookings + noShowBookings;
-  const revenue = employees.reduce((sum, e) => sum + e.earnings, 0);
-  const reviewCount = employees.reduce((sum, e) => sum + e.reviewCount, 0);
-  const ratingBase = employees.length
-    ? employees.reduce((sum, e) => sum + e.rating, 0) / employees.length
-    : 0;
-  const filled = [shop.nameEn, shop.addressEn, shop.services.length > 0, shop.employees.length > 0,
-    shop.services.every((s) => s.price > 0), shop.gender].filter(Boolean).length;
-  return {
-    totalBookings,
-    completedBookings,
-    cancelledBookings,
-    noShowBookings,
-    revenue,
-    commissionAmount: Math.round(revenue * commissionPercentage / 100),
-    avgServiceValue: completedBookings ? Math.round(revenue / completedBookings) : 0,
-    rating: Number(ratingBase.toFixed(2)),
-    reviewCount,
-    profileCompletion: Math.round((filled / 6) * 100),
-    conversionRate: totalBookings ? Math.round((completedBookings / totalBookings) * 100) : 0,
-    completedRate: totalBookings ? Math.round((completedBookings / totalBookings) * 100) : 0,
-    cancellationRate: totalBookings ? Math.round(((cancelledBookings + noShowBookings) / totalBookings) * 100) : 0
-  };
-}
-
-function computeProviderPerformance(provider: ProviderRecord, metricsByShop: Record<string, ShopMetrics>) {
-  if (provider.performance) {
-    const p = provider.performance;
-    return {
-      revenue: p.revenue,
-      monthlyRevenue: Math.round(p.revenue / 6),
-      commissionAmount: p.commissionAmount,
-      totalBookings: p.totalBookings,
-      completedBookings: p.completedBookings,
-      cancelledBookings: p.cancelledBookings,
-      reviewCount: p.reviewCount,
-      rating: p.rating,
-      completedRate: p.totalBookings ? Math.round((p.completedBookings / p.totalBookings) * 100) : 0,
-      cancellationRate: p.totalBookings ? Math.round((p.cancelledBookings / p.totalBookings) * 100) : 0,
-      employeeCount: p.employeeCount,
-      serviceCount: p.serviceCount
-    };
+// providers.status is what the database acts on: a provider is visible and bookable exactly when it is
+// approved or active (a trigger derives is_verified from it), never when pending, rejected or suspended.
+function statusesFromDb(status: string | null | undefined, verified: boolean | null | undefined): { application: ApplicationStatus; account: AccountStatus; db: DbProviderStatus } {
+  switch (status) {
+    case "rejected": return { application: "rejected", account: "inactive", db: "rejected" };
+    case "suspended": return { application: "approved", account: "suspended", db: "suspended" };
+    case "active": return { application: "approved", account: "active", db: "active" };
+    case "approved": return { application: "approved", account: "inactive", db: "approved" };
+    case "pending": return { application: "pending", account: "inactive", db: "pending" };
+    default: return verified
+      ? { application: "approved", account: "active", db: "active" }
+      : { application: "pending", account: "inactive", db: "pending" };
   }
-  const shopMetrics = provider.shops.map((shop) => metricsByShop[shop.id]).filter(Boolean);
-  const revenue = shopMetrics.reduce((sum, m) => sum + m.revenue, 0);
-  const totalBookings = shopMetrics.reduce((sum, m) => sum + m.totalBookings, 0);
-  const completedBookings = shopMetrics.reduce((sum, m) => sum + m.completedBookings, 0);
-  const cancelledBookings = shopMetrics.reduce((sum, m) => sum + m.cancelledBookings, 0);
-  const reviewCount = shopMetrics.reduce((sum, m) => sum + m.reviewCount, 0);
-  const rating = shopMetrics.length
-    ? Number((shopMetrics.reduce((sum, m) => sum + m.rating, 0) / shopMetrics.length).toFixed(2))
-    : 0;
+}
+
+// A provider with no branches has no bookings, so zero is a fact for it rather than a guess.
+const EMPTY_TALLY: Tally = {
+  totalBookings: 0, completedBookings: 0, cancelledBookings: 0, noShowBookings: 0,
+  revenue: 0, commissionAmount: 0, revenue30d: 0, reviewCount: 0, ratingSum: 0
+};
+
+function tallyFromBranchRow(row: BranchPerformanceRow): Tally {
   return {
-    revenue,
-    monthlyRevenue: Math.round(revenue / 6),
-    commissionAmount: Math.round(revenue * provider.commissionPercentage / 100),
-    totalBookings,
-    completedBookings,
-    cancelledBookings,
-    reviewCount,
-    rating,
-    completedRate: totalBookings ? Math.round((completedBookings / totalBookings) * 100) : 0,
-    cancellationRate: totalBookings ? Math.round((cancelledBookings / totalBookings) * 100) : 0,
-    employeeCount: provider.shops.reduce((sum, shop) => sum + shop.employees.length, 0),
-    serviceCount: provider.shops.reduce((sum, shop) => sum + shop.services.length, 0)
+    totalBookings: num(row.total_bookings),
+    completedBookings: num(row.completed_bookings),
+    cancelledBookings: num(row.cancelled_bookings),
+    noShowBookings: num(row.no_show_bookings),
+    revenue: num(row.gross_revenue),
+    commissionAmount: num(row.commission_amount),
+    revenue30d: num(row.revenue_30d),
+    reviewCount: num(row.review_count),
+    ratingSum: num(row.rating_sum)
   };
 }
 
-const demoProviders: ProviderRecord[] = (() => {
-  const maleServices: AdminService[] = [
-    { id: "svc-cut", nameEn: "Classic Haircut", nameAr: "قصة شعر كلاسيكية", categoryEn: "Barber & Hair", categoryAr: "الحلاقة والشعر", gender: "male", price: 45, duration: 40, isActive: true },
-    { id: "svc-beard", nameEn: "Beard Sculpt", nameAr: "نحت اللحية", categoryEn: "Beard & Shave", categoryAr: "اللحية والحلاقة", gender: "male", price: 30, duration: 25, isActive: true }
-  ];
-  const femaleServices: AdminService[] = [
-    { id: "svc-facial", nameEn: "Deep Cleanse Facial", nameAr: "تنظيف بشرة عميق", categoryEn: "Skincare", categoryAr: "العناية بالبشرة", gender: "female", price: 120, duration: 60, isActive: true },
-    { id: "svc-nails", nameEn: "Manicure", nameAr: "مانيكير", categoryEn: "Nails", categoryAr: "الأظافر", gender: "female", price: 60, duration: 40, isActive: true }
-  ];
-  const bothServices: AdminService[] = [
-    { id: "svc-spa", nameEn: "Moroccan Bath", nameAr: "حمام مغربي", categoryEn: "Spa", categoryAr: "سبا", gender: "both", price: 90, duration: 60, isActive: true },
-    { id: "svc-massage", nameEn: "Recovery Massage", nameAr: "مساج استشفائي", categoryEn: "Wellness", categoryAr: "العافية", gender: "both", price: 180, duration: 75, isActive: true }
-  ];
+function figuresFromEmployeeRow(row: EmployeePerformanceRow): EmployeeFigures {
+  return {
+    completedBookings: num(row.completed_bookings),
+    cancelledBookings: num(row.cancelled_bookings),
+    noShowBookings: num(row.no_show_bookings),
+    revenue: num(row.gross_revenue),
+    commissionAmount: num(row.commission_amount),
+    earnings: row.employee_earnings === null || row.employee_earnings === undefined ? null : num(row.employee_earnings),
+    reviewCount: num(row.review_count),
+    ratingSum: num(row.rating_sum),
+    repeatCustomers: num(row.repeat_customers)
+  };
+}
 
-  return [
-    {
-      id: "provider-elite",
-      source: "local",
-      providerName: "Omar Khaled",
-      businessNameEn: "Elite Barbershop",
-      businessNameAr: "إليت باربرشوب",
-      contactEmail: "omar@elite.example",
-      contactPhone: "+966 55 418 2031",
-      type: "salon_barber_shop",
-      applicationStatus: "approved",
-      accountStatus: "active",
-      gender: "male",
-      registrationDate: new Date("2026-02-08").toISOString(),
-      commissionPercentage: 15,
-      tradeLicenseUrl: "#",
-      shops: [
-        {
-          id: "shop-elite-main",
-          providerId: "provider-elite",
-          nameEn: "Elite Barbershop, Riyadh Central",
-          nameAr: "إليت باربرشوب، وسط الرياض",
-          addressEn: "Riyadh Central Branch",
-          addressAr: "فرع وسط الرياض",
-          gender: "male",
-          services: maleServices,
-          employees: [
-            makeEmployee("emp-omar", "Omar Khaled", "عمر خالد", "Master Barber", "حلاق خبير", maleServices),
-            makeEmployee("emp-yousef", "Yousef Adel", "يوسف عادل", "Beard Specialist", "أخصائي لحية", maleServices)
-          ]
-        }
-      ]
-    },
-    {
-      id: "provider-sara",
-      source: "local",
-      providerName: "Sara Al-Nasser",
-      businessNameEn: "Sara Beauty Lounge",
-      businessNameAr: "سارة بيوتي لاونج",
-      contactEmail: "sara@sarabeauty.example",
-      contactPhone: "+966 56 771 0430",
-      type: "salon_barber_shop",
-      applicationStatus: "pending",
-      accountStatus: "inactive",
-      gender: "female",
-      registrationDate: new Date("2026-06-14").toISOString(),
-      commissionPercentage: 15,
-      tradeLicenseUrl: "#",
-      shops: [
-        {
-          id: "shop-sara-olaya",
-          providerId: "provider-sara",
-          nameEn: "Sara Beauty Lounge, Olaya",
-          nameAr: "سارة بيوتي لاونج، العليا",
-          addressEn: "Olaya, Riyadh",
-          addressAr: "العليا، الرياض",
-          gender: "female",
-          services: femaleServices,
-          employees: [
-            makeEmployee("emp-lina", "Lina Nasser", "لينا ناصر", "Skincare Specialist", "أخصائية بشرة", femaleServices, false)
-          ]
-        }
-      ]
-    },
-    {
-      id: "provider-primora-spa",
-      source: "local",
-      providerName: "Karim Saad",
-      businessNameEn: "Primora Wellness Spa",
-      businessNameAr: "بريمورا سبا",
-      contactEmail: "karim@primoraspa.example",
-      contactPhone: "+966 54 209 4488",
-      type: "salon_barber_shop",
-      applicationStatus: "rejected",
-      accountStatus: "inactive",
-      gender: "both",
-      registrationDate: new Date("2026-05-20").toISOString(),
-      commissionPercentage: 18,
-      tradeLicenseUrl: "#",
-      shops: [
-        {
-          id: "shop-primora-spa",
-          providerId: "provider-primora-spa",
-          nameEn: "Primora Wellness Spa",
-          nameAr: "بريمورا سبا",
-          addressEn: "Al-Malqa, Riyadh",
-          addressAr: "الملقا، الرياض",
-          gender: "both",
-          services: bothServices,
-          employees: [
-            makeEmployee("emp-karim", "Karim Saad", "كريم سعد", "Spa Operations Lead", "مشرف السبا", bothServices)
-          ]
-        }
-      ]
-    }
-  ];
-})();
+function addTallies(items: Tally[]): Tally {
+  return items.reduce<Tally>((sum, item) => ({
+    totalBookings: sum.totalBookings + item.totalBookings,
+    completedBookings: sum.completedBookings + item.completedBookings,
+    cancelledBookings: sum.cancelledBookings + item.cancelledBookings,
+    noShowBookings: sum.noShowBookings + item.noShowBookings,
+    revenue: sum.revenue + item.revenue,
+    commissionAmount: sum.commissionAmount + item.commissionAmount,
+    revenue30d: sum.revenue30d + item.revenue30d,
+    reviewCount: sum.reviewCount + item.reviewCount,
+    ratingSum: sum.ratingSum + item.ratingSum
+  }), EMPTY_TALLY);
+}
 
-const blankProvider = (): ProviderRecord => ({
-  id: "",
-  source: "local",
-  providerName: "",
-  businessNameEn: "",
-  businessNameAr: "",
-  contactEmail: "",
-  contactPhone: "",
-  type: "salon_barber_shop",
-  applicationStatus: "pending",
-  accountStatus: "inactive",
-  gender: "both",
-  shops: [],
-  registrationDate: new Date().toISOString(),
-  commissionPercentage: 15,
-  tradeLicenseUrl: "#"
-});
+// Rates are taken over visits that reached an outcome (completed, cancelled or no-show); bookings still
+// ahead or awaiting payment are neither successes nor failures yet. Each is null while there are none.
+function describeOutcomes(counts: { completedBookings: number; cancelledBookings: number; noShowBookings: number; revenue: number; reviewCount: number; ratingSum: number }) {
+  const finished = counts.completedBookings + counts.cancelledBookings + counts.noShowBookings;
+  return {
+    finished,
+    completedRate: finished ? Math.round((counts.completedBookings / finished) * 100) : null,
+    cancellationRate: finished ? Math.round(((counts.cancelledBookings + counts.noShowBookings) / finished) * 100) : null,
+    rating: counts.reviewCount ? counts.ratingSum / counts.reviewCount : null,
+    avgBookingValue: counts.completedBookings ? Math.round(counts.revenue / counts.completedBookings) : null
+  };
+}
+
+// How much of the shop's public profile is filled in; a plain count of present fields.
+function profileCompletion(shop: Pick<AdminShop, "nameEn" | "addressEn" | "services" | "employees">): number {
+  const filled = [
+    shop.nameEn,
+    shop.addressEn,
+    shop.services.length > 0,
+    shop.employees.length > 0,
+    shop.services.length > 0 && shop.services.every((service) => service.price > 0)
+  ].filter(Boolean).length;
+  return Math.round((filled / 5) * 100);
+}
+
+const providerRevenue = (provider: ProviderRecord) => provider.figures?.revenue ?? 0;
+const providerRating = (provider: ProviderRecord) => (provider.figures ? describeOutcomes(provider.figures).rating ?? 0 : 0);
+
+const blankDraft: EditDraft = { businessNameEn: "", businessNameAr: "", contactEmail: "", contactPhone: "", tradeLicenseUrl: "" };
+
+function crIsCleared(app: { cr_verification_status?: string | null }) {
+  return app.cr_verification_status === "verified" || app.cr_verification_status === "manually_reviewed";
+}
 
 export default function AdminProviderManagement() {
   const [lang, setLang] = useState<Locale>("en");
-  const [providers, setProviders] = useState<ProviderRecord[]>(demoProviders);
+  const [providers, setProviders] = useState<ProviderRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
-  const [query, setQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | ApplicationStatus | AccountStatus>("all");
+  const [crDialog, setCrDialog] = useState<{ kind: "wathq" | "manual"; providerId: string; applicationId?: string; cr: string; name: string } | null>(null);
+  const [statusPending, setStatusPending] = useState<{ provider: ProviderRecord; next: DbProviderStatus; actionLabel: string } | null>(null);
+  const [metricsError, setMetricsError] = useState("");
+  const [suppressedBranches, setSuppressedBranches] = useState<Set<string>>(new Set());
+  const [privateHidden, setPrivateHidden] = useState(false);
+  const params = useSearchParams();
+  const [query, setQuery] = useState(() => params.get("q") ?? "");
+  const [statusFilter, setStatusFilter] = useState<"all" | ApplicationStatus | AccountStatus>(() =>
+    oneOf(params.get("status"), ["all", "pending", "approved", "rejected", "active", "suspended", "inactive"] as const, "all"));
   const [sortMode, setSortMode] = useState<"recent" | "revenue" | "rating">("recent");
-  const [detail, setDetail] = useState<ProviderRecord | null>(null);
-  const [notesDraft, setNotesDraft] = useState("");
-  const [employeeEarningsById, setEmployeeEarningsById] = useState<Record<string, EmployeeEarningsSummary>>({});
-  const [modalOpen, setModalOpen] = useState(false);
-  const [form, setForm] = useState<ProviderRecord>(() => blankProvider());
-  const [mainTab, setMainTab] = useState<"providers" | "applications">("providers");
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const [notesEdit, setNotesEdit] = useState<{ id: string; text: string } | null>(null);
+  const [editing, setEditing] = useState<ProviderRecord | null>(null);
+  const [draft, setDraft] = useState<EditDraft>(blankDraft);
+  const [draftError, setDraftError] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [busyProviderId, setBusyProviderId] = useState("");
+  const [mainTab, setMainTab] = useState<"providers" | "applications">(() => (params.get("tab") === "applications" ? "applications" : "providers"));
   const [applications, setApplications] = useState<ProviderApplicationRecord[]>([]);
   const [appsLoading, setAppsLoading] = useState(false);
-  const [appFilter, setAppFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
+  const [appsError, setAppsError] = useState("");
+  const [appFilter, setAppFilter] = useState<"all" | "pending" | "approved" | "rejected">(() =>
+    oneOf(params.get("appStatus"), ["all", "pending", "approved", "rejected"] as const, "pending"));
+  useEffect(() => {
+    writeUrlState({
+      tab: mainTab === "applications" ? "applications" : "",
+      status: statusFilter === "all" ? "" : statusFilter,
+      appStatus: appFilter === "pending" ? "" : appFilter,
+      q: query.trim(),
+    });
+  }, [mainTab, statusFilter, appFilter, query]);
   const [approvalModalApp, setApprovalModalApp] = useState<ProviderApplicationRecord | null>(null);
-  const [approvalCommission, setApprovalCommission] = useState(15);
   const [rejectionModalApp, setRejectionModalApp] = useState<ProviderApplicationRecord | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [submittingAppAction, setSubmittingAppAction] = useState(false);
-  const idCounterRef = useRef(0);
-
-  const nextLocalId = useCallback((prefix: string) => {
-    idCounterRef.current += 1;
-    return `${prefix}-${idCounterRef.current}`;
-  }, []);
 
   useEffect(() => {
     const sync = () => setLang(document.documentElement.lang === "ar" ? "ar" : "en");
@@ -759,127 +625,104 @@ export default function AdminProviderManagement() {
   const isRTL = lang === "ar";
   const dirClass = isRTL ? "text-right" : "text-left";
   const rowDir = isRTL ? "flex-row-reverse" : "flex-row";
+  const detail = useMemo(() => providers.find((provider) => provider.id === detailId) ?? null, [providers, detailId]);
+  // The notes box shows what the operator is typing for this provider, or the saved notes until they type.
+  const notesDraft = detail ? (notesEdit?.id === detail.id ? notesEdit.text : detail.adminNotes ?? "") : "";
 
-  const labelGender = useCallback((gender: GenderScope) => {
-    if (gender === "male") return t.male;
-    if (gender === "female") return t.female;
-    return t.both;
-  }, [t.both, t.female, t.male]);
+  const labelWorkType = (workType: WorkType) => (workType === "remote" ? t.remote : workType === "both" ? t.remoteInShop : t.inShop);
 
-  const labelWorkType = useCallback((workType: WorkType) => {
-    if (workType === "remote") return t.remote;
-    if (workType === "both") return t.remoteInShop;
-    return t.inShop;
-  }, [t.inShop, t.remote, t.remoteInShop]);
-
-  const normalizeProvider = useCallback((provider: ProviderRow, index: number, perfMap: Record<string, any> = {}): ProviderRecord => {
+  const normalizeProvider = useCallback((provider: ProviderRow, branchFigures: Record<string, Tally> | null, employeeFigures: Record<string, EmployeeFigures> | null): ProviderRecord => {
     const providerServices: AdminService[] = (provider.services || []).map((service) => {
       const category = service.categories ?? null;
       const categorySlug = category?.slug ?? "";
       return {
         id: service.id,
-        nameEn: service.name_en || "Service",
-        nameAr: service.name_ar || service.name_en || "خدمة",
-        categoryEn: category?.name_en || categorySlug || "Services",
-        categoryAr: category?.name_ar || category?.name_en || "الخدمات",
-        gender: inferServiceGender(service.slug ?? service.id, categorySlug, service.name_en ?? ""),
+        nameEn: service.name_en || "",
+        nameAr: service.name_ar || service.name_en || "",
+        categoryEn: category?.name_en || categorySlug || "",
+        categoryAr: category?.name_ar || category?.name_en || "",
         price: Number(service.base_price || 0),
         duration: Number(service.base_duration_minutes || 0),
         isActive: service.is_active !== false
       };
     });
 
-    const branches: ProviderBranchRow[] = provider.branches?.length
-      ? provider.branches
-      : [{ id: `${provider.id}-shop`, name_en: provider.business_name_en, name_ar: provider.business_name_ar, address_text_en: "Riyadh", address_text_ar: "الرياض", employees: [] }];
-
-    const shops: AdminShop[] = branches.map((branch, branchIndex) => {
-      const employees = (branch.employees || []).map((employee, employeeIndex) => {
+    const shops: AdminShop[] = (provider.branches || []).map((branch) => {
+      const employees: AdminEmployee[] = (branch.employees || []).map((employee) => {
         const assignedIds = (employee.employee_services || []).map((row) => row.service_id).filter(Boolean);
-        const assignedServices = providerServices.filter((service) => assignedIds.includes(service.id));
-        return makeEmployee(
-          employee.id || `${branch.id}-employee-${employeeIndex}`,
-          employee.name_en || "Employee",
-          employee.name_ar || employee.name_en || "موظف",
-          employee.title_en || "Specialist",
-          employee.title_ar || employee.title_en || "أخصائي",
-          assignedServices.length ? assignedServices : providerServices,
-          employee.is_active !== false
-        );
+        const assigned = providerServices.filter((service) => assignedIds.includes(service.id));
+        return {
+          id: employee.id,
+          nameEn: employee.name_en || "",
+          nameAr: employee.name_ar || employee.name_en || "",
+          roleEn: employee.title_en || "",
+          roleAr: employee.title_ar || employee.title_en || "",
+          assignedServiceIds: assigned.map((service) => service.id),
+          assignedServiceNamesEn: assigned.map((service) => service.nameEn),
+          assignedServiceNamesAr: assigned.map((service) => service.nameAr),
+          isActive: employee.is_active !== false,
+          photoUrl: employee.photo_url || "",
+          workType: employee.work_type === "remote" || employee.work_type === "both" ? employee.work_type : "in_shop",
+          figures: employeeFigures?.[employee.id] ?? null
+        };
       });
-      const shopServices = providerServices.length ? providerServices : demoProviders[0].shops[0].services;
       return {
-        id: branch.id || `${provider.id}-shop-${branchIndex}`,
+        id: branch.id,
         providerId: provider.id,
-        nameEn: branch.name_en || provider.business_name_en || "Shop",
-        nameAr: branch.name_ar || provider.business_name_ar || provider.business_name_en || "متجر",
-        addressEn: branch.address_text_en || "Riyadh",
-        addressAr: branch.address_text_ar || "الرياض",
-        gender: genderFromServices(shopServices),
-        services: shopServices,
-        employees
+        nameEn: branch.name_en || provider.business_name_en || "",
+        nameAr: branch.name_ar || provider.business_name_ar || provider.business_name_en || "",
+        addressEn: branch.address_text_en || branch.address_text_ar || "",
+        addressAr: branch.address_text_ar || branch.address_text_en || "",
+        services: providerServices,
+        employees,
+        figures: branchFigures?.[branch.id] ?? null
       };
     });
 
-    const providerGender = shops.some((shop) => shop.gender === "both")
-      ? "both"
-      : genderFromServices(shops.flatMap((shop) => shop.services));
-
-    const perf = perfMap[provider.id];
-    const performance = perf ? {
-      totalBookings: Number(perf.total_bookings || 0),
-      completedBookings: Number(perf.completed_bookings || 0),
-      cancelledBookings: Number(perf.cancelled_bookings || 0),
-      noShowBookings: Number(perf.no_show_bookings || 0),
-      revenue: Number(perf.gross_revenue || 0),
-      commissionAmount: Number(perf.commission_amount || 0),
-      rating: Number(perf.avg_rating || 0),
-      reviewCount: Number(perf.review_count || 0),
-      employeeCount: Number(perf.employee_count || 0),
-      serviceCount: Number(perf.service_count || 0)
-    } : undefined;
+    const branchTallies = shops.map((shop) => shop.figures);
+    const figures = shops.length === 0
+      ? EMPTY_TALLY
+      : branchTallies.every((tally): tally is Tally => tally !== null) ? addTallies(branchTallies) : null;
+    const { application, account, db } = statusesFromDb(provider.status, provider.is_verified);
+    const commission = provider.commission_percentage;
 
     return {
       id: provider.id,
-      source: "db",
-      providerName: provider.business_name_en || `Provider ${index + 1}`,
-      businessNameEn: provider.business_name_en || "Provider",
-      businessNameAr: provider.business_name_ar || provider.business_name_en || "مزود",
-      contactEmail: provider.contact_email || `${String(provider.business_name_en || "provider").toLowerCase().replace(/[^a-z0-9]+/g, ".").replace(/^\.+|\.+$/g, "") || "provider"}@primora.provider`,
-      contactPhone: provider.contact_phone || `+966 5${String(10000000 + (hashText(provider.id || String(index)) % 89999999)).slice(0, 8)}`,
+      businessNameEn: provider.business_name_en || "",
+      businessNameAr: provider.business_name_ar || provider.business_name_en || "",
+      contactEmail: provider.contact_email || "",
+      contactPhone: provider.contact_phone || "",
       type: provider.type === "freelancer" || provider.type === "salon" || provider.type === "salon_barber_shop" ? provider.type : "salon_barber_shop",
-      applicationStatus: provider.is_verified ? "approved" : "pending",
-      accountStatus: provider.is_verified ? "active" : "inactive",
-      gender: providerGender,
+      status: db,
+      applicationStatus: application,
+      accountStatus: account,
       shops,
-      registrationDate: provider.created_at || new Date().toISOString(),
-      commissionPercentage: Number(provider.commission_percentage || 15),
-      tradeLicenseUrl: provider.trade_license_url || "#",
+      registrationDate: provider.created_at || "",
+      recordedCommission: commission === null || commission === undefined ? null : Number(commission),
+      tradeLicenseUrl: provider.trade_license_url || "",
       crNumber: provider.cr_number || "",
       crVerificationStatus: provider.cr_verification_status || (provider.is_verified ? "verified" : "unverified"),
-      performance
+      adminNotes: provider.admin_notes || "",
+      lastActivity: provider.last_activity_at || undefined,
+      figures
     };
   }, []);
 
   const loadProviders = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    setMetricsError("");
     try {
-      setLoading(true);
-      setError("");
-      
       const { data, error: dbError } = await supabase
         .from("providers")
         .select(`
           id,
           business_name_en,
           business_name_ar,
-          contact_email,
-          contact_phone,
           type,
+          status,
           is_verified,
-          cr_number,
           cr_verification_status,
-          commission_percentage,
-          trade_license_url,
           created_at,
           branches (
             id,
@@ -894,6 +737,8 @@ export default function AdminProviderManagement() {
               title_en,
               title_ar,
               is_active,
+              photo_url,
+              work_type,
               employee_services ( service_id )
             )
           ),
@@ -909,103 +754,89 @@ export default function AdminProviderManagement() {
           )
         `)
         .order("created_at", { ascending: false });
-
       if (dbError) throw dbError;
 
-      const perfMap: Record<string, any> = {};
-      try {
-        const { data: perfData, error: perfError } = await supabase
-          .from("admin_provider_performance")
-          .select("*");
-        if (!perfError && perfData) {
-          perfData.forEach((row: any) => {
-            perfMap[row.provider_id] = row;
-          });
+      // Contact details, registration numbers, commission and the review notes are not readable from the table by signed-in users;
+      // administrators read them through one audited command.
+      // GOV-FIX (Q4): the directory needs personal.read and is logged; finance and analyst see the list without these fields.
+      // SECFIX-2 R2-L4: read page by page (at most 500 rows each) so every audit row names every provider it returned.
+      const privateRows: Array<{ provider_id: string }> = [];
+      let privateForbidden = false;
+      for (let offset = 0; ; offset += AUDITED_PAGE) {
+        const privateResult = await supabase.rpc("admin_provider_private_directory", { p_purpose: "provider_onboarding", p_limit: AUDITED_PAGE, p_offset: offset });
+        privateForbidden = Boolean(privateResult.error) && (privateResult.error as { hint?: string } | null)?.hint === "console_role_forbidden";
+        if (privateResult.error && !privateForbidden) throw privateResult.error;
+        const batch = (privateResult.data ?? []) as Array<{ provider_id: string }>;
+        privateRows.push(...batch);
+        if (privateForbidden || batch.length < AUDITED_PAGE) break;
+      }
+      setPrivateHidden(privateForbidden);
+      const privateById = new Map(privateRows.map((row) => [row.provider_id, row]));
+
+      // Branch and employee figures come from their own views. If either fails nothing is estimated in
+      // its place: the screen says so and shows no figures.
+      const readEmployeePages = async () => {
+        const rows: EmployeePerformanceRow[] = [];
+        for (let offset = 0; ; offset += AUDITED_PAGE) {
+          const page = await supabase.rpc("admin_employee_performance_report", { p_provider_id: null, p_purpose: "provider_onboarding", p_limit: AUDITED_PAGE, p_offset: offset });
+          if (page.error) return { data: null, error: page.error };
+          const batch = (page.data ?? []) as EmployeePerformanceRow[];
+          rows.push(...batch);
+          if (batch.length < AUDITED_PAGE) return { data: rows, error: null };
         }
-      } catch (err) {
-        console.warn("Could not query admin_provider_performance, using local rollups:", err);
-      }
-
-      try {
-        const { data: earningsData, error: earningsError } = await supabase
-          .from("employee_earnings_summary")
-          .select("employee_id, month_start, total_completed_bookings, total_employee_earnings")
-          .order("month_start", { ascending: false });
-        if (earningsError) throw earningsError;
-        const earningsMap = (earningsData as EmployeeEarningsRow[] | null ?? []).reduce<Record<string, EmployeeEarningsSummary>>((map, row) => {
-          if (!row.employee_id) return map;
-          const existing = map[row.employee_id] ?? { employeeId: row.employee_id, completedBookings: 0, totalEarnings: 0, monthStart: row.month_start ?? undefined };
-          map[row.employee_id] = {
-            employeeId: row.employee_id,
-            completedBookings: existing.completedBookings + Number(row.total_completed_bookings || 0),
-            totalEarnings: existing.totalEarnings + Number(row.total_employee_earnings || 0),
-            monthStart: existing.monthStart || row.month_start || undefined
-          };
-          return map;
-        }, {});
-        setEmployeeEarningsById(earningsMap);
-      } catch (err) {
-        console.warn("Could not query employee_earnings_summary, using employee card fallbacks:", err);
-        setEmployeeEarningsById({});
-      }
-
-      if (data?.length) {
-        setProviders((data as ProviderRow[]).map((p, idx) => normalizeProvider(p, idx, perfMap)));
+      };
+      const [branchResult, employeeResult] = await Promise.all([
+        supabase.rpc("admin_branch_performance_report"),
+        // GOV-2 (Q4): per-employee figures (earnings come from the ledger) are read through the audited report, page by page.
+        readEmployeePages()
+      ]);
+      let branchFigures: Record<string, Tally> | null = null;
+      let employeeFigures: Record<string, EmployeeFigures> | null = null;
+      const failures = [branchResult.error, employeeResult.error].filter(Boolean).map((failure) => errorMessage(failure));
+      if (failures.length > 0) {
+        setMetricsError(failures.join(" · "));
       } else {
-        setProviders([]);
+        // SECFIX-2 R2-M3 (D4): a branch whose figures describe 1 to 4 customers comes back withheld; it has no figures here.
+        const branchRows = (branchResult.data ?? []) as BranchPerformanceRow[];
+        setSuppressedBranches(new Set(branchRows.filter((row) => row.suppressed).map((row) => row.branch_id)));
+        branchFigures = Object.fromEntries(branchRows.filter((row) => !row.suppressed).map((row) => [row.branch_id, tallyFromBranchRow(row)]));
+        employeeFigures = Object.fromEntries(((employeeResult.data ?? []) as EmployeePerformanceRow[]).map((row) => [row.employee_id, figuresFromEmployeeRow(row)]));
       }
-    } catch (loadError: any) {
-      console.error("Provider management load error:", loadError);
+      setProviders(((data ?? []) as unknown as ProviderRow[]).map((row) => normalizeProvider({ ...row, ...(privateById.get(row.id) ?? {}) } as ProviderRow, branchFigures, employeeFigures)));
+    } catch (loadError) {
       setProviders([]);
-      setError(loadError?.message || t.loadFailed);
+      setError(`${t.loadFailed} ${errorMessage(loadError)}`.trim());
     } finally {
       setLoading(false);
     }
   }, [normalizeProvider, t.loadFailed]);
 
   const loadApplications = useCallback(async () => {
+    setAppsLoading(true);
+    setAppsError("");
     try {
-      setAppsLoading(true);
-      const { data, error: appError } = await supabase
-        .from("admin_provider_applications_view")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (appError) {
-        const { data: tableData, error: tableError } = await supabase
-          .from("provider_applications")
-          .select("*")
-          .order("created_at", { ascending: false });
-        if (tableError) throw tableError;
-        setApplications((tableData as ProviderApplicationRecord[]) || []);
-      } else {
-        setApplications((data as ProviderApplicationRecord[]) || []);
-      }
-    } catch (err: any) {
-      console.warn("Could not query provider applications:", err);
+      // GOV-2 (Q4): applicants' names and contact details are read through the audited admin_list_provider_applications.
+      const result = await supabase.rpc("admin_list_provider_applications", { p_status: null, p_limit: 500, p_offset: 0, p_purpose: "provider_onboarding" });
+      if (result.error) throw result.error;
+      setApplications(((result.data as { rows?: ProviderApplicationRecord[] } | null)?.rows ?? []) as ProviderApplicationRecord[]);
+    } catch (loadError) {
       setApplications([]);
+      setAppsError(errorMessage(loadError));
     } finally {
       setAppsLoading(false);
     }
   }, []);
 
-  const handleApproveApplication = async (appId: string, commission: number) => {
-    setSubmittingAppAction(true);
+  // Approval is one server command that needs the operator's reason; a refusal goes back to the dialog, which keeps
+  // what was typed.
+  const handleApproveApplication = async (appId: string, reason: string): Promise<string | null> => {
+    // Platform fees follow the fee rules; the function's own default fills the recorded percentage.
+    const { error: rpcError } = await supabase.rpc("approve_provider_application", { p_application_id: appId, p_reason: reason });
+    if (rpcError) return errorMessage(rpcError) || (isRTL ? "فشلت عملية الموافقة." : "Failed to approve application.");
     setError("");
-    try {
-      const { error: rpcError } = await supabase.rpc("approve_provider_application", {
-        p_application_id: appId,
-        p_commission_percentage: commission
-      });
-      if (rpcError) throw rpcError;
-      setNotice(isRTL ? "تمت الموافقة على الطلب بنجاح وتفعيل مزود الخدمة." : "Application approved successfully and provider activated.");
-      setApprovalModalApp(null);
-      await Promise.all([loadApplications(), loadProviders()]);
-    } catch (err: any) {
-      console.error("Approval failed:", err);
-      setError(err?.message || (isRTL ? "فشلت عملية الموافقة." : "Failed to approve application."));
-    } finally {
-      setSubmittingAppAction(false);
-    }
+    setNotice(isRTL ? "تمت الموافقة على الطلب بنجاح وتفعيل مزود الخدمة." : "Application approved successfully and provider activated.");
+    await Promise.all([loadApplications(), loadProviders()]);
+    return null;
   };
 
   const handleRejectApplication = async (appId: string, reason: string) => {
@@ -1025,9 +856,8 @@ export default function AdminProviderManagement() {
       setRejectionModalApp(null);
       setRejectionReason("");
       await loadApplications();
-    } catch (err: any) {
-      console.error("Rejection failed:", err);
-      setError(err?.message || (isRTL ? "فشلت عملية الرفض." : "Failed to reject application."));
+    } catch (err) {
+      setError(errorMessage(err) || (isRTL ? "فشلت عملية الرفض." : "Failed to reject application."));
     } finally {
       setSubmittingAppAction(false);
     }
@@ -1035,13 +865,21 @@ export default function AdminProviderManagement() {
 
   const applyCrStatus = (providerId: string, crNumber: string, status: string) => {
     setProviders((prev) => prev.map((p) => p.id === providerId ? { ...p, crNumber, crVerificationStatus: status } : p));
-    if (detail?.id === providerId) {
-      setDetail((prev) => prev ? { ...prev, crNumber, crVerificationStatus: status } : null);
+  };
+
+  const crStatusLabel = (status: string | null | undefined) => {
+    switch (status) {
+      case "verified": return isRTL ? "مؤكد عبر واثق" : "Confirmed by Wathq";
+      case "manually_reviewed": return isRTL ? "مراجعة يدوية" : "Manually reviewed";
+      case "name_mismatch": return isRTL ? "الاسم لا يطابق واثق" : "Name differs from Wathq";
+      case "rejected": return isRTL ? "غير قائم في واثق" : "Not active in Wathq";
+      default: return isRTL ? "لم يُفحص بعد" : "Not checked yet";
     }
   };
 
-  // Calls the Ministry of Commerce Wathq API through the wathq-verify Edge Function.
-  const handleVerifyCr = async (providerId: string, crNumber: string) => {
+  // Calls the Ministry of Commerce Wathq API through the wathq-verify Edge Function. The target is an approved provider or,
+  // before approval, an application: approve_provider_application refuses an application whose CR is not cleared.
+  const handleVerifyCr = async (target: { providerId: string; applicationId?: string }, crNumber: string) => {
     const cr = crNumber.trim();
     if (!/^[0-9]{10}$/.test(cr)) {
       setError(isRTL ? "يجب أن يتكون السجل التجاري من 10 أرقام بالضبط." : "Commercial Registration (CR) must be exactly 10 digits.");
@@ -1049,7 +887,9 @@ export default function AdminProviderManagement() {
     }
     setError("");
     setNotice("");
-    const { data, error: fnError } = await supabase.functions.invoke("wathq-verify", { body: { providerId, crNumber: cr } });
+    const { data, error: fnError } = await supabase.functions.invoke("wathq-verify", {
+      body: target.applicationId ? { applicationId: target.applicationId, crNumber: cr } : { providerId: target.providerId, crNumber: cr },
+    });
     if (fnError) {
       let detailMessage = fnError.message;
       try {
@@ -1061,32 +901,33 @@ export default function AdminProviderManagement() {
       setError(detailMessage);
       return;
     }
-    if (data?.status === "verified") {
-      setNotice(isRTL ? "أكد واثق أن السجل التجاري قائم." : "Wathq confirmed the Commercial Registration is active.");
-      applyCrStatus(providerId, cr, "verified");
+    const outcome: string = data?.status === "verified" || data?.status === "name_mismatch" ? data.status : "rejected";
+    if (outcome === "verified") {
+      setNotice(isRTL ? "أكد واثق أن السجل التجاري قائم ويطابق اسم النشاط." : "Wathq confirmed the Commercial Registration is active and matches the business name.");
+    } else if (outcome === "name_mismatch") {
+      const registered = data?.crName ? ` (${data.crName})` : "";
+      setError(isRTL
+        ? `السجل قائم لكن الاسم المسجل في واثق${registered} لا يطابق اسم النشاط. راجع الشهادة وسجّل مراجعة يدوية إن كانت صحيحة.`
+        : `The registration is active but the name registered with Wathq${registered} does not match the business name. Review the certificate and record a manual review if it is correct.`);
     } else {
       setError(isRTL ? "واثق لم يؤكد هذا السجل التجاري (غير موجود أو غير قائم)." : "Wathq did not confirm this CR (not found or not active).");
-      applyCrStatus(providerId, cr, "rejected");
     }
+    if (target.applicationId) await loadApplications();
+    else applyCrStatus(target.providerId, cr, outcome);
   };
 
   // Manual review of the CR certificate by an admin. Recorded as "manually reviewed", never as Wathq-verified.
-  const handleManualCrReview = async (providerId: string, crNumber: string) => {
+  const handleManualCrReview = async (target: { providerId: string; applicationId?: string }, crNumber: string, notes: string): Promise<string | null> => {
     const cr = crNumber.trim();
-    const notes = prompt(isRTL ? "ما الذي تم التحقق منه؟ (المستند، تاريخ الانتهاء)" : "What did you check? (document reviewed, expiry date)", "");
-    if (!notes || !notes.trim()) return;
     setError("");
-    const { error: rpcError } = await supabase.rpc("admin_record_cr_review", {
-      p_provider_id: providerId,
-      p_cr_number: cr,
-      p_notes: notes.trim(),
-    });
-    if (rpcError) {
-      setError(rpcError.message);
-      return;
-    }
+    const { error: rpcError } = target.applicationId
+      ? await supabase.rpc("admin_confirm_application_cr", { p_application_id: target.applicationId, p_notes: notes.trim() })
+      : await supabase.rpc("admin_record_cr_review", { p_provider_id: target.providerId, p_cr_number: cr, p_notes: notes.trim() });
+    if (rpcError) return errorMessage(rpcError);
     setNotice(isRTL ? "تم تسجيل المراجعة اليدوية للسجل التجاري." : "Manual CR review recorded.");
-    applyCrStatus(providerId, cr, "manually_reviewed");
+    if (target.applicationId) await loadApplications();
+    else applyCrStatus(target.providerId, cr, "manually_reviewed");
+    return null;
   };
 
   useEffect(() => {
@@ -1101,28 +942,11 @@ export default function AdminProviderManagement() {
   const displayShopName = (shop: AdminShop) => isRTL ? shop.nameAr || shop.nameEn : shop.nameEn || shop.nameAr;
   const displayEmployeeName = (employee: AdminEmployee) => isRTL ? employee.nameAr || employee.nameEn : employee.nameEn || employee.nameAr;
   const displayEmployeeRole = (employee: AdminEmployee) => isRTL ? employee.roleAr || employee.roleEn : employee.roleEn || employee.roleAr;
-  const money = (value: number) => `${value.toLocaleString(isRTL ? "ar-SA" : "en-US")} SAR`;
-
-  // Derived per-shop performance metrics for every provider (keyed by shop id).
-  const metricsByShop = useMemo(() => {
-    const map: Record<string, ShopMetrics> = {};
-    providers.forEach((provider) => {
-      provider.shops.forEach((shop) => {
-        map[shop.id] = computeShopMetrics(shop, provider.commissionPercentage);
-      });
-    });
-    return map;
-  }, [providers]);
-
-  const providerRevenue = useCallback((provider: ProviderRecord) => {
-    if (provider.performance) return provider.performance.revenue;
-    return provider.shops.reduce((sum, shop) => sum + (metricsByShop[shop.id]?.revenue ?? 0), 0);
-  }, [metricsByShop]);
-  const providerRating = useCallback((provider: ProviderRecord) => {
-    if (provider.performance) return provider.performance.rating;
-    const rated = provider.shops.map((shop) => metricsByShop[shop.id]?.rating ?? 0).filter(Boolean);
-    return rated.length ? rated.reduce((sum, r) => sum + r, 0) / rated.length : 0;
-  }, [metricsByShop]);
+  const numberFormat = isRTL ? "ar-SA" : "en-US";
+  const count = (value: number) => value.toLocaleString(numberFormat);
+  const money = (value: number) => sar(value, lang);
+  const pct = (value: number | null) => value === null ? "—" : `${value.toLocaleString(numberFormat)}%`;
+  const stars = (value: number | null) => value === null ? "—" : `★ ${value.toLocaleString(numberFormat, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`;
 
   const metrics = useMemo(() => ({
     total: providers.length,
@@ -1130,15 +954,17 @@ export default function AdminProviderManagement() {
     approved: providers.filter((provider) => provider.applicationStatus === "approved").length,
     shops: providers.reduce((sum, provider) => sum + provider.shops.length, 0),
     employees: providers.reduce((sum, provider) => sum + provider.shops.reduce((shopSum, shop) => shopSum + shop.employees.length, 0), 0),
-    revenue: providers.reduce((sum, provider) => sum + providerRevenue(provider), 0)
-  }), [providers, providerRevenue]);
+    revenue: providers.every((provider) => provider.figures !== null)
+      ? providers.reduce((sum, provider) => sum + (provider.figures?.revenue ?? 0), 0)
+      : null
+  }), [providers]);
 
   const filteredProviders = useMemo(() => {
     const list = providers.filter((provider) => {
       if (statusFilter !== "all" && provider.applicationStatus !== statusFilter && provider.accountStatus !== statusFilter) return false;
       if (!query.trim()) return true;
       const q = query.trim().toLowerCase();
-      const textEn = `${provider.providerName} ${provider.businessNameEn} ${provider.contactEmail} ${provider.contactPhone} ${provider.shops.map((shop) => `${shop.nameEn} ${shop.addressEn} ${shop.services.map((service) => service.nameEn).join(" ")}`).join(" ")}`.toLowerCase();
+      const textEn = `${provider.businessNameEn} ${provider.contactEmail} ${provider.contactPhone} ${provider.shops.map((shop) => `${shop.nameEn} ${shop.addressEn} ${shop.services.map((service) => service.nameEn).join(" ")}`).join(" ")}`.toLowerCase();
       const textAr = `${provider.businessNameAr} ${provider.shops.map((shop) => `${shop.nameAr} ${shop.addressAr} ${shop.services.map((service) => service.nameAr).join(" ")}`).join(" ")}`;
       return textEn.includes(q) || textAr.includes(query.trim());
     });
@@ -1147,241 +973,155 @@ export default function AdminProviderManagement() {
     else if (sortMode === "rating") sorted.sort((a, b) => providerRating(b) - providerRating(a));
     else sorted.sort((a, b) => new Date(b.lastActivity ?? b.registrationDate).getTime() - new Date(a.lastActivity ?? a.registrationDate).getTime());
     return sorted;
-  }, [providers, query, statusFilter, sortMode, providerRevenue, providerRating]);
+  }, [providers, query, statusFilter, sortMode]);
 
-  const persistProviderPatch = async (provider: ProviderRecord, patch: Partial<ProviderRecord>) => {
-    if (provider.source !== "db") return;
-    const payload: Record<string, unknown> = {};
-    if (patch.businessNameEn !== undefined) payload.business_name_en = patch.businessNameEn;
-    if (patch.businessNameAr !== undefined) payload.business_name_ar = patch.businessNameAr;
-    if (patch.contactEmail !== undefined) payload.contact_email = patch.contactEmail;
-    if (patch.contactPhone !== undefined) payload.contact_phone = patch.contactPhone;
-    if (patch.type !== undefined) payload.type = patch.type;
-    if (patch.commissionPercentage !== undefined) payload.commission_percentage = patch.commissionPercentage;
-    if (patch.tradeLicenseUrl !== undefined) payload.trade_license_url = patch.tradeLicenseUrl;
-    if (patch.applicationStatus !== undefined) payload.is_verified = patch.applicationStatus === "approved";
-    if (Object.keys(payload).length > 0) {
-      const { error: patchError } = await supabase.from("providers").update(payload).eq("id", provider.id);
-      if (patchError) throw patchError;
-    }
-    // Extended columns (provider_status enum + admin_notes) from the
-    // admin_shop_management migration. Best-effort: if the migration is not yet
-    // applied the columns are missing, so we swallow the error and keep the
-    // optimistic local state — the core is_verified write above still lands.
-    const extended: Record<string, unknown> = {};
-    if (patch.applicationStatus !== undefined || patch.accountStatus !== undefined) {
-      extended.status = deriveDbStatus(patch.applicationStatus ?? provider.applicationStatus, patch.accountStatus ?? provider.accountStatus);
-    }
-    if (patch.adminNotes !== undefined) extended.admin_notes = patch.adminNotes;
-    if (Object.keys(extended).length > 0) {
-      extended.last_activity_at = new Date().toISOString();
-      try {
-        await supabase.from("providers").update(extended).eq("id", provider.id);
-      } catch (extendedError) {
-        console.warn("Provider extended columns not available yet:", extendedError);
-      }
-    }
+  // Status changes are one server command: it checks the move is allowed, records the reason in the audit
+  // log in the same transaction, and tells us how many upcoming bookings the change leaves in place. The reason
+  // is collected in a dialog that names the provider, so a refusal keeps what the operator typed.
+  const changeStatus = (provider: ProviderRecord, next: DbProviderStatus, actionLabel: string) => {
+    setError("");
+    setNotice("");
+    setStatusPending({ provider, next, actionLabel });
   };
 
-  const updateProvider = async (providerId: string, patch: Partial<ProviderRecord>) => {
-    const target = providers.find((provider) => provider.id === providerId);
-    if (!target) return;
-    try {
-      await persistProviderPatch(target, patch);
-      setProviders((current) => current.map((provider) => provider.id === providerId ? { ...provider, ...patch } : provider));
-      setDetail((current) => current?.id === providerId ? { ...current, ...patch } : current);
-      setNotice(t.updated);
-    } catch (updateError: any) {
-      console.error("Provider update failed:", updateError);
-      setError(updateError?.message || "Failed to update provider.");
-    }
+  const runStatusChange = async (provider: ProviderRecord, next: DbProviderStatus, reason: string): Promise<string | null> => {
+    setBusyProviderId(provider.id);
+    const { data, error: rpcError } = await supabase.rpc("admin_set_provider_status", {
+      p_provider_id: provider.id,
+      p_status: next,
+      p_reason: reason
+    });
+    setBusyProviderId("");
+    if (rpcError) return errorMessage(rpcError);
+    const upcoming = Number((data as { upcoming_bookings?: number } | null)?.upcoming_bookings ?? 0);
+    setNotice(upcoming > 0 && (next === "suspended" || next === "rejected") ? fill(t.statusChangedUpcoming, { n: count(upcoming) }) : t.updated);
+    await loadProviders();
+    return null;
   };
-
-  // Keep the admin-notes textarea in sync with whichever provider is open.
-  useEffect(() => {
-    setNotesDraft(detail?.adminNotes ?? "");
-  }, [detail?.id, detail?.adminNotes]);
 
   const saveNotes = async () => {
     if (!detail) return;
-    await updateProvider(detail.id, { adminNotes: notesDraft });
+    setError("");
+    const { error: notesError } = await supabase.from("providers").update({ admin_notes: notesDraft }).eq("id", detail.id);
+    if (notesError) {
+      setError(errorMessage(notesError));
+      return;
+    }
     setNotice(t.notesSaved);
-  };
-
-  const openAdd = () => {
-    setForm(blankProvider());
-    setModalOpen(true);
+    setNotesEdit(null);
+    await loadProviders();
   };
 
   const openEdit = (provider: ProviderRecord) => {
-    setForm(provider);
-    setModalOpen(true);
+    setDraft({
+      businessNameEn: provider.businessNameEn,
+      businessNameAr: provider.businessNameAr,
+      contactEmail: provider.contactEmail,
+      contactPhone: provider.contactPhone,
+      tradeLicenseUrl: provider.tradeLicenseUrl
+    });
+    setDraftError("");
+    setEditing(provider);
   };
 
-  const saveProvider = async () => {
-    const providerId = form.id || nextLocalId("provider");
-    const normalized: ProviderRecord = {
-      ...form,
-      id: providerId,
-      source: form.source || "db",
-      shops: form.shops.length ? form.shops : [
-        {
-          id: nextLocalId("shop"),
-          providerId,
-          nameEn: form.businessNameEn || "New Shop",
-          nameAr: form.businessNameAr || "متجر جديد",
-          addressEn: "Riyadh",
-          addressAr: "الرياض",
-          gender: form.gender,
-          services: [],
-          employees: []
-        }
-      ]
+  // Only fields the operator actually changed are written, so opening and saving never rewrites a value.
+  const saveEdit = async () => {
+    if (!editing) return;
+    const next = {
+      businessNameEn: draft.businessNameEn.trim(),
+      businessNameAr: draft.businessNameAr.trim(),
+      contactEmail: draft.contactEmail.trim(),
+      contactPhone: draft.contactPhone.trim(),
+      tradeLicenseUrl: draft.tradeLicenseUrl.trim()
     };
-
-    try {
-      const existing = providers.find((provider) => provider.id === normalized.id);
-      if (existing) {
-        await persistProviderPatch(existing, normalized);
-      } else {
-        const { data: inserted, error: insertError } = await supabase.from("providers").insert({
-          business_name_en: normalized.businessNameEn,
-          business_name_ar: normalized.businessNameAr,
-          contact_email: normalized.contactEmail,
-          contact_phone: normalized.contactPhone,
-          type: normalized.type,
-          commission_percentage: normalized.commissionPercentage,
-          trade_license_url: normalized.tradeLicenseUrl,
-          is_verified: normalized.applicationStatus === "approved"
-        }).select().single();
-        if (insertError) throw insertError;
-        if (inserted) normalized.id = inserted.id;
-      }
-      setProviders((current) => current.some((provider) => provider.id === normalized.id)
-        ? current.map((provider) => provider.id === normalized.id ? normalized : provider)
-        : [normalized, ...current]);
-      setModalOpen(false);
-      setNotice(t.saved);
-    } catch (saveError: any) {
-      console.error("Provider save failed:", saveError);
-      setError(saveError?.message || "Failed to save provider.");
+    if (!next.businessNameEn || !next.businessNameAr) {
+      setDraftError(t.nameRequired);
+      return;
     }
-  };
-
-  const deleteProvider = async (provider: ProviderRecord) => {
-    const message = t.confirmDeleteProvider.replace("{name}", displayProviderName(provider));
-    if (typeof window !== "undefined" && !window.confirm(message)) return;
-    try {
-      if (provider.source === "db") {
-        const { error: deleteError } = await supabase.from("providers").delete().eq("id", provider.id);
-        if (deleteError) throw deleteError;
-      }
-      setProviders((current) => current.filter((item) => item.id !== provider.id));
-      if (detail?.id === provider.id) setDetail(null);
-      setNotice(t.deleted);
-    } catch (deleteError: any) {
-      console.error("Provider delete failed:", deleteError);
-      setError(deleteError?.message || "Failed to delete provider.");
+    if (next.contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(next.contactEmail)) {
+      setDraftError(t.invalidEmail);
+      return;
     }
-  };
-
-  const mutateProviderShops = (providerId: string, updater: (shops: AdminShop[]) => AdminShop[]) => {
-    setProviders((current) => current.map((provider) => provider.id === providerId ? { ...provider, shops: updater(provider.shops) } : provider));
-    setDetail((current) => current?.id === providerId ? { ...current, shops: updater(current.shops) } : current);
-  };
-
-  const addShop = (provider: ProviderRecord) => {
-    const shop: AdminShop = {
-      id: nextLocalId("shop"),
-      providerId: provider.id,
-      nameEn: `${provider.businessNameEn || "Provider"} New Branch`,
-      nameAr: `${provider.businessNameAr || "مزود"} فرع جديد`,
-      addressEn: "Riyadh",
-      addressAr: "الرياض",
-      gender: provider.gender,
-      services: [],
-      employees: []
-    };
-    mutateProviderShops(provider.id, (shops) => [...shops, shop]);
-  };
-
-  const addService = (provider: ProviderRecord, shop: AdminShop) => {
-    const service: AdminService = {
-      id: nextLocalId("service"),
-      nameEn: "Signature Service",
-      nameAr: "خدمة مميزة",
-      categoryEn: "Grooming",
-      categoryAr: "العناية",
-      gender: shop.gender,
-      price: 90,
-      duration: 45,
-      isActive: true
-    };
-    mutateProviderShops(provider.id, (shops) => shops.map((item) => item.id === shop.id ? { ...item, services: [...item.services, service] } : item));
-  };
-
-  const addEmployee = (provider: ProviderRecord, shop: AdminShop) => {
-    const employee = makeEmployee(nextLocalId("employee"), "New Specialist", "أخصائي جديد", "Specialist", "أخصائي", shop.services);
-    mutateProviderShops(provider.id, (shops) => shops.map((item) => item.id === shop.id ? { ...item, employees: [...item.employees, employee] } : item));
-  };
-
-  const removeShop = (provider: ProviderRecord, shop: AdminShop) => {
-    if (typeof window !== "undefined" && !window.confirm(t.confirmDeleteShop.replace("{name}", displayShopName(shop)))) return;
-    mutateProviderShops(provider.id, (shops) => shops.filter((item) => item.id !== shop.id));
-  };
-
-  const removeEmployee = (provider: ProviderRecord, shop: AdminShop, employee: AdminEmployee) => {
-    if (typeof window !== "undefined" && !window.confirm(t.confirmDeleteEmployee.replace("{name}", displayEmployeeName(employee)))) return;
-    mutateProviderShops(provider.id, (shops) => shops.map((item) => item.id === shop.id ? { ...item, employees: item.employees.filter((staff) => staff.id !== employee.id) } : item));
+    const payload: Record<string, string | null> = {};
+    if (next.businessNameEn !== editing.businessNameEn) payload.business_name_en = next.businessNameEn;
+    if (next.businessNameAr !== editing.businessNameAr) payload.business_name_ar = next.businessNameAr;
+    if (next.contactEmail !== editing.contactEmail) payload.contact_email = next.contactEmail || null;
+    if (next.contactPhone !== editing.contactPhone) payload.contact_phone = next.contactPhone || null;
+    if (next.tradeLicenseUrl !== editing.tradeLicenseUrl) payload.trade_license_url = next.tradeLicenseUrl || null;
+    if (Object.keys(payload).length === 0) {
+      setEditing(null);
+      return;
+    }
+    setSavingEdit(true);
+    setDraftError("");
+    const { error: updateError } = await supabase.from("providers").update(payload).eq("id", editing.id);
+    setSavingEdit(false);
+    if (updateError) {
+      // The dialog stays open with the operator's input intact.
+      setDraftError(errorMessage(updateError));
+      return;
+    }
+    setEditing(null);
+    setNotice(t.saved);
+    await loadProviders();
   };
 
   const cardBase = "rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]";
   const portalTarget = typeof document !== "undefined" ? document.body : null;
-  const detailPerf = detail ? computeProviderPerformance(detail, metricsByShop) : null;
-  const detailEmployeeEarnings = useMemo(() => {
-    if (!detail) return [];
-    return detail.shops.flatMap((shop) => shop.employees.map((employee) => ({
-      employee,
-      shop,
-      summary: employeeEarningsById[employee.id]
-    }))).filter((item) => item.summary);
-  }, [detail, employeeEarningsById]);
-  const pct = (value: number) => `${value}%`;
+  const detailOutcomes = detail?.figures ? describeOutcomes(detail.figures) : null;
+  const detailEmployeeEarnings = detail
+    ? detail.shops.flatMap((shop) => shop.employees.map((employee) => ({ employee, shop }))).filter((item) => item.employee.figures && ((item.employee.figures.earnings ?? 0) > 0 || item.employee.figures.completedBookings > 0))
+    : [];
+  const actionButton = "rounded-xl px-3 py-2 text-[11px] font-black disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-[#9B7928]";
 
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className={`space-y-6 ${dirClass}`}>
-      <div className={`flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between ${rowDir}`}>
-        <div>
-          <h2 className="font-serif text-2xl font-black tracking-tight text-gray-900">{t.title}</h2>
-          <p className="mt-1 text-xs font-semibold text-gray-500">{t.subtitle}</p>
-        </div>
-        <button onClick={openAdd} className="rounded-2xl bg-[#D1AF47] px-5 py-3 text-sm font-black text-[#101828] shadow-[0_14px_34px_rgba(209,175,71,0.24)] hover:bg-[#E0C46A]">
-          {t.addProvider}
-        </button>
+      <div>
+        <h1 className="font-serif text-2xl font-black tracking-tight text-gray-900">{t.title}</h1>
+        <p className="mt-1 text-xs font-semibold text-gray-500">{t.subtitle}</p>
+        <p className="mt-1 text-[11px] font-semibold text-[#7A5B12]">{t.joinHint}</p>
       </div>
 
-      {(notice || error) && (
-        <div className={`rounded-xl border px-4 py-3 text-xs font-bold ${error ? "border-[#FECDCA] bg-[#FEF3F2] text-[#B42318]" : "border-[#D1FADF] bg-[#ECFDF3] text-[#027A48]"}`}>
-          {error || notice}
+      <CommandResult
+        error={error || undefined}
+        success={error ? undefined : notice || undefined}
+        locale={isRTL ? "ar" : "en"}
+        onDismiss={() => {
+          setError("");
+          setNotice("");
+        }}
+      />
+      {metricsError && (
+        <div role="alert" className="rounded-xl border border-[#FEDF89] bg-[#FFFAEB] px-4 py-3 text-xs font-bold text-[#B54708]">
+          {fill(t.metricsFailed, { reason: metricsError })}
+        </div>
+      )}
+      {privateHidden && (
+        <div role="note" className="rounded-xl border border-[#D0D5DD] bg-[#F9FAFB] px-4 py-3 text-xs font-bold text-[#344054]">
+          {t.privateHidden}
         </div>
       )}
 
       {/* 1. TOP TAB SWITCHER */}
       <div className={`flex flex-wrap items-center gap-3 border-b border-[#ECECEC] pb-4 ${rowDir}`}>
         <button
+          type="button"
+          aria-pressed={mainTab === "providers"}
           onClick={() => setMainTab("providers")}
-          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-black transition ${
+          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-black transition focus-visible:outline-2 focus-visible:outline-[#9B7928] ${
             mainTab === "providers"
               ? "bg-[#101828] text-[#F4E7B6] shadow-sm"
               : "border border-[#ECECEC] bg-white text-[#667085] hover:border-[#D1AF47]/40"
           }`}
         >
           <span>{t.activeRegistry}</span>
-          <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px]">{providers.length}</span>
+          <span className="rounded-full bg-white/20 px-2 py-0.5 text-[11px]">{count(providers.length)}</span>
         </button>
         <button
+          type="button"
+          aria-pressed={mainTab === "applications"}
           onClick={() => setMainTab("applications")}
-          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-black transition ${
+          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-black transition focus-visible:outline-2 focus-visible:outline-[#9B7928] ${
             mainTab === "applications"
               ? "bg-[#101828] text-[#F4E7B6] shadow-sm"
               : "border border-[#ECECEC] bg-white text-[#667085] hover:border-[#D1AF47]/40"
@@ -1389,8 +1129,8 @@ export default function AdminProviderManagement() {
         >
           <span>{t.applicationsQueue}</span>
           {applications.filter((a) => a.status === "pending").length > 0 && (
-            <span className="rounded-full bg-[#D1AF47] px-2 py-0.5 text-[10px] text-[#101828] font-black">
-              {applications.filter((a) => a.status === "pending").length}
+            <span className="rounded-full bg-[#D1AF47] px-2 py-0.5 text-[11px] text-[#101828] font-black">
+              {count(applications.filter((a) => a.status === "pending").length)}
             </span>
           )}
         </button>
@@ -1400,23 +1140,29 @@ export default function AdminProviderManagement() {
         <>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-6">
             {[
-              [t.providers, metrics.total.toLocaleString(isRTL ? "ar-SA" : "en-US")],
-              [t.applications, metrics.pending.toLocaleString(isRTL ? "ar-SA" : "en-US")],
-              [t.approved, metrics.approved.toLocaleString(isRTL ? "ar-SA" : "en-US")],
-              [t.totalShops, metrics.shops.toLocaleString(isRTL ? "ar-SA" : "en-US")],
-              [t.employees, metrics.employees.toLocaleString(isRTL ? "ar-SA" : "en-US")],
-              [t.revenue, money(metrics.revenue)]
+              [t.providers, count(metrics.total)],
+              [t.applications, count(metrics.pending)],
+              [t.approved, count(metrics.approved)],
+              [t.totalShops, count(metrics.shops)],
+              [t.employees, count(metrics.employees)],
+              [t.revenue, metrics.revenue === null ? "—" : money(metrics.revenue)]
             ].map(([label, value]) => (
               <div key={String(label)} className={cardBase}>
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{label}</span>
-                <strong className="mt-2 block font-serif text-xl font-black text-gray-900">{value}</strong>
+                <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#667085]">{label}</span>
+                <strong className="mt-2 block font-serif text-lg font-black text-gray-900 [overflow-wrap:anywhere] sm:text-xl">{value}</strong>
               </div>
             ))}
           </div>
 
           <div className="rounded-2xl border border-[#ECECEC] bg-white p-4 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-            <div className={`flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between ${rowDir}`}>
-              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t.search} className="min-h-11 flex-1 rounded-xl border border-[#ECECEC] bg-gray-50 px-4 text-sm font-semibold text-gray-800 outline-none focus:border-[#D1AF47]" />
+            <div className={`flex flex-col gap-3 lg:items-center lg:justify-between ${isRTL ? "lg:flex-row-reverse" : "lg:flex-row"}`}>
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={t.search}
+                aria-label={t.search}
+                className="min-h-11 flex-1 rounded-xl border border-[#ECECEC] bg-gray-50 px-4 text-sm font-semibold text-gray-800 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928]"
+              />
               <div className="flex flex-wrap items-center gap-2">
                 {([
                   ["all", t.all],
@@ -1427,11 +1173,22 @@ export default function AdminProviderManagement() {
                   ["suspended", t.suspended],
                   ["inactive", t.inactive],
                 ] as const).map(([value, label]) => (
-                  <button key={value} onClick={() => setStatusFilter(value)} className={`rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-wider transition ${statusFilter === value ? "bg-[#101828] text-[#F4E7B6]" : "border border-[#ECECEC] bg-white text-[#667085] hover:border-[#D1AF47]/35"}`}>
+                  <button
+                    key={value}
+                    type="button"
+                    aria-pressed={statusFilter === value}
+                    onClick={() => setStatusFilter(value)}
+                    className={`rounded-xl px-3 py-2 text-[11px] font-black uppercase tracking-wider transition focus-visible:outline-2 focus-visible:outline-[#9B7928] ${statusFilter === value ? "bg-[#101828] text-[#F4E7B6]" : "border border-[#ECECEC] bg-white text-[#667085] hover:border-[#D1AF47]/35"}`}
+                  >
                     {label}
                   </button>
                 ))}
-                <select value={sortMode} onChange={(event) => setSortMode(event.target.value as typeof sortMode)} className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-[#667085] outline-none focus:border-[#D1AF47]">
+                <select
+                  value={sortMode}
+                  aria-label={isRTL ? "ترتيب" : "Sort"}
+                  onChange={(event) => setSortMode(event.target.value as typeof sortMode)}
+                  className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2 text-[11px] font-black uppercase tracking-wider text-[#667085] outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928]"
+                >
                   <option value="recent">{t.sortRecent}</option>
                   <option value="revenue">{t.sortRevenue}</option>
                   <option value="rating">{t.sortRating}</option>
@@ -1441,55 +1198,62 @@ export default function AdminProviderManagement() {
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-[#ECECEC] bg-white shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-            <div className="overflow-x-auto">
+            <div role="region" aria-label={t.title} tabIndex={0} className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-[#9B7928]">
               <table className="w-full min-w-[1040px] text-xs">
                 <thead>
-                  <tr className="border-b border-[#ECECEC] bg-gray-50/70 text-[9px] font-extrabold uppercase tracking-widest text-[#667085]">
-                    {[t.provider, t.contact, t.applicationStatus, t.accountStatus, t.genderCategory, t.shopsManaged, t.revenue, t.rating, t.actions].map((heading) => (
-                      <th key={heading} className={`px-5 py-4 ${dirClass}`}>{heading}</th>
+                  <tr className="border-b border-[#ECECEC] bg-gray-50/70 text-[11px] font-extrabold uppercase tracking-widest text-[#667085]">
+                    {[t.provider, t.contact, t.applicationStatus, t.accountStatus, t.shopsManaged, t.revenue, t.rating, t.actions].map((heading) => (
+                      <th key={heading} scope="col" className={`px-5 py-4 ${dirClass}`}>{heading}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#F5F5F5]">
                   {loading ? (
-                    <tr><td colSpan={9} className="px-5 py-10 text-center text-sm font-bold text-[#667085]">Loading...</td></tr>
+                    <tr><td colSpan={8} className="px-5 py-10 text-center text-sm font-bold text-[#667085]">{t.loading}</td></tr>
                   ) : filteredProviders.length === 0 ? (
-                    <tr><td colSpan={9} className="px-5 py-12 text-center text-sm font-bold text-[#667085]">{isRTL ? "لا يوجد مزودون مطابقون." : "No providers match these filters."}</td></tr>
+                    <tr><td colSpan={8} className="px-5 py-12 text-center text-sm font-bold text-[#667085]">{providers.length === 0 ? (error ? t.loadFailed : t.noProviders) : t.noMatches}</td></tr>
                   ) : filteredProviders.map((provider) => (
                     <tr key={provider.id} className="text-[#344054] hover:bg-gray-50/60">
                       <td className="px-5 py-4">
                         <p className="font-black text-gray-900">{displayProviderName(provider)}</p>
-                        <p className="mt-1 text-[10px] font-semibold text-[#667085]">{provider.providerName}</p>
+                        <p className="mt-1 text-[11px] font-semibold text-[#667085]">{isRTL ? provider.businessNameEn : provider.businessNameAr}</p>
                       </td>
                       <td className="px-5 py-4">
-                        <p className="font-bold">{provider.contactEmail}</p>
-                        <p className="mt-1 text-[10px] font-semibold text-[#667085]">{provider.contactPhone}</p>
+                        <p className="font-bold">{provider.contactEmail || t.notProvided}</p>
+                        <p className="mt-1 text-[11px] font-semibold text-[#667085]">{provider.contactPhone || t.notProvided}</p>
                       </td>
                       <td className="px-5 py-4">
-                        <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase ${provider.applicationStatus === "approved" ? "bg-[#ECFDF3] text-[#027A48]" : provider.applicationStatus === "rejected" ? "bg-[#FEF3F2] text-[#B42318]" : "bg-[#FFFAEB] text-[#B54708]"}`}>
+                        <span className={`rounded-full px-2.5 py-1 text-[11px] font-black uppercase ${provider.applicationStatus === "approved" ? "bg-[#ECFDF3] text-[#027A48]" : provider.applicationStatus === "rejected" ? "bg-[#FEF3F2] text-[#B42318]" : "bg-[#FFFAEB] text-[#B54708]"}`}>
                           {t[provider.applicationStatus]}
                         </span>
                       </td>
                       <td className="px-5 py-4">
-                        <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase ${provider.accountStatus === "active" ? "bg-[#ECFDF3] text-[#027A48]" : provider.accountStatus === "suspended" ? "bg-[#FEF3F2] text-[#B42318]" : "bg-gray-100 text-[#667085]"}`}>
+                        <span className={`rounded-full px-2.5 py-1 text-[11px] font-black uppercase ${provider.accountStatus === "active" ? "bg-[#ECFDF3] text-[#027A48]" : provider.accountStatus === "suspended" ? "bg-[#FEF3F2] text-[#B42318]" : "bg-gray-100 text-[#667085]"}`}>
                           {t[provider.accountStatus]}
                         </span>
                       </td>
-                      <td className="px-5 py-4 font-bold">{labelGender(provider.gender)}</td>
-                      <td className="px-5 py-4 font-black text-gray-900">{provider.shops.length}</td>
-                      <td className="px-5 py-4 font-black text-[#9A741F]">{money(providerRevenue(provider))}</td>
-                      <td className="px-5 py-4 font-bold text-gray-900">{providerRating(provider) ? `★ ${providerRating(provider).toFixed(1)}` : "—"}</td>
+                      <td className="px-5 py-4 font-black text-gray-900">{count(provider.shops.length)}</td>
+                      <td className="px-5 py-4 font-black text-[#9A741F]">{provider.figures ? money(providerRevenue(provider)) : "—"}</td>
+                      <td className="px-5 py-4 font-bold text-gray-900">{provider.figures ? stars(describeOutcomes(provider.figures).rating) : "—"}</td>
                       <td className="px-5 py-4">
                         <div className="flex flex-wrap gap-2">
-                          <button onClick={() => setDetail(provider)} className="rounded-xl border border-[#ECECEC] px-3 py-2 text-[10px] font-black text-gray-700 hover:border-[#D1AF47]/40">{t.view}</button>
-                          <button onClick={() => openEdit(provider)} className="rounded-xl border border-[#D1AF47]/30 bg-[#D1AF47]/10 px-3 py-2 text-[10px] font-black text-[#9A741F]">{t.edit}</button>
-                          {provider.applicationStatus !== "approved" && <button onClick={() => void updateProvider(provider.id, { applicationStatus: "approved", accountStatus: "active" })} className="rounded-xl bg-[#101828] px-3 py-2 text-[10px] font-black text-[#F4E7B6]">{t.approve}</button>}
-                          {provider.applicationStatus !== "rejected" && <button onClick={() => void updateProvider(provider.id, { applicationStatus: "rejected", accountStatus: "inactive" })} className="rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-3 py-2 text-[10px] font-black text-[#B42318]">{t.reject}</button>}
-                          {provider.accountStatus === "suspended"
-                            ? <button onClick={() => void updateProvider(provider.id, { accountStatus: "active", applicationStatus: "approved" })} className="rounded-xl border border-[#ABEFC6] bg-[#ECFDF3] px-3 py-2 text-[10px] font-black text-[#027A48]">{t.reactivate}</button>
-                            : <button onClick={() => void updateProvider(provider.id, { accountStatus: "suspended" })} className="rounded-xl border border-[#FEDF89] bg-[#FFFAEB] px-3 py-2 text-[10px] font-black text-[#B54708]">{t.suspend}</button>}
-                          <button onClick={() => void updateProvider(provider.id, { accountStatus: provider.accountStatus === "active" ? "inactive" : "active" })} className="rounded-xl border border-[#ECECEC] px-3 py-2 text-[10px] font-black text-[#667085]">{provider.accountStatus === "active" ? t.deactivate : t.activate}</button>
-                          <button onClick={() => void deleteProvider(provider)} className="rounded-xl border border-[#FECDCA] px-3 py-2 text-[10px] font-black text-[#B42318]">{t.delete}</button>
+                          <button type="button" aria-label={`${t.view}: ${displayProviderName(provider)}`} onClick={() => setDetailId(provider.id)} className={`${actionButton} border border-[#ECECEC] text-gray-700 hover:border-[#D1AF47]/40`}>{t.view}</button>
+                          <button type="button" aria-label={`${t.edit}: ${displayProviderName(provider)}`} onClick={() => openEdit(provider)} className={`${actionButton} border border-[#D1AF47]/30 bg-[#D1AF47]/10 text-[#9A741F]`}>{t.edit}</button>
+                          {(provider.status === "pending" || provider.status === "rejected") && (
+                            <button type="button" aria-label={`${t.approve}: ${displayProviderName(provider)}`} disabled={busyProviderId !== ""} onClick={() => changeStatus(provider, "active", t.approve)} className={`${actionButton} bg-[#101828] text-[#F4E7B6]`}>{t.approve}</button>
+                          )}
+                          {provider.status === "pending" && (
+                            <button type="button" aria-label={`${t.reject}: ${displayProviderName(provider)}`} disabled={busyProviderId !== ""} onClick={() => changeStatus(provider, "rejected", t.reject)} className={`${actionButton} border border-[#FECDCA] bg-[#FEF3F2] text-[#B42318]`}>{t.reject}</button>
+                          )}
+                          {provider.status === "rejected" && (
+                            <button type="button" aria-label={`${t.reopen}: ${displayProviderName(provider)}`} disabled={busyProviderId !== ""} onClick={() => changeStatus(provider, "pending", t.reopen)} className={`${actionButton} border border-[#ECECEC] text-[#667085]`}>{t.reopen}</button>
+                          )}
+                          {(provider.status === "active" || provider.status === "approved") && (
+                            <button type="button" aria-label={`${t.suspend}: ${displayProviderName(provider)}`} disabled={busyProviderId !== ""} onClick={() => changeStatus(provider, "suspended", t.suspend)} className={`${actionButton} border border-[#FEDF89] bg-[#FFFAEB] text-[#B54708]`}>{t.suspend}</button>
+                          )}
+                          {provider.status === "suspended" && (
+                            <button type="button" aria-label={`${t.reactivate}: ${displayProviderName(provider)}`} disabled={busyProviderId !== ""} onClick={() => changeStatus(provider, "active", t.reactivate)} className={`${actionButton} border border-[#ABEFC6] bg-[#ECFDF3] text-[#027A48]`}>{t.reactivate}</button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -1508,8 +1272,10 @@ export default function AdminProviderManagement() {
                 {(["all", "pending", "approved", "rejected"] as const).map((st) => (
                   <button
                     key={st}
+                    type="button"
+                    aria-pressed={appFilter === st}
                     onClick={() => setAppFilter(st)}
-                    className={`rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-wider transition ${
+                    className={`rounded-xl px-3 py-2 text-[11px] font-black uppercase tracking-wider transition focus-visible:outline-2 focus-visible:outline-[#9B7928] ${
                       appFilter === st
                         ? "bg-[#101828] text-[#F4E7B6]"
                         : "border border-[#ECECEC] bg-white text-[#667085] hover:border-[#D1AF47]/35"
@@ -1522,19 +1288,25 @@ export default function AdminProviderManagement() {
               </div>
               <button
                 onClick={() => void loadApplications()}
-                className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2 text-[10px] font-bold text-[#667085] hover:bg-gray-50"
+                className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2 text-[11px] font-bold text-[#667085] hover:bg-gray-50"
               >
                 {isRTL ? "تحديث الطلبات" : "Refresh Applications"}
               </button>
             </div>
           </div>
 
+          {appsError && (
+            <div role="alert" className="rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-4 py-3 text-xs font-bold text-[#B42318]">
+              {fill(t.applicationsFailed, { reason: appsError })}
+            </div>
+          )}
+
           {/* Applications Table */}
           <div className="overflow-hidden rounded-2xl border border-[#ECECEC] bg-white shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1040px] text-xs">
                 <thead>
-                  <tr className="border-b border-[#ECECEC] bg-gray-50/70 text-[9px] font-extrabold uppercase tracking-widest text-[#667085]">
+                  <tr className="border-b border-[#ECECEC] bg-gray-50/70 text-[11px] font-extrabold uppercase tracking-widest text-[#667085]">
                     <th className={`px-5 py-4 ${dirClass}`}>{t.applicant}</th>
                     <th className={`px-5 py-4 ${dirClass}`}>{t.businessNameEn} / {t.businessNameAr}</th>
                     <th className={`px-5 py-4 ${dirClass}`}>{t.type}</th>
@@ -1548,7 +1320,7 @@ export default function AdminProviderManagement() {
                 </thead>
                 <tbody className="divide-y divide-[#F5F5F5]">
                   {appsLoading ? (
-                    <tr><td colSpan={9} className="px-5 py-10 text-center text-sm font-bold text-[#667085]">Loading applications...</td></tr>
+                    <tr><td colSpan={9} className="px-5 py-10 text-center text-sm font-bold text-[#667085]">{t.loadingApplications}</td></tr>
                   ) : applications.filter((a) => appFilter === "all" || a.status === appFilter).length === 0 ? (
                     <tr><td colSpan={9} className="px-5 py-12 text-center text-sm font-bold text-[#667085]">{t.noApplications}</td></tr>
                   ) : (
@@ -1556,30 +1328,58 @@ export default function AdminProviderManagement() {
                       <tr key={app.id} className="text-[#344054] hover:bg-gray-50/60">
                         <td className="px-5 py-4">
                           <p className="font-black text-gray-900">{app.first_name || ""} {app.last_name || ""}</p>
-                          <p className="mt-1 text-[10px] text-[#667085]">{new Date(app.created_at).toLocaleDateString()}</p>
+                          <p className="mt-1 text-[11px] text-[#667085]">{new Date(app.created_at).toLocaleDateString()}</p>
                         </td>
                         <td className="px-5 py-4">
                           <p className="font-black text-gray-900">{isRTL ? app.business_name_ar || app.business_name_en : app.business_name_en || app.business_name_ar}</p>
-                          <p className="mt-1 text-[10px] text-[#667085]">{isRTL ? app.business_name_en : app.business_name_ar}</p>
+                          <p className="mt-1 text-[11px] text-[#667085]">{isRTL ? app.business_name_en : app.business_name_ar}</p>
                         </td>
                         <td className="px-5 py-4">
-                          <span className="rounded-md bg-stone-100 px-2 py-0.5 text-[10px] font-bold uppercase">{app.business_type}</span>
+                          <span className="rounded-md bg-stone-100 px-2 py-0.5 text-[11px] font-bold uppercase">{app.business_type}</span>
                         </td>
                         <td className="px-5 py-4">
                           <p className="font-semibold text-gray-900">CR: {app.cr_number || "—"}</p>
-                          <p className="mt-0.5 text-[10px] text-[#667085]">VAT: {app.tax_number || "—"}</p>
+                          <p className="mt-0.5 text-[11px] text-[#667085]">VAT: {app.tax_number || "—"}</p>
+                          {app.cr_number ? (
+                            <div className="mt-2 space-y-1">
+                              <span className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-black ${crIsCleared(app) ? "bg-[#ECFDF3] text-[#027A48]" : "bg-[#FFFAEB] text-[#B54708]"}`}>
+                                {crStatusLabel(app.cr_verification_status)}
+                              </span>
+                              {app.cr_check_data?.registered_name ? (
+                                <p className="text-[11px] text-[#667085]">{isRTL ? "الاسم في واثق:" : "Wathq name:"} {app.cr_check_data.registered_name}</p>
+                              ) : null}
+                              {!crIsCleared(app) && (app.status === "pending" || app.status === "under_review") ? (
+                                <div className="flex flex-wrap gap-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => setCrDialog({ kind: "wathq", providerId: "", applicationId: app.id, cr: app.cr_number || "", name: app.business_name_en || app.business_name_ar })}
+                                    className="rounded-lg bg-[#101828] px-2 py-1 text-[11px] font-black text-[#F4E7B6] hover:bg-black"
+                                  >
+                                    {isRTL ? "تحقق عبر واثق" : "Check with Wathq"}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setCrDialog({ kind: "manual", providerId: "", applicationId: app.id, cr: app.cr_number || "", name: app.business_name_en || app.business_name_ar })}
+                                    className="rounded-lg border border-gray-300 px-2 py-1 text-[11px] font-bold text-gray-800 hover:border-gray-500"
+                                  >
+                                    {isRTL ? "مراجعة يدوية" : "Manual review"}
+                                  </button>
+                                </div>
+                              ) : null}
+                            </div>
+                          ) : null}
                         </td>
                         <td className="px-5 py-4">
                           <p className="font-bold text-gray-900">{app.contact_email}</p>
-                          <p className="mt-0.5 text-[10px] text-[#667085]">{app.contact_phone}</p>
+                          <p className="mt-0.5 text-[11px] text-[#667085]">{app.contact_phone}</p>
                         </td>
                         <td className="px-5 py-4">
                           <p className="font-semibold text-gray-900">{app.city} · {app.district}</p>
-                          <p className="mt-0.5 text-[10px] text-[#667085] truncate max-w-[180px]">{app.address_text}</p>
+                          <p className="mt-0.5 text-[11px] text-[#667085] truncate max-w-[180px]">{app.address_text}</p>
                         </td>
                         <td className="px-5 py-4">
                           {app.trade_license_url && app.trade_license_url !== "#" ? (
-                            <a href={app.trade_license_url} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-[#D1AF47] hover:underline">
+                            <a href={app.trade_license_url} target="_blank" rel="noopener noreferrer" className="text-[11px] font-bold text-[#D1AF47] hover:underline">
                               {isRTL ? "عرض الوثيقة" : "View Document"}
                             </a>
                           ) : (
@@ -1587,7 +1387,7 @@ export default function AdminProviderManagement() {
                           )}
                         </td>
                         <td className="px-5 py-4">
-                          <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase ${
+                          <span className={`rounded-full px-2.5 py-1 text-[11px] font-black uppercase ${
                             app.status === "approved"
                               ? "bg-[#ECFDF3] text-[#027A48]"
                               : app.status === "rejected"
@@ -1601,7 +1401,7 @@ export default function AdminProviderManagement() {
                               : t.pending}
                           </span>
                           {app.status === "rejected" && app.rejection_reason && (
-                            <p className="mt-1 text-[9px] text-[#B42318] max-w-[140px] truncate" title={app.rejection_reason}>
+                            <p className="mt-1 text-[11px] text-[#B42318] max-w-[140px] truncate" title={app.rejection_reason}>
                               {app.rejection_reason}
                             </p>
                           )}
@@ -1612,9 +1412,8 @@ export default function AdminProviderManagement() {
                               <button
                                 onClick={() => {
                                   setApprovalModalApp(app);
-                                  setApprovalCommission(15);
                                 }}
-                                className="rounded-xl bg-[#101828] px-3 py-1.5 text-[10px] font-black text-[#F4E7B6] hover:bg-black transition"
+                                className="rounded-xl bg-[#101828] px-3 py-1.5 text-[11px] font-black text-[#F4E7B6] hover:bg-black transition"
                               >
                                 {t.approve}
                               </button>
@@ -1623,15 +1422,15 @@ export default function AdminProviderManagement() {
                                   setRejectionModalApp(app);
                                   setRejectionReason("");
                                 }}
-                                className="rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-3 py-1.5 text-[10px] font-black text-[#B42318] hover:bg-[#FEE4E2] transition"
+                                className="rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-3 py-1.5 text-[11px] font-black text-[#B42318] hover:bg-[#FEE4E2] transition"
                               >
                                 {t.reject}
                               </button>
                             </div>
                           ) : app.status === "approved" ? (
-                            <span className="text-[10px] font-bold text-[#027A48]">{isRTL ? "مفعل كشريك" : "Active Merchant"}</span>
+                            <span className="text-[11px] font-bold text-[#027A48]">{isRTL ? "مفعل كشريك" : "Active Merchant"}</span>
                           ) : (
-                            <span className="text-[10px] font-bold text-[#B42318]">{isRTL ? "مرفوض" : "Rejected"}</span>
+                            <span className="text-[11px] font-bold text-[#B42318]">{isRTL ? "مرفوض" : "Rejected"}</span>
                           )}
                         </td>
                       </tr>
@@ -1644,121 +1443,123 @@ export default function AdminProviderManagement() {
         </div>
       )}
 
-      {portalTarget && modalOpen && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#101828]/55 px-4 py-8 backdrop-blur-sm">
-          <div className="w-full max-w-3xl rounded-[28px] border border-[#D1AF47]/25 bg-[#F9F7F1] p-6 shadow-2xl">
+      {portalTarget && editing && createPortal(
+        <ModalOverlay onClose={() => setEditing(null)} canClose={!savingEdit} className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#101828]/55 px-4 py-8 backdrop-blur-sm">
+          <div role="dialog" aria-modal="true" aria-labelledby="provider-edit-title" className="max-h-full w-full max-w-3xl overflow-y-auto rounded-[28px] border border-[#D1AF47]/25 bg-[#F9F7F1] p-6 shadow-2xl">
             <div className={`mb-5 flex items-center justify-between gap-4 ${rowDir}`}>
-              <h3 className="font-serif text-2xl font-black text-gray-900">{form.id ? t.edit : t.addProvider}</h3>
-              <button onClick={() => setModalOpen(false)} className="rounded-full border border-[#ECECEC] px-3 py-1 text-xs font-black text-[#667085]">{t.cancel}</button>
+              <h3 id="provider-edit-title" className="font-serif text-2xl font-black text-gray-900">{t.edit}: {displayProviderName(editing)}</h3>
+              <button type="button" onClick={() => setEditing(null)} className="rounded-full border border-[#ECECEC] px-3 py-1 text-xs font-black text-[#667085] focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.cancel}</button>
             </div>
+            {draftError && (
+              <div role="alert" className="mb-4 rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-4 py-3 text-xs font-bold text-[#B42318]">{draftError}</div>
+            )}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {[
-                ["providerName", t.providerName],
-                ["businessNameEn", t.businessNameEn],
-                ["businessNameAr", t.businessNameAr],
-                ["contactEmail", t.email],
-                ["contactPhone", t.phone],
-                ["tradeLicenseUrl", t.tradeLicense],
-              ].map(([key, label]) => (
-                <label key={key} className="space-y-2 text-[10px] font-black uppercase tracking-widest text-[#667085]">
+              {([
+                ["businessNameEn", t.businessNameEn, "text"],
+                ["businessNameAr", t.businessNameAr, "text"],
+                ["contactEmail", t.email, "email"],
+                ["contactPhone", t.phone, "tel"],
+                ["tradeLicenseUrl", t.tradeLicense, "url"],
+              ] as const).map(([key, label, inputType]) => (
+                <label key={key} className="space-y-2 text-[11px] font-black uppercase tracking-widest text-[#667085]">
                   {label}
-                  <input value={String(form[key as keyof ProviderRecord] ?? "")} onChange={(event) => setForm((current) => ({ ...current, [key]: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]" />
+                  <input
+                    type={inputType}
+                    dir={inputType === "text" ? undefined : "ltr"}
+                    value={draft[key]}
+                    onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))}
+                    className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928]"
+                  />
                 </label>
               ))}
-              <label className="space-y-2 text-[10px] font-black uppercase tracking-widest text-[#667085]">
-                {t.applicationStatus}
-                <select value={form.applicationStatus} onChange={(event) => setForm((current) => ({ ...current, applicationStatus: event.target.value as ApplicationStatus }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]">
-                  <option value="pending">{t.pending}</option>
-                  <option value="approved">{t.approved}</option>
-                  <option value="rejected">{t.rejected}</option>
-                </select>
-              </label>
-              <label className="space-y-2 text-[10px] font-black uppercase tracking-widest text-[#667085]">
-                {t.accountStatus}
-                <select value={form.accountStatus} onChange={(event) => setForm((current) => ({ ...current, accountStatus: event.target.value as AccountStatus }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]">
-                  <option value="active">{t.active}</option>
-                  <option value="inactive">{t.inactive}</option>
-                </select>
-              </label>
-              <label className="space-y-2 text-[10px] font-black uppercase tracking-widest text-[#667085]">
-                {t.genderCategory}
-                <select value={form.gender} onChange={(event) => setForm((current) => ({ ...current, gender: event.target.value as GenderScope }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]">
-                  <option value="male">{t.male}</option>
-                  <option value="female">{t.female}</option>
-                  <option value="both">{t.both}</option>
-                </select>
-              </label>
-              <label className="space-y-2 text-[10px] font-black uppercase tracking-widest text-[#667085]">
-                {t.commission}
-                <input type="number" value={form.commissionPercentage} onChange={(event) => setForm((current) => ({ ...current, commissionPercentage: Number(event.target.value) }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm normal-case tracking-normal text-gray-900 outline-none focus:border-[#D1AF47]" />
-              </label>
             </div>
             <div className="mt-6 flex justify-end gap-3">
-              <button onClick={() => setModalOpen(false)} className="rounded-xl border border-[#ECECEC] px-5 py-2.5 text-xs font-black text-[#667085]">{t.cancel}</button>
-              <button onClick={() => void saveProvider()} className="rounded-xl bg-[#D1AF47] px-5 py-2.5 text-xs font-black text-[#101828] hover:bg-[#E0C46A]">{t.save}</button>
+              <button type="button" onClick={() => setEditing(null)} className="rounded-xl border border-[#ECECEC] px-5 py-2.5 text-xs font-black text-[#667085] focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.cancel}</button>
+              <button type="button" disabled={savingEdit} onClick={() => void saveEdit()} className="rounded-xl bg-[#D1AF47] px-5 py-2.5 text-xs font-black text-[#101828] hover:bg-[#E0C46A] disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-[#9B7928]">{savingEdit ? t.saving : t.save}</button>
             </div>
           </div>
-        </div>,
+        </ModalOverlay>,
         portalTarget
       )}
 
-      {/* APPROVAL MODAL */}
-      {portalTarget && approvalModalApp && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#101828]/55 px-4 py-8 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-[28px] border border-[#D1AF47]/25 bg-[#F9F7F1] p-6 shadow-2xl">
-            <div className={`mb-4 flex items-center justify-between gap-4 ${rowDir}`}>
-              <div>
-                <h3 className="font-serif text-xl font-black text-gray-900">{t.approveApplication}</h3>
-                <p className="mt-1 text-xs text-[#667085]">{approvalModalApp.business_name_en} ({approvalModalApp.business_name_ar})</p>
-              </div>
-              <button onClick={() => setApprovalModalApp(null)} className="rounded-full border border-[#ECECEC] px-3 py-1 text-xs font-black text-[#667085]">{t.cancel}</button>
-            </div>
-            <div className="space-y-4 py-2">
-              <p className="text-xs text-gray-600 leading-relaxed">
-                {isRTL
-                  ? "سيتم إنشاء سجل المزود والفرع الرئيسي وترقية حساب المستخدم إلى مالك مزود (provider_owner) وتوثيق العملية في سجل التدقيق الإداري."
-                  : "Approving this application will atomically create the provider record, main branch, upgrade user role to provider_owner, and log the action in the admin audit trail."}
-              </p>
-              <label className="block space-y-1 text-xs font-bold text-gray-700">
-                <span>{t.commissionPct}</span>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.5"
-                  value={approvalCommission}
-                  onChange={(e) => setApprovalCommission(Number(e.target.value))}
-                  className="w-full rounded-xl border border-[#ECECEC] bg-white px-4 py-2.5 text-sm font-bold text-gray-900 outline-none focus:border-[#D1AF47]"
-                />
-              </label>
-            </div>
-            <div className={`mt-6 flex justify-end gap-3 ${rowDir}`}>
-              <button
-                onClick={() => setApprovalModalApp(null)}
-                className="rounded-xl border border-[#ECECEC] px-5 py-2.5 text-xs font-black text-[#667085]"
-              >
-                {t.cancel}
-              </button>
-              <button
-                disabled={submittingAppAction}
-                onClick={() => void handleApproveApplication(approvalModalApp.id, approvalCommission)}
-                className="rounded-xl bg-[#101828] px-5 py-2.5 text-xs font-black text-[#F4E7B6] hover:bg-black transition disabled:opacity-50"
-              >
-                {submittingAppAction ? (isRTL ? "جاري الاعتماد..." : "Approving...") : t.approve}
-              </button>
-            </div>
-          </div>
-        </div>,
-        portalTarget
+      {crDialog && (
+        <CommandDialog
+          locale={isRTL ? "ar" : "en"}
+          title={crDialog.kind === "wathq" ? (isRTL ? "التحقق من السجل التجاري عبر واثق" : "Check the Commercial Registration with Wathq") : (isRTL ? "تسجيل مراجعة يدوية للسجل التجاري" : "Record a manual Commercial Registration review")}
+          intro={crDialog.kind === "wathq"
+            ? (isRTL ? "يُرسل الرقم إلى واثق، وتُسجَّل النتيجة كما أعادتها الخدمة." : "The number is sent to Wathq and the result is recorded as the service returns it.")
+            : (isRTL ? "تُسجَّل كمراجعة يدوية ولا تُعدّ تأكيداً من واثق." : "Recorded as a manual review, never as a Wathq confirmation.")}
+          facts={[{ label: t.provider, value: crDialog.name }]}
+          field={{ label: isRTL ? "رقم السجل التجاري (10 أرقام)" : "Commercial Registration number (10 digits)", initial: crDialog.cr, pattern: /^\d{10}$/, error: isRTL ? "أدخل 10 أرقام." : "Enter exactly 10 digits.", ltr: true }}
+          reasonLabel={isRTL ? "ما الذي تم التحقق منه؟ (المستند، تاريخ الانتهاء)" : "What did you check? (document reviewed, expiry date)"}
+          reasonRequired={crDialog.kind === "manual"}
+          confirmLabel={crDialog.kind === "wathq" ? (isRTL ? "التحقق عبر واثق" : "Check with Wathq") : (isRTL ? "تسجيل المراجعة" : "Record review")}
+          onConfirm={async (reason, cr) => {
+            const target = { providerId: crDialog.providerId, applicationId: crDialog.applicationId };
+            if (crDialog.kind === "manual") return handleManualCrReview(target, cr, reason);
+            await handleVerifyCr(target, cr);
+            return null;
+          }}
+          onClose={() => setCrDialog(null)}
+        />
+      )}
+
+      {statusPending && (
+        <CommandDialog
+          locale={isRTL ? "ar" : "en"}
+          tone={statusPending.next === "suspended" || statusPending.next === "rejected" ? "danger" : "default"}
+          title={fill(t.statusDialogTitle, { action: statusPending.actionLabel, name: displayProviderName(statusPending.provider) })}
+          intro={statusPending.next === "suspended" || statusPending.next === "rejected" ? t.statusUpcomingWarning : undefined}
+          facts={[
+            { label: t.provider, value: displayProviderName(statusPending.provider) },
+            { label: t.statusFactStatus, value: String(t[statusPending.provider.status as keyof typeof t] ?? statusPending.provider.status) },
+            { label: t.statusFactShops, value: count(statusPending.provider.shops.length) },
+          ]}
+          reasonLabel={t.statusReasonLabel}
+          confirmLabel={statusPending.actionLabel}
+          onConfirm={(reason) => runStatusChange(statusPending.provider, statusPending.next, reason)}
+          onClose={() => setStatusPending(null)}
+        />
+      )}
+
+      {/* APPROVAL DIALOG */}
+      {approvalModalApp && (
+        <CommandDialog
+          locale={isRTL ? "ar" : "en"}
+          title={t.approveApplication}
+          intro={isRTL
+            ? "سيتم إنشاء سجل المزود والفرع الرئيسي وترقية حساب المستخدم إلى مالك مزود (provider_owner) وتوثيق العملية في سجل التدقيق الإداري."
+            : "Approving this application will atomically create the provider record, main branch, upgrade user role to provider_owner, and log the action in the admin audit trail."}
+          facts={[
+            { label: t.applicant, value: [approvalModalApp.first_name, approvalModalApp.last_name].filter(Boolean).join(" ") || "—" },
+            { label: t.businessNameEn, value: approvalModalApp.business_name_en },
+            { label: t.businessNameAr, value: approvalModalApp.business_name_ar },
+            { label: t.contact, value: approvalModalApp.contact_email || approvalModalApp.contact_phone || "—" },
+            { label: "CR", value: approvalModalApp.cr_number || "—" },
+            ...(approvalModalApp.cr_number ? [{ label: isRTL ? "حالة السجل التجاري" : "CR check", value: crStatusLabel(approvalModalApp.cr_verification_status) }] : []),
+          ]}
+          effects={[
+            t.approvalFeeNote,
+            ...(approvalModalApp.cr_number && !crIsCleared(approvalModalApp)
+              ? [isRTL
+                ? "السجل التجاري لم يُعتمد بعد: سترفض قاعدة البيانات الموافقة حتى يتم التحقق عبر واثق أو تسجيل مراجعة يدوية."
+                : "The commercial registration is not cleared yet: the database refuses approval until it is verified with Wathq or manually reviewed."]
+              : []),
+          ]}
+          reasonLabel={t.statusReasonLabel}
+          confirmLabel={t.approve}
+          onConfirm={(reason) => handleApproveApplication(approvalModalApp.id, reason)}
+          onClose={() => setApprovalModalApp(null)}
+        />
       )}
 
       {/* REJECTION MODAL */}
       {portalTarget && rejectionModalApp && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#101828]/55 px-4 py-8 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-[28px] border border-[#FECDCA] bg-white p-6 shadow-2xl">
+        <ModalOverlay onClose={() => setRejectionModalApp(null)} canClose={!submittingAppAction} className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#101828]/55 px-4 py-8 backdrop-blur-sm">
+          <div role="dialog" aria-modal="true" aria-labelledby="provider-reject-title" tabIndex={-1} className="w-full max-w-lg rounded-[28px] border border-[#FECDCA] bg-white p-6 shadow-2xl">
             <div className={`mb-4 flex items-center justify-between gap-4 ${rowDir}`}>
               <div>
-                <h3 className="font-serif text-xl font-black text-[#B42318]">{t.rejectApplication}</h3>
+                <h3 id="provider-reject-title" className="font-serif text-xl font-black text-[#B42318]">{t.rejectApplication}</h3>
                 <p className="mt-1 text-xs text-[#667085]">{rejectionModalApp.business_name_en} ({rejectionModalApp.business_name_ar})</p>
               </div>
               <button onClick={() => setRejectionModalApp(null)} className="rounded-full border border-[#ECECEC] px-3 py-1 text-xs font-black text-[#667085]">{t.cancel}</button>
@@ -1767,11 +1568,12 @@ export default function AdminProviderManagement() {
               <label className="block space-y-1 text-xs font-bold text-gray-700">
                 <span>{t.rejectionReason} *</span>
                 <textarea
+                  data-autofocus
                   rows={3}
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(e.target.value)}
                   placeholder={isRTL ? "وضح سبب عدم قبول الطلب (بيانات السجل التجاري غير متطابقة، إلخ)..." : "Specify rejection reason (e.g., CR document mismatch)..."}
-                  className="w-full rounded-xl border border-[#ECECEC] bg-white px-4 py-2.5 text-xs text-gray-900 outline-none focus:border-[#B42318]"
+                  className="w-full rounded-xl border border-[#ECECEC] bg-white px-4 py-2.5 text-xs text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#B42318]"
                 />
               </label>
             </div>
@@ -1791,48 +1593,59 @@ export default function AdminProviderManagement() {
               </button>
             </div>
           </div>
-        </div>,
+        </ModalOverlay>,
         portalTarget
       )}
 
       {portalTarget && detail && createPortal(
-        <div className="fixed inset-0 z-[9999] bg-[#101828]/45 backdrop-blur-sm">
-          <aside className={`absolute top-0 bottom-0 ${isRTL ? "left-0" : "right-0"} flex w-full max-w-5xl flex-col overflow-hidden bg-[#F7F6F3] shadow-2xl`}>
+        <ModalOverlay onClose={() => setDetailId(null)} className="fixed inset-0 z-[9999] bg-[#101828]/45 backdrop-blur-sm">
+          <aside role="dialog" aria-modal="true" aria-labelledby="provider-detail-title" className={`absolute top-0 bottom-0 ${isRTL ? "left-0" : "right-0"} flex w-full max-w-5xl flex-col overflow-hidden bg-[#F7F6F3] shadow-2xl`}>
             <div className={`flex items-start justify-between gap-4 border-b border-[#ECECEC] bg-white px-6 py-5 ${rowDir}`}>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D1AF47]">{t.detailTitle}</p>
-                <h3 className="mt-1 font-serif text-2xl font-black text-gray-900">{displayProviderName(detail)}</h3>
-                <p className="mt-1 text-xs font-semibold text-[#667085]">{detail.contactEmail} · {detail.contactPhone}</p>
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#D1AF47]">{t.detailTitle}</p>
+                <h3 id="provider-detail-title" className="mt-1 font-serif text-2xl font-black text-gray-900">{displayProviderName(detail)}</h3>
+                <p className="mt-1 text-xs font-semibold text-[#667085]">{detail.contactEmail || t.notProvided} · {detail.contactPhone || t.notProvided}</p>
               </div>
-              <button onClick={() => setDetail(null)} className="rounded-full border border-[#ECECEC] px-3 py-1 text-xs font-black text-[#667085]">{t.cancel}</button>
+              <button type="button" onClick={() => setDetailId(null)} className="rounded-full border border-[#ECECEC] px-3 py-1 text-xs font-black text-[#667085] focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.close}</button>
             </div>
 
             <div className="flex-1 space-y-5 overflow-y-auto p-6">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+              {(notice || error) && (
+                <div role={error ? "alert" : "status"} className={`rounded-xl border px-4 py-3 text-xs font-bold ${error ? "border-[#FECDCA] bg-[#FEF3F2] text-[#B42318]" : "border-[#D1FADF] bg-[#ECFDF3] text-[#027A48]"}`}>
+                  {error || notice}
+                </div>
+              )}
+              {metricsError && (
+                <div role="alert" className="rounded-xl border border-[#FEDF89] bg-[#FFFAEB] px-4 py-3 text-xs font-bold text-[#B54708]">
+                  {fill(t.metricsFailed, { reason: metricsError })}
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {[
                   [t.applicationStatus, t[detail.applicationStatus]],
                   [t.accountStatus, t[detail.accountStatus]],
-                  [t.genderCategory, labelGender(detail.gender)],
-                  [t.commission, `${detail.commissionPercentage}%`],
                 ].map(([label, value]) => (
                   <div key={label} className={cardBase}>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#667085]">{label}</span>
+                    <span className="text-[11px] font-black uppercase tracking-widest text-[#667085]">{label}</span>
                     <strong className="mt-2 block text-sm font-black text-gray-900">{value}</strong>
                   </div>
                 ))}
               </div>
+              {/* D-D3: the effective platform fee from the fee rules in force, never a free-standing commission percentage. */}
+              <EffectiveFeeTerms locale={isRTL ? "ar" : "en"} providerId={detail.id} mode="admin" />
 
               {/* Wathq CR Verification (G26) */}
               <div className="rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
                 <div className={`flex flex-wrap items-center justify-between gap-4 ${rowDir}`}>
                   <div>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#D1AF47] block">
+                    <span className="text-[11px] font-black uppercase tracking-widest text-[#D1AF47] block">
                       {isRTL ? "توثيق واثق (السجل التجاري السعودي)" : "Wathq Saudi CR Verification"}
                     </span>
                     <p className="mt-1 text-sm font-bold text-gray-900">
                       CR: {detail.crNumber || (isRTL ? "غير مسجل" : "Not Registered")}
                     </p>
-                    <span className={`inline-block mt-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                    <span className={`inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider ${
                       detail.crVerificationStatus === "verified"
                         ? "bg-[#ECFDF3] text-[#027A48]"
                         : "bg-[#FFFAEB] text-[#B54708]"
@@ -1843,25 +1656,23 @@ export default function AdminProviderManagement() {
                         ? (isRTL ? "مراجعة يدوية" : "Manually reviewed")
                         : detail.crVerificationStatus === "rejected"
                         ? (isRTL ? "غير قائم في واثق" : "Not active in Wathq")
+                        : detail.crVerificationStatus === "name_mismatch"
+                        ? (isRTL ? "الاسم لا يطابق واثق" : "Name differs from Wathq")
                         : (isRTL ? "غير موثق" : "Unverified")}
                     </span>
                   </div>
                   {detail.crVerificationStatus !== "verified" && (
                     <div className="flex flex-wrap gap-2">
                       <button
-                        onClick={() => {
-                          const cr = prompt(isRTL ? "أدخل رقم السجل التجاري (10 أرقام):" : "Enter 10-digit CR Number:", detail.crNumber || "");
-                          if (cr) void handleVerifyCr(detail.id, cr);
-                        }}
+                        type="button"
+                        onClick={() => setCrDialog({ kind: "wathq", providerId: detail.id, cr: detail.crNumber || "", name: displayProviderName(detail) })}
                         className="px-4 py-2 rounded-xl bg-[#101828] text-[#F4E7B6] text-xs font-black hover:bg-black transition"
                       >
                         {isRTL ? "التحقق عبر واثق" : "Check with Wathq"}
                       </button>
                       <button
-                        onClick={() => {
-                          const cr = prompt(isRTL ? "أدخل رقم السجل التجاري (10 أرقام):" : "Enter 10-digit CR Number:", detail.crNumber || "");
-                          if (cr) void handleManualCrReview(detail.id, cr);
-                        }}
+                        type="button"
+                        onClick={() => setCrDialog({ kind: "manual", providerId: detail.id, cr: detail.crNumber || "", name: displayProviderName(detail) })}
                         className="px-4 py-2 rounded-xl border border-gray-300 text-gray-800 text-xs font-bold hover:border-gray-500 transition"
                       >
                         {isRTL ? "تسجيل مراجعة يدوية" : "Record manual review"}
@@ -1871,71 +1682,77 @@ export default function AdminProviderManagement() {
                 </div>
               </div>
 
-              {/* Shop performance dashboard — provider-wide rollup */}
-              {detailPerf && (
-                <section className="rounded-[24px] border border-[#101828] bg-[#101828] p-5 text-white shadow-[0_18px_50px_rgba(16,24,40,0.25)]">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#E0C46A]">{t.performance}</p>
+              {/* Recorded performance: every figure comes from bookings, the ledger and published reviews */}
+              <section className="rounded-[24px] border border-[#101828] bg-[#101828] p-5 text-white shadow-[0_18px_50px_rgba(16,24,40,0.25)]">
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#E0C46A]">{t.performance}</p>
+                {detail.figures && detailOutcomes ? (
                   <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
                     {[
-                      [t.revenue, money(detailPerf.revenue)],
-                      [t.monthlyRevenue, money(detailPerf.monthlyRevenue)],
-                      [t.commissionAmount, money(detailPerf.commissionAmount)],
-                      [t.totalBookings, detailPerf.totalBookings.toLocaleString(isRTL ? "ar-SA" : "en-US")],
-                      [t.completedRate, pct(detailPerf.completedRate)],
-                      [t.cancellationRate, pct(detailPerf.cancellationRate)],
-                      [t.rating, detailPerf.rating ? `★ ${detailPerf.rating.toFixed(1)}` : "—"],
-                      [t.reviews, detailPerf.reviewCount.toLocaleString(isRTL ? "ar-SA" : "en-US")],
+                      [t.revenue, money(detail.figures.revenue)],
+                      [t.revenue30d, money(detail.figures.revenue30d)],
+                      [t.commissionCharged, money(detail.figures.commissionAmount)],
+                      [t.totalBookings, count(detail.figures.totalBookings)],
+                      [t.completedRate, pct(detailOutcomes.completedRate)],
+                      [t.cancellationRate, pct(detailOutcomes.cancellationRate)],
+                      [t.rating, stars(detailOutcomes.rating)],
+                      [t.reviews, count(detail.figures.reviewCount)],
                     ].map(([label, value]) => (
                       <div key={label} className="rounded-2xl bg-white/5 p-3">
-                        <span className="text-[9px] font-black uppercase tracking-widest text-white/50">{label}</span>
+                        <span className="text-[11px] font-black uppercase tracking-widest text-white/50">{label}</span>
                         <strong className="mt-1.5 block font-serif text-lg font-black text-white">{value}</strong>
                       </div>
                     ))}
                   </div>
-                  <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+                ) : (
+                  <div className="mt-4 rounded-2xl bg-white/5 p-4 text-sm font-semibold text-white/70">{detail.shops.some((shop) => suppressedBranches.has(shop.id)) ? t.metricsSuppressed : t.metricsUnavailable}</div>
+                )}
+                <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+                  {detail.figures && (
                     <div className="rounded-2xl bg-white/5 p-4">
-                      <p className="text-[9px] font-black uppercase tracking-widest text-white/50">{t.financialSummary}</p>
+                      <p className="text-[11px] font-black uppercase tracking-widest text-white/50">{t.financialSummary}</p>
                       <div className="mt-2 space-y-1.5 text-xs font-bold">
-                        <div className={`flex items-center justify-between ${rowDir}`}><span className="text-white/60">{t.grossRevenue}</span><span>{money(detailPerf.revenue)}</span></div>
-                        <div className={`flex items-center justify-between ${rowDir}`}><span className="text-white/60">{t.commissionAmount} ({detail.commissionPercentage}%)</span><span className="text-[#E0C46A]">{money(detailPerf.commissionAmount)}</span></div>
-                        <div className={`flex items-center justify-between border-t border-white/10 pt-1.5 ${rowDir}`}><span className="text-white/60">{t.netToProvider}</span><span>{money(detailPerf.revenue - detailPerf.commissionAmount)}</span></div>
+                        <div className={`flex items-center justify-between ${rowDir}`}><span className="text-white/60">{t.grossRevenue}</span><span>{money(detail.figures.revenue)}</span></div>
+                        <div className={`flex items-center justify-between ${rowDir}`}><span className="text-white/60">{t.commissionCharged}</span><span className="text-[#E0C46A]">{money(detail.figures.commissionAmount)}</span></div>
                       </div>
+                      <div className="mt-2 text-[11px] font-semibold text-white/50">{t.commissionChargedNote}</div>
                     </div>
-                    <label className="rounded-2xl bg-white/5 p-4">
-                      <p className="text-[9px] font-black uppercase tracking-widest text-white/50">{t.adminNotes}</p>
-                      <textarea value={notesDraft} onChange={(event) => setNotesDraft(event.target.value)} placeholder={t.adminNotesHint} rows={2} className="mt-2 w-full rounded-xl border border-white/10 bg-[#0B1220] px-3 py-2 text-xs font-semibold text-white outline-none placeholder:text-white/30 focus:border-[#E0C46A]" />
-                      <button onClick={() => void saveNotes()} className="mt-2 rounded-lg bg-[#E0C46A] px-3 py-1.5 text-[10px] font-black text-[#101828] hover:brightness-105">{t.saveNotes}</button>
-                    </label>
-                  </div>
-                </section>
-              )}
+                  )}
+                  <label className="rounded-2xl bg-white/5 p-4">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-white/50">{t.adminNotes}</p>
+                    <textarea value={notesDraft} onChange={(event) => setNotesEdit({ id: detail.id, text: event.target.value })} placeholder={t.adminNotesHint} rows={2} className="mt-2 w-full rounded-xl border border-white/10 bg-[#0B1220] px-3 py-2 text-xs font-semibold text-white outline-2 outline-offset-2 outline-transparent placeholder:text-white/30 focus-visible:outline-[#E0C46A]" />
+                    <button type="button" onClick={() => void saveNotes()} className="mt-2 rounded-lg bg-[#E0C46A] px-3 py-1.5 text-[11px] font-black text-[#101828] hover:brightness-105 focus-visible:outline-2 focus-visible:outline-white">{t.saveNotes}</button>
+                  </label>
+                </div>
+              </section>
 
               <section className="rounded-[24px] border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
                 <div className={`mb-4 flex items-center justify-between gap-3 ${rowDir}`}>
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D1AF47]">{t.employeeEarningsSummary}</p>
-                    <p className="mt-1 text-xs font-semibold text-[#667085]">employee_earnings_summary</p>
+                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#D1AF47]">{t.employeeEarningsSummary}</p>
+                    <div className="mt-1 text-xs font-semibold text-[#667085]">{t.employeeEarningsSource}</div>
                   </div>
                   <strong className="font-serif text-xl font-black text-gray-900">
-                    {money(detailEmployeeEarnings.reduce((sum, item) => sum + (item.summary?.totalEarnings ?? 0), 0))}
+                    {detailEmployeeEarnings.some((item) => item.employee.figures?.earnings === null)
+                      ? "—"
+                      : money(detailEmployeeEarnings.reduce((sum, item) => sum + (item.employee.figures?.earnings ?? 0), 0))}
                   </strong>
                 </div>
                 {detailEmployeeEarnings.length === 0 ? (
-                  <p className="rounded-2xl border border-[#ECECEC] bg-[#FBFAF7] px-4 py-5 text-center text-xs font-bold text-[#667085]">{t.noEmployeeEarnings}</p>
+                  <div className="rounded-2xl border border-[#ECECEC] bg-[#FBFAF7] px-4 py-5 text-center text-xs font-bold text-[#667085]">{detail.shops.some((shop) => shop.employees.some((employee) => employee.figures === null)) ? t.metricsUnavailable : t.noEmployeeEarnings}</div>
                 ) : (
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-                    {detailEmployeeEarnings.map(({ employee, shop, summary }) => (
-                      <div key={`${employee.id}-${summary?.monthStart ?? "all"}`} className="rounded-2xl border border-[#F0F0F0] bg-[#FBFAF7] p-4">
+                    {detailEmployeeEarnings.map(({ employee, shop }) => (
+                      <div key={employee.id} className="rounded-2xl border border-[#F0F0F0] bg-[#FBFAF7] p-4">
                         <p className="font-black text-gray-900">{displayEmployeeName(employee)}</p>
-                        <p className="mt-1 text-[10px] font-bold text-[#667085]">{displayShopName(shop)}</p>
+                        <p className="mt-1 text-[11px] font-bold text-[#667085]">{displayShopName(shop)}</p>
                         <div className="mt-3 grid grid-cols-2 gap-2">
                           <div className="rounded-xl bg-white p-3">
-                            <span className="block text-[8px] font-black uppercase tracking-wider text-[#667085]">{t.statementEarnings}</span>
-                            <strong className="mt-1 block text-xs font-black text-[#9A741F]">{money(summary?.totalEarnings ?? 0)}</strong>
+                            <span className="block text-[8px] font-black uppercase tracking-wider text-[#667085]">{t.earnings}</span>
+                            <strong className="mt-1 block text-xs font-black text-[#9A741F]">{employee.figures?.earnings === null || employee.figures?.earnings === undefined ? "—" : money(employee.figures.earnings)}</strong>
                           </div>
                           <div className="rounded-xl bg-white p-3">
-                            <span className="block text-[8px] font-black uppercase tracking-wider text-[#667085]">{t.statementCompleted}</span>
-                            <strong className="mt-1 block text-xs font-black text-gray-900">{(summary?.completedBookings ?? 0).toLocaleString(isRTL ? "ar-SA" : "en-US")}</strong>
+                            <span className="block text-[8px] font-black uppercase tracking-wider text-[#667085]">{t.completed}</span>
+                            <strong className="mt-1 block text-xs font-black text-gray-900">{count(employee.figures?.completedBookings ?? 0)}</strong>
                           </div>
                         </div>
                       </div>
@@ -1946,78 +1763,54 @@ export default function AdminProviderManagement() {
 
               <div className={`flex items-center justify-between gap-3 ${rowDir}`}>
                 <h4 className="font-serif text-xl font-black text-gray-900">{t.shops}</h4>
-                <button onClick={() => addShop(detail)} className="rounded-xl bg-[#101828] px-4 py-2 text-xs font-black text-[#F4E7B6]">{t.addShop}</button>
               </div>
 
-              {detail.shops.map((shop) => (
+              {detail.shops.length === 0 && (
+                <div className="rounded-2xl border border-[#ECECEC] bg-white px-4 py-6 text-center text-sm font-bold text-[#667085]">{t.noBranches}</div>
+              )}
+
+              {detail.shops.map((shop) => {
+                const shopOutcomes = shop.figures ? describeOutcomes(shop.figures) : null;
+                return (
                 <section key={shop.id} className="rounded-[24px] border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
                   <div className={`mb-5 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between ${rowDir}`}>
                     <div>
                       <h5 className="font-serif text-lg font-black text-gray-900">{displayShopName(shop)}</h5>
-                      <p className="mt-1 text-xs font-semibold text-[#667085]">{isRTL ? shop.addressAr : shop.addressEn}</p>
-                      <p className="mt-2 text-[10px] font-black uppercase tracking-wider text-[#D1AF47]">{labelGender(shop.gender)}</p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <button onClick={() => addService(detail, shop)} className="rounded-xl border border-[#D1AF47]/30 bg-[#D1AF47]/10 px-3 py-2 text-[10px] font-black text-[#9A741F]">{t.addService}</button>
-                      <button onClick={() => addEmployee(detail, shop)} className="rounded-xl border border-[#ECECEC] px-3 py-2 text-[10px] font-black text-[#667085]">{t.addEmployee}</button>
-                      <button onClick={() => removeShop(detail, shop)} className="rounded-xl border border-[#FECDCA] px-3 py-2 text-[10px] font-black text-[#B42318]">{t.removeShop}</button>
+                      <p className="mt-1 text-xs font-semibold text-[#667085]">{(isRTL ? shop.addressAr : shop.addressEn) || t.notProvided}</p>
                     </div>
                   </div>
 
-                  {/* Per-shop performance metrics */}
-                  {(() => {
-                    const localM = metricsByShop[shop.id];
-                    const performance = detail.performance;
-                    const shopCount = Math.max(detail.shops.length, 1);
-                    const totalBookings = performance ? Math.round(performance.totalBookings / shopCount) : 0;
-                    const completedBookings = performance ? Math.round(performance.completedBookings / shopCount) : 0;
-                    const cancelledBookings = performance ? Math.round(performance.cancelledBookings / shopCount) : 0;
-                    const noShowBookings = performance ? Math.round(performance.noShowBookings / shopCount) : 0;
-                    const m = performance ? {
-                      revenue: performance.revenue / shopCount,
-                      totalBookings,
-                      completedBookings,
-                      cancelledBookings,
-                      noShowBookings,
-                      rating: performance.rating,
-                      reviewCount: Math.round(performance.reviewCount / shopCount),
-                      profileCompletion: localM?.profileCompletion ?? 100,
-                      commissionAmount: performance.commissionAmount / shopCount,
-                      avgServiceValue: performance.completedBookings ? Math.round(performance.revenue / performance.completedBookings) : 0,
-                      conversionRate: localM?.conversionRate ?? 0,
-                      completedRate: totalBookings ? Math.round((completedBookings / totalBookings) * 100) : 0,
-                      cancellationRate: totalBookings ? Math.round(((cancelledBookings + noShowBookings) / totalBookings) * 100) : 0
-                    } : localM;
-                    if (!m) return null;
-                    return (
-                      <div className="mb-5 grid grid-cols-2 gap-2.5 md:grid-cols-4 xl:grid-cols-7">
-                        {[
-                          [t.revenue, money(m.revenue)],
-                          [t.totalBookings, m.totalBookings.toLocaleString(isRTL ? "ar-SA" : "en-US")],
-                          [t.completed, m.completedBookings.toLocaleString(isRTL ? "ar-SA" : "en-US")],
-                          [t.cancelled, (m.cancelledBookings + m.noShowBookings).toLocaleString(isRTL ? "ar-SA" : "en-US")],
-                          [t.rating, m.rating ? `★ ${m.rating.toFixed(1)}` : "—"],
-                          [t.reviews, m.reviewCount.toLocaleString(isRTL ? "ar-SA" : "en-US")],
-                          [t.profileCompletion, `${m.profileCompletion}%`],
-                        ].map(([label, value]) => (
-                          <div key={label} className="rounded-xl border border-[#F0F0F0] bg-[#FBFAF7] px-3 py-2">
-                            <span className="block text-[8px] font-black uppercase tracking-wider text-[#667085]">{label}</span>
-                            <strong className="mt-0.5 block text-xs font-black text-gray-900">{value}</strong>
-                          </div>
-                        ))}
-                      </div>
-                    );
-                  })()}
+                  {/* Per-branch figures */}
+                  {shop.figures && shopOutcomes ? (
+                    <div className="mb-5 grid grid-cols-2 gap-2.5 md:grid-cols-4 xl:grid-cols-7">
+                      {[
+                        [t.revenue, money(shop.figures.revenue)],
+                        [t.totalBookings, count(shop.figures.totalBookings)],
+                        [t.completed, count(shop.figures.completedBookings)],
+                        [t.cancelled, count(shop.figures.cancelledBookings + shop.figures.noShowBookings)],
+                        [t.rating, stars(shopOutcomes.rating)],
+                        [t.reviews, count(shop.figures.reviewCount)],
+                        [t.profileCompletion, pct(profileCompletion(shop))],
+                      ].map(([label, value]) => (
+                        <div key={label} className="rounded-xl border border-[#F0F0F0] bg-[#FBFAF7] px-3 py-2">
+                          <span className="block text-[8px] font-black uppercase tracking-wider text-[#667085]">{label}</span>
+                          <strong className="mt-0.5 block text-xs font-black text-gray-900">{value}</strong>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mb-5 rounded-xl border border-[#F0F0F0] bg-[#FBFAF7] px-3 py-3 text-xs font-bold text-[#667085]">{suppressedBranches.has(shop.id) ? t.metricsSuppressed : t.metricsUnavailable}</div>
+                  )}
 
                   <div className="grid grid-cols-1 gap-4 xl:grid-cols-[0.9fr_1.1fr]">
                     <div className="rounded-2xl border border-[#F2F2F2] bg-gray-50/60 p-4">
-                      <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.services}</p>
+                      <p className="mb-3 text-[11px] font-black uppercase tracking-widest text-[#667085]">{t.services}</p>
                       <div className="space-y-2">
                         {shop.services.map((service) => (
                           <div key={service.id} className={`flex items-center justify-between gap-3 rounded-xl bg-white px-3 py-2 ${rowDir}`}>
                             <div>
                               <p className="text-xs font-black text-gray-900">{isRTL ? service.nameAr : service.nameEn}</p>
-                              <p className="mt-0.5 text-[10px] font-semibold text-[#667085]">{isRTL ? service.categoryAr : service.categoryEn} · {labelGender(service.gender)}</p>
+                              <p className="mt-0.5 text-[11px] font-semibold text-[#667085]">{(isRTL ? service.categoryAr : service.categoryEn) || "—"}</p>
                             </div>
                             <span className="text-xs font-black text-[#9A741F]">{money(service.price)}</span>
                           </div>
@@ -2026,42 +1819,51 @@ export default function AdminProviderManagement() {
                     </div>
 
                     <div className="rounded-2xl border border-[#F2F2F2] bg-gray-50/60 p-4">
-                      <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.employees}</p>
+                      <p className="mb-3 text-[11px] font-black uppercase tracking-widest text-[#667085]">{t.employees}</p>
+                      {shop.employees.length === 0 && <div className="text-xs font-bold text-[#667085]">{t.noEmployees}</div>}
                       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                         {shop.employees.map((employee) => {
-                          const statement = employeeEarningsById[employee.id];
-                          const displayEarnings = statement?.totalEarnings ?? employee.earnings;
-                          const displayCompleted = statement?.completedBookings ?? employee.completedBookings;
+                          const figures = employee.figures;
+                          const outcomes = figures ? describeOutcomes(figures) : null;
                           return (
                           <div key={employee.id} className="rounded-2xl border border-[#ECECEC] bg-white p-4">
                             <div className={`flex items-start gap-3 ${rowDir}`}>
-                              <img src={employee.photoUrl} alt={displayEmployeeName(employee)} className="h-12 w-12 rounded-2xl object-cover" />
+                              {employee.photoUrl ? (
+                                // Photos are stored as links to storage we do not control, so next/image would need every host allow-listed.
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={employee.photoUrl} alt={displayEmployeeName(employee)} loading="lazy" className="h-12 w-12 shrink-0 rounded-2xl object-cover" />
+                              ) : (
+                                <span aria-hidden="true" className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#F4E7B6]/60 text-sm font-black text-[#7A5B12]">{initialsOf(displayEmployeeName(employee))}</span>
+                              )}
                               <div className="min-w-0 flex-1">
                                 <p className="font-black text-gray-900">{displayEmployeeName(employee)}</p>
-                                <p className="text-[10px] font-bold text-[#667085]">{displayEmployeeRole(employee)}</p>
+                                <p className="text-[11px] font-bold text-[#667085]">{displayEmployeeRole(employee) || "—"}</p>
                               </div>
-                              <button onClick={() => removeEmployee(detail, shop, employee)} className="text-[10px] font-black text-[#B42318]">{t.delete}</button>
                             </div>
-                            <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{statement ? t.statementEarnings : t.earnings}</span><strong className="text-[10px] text-[#9A741F]">{money(displayEarnings)}</strong></div>
-                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.rating}</span><strong className="text-[10px] text-gray-900">★ {employee.rating}</strong></div>
-                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{statement ? t.statementCompleted : t.completed}</span><strong className="text-[10px] text-gray-900">{displayCompleted}</strong></div>
-                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.cancelled}</span><strong className="text-[10px] text-gray-900">{employee.cancelledBookings}</strong></div>
-                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.noShow}</span><strong className="text-[10px] text-gray-900">{employee.noShowBookings}</strong></div>
-                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.reviews}</span><strong className="text-[10px] text-gray-900">{employee.reviewCount}</strong></div>
-                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.avgServiceValue}</span><strong className="text-[10px] text-gray-900">{money(employeeAvgServiceValue(employee))}</strong></div>
-                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.commissionShare}</span><strong className="text-[10px] text-[#9A741F]">{money(employeeCommissionShare(employee, detail.commissionPercentage))}</strong></div>
-                              <div className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{t.repeatCustomers}</span><strong className="text-[10px] text-gray-900">{employee.repeatCustomers}</strong></div>
-                            </div>
-                            <div className="mt-3">
-                              <div className={`flex items-center justify-between text-[9px] font-black uppercase text-[#667085] ${rowDir}`}><span>{t.utilization}</span><span>{employee.utilizationRate}%</span></div>
-                              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-gray-100"><div className="h-full rounded-full bg-[#D1AF47]" style={{ width: `${Math.min(100, employee.utilizationRate)}%` }} /></div>
-                            </div>
-                            <p className="mt-3 text-[10px] font-bold text-[#667085]">{t.workType}: {labelWorkType(employee.workType)}</p>
-                            <p className="mt-1 text-[10px] font-bold text-[#667085]">{t.availability}: {employee.isActive ? t.active : t.inactive}</p>
+                            {figures && outcomes ? (
+                              <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                                {[
+                                  [t.earnings, figures.earnings === null ? "—" : money(figures.earnings), "text-[#9A741F]"],
+                                  [t.rating, stars(outcomes.rating), "text-gray-900"],
+                                  [t.completed, count(figures.completedBookings), "text-gray-900"],
+                                  [t.cancelled, count(figures.cancelledBookings), "text-gray-900"],
+                                  [t.noShow, count(figures.noShowBookings), "text-gray-900"],
+                                  [t.reviews, count(figures.reviewCount), "text-gray-900"],
+                                  [t.avgServiceValue, outcomes.avgBookingValue === null ? "—" : money(outcomes.avgBookingValue), "text-gray-900"],
+                                  [t.commission, money(figures.commissionAmount), "text-[#9A741F]"],
+                                  [t.repeatCustomers, count(figures.repeatCustomers), "text-gray-900"],
+                                ].map(([label, value, tone]) => (
+                                  <div key={label} className="rounded-xl bg-gray-50 p-2"><span className="block text-[8px] font-black uppercase text-[#667085]">{label}</span><strong className={`text-[11px] ${tone}`}>{value}</strong></div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="mt-3 text-[11px] font-bold text-[#667085]">{t.metricsUnavailable}</div>
+                            )}
+                            <p className="mt-3 text-[11px] font-bold text-[#667085]">{t.workType}: {labelWorkType(employee.workType)}</p>
+                            <p className="mt-1 text-[11px] font-bold text-[#667085]">{t.availability}: {employee.isActive ? t.active : t.inactive}</p>
                             <div className="mt-3 flex flex-wrap gap-1.5">
                               {(isRTL ? employee.assignedServiceNamesAr : employee.assignedServiceNamesEn).map((name) => (
-                                <span key={name} className="rounded-full bg-[#F7F3E8] px-2 py-1 text-[9px] font-bold text-[#9A741F]">{name}</span>
+                                <span key={name} className="rounded-full bg-[#F7F3E8] px-2 py-1 text-[11px] font-bold text-[#9A741F]">{name}</span>
                               ))}
                             </div>
                           </div>
@@ -2071,10 +1873,11 @@ export default function AdminProviderManagement() {
                     </div>
                   </div>
                 </section>
-              ))}
+                );
+              })}
             </div>
           </aside>
-        </div>,
+        </ModalOverlay>,
         portalTarget
       )}
     </div>

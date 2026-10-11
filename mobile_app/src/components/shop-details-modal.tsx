@@ -3,16 +3,16 @@ import {
   StyleSheet,
   View,
   Text,
-  TouchableOpacity,
   Modal,
   ScrollView,
   Image,
   Alert,
   Dimensions,
-  Linking,
   ActivityIndicator
 } from "react-native";
+import { AppPressable } from "@/components/app-pressable";
 import { supabase } from "../lib/supabase";
+import { openCheckout, PAYMENT_RETURN_URL, notifyBookingsChanged } from "@/lib/payment-return";
 import {
   MarketplaceProvider,
   ShopDetails,
@@ -25,6 +25,7 @@ import {
   loadShopDetails,
   riyadhDate
 } from "../lib/marketplace";
+import { errorMessage } from "@/lib/error-message";
 
 const { height } = Dimensions.get("window");
 
@@ -80,7 +81,7 @@ export function ShopDetailsModal({
       estimateNote: "Final amount is confirmed by the server at checkout.",
       policyHeading: "Cancellation policy",
       policy: (h: number, late: number, noShow: number) =>
-        `Free cancellation up to ${h} hours before the appointment. Later cancellations: ${late}% of the price. No-show: ${noShow}% of the price.`,
+        `Free cancellation up to ${h} hours before the appointment. Later cancellations: ${late}% of the deposit is kept. No-show: ${noShow}% of the deposit is kept.`,
       payBtn: "Confirm & continue to payment",
       confirmBtn: "Confirm booking",
       close: "Close",
@@ -95,6 +96,7 @@ export function ShopDetailsModal({
       bookingFailed: "Booking failed",
       bookingConfirmed: "Booking confirmed",
       bookingConfirmedText: "Nothing is due online. Details are in your bookings.",
+      okLabel: "OK",
       paymentFailed: "Your time is held, but the payment page could not be opened. Open it again from your bookings before the hold expires.",
       loadFailed: "Could not load this shop",
       retry: "Try again",
@@ -131,7 +133,7 @@ export function ShopDetailsModal({
       estimateNote: "يؤكد الخادم المبلغ النهائي عند الدفع.",
       policyHeading: "سياسة الإلغاء",
       policy: (h: number, late: number, noShow: number) =>
-        `الإلغاء مجاني حتى ${h} ساعة قبل الموعد. الإلغاء المتأخر: ${late}% من السعر. عدم الحضور: ${noShow}% من السعر.`,
+        `الإلغاء مجاني حتى ${h} ساعة قبل الموعد. الإلغاء المتأخر: يُحتجز ${late}% من العربون. عدم الحضور: يُحتجز ${noShow}% من العربون.`,
       payBtn: "تأكيد والمتابعة للدفع",
       confirmBtn: "تأكيد الحجز",
       close: "إغلاق",
@@ -146,6 +148,7 @@ export function ShopDetailsModal({
       bookingFailed: "تعذر إتمام الحجز",
       bookingConfirmed: "تم تأكيد الحجز",
       bookingConfirmedText: "لا يوجد مبلغ مستحق عبر الإنترنت. التفاصيل في حجوزاتك.",
+      okLabel: "حسناً",
       paymentFailed: "تم حجز الموعد مؤقتاً، لكن تعذر فتح صفحة الدفع. افتحها من حجوزاتك قبل انتهاء مهلة الحجز.",
       loadFailed: "تعذر تحميل بيانات المركز",
       retry: "إعادة المحاولة",
@@ -172,7 +175,7 @@ export function ShopDetailsModal({
     setDetailsError("");
     loadShopDetails(shop.providerId, shop.branchId)
       .then((d) => { if (!cancelled) setDetails(d); })
-      .catch((err) => { if (!cancelled) setDetailsError(err instanceof Error ? err.message : String(err)); });
+      .catch((err) => { if (!cancelled) setDetailsError(errorMessage(err)); });
     return () => { cancelled = true; };
   }, [shop.providerId, shop.branchId, reloadKey]);
 
@@ -212,7 +215,7 @@ export function ShopDetailsModal({
       .catch((err) => {
         if (cancelled) return;
         setSlots([]);
-        setSlotsError(err instanceof Error ? err.message : String(err));
+        setSlotsError(errorMessage(err));
       })
       .finally(() => { if (!cancelled) setSlotsLoading(false); });
     return () => { cancelled = true; };
@@ -232,7 +235,8 @@ export function ShopDetailsModal({
     const price = selectedService.price;
     const vat = Math.round(price * VAT_RATE * 100) / 100;
     const total = Math.round((price + vat) * 100) / 100;
-    const deposit = Math.round(total * details.depositPercentage) / 100;
+    // The server takes the deposit on the price before VAT (booking_create_internal), not on the VAT-inclusive total.
+    const deposit = Math.round(price * details.depositPercentage) / 100;
     return { price, vat, total, deposit, balance: Math.round((total - deposit) * 100) / 100 };
   }, [selectedService, details]);
 
@@ -264,21 +268,22 @@ export function ShopDetailsModal({
       }
 
       if (booking.status === "confirmed") {
-        Alert.alert(t.bookingConfirmed, t.bookingConfirmedText, [{ text: "OK", onPress: onClose }]);
+        notifyBookingsChanged();
+        Alert.alert(t.bookingConfirmed, t.bookingConfirmedText, [{ text: t.okLabel, onPress: onClose }]);
         return;
       }
 
       const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
-        body: { bookingId: booking.id },
+        body: { bookingId: booking.id, returnUrl: PAYMENT_RETURN_URL },
       });
       if (checkoutError || !checkout?.checkoutUrl) {
         Alert.alert(t.bookingFailed, t.paymentFailed);
         return;
       }
-      await Linking.openURL(checkout.checkoutUrl);
+      await openCheckout(checkout.checkoutUrl);
       onClose();
     } catch (err) {
-      Alert.alert(t.bookingFailed, err instanceof Error ? err.message : String(err));
+      Alert.alert(t.bookingFailed, errorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -292,13 +297,13 @@ export function ShopDetailsModal({
       const { data, error } = await supabase.rpc("purchase_service_package", { p_package_id: pkg.id, p_payment_method: "card" });
       if (error) throw error;
       const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
-        body: { purchaseType: "package", purchaseId: data.purchase_id },
+        body: { purchaseType: "package", purchaseId: data.purchase_id, returnUrl: PAYMENT_RETURN_URL },
       });
       if (checkoutError || !checkout?.checkoutUrl) throw new Error(t.packageFailed);
-      await Linking.openURL(checkout.checkoutUrl);
+      await openCheckout(checkout.checkoutUrl);
       onClose();
     } catch (err) {
-      Alert.alert(t.bookingFailed, err instanceof Error ? err.message : String(err));
+      Alert.alert(t.bookingFailed, errorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -324,7 +329,7 @@ export function ShopDetailsModal({
       }
       Alert.alert(t.messageShop, t.conversationReady);
     } catch (err) {
-      Alert.alert(t.bookingFailed, err instanceof Error ? err.message : String(err));
+      Alert.alert(t.bookingFailed, errorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -355,18 +360,18 @@ export function ShopDetailsModal({
                 {shop.rating !== null ? `★ ${shop.rating} (${shop.reviews} ${t.reviews})` : t.newShop}
               </Text>
             </View>
-            <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+            <AppPressable onPress={onClose} style={styles.closeBtn}>
               <Text style={styles.closeBtnText}>{t.close}</Text>
-            </TouchableOpacity>
+            </AppPressable>
           </View>
 
           {!details && !detailsError && <ActivityIndicator color="hsl(45,60%,55%)" style={{ marginTop: 40 }} />}
           {detailsError !== "" && (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>{t.loadFailed}: {detailsError}</Text>
-              <TouchableOpacity onPress={() => setReloadKey((k) => k + 1)} style={[styles.payBtn, { marginTop: 12 }]}>
+              <AppPressable onPress={() => setReloadKey((k) => k + 1)} style={[styles.payBtn, { marginTop: 12 }]}>
                 <Text style={styles.payBtnText}>{t.retry}</Text>
-              </TouchableOpacity>
+              </AppPressable>
             </View>
           )}
 
@@ -382,30 +387,34 @@ export function ShopDetailsModal({
                 <Text style={[styles.addressText, isAr && styles.rtlText]}>
                   {details.address[locale] || [shop.district, shop.city].filter(Boolean).join(isAr ? "، " : ", ")}
                 </Text>
-                <TouchableOpacity onPress={handleMessageShop} disabled={submitting} style={[styles.closeBtn, { alignSelf: isAr ? "flex-end" : "flex-start" }]}>
+                <AppPressable onPress={handleMessageShop} disabled={submitting} style={[styles.closeBtn, { alignSelf: isAr ? "flex-end" : "flex-start" }]}>
                   <Text style={styles.closeBtnText}>{t.messageShop}</Text>
-                </TouchableOpacity>
+                </AppPressable>
               </View>
             </View>
 
             {/* Tab Switcher */}
             <View style={[styles.tabContainer, isAr && styles.rtlRow]}>
-              <TouchableOpacity
+              <AppPressable
+                role="tab"
+                selected={activeTab === "services"}
                 onPress={() => handleTabChange("services")}
                 style={[styles.tabButton, activeTab === "services" && styles.activeTabButton]}
               >
                 <Text style={[styles.tabButtonText, activeTab === "services" && styles.activeTabButtonText]}>
                   {t.servicesHeading}
                 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+              </AppPressable>
+              <AppPressable
+                role="tab"
+                selected={activeTab === "packages"}
                 onPress={() => handleTabChange("packages")}
                 style={[styles.tabButton, activeTab === "packages" && styles.activeTabButton]}
               >
                 <Text style={[styles.tabButtonText, activeTab === "packages" && styles.activeTabButtonText]}>
                   {t.packagesHeading}
                 </Text>
-              </TouchableOpacity>
+              </AppPressable>
             </View>
 
             {activeTab === "services" ? (
@@ -414,8 +423,10 @@ export function ShopDetailsModal({
                 <Text style={[styles.sectionHeading, isAr && styles.rtlText]}>{t.servicesHeading}</Text>
                 <View style={styles.servicesGrid}>
                   {details.services.map((srv) => (
-                    <TouchableOpacity
+                    <AppPressable
                       key={srv.id}
+                      role="radio"
+                      selected={selectedService?.id === srv.id}
                       onPress={() => {
                         setSelectedService(srv);
                         setSelectedSpecialist(null);
@@ -434,7 +445,7 @@ export function ShopDetailsModal({
                         </Text>
                       </View>
                       <Text style={styles.srvPrice}>{formatSar(srv.price, locale)}</Text>
-                    </TouchableOpacity>
+                    </AppPressable>
                   ))}
                   {details.services.length === 0 && (
                     <View style={styles.emptyContainer}>
@@ -452,8 +463,10 @@ export function ShopDetailsModal({
                     ) : (
                       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, isAr && styles.rtlRow]}>
                         {specialistOptions.map((spec) => (
-                          <TouchableOpacity
+                          <AppPressable
                             key={spec.id}
+                            role="radio"
+                            selected={selectedSpecialist === spec.id}
                             onPress={() => {
                               setSelectedSpecialist(spec.id);
                               setSelectedSlot(null);
@@ -463,7 +476,7 @@ export function ShopDetailsModal({
                             {spec.avatar !== "" && <Image source={{ uri: spec.avatar }} style={styles.specAvatar as any} />}
                             <Text style={styles.specName}>{spec.name[locale]}</Text>
                             {spec.role[locale] !== "" && <Text style={styles.specRole}>{spec.role[locale]}</Text>}
-                          </TouchableOpacity>
+                          </AppPressable>
                         ))}
                       </ScrollView>
                     )}
@@ -476,8 +489,10 @@ export function ShopDetailsModal({
                     <Text style={[styles.sectionHeading, isAr && styles.rtlText]}>{t.dateHeading}</Text>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.dateGrid, isAr && styles.rtlRow]}>
                       {datesList.map((dt) => (
-                        <TouchableOpacity
+                        <AppPressable
                           key={dt.id}
+                          role="radio"
+                          selected={selectedDate === dt.id}
                           onPress={() => {
                             setSelectedDate(dt.id);
                             setSelectedSlot(null);
@@ -486,7 +501,7 @@ export function ShopDetailsModal({
                         >
                           <Text style={[styles.dateLabel, selectedDate === dt.id && styles.activeDateText]}>{dt.label}</Text>
                           <Text style={[styles.dateSub, selectedDate === dt.id && styles.activeDateSub]}>{dt.dateStr}</Text>
-                        </TouchableOpacity>
+                        </AppPressable>
                       ))}
                     </ScrollView>
                   </>
@@ -509,13 +524,15 @@ export function ShopDetailsModal({
                     {!slotsLoading && slots.length > 0 && (
                       <View style={styles.slotGrid}>
                         {slots.map((slot) => (
-                          <TouchableOpacity
+                          <AppPressable
                             key={slot}
+                            role="radio"
+                            selected={selectedSlot === slot}
                             onPress={() => setSelectedSlot(slot)}
                             style={[styles.slotChip, selectedSlot === slot && styles.slotSelected]}
                           >
                             <Text style={[styles.slotText, selectedSlot === slot && styles.slotTextSelected]}>{formatSlotLabel(slot, locale)}</Text>
-                          </TouchableOpacity>
+                          </AppPressable>
                         ))}
                       </View>
                     )}
@@ -530,15 +547,17 @@ export function ShopDetailsModal({
                         <Text style={[styles.sectionHeadingCompact, { marginTop: 12 }, isAr && styles.rtlText]}>{t.forWhom}</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.horizontalList, isAr && styles.rtlRow, { marginTop: 8, marginBottom: 12 }]}>
                           {clientProfiles.map((p) => (
-                            <TouchableOpacity
+                            <AppPressable
                               key={p.id ?? "self"}
+                              role="radio"
+                              selected={selectedProfileId === p.id}
                               onPress={() => setSelectedProfileId(p.id)}
                               style={[styles.profileChip, selectedProfileId === p.id && styles.profileChipSelected]}
                             >
                               <Text style={[styles.profileChipText, selectedProfileId === p.id && styles.profileChipTextSelected]}>
                                 {p.name}
                               </Text>
-                            </TouchableOpacity>
+                            </AppPressable>
                           ))}
                         </ScrollView>
                       </>
@@ -566,11 +585,11 @@ export function ShopDetailsModal({
                       {t.policy(details.freeCancellationHours, details.lateCancellationFeePercent, details.noShowFeePercent)}
                     </Text>
 
-                    <TouchableOpacity onPress={handleBookingConfirm} disabled={submitting} style={[styles.payBtn, submitting && { opacity: 0.6 }]}>
+                    <AppPressable label={estimate.deposit > 0 ? t.payBtn : t.confirmBtn} busy={submitting} onPress={handleBookingConfirm} disabled={submitting} style={[styles.payBtn, submitting && { opacity: 0.6 }]}>
                       {submitting
                         ? <ActivityIndicator color="hsl(220,15%,8%)" />
                         : <Text style={styles.payBtnText}>{estimate.deposit > 0 ? t.payBtn : t.confirmBtn}</Text>}
-                    </TouchableOpacity>
+                    </AppPressable>
                   </>
                 )}
               </>
@@ -599,9 +618,9 @@ export function ShopDetailsModal({
 
                       <View style={styles.packageAction}>
                         <Text style={styles.packagePrice}>{formatSar(pkg.price, locale)}</Text>
-                        <TouchableOpacity onPress={() => handlePackagePurchase(pkg)} disabled={submitting} style={styles.packageBuyBtn}>
+                        <AppPressable onPress={() => handlePackagePurchase(pkg)} disabled={submitting} style={styles.packageBuyBtn}>
                           <Text style={styles.packageBuyBtnText}>{t.buy}</Text>
-                        </TouchableOpacity>
+                        </AppPressable>
                       </View>
                     </View>
                   ))}

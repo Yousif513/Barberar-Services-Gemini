@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { EffectiveFeeTerms } from "@/components/effective-fee-terms";
 
 const translations = {
   en: {
@@ -12,8 +13,9 @@ const translations = {
     pricingModel: "How We Calculate Transaction Splits",
     platformFee: "Platform Commission",
     partnerPayout: "Partner Payout Share",
-    feeDesc: "Bookings from your own clients (your link, QR code or imported contacts) carry no commission. A new client who finds you on the Primora marketplace carries a 20% commission on the first visit (minimum SAR 10, maximum SAR 40); repeat visits from that client carry no commission. No monthly subscription is required for basic accounts.",
-    payoutDesc: "The remaining 85% is routed straight to your salon's local bank account. As soon as the customer's appointment is completed and marked off in your dashboard calendar, the ledger releases the funds according to the payout settlement schedule.",
+    feeDesc: "Bookings from your own clients (your link, QR code or imported contacts) carry no platform fee. Marketplace bookings carry the platform fee shown in your fee terms above, computed from the fee rules in force on your account, plus VAT on that fee where applicable. A fee increase is announced at least 30 days before it applies.",
+    payoutDesc: "What remains after the platform fee and the VAT on it is paid to your approved bank account once the visit is completed, according to the payout schedule.",
+    planFeeNote: "Same platform fee terms on every plan",
     noUpfront: "Zero Setup or Upfront Fees",
     noUpfrontDesc: "Registering, listing your services catalog, and setting up staff availability calendars are 100% free. We only succeed when you acquire bookings.",
     footerText: "Built for Riyadh, Saudi Arabia. All rights reserved.",
@@ -66,8 +68,8 @@ const translations = {
     splitSubtitle: "Card payments are processed by Tap Payments.",
     payoutTimeline: "Payout Transfer Schedule",
     payoutTimelineDesc: "Completed appointments trigger automated payout transfers directly into your registered local IBAN (Riyad Bank, SNB, Al Rajhi, etc.) via scheduled banking batches.",
-    securedEscrow: "Booking Guarantee",
-    securedEscrowDesc: "Guards against customer no-shows and salon cancellations in accordance with clear cancellation policies.",
+    securedEscrow: "Deposit protection policy",
+    securedEscrowDesc: "Your deposit and cancellation terms decide what is kept when a customer cancels late or does not come.",
     
     // Checkout
     checkoutTitle: "Secure Plan Subscription",
@@ -76,7 +78,7 @@ const translations = {
     madaApplePay: "Mada / Apple Pay / Credit Card",
     summary: "Order Summary",
     subtotal: "Subtotal",
-    vat: "VAT (15%)",
+    quoteUnavailable: "Price unavailable",
     total: "Total Due",
     payNow: "Proceed to Secure Payment",
     processing: "Redirecting to secure Tap Payments gateway...",
@@ -90,8 +92,9 @@ const translations = {
     pricingModel: "كيف نحسب تقسيمات العمليات المالية",
     platformFee: "عمولة المنصة",
     partnerPayout: "حصة الشريك ومقدم الخدمة",
-    feeDesc: "لا عمولة على حجوزات عملائك (رابطك أو رمز QR أو جهات الاتصال المستوردة). العميل الجديد القادم من سوق بريمورا عليه عمولة 20% في الزيارة الأولى (بحد أدنى 10 ر.س وأقصى 40 ر.س)، ولا عمولة على زياراته المتكررة. لا يلزم اشتراك شهري للحسابات الأساسية.",
-    payoutDesc: "يتم توجيه الـ 85% المتبقية مباشرة إلى الحساب البنكي لصالونك أو عملك. بمجرد اكتمال موعد العميل ووضع علامة اكتمال في تقويم لوحة التحكم، يحرر نظام الدفع الأموال وفقاً لجدول التسوية المعتمد.",
+    feeDesc: "لا رسوم منصة على حجوزات عملائك (رابطك أو رمز QR أو جهات الاتصال المستوردة). حجوزات السوق عليها رسوم المنصة الموضحة في شروط الرسوم أعلاه، محسوبة من قواعد الرسوم السارية على حسابك، مع ضريبة القيمة المضافة على هذه الرسوم حيثما تنطبق. أي زيادة في الرسوم يُعلن عنها قبل 30 يوماً على الأقل من تطبيقها.",
+    payoutDesc: "يُحوَّل ما يتبقى بعد رسوم المنصة والضريبة عليها إلى حسابك البنكي المعتمد بعد اكتمال الزيارة، وفق جدول التحويلات.",
+    planFeeNote: "شروط رسوم المنصة نفسها في كل الخطط",
     noUpfront: "بدون أي رسوم إعداد أو تأسيس مسبقة",
     noUpfrontDesc: "التسجيل، وإدراج قائمة خدماتك، وإعداد تقويم توافر موظفيك مجاني 100%. نحن ننجح فقط عندما تستقبل حجوزات فعلية.",
     footerText: "صمم خصيصاً للرياض، المملكة العربية السعودية. جميع الحقوق محفوظة.",
@@ -144,8 +147,8 @@ const translations = {
     splitSubtitle: "تتم معالجة مدفوعات البطاقات عبر Tap Payments.",
     payoutTimeline: "جدول تحويل المستحقات",
     payoutTimelineDesc: "تؤدي المواعيد المكتملة إلى تحويلات مستحقات تلقائية مباشرة إلى حسابك المصرفي المحلي المسجل (بنك الرياض، الأهلي SNB، الراجحي، إلخ) عبر دفعات بنكية مجدولة.",
-    securedEscrow: "ضمان الحجز المعتمد",
-    securedEscrowDesc: "حماية ضد عدم حضور العملاء وإلغاءات الصالون وفقاً لسياسات الإلغاء الشفافة.",
+    securedEscrow: "سياسة حماية العربون",
+    securedEscrowDesc: "تحدد شروط العربون والإلغاء لديك ما يُحتفظ به عند الإلغاء المتأخر أو عدم الحضور.",
     
     // Checkout
     checkoutTitle: "الاشتراك الآمن في الخطة",
@@ -154,7 +157,7 @@ const translations = {
     madaApplePay: "مدى / أبل باي / بطاقة ائتمان",
     summary: "ملخص الطلب",
     subtotal: "المجموع الفرعي",
-    vat: "ضريبة القيمة المضافة (15%)",
+    quoteUnavailable: "السعر غير متاح",
     total: "المبلغ الإجمالي",
     payNow: "المتابعة إلى بوابة الدفع الآمنة",
     processing: "جاري التحويل لبوابة الدفع الآمنة Tap Payments...",
@@ -176,6 +179,9 @@ export default function PricingPage() {
   const [providerId, setProviderId] = useState<string | null>(null);
   const [currentSubscription, setCurrentSubscription] = useState<any | null>(null);
   const [checkoutError, setCheckoutError] = useState("");
+  // The price comes from the database (quote_provider_plan), the same function that sets the amount charged.
+  const [quote, setQuote] = useState<{ total_sar: number; monthly_rate_sar: number; months: number } | null>(null);
+  const [quoteError, setQuoteError] = useState(false);
 
   const checkoutRef = useRef<HTMLDivElement>(null);
 
@@ -224,6 +230,21 @@ export default function PricingPage() {
     }
     loadCurrentSubscription();
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const planId = selectedPlan === "basic" ? "starter" : selectedPlan;
+    setQuote(null);
+    setQuoteError(false);
+    supabase
+      .rpc("quote_provider_plan", { p_plan_id: planId, p_billing_interval: billingCycle === "annual" ? "yearly" : "monthly" })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error || !data) { setQuoteError(true); return; }
+        setQuote({ total_sar: Number(data.total_sar), monthly_rate_sar: Number(data.monthly_rate_sar), months: Number(data.months) });
+      });
+    return () => { cancelled = true; };
+  }, [selectedPlan, billingCycle]);
 
   const handleSelectPlan = (plan: "basic" | "growth" | "elite") => {
     setSelectedPlan(plan);
@@ -301,29 +322,12 @@ export default function PricingPage() {
   // Pricing calculations based on selections
   const getPricingDetails = () => {
     const isAnnual = billingCycle === "annual";
-    let basePricePerMonth = 0;
-    let title = "";
-    
-    if (selectedPlan === "basic") {
-      basePricePerMonth = 0;
-      title = t.basicName;
-    } else if (selectedPlan === "growth") {
-      basePricePerMonth = isAnnual ? 239 : 299;
-      title = t.growthName;
-    } else if (selectedPlan === "elite") {
-      basePricePerMonth = isAnnual ? 639 : 799;
-      title = t.eliteName;
-    }
-
-    const subtotal = isAnnual ? basePricePerMonth * 12 : basePricePerMonth;
-    const vat = parseFloat((subtotal * 0.15).toFixed(2));
-    const total = parseFloat((subtotal + vat).toFixed(2));
-
+    const title = selectedPlan === "basic" ? t.basicName : selectedPlan === "growth" ? t.growthName : t.eliteName;
+    // The amount charged is the server quote (annual billing = 12 x the monthly rate for annual billing); nothing is added on the screen.
+    const total = quote ? quote.total_sar : null;
     return {
       title,
-      basePricePerMonth,
-      subtotal,
-      vat,
+      subtotal: total,
       total,
       isAnnual
     };
@@ -503,7 +507,7 @@ export default function PricingPage() {
               <div className="border-t border-[#ECECEC] pt-4 space-y-2">
                 <div className="flex items-center gap-2 text-xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47] shadow-[0_0_6px_rgba(209,175,71,0.8)]" />
-                  <span className="text-[#344054]">10% {t.platformFee} (Discounted!)</span>
+                  <span className="text-[#344054]">{t.planFeeNote}</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-[#344054]">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />
@@ -562,7 +566,7 @@ export default function PricingPage() {
               <div className="border-t border-[rgba(255,255,255,0.06)] pt-4 space-y-2">
                 <div className="flex items-center gap-2 text-xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47]" />
-                  <span>Custom Platform Commission</span>
+                  <span>{t.planFeeNote}</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-[#344054]">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />
@@ -650,27 +654,8 @@ export default function PricingPage() {
             </p>
           </div>
           
-          {/* Visual Dynamic Split Ledger Bar */}
-          <div className="space-y-4 pt-4">
-            <div className="h-6 w-full bg-[#1A2236] rounded-full overflow-hidden flex p-1 border border-[rgba(255,255,255,0.08)]">
-              <div 
-                className="bg-gradient-to-r from-[#D1AF47] to-[#B8952E] rounded-full h-full flex items-center justify-center text-[10px] font-black text-[#070B12] transition-all duration-500 shadow-[0_0_12px_rgba(209,175,71,0.4)]"
-                style={{ width: "15%" }}
-              >
-                15%
-              </div>
-              <div 
-                className="bg-gradient-to-r from-[#172033] to-[#25324D] rounded-full h-full flex items-center justify-end px-3 text-[10px] font-black text-[#101828] transition-all duration-500 flex-1"
-              >
-                85%
-              </div>
-            </div>
-            
-            <div className="flex justify-between items-center text-xs font-bold text-[#667085] px-2">
-              <span className="text-[#D1AF47]">{t.platformFee} (15%)</span>
-              <span className="text-[#101828]">{t.partnerPayout} (85%)</span>
-            </div>
-          </div>
+          {/* D-D3: the effective platform fee from the fee rules in force, VAT on the fee and a worked example (no fixed split). */}
+          <EffectiveFeeTerms locale={locale} mode="provider" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
             <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] p-6 rounded-2xl border border-[rgba(255,255,255,0.04)] space-y-3">
@@ -872,10 +857,10 @@ export default function PricingPage() {
                     </div>
                     <div>
                       <h4 className="text-xs font-bold text-[#101828]">
-                        {locale === "en" ? "Bank-Grade Encryption" : "تشفير مصرفي آمن"}
+                        {locale === "en" ? "Card payments on Tap's hosted page" : "الدفع بالبطاقة عبر صفحة Tap المستضافة"}
                       </h4>
                       <p className="text-[10px] text-[#667085]">
-                        {locale === "en" ? "PCI-DSS Compliant via Tap Payments" : "متوافق مع معايير الأمان عبر Tap Payments"}
+                        {locale === "en" ? "Card details are entered on the payment provider's page, never on PRIMORA" : "تُدخل بيانات البطاقة في صفحة مزود الدفع وليس في بريمورا"}
                       </p>
                     </div>
                   </div>
@@ -917,16 +902,12 @@ export default function PricingPage() {
                     
                     <div className="flex justify-between text-[#667085]">
                       <span>{t.subtotal}</span>
-                      <span className="text-[#101828] font-medium">{pricingDetails.subtotal} {t.sar}</span>
-                    </div>
-                    <div className="flex justify-between text-[#667085]">
-                      <span>{t.vat}</span>
-                      <span className="text-[#101828] font-medium">{pricingDetails.vat} {t.sar}</span>
+                      <span className="text-[#101828] font-medium">{pricingDetails.subtotal !== null ? `${pricingDetails.subtotal} ${t.sar}` : (quoteError ? t.quoteUnavailable : "…")}</span>
                     </div>
 
                     <div className="border-t border-[#D1AF47]/20 pt-3 flex justify-between text-sm">
                       <span className="text-[#101828] font-bold">{t.total}</span>
-                      <span className="text-[#D1AF47] font-black">{pricingDetails.total} {t.sar}</span>
+                      <span className="text-[#D1AF47] font-black">{pricingDetails.total !== null ? `${pricingDetails.total} ${t.sar}` : (quoteError ? t.quoteUnavailable : "…")}</span>
                     </div>
                   </div>
                 </div>

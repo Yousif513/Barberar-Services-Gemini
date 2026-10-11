@@ -1,25 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.108.1"
-
-function getCorsHeaders(req: Request) {
-  const origin = req.headers.get("origin") || ""
-  const allowedOriginEnv = Deno.env.get("APP_ORIGIN")
-  const isAllowed =
-    (allowedOriginEnv && origin === allowedOriginEnv) ||
-    origin === "http://localhost:3000" ||
-    origin === "http://127.0.0.1:3000" ||
-    origin.endsWith(".vercel.app") ||
-    origin.endsWith("primora.sa")
-
-  return {
-    "Access-Control-Allow-Origin": isAllowed ? origin : (allowedOriginEnv || "http://localhost:3000"),
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-  }
-}
+import { adminSessionAllows, corsHeaders as sharedCorsHeaders } from "../_shared/http.ts"
 
 serve(async (req) => {
-  const corsHeaders = getCorsHeaders(req)
+  const corsHeaders = sharedCorsHeaders(req)
 
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -71,7 +55,8 @@ serve(async (req) => {
           .eq("id", user.id)
           .single()
 
-        if (profile?.role !== "admin") {
+        // GOV-1 / Q6: an administrator counts only in an aal2 console session with the operations permission.
+        if (profile?.role !== "admin" || !(await adminSessionAllows(token, "operations.write"))) {
           return new Response(JSON.stringify({ 
             error: "Forbidden. Only trusted server-side events or administrators may target other users." 
           }), {

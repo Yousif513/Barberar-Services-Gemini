@@ -20,7 +20,8 @@ const translations = {
     verifyBtn: "Toggle Status",
     successMsg: "Package status updated successfully!",
     errorLoad: "Failed to load packages from database.",
-    noPackages: "No service packages found in database."
+    noPackages: "No service packages found in database.",
+    fewerThanFive: "Fewer than 5"
   },
   ar: {
     title: "باقات الخدمات وعروض التوفير",
@@ -39,14 +40,16 @@ const translations = {
     verifyBtn: "تعديل الحالة",
     successMsg: "تم تحديث حالة الباقة بنجاح!",
     errorLoad: "تعذر تحميل الباقات من قاعدة البيانات.",
-    noPackages: "لا توجد باقات خدمات مسجلة في قاعدة البيانات."
+    noPackages: "لا توجد باقات خدمات مسجلة في قاعدة البيانات.",
+    fewerThanFive: "أقل من 5"
   }
 };
 
 export default function AdminPackages() {
   const [packages, setPackages] = useState<any[]>([]);
-  const [activeVouchersCount, setActiveVouchersCount] = useState<number>(0);
-  const [totalRedemptionsCount, setTotalRedemptionsCount] = useState<number>(0);
+  // null = fewer than 5 (D4 small-cell suppression), shown as such rather than as a number.
+  const [activeVouchersCount, setActiveVouchersCount] = useState<number | null>(0);
+  const [totalRedemptionsCount, setTotalRedemptionsCount] = useState<number | null>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -95,20 +98,13 @@ export default function AdminPackages() {
       if (pkgErr) throw pkgErr;
       setPackages(pkgData || []);
 
-      // Count active sold vouchers and redemptions
-      const { data: userPkgData } = await supabase
-        .from("user_packages")
-        .select("id, remaining_sessions");
-
-      if (userPkgData) {
-        setActiveVouchersCount(userPkgData.filter(u => u.remaining_sessions > 0).length);
-      }
-
-      const { count: redemptionsCount } = await supabase
-        .from("package_redemptions")
-        .select("id", { count: "exact", head: true });
-
-      setTotalRedemptionsCount(redemptionsCount || 0);
+      // GOV-FIX (Q4): customers' vouchers and redemptions are counted on the server (admin_package_usage_summary); a count of
+      // 1 to 4 people is suppressed (D4) and a failure is reported instead of showing zero.
+      const { data: usage, error: usageErr } = await supabase.rpc("admin_package_usage_summary");
+      if (usageErr) throw usageErr;
+      const totals = usage as { active_vouchers: number | null; redemptions: number | null } | null;
+      setActiveVouchersCount(totals?.active_vouchers ?? null);
+      setTotalRedemptionsCount(totals?.redemptions ?? null);
     } catch (err: any) {
       console.error("Error loading admin packages:", err.message);
       setError(translations[lang].errorLoad);
@@ -159,11 +155,11 @@ export default function AdminPackages() {
         </div>
         <div className={cardBase}>
           <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085] block">{t.activeVouchers}</span>
-          <strong className="block text-2xl font-serif font-black text-emerald-700 mt-2.5">{activeVouchersCount}</strong>
+          <strong className="block text-2xl font-serif font-black text-emerald-700 mt-2.5">{activeVouchersCount === null ? t.fewerThanFive : activeVouchersCount}</strong>
         </div>
         <div className={cardBase}>
           <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085] block">{t.redeemedRatio}</span>
-          <strong className="block text-2xl font-serif font-black text-amber-700 mt-2.5">{totalRedemptionsCount}</strong>
+          <strong className="block text-2xl font-serif font-black text-amber-700 mt-2.5">{totalRedemptionsCount === null ? t.fewerThanFive : totalRedemptionsCount}</strong>
         </div>
       </div>
 

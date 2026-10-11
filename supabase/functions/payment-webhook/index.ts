@@ -41,13 +41,25 @@ serve(async (req) => {
     if (purchaseType !== "booking") {
       const purchaseId = charge.metadata?.purchase_id
       if (!purchaseId) return json({ received: true, status: "skipped" })
-      const { data, error } = await db.rpc("confirm_purchase_payment", {
-        p_purchase_type: purchaseType,
-        p_purchase_id: purchaseId,
-        p_payment_intent_id: chargeId,
-        p_amount: amount,
-      })
+      // A membership has its own confirmation (idempotent on the charge id, amount-checked against the sold price).
+      const { data, error } = purchaseType === "membership"
+        ? await db.rpc("confirm_membership_payment", {
+            p_membership_id: purchaseId,
+            p_payment_intent_id: chargeId,
+            p_amount: amount,
+          })
+        : await db.rpc("confirm_purchase_payment", {
+            p_purchase_type: purchaseType,
+            p_purchase_id: purchaseId,
+            p_payment_intent_id: chargeId,
+            p_amount: amount,
+          })
       if (error) throw error
+      // A payment that arrived after the purchase could no longer be sold (membership, package, gift card, tip, subscription): the database recorded the capture and queued its refund.
+      if (data?.conflict && data?.refund_request_id && !data?.replay) {
+        const outcome = await processRefundRequest(db, tapSecretKey, data.refund_request_id)
+        return json({ received: true, status: "refund_for_conflict", purchase_type: purchaseType, purchase_id: purchaseId, refund: outcome })
+      }
       return json({ success: true, result: data })
     }
 

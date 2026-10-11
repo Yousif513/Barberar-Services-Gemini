@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { corsHeaders, json, MissingConfigError, resolveCaller, serviceClient } from "../_shared/http.ts"
+import { corsHeaders, json, MissingConfigError, resolveCaller, serviceClient, adminSessionAllows, bearerToken } from "../_shared/http.ts"
 import { processRefundRequest } from "../_shared/refunds.ts"
 
 // Processes refund requests recorded by the database (cancellations, no-show remainders,
@@ -16,6 +16,10 @@ serve(async (req) => {
     const caller = await resolveCaller(req)
     if (!caller) return json(req, { error: "Authentication required." }, 401)
     if (caller.kind === "user") return json(req, { error: "Administrative access required." }, 403)
+    // D-Q5: operations and analyst hold no money permission.
+    if (caller.kind === "admin" && !(await adminSessionAllows(bearerToken(req), "money.refund"))) {
+      return json(req, { error: "Your console role cannot process refunds." }, 403)
+    }
 
     const tapSecretKey = Deno.env.get("TAP_SECRET_KEY")
     if (!tapSecretKey) return json(req, { error: "Tap refunds are not configured (TAP_SECRET_KEY)." }, 503)

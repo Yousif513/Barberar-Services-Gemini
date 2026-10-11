@@ -1,0 +1,48 @@
+agent: qa-claude-release-gate (round 3)
+working copy: primora-fix, branch claude-code
+date: 2026-10-06
+command: node --test supabase/tests/db/qa_open_defects.repro.mjs
+exit code: 1 (7 cases, every one fails today by design; file is outside npm run test:db)
+
+▶ QA-4 internal provider and staff details are readable by every signed-in account
+  ✖ a customer and a competing provider's owner cannot read operator notes, commission, registration or staff contact details (12.5749ms)
+✖ QA-4 internal provider and staff details are readable by every signed-in account (1492.8976ms)
+▶ R3-1 the audit trigger on every table copies private text into the permanent log
+  ✖ an administrator completing a booking leaves no customer name, address or message variables in the audit log (19.4721ms)
+  ✖ an administrator's direct edit of a customer note or a staff leave reason does not copy the text into the log (54.639ms)
+✖ R3-1 the audit trigger on every table copies private text into the permanent log (74.2209ms)
+▶ R3-2 one bulk administrator write floods the audit log
+  ✖ a 500-row administrator insert writes a handful of audit rows, not one per row (77.6644ms)
+✖ R3-2 one bulk administrator write floods the audit log (77.762ms)
+▶ R3-3 three booking commands still say whether a booking id exists
+  ✖ reschedule_booking, customer_confirm_attendance and generate_zatca_tax_invoice answer a foreign booking like a missing one (21.673ms)
+✖ R3-3 three booking commands still say whether a booking id exists (21.7726ms)
+▶ R3-4 reason length rules differ between administrator commands
+  ✖ moderate_review, reject_provider_application and resolve_booking_dispute refuse a one character reason like the other reasoned commands (3.9964ms)
+✖ R3-4 reason length rules differ between administrator commands (4.0831ms)
+▶ R3-5 a staff member can approve their own leave
+  ✖ a provider employee cannot insert a leave row already marked approved (15.2947ms)
+✖ R3-5 a staff member can approve their own leave (15.3548ms)
+ℹ tests 7
+ℹ suites 6
+ℹ pass 0
+ℹ fail 7
+ℹ cancelled 0
+ℹ skipped 0
+ℹ duration_ms 11759.2628
+✖ failing tests:
+✖ a customer and a competing provider's owner cannot read operator notes, commission, registration or staff contact details (12.5749ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+✖ an administrator completing a booking leaves no customer name, address or message variables in the audit log (19.4721ms)
+  AssertionError [ERR_ASSERTION]: message_queue.variables (customer name, address, links) was copied into admin_audit_logs
+✖ an administrator's direct edit of a customer note or a staff leave reason does not copy the text into the log (54.639ms)
+  AssertionError [ERR_ASSERTION]: free text from notes and reasons is in the audit log
+✖ a 500-row administrator insert writes a handful of audit rows, not one per row (77.6644ms)
+  AssertionError [ERR_ASSERTION]: 500 audit rows for one statement
+✖ reschedule_booking, customer_confirm_attendance and generate_zatca_tax_invoice answer a foreign booking like a missing one (21.673ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+✖ moderate_review, reject_provider_application and resolve_booking_dispute refuse a one character reason like the other reasoned commands (3.9964ms)
+  AssertionError [ERR_ASSERTION]: these commands accepted the one-character reason and went on to look up the record
+✖ a provider employee cannot insert a leave row already marked approved (15.2947ms)
+  AssertionError [ERR_ASSERTION]: Expected "actual" to be strictly unequal to: 'ok'
+[1 line(s) of the raw output are not copied here because they contain words that the manifest content scan reserves]

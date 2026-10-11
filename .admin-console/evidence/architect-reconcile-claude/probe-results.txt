@@ -1,0 +1,88 @@
+##### probe-admin-packages-visibility.mjs
+admin sees packages rows: 0
+admin update returns: []
+admin user_packages: [{"c":0}]
+admin redemptions: [{"c":0}]
+##### probe-admin-table-readability.mjs
+psp_reconciliation_runs              ok
+provider_fee_invoices                ok
+monthly_vat_summary                  ok
+provider_settlement_summary          ok
+employee_earnings_summary            ok
+admin_employee_performance           ok
+admin_branch_performance             ok
+admin_provider_applications_view     ok
+invoices                             ok
+payment_disputes                     ok
+message_templates                    ok
+integration_audit_log                ok
+platform_settings                    ok
+platform_feature_flags               ok
+data_subject_requests                ok
+consents                             ok
+payout_requests                      ok
+transactional_ledger                 ok
+refund_requests                      ok
+fee_rules                            ok
+admin_audit_logs                     ok
+reviews                              ok
+branches                             ok
+services                             ok
+providers                            ERR permission denied for table providers
+bookings                             ok
+employees                            ERR permission denied for table employees
+profiles                             ok
+categories                           ok
+integrations                         ok
+payment_methods                      ok
+promotional_codes                    ok
+##### probe-admin-write-policies-and-grants.mjs
+booking_tips                       ALL     Admins manage booking tips
+bookings                           ALL     Admins manage bookings
+branches                           DELETE  Owners or admins delete branches
+branches                           INSERT  Owners or admins insert branches
+branches                           UPDATE  Owners or admins update branches
+categories                         ALL     Admins manage categories
+coupon_redemptions                 ALL     Admins manage coupon redemptions
+customer_favorites                 ALL     Admins manage all favorites
+customer_loyalty                   ALL     Admins manage customer loyalty
+customer_referrals                 ALL     Admins manage referrals
+data_subject_requests              UPDATE  Admins update DSR requests
+employee_commission_rules          ALL     Admins manage employee commissions
+gift_card_redemptions              ALL     Admins manage gift card redemptions
+gift_cards                         ALL     Admins manage gift cards
+integration_audit_log              INSERT  Admins write integration audit log
+integrations                       ALL     Admins manage integrations
+legal_agreements                   ALL     Admins manage all legal agreements
+loyalty_points_ledger              ALL     Admins manage loyalty ledger
+package_redemptions                ALL     Admins manage package redemptions
+payment_methods                    ALL     Admins manage payment methods
+payment_refund_requests            ALL     Admins manage payment refund requests
+payout_requests                    DELETE  Admins delete payout requests
+payout_requests                    UPDATE  Admins update payout requests
+provider_applications              UPDATE  Admins update provider applications
+provider_client_contacts           DELETE  Provider owners delete client contacts
+provider_client_contacts           UPDATE  Provider owners annotate client contacts
+providers                          ALL     Admins manage providers
+reviews                            ALL     Admins manage reviews
+services                           ALL     Admins manage services
+transactional_ledger               ALL     Admins manage ledger
+wallet_credits                     ALL     Admins manage wallet credits
+[{"table_name":"branches","p":"DELETE,INSERT,UPDATE"},{"table_name":"gift_cards","p":"DELETE,INSERT,UPDATE"},{"table_name":"integrations","p":"DELETE,INSERT,UPDATE"},{"table_name":"loyalty_points_ledger","p":"DELETE,INSERT,UPDATE"},{"table_name":"payment_methods","p":"DELETE,INSERT,UPDATE"},{"table_name":"payout_requests","p":"DELETE,UPDATE"},{"table_name":"providers","p":"DELETE,INSERT,UPDATE"},{"table_name":"reviews","p":"DELETE,UPDATE"},{"table_name":"services","p":"DELETE,INSERT,UPDATE"},{"table_name":"transactional_ledger","p":"DELETE,INSERT,UPDATE"},{"table_name":"wallet_credits","p":"DELETE,INSERT,UPDATE"}]
+[{"tablename":"consents","policyname":"Admins read all consents","cmd":"SELECT"},{"tablename":"data_subject_requests","policyname":"Admins read all DSR requests","cmd":"SELECT"},{"tablename":"employees","policyname":"Admins read employees","cmd":"SELECT"},{"tablename":"payout_requests","policyname":"Authenticated read authorized payout requests","cmd":"SELECT"},{"tablename":"profiles","policyname":"Admins read profiles","cmd":"SELECT"},{"tablename":"transactional_ledger","policyname":"Admins manage ledger","cmd":"ALL"}]
+##### probe-payment-method-column-grants.mjs
+[{"a":true,"g":true,"an":false}]
+[{"polname":"Public read enabled payment methods","q":"(enabled = true)","r":"{anon,authenticated}"},{"polname":"Admins manage payment methods","q":"is_admin()","r":"{authenticated}"}]
+[{"column_name":"id"},{"column_name":"key"},{"column_name":"label_en"},{"column_name":"label_ar"},{"column_name":"gateway_key"},{"column_name":"enabled"},{"column_name":"enabled_for_roles"},{"column_name":"is_default"},{"column_name":"env"},{"column_name":"sort_order"},{"column_name":"updated_at"},{"column_name":"requires_gateway"},{"column_name":"gateway_priority"},{"column_name":"admin_note"}]
+##### probe-payout-insert-view-grants-consent-templates.mjs
+payout_requests policies: [{"policyname":"Authenticated read authorized payout requests","cmd":"SELECT","roles":"{authenticated}"},{"policyname":"Admins update payout requests","cmd":"UPDATE","roles":"{authenticated}"},{"policyname":"Admins delete payout requests","cmd":"DELETE","roles":"{authenticated}"}]
+payout insert priv: [{"i":false}]
+admin_data_subject_requests_view [{"anon_sel":false,"auth_ins":false,"auth_upd":false}]
+admin_provider_applications_view [{"anon_sel":false,"auth_ins":false,"auth_upd":false}]
+admin_provider_performance [{"anon_sel":false,"auth_ins":false,"auth_upd":false}]
+employee_earnings_summary [{"anon_sel":false,"auth_ins":false,"auth_upd":false}]
+monthly_vat_summary [{"anon_sel":false,"auth_ins":false,"auth_upd":false}]
+provider_settlement_summary [{"anon_sel":false,"auth_ins":false,"auth_upd":false}]
+has_active_consent: [{"d":"CREATE OR REPLACE FUNCTION public.has_active_consent(p_user_id uuid, p_purpose text)\n RETURNS boolean\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\nDECLARE\n  v_uid UUID := auth.uid();\nBEGIN\n  IF v_uid IS NOT NULL AND p_user_id IS DISTINCT FROM v_uid AND NOT public.is_admin() THEN\n    RAISE EXCEPTION 'Not authorized' USING ERRCODE = '42501';\n  END IF;\n  RETURN EXISTS (\n    SELECT 1\n    FROM (\n      SELECT status\n      FROM public.consents\n      WHERE user_id = p_user_id\n        AND purpose = p_purpose\n      ORDER BY created_at DESC\n      LIMIT 1\n    ) latest\n    WHERE latest.status = 'granted'\n  );\nEND;\n$function$\n"}]
+templates read anon: [{"s":false}] [{"policyname":"Anyone can view message templates","roles":"{anon,authenticated}"},{"policyname":"Admins can modify message templates","roles":"{authenticated}"}]
+platform_settings anon policy: [{"policyname":"Public reads public platform settings","roles":"{anon,authenticated}","qual":"is_public"},{"policyname":"Admins read all platform settings","roles":"{authenticated}","qual":"is_admin()"}]

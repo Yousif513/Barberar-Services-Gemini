@@ -2,35 +2,43 @@
 // Deno Edge Function to calculate travel time and traffic buffers for home services
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-
-function getCorsHeaders(req: Request) {
-  const origin = req.headers.get("origin") || ""
-  const allowedOriginEnv = Deno.env.get("APP_ORIGIN")
-  const isAllowed =
-    (allowedOriginEnv && origin === allowedOriginEnv) ||
-    origin === "http://localhost:3000" ||
-    origin === "http://127.0.0.1:3000" ||
-    origin.endsWith(".vercel.app") ||
-    origin.endsWith("primora.sa")
-
-  return {
-    "Access-Control-Allow-Origin": isAllowed ? origin : (allowedOriginEnv || "http://localhost:3000"),
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-  }
-}
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.108.1"
+import { corsHeaders as sharedCorsHeaders } from "../_shared/http.ts"
 
 serve(async (req) => {
-  const corsHeaders = getCorsHeaders(req)
+  const corsHeaders = sharedCorsHeaders(req)
 
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const { providerLat, providerLng, customerLat, customerLng } = await req.json()
+    // Every call spends a paid Maps quota, so only a signed-in account may make one. The publishable key that ships in
+    // every browser bundle is not an identity; getUser needs a real session token.
+    const authHeader = req.headers.get("Authorization")
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Missing authorization header." }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
+    const supabase = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_ANON_KEY") ?? "")
+    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""))
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Invalid credentials." }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
 
-    if (!providerLat || !providerLng || !customerLat || !customerLng) {
+    const body = await req.json()
+    const providerLat = Number(body.providerLat)
+    const providerLng = Number(body.providerLng)
+    const customerLat = Number(body.customerLat)
+    const customerLng = Number(body.customerLng)
+
+    const inRange = (lat: number, lng: number) => Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180
+    if (!inRange(providerLat, providerLng) || !inRange(customerLat, customerLng)) {
       return new Response(
         JSON.stringify({ error: "Missing required coordinates (lat/lng) for calculation." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }

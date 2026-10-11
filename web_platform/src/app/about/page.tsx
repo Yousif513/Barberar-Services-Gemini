@@ -8,38 +8,40 @@ const translations = {
     backHome: "Back to Home",
     aboutUs: "About Us",
     title: "The Primora Collective",
-    subtitle: "Riyadh's Premier Luxury Beauty, Grooming & Wellness Marketplace",
+    subtitle: "A beauty, grooming and wellness marketplace for Saudi Arabia",
     storyTitle: "Our Story",
-    storyContent1: "Founded in Riyadh, Saudi Arabia, Primora was born out of a desire to redefine how selective clients discover and experience luxury personal care. We envisioned a marketplace that brings the top 1% of independent grooming master stylists, premium beauty salons, and luxury wellness sanctuaries together under a single, unified digital collective.",
-    storyContent2: "Whether you prefer the tranquil atmosphere of Riyadh's most exclusive wellness spas or the absolute comfort and privacy of a bespoke in-home service, Primora guarantees a vetted, secure, and exceptional experience tailored to you.",
+    storyContent1: "Primora is built in Riyadh, Saudi Arabia. It brings independent stylists, salons, barbershops, spas and home-service professionals together in one place, so customers can find them, choose a time and pay a deposit online.",
+    storyContent2: "Whether you prefer a salon or a visit at home, you see the price, the VAT and the provider's cancellation policy before you pay.",
     pillarTitle: "The Primora Pillars",
-    pillar1Title: "Top 1% Vetted Talent",
-    pillar1Desc: "Every specialist on our platform passes verified identity checks, portfolio evaluations, and onboarding reviews.",
-    pillar2Title: "Secure Payment Settlement",
-    pillar2Desc: "Deposits are paid by card through Tap Payments, and providers are paid out after the appointment is completed.",
-    pillar3Title: "Geofenced Convenience",
-    pillar3Desc: "Seamless logistics management for home-service appointments, ensuring prompt arrivals across Riyadh.",
+    pillar1Title: "Reviewed Providers",
+    pillar1Desc: "Every provider application is reviewed by our team before the provider is listed, and customers can rate each visit.",
+    pillar2Title: "Deposits Through Tap",
+    pillar2Desc: "Deposits are paid by card on Tap Payments' hosted page. Each booking is recorded in a ledger, and providers request payouts to their registered bank account.",
+    pillar3Title: "Home Service",
+    pillar3Desc: "Providers can offer appointments at the customer's address, and the booking shows where the visit takes place.",
+    hygieneLabel: "Operational Integrity",
     hygieneTitle: "Professional Service Standards",
-    hygieneDesc: "We promote professional grooming and hygiene practices across our partner network. Independent artists and salons follow industry-standard sanitation guidelines and high-quality product protocols.",
+    hygieneDesc: "Each provider sets and maintains its own hygiene practices. Our team reviews every provider application before it goes live, and customer ratings and reviews are shown on the provider page.",
     footerText: "Built for Riyadh, Saudi Arabia. All rights reserved."
   },
   ar: {
     backHome: "العودة للرئيسية",
     aboutUs: "من نحن",
     title: "مجموعة بريمورا",
-    subtitle: "منصة الرياض الرائدة للجمال، العناية الشخصية والعافية الفاخرة",
+    subtitle: "منصة للجمال والعناية الشخصية والعافية في المملكة العربية السعودية",
     storyTitle: "قصتنا",
-    storyContent1: "تأسست بريمورا في الرياض، المملكة العربية السعودية، انطلاقاً من الرغبة في إعادة تعريف كيفية اكتشاف وتجربة العناية الشخصية الفاخرة. لقد تصورنا منصة تجمع أفضل 1% من مصممي الحلاقة المستقلين وصالونات التجميل الراقية وملاذات العافية الفاخرة تحت مظلة واحدة موحدة.",
-    storyContent2: "سواء كنت تفضل الأجواء الهادئة في المنتجعات الصحية الأكثر تميزاً بالرياض أو الراحة والخصوصية المطلقة للخدمة المنزلية المصممة خصيصاً لك، فإن بريمورا تضمن لك تجربة موثوقة وآمنة واستثنائية.",
+    storyContent1: "بُنيت بريمورا في الرياض، المملكة العربية السعودية. تجمع المصففين المستقلين والصالونات ومحلات الحلاقة والسبا ومحترفي الخدمات المنزلية في مكان واحد، ليجدهم العميل ويختار موعداً ويدفع العربون إلكترونياً.",
+    storyContent2: "سواء كنت تفضل الصالون أو الزيارة في المنزل، ترى السعر والضريبة وسياسة الإلغاء لدى مقدم الخدمة قبل أن تدفع.",
     pillarTitle: "ركائز بريمورا",
-    pillar1Title: "أفضل 1% من الكفاءات المعتمدة",
-    pillar1Desc: "يمر كل أخصائي على منصتنا بعمليات تحقق من الهوية وفحص للمحفظة المهنية ومعايير تقديم الخدمة.",
-    pillar2Title: "أمان المدفوعات والتسوية",
-    pillar2Desc: "يُدفع العربون بالبطاقة عبر Tap Payments، وتُصرف مستحقات مقدمي الخدمة بعد إتمام الموعد.",
-    pillar3Title: "سهولة تغطية الرياض الجغرافية",
-    pillar3Desc: "إدارة لوجستية سلسة للمواعيد المنزلية لضمان الوصول في الوقت المحدد في جميع أنحاء الرياض.",
+    pillar1Title: "مقدمو خدمة تمت مراجعتهم",
+    pillar1Desc: "يراجع فريقنا كل طلب انضمام قبل إدراج مقدم الخدمة، ويمكن للعملاء تقييم كل زيارة.",
+    pillar2Title: "العربون عبر Tap",
+    pillar2Desc: "يُدفع العربون بالبطاقة في صفحة Tap Payments المستضافة. يُسجَّل كل حجز في دفتر حسابات، ويطلب مقدمو الخدمة تحويل مستحقاتهم إلى حسابهم البنكي المسجّل.",
+    pillar3Title: "خدمة منزلية",
+    pillar3Desc: "يمكن لمقدمي الخدمة تقديم مواعيد في عنوان العميل، ويوضح الحجز مكان الزيارة.",
+    hygieneLabel: "النزاهة التشغيلية",
     hygieneTitle: "معايير الخدمة المهنية",
-    hygieneDesc: "نحرص على تطبيق أعلى معايير النظافة المهنية في شبكتنا. يلتزم مقدمو الخدمة الشركاء بإرشادات التعقيم القياسية واستخدام منتجات عناية عالية الجودة.",
+    hygieneDesc: "يحدد كل مقدم خدمة ممارسات النظافة لديه ويلتزم بها. يراجع فريقنا كل طلب انضمام قبل ظهوره، وتظهر تقييمات العملاء ومراجعاتهم في صفحة مقدم الخدمة.",
     footerText: "صمم خصيصاً للرياض، المملكة العربية السعودية. جميع الحقوق محفوظة."
   }
 };
@@ -134,10 +136,10 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* Hygiene Certification Banner */}
+        {/* Service standards banner */}
         <div className="bg-stone-950 text-white rounded-3xl p-8 sm:p-12 space-y-4 relative overflow-hidden border border-stone-900 shadow-md">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[hsla(45,60%,55%,0.04)] rounded-full blur-3xl" />
-          <span className="text-[9px] uppercase font-bold text-[hsl(45,60%,55%)] tracking-wider">Operational Integrity</span>
+          <span className="text-[9px] uppercase font-bold text-[hsl(45,60%,55%)] tracking-wider">{t.hygieneLabel}</span>
           <h3 className="text-lg sm:text-xl font-serif text-white">{t.hygieneTitle}</h3>
           <p className="text-xs text-stone-400 leading-relaxed max-w-xl font-light">
             {t.hygieneDesc}

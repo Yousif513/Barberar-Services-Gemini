@@ -1,6 +1,7 @@
 import { before, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { as, createMigratedDb, createUser, expectError, firstSlot, nextWorkingDate, ROLES, SEED, serviceFor, sys } from "./harness.mjs";
+import { approvedDestination, releaseWithApproval } from "./gov1_fixtures.mjs";
 
 let db;
 let svc;
@@ -115,11 +116,12 @@ describe("refunds, payouts and reports", () => {
                      values ($1, 'package_sale', $2, $3::numeric, 0, $3::numeric, 'pending')`, [prov, `chg_payout_${amount}`, amount]);
     }
     const owner = ROLES.user(other);
+    await approvedDestination(db, prov, 'SA0380000000608010167519');
     const first = (await as(db, owner, `select * from request_provider_payout($1, 70, 'SNB', 'SA0380000000608010167519')`, [prov]))[0];
     await expectError(as(db, owner, `select request_provider_payout($1, 40, 'SNB', 'SA0380000000608010167519')`, [prov]), /exceeds the available balance/);
-    const released = (await as(db, admin, `select admin_release_payout($1, 'release-1') r`, [first.id]))[0].r;
+    const released = await releaseWithApproval(db, admin, first.id, 'release-1', 'Bank transfer made');
     assert.equal(released.status, "success");
-    assert.equal((await as(db, admin, `select admin_release_payout($1, 'release-1') r`, [first.id]))[0].r.status, "already_processed");
+    assert.equal((await as(db, admin, `select admin_release_payout($1, 'release-1', 'Bank transfer made') r`, [first.id]))[0].r.status, "already_processed");
     const rows = await sys(db, `select provider_share, payout_status from transactional_ledger where provider_id = $1 order by provider_share`, [prov]);
     assert.deepEqual(rows.map((r) => r.payout_status).sort(), ["pending", "released"]);
     assert.equal(Number((await sys(db, `select provider_available_balance($1) v`, [prov]))[0].v), 30);
@@ -170,6 +172,23 @@ describe("refunds, payouts and reports", () => {
     assert.ok(tlv.includes(Buffer.from("310123456700003")), "QR carries the provider VAT number");
     const again = (await as(db, customer, `select generate_zatca_tax_invoice($1) r`, [b.id]))[0].r;
     assert.equal(again.invoice_number, inv.invoice_number);
+  });
+
+  it("chains every invoice of a provider to the one before it, even when they are issued in the same transaction", async () => {
+    const first = await paidCompletedBooking();
+    const second = await paidCompletedBooking();
+    await sys(db, `update providers set vat_number = '310123456700003' where id = $1`, [SEED.provider1]);
+    const issued = await db.transaction(async (tx) => {
+      await tx.exec(`SET LOCAL ROLE authenticated`);
+      await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify({ role: "authenticated", sub: SEED.customer })]);
+      const a = (await tx.query(`select generate_zatca_tax_invoice($1) r`, [first.id])).rows[0].r;
+      const b = (await tx.query(`select generate_zatca_tax_invoice($1) r`, [second.id])).rows[0].r;
+      return { a, b };
+    });
+    assert.equal(issued.b.previous_invoice_hash, issued.a.invoice_hash, "the second invoice follows the first");
+    const third = await paidCompletedBooking();
+    const c = (await as(db, customer, `select generate_zatca_tax_invoice($1) r`, [third.id]))[0].r;
+    assert.equal(c.previous_invoice_hash, issued.b.invoice_hash, "a later invoice follows the newest one, not the oldest transaction start");
   });
 
   it("charges no platform fee on a returning marketplace client", async () => {

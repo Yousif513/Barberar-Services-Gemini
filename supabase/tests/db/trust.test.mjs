@@ -16,7 +16,11 @@ describe("anonymous access", () => {
   it("exposes only read-only discovery functions to anonymous visitors", async () => {
     const allowed = new Set([
       "get_available_slots", "get_branch_available_slots", "get_branch_schedule_with_prayer_pauses",
-      "search_marketplace_providers", "normalize_arabic",
+      "search_marketplace_providers", "normalize_arabic", "provider_rating_summaries",
+      "track_analytics_event", // D-26: insert-only client event recorder, validated and rate limited
+      "public_professional_profile", "public_provider_reviews", // P-02: reviews with a reviewer display and no identifiers; G75: the public professional page; answers NULL for anything not published
+      "get_sponsored_placements", "record_sponsored_click", // G63: the labelled sponsored block and its click counter; no-ops while the owner has not configured the feature
+
     ]);
     const rows = await sys(db, `
       select distinct p.proname
@@ -57,24 +61,30 @@ describe("verification and onboarding", () => {
     const manual = (await sys(db, `select cr_verification_status, cr_wathq_data->>'source' src from providers where id = $1`, [SEED.provider1]))[0];
     assert.equal(manual.cr_verification_status, "manually_reviewed");
     assert.equal(manual.src, "manual_admin_review");
-    await as(db, ROLES.service, `select record_wathq_cr_verification($1, '1010101010', true, '{"status":"active"}'::jsonb)`, [SEED.provider1]);
+    await as(db, ROLES.service, `select record_wathq_cr_verification($1, '1010101010', true, jsonb_build_object('status', 'active', 'crName', (select business_name_en from providers where id = $1)))`, [SEED.provider1]);
     const wathq = (await sys(db, `select cr_verification_status, cr_wathq_data->>'source' src from providers where id = $1`, [SEED.provider1]))[0];
     assert.equal(wathq.cr_verification_status, "verified");
     assert.equal(wathq.src, "wathq_api");
   });
 
   it("activates an approved provider and refuses incomplete applications", async () => {
+    // Applications are closed until the provider agreement is published, and approval needs the applicant's acceptance of it.
+    const agreement = (await sys(db, `select id, version, status from legal_agreements where agreement_key = 'provider_agreement' order by created_at limit 1`))[0];
+    if (agreement.status === "draft") await as(db, admin, `select admin_publish_agreement($1, 'Reviewed by counsel 2026-10-07')`, [agreement.id]);
     const applicant = await createUser(db);
+    await as(db, ROLES.user(applicant), `select record_agreement_acceptance('provider_agreement', $1)`, [agreement.version]);
     const insert = (lat) => as(db, ROLES.user(applicant),
-      `insert into provider_applications (user_id, business_name_en, business_name_ar, contact_email, contact_phone, district, address_text, latitude, longitude, cr_number, tax_number)
-       values ($1, 'Malqa Cuts', 'قصات الملقا', 'a@b.sa', '+966500001234', 'Al Malqa', 'King Fahd Rd', $2, $3, '1010202020', '300012345600003') returning id`,
+      `insert into provider_applications (user_id, business_name_en, business_name_ar, contact_email, contact_phone, city, district, address_text, latitude, longitude, cr_number, tax_number)
+       values ($1, 'Malqa Cuts', 'قصات الملقا', 'a@b.sa', '+966500001234', 'Riyadh', 'Al Malqa', 'King Fahd Rd', $2, $3, '1010202020', '300012345600003') returning id`,
       [applicant, lat, lat === null ? null : 46.6]).then((r) => r[0].id);
     const noLocation = await insert(null);
-    await expectError(as(db, admin, `select approve_provider_application($1)`, [noLocation]), /location/);
+    await expectError(as(db, admin, `select approve_provider_application($1, 'Documents checked')`, [noLocation]), /location/);
     await as(db, admin, `select reject_provider_application($1, 'Missing location')`, [noLocation]);
     const app = await insert(24.8);
-    await expectError(as(db, owner1, `select approve_provider_application($1)`, [app]), /Administrator/);
-    const r = (await as(db, admin, `select approve_provider_application($1) r`, [app]))[0].r;
+    await expectError(as(db, owner1, `select approve_provider_application($1, 'Documents checked')`, [app]), /Administrator/);
+    await expectError(as(db, admin, `select approve_provider_application($1, 'Documents checked')`, [app]), /commercial registration must be verified/);
+    await as(db, admin, `select admin_confirm_application_cr($1, 'CR document reviewed, registered name matches the applicant')`, [app]);
+    const r = (await as(db, admin, `select approve_provider_application($1, 'Documents checked') r`, [app]))[0].r;
     const p = (await sys(db, `select status, is_verified, description_en, vat_number, cr_number from providers where id = $1`, [r.provider_id]))[0];
     assert.equal(p.status, "active");
     assert.equal(p.is_verified, true);

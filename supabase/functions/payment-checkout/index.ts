@@ -1,10 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders, json, MissingConfigError, resolveCaller, serviceClient } from "../_shared/http.ts"
+import { buildRedirectUrl } from "../_shared/return-url.ts"
 
 // Creates a Tap charge for something the signed-in user owes. The amount always comes from the
 // database record, never from the browser.
 //   { "bookingId": "<uuid>" }                                   booking deposit
-//   { "purchaseType": "gift_card" | "package" | "tip" | "subscription", "purchaseId": "<uuid>" }
+//   { "purchaseType": "gift_card" | "package" | "membership" | "tip" | "subscription", "purchaseId": "<uuid>" }
 type Payable = { amount: number; description: string; metadata: Record<string, string>; redirectPath: string }
 
 serve(async (req) => {
@@ -57,6 +58,16 @@ serve(async (req) => {
           if (data?.status === "pending_payment") {
             payable = { amount: Number(data.amount_paid), description: `Package ${data.id}`,
               metadata: { purchase_type: "package", purchase_id: data.id }, redirectPath: `/customer/packages?purchase=${data.id}` }
+          }
+          break
+        }
+        case "membership": {
+          // The amount is the price snapshotted on the membership row when it was bought, never anything from the request.
+          const { data } = await db.from("memberships").select("id, amount_due, status")
+            .eq("id", id).eq("customer_id", userId).maybeSingle()
+          if (data?.status === "pending_payment") {
+            payable = { amount: Number(data.amount_due), description: `Membership ${data.id}`,
+              metadata: { purchase_type: "membership", purchase_id: data.id }, redirectPath: `/customer/memberships?purchase=${data.id}` }
           }
           break
         }
@@ -123,7 +134,7 @@ serve(async (req) => {
         },
         source: { id: "src_all" },
         post: { url: webhookUrl },
-        redirect: { url: `${appUrl}${payable.redirectPath}` },
+        redirect: { url: buildRedirectUrl(appUrl, payable.redirectPath, body?.returnUrl) },
       }),
     })
     const charge = await response.json().catch(() => ({}))

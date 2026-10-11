@@ -25,12 +25,15 @@ const confirmPayment = async (booking) => {
 };
 
 // Inserts a confirmed booking that already started (for completion / no-show tests).
+// Each one starts a different number of days back, so two of them never overlap.
+let pastDays = 0;
 const pastBooking = async (customerId = SEED.customer) => {
+  pastDays += 7;
   const r = await sys(db,
     `insert into bookings (customer_id, branch_id, employee_id, service_id, status, scheduled_at, duration_minutes,
                            subtotal_price, total_price, tax_amount, deposit_required, platform_commission, source)
-     values ($1, $2, $3, $4, 'confirmed', now() - interval '3 hours' - (random() * interval '100 days'), $5, $6, $6, round($6 * 0.15, 2), 0, 0, 'link')
-     returning *`, [customerId, SEED.branch1, SEED.employee1, svc.id, svc.duration, svc.price]);
+     values ($1, $2, $3, $4, 'confirmed', now() - interval '3 hours' - make_interval(days => $7::int), $5, $6, $6, round($6 * 0.15, 2), 0, 0, 'link')
+     returning *`, [customerId, SEED.branch1, SEED.employee1, svc.id, svc.duration, svc.price, pastDays]);
   return r[0];
 };
 
@@ -65,10 +68,23 @@ describe("booking engine", () => {
     await as(db, customer, `select cancel_booking($1, 'test cleanup')`, [b.id]);
   });
 
-  it("charges no platform fee on provider-sourced bookings", async () => {
+  it("charges no platform fee on provider-sourced bookings made through the provider's own share token", async () => {
+    // The channel is derived on the server (D-02): claiming source 'link' proves nothing, the provider's token does.
+    const token = (await as(db, owner1, `select create_provider_share_token($1, 'link', 'test link') t`, [SEED.provider1]))[0].t.token;
+    const slot = await firstSlot(db, customer, SEED.employee1, date, svc.duration);
+    const b = await as(db, customer,
+      `select * from create_booking(target_employee_id => $1, target_service_id => $2, target_scheduled_at => $3, request_source_token => $4)`,
+      [SEED.employee1, svc.id, slot, token]).then((r) => r[0]);
+    assert.equal(b.source, "link");
+    assert.equal(Number(b.platform_commission), 0);
+    await as(db, customer, `select cancel_booking($1, 'test cleanup')`, [b.id]);
+  });
+
+  it("charges the marketplace fee when the caller only claims a provider-sourced channel", async () => {
     const slot = await firstSlot(db, customer, SEED.employee1, date, svc.duration);
     const b = await book(customer, slot, { source: "link" });
-    assert.equal(Number(b.platform_commission), 0);
+    assert.equal(b.source, "marketplace");
+    assert.ok(Number(b.platform_commission) > 0);
     await as(db, customer, `select cancel_booking($1, 'test cleanup')`, [b.id]);
   });
 
@@ -120,7 +136,7 @@ describe("booking engine", () => {
   });
 
   it("customer late cancellation keeps the provider's fee; provider cancellation refunds everything", async () => {
-    await sys(db, `update providers set free_cancellation_hours = 2000 where id = $1`, [SEED.provider1]);
+    await sys(db, `update providers set free_cancellation_hours = 720 where id = $1`, [SEED.provider1]);
     let slot = await firstSlot(db, customer, SEED.employee1, date, svc.duration);
     let b = await book(customer, slot);
     await confirmPayment(b);
@@ -145,7 +161,7 @@ describe("booking engine", () => {
       [SEED.employee1, date, svc.duration]);
     const b = await book(customer, slots[0].slot_start, { source: "link" });
     await confirmPayment(b);
-    await sys(db, `update providers set free_cancellation_hours = 2000 where id = $1`, [SEED.provider1]);
+    await sys(db, `update providers set free_cancellation_hours = 720 where id = $1`, [SEED.provider1]);
     const target = slots[slots.length - 1].slot_start;
     await expectError(as(db, customer, `select reschedule_booking($1, $2)`, [b.id, target]), /Rescheduling closes/);
     const moved = (await as(db, owner1, `select reschedule_booking($1, $2) r`, [b.id, target]))[0].r;
@@ -166,7 +182,7 @@ describe("booking engine", () => {
     const checkedIn = (await as(db, owner1, `select employee_update_booking_status($1, 'in_service') r`, [future.id]))[0].r;
     assert.equal(checkedIn.status, "confirmed");
     assert.ok(checkedIn.checked_in_at);
-    await expectError(as(db, customer, `select employee_update_booking_status($1, 'in_service')`, [future.id]), /Not authorized/);
+    await expectError(as(db, customer, `select employee_update_booking_status($1, 'in_service')`, [future.id]), /Booking not found/);
 
     const past = await pastBooking();
     const done = (await as(db, owner1, `select employee_update_booking_status($1, 'completed') r`, [past.id]))[0].r;
@@ -269,6 +285,7 @@ describe("booking engine", () => {
 
   it("keeps block reasons and other customers' eligibility private", async () => {
     const blocked = await createUser(db);
+    await sys(db, `insert into conversations (customer_id, provider_id) values ($1, $2)`, [blocked, SEED.provider1]); // P-03: a block needs a relationship with the provider
     await as(db, owner1, `select toggle_customer_block($1, $2, 'abusive messages', true)`, [SEED.provider1, blocked]);
     const self = (await as(db, ROLES.user(blocked), `select check_customer_booking_eligibility($1, $2) r`, [SEED.provider1, blocked]))[0].r;
     assert.equal(self.is_blocked, true);

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
 
 interface JobBid {
   id: string;
@@ -202,7 +203,7 @@ export default function CustomerJobsPage() {
       setJobPosts((data as unknown as JobPost[]) || []);
     } catch (err: unknown) {
       setJobPosts([]);
-      setLoadError(err instanceof Error ? err.message : String(err));
+      setLoadError(errorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -250,7 +251,7 @@ export default function CustomerJobsPage() {
       setShowAddForm(false);
       loadJobPosts();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -267,7 +268,7 @@ export default function CustomerJobsPage() {
       setSuccess(t.accepted);
       loadJobPosts();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setBusyId("");
     }
@@ -290,7 +291,7 @@ export default function CustomerJobsPage() {
       setSuccess(t.cancelled);
       loadJobPosts();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(errorMessage(err));
     } finally {
       setBusyId("");
     }
@@ -336,8 +337,8 @@ export default function CustomerJobsPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.jobTitle}</label>
-              <input
+              <label htmlFor="job-jobTitle" className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.jobTitle}</label>
+              <input id="job-jobTitle"
                 type="text"
                 maxLength={200}
                 placeholder={t.titlePlaceholder}
@@ -349,8 +350,8 @@ export default function CustomerJobsPage() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.description}</label>
-              <textarea
+              <label htmlFor="job-description" className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.description}</label>
+              <textarea id="job-description"
                 placeholder={t.descriptionPlaceholder}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -360,8 +361,8 @@ export default function CustomerJobsPage() {
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.address}</label>
-              <input
+              <label htmlFor="job-address" className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.address}</label>
+              <input id="job-address"
                 type="text"
                 placeholder={t.addressPlaceholder}
                 value={addressText}
@@ -372,8 +373,8 @@ export default function CustomerJobsPage() {
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.targetDate}</label>
-              <input
+              <label htmlFor="job-targetDate" className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.targetDate}</label>
+              <input id="job-targetDate"
                 type="datetime-local"
                 required
                 value={targetDate}
@@ -383,8 +384,8 @@ export default function CustomerJobsPage() {
             </div>
 
             <div>
-              <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.budget}</label>
-              <input
+              <label htmlFor="job-budget" className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.budget}</label>
+              <input id="job-budget"
                 type="number"
                 min="50"
                 value={budgetMax}
@@ -396,8 +397,8 @@ export default function CustomerJobsPage() {
 
             {categoriesList.length > 0 && (
               <div>
-                <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.category}</label>
-                <select
+                <label htmlFor="job-category" className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t.category}</label>
+                <select id="job-category"
                   required
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
@@ -459,7 +460,7 @@ export default function CustomerJobsPage() {
                   </div>
                 </div>
 
-                <div className="text-left sm:text-right">
+                <div className="text-start sm:text-end">
                   <span className="text-[10px] text-gray-400 block font-bold">{t.budgetLimit}</span>
                   <span className="text-xl font-black text-gray-900">{post.budget_max} {t.sar}</span>
                   {post.status === "open" && (
@@ -497,7 +498,7 @@ export default function CustomerJobsPage() {
                         </div>
 
                         <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                          <div className="text-left sm:text-right">
+                          <div className="text-start sm:text-end">
                             <span className="text-[9px] text-gray-400 block font-bold">{t.proposedBid}</span>
                             <span className="text-sm font-extrabold text-gray-900">{bid.bid_price} {t.sar}</span>
                           </div>

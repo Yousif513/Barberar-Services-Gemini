@@ -144,6 +144,7 @@ export default function CustomerSearchPage() {
           </svg>
           <input
             type="text"
+            aria-label={t.searchPlaceholder}
             placeholder={t.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -225,7 +226,7 @@ export default function CustomerSearchPage() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-1.5 text-[10px]">
-                      <span className="font-semibold text-gray-500">📍 {p.district || p.city || "Riyadh"}</span>
+                      {(p.district || p.city) && <span className="font-semibold text-gray-500">📍 {p.district || p.city}</span>}
                       {p.distance_km && (
                         <span className="font-mono text-gray-400">({p.distance_km} km)</span>
                       )}

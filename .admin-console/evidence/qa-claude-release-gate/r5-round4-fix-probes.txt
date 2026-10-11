@@ -1,0 +1,13 @@
+agent: qa-claude-release-gate (round 5, verification of the round 4 fixes)
+date: 2026-10-06
+commands: npm run test:db (exit 0, 219 of 219); node --test supabase/tests/db/qa_open_defects.repro.mjs (R4-1 two cases and R4-2 now pass, 1 case still fails: signed-in column visibility)
+gates re-run, all exit 0: test:inventory, web tests, security-core, admin-controls, p3-compat, typecheck:mobile, lint (0 errors), build
+
+AUDIT PATTERN
+the sensitive pattern now includes buyer, url, uri and webhook: an administrator generating a tax invoice no longer logs buyer_name or buyer_vat_number, and a change of webhook_url or base_url logs "changed" without the value
+columns the new pattern hides on money tables: invoices.buyer_name and invoices.buyer_vat_number only; amounts, statuses and identifiers stay logged
+
+LEAVE APPROVAL TRIGGER
+staff widening the dates of an approved row: refused 42501; staff moving an approved row to another employee: refused 42501
+staff editing the dates of their own pending row: accepted; staff editing only the reason of an approved row: accepted
+owner widens or rejects approved leave: accepted; administrator and service role change dates: accepted; another provider's owner: 0 rows

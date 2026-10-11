@@ -38,6 +38,19 @@ jobs:
       - name: Database tests (migrations, RLS, server commands on PGlite)
         run: npm run test:db
 
+      - name: Inventory and supply tests
+        run: npm run test:inventory
+
+      - name: Screens only ask the database for what exists (rpc arguments, columns, embeds)
+        run: npm run test:ui-schema
+
+      - name: Mobile unit tests (session storage)
+        run: npm run test:mobile
+
+      - name: Migration compatibility with the P3 branch
+        # CI checks out only the commit under test, so verify that commit's migration chain (HEAD), not a remote branch ref.
+        run: npm run test:p3-compat -- HEAD
+
       - name: Web tests (authorization boundaries, no mock data)
         run: npm run test --workspace=web_platform
 
@@ -85,7 +98,9 @@ jobs:
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # Pinned to the CLI the migrations and the smoke test are verified with locally (package.json devDependency).
+          # A newer CLI ships newer images whose default table privileges differ; upgrade both together, deliberately.
+          version: 2.106.0
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
@@ -93,10 +108,22 @@ jobs:
           deno-version: v2.x
 
       - name: Start local Supabase
-        run: supabase start
+        # The image registry rate-limits shared CI runners (toomanyrequests). Services the checks do not use are skipped,
+        # and the start is retried with a growing pause before the job is failed.
+        run: |
+          for attempt in 1 2 3 4; do
+            if supabase start -x studio,imgproxy,vector,logflare,edge-runtime,realtime,supavisor; then exit 0; fi
+            echo "supabase start failed (attempt $attempt); retrying after $((attempt * 60))s"
+            supabase stop --no-backup || true
+            sleep $((attempt * 60))
+          done
+          exit 1
 
-      - name: Apply migrations
-        run: supabase db reset --no-seed
+      - name: Apply migrations and seed on the real Postgres
+        run: supabase db reset
+
+      - name: Smoke test the real stack (sign-in, row-level security, privileges, booking)
+        run: node scripts/smoke-local-supabase.mjs
 
       - name: Verify DB Migration Integrity
         run: supabase db lint

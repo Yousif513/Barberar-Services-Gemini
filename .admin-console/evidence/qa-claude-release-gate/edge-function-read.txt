@@ -1,0 +1,19 @@
+agent: qa-claude-release-gate
+date: 2026-10-06
+method: source read of supabase/functions/** (13 functions and 2 shared helpers) against the rule in AGENTS.md: every service-role function reads the Authorization header, calls auth.getUser, checks profiles.role, and does not send Access-Control-Allow-Origin with a wildcard.
+runtime behaviour is UNVERIFIED: Deno is not installed here, no function was started, nothing was called on the hosted project.
+
+function: caller check observed in source -> finding
+process-refund: resolveCaller (service key, admin, or user); a plain user gets 403; the queue run is service-key only -> sound; no operator recorded in the audit trail (gap refund-execution-has-no-operator-in-the-audit-trail)
+payment-checkout: resolveCaller; every purchase type is read by the caller's own id; the amount comes from the database; the service caller gets 401 -> sound
+payment-webhook: verify_jwt is false in config.toml by design; the charge is fetched again from the gateway and only a captured charge in SAR is recorded; no signature header is checked -> acceptable only because of the re-fetch; each call costs a gateway request
+reconcile-psp, dispatch-messages: resolveCaller, users get 403 -> sound
+wathq-verify: resolveCaller, only admin -> sound
+expire-holds: service key or admin token; an administrator may choose hold_interval_minutes and nothing is recorded -> gap service-key-edge-function-paths-leave-no-audit-entry
+send-notification: service key, the user themself, or an admin for any user; no record of an administrator's push -> same gap
+send-otp, send-push: Authorization must equal the service key exactly -> sound; plain string comparison of the key
+process-payout: admin only (getUser then profiles.role); releases whole ledger rows without checking coverage or allocations; service-key writes skip the audit trigger; no audit call; no screen calls it -> gap process-payout-edge-function-releases-money-without-allocation-or-audit
+request-payout: owner of the provider; no IBAN format check, no amount sign check (the table constraints are the only guard); no screen calls it -> same gap, second part
+calculate-travel: NO caller check at all; forwards to a billed third-party API -> gap calculate-travel-edge-function-is-unauthenticated-and-spends-a-paid-key
+CORS: process-payout, request-payout, send-notification, send-otp, send-push, calculate-travel reflect any origin ending in .vercel.app or primora.sa; _shared/http.ts and expire-holds use a fixed list -> gap edge-function-cors-reflects-any-vercel-app-or-primora-sa-suffix-origin
+no function sends Access-Control-Allow-Origin with a wildcard (the existing source guard in web_platform/tests/negative-authorization.test.mjs checks the same text)

@@ -72,8 +72,33 @@ const checks = [
     require: ["[functions.payment-webhook]", "verify_jwt = false"],
   },
   {
+    file: "supabase/functions/public-api/index.ts",
+    require: ["handleApiRequest(", "serviceClient()"],
+    reject: ["Access-Control", "corsHeaders", "OPTIONS"],
+  },
+  {
+    file: "supabase/functions/_shared/api-router.ts",
+    require: ['"authenticate_api_key"', "extractBearer(", "method_not_allowed"],
+    reject: ["Access-Control", "x-api-key", 'searchParams.get("api_key")'],
+  },
+  {
+    file: "supabase/functions/deliver-webhooks/index.ts",
+    require: [
+      "resolveCaller(req)",
+      'consoleCallerDecision(caller?.kind ?? null, true, FUNCTION_PERMISSIONS["deliver-webhooks"]',
+      'redirect: "manual"',
+      "checkResolvedAddresses(",
+      "validateWebhookUrl(",
+    ],
+    reject: ["Access-Control", "corsHeaders", 'redirect: "follow"'],
+  },
+  {
+    file: "supabase/config.toml",
+    require: ["[functions.public-api]"],
+  },
+  {
     file: "supabase/functions/send-push/index.ts",
-    require: ["SUPABASE_SERVICE_ROLE_KEY", 'authorization !== `Bearer ${serviceKey}`'],
+    require: ["SUPABASE_SERVICE_ROLE_KEY", "serviceKeyMatches(", "!serviceKeyMatches("],
   },
 ];
 

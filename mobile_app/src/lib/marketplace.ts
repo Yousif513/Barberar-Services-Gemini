@@ -156,8 +156,7 @@ export async function loadShopDetails(providerId: string, branchId: string): Pro
       .eq("branch_id", branchId).eq("is_active", true),
     supabase.from("packages").select("id, name_en, name_ar, description_en, description_ar, price, session_count, expires_in_days")
       .eq("provider_id", providerId).eq("is_active", true),
-    supabase.from("reviews").select("id, rating, comment, created_at, reply_comment, moderation_status, profiles(first_name, last_name)")
-      .eq("provider_id", providerId).order("created_at", { ascending: false }).limit(30),
+    supabase.rpc("public_provider_reviews", { p_provider_id: providerId, p_limit: 30 }),
   ]);
   for (const res of [providerRes, branchRes, serviceRes, employeeRes, packageRes, reviewRes]) {
     if (res.error) throw res.error;
@@ -205,7 +204,7 @@ export async function loadShopDetails(providerId: string, branchId: string): Pro
         comment: r.comment || "",
         reply: r.reply_comment || "",
         createdAt: r.created_at,
-        authorName: [r.profiles?.first_name, r.profiles?.last_name ? `${String(r.profiles.last_name).charAt(0)}.` : ""]
+        authorName: [r.reviewer_first_name, r.reviewer_last_initial]
           .filter(Boolean).join(" "),
       })),
   };

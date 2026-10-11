@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
 
 type Locale = "en" | "ar";
 type Bilingual = { en: string; ar: string };
@@ -237,7 +238,7 @@ export default function CustomerDashboard() {
           rating: p.rating === null ? null : Number(p.rating),
         })));
     }
-    load().catch((err) => setLoadError(err instanceof Error ? err.message : String(err)));
+    load().catch((err) => setLoadError(errorMessage(err)));
   }, []);
 
   const upcomingList = bookings
@@ -327,6 +328,7 @@ export default function CustomerDashboard() {
               <svg className="h-4 w-4 flex-shrink-0 text-[#9CA3AF]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
               <input
                 value={query}
+                aria-label={t.search}
                 onChange={(e) => { setQuery(e.target.value); setSearchOpen(true); }}
                 onFocus={() => setSearchOpen(true)}
                 onBlur={() => setTimeout(() => setSearchOpen(false), 150)}

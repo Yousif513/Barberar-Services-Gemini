@@ -3,6 +3,12 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
+// Shown after the server accepted a status command.
+const statusDone: Record<"en" | "ar", Record<string, string>> = {
+  en: { confirmed: "Booking confirmed.", in_service: "Customer checked in and seated.", completed: "Booking marked completed.", cancelled: "Booking cancelled.", no_show: "Booking marked as no-show." },
+  ar: { confirmed: "تم تأكيد الحجز.", in_service: "تم تسجيل وصول العميل وبدء الجلسة.", completed: "تم تحديد الحجز كمكتمل.", cancelled: "تم إلغاء الحجز.", no_show: "تم تسجيل عدم حضور العميل." },
+};
+
 const translations = {
   en: {
     title: "Manage Appointments",
@@ -71,6 +77,8 @@ export default function ProviderBookingsPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  // Confirmation of the last status command, announced to screen readers; cleared when the next command starts.
+  const [notice, setNotice] = useState("");
 
   const t = translations[locale];
 
@@ -122,7 +130,7 @@ export default function ProviderBookingsPage() {
               status,
               total_price,
               services ( name_en, name_ar ),
-              profiles ( first_name, last_name, phone ),
+              profiles ( first_name, last_name, phone_number ),
               employees ( id, name_en, name_ar )
             `)
             .in("branch_id", branchIds)
@@ -146,6 +154,7 @@ export default function ProviderBookingsPage() {
   async function updateStatus(id: string, newStatus: string) {
     try {
       setError("");
+      setNotice("");
       const { error: rpcError } = await supabase.rpc("employee_update_booking_status", {
         p_booking_id: id,
         p_new_status: newStatus
@@ -155,6 +164,8 @@ export default function ProviderBookingsPage() {
       if (rpcError) throw rpcError;
       
       setBookings(prev => prev.map(b => b.id === id ? { ...b, status: newStatus } : b));
+      const done = statusDone[locale][newStatus];
+      if (done) setNotice(done);
     } catch (err: unknown) {
       console.error("Failed to update booking status:", err instanceof Error ? err.message : err);
       setError(err instanceof Error ? err.message : (locale === "ar" ? "تعذر تحديث حالة الحجز." : "Failed to update booking status."));
@@ -241,8 +252,12 @@ export default function ProviderBookingsPage() {
         </div>
       </div>
 
+      {notice && (
+        <div role="status" aria-live="polite" className="rounded-2xl border border-green-200 bg-green-50 p-3 text-xs font-bold text-green-800">{notice}</div>
+      )}
+
       {error && (
-        <div className={`bg-white border border-[#ECECEC]/60 border border-[#ECECEC] text-[#344054] text-xs rounded-2xl p-4 shadow-[0_0_20px_rgba(0,0,0,0.15)] flex items-center gap-3 backdrop-blur-md ${locale === "ar" ? "border-r-4 border-r-[#D1AF47] text-right flex-row-reverse" : "border-l-4 border-l-[#D1AF47] text-left"}`}>
+        <div role="alert" className={`bg-white border border-[#ECECEC]/60 border border-[#ECECEC] text-[#344054] text-xs rounded-2xl p-4 shadow-[0_0_20px_rgba(0,0,0,0.15)] flex items-center gap-3 backdrop-blur-md ${locale === "ar" ? "border-r-4 border-r-[#D1AF47] text-right flex-row-reverse" : "border-l-4 border-l-[#D1AF47] text-left"}`}>
           <svg className="w-5 h-5 text-[#D1AF47] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -391,7 +406,7 @@ export default function ProviderBookingsPage() {
                           <span className="font-bold text-[#101828] block text-sm tracking-wide">
                             {bk.profiles?.first_name} {bk.profiles?.last_name}
                           </span>
-                          <span className="text-[11px] text-[#667085] block mt-1 tracking-wider font-mono">{bk.profiles?.phone}</span>
+                          <span className="text-[11px] text-[#667085] block mt-1 tracking-wider font-mono">{bk.profiles?.phone_number}</span>
                         </td>
 
                         {/* Service Info */}
@@ -498,7 +513,7 @@ export default function ProviderBookingsPage() {
                       <h4 className="font-bold text-[#101828] text-base tracking-wide">
                         {bk.profiles?.first_name} {bk.profiles?.last_name}
                       </h4>
-                      <p className="text-xs text-[#667085] mt-0.5 tracking-wider font-mono">{bk.profiles?.phone}</p>
+                      <p className="text-xs text-[#667085] mt-0.5 tracking-wider font-mono">{bk.profiles?.phone_number}</p>
                     </div>
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-bold border uppercase tracking-wider ${badge.bg} ${badge.text} ${badge.border}`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />

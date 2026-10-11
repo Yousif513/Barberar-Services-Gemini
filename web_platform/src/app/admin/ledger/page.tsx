@@ -2,6 +2,12 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
+import { CommandResult } from "@/components/operations-ui";
+import { CommandDialog } from "@/components/modal";
+
+// Rows per list read from the audited functions (the server caps a page at 500).
+const LIST_LIMIT = 200;
 
 const translations = {
   en: {
@@ -24,6 +30,8 @@ const translations = {
     successMsg: "Payout released.",
     errorMsg: "Failed to release transaction payout split.",
     errorLoad: "Failed to load financial records.",
+    ledgerShowing: "Showing the latest {shown} of {total} ledger entries. Totals cover all {total}.",
+    listShowing: "Showing the latest {shown} of {total}.",
     payoutRequestsTitle: "Provider Payout Requests",
     payoutRequestsSubtitle: "Review withdrawal requests, move them into processing, reject them, or mark paid after releasing matched ledger rows.",
     requestId: "Request ID",
@@ -44,6 +52,7 @@ const translations = {
     requestProcessingMsg: "Payout request moved to processing.",
     requestRejectedMsg: "Payout request rejected.",
     requestPaidMsg: "Payout request marked paid and ledger rows released.",
+    requestPendingApprovalMsg: "Payout recorded for approval: a second administrator approves it in Approvals, which pays it.",
     requestActionError: "Failed to update payout request.",
     noLedgerCoverage: "No pending ledger rows were found for this provider.",
     noLedgerRows: "No captured ledger rows yet.",
@@ -76,6 +85,7 @@ const translations = {
     
     // Statements Tab
     vatReportTitle: "Monthly VAT Collection Report",
+    reportsFailed: "These statements could not be loaded, so the tables below are incomplete: {reason}",
     vatReportSubtitle: "Value-Added Tax (15% VAT) collected from completed bookings.",
     settlementTitle: "Provider Settlement Ledger",
     settlementSubtitle: "Gross captured volume, platform commission, and released payouts per provider.",
@@ -89,7 +99,9 @@ const translations = {
     releasedPayouts: "Released Payout",
     employee: "Stylist / Employee",
     totalEarnings: "Total Earnings",
-    noRecords: "No records found."
+    noRecords: "No records found.",
+    listFailed: "This list could not be loaded, so an empty table would be wrong: {reason}",
+    retry: "Retry"
   },
   ar: {
     title: "السجل والتقارير المالية",
@@ -111,6 +123,8 @@ const translations = {
     successMsg: "تم تحرير دفعة الضمان بنجاح!",
     errorMsg: "فشل تحرير دفعة الضمان المالي.",
     errorLoad: "فشل تحميل السجلات المالية.",
+    ledgerShowing: "عرض أحدث {shown} من {total} قيداً. الإجماليات تشمل جميع القيود ({total}).",
+    listShowing: "عرض أحدث {shown} من {total}.",
     payoutRequestsTitle: "طلبات تحويل المزودين",
     payoutRequestsSubtitle: "مراجعة طلبات السحب ونقلها للمعالجة أو رفضها أو تعليمها كمدفوعة بعد تحرير سجلات الدفعات المطابقة.",
     requestId: "رقم الطلب",
@@ -131,6 +145,7 @@ const translations = {
     requestProcessingMsg: "تم نقل طلب التحويل إلى قيد المعالجة.",
     requestRejectedMsg: "تم رفض طلب التحويل.",
     requestPaidMsg: "تم تعليم طلب التحويل كمدفوع وتحرير سجلات الدفعات.",
+    requestPendingApprovalMsg: "سُجّل التحويل للاعتماد: يعتمده مسؤول ثانٍ من شاشة الاعتمادات، وعندها يُصرف.",
     requestActionError: "فشل تحديث طلب التحويل.",
     noLedgerCoverage: "لم يتم العثور على سجلات دفعات معلقة لهذا المزود.",
     noLedgerRows: "لا توجد سجلات مالية مقبوضة بعد.",
@@ -163,6 +178,7 @@ const translations = {
     
     // Statements Tab
     vatReportTitle: "تقرير ضريبة القيمة المضافة الشهري",
+    reportsFailed: "تعذّر تحميل هذه الكشوف، لذا فالجداول أدناه غير مكتملة: {reason}",
     vatReportSubtitle: "ضريبة القيمة المضافة (١٥٪) المحصلة من الحجوزات المكتملة.",
     settlementTitle: "تسويات مبالغ المزودين",
     settlementSubtitle: "إجمالي الحجم المالي المقبوض، عمولة المنصة، والمبالغ المحولة لكل مزود.",
@@ -176,7 +192,9 @@ const translations = {
     releasedPayouts: "المبالغ المحولة فعلياً",
     employee: "الموظف / الأخصائي",
     totalEarnings: "إجمالي الأرباح",
-    noRecords: "لا توجد سجلات حالياً."
+    noRecords: "لا توجد سجلات حالياً.",
+    listFailed: "تعذّر تحميل هذه القائمة، لذا فإظهار جدول فارغ سيكون مضللاً: {reason}",
+    retry: "إعادة المحاولة"
   }
 };
 
@@ -222,12 +240,14 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
   const [paymentIntegrations, setPaymentIntegrations] = useState<PaymentIntegration[]>([]);
   const [note, setNote] = useState("");
   const [methodError, setMethodError] = useState("");
+  // Turning a payment method off or changing the default is confirmed in a dialog that names the method.
+  const [methodConfirm, setMethodConfirm] = useState<{ kind: "toggle" | "default"; method: PayMethod } | null>(null);
   const L = lang === "ar"
     ? { title: "طرق الدفع (السوق السعودي)", subtitle: "فعّل أو عطّل الطرق وحدد الافتراضية — تنعكس فوراً على صفحة الدفع لدى العميل وشاشة مستحقات المزود.", enabled: "مفعلة", disabled: "معطلة", makeDefault: "افتراضية", isDefault: "★ الافتراضية", roles: "متاحة لـ", customer: "العميل", provider: "المزود", gateway: "البوابة", saved: "تم حفظ إعدادات طرق الدفع.", empty: "لا توجد طرق دفع — طبّق ترحيل قاعدة البيانات ثم أعد التحميل." }
     : { title: "Payment Methods (KSA)", subtitle: "Enable, disable and set the default — changes reflect instantly at customer checkout and provider payout screens.", enabled: "Enabled", disabled: "Disabled", makeDefault: "Make default", isDefault: "★ Default", roles: "Available to", customer: "Customer", provider: "Provider", gateway: "Gateway", saved: "Payment method settings saved.", empty: "No payment methods yet — apply the database migration and reload." };
 
   const P = lang === "ar"
-    ? { activeApi: "API Ù…ØªØµÙ„", blocked: "Ù…Ø­Ø¬ÙˆØ¨: Ø§Ø®ØªØ± API Ø¯ÙØ¹ Ù…ØªØµÙ„", noGateway: "Ù„Ø§ ÙŠØ­ØªØ§Ø¬ API", selectGateway: "Ø§Ø®ØªÙŠØ§Ø± Ù…Ø²ÙˆØ¯ Ø§Ù„Ø¯ÙØ¹", activeApis: "APIs Ø§Ù„Ù…ÙØ¹Ù„Ø©" }
+    ? { activeApi: "API متصل", blocked: "محجوب: اختر API دفع متصل", noGateway: "لا يحتاج API", selectGateway: "اختيار مزود الدفع", activeApis: "APIs المفعلة" }
     : { activeApi: "Connected API", blocked: "Blocked: choose a connected payment API", noGateway: "No API required", selectGateway: "Select gateway provider", activeApis: "Active payment APIs" };
 
   useEffect(() => {
@@ -246,7 +266,7 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
         setMethods([]);
         setPaymentIntegrations([]);
         setMethodError(lang === "ar"
-          ? "ÙØ´Ù„ ØªØ­Ù…ÙŠÙ„ Ø·Ø±Ù‚ Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ø­Ù‚ÙŠÙ‚ÙŠØ©. Ø·Ø¨Ù‘Ù‚ ØªØ±Ø­ÙŠÙ„Ø§Øª Supabase ÙˆØªØ£ÙƒØ¯ Ù…Ù† ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø´Ø±Ù."
+          ? "فشل تحميل طرق الدفع الحقيقية. طبّق ترحيلات Supabase وتأكد من صلاحيات المشرف."
           : "Failed to load real payment methods. Apply the Supabase migrations and verify admin permissions.");
       }
     })();
@@ -257,11 +277,13 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
     setMethods(previous);
     setNote("");
     setMethodError(lang === "ar"
-      ? "Ù„Ù… ÙŠØªÙ… Ø­ÙØ¸ ØªØºÙŠÙŠØ± Ø·Ø±ÙŠÙ‚Ø© Ø§Ù„Ø¯ÙØ¹. ØªØ£ÙƒØ¯ Ù…Ù† Ø§Ù„ØªØ±Ø­ÙŠÙ„Ø§Øª ÙˆØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø´Ø±Ù."
+      ? "لم يتم حفظ تغيير طريقة الدفع. تأكد من الترحيلات وصلاحيات المشرف."
       : "Payment method change was not saved. Check the migrations and admin permissions.");
   };
 
-  const toggleEnabled = async (m: PayMethod) => {
+  const toggleEnabled = (m: PayMethod) => setMethodConfirm({ kind: "toggle", method: m });
+
+  const applyToggle = async (m: PayMethod) => {
     const previous = methods;
     setMethods((prev) => prev.map((x) => (x.id === m.id ? { ...x, enabled: !m.enabled } : x)));
     try {
@@ -273,11 +295,15 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
     }
   };
 
-  const makeDefault = async (m: PayMethod) => {
+  const makeDefault = (m: PayMethod) => {
     if (m.requires_gateway && !isOperational(m)) {
       setMethodError(P.blocked);
       return;
     }
+    setMethodConfirm({ kind: "default", method: m });
+  };
+
+  const applyDefault = async (m: PayMethod) => {
     const previous = methods;
     setMethods((prev) => prev.map((x) => ({ ...x, is_default: x.id === m.id })));
     try {
@@ -320,8 +346,41 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
     }
   };
 
+  const renderMethodConfirm = () => {
+    if (!methodConfirm) return null;
+    const { kind, method } = methodConfirm;
+    const name = lang === "ar" ? method.label_ar : method.label_en;
+    const disabling = kind === "toggle" && method.enabled;
+    const ar = lang === "ar";
+    return (
+      <CommandDialog
+        locale={lang}
+        tone={disabling ? "danger" : "default"}
+        title={kind === "default" ? (ar ? "تعيين طريقة الدفع الافتراضية" : "Set the default payment method") : disabling ? (ar ? "إيقاف طريقة الدفع" : "Disable this payment method") : (ar ? "تفعيل طريقة الدفع" : "Enable this payment method")}
+        intro={kind === "default"
+          ? (ar ? "تصبح هذه الطريقة الخيار الأول عند الدفع وتُفعَّل إن كانت معطلة." : "This becomes the first choice at checkout, and is enabled if it was off.")
+          : disabling
+            ? (ar ? "لن تظهر هذه الطريقة للعملاء عند الدفع." : "Customers will no longer see this method at checkout.")
+            : (ar ? "ستظهر هذه الطريقة للعملاء عند الدفع." : "Customers will see this method at checkout.")}
+        facts={[
+          { label: ar ? "طريقة الدفع" : "Payment method", value: name },
+          { label: ar ? "البوابة" : "Gateway", value: `${method.gateway_key ?? "—"} · ${method.env}` },
+        ]}
+        reasonLabel=""
+        reasonRequired={false}
+        confirmLabel={kind === "default" ? (ar ? "تعيين كافتراضية" : "Make default") : disabling ? (ar ? "إيقاف" : "Disable") : (ar ? "تفعيل" : "Enable")}
+        onConfirm={async () => {
+          await (kind === "default" ? applyDefault(method) : applyToggle(method));
+          return null;
+        }}
+        onClose={() => setMethodConfirm(null)}
+      />
+    );
+  };
+
   return (
     <div className={cardBase}>
+      {renderMethodConfirm()}
       <div className="mb-4">
         <h3 className="text-sm font-serif font-black text-gray-900">{L.title}</h3>
         <p className="text-[11px] text-gray-500 font-semibold mt-0.5">{L.subtitle}</p>
@@ -374,7 +433,7 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
                   <select
                     value={operational ? (m.gateway_key || "") : ""}
                     onChange={(event) => changeGateway(m, event.target.value)}
-                    className="w-full rounded-xl border border-[#ECECEC] bg-white px-2.5 py-2 text-[10px] font-black text-gray-700 outline-none focus:border-[#D1AF47]"
+                    className="w-full rounded-xl border border-[#ECECEC] bg-white px-2.5 py-2 text-[10px] font-black text-gray-700 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]"
                   >
                     <option value="" disabled>{candidates.length ? P.selectGateway : P.blocked}</option>
                     {candidates.map((gateway) => (
@@ -402,13 +461,144 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
   );
 }
 
+// Copy for the commands that settle provider money. Each opens a dialog that names the target, states what happens,
+// captures the operator's reason (recorded in the audit log) and keeps it if the server refuses.
+const commandCopy = {
+  en: {
+    reasonLabel: "Reason (recorded in the audit log)",
+    reconciliationHold: "Held until Tap reconciliation clears: {n} open break(s), SAR {amount}",
+    payReasonLabel: "Bank transfer reference or note (recorded in the audit log)",
+    releaseTitle: "Release this ledger entry",
+    releaseIntro: "Record that the provider's share of this entry was paid outside the payout flow. A different administrator must approve it, the provider needs an approved bank account past its 48-hour hold, and the bank transfer reference is kept with the entry.",
+    releaseReferenceLabel: "Bank transfer reference",
+    releaseReferenceError: "Enter the bank transfer reference (4 to 64 letters, digits or dashes).",
+    releasePendingMsg: "Sent for approval: a different administrator must approve this settlement.",
+    releaseConfirm: "Release share",
+    processingTitle: "Move this payout request to processing",
+    processingIntro: "The request is accepted for processing. No money moves at this step.",
+    processingConfirm: "Move to processing",
+    rejectTitle: "Reject this payout request",
+    rejectIntro: "The request is closed as rejected; the provider has to make a new request.",
+    rejectConfirm: "Reject request",
+    payTitle: "Mark this payout as paid",
+    payIntro: "Every payout needs a second administrator: this records your release for approval, and the approval allocates the provider's pending ledger shares and marks it paid. Payouts to a bank account approved in the last 48 hours wait for the hold to end.",
+    payConfirm: "Mark as paid",
+    factEntry: "Ledger entry",
+    factCaptured: "Captured",
+    factPlatform: "Platform share",
+    factProvider: "Provider share",
+    factDate: "Date",
+    factRequest: "Payout request",
+    factPayee: "Provider",
+    factAmount: "Amount",
+    factBank: "Bank",
+    factStatus: "Status",
+    releaseFor: "Release ledger entry {id}",
+    processingFor: "Move payout request {id} to processing",
+    payFor: "Mark payout request {id} as paid",
+    rejectFor: "Reject payout request {id}",
+    revealFor: "Reveal the IBAN of {name}",
+    reveal: "Reveal IBAN",
+    revealTitle: "Reveal the full IBAN",
+    revealIntro: "Finance and owners only. The IBAN is shown once for 60 seconds and is never stored in the console or the audit log; the reveal and your reason are audited. Needs a fresh authenticator code.",
+    revealReason: "Reason with a ticket (PAY-1042, #5521) or this provider's payout request id (at least 15 characters)",
+    revealedTitle: "IBAN of {name}",
+    revealedNotApproved: "NOT APPROVED – do not pay. Shown masked until a second administrator approves it.",
+    revealLimit: "You have reached the most IBAN reveals allowed in 24 hours ({n}). Another owner can allow more from Approvals.",
+    revealedActive: "Approved account",
+    revealedPending: "Account waiting for approval",
+    revealedHolder: "Account holder",
+    revealedBank: "Bank",
+    revealedExpires: "Hidden in {n} s",
+    hideNow: "Hide now",
+    notProvided: "Not provided",
+  },
+  ar: {
+    reasonLabel: "السبب (يُسجل في سجل التدقيق)",
+    reconciliationHold: "موقوف حتى تكتمل التسوية مع Tap: {n} من فروق التسوية المفتوحة بقيمة {amount} ريال",
+    payReasonLabel: "مرجع التحويل البنكي أو ملاحظة (تُسجل في سجل التدقيق)",
+    releaseTitle: "صرف هذا القيد",
+    releaseIntro: "تسجيل أن حصة مقدم الخدمة من هذا القيد صُرفت خارج مسار التحويلات. يجب أن يعتمدها مسؤول آخر، وأن يكون لمقدم الخدمة حساب بنكي معتمد تجاوز فترة الانتظار (48 ساعة)، ويُحفظ مرجع التحويل البنكي مع القيد.",
+    releaseReferenceLabel: "مرجع التحويل البنكي",
+    releaseReferenceError: "أدخل مرجع التحويل البنكي (من 4 إلى 64 حرفاً أو رقماً أو شرطة).",
+    releasePendingMsg: "أُرسل للاعتماد: يجب أن يعتمد مسؤول آخر هذه التسوية.",
+    releaseConfirm: "صرف الحصة",
+    processingTitle: "نقل طلب الصرف إلى المعالجة",
+    processingIntro: "يُقبل الطلب للمعالجة. لا تنتقل أي أموال في هذه الخطوة.",
+    processingConfirm: "نقل إلى المعالجة",
+    rejectTitle: "رفض طلب الصرف",
+    rejectIntro: "يُغلق الطلب كمرفوض، وعلى مقدم الخدمة تقديم طلب جديد.",
+    rejectConfirm: "رفض الطلب",
+    payTitle: "تسجيل هذا الطلب كمدفوع",
+    payIntro: "كل تحويل يحتاج مسؤولاً ثانياً: يُسجَّل صرفك للاعتماد، وعند الاعتماد تُخصَّص حصص مقدم الخدمة المعلّقة ويُسجَّل الطلب مدفوعاً. التحويل إلى حساب بنكي اعتُمد خلال آخر 48 ساعة ينتظر انتهاء فترة التعليق.",
+    payConfirm: "تسجيل كمدفوع",
+    factEntry: "قيد الدفتر",
+    factCaptured: "المبلغ المحصّل",
+    factPlatform: "حصة المنصة",
+    factProvider: "حصة مقدم الخدمة",
+    factDate: "التاريخ",
+    factRequest: "طلب الصرف",
+    factPayee: "مقدم الخدمة",
+    factAmount: "المبلغ",
+    factBank: "البنك",
+    factStatus: "الحالة",
+    releaseFor: "صرف قيد الدفتر {id}",
+    processingFor: "نقل طلب الصرف {id} إلى المعالجة",
+    payFor: "تسجيل طلب الصرف {id} كمدفوع",
+    rejectFor: "رفض طلب الصرف {id}",
+    revealFor: "كشف آيبان {name}",
+    reveal: "كشف الآيبان",
+    revealTitle: "كشف الآيبان كاملاً",
+    revealIntro: "للمالية والمالك فقط. يظهر الآيبان مرة واحدة لمدة 60 ثانية ولا يُحفظ في اللوحة ولا في سجل التدقيق؛ ويُسجَّل الكشف وسببه. يحتاج رمزاً جديداً من تطبيق المصادقة.",
+    revealReason: "السبب مع رقم تذكرة (PAY-1042 أو ‎#5521) أو معرّف طلب صرف لهذا المزود (15 حرفاً على الأقل)",
+    revealedTitle: "آيبان {name}",
+    revealedNotApproved: "غير معتمد – لا تحوّل إليه. يظهر مخفياً جزئياً حتى يعتمده مسؤول ثانٍ.",
+    revealLimit: "بلغت الحد الأعلى لكشف الآيبان خلال 24 ساعة ({n}). يمكن لمالك آخر السماح بالمزيد من صفحة الاعتمادات.",
+    revealedActive: "الحساب المعتمد",
+    revealedPending: "حساب بانتظار الاعتماد",
+    revealedHolder: "اسم صاحب الحساب",
+    revealedBank: "البنك",
+    revealedExpires: "يختفي خلال {n} ث",
+    hideNow: "إخفاء الآن",
+    notProvided: "غير متوفر",
+  },
+};
+// GOV-FIX L-3: an account waiting for approval comes back masked only (iban_masked, approved false); nobody may pay it.
+type RevealedAccount = { iban?: string; iban_masked?: string; approved?: boolean; bank_name: string; account_holder_name: string | null };
+type Revealed = { name: string; expiresAt: number; active: RevealedAccount | null; pending: RevealedAccount | null };
+type MoneyAction =
+  | { kind: "reveal"; request: any; providerName: string }
+  | { kind: "release"; item: any }
+  | { kind: "review"; request: any; decision: "processing" | "rejected" }
+  | { kind: "pay"; request: any };
+
 export default function AdminLedger() {
   const [activeTab, setActiveTab] = useState<"methods" | "splits" | "requests" | "statements" | "reconciliation">("methods");
   const [ledger, setLedger] = useState<any[]>([]);
+  // GOV-2 (Q4): the ledger, payouts, statements and fee invoices come from audited, paged server functions; totals are the
+  // server's figures for every matching row, not a sum of the page shown.
+  const [ledgerTotals, setLedgerTotals] = useState<{ total: number; total_captured: number; platform_share: number; provider_share: number } | null>(null);
+  const [listTotals, setListTotals] = useState<{ payouts: number; feeInvoices: number }>({ payouts: 0, feeInvoices: 0 });
   const [payoutRequests, setPayoutRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [requestsLoading, setRequestsLoading] = useState(true);
+  // A failed query is an error with a retry; only a successful query with zero rows is an empty table.
+  const [requestsError, setRequestsError] = useState("");
+  const [reconError, setReconError] = useState("");
+  const [feeInvoicesError, setFeeInvoicesError] = useState("");
   const [processingRequestId, setProcessingRequestId] = useState("");
+  const [money, setMoney] = useState<MoneyAction | null>(null);
+  // Q3: a revealed IBAN lives only in this state, for at most 60 seconds, and is never written anywhere else.
+  const [revealed, setRevealed] = useState<Revealed | null>(null);
+  const [revealClock, setRevealClock] = useState(0);
+  useEffect(() => {
+    if (!revealed) return;
+    const tick = window.setInterval(() => {
+      if (Date.now() >= revealed.expiresAt) setRevealed(null);
+      else setRevealClock(Date.now());
+    }, 1000);
+    return () => window.clearInterval(tick);
+  }, [revealed]);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [lang, setLang] = useState<"en" | "ar">("ar");
@@ -418,6 +608,8 @@ export default function AdminLedger() {
   const [settlementSummary, setSettlementSummary] = useState<any[]>([]);
   const [earningsSummary, setEarningsSummary] = useState<any[]>([]);
   const [reportsLoading, setReportsLoading] = useState(false);
+  // A failed statement query must read as a failure, not as a month with no VAT or settlements.
+  const [reportsError, setReportsError] = useState("");
 
   // Daily PSP Reconciliation & Fee Invoices States (G33, G34)
   const [reconciliationRuns, setReconciliationRuns] = useState<any[]>([]);
@@ -468,12 +660,6 @@ export default function AdminLedger() {
       year: "numeric"
     });
 
-  const maskIban = (iban: string) => {
-    const clean = (iban || "").replace(/\s/g, "").toUpperCase();
-    if (clean.length <= 8) return clean;
-    return `${clean.slice(0, 4)} **** **** ${clean.slice(-4)}`;
-  };
-
   const requestStatusLabel = (status: string) => {
     if (status === "processing") return t.statusProcessing;
     if (status === "paid") return t.statusPaid;
@@ -491,25 +677,18 @@ export default function AdminLedger() {
   const loadLedger = async () => {
     try {
       setLoading(true);
-      const { data, error: dbError } = await supabase
-        .from("transactional_ledger")
-        .select(`
-          id,
-          booking_id,
-          payment_intent_id,
-          total_captured,
-          platform_share,
-          provider_share,
-          payout_status,
-          created_at
-        `)
-        .order("created_at", { ascending: false });
+      const { data, error: dbError } = await supabase.rpc("admin_list_ledger_entries", {
+        p_from: null, p_to: null, p_provider_id: null, p_payout_status: null, p_limit: LIST_LIMIT, p_offset: 0, p_purpose: "finance_operations"
+      });
 
       if (dbError) throw dbError;
-      setLedger(data || []);
+      const page = data as { total: number; total_captured: number; platform_share: number; provider_share: number; rows: any[] };
+      setLedger(page.rows ?? []);
+      setLedgerTotals({ total: Number(page.total), total_captured: Number(page.total_captured), platform_share: Number(page.platform_share), provider_share: Number(page.provider_share) });
     } catch (err) {
-      setError(t.errorLoad);
-      console.warn("Offline splits ledger warning:", err);
+      setLedger([]);
+      setLedgerTotals(null);
+      setError(`${t.errorLoad} ${errorMessage(err)}`.trim());
     } finally {
       setLoading(false);
     }
@@ -518,30 +697,18 @@ export default function AdminLedger() {
   const loadPayoutRequests = async () => {
     try {
       setRequestsLoading(true);
-      const { data, error: dbError } = await supabase
-        .from("payout_requests")
-        .select(`
-          id,
-          provider_id,
-          amount,
-          bank_name,
-          iban,
-          status,
-          admin_note,
-          requested_at,
-          processed_at,
-          providers (
-            business_name_en,
-            business_name_ar
-          )
-        `)
-        .order("requested_at", { ascending: false });
+      setRequestsError("");
+      const { data, error: dbError } = await supabase.rpc("admin_list_payout_requests", {
+        p_status: null, p_provider_id: null, p_limit: LIST_LIMIT, p_offset: 0, p_purpose: "payout_review"
+      });
 
       if (dbError) throw dbError;
-      setPayoutRequests(data || []);
+      const page = data as { total: number; rows: any[] };
+      setPayoutRequests(page.rows ?? []);
+      setListTotals((current) => ({ ...current, payouts: Number(page.total) }));
     } catch (err) {
       setPayoutRequests([]);
-      console.warn("Payout request load warning:", err);
+      setRequestsError(errorMessage(err));
     } finally {
       setRequestsLoading(false);
     }
@@ -550,35 +717,38 @@ export default function AdminLedger() {
   const loadReports = async () => {
     try {
       setReportsLoading(true);
-      
+      setReportsError("");
+
       const [vatResult, settlementResult, earningsResult] = await Promise.all([
-        supabase.from("monthly_vat_summary").select("*").order("month_start", { ascending: false }),
-        supabase.from("provider_settlement_summary").select("*, providers(business_name_en, business_name_ar)").order("month_start", { ascending: false }),
-        supabase.from("employee_earnings_summary").select("*, employees(name_en, name_ar)").order("month_start", { ascending: false })
+        supabase.rpc("admin_finance_summary", { p_kind: "vat", p_from: null, p_to: null, p_provider_id: null, p_limit: LIST_LIMIT, p_offset: 0, p_purpose: "tax_reporting" }),
+        supabase.rpc("admin_finance_summary", { p_kind: "settlement", p_from: null, p_to: null, p_provider_id: null, p_limit: LIST_LIMIT, p_offset: 0, p_purpose: "finance_operations" }),
+        supabase.rpc("admin_finance_summary", { p_kind: "employee_earnings", p_from: null, p_to: null, p_provider_id: null, p_limit: LIST_LIMIT, p_offset: 0, p_purpose: "finance_operations" })
       ]);
 
       if (vatResult.error) {
         console.error("Failed to load monthly_vat_summary:", vatResult.error);
         setVatSummary([]);
       } else {
-        setVatSummary(vatResult.data || []);
+        setVatSummary((vatResult.data as { rows: any[] } | null)?.rows ?? []);
       }
 
       if (settlementResult.error) {
         console.error("Failed to load provider_settlement_summary:", settlementResult.error);
         setSettlementSummary([]);
       } else {
-        setSettlementSummary(settlementResult.data || []);
+        setSettlementSummary((settlementResult.data as { rows: any[] } | null)?.rows ?? []);
       }
 
       if (earningsResult.error) {
         console.error("Failed to load employee_earnings_summary:", earningsResult.error);
         setEarningsSummary([]);
       } else {
-        setEarningsSummary(earningsResult.data || []);
+        setEarningsSummary((earningsResult.data as { rows: any[] } | null)?.rows ?? []);
       }
+      const failures = [vatResult.error, settlementResult.error, earningsResult.error].filter(Boolean).map((e) => errorMessage(e));
+      if (failures.length > 0) setReportsError(failures.join(" · "));
     } catch (err) {
-      console.warn("Accountant report views loading fallback:", err);
+      setReportsError(errorMessage(err));
     } finally {
       setReportsLoading(false);
     }
@@ -587,6 +757,7 @@ export default function AdminLedger() {
   const loadReconciliationRuns = async () => {
     try {
       setReconLoading(true);
+      setReconError("");
       const { data, error: dbError } = await supabase
         .from("psp_reconciliation_runs")
         .select("*")
@@ -594,7 +765,7 @@ export default function AdminLedger() {
       if (dbError) throw dbError;
       setReconciliationRuns(data || []);
     } catch (err) {
-      console.warn("Reconciliation runs load warning:", err);
+      setReconError(errorMessage(err));
       setReconciliationRuns([]);
     } finally {
       setReconLoading(false);
@@ -604,33 +775,16 @@ export default function AdminLedger() {
   const loadFeeInvoices = async () => {
     try {
       setFeeInvoicesLoading(true);
-      const { data, error: dbError } = await supabase
-        .from("provider_fee_invoices")
-        .select(`
-          id,
-          provider_id,
-          invoice_number,
-          period_start,
-          period_end,
-          total_bookings_count,
-          gross_gmv_sar,
-          deposit_captured_sar,
-          platform_commission_sar,
-          net_fee_receivable_sar,
-          vat_on_commission_sar,
-          total_invoice_due_sar,
-          status,
-          created_at,
-          providers (
-            business_name_en,
-            business_name_ar
-          )
-        `)
-        .order("created_at", { ascending: false });
+      setFeeInvoicesError("");
+      const { data, error: dbError } = await supabase.rpc("admin_list_fee_invoices", {
+        p_status: null, p_provider_id: null, p_limit: LIST_LIMIT, p_offset: 0, p_purpose: "finance_operations"
+      });
       if (dbError) throw dbError;
-      setProviderFeeInvoices(data || []);
+      const page = data as { total: number; rows: any[] };
+      setProviderFeeInvoices(page.rows ?? []);
+      setListTotals((current) => ({ ...current, feeInvoices: Number(page.total) }));
     } catch (err) {
-      console.warn("Fee invoices load warning:", err);
+      setFeeInvoicesError(errorMessage(err));
       setProviderFeeInvoices([]);
     } finally {
       setFeeInvoicesLoading(false);
@@ -679,88 +833,204 @@ export default function AdminLedger() {
     loadFeeInvoices();
   }, [lang]);
 
-  const handleReleasePayout = async (id: string) => {
-    try {
-      setSuccess("");
-      setError("");
+  // Every money command opens a dialog first (see renderMoneyDialog); these run the command once the operator has
+  // confirmed and given a reason. A refusal is returned to the dialog, which stays open with what was typed.
+  const handleReleasePayout = (item: any) => setMoney({ kind: "release", item });
+  const updatePayoutRequestStatus = (request: any, decision: "processing" | "rejected") => setMoney({ kind: "review", request, decision });
+  const markPayoutRequestPaid = (request: any) => setMoney({ kind: "pay", request });
 
-      const idempotencyKey = `ledger_release_${id}_${Date.now()}`;
-      const { error: rpcError } = await supabase.rpc("admin_release_ledger_item", {
-        p_ledger_id: id,
-        p_idempotency_key: idempotencyKey,
-      });
-
-      if (rpcError) throw rpcError;
-
-      setSuccess(t.successMsg);
-      loadLedger();
-    } catch (err: any) {
-      setError(err?.message || t.errorMsg);
-      console.warn("Offline split release error:", err);
-    }
+  const runReleaseItem = async (item: any, reason: string, bankReference: string): Promise<string | null> => {
+    // Stable per entry, so a retry after a lost response cannot release twice.
+    const idempotencyKey = `ledger_release_${item.id}`;
+    const { data: released, error: rpcError } = await supabase.rpc("admin_release_ledger_item", {
+      p_ledger_id: item.id,
+      p_reason: reason,
+      p_bank_reference: bankReference.trim(),
+      p_idempotency_key: idempotencyKey,
+    });
+    if (rpcError) return errorMessage(rpcError) || t.errorMsg;
+    setError("");
+    // GOV-1 review H-4: one administrator alone only records the request; a second one approves it in /admin/approvals.
+    setSuccess((released as { status?: string } | null)?.status === "pending_approval" ? commandCopy[lang].releasePendingMsg : t.successMsg);
+    void loadLedger();
+    return null;
   };
 
-  const updatePayoutRequestStatus = async (request: any, status: "processing" | "rejected") => {
-    try {
-      setSuccess("");
-      setError("");
-      setProcessingRequestId(request.id);
-
-      const { error: patchError } = await supabase
-        .from("payout_requests")
-        .update({
-          status,
-          processed_at: status === "rejected" ? new Date().toISOString() : null,
-          admin_note: status === "rejected" ? "Rejected by admin review." : "Approved for payout processing."
-        })
-        .eq("id", request.id);
-
-      if (patchError) throw patchError;
-
-      setSuccess(status === "rejected" ? t.requestRejectedMsg : t.requestProcessingMsg);
-      await loadPayoutRequests();
-    } catch (err) {
-      setError(t.requestActionError);
-      console.warn("Payout request status warning:", err);
-    } finally {
-      setProcessingRequestId("");
-    }
+  const runReviewRequest = async (request: any, decision: "processing" | "rejected", reason: string): Promise<string | null> => {
+    const { error: rpcError } = await supabase.rpc("admin_review_payout_request", {
+      p_payout_request_id: request.id,
+      p_decision: decision,
+      p_reason: reason,
+    });
+    if (rpcError) return errorMessage(rpcError) || t.requestActionError;
+    setError("");
+    setSuccess(decision === "rejected" ? t.requestRejectedMsg : t.requestProcessingMsg);
+    await loadPayoutRequests();
+    return null;
   };
 
-  const markPayoutRequestPaid = async (request: any) => {
-    try {
-      setSuccess("");
-      setError("");
-      setProcessingRequestId(request.id);
+  const runPayRequest = async (request: any, reason: string): Promise<string | null> => {
+    // Stable per request, so a retry after a lost response cannot pay twice.
+    const idempotencyKey = `payout_release_${request.id}`;
+    const { data: released, error: rpcError } = await supabase.rpc("admin_release_payout", {
+      p_payout_request_id: request.id,
+      p_idempotency_key: idempotencyKey,
+      p_reason: reason,
+    });
+    if (rpcError) return errorMessage(rpcError) || t.requestActionError;
+    setError("");
+    // D-Q5: the release waits for a second administrator unless this call executed an approved request.
+    setSuccess((released as { status?: string } | null)?.status === "pending_approval" ? t.requestPendingApprovalMsg : t.requestPaidMsg);
+    await Promise.all([loadLedger(), loadPayoutRequests()]);
+    return null;
+  };
 
-      const idempotencyKey = `payout_release_${request.id}_${Date.now()}`;
-      const { error: rpcError } = await supabase.rpc("admin_release_payout", {
-        p_payout_request_id: request.id,
-        p_idempotency_key: idempotencyKey,
-        p_admin_note: `Released payout of ${Number(request.amount || 0).toFixed(2)} SAR.`,
-      });
+  const runReveal = async (request: any, providerName: string, reason: string): Promise<string | null> => {
+    const { data, error: rpcError } = await supabase.rpc("reveal_provider_iban", { p_provider_id: request.provider_id, p_reason: reason });
+    if (rpcError) return errorMessage(rpcError);
+    const shown = data as { expires_at: string; active: RevealedAccount | null; pending: RevealedAccount | null; refused?: boolean; ceiling?: number };
+    // GOV-FIX L-2: past the 24-hour ceiling nothing is revealed (the server records the refusal and raises an alert).
+    if (shown.refused) return commandCopy[lang].revealLimit.replace("{n}", String(shown.ceiling ?? ""));
+    setRevealed({ name: providerName, expiresAt: Math.min(new Date(shown.expires_at).getTime(), Date.now() + 60000), active: shown.active, pending: shown.pending });
+    setRevealClock(Date.now());
+    return null;
+  };
 
-      if (rpcError) {
-        throw rpcError;
-      }
+  const renderRevealed = () => {
+    if (!revealed) return null;
+    const c = commandCopy[lang];
+    const seconds = Math.max(0, Math.ceil((revealed.expiresAt - (revealClock || Date.now())) / 1000));
+    const account = (label: string, value: RevealedAccount | null) => value && (
+      <div className="rounded-xl border border-[#ECECEC] bg-[#F9F7F1] p-3">
+        <p className="text-[11px] font-black text-[#667085]">{label}</p>
+        {value.iban ? (
+          <p dir="ltr" className="mt-1 select-all break-all font-mono text-base font-black text-[#101828]">{value.iban.replace(/(.{4})/g, "$1 ").trim()}</p>
+        ) : (
+          <>
+            <p dir="ltr" className="mt-1 break-all font-mono text-base font-black text-[#667085]">{value.iban_masked}</p>
+            <p role="note" className="mt-1 text-xs font-black text-[#B42318]">{c.revealedNotApproved}</p>
+          </>
+        )}
+        <p className="mt-1 text-xs text-[#475467]">{c.revealedBank}: {value.bank_name} · {c.revealedHolder}: {value.account_holder_name || c.notProvided}</p>
+      </div>
+    );
+    return (
+      <div role="dialog" aria-modal="false" aria-label={c.revealedTitle.replace("{name}", revealed.name)} dir={lang === "ar" ? "rtl" : "ltr"}
+        className="fixed inset-x-4 bottom-4 z-[9500] mx-auto max-w-lg rounded-[24px] border border-[#D1AF47]/50 bg-white p-5 text-start shadow-2xl">
+        <div className="flex items-start justify-between gap-3">
+          <p className="font-serif text-lg font-black text-[#101828]">{c.revealedTitle.replace("{name}", revealed.name)}</p>
+          <span role="timer" aria-live="off" className="shrink-0 rounded-full bg-[#FFFAEB] px-2.5 py-1 text-[11px] font-black text-[#B54708]">{c.revealedExpires.replace("{n}", String(seconds))}</span>
+        </div>
+        <div className="mt-3 space-y-2">
+          {account(c.revealedActive, revealed.active)}
+          {account(c.revealedPending, revealed.pending)}
+        </div>
+        <div className="mt-3 flex justify-end">
+          <button type="button" onClick={() => setRevealed(null)} className="rounded-xl border border-[#D0D5DD] px-4 py-2 text-sm font-bold text-[#344054] focus-visible:outline-2 focus-visible:outline-[#9B7928]">{c.hideNow}</button>
+        </div>
+      </div>
+    );
+  };
 
-      setSuccess(t.requestPaidMsg);
-      await Promise.all([loadLedger(), loadPayoutRequests()]);
-    } catch (err: any) {
-      setError(err?.message || t.requestActionError);
-      console.error("Payout request release error:", err);
-    } finally {
-      setProcessingRequestId("");
+  const renderMoneyDialog = () => {
+    if (!money) return null;
+    const c = commandCopy[lang];
+    const close = () => setMoney(null);
+    if (money.kind === "reveal") {
+      const { request, providerName } = money;
+      return (
+        <CommandDialog
+          locale={lang}
+          title={c.revealTitle}
+          intro={c.revealIntro}
+          facts={[
+            { label: c.factPayee, value: providerName },
+            { label: c.factBank, value: `${request.bank_name} · ${request.iban_masked ?? ""}` },
+            { label: c.factRequest, value: String(request.id).slice(0, 8).toUpperCase() },
+          ]}
+          reasonLabel={c.revealReason}
+          minReasonLength={15}
+          confirmLabel={c.reveal}
+          onConfirm={(reason) => runReveal(request, providerName, reason)}
+          onClose={close}
+        />
+      );
     }
+    const sarText = (value: unknown) => `${formatMoney(value as number)} ${lang === "ar" ? "ريال" : "SAR"}`;
+    if (money.kind === "release") {
+      const { item } = money;
+      return (
+        <CommandDialog
+          locale={lang}
+          tone="danger"
+          title={c.releaseTitle}
+          intro={c.releaseIntro}
+          facts={[
+            { label: c.factEntry, value: String(item.id).slice(0, 8).toUpperCase() },
+            { label: c.factCaptured, value: sarText(item.total_captured) },
+            { label: c.factPlatform, value: sarText(item.platform_share) },
+            { label: c.factProvider, value: sarText(item.provider_share) },
+            { label: c.factDate, value: formatDate(item.created_at) },
+          ]}
+          reasonLabel={c.reasonLabel}
+          field={{ label: c.releaseReferenceLabel, pattern: /^[A-Za-z0-9][A-Za-z0-9 \-\/]{3,63}$/, error: c.releaseReferenceError, ltr: true }}
+          confirmLabel={c.releaseConfirm}
+          onConfirm={(reason, reference) => runReleaseItem(item, reason, reference)}
+          onClose={close}
+        />
+      );
+    }
+    const { request } = money;
+    const provider = Array.isArray(request.providers) ? request.providers[0] : request.providers;
+    const providerName = (lang === "ar" ? provider?.business_name_ar || provider?.business_name_en : provider?.business_name_en || provider?.business_name_ar) || String(request.provider_id).slice(0, 8);
+    const facts = [
+      { label: c.factRequest, value: String(request.id).slice(0, 8).toUpperCase() },
+      { label: c.factPayee, value: providerName },
+      { label: c.factAmount, value: sarText(request.amount) },
+      { label: c.factBank, value: `${request.bank_name} · ${request.iban_masked ?? ""}` },
+      { label: c.factStatus, value: requestStatusLabel(request.status) },
+    ];
+    if (money.kind === "pay") {
+      return (
+        <CommandDialog
+          locale={lang}
+          tone="danger"
+          title={c.payTitle}
+          intro={c.payIntro}
+          facts={facts}
+          reasonLabel={c.payReasonLabel}
+          confirmWord={Number(request.amount || 0).toFixed(2)}
+          confirmLabel={c.payConfirm}
+          onConfirm={(reason) => runPayRequest(request, reason)}
+          onClose={close}
+        />
+      );
+    }
+    const rejecting = money.decision === "rejected";
+    return (
+      <CommandDialog
+        locale={lang}
+        tone={rejecting ? "danger" : "default"}
+        title={rejecting ? c.rejectTitle : c.processingTitle}
+        intro={rejecting ? c.rejectIntro : c.processingIntro}
+        facts={facts}
+        reasonLabel={c.reasonLabel}
+        confirmLabel={rejecting ? c.rejectConfirm : c.processingConfirm}
+        onConfirm={(reason) => runReviewRequest(request, money.decision, reason)}
+        onClose={close}
+      />
+    );
   };
 
   const isRTL = lang === "ar";
   const flip = isRTL ? "flex-row-reverse" : "flex-row";
 
   // Calculate split summaries
-  const totalGross = ledger.reduce((sum, item) => sum + (parseFloat(item.total_captured) || 0), 0);
-  const platformTotal = ledger.reduce((sum, item) => sum + (parseFloat(item.platform_share) || 0), 0);
-  const providerTotal = ledger.reduce((sum, item) => sum + (parseFloat(item.provider_share) || 0), 0);
+  const totalGross = ledgerTotals?.total_captured ?? 0;
+  const platformTotal = ledgerTotals?.platform_share ?? 0;
+  const providerTotal = ledgerTotals?.provider_share ?? 0;
+  const showing = (template: string, shown: number, total: number) =>
+    template.replace(/\{shown\}/g, shown.toLocaleString(lang === "ar" ? "ar-SA" : "en-US")).replace(/\{total\}/g, total.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"));
 
   const cardBase = "rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] transition-all duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.035)] hover:border-[#D1AF47]/20";
 
@@ -809,17 +1079,17 @@ export default function AdminLedger() {
         </div>
       </div>
 
-      {success && (
-        <div className={`bg-[#ECFDF3] border border-[#22C55E]/20 text-[#16A34A] text-xs rounded-xl p-4 font-semibold ${isRTL ? "text-right" : "text-left"}`}>
-          {t.success}: {success}
-        </div>
-      )}
-
-      {error && (
-        <div className={`bg-[#FEF3F2] border border-[#EF4444]/20 text-[#EF4444] text-xs rounded-xl p-4 font-semibold ${isRTL ? "text-right" : "text-left"}`}>
-          {t.error}: {error}
-        </div>
-      )}
+      <CommandResult
+        error={error ? `${t.error}: ${error}` : undefined}
+        success={success && !error ? `${t.success}: ${success}` : undefined}
+        locale={lang}
+        onDismiss={() => {
+          setError("");
+          setSuccess("");
+        }}
+      />
+      {renderMoneyDialog()}
+      {renderRevealed()}
 
       {/* ──────────────────────────────────────────────────────── */}
       {/* 0. PAYMENT METHODS REGISTRY TAB                          */}
@@ -929,7 +1199,9 @@ export default function AdminLedger() {
                         </td>
                         <td className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>
                           <button
-                            onClick={() => handleReleasePayout(item.id)}
+                            type="button"
+                            aria-label={commandCopy[lang].releaseFor.replace("{id}", String(item.id).slice(0, 8).toUpperCase())}
+                            onClick={() => handleReleasePayout(item)}
                             disabled={item.payout_status === "released"}
                             className="px-4 py-2 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-50 disabled:text-gray-400 text-white text-[10px] font-black uppercase tracking-wider rounded-lg transition border border-[#ECECEC] disabled:border-[#ECECEC]"
                           >
@@ -941,6 +1213,9 @@ export default function AdminLedger() {
                   )}
                 </tbody>
               </table>
+              {ledgerTotals && ledgerTotals.total > ledger.length && (
+                <p className="px-6 py-3 text-[11px] font-semibold text-gray-500">{showing(t.ledgerShowing, ledger.length, ledgerTotals.total)}</p>
+              )}
             </div>
           </div>
         </div>
@@ -979,6 +1254,13 @@ export default function AdminLedger() {
                   <tr>
                     <td colSpan={7} className="py-8 text-center text-gray-400 font-bold">{t.loading}</td>
                   </tr>
+                ) : requestsError ? (
+                  <tr>
+                    <td colSpan={7} className="py-8 text-center">
+                      <p role="alert" className="font-bold text-[#B42318]">{t.listFailed.replace("{reason}", requestsError)}</p>
+                      <button type="button" onClick={() => void loadPayoutRequests()} className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-xs font-bold text-gray-800 hover:border-gray-500">{t.retry}</button>
+                    </td>
+                  </tr>
                 ) : payoutRequests.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="py-8 text-center text-gray-400 font-bold">{t.noPayoutRequests}</td>
@@ -1007,17 +1289,32 @@ export default function AdminLedger() {
                         </td>
                         <td className="py-4 px-6">
                           <p className="font-bold text-gray-900">{request.bank_name}</p>
-                          <p className="mt-1 font-mono text-[9px] text-gray-400">{maskIban(request.iban)}</p>
+                          <p dir="ltr" className="mt-1 font-mono text-[9px] text-gray-400">{request.iban_masked}</p>
+                          <button
+                            type="button"
+                            aria-label={commandCopy[lang].revealFor.replace("{name}", String(providerName))}
+                            onClick={() => setMoney({ kind: "reveal", request, providerName: String(providerName) })}
+                            className="mt-1 text-[9px] font-black uppercase tracking-wider text-[#725517] underline focus-visible:outline-2 focus-visible:outline-[#9B7928]"
+                          >
+                            {commandCopy[lang].reveal}
+                          </button>
                         </td>
                         <td className="py-4 px-6">
                           <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-block ${requestStatusClass(request.status)}`}>
                             {requestStatusLabel(request.status)}
                           </span>
+                          {request.reconciliation_hold ? (
+                            <p className="mt-1 max-w-[220px] text-[10px] font-bold text-[#B54708]">
+                              {commandCopy[lang].reconciliationHold.replace("{n}", String(request.reconciliation_hold.open_breaks)).replace("{amount}", formatMoney(request.reconciliation_hold.amount_sar))}
+                            </p>
+                          ) : null}
                         </td>
                         <td className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>
                           <div className={`flex flex-wrap gap-2 ${isRTL ? "justify-start" : "justify-end"}`}>
                             {request.status === "requested" && (
                               <button
+                                type="button"
+                                aria-label={commandCopy[lang].processingFor.replace("{id}", request.id.slice(0, 8).toUpperCase())}
                                 onClick={() => updatePayoutRequestStatus(request, "processing")}
                                 disabled={isBusy}
                                 className="px-3 py-1.5 bg-white text-gray-700 border border-[#ECECEC] hover:bg-gray-50 disabled:opacity-50 text-[9px] font-black uppercase tracking-wider rounded-lg transition"
@@ -1027,6 +1324,8 @@ export default function AdminLedger() {
                             )}
                             {!isClosed && (
                               <button
+                                type="button"
+                                aria-label={commandCopy[lang].payFor.replace("{id}", request.id.slice(0, 8).toUpperCase())}
                                 onClick={() => markPayoutRequestPaid(request)}
                                 disabled={isBusy}
                                 className="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 disabled:opacity-50 text-white text-[9px] font-black uppercase tracking-wider rounded-lg transition"
@@ -1036,6 +1335,8 @@ export default function AdminLedger() {
                             )}
                             {!isClosed && (
                               <button
+                                type="button"
+                                aria-label={commandCopy[lang].rejectFor.replace("{id}", request.id.slice(0, 8).toUpperCase())}
                                 onClick={() => updatePayoutRequestStatus(request, "rejected")}
                                 disabled={isBusy}
                                 className="px-3 py-1.5 bg-[#FEF3F2] text-[#D92D20] hover:bg-[#FEE4E2] disabled:opacity-50 text-[9px] font-black uppercase tracking-wider rounded-lg transition"
@@ -1051,6 +1352,9 @@ export default function AdminLedger() {
                 )}
               </tbody>
             </table>
+            {payoutRequests.length > 0 && listTotals.payouts > payoutRequests.length && (
+              <p className="px-6 py-3 text-[11px] font-semibold text-gray-500">{showing(t.listShowing, payoutRequests.length, listTotals.payouts)}</p>
+            )}
           </div>
         </div>
       )}
@@ -1060,6 +1364,11 @@ export default function AdminLedger() {
       {/* ──────────────────────────────────────────────────────── */}
       {activeTab === "statements" && (
         <div className="space-y-6 animate-fadeIn">
+          {reportsError && (
+            <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800">
+              {t.reportsFailed.replace("{reason}", reportsError)}
+            </div>
+          )}
           {/* Monthly VAT Summary */}
           <div className="bg-white border border-[#ECECEC] rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
             <div className="border-b border-[#ECECEC] bg-gray-50/50 p-5">
@@ -1215,7 +1524,7 @@ export default function AdminLedger() {
                   type="date"
                   value={reconDateInput}
                   onChange={(e) => setReconDateInput(e.target.value)}
-                  className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2 text-xs font-bold text-gray-800 outline-none focus:border-[#D1AF47]"
+                  className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2 text-xs font-bold text-gray-800 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]"
                 />
                 <button
                   type="button"
@@ -1252,6 +1561,13 @@ export default function AdminLedger() {
                   {reconLoading ? (
                     <tr>
                       <td colSpan={8} className="py-8 text-center text-gray-400 font-bold">{t.loading}</td>
+                    </tr>
+                  ) : reconError ? (
+                    <tr>
+                      <td colSpan={8} className="py-8 text-center">
+                        <p role="alert" className="font-bold text-[#B42318]">{t.listFailed.replace("{reason}", reconError)}</p>
+                        <button type="button" onClick={() => void loadReconciliationRuns()} className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-xs font-bold text-gray-800 hover:border-gray-500">{t.retry}</button>
+                      </td>
                     </tr>
                   ) : reconciliationRuns.length === 0 ? (
                     <tr>
@@ -1317,6 +1633,13 @@ export default function AdminLedger() {
                     <tr>
                       <td colSpan={8} className="py-8 text-center text-gray-400 font-bold">{t.loading}</td>
                     </tr>
+                  ) : feeInvoicesError ? (
+                    <tr>
+                      <td colSpan={8} className="py-8 text-center">
+                        <p role="alert" className="font-bold text-[#B42318]">{t.listFailed.replace("{reason}", feeInvoicesError)}</p>
+                        <button type="button" onClick={() => void loadFeeInvoices()} className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-xs font-bold text-gray-800 hover:border-gray-500">{t.retry}</button>
+                      </td>
+                    </tr>
                   ) : providerFeeInvoices.length === 0 ? (
                     <tr>
                       <td colSpan={8} className="py-8 text-center text-gray-400 font-bold">{t.noRecords}</td>
@@ -1346,6 +1669,9 @@ export default function AdminLedger() {
                   )}
                 </tbody>
               </table>
+              {providerFeeInvoices.length > 0 && listTotals.feeInvoices > providerFeeInvoices.length && (
+                <p className="px-6 py-3 text-[11px] font-semibold text-gray-500">{showing(t.listShowing, providerFeeInvoices.length, listTotals.feeInvoices)}</p>
+              )}
             </div>
           </div>
         </div>

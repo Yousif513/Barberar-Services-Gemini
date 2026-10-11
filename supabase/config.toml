@@ -21,7 +21,29 @@ port = 54323
 [auth]
 site_url = "http://localhost:3000"
 additional_redirect_urls = ["http://localhost:3000/*", "exp://*"]
-jwt_expiry = 3600
+# GOV-FIX M-2: an access token outlives a revoked session by at most 15 minutes (the database also checks the session).
+jwt_expiry = 900
+
+# GOV-1 / Q6 (docs/legal/2026-10-10-adopted-decisions.md): every administrator enrols an authenticator app (TOTP) and the
+# database rejects administrator sessions below aal2. The hosted project must enable the same in Authentication settings.
+[auth.mfa]
+max_enrolled_factors = 2
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+# Q6: sessions end after 12 hours absolute and 30 minutes idle. Supabase applies these to every user of the project, not only
+# administrators; the hosted project must set the same values (Authentication > Sessions, a paid-plan setting).
+[auth.sessions]
+timebox = "12h"
+inactivity_timeout = "30m"
+
+# Q6: 10 consecutive failed MFA codes lock the account and raise a security alert (public.hook_mfa_verification_attempt).
+# The hosted project must enable the MFA verification attempt hook with the same Postgres function.
+[auth.hook.mfa_verification_attempt]
+enabled = true
+uri = "pg-functions://postgres/public/hook_mfa_verification_attempt"
 
 [auth.sms]
 enable_signup = true
@@ -41,4 +63,14 @@ enabled = false
 # Payment providers cannot send a Supabase JWT. The function independently
 # verifies every charge against Tap before invoking service-role database work.
 [functions.payment-webhook]
+verify_jwt = false
+
+# Provider API keys are not Supabase JWTs. public-api authenticates every request itself
+# (authenticate_api_key: hashed key, scopes, expiry, rate limit) and sends no CORS headers.
+[functions.public-api]
+verify_jwt = false
+
+# Meta cannot send a Supabase JWT. whatsapp-inbound authenticates every POST itself: HMAC-SHA256 of the raw body with the app secret
+# (X-Hub-Signature-256, constant-time compare), and the GET subscription handshake with a verify token. Nothing is processed without them.
+[functions.whatsapp-inbound]
 verify_jwt = false

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { CommandDialog } from "@/components/modal";
 
 const translations = {
   en: {
@@ -12,7 +13,6 @@ const translations = {
     error: "Error",
     disputedAmount: "Disputed Amount",
     bookingId: "Booking ID",
-    flaggedRating: "Flagged Review Rating",
     disputeDetail: "Dispute Detail / Reason",
     selectAction: "Refund the customer or reject the dispute",
     declineRefund: "Decline Refund",
@@ -22,6 +22,7 @@ const translations = {
     statusOpen: "OPEN",
     noDetail: "No detail provided.",
     independent: "Independent",
+    customerHidden: "Customer {id}",
     successMsg: "Dispute successfully resolved as ",
     errorMsg: "Failed to process dispute decision."
   },
@@ -33,7 +34,6 @@ const translations = {
     error: "خطأ",
     disputedAmount: "المبلغ المتنازع عليه",
     bookingId: "رقم الحجز",
-    flaggedRating: "التقييم المعلم",
     disputeDetail: "تفاصيل / سبب النزاع",
     selectAction: "اختر إجراءً لتحرير مبلغ الضمان أو رفض بلاغ المخالفة",
     declineRefund: "رفض الاسترجاع",
@@ -43,6 +43,7 @@ const translations = {
     statusOpen: "مفتوح",
     noDetail: "لم يتم تقديم تفاصيل.",
     independent: "مستقل",
+    customerHidden: "العميل {id}",
     successMsg: "تم تسوية النزاع بنجاح كـ ",
     errorMsg: "فشلت معالجة قرار النزاع."
   }
@@ -79,36 +80,25 @@ export default function AdminDisputes() {
     try {
       setLoading(true);
       setError("");
-      // Try payment_disputes table first
-      const { data, error: dbError } = await supabase
-        .from("payment_disputes")
-        .select(`
-          id,
-          disputed_amount_sar,
-          reason,
-          status,
-          created_at,
-          customer:profiles(first_name, last_name),
-          provider:providers(business_name_en, business_name_ar),
-          booking:bookings(id, status, scheduled_at)
-        `)
-        .order("created_at", { ascending: false });
+      // GOV-FIX (Q4): disputes come from the audited admin_list_disputes; the customer's name is included only for a console
+      // role holding personal.read, otherwise the screen shows the short id.
+      const { data: listed, error: dbError } = await supabase.rpc("admin_list_disputes", { p_status: null, p_limit: 200, p_offset: 0, p_purpose: "dispute_resolution" });
 
       if (dbError) throw dbError;
+      const data = ((listed as { rows?: Array<Record<string, any>> } | null)?.rows ?? []);
 
-      if (data && data.length > 0) {
+      if (data.length > 0) {
         setDisputes(data.map(d => {
-          const cust = d.customer as any;
+          const cust = d.customer as { first_name: string | null; last_name: string | null } | null | undefined;
           const prov = d.provider as any;
           const bk = d.booking as any;
           return {
             id: d.id,
             bookingId: bk?.id || "N/A",
-            customer: cust ? `${cust.first_name || ""} ${cust.last_name || ""}`.trim() : "Verified Client",
+            customer: (cust ? `${cust.first_name || ""} ${cust.last_name || ""}`.trim() : "") || (d.customer_id ? t.customerHidden.replace("{id}", String(d.customer_id).slice(0, 8)) : "—"),
             provider: (lang === "ar" ? prov?.business_name_ar : prov?.business_name_en) || prov?.business_name_en || t.independent,
             amount: `${d.disputed_amount_sar || 0} ${lang === "ar" ? "ريال" : "SAR"}`,
             reason: d.reason || t.noDetail,
-            rating: 1,
             status: d.status === "resolved_refund" ? "REFUNDED" : d.status === "resolved_rejected" ? "DECLINED" : "OPEN"
           };
         }));
@@ -128,30 +118,64 @@ export default function AdminDisputes() {
     loadDisputes();
   }, [lang]);
 
-  const handleResolveDispute = async (disputeId: string, action: "REFUNDED" | "RESOLVED" | "DECLINED") => {
-    try {
-      setSuccess("");
-      setError("");
+  // A decision moves money, so it opens a dialog that names the dispute and captures a recorded reason; the server
+  // issues any refund request. A refusal is returned to the dialog, which keeps what the operator typed.
+  const [pendingDecision, setPendingDecision] = useState<{ dispute: (typeof disputes)[number]; action: "REFUNDED" | "RESOLVED" | "DECLINED" } | null>(null);
+  const handleResolveDispute = (disputeId: string, action: "REFUNDED" | "RESOLVED" | "DECLINED") => {
+    const dispute = disputes.find((row) => row.id === disputeId);
+    if (!dispute) return;
+    setSuccess("");
+    setError("");
+    setPendingDecision({ dispute, action });
+  };
 
-      // A decision moves money, so it needs a recorded reason; the server issues any refund request.
-      const reason = window.prompt(lang === "ar" ? "سبب القرار (يُحفظ في سجل التدقيق):" : "Reason for this decision (kept in the audit log):");
-      if (!reason || !reason.trim()) return;
-      const resolution = action === "REFUNDED" ? "resolved_refund" : "resolved_rejected";
-      const { error: rpcError } = await supabase.rpc("resolve_booking_dispute", {
-        p_dispute_id: disputeId,
-        p_resolution: resolution,
-        p_admin_notes: reason.trim()
-      });
-      if (rpcError) throw rpcError;
-
-      setDisputes((prev) =>
-        prev.map((d) => (d.id === disputeId ? { ...d, status: action } : d))
-      );
-
-      setSuccess(`${t.successMsg} ${action}!`);
-    } catch (err: any) {
-      setError(err?.message || t.errorMsg);
+  const runDecision = async (disputeId: string, action: "REFUNDED" | "RESOLVED" | "DECLINED", reason: string): Promise<string | null> => {
+    const resolution = action === "REFUNDED" ? "resolved_refund" : "resolved_rejected";
+    const { data: decided, error: rpcError } = await supabase.rpc("resolve_booking_dispute", {
+      p_dispute_id: disputeId,
+      p_resolution: resolution,
+      p_admin_notes: reason
+    });
+    if (rpcError) return rpcError.message || t.errorMsg;
+    // D-Q5: a refund at or above the threshold waits for a second administrator; the dispute stays open until then.
+    if ((decided as { status?: string } | null)?.status === "pending_approval") {
+      setSuccess(lang === "ar"
+        ? "الاسترداد يتجاوز الحد، فسُجّل للاعتماد: يعتمده مسؤول ثانٍ من شاشة الاعتمادات، ويبقى النزاع مفتوحاً حتى ذلك."
+        : "The refund is above the threshold, so it was recorded for approval: a second administrator approves it in Approvals; the dispute stays open until then.");
+      return null;
     }
+    setDisputes((prev) => prev.map((row) => (row.id === disputeId ? { ...row, status: action } : row)));
+    setSuccess(`${t.successMsg} ${action}!`);
+    return null;
+  };
+
+  const renderDecisionDialog = () => {
+    if (!pendingDecision) return null;
+    const { dispute, action } = pendingDecision;
+    const refunding = action === "REFUNDED";
+    const ar = lang === "ar";
+    return (
+      <CommandDialog
+        locale={lang}
+        tone={refunding ? "danger" : "default"}
+        title={refunding ? (ar ? "الحكم لصالح العميل واسترداد المبلغ" : "Uphold the dispute and refund") : (ar ? "رفض النزاع" : "Decline the dispute")}
+        intro={refunding
+          ? (ar ? "يُنشئ الخادم طلب استرداد بالمبلغ المتنازع عليه. لا يمكن التراجع عن القرار من لوحة الإدارة." : "The server creates a refund request for the disputed amount. The decision cannot be undone from the console.")
+          : (ar ? "يُغلق النزاع دون استرداد. لا يمكن التراجع عن القرار من لوحة الإدارة." : "The dispute is closed with no refund. The decision cannot be undone from the console.")}
+        facts={[
+          { label: ar ? "النزاع" : "Dispute", value: String(dispute.id).slice(0, 8) },
+          { label: ar ? "الحجز" : "Booking", value: String(dispute.bookingId).slice(0, 8) },
+          { label: ar ? "العميل" : "Customer", value: dispute.customer },
+          { label: ar ? "مقدم الخدمة" : "Provider", value: dispute.provider },
+          { label: ar ? "المبلغ" : "Amount", value: dispute.amount },
+          { label: ar ? "السبب المذكور" : "Reason given", value: dispute.reason },
+        ]}
+        reasonLabel={ar ? "سبب القرار (يُسجل في سجل التدقيق)" : "Reason for this decision (recorded in the audit log)"}
+        confirmLabel={refunding ? (ar ? "الحكم واسترداد المبلغ" : "Uphold and refund") : (ar ? "رفض النزاع" : "Decline dispute")}
+        onConfirm={(reason) => runDecision(dispute.id, action, reason)}
+        onClose={() => setPendingDecision(null)}
+      />
+    );
   };
 
   const isRTL = lang === "ar";
@@ -179,6 +203,7 @@ export default function AdminDisputes() {
         </div>
       </div>
 
+      {renderDecisionDialog()}
       {success && (
         <div className={`bg-[#ECFDF3] border border-[#D1FADF] text-[#027A48] text-xs rounded-xl p-4 font-bold ${isRTL ? "text-right" : "text-left"}`}>
           {t.success}: {success}
@@ -260,10 +285,7 @@ export default function AdminDisputes() {
                     </span>
                   </div>
                   <p className="text-[10px] text-gray-500 font-semibold mt-2.5 uppercase tracking-widest">
-                    {t.bookingId}: <span className="font-mono text-gray-900 font-bold">{d.bookingId.substring(0, 8)}...</span> | {t.flaggedRating}: {" "}
-                    <span className="text-[#D1AF47] font-bold tracking-widest">
-                      {"★".repeat(d.rating)}{"☆".repeat(5 - d.rating)}
-                    </span>
+                    {t.bookingId}: <span className="font-mono text-gray-900 font-bold">{d.bookingId.substring(0, 8)}...</span>
                   </p>
                 </div>
                 

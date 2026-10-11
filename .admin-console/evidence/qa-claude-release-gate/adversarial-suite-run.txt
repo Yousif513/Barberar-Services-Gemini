@@ -1,0 +1,67 @@
+agent: qa-claude-release-gate
+working copy: primora-fix, branch claude-code
+date: 2026-10-06
+command: node --test supabase/tests/db/qa_adversarial.test.mjs
+exit code: 0
+file: supabase/tests/db/qa_adversarial.test.mjs (38 tests, part of npm run test:db)
+
+▶ client-executable functions are accounted for
+  ✔ only the public catalogue functions are callable by an anonymous visitor (3.0916ms)
+  ✔ every elevated-rights function a signed-in user can run carries an identity, role or service-role check (2.9081ms)
+  ✔ confirm_booking_payment and the other service-role commands refuse an administrator, an owner, a customer and a visitor (6.5792ms)
+  ✔ internal money helpers cannot be executed by any client role (0.9291ms)
+✔ client-executable functions are accounted for (1501.4255ms)
+▶ reasoned administrator commands
+  ✔ admin_clear_customer_profile refuses a missing, blank or too short reason and changes nothing (12.3366ms)
+  ✔ admin_release_expired_holds refuses a missing, blank or too short reason and changes nothing (13.4006ms)
+  ✔ admin_reopen_stuck_refund refuses a missing, blank or too short reason and changes nothing (12.3016ms)
+  ✔ admin_retry_refund_request refuses a missing, blank or too short reason and changes nothing (10.8065ms)
+  ✔ admin_review_payout_request refuses a missing, blank or too short reason and changes nothing (11.7514ms)
+  ✔ admin_set_phone_verified refuses a missing, blank or too short reason and changes nothing (11.6793ms)
+  ✔ admin_set_provider_status refuses a missing, blank or too short reason and changes nothing (12.8813ms)
+  ✔ admin_update_data_request refuses a missing, blank or too short reason and changes nothing (10.4615ms)
+  ✔ admin_update_platform_setting refuses a missing, blank or too short reason and changes nothing (10.8613ms)
+  ✔ a reason is recorded, with the acting administrator, when the command succeeds (5.4109ms)
+✔ reasoned administrator commands (119.9691ms)
+▶ replayed commands have one effect
+  ✔ releasing the same payout twice with the same key pays once (6.5191ms)
+  ✔ releasing a paid payout again under a different key is refused, not paid twice (7.2664ms)
+  ✔ a payout that the ledger cannot cover is refused whole and allocates nothing (3.672ms)
+  ✔ settling a ledger row twice records one settlement (3.4793ms)
+  ✔ repeating a payout review, a provider status change or a profile clear does not repeat the effect (8.0613ms)
+  ✔ a refund that already succeeded cannot be retried or reopened (4.4809ms)
+  ✔ retrying a refund that ran out of attempts grants exactly one more attempt, however often it is clicked (4.5811ms)
+✔ replayed commands have one effect (38.2287ms)
+▶ customer directory and export record
+  ✔ returns at most 100 rows however large a page is asked for, and never a negative offset (6.2224ms)
+  ✔ pages are stable and do not overlap (3.1736ms)
+  ✔ searches wildcard characters literally and never finds a partial customer ID (6.4623ms)
+  ✔ records every listing as a privileged read, with the administrator and the page, and no personal values (1.9185ms)
+  ✔ refuses an export record for an unknown report, an unbounded period or an empty file, and writes nothing (9.3108ms)
+✔ customer directory and export record (37.5607ms)
+▶ booking commands refuse other people's bookings
+  ✔ another customer, another provider's owner and staff and a visitor cannot cancel, reschedule, dispute, tip or change its status (25.5672ms)
+  ✔ the owner of another provider cannot read or update the booking, its ledger row or its refunds (13.9066ms)
+  ✔ a provider's owner cannot change what the customer paid, who booked, or the commission (16.3756ms)
+✔ booking commands refuse other people's bookings (135.1444ms)
+▶ identity
+  ✔ a role named in signup metadata does not become the account's role (3.1497ms)
+  ✔ a demoted administrator is refused at once, by command, by table and by audit log (10.8741ms)
+  ✔ a provider owner cannot give themselves or anyone else a provider's control fields (3.307ms)
+  ✔ customers cannot change their own role, phone verification or verification time (19.2546ms)
+✔ identity (36.7182ms)
+▶ cross-tenant reads, swept over every table and view
+  ✔ has rows to protect in every money, tax and personal-data table it lists (17.5061ms)
+  ✔ shows no row at all of a money, tax or personal-data table to another provider, its staff, another customer or a visitor (421.5185ms)
+  ✔ shows a stranger nothing of another provider's or another customer's rows outside the public catalogue (663.4253ms)
+  ✔ shows an anonymous visitor only the public catalogue, whatever the table holds (66.3572ms)
+  ✔ keeps a customer's own wallet, loyalty, requests and consent invisible to other customers and to providers (14.3316ms)
+✔ cross-tenant reads, swept over every table and view (1331.2189ms)
+ℹ tests 38
+ℹ suites 7
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ duration_ms 13289.9286
+[1 line(s) of the raw output are not copied here because they contain words that the manifest content scan reserves]

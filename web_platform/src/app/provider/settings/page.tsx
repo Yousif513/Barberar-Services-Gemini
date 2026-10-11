@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { BookingPolicyCard } from "../_components/booking-policy-card";
+import { DAY_KEYS, HoursApplyDialog, isOvernight, type DayKey, type StaffHours, type WeeklyHours } from "../_components/hours-apply";
+import { errorMessage } from "@/lib/error-message";
 
 const translations = {
   en: {
@@ -146,11 +149,11 @@ export default function ProviderSettingsPage() {
   const [success, setSuccess] = useState("");
 
   // Business Profile States
-  const [businessNameEn, setBusinessNameEn] = useState("Elite Grooming Lounge");
-  const [businessNameAr, setBusinessNameAr] = useState("صالون إيليت الرجالي");
-  const [descriptionEn, setDescriptionEn] = useState("Premium salon and grooming shop catering to Riyadh's selective clients.");
-  const [descriptionAr, setDescriptionAr] = useState("صالون حلاقة وعناية رجالية فاخرة تلبي تفضيلات عملاء الرياض المميزين.");
-  const [phone, setPhone] = useState("+966 11 456 7890");
+  const [businessNameEn, setBusinessNameEn] = useState("");
+  const [businessNameAr, setBusinessNameAr] = useState("");
+  const [descriptionEn, setDescriptionEn] = useState("");
+  const [descriptionAr, setDescriptionAr] = useState("");
+  const [phone, setPhone] = useState("");
 
   // Geofence Radius
   const [radius, setRadius] = useState(0);
@@ -159,21 +162,14 @@ export default function ProviderSettingsPage() {
   const [geofenceAutosaving, setGeofenceAutosaving] = useState(false);
   const [geofenceAutosaveText, setGeofenceAutosaveText] = useState("");
 
-  // Booking deposit policy
-  const [depositPercentage, setDepositPercentage] = useState(20);
-  const [isSavingDeposit, setIsSavingDeposit] = useState(false);
-  const [depositSuccess, setDepositSuccess] = useState("");
+  const [providerId, setProviderId] = useState("");
 
-  // Opening hours state
-  const [hours, setHours] = useState<any>({
-    sunday: { open: "09:00", close: "22:00", isClosed: false },
-    monday: { open: "09:00", close: "22:00", isClosed: false },
-    tuesday: { open: "09:00", close: "22:00", isClosed: false },
-    wednesday: { open: "09:00", close: "22:00", isClosed: false },
-    thursday: { open: "09:00", close: "23:00", isClosed: false },
-    friday: { open: "13:00", close: "23:00", isClosed: false },
-    saturday: { open: "09:00", close: "22:00", isClosed: false }
-  });
+  // Opening hours: empty until the owner's professionals have a schedule to read back; nothing is assumed.
+  const emptyHours = (): WeeklyHours => Object.fromEntries(DAY_KEYS.map((key) => [key, { open: "", close: "", isClosed: true }])) as WeeklyHours;
+  const [hours, setHours] = useState<WeeklyHours>(emptyHours);
+  const [loadedHours, setLoadedHours] = useState<WeeklyHours>(emptyHours);
+  const [staffHours, setStaffHours] = useState<StaffHours[]>([]);
+  const [applyOpen, setApplyOpen] = useState(false);
 
   // Security States
   const [currentPassword, setCurrentPassword] = useState("");
@@ -195,7 +191,7 @@ export default function ProviderSettingsPage() {
 
   // Save/Loading states for sub-sections
   const [isSavingProfile, setIsSavingProfile] = useState(false);
-  const [isSavingHours, setIsSavingHours] = useState(false);
+  const isSavingHours = applyOpen;
   const [hoursSuccess, setHoursSuccess] = useState("");
 
   const t = translations[locale];
@@ -226,36 +222,26 @@ export default function ProviderSettingsPage() {
 
       const { data: providerInfo, error: fetchError } = await supabase
         .from("providers")
-        .select("business_name_en, business_name_ar, description_en, description_ar, phone, deposit_percentage")
+        .select("id, business_name_en, business_name_ar, description_en, description_ar")
         .eq("owner_id", user.id)
         .maybeSingle();
 
       if (fetchError) throw fetchError;
-
-      const { data: profileInfo, error: profileError } = await supabase
-        .from("profiles")
-        .select("phone_number")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if (profileError) throw profileError;
 
       if (providerInfo) {
         setBusinessNameEn(providerInfo.business_name_en || "");
         setBusinessNameAr(providerInfo.business_name_ar || "");
         setDescriptionEn(providerInfo.description_en || "");
         setDescriptionAr(providerInfo.description_ar || "");
-        if (providerInfo.deposit_percentage != null) setDepositPercentage(Number(providerInfo.deposit_percentage));
-      }
-
-      if (profileInfo?.phone_number) {
-        setPhone(profileInfo.phone_number);
-      } else if (providerInfo?.phone) {
-        setPhone(providerInfo.phone);
+        setProviderId(providerInfo.id);
+        // The business phone is a private column: the owner reads it through this command.
+        const { data: privateProfile, error: privateError } = await supabase.rpc("get_provider_private_profile", { p_provider_id: providerInfo.id });
+        if (privateError) throw privateError;
+        setPhone(privateProfile?.contact_phone || "");
       }
 
       // Branches carry the home-service radius; staff schedules (employee_availability) drive bookable hours.
-      const { data: ownerProvider } = await supabase.from("providers").select("id").eq("owner_id", user.id).maybeSingle();
+      const ownerProvider = providerInfo;
       if (ownerProvider) {
         const { data: branchRows, error: branchError } = await supabase
           .from("branches").select("id, geofence_radius_km").eq("provider_id", ownerProvider.id).order("created_at", { ascending: true });
@@ -264,26 +250,30 @@ export default function ProviderSettingsPage() {
         setBranchIds(ids);
         if (branchRows?.[0]) setRadius(Number(branchRows[0].geofence_radius_km || 0));
         if (ids.length) {
-          const { data: staffHours, error: hoursError } = await supabase
-            .from("employee_availability")
-            .select("day_of_week, start_time, end_time, is_working_day, employees!inner(branch_id, is_active)")
-            .in("employees.branch_id", ids)
-            .eq("employees.is_active", true);
+          const { data: staffRows, error: hoursError } = await supabase
+            .from("employees")
+            .select("id, name_en, name_ar, employee_availability ( day_of_week, start_time, end_time, is_working_day )")
+            .in("branch_id", ids)
+            .eq("is_active", true);
           if (hoursError) throw hoursError;
-          if (staffHours?.length) {
-            const keys = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-            const next: any = {};
-            keys.forEach((key, dow) => {
-              const working = staffHours.filter((h: any) => h.day_of_week === dow && h.is_working_day !== false);
-              next[key] = working.length
-                ? {
-                    open: working.map((h: any) => String(h.start_time).slice(0, 5)).sort()[0],
-                    close: working.map((h: any) => String(h.end_time).slice(0, 5)).sort().reverse()[0],
-                    isClosed: false,
-                  }
-                : { open: "09:00", close: "22:00", isClosed: true };
+          const members: StaffHours[] = (staffRows || []).map((row: any) => ({
+            id: row.id,
+            name: (document.documentElement.lang === "ar" ? row.name_ar || row.name_en : row.name_en || row.name_ar) || "",
+            rows: row.employee_availability || [],
+          }));
+          setStaffHours(members);
+          const allRows = members.flatMap((member) => member.rows);
+          if (allRows.length) {
+            const next = emptyHours();
+            DAY_KEYS.forEach((key, dow) => {
+              const working = allRows.filter((h) => h.day_of_week === dow && h.is_working_day !== false);
+              if (!working.length) return;
+              const opens = working.map((h) => String(h.start_time).slice(0, 5)).sort();
+              const closes = working.map((h) => String(h.end_time).slice(0, 5)).sort();
+              next[key] = { open: opens[0], close: closes[closes.length - 1], isClosed: false };
             });
             setHours(next);
+            setLoadedHours(next);
           }
         }
       }
@@ -298,7 +288,7 @@ export default function ProviderSettingsPage() {
         if (typeof prefs.marketingAlerts === "boolean") setMarketingAlerts(prefs.marketingAlerts);
       }
     } catch (err: any) {
-      setError(err?.message || String(err));
+      setError(errorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -319,18 +309,12 @@ export default function ProviderSettingsPage() {
           business_name_en: businessNameEn,
           business_name_ar: businessNameAr,
           description_en: descriptionEn,
-          description_ar: descriptionAr
+          description_ar: descriptionAr,
+          contact_phone: phone.trim() || null
         })
         .eq("owner_id", user.id);
 
       if (updateError) throw updateError;
-
-      const { error: phoneError } = await supabase
-        .from("profiles")
-        .update({ phone_number: phone })
-        .eq("id", user.id);
-
-      if (phoneError) throw phoneError;
 
       setSuccess(t.savedMsg);
       setTimeout(() => setSuccess(""), 4000);
@@ -359,79 +343,43 @@ export default function ProviderSettingsPage() {
     }, 600);
   };
 
-  async function saveDeposit() {
-    if (isSavingDeposit) return;
-    setIsSavingDeposit(true);
-    setDepositSuccess("");
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user session");
-      const { error: updateError } = await supabase
-        .from("providers")
-        .update({ deposit_percentage: depositPercentage })
-        .eq("owner_id", user.id);
-      if (updateError) throw updateError;
-      setDepositSuccess(t.depositSavedMsg);
-      setTimeout(() => setDepositSuccess(""), 4000);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setIsSavingDeposit(false);
-    }
-  }
-
-  const handleHourChange = (day: string, field: "open" | "close" | "isClosed", val: any) => {
-    setHours((prev: any) => ({
+  const handleHourChange = (day: string, field: "open" | "close" | "isClosed", val: string | boolean) => {
+    setHours((prev) => ({
       ...prev,
       [day]: {
-        ...prev[day],
+        ...prev[day as DayKey],
         [field]: val
       }
     }));
   };
 
-  // Applies the weekly hours to every active professional at this provider's branches; individual
-  // schedules can still be adjusted per person afterwards.
-  async function handleSaveHours(e: React.FormEvent) {
+  // Opening hours are stored per professional. Saving validates the week and then asks whom to apply it to,
+  // so a professional's own schedule is never replaced without being listed first. A closing time before the
+  // opening time is an overnight shift (for example 21:00 to 02:00 in Ramadan).
+  function handleSaveHours(e: React.FormEvent) {
     e.preventDefault();
     setHoursSuccess("");
     setError("");
-    try {
-      setIsSavingHours(true);
-      if (!branchIds.length) throw new Error(locale === "en" ? "Add a branch first." : "أضف فرعاً أولاً.");
-      const { data: staff, error: staffError } = await supabase
-        .from("employees").select("id").in("branch_id", branchIds).eq("is_active", true);
-      if (staffError) throw staffError;
-      if (!staff?.length) {
-        throw new Error(locale === "en"
-          ? "Add a team member first; bookable hours belong to professionals."
-          : "أضف أحد أعضاء الفريق أولاً؛ أوقات الحجز مرتبطة بالأخصائيين.");
-      }
-      const keys = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-      for (const key of keys) {
-        const day = hours[key];
-        if (!day.isClosed && day.open >= day.close) {
-          throw new Error(locale === "en" ? "Closing time must be after opening time." : "يجب أن يكون وقت الإغلاق بعد وقت الفتح.");
-        }
-      }
-      const rows = staff.flatMap((member: any) => keys.map((key, dow) => ({
-        employee_id: member.id,
-        day_of_week: dow,
-        start_time: hours[key].open,
-        end_time: hours[key].close,
-        is_working_day: !hours[key].isClosed,
-      })));
-      const { error: upsertError } = await supabase
-        .from("employee_availability")
-        .upsert(rows, { onConflict: "employee_id,day_of_week" });
-      if (upsertError) throw upsertError;
-      setHoursSuccess(t.hoursSavedMsg);
-      setTimeout(() => setHoursSuccess(""), 4000);
-    } catch (err: any) {
-      setError(err?.message || String(err));
-    } finally {
-      setIsSavingHours(false);
+    if (!branchIds.length) { setError(locale === "en" ? "Add a branch first." : "أضف فرعاً أولاً."); return; }
+    if (!staffHours.length) {
+      setError(locale === "en"
+        ? "Add a team member first; bookable hours belong to professionals."
+        : "أضف أحد أعضاء الفريق أولاً؛ أوقات الحجز مرتبطة بالأخصائيين.");
+      return;
     }
+    for (const key of DAY_KEYS) {
+      const day = hours[key];
+      if (day.isClosed) continue;
+      if (!day.open || !day.close) {
+        setError(locale === "en" ? "Set both an opening and a closing time for every open day." : "حدد وقت الفتح ووقت الإغلاق لكل يوم مفتوح.");
+        return;
+      }
+      if (day.open === day.close) {
+        setError(locale === "en" ? "Opening and closing time cannot be the same." : "لا يمكن أن يتساوى وقت الفتح مع وقت الإغلاق.");
+        return;
+      }
+    }
+    setApplyOpen(true);
   }
 
   async function handleUpdatePassword(e: React.FormEvent) {
@@ -709,7 +657,7 @@ export default function ProviderSettingsPage() {
             <form onSubmit={handleSaveHours}>
               <div className="divide-y divide-[#ECECEC]">
                 {daysList.map((day) => {
-                  const current = hours[day.key];
+                  const current = hours[day.key as DayKey];
                   return (
                     <div 
                       key={day.key} 
@@ -717,7 +665,10 @@ export default function ProviderSettingsPage() {
                         current.isClosed ? "opacity-45" : "opacity-100"
                       }`}
                     >
-                      <span className="text-sm font-bold text-[#101828] w-28">{day.name}</span>
+                      <span className="text-sm font-bold text-[#101828] w-28">
+                        {day.name}
+                        {isOvernight(current) && <span className="block text-[10px] font-semibold text-[#9A741F]">{locale === "en" ? "Overnight: closes the next day" : "وردية ليلية: تُغلق في اليوم التالي"}</span>}
+                      </span>
                       
                       <div className="flex items-center gap-6 flex-wrap">
                         {/* Custom Closed Toggle Switch */}
@@ -744,6 +695,7 @@ export default function ProviderSettingsPage() {
                               <span className="text-[10px] text-[#667085] uppercase font-bold tracking-wider">{t.openTime}</span>
                               <input
                                 type="time"
+                                aria-label={`${day.name} ${t.openTime}`}
                                 value={current.open}
                                 onChange={(e) => handleHourChange(day.key, "open", e.target.value)}
                                 className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] focus:border-[#D1AF47]/50 rounded-xl px-3 py-1.5 text-xs text-[#101828] outline-none focus:ring-1 focus:ring-[#D1AF47]/30 transition duration-300 font-mono"
@@ -754,6 +706,7 @@ export default function ProviderSettingsPage() {
                               <span className="text-[10px] text-[#667085] uppercase font-bold tracking-wider">{t.closeTime}</span>
                               <input
                                 type="time"
+                                aria-label={`${day.name} ${t.closeTime}`}
                                 value={current.close}
                                 onChange={(e) => handleHourChange(day.key, "close", e.target.value)}
                                 className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] focus:border-[#D1AF47]/50 rounded-xl px-3 py-1.5 text-xs text-[#101828] outline-none focus:ring-1 focus:ring-[#D1AF47]/30 transition duration-300 font-mono"
@@ -882,59 +835,24 @@ export default function ProviderSettingsPage() {
             </div>
           </div>
 
-          {/* BOOKING DEPOSIT POLICY */}
-          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">
-            <div className="flex items-center gap-4 border-b border-[#ECECEC] pb-4 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D1AF47]/10 to-transparent flex items-center justify-center border border-[#D1AF47]/20">
-                <svg className="w-5 h-5 text-[#D1AF47]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 8h6m-6 4h6m-7 8h8a2 2 0 002-2V6a2 2 0 00-2-2H8a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-[#101828]">{t.depositSection}</h3>
-                <p className="text-xs text-[#667085]">{t.depositDesc}</p>
-              </div>
-            </div>
+          {/* BOOKING POLICY (deposit, cancellation window, late and no-show fees) */}
+          {providerId && <BookingPolicyCard lang={locale} providerId={providerId} />}
 
-            <div className="space-y-4 pt-2">
-              <div className="flex justify-between text-xs font-bold text-[#101828]">
-                <span className="text-[#344054]">{t.depositLabel}</span>
-                <span className="text-[#D1AF47] text-sm font-bold font-mono tracking-tight bg-[#D1AF47]/10 px-2 py-0.5 rounded-md border border-[#D1AF47]/20">
-                  {depositPercentage}%
-                </span>
-              </div>
+          <Link href="/provider/time-off" className="block rounded-3xl border border-[#ECECEC] bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.015)] outline-2 outline-offset-2 outline-transparent hover:border-[#D1AF47]/50 focus-visible:outline-[#9B7928]">
+            <span className="block text-lg font-bold text-[#101828]">{locale === "en" ? "Closures, seasons and leave" : "الإغلاقات والمواسم والإجازات"}</span>
+            <span className="mt-1 block text-xs leading-5 text-[#667085]">{locale === "en" ? "Close for a holiday, add a Ramadan schedule, and approve your team's leave requests." : "أغلق في الأعياد، وأضف جدول رمضان، ووافق على طلبات إجازة فريقك."}</span>
+          </Link>
 
-              <input
-                type="range"
-                min="0"
-                max="100"
-                step="5"
-                value={depositPercentage}
-                onChange={(e) => setDepositPercentage(parseInt(e.target.value))}
-                className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-[#D1AF47] focus:outline-none transition duration-300"
-              />
-
-              <div className="flex justify-between text-[9px] text-[#667085] font-bold tracking-widest uppercase">
-                <span>0%</span><span>50%</span><span>100%</span>
-              </div>
-
-              <div className="flex items-center justify-between rounded-2xl bg-transparent border border-[#ECECEC] px-4 py-3 mt-2">
-                <span className="text-[11px] text-[#667085]">{t.depositExample}</span>
-                <span className="text-sm font-bold text-[#22C55E] font-mono">{Math.round((200 * depositPercentage) / 100)} SAR</span>
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-2">
-                {depositSuccess && <span className="text-xs font-semibold text-[#22C55E]">{depositSuccess}</span>}
-                <button
-                  onClick={saveDeposit}
-                  disabled={isSavingDeposit}
-                  className="bg-gradient-to-r from-[#D1AF47] to-[#B8952E] hover:from-[#E0C46A] hover:to-[#D1AF47] text-[#070B12] px-5 py-2.5 rounded-xl text-sm font-bold shadow-[0_4px_20px_rgba(209,175,71,0.25)] transition disabled:opacity-50"
-                >
-                  {isSavingDeposit ? (locale === "en" ? "Saving…" : "جارٍ الحفظ…") : t.depositSaveBtn}
-                </button>
-              </div>
-            </div>
-          </div>
+          {applyOpen && (
+            <HoursApplyDialog
+              lang={locale}
+              hours={hours}
+              loaded={loadedHours}
+              staff={staffHours}
+              onClose={() => setApplyOpen(false)}
+              onApplied={(message) => { setHoursSuccess(message); setLoadedHours(hours); void loadSettings(); }}
+            />
+          )}
 
           {/* NOTIFICATION PREFERENCES */}
           <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.015)] rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.3)] backdrop-blur-md relative overflow-hidden">

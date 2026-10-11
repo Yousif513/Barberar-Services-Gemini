@@ -31,7 +31,7 @@ const CATEGORY_FALLBACK_IMAGE: Record<string, string> = {
 
 const translations = {
   en: {
-    promoText: "Book verified beauty & grooming salons across Saudi Arabia",
+    promoText: "Book beauty and grooming appointments across Saudi Arabia",
     home: "Home",
     discover: "Services",
     serviceBoard: "Service Board",
@@ -39,52 +39,51 @@ const translations = {
     aboutUs: "About Us",
     login: "Log in",
     signup: "Sign up",
-    heroBadge: "New Riyadh Collective",
+    heroBadge: "Beauty and grooming, booked online",
     heroTitleLine1: "Style Naturally.",
     heroTitleLine2: "Groom Confidently.",
-    heroDesc: "Riyadh's premier luxury marketplace. Instantly book verified salons, master barbershops, wellness retreats, and certified home-service professionals near you.",
+    heroDesc: "Book salons, barbershops, wellness spaces and home-service professionals near you, and pay the deposit by card through Tap.",
     shopServices: "Shop Services",
     exploreCollective: "Explore Collective",
-    verifiedArtists: "Verified Artists",
-    vettedSub: "Top 1% Vetted",
+    verifiedArtists: "Reviewed Providers",
+    vettedSub: "Checked before listing",
     escrowSecurity: "Clear Deposits",
     escrowSub: "Deposit now, balance at the venue",
-    riyadhGeofenced: "Riyadh Geofenced",
-    geofencedSub: "Flexible In-Home",
+    riyadhGeofenced: "Home Service",
+    geofencedSub: "Where providers offer it",
     flexibleBookings: "Flexible Bookings",
     flexibleSub: "Easy Reschedule",
-    featuredSpaceBadge: "Featured Space",
-    featuredSpaceName: "Riyadh Apothecary & Spa",
-    featuredSpacePrice: "Starting from 150 SAR per session",
-    verifiedArtistsProp: "Verified Artists",
-    vettedSubProp: "Top 1% vetted professionals",
+    heroCardBadge: "Book online",
+    heroCardTitle: "Salons, barbershops, spas and home service",
+    verifiedArtistsProp: "Reviewed Providers",
+    vettedSubProp: "Every provider application is reviewed before listing",
     escrowSecurityProp: "Transparent Pricing",
     escrowSubProp: "VAT and policies shown before you pay",
-    hygieneCertifiedProp: "Hygiene Certified",
-    hygieneSubProp: "Strict hygiene protocols",
-    supportProp: "24/7 Dedicated Help",
-    supportSubProp: "Local Riyadh-based support",
+    hygieneCertifiedProp: "Prayer-Time Scheduling",
+    hygieneSubProp: "Slots pause around the five daily prayers",
+    supportProp: "Message Your Provider",
+    supportSubProp: "Chat about a booking from your account",
     shopByCategory: "Shop by Category",
     featuredArtists: "Featured Services",
     featuredArtistsSub: "Hand-picked treatments, curated by the PRIMORA team",
     howItWorks: "How It Works",
     how1Title: "Select Service",
     how1Desc: "Find the perfect grooming, massage, or salon treatment based on reviews, locations, and transparent pricing.",
-    how2Title: "Secure Booking",
+    how2Title: "Book with a Deposit",
     how2Desc: "Choose your preferred date, time slot, and staff, then pay the deposit by card through Tap.",
     how3Title: "Exceptional Care",
     how3Desc: "Enjoy the premium care you deserve, either at the provider's physical location or in the comfort of your home.",
-    providerAcqBadge: "Join Riyadh's Finest Collective",
+    providerAcqBadge: "For Salons, Barbershops and Spas",
     providerAcqTitle: "Grow Your Business with Primora",
-    providerAcqDesc: "Join thousands of master barbershops, luxury wellness spas, independent hair stylists, and beauty professionals who manage bookings, secure split payments, and acquire loyal customers in Riyadh.",
-    footerDesc: "Luxury Beauty, Grooming & Wellness Marketplace. Connecting premier Riyadh artists with selective clients.",
+    providerAcqDesc: "List your business, manage bookings and staff schedules, and request payouts to your registered bank account.",
+    footerDesc: "A marketplace for beauty, grooming and wellness bookings in Saudi Arabia.",
     footerDiscover: "Discover",
     footerPartners: "For Partners",
     footerLegal: "Legal",
     allRightsReserved: "All rights reserved. Built for Riyadh, Saudi Arabia."
   },
   ar: {
-    promoText: "احجز لدى صالونات تجميل وعناية موثقة في أنحاء المملكة",
+    promoText: "احجز مواعيد الجمال والعناية في أنحاء المملكة",
     home: "الرئيسية",
     discover: "الخدمات",
     serviceBoard: "لوحة الخدمات",
@@ -92,45 +91,44 @@ const translations = {
     aboutUs: "من نحن",
     login: "تسجيل الدخول",
     signup: "تسجيل جديد",
-    heroBadge: "مجموعة الرياض الفاخرة الجديدة",
+    heroBadge: "الجمال والعناية بحجز إلكتروني",
     heroTitleLine1: "أناقة طبيعية.",
     heroTitleLine2: "عناية بثقة.",
-    heroDesc: "منصة الرياض الرائدة للجمال والعناية. احجز فوراً في أرقى الصالونات، ومحلات الحلاقة، والمنتجعات الصحية، ومحترفي الخدمات المنزلية المعتمدين بالقرب منك.",
+    heroDesc: "احجز في الصالونات ومحلات الحلاقة ومساحات العافية ومحترفي الخدمات المنزلية القريبين منك، وادفع العربون بالبطاقة عبر Tap.",
     shopServices: "تسوق الخدمات",
     exploreCollective: "اكتشف المجموعة",
-    verifiedArtists: "فنانون موثوقون",
-    vettedSub: "نخبة مصفاة 1%",
+    verifiedArtists: "مقدمو خدمة تمت مراجعتهم",
+    vettedSub: "يُفحص الطلب قبل الإدراج",
     escrowSecurity: "عربون واضح",
     escrowSub: "العربون الآن والباقي في المركز",
-    riyadhGeofenced: "تغطية كاملة بالرياض",
-    geofencedSub: "خدمة منزلية مرنة",
+    riyadhGeofenced: "خدمة منزلية",
+    geofencedSub: "حيث يقدمها المزود",
     flexibleBookings: "حجوزات مرنة",
     flexibleSub: "تعديل سهل للموعد",
-    featuredSpaceBadge: "المساحة المميزة",
-    featuredSpaceName: "سبا وعطارة الرياض الفاخرة",
-    featuredSpacePrice: "تبدأ من 150 ريال لكل جلسة",
-    verifiedArtistsProp: "فنانون معتمدون",
-    vettedSubProp: "أفضل 1% من المحترفين المعتمدين",
+    heroCardBadge: "احجز إلكترونياً",
+    heroCardTitle: "صالونات ومحلات حلاقة وسبا وخدمات منزلية",
+    verifiedArtistsProp: "مقدمو خدمة تمت مراجعتهم",
+    vettedSubProp: "يُراجَع كل طلب انضمام قبل الإدراج",
     escrowSecurityProp: "أسعار شفافة",
     escrowSubProp: "الضريبة والسياسات واضحة قبل الدفع",
-    hygieneCertifiedProp: "شهادة النظافة",
-    hygieneSubProp: "بروتوكولات تعقيم صارمة 100%",
-    supportProp: "دعم مخصص 24/7",
-    supportSubProp: "دعم محلي مقره الرياض",
+    hygieneCertifiedProp: "جدولة تراعي أوقات الصلاة",
+    hygieneSubProp: "تتوقف المواعيد حول الصلوات الخمس",
+    supportProp: "راسل مقدم الخدمة",
+    supportSubProp: "تحدث عن حجزك من حسابك",
     shopByCategory: "تسوق حسب الفئة",
     featuredArtists: "خدمات مميزة",
     featuredArtistsSub: "علاجات مختارة بعناية من فريق بريمورا",
     howItWorks: "كيف يعمل؟",
     how1Title: "اختر الخدمة",
     how1Desc: "ابحث عن العلاج أو الحلاقة أو خدمة الصالون المثالية بناءً على التقييمات والمواقع والأسعار الواضحة.",
-    how2Title: "حجز آمن",
-    how2Desc: "اختر التاريخ والوقت المفضلين لديك والموظف. قم بتأمين حجزك باستخدام نظام الدفع بالضمان الموثوق.",
+    how2Title: "احجز بعربون",
+    how2Desc: "اختر التاريخ والوقت المفضلين لديك والموظف، ثم ادفع العربون بالبطاقة عبر Tap.",
     how3Title: "عناية استثنائية",
     how3Desc: "استمتع بالعناية الفائقة التي تستحقها، سواء في صالون مقدم الخدمة أو في منزلك براحة تامة.",
-    providerAcqBadge: "انضم إلى أرقى المحترفين في الرياض",
+    providerAcqBadge: "للصالونات ومحلات الحلاقة والسبا",
     providerAcqTitle: "نمّ تجارتك مع بريمورا",
-    providerAcqDesc: "انضم إلى آلاف الصالونات ومحلات الحلاقة الفاخرة والمنتجعات الصحية ومصففي الشعر المستقلين ومحترفي العناية بالرياض الذين يعتمدون على بريمورا لإدارة جداولهم وتأمين مدفوعاتهم.",
-    footerDesc: "منصة الجمال الفاخرة، والعناية والعافية. نصل بين أفضل فناني الرياض والعملاء المميزين.",
+    providerAcqDesc: "أدرج منشأتك وأدر الحجوزات وجداول الموظفين واطلب تحويل مستحقاتك إلى حسابك البنكي المسجّل.",
+    footerDesc: "منصة لحجوزات الجمال والعناية والعافية في المملكة العربية السعودية.",
     footerDiscover: "استكشف",
     footerPartners: "للشركاء",
     footerLegal: "قانوني",
@@ -205,11 +203,11 @@ export default function Home() {
         .order("sort_order")
         .limit(5);
       if (error || !data?.length) return;
-      const providerIds = [...new Set(data.map((r) => r.provider_id))];
-      const { data: reviewRows } = await supabase
-        .from("reviews")
-        .select("provider_id, rating, moderation_status")
-        .in("provider_id", providerIds);
+      // Platform catalogue entries have no provider yet (provider_id is null): they have no reviews to ask for and no shop to open.
+      const providerIds = [...new Set(data.map((r) => r.provider_id).filter((id): id is string => Boolean(id)))];
+      const { data: reviewRows } = providerIds.length
+        ? await supabase.from("reviews").select("provider_id, rating, moderation_status").in("provider_id", providerIds)
+        : { data: [] as { provider_id: string; rating: number | string; moderation_status: string | null }[] };
       const published = (reviewRows || []).filter((r) => (r.moderation_status || "published") === "published");
       setFeaturedRows(data.map((r) => {
         const cat = r.categories as unknown as { slug?: string; name_en?: string; name_ar?: string } | null;
@@ -233,7 +231,8 @@ export default function Home() {
 
   const bestSellers = useMemo(() => featuredRows.map((r) => ({
     id: r.id,
-    href: `/shop/${r.provider_id}`,
+    // a service that belongs to a provider opens that provider's shop; a catalogue entry opens the search
+    href: r.provider_id ? `/shop/${r.provider_id}` : "/discover",
     name: locale === "ar" ? r.name_ar : r.name_en,
     category: locale === "ar" ? r.category_ar : r.category_en,
     rating: r.rating,
@@ -251,8 +250,8 @@ export default function Home() {
       </div>
 
       {/* 2. HEADER */}
-      <header className="bg-[#FBF8F1]/92 border-b border-[#D8C99F]/45 py-5 px-6 sm:px-12 flex items-center justify-between sticky top-0 z-50 shadow-[0_10px_30px_rgba(21,18,13,0.06)] backdrop-blur-md">
-        <Link href="/" className="text-2xl font-serif font-black tracking-widest text-[#10120F] hover:text-[#B8952E] transition flex-shrink-0">
+      <header className="bg-[#FBF8F1]/92 border-b border-[#D8C99F]/45 py-4 sm:py-5 px-4 sm:px-12 gap-2 flex items-center justify-between sticky top-0 z-50 shadow-[0_10px_30px_rgba(21,18,13,0.06)] backdrop-blur-md">
+        <Link href="/" className="text-2xl font-serif font-black tracking-widest text-[#10120F] hover:text-[#B8952E] transition flex-shrink-0 text-xl sm:text-2xl">
           PRIMORA
         </Link>
         <nav className="hidden lg:flex items-center justify-center gap-8 text-xs font-bold uppercase tracking-wider text-[#746B5D] flex-1 mx-8">
@@ -263,8 +262,8 @@ export default function Home() {
           <Link href="/about" className="hover:text-[#B8952E] transition-colors">{t.aboutUs}</Link>
         </nav>
         
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-4">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-6">
+          <div className="hidden sm:flex items-center gap-4">
             {/* Search Icon */}
             <Link href="/services" className="text-[#746B5D] hover:text-[#B8952E] transition">
               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -279,20 +278,20 @@ export default function Home() {
             </Link>
           </div>
           
-          <div className="h-4 w-px bg-[#D8C99F]/65"></div>
+          <div className="hidden sm:block h-4 w-px bg-[#D8C99F]/65"></div>
 
           {/* Lang button & Signin/Signup */}
-          <div className="flex items-center gap-4">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
             <button
               onClick={toggleLanguage}
-              className="px-3 py-1.5 rounded-full border border-[#D8C99F]/75 bg-white/60 text-[10px] uppercase tracking-wider font-extrabold text-[#746B5D] hover:border-[#D1AF47] hover:text-[#10120F] transition"
+              className="px-2.5 sm:px-3 py-1.5 rounded-full border border-[#D8C99F]/75 bg-white/60 text-[10px] uppercase tracking-wider font-extrabold text-[#746B5D] hover:border-[#D1AF47] hover:text-[#10120F] transition"
             >
               {locale === "en" ? "العربية" : "English"}
             </button>
             <Link href="/login" className="text-xs font-bold uppercase tracking-wider text-[#746B5D] hover:text-[#10120F] transition">
               {t.login}
             </Link>
-            <Link href="/login" className="bg-[#10120F] font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-full hover:bg-[#B8952E] transition shadow-[0_10px_24px_rgba(16,18,15,0.12)] text-[#F7F3EA]">
+            <Link href="/login" className="bg-[#10120F] font-bold text-xs uppercase tracking-wider px-3.5 sm:px-5 py-2.5 rounded-full whitespace-nowrap hover:bg-[#B8952E] transition shadow-[0_10px_24px_rgba(16,18,15,0.12)] text-[#F7F3EA]">
               {t.signup}
             </Link>
           </div>
@@ -362,14 +361,13 @@ export default function Home() {
               <div className="aspect-[4/5] overflow-hidden rounded-[24px]">
                 <img 
                   src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=900&auto=format&fit=crop" 
-                  alt={t.featuredSpaceName}
+                  alt=""
                   className="h-full w-full object-cover opacity-90"
                 />
               </div>
               <div className="absolute bottom-8 left-8 right-8 rounded-[22px] border border-[#D1AF47]/35 bg-[#10120F]/88 p-5 text-[#F7F3EA] backdrop-blur-md">
-                <p className="text-[10px] font-extrabold uppercase tracking-[0.25em] text-[#D1AF47]">{t.featuredSpaceBadge}</p>
-                <h3 className="mt-2 font-serif text-2xl font-bold leading-tight">{t.featuredSpaceName}</h3>
-                <p className="mt-3 text-xs text-[#D9D4C8]">{t.featuredSpacePrice}</p>
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.25em] text-[#D1AF47]">{t.heroCardBadge}</p>
+                <h3 className="mt-2 font-serif text-2xl font-bold leading-tight">{t.heroCardTitle}</h3>
               </div>
             </div>
           </div>
@@ -509,9 +507,6 @@ export default function Home() {
                     className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" 
                   />
                   {/* Badge */}
-                  <span className="absolute top-2.5 left-2.5 bg-[#10120F] text-[#F4E7B6] text-[8px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-full border border-[#D1AF47]/30">
-                    {locale === "ar" ? "شائع" : "Popular"}
-                  </span>
                 </div>
 
                 {/* Details */}

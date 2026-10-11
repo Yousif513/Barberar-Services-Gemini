@@ -1,8 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { ToastContainer } from "@/components/toast";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
+import { errorHint, isReauthRequired } from "@/lib/step-up";
 
 const translations = {
   en: {
@@ -20,9 +23,24 @@ const translations = {
     status: "Payout Status",
     created: "Date & Time",
     payoutBank: "Linked Bank Account",
-    bankName: "Riyad Bank (KSA)",
-    iban: "SA82 2000 0000 1234 5678 9012",
-    verified: "Verified Account",
+    noAccount: "No payout bank account yet. Add one; PRIMORA finance approves it before the first payout.",
+    accountApproved: "Approved",
+    accountOnHold: "Approved; payouts to it start after {date} (48-hour safety hold)",
+    accountPending: "Change waiting for approval by PRIMORA finance: {iban}",
+    accountRejected: "Your last bank account change was not approved. Contact PRIMORA support or submit it again.",
+    holderShown: "Account holder: {name}",
+    changeAccount: "Change bank account",
+    addAccount: "Add bank account",
+    changeTitle: "Payout bank account",
+    changeIntro: "For your security you sign in again before changing the account, PRIMORA finance checks the holder name against your commercial registration, and payouts to a new account start 48 hours after approval. You are notified on your registered phone and email.",
+    holderLabel: "Account holder name (as registered at the bank)",
+    changeSubmit: "Submit for approval",
+    changeSubmitted: "Bank account submitted. PRIMORA finance approves it; you are notified.",
+    reauthNeeded: "For your security, sign in again (within the last 10 minutes) to change the payout bank account.",
+    contactRecentlyChanged: "Your verified email or phone changed in the last 48 hours. For your security, the payout bank account can be changed 48 hours after that change; we have told both your old and new contact.",
+    signInAgain: "Sign in again",
+    payoutTo: "Paid to {bank} · {iban}",
+    payoutNeedsAccount: "Add a bank account and wait for its approval before requesting a payout.",
     statusPaid: "Paid Out",
     statusPending: "Pending",
     payoutModalTitle: "Request Payout Transfer",
@@ -72,9 +90,6 @@ const translations = {
     status: "حالة التحويل",
     created: "التاريخ والوقت",
     payoutBank: "الحساب البنكي المرتبط",
-    bankName: "بنك الرياض (المملكة العربية السعودية)",
-    iban: "SA82 2000 0000 1234 5678 9012",
-    verified: "حساب موثق",
     statusPaid: "تم تحويلها",
     statusPending: "قيد الانتظار",
     payoutModalTitle: "تقديم طلب تحويل أرباح",
@@ -103,6 +118,24 @@ const translations = {
     requestSubmitted: "تم إرسال طلب التحويل لمراجعة الإدارة.",
     requestFailed: "تعذر إرسال طلب التحويل.",
     noProviderAccount: "لم يتم العثور على حساب مزود لهذه الجلسة.",
+    noAccount: "لا يوجد حساب بنكي للتحويلات بعد. أضِف حساباً؛ تعتمده إدارة المالية في PRIMORA قبل أول تحويل.",
+    accountApproved: "معتمد",
+    accountOnHold: "معتمد؛ تبدأ التحويلات إليه بعد {date} (فترة أمان 48 ساعة)",
+    accountPending: "تغيير بانتظار اعتماد مالية PRIMORA: {iban}",
+    accountRejected: "لم يُعتمد آخر تغيير لحسابك البنكي. تواصل مع دعم PRIMORA أو قدّمه من جديد.",
+    holderShown: "صاحب الحساب: {name}",
+    changeAccount: "تغيير الحساب البنكي",
+    addAccount: "إضافة حساب بنكي",
+    changeTitle: "الحساب البنكي للتحويلات",
+    changeIntro: "لحمايتك تسجّل الدخول من جديد قبل تغيير الحساب، وتطابق مالية PRIMORA اسم صاحب الحساب مع سجلك التجاري، وتبدأ التحويلات إلى الحساب الجديد بعد 48 ساعة من الاعتماد. يصلك إشعار على جوالك وبريدك المسجلين.",
+    holderLabel: "اسم صاحب الحساب (كما هو مسجل في البنك)",
+    changeSubmit: "إرسال للاعتماد",
+    changeSubmitted: "أُرسل الحساب البنكي. تعتمده مالية PRIMORA ويصلك إشعار.",
+    reauthNeeded: "لحمايتك، سجّل الدخول من جديد (خلال آخر 10 دقائق) لتغيير الحساب البنكي للتحويلات.",
+    contactRecentlyChanged: "تغيّر بريدك الإلكتروني أو جوالك الموثّق خلال آخر 48 ساعة. لحمايتك، يمكن تغيير الحساب البنكي للتحويلات بعد مرور 48 ساعة على ذلك التغيير؛ وقد أبلغنا وسيلة التواصل القديمة والجديدة.",
+    signInAgain: "تسجيل الدخول من جديد",
+    payoutTo: "يُحوَّل إلى {bank} · {iban}",
+    payoutNeedsAccount: "أضِف حساباً بنكياً وانتظر اعتماده قبل طلب تحويل.",
     signInRequired: "سجل الدخول بحساب مزود لطلب التحويل.",
     submitting: "جار الإرسال...",
     close: "إغلاق",
@@ -112,6 +145,7 @@ const translations = {
 };
 
 export default function ProviderWalletPage() {
+  const router = useRouter();
   const [lang, setLang] = useState<"en" | "ar">("ar");
 
   const [availableBalance, setAvailableBalance] = useState(0);
@@ -120,6 +154,16 @@ export default function ProviderWalletPage() {
   const [payoutAmount, setPayoutAmount] = useState("");
   const [payoutBank, setPayoutBank] = useState("");
   const [payoutIban, setPayoutIban] = useState("");
+  const [payoutHolder, setPayoutHolder] = useState("");
+  const [showAccountModal, setShowAccountModal] = useState(false);
+  const [accountError, setAccountError] = useState("");
+  const [needsReauth, setNeedsReauth] = useState(false);
+  type DestinationSummary = {
+    active: { bank_name: string; account_holder_name: string | null; iban_masked: string; hold_until: string | null; on_hold: boolean } | null;
+    pending: { bank_name: string; iban_masked: string; requested_at: string } | null;
+    last_rejected_at: string | null;
+  };
+  const [destination, setDestination] = useState<DestinationSummary | null>(null);
   const [providerId, setProviderId] = useState("");
   const [submittingPayout, setSubmittingPayout] = useState(false);
   const [error, setError] = useState("");
@@ -190,12 +234,6 @@ export default function ProviderWalletPage() {
   const t = translations[lang];
 
   const formatSar = (value: unknown) => `${Number(value || 0).toFixed(2)} SAR`;
-
-  const maskIban = (iban: string) => {
-    const clean = iban.replace(/\s/g, "").toUpperCase();
-    if (clean.length <= 8) return clean;
-    return `${clean.slice(0, 4)} **** **** ${clean.slice(-4)}`;
-  };
 
   const payoutStatusLabel = (status: string) => {
     if (status === "processing") return t.payoutStatusProcessing;
@@ -272,11 +310,16 @@ export default function ProviderWalletPage() {
 
       const { data: requestData, error: requestError } = await supabase
         .from("payout_requests")
-        .select("id, amount, bank_name, iban, status, requested_at")
+        .select("id, amount, bank_name, iban_masked, status, requested_at")
         .eq("provider_id", provider.id)
         .order("requested_at", { ascending: false });
 
       if (requestError) throw requestError;
+
+      // GOV-1 / Q3: the approved payout account, masked; the full IBAN never reaches the browser.
+      const { data: destinationData, error: destinationError } = await supabase.rpc("provider_payout_destination_summary", { p_provider_id: provider.id });
+      if (destinationError) throw destinationError;
+      setDestination(destinationData as DestinationSummary);
 
       let earningsRows: EmployeeEarningsRow[] = [];
       try {
@@ -321,7 +364,7 @@ export default function ProviderWalletPage() {
         }),
         amount: formatSar(item.amount),
         bankName: item.bank_name,
-        iban: maskIban(item.iban),
+        iban: item.iban_masked ?? "",
         status: payoutStatusLabel(item.status),
         statusClass: payoutStatusClass(item.status)
       }));
@@ -384,14 +427,8 @@ export default function ProviderWalletPage() {
       return;
     }
 
-    if (!payoutBank.trim()) {
-      addToast(lang === "ar" ? "يرجى تحديد اسم البنك." : "Please select your bank.", "error");
-      return;
-    }
-
-    const cleanIban = payoutIban.replace(/\s/g, "").toUpperCase();
-    if (!cleanIban.startsWith("SA") || cleanIban.length !== 24) {
-      addToast(lang === "ar" ? "رقم الآيبان غير صحيح. يجب أن يبدأ بـ SA ويتكون من 24 حرفاً ورقماً." : "Invalid IBAN. Must start with SA and contain 24 characters.", "error");
+    if (!destination?.active) {
+      addToast(t.payoutNeedsAccount, "error");
       return;
     }
 
@@ -411,26 +448,66 @@ export default function ProviderWalletPage() {
       const { error: rpcError } = await supabase.rpc("request_provider_payout", {
         p_provider_id: providerId,
         p_amount: amt,
-        p_bank_name: payoutBank.trim(),
-        p_iban: cleanIban,
+        p_bank_name: null,
+        p_iban: null,
       });
 
       if (rpcError) throw rpcError;
 
       addToast(t.requestSubmitted, "success");
       setPayoutAmount("");
-      setPayoutIban("");
       setShowPayoutModal(false);
       await loadWalletData();
     } catch (err) {
       console.error("Failed to submit payout request:", err);
-      addToast(t.requestFailed, "error");
+      addToast(`${t.requestFailed} ${errorMessage(err)}`, "error");
     } finally {
       setSubmittingPayout(false);
     }
   };
 
 
+
+  const handleChangeAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAccountError("");
+    setNeedsReauth(false);
+    const cleanIban = payoutIban.replace(/\s/g, "").toUpperCase();
+    if (!/^SA[0-9]{22}$/.test(cleanIban)) {
+      setAccountError(lang === "ar" ? "رقم الآيبان غير صحيح: SA متبوعة بـ 22 رقماً." : "Invalid IBAN: SA followed by 22 digits.");
+      return;
+    }
+    if (!payoutBank.trim() || payoutHolder.trim().length < 3) {
+      setAccountError(t.errorFill);
+      return;
+    }
+    setSubmittingPayout(true);
+    const { data, error: rpcError } = await supabase.rpc("provider_request_payout_destination", {
+      p_provider_id: providerId,
+      p_bank_name: payoutBank.trim(),
+      p_account_holder_name: payoutHolder.trim(),
+      p_iban: cleanIban,
+    });
+    setSubmittingPayout(false);
+    if (rpcError) {
+      if (isReauthRequired(rpcError)) setNeedsReauth(true);
+      else if (errorHint(rpcError) === "contact_recently_changed") setAccountError(t.contactRecentlyChanged);
+      else setAccountError(errorMessage(rpcError));
+      return;
+    }
+    setDestination(data as DestinationSummary);
+    setPayoutIban("");
+    setShowAccountModal(false);
+    addToast(t.changeSubmitted, "success");
+  };
+
+  const signInAgain = async () => {
+    await supabase.auth.signOut({ scope: "local" });
+    router.replace(`/login?returnUrl=${encodeURIComponent("/provider/wallet")}`);
+  };
+
+  const holdDate = (value: string | null) =>
+    value ? new Date(value).toLocaleString(lang === "ar" ? "ar-SA-u-ca-gregory" : "en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Riyadh" }) : "";
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
@@ -592,14 +669,32 @@ export default function ProviderWalletPage() {
           </div>
           <div>
             <h3 className="font-bold text-[10px] tracking-widest text-[#667085] uppercase">{t.payoutBank}</h3>
-            <p className="text-sm font-semibold text-[#101828] mt-1">{t.bankName}</p>
-            <p className="text-xs text-[#344054] font-mono tracking-wider mt-0.5">{t.iban}</p>
+            {destination?.active ? (
+              <>
+                <p className="text-sm font-semibold text-[#101828] mt-1">{destination.active.bank_name}</p>
+                <p dir="ltr" className="text-xs text-[#344054] font-mono tracking-wider mt-0.5">{destination.active.iban_masked}</p>
+                {destination.active.account_holder_name && <p className="text-xs text-[#667085] mt-0.5">{t.holderShown.replace("{name}", destination.active.account_holder_name)}</p>}
+              </>
+            ) : (
+              <p className="text-sm text-[#667085] mt-1">{t.noAccount}</p>
+            )}
+            {destination?.pending && <p className="text-xs font-semibold text-[#B54708] mt-1">{t.accountPending.replace("{iban}", destination.pending.iban_masked)}</p>}
+            {!destination?.pending && destination?.last_rejected_at && <p className="text-xs font-semibold text-[#B42318] mt-1">{t.accountRejected}</p>}
           </div>
         </div>
-        <span className="px-4 py-2 bg-[#3DDC84]/10 text-[#22C55E] rounded-full text-xs font-bold flex items-center gap-2 border border-[#3DDC84]/20 shadow-[0_0_15px_rgba(61,220,132,0.1)] transition-all duration-300 hover:scale-105">
-          <span className="w-2 h-2 rounded-full bg-[#3DDC84] animate-pulse"></span>
-          {t.verified}
-        </span>
+        <div className="flex flex-col items-start gap-2 sm:items-end">
+          {destination?.active && (
+            <span className="px-4 py-2 bg-[#3DDC84]/10 text-[#16A34A] rounded-full text-xs font-bold flex items-center gap-2 border border-[#3DDC84]/20">
+              {destination.active.on_hold ? t.accountOnHold.replace("{date}", holdDate(destination.active.hold_until)) : t.accountApproved}
+            </span>
+          )}
+          {providerId && (
+            <button type="button" onClick={() => { setAccountError(""); setNeedsReauth(false); setShowAccountModal(true); }}
+              className="rounded-xl border border-[#D1AF47]/50 bg-[#F8F3E4] px-4 py-2 text-xs font-bold text-[#725517] focus-visible:outline-2 focus-visible:outline-[#9B7928]">
+              {destination?.active ? t.changeAccount : t.addAccount}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Payout Requests */}
@@ -857,45 +952,11 @@ export default function ProviderWalletPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="text-[10px] uppercase font-bold tracking-widest text-[#344054] block mb-2">
-                  {t.bankNameLabel}
-                </label>
-                <select
-                  value={payoutBank}
-                  onChange={(e) => setPayoutBank(e.target.value)}
-                  className="w-full bg-transparent border border-[#ECECEC] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#D1AF47] focus:shadow-[0_0_12px_rgba(209,175,71,0.15)] text-[#101828] font-semibold transition-all duration-300 appearance-none"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23D1AF47' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>")`,
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: lang === "ar" ? "left 1rem center" : "right 1rem center",
-                    backgroundSize: "1em",
-                    paddingLeft: lang === "ar" ? "2.5rem" : "1rem",
-                    paddingRight: lang === "ar" ? "1rem" : "2.5rem"
-                  }}
-                  required
-                >
-                  <option value="" className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]">-- Select Bank --</option>
-                  <option value="Riyad Bank" className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]">Riyad Bank (بنك الرياض)</option>
-                  <option value="Al Rajhi Bank" className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]">Al Rajhi Bank (مصرف الراجحي)</option>
-                  <option value="SNB" className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]">Al Ahli Bank / SNB (البنك الأهلي)</option>
-                  <option value="Alinma Bank" className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)]">Alinma Bank (مصرف الإنماء)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="text-[10px] uppercase font-bold tracking-widest text-[#344054] block mb-2">
-                  {t.ibanLabel}
-                </label>
-                <input
-                  type="text"
-                  placeholder="SA82 2000 0000..."
-                  value={payoutIban}
-                  onChange={(e) => setPayoutIban(e.target.value)}
-                  className="w-full bg-transparent border border-[#ECECEC] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#D1AF47] focus:shadow-[0_0_12px_rgba(209,175,71,0.15)] text-[#101828] font-semibold font-mono tracking-wider transition-all duration-300"
-                  required
-                />
-              </div>
+              <p className="rounded-xl border border-[#ECECEC] bg-[#FBFAF7] px-4 py-3 text-xs font-semibold text-[#344054]">
+                {destination?.active
+                  ? t.payoutTo.replace("{bank}", destination.active.bank_name).replace("{iban}", destination.active.iban_masked)
+                  : t.payoutNeedsAccount}
+              </p>
 
               <div className="flex gap-4 pt-4">
                 <button
@@ -915,6 +976,47 @@ export default function ProviderWalletPage() {
               </div>
             </form>
           </div>
+        </div>
+      )}
+      {showAccountModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <form role="dialog" aria-modal="true" aria-labelledby="payout-account-title" dir={lang === "ar" ? "rtl" : "ltr"} onSubmit={handleChangeAccount}
+            className="w-full max-w-md space-y-4 rounded-[28px] border border-[#ECECEC] bg-white p-7 text-start shadow-2xl">
+            <h3 id="payout-account-title" className="text-lg font-bold text-[#101828]">{t.changeTitle}</h3>
+            <p className="text-xs leading-5 text-[#475467]">{t.changeIntro}</p>
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-[#344054]">
+              {t.bankNameLabel}
+              <select value={payoutBank} onChange={(e) => setPayoutBank(e.target.value)} required
+                className="mt-2 w-full rounded-xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-semibold normal-case tracking-normal text-[#101828] focus-visible:outline-2 focus-visible:outline-[#9B7928]">
+                <option value="">{lang === "ar" ? "-- اختر البنك --" : "-- Select bank --"}</option>
+                <option value="Riyad Bank">Riyad Bank (بنك الرياض)</option>
+                <option value="Al Rajhi Bank">Al Rajhi Bank (مصرف الراجحي)</option>
+                <option value="SNB">Al Ahli Bank / SNB (البنك الأهلي)</option>
+                <option value="Alinma Bank">Alinma Bank (مصرف الإنماء)</option>
+              </select>
+            </label>
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-[#344054]">
+              {t.holderLabel}
+              <input value={payoutHolder} onChange={(e) => setPayoutHolder(e.target.value)} required minLength={3} maxLength={150} autoComplete="off"
+                className="mt-2 w-full rounded-xl border border-[#ECECEC] px-4 py-3 text-sm font-semibold normal-case tracking-normal text-[#101828] focus-visible:outline-2 focus-visible:outline-[#9B7928]" />
+            </label>
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-[#344054]">
+              {t.ibanLabel}
+              <input value={payoutIban} onChange={(e) => setPayoutIban(e.target.value)} required dir="ltr" autoComplete="off" inputMode="text"
+                className="mt-2 w-full rounded-xl border border-[#ECECEC] px-4 py-3 font-mono text-sm tracking-wider text-[#101828] focus-visible:outline-2 focus-visible:outline-[#9B7928]" />
+            </label>
+            {accountError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-800">{accountError}</p>}
+            {needsReauth && (
+              <div role="alert" className="space-y-2 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-900">
+                <p>{t.reauthNeeded}</p>
+                <button type="button" onClick={() => void signInAgain()} className="rounded-lg bg-[#101828] px-3 py-1.5 text-xs font-black text-white focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.signInAgain}</button>
+              </div>
+            )}
+            <div className="flex gap-3 pt-2">
+              <button type="button" onClick={() => setShowAccountModal(false)} className="flex-1 rounded-xl border border-[#ECECEC] py-3 text-xs font-bold text-[#344054] focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.close}</button>
+              <button type="submit" disabled={submittingPayout} className="flex-1 rounded-xl bg-[#101828] py-3 text-xs font-bold text-white disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-[#9B7928]">{submittingPayout ? t.submitting : t.changeSubmit}</button>
+            </div>
+          </form>
         </div>
       )}
       <ToastContainer toasts={toasts} onRemove={removeToast} />

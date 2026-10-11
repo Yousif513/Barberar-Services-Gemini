@@ -1,451 +1,340 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
+import { ForbiddenNotice, isForbidden, operationsInput, sar, useOperationsLocale } from "@/components/operations-ui";
 
-type WorkType = "remote" | "in_shop" | "both";
-type Employee = {
+// A read-only directory of the staff providers have registered. Providers manage their own team, so there is
+// nothing to add, edit or delete here; staff and figures come from the audited admin_list_employees (bookings, the
+// ledger and published reviews); earnings are left blank, never estimated, for a role without the ledger permission.
+
+const PAGE_SIZE = 25;
+
+type EmployeeRow = {
   id: string;
-  nameEn: string;
-  nameAr: string;
-  roleEn: string;
-  roleAr: string;
-  photoUrl: string;
-  phone: string;
-  email: string;
-  assignedServices: string[];
-  workType: WorkType;
-  isAvailable: boolean;
-  totalEarnings: number;
-  rating: number;
-  completedBookings: number;
+  name_en: string | null;
+  name_ar: string | null;
+  title_en: string | null;
+  title_ar: string | null;
+  is_active: boolean | null;
+  photo_url: string | null;
+  work_type: string | null;
+  branches: {
+    name_en: string | null;
+    name_ar: string | null;
+    provider_id: string;
+    providers: { business_name_en: string | null; business_name_ar: string | null } | null;
+  } | null;
 };
 
-const copy = {
+type PerformanceRow = {
+  employee_id: string;
+  completed_bookings: number | string | null;
+  employee_earnings: number | string | null;
+  review_count: number | string | null;
+  rating_sum: number | string | null;
+};
+
+type ProviderOption = { id: string; business_name_en: string | null; business_name_ar: string | null };
+
+const translations = {
   en: {
     title: "Employees",
-    subtitle: "Manage provider employees, availability, work modes, service assignments, and performance.",
-    add: "+ Add Employee",
-    totalEarnings: "Total earned",
-    completed: "Completed bookings",
-    averageRating: "Average rating",
-    best: "Best-performing employee",
-    active: "Active employees",
-    remote: "Remote employees",
-    inShop: "In-shop employees",
-    employee: "Employee",
+    subtitle: "Staff registered by providers. Providers manage their own teams, so this directory is read-only.",
+    search: "Search by name or title",
     status: "Status",
+    provider: "Provider",
+    allProviders: "All providers",
+    statuses: { all: "All", active: "Active", inactive: "Inactive" } as Record<string, string>,
+    employee: "Employee",
+    branch: "Provider and branch",
     workType: "Work type",
-    services: "Assigned services",
-    earnings: "Earnings",
+    workTypes: { in_shop: "In-shop", remote: "Remote", both: "Remote + in-shop" } as Record<string, string>,
+    completed: "Completed bookings",
     rating: "Rating",
-    bookings: "Bookings",
-    actions: "Actions",
-    activeLabel: "Active",
-    inactiveLabel: "Inactive",
-    remoteLabel: "Remote",
-    inShopLabel: "In-shop",
-    bothLabel: "Remote + in-shop",
-    view: "View",
-    edit: "Edit",
-    delete: "Delete",
-    save: "Save",
-    cancel: "Cancel",
-    nameEn: "English name",
-    nameAr: "Arabic name",
-    roleEn: "English role",
-    roleAr: "Arabic role",
-    photoUrl: "Photo URL",
-    phone: "Phone",
-    email: "Email",
-    servicesCsv: "Assigned services, comma separated",
-    available: "Employee available",
-    formTitleAdd: "Add employee",
-    formTitleEdit: "Edit employee",
-    details: "Employee details",
-    confirmDelete: "Delete {name}? This cannot be undone in this local admin view.",
+    earnings: "Earnings",
+    noTitle: "No title",
+    loading: "Loading employees…",
+    loadFailed: "Employees could not be loaded: {reason}",
+    providersFailed: "The provider list could not be loaded, so you cannot filter by provider: {reason}",
+    providersCapped: "Only the first {n} providers are listed in the filter. Search by name to find the others.",
+    clearFilters: "Clear filters",
+    retry: "Try again",
+    empty: "No employees have been registered yet.",
+    filteredEmpty: "No employees match these filters.",
+    total: "{n} employees",
+    page: "Page {page} of {pages}",
+    previous: "Previous",
+    next: "Next",
   },
   ar: {
     title: "الموظفون",
-    subtitle: "إدارة موظفي المزودين والتوفر ونوع العمل والخدمات والأداء.",
-    add: "+ إضافة موظف",
-    totalEarnings: "إجمالي الأرباح",
-    completed: "الحجوزات المكتملة",
-    averageRating: "متوسط التقييم",
-    best: "أفضل موظف أداء",
-    active: "الموظفون النشطون",
-    remote: "موظفو العمل عن بعد",
-    inShop: "موظفو المحل",
-    employee: "الموظف",
+    subtitle: "الموظفون المسجلون لدى مقدمي الخدمة. يدير كل مقدم خدمة فريقه بنفسه، لذلك هذا الدليل للعرض فقط.",
+    search: "ابحث بالاسم أو المسمى",
     status: "الحالة",
+    provider: "مقدم الخدمة",
+    allProviders: "كل مقدمي الخدمة",
+    statuses: { all: "الكل", active: "نشط", inactive: "غير نشط" } as Record<string, string>,
+    employee: "الموظف",
+    branch: "مقدم الخدمة والفرع",
     workType: "نوع العمل",
-    services: "الخدمات المعينة",
-    earnings: "الأرباح",
+    workTypes: { in_shop: "داخل المتجر", remote: "عن بعد", both: "عن بعد وداخل المتجر" } as Record<string, string>,
+    completed: "الحجوزات المكتملة",
     rating: "التقييم",
-    bookings: "الحجوزات",
-    actions: "الإجراءات",
-    activeLabel: "نشط",
-    inactiveLabel: "غير نشط",
-    remoteLabel: "عن بعد",
-    inShopLabel: "داخل المحل",
-    bothLabel: "عن بعد وداخل المحل",
-    view: "عرض",
-    edit: "تعديل",
-    delete: "حذف",
-    save: "حفظ",
-    cancel: "إلغاء",
-    nameEn: "الاسم بالإنجليزية",
-    nameAr: "الاسم بالعربية",
-    roleEn: "الدور بالإنجليزية",
-    roleAr: "الدور بالعربية",
-    photoUrl: "رابط الصورة",
-    phone: "الهاتف",
-    email: "البريد الإلكتروني",
-    servicesCsv: "الخدمات المعينة مفصولة بفواصل",
-    available: "الموظف متاح",
-    formTitleAdd: "إضافة موظف",
-    formTitleEdit: "تعديل موظف",
-    details: "تفاصيل الموظف",
-    confirmDelete: "حذف {name}؟ لا يمكن التراجع عن ذلك في عرض الإدارة المحلي.",
-  }
+    earnings: "الأرباح",
+    noTitle: "بلا مسمى",
+    loading: "جارٍ تحميل الموظفين…",
+    loadFailed: "تعذّر تحميل الموظفين: {reason}",
+    providersFailed: "تعذّر تحميل قائمة مقدمي الخدمة، لذا لا يمكن التصفية بحسب مقدم الخدمة: {reason}",
+    providersCapped: "تُعرض أول {n} من مقدمي الخدمة فقط في التصفية. ابحث بالاسم للوصول إلى الباقين.",
+    clearFilters: "مسح التصفية",
+    retry: "إعادة المحاولة",
+    empty: "لم يُسجَّل أي موظف بعد.",
+    filteredEmpty: "لا يوجد موظفون مطابقون لهذه التصفية.",
+    total: "عدد الموظفين: {n}",
+    page: "الصفحة {page} من {pages}",
+    previous: "السابق",
+    next: "التالي",
+  },
 };
 
-const demoEmployees: Employee[] = [
-  {
-    id: "emp-omar",
-    nameEn: "Omar Khaled",
-    nameAr: "عمر خالد",
-    roleEn: "Master Barber",
-    roleAr: "حلاق خبير",
-    photoUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&auto=format&fit=crop",
-    phone: "+966 55 418 2031",
-    email: "omar.khaled@primora.team",
-    assignedServices: ["Classic Haircut", "Beard Sculpt", "Hot Towel Shave"],
-    workType: "both",
-    isAvailable: true,
-    totalEarnings: 28450,
-    rating: 4.9,
-    completedBookings: 186
-  },
-  {
-    id: "emp-yousef",
-    nameEn: "Yousef Adel",
-    nameAr: "يوسف عادل",
-    roleEn: "Beard Specialist",
-    roleAr: "أخصائي لحية",
-    photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
-    phone: "+966 54 209 4488",
-    email: "yousef.adel@primora.team",
-    assignedServices: ["Beard Sculpt", "Royal Shave Ritual"],
-    workType: "in_shop",
-    isAvailable: true,
-    totalEarnings: 19380,
-    rating: 4.8,
-    completedBookings: 132
-  },
-  {
-    id: "emp-lina",
-    nameEn: "Lina Nasser",
-    nameAr: "لينا ناصر",
-    roleEn: "Spa & Skincare Specialist",
-    roleAr: "أخصائية سبا وبشرة",
-    photoUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400&auto=format&fit=crop",
-    phone: "+966 56 771 0430",
-    email: "lina.nasser@primora.team",
-    assignedServices: ["Express Facial", "Moroccan Bath", "Aromatherapy Massage"],
-    workType: "remote",
-    isAvailable: false,
-    totalEarnings: 22110,
-    rating: 4.7,
-    completedBookings: 118
-  }
-];
-
-const blankEmployee = (): Employee => ({
-  id: "",
-  nameEn: "",
-  nameAr: "",
-  roleEn: "Specialist",
-  roleAr: "أخصائي",
-  photoUrl: "",
-  phone: "",
-  email: "",
-  assignedServices: [],
-  workType: "in_shop",
-  isAvailable: true,
-  totalEarnings: 0,
-  rating: 4.7,
-  completedBookings: 0
-});
+const fill = (template: string, values: Record<string, string | number>) =>
+  Object.entries(values).reduce((text, [key, value]) => text.replace(`{${key}}`, String(value)), template);
+const initialsOf = (name: string) => name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((word) => word.charAt(0)).join("").toUpperCase();
+// Characters that would change the meaning of a PostgREST filter are not searchable.
+const safeTerm = (term: string) => term.replace(/[%*,()\\]/g, " ").replace(/\s+/g, " ").trim();
 
 export default function AdminEmployeesPage() {
-  const [lang, setLang] = useState<"en" | "ar">("en");
-  const [employees, setEmployees] = useState<Employee[]>(demoEmployees);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
-  const [activeEmployee, setActiveEmployee] = useState<Employee | null>(null);
-  const [form, setForm] = useState<Employee>(() => blankEmployee());
-  const t = copy[lang];
+  const lang = useOperationsLocale();
+  const t = translations[lang];
   const isRTL = lang === "ar";
+  const numberFormat = isRTL ? "ar-SA" : "en-US";
+
+  const [term, setTerm] = useState("");
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<"all" | "active" | "inactive">("all");
+  const [providerId, setProviderId] = useState("");
+  const [page, setPage] = useState(1);
+  const [reloadKey, setReloadKey] = useState(0);
+  const [providers, setProviders] = useState<ProviderOption[]>([]);
+  const [rows, setRows] = useState<EmployeeRow[]>([]);
+  const [figures, setFigures] = useState<Record<string, PerformanceRow> | null>(null);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [loadForbidden, setLoadForbidden] = useState(false);
+  const [providersError, setProvidersError] = useState("");
+
+  // The search box applies a moment after typing stops, so each keystroke is not a query.
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setSearch(safeTerm(term));
+      setPage(1);
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [term]);
 
   useEffect(() => {
-    const sync = () => setLang(document.documentElement.lang === "ar" ? "ar" : "en");
-    sync();
-    const observer = new MutationObserver(sync);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
-    return () => observer.disconnect();
-  }, []);
-
-  const labelForWorkType = (workType: WorkType) => {
-    if (workType === "remote") return t.remoteLabel;
-    if (workType === "both") return t.bothLabel;
-    return t.inShopLabel;
-  };
-
-  const metrics = useMemo(() => {
-    const totalEarnings = employees.reduce((sum, employee) => sum + employee.totalEarnings, 0);
-    const completed = employees.reduce((sum, employee) => sum + employee.completedBookings, 0);
-    const averageRating = employees.length ? employees.reduce((sum, employee) => sum + employee.rating, 0) / employees.length : 0;
-    const best = employees.reduce<Employee | null>((winner, employee) => {
-      if (!winner) return employee;
-      return employee.totalEarnings + employee.completedBookings * 35 > winner.totalEarnings + winner.completedBookings * 35 ? employee : winner;
-    }, null);
-
-    return {
-      totalEarnings,
-      completed,
-      averageRating,
-      best,
-      active: employees.filter((employee) => employee.isAvailable).length,
-      remote: employees.filter((employee) => employee.workType === "remote" || employee.workType === "both").length,
-      inShop: employees.filter((employee) => employee.workType === "in_shop" || employee.workType === "both").length
+    let cancelled = false;
+    void (async () => {
+      const { data, error } = await supabase.from("providers").select("id, business_name_en, business_name_ar").order("business_name_en", { ascending: true });
+      if (cancelled) return;
+      if (error) {
+        setProviders([]);
+        setProvidersError(errorMessage(error));
+        return;
+      }
+      setProvidersError("");
+      setProviders((data ?? []) as ProviderOption[]);
+    })();
+    return () => {
+      cancelled = true;
     };
-  }, [employees]);
+  }, [reloadKey]);
 
-  const displayName = (employee: Employee) => isRTL ? employee.nameAr || employee.nameEn : employee.nameEn || employee.nameAr;
-  const displayRole = (employee: Employee) => isRTL ? employee.roleAr || employee.roleEn : employee.roleEn || employee.roleAr;
-  const money = (value: number) => `${value.toLocaleString(isRTL ? "ar-SA" : "en-US")} SAR`;
-
-  const openAdd = () => {
-    setForm(blankEmployee());
-    setModalOpen(true);
-  };
-
-  const openEdit = (employee: Employee) => {
-    setForm(employee);
-    setModalOpen(true);
-  };
-
-  const openDetails = (employee: Employee) => {
-    setActiveEmployee(employee);
-    setDetailsOpen(true);
-  };
-
-  const saveEmployee = () => {
-    const normalized: Employee = {
-      ...form,
-      id: form.id || `emp-${Date.now()}`,
-      assignedServices: form.assignedServices.map((service) => service.trim()).filter(Boolean),
-      totalEarnings: Number(form.totalEarnings) || 0,
-      rating: Number(form.rating) || 0,
-      completedBookings: Number(form.completedBookings) || 0
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      setLoadError("");
+      // GOV-2 (Q4): staff records and their figures come from the audited admin_list_employees, one server page at a time.
+      // Earnings are money and come back empty unless the console role holds the ledger permission.
+      const { data, error } = await supabase.rpc("admin_list_employees", {
+        p_search: search || null,
+        p_status: status,
+        p_provider_id: providerId || null,
+        p_limit: PAGE_SIZE,
+        p_offset: (page - 1) * PAGE_SIZE,
+        p_purpose: "staff_administration",
+      });
+      if (cancelled) return;
+      if (error) {
+        setRows([]);
+        setFigures(null);
+        setTotal(0);
+        setLoadError(errorMessage(error));
+        setLoadForbidden(isForbidden(error));
+        setLoading(false);
+        return;
+      }
+      setLoadForbidden(false);
+      const result = data as { total: number | string; rows: Array<EmployeeRow & { performance: Omit<PerformanceRow, "employee_id"> | null }> };
+      const pageRows = result.rows ?? [];
+      setRows(pageRows);
+      setTotal(Number(result.total ?? 0));
+      setFigures(Object.fromEntries(pageRows.filter((row) => row.performance).map((row) => [row.id, { employee_id: row.id, ...row.performance! }])));
+      setLoading(false);
     };
-    setEmployees((current) => current.some((employee) => employee.id === normalized.id)
-      ? current.map((employee) => employee.id === normalized.id ? normalized : employee)
-      : [normalized, ...current]);
-    setModalOpen(false);
-  };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [page, status, providerId, search, reloadKey]);
 
-  const deleteEmployee = (employee: Employee) => {
-    const message = t.confirmDelete.replace("{name}", displayName(employee));
-    if (typeof window !== "undefined" && !window.confirm(message)) return;
-    setEmployees((current) => current.filter((item) => item.id !== employee.id));
-  };
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928]";
+  const cell = "px-4 py-3 align-top";
+  const filtered = Boolean(search || providerId || status !== "all");
+  const name = (row: EmployeeRow) => (isRTL ? row.name_ar || row.name_en : row.name_en || row.name_ar) || "—";
+  const title = (row: EmployeeRow) => (isRTL ? row.title_ar || row.title_en : row.title_en || row.title_ar) || t.noTitle;
+  const providerName = (row: { business_name_en: string | null; business_name_ar: string | null } | null | undefined) =>
+    (isRTL ? row?.business_name_ar || row?.business_name_en : row?.business_name_en || row?.business_name_ar) || "—";
+  const branchName = (row: EmployeeRow) => (isRTL ? row.branches?.name_ar || row.branches?.name_en : row.branches?.name_en || row.branches?.name_ar) || "—";
 
   return (
-    <div dir={isRTL ? "rtl" : "ltr"} className={`space-y-7 text-[#17130D] ${isRTL ? "text-right" : "text-left"}`}>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="font-serif text-3xl font-black text-[#17130D]">{t.title}</h1>
-          <p className="mt-2 max-w-2xl text-sm font-medium text-[#6F6759]">{t.subtitle}</p>
+    <div dir={isRTL ? "rtl" : "ltr"} className={`space-y-5 ${isRTL ? "text-right" : "text-left"}`}>
+      <div>
+        <h1 className="font-serif text-2xl font-black leading-tight text-gray-900">{t.title}</h1>
+        <p className="mt-1 text-xs font-semibold text-gray-500">{t.subtitle}</p>
+      </div>
+
+      <div className="flex flex-wrap items-end gap-3">
+        <label className="flex min-w-[220px] flex-1 flex-col gap-1 text-[11px] font-bold text-[#667085]">
+          <span>{t.search}</span>
+          <input type="search" value={term} onChange={(event) => setTerm(event.target.value)} className={operationsInput} />
+        </label>
+        <label className="flex flex-col gap-1 text-[11px] font-bold text-[#667085]">
+          <span>{t.provider}</span>
+          <select
+            value={providerId}
+            onChange={(event) => {
+              setProviderId(event.target.value);
+              setPage(1);
+            }}
+            className={`${operationsInput} min-w-[200px]`}
+          >
+            <option value="">{t.allProviders}</option>
+            {providers.map((provider) => (
+              <option key={provider.id} value={provider.id}>{providerName(provider)}</option>
+            ))}
+          </select>
+        </label>
+        <label className="flex flex-col gap-1 text-[11px] font-bold text-[#667085]">
+          <span>{t.status}</span>
+          <select
+            value={status}
+            onChange={(event) => {
+              setStatus(event.target.value as typeof status);
+              setPage(1);
+            }}
+            className={operationsInput}
+          >
+            {(["all", "active", "inactive"] as const).map((value) => (
+              <option key={value} value={value}>{t.statuses[value]}</option>
+            ))}
+          </select>
+        </label>
+        {!loading && !loadError && <div className="pb-2 text-[11px] font-semibold text-gray-500">{fill(t.total, { n: total.toLocaleString(numberFormat) })}</div>}
+      </div>
+
+      {providersError && (
+        <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#FEDF89] bg-[#FFFAEB] px-4 py-3 text-xs font-bold text-[#93370D]">
+          <span>{fill(t.providersFailed, { reason: providersError })}</span>
+          <button type="button" onClick={() => setReloadKey((key) => key + 1)} className={`rounded-lg border border-[#FEDF89] bg-white px-3 py-1.5 font-black ${focusRing}`}>{t.retry}</button>
         </div>
-        <button onClick={openAdd} className="rounded-2xl bg-[#D1AF47] px-5 py-3 text-sm font-black text-[#11100B] shadow-[0_14px_34px_rgba(209,175,71,0.25)] transition hover:bg-[#E0C46A]">
-          {t.add}
-        </button>
-      </div>
+      )}
+      {!providersError && providers.length >= 1000 && (
+        <div role="status" className="rounded-xl border border-[#FEDF89] bg-[#FFFAEB] px-4 py-3 text-xs font-bold text-[#93370D]">{fill(t.providersCapped, { n: (1000).toLocaleString(numberFormat) })}</div>
+      )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-7">
-        {[
-          { label: t.totalEarnings, value: money(metrics.totalEarnings) },
-          { label: t.completed, value: metrics.completed.toLocaleString(isRTL ? "ar-SA" : "en-US") },
-          { label: t.averageRating, value: metrics.averageRating.toFixed(1) },
-          { label: t.best, value: metrics.best ? displayName(metrics.best) : "—" },
-          { label: t.active, value: metrics.active.toLocaleString(isRTL ? "ar-SA" : "en-US") },
-          { label: t.remote, value: metrics.remote.toLocaleString(isRTL ? "ar-SA" : "en-US") },
-          { label: t.inShop, value: metrics.inShop.toLocaleString(isRTL ? "ar-SA" : "en-US") }
-        ].map((metric) => (
-          <div key={metric.label} className="rounded-[24px] border border-[#D1AF47]/20 bg-white/78 p-5 shadow-[0_18px_44px_rgba(17,16,11,0.07)] backdrop-blur">
-            <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-[#8B806B]">{metric.label}</span>
-            <strong className="mt-2 block truncate text-xl font-black text-[#17130D]">{metric.value}</strong>
-          </div>
-        ))}
-      </div>
-
-      <div className="overflow-hidden rounded-[28px] border border-[#D1AF47]/20 bg-white/82 shadow-[0_20px_60px_rgba(17,16,11,0.08)]">
-        <div className="hidden overflow-x-auto lg:block">
-          <table className="w-full min-w-[980px] text-sm">
-            <thead className="bg-[#17130D] text-[#F4E7B6]">
+      {loadError && loadForbidden ? (
+        <ForbiddenNotice locale={lang} />
+      ) : loadError ? (
+        <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+          <span>{fill(t.loadFailed, { reason: loadError })}</span>
+          <button type="button" onClick={() => setReloadKey((key) => key + 1)} className={`rounded-xl border border-red-300 bg-white px-3 py-1.5 text-xs font-black text-red-800 ${focusRing}`}>{t.retry}</button>
+        </div>
+      ) : loading ? (
+        <div role="status" className="rounded-2xl border border-[#ECECEC] bg-white p-5 text-sm font-semibold text-gray-500">{t.loading}</div>
+      ) : rows.length === 0 ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#ECECEC] bg-white p-5 text-sm font-semibold text-gray-500">
+          <span>{filtered ? t.filteredEmpty : t.empty}</span>
+          {filtered && (
+            <button type="button" onClick={() => { setTerm(""); setSearch(""); setStatus("all"); setProviderId(""); setPage(1); }} className={`rounded-xl border border-[#ECECEC] px-3 py-1.5 text-xs font-black text-gray-700 ${focusRing}`}>{t.clearFilters}</button>
+          )}
+        </div>
+      ) : (
+        <div role="region" aria-label={t.title} tabIndex={0} className={`overflow-x-auto rounded-2xl border border-[#ECECEC] bg-white ${focusRing}`}>
+          <table className="w-full min-w-[860px] text-sm">
+            <thead className="bg-[#FAFAF7] text-[11px] font-extrabold uppercase tracking-widest text-[#667085]">
               <tr>
-                {[t.employee, t.status, t.workType, t.services, t.earnings, t.rating, t.bookings, t.actions].map((head) => (
-                  <th key={head} className="px-5 py-4 text-start text-[10px] font-black uppercase tracking-[0.18em]">{head}</th>
+                {[t.employee, t.branch, t.workType, t.status, t.completed, t.rating, t.earnings].map((heading) => (
+                  <th key={heading} scope="col" className={`${cell} text-start`}>{heading}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#17130D]/8">
-              {employees.map((employee) => (
-                <tr key={employee.id} className="transition hover:bg-[#F7F3E8]">
-                  <td className="px-5 py-4">
-                    <div className="flex items-center gap-3">
-                      <img src={employee.photoUrl} alt={displayName(employee)} className="h-11 w-11 rounded-2xl object-cover" />
-                      <div>
-                        <p className="font-black text-[#17130D]">{displayName(employee)}</p>
-                        <p className="text-xs font-semibold text-[#8B806B]">{displayRole(employee)}</p>
+            <tbody className="divide-y divide-[#F2F4F7]">
+              {rows.map((row) => {
+                const performance = figures?.[row.id];
+                const reviews = Number(performance?.review_count ?? 0);
+                const rating = performance && reviews > 0 ? Number(performance.rating_sum ?? 0) / reviews : null;
+                return (
+                  <tr key={row.id}>
+                    <td className={cell}>
+                      <div className="flex items-center gap-3">
+                        {row.photo_url ? (
+                          // Photos are stored as links to storage we do not control, so next/image would need every host allow-listed.
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={row.photo_url} alt={name(row)} loading="lazy" className="h-10 w-10 shrink-0 rounded-xl object-cover" />
+                        ) : (
+                          <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F4E7B6]/60 text-xs font-black text-[#7A5B12]">{initialsOf(name(row))}</span>
+                        )}
+                        <div className="min-w-0">
+                          <div className="font-black text-gray-900">{name(row)}</div>
+                          <div className="text-[11px] font-semibold text-gray-500">{title(row)}</div>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className={`rounded-full px-3 py-1 text-[10px] font-black ${employee.isAvailable ? "bg-[#16A34A]/10 text-[#15803D]" : "bg-[#EF4444]/10 text-[#B91C1C]"}`}>
-                      {employee.isAvailable ? t.activeLabel : t.inactiveLabel}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 font-bold text-[#6F6759]">{labelForWorkType(employee.workType)}</td>
-                  <td className="px-5 py-4 text-xs font-semibold text-[#6F6759]">{employee.assignedServices.slice(0, 3).join(", ")}</td>
-                  <td className="px-5 py-4 font-black text-[#B68B2C]">{money(employee.totalEarnings)}</td>
-                  <td className="px-5 py-4 font-black text-[#17130D]">★ {employee.rating.toFixed(1)}</td>
-                  <td className="px-5 py-4 font-black text-[#17130D]">{employee.completedBookings}</td>
-                  <td className="px-5 py-4">
-                    <div className="flex flex-wrap gap-2">
-                      <button onClick={() => openDetails(employee)} className="rounded-xl border border-[#17130D]/10 px-3 py-2 text-xs font-black text-[#17130D] hover:border-[#D1AF47]/45">{t.view}</button>
-                      <button onClick={() => openEdit(employee)} className="rounded-xl border border-[#D1AF47]/35 bg-[#D1AF47]/10 px-3 py-2 text-xs font-black text-[#9A741F] hover:bg-[#D1AF47]/20">{t.edit}</button>
-                      <button onClick={() => deleteEmployee(employee)} className="rounded-xl border border-[#EF4444]/20 bg-[#EF4444]/10 px-3 py-2 text-xs font-black text-[#B91C1C] hover:bg-[#EF4444]/15">{t.delete}</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className={cell}>
+                      <div className="font-bold text-gray-900">{providerName(row.branches?.providers)}</div>
+                      <div className="text-[11px] font-semibold text-gray-500">{branchName(row)}</div>
+                    </td>
+                    <td className={`${cell} text-xs text-gray-700`}>{t.workTypes[row.work_type ?? "in_shop"] ?? row.work_type}</td>
+                    <td className={cell}>
+                      <span className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-black ${row.is_active === false ? "bg-gray-100 text-[#667085]" : "bg-green-50 text-green-700"}`}>
+                        {row.is_active === false ? t.statuses.inactive : t.statuses.active}
+                      </span>
+                    </td>
+                    <td className={`${cell} font-black text-gray-900`}>{performance ? Number(performance.completed_bookings ?? 0).toLocaleString(numberFormat) : "—"}</td>
+                    <td className={`${cell} font-black text-gray-900`}>
+                      {performance ? (rating === null ? "—" : `★ ${rating.toLocaleString(numberFormat, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`) : "—"}
+                    </td>
+                    <td className={`${cell} whitespace-nowrap font-black text-[#9A741F]`}>{performance && performance.employee_earnings !== null && performance.employee_earnings !== undefined ? sar(Number(performance.employee_earnings), lang) : "—"}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
-
-        <div className="grid gap-4 p-4 lg:hidden">
-          {employees.map((employee) => (
-            <div key={employee.id} className="rounded-3xl border border-[#17130D]/10 bg-white p-4 shadow-sm">
-              <div className="flex items-start gap-3">
-                <img src={employee.photoUrl} alt={displayName(employee)} className="h-14 w-14 rounded-2xl object-cover" />
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-black text-[#17130D]">{displayName(employee)}</h3>
-                  <p className="text-xs font-semibold text-[#8B806B]">{displayRole(employee)}</p>
-                  <p className="mt-2 text-xs font-bold text-[#B68B2C]">{money(employee.totalEarnings)} · ★ {employee.rating.toFixed(1)}</p>
-                </div>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <span className="rounded-full bg-[#17130D]/6 px-3 py-1 text-[10px] font-black text-[#17130D]">{labelForWorkType(employee.workType)}</span>
-                <span className={`rounded-full px-3 py-1 text-[10px] font-black ${employee.isAvailable ? "bg-[#16A34A]/10 text-[#15803D]" : "bg-[#EF4444]/10 text-[#B91C1C]"}`}>
-                  {employee.isAvailable ? t.activeLabel : t.inactiveLabel}
-                </span>
-              </div>
-              <div className="mt-4 flex gap-2">
-                <button onClick={() => openDetails(employee)} className="flex-1 rounded-xl border border-[#17130D]/10 py-2 text-xs font-black">{t.view}</button>
-                <button onClick={() => openEdit(employee)} className="flex-1 rounded-xl bg-[#D1AF47] py-2 text-xs font-black text-[#11100B]">{t.edit}</button>
-                <button onClick={() => deleteEmployee(employee)} className="flex-1 rounded-xl bg-[#EF4444]/10 py-2 text-xs font-black text-[#B91C1C]">{t.delete}</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#17130D]/55 px-4 py-8 backdrop-blur-sm">
-          <div className="w-full max-w-3xl rounded-[28px] border border-[#D1AF47]/25 bg-[#F9F7F1] p-6 shadow-2xl">
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="font-serif text-2xl font-black text-[#17130D]">{form.id ? t.formTitleEdit : t.formTitleAdd}</h2>
-              <button onClick={() => setModalOpen(false)} className="rounded-full border border-[#17130D]/10 px-3 py-1 text-xs font-black text-[#6F6759]">{t.cancel}</button>
-            </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {[
-                ["nameEn", t.nameEn],
-                ["nameAr", t.nameAr],
-                ["roleEn", t.roleEn],
-                ["roleAr", t.roleAr],
-                ["photoUrl", t.photoUrl],
-                ["phone", t.phone],
-                ["email", t.email],
-              ].map(([key, label]) => (
-                <label key={key} className="space-y-2 text-xs font-black uppercase tracking-widest text-[#8B806B]">
-                  {label}
-                  <input value={String(form[key as keyof Employee] ?? "")} onChange={(event) => setForm((current) => ({ ...current, [key]: event.target.value }))} className="w-full rounded-2xl border border-[#17130D]/10 bg-white px-4 py-3 text-sm normal-case tracking-normal text-[#17130D] outline-none focus:border-[#D1AF47]/60" />
-                </label>
-              ))}
-              <label className="space-y-2 text-xs font-black uppercase tracking-widest text-[#8B806B]">
-                {t.workType}
-                <select value={form.workType} onChange={(event) => setForm((current) => ({ ...current, workType: event.target.value as WorkType }))} className="w-full rounded-2xl border border-[#17130D]/10 bg-white px-4 py-3 text-sm normal-case tracking-normal text-[#17130D] outline-none focus:border-[#D1AF47]/60">
-                  <option value="in_shop">{t.inShopLabel}</option>
-                  <option value="remote">{t.remoteLabel}</option>
-                  <option value="both">{t.bothLabel}</option>
-                </select>
-              </label>
-              <label className="space-y-2 text-xs font-black uppercase tracking-widest text-[#8B806B]">
-                {t.earnings}
-                <input type="number" value={form.totalEarnings} onChange={(event) => setForm((current) => ({ ...current, totalEarnings: Number(event.target.value) }))} className="w-full rounded-2xl border border-[#17130D]/10 bg-white px-4 py-3 text-sm normal-case tracking-normal text-[#17130D] outline-none focus:border-[#D1AF47]/60" />
-              </label>
-              <label className="space-y-2 text-xs font-black uppercase tracking-widest text-[#8B806B]">
-                {t.rating}
-                <input type="number" step="0.1" value={form.rating} onChange={(event) => setForm((current) => ({ ...current, rating: Number(event.target.value) }))} className="w-full rounded-2xl border border-[#17130D]/10 bg-white px-4 py-3 text-sm normal-case tracking-normal text-[#17130D] outline-none focus:border-[#D1AF47]/60" />
-              </label>
-              <label className="space-y-2 text-xs font-black uppercase tracking-widest text-[#8B806B]">
-                {t.bookings}
-                <input type="number" value={form.completedBookings} onChange={(event) => setForm((current) => ({ ...current, completedBookings: Number(event.target.value) }))} className="w-full rounded-2xl border border-[#17130D]/10 bg-white px-4 py-3 text-sm normal-case tracking-normal text-[#17130D] outline-none focus:border-[#D1AF47]/60" />
-              </label>
-              <label className="space-y-2 text-xs font-black uppercase tracking-widest text-[#8B806B] sm:col-span-2">
-                {t.servicesCsv}
-                <input value={form.assignedServices.join(", ")} onChange={(event) => setForm((current) => ({ ...current, assignedServices: event.target.value.split(",") }))} className="w-full rounded-2xl border border-[#17130D]/10 bg-white px-4 py-3 text-sm normal-case tracking-normal text-[#17130D] outline-none focus:border-[#D1AF47]/60" />
-              </label>
-              <label className="flex items-center justify-between rounded-2xl border border-[#17130D]/10 bg-white px-4 py-3 text-sm font-black text-[#17130D] sm:col-span-2">
-                {t.available}
-                <input type="checkbox" checked={form.isAvailable} onChange={(event) => setForm((current) => ({ ...current, isAvailable: event.target.checked }))} className="h-5 w-5 accent-[#D1AF47]" />
-              </label>
-            </div>
-            <div className="mt-6 flex justify-end gap-3">
-              <button onClick={() => setModalOpen(false)} className="rounded-xl border border-[#17130D]/10 px-5 py-2.5 text-xs font-black text-[#6F6759]">{t.cancel}</button>
-              <button onClick={saveEmployee} className="rounded-xl bg-[#D1AF47] px-5 py-2.5 text-xs font-black text-[#11100B] hover:bg-[#E0C46A]">{t.save}</button>
-            </div>
-          </div>
-        </div>
       )}
 
-      {detailsOpen && activeEmployee && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#17130D]/55 px-4 py-8 backdrop-blur-sm">
-          <div className="w-full max-w-xl rounded-[28px] border border-[#D1AF47]/25 bg-[#F9F7F1] p-6 shadow-2xl">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <img src={activeEmployee.photoUrl} alt={displayName(activeEmployee)} className="h-20 w-20 rounded-3xl object-cover" />
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#B68B2C]">{t.details}</p>
-                  <h2 className="mt-1 font-serif text-2xl font-black text-[#17130D]">{displayName(activeEmployee)}</h2>
-                  <p className="text-sm font-semibold text-[#6F6759]">{displayRole(activeEmployee)}</p>
-                </div>
-              </div>
-              <button onClick={() => setDetailsOpen(false)} className="rounded-full border border-[#17130D]/10 px-3 py-1 text-xs font-black text-[#6F6759]">{t.cancel}</button>
-            </div>
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <div className="rounded-2xl border border-[#17130D]/10 bg-white p-4"><span className="text-[9px] font-black uppercase text-[#8B806B]">{t.earnings}</span><strong className="mt-1 block text-lg text-[#B68B2C]">{money(activeEmployee.totalEarnings)}</strong></div>
-              <div className="rounded-2xl border border-[#17130D]/10 bg-white p-4"><span className="text-[9px] font-black uppercase text-[#8B806B]">{t.rating}</span><strong className="mt-1 block text-lg text-[#17130D]">★ {activeEmployee.rating.toFixed(1)}</strong></div>
-              <div className="rounded-2xl border border-[#17130D]/10 bg-white p-4"><span className="text-[9px] font-black uppercase text-[#8B806B]">{t.bookings}</span><strong className="mt-1 block text-lg text-[#17130D]">{activeEmployee.completedBookings}</strong></div>
-              <div className="rounded-2xl border border-[#17130D]/10 bg-white p-4"><span className="text-[9px] font-black uppercase text-[#8B806B]">{t.workType}</span><strong className="mt-1 block text-sm text-[#17130D]">{labelForWorkType(activeEmployee.workType)}</strong></div>
-            </div>
-            <div className="mt-4 rounded-2xl border border-[#17130D]/10 bg-white p-4 text-sm font-semibold text-[#6F6759]">
-              <p>{activeEmployee.phone}</p>
-              <p>{activeEmployee.email}</p>
-              <p className="mt-3">{activeEmployee.assignedServices.join(", ")}</p>
-            </div>
+      {!loadError && total > PAGE_SIZE && (
+        <div className="flex items-center justify-between gap-3 text-xs">
+          <span className="font-semibold text-gray-500">{fill(t.page, { page: page.toLocaleString(numberFormat), pages: pages.toLocaleString(numberFormat) })}</span>
+          <div className="flex gap-2">
+            <button type="button" disabled={page <= 1 || loading} onClick={() => setPage((current) => Math.max(1, current - 1))} className={`rounded-xl border border-[#ECECEC] px-3 py-1.5 font-bold disabled:opacity-40 ${focusRing}`}>{t.previous}</button>
+            <button type="button" disabled={page >= pages || loading} onClick={() => setPage((current) => Math.min(pages, current + 1))} className={`rounded-xl border border-[#ECECEC] px-3 py-1.5 font-bold disabled:opacity-40 ${focusRing}`}>{t.next}</button>
           </div>
         </div>
       )}

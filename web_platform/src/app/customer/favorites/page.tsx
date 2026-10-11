@@ -9,9 +9,9 @@ interface FavoriteItem {
   provider_id: string;
   name_en: string;
   name_ar: string;
-  rating: number;
+  rating: number | null;
   reviews_count: number;
-  image: string;
+  image: string | null;
   district: string;
   city: string;
 }
@@ -21,6 +21,7 @@ const translations = {
     title: "My Favorites",
     subtitle: "Quick access to your preferred salons, barbershops, and stylists in Riyadh & Jeddah.",
     reviews: "reviews",
+    newSalon: "New on PRIMORA",
     bookBtn: "Book Appointment",
     removeTitle: "Remove from favorites",
     noFavorites: "No favorite salons saved yet.",
@@ -36,6 +37,7 @@ const translations = {
     title: "المفضلة",
     subtitle: "وصول سريع ومباشر إلى صالوناتك ومراكز التجميل المفضلة في الرياض وجدة.",
     reviews: "تقييم",
+    newSalon: "جديد على بريمورا",
     bookBtn: "حجز موعد",
     removeTitle: "إزالة من المفضلة",
     noFavorites: "لم تقم بإضافة أي صالون إلى المفضلة بعد.",
@@ -98,10 +100,10 @@ export default function CustomerFavorites() {
           created_at,
           providers (
             id,
-            name_en,
-            name_ar,
-            rating,
-            reviews_count,
+            business_name_en,
+            business_name_ar,
+            logo_url,
+            cover_image_url,
             branches (
               id,
               name_en,
@@ -121,23 +123,32 @@ export default function CustomerFavorites() {
       }
 
       if (data) {
-        const mapped: FavoriteItem[] = data
-          .filter((f: any) => f.providers)
-          .map((f: any) => {
-            const p = f.providers;
-            const branch = p.branches && p.branches.length > 0 ? p.branches[0] : null;
-            return {
-              id: f.id,
-              provider_id: p.id,
-              name_en: p.name_en || "Salon",
-              name_ar: p.name_ar || "صالون",
-              rating: Number(p.rating || 4.9),
-              reviews_count: Number(p.reviews_count || 120),
-              image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=400&auto=format&fit=crop",
-              district: branch?.district || (locale === "ar" ? "الرياض" : "Riyadh"),
-              city: branch?.city || (locale === "ar" ? "الرياض" : "Riyadh"),
-            };
+        const rows = data.filter((f: any) => f.providers);
+        // The rating is the real average of published reviews; a salon with none yet is shown as new.
+        const ratings = new Map<string, { rating: number; reviews: number }>();
+        if (rows.length > 0) {
+          const { data: summaries, error: ratingErr } = await supabase.rpc("provider_rating_summaries", {
+            p_provider_ids: rows.map((f: any) => f.providers.id),
           });
+          if (ratingErr) throw ratingErr;
+          for (const row of summaries ?? []) ratings.set(row.provider_id, { rating: Number(row.rating), reviews: Number(row.reviews) });
+        }
+        const mapped: FavoriteItem[] = rows.map((f: any) => {
+          const p = f.providers;
+          const branch = p.branches && p.branches.length > 0 ? p.branches[0] : null;
+          const summary = ratings.get(p.id);
+          return {
+            id: f.id,
+            provider_id: p.id,
+            name_en: p.business_name_en || p.business_name_ar || "",
+            name_ar: p.business_name_ar || p.business_name_en || "",
+            rating: summary ? summary.rating : null,
+            reviews_count: summary ? summary.reviews : 0,
+            image: p.cover_image_url || p.logo_url || null,
+            district: branch?.district || "",
+            city: branch?.city || "",
+          };
+        });
         setFavorites(mapped);
       }
     } catch (err: any) {
@@ -198,11 +209,17 @@ export default function CustomerFavorites() {
               className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between group hover:shadow-md transition-shadow duration-300"
             >
               <div className="h-44 overflow-hidden relative">
-                <img
-                  src={item.image}
-                  alt={isRTL ? item.name_ar : item.name_en}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
+                {item.image ? (
+                  <img
+                    src={item.image}
+                    alt={isRTL ? item.name_ar : item.name_en}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                ) : (
+                  <div aria-hidden="true" className="w-full h-full bg-stone-100 flex items-center justify-center text-4xl font-black text-stone-300">
+                    {(isRTL ? item.name_ar : item.name_en).trim().charAt(0)}
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={() => handleRemove(item.provider_id)}
@@ -229,14 +246,14 @@ export default function CustomerFavorites() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    {item.district}, {item.city}
+                    {[item.district, item.city].filter(Boolean).join(isRTL ? "، " : ", ")}
                   </p>
 
                   <div className="flex items-center gap-1 mt-3 text-[10px] font-bold text-gray-800">
                     <svg className="w-3.5 h-3.5 text-amber-500 fill-current" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
-                    <span>{item.rating} ({item.reviews_count} {t.reviews})</span>
+                    <span>{item.rating === null ? t.newSalon : `${item.rating} (${item.reviews_count} ${t.reviews})`}</span>
                   </div>
                 </div>
 

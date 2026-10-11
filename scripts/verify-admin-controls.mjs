@@ -17,13 +17,14 @@ const checks = [
     reject: ["RAMADAN20", "WELCOME50", "PRIMORA10", "24,320", "2,432"],
   },
   {
-    file: "web_platform/src/app/admin/payments/page.tsx",
-    require: ['router.replace("/admin/ledger")'],
+    file: "web_platform/next.config.ts",
+    require: ['source: "/admin/payments", destination: "/admin/ledger"', 'source: "/admin/system-logs", destination: "/admin/audit-logs"'],
     reject: ['from("payment_refund_requests")', "refundDuplicate"],
   },
   {
     file: "web_platform/src/app/admin/ledger/page.tsx",
-    require: ['from("transactional_ledger")', 'from("payout_requests")', "handleReleasePayout", "markPayoutRequestPaid"],
+    // GOV-2 (Q4): the ledger and payout requests are read through audited server functions, never from the tables.
+    require: ['rpc("admin_list_ledger_entries"', 'rpc("admin_list_payout_requests"', "handleReleasePayout", "markPayoutRequestPaid"],
     reject: ["demo-p1", "Omar Khaled"],
   },
   {

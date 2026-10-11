@@ -7,10 +7,11 @@ export function isLocalDevAccessEnabled() {
     return false;
   }
 
+  // Opt-in only, never in a production build, and only on this machine. The database (RLS) remains the
+  // authorization boundary; this only lets developers view dashboards without signing in.
+  if (process.env.NODE_ENV === "production") return false;
   const isLocalHost = ["localhost", "127.0.0.1", "::1", "[::1]"].includes(window.location.hostname);
-  const explicitlyDisabled = process.env.NEXT_PUBLIC_ENABLE_DEV_ACCESS === "false";
-
-  return isLocalHost && !explicitlyDisabled;
+  return isLocalHost && process.env.NEXT_PUBLIC_ENABLE_DEV_ACCESS === "true";
 }
 
 export function getDevRole(): DevRole | null {
@@ -20,11 +21,8 @@ export function getDevRole(): DevRole | null {
   if (role === "customer" || role === "provider_owner" || role === "admin") {
     return role;
   }
-
-  // Auto-initialize a default dev role so pages don't get stuck
-  // on "Verifying secure session..." when no role is set yet.
-  window.localStorage.setItem(storageKey, "customer");
-  return "customer";
+  // No role is assigned automatically: a developer picks one explicitly on the login page or switcher.
+  return null;
 }
 
 export function setDevRole(role: DevRole) {

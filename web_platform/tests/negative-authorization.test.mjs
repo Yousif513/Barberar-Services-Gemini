@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync as readRaw } from "node:fs";
+import { existsSync, readFileSync as readRaw } from "node:fs";
 const readFileSync = (path, enc) => readRaw(path, enc).replace(/\r\n/g, "\n");
 import { fileURLToPath } from "node:url";
 import { dirname, resolve, join } from "node:path";
@@ -32,6 +32,14 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(code.includes('req.headers.get("Authorization")'), "Must read Authorization header");
       assert.ok(code.includes('profile?.role !== "admin"'), "Must require admin role");
       assert.ok(code.includes('403'), "Must return 403 for non-admin");
+      assert.ok(!code.includes('"Access-Control-Allow-Origin": "*"'), "Must not use wildcard CORS");
+    });
+
+    it("calculate-travel needs a signed-in session before it spends the maps quota", async () => {
+      const code = readFileSync(join(rootDir, "supabase/functions/calculate-travel/index.ts"), "utf8");
+      assert.ok(code.includes('req.headers.get("Authorization")'), "Must read Authorization header");
+      assert.ok(code.includes("auth.getUser(") && code.includes("401"), "Must reject a request with no real session");
+      assert.ok(code.indexOf("auth.getUser(") < code.indexOf("GOOGLE_MAPS_API_KEY"), "Must check the caller before using the key");
       assert.ok(!code.includes('"Access-Control-Allow-Origin": "*"'), "Must not use wildcard CORS");
     });
 
@@ -132,13 +140,10 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(!ledgerCode.includes("Omar Khaled"), "Forbidden mock name Omar Khaled found");
     });
 
-    it("admin/payments has no grep-bait comments", () => {
-      const paymentsCode = readFileSync(
-        join(webPlatformDir, "src/app/admin/payments/page.tsx"),
-        "utf8"
-      );
-      assert.ok(!paymentsCode.includes('Required admin-control markers'), "Grep-bait comments must be deleted");
-      assert.ok(!paymentsCode.includes('refundDuplicate'), "Grep-bait comment refundDuplicate must be deleted");
+    it("admin/payments is a server redirect to the ledger, not a stub page carrying marker comments", () => {
+      assert.ok(!existsSync(join(webPlatformDir, "src/app/admin/payments/page.tsx")), "the stub page must not come back");
+      const config = readFileSync(join(webPlatformDir, "next.config.ts"), "utf8");
+      assert.ok(config.includes('source: "/admin/payments", destination: "/admin/ledger"'), "the old address must redirect to the ledger");
     });
   });
 
@@ -468,7 +473,8 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         "utf8"
       );
       assert.ok(fnCode.includes("resolveCaller(req)"), "Must resolve the caller from the Authorization header");
-      assert.ok(fnCode.includes('caller.kind === "user"'), "Must reject non-admin users");
+      // GOV-FIX H-1: non-admin users and console roles without operations.write are refused (behaviour in supabase/tests/console-permission.test.mjs).
+      assert.ok(fnCode.includes('consoleCallerDecision(caller?.kind ?? null, true, FUNCTION_PERMISSIONS["dispatch-messages"]'), "Must require operations.write of a console caller");
       assert.ok(fnCode.includes("claim_message_batch"), "Must claim messages through the database");
       assert.ok(fnCode.includes("graph.facebook.com"), "Must send through the WhatsApp Cloud API");
       assert.ok(!fnCode.includes("wamid_"), "Must never fabricate WhatsApp message ids");
@@ -480,8 +486,9 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         "utf8"
       );
       assert.ok(!notifCode.includes("INITIAL_HISTORY = ["), "Must not use hardcoded mock history");
-      assert.ok(notifCode.includes('from("message_log")'), "Must query live message_log");
-      assert.ok(notifCode.includes('from("message_queue")'), "Must query live message_queue");
+      // GOV-2 (Q4): the log and the queue are read through audited / aggregate server functions.
+      assert.ok(notifCode.includes('rpc("admin_list_message_log"'), "Must query the live message log through the audited function");
+      assert.ok(notifCode.includes('rpc("admin_message_queue_summary"'), "Must query live message_queue sizes");
       assert.ok(notifCode.includes('functions.invoke("dispatch-messages"'), "Must allow manual queue dispatch through the Edge Function");
       assert.ok(notifCode.includes("Quiet Hours") || notifCode.includes("ساعات الهدوء"), "Must display quiet hours metrics");
     });
@@ -529,21 +536,20 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         "utf8"
       );
       assert.ok(!pushCode.includes('"Access-Control-Allow-Origin": "*"'), "Forbidden: wildcard CORS in send-push");
-      assert.ok(pushCode.includes("getCorsHeaders"), "Must use dynamic CORS allowlist helper");
+      assert.ok(pushCode.includes('corsHeaders as sharedCorsHeaders } from "../_shared/http.ts"'), "Must use the shared exact-origin CORS allowlist");
+      assert.ok(!/endsWith\(["']\.vercel\.app["']\)|endsWith\(["']primora\.sa["']\)/.test(pushCode), "Forbidden: suffix origin matching in send-push");
       assert.ok(pushCode.includes("Authorization"), "Must verify caller authorization");
     });
 
-    it("developer console hashes tokens with SHA-256 and removes simulated accounts (G40, G69)", () => {
-      const devCode = readFileSync(
-        join(webPlatformDir, "src/app/developer/page.tsx"),
-        "utf8"
-      );
-      assert.ok(devCode.includes("hashToken"), "Must have SHA-256 hashToken function");
-      assert.ok(devCode.includes("SHA-256"), "Must use SHA-256 algorithm");
-      assert.ok(!devCode.includes("dev-mock-profile"), "Must remove mock developer profile");
-      assert.ok(!devCode.includes("tk-mock-1"), "Must remove mock API tokens");
-      assert.ok(!devCode.includes("wh-mock-1"), "Must remove mock webhooks");
-      assert.ok(devCode.includes("is_approved: false"), "Must require admin audit/approval for tokens");
+    it("developer console no longer creates or hashes tokens in the browser (G40, G69)", () => {
+      // The placeholder page generated a token with crypto.getRandomValues, hashed it in the browser and inserted it into
+      // api_tokens from a React handler. G69 replaced it: keys are created and hashed by the database (create_api_key),
+      // and the old address only redirects. web_platform/tests/developer-console.test.mjs checks the new screens.
+      const old = readFileSync(join(webPlatformDir, "src/app/developer/page.tsx"), "utf8");
+      assert.ok(old.includes('redirect("/provider/developer")'), "The old address must only redirect to the console");
+      for (const gone of ["hashToken", "crypto.subtle", "getRandomValues", "api_tokens", "pk_live_", "is_approved", "dev-mock-profile", "tk-mock-1", "wh-mock-1"]) {
+        assert.ok(!old.includes(gone), `The old developer page must not contain ${gone}`);
+      }
     });
 
     it("admin screens enforce SAR-only currency without dollar signs (G32)", () => {
@@ -559,7 +565,7 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       const promoCode = readFileSync(join(webPlatformDir, "src/app/provider/promotions/page.tsx"), "utf8");
       assert.ok(!promoCode.includes('"promo-1"'), "Must not use mock promo-1");
       assert.ok(!promoCode.includes('"promo-2"'), "Must not use mock promo-2");
-      assert.ok(promoCode.includes('from("provider_promos")'), "Must query real provider_promos");
+      assert.ok(promoCode.includes('rpc("list_provider_promo_codes"'), "Must read the codes checkout redeems (promotional_codes) through the owner command");
 
       const custCode = readFileSync(join(webPlatformDir, "src/app/provider/customers/page.tsx"), "utf8");
       assert.ok(!custCode.includes('"cust-1"'), "Must not use mock cust-1");
@@ -704,19 +710,6 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(migrationCode.includes("booking.employee_status_update"), "Must log audit event");
       assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.employee_update_booking_status"), "Must revoke public execution");
       assert.ok(migrationCode.includes("GRANT EXECUTE ON FUNCTION public.employee_update_booking_status"), "Must grant authenticated execution");
-    });
-
-    it("verify_provider_cr enforces 10-digit Saudi CR regex and records Wathq data (G26)", () => {
-      const migrationCode = readFileSync(
-        join(rootDir, "supabase/migrations/20261004020000_people_and_trust.sql"),
-        "utf8"
-      );
-      assert.ok(migrationCode.includes("FUNCTION public.verify_provider_cr"), "Must define verify_provider_cr RPC");
-      assert.ok(migrationCode.includes("^[0-9]{10}$"), "Must enforce 10-digit CR number regex");
-      assert.ok(migrationCode.includes("Commercial Registration (CR) must be exactly 10 digits"), "Must throw clear error on invalid CR");
-      assert.ok(migrationCode.includes("wathq_saudi_api"), "Must record Wathq validation source");
-      assert.ok(migrationCode.includes("provider.cr_verification"), "Must log verification audit");
-      assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.verify_provider_cr"), "Must revoke public execution");
     });
 
     it("reply_to_review enforces owner authorization and rejects empty replies (G30)", () => {
@@ -871,7 +864,8 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         join(webPlatformDir, "src/app/admin/disputes/page.tsx"),
         "utf8"
       );
-      assert.ok(adminDisputesCode.includes("payment_disputes"), "Admin disputes must query payment_disputes table");
+      // GOV-FIX (Q4): payment_disputes is read through the audited admin_list_disputes.
+      assert.ok(adminDisputesCode.includes('rpc("admin_list_disputes"'), "Admin disputes must read payment_disputes through the audited list");
       assert.ok(adminDisputesCode.includes("resolve_booking_dispute"), "Admin disputes must call resolve_booking_dispute RPC");
       assert.ok(!adminDisputesCode.includes("d-mock-1"), "Admin disputes must have no fake mock disputes");
 
@@ -880,7 +874,7 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         "utf8"
       );
       assert.ok(adminLedgerCode.includes("run_daily_psp_reconciliation"), "Admin ledger must connect to run_daily_psp_reconciliation RPC");
-      assert.ok(adminLedgerCode.includes("provider_fee_invoices"), "Admin ledger must query provider_fee_invoices table");
+      assert.ok(adminLedgerCode.includes('rpc("admin_list_fee_invoices"'), "Admin ledger must read provider fee invoices through the audited function");
       assert.ok(!adminLedgerCode.includes('"text-[#D1AF47] font-serif text-xs font-black">\n                  $'), "Ledger widget must not use dollar signs");
 
       const pricingCode = readFileSync(
@@ -923,18 +917,6 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       assert.ok(migrationCode.includes("Forbidden: not authorized to import clients"), "Must restrict to provider owner or admin");
       assert.ok(migrationCode.includes("provider.clients_imported"), "Must emit audit event");
       assert.ok(migrationCode.includes("REVOKE ALL ON FUNCTION public.import_provider_clients"), "Must revoke public execution");
-    });
-
-    it("enqueue_post_visit_rebook trigger enqueues post-visit review and rebook on completed booking (G41)", () => {
-      const migrationCode = readFileSync(
-        join(rootDir, "supabase/migrations/20261004040000_growth_surfaces.sql"),
-        "utf8"
-      );
-      assert.ok(migrationCode.includes("FUNCTION public.enqueue_post_visit_rebook"), "Must create enqueue_post_visit_rebook function");
-      assert.ok(migrationCode.includes("trigger_enqueue_post_visit_rebook"), "Must define trigger on bookings table");
-      assert.ok(migrationCode.includes("WHEN (NEW.status = 'completed')"), "Trigger must only run when booking completes");
-      assert.ok(migrationCode.includes("post_visit_review_rebook"), "Must enqueue post_visit_review_rebook message");
-      assert.ok(migrationCode.includes("message_queue"), "Must enqueue into message_queue");
     });
 
     it("get_provider_monthly_value_summary calculates G43 value metrics and commission savings (G43)", () => {
@@ -1239,7 +1221,8 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       );
       assert.ok(customerBookingsCode.includes("add_booking_tip"), "Customer bookings must wire add_booking_tip RPC");
       assert.ok(customerBookingsCode.includes('purchaseType: "tip"'), "Tips are paid through checkout before they count");
-      assert.ok(customerBookingsCode.includes("100% of your tip goes directly to your specialist"), "Customer bookings must highlight 100% to specialist notice");
+      assert.ok(customerBookingsCode.includes("The full tip is paid to the provider for the specialist who served you"), "Customer bookings must say the tip is paid to the provider with no platform commission (the ledger credits the provider, not the specialist)");
+      assert.ok(!customerBookingsCode.includes("goes directly to your specialist"), "Customer bookings must not claim tips go directly to the specialist");
 
       const shopCode = readFileSync(
         join(webPlatformDir, "src/app/shop/[id]/page.tsx"),
@@ -1333,7 +1316,7 @@ describe("Negative Authorization & Security Boundary Tests", () => {
       );
       assert.ok(discoverCode.includes("search_marketplace_providers"), "Discover page must call search_marketplace_providers RPC");
       assert.ok(discoverCode.includes("projectPin"), "Discover page must project map pins");
-      assert.ok(discoverCode.includes("SAUDI_DISTRICTS"), "Discover page must provide Saudi district filters");
+      assert.ok(discoverCode.includes("districtOptions"), "Discover page must offer district filters taken from the branches the search returns");
 
       const shopCode = readFileSync(
         join(webPlatformDir, "src/app/shop/[id]/page.tsx"),

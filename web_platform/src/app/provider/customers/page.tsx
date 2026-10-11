@@ -1,7 +1,72 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
+import { CommandDialog } from "@/components/modal";
+import { MAX_IMPORT_ROWS, parseClientCsv } from "@/lib/client-import.mjs";
+import { ProviderDialog, providerGhostButton } from "../_components/dialog";
+
+const importCopy = {
+  en: {
+    csvLabel: "Client list (Name, Phone, Notes)",
+    chooseFile: "Choose a CSV file",
+    orPaste: "or paste the rows below",
+    fileFailed: "The file could not be read: ",
+    pasteData: "Paste or choose your client list first.",
+    notReady: "Your business is not loaded yet. Try again in a moment.",
+    summary: "{n} client(s) ready to import",
+    headerSkipped: "The first row was read as column titles and skipped.",
+    rejectedTitle: "{n} row(s) will be left out",
+    tooMany: "Only the first {max} clients are imported at a time; import the rest in another file.",
+    reasons: {
+      noName: "no name",
+      noPhone: "no phone number",
+      badPhone: "not a Saudi mobile number (05XXXXXXXX or +9665XXXXXXXX)",
+      duplicate: "the same phone appears twice",
+      tooLong: "name or note is too long",
+    },
+    line: "Line",
+    importDone: "{ok} client(s) imported.",
+    importSkipped: "{n} skipped by the server (missing name or invalid Saudi mobile number).",
+    blockTitle: "Block this client?",
+    blockIntro: "They will not be able to book with your business until you unblock them. The reason is kept with your name.",
+    blockReason: "Reason for blocking",
+    unblockTitle: "Unblock this client?",
+    unblockIntro: "They can book with your business again.",
+    blockFailed: "The block list was not changed: ",
+    nothingToImport: "There is no row to import. Check the phone numbers.",
+  },
+  ar: {
+    csvLabel: "قائمة العملاء (الاسم، الجوال، الملاحظات)",
+    chooseFile: "اختر ملف CSV",
+    orPaste: "أو الصق الصفوف أدناه",
+    fileFailed: "تعذرت قراءة الملف: ",
+    pasteData: "الصق قائمة العملاء أو اختر ملفاً أولاً.",
+    notReady: "لم يُحمَّل نشاطك بعد. حاول بعد لحظات.",
+    summary: "{n} عميل جاهز للاستيراد",
+    headerSkipped: "قُرئ الصف الأول كعناوين أعمدة وتم تخطيه.",
+    rejectedTitle: "سيُستبعد {n} صف",
+    tooMany: "يُستورد أول {max} عميل فقط في المرة الواحدة؛ استورد الباقي في ملف آخر.",
+    reasons: {
+      noName: "لا يوجد اسم",
+      noPhone: "لا يوجد رقم جوال",
+      badPhone: "ليس رقم جوال سعودياً (05XXXXXXXX أو +9665XXXXXXXX)",
+      duplicate: "الرقم نفسه مكرر",
+      tooLong: "الاسم أو الملاحظة طويلة جداً",
+    },
+    line: "السطر",
+    importDone: "تم استيراد {ok} عميل.",
+    importSkipped: "تخطى الخادم {n} صفاً (اسم ناقص أو رقم جوال سعودي غير صالح).",
+    blockTitle: "حظر هذا العميل؟",
+    blockIntro: "لن يتمكن من الحجز لدى نشاطك حتى تلغي الحظر. يُحفظ السبب باسمك.",
+    blockReason: "سبب الحظر",
+    unblockTitle: "إلغاء حظر هذا العميل؟",
+    unblockIntro: "يستطيع الحجز لدى نشاطك من جديد.",
+    blockFailed: "لم تتغير قائمة الحظر: ",
+    nothingToImport: "لا يوجد صف للاستيراد. تحقق من أرقام الجوال.",
+  },
+};
 
 const translations = {
   en: {
@@ -114,84 +179,89 @@ export default function ProviderCustomersPage() {
 
   const t = translations[locale];
 
-  const handleToggleBlock = async (clientId: string, currentlyBlocked: boolean) => {
-    if (!providerId) return;
+  const x = importCopy[locale];
+  const [blockTarget, setBlockTarget] = useState<{ id: string; name: string; blocked: boolean } | null>(null);
+
+  // Blocking asks for a reason that the server records with the actor; the screen changes only after the command succeeds.
+  const confirmBlock = async (reason: string): Promise<string | null> => {
+    if (!providerId || !blockTarget) return x.notReady;
+    const { error: rpcErr } = await supabase.rpc("toggle_customer_block", {
+      p_provider_id: providerId,
+      p_customer_id: blockTarget.id,
+      p_reason: blockTarget.blocked ? "" : reason,
+      p_block: !blockTarget.blocked,
+    });
+    if (rpcErr) return x.blockFailed + errorMessage(rpcErr);
+    setBlockedCustomerIds(prev => {
+      const next = new Set(prev);
+      if (blockTarget.blocked) next.delete(blockTarget.id);
+      else next.add(blockTarget.id);
+      return next;
+    });
+    return null;
+  };
+  const handleToggleBlock = (clientId: string, currentlyBlocked: boolean) => {
+    const client = clients.find(c => c.id === clientId);
+    setBlockTarget({ id: clientId, name: String(client?.name || "").trim(), blocked: currentlyBlocked });
+  };
+
+  // The pasted or chosen list is read on this screen, so every rejected row is explained before anything is sent.
+  const parsedImport = useMemo(() => parseClientCsv(importText), [importText]);
+
+  const handleFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
     try {
-      const { error: rpcErr } = await supabase.rpc("toggle_customer_block", {
-        p_provider_id: providerId,
-        p_customer_id: clientId,
-        p_reason: currentlyBlocked ? "" : "Policy violations / no-show protection",
-        p_block: !currentlyBlocked
-      });
-      if (rpcErr) throw rpcErr;
-      setBlockedCustomerIds(prev => {
-        const next = new Set(prev);
-        if (currentlyBlocked) next.delete(clientId);
-        else next.add(clientId);
-        return next;
-      });
-    } catch (err: any) {
-      console.error("Toggle block error:", err);
-      setError(err?.message || "Failed to update client block status.");
+      setImportText(await file.text());
+      setImportError("");
+      setImportMessage("");
+    } catch (err) {
+      setImportError(x.fileFailed + errorMessage(err));
     }
   };
 
   const handleImportClients = async () => {
+    setImportMessage("");
     if (!consentConfirmed) {
       setImportError(t.importErrorConsent);
       return;
     }
     if (!importText.trim()) {
-      setImportError(locale === "ar" ? "يرجى إدخال بيانات العملاء" : "Please paste client data");
+      setImportError(x.pasteData);
+      return;
+    }
+    if (parsedImport.rows.length === 0) {
+      setImportError(x.nothingToImport);
+      return;
+    }
+    if (!providerId) {
+      setImportError(x.notReady);
       return;
     }
 
     try {
       setImportLoading(true);
       setImportError("");
-      const lines = importText.trim().split("\n");
-      const clientsToImport = lines.map(line => {
-        const parts = line.split(",").map(p => p.trim());
-        return {
-          name: parts[0] || "",
-          phone: parts[1] || "",
-          notes: parts[2] || ""
-        };
-      }).filter(c => c.name || c.phone);
-
-      if (clientsToImport.length === 0) {
-        setImportError("No valid rows found to import.");
-        return;
-      }
-
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data: prov } = await supabase.from("providers").select("id").eq("owner_id", user.id).maybeSingle();
-      if (!prov) {
-        setImportError("Provider account not found.");
-        return;
-      }
-
       const { data, error: rpcErr } = await supabase.rpc("import_provider_clients", {
-        p_provider_id: prov.id,
-        p_clients: clientsToImport,
+        p_provider_id: providerId,
+        p_clients: parsedImport.rows.map(({ name, phone, notes }) => ({ name, phone, notes })),
         p_consent_confirmed: true
       });
 
       if (rpcErr) throw rpcErr;
 
       const skipped = Number(data?.skipped_rows || 0);
+      const imported = Number(data?.successful_rows ?? 0);
       setImportMessage(
-        skipped > 0
-          ? `${t.importSuccessMsg} (${data?.successful_rows ?? 0} ${locale === "ar" ? "تم استيرادها" : "imported"}, ${skipped} ${locale === "ar" ? "تم تخطيها لعدم صحة الاسم أو الرقم" : "skipped: missing name or invalid Saudi mobile number"})`
-          : t.importSuccessMsg
+        `${x.importDone.replace("{ok}", String(imported))}${skipped > 0 ? ` ${x.importSkipped.replace("{n}", String(skipped))}` : ""}`
       );
       setImportText("");
-      setShowImportModal(false);
-      loadClients();
-    } catch (err: any) {
+      setConsentConfirmed(false);
+      void loadClients();
+    } catch (err: unknown) {
       console.error("Client import error:", err);
-      setImportError(err?.message || "Failed to import clients.");
+      setImportError(errorMessage(err));
     } finally {
       setImportLoading(false);
     }
@@ -779,47 +849,56 @@ export default function ProviderCustomersPage() {
 
       {/* CSV CLIENT IMPORT MODAL (G35) */}
       {showImportModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white border border-[#ECECEC] shadow-2xl rounded-3xl max-w-xl w-full p-6 space-y-5 text-[#101828]">
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-[#101828] flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#D1AF47]"></span>
-                  {t.importModalTitle}
-                </h3>
-                <p className="text-xs text-[#667085] mt-1">{t.importModalSubtitle}</p>
-              </div>
-              <button
-                onClick={() => setShowImportModal(false)}
-                className="text-[#667085] hover:text-[#101828] p-1 font-bold"
-              >
-                ✕
-              </button>
+        <ProviderDialog label={t.importModalTitle} onClose={() => setShowImportModal(false)} canClose={!importLoading} wide>
+          <div className="space-y-5 text-[#101828]">
+            <div>
+              <h3 className="text-lg font-bold text-[#101828]">{t.importModalTitle}</h3>
+              <p className="mt-1 text-xs text-[#667085]">{t.importModalSubtitle}</p>
             </div>
 
             {importError && (
-              <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl font-medium">
+              <div role="alert" className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl font-medium">
                 {importError}
               </div>
             )}
             {importMessage && (
-              <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs rounded-xl font-medium">
+              <div role="status" className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs rounded-xl font-medium">
                 {importMessage}
               </div>
             )}
 
             <div className="space-y-2">
-              <label className="text-[11px] font-bold text-[#344054] block uppercase tracking-wider">
-                CSV Data (Name, Phone, Notes)
-              </label>
+              <label htmlFor="client-file" className="text-[11px] font-bold text-[#344054] block uppercase tracking-wider">{x.chooseFile}</label>
+              <input id="client-file" type="file" accept=".csv,.txt,text/csv,text/plain" onChange={(e) => void handleFile(e)} className="block w-full text-xs text-[#344054] file:me-3 file:rounded-lg file:border file:border-[#ECECEC] file:bg-white file:px-3 file:py-1.5 file:text-xs file:font-bold" />
+              <label htmlFor="client-paste" className="text-[11px] font-bold text-[#344054] block uppercase tracking-wider">{x.csvLabel} - {x.orPaste}</label>
               <textarea
+                id="client-paste"
                 rows={6}
+                dir="auto"
                 value={importText}
                 onChange={(e) => setImportText(e.target.value)}
                 placeholder={t.pasteCsvPlaceholder}
-                className="w-full bg-[#FAFAFA] border border-[#ECECEC] rounded-xl p-3 text-xs font-mono text-[#101828] outline-none focus:border-[#D1AF47] resize-none"
+                className="w-full bg-[#FAFAFA] border border-[#ECECEC] rounded-xl p-3 text-xs font-mono text-[#101828] outline-none focus-visible:border-[#D1AF47] resize-y"
               />
             </div>
+
+            {importText.trim() && (
+              <div className="rounded-xl border border-[#ECECEC] bg-[#F9FAFB] p-3 text-xs text-[#344054]" aria-live="polite">
+                <p className="font-bold text-[#101828]">{x.summary.replace("{n}", String(parsedImport.rows.length))}</p>
+                {parsedImport.headerSkipped && <p className="mt-1">{x.headerSkipped}</p>}
+                {parsedImport.tooMany && <p className="mt-1 font-semibold text-[#9A741F]">{x.tooMany.replace("{max}", String(MAX_IMPORT_ROWS))}</p>}
+                {parsedImport.rejected.length > 0 && (
+                  <div className="mt-2">
+                    <p className="font-bold text-[#B42318]">{x.rejectedTitle.replace("{n}", String(parsedImport.rejected.length))}</p>
+                    <ul className="mt-1 max-h-32 list-disc space-y-0.5 overflow-y-auto ps-5">
+                      {parsedImport.rejected.slice(0, 20).map((row) => (
+                        <li key={row.line}>{x.line} {row.line}: {x.reasons[row.reason]}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* PDPL CONSENT CHECKBOX */}
             <div className="flex items-start gap-3 p-3.5 bg-[#FFFDF5] border border-[#D1AF47]/30 rounded-xl">
@@ -837,21 +916,39 @@ export default function ProviderCustomersPage() {
 
             <div className="flex items-center gap-3 pt-2">
               <button
+                type="button"
                 onClick={() => setShowImportModal(false)}
-                className="flex-1 py-2.5 border border-[#ECECEC] rounded-xl text-xs font-bold text-[#344054] hover:bg-gray-50"
+                disabled={importLoading}
+                className={`flex-1 ${providerGhostButton}`}
               >
                 {t.cancel}
               </button>
               <button
+                type="button"
                 onClick={handleImportClients}
-                disabled={importLoading || !importText.trim()}
+                disabled={importLoading || parsedImport.rows.length === 0}
                 className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#D1AF47] to-[#B8952E] text-[#070B12] font-black text-xs hover:from-[#E0C46A] hover:to-[#D1AF47] transition-all disabled:opacity-50"
               >
                 {importLoading ? t.importing : t.startImport}
               </button>
             </div>
           </div>
-        </div>
+        </ProviderDialog>
+      )}
+
+      {blockTarget && (
+        <CommandDialog
+          locale={locale}
+          tone={blockTarget.blocked ? "default" : "danger"}
+          title={blockTarget.blocked ? x.unblockTitle : x.blockTitle}
+          intro={blockTarget.blocked ? x.unblockIntro : x.blockIntro}
+          facts={blockTarget.name ? [{ label: t.clientName, value: blockTarget.name }] : []}
+          reasonLabel={x.blockReason}
+          reasonRequired={!blockTarget.blocked}
+          confirmLabel={blockTarget.blocked ? t.unblockClient : t.blockClient}
+          onConfirm={(reason) => confirmBlock(reason)}
+          onClose={() => setBlockTarget(null)}
+        />
       )}
     </div>
   );

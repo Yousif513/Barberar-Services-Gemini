@@ -1,21 +1,23 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { AppPressable } from "@/components/app-pressable";
+import { useLocale } from "@/lib/locale";
 import {
   StyleSheet,
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   ScrollView,
   ActivityIndicator
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ShopDetailsModal } from "@/components/shop-details-modal";
 import { Category, MarketplaceProvider, formatSar, loadCategories, searchProviders } from "@/lib/marketplace";
+import { errorMessage } from "@/lib/error-message";
 
 type LoadState = "loading" | "ready" | "error";
 
 export default function HomeScreen() {
-  const [lang, setLang] = useState<"en" | "ar">("ar");
+  const { lang, setLang } = useLocale();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [categories, setCategories] = useState<Category[]>([]);
@@ -76,7 +78,7 @@ export default function HomeScreen() {
       setLoadState("ready");
     } catch (err) {
       if (signal.cancelled) return;
-      setLoadError(err instanceof Error ? err.message : String(err));
+      setLoadError(errorMessage(err));
       setLoadState("error");
     }
   }, [query, category]);
@@ -102,9 +104,9 @@ export default function HomeScreen() {
             <Text style={styles.brandText}>{t.brand}</Text>
             <Text style={styles.subBrandText}>{t.city}</Text>
           </View>
-          <TouchableOpacity onPress={toggleLanguage} style={styles.langBtn}>
+          <AppPressable onPress={toggleLanguage} style={styles.langBtn}>
             <Text style={styles.langBtnText}>{isAr ? "English" : "العربية"}</Text>
-          </TouchableOpacity>
+          </AppPressable>
         </View>
 
         {/* SEARCH BAR */}
@@ -123,13 +125,15 @@ export default function HomeScreen() {
         {categories.length > 0 && (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.catScroll} contentContainerStyle={isAr && styles.rtlRow}>
             {[{ id: "all", slug: "all", name: { en: t.allCategories, ar: t.allCategories } }, ...categories].map((cat) => (
-              <TouchableOpacity
+              <AppPressable
                 key={cat.id}
+                role="radio"
+                selected={category === cat.slug}
                 onPress={() => setCategory(cat.slug)}
                 style={[styles.catCard, category === cat.slug && styles.catCardActive]}
               >
                 <Text style={[styles.catName, category === cat.slug && styles.catNameActive]}>{cat.name[lang]}</Text>
-              </TouchableOpacity>
+              </AppPressable>
             ))}
           </ScrollView>
         )}
@@ -141,9 +145,9 @@ export default function HomeScreen() {
           <View style={styles.stateBox}>
             <Text style={styles.stateTitle}>{t.loadFailed}</Text>
             <Text style={styles.stateText}>{loadError}</Text>
-            <TouchableOpacity onPress={() => setReloadKey((k) => k + 1)} style={styles.bookBtn}>
+            <AppPressable onPress={() => setReloadKey((k) => k + 1)} style={styles.bookBtn}>
               <Text style={styles.bookBtnText}>{t.retry}</Text>
-            </TouchableOpacity>
+            </AppPressable>
           </View>
         )}
         {loadState === "ready" && providers.length === 0 && (
@@ -170,12 +174,12 @@ export default function HomeScreen() {
                     {provider.startingPrice !== null ? (
                       <Text style={styles.cardPrice}>{t.startingFrom}: <Text style={styles.priceHighlight}>{formatSar(provider.startingPrice, lang)}</Text></Text>
                     ) : <View />}
-                    <TouchableOpacity
+                    <AppPressable
                       onPress={() => setSelectedProvider(provider)}
                       style={styles.bookBtn}
                     >
                       <Text style={styles.bookBtnText}>{t.bookNow}</Text>
-                    </TouchableOpacity>
+                    </AppPressable>
                   </View>
                 </View>
               </View>

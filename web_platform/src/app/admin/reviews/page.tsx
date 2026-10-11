@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { CommandDialog } from "@/components/modal";
 
 const translations = {
   en: {
@@ -73,24 +74,13 @@ export default function AdminReviews() {
     try {
       setLoading(true);
       setActionError("");
-      const { data, error } = await supabase
-        .from("reviews")
-        .select(`
-          id,
-          rating,
-          comment,
-          created_at,
-          moderation_status,
-          reply_comment,
-          reply_created_at,
-          customer:profiles(first_name, last_name),
-          provider:providers(business_name_en, business_name_ar),
-          employee:employees(name_en, name_ar)
-        `)
-        .order("created_at", { ascending: false });
+      // GOV-FIX (Q4): reviews in every moderation state come from the audited admin_list_reviews (operations and owner);
+      // reviewers' names are included only with personal.read. The newest 200 are shown.
+      const { data, error } = await supabase.rpc("admin_list_reviews", { p_status: null, p_limit: 200, p_offset: 0, p_purpose: "review_moderation" });
 
       if (error) throw error;
-      setReviews(data || []);
+      const rows = ((data as { rows?: Array<Record<string, any>> } | null)?.rows ?? []);
+      setReviews(rows);
     } catch (err: any) {
       console.warn("Failed to load live reviews:", err.message);
       setActionError(err?.message || "Failed to sync reviews from database.");
@@ -100,25 +90,57 @@ export default function AdminReviews() {
     }
   }
 
-  const handleModerate = async (reviewId: string, status: "published" | "flagged" | "hidden") => {
-    try {
-      // Hiding or flagging customer content needs a recorded reason (moderate_review audits it).
-      const reason = status === "published"
-        ? "Restored by admin"
-        : window.prompt(lang === "ar" ? "سبب الإجراء:" : "Reason for this action:");
-      if (!reason || !reason.trim()) return;
-      const { error } = await supabase.rpc("moderate_review", {
-        p_review_id: reviewId,
-        p_status: status,
-        p_reason: reason.trim()
-      });
-      if (error) throw error;
+  // Hiding or flagging customer content opens a dialog that shows the review and captures a recorded reason
+  // (moderate_review audits it); restoring a review needs none. A refusal stays in the dialog.
+  const [pendingModeration, setPendingModeration] = useState<{ review: any; status: "flagged" | "hidden" } | null>(null);
+  const runModeration = async (reviewId: string, status: "published" | "flagged" | "hidden", reason: string): Promise<string | null> => {
+    const { error } = await supabase.rpc("moderate_review", {
+      p_review_id: reviewId,
+      p_status: status,
+      p_reason: reason
+    });
+    if (error) return error.message || "Failed to update review status.";
+    setActionError("");
+    setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, moderation_status: status } : r));
+    return null;
+  };
 
-      setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, moderation_status: status } : r));
-    } catch (err: any) {
-      console.error("Failed to moderate review:", err);
-      setActionError(err?.message || "Failed to update review status.");
+  const handleModerate = async (reviewId: string, status: "published" | "flagged" | "hidden") => {
+    if (status === "published") {
+      const message = await runModeration(reviewId, status, "Restored by admin");
+      if (message) setActionError(message);
+      return;
     }
+    const review = reviews.find((row) => row.id === reviewId);
+    if (review) setPendingModeration({ review, status });
+  };
+
+  const renderModerationDialog = () => {
+    if (!pendingModeration) return null;
+    const { review, status } = pendingModeration;
+    const ar = lang === "ar";
+    const customer = review.customer ? `${review.customer.first_name || ""} ${review.customer.last_name || ""}`.trim() : "";
+    const provider = ar ? review.provider?.business_name_ar || review.provider?.business_name_en : review.provider?.business_name_en || review.provider?.business_name_ar;
+    return (
+      <CommandDialog
+        locale={lang}
+        tone={status === "hidden" ? "danger" : "default"}
+        title={status === "hidden" ? (ar ? "إخفاء هذا التقييم" : "Hide this review") : (ar ? "الإبلاغ عن هذا التقييم" : "Flag this review")}
+        intro={status === "hidden"
+          ? (ar ? "لن يظهر التقييم للعملاء. يمكن استعادته لاحقاً." : "The review is no longer shown to customers. It can be restored later.")
+          : (ar ? "يُعلَّم التقييم للمراجعة. يمكن استعادته لاحقاً." : "The review is marked for follow-up. It can be restored later.")}
+        facts={[
+          { label: ar ? "العميل" : "Customer", value: customer || "—" },
+          { label: ar ? "مقدم الخدمة" : "Provider", value: provider || "—" },
+          { label: ar ? "التقييم" : "Rating", value: String(review.rating ?? "—") },
+          { label: ar ? "التعليق" : "Comment", value: review.comment || "—" },
+        ]}
+        reasonLabel={ar ? "سبب الإجراء (يُسجل في سجل التدقيق)" : "Reason for this action (recorded in the audit log)"}
+        confirmLabel={status === "hidden" ? (ar ? "إخفاء التقييم" : "Hide review") : (ar ? "الإبلاغ عن التقييم" : "Flag review")}
+        onConfirm={(reason) => runModeration(review.id, status, reason)}
+        onClose={() => setPendingModeration(null)}
+      />
+    );
   };
 
   const t = translations[lang];
@@ -139,6 +161,7 @@ export default function AdminReviews() {
         <p className="text-xs text-gray-500 font-semibold mt-1">{t.subtitle}</p>
       </div>
 
+      {renderModerationDialog()}
       {actionError && (
         <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl font-bold">
           {actionError}
@@ -177,7 +200,7 @@ export default function AdminReviews() {
           </div>
         ) : (
           reviews.map(r => {
-            const customerName = r.customer ? `${r.customer.first_name || ""} ${r.customer.last_name || ""}`.trim() : (isRTL ? "عميل موثق" : "Verified Client");
+            const customerName = r.customer ? `${r.customer.first_name || ""} ${r.customer.last_name || ""}`.trim() : (r.customer_id ? (isRTL ? `العميل ${String(r.customer_id).slice(0, 8)}` : `Customer ${String(r.customer_id).slice(0, 8)}`) : "—");
             const providerName = isRTL ? r.provider?.business_name_ar || r.provider?.business_name_en : r.provider?.business_name_en;
             const staffName = isRTL ? r.employee?.name_ar || r.employee?.name_en : r.employee?.name_en;
             const statusKey = r.moderation_status || "published";

@@ -1,0 +1,53 @@
+Gate results, 2026-10-09, merged claude-code tree (extracted from the full logs in this folder)
+## gate-test-db
+ℹ tests 1155
+ℹ pass 1155
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+## gate-test-web
+ℹ tests 714
+ℹ pass 714
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+exit=0
+## test:inventory edge mobile and script checks
+=== npm run test:inventory
+ℹ tests 10
+ℹ pass 10
+ℹ fail 0
+exit=0
+=== npm run test:edge
+ℹ tests 8
+ℹ pass 8
+ℹ fail 0
+exit=0
+=== npm run test:security-core
+Security core verification passed.
+exit=0
+=== npm run test:admin-controls
+Admin controls verification passed.
+exit=0
+=== npm run test:p3-compat
+Applied 43 migrations from origin/claude-code and 2 P3 migrations in isolated Postgres.
+Full-chain owner writes, scoped delegation, duplicate retry and revoked-permission denial passed.
+exit=0
+=== npm run test:ui-schema
+checked 196 rpc calls and 228 select strings (17 dynamic calls not checked); 0 mismatches, 0 in the baseline
+exit=0
+=== npm run test:mobile
+ℹ tests 27
+ℹ pass 27
+ℹ fail 0
+exit=0
+## typecheck:mobile
+exit=0
+## lint
+✖ 310 problems (0 errors, 310 warnings)
+✖ 14 problems (0 errors, 14 warnings)
+exit=0
+## web build
+  Creating an optimized production build ...
+✓ Compiled successfully in 1452ms
+exit=0

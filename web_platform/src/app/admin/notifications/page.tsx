@@ -44,6 +44,8 @@ const translations = {
     colStatus: "Status",
     colCost: "Cost (SAR)",
     colTime: "Timestamp",
+    logsFailed: "The message log could not be loaded, so an empty list would be wrong: {reason}",
+    retry: "Retry",
     emptyLogs: "No message records found. When bookings occur, automated confirmations and reminders will appear here.",
     loading: "Loading message logs..."
   },
@@ -88,6 +90,8 @@ const translations = {
     colStatus: "الحالة",
     colCost: "التكلفة (ر.س)",
     colTime: "الوقت",
+    logsFailed: "تعذّر تحميل سجل الرسائل، لذا فإظهار قائمة فارغة سيكون مضللاً: {reason}",
+    retry: "إعادة المحاولة",
     emptyLogs: "لا توجد سجلات مراسلة حتى الآن. عند إنشاء الحجوزات، ستظهر إشعارات التأكيد والتذكير هنا تلقائياً.",
     loading: "جارٍ تحميل سجل الرسائل..."
   }
@@ -137,6 +141,7 @@ export default function AdminNotificationsPage() {
     totalCostSar: 0
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [logsError, setLogsError] = useState("");
 
   useEffect(() => {
     const checkLang = () => {
@@ -151,28 +156,24 @@ export default function AdminNotificationsPage() {
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
+    setLogsError("");
     try {
       // 1. Fetch recent message logs
-      const { data: logsData } = await supabase
-        .from("message_log")
-        .select("id, recipient_phone, channel, template_name, locale, message_body, status, cost_sar, sent_at, error_details")
-        .order("sent_at", { ascending: false })
-        .limit(50);
+      // GOV-2 (Q4): the log is read through the audited admin_list_message_log (numbers masked to the last three digits).
+      const { data: logsData, error: logsFailure } = await supabase.rpc("admin_list_message_log", {
+        p_status: null, p_channel: null, p_limit: 50, p_offset: 0, p_purpose: "messaging_operations"
+      });
 
-      const logs = (logsData as MessageLogRow[]) || [];
+      if (logsFailure) throw logsFailure;
+      const logs = ((logsData as { rows?: MessageLogRow[] } | null)?.rows ?? []) as MessageLogRow[];
       setMessageLogs(logs);
 
       // 2. Fetch queue counts
-      const { count: pendingCount } = await supabase
-        .from("message_queue")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pending");
-
-      const { count: deferredCount } = await supabase
-        .from("message_queue")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "deferred_quiet_hours");
-
+      const { data: queueData, error: queueFailure } = await supabase.rpc("admin_message_queue_summary");
+      if (queueFailure) throw queueFailure;
+      const queue = queueData as { pending?: number | string; deferred?: number | string } | null;
+      const pendingCount = Number(queue?.pending ?? 0);
+      const deferredCount = Number(queue?.deferred ?? 0);
       const deliveredCount = logs.filter((l) => l.status === "delivered" || l.status === "sent").length;
       const skippedCount = logs.filter((l) => l.status.startsWith("skipped")).length;
       const totalCost = logs.reduce((sum, item) => sum + (Number(item.cost_sar) || 0), 0);
@@ -185,7 +186,8 @@ export default function AdminNotificationsPage() {
         totalCostSar: Number(totalCost.toFixed(2))
       });
     } catch (err) {
-      console.warn("Failed to load message log data:", err);
+      setMessageLogs([]);
+      setLogsError(err instanceof Error ? err.message : (err as { message?: string } | null)?.message || "Unknown error");
     } finally {
       setIsLoading(false);
     }
@@ -199,7 +201,7 @@ export default function AdminNotificationsPage() {
   const isRTL = lang === "ar";
   const flip = isRTL ? "flex-row-reverse" : "flex-row";
   const cardBase = "rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]";
-  const inputBase = "w-full rounded-xl border border-[#ECECEC] bg-[#FDFDFC] px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-[#D1AF47]/50";
+  const inputBase = "w-full rounded-xl border border-[#ECECEC] bg-[#FDFDFC] px-4 py-2.5 text-sm text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] transition focus:border-[#D1AF47]/50";
 
   // One server command: in-app notifications for the audience, WhatsApp only for recipients with
   // WhatsApp and marketing consent (admin_broadcast_notification). Counts come back from the server.
@@ -364,6 +366,11 @@ export default function AdminNotificationsPage() {
           <div className={`${cardBase} overflow-hidden p-0`}>
             {isLoading ? (
               <div className="p-8 text-center text-xs font-bold text-gray-400">{t.loading}</div>
+            ) : logsError ? (
+              <div className="p-8 text-center">
+                <p role="alert" className="text-xs font-bold text-[#B42318]">{t.logsFailed.replace("{reason}", logsError)}</p>
+                <button type="button" onClick={() => void loadData()} className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-xs font-bold text-gray-800 hover:border-gray-500">{t.retry}</button>
+              </div>
             ) : messageLogs.length === 0 ? (
               <div className="p-8 text-center text-xs font-semibold text-gray-400">{t.emptyLogs}</div>
             ) : (

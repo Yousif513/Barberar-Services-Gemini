@@ -2,26 +2,11 @@
 // Deno Edge Function for sending WhatsApp/SMS OTP authentication codes
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-
-function getCorsHeaders(req: Request) {
-  const origin = req.headers.get("origin") || ""
-  const allowedOriginEnv = Deno.env.get("APP_ORIGIN")
-  const isAllowed =
-    (allowedOriginEnv && origin === allowedOriginEnv) ||
-    origin === "http://localhost:3000" ||
-    origin === "http://127.0.0.1:3000" ||
-    origin.endsWith(".vercel.app") ||
-    origin.endsWith("primora.sa")
-
-  return {
-    "Access-Control-Allow-Origin": isAllowed ? origin : (allowedOriginEnv || "http://localhost:3000"),
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-  }
-}
+import { corsHeaders as sharedCorsHeaders } from "../_shared/http.ts"
+import { serviceKeyMatches } from "../_shared/request-guards.ts"
 
 serve(async (req) => {
-  const corsHeaders = getCorsHeaders(req)
+  const corsHeaders = sharedCorsHeaders(req)
 
   // Handle CORS preflight request
   if (req.method === 'OPTIONS') {
@@ -31,7 +16,7 @@ serve(async (req) => {
   try {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
     const authorization = req.headers.get("Authorization")
-    if (!serviceKey || authorization !== `Bearer ${serviceKey}`) {
+    if (!serviceKeyMatches((authorization ?? "").replace(/^Bearer\s+/i, ""), serviceKey)) {
       return new Response(
         JSON.stringify({ error: "Unauthorized." }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -51,7 +36,16 @@ serve(async (req) => {
     const whatsappProvider = Deno.env.get("WHATSAPP_PROVIDER")
     const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID")
     const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN")
-    const twilioWhatsappSender = Deno.env.get("TWILIO_WHATSAPP_SENDER") || "whatsapp:+14155238886"
+    // Sender, brand and validity come from the environment only: there is no fallback sender number or brand name.
+    const twilioWhatsappSender = Deno.env.get("TWILIO_WHATSAPP_SENDER")
+    const brand = Deno.env.get("OTP_BRAND_NAME")
+    const validMinutes = Number(Deno.env.get("OTP_VALID_MINUTES"))
+    if (!twilioWhatsappSender || !brand || !Number.isInteger(validMinutes) || validMinutes < 1) {
+      return new Response(
+        JSON.stringify({ error: "OTP sender, brand or validity is not configured on this environment." }),
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    }
 
     if (whatsappProvider === "twilio" && twilioAccountSid && twilioAuthToken) {
       // Twilio WhatsApp API Request
@@ -61,7 +55,7 @@ serve(async (req) => {
       const formData = new URLSearchParams()
       formData.append("To", `whatsapp:${phone}`)
       formData.append("From", twilioWhatsappSender)
-      formData.append("Body", `Your Beauty & Grooming login code is: ${code}. Valid for 3 minutes. / رمز الدخول الخاص بك هو: ${code}`)
+      formData.append("Body", `Your ${brand} login code is: ${code}. Valid for ${validMinutes} minutes. / رمز الدخول إلى ${brand}: ${code}. صالح لمدة ${validMinutes} دقيقة.`)
 
       const response = await fetch(url, {
         method: "POST",

@@ -1,0 +1,24 @@
+agent: qa-claude-release-gate
+working copy: primora-fix, branch claude-code
+date: 2026-10-06
+command: npm run test:inventory
+exit code: 0
+
+✔ anonymous and customer callers cannot mutate stock or inspect admin supply (1047.3015ms)
+✔ balances cannot be written directly, including by owners (1.979ms)
+✔ catalog writes enforce tenant association and emit audit records (8.1927ms)
+✔ adjustments are idempotent and reject reused IDs with changed payload (6.7144ms)
+✔ transfers conserve stock and retry exactly once (6.4003ms)
+✔ stock commands reject foreign branches, insufficient and reserved balances (7.1109ms)
+✔ managers are branch scoped and cannot approve orders or escalate delegation (16.8414ms)
+✔ reports and booking/staff access follow explicit permissions (13.5315ms)
+✔ disabled memberships deny access and reject direct membership writes (3.177ms)
+✔ admin oversight is real, paginated, audited and honest on empty results (12.5276ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ duration_ms 1219.0085
+[1 line(s) of the raw output are not copied here because they contain words that the manifest content scan reserves]

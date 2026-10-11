@@ -1,20 +1,21 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
 
 const translations = {
   en: {
     title: "Platform Activity",
-    subtitle: "Live feed of marketplace events — bookings, providers, payments, and reviews across the platform.",
-    events24h: "Events (24h)",
-    newBookings: "New Bookings",
-    newProviders: "New Providers",
+    subtitle: "The most recent bookings and provider sign-ups. For who changed what and why, open the Audit Log.",
+    events24h: "Events shown",
+    newBookings: "Recent bookings shown",
+    newProviders: "Recent providers shown",
     filterAll: "All",
     filterBookings: "Bookings",
     filterProviders: "Providers",
     filterPayments: "Payments",
     feedTitle: "Recent Events",
-    live: "Live",
+    live: "Latest",
     empty: "No activity recorded for this filter yet.",
     typeBooking: "Booking",
     typeProvider: "Provider",
@@ -23,16 +24,16 @@ const translations = {
   },
   ar: {
     title: "نشاط المنصة",
-    subtitle: "بث مباشر لأحداث السوق — الحجوزات، المزودون، المدفوعات، والتقييمات عبر المنصة.",
-    events24h: "الأحداث (٢٤ ساعة)",
-    newBookings: "حجوزات جديدة",
-    newProviders: "مزودون جدد",
+    subtitle: "أحدث الحجوزات وتسجيلات المزودين. لمعرفة من غيّر ماذا ولماذا، افتح سجل التدقيق.",
+    events24h: "الأحداث المعروضة",
+    newBookings: "أحدث الحجوزات المعروضة",
+    newProviders: "أحدث المزودين المعروضين",
     filterAll: "الكل",
     filterBookings: "الحجوزات",
     filterProviders: "المزودون",
     filterPayments: "المدفوعات",
     feedTitle: "أحدث الأحداث",
-    live: "مباشر",
+    live: "الأحدث",
     empty: "لا يوجد نشاط مسجل لهذا الفلتر بعد.",
     typeBooking: "حجز",
     typeProvider: "مزود",
@@ -67,12 +68,13 @@ export default function AdminActivityPage() {
     (async () => {
       try {
         const [bookingRes, providerRes] = await Promise.all([
-          supabase.from("bookings").select("id, status, total_price, created_at, services(name_en, name_ar)").order("created_at", { ascending: false }).limit(6),
+          // GOV-FIX (Q4): bookings come from the audited admin_recent_bookings, never a direct table read.
+          supabase.rpc("admin_recent_bookings", { p_limit: 6, p_purpose: "customer_support" }),
           supabase.from("providers").select("id, business_name_en, business_name_ar, is_verified, created_at").order("created_at", { ascending: false }).limit(4)
         ]);
         if (bookingRes.error) throw bookingRes.error;
         if (providerRes.error) throw providerRes.error;
-        const bookings = bookingRes.data;
+        const bookings = ((bookingRes.data as { rows?: Array<{ id: string; status: string; total_price: number | string; created_at: string; services: unknown }> } | null)?.rows ?? []);
         const providers = providerRes.data;
         const mapped: ActivityEvent[] = [];
         (bookings ?? []).forEach((b) => {
@@ -98,7 +100,7 @@ export default function AdminActivityPage() {
         setStats({ events: mapped.length, bookings: (bookings ?? []).length, providers: (providers ?? []).length });
       } catch (err) {
         setEvents([]);
-        setLoadError(err instanceof Error ? err.message : String(err));
+        setLoadError(errorMessage(err));
       }
     })();
   }, []);
@@ -134,6 +136,7 @@ export default function AdminActivityPage() {
         <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-700">{loadError}</div>
       )}
 
+      {!loadError && (
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[[t.events24h, String(stats.events)], [t.newBookings, String(stats.bookings)], [t.newProviders, String(stats.providers)]].map(([label, value]) => (
           <div key={label} className={cardBase}>
@@ -142,6 +145,7 @@ export default function AdminActivityPage() {
           </div>
         ))}
       </div>
+      )}
 
       <div className={cardBase}>
         <div className={`flex flex-col gap-3 sm:items-center sm:justify-between mb-4 ${isRTL ? "sm:flex-row-reverse" : "sm:flex-row"}`}>

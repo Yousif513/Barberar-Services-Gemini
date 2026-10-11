@@ -1,17 +1,61 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { errorMessage } from "@/lib/error-message";
+import { sar } from "@/components/operations-ui";
+import MakeRegularButton from "@/components/make-regular";
+import IntakeLink from "@/components/intake-link";
+import {
+  receiptAmounts, bookingStatusKey, bookingStatusTone, settlementKey, policyFromProvider, policySentences,
+  formatBookingDateTime, isSuccessfulBooking,
+} from "@/lib/booking-display.mjs";
+
+// While a booking waits for the payment webhook the receipt re-reads it every 3 seconds, for at most one minute.
+const POLL_INTERVAL_MS = 3000;
+const POLL_LIMIT = 20;
+
+const BOOKING_SELECT = `
+  id,
+  status,
+  scheduled_at,
+  duration_minutes,
+  subtotal_price,
+  discount_amount,
+  tax_amount,
+  total_price,
+  deposit_required,
+  gift_card_amount,
+  cancellation_fee,
+  refund_amount,
+  is_home_service,
+  services ( id, name_en, name_ar, base_price, base_duration_minutes ),
+  employees ( id, name_en, name_ar ),
+  branches (
+    id,
+    name_en,
+    name_ar,
+    address_text_en,
+    address_text_ar,
+    providers ( id, business_name_en, business_name_ar, deposit_percentage, free_cancellation_hours, late_cancellation_fee_percent, no_show_fee_percent )
+  )
+`;
 
 type BookingDetail = {
   id: string;
   status: string;
   scheduled_at: string;
   duration_minutes: number;
+  subtotal_price: number | null;
+  discount_amount: number;
+  tax_amount: number;
   total_price: number;
   deposit_required: number;
+  gift_card_amount: number;
+  cancellation_fee: number;
+  refund_amount: number;
   is_home_service: boolean;
   services: {
     id: string;
@@ -35,6 +79,10 @@ type BookingDetail = {
       id: string;
       business_name_en: string;
       business_name_ar: string;
+      deposit_percentage: number | null;
+      free_cancellation_hours: number | null;
+      late_cancellation_fee_percent: number | null;
+      no_show_fee_percent: number | null;
     };
   };
 };
@@ -43,6 +91,14 @@ const translations = {
   en: {
     title: "Booking Confirmed",
     subtitle: "Thank you for choosing Primora. Your appointment details are saved below.",
+    titleCompleted: "Visit Completed",
+    subtitleCompleted: "This visit is complete. Your receipt is below.",
+    titleCancelled: "Booking Cancelled",
+    subtitleCancelled: "This booking was cancelled. What was kept and what comes back to you is shown below.",
+    titleNoShow: "Marked as No-Show",
+    subtitleNoShow: "The provider marked this visit as a no-show. What was kept and what comes back to you is shown below.",
+    titleUnknown: "Booking Receipt",
+    subtitleUnknown: "The status of this booking is not one this page recognises. Check My Bookings.",
     loading: "Fetching booking details...",
     notFound: "Booking not found",
     loadFailed: "We could not load this booking right now. Your booking is not affected; check My Bookings or try again.",
@@ -61,15 +117,36 @@ const translations = {
     paymentLabel: "Payment Status",
     paid: "Paid",
     pendingPayment: "Pending Payment",
-    confirmed: "Confirmed",
-    pending: "Pending",
-    cancelled: "Cancelled",
+    statusConfirmed: "Confirmed",
+    statusCompleted: "Completed",
+    statusCancelled: "Cancelled",
+    statusNoShow: "No-show",
+    statusUnknown: "Unknown",
+    notRequired: "No payment due",
+    refunded: "Refunded",
+    partlyRefunded: "Partly refunded",
+    feeKept: "Fee kept",
+    noCharge: "No charge",
     priceBreakdown: "Price Summary",
-    totalPrice: "Total Amount",
-    depositPaid: "Deposit Paid (15%)",
-    dueAtVenue: "Balance Due at Venue (85%)",
-    vatLine: "Includes 15% KSA VAT",
-    sar: "SAR",
+    subtotal: "Subtotal",
+    discount: "Discount",
+    vat: "VAT",
+    totalPrice: "Total incl. VAT",
+    depositPaid: "Deposit paid",
+    depositDue: "Deposit due now",
+    giftCard: "Gift card",
+    dueAtVenue: "Balance due at the venue",
+    cancellationFee: "Cancellation fee kept",
+    refundAmount: "Refund to you",
+    policyTitle: "Cancellation & No-Show Terms",
+    policyUnavailable: "The provider's cancellation terms could not be loaded.",
+    payNow: "Pay deposit now",
+    paying: "Opening payment...",
+    payFailed: "Could not open the payment page. Nothing was charged; try again.",
+    waiting: "Checking for your payment...",
+    stillWaiting: "We have not received the payment confirmation yet. If you already paid it can take a minute.",
+    refresh: "Refresh status",
+    refreshFailed: "Could not refresh the booking right now.",
     addToCalendar: "Add to Calendar",
     viewBookings: "View My Bookings",
     messageShop: "Message Shop",
@@ -78,6 +155,14 @@ const translations = {
   ar: {
     title: "تم تأكيد الحجز",
     subtitle: "شكراً لاختيارك بريمورا. تفاصيل موعدك محفوظة أدناه.",
+    titleCompleted: "اكتملت الزيارة",
+    subtitleCompleted: "اكتملت هذه الزيارة. إيصالك أدناه.",
+    titleCancelled: "تم إلغاء الحجز",
+    subtitleCancelled: "أُلغي هذا الحجز. يظهر أدناه ما تم استقطاعه وما يعود إليك.",
+    titleNoShow: "سُجّل كعدم حضور",
+    subtitleNoShow: "سجّل مقدم الخدمة هذه الزيارة كعدم حضور. يظهر أدناه ما تم استقطاعه وما يعود إليك.",
+    titleUnknown: "إيصال الحجز",
+    subtitleUnknown: "حالة هذا الحجز غير معروفة لهذه الصفحة. راجع حجوزاتي.",
     loading: "جاري تحميل تفاصيل الحجز...",
     notFound: "لم يتم العثور على الحجز",
     loadFailed: "تعذر تحميل هذا الحجز الآن. حجزك لم يتأثر؛ راجع حجوزاتي أو حاول مرة أخرى.",
@@ -96,15 +181,36 @@ const translations = {
     paymentLabel: "حالة الدفع",
     paid: "مدفوع",
     pendingPayment: "في انتظار الدفع",
-    confirmed: "مؤكد",
-    pending: "معلق",
-    cancelled: "ملغى",
+    statusConfirmed: "مؤكد",
+    statusCompleted: "مكتمل",
+    statusCancelled: "ملغى",
+    statusNoShow: "لم يحضر",
+    statusUnknown: "غير معروف",
+    notRequired: "لا يوجد مبلغ مستحق",
+    refunded: "تم الاسترداد",
+    partlyRefunded: "استرداد جزئي",
+    feeKept: "تم استقطاع الرسم",
+    noCharge: "بدون رسوم",
     priceBreakdown: "ملخص السعر",
-    totalPrice: "المبلغ الإجمالي",
-    depositPaid: "العربون المدفوع (15%)",
-    dueAtVenue: "المبلغ المتبقي في المركز (85%)",
-    vatLine: "يشمل 15% ضريبة القيمة المضافة",
-    sar: "ر.س",
+    subtotal: "المجموع الفرعي",
+    discount: "الخصم",
+    vat: "ضريبة القيمة المضافة",
+    totalPrice: "الإجمالي شامل الضريبة",
+    depositPaid: "العربون المدفوع",
+    depositDue: "العربون المستحق الآن",
+    giftCard: "بطاقة الهدية",
+    dueAtVenue: "المتبقي المستحق في المركز",
+    cancellationFee: "رسم الإلغاء المستقطع",
+    refundAmount: "المبلغ المسترد إليك",
+    policyTitle: "سياسة الإلغاء وعدم الحضور",
+    policyUnavailable: "تعذر تحميل سياسة الإلغاء الخاصة بمقدم الخدمة.",
+    payNow: "ادفع العربون الآن",
+    paying: "جارٍ فتح صفحة الدفع...",
+    payFailed: "تعذر فتح صفحة الدفع. لم يُخصم أي مبلغ؛ حاول مرة أخرى.",
+    waiting: "جارٍ التحقق من دفعتك...",
+    stillWaiting: "لم يصلنا تأكيد الدفع بعد. إذا كنت قد دفعت فقد يستغرق ذلك دقيقة.",
+    refresh: "تحديث الحالة",
+    refreshFailed: "تعذر تحديث الحجز الآن.",
     addToCalendar: "إضافة إلى التقويم",
     viewBookings: "عرض حجوزاتي",
     messageShop: "مراسلة المتجر",
@@ -114,7 +220,6 @@ const translations = {
 
 export default function BookingConfirmationPage() {
   const params = useParams();
-  const router = useRouter();
   const bookingId = params?.id as string;
 
   const [locale, setLocale] = useState<"en" | "ar">("en");
@@ -123,6 +228,10 @@ export default function BookingConfirmationPage() {
   const [booking, setBooking] = useState<BookingDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
+  const [refreshError, setRefreshError] = useState(false);
+  const [polls, setPolls] = useState(0);
+  const [paying, setPaying] = useState(false);
+  const [payError, setPayError] = useState("");
 
   // Synchronize language with HTML element attribute
   useEffect(() => {
@@ -138,53 +247,78 @@ export default function BookingConfirmationPage() {
     return () => observer.disconnect();
   }, []);
 
+  const fetchBooking = useCallback(async () => {
+    const { data, error } = await supabase.from("bookings").select(BOOKING_SELECT).eq("id", bookingId).single();
+    if (error || !data) {
+      throw error || new Error("No data returned");
+    }
+    return data as unknown as BookingDetail;
+  }, [bookingId]);
+
+  // A quiet re-read keeps the last good receipt on screen and only flags that the refresh failed.
+  const refreshQuietly = useCallback(async () => {
+    try {
+      setBooking(await fetchBooking());
+      setRefreshError(false);
+    } catch {
+      setRefreshError(true);
+    }
+  }, [fetchBooking]);
+
   useEffect(() => {
+    let active = true;
     async function loadBooking() {
       if (!bookingId) {
         setIsLoading(false);
         return;
       }
-
       try {
-        const { data, error } = await supabase
-          .from("bookings")
-          .select(`
-            id,
-            status,
-            scheduled_at,
-            duration_minutes,
-            total_price,
-            deposit_required,
-            is_home_service,
-            services ( id, name_en, name_ar, base_price, base_duration_minutes ),
-            employees ( id, name_en, name_ar ),
-            branches (
-              id,
-              name_en,
-              name_ar,
-              address_text_en,
-              address_text_ar,
-              providers ( id, business_name_en, business_name_ar )
-            )
-          `)
-          .eq("id", bookingId)
-          .single();
-
-        if (error || !data) {
-          throw error || new Error("No data returned");
-        }
-
-        setBooking(data as any);
+        const loaded = await fetchBooking();
+        if (!active) return;
+        setBooking(loaded);
         setLoadError("");
       } catch (err) {
+        if (!active) return;
         setBooking(null);
-        setLoadError(err instanceof Error ? err.message : String(err));
+        setLoadError(errorMessage(err));
       } finally {
-        setIsLoading(false);
+        if (active) setIsLoading(false);
       }
     }
     loadBooking();
-  }, [bookingId]);
+    return () => {
+      active = false;
+    };
+  }, [bookingId, fetchBooking]);
+
+  // The payment webhook confirms the booking after the Tap redirect; poll every 3 s for up to a minute while it is pending.
+  const awaitingPayment = booking?.status === "pending_payment";
+  useEffect(() => {
+    if (!awaitingPayment || polls >= POLL_LIMIT) return;
+    const timer = window.setTimeout(() => {
+      setPolls((n) => n + 1);
+      void refreshQuietly();
+    }, POLL_INTERVAL_MS);
+    return () => window.clearTimeout(timer);
+  }, [awaitingPayment, polls, refreshQuietly]);
+
+  const payNow = async () => {
+    setPayError("");
+    setPaying(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("payment-checkout", { body: { bookingId } });
+      if (error || !data?.checkoutUrl) throw new Error("no checkout url");
+      window.location.assign(data.checkoutUrl);
+    } catch {
+      setPayError(t.payFailed);
+      setPaying(false);
+    }
+  };
+
+  const refreshNow = () => {
+    setPolls(0);
+    void refreshQuietly();
+  };
 
   const downloadICS = () => {
     if (!booking) return;
@@ -210,7 +344,7 @@ export default function BookingConfirmationPage() {
       `DTSTART:${formatICSDate(startDate)}`,
       `DTEND:${formatICSDate(endDate)}`,
       `SUMMARY:${serviceName} - ${providerName}`,
-      `DESCRIPTION:${locale === "ar" ? `حجزك المؤكد مع الأخصائي ${booking.employees.name_ar}` : `Your confirmed appointment with specialist ${booking.employees.name_en}`}`,
+      `DESCRIPTION:${locale === "ar" ? `موعدك مع الأخصائي ${booking.employees.name_ar}` : `Your appointment with specialist ${booking.employees.name_en}`}`,
       `LOCATION:${branchName}`,
       "END:VEVENT",
       "END:VCALENDAR"
@@ -227,25 +361,6 @@ export default function BookingConfirmationPage() {
   };
 
   const isRTL = locale === "ar";
-
-  // Gregorian clean formatting per locale
-  const formatDateTime = (isoString: string) => {
-    try {
-      const date = new Date(isoString);
-      return date.toLocaleString(locale === "ar" ? "ar-SA" : "en-US", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true,
-        timeZone: "Asia/Riyadh"
-      });
-    } catch {
-      return isoString;
-    }
-  };
 
   if (isLoading) {
     return (
@@ -272,14 +387,42 @@ export default function BookingConfirmationPage() {
     );
   }
 
-  // Calculate pricing
-  const total = Number(booking.total_price);
-  const deposit = Number(booking.deposit_required);
-  const balance = total - deposit;
-  const vatIncluded = total * 15 / 115; // 15% VAT KSA rollup
-
-  // The database is the source of truth; the ?status= hint can be stale once the payment webhook lands.
-  const isPaid = booking.status !== "pending_payment";
+  // The database row is the source of truth for every figure and for the status; nothing here is a literal.
+  const amounts = receiptAmounts(booking);
+  const statusKey = bookingStatusKey(booking.status);
+  const tone = bookingStatusTone(statusKey);
+  const settlement = settlementKey(booking);
+  const policy = policyFromProvider(booking.branches?.providers);
+  const isPending = statusKey === "pending_payment";
+  const isClosed = statusKey === "cancelled" || statusKey === "no_show";
+  const headlines = {
+    pending_payment: [t.titlePending, t.subtitlePending],
+    confirmed: [t.title, t.subtitle],
+    completed: [t.titleCompleted, t.subtitleCompleted],
+    cancelled: [t.titleCancelled, t.subtitleCancelled],
+    no_show: [t.titleNoShow, t.subtitleNoShow],
+    unknown: [t.titleUnknown, t.subtitleUnknown],
+  }[statusKey];
+  const statusLabels = {
+    pending_payment: t.pendingPayment, confirmed: t.statusConfirmed, completed: t.statusCompleted,
+    cancelled: t.statusCancelled, no_show: t.statusNoShow, unknown: t.statusUnknown,
+  };
+  const settlementLabels = {
+    pending: t.pendingPayment, paid: t.paid, not_required: t.notRequired, refunded: t.refunded,
+    partly_refunded: t.partlyRefunded, fee_kept: t.feeKept, no_charge: t.noCharge,
+  };
+  const toneClasses = {
+    emerald: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+    amber: "bg-amber-50 text-amber-700 border border-amber-200",
+    red: "bg-red-50 text-red-700 border border-red-200",
+    sky: "bg-sky-50 text-sky-700 border border-sky-200",
+    stone: "bg-stone-100 text-stone-700 border border-stone-200",
+  };
+  const settlementTone = settlement === "paid" || settlement === "not_required" || settlement === "refunded" || settlement === "no_charge"
+    ? "emerald" : settlement === "pending" || settlement === "partly_refunded" ? "amber" : "red";
+  const iconPath = isSuccessfulBooking(statusKey)
+    ? "M4.5 12.75l6 6 9-13.5"
+    : isPending ? "M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" : "M6 18L18 6M6 6l12 12";
 
   return (
     <div className="min-h-screen bg-[#FBFAF9] text-[#211A12] py-10 px-4 flex justify-center font-sans antialiased" dir={isRTL ? "rtl" : "ltr"}>
@@ -287,13 +430,13 @@ export default function BookingConfirmationPage() {
         
         {/* SUCCESS ICON AND HEADLINE */}
         <div className="text-center space-y-3">
-          <div className="w-16 h-16 bg-[#C29A4C]/10 border border-[#C29A4C]/20 rounded-full flex items-center justify-center mx-auto shadow-sm">
-            <svg className="w-7.5 h-7.5 text-[#C29A4C]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          <div className={`w-16 h-16 border rounded-full flex items-center justify-center mx-auto shadow-sm ${isClosed ? "bg-red-50 border-red-200 text-red-700" : "bg-[#C29A4C]/10 border-[#C29A4C]/20 text-[#C29A4C]"}`}>
+            <svg className="w-7.5 h-7.5" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d={iconPath} />
             </svg>
           </div>
-          <h1 className="font-serif text-3xl font-black tracking-tight text-[#15100A]">{isPaid ? t.title : t.titlePending}</h1>
-          <p className="text-xs text-[#8A7F6C] font-semibold leading-relaxed px-4">{isPaid ? t.subtitle : t.subtitlePending}</p>
+          <h1 className="font-serif text-3xl font-black tracking-tight text-[#15100A]">{headlines[0]}</h1>
+          <p className="text-xs text-[#8A7F6C] font-semibold leading-relaxed px-4">{headlines[1]}</p>
         </div>
 
         {/* RECEIPT SUMMARY CARD */}
@@ -336,29 +479,21 @@ export default function BookingConfirmationPage() {
             <div>
               <span className="text-[9px] font-black uppercase tracking-widest text-[#8A7F6C] block">{t.dateTimeLabel}</span>
               <strong className="text-xs font-bold text-[#211A12] mt-0.5 block">
-                {formatDateTime(booking.scheduled_at)}
+                {formatBookingDateTime(booking.scheduled_at, locale)}
               </strong>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <span className="text-[9px] font-black uppercase tracking-widest text-[#8A7F6C] block">{t.statusLabel}</span>
-                <span className={`inline-block text-[9px] font-black px-2.5 py-0.5 rounded-full mt-1.5 uppercase ${
-                  booking.status === "cancelled"
-                    ? "bg-red-50 text-red-700 border border-red-200"
-                    : "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                }`}>
-                  {booking.status === "cancelled" ? t.cancelled : t.confirmed}
+                <span className={`inline-block text-[9px] font-black px-2.5 py-0.5 rounded-full mt-1.5 uppercase ${toneClasses[tone]}`}>
+                  {statusLabels[statusKey]}
                 </span>
               </div>
               <div>
                 <span className="text-[9px] font-black uppercase tracking-widest text-[#8A7F6C] block">{t.paymentLabel}</span>
-                <span className={`inline-block text-[9px] font-black px-2.5 py-0.5 rounded-full mt-1.5 uppercase ${
-                  isPaid
-                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                    : "bg-amber-50 text-amber-700 border border-amber-200"
-                }`}>
-                  {isPaid ? t.paid : t.pendingPayment}
+                <span className={`inline-block text-[9px] font-black px-2.5 py-0.5 rounded-full mt-1.5 uppercase ${toneClasses[settlementTone]}`}>
+                  {settlementLabels[settlement]}
                 </span>
               </div>
             </div>
@@ -368,35 +503,69 @@ export default function BookingConfirmationPage() {
           <div className="space-y-3.5">
             <h3 className="text-[10px] font-black uppercase tracking-widest text-[#8A7F6C]">{t.priceBreakdown}</h3>
             
-            <div className="space-y-2">
+            <dl className="space-y-2">
+              {amounts.discount > 0 && (
+                <div className="flex justify-between text-xs font-semibold text-[#211A12]/80">
+                  <dt>{t.subtotal}</dt>
+                  <dd className="font-serif font-black">{sar(amounts.subtotal, locale)}</dd>
+                </div>
+              )}
+              {amounts.discount > 0 && (
+                <div className="flex justify-between text-xs font-semibold text-emerald-700">
+                  <dt>{t.discount}</dt>
+                  <dd className="font-serif font-black">-{sar(amounts.discount, locale)}</dd>
+                </div>
+              )}
               <div className="flex justify-between text-xs font-semibold text-[#211A12]/80">
-                <span>{t.totalPrice}</span>
-                <span className="font-serif font-black">{total.toFixed(2)} {t.sar}</span>
+                <dt>{t.vat}</dt>
+                <dd className="font-serif font-black">{sar(amounts.vat, locale)}</dd>
               </div>
-              <div className="flex justify-between text-xs font-semibold text-emerald-700">
-                <span>{t.depositPaid}</span>
-                <span className="font-serif font-black">-{deposit.toFixed(2)} {t.sar}</span>
+              <div className="flex justify-between text-xs font-semibold text-[#211A12]/80">
+                <dt>{t.totalPrice}</dt>
+                <dd className="font-serif font-black">{sar(amounts.totalDue, locale)}</dd>
               </div>
-              <div className="flex justify-between text-sm font-black text-[#15100A] border-t border-[#211A12]/6 pt-2">
-                <span>{t.dueAtVenue}</span>
-                <span className="font-serif font-black">{balance.toFixed(2)} {t.sar}</span>
-              </div>
-            </div>
+              {amounts.giftCard > 0 && (
+                <div className="flex justify-between text-xs font-semibold text-emerald-700">
+                  <dt>{t.giftCard}</dt>
+                  <dd className="font-serif font-black">-{sar(amounts.giftCard, locale)}</dd>
+                </div>
+              )}
+              {amounts.deposit > 0 && !isClosed && (
+                <div className="flex justify-between text-xs font-semibold text-emerald-700">
+                  <dt>{isPending ? t.depositDue : t.depositPaid}</dt>
+                  <dd className="font-serif font-black">{isPending ? "" : "-"}{sar(amounts.deposit, locale)}</dd>
+                </div>
+              )}
+              {!isClosed && (
+                <div className="flex justify-between text-sm font-black text-[#15100A] border-t border-[#211A12]/6 pt-2">
+                  <dt>{t.dueAtVenue}</dt>
+                  <dd className="font-serif font-black">{sar(amounts.balanceAtVenue, locale)}</dd>
+                </div>
+              )}
+              {isClosed && Number(booking.cancellation_fee) > 0 && (
+                <div className="flex justify-between text-sm font-black text-red-700 border-t border-[#211A12]/6 pt-2">
+                  <dt>{t.cancellationFee}</dt>
+                  <dd className="font-serif font-black">{sar(Number(booking.cancellation_fee), locale)}</dd>
+                </div>
+              )}
+              {isClosed && Number(booking.refund_amount) > 0 && (
+                <div className="flex justify-between text-sm font-black text-emerald-700">
+                  <dt>{t.refundAmount}</dt>
+                  <dd className="font-serif font-black">{sar(Number(booking.refund_amount), locale)}</dd>
+                </div>
+              )}
+            </dl>
 
-            <div className="text-[9px] font-medium text-[#8A7F6C] bg-stone-50 border border-stone-150 rounded-lg p-2 text-center">
-              {t.vatLine} ({vatIncluded.toFixed(2)} {t.sar})
-            </div>
-
-            {/* CANCELLATION & NO-SHOW POLICY (G10) */}
+            {/* CANCELLATION & NO-SHOW POLICY (G10): the provider's own numbers */}
             <div className="rounded-xl border border-amber-200/80 bg-amber-50/50 p-3 space-y-1.5 text-[10px] text-amber-900">
-              <span className="font-bold block">
-                {locale === "ar" ? "سياسة الإلغاء وعدم الحضور:" : "Cancellation & No-Show Terms:"}
-              </span>
-              <p className="text-amber-800 leading-relaxed font-medium">
-                {locale === "ar"
-                  ? "يمكنك إلغاء الحجز مجاناً مع استرداد كامل العربون حتى 24 ساعة قبل الموعد. في حال الإلغاء المتأخر يُخصم 50% من العربون، وفي حال عدم الحضور يُخصم كامل العربون."
-                  : "Free cancellation with a 100% deposit refund is available up to 24 hours before your scheduled appointment. Late cancellations incur a 50% fee, and no-shows forfeit the full deposit."}
-              </p>
+              <span className="font-bold block">{t.policyTitle}</span>
+              {policy ? (
+                <ul className="text-amber-800 leading-relaxed font-medium list-disc ps-4 space-y-0.5">
+                  {policySentences(policy, locale).map((sentence) => <li key={sentence}>{sentence}</li>)}
+                </ul>
+              ) : (
+                <p className="text-amber-800 leading-relaxed font-medium">{t.policyUnavailable}</p>
+              )}
             </div>
           </div>
 
@@ -404,7 +573,34 @@ export default function BookingConfirmationPage() {
 
         {/* PRIMARY AND SECONDARY ACTIONS */}
         <div className="space-y-3">
+          {isPending && (
+            <div className="space-y-2" aria-live="polite">
+              <button
+                type="button"
+                onClick={payNow}
+                disabled={paying}
+                className="w-full rounded-xl bg-[#211A12] py-3 text-center text-xs font-black text-white shadow-md transition hover:bg-black focus-visible:outline-2 focus-visible:outline-[#9B7928] disabled:opacity-60"
+              >
+                {paying ? t.paying : `${t.payNow} (${sar(amounts.deposit, locale)})`}
+              </button>
+              {payError && <p role="alert" className="text-center text-[11px] font-semibold text-red-700">{payError}</p>}
+              {refreshError && <p role="alert" className="text-center text-[11px] font-semibold text-red-700">{t.refreshFailed}</p>}
+              {polls < POLL_LIMIT ? (
+                <p className="text-center text-[11px] font-semibold text-[#8A7F6C]">{t.waiting}</p>
+              ) : (
+                <div className="space-y-1.5 text-center">
+                  <p className="text-[11px] font-semibold text-[#8A7F6C]">{t.stillWaiting}</p>
+                  <button type="button" onClick={refreshNow} className="rounded-lg border border-[#211A12]/10 bg-white px-4 py-2 text-[11px] font-bold text-[#211A12] focus-visible:outline-2 focus-visible:outline-[#9B7928]">
+                    {t.refresh}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!isClosed && (
           <button
+            type="button"
             onClick={downloadICS}
             className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#C29A4C] to-[#E6C679] py-3 text-center text-xs font-black text-[#15100A] shadow-md shadow-[#C29A4C]/15 transition hover:brightness-105"
           >
@@ -413,6 +609,11 @@ export default function BookingConfirmationPage() {
             </svg>
             <span>{t.addToCalendar}</span>
           </button>
+          )}
+
+          <IntakeLink bookingId={booking.id} status={booking.status} className="block w-full rounded-xl border border-[#C29A4C]/40 bg-white py-3 text-center text-xs font-black text-[#6B4F17] transition hover:bg-[#F8F3E4]" />
+
+          <MakeRegularButton booking={booking} className="w-full rounded-xl border border-[#C29A4C]/40 bg-white py-3 text-center text-xs font-black text-[#6B4F17] transition hover:bg-[#F8F3E4]" />
 
           <div className="grid grid-cols-2 gap-3">
             <Link

@@ -1,0 +1,106 @@
+agent: qa-claude-release-gate
+working copy: primora-fix, branch claude-code
+date: 2026-10-06
+commands: npm run build --workspace=web_platform (exit 0, includes the TypeScript pass for the web app); npm run lint (exit 0); npm run typecheck:mobile (tsc --noEmit, exit 0, no output)
+
+BUILD
+▲ Next.js 16.3.8 (Turbopack)
+✓ Compiled successfully in 821ms
+  Finished TypeScript in 2.3s ...
+  Generating static pages using 23 workers (0/77) ...
+  Generating static pages using 23 workers (19/77)
+  Generating static pages using 23 workers (38/77)
+  Generating static pages using 23 workers (57/77)
+✓ Generating static pages using 23 workers (77/77) in 7.4s
+Route (app)                               Revalidate  Expire
+┌ ○ /
+├ ○ /_not-found
+├ ○ /about
+├ ○ /admin
+├ ○ /admin/activity
+├ ○ /admin/audit-logs
+├ ○ /admin/bookings
+├ ○ /admin/branches
+├ ○ /admin/coupons
+├ ○ /admin/customers
+├ ○ /admin/disputes
+├ ○ /admin/employees
+├ ○ /admin/help
+├ ○ /admin/integrations
+├ ○ /admin/ledger
+├ ○ /admin/notifications
+├ ○ /admin/packages
+├ ○ /admin/providers
+├ ○ /admin/refunds
+├ ○ /admin/reports
+├ ○ /admin/reviews
+├ ○ /admin/services
+├ ○ /admin/settings
+├ ○ /admin/supply
+├ ○ /admin/taxes
+├ ○ /become-provider
+├ ○ /categories/barber
+├ ○ /categories/hair
+├ ○ /categories/makeup
+├ ○ /categories/spa
+├ ○ /customer/book
+├ ○ /customer/bookings
+├ ƒ /customer/bookings/[id]/confirmation
+├ ○ /customer/dashboard
+├ ○ /customer/dependents
+├ ○ /customer/favorites
+├ ○ /customer/jobs
+├ ○ /customer/messages
+├ ○ /customer/notifications
+├ ○ /customer/packages
+├ ○ /customer/reviews
+├ ○ /customer/search
+├ ○ /customer/settings
+├ ○ /customer/wallet
+├ ○ /developer
+├ ○ /discover
+├ ○ /login
+├ ○ /privacy
+├ ○ /provider/become
+├ ○ /provider/bookings
+├ ○ /provider/calendar
+├ ○ /provider/chain
+├ ○ /provider/customers
+├ ○ /provider/dashboard
+├ ○ /provider/employees
+├ ○ /provider/inventory
+├ ○ /provider/jobs
+├ ○ /provider/messages
+├ ○ /provider/packages
+├ ○ /provider/pricing
+├ ○ /provider/promotions
+├ ○ /provider/reports
+├ ○ /provider/resources
+├ ○ /provider/reviews
+├ ○ /provider/services
+├ ○ /provider/settings
+├ ○ /provider/staff-management
+├ ○ /provider/team
+├ ○ /provider/wallet
+├ ○ /robots.txt
+├ ○ /security
+├ ○ /service-board
+├ ○ /services
+├ ƒ /shop/[id]
+├ ○ /sitemap.xml                                  1h      1y
+├ ○ /store
+└ ○ /terms
+
+LINT
+> web_platform@0.1.0 lint
+> eslint
+✖ 387 problems (0 errors, 387 warnings)
+> mobile_app@1.0.0 lint
+> expo lint
+✖ 14 problems (0 errors, 14 warnings)
+
+TYPECHECK (mobile)
+> beauty-grooming-marketplace@1.0.0 typecheck:mobile
+> tsc --noEmit --incremental false --project mobile_app/tsconfig.json
+tsc exit code 0, no diagnostics printed (0 type errors in mobile_app)
+(the web workspace type check is the 'Finished TypeScript' line in BUILD)

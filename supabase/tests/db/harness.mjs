@@ -1,7 +1,10 @@
 // Database test harness: a Supabase-shaped Postgres (PGlite) with every migration applied.
 // Mirrors the Supabase details that matter for authorization: extensions live in the
-// "extensions" schema, anon/authenticated/service_role exist, public objects are granted to
-// them by default privileges, and auth.uid()/auth.jwt() read request.jwt.claims.
+// "extensions" schema, anon/authenticated/service_role exist, functions are executable by default
+// (as on Supabase), and auth.uid()/auth.jwt() read request.jwt.claims.
+// Tables, views and sequences are NOT granted to the client roles by default: current Supabase
+// projects start with no Data API privileges, so every table must carry explicit grants
+// (see 20261006220000_explicit_data_api_grants.sql). Granting them here would hide a missing grant.
 import { PGlite } from "@electric-sql/pglite";
 import { btree_gist } from "@electric-sql/pglite/contrib/btree_gist";
 import { pgcrypto } from "@electric-sql/pglite/contrib/pgcrypto";
@@ -26,9 +29,7 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 GRANT anon, authenticated, service_role TO postgres;
 GRANT USAGE ON SCHEMA public, extensions TO anon, authenticated, service_role;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA extensions TO anon, authenticated, service_role;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon, authenticated, service_role;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
 CREATE SCHEMA IF NOT EXISTS auth;
 CREATE TABLE IF NOT EXISTS auth.users (
   instance_id uuid, id uuid PRIMARY KEY DEFAULT gen_random_uuid(), aud text, role text,
@@ -43,6 +44,15 @@ CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $f$
   SELECT NULLIF(auth.jwt()->>'sub', '')::uuid $f$;
 CREATE OR REPLACE FUNCTION auth.role() RETURNS text LANGUAGE sql STABLE AS $f$
   SELECT auth.jwt()->>'role' $f$;
+-- The two Auth tables the governance commands touch (MFA factors and sessions), with the columns they use.
+CREATE TABLE IF NOT EXISTS auth.mfa_factors (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL, friendly_name text, factor_type text NOT NULL DEFAULT 'totp',
+  status text NOT NULL DEFAULT 'verified', created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS auth.sessions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL, created_at timestamptz DEFAULT now(), updated_at timestamptz DEFAULT now(),
+  not_after timestamptz
+);
 GRANT USAGE ON SCHEMA auth TO anon, authenticated, service_role;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA auth TO anon, authenticated, service_role;
 `;
@@ -56,10 +66,15 @@ export function migrationFiles() {
 
 // Applies every migration in its own transaction, as `supabase db push` does, and stops at
 // the first failure so a broken chain is reported exactly as the CLI would report it.
-export async function createMigratedDb() {
+// activateDemo: the migrations leave the three demo salons switched off (nobody can book a salon that does not exist), but the
+// tests need salons that can be booked, so the harness turns them on explicitly. Pass false to test the migrated state itself.
+export async function createMigratedDb({ activateDemo = true } = {}) {
   const db = new PGlite({ extensions: { btree_gist, pgcrypto, uuid_ossp } });
   await db.exec(BOOTSTRAP);
   await db.exec(`ALTER DATABASE postgres SET search_path TO "$user", public, extensions; SET search_path TO "$user", public, extensions;`);
+  // A hosted Supabase session runs in UTC. The tests must too, so a time of day compared in the session time zone instead of
+  // Asia/Riyadh fails here the way it fails in production (it used to pass on a developer machine set to UTC+3).
+  await db.exec(`ALTER DATABASE postgres SET timezone TO 'UTC'; SET TIME ZONE 'UTC';`);
   for (const m of migrationFiles()) {
     try {
       await db.exec("BEGIN;");
@@ -70,7 +85,26 @@ export async function createMigratedDb() {
       throw new Error(`Migration ${m.name} failed: ${error.message}`);
     }
   }
+  if (activateDemo) {
+    await db.exec(`select set_config('request.jwt.claims', '{"role":"service_role"}', false);
+      update public.providers set status = 'active', is_verified = true where id = any (public.demo_provider_ids());
+      select set_config('request.jwt.claims', '', false);`);
+  }
   return db;
+}
+
+// The claims Supabase Auth puts in a signed-in user's JWT after a password sign-in followed by a TOTP verification just now:
+// assurance level aal2 and an amr entry per method with its time. Admin commands require aal2 and, for sensitive ones, a TOTP
+// verification in the last 5 minutes (GOV-1). A test that needs a weaker session passes ROLES.user(id, { aal: "aal1", amr: [...] }).
+// session_id: Supabase Auth names the session in every access token, and the console role needs that session to still exist
+// (GOV-FIX M-2). createUser opens one session per user whose id equals the user's id; a test that needs a revoked or other
+// session passes ROLES.user(id, { session_id: ... }).
+export function sessionClaims(user, nowSeconds = Math.floor(Date.now() / 1000)) {
+  return {
+    session_id: user.session_id ?? user.sub,
+    aal: user.aal ?? "aal2",
+    amr: user.amr ?? [{ method: "totp", timestamp: nowSeconds }, { method: "password", timestamp: nowSeconds - 60 }],
+  };
 }
 
 // Runs SQL inside a transaction as a given Supabase role with JWT claims.
@@ -78,7 +112,7 @@ export async function as(db, user, sql, params = []) {
   return db.transaction(async (tx) => {
     await tx.exec(`SET LOCAL ROLE ${user.role}`);
     const claims = { role: user.role };
-    if (user.sub) claims.sub = user.sub;
+    if (user.sub) Object.assign(claims, { sub: user.sub }, sessionClaims(user));
     await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify(claims)]);
     return (await tx.query(sql, params)).rows;
   });
@@ -95,7 +129,7 @@ export async function sys(db, sql, params = []) {
 export const ROLES = {
   anon: { sub: null, role: "anon" },
   service: { sub: null, role: "service_role" },
-  user: (sub) => ({ sub, role: "authenticated" }),
+  user: (sub, session = {}) => ({ sub, role: "authenticated", ...session }),
 };
 
 // Fixture ids from the demo seed migration (20260704082805_live_demo_seed_messages.sql).
@@ -111,18 +145,26 @@ export const SEED = {
 };
 
 let counter = 0;
-export async function createUser(db, { role = "customer", phone = null, verified = false } = {}) {
+// An administrator gets the console role adminRole (GOV-1: owner, finance, operations or analyst); owner by default, which is
+// what every administrator was before console roles existed.
+export async function createUser(db, { role = "customer", phone = null, verified = false, adminRole = "owner" } = {}) {
   counter += 1;
   const id = `c0000000-0000-4000-8000-${String(counter).padStart(12, "0")}`;
-  await sys(db, `insert into auth.users (id, email) values ($1, $2)`, [id, `user${counter}@test.local`]);
+  // The sign-in email is confirmed, as it is after a normal sign-up; out-of-band notices go only to confirmed contacts (GOV-FIX H-3).
+  await sys(db, `insert into auth.users (id, email, email_confirmed_at) values ($1, $2, now())`, [id, `user${counter}@test.local`]);
+  await sys(db, `insert into auth.sessions (id, user_id) values ($1, $1) on conflict (id) do nothing`, [id]);
   await sys(db, `update profiles set role = $2::user_role, phone_number = $3, phone_verified = $4 where id = $1`,
     [id, role, phone, verified]);
+  if (role === "admin") {
+    await sys(db, `insert into admin_role_assignments (user_id, admin_role, reason) values ($1, $2, 'Test fixture')
+                   on conflict (user_id) do update set admin_role = excluded.admin_role`, [id, adminRole]);
+  }
   return id;
 }
 
 // A future date (Riyadh) on which the given employee has working hours.
 export async function nextWorkingDate(db, employeeId, minDaysAhead = 3) {
-  const rows = await sys(db, `select distinct day_of_week from employee_availability where employee_id = $1`, [employeeId]);
+  const rows = await sys(db, `select distinct day_of_week from employee_availability where employee_id = $1 and is_working_day`, [employeeId]);
   const days = rows.map((r) => r.day_of_week);
   let d = new Date(Date.now() + minDaysAhead * 86400000);
   for (let i = 0; i < 14 && !days.includes(d.getUTCDay()); i += 1) d = new Date(d.getTime() + 86400000);

@@ -20,6 +20,8 @@ export async function processRefundRequest(
   if (!claim?.claimed) return { refundId, status: "skipped", error: claim?.reason }
 
   let gatewayRefundId: string | undefined
+  let gatewayStatus: string | undefined
+  let gatewayAmount: number | null = null
   let failure: string | undefined
   try {
     const response = await fetch("https://api.tap.company/v2/refunds", {
@@ -42,6 +44,9 @@ export async function processRefundRequest(
     const status = String(body?.status || "").toUpperCase()
     if (response.ok && body?.id && ["REFUNDED", "PENDING", "IN_PROGRESS", "INITIATED"].includes(status)) {
       gatewayRefundId = body.id
+      // D-Q9: Tap's own status is kept; a refund still PENDING at Tap is tracked until it succeeds ("Check with Tap").
+      gatewayStatus = status
+      gatewayAmount = typeof body?.amount === "number" ? body.amount : null
     } else {
       failure = `Tap refund rejected (${response.status}): ${JSON.stringify(body?.errors ?? body).slice(0, 500)}`
     }
@@ -56,6 +61,14 @@ export async function processRefundRequest(
     p_error: failure ?? null,
   })
   if (completeError) throw completeError
+  if (!failure && gatewayStatus) {
+    const { error: statusError } = await db.rpc("record_refund_gateway_status", {
+      p_refund_id: refundId,
+      p_tap_status: gatewayStatus,
+      p_tap_amount: gatewayAmount,
+    })
+    if (statusError) throw statusError
+  }
 
   return failure
     ? { refundId, status: "failed", error: failure }
