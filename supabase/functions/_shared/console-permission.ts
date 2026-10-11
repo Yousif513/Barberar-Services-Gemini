@@ -12,6 +12,10 @@ export const FUNCTION_PERMISSIONS = {
   "dispatch-messages": "operations.write",
   // Delivers outgoing integration webhooks.
   "deliver-webhooks": "settings.manage",
+  // PRIV: builds an approved personal-data copy (JSON + PDF) and removes expired ones.
+  "privacy-export": "privacy.approve",
+  // PRIV: deletes the auth account of an approved, already erased deletion request (and accounts a restore brought back).
+  "privacy-erase-account": "privacy.approve",
 } as const
 
 export type GuardedFunction = keyof typeof FUNCTION_PERMISSIONS

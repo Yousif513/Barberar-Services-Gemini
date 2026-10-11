@@ -71,6 +71,14 @@ const ROLE_AR: Record<string, string> = { owner: "مالك", finance: "الما�
 const roleEn = (v: unknown) => ROLE_EN[text(v)] ?? (text(v) || "no console role");
 const roleAr = (v: unknown) => ROLE_AR[text(v)] ?? (text(v) || "بلا دور");
 
+const TYPE_EN: Record<string, string> = { access: "access", copy: "copy of your data", correction: "correction", deletion: "deletion", consent_withdrawal: "consent withdrawal" };
+const TYPE_AR: Record<string, string> = { access: "الاطلاع", copy: "نسخة من بياناتك", correction: "التصحيح", deletion: "الحذف", consent_withdrawal: "سحب الموافقة" };
+const typeEn = (v: unknown) => TYPE_EN[text(v)] ?? "privacy";
+const typeAr = (v: unknown) => TYPE_AR[text(v)] ?? "خصوصية";
+const RETAINED_AR: Record<string, string> = { bookings_pseudonymised: "حجوزات بلا هوية", tax_invoices: "فواتير ضريبية", ledger_and_payment_records: "سجلات الدفع والقيود" };
+const COMPLAINT_EN = "You have the right to complain to the Saudi Data and AI Authority (SDAIA) within 90 days.";
+const COMPLAINT_AR = "يحق لك تقديم شكوى إلى الهيئة السعودية للبيانات والذكاء الاصطناعي (سدايا) خلال 90 يوماً.";
+
 // Arabic first, then English, in one message: the recipient's language is not stored with the notice. Only the values the
 // payload already carries for this purpose are used (a masked IBAN, never a full one); unknown keys are ignored.
 export function renderNotice(templateKey: string, payload: Record<string, unknown>): Message {
@@ -134,6 +142,58 @@ export function renderNotice(templateKey: string, payload: Record<string, unknow
       subject = "PRIMORA: a Tap reconciliation break was escalated";
       ar = `بقي فرق تسوية مع Tap مفتوحاً أكثر من 3 أيام عمل (يوم ${text(p.business_day)}، الفرق ${sar(p.difference)} ريال).`;
       en = `A Tap reconciliation break has been open for more than 3 business days (day ${text(p.business_day)}, difference SAR ${sar(p.difference)}).`;
+      break;
+    // PRIV (Q1, Q2, X1): privacy requests and incidents. Only the request type, dates, reasons and category counts travel here.
+    case "privacy_request_received":
+      subject = "PRIMORA: we received your privacy request";
+      ar = `استلمنا طلب الخصوصية (${typeAr(p.request_type)}). سنرد خلال 30 يوماً، والطلب مجاني.`;
+      en = `We received your privacy request (${typeEn(p.request_type)}). We will answer within 30 days. It is free of charge.`;
+      break;
+    case "privacy_request_confirm":
+      subject = "PRIMORA: confirm your privacy request";
+      ar = `سجلنا طلب خصوصية (${typeAr(p.request_type)}) لحسابك. افتح صفحة الخصوصية في حسابك وأكّده برمز لمرة واحدة. لن نفعل شيئاً قبل تأكيدك.`;
+      en = `We logged a privacy request (${typeEn(p.request_type)}) for your account. Open Privacy in your account and confirm it with a one-time code. Nothing is done before you confirm.`;
+      break;
+    case "privacy_request_extended":
+      subject = "PRIMORA: your privacy request needs more time";
+      ar = `مددنا موعد الرد على طلبك (${typeAr(p.request_type)}) مرة واحدة حتى ${riyadh(p.extended_due_at)}. السبب: ${text(p.reason)}`;
+      en = `We extended the answer date of your request (${typeEn(p.request_type)}) once, to ${riyadh(p.extended_due_at)}. Reason: ${text(p.reason)}`;
+      break;
+    case "privacy_request_refused":
+      subject = "PRIMORA: your privacy request was refused";
+      ar = `رُفض طلبك (${typeAr(p.request_type)}). السبب: ${text(p.reason)} ${COMPLAINT_AR}`;
+      en = `Your request (${typeEn(p.request_type)}) was refused. Reason: ${text(p.reason)} ${COMPLAINT_EN}`;
+      break;
+    case "privacy_request_completed":
+      subject = "PRIMORA: your privacy request is complete";
+      ar = `اكتمل طلبك (${typeAr(p.request_type)}). التفاصيل في صفحة الخصوصية في حسابك.`;
+      en = `Your request (${typeEn(p.request_type)}) is complete. The details are under Privacy in your account.`;
+      break;
+    case "privacy_copy_ready":
+      subject = "PRIMORA: your data copy is ready";
+      ar = `نسخة بياناتك جاهزة في صفحة الخصوصية في حسابك حتى ${riyadh(p.expires_at)}، بعد تسجيل دخولك فقط.`;
+      en = `Your data copy is ready under Privacy in your account until ${riyadh(p.expires_at)}, only after you sign in.`;
+      break;
+    case "privacy_deletion_completed": {
+      subject = "PRIMORA: your account and data were deleted";
+      const retained = Array.isArray(p.retained) ? (p.retained as Record<string, unknown>[]) : [];
+      const keptEn = retained.filter((r) => Number(r.count) > 0)
+        .map((r) => `${text(r.category).replace(/_/g, " ")} (${text(r.count)}; ${text(r.basis)}; until ${text(r.until)})`).join("; ");
+      const keptAr = retained.filter((r) => Number(r.count) > 0)
+        .map((r) => `${RETAINED_AR[text(r.category)] ?? text(r.category)} (${text(r.count)}؛ ${text(r.basis)}؛ حتى ${text(r.until)})`).join("؛ ");
+      ar = `حذفنا حسابك وملفك الشخصي وبيانات التواصل والموافقات والمفضلة ورموز الأجهزة والرسائل، وأتلفنا إجابات الاستبيان الصحي. احتفظنا بما يلي لأن النظام يوجبه: ${keptAr || "لا شيء"}. ${COMPLAINT_AR}`;
+      en = `We deleted your account, profile, contact details, consents, favourites, device tokens and messages, and destroyed your health-intake answers. We kept the following because the law requires it: ${keptEn || "nothing"}. ${COMPLAINT_EN}`;
+      break;
+    }
+    case "privacy_request_escalated":
+      subject = "PRIMORA: a privacy request is close to its deadline";
+      ar = `طلب خصوصية (${typeAr(p.request_type)}) بلغ مرحلة التصعيد ${text(p.level)}. الموعد النهائي ${riyadh(p.deadline_at)}.`;
+      en = `A privacy request (${typeEn(p.request_type)}) reached escalation ${text(p.level)}. Its deadline is ${riyadh(p.deadline_at)}.`;
+      break;
+    case "privacy_incident_deadline":
+      subject = "PRIMORA: an incident's 72-hour SDAIA deadline is near";
+      ar = `لم يُبلَّغ سدايا بعد عن الحادثة ${text(p.reference)}. الموعد النهائي ${riyadh(p.deadline_at)}.`;
+      en = `Incident ${text(p.reference)} has not been reported to SDAIA. The deadline is ${riyadh(p.deadline_at)}.`;
       break;
     default:
       subject = "PRIMORA: a security event on your account";
