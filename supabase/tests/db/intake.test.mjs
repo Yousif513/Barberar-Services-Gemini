@@ -69,6 +69,10 @@ const record = (user, booking, result = "negative", at = null, key = null) =>
 
 before(async () => {
   db = await createMigratedDb();
+  // X3(6) (PRIV-4): health answers are collected only after the owner records the approved transfer risk assessment. These tests
+  // exercise collection itself, so the fixture records one; supabase/tests/db/priv_privacy.test.mjs tests the gate.
+  await sys(db, `insert into privacy_transfer_assessments (scope, document_reference, approved_on, signed_by, recorded_by)
+                 values ('health_intake', 'Test fixture assessment', current_date, 'Test fixture', $1)`, [SEED.owner1]);
   admin = ROLES.user(await createUser(db, { role: "admin" }));
   stranger = ROLES.user(await createUser(db, { role: "provider_employee" }));
   employeeUser = ROLES.user(await createUser(db, { role: "provider_employee" }));
@@ -253,13 +257,15 @@ describe("explicit consent and the customer's submission", () => {
 });
 
 describe("who reads answers, and the audit trail", () => {
-  it("lets the owner, a delegate and the assigned employee read through the command, auditing each read", async () => {
+  // Q2.6 (PRIV-4): only the provider assigned to the booking reads the answers; the business owner and a delegate no longer do.
+  it("lets the assigned employee read through the command, auditing each read; the owner and a delegate are refused", async () => {
     const customer = await newCustomer();
     const booking = await makeBooking(customer);
     await consent(customer);
     await submit(customer, booking.id);
     let reads = await count("admin_audit_logs", `action = 'intake.answers_read'`);
-    for (const user of [owner, delegate, employeeUser]) {
+    for (const user of [owner, delegate]) await expectError(read(user, booking.id), /Booking not found/);
+    for (const user of [employeeUser, employeeUser, employeeUser]) {
       const r = await read(user, booking.id);
       assert.equal(r.status, "submitted");
       assert.equal(r.answers.allergies, SECRET);
@@ -269,7 +275,7 @@ describe("who reads answers, and the audit trail", () => {
     }
     const audit = await sys(db, `select details::text d, actor_id from admin_audit_logs where action = 'intake.answers_read' order by created_at desc limit 3`);
     assert.ok(audit.every((a) => !a.d.includes("Penicillin") && !a.d.includes("asthma")), "the audit row never carries an answer");
-    assert.deepEqual(new Set(audit.map((a) => a.actor_id)), new Set([owner.sub, delegate.sub, employeeUser.sub]));
+    assert.deepEqual(new Set(audit.map((a) => a.actor_id)), new Set([employeeUser.sub]));
     const view = await call(customer, `select get_booking_intake($1) r`, [booking.id]);
     assert.equal(view.submission.read_count, 3, "the customer sees how many times the answers were read");
     assert.equal(view.submission.answers.allergies, SECRET);
@@ -292,7 +298,7 @@ describe("who reads answers, and the audit trail", () => {
 
   it("answers with a status, not answers, when nothing was submitted", async () => {
     const booking = await makeBooking(await newCustomer());
-    assert.deepEqual(await read(owner, booking.id), { booking_id: booking.id, status: "missing", answers: null });
+    assert.deepEqual(await read(employeeUser, booking.id), { booking_id: booking.id, status: "missing", answers: null });
   });
 
   it("refuses to show answers of a cancelled booking", async () => {
@@ -301,7 +307,7 @@ describe("who reads answers, and the audit trail", () => {
     await consent(customer);
     await submit(customer, booking.id);
     await call(customer, `select cancel_booking($1, 'Changed my mind') r`, [booking.id]);
-    await expectError(read(owner, booking.id), /cancelled or missed/);
+    await expectError(read(employeeUser, booking.id), /cancelled or missed/);
   });
 });
 
@@ -327,7 +333,7 @@ describe("the non-sensitive status view", () => {
     const overview = await call(admin, `select admin_intake_overview() r`);
     assert.ok(overview.templates >= 1);
     assert.ok(overview.submissions_by_status.submitted >= 1);
-    assert.equal(overview.retention_days, null);
+    assert.equal(overview.retention_days, 30, "Q2.6: the adopted 30-day rule");
     assert.ok(!JSON.stringify(overview).includes("Penicillin"));
     for (const user of [owner, employeeUser, await newCustomer(), ROLES.anon]) {
       await expectError(call(user, `select admin_intake_overview() r`), /Administrator access required|permission denied/);
@@ -508,12 +514,12 @@ describe("withdrawal, deletion and retention", () => {
     assert.equal(r.answers_removed, 2);
     assert.equal(await count("intake_answers", "submission_id = $1", [fs.submission_id]), 0);
     assert.equal(await count("intake_answers", "submission_id = $1", [ps.submission_id]), 0, "a past submission is blanked too");
-    assert.equal((await read(owner, past.id)).answers, null);
+    assert.equal((await read(employeeUser, past.id)).answers, null);
     const [tomb] = await sys(db, `select status, removal_reason, answers_removed_at, template_version from intake_submissions where id = $1`, [fs.submission_id]);
     assert.equal(tomb.status, "withdrawn");
     assert.equal(tomb.removal_reason, "consent_withdrawn");
     assert.equal((await state(future.id)).form_status, "withdrawn");
-    assert.equal((await read(owner, future.id)).answers, null);
+    assert.equal((await read(employeeUser, future.id)).answers, null);
     await expectError(submit(customer, future.id), /consent to share health information/);
     assert.equal((await call(customer, `select get_booking_intake($1) r`, [future.id])).consent_active, false);
     await consent(customer);
@@ -537,17 +543,18 @@ describe("withdrawal, deletion and retention", () => {
     assert.equal((await sys(db, `select removal_reason from intake_submissions where id = $1`, [s.submission_id]))[0].removal_reason, "customer_deleted");
   });
 
-  it("purges nothing while the retention setting is unset", async () => {
+  it("destroys answers 30 days after the appointment was cancelled or completed, and only the scheduler or an administrator runs it (Q2.6)", async () => {
     const customer = await newCustomer();
     await consent(customer);
     const old = await makeBooking(customer, { past: true });
-    await forceBooking(old.id, `scheduled_at = now() - interval '${400 + scenario} days'`);
     const s = await submit(customer, old.id);
-    assert.deepEqual(await call(ROLES.service, `select purge_expired_intake() r`), { configured: false, purged: 0 });
-    assert.deepEqual(await call(admin, `select admin_purge_expired_intake('Quarterly clean-up') r`), { configured: false, purged: 0 });
-    assert.equal(await count("intake_answers", "submission_id = $1", [s.submission_id]), 1);
-
-    await sys(db, `update platform_settings set value = '365'::jsonb where key = 'intake.retention_days'`);
+    // Fixture only: the visit is moved to "cancelled 29 days ago" past the transition rules.
+    await db.exec(`alter table bookings disable trigger validate_booking_status_transition_before_update`);
+    try { await forceBooking(old.id, `status = 'cancelled', cancelled_at = now() - interval '29 days'`); }
+    finally { await db.exec(`alter table bookings enable trigger validate_booking_status_transition_before_update`); }
+    assert.equal((await call(ROLES.service, `select purge_expired_intake() r`)).retention_days, 30);
+    assert.equal(await count("intake_answers", "submission_id = $1", [s.submission_id]), 1, "day 29: kept");
+    await sys(db, `update bookings set cancelled_at = now() - interval '31 days' where id = $1`, [old.id]);
     for (const user of [owner, employeeUser, customer, ROLES.anon]) {
       await expectError(call(user, `select purge_expired_intake() r`), /Only the scheduled job|permission denied/);
       await expectError(call(user, `select admin_purge_expired_intake('Quarterly clean-up') r`), /Administrator access required|permission denied/);
@@ -560,7 +567,6 @@ describe("withdrawal, deletion and retention", () => {
     assert.ok(run.purged >= 1);
     assert.equal(await count("intake_answers", "submission_id = $1", [s.submission_id]), 0);
     assert.equal((await sys(db, `select status, removal_reason from intake_submissions where id = $1`, [s.submission_id]))[0].status, "purged");
-    await sys(db, `update platform_settings set value = 'null'::jsonb where key = 'intake.retention_days'`);
   });
 });
 

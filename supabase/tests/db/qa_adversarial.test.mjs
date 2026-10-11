@@ -68,17 +68,20 @@ describe("client-executable functions are accounted for", () => {
     const unguarded = (await functionsFor("authenticated"))
       .filter((f) => f.definer)
       // gov2_require_read (GOV-2) is is_admin() plus admin_can() in one internal helper that no client can call.
-      .filter((f) => !/auth\.uid\(\)|is_admin\(\)|admin_can\(|admin_role\(\)|auth\.jwt\(\)|service_role|can_access_provider_operation|can_access_provider_wide|is_booking_staff|gov2_require_read\(/.test(f.body))
+      // privacy_require_console (PRIV-1) is the same pair for the privacy commands: is_admin() then admin_can(permission).
+      .filter((f) => !/auth\.uid\(\)|is_admin\(\)|admin_can\(|admin_role\(\)|auth\.jwt\(\)|service_role|can_access_provider_operation|can_access_provider_wide|is_booking_staff|gov2_require_read\(|privacy_require_console\(/.test(f.body))
       .map((f) => f.signature.split("(")[0])
       .sort();
-    assert.deepEqual(unguarded, ["get_branch_available_slots", "get_branch_schedule_with_prayer_pauses", "get_sponsored_placements", "public_provider_reviews", "search_marketplace_providers"],
+    // privacy_erasure_active (PRIV-3) only answers whether a deletion-engine run recorded in the caller's own transaction is open; the
+    // booking-immutability trigger, which runs with the caller's rights, needs it.
+    assert.deepEqual(unguarded, ["get_branch_available_slots", "get_branch_schedule_with_prayer_pauses", "get_sponsored_placements", "privacy_erasure_active", "public_provider_reviews", "search_marketplace_providers"],
       "the public catalogue functions (slot listings, schedules, search) are open to visitors on purpose (get_available_slots mentions auth.uid() only to keep a waitlist hold for its holder, which is not an authorization check); get_sponsored_placements (G63) is the labelled sponsored block of the discover page and is public on purpose");
   });
 
   it("confirm_booking_payment and the other service-role commands refuse an administrator, an owner, a customer and a visitor", async () => {
     // Money is confirmed only by the payment webhook (service role). An administrator is not that identity.
     const serviceOnly = (await functionsFor("authenticated"))
-      .filter((f) => f.definer && /<> 'service_role'/.test(f.body) && !/is_admin\(\)|admin_can\(|auth\.uid\(\)/.test(f.body))
+      .filter((f) => f.definer && /<> 'service_role'/.test(f.body) && !/is_admin\(\)|admin_can\(|auth\.uid\(\)|privacy_require_console\(/.test(f.body))
       .map((f) => f.signature);
     // FIX-MONEY M-22: confirm_booking_payment is no longer even executable by authenticated, so no service-role-only command is left in the client-executable set.
     assert.deepEqual(serviceOnly.map((s) => s.split("(")[0]), []);
@@ -114,7 +117,7 @@ describe("reasoned administrator commands", () => {
         values ($1, 'chg_qa_reason', 10, 'Gateway refused', 'admin', 'failed', 1, 'qa-reason-refund') returning id`, [ledger]))[0].id,
       payout: (await sys(db, `insert into payout_requests (provider_id, requested_by, amount, bank_name, iban)
         values ($1, $2, 50, 'Test Bank', 'SA0380000000608010167519') returning id`, [SEED.provider1, SEED.owner1]))[0].id,
-      request: (await sys(db, `insert into data_subject_requests (user_id, request_type, status) values ($1, 'export', 'pending') returning id`, [SEED.customer]))[0].id,
+      request: (await sys(db, `insert into privacy_requests (subject_id, request_type, status, received_at, due_at, verified_at, details) values ($1, 'copy', 'open', now(), now() + interval '30 days', now(), null) returning id`, [SEED.customer]))[0].id,
       person: await createUser(db, { role: "customer", phone: "+966555111222", verified: true }),
     };
   });
@@ -128,7 +131,7 @@ describe("reasoned administrator commands", () => {
     admin_review_payout_request: (reason) => [`select admin_review_payout_request($1, 'processing', ${reason})`, () => [fixtures.payout]],
     admin_set_phone_verified: (reason) => [`select admin_set_phone_verified($1, false, ${reason})`, () => [fixtures.person]],
     admin_set_provider_status: (reason) => [`select admin_set_provider_status($1, 'suspended', ${reason})`, () => [SEED.provider2]],
-    admin_update_data_request: (reason) => [`select admin_update_data_request($1, 'in_progress', ${reason})`, () => [fixtures.request]],
+    admin_privacy_add_note: (reason) => [`select admin_privacy_add_note($1, ${reason})`, () => [fixtures.request]],
     admin_update_platform_setting: (reason) => [`select admin_update_platform_setting('booking_hold_minutes', '20'::jsonb, ${reason})`, () => []],
   };
 
@@ -139,7 +142,7 @@ describe("reasoned administrator commands", () => {
         provider: (await sys(db, `select status from providers where id = $1`, [SEED.provider2]))[0].status,
         refund: (await sys(db, `select status, attempts from refund_requests where id = $1`, [fixtures.refund]))[0],
         payout: (await sys(db, `select status from payout_requests where id = $1`, [fixtures.payout]))[0].status,
-        request: (await sys(db, `select status from data_subject_requests where id = $1`, [fixtures.request]))[0].status,
+        request: (await sys(db, `select status, staff_notes from privacy_requests where id = $1`, [fixtures.request]))[0],
         person: (await sys(db, `select phone_number, phone_verified from profiles where id = $1`, [fixtures.person]))[0],
         hold: (await sys(db, `select value from platform_settings where key = 'booking_hold_minutes'`))[0].value,
       });
@@ -453,7 +456,8 @@ describe("cross-tenant reads, swept over every table and view", () => {
   before(async () => {
     const svc = await serviceFor(db, SEED.employee1);
     const booking = (await sys(db, `insert into bookings (customer_id, branch_id, employee_id, service_id, scheduled_at, duration_minutes, status, total_price, platform_commission, deposit_required)
-      values ($1, $2, $3, $4, now() + interval '3 days', 30, 'confirmed', 100, 10, 10) returning id`, [SEED.customer, SEED.branch1, SEED.employee1, svc.id]))[0].id;
+      values ($1, $2, $3, $4, now() + interval '47 days', 30, 'confirmed', 100, 10, 10) returning id`, [SEED.customer, SEED.branch1, SEED.employee1, svc.id]))[0].id;
+    // 47 days out: a fixture booking 3 days out collided with the demo seed's booking whenever the suite ran near 06:00 UTC.
     const byName = {
       provider_id: SEED.provider1, branch_id: SEED.branch1, customer_id: SEED.customer, user_id: SEED.customer, requested_by: SEED.owner1,
       booking_id: booking, employee_id: SEED.employee1, service_id: svc.id, owner_id: SEED.owner1, profile_id: SEED.customer,
@@ -557,20 +561,20 @@ describe("cross-tenant reads, swept over every table and view", () => {
 
   it("keeps a customer's own wallet, loyalty, requests and consent invisible to other customers and to providers", async () => {
     await sys(db, `insert into wallet_credits (customer_id, amount, reason, source) values ($1, 5, 'Referral reward', 'referral')`, [SEED.customer]);
-    await sys(db, `insert into data_subject_requests (user_id, request_type, status) values ($1, 'export', 'pending')`, [SEED.customer]);
+    await sys(db, `insert into privacy_requests (subject_id, request_type, status, received_at, due_at, verified_at, details) values ($1, 'access', 'open', now(), now() + interval '30 days', now(), null)`, [SEED.customer]);
     await sys(db, `insert into consents (user_id, purpose, granted, source) values ($1, 'marketing', true, 'qa')`, [SEED.customer]).catch(() => {});
     for (const [name, user] of [["another customer", customer2], ["a provider owner", owner1], ["a provider's staff", employee1], ["a visitor", ROLES.anon]]) {
       for (const sql of [
         `select id from wallet_credits where customer_id = $1`,
-        `select id from data_subject_requests where user_id = $1`,
+        `select id from privacy_requests where subject_id = $1`,
         `select id from consents where user_id = $1`,
       ]) {
         const rows = await as(db, user, sql, [SEED.customer]).catch(() => []);
         assert.equal(rows.length, 0, `${name}: ${sql}`);
       }
     }
-    for (const sql of [`select id from wallet_credits where customer_id = $1`, `select id from data_subject_requests where user_id = $1`]) {
-      assert.ok((await as(db, customer, sql, [SEED.customer])).length >= 1, `the customer reads their own: ${sql}`);
-    }
+    assert.ok((await as(db, customer, `select id from wallet_credits where customer_id = $1`, [SEED.customer])).length >= 1, "the customer reads their own wallet");
+    // PRIV-1: privacy requests are read through privacy_my_requests, never from the table.
+    assert.ok((await as(db, customer, `select privacy_my_requests() r`))[0].r.length >= 1, "the customer reads their own requests");
   });
 });

@@ -79,7 +79,7 @@ describe("administrator commands refuse every other role before doing anything e
     for (const name of [
       "admin_dashboard_overview", "admin_review_payout_request", "admin_update_platform_setting", "admin_release_expired_holds",
       "admin_retry_refund_request", "admin_clear_customer_profile", "admin_set_provider_status", "admin_export_finance_report",
-      "admin_customer_overview", "admin_update_data_request", "admin_set_phone_verified", "admin_release_payout",
+      "admin_customer_overview", "admin_privacy_extend_request", "admin_set_phone_verified", "admin_release_payout",
       "admin_release_ledger_item", "admin_create_refund_request", "get_admin_supply_overview", "set_user_role",
     ]) {
       assert.ok(found.includes(name), `${name} is expected to be an administrator-only command`);
@@ -123,7 +123,7 @@ describe("tables the console and the money flows write", () => {
     ["wallet_credits", `update wallet_credits set amount = amount returning 1`, `delete from wallet_credits returning 1`],
     ["payout_requests", `update payout_requests set status = status returning 1`, `delete from payout_requests returning 1`],
     ["refund_requests", `update refund_requests set status = status returning 1`, `delete from refund_requests returning 1`],
-    ["data_subject_requests", `update data_subject_requests set status = status returning 1`, `delete from data_subject_requests returning 1`],
+    ["privacy_requests", `update privacy_requests set status = status returning 1`, `delete from privacy_requests returning 1`],
     ["categories", `update categories set is_active = is_active returning 1`, `delete from categories returning 1`],
     ["admin_audit_logs", `update admin_audit_logs set action = action returning 1`, `delete from admin_audit_logs returning 1`],
   ];
@@ -136,7 +136,7 @@ describe("tables the console and the money flows write", () => {
       values ($1, 'chg_matrix_1', 10, 'Gateway refused', 'admin', 'failed', 1, 'matrix-refund-1')`, [ledger]);
     await sys(db, `insert into payout_requests (provider_id, requested_by, amount, bank_name, iban)
       values ($1, $2, 50, 'Test Bank', 'SA0380000000608010167519')`, [SEED.provider1, SEED.owner1]);
-    await sys(db, `insert into data_subject_requests (user_id, request_type, status) values ($1, 'export', 'pending')`, [SEED.customer]);
+    await sys(db, `insert into privacy_requests (subject_id, request_type, status, received_at, due_at, verified_at, details) values ($1, 'copy', 'open', now(), now() + interval '30 days', now(), null)`, [SEED.customer]);
     await sys(db, `insert into wallet_credits (customer_id, amount, reason, source) values ($1, 5, 'Referral reward', 'referral')`, [SEED.customer]);
     await sys(db, `insert into promotional_codes (code, discount_type, discount_value) values ('MATRIX10', 'percentage', 10)`);
     await as(db, admin, `select admin_release_expired_holds('Seed one audit row')`);
@@ -258,7 +258,7 @@ describe("what the landing page summary reveals", () => {
   it("contains counts and money totals, never a customer's name, email or phone", async () => {
     const id = await createUser(db, { role: "customer", phone: "+966599887766", verified: true });
     await sys(db, `update profiles set first_name = 'Zainab', last_name = 'Qahtani', email = 'zainab.qahtani@example.test' where id = $1`, [id]);
-    await sys(db, `insert into data_subject_requests (user_id, request_type, status, details) values ($1, 'erasure', 'pending', 'Please delete my account')`, [id]);
+    await sys(db, `insert into privacy_requests (subject_id, request_type, status, received_at, due_at, verified_at, details) values ($1, 'deletion', 'open', now(), now() + interval '30 days', now(), 'Please delete my account')`, [id]);
     const text = JSON.stringify((await as(db, admin, `select admin_dashboard_overview() as o`))[0].o);
     for (const secret of ["Zainab", "Qahtani", "zainab.qahtani", "+966599887766", "Please delete my account"]) {
       assert.ok(!text.includes(secret), `the overview must not contain ${secret}`);

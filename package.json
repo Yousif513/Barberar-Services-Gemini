@@ -29,8 +29,10 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
+    "@pdf-lib/fontkit": "1.1.1",
     "expo": "~56.0.11",
     "expo-router": "~56.2.10",
+    "pdf-lib": "1.17.1",
     "supabase": "^2.106.0"
   }
 }

@@ -25,6 +25,10 @@ async function makeBooking(user) {
 
 before(async () => {
   db = await createMigratedDb();
+  // X3(6) (PRIV-4): health answers are collected only after the owner records the approved transfer risk assessment. These tests
+  // exercise collection itself, so the fixture records one; supabase/tests/db/priv_privacy.test.mjs tests the gate.
+  await sys(db, `insert into privacy_transfer_assessments (scope, document_reference, approved_on, signed_by, recorded_by)
+                 values ('health_intake', 'Test fixture assessment', current_date, 'Test fixture', $1)`, [SEED.owner1]);
   customer = ROLES.user(await createUser(db, { role: "customer" }));
   customer2 = ROLES.user(await createUser(db, { role: "customer" }));
 });

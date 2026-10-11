@@ -22,7 +22,7 @@ const call = (user, sql, params = []) => as(db, user, sql, params).then((rows) =
 const TABLES = [
   ["profiles", `select id from profiles where id <> auth.uid()`],
   ["consents", `select id from consents where user_id <> auth.uid()`],
-  ["data_subject_requests", `select id from data_subject_requests where user_id <> auth.uid()`],
+  ["privacy_requests", `select id from privacy_requests where subject_id <> auth.uid()`],
   ["payout_requests", `select id from payout_requests`],
   ["payout_allocations", `select payout_request_id from payout_allocations`],
   ["transactional_ledger", `select id from transactional_ledger`],
@@ -55,7 +55,7 @@ before(async () => {
   // One row in each table, so "no rows" means the policy refused them, not that the table was empty.
   ledgerId = await payableLedger(db, SEED.provider1, 120);
   await sys(db, `insert into consents (user_id, purpose, status, document_version, method) values ($1, 'marketing', 'granted', 'v1', 'web_form')`, [SEED.customer]);
-  await sys(db, `insert into data_subject_requests (user_id, request_type, status, details) values ($1, 'access', 'pending', 'Copy of my data')`, [SEED.customer]);
+  await sys(db, `insert into privacy_requests (subject_id, request_type, status, received_at, due_at, verified_at, details) values ($1, 'access', 'open', now(), now() + interval '30 days', now(), 'Copy of my data')`, [SEED.customer]);
   await sys(db, `insert into payout_requests (provider_id, requested_by, amount, bank_name, iban) values ($1, $2, 10, 'Test Bank', 'SA0380000000608010167519')`, [SEED.provider1, SEED.owner1]);
   await sys(db, `insert into message_log (recipient_phone, recipient_id, channel, template_name, locale, message_body, status, sent_at)
                  values ('+966500000123', $1, 'whatsapp', 'booking_confirmed', 'ar', 'Your booking is confirmed', 'delivered', now())`, [SEED.customer]);
@@ -77,7 +77,7 @@ before(async () => {
 
 describe("direct table reads by console sessions", () => {
   it("have rows behind them (read as the database owner)", async () => {
-    for (const table of ["consents", "data_subject_requests", "payout_requests", "transactional_ledger", "message_log", "intake_answers", "analytics_events"]) {
+    for (const table of ["consents", "privacy_requests", "payout_requests", "transactional_ledger", "message_log", "intake_answers", "analytics_events"]) {
       assert.ok((await sys(db, `select count(*)::int n from ${table}`))[0].n > 0, `${table} has a fixture row`);
     }
   });
@@ -110,12 +110,12 @@ describe("direct table reads by console sessions", () => {
 
 describe("audited read functions", () => {
   it("serve data requests and consents to owner and operations, each read writing one audit event with role, purpose and targets", async () => {
-    const before = await auditCount("data_requests.listed");
-    const result = await call(operations, `select admin_list_data_requests('open', 50, 0, 'privacy_request') r`);
+    const before = await auditCount("privacy_requests.listed");
+    const result = await call(operations, `select admin_privacy_list_requests('open', 50, 0, 'privacy_request') r`);
     assert.ok(result.total >= 1 && result.rows.length >= 1);
-    assert.equal(result.rows[0].profiles.first_name !== undefined, true);
-    assert.equal(await auditCount("data_requests.listed"), before + 1);
-    const audit = await lastAudit("data_requests.listed");
+    assert.equal(result.rows[0].subject.first_name !== undefined, true);
+    assert.equal(await auditCount("privacy_requests.listed"), before + 1);
+    const audit = await lastAudit("privacy_requests.listed");
     assert.equal(audit.actor_id, operations.sub);
     assert.equal(audit.details.console_role, "operations");
     assert.equal(audit.details.purpose, "privacy_request");
@@ -129,7 +129,7 @@ describe("audited read functions", () => {
 
   it("refuse personal data to finance and analyst, and refuse a purpose that is not on the list", async () => {
     for (const user of [finance, analyst]) {
-      await expectError(call(user, `select admin_list_data_requests('open', 10, 0, null) r`), forbidden);
+      await expectError(call(user, `select admin_privacy_list_requests('open', 10, 0, null) r`), forbidden);
       await expectError(call(user, `select admin_customer_overview(null, 10, 0) r`), forbidden);
       await expectError(call(user, `select admin_list_message_log(null, null, 10, 0, null) r`), forbidden);
       await expectError(call(user, `select admin_list_employees(null, null, null, 10, 0, null) r`), forbidden);
