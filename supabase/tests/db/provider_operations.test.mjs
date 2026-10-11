@@ -33,7 +33,8 @@ async function booking({ status, price = 100, commission = 20, customerId = SEED
 const row = async (view, key, value) => (view === "admin_employee_performance"
   ? (await as(db, admin, `select admin_employee_performance_report(null, null) r`))[0].r.find((item) => item[key] === value)
   : view === "admin_branch_performance"
-    ? (await as(db, admin, `select * from admin_branch_performance_report() where ${key} = $1`, [value]))[0]
+    // The figures themselves (the console report withholds branches with 1 to 4 customers, D4: secfix2_mediums_lows.test.mjs).
+    ? (await sys(db, `select * from admin_branch_performance where ${key} = $1`, [value]))[0]
     : (await as(db, admin, `select * from ${view} where ${key} = $1`, [value]))[0]);
 const n = (value) => Number(value);
 

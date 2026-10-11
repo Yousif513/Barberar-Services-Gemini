@@ -142,6 +142,9 @@ type ProviderApplicationRecord = {
 
 type Numeric = number | string | null;
 
+// The audited directory functions return at most this many rows per read (SECFIX-2 R2-L4).
+const AUDITED_PAGE = 500;
+
 type BranchPerformanceRow = {
   branch_id: string;
   total_bookings: Numeric;
@@ -153,6 +156,7 @@ type BranchPerformanceRow = {
   revenue_30d: Numeric;
   review_count: Numeric;
   rating_sum: Numeric;
+  suppressed?: boolean;
 };
 
 type EmployeePerformanceRow = {
@@ -297,6 +301,7 @@ const copy = {
     privateHidden: "Contact details, registration numbers and internal notes are hidden for your console role (personal data needs Operations or Owner).",
     metricsFailed: "Performance figures could not be loaded, so none are shown: {reason}",
     metricsUnavailable: "Performance figures are unavailable right now.",
+    metricsSuppressed: "Fewer than 5 customers: figures are withheld so they cannot point at individual people.",
     applicationsFailed: "Applications could not be loaded: {reason}",
     noBranches: "This provider has no branches yet.",
     noEmployees: "No employees on this branch.",
@@ -411,6 +416,7 @@ const copy = {
     privateHidden: "بيانات التواصل وأرقام السجل والملاحظات الداخلية مخفية لدورك في لوحة الإدارة (البيانات الشخصية تحتاج دور العمليات أو المالك).",
     metricsFailed: "تعذر تحميل أرقام الأداء، لذا لا تُعرض أي أرقام: {reason}",
     metricsUnavailable: "أرقام الأداء غير متاحة حالياً.",
+    metricsSuppressed: "أقل من 5 عملاء: حُجبت الأرقام حتى لا تدل على أشخاص بأعينهم.",
     applicationsFailed: "تعذر تحميل الطلبات: {reason}",
     noBranches: "لا توجد فروع لهذا المزود بعد.",
     noEmployees: "لا يوجد موظفون في هذا الفرع.",
@@ -574,6 +580,7 @@ export default function AdminProviderManagement() {
   const [crDialog, setCrDialog] = useState<{ kind: "wathq" | "manual"; providerId: string; applicationId?: string; cr: string; name: string } | null>(null);
   const [statusPending, setStatusPending] = useState<{ provider: ProviderRecord; next: DbProviderStatus; actionLabel: string } | null>(null);
   const [metricsError, setMetricsError] = useState("");
+  const [suppressedBranches, setSuppressedBranches] = useState<Set<string>>(new Set());
   const [privateHidden, setPrivateHidden] = useState(false);
   const params = useSearchParams();
   const [query, setQuery] = useState(() => params.get("q") ?? "");
@@ -752,18 +759,36 @@ export default function AdminProviderManagement() {
       // Contact details, registration numbers, commission and the review notes are not readable from the table by signed-in users;
       // administrators read them through one audited command.
       // GOV-FIX (Q4): the directory needs personal.read and is logged; finance and analyst see the list without these fields.
-      const privateResult = await supabase.rpc("admin_provider_private_directory", { p_purpose: "provider_onboarding" });
-      const privateForbidden = Boolean(privateResult.error) && (privateResult.error as { hint?: string } | null)?.hint === "console_role_forbidden";
-      if (privateResult.error && !privateForbidden) throw privateResult.error;
+      // SECFIX-2 R2-L4: read page by page (at most 500 rows each) so every audit row names every provider it returned.
+      const privateRows: Array<{ provider_id: string }> = [];
+      let privateForbidden = false;
+      for (let offset = 0; ; offset += AUDITED_PAGE) {
+        const privateResult = await supabase.rpc("admin_provider_private_directory", { p_purpose: "provider_onboarding", p_limit: AUDITED_PAGE, p_offset: offset });
+        privateForbidden = Boolean(privateResult.error) && (privateResult.error as { hint?: string } | null)?.hint === "console_role_forbidden";
+        if (privateResult.error && !privateForbidden) throw privateResult.error;
+        const batch = (privateResult.data ?? []) as Array<{ provider_id: string }>;
+        privateRows.push(...batch);
+        if (privateForbidden || batch.length < AUDITED_PAGE) break;
+      }
       setPrivateHidden(privateForbidden);
-      const privateById = new Map(((privateResult.data ?? []) as Array<{ provider_id: string }>).map((row) => [row.provider_id, row]));
+      const privateById = new Map(privateRows.map((row) => [row.provider_id, row]));
 
       // Branch and employee figures come from their own views. If either fails nothing is estimated in
       // its place: the screen says so and shows no figures.
+      const readEmployeePages = async () => {
+        const rows: EmployeePerformanceRow[] = [];
+        for (let offset = 0; ; offset += AUDITED_PAGE) {
+          const page = await supabase.rpc("admin_employee_performance_report", { p_provider_id: null, p_purpose: "provider_onboarding", p_limit: AUDITED_PAGE, p_offset: offset });
+          if (page.error) return { data: null, error: page.error };
+          const batch = (page.data ?? []) as EmployeePerformanceRow[];
+          rows.push(...batch);
+          if (batch.length < AUDITED_PAGE) return { data: rows, error: null };
+        }
+      };
       const [branchResult, employeeResult] = await Promise.all([
         supabase.rpc("admin_branch_performance_report"),
-        // GOV-2 (Q4): per-employee figures (earnings come from the ledger) are read through the audited report.
-        supabase.rpc("admin_employee_performance_report", { p_provider_id: null, p_purpose: "provider_onboarding" })
+        // GOV-2 (Q4): per-employee figures (earnings come from the ledger) are read through the audited report, page by page.
+        readEmployeePages()
       ]);
       let branchFigures: Record<string, Tally> | null = null;
       let employeeFigures: Record<string, EmployeeFigures> | null = null;
@@ -771,7 +796,10 @@ export default function AdminProviderManagement() {
       if (failures.length > 0) {
         setMetricsError(failures.join(" · "));
       } else {
-        branchFigures = Object.fromEntries(((branchResult.data ?? []) as BranchPerformanceRow[]).map((row) => [row.branch_id, tallyFromBranchRow(row)]));
+        // SECFIX-2 R2-M3 (D4): a branch whose figures describe 1 to 4 customers comes back withheld; it has no figures here.
+        const branchRows = (branchResult.data ?? []) as BranchPerformanceRow[];
+        setSuppressedBranches(new Set(branchRows.filter((row) => row.suppressed).map((row) => row.branch_id)));
+        branchFigures = Object.fromEntries(branchRows.filter((row) => !row.suppressed).map((row) => [row.branch_id, tallyFromBranchRow(row)]));
         employeeFigures = Object.fromEntries(((employeeResult.data ?? []) as EmployeePerformanceRow[]).map((row) => [row.employee_id, figuresFromEmployeeRow(row)]));
       }
       setProviders(((data ?? []) as unknown as ProviderRow[]).map((row) => normalizeProvider({ ...row, ...(privateById.get(row.id) ?? {}) } as ProviderRow, branchFigures, employeeFigures)));
@@ -1676,7 +1704,7 @@ export default function AdminProviderManagement() {
                     ))}
                   </div>
                 ) : (
-                  <div className="mt-4 rounded-2xl bg-white/5 p-4 text-sm font-semibold text-white/70">{t.metricsUnavailable}</div>
+                  <div className="mt-4 rounded-2xl bg-white/5 p-4 text-sm font-semibold text-white/70">{detail.shops.some((shop) => suppressedBranches.has(shop.id)) ? t.metricsSuppressed : t.metricsUnavailable}</div>
                 )}
                 <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
                   {detail.figures && (
@@ -1771,7 +1799,7 @@ export default function AdminProviderManagement() {
                       ))}
                     </div>
                   ) : (
-                    <div className="mb-5 rounded-xl border border-[#F0F0F0] bg-[#FBFAF7] px-3 py-3 text-xs font-bold text-[#667085]">{t.metricsUnavailable}</div>
+                    <div className="mb-5 rounded-xl border border-[#F0F0F0] bg-[#FBFAF7] px-3 py-3 text-xs font-bold text-[#667085]">{suppressedBranches.has(shop.id) ? t.metricsSuppressed : t.metricsUnavailable}</div>
                   )}
 
                   <div className="grid grid-cols-1 gap-4 xl:grid-cols-[0.9fr_1.1fr]">

@@ -14,7 +14,8 @@ const owner1 = ROLES.user(SEED.owner1);
 const owner2 = ROLES.user(SEED.owner2);
 const customer = ROLES.user(SEED.customer);
 const code = (promise) => promise.then(() => "ok", (error) => error.code ?? error.message);
-const profile = async (user, id = null) => (await as(db, user, `select get_provider_private_profile($1) r`, [id]))[0].r;
+// A console session states its purpose (SECFIX-2 R2-M1); the owner and delegates are not asked for one.
+const profile = async (user, id = null) => (await as(db, user, `select get_provider_private_profile($1, 'provider_onboarding') r`, [id]))[0].r;
 
 before(async () => {
   db = await createMigratedDb();

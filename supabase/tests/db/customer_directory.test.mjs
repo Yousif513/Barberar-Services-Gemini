@@ -104,14 +104,16 @@ describe("customer overview", () => {
     await overview("layla.a@example.com", 10, 20);
     const row = (await auditRows("customers.listed")).at(-1);
     assert.equal(row.actor_id, admin.sub);
-    assert.equal(row.details.searched, true);
-    assert.equal(row.details.limit, 10);
-    assert.equal(row.details.offset, 20);
+    // SECFIX-2 R2-M6: the search is recorded as its SHA-256, with the purpose and the ids of the customers returned.
+    assert.match(row.details.filter.search_sha256, /^[0-9a-f]{64}$/);
+    assert.equal(row.details.filter.limit, 10);
+    assert.equal(row.details.filter.offset, 20);
+    assert.equal(row.details.purpose, "customer_support");
     assert.ok(!JSON.stringify(row.details).includes("layla"), "an email typed into the search box never enters the audit log");
     await overview(null, 1000, -5);
     const clamped = (await auditRows("customers.listed")).at(-1);
-    assert.equal(clamped.details.limit, 100);
-    assert.equal(clamped.details.offset, 0);
+    assert.equal(clamped.details.filter.limit, 100);
+    assert.equal(clamped.details.filter.offset, 0);
   });
 });
 

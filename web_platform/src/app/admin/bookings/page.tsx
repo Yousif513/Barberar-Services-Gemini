@@ -22,6 +22,7 @@ const translations = {
     commShare: "Platform commission",
     status: "Status",
     guest: "Guest",
+    nameHidden: "Name hidden (your role has no personal-data access)",
     independent: "Independent",
     directStaff: "Direct Staff",
     invoiceTitle: "Tax Invoice",
@@ -104,6 +105,7 @@ const translations = {
     commShare: "عمولة المنصة",
     status: "الحالة",
     guest: "زائر",
+    nameHidden: "الاسم مخفي (دورك لا يملك صلاحية البيانات الشخصية)",
     independent: "مستقل",
     directStaff: "أخصائي مباشر",
     invoiceTitle: "فاتورة ضريبية مبسطة",
@@ -236,6 +238,8 @@ function BookingsScreen() {
   const [to, setTo] = useState(() => (DATE_PATTERN.test(params.get("to") ?? "") ? (params.get("to") as string) : ""));
   const [page, setPage] = useState(1);
   const [totals, setTotals] = useState<DirectoryTotals | null>(null);
+  // SECFIX-2 R2-M6: customer names come back only to roles with personal.read.
+  const [namesIncluded, setNamesIncluded] = useState(true);
   useEffect(() => {
     writeUrlState({ status: statusFilter === "all" ? "" : statusFilter, q: search, from, to });
   }, [statusFilter, search, from, to]);
@@ -270,6 +274,8 @@ function BookingsScreen() {
         p_to: to || null,
         p_limit: PAGE_SIZE,
         p_offset: (page - 1) * PAGE_SIZE,
+        // The server records the purpose that matches the console role (customer support, or finance operations for finance).
+        p_purpose: null,
       });
       if (cancelled) return;
       if (error) {
@@ -278,7 +284,8 @@ function BookingsScreen() {
         setLoadError(errorMessage(error));
         setLoadForbidden(isForbidden(error));
       } else {
-        const result = data as { matching: number | string; total_value: number | string; total_commission: number | string; active: number | string; rows: BookingRow[] };
+        const result = data as { matching: number | string; total_value: number | string; total_commission: number | string; active: number | string; rows: BookingRow[]; names_included?: boolean };
+        setNamesIncluded(result.names_included !== false);
         setBookings(result.rows ?? []);
         setTotals({ matching: Number(result.matching), value: Number(result.total_value), commission: Number(result.total_commission), active: Number(result.active) });
         setLoadForbidden(false);
@@ -307,7 +314,8 @@ function BookingsScreen() {
     setSelectedBooking(booking);
   };
 
-  const bookingName = (booking: BookingRow) => `${booking.customer?.first_name || t.guest} ${booking.customer?.last_name || ""}`.trim();
+  const bookingName = (booking: BookingRow) =>
+    !namesIncluded ? t.nameHidden : `${booking.customer?.first_name || t.guest} ${booking.customer?.last_name || ""}`.trim();
   const providerName = (booking: BookingRow) =>
     (lang === "ar"
       ? booking.branches?.providers?.business_name_ar || booking.branches?.providers?.business_name_en

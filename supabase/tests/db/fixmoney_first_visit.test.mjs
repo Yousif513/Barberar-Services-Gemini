@@ -2,6 +2,7 @@
 import { before, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { as, createMigratedDb, createUser, nextWorkingDate, ROLES, SEED, serviceFor, sys } from "./harness.mjs";
+import { setPlatformSetting } from "./gov1_fixtures.mjs";
 
 const owner1 = ROLES.user(SEED.owner1);
 let db;
@@ -59,7 +60,7 @@ describe("M-08: a counter walk-in is not a first visit", () => {
 describe("M-14: walk-ins are not sponsored acquisitions", () => {
   it("a walk-in linked to a customer who clicked a sponsored placement accrues nothing, and the real booking is the new client", async () => {
     const admin = ROLES.user(await createUser(db, { role: "admin" }));
-    const set = (key, value) => as(db, admin, `select admin_update_platform_setting($1, $2::jsonb, 'fixmoney sponsored setup') r`, [key, JSON.stringify(value)]);
+    const set = (key, value) => setPlatformSetting(db, admin, key, value, "fixmoney sponsored setup");
     await set("sponsored.price_per_new_client_sar", 25.5);
     await set("sponsored.max_slots_per_search", 3);
     await set("sponsored.attribution_window_days", 14);

@@ -108,7 +108,10 @@ describe("booking directory", () => {
     assert.equal(rows.length, before + 1);
     const row = rows.at(-1);
     assert.equal(row.actor_id, admin.sub);
-    assert.deepEqual([row.details.searched, row.details.status, row.details.limit, row.details.offset], [true, "completed", 10, 20]);
+    // SECFIX-2 R2-M6: the search is recorded as its SHA-256, with the purpose and the ids of the bookings returned.
+    assert.match(row.details.filter.search_sha256, /^[0-9a-f]{64}$/);
+    assert.deepEqual([row.details.filter.status, row.details.filter.limit, row.details.filter.offset], ["completed", 10, 20]);
+    assert.ok(row.details.purpose);
     assert.ok(!JSON.stringify(row.details).includes("layla"), "an email typed into the search box never enters the audit log");
   });
 });

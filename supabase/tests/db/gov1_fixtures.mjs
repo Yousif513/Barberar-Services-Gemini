@@ -39,3 +39,18 @@ export async function releaseWithApproval(db, maker, payoutId, key, reason, note
   const [done] = await as(db, checker, `select admin_decide_approval($1, 'approve', 'Second approval (four eyes)') r`, [first.r.approval_id]);
   return done.r.result;
 }
+
+// SECFIX-2 R2-L7: the sponsored price changes only with a different owner's approval. Fixtures that set platform settings go
+// through the command and, when it answers pending_approval, a second owner created once per database approves it.
+const settingApprovers = new WeakMap();
+export async function setPlatformSetting(db, maker, key, value, reason = "Fixture setting change") {
+  const [first] = await as(db, maker, `select admin_update_platform_setting($1, $2::jsonb, $3) r`, [key, JSON.stringify(value), reason]);
+  if (first.r?.status !== "pending_approval") return first.r;
+  let checker = settingApprovers.get(db);
+  if (!checker) {
+    checker = ROLES.user(await createUser(db, { role: "admin", adminRole: "owner" }));
+    settingApprovers.set(db, checker);
+  }
+  const [done] = await as(db, checker, `select admin_decide_approval($1, 'approve', 'Second owner confirms the setting') r`, [first.r.approval_id]);
+  return done.r.result;
+}

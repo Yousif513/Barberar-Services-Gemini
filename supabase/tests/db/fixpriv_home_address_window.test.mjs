@@ -9,7 +9,7 @@ let svc;
 let seq = 3;
 const owner1 = ROLES.user(SEED.owner1);
 const customer = ROLES.user(SEED.customer);
-const reveal = async (user, id) => (await as(db, user, `select get_booking_address_secure($1) r`, [id]))[0].r;
+const reveal = async (user, id) => (await as(db, user, `select get_booking_address_secure($1, 'customer_support') r`, [id]))[0].r;
 const vaultRows = async (user, id) => (await as(db, user, `select count(*)::int c from booking_home_addresses where booking_id = $1`, [id]))[0].c;
 const force = async (sql, params) => {
   await db.exec(`alter table bookings disable trigger user`);

@@ -48,7 +48,7 @@ describe("M-5: staff salary IBAN", () => {
 
   it("calculate_staff_payroll returns only the masked number", async () => {
     for (const user of [providerOwner, owner]) {
-      const [row] = await as(db, user, `select calculate_staff_payroll($1, current_date - 30, current_date) r`, [SEED.provider1]);
+      const [row] = await as(db, user, `select calculate_staff_payroll($1, current_date - 30, current_date, 'staff_administration') r`, [SEED.provider1]);
       const entry = row.r.payroll_entries.find((e) => e.employee_id === SEED.employee1);
       assert.equal(entry.wps_iban_masked, "SA** **** **** **** **** 7519");
       assert.equal(entry.wps_iban, undefined);

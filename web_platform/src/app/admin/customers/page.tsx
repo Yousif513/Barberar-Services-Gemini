@@ -311,6 +311,7 @@ function CustomersScreen() {
         p_search: search || null,
         p_limit: PAGE_SIZE,
         p_offset: (page - 1) * PAGE_SIZE,
+        p_purpose: "customer_support",
       });
       if (cancelled) return;
       if (error) {

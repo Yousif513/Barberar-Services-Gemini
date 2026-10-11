@@ -116,9 +116,14 @@ describe("audited reads", () => {
   });
 
   it("admin_branch_performance_report: the branch figures without direct booking reads", async () => {
-    const viaFunction = await as(db, analyst, `select branch_id, total_bookings from admin_branch_performance_report() order by branch_id`);
-    const truth = await sys(db, `select branch_id, total_bookings from admin_branch_performance order by branch_id`);
-    assert.deepEqual(viaFunction, truth);
+    // SECFIX-2 R2-M3: a branch whose figures describe 1 to 4 customers is withheld (D4); the rest match the view.
+    const viaFunction = await as(db, analyst, `select branch_id, total_bookings, suppressed from admin_branch_performance_report() order by branch_id`);
+    const truth = await sys(db, `select p.branch_id, p.total_bookings,
+        (select count(distinct b.customer_id) from bookings b where b.branch_id = p.branch_id and b.customer_id is not null)::int people
+      from admin_branch_performance p order by p.branch_id`);
+    assert.deepEqual(viaFunction.map((r) => [r.branch_id, r.suppressed ? null : r.total_bookings]),
+      truth.map((r) => [r.branch_id, r.people >= 1 && r.people <= 4 ? null : r.total_bookings]));
+    for (const r of viaFunction) assert.equal(r.suppressed, r.total_bookings === null);
     const direct = await as(db, analyst, `select coalesce(sum(total_bookings), 0)::int n from admin_branch_performance`);
     assert.equal(direct[0].n, 0, "the view itself shows a console session nothing (security invoker)");
   });

@@ -298,9 +298,9 @@ describe("customer directory and export record", () => {
     await as(db, admin, `select admin_customer_overview('Bulk_', 10, 20)`);
     const row = (await sys(db, `select actor_id, details from admin_audit_logs where action = 'customers.listed' order by created_at desc limit 1`))[0];
     assert.equal(row.actor_id, admin.sub);
-    assert.equal(row.details.searched, true);
-    assert.equal(row.details.limit, 10);
-    assert.equal(row.details.offset, 20);
+    assert.match(row.details.filter.search_sha256, /^[0-9a-f]{64}$/);
+    assert.equal(row.details.filter.limit, 10);
+    assert.equal(row.details.filter.offset, 20);
     assert.ok(!JSON.stringify(row.details).includes("Bulk_"), "the search term is not copied into the log");
   });
 

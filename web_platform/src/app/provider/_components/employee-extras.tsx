@@ -172,7 +172,9 @@ export function CommissionRulesDialog({ lang, providerId, employeeId, employeeNa
     const { data, error } = await supabase.rpc("reveal_employee_wps_iban", { p_employee_id: employeeId, p_reason: revealReason.trim() });
     setRevealBusy(false);
     if (error) { setRevealError(isReauthRequired(error) ? t.revealReauth : t.revealFailed + errorMessage(error)); return; }
-    const shown = data as { iban: string; expires_at: string };
+    const shown = data as { iban?: string; expires_at?: string; refused?: boolean; message?: string };
+    // SECFIX-2 R2-L2: a console reveal past the shared 24-hour ceiling is answered, not shown.
+    if (shown.refused || !shown.iban || !shown.expires_at) { setRevealError(shown.message || t.revealFailed); return; }
     const until = Math.min(new Date(shown.expires_at).getTime(), Date.now() + 60000);
     setClock(Date.now());
     setRevealed({ iban: shown.iban, until });

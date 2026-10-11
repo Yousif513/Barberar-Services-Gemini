@@ -4,6 +4,7 @@
 import { before, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { as, createMigratedDb, createUser, expectError, ROLES, SEED, serviceFor, sys } from "./harness.mjs";
+import { setPlatformSetting } from "./gov1_fixtures.mjs";
 
 let db;
 let admin;
@@ -28,8 +29,8 @@ let seq = 0;
 let capturedCapped;
 let capturedCappedRows;
 
-const setSetting = (key, value, user = admin) =>
-  as(db, user, `select admin_update_platform_setting($1, $2::jsonb, 'sponsored test setup') r`, [key, JSON.stringify(value)]).then((r) => r[0].r);
+// The sponsored price needs a second owner's approval (SECFIX-2 R2-L7); setPlatformSetting supplies it.
+const setSetting = (key, value, user = admin) => setPlatformSetting(db, user, key, value, "sponsored test setup");
 const configure = async ({ price = PRICE, slots = 3, window = 14 } = {}) => {
   await setSetting("sponsored.price_per_new_client_sar", price);
   await setSetting("sponsored.max_slots_per_search", slots);

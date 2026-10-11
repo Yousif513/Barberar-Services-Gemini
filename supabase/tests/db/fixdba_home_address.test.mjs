@@ -13,7 +13,8 @@ const owner2 = ROLES.user(SEED.owner2);
 const customer = ROLES.user(SEED.customer);
 const code = (promise) => promise.then(() => "ok", (error) => error.code ?? error.message);
 const vaultRows = async (user, id) => (await as(db, user, `select count(*)::int c from booking_home_addresses where booking_id = $1`, [id]))[0].c;
-const reveal = async (user, id) => (await as(db, user, `select get_booking_address_secure($1) r`, [id]))[0].r;
+// A console session states its purpose (SECFIX-2 R2-M7); customers and staff are not asked for one.
+const reveal = async (user, id) => (await as(db, user, `select get_booking_address_secure($1, 'customer_support') r`, [id]))[0].r;
 
 before(async () => {
   db = await createMigratedDb();
