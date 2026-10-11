@@ -57,6 +57,10 @@ const translations = {
     webhooks: "Webhooks",
     systemLogs: "System Logs",
     auditLogs: "Audit Logs",
+    privacyCompliance: "Privacy & Compliance",
+    privacy: "Privacy Requests",
+    incidents: "Incident Register",
+    ropa: "Processing Register",
     settings: "Settings",
     logout: "Log Out",
     adminAccount: "Administrator",
@@ -121,6 +125,10 @@ const translations = {
     webhooks: "تنبيهات الويب هوك",
     systemLogs: "سجلات النظام",
     auditLogs: "سجلات التدقيق",
+    privacyCompliance: "الخصوصية والامتثال",
+    privacy: "طلبات الخصوصية",
+    incidents: "سجل الحوادث",
+    ropa: "سجل أنشطة المعالجة",
     settings: "الإعدادات العامة",
     logout: "تسجيل الخروج",
     adminAccount: "حساب المشرف",
@@ -205,6 +213,12 @@ const getNavIcon = (nameKey: string) => {
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>;
     case "systemLogs":
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>;
+    case "privacy":
+      return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" /></svg>;
+    case "incidents":
+      return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>;
+    case "ropa":
+      return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h10M4 18h7" /></svg>;
     case "auditLogs":
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>;
     case "platformRules":
@@ -392,6 +406,14 @@ export default function AdminLayout({
         { nameKey: "coupons", path: "/admin/coupons" },
         { nameKey: "roles", path: "/admin/roles" },
         { nameKey: "platformRules", path: "/admin/platform-rules" }
+      ]
+    },
+    {
+      titleKey: "privacyCompliance",
+      items: [
+        { nameKey: "privacy", path: "/admin/privacy" },
+        { nameKey: "incidents", path: "/admin/incidents" },
+        { nameKey: "ropa", path: "/admin/ropa" }
       ]
     },
     {

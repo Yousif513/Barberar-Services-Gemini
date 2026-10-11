@@ -53,9 +53,12 @@ describe("intake screens", () => {
   it("call only commands the migrations create", () => {
     const used = Object.values(files).flatMap((f) => [...f.matchAll(/\.rpc\("([a-z_]+)"/g)].map((m) => m[1]));
     const own = [...new Set(used)].sort();
-    assert.deepEqual(own, ["clear_patch_test_block", "delete_booking_intake", "get_booking_intake", "read_booking_intake_answers", "record_consent", "record_patch_test",
+    // PRIV-4 (Q2.6, X3(6)): the collection gate notice and the reuse of earlier answers under the separate 12-month consent.
+    assert.deepEqual(own, ["clear_patch_test_block", "delete_booking_intake", "get_booking_intake", "get_reusable_intake_answers", "health_intake_collection_status",
+      "read_booking_intake_answers", "record_consent", "record_patch_test",
       "remove_service_intake_requirement", "save_intake_template", "set_provider_intake_enforcement", "set_service_intake_requirement", "submit_booking_intake", "withdraw_health_data_consent"]);
-    for (const name of own.filter((n) => n !== "record_consent")) assert.ok(migration.includes(`FUNCTION public.${name}(`), name);
+    const priv = readFileSync(new URL("../../supabase/migrations/20261011230000_priv_health_intake.sql", import.meta.url), "utf8");
+    for (const name of own.filter((n) => n !== "record_consent")) assert.ok(migration.includes(`FUNCTION public.${name}(`) || priv.includes(`FUNCTION public.${name}(`), name);
   });
 
   it("ask for the health-data consent through the consent command before saving answers", () => {

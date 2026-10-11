@@ -21,7 +21,8 @@ type Status = (typeof STATUSES)[number];
 type Numeric = number | string | null;
 type ApprovalRow = {
   id: string;
-  kind: "payout_release" | "refund" | "iban_change" | "setting_change" | "ledger_settlement" | "ledger_adjustment" | "fee_rule_change" | "payout_hold" | "reward_program" | "role_change" | "booking_cancellation" | "reconciliation_import" | "sponsored_price_change";
+  kind: "payout_release" | "refund" | "iban_change" | "setting_change" | "ledger_settlement" | "ledger_adjustment" | "fee_rule_change" | "payout_hold" | "reward_program" | "role_change" | "booking_cancellation" | "reconciliation_import" | "sponsored_price_change"
+    | "privacy_export" | "privacy_deletion" | "privacy_legal_hold";
   status: string;
   target_id: string | null;
   amount_sar: Numeric;
@@ -78,7 +79,11 @@ const translations = {
       ledger_settlement: "Manual ledger settlement", ledger_adjustment: "Ledger correction", fee_rule_change: "Fee rule change",
       payout_hold: "Payout hold", reward_program: "Reward programme change", role_change: "Console role grant",
       booking_cancellation: "Booking cancellation with refund", reconciliation_import: "Reconciliation file import",
-      sponsored_price_change: "Sponsored price per new client" },
+      sponsored_price_change: "Sponsored price per new client",
+      privacy_export: "Release of a customer's data copy", privacy_deletion: "Customer data deletion", privacy_legal_hold: "Legal hold on customer data" },
+    privacyTypes: { access: "access", copy: "copy", deletion: "deletion" } as Record<string, string>,
+    privacyPreview: "{p} bookings pseudonymised, {d} deleted, {m} messages, {h} health answers",
+    privacyFollowUp: "Approved. The next step did not run yet ({reason}); open Privacy Requests to run it again.",
     consoleRoles: { owner: "Owner", finance: "Finance", operations: "Operations", analyst: "Analyst (read-only)" } as Record<string, string>,
     noConsoleRole: "No console role",
     breakGlassClosedUntil: "Break-glass closed until {date}: an administrator who could approve this was demoted or removed",
@@ -193,7 +198,11 @@ const translations = {
       ledger_settlement: "تسوية قيد يدوية", ledger_adjustment: "تصحيح قيد", fee_rule_change: "تغيير قاعدة رسوم",
       payout_hold: "إيقاف التحويلات", reward_program: "تغيير برنامج مكافآت", role_change: "منح دور في لوحة الإدارة",
       booking_cancellation: "إلغاء حجز مع استرداد", reconciliation_import: "استيراد ملف تسوية",
-      sponsored_price_change: "سعر الإعلان لكل عميل جديد" },
+      sponsored_price_change: "سعر الإعلان لكل عميل جديد",
+      privacy_export: "تسليم نسخة من بيانات عميل", privacy_deletion: "حذف بيانات عميل", privacy_legal_hold: "حجز قانوني على بيانات عميل" },
+    privacyTypes: { access: "اطلاع", copy: "نسخة", deletion: "حذف" } as Record<string, string>,
+    privacyPreview: "{p} حجوزات بلا هوية، {d} محذوفة، {m} رسائل، {h} إجابات صحية",
+    privacyFollowUp: "تم الاعتماد. لم تُنفَّذ الخطوة التالية بعد ({reason})؛ افتح طلبات الخصوصية لإعادة تشغيلها.",
     consoleRoles: { owner: "المالك", finance: "المالية", operations: "العمليات", analyst: "محلل (قراءة فقط)" } as Record<string, string>,
     noConsoleRole: "بلا دور في لوحة الإدارة",
     breakGlassClosedUntil: "إجراء الطوارئ مغلق حتى {date}: خُفّض دور مسؤول كان يمكنه الاعتماد أو أُزيل",
@@ -391,6 +400,17 @@ function ApprovalsScreen() {
     if (row.kind === "payout_hold") {
       return [providerName(row), s.action === "lift" ? d.lift : d.place].filter(Boolean).join(" · ");
     }
+    if (row.kind === "privacy_export" || row.kind === "privacy_deletion") {
+      const p = (s.preview ?? {}) as Record<string, unknown>;
+      return [t.privacyTypes[text(s.request_type)] ?? text(s.request_type), `${text(s.subject_id).slice(0, 8)}`,
+        row.kind === "privacy_deletion" ? t.privacyPreview.replace("{p}", text(p.bookings_to_pseudonymise)).replace("{d}", text(p.bookings_to_delete))
+          .replace("{m}", text(p.messages)).replace("{h}", text(p.health_answers)) : "",
+        s.deadline_at ? operationsDate(text(s.deadline_at), lang) : ""].filter(Boolean).join(" · ");
+    }
+    if (row.kind === "privacy_legal_hold") {
+      const cats = Array.isArray(s.categories) ? (s.categories as string[]).join(", ") : "";
+      return [text(s.basis).replace("_", " "), text(s.case_reference), cats].filter(Boolean).join(" · ");
+    }
     if (row.kind === "sponsored_price_change") {
       const price = (value: unknown) => (value === null || value === undefined ? "—" : sar(toNumber(value as Numeric), lang));
       return `${price(s.value_before)} → ${price(s.value)}`;
@@ -416,7 +436,15 @@ function ApprovalsScreen() {
 
   const decide = async (row: ApprovalRow, decision: "approve" | "reject", reason: string): Promise<string | null> => {
     const { error } = await supabase.rpc("admin_decide_approval", { p_request_id: row.id, p_decision: decision, p_reason: reason });
-    return error ? errorMessage(error) : null;
+    if (error) return errorMessage(error);
+    // PRIV: an approved copy is built and an approved deletion's auth account removed right away by the Edge Functions (the
+    // scheduler retries them too). A failure here leaves the approval done and the next step visible on the privacy screen.
+    if (decision === "approve" && (row.kind === "privacy_export" || row.kind === "privacy_deletion")) {
+      const { error: followUp } = await supabase.functions.invoke(row.kind === "privacy_export" ? "privacy-export" : "privacy-erase-account",
+        { body: row.kind === "privacy_export" ? { request_id: row.target_id } : {} });
+      if (followUp) setFailure(t.privacyFollowUp.replace("{reason}", errorMessage(followUp)));
+    }
+    return null;
   };
 
   const confirmDialog = async (reason: string, extra: string): Promise<string | null> => {
