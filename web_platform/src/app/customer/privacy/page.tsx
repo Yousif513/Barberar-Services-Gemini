@@ -95,6 +95,13 @@ export default function CustomerPrivacy() {
   const [reuse, setReuse] = useState<{ active: boolean; until: string | null } | null>(null);
 
   const load = useCallback(() => setReload((k) => k + 1), []);
+  // The code step opens above the form; bring it into view and put the focus on it.
+  useEffect(() => {
+    if (!pending) return;
+    const panel = document.getElementById("verify-panel");
+    panel?.scrollIntoView({ behavior: "smooth", block: "center" });
+    panel?.querySelector<HTMLElement>("button, input")?.focus();
+  }, [pending, codeSent]);
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -190,7 +197,7 @@ export default function CustomerPrivacy() {
       {message.success && <div role="status" className="rounded-xl border border-emerald-300 bg-emerald-50 p-3 text-sm font-semibold text-emerald-800">{message.success}</div>}
 
       {pending && (
-        <section aria-labelledby="verify-title" className="space-y-3 rounded-2xl border border-[#A57C32]/40 bg-[#FBF7EA] p-5">
+        <section id="verify-panel" aria-labelledby="verify-title" className="space-y-3 rounded-2xl border border-[#A57C32]/40 bg-[#FBF7EA] p-5">
           <h2 id="verify-title" className="font-serif text-lg font-black text-stone-900">{t.verifyTitle}</h2>
           {destination ? <p className="text-sm text-stone-700">{fill(t.verifyBody, { dest: destination })}</p> : <p className="text-sm text-red-800">{t.noContact}</p>}
           {destination && !codeSent && <button type="button" disabled={busy} onClick={() => void sendCode()} className={button}>{t.sendCode}</button>}
