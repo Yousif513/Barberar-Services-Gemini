@@ -33,6 +33,12 @@ try {
     CREATE FUNCTION auth.jwt() RETURNS jsonb LANGUAGE sql STABLE AS $$ SELECT COALESCE(NULLIF(current_setting('request.jwt.claims',true),'')::jsonb,'{}') $$;
     CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT NULLIF(auth.jwt()->>'sub','')::uuid $$;
     CREATE FUNCTION auth.role() RETURNS text LANGUAGE sql STABLE AS $$ SELECT auth.jwt()->>'role' $$;
+    -- The Auth tables the governance commands touch (MFA factors and sessions), as in supabase/tests/db/harness.mjs.
+    CREATE TABLE auth.mfa_factors(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),user_id uuid NOT NULL,friendly_name text,
+      factor_type text NOT NULL DEFAULT 'totp',status text NOT NULL DEFAULT 'verified',created_at timestamptz NOT NULL DEFAULT now(),
+      updated_at timestamptz NOT NULL DEFAULT now());
+    CREATE TABLE auth.sessions(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),user_id uuid NOT NULL,created_at timestamptz DEFAULT now(),
+      updated_at timestamptz DEFAULT now(),not_after timestamptz);
     GRANT USAGE ON SCHEMA auth TO anon,authenticated,service_role;
     GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA auth TO anon,authenticated,service_role;
     ALTER DATABASE postgres SET search_path TO "$user",public,extensions;
@@ -40,7 +46,8 @@ try {
   `);
   const additions = ['20261005060000_enterprise_inventory_and_supply.sql', '20261005070000_inventory_controls_and_chain_operations.sql'];
   const migrations = paths.map(path => ({ path, sql: execFileSync('git', ['show', `${ref}:${path}`], { encoding: 'utf8', maxBuffer: 4 * 1024 * 1024 }) }));
-  for (const name of additions) migrations.push({ path: name, sql: readFileSync(new URL(`../supabase/migrations/${name}`, import.meta.url), 'utf8') });
+  // Once the P3 migrations are part of the ref's own chain (they are on claude-code and master now), they are not applied twice.
+  for (const name of additions.filter(name => !paths.some(path => path.endsWith(`/${name}`)))) migrations.push({ path: name, sql: readFileSync(new URL(`../supabase/migrations/${name}`, import.meta.url), 'utf8') });
   for (const migration of migrations) {
     try { await db.exec('BEGIN'); await db.exec(migration.sql); await db.exec('COMMIT'); }
     catch (error) { await db.exec('ROLLBACK'); throw new Error(`${migration.path}: ${error.message}`); }
