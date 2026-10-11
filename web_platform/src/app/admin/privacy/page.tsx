@@ -7,6 +7,8 @@ import { errorMessage } from "@/lib/error-message";
 import { CommandResult, ForbiddenNotice, isForbidden, operationsButton, operationsDate, operationsInput, useOperationsLocale } from "@/components/operations-ui";
 import { CommandDialog } from "@/components/modal";
 import { writeUrlState } from "@/lib/url-state";
+import { knownToHold, useConsoleSession } from "@/lib/console-session";
+import { CustomerPicker, type PickedCustomer } from "./customer-picker";
 
 // Privacy requests, legal holds, the deletion ledger and the health-intake collection gate (PRIV package; Q1, Q2, Q2.6, X3(6) of
 // docs/legal/2026-10-10-privacy-decision-memo.md). Every read goes through an audited server function and every change through a
@@ -66,7 +68,7 @@ const copy = {
     correctionIntro: "The new value replaces the contested one, every business the customer booked with is notified, and the customer is told.",
     correctionReason: "How the correction was checked (at least 10 characters)", done: "Done.",
     preview: "{p} bookings pseudonymised and kept 10 years with their invoices, {d} bookings deleted, {m} messages deleted, {h} health answers destroyed, {c} consents and {f} favourites deleted. Open disputes: {o}. Wallet balance: {w} SAR, unused package sessions: {s}.",
-    logTitle: "Log a request received outside the app", subjectId: "Customer ID (from Customers)", type: "Type", channel: "Channel", receivedAt: "Received at (Riyadh time)",
+    logTitle: "Log a request received outside the app", type: "Type", channel: "Channel", receivedAt: "Received at (Riyadh time)",
     whatAsked: "What the customer asked (10 to 2000 characters)", field: "Detail to correct", newValue: "Correct value", purposesLabel: "Consents to withdraw",
     logSubmit: "Log the request", logged: "Logged. The customer was asked to confirm it in the app.",
     fields: { first_name: "First name", last_name: "Last name", gender: "Gender" } as Record<string, string>,
@@ -86,58 +88,79 @@ const copy = {
     gateForm: "Record the approved transfer risk assessment (owner)", docRef: "Signed document reference", approvedOn: "Approval date", signedBy: "Signed by", gateNotes: "Notes (optional)",
     gateSubmit: "Record and switch collection on", revoke: "Switch collection off", revokeTitle: "Switch health-intake collection off", revokeReason: "Reason (at least 10 characters)",
     never: "—",
+    v: {
+      subject: "Find and choose the customer first.", details: "Describe what the customer asked in 10 to 2000 characters ({count} now).",
+      value: "Enter the correct value.", purposes: "Tick at least one consent to withdraw.", min: "Write at least {n} characters ({count} now).",
+      booking: "Enter the disputed booking's ID: 36 characters, as shown on the booking.", received: "Enter when it actually arrived, within the last 30 days and not in the future.",
+      date: "Enter the approval date.", categories: "Tick at least one thing the case needs.", fix: "Check the highlighted fields.",
+    },
   },
   ar: {
     title: "طلبات الخصوصية",
-    subtitle: "طلبات العملاء وفق نظام حماية البيانات الشخصية: 30 يوماً من الاستلام، وتمديد واحد حتى 30 يوماً يُبلَّغ قبل اليوم 30، ومجاناً. لا تُنفَّذ النسخة أو الحذف أو الحجز القانوني إلا بعد اعتماد مالك آخر.",
+    subtitle: "طلبات العملاء وفق نظام حماية البيانات الشخصية: ٣٠ يوماً من الاستلام، وتمديد واحد حتى ٣٠ يوماً يُبلَّغ قبل اليوم ٣٠، ومجاناً. لا تُنفَّذ النسخة أو الحذف أو الحجز القانوني إلا بعد اعتماد مالك آخر.",
     tabs: { requests: "الطلبات", holds: "الحجز القانوني", ledger: "سجل الحذف والاستبيان الصحي" },
     open: "مفتوحة", closed: "مغلقة", view: "عرض",
     types: { access: "اطلاع", copy: "نسخة", correction: "تصحيح", deletion: "حذف", consent_withdrawal: "سحب موافقة" } as Record<string, string>,
     statuses: { awaiting_verification: "بانتظار تأكيد العميل", open: "مفتوح", awaiting_approval: "بانتظار الاعتماد", executing: "قيد التنفيذ", completed: "مكتمل", refused: "مرفوض", withdrawn: "مسحوب" } as Record<string, string>,
     channels: { in_app: "داخل التطبيق", email: "البريد", phone: "الهاتف", in_person: "حضورياً" } as Record<string, string>,
-    escalation: { past_internal_target: "تجاوز هدف 15 يوماً", day_20: "تصعيد: اليوم 20", day_28: "تصعيد: اليوم 28", overdue: "متأخر" } as Record<string, string>,
+    escalation: { past_internal_target: "تجاوز هدف ١٥ يوماً", day_20: "تصعيد: اليوم ٢٠", day_28: "تصعيد: اليوم ٢٨", overdue: "متأخر" } as Record<string, string>,
     cols: ["الطلب", "العميل", "القناة", "الاستلام", "الموعد النهائي", "الحالة", ""],
     loading: "جارٍ التحميل…", loadFailed: "تعذّر تحميل طلبات الخصوصية: {reason}", retry: "إعادة المحاولة",
     emptyOpen: "لا توجد طلبات خصوصية مفتوحة.", emptyClosed: "لا توجد طلبات مغلقة بعد.",
-    escalate: "تشغيل فحص اليوم 20 / 28 الآن", escalated: "تم الفحص: {a} عند اليوم 20 و{b} عند اليوم 28.",
+    escalate: "تشغيل فحص اليوم ٢٠ / ٢٨ الآن", escalated: "تم الفحص: {a} عند اليوم ٢٠ و{b} عند اليوم ٢٨.",
     detailTitle: "الطلب {id}", received: "الاستلام", verified: "تأكيد الهوية", notVerified: "لم يؤكَّد بعد: لا يُسلَّم أو يُحذف شيء قبل تأكيد العميل برمز لمرة واحدة داخل التطبيق.",
     deadline: "الموعد النهائي", extended: "مُدِّد مرة واحدة", extensionReason: "سبب التمديد", details: "ما طلبه العميل", notes: "ملاحظات الفريق", history: "السجل",
     correction: "التصحيح المطلوب", reviewChoice: "التقييمات", reviewChoices: { delete_text: "حذف نص التقييم", deleted_user: "الإبقاء باسم «مستخدم محذوف»" } as Record<string, string>,
     purposes: "الموافقات المطلوب سحبها", restricted: "حقل موقوف عن المعالجة", summary: "النتيجة", decision: "القرار",
     addNote: "إضافة ملاحظة", propose: "اقتراح للاعتماد", completeCorrection: "إتمام التصحيح", buildCopy: "إنشاء النسخة الآن", eraseAccount: "حذف حساب الدخول الآن",
-    extendTitle: "تمديد مرة واحدة (قبل اليوم 30)", extendReason: "السبب الذي سيقرؤه العميل (20 حرفاً على الأقل)", extendSubmit: "تمديد حتى 30 يوماً",
+    extendTitle: "تمديد مرة واحدة (قبل اليوم ٣٠)", extendReason: "السبب الذي سيقرؤه العميل (٢٠ حرفاً على الأقل)", extendSubmit: "تمديد حتى ٣٠ يوماً",
     extendCodes: { disproportionate_effort: "جهد غير متناسب", multiple_requests: "طلبات متعددة من الشخص نفسه" } as Record<string, string>,
-    refuseTitle: "رفض", refuseReason: "السبب الذي سيقرؤه العميل مع حقه في الشكوى إلى سدايا (20 حرفاً على الأقل)", refuseSubmit: "رفض الطلب",
+    refuseTitle: "رفض", refuseReason: "السبب الذي سيقرؤه العميل مع حقه في الشكوى إلى سدايا (٢٠ حرفاً على الأقل)", refuseSubmit: "رفض الطلب",
     refuseCodes: { repetitive: "متكرر", manifestly_unfounded: "لا أساس له بوضوح", disproportionate: "غير متناسب" } as Record<string, string>,
     noteLabel: "ملاحظة (تُحفظ مع الطلب وفي سجل التدقيق)", proposeTitle: "اقتراح {type} للاعتماد",
     proposeIntro: "يعتمده مالك آخر من شاشة الاعتمادات؛ لا يمكنك اعتماد اقتراحك. يؤكد كلاكما برمز جديد من تطبيق المصادقة.",
-    proposeReason: "ما الذي تحققت منه (10 أحرف على الأقل)", deletionEffects: "ما الذي يفعله الحذف", correctionTitle: "إتمام التصحيح",
+    proposeReason: "ما الذي تحققت منه (١٠ أحرف على الأقل)", deletionEffects: "ما الذي يفعله الحذف", correctionTitle: "إتمام التصحيح",
     correctionIntro: "تحل القيمة الجديدة محل القيمة المعترض عليها، وتُبلَّغ كل منشأة حجز لديها العميل، ويُبلَّغ العميل.",
-    correctionReason: "كيف تم التحقق من التصحيح (10 أحرف على الأقل)", done: "تم.",
-    preview: "{p} حجوزات تُزال منها الهوية وتُحفظ 10 سنوات مع فواتيرها، {d} حجوزات تُحذف، {m} رسائل تُحذف، {h} إجابات صحية تُتلف، {c} موافقات و{f} مفضلة تُحذف. نزاعات مفتوحة: {o}. رصيد المحفظة: {w} ريال، جلسات باقات غير مستخدمة: {s}.",
-    logTitle: "تسجيل طلب ورد خارج التطبيق", subjectId: "معرّف العميل (من شاشة العملاء)", type: "النوع", channel: "القناة", receivedAt: "وقت الاستلام (بتوقيت الرياض)",
-    whatAsked: "ما طلبه العميل (10 إلى 2000 حرف)", field: "البيان المطلوب تصحيحه", newValue: "القيمة الصحيحة", purposesLabel: "الموافقات المطلوب سحبها",
+    correctionReason: "كيف تم التحقق من التصحيح (١٠ أحرف على الأقل)", done: "تم.",
+    preview: "{p} حجوزات تُزال منها الهوية وتُحفظ ١٠ سنوات مع فواتيرها، {d} حجوزات تُحذف، {m} رسائل تُحذف، {h} إجابات صحية تُتلف، {c} موافقات و{f} مفضلة تُحذف. نزاعات مفتوحة: {o}. رصيد المحفظة: {w} ريال، جلسات باقات غير مستخدمة: {s}.",
+    logTitle: "تسجيل طلب ورد خارج التطبيق", type: "النوع", channel: "القناة", receivedAt: "وقت الاستلام (بتوقيت الرياض)",
+    whatAsked: "ما طلبه العميل (١٠ إلى ٢٠٠٠ حرف)", field: "البيان المطلوب تصحيحه", newValue: "القيمة الصحيحة", purposesLabel: "الموافقات المطلوب سحبها",
     logSubmit: "تسجيل الطلب", logged: "تم التسجيل. طُلب من العميل تأكيده داخل التطبيق.",
     fields: { first_name: "الاسم الأول", last_name: "اسم العائلة", gender: "الجنس" } as Record<string, string>,
     purposeNames: { whatsapp: "واتساب", marketing: "التسويق", photos_portfolio: "الصور في المعرض", data_processing: "معالجة البيانات", health_data: "البيانات الصحية", health_data_reuse: "إعادة استخدام البيانات الصحية" } as Record<string, string>,
-    holdsActive: "سارية", holdsPending: "بانتظار الاعتماد", holdsClosed: "مرفوعة أو مسحوبة", reviewOverdue: "{n} حجوزات تجاوزت مراجعة 90 يوماً.",
+    holdsActive: "سارية", holdsPending: "بانتظار الاعتماد", holdsClosed: "مرفوعة أو مسحوبة", reviewOverdue: "{n} حجوزات تجاوزت مراجعة ٩٠ يوماً.",
     holdCols: ["الأساس", "المرجع", "العميل", "المحجوز", "موعد المراجعة", ""], basis: { court_case: "قضية أمام القضاء", payment_dispute: "نزاع دفع" } as Record<string, string>,
-    keep: "إبقاء (مراجعة بعد 90 يوماً)", release: "رفع الحجز", releaseDue: "رفع حجوزات النزاعات بعد 30 يوماً من إغلاقها",
-    reviewTitleKeep: "إبقاء هذا الحجز", reviewTitleRelease: "رفع هذا الحجز", reviewReason: "نتيجة المراجعة (20 حرفاً على الأقل)",
+    keep: "إبقاء (مراجعة بعد ٩٠ يوماً)", release: "رفع الحجز", releaseDue: "رفع حجوزات النزاعات بعد ٣٠ يوماً من إغلاقها",
+    reviewTitleKeep: "إبقاء هذا الحجز", reviewTitleRelease: "رفع هذا الحجز", reviewReason: "نتيجة المراجعة (٢٠ حرفاً على الأقل)",
     holdForm: "اقتراح حجز قانوني", holdBasis: "الأساس", holdReference: "مرجع القضية أو النزاع", holdCategories: "ما تحتاجه القضية (لا تشمل البيانات الصحية أبداً)",
-    holdBooking: "معرّف الحجز محل النزاع", holdReason: "السبب (20 حرفاً على الأقل)", holdAccountReason: "لماذا تحتاج القضية الحساب نفسه: الملف وبيانات التواصل وتسجيل الدخول (20 حرفاً على الأقل)", holdSubmit: "اقتراح الحجز",
+    holdBooking: "معرّف الحجز محل النزاع", holdReason: "السبب (٢٠ حرفاً على الأقل)", holdAccountReason: "لماذا تحتاج القضية الحساب نفسه: الملف وبيانات التواصل وتسجيل الدخول (٢٠ حرفاً على الأقل)", holdSubmit: "اقتراح الحجز",
     categories: { account: "الحساب", reviews: "التقييمات", messages: "الرسائل", bookings: "الحجوزات" } as Record<string, string>,
     emptyHolds: "لا توجد حجوزات في هذه القائمة.", released: "رُفع: {n}.",
     ledgerTitle: "سجل الحذف", ledgerEntries: "العملاء المحذوفون المسجلون", authPending: "حسابات دخول بانتظار الحذف", lastErased: "آخر حذف", lastReapplied: "آخر إعادة تطبيق",
     ledgerNote: "استعادة قاعدة البيانات تعيد هذا السجل إلى الوراء أيضاً. نزّله بعد كل حذف واحفظه خارج قاعدة البيانات مع بصمة SHA-256، وبعد أي استعادة يُستورد الأرشيف بمفتاح الخدمة (privacy_import_deletion_archive) ثم يُعاد تطبيقه من هنا.",
     download: "تنزيل السجل (JSON)", reapply: "إعادة تطبيق السجل الآن", reapplied: "أُعيد التطبيق: حُذف {n} عملاء مجدداً؛ {a} حسابات دخول بانتظار الحذف.",
-    gateTitle: "جمع الاستبيان الصحي", gateOff: "الجمع متوقف حتى يسجل المالك اعتماد تقييم مخاطر النقل (البند 6 من X3).", gateOn: "الجمع مفعّل. تقييم معتمد بتاريخ {date}.",
+    gateTitle: "جمع الاستبيان الصحي", gateOff: "الجمع متوقف حتى يسجل المالك اعتماد تقييم مخاطر النقل (البند ٦ من X3).", gateOn: "الجمع مفعّل. تقييم معتمد بتاريخ {date}.",
     gateForm: "تسجيل اعتماد تقييم مخاطر النقل (المالك)", docRef: "مرجع الوثيقة الموقعة", approvedOn: "تاريخ الاعتماد", signedBy: "الموقّع", gateNotes: "ملاحظات (اختياري)",
-    gateSubmit: "التسجيل وتفعيل الجمع", revoke: "إيقاف الجمع", revokeTitle: "إيقاف جمع الاستبيان الصحي", revokeReason: "السبب (10 أحرف على الأقل)",
+    gateSubmit: "التسجيل وتفعيل الجمع", revoke: "إيقاف الجمع", revokeTitle: "إيقاف جمع الاستبيان الصحي", revokeReason: "السبب (١٠ أحرف على الأقل)",
     never: "—",
+    v: {
+      subject: "ابحث عن العميل واختره أولاً.", details: "صف ما طلبه العميل في ١٠ إلى ٢٠٠٠ حرف (الآن {count}).",
+      value: "أدخل القيمة الصحيحة.", purposes: "ضع علامة على موافقة واحدة على الأقل لسحبها.", min: "اكتب {n} حرفاً على الأقل (الآن {count}).",
+      booking: "أدخل معرّف الحجز محل النزاع: ٣٦ حرفاً كما يظهر في الحجز.", received: "أدخل وقت وصول الطلب فعلاً، خلال آخر ٣٠ يوماً وليس في المستقبل.",
+      date: "أدخل تاريخ الاعتماد.", categories: "ضع علامة على عنصر واحد على الأقل تحتاجه القضية.", fix: "راجع الحقول المحددة.",
+    },
   },
 };
 type T = typeof copy.en;
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+// Counts in validation messages follow the page's numerals.
+const num = (n: number, lang: "en" | "ar") => new Intl.NumberFormat(lang === "ar" ? "ar-SA" : "en-US").format(n);
+const minMessage = (t: T, lang: "en" | "ar", n: number, text: string) => fill(t.v.min, { n: num(n, lang), count: num(text.trim().length, lang) });
+function FieldError({ id, text }: { id: string; text?: string }) {
+  return text ? <span id={id} className="mt-1 block text-[11px] font-black text-[#B42318]">{text}</span> : null;
+}
+// Moves focus to the first field the form marked invalid, so a keyboard user lands where the problem is.
+const focusFirstInvalid = (form: HTMLFormElement | null) => window.setTimeout(() => form?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(), 0);
 const fill = (s: string, v: Record<string, string | number>) => Object.entries(v).reduce((acc, [k, x]) => acc.split(`{${k}}`).join(String(x)), s);
 const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928]";
 const small = `whitespace-nowrap rounded-lg border px-2.5 py-1.5 text-[11px] font-black disabled:opacity-50 ${focusRing}`;
@@ -184,6 +207,7 @@ type TabProps = { t: T; lang: "en" | "ar"; setNotice: (n: { error?: string; succ
 type Rpc = PromiseLike<{ data: unknown; error: unknown }>;
 
 function RequestsTab({ t, lang, setNotice }: TabProps) {
+  const canManage = knownToHold(useConsoleSession(), ["privacy.manage"]);
   const [state, setState] = useState<"open" | "closed">("open");
   const [rows, setRows] = useState<PrivacyRequest[] | null>(null);
   const [total, setTotal] = useState(0);
@@ -233,7 +257,7 @@ function RequestsTab({ t, lang, setNotice }: TabProps) {
   const escalate = async () => {
     const { data, error } = await supabase.rpc("privacy_escalate_requests");
     if (error) setNotice({ error: errorMessage(error) });
-    else { const d = data as { day_20: number; day_28: number }; setNotice({ success: fill(t.escalated, { a: d.day_20, b: d.day_28 }) }); refresh(); }
+    else { const d = data as { day_20: number; day_28: number }; setNotice({ success: fill(t.escalated, { a: num(d.day_20, lang), b: num(d.day_28, lang) }) }); refresh(); }
   };
   const name = (r: PrivacyRequest) => [r.subject?.first_name, r.subject?.last_name].filter(Boolean).join(" ") || r.subject_id.slice(0, 8);
   const forbidden = loadError && isForbidden(loadError);
@@ -244,10 +268,10 @@ function RequestsTab({ t, lang, setNotice }: TabProps) {
         <div role="group" className="flex rounded-xl border border-gray-200 bg-gray-50 p-1 text-xs font-bold">
           {(["open", "closed"] as const).map((v) => (
             <button key={v} type="button" aria-pressed={state === v} onClick={() => { setState(v); setSelected(null); }}
-              className={`rounded-lg px-3 py-1.5 ${focusRing} ${state === v ? "bg-white shadow-sm" : "text-gray-500"}`}>{t[v]}{state === v && rows ? ` (${total})` : ""}</button>
+              className={`rounded-lg px-3 py-1.5 ${focusRing} ${state === v ? "bg-white shadow-sm" : "text-gray-500"}`}>{t[v]}{state === v && rows ? ` (${num(total, lang)})` : ""}</button>
           ))}
         </div>
-        <button type="button" onClick={() => void escalate()} className={operationsButton}>{t.escalate}</button>
+        {canManage && <button type="button" onClick={() => void escalate()} className={operationsButton}>{t.escalate}</button>}
       </div>
 
       {forbidden ? <ForbiddenNotice locale={lang} /> : loadError ? (
@@ -291,9 +315,9 @@ function RequestsTab({ t, lang, setNotice }: TabProps) {
       {dialog && dialog.kind === "propose" && (
         <CommandDialog locale={lang} tone={dialog.request.request_type === "deletion" ? "danger" : "default"}
           title={fill(t.proposeTitle, { type: t.types[dialog.request.request_type] })} intro={t.proposeIntro}
-          facts={[{ label: t.cols[1], value: dialog.request.subject_id }, { label: t.deadline, value: operationsDate(dialog.request.deadline_at, lang) }]}
+          facts={[{ label: t.cols[1], value: name(dialog.request) }, { label: t.deadline, value: operationsDate(dialog.request.deadline_at, lang) }]}
           effectsTitle={dialog.request.request_type === "deletion" ? t.deletionEffects : undefined}
-          effects={dialog.request.request_type === "deletion" && preview ? [previewText(t, preview)] : []}
+          effects={dialog.request.request_type === "deletion" && preview ? [previewText(t, lang, preview)] : []}
           reasonLabel={t.proposeReason} minReasonLength={10} confirmLabel={t.propose} onClose={() => setDialog(null)}
           onConfirm={(reason) => run(supabase.rpc("admin_privacy_propose_execution", { p_request_id: dialog.request.id, p_reason: reason }), t.done)} />
       )}
@@ -303,14 +327,15 @@ function RequestsTab({ t, lang, setNotice }: TabProps) {
           reasonLabel={t.correctionReason} minReasonLength={10} confirmLabel={t.completeCorrection} onClose={() => setDialog(null)}
           onConfirm={(note) => run(supabase.rpc("admin_privacy_complete_correction", { p_request_id: dialog.request.id, p_note: note }), t.done)} />
       )}
-      <LogRequestForm t={t} onDone={(msg) => { setNotice({ success: msg }); refresh(); }} onError={(e) => setNotice({ error: e })} />
+      {canManage && <LogRequestForm t={t} lang={lang} onDone={(msg) => { setNotice({ success: msg }); refresh(); }} onError={(e) => setNotice({ error: e })} />}
     </div>
   );
 }
 
-function previewText(t: T, p: Record<string, number | string>) {
-  return fill(t.preview, { p: p.bookings_to_pseudonymise ?? 0, d: p.bookings_to_delete ?? 0, m: p.messages ?? 0, h: p.health_answers ?? 0,
-    c: p.consents ?? 0, f: p.favourites ?? 0, o: p.open_disputes ?? 0, w: p.wallet_balance_sar ?? 0, s: p.unused_package_sessions ?? 0 });
+function previewText(t: T, lang: "en" | "ar", p: Record<string, number | string>) {
+  const n = (v: number | string | undefined) => num(Number(v ?? 0), lang);
+  return fill(t.preview, { p: n(p.bookings_to_pseudonymise), d: n(p.bookings_to_delete), m: n(p.messages), h: n(p.health_answers),
+    c: n(p.consents), f: n(p.favourites), o: n(p.open_disputes), w: n(p.wallet_balance_sar), s: n(p.unused_package_sessions) });
 }
 
 function RequestDetail({ t, lang, r, preview, setDialog, run, invoke }: {
@@ -322,6 +347,8 @@ function RequestDetail({ t, lang, r, preview, setDialog, run, invoke }: {
   const [refuseCode, setRefuseCode] = useState("repetitive");
   const [refuseReason, setRefuseReason] = useState("");
   const [formError, setFormError] = useState("");
+  const [extendProblem, setExtendProblem] = useState("");
+  const [refuseProblem, setRefuseProblem] = useState("");
   const live = ["awaiting_verification", "open", "awaiting_approval", "executing"].includes(r.status);
   const facts: [string, React.ReactNode][] = [
     [t.received, `${operationsDate(r.received_at, lang)} · ${t.channels[r.channel] ?? r.channel}`],
@@ -338,13 +365,17 @@ function RequestDetail({ t, lang, r, preview, setDialog, run, invoke }: {
   if (r.staff_notes) facts.push([t.notes, r.staff_notes]);
   if (r.completion_summary) facts.push([t.summary, <pre key="s" dir="ltr" className="max-h-48 overflow-auto whitespace-pre-wrap text-start font-mono text-[10px]">{JSON.stringify(r.completion_summary, null, 2)}</pre>]);
 
-  const submitExtend = async (e: React.FormEvent) => {
+  const submitExtend = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (extendReason.trim().length < 20) { setExtendProblem(minMessage(t, lang, 20, extendReason)); focusFirstInvalid(e.currentTarget); return; }
+    setExtendProblem("");
     const msg = await run(supabase.rpc("admin_privacy_extend_request", { p_request_id: r.id, p_code: extendCode, p_reason: extendReason.trim() }), t.done);
     setFormError(msg ?? ""); if (!msg) setExtendReason("");
   };
-  const submitRefuse = async (e: React.FormEvent) => {
+  const submitRefuse = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (refuseReason.trim().length < 20) { setRefuseProblem(minMessage(t, lang, 20, refuseReason)); focusFirstInvalid(e.currentTarget); return; }
+    setRefuseProblem("");
     const msg = await run(supabase.rpc("admin_privacy_refuse_request", { p_request_id: r.id, p_code: refuseCode, p_reason: refuseReason.trim() }), t.done);
     setFormError(msg ?? ""); if (!msg) setRefuseReason("");
   };
@@ -355,7 +386,7 @@ function RequestDetail({ t, lang, r, preview, setDialog, run, invoke }: {
       <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-[minmax(140px,auto)_1fr]">
         {facts.map(([label, value]) => <div key={label} className="contents"><dt className="font-semibold text-[#667085]">{label}</dt><dd className="min-w-0 break-words font-semibold text-[#101828]">{value}</dd></div>)}
       </dl>
-      {r.request_type === "deletion" && preview && <p className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs font-semibold text-amber-950">{previewText(t, preview)}</p>}
+      {r.request_type === "deletion" && preview && <p className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs font-semibold text-amber-950">{previewText(t, lang, preview)}</p>}
       <div className="flex flex-wrap gap-2">
         <button type="button" onClick={() => setDialog({ kind: "note", request: r })} className={`${small} border-[#ECECEC] text-gray-800`}>{t.addNote}</button>
         {r.status === "open" && ["access", "copy", "deletion"].includes(r.request_type) && (
@@ -373,27 +404,29 @@ function RequestDetail({ t, lang, r, preview, setDialog, run, invoke }: {
       </div>
       {formError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-bold text-red-800">{formError}</p>}
       {live && !r.extended_due_at && (
-        <form onSubmit={(e) => void submitExtend(e)} className="grid gap-2 rounded-xl border border-[#ECECEC] p-3 sm:grid-cols-[220px_1fr_auto] sm:items-end">
+        <form noValidate onSubmit={(e) => void submitExtend(e)} className="grid gap-2 rounded-xl border border-[#ECECEC] p-3 sm:grid-cols-[220px_1fr_auto] sm:items-end">
           <label className="text-xs font-bold text-[#667085]">{t.extendTitle}
             <select value={extendCode} onChange={(e) => setExtendCode(e.target.value)} className={`${operationsInput} mt-1`}>
               {Object.entries(t.extendCodes).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           </label>
           <label className="text-xs font-bold text-[#667085]">{t.extendReason}
-            <input value={extendReason} onChange={(e) => setExtendReason(e.target.value)} minLength={20} required className={`${operationsInput} mt-1`} />
+            <input value={extendReason} onChange={(e) => setExtendReason(e.target.value)} aria-invalid={Boolean(extendProblem)} aria-describedby={extendProblem ? "extend-error" : undefined} className={`${operationsInput} mt-1`} />
+            <FieldError id="extend-error" text={extendProblem} />
           </label>
           <button type="submit" className={operationsButton}>{t.extendSubmit}</button>
         </form>
       )}
       {["awaiting_verification", "open", "awaiting_approval"].includes(r.status) && (
-        <form onSubmit={(e) => void submitRefuse(e)} className="grid gap-2 rounded-xl border border-red-100 p-3 sm:grid-cols-[220px_1fr_auto] sm:items-end">
+        <form noValidate onSubmit={(e) => void submitRefuse(e)} className="grid gap-2 rounded-xl border border-red-100 p-3 sm:grid-cols-[220px_1fr_auto] sm:items-end">
           <label className="text-xs font-bold text-[#667085]">{t.refuseTitle}
             <select value={refuseCode} onChange={(e) => setRefuseCode(e.target.value)} className={`${operationsInput} mt-1`}>
               {Object.entries(t.refuseCodes).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           </label>
           <label className="text-xs font-bold text-[#667085]">{t.refuseReason}
-            <input value={refuseReason} onChange={(e) => setRefuseReason(e.target.value)} minLength={20} required className={`${operationsInput} mt-1`} />
+            <input value={refuseReason} onChange={(e) => setRefuseReason(e.target.value)} aria-invalid={Boolean(refuseProblem)} aria-describedby={refuseProblem ? "refuse-error" : undefined} className={`${operationsInput} mt-1`} />
+            <FieldError id="refuse-error" text={refuseProblem} />
           </label>
           <button type="submit" className={`${operationsButton} !border-red-300 !bg-red-50 !text-red-800`}>{t.refuseSubmit}</button>
         </form>
@@ -410,8 +443,9 @@ function RequestDetail({ t, lang, r, preview, setDialog, run, invoke }: {
   );
 }
 
-function LogRequestForm({ t, onDone, onError }: { t: T; onDone: (m: string) => void; onError: (e: string) => void }) {
-  const [subject, setSubject] = useState("");
+function LogRequestForm({ t, lang, onDone, onError }: { t: T; lang: "en" | "ar"; onDone: (m: string) => void; onError: (e: string) => void }) {
+  const [subject, setSubject] = useState<PickedCustomer | null>(null);
+  const [problems, setProblems] = useState<Record<string, string>>({});
   const [type, setType] = useState<RequestType>("copy");
   const [channel, setChannel] = useState("phone");
   const [receivedAt, setReceivedAt] = useState("");
@@ -420,43 +454,60 @@ function LogRequestForm({ t, onDone, onError }: { t: T; onDone: (m: string) => v
   const [value, setValue] = useState("");
   const [purposes, setPurposes] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
-  const submit = async (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
+    // Checked here, in the page language, before the server checks the same rules; nothing typed is lost on a refusal.
+    const found: Record<string, string> = {};
+    if (!subject) found.subject = t.v.subject;
+    const text = details.trim();
+    if (text.length < 10 || text.length > 2000) found.details = fill(t.v.details, { count: num(text.length, lang) });
+    if (type === "correction" && !value.trim()) found.value = t.v.value;
+    if (type === "consent_withdrawal" && purposes.length === 0) found.purposes = t.v.purposes;
+    if (receivedAt) {
+      const at = new Date(`${receivedAt}:00+03:00`).getTime();
+      if (!Number.isFinite(at) || at > Date.now() + 60000 || at < Date.now() - 30 * 86400000) found.receivedAt = t.v.received;
+    }
+    setProblems(found);
+    if (Object.keys(found).length > 0) { focusFirstInvalid(form); return; }
+    if (busy || !subject) return;
     setBusy(true);
     const options = type === "correction" ? { correction_field: field, correction_value: value } : type === "consent_withdrawal" ? { consent_purposes: purposes } : {};
     const received = receivedAt ? new Date(`${receivedAt}:00+03:00`).toISOString() : new Date().toISOString();
-    const { error } = await supabase.rpc("admin_privacy_log_request", { p_subject_id: subject.trim(), p_request_type: type, p_channel: channel,
+    const { error } = await supabase.rpc("admin_privacy_log_request", { p_subject_id: subject.id, p_request_type: type, p_channel: channel,
       p_received_at: received, p_details: details.trim(), p_options: options });
     setBusy(false);
     if (error) onError(errorMessage(error));
-    else { onDone(t.logged); setSubject(""); setDetails(""); setValue(""); setPurposes([]); }
+    else { onDone(t.logged); setSubject(null); setDetails(""); setValue(""); setPurposes([]); setReceivedAt(""); }
   };
+  const invalid = (key: string) => ({ "aria-invalid": Boolean(problems[key]), "aria-describedby": problems[key] ? `log-${key}-error` : undefined });
   return (
-    <form onSubmit={(e) => void submit(e)} className={`${card} grid gap-3 sm:grid-cols-2`} aria-labelledby="log-title">
+    <form noValidate onSubmit={(e) => void submit(e)} className={`${card} grid gap-3 sm:grid-cols-2`} aria-labelledby="log-title">
       <h2 id="log-title" className="font-serif text-lg font-black text-gray-900 sm:col-span-2">{t.logTitle}</h2>
-      <label className="text-xs font-bold text-[#667085]">{t.subjectId}<input dir="ltr" required pattern="[0-9a-fA-F-]{36}" value={subject} onChange={(e) => setSubject(e.target.value)} className={`${operationsInput} mt-1 font-mono`} /></label>
+      <div className="sm:col-span-2"><CustomerPicker lang={lang} value={subject} onChange={(c) => { setSubject(c); setProblems((p) => ({ ...p, subject: "" })); }} error={problems.subject} inputId="log-subject" /></div>
       <label className="text-xs font-bold text-[#667085]">{t.type}
         <select value={type} onChange={(e) => setType(e.target.value as RequestType)} className={`${operationsInput} mt-1`}>{Object.entries(t.types).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
       </label>
       <label className="text-xs font-bold text-[#667085]">{t.channel}
         <select value={channel} onChange={(e) => setChannel(e.target.value)} className={`${operationsInput} mt-1`}>{["email", "phone", "in_person"].map((k) => <option key={k} value={k}>{t.channels[k]}</option>)}</select>
       </label>
-      <label className="text-xs font-bold text-[#667085]">{t.receivedAt}<input type="datetime-local" value={receivedAt} onChange={(e) => setReceivedAt(e.target.value)} className={`${operationsInput} mt-1`} /></label>
+      <label className="text-xs font-bold text-[#667085]">{t.receivedAt}<input type="datetime-local" value={receivedAt} onChange={(e) => setReceivedAt(e.target.value)} {...invalid("receivedAt")} className={`${operationsInput} mt-1`} /><FieldError id="log-receivedAt-error" text={problems.receivedAt} /></label>
       {type === "correction" && (
         <>
           <label className="text-xs font-bold text-[#667085]">{t.field}<select value={field} onChange={(e) => setField(e.target.value)} className={`${operationsInput} mt-1`}>{Object.entries(t.fields).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
-          <label className="text-xs font-bold text-[#667085]">{t.newValue}<input required value={value} onChange={(e) => setValue(e.target.value)} maxLength={50} className={`${operationsInput} mt-1`} /></label>
+          <label className="text-xs font-bold text-[#667085]">{t.newValue}<input value={value} onChange={(e) => setValue(e.target.value)} maxLength={50} {...invalid("value")} className={`${operationsInput} mt-1`} /><FieldError id="log-value-error" text={problems.value} /></label>
         </>
       )}
       {type === "consent_withdrawal" && (
-        <fieldset className="sm:col-span-2"><legend className="text-xs font-bold text-[#667085]">{t.purposesLabel}</legend>
-          <div className="mt-1 flex flex-wrap gap-3 text-xs">{Object.entries(t.purposeNames).map(([k, v]) => (
-            <label key={k} className="flex items-center gap-1.5"><input type="checkbox" checked={purposes.includes(k)} onChange={(e) => setPurposes((p) => e.target.checked ? [...p, k] : p.filter((x) => x !== k))} className="accent-[#9B7928]" />{v}</label>
+        <fieldset className="sm:col-span-2" aria-describedby={problems.purposes ? "log-purposes-error" : undefined}><legend className="text-xs font-bold text-[#667085]">{t.purposesLabel}</legend>
+          <div className="mt-1 flex flex-wrap gap-3 text-xs">{Object.entries(t.purposeNames).map(([k, v], i) => (
+            <label key={k} className="flex items-center gap-1.5"><input type="checkbox" checked={purposes.includes(k)} aria-invalid={i === 0 && Boolean(problems.purposes)} onChange={(e) => setPurposes((p) => e.target.checked ? [...p, k] : p.filter((x) => x !== k))} className="accent-[#9B7928]" />{v}</label>
           ))}</div>
+          <FieldError id="log-purposes-error" text={problems.purposes} />
         </fieldset>
       )}
-      <label className="text-xs font-bold text-[#667085] sm:col-span-2">{t.whatAsked}<textarea required minLength={10} maxLength={2000} rows={2} value={details} onChange={(e) => setDetails(e.target.value)} className={`${operationsInput} mt-1`} /></label>
-      <div className="sm:col-span-2"><button type="submit" disabled={busy} className={operationsButton}>{t.logSubmit}</button></div>
+      <label className="text-xs font-bold text-[#667085] sm:col-span-2">{t.whatAsked}<textarea maxLength={2000} rows={2} value={details} onChange={(e) => setDetails(e.target.value)} {...invalid("details")} className={`${operationsInput} mt-1`} /><FieldError id="log-details-error" text={problems.details} /></label>
+      <div className="sm:col-span-2"><button type="submit" aria-disabled={busy} className={operationsButton}>{t.logSubmit}</button></div>
     </form>
   );
 }
@@ -468,7 +519,10 @@ function HoldsTab({ t, lang, setNotice }: TabProps) {
   const [loadError, setLoadError] = useState<unknown>(null);
   const [reload, setReload] = useState(0);
   const [dialog, setDialog] = useState<Dialog | null>(null);
-  const [form, setForm] = useState({ subject: "", basis: "court_case", reference: "", booking: "", reason: "", accountReason: "", categories: [] as string[] });
+  const [form, setForm] = useState({ basis: "court_case", reference: "", booking: "", reason: "", accountReason: "", categories: [] as string[] });
+  const [holdSubject, setHoldSubject] = useState<PickedCustomer | null>(null);
+  const [holdProblems, setHoldProblems] = useState<Record<string, string>>({});
+  const canManage = knownToHold(useConsoleSession(), ["privacy.manage"]);
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -483,17 +537,27 @@ function HoldsTab({ t, lang, setNotice }: TabProps) {
   const releaseDue = async () => {
     const { data, error } = await supabase.rpc("privacy_release_due_holds");
     if (error) setNotice({ error: errorMessage(error) });
-    else { setNotice({ success: fill(t.released, { n: (data as { released: number }).released }) }); setReload((k) => k + 1); }
+    else { setNotice({ success: fill(t.released, { n: num((data as { released: number }).released, lang) }) }); setReload((k) => k + 1); }
   };
-  const propose = async (e: React.FormEvent) => {
+  const propose = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { error } = await supabase.rpc("admin_privacy_propose_legal_hold", { p_subject_id: form.subject.trim(), p_basis: form.basis,
+    const found: Record<string, string> = {};
+    if (!holdSubject) found.subject = t.v.subject;
+    if (form.reference.trim().length < 3) found.reference = minMessage(t, lang, 3, form.reference);
+    if (form.basis === "payment_dispute" && !UUID.test(form.booking.trim())) found.booking = t.v.booking;
+    if (form.basis === "court_case" && form.categories.length === 0) found.categories = t.v.categories;
+    if (form.basis === "court_case" && form.categories.includes("account") && form.accountReason.trim().length < 20) found.accountReason = minMessage(t, lang, 20, form.accountReason);
+    if (form.reason.trim().length < 20) found.reason = minMessage(t, lang, 20, form.reason);
+    setHoldProblems(found);
+    if (Object.keys(found).length > 0 || !holdSubject) { focusFirstInvalid(e.currentTarget); return; }
+    const { error } = await supabase.rpc("admin_privacy_propose_legal_hold", { p_subject_id: holdSubject.id, p_basis: form.basis,
       p_case_reference: form.reference.trim(), p_categories: form.basis === "court_case" ? form.categories : null,
       p_booking_id: form.basis === "payment_dispute" ? form.booking.trim() : null, p_reason: form.reason.trim(),
       p_account_reason: form.basis === "court_case" && form.categories.includes("account") ? form.accountReason.trim() : null });
     if (error) setNotice({ error: errorMessage(error) });
-    else { setNotice({ success: t.done }); setForm({ ...form, reference: "", booking: "", reason: "", accountReason: "", categories: [] }); setReload((k) => k + 1); }
+    else { setNotice({ success: t.done }); setForm({ ...form, reference: "", booking: "", reason: "", accountReason: "", categories: [] }); setHoldSubject(null); setReload((k) => k + 1); }
   };
+  const invalid = (key: string) => ({ "aria-invalid": Boolean(holdProblems[key]), "aria-describedby": holdProblems[key] ? `hold-${key}-error` : undefined });
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -502,9 +566,9 @@ function HoldsTab({ t, lang, setNotice }: TabProps) {
             <button key={v} type="button" aria-pressed={state === v} onClick={() => setState(v)} className={`rounded-lg px-3 py-1.5 ${focusRing} ${state === v ? "bg-white shadow-sm" : "text-gray-500"}`}>{label}</button>
           ))}
         </div>
-        <button type="button" onClick={() => void releaseDue()} className={operationsButton}>{t.releaseDue}</button>
+        {canManage && <button type="button" onClick={() => void releaseDue()} className={operationsButton}>{t.releaseDue}</button>}
       </div>
-      {overdue > 0 && <p role="status" className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs font-bold text-amber-950">{fill(t.reviewOverdue, { n: overdue })}</p>}
+      {overdue > 0 && <p role="status" className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs font-bold text-amber-950">{fill(t.reviewOverdue, { n: num(overdue, lang) })}</p>}
       {loadError ? (isForbidden(loadError) ? <ForbiddenNotice locale={lang} /> : <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{fill(t.loadFailed, { reason: errorMessage(loadError) })}</p>)
         : !rows ? <div role="status" className={card}>{t.loading}</div> : rows.length === 0 ? <div className={`${card} text-sm font-semibold text-gray-500`}>{t.emptyHolds}</div> : (
         <div role="region" aria-label={t.tabs.holds} tabIndex={0} className={`overflow-x-auto rounded-2xl border border-[#ECECEC] bg-white ${focusRing}`}>
@@ -540,26 +604,27 @@ function HoldsTab({ t, lang, setNotice }: TabProps) {
             setNotice({ success: t.done }); setReload((k) => k + 1); return null;
           }} />
       )}
-      <form onSubmit={(e) => void propose(e)} className={`${card} grid gap-3 sm:grid-cols-2`} aria-labelledby="hold-title">
+      {canManage && <form noValidate onSubmit={(e) => void propose(e)} className={`${card} grid gap-3 sm:grid-cols-2`} aria-labelledby="hold-title">
         <h2 id="hold-title" className="font-serif text-lg font-black text-gray-900 sm:col-span-2">{t.holdForm}</h2>
-        <label className="text-xs font-bold text-[#667085]">{t.subjectId}<input dir="ltr" required pattern="[0-9a-fA-F-]{36}" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} className={`${operationsInput} mt-1 font-mono`} /></label>
+        <div className="sm:col-span-2"><CustomerPicker lang={lang} value={holdSubject} onChange={(c) => { setHoldSubject(c); setHoldProblems((p) => ({ ...p, subject: "" })); }} error={holdProblems.subject} inputId="hold-subject" /></div>
         <label className="text-xs font-bold text-[#667085]">{t.holdBasis}<select value={form.basis} onChange={(e) => setForm({ ...form, basis: e.target.value })} className={`${operationsInput} mt-1`}>{Object.entries(t.basis).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
-        <label className="text-xs font-bold text-[#667085]">{t.holdReference}<input required minLength={3} value={form.reference} onChange={(e) => setForm({ ...form, reference: e.target.value })} className={`${operationsInput} mt-1`} /></label>
+        <label className="text-xs font-bold text-[#667085]">{t.holdReference}<input value={form.reference} onChange={(e) => setForm({ ...form, reference: e.target.value })} {...invalid("reference")} className={`${operationsInput} mt-1`} /><FieldError id="hold-reference-error" text={holdProblems.reference} /></label>
         {form.basis === "payment_dispute" ? (
-          <label className="text-xs font-bold text-[#667085]">{t.holdBooking}<input dir="ltr" required pattern="[0-9a-fA-F-]{36}" value={form.booking} onChange={(e) => setForm({ ...form, booking: e.target.value })} className={`${operationsInput} mt-1 font-mono`} /></label>
+          <label className="text-xs font-bold text-[#667085]">{t.holdBooking}<input dir="ltr" value={form.booking} onChange={(e) => setForm({ ...form, booking: e.target.value })} {...invalid("booking")} className={`${operationsInput} mt-1 font-mono`} /><FieldError id="hold-booking-error" text={holdProblems.booking} /></label>
         ) : (
-          <fieldset><legend className="text-xs font-bold text-[#667085]">{t.holdCategories}</legend>
-            <div className="mt-1 flex flex-wrap gap-3 text-xs">{Object.entries(t.categories).map(([k, v]) => (
-              <label key={k} className="flex items-center gap-1.5"><input type="checkbox" checked={form.categories.includes(k)} onChange={(e) => setForm({ ...form, categories: e.target.checked ? [...form.categories, k] : form.categories.filter((x) => x !== k) })} className="accent-[#9B7928]" />{v}</label>
+          <fieldset aria-describedby={holdProblems.categories ? "hold-categories-error" : undefined}><legend className="text-xs font-bold text-[#667085]">{t.holdCategories}</legend>
+            <FieldError id="hold-categories-error" text={holdProblems.categories} />
+            <div className="mt-1 flex flex-wrap gap-3 text-xs">{Object.entries(t.categories).map(([k, v], i) => (
+              <label key={k} className="flex items-center gap-1.5"><input type="checkbox" aria-invalid={i === 0 && Boolean(holdProblems.categories)} checked={form.categories.includes(k)} onChange={(e) => setForm({ ...form, categories: e.target.checked ? [...form.categories, k] : form.categories.filter((x) => x !== k) })} className="accent-[#9B7928]" />{v}</label>
             ))}</div>
           </fieldset>
         )}
         {form.basis === "court_case" && form.categories.includes("account") && (
-          <label className="text-xs font-bold text-[#667085] sm:col-span-2">{t.holdAccountReason}<textarea required minLength={20} rows={2} value={form.accountReason} onChange={(e) => setForm({ ...form, accountReason: e.target.value })} className={`${operationsInput} mt-1`} /></label>
+          <label className="text-xs font-bold text-[#667085] sm:col-span-2">{t.holdAccountReason}<textarea rows={2} value={form.accountReason} onChange={(e) => setForm({ ...form, accountReason: e.target.value })} {...invalid("accountReason")} className={`${operationsInput} mt-1`} /><FieldError id="hold-accountReason-error" text={holdProblems.accountReason} /></label>
         )}
-        <label className="text-xs font-bold text-[#667085] sm:col-span-2">{t.holdReason}<textarea required minLength={20} rows={2} value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} className={`${operationsInput} mt-1`} /></label>
+        <label className="text-xs font-bold text-[#667085] sm:col-span-2">{t.holdReason}<textarea rows={2} value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} {...invalid("reason")} className={`${operationsInput} mt-1`} /><FieldError id="hold-reason-error" text={holdProblems.reason} /></label>
         <div className="sm:col-span-2"><button type="submit" className={operationsButton}>{t.holdSubmit}</button></div>
-      </form>
+      </form>}
     </div>
   );
 }
@@ -571,6 +636,7 @@ function LedgerTab({ t, lang, setNotice }: TabProps) {
   const [reload, setReload] = useState(0);
   const [revoking, setRevoking] = useState(false);
   const [gateForm, setGateForm] = useState({ ref: "", date: "", signer: "", notes: "" });
+  const [gateProblems, setGateProblems] = useState<Record<string, string>>({});
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -594,12 +660,18 @@ function LedgerTab({ t, lang, setNotice }: TabProps) {
     const { data, error } = await supabase.rpc("privacy_reapply_deletion_ledger");
     if (error) { setNotice({ error: errorMessage(error) }); return; }
     const d = data as { reapplied: number; auth_accounts_to_delete: string[] };
-    setNotice({ success: fill(t.reapplied, { n: d.reapplied, a: d.auth_accounts_to_delete.length }) });
+    setNotice({ success: fill(t.reapplied, { n: num(d.reapplied, lang), a: num(d.auth_accounts_to_delete.length, lang) }) });
     if (d.auth_accounts_to_delete.length) await supabase.functions.invoke("privacy-erase-account", { body: {} });
     setReload((k) => k + 1);
   };
-  const recordGate = async (e: React.FormEvent) => {
+  const recordGate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const found: Record<string, string> = {};
+    if (gateForm.ref.trim().length < 3) found.ref = minMessage(t, lang, 3, gateForm.ref);
+    if (!gateForm.date) found.date = t.v.date;
+    if (gateForm.signer.trim().length < 3) found.signer = minMessage(t, lang, 3, gateForm.signer);
+    setGateProblems(found);
+    if (Object.keys(found).length > 0) { focusFirstInvalid(e.currentTarget); return; }
     const { error } = await supabase.rpc("admin_privacy_record_transfer_assessment", { p_document_reference: gateForm.ref.trim(), p_approved_on: gateForm.date,
       p_signed_by: gateForm.signer.trim(), p_notes: gateForm.notes.trim() || null });
     if (error) setNotice({ error: errorMessage(error) }); else { setNotice({ success: t.done }); setReload((k) => k + 1); }
@@ -612,8 +684,8 @@ function LedgerTab({ t, lang, setNotice }: TabProps) {
         <h2 id="ledger-title" className="font-serif text-lg font-black text-gray-900">{t.ledgerTitle}</h2>
         {loadError ? (isForbidden(loadError) ? <ForbiddenNotice locale={lang} /> : <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{fill(t.loadFailed, { reason: errorMessage(loadError) })}</p>) : !summary ? <div role="status" className={card}>{t.loading}</div> : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
-            {stat(t.ledgerEntries, summary.entries)}
-            {stat(t.authPending, summary.auth_pending)}
+            {stat(t.ledgerEntries, num(summary.entries, lang))}
+            {stat(t.authPending, num(summary.auth_pending, lang))}
             {stat(t.lastErased, summary.last_erased_at ? operationsDate(summary.last_erased_at, lang) : t.never)}
             {stat(t.lastReapplied, summary.last_reapplied_at ? operationsDate(summary.last_reapplied_at, lang) : t.never)}
           </div>
@@ -628,18 +700,18 @@ function LedgerTab({ t, lang, setNotice }: TabProps) {
         <h2 id="gate-title" className="font-serif text-lg font-black text-gray-900">{t.gateTitle}</h2>
         {gate && (gate.enabled ? (
           <>
-            <p role="status" className="text-sm font-bold text-emerald-800">{fill(t.gateOn, { date: gate.approved_on ?? "" })}</p>
+            <p role="status" className="text-sm font-bold text-emerald-800">{fill(t.gateOn, { date: gate.approved_on ? new Intl.DateTimeFormat(lang === "ar" ? "ar-SA-u-ca-gregory" : "en-GB", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(`${gate.approved_on.slice(0, 10)}T00:00:00Z`)) : "" })}</p>
             <button type="button" onClick={() => setRevoking(true)} className={`${small} border-red-300 text-red-700`}>{t.revoke}</button>
           </>
         ) : (
           <>
             <p role="status" className="text-sm font-bold text-amber-900">{t.gateOff}</p>
             {notice && <p className="text-xs text-gray-600">{notice}</p>}
-            <form onSubmit={(e) => void recordGate(e)} className="grid gap-3 sm:grid-cols-2" aria-label={t.gateForm}>
+            <form noValidate onSubmit={(e) => void recordGate(e)} className="grid gap-3 sm:grid-cols-2" aria-label={t.gateForm}>
               <p className="text-xs font-black text-[#344054] sm:col-span-2">{t.gateForm}</p>
-              <label className="text-xs font-bold text-[#667085]">{t.docRef}<input required minLength={3} value={gateForm.ref} onChange={(e) => setGateForm({ ...gateForm, ref: e.target.value })} className={`${operationsInput} mt-1`} /></label>
-              <label className="text-xs font-bold text-[#667085]">{t.approvedOn}<input type="date" required value={gateForm.date} onChange={(e) => setGateForm({ ...gateForm, date: e.target.value })} className={`${operationsInput} mt-1`} /></label>
-              <label className="text-xs font-bold text-[#667085]">{t.signedBy}<input required minLength={3} value={gateForm.signer} onChange={(e) => setGateForm({ ...gateForm, signer: e.target.value })} className={`${operationsInput} mt-1`} /></label>
+              <label className="text-xs font-bold text-[#667085]">{t.docRef}<input value={gateForm.ref} onChange={(e) => setGateForm({ ...gateForm, ref: e.target.value })} aria-invalid={Boolean(gateProblems.ref)} aria-describedby={gateProblems.ref ? "gate-ref-error" : undefined} className={`${operationsInput} mt-1`} /><FieldError id="gate-ref-error" text={gateProblems.ref} /></label>
+              <label className="text-xs font-bold text-[#667085]">{t.approvedOn}<input type="date" value={gateForm.date} onChange={(e) => setGateForm({ ...gateForm, date: e.target.value })} aria-invalid={Boolean(gateProblems.date)} aria-describedby={gateProblems.date ? "gate-date-error" : undefined} className={`${operationsInput} mt-1`} /><FieldError id="gate-date-error" text={gateProblems.date} /></label>
+              <label className="text-xs font-bold text-[#667085]">{t.signedBy}<input value={gateForm.signer} onChange={(e) => setGateForm({ ...gateForm, signer: e.target.value })} aria-invalid={Boolean(gateProblems.signer)} aria-describedby={gateProblems.signer ? "gate-signer-error" : undefined} className={`${operationsInput} mt-1`} /><FieldError id="gate-signer-error" text={gateProblems.signer} /></label>
               <label className="text-xs font-bold text-[#667085]">{t.gateNotes}<input value={gateForm.notes} onChange={(e) => setGateForm({ ...gateForm, notes: e.target.value })} className={`${operationsInput} mt-1`} /></label>
               <div className="sm:col-span-2"><button type="submit" className={operationsButton}>{t.gateSubmit}</button></div>
             </form>

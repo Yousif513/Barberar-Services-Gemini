@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
 import { errorHint } from "@/lib/step-up";
+import { otpErrorMessage } from "@/lib/auth-errors";
 import { useOperationsLocale } from "@/components/operations-ui";
 
 // The customer's privacy requests (PRIV; Q1 and Q2 of docs/legal/2026-10-10-privacy-decision-memo.md): access, a copy, a
@@ -19,6 +20,24 @@ type Request = {
 };
 type Pending = { run: () => Promise<void> } | null;
 
+// The server accepts a request only after a sign-in by one-time code in the last 10 minutes (privacy_require_contact_otp, which
+// reads the session's amr claim). The screen reads the same claim first and asks for the code before sending, so the normal
+// path makes no refused call; the server still decides, and a refusal still opens the code step.
+const OTP_METHODS = ["otp", "magiclink", "sms", "email"];
+async function hasFreshContactCode(): Promise<boolean> {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (!token) return false;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))) as { amr?: { method?: string; timestamp?: number }[] };
+    const latest = Math.max(0, ...(payload.amr ?? []).filter((e) => OTP_METHODS.includes(e.method ?? "")).map((e) => Number(e.timestamp) || 0));
+    // A minute of margin so a code that is about to age out is asked for again rather than refused.
+    return latest > 0 && Date.now() / 1000 - latest < 9 * 60;
+  } catch {
+    return false;
+  }
+}
+
 const copy = {
   en: {
     title: "Privacy & my data", subtitle: "Ask for access to your data, a copy of it, a correction or its deletion, or withdraw a consent. Every request is free of charge and answered within 30 days.",
@@ -33,6 +52,11 @@ const copy = {
     balance: "You still have {w} SAR wallet credit and {s} unused package sessions; they cannot be used after deletion.",
     purposes: "Consents to withdraw", purposeNames: { whatsapp: "WhatsApp reminders", marketing: "Offers and promotions", photos_portfolio: "Photos in portfolios", health_data: "Health information for treatments", health_data_reuse: "Reusing my health answers for later bookings" } as Record<string, string>,
     verifyTitle: "Confirm it is you", verifyBody: "We send a one-time code to {dest}. Enter it here; the request is then sent.", sendCode: "Send the code", code: "6-digit code", verify: "Confirm",
+    codeFormat: "Enter the 6 digits from the message we sent.", resend: "Send a new code",
+    receivedOk: "We received your {type} request. We will answer by {date}; it is free of charge.", completedNow: "Your {type} request is complete.",
+    confirmed: "Your {type} request is confirmed. We will answer by {date}.", withdrawn: "Your request was withdrawn.", saved: "Your choice is saved.",
+    reuseSaved: "Your choice about reusing health answers is saved.",
+    hints: { contact_changed_recently: "Your e-mail or phone changed in the last 30 days. For your protection, privacy requests and downloads open again 30 days after the change; we have told your previous contact." } as Record<string, string>,
     noContact: "Your account has no verified e-mail or phone. Contact PRIMORA support to verify one first.", codeSent: "Code sent.",
     mine: "My requests", none: "You have not made any privacy request.", loadFailed: "Your requests could not be loaded: {reason}", retry: "Try again",
     statuses: { awaiting_verification: "Waiting for you to confirm", open: "Received", awaiting_approval: "Being checked", executing: "Being carried out", completed: "Completed", refused: "Refused", withdrawn: "Withdrawn" } as Record<string, string>,
@@ -43,7 +67,7 @@ const copy = {
     reuseGrant: "Allow reuse for 12 months", reuseWithdraw: "Stop reuse",
   },
   ar: {
-    title: "الخصوصية وبياناتي", subtitle: "اطلب الاطلاع على بياناتك أو نسخة منها أو تصحيحها أو حذفها، أو اسحب موافقة. كل طلب مجاني ونرد عليه خلال 30 يوماً.",
+    title: "الخصوصية وبياناتي", subtitle: "اطلب الاطلاع على بياناتك أو نسخة منها أو تصحيحها أو حذفها، أو اسحب موافقة. كل طلب مجاني ونرد عليه خلال ٣٠ يوماً.",
     newRequest: "تقديم طلب", type: "ما الذي تحتاجه؟", details: "أي معلومة تفيدنا (اختياري)", submit: "إرسال الطلب", sending: "جارٍ الإرسال…",
     types: { access: "الاطلاع على بياناتي", copy: "نسخة من بياناتي (JSON وPDF)", correction: "تصحيح بيان", deletion: "حذف حسابي وبياناتي", consent_withdrawal: "سحب موافقة" } as Record<string, string>,
     typeNames: { access: "اطلاع", copy: "نسخة", correction: "تصحيح", deletion: "حذف", consent_withdrawal: "سحب موافقة" } as Record<string, string>,
@@ -51,18 +75,23 @@ const copy = {
     genders: { male: "ذكر", female: "أنثى" } as Record<string, string>,
     correctionNote: "أثناء التحقق يُوقف استخدام هذا البيان ولا يمكن لأحد تغييره.",
     reviews: "تقييماتك", reviewChoices: { delete_text: "حذف تقييماتي", deleted_user: "إبقاؤها باسم «مستخدم محذوف»" } as Record<string, string>,
-    deletionPreview: "ما الذي سيحدث: يُحذف حسابك وملفك الشخصي وبيانات التواصل والموافقات والمفضلة ورموز الأجهزة وكل رسائلك، وتُتلف إجابات الاستبيان الصحي. تُحفظ {p} حجوزات مرتبطة بفاتورة ضريبية أو دفعة لمدة 10 سنوات دون اسمك (المادة 8 من نظام الدفاتر التجارية وأحكام ضريبة القيمة المضافة)، وتُحذف {d} حجوزات أخرى. السجل المرتبط بنزاع دفع مفتوح يُحفظ حتى 30 يوماً بعد إغلاقه.",
+    deletionPreview: "ما الذي سيحدث: يُحذف حسابك وملفك الشخصي وبيانات التواصل والموافقات والمفضلة ورموز الأجهزة وكل رسائلك، وتُتلف إجابات الاستبيان الصحي. تُحفظ {p} حجوزات مرتبطة بفاتورة ضريبية أو دفعة لمدة ١٠ سنوات دون اسمك (المادة ٨ من نظام الدفاتر التجارية وأحكام ضريبة القيمة المضافة)، وتُحذف {d} حجوزات أخرى. السجل المرتبط بنزاع دفع مفتوح يُحفظ حتى ٣٠ يوماً بعد إغلاقه.",
     balance: "لديك {w} ريال رصيد في المحفظة و{s} جلسات باقات غير مستخدمة؛ لا يمكن استخدامها بعد الحذف.",
     purposes: "الموافقات المطلوب سحبها", purposeNames: { whatsapp: "تذكيرات واتساب", marketing: "العروض والترويج", photos_portfolio: "الصور في المعارض", health_data: "المعلومات الصحية للعلاجات", health_data_reuse: "إعادة استخدام إجاباتي الصحية لحجوزات لاحقة" } as Record<string, string>,
-    verifyTitle: "تأكيد هويتك", verifyBody: "نرسل رمزاً لمرة واحدة إلى {dest}. أدخله هنا ثم يُرسل الطلب.", sendCode: "إرسال الرمز", code: "رمز من 6 أرقام", verify: "تأكيد",
+    verifyTitle: "تأكيد هويتك", verifyBody: "نرسل رمزاً لمرة واحدة إلى {dest}. أدخله هنا ثم يُرسل الطلب.", sendCode: "إرسال الرمز", code: "رمز من ٦ أرقام", verify: "تأكيد",
+    codeFormat: "أدخل الأرقام الستة من الرسالة التي أرسلناها.", resend: "إرسال رمز جديد",
+    receivedOk: "استلمنا طلب {type}. سنرد قبل {date}، والطلب مجاني.", completedNow: "اكتمل طلب {type}.",
+    confirmed: "تم تأكيد طلب {type}. سنرد قبل {date}.", withdrawn: "تم سحب طلبك.", saved: "تم حفظ اختيارك.",
+    reuseSaved: "تم حفظ اختيارك بشأن إعادة استخدام الإجابات الصحية.",
+    hints: { contact_changed_recently: "تغيّر بريدك أو هاتفك خلال آخر ٣٠ يوماً. لحمايتك تُتاح طلبات الخصوصية والتنزيلات من جديد بعد ٣٠ يوماً من التغيير، وقد أبلغنا وسيلة التواصل السابقة." } as Record<string, string>,
     noContact: "لا يوجد في حسابك بريد أو هاتف موثق. تواصل مع دعم بريمورا لتوثيق أحدهما أولاً.", codeSent: "أُرسل الرمز.",
     mine: "طلباتي", none: "لم تقدم أي طلب خصوصية.", loadFailed: "تعذّر تحميل طلباتك: {reason}", retry: "إعادة المحاولة",
     statuses: { awaiting_verification: "بانتظار تأكيدك", open: "مستلم", awaiting_approval: "قيد المراجعة", executing: "قيد التنفيذ", completed: "مكتمل", refused: "مرفوض", withdrawn: "مسحوب" } as Record<string, string>,
     received: "الاستلام", deadline: "الرد قبل", extended: "مُدِّد مرة واحدة: {reason}", refused: "السبب: {reason}", confirm: "تأكيد هذا الطلب", withdraw: "سحب الطلب",
-    download: "تنزيل {file}", expires: "متاح حتى {date}", expired: "انتهت صلاحية التنزيل بعد 7 أيام. قدّم طلب نسخة جديداً إذا احتجته.",
+    download: "تنزيل {file}", expires: "متاح حتى {date}", expired: "انتهت صلاحية التنزيل بعد ٧ أيام. قدّم طلب نسخة جديداً إذا احتجته.",
     chooseReviews: "اختر ما يحدث لتقييماتك قبل التأكيد:", saveChoice: "حفظ الاختيار", done: "تم.", printed: "تتوفر نسخة مطبوعة عند الطلب.",
-    reuseTitle: "الإجابات الصحية للحجوزات اللاحقة", reuseOn: "تسمح لنا بإعادة استخدام أحدث إجاباتك الصحية لحجوزاتك القادمة حتى {date}.", reuseOff: "تُستخدم إجاباتك الصحية للحجز الذي قُدمت له فقط، وتُتلف بعد 30 يوماً منه.",
-    reuseGrant: "السماح بإعادة الاستخدام 12 شهراً", reuseWithdraw: "إيقاف إعادة الاستخدام",
+    reuseTitle: "الإجابات الصحية للحجوزات اللاحقة", reuseOn: "تسمح لنا بإعادة استخدام أحدث إجاباتك الصحية لحجوزاتك القادمة حتى {date}.", reuseOff: "تُستخدم إجاباتك الصحية للحجز الذي قُدمت له فقط، وتُتلف بعد ٣٠ يوماً منه.",
+    reuseGrant: "السماح بإعادة الاستخدام ١٢ شهراً", reuseWithdraw: "إيقاف إعادة الاستخدام",
   },
 };
 const input = "w-full rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm text-stone-900 focus-visible:outline-2 focus-visible:outline-[#A57C32]";
@@ -93,6 +122,13 @@ export default function CustomerPrivacy() {
   const [code, setCode] = useState("");
   const [choices, setChoices] = useState<Record<string, string>>({});
   const [reuse, setReuse] = useState<{ active: boolean; until: string | null } | null>(null);
+  const [codeProblem, setCodeProblem] = useState("");
+  const resultRef = useRef<HTMLDivElement>(null);
+  const codeRef = useRef<HTMLInputElement>(null);
+  // The outcome of a command is announced and receives the focus, so a keyboard user hears it and continues from there.
+  useEffect(() => {
+    if (message.error || message.success) resultRef.current?.focus();
+  }, [message]);
 
   const load = useCallback(() => setReload((k) => k + 1), []);
   // The code step opens above the form; bring it into view and put the focus on it.
@@ -129,18 +165,35 @@ export default function CustomerPrivacy() {
     return () => { cancelled = true; };
   }, [type]);
 
-  // Runs a command; when the server asks for a fresh one-time code, keeps the command and opens the code step.
-  const attempt = async (run: () => Promise<{ error: unknown }>, success: string) => {
-    setBusy(true);
+  // Says what the server recorded: the request, its type and the date it will be answered by.
+  const outcome = (kind: "submit" | "confirm", data: unknown) => {
+    const r = data as Partial<Request> | null;
+    const type = t.typeNames[r?.request_type ?? ""] ?? "";
+    if (r?.status === "completed") return fill(t.completedNow, { type });
+    if (!r?.deadline_at) return t.done;
+    return fill(kind === "submit" ? t.receivedOk : t.confirmed, { type, date: date(r.deadline_at) });
+  };
+  // Runs a command; asks for the one-time code first when the session has none from the last minutes, and when the server
+  // still asks for a fresh code, keeps the command and opens the code step.
+  const attempt = async (run: () => Promise<{ data?: unknown; error: unknown }>, success: string | ((data: unknown) => string), needsCode = false) => {
     setMessage({});
-    const { error } = await run();
+    if (needsCode && !(await hasFreshContactCode())) {
+      setPending({ run: async () => { await attempt(run, success); } });
+      return;
+    }
+    setBusy(true);
+    const { data, error } = await run();
     setBusy(false);
     if (error && errorHint(error) === "contact_otp_required") {
       setPending({ run: async () => { await attempt(run, success); } });
       return;
     }
-    if (error) { setMessage({ error: errorHint(error) === "no_verified_contact" ? t.noContact : errorMessage(error) }); return; }
-    setMessage({ success });
+    if (error) {
+      const hint = errorHint(error);
+      setMessage({ error: hint === "no_verified_contact" ? t.noContact : t.hints[hint] ?? errorMessage(error) });
+      return;
+    }
+    setMessage({ success: typeof success === "function" ? success(data) : success });
     load();
   };
 
@@ -148,7 +201,7 @@ export default function CustomerPrivacy() {
     e.preventDefault();
     const options = type === "correction" ? { correction_field: field, correction_value: value.trim() }
       : type === "deletion" ? { review_choice: reviewChoice } : type === "consent_withdrawal" ? { consent_purposes: purposes } : {};
-    void attempt(async () => supabase.rpc("privacy_submit_request", { p_request_type: type, p_details: details.trim() || null, p_options: options }), t.done);
+    void attempt(async () => supabase.rpc("privacy_submit_request", { p_request_type: type, p_details: details.trim() || null, p_options: options }), (data) => outcome("submit", data), true);
   };
 
   const sendCode = async () => {
@@ -158,16 +211,19 @@ export default function CustomerPrivacy() {
       ? await supabase.auth.signInWithOtp({ email: contact.email, options: { shouldCreateUser: false } })
       : await supabase.auth.signInWithOtp({ phone: contact.phone as string, options: { shouldCreateUser: false, channel: "sms" } });
     setBusy(false);
-    if (error) setMessage({ error: errorMessage(error) }); else { setCodeSent(true); setMessage({ success: t.codeSent }); }
+    if (error) setMessage({ error: otpErrorMessage(error, lang) });
+    else { setCodeSent(true); setCode(""); setCodeProblem(""); setMessage({}); window.setTimeout(() => codeRef.current?.focus(), 0); }
   };
   const verifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!/^[0-9]{6}$/.test(code.trim())) { setCodeProblem(t.codeFormat); codeRef.current?.focus(); return; }
+    setCodeProblem("");
     setBusy(true);
     const { error } = contact?.email
       ? await supabase.auth.verifyOtp({ email: contact.email, token: code.trim(), type: "email" })
       : await supabase.auth.verifyOtp({ phone: contact?.phone as string, token: code.trim(), type: "sms" });
     setBusy(false);
-    if (error) { setMessage({ error: errorMessage(error) }); return; }
+    if (error) { setCodeProblem(otpErrorMessage(error, lang)); setCode(""); codeRef.current?.focus(); return; }
     const next = pending;
     setPending(null); setCodeSent(false); setCode("");
     if (next) await next.run();
@@ -175,6 +231,7 @@ export default function CustomerPrivacy() {
 
   const download = async (r: Request, file: "json" | "pdf") => {
     setMessage({});
+    if (!(await hasFreshContactCode())) { setPending({ run: async () => { await download(r, file); } }); return; }
     const { data, error } = await supabase.functions.invoke("privacy-export-download", { body: { request_id: r.id, file } });
     if (error) {
       // The download needs a fresh one-time code too (review M1): keep the download and open the code step.
@@ -192,7 +249,7 @@ export default function CustomerPrivacy() {
   };
 
   const setReuseConsent = (status: "granted" | "withdrawn") =>
-    attempt(async () => supabase.rpc("record_consent", { p_purpose: "health_data_reuse", p_status: status, p_document_version: "v1.0", p_method: "web_form" }), t.done);
+    attempt(async () => supabase.rpc("record_consent", { p_purpose: "health_data_reuse", p_status: status, p_document_version: "v1.0", p_method: "web_form" }), t.reuseSaved);
 
   const destination = contact?.email ?? contact?.phone ?? "";
   return (
@@ -201,8 +258,8 @@ export default function CustomerPrivacy() {
         <h1 className="font-serif text-2xl font-black text-stone-900">{t.title}</h1>
         <p className="mt-1 text-sm text-stone-600">{t.subtitle}</p>
       </div>
-      {message.error && <div role="alert" className="rounded-xl border border-red-300 bg-red-50 p-3 text-sm font-semibold text-red-800">{message.error}</div>}
-      {message.success && <div role="status" className="rounded-xl border border-emerald-300 bg-emerald-50 p-3 text-sm font-semibold text-emerald-800">{message.success}</div>}
+      {message.error && <div ref={resultRef} tabIndex={-1} role="alert" className="rounded-xl border border-red-300 bg-red-50 p-3 text-sm font-semibold text-red-800 focus-visible:outline-2 focus-visible:outline-[#A57C32]">{message.error}</div>}
+      {message.success && <div ref={resultRef} tabIndex={-1} role="status" className="rounded-xl border border-emerald-300 bg-emerald-50 p-3 text-sm font-semibold text-emerald-800 focus-visible:outline-2 focus-visible:outline-[#A57C32]">{message.success}</div>}
 
       {pending && (
         <section id="verify-panel" aria-labelledby="verify-title" className="space-y-3 rounded-2xl border border-[#A57C32]/40 bg-[#FBF7EA] p-5">
@@ -210,11 +267,14 @@ export default function CustomerPrivacy() {
           {destination ? <p className="text-sm text-stone-700">{fill(t.verifyBody, { dest: destination })}</p> : <p className="text-sm text-red-800">{t.noContact}</p>}
           {destination && !codeSent && <button type="button" disabled={busy} onClick={() => void sendCode()} className={button}>{t.sendCode}</button>}
           {codeSent && (
-            <form onSubmit={(e) => void verifyCode(e)} className="flex flex-wrap items-end gap-2">
+            <form noValidate onSubmit={(e) => void verifyCode(e)} className="flex flex-wrap items-end gap-2">
               <label className="text-xs font-bold text-stone-700">{t.code}
-                <input dir="ltr" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" required value={code} onChange={(e) => setCode(e.target.value)} className={`${input} mt-1 w-40 font-mono`} />
+                <input ref={codeRef} dir="ltr" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={(e) => setCode(e.target.value)} readOnly={busy}
+                  aria-invalid={Boolean(codeProblem)} aria-describedby={codeProblem ? "privacy-code-error" : undefined} className={`${input} mt-1 w-40 font-mono`} />
               </label>
-              <button type="submit" disabled={busy} className={button}>{t.verify}</button>
+              <button type="submit" aria-disabled={busy} className={button}>{t.verify}</button>
+              <button type="button" onClick={() => void sendCode()} aria-disabled={busy} className={ghost}>{t.resend}</button>
+              {codeProblem && <p id="privacy-code-error" role="alert" className="basis-full text-xs font-bold text-red-800">{codeProblem}</p>}
             </form>
           )}
         </section>
@@ -292,14 +352,14 @@ export default function CustomerPrivacy() {
                       <div className="flex flex-wrap items-center gap-2 text-xs">
                         <span>{t.chooseReviews}</span>
                         <select value={choices[r.id] ?? ""} onChange={(e) => setChoices({ ...choices, [r.id]: e.target.value })} className={`${input} w-auto`}><option value="" />{Object.entries(t.reviewChoices).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
-                        <button type="button" disabled={!choices[r.id]} onClick={() => void attempt(async () => supabase.rpc("privacy_set_review_choice", { p_request_id: r.id, p_choice: choices[r.id] }), t.done)} className={ghost}>{t.saveChoice}</button>
+                        <button type="button" disabled={!choices[r.id]} onClick={() => void attempt(async () => supabase.rpc("privacy_set_review_choice", { p_request_id: r.id, p_choice: choices[r.id] }), t.saved, true)} className={ghost}>{t.saveChoice}</button>
                       </div>
                     )}
-                    <button type="button" disabled={busy} onClick={() => void attempt(async () => supabase.rpc("privacy_confirm_request", { p_request_id: r.id }), t.done)} className={button}>{t.confirm}</button>
+                    <button type="button" disabled={busy} onClick={() => void attempt(async () => supabase.rpc("privacy_confirm_request", { p_request_id: r.id }), (data) => outcome("confirm", data), true)} className={button}>{t.confirm}</button>
                   </div>
                 )}
                 {["awaiting_verification", "open"].includes(r.status) && (
-                  <button type="button" disabled={busy} onClick={() => void attempt(async () => supabase.rpc("privacy_withdraw_request", { p_request_id: r.id }), t.done)} className={ghost}>{t.withdraw}</button>
+                  <button type="button" disabled={busy} onClick={() => void attempt(async () => supabase.rpc("privacy_withdraw_request", { p_request_id: r.id }), t.withdrawn, true)} className={ghost}>{t.withdraw}</button>
                 )}
                 {r.export && (r.export.status === "built" ? (
                   <div className="flex flex-wrap items-center gap-2">
