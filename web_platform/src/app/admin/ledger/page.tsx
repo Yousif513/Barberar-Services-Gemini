@@ -466,6 +466,7 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
 const commandCopy = {
   en: {
     reasonLabel: "Reason (recorded in the audit log)",
+    reconciliationHold: "Held until Tap reconciliation clears: {n} open break(s), SAR {amount}",
     payReasonLabel: "Bank transfer reference or note (recorded in the audit log)",
     releaseTitle: "Release this ledger entry",
     releaseIntro: "Record that the provider's share of this entry was paid outside the payout flow. A different administrator must approve it, the provider needs an approved bank account past its 48-hour hold, and the bank transfer reference is kept with the entry.",
@@ -514,6 +515,7 @@ const commandCopy = {
   },
   ar: {
     reasonLabel: "السبب (يُسجل في سجل التدقيق)",
+    reconciliationHold: "موقوف حتى تكتمل التسوية مع Tap: {n} من فروق التسوية المفتوحة بقيمة {amount} ريال",
     payReasonLabel: "مرجع التحويل البنكي أو ملاحظة (تُسجل في سجل التدقيق)",
     releaseTitle: "صرف هذا القيد",
     releaseIntro: "تسجيل أن حصة مقدم الخدمة من هذا القيد صُرفت خارج مسار التحويلات. يجب أن يعتمدها مسؤول آخر، وأن يكون لمقدم الخدمة حساب بنكي معتمد تجاوز فترة الانتظار (48 ساعة)، ويُحفظ مرجع التحويل البنكي مع القيد.",
@@ -1301,6 +1303,11 @@ export default function AdminLedger() {
                           <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-block ${requestStatusClass(request.status)}`}>
                             {requestStatusLabel(request.status)}
                           </span>
+                          {request.reconciliation_hold ? (
+                            <p className="mt-1 max-w-[220px] text-[10px] font-bold text-[#B54708]">
+                              {commandCopy[lang].reconciliationHold.replace("{n}", String(request.reconciliation_hold.open_breaks)).replace("{amount}", formatMoney(request.reconciliation_hold.amount_sar))}
+                            </p>
+                          ) : null}
                         </td>
                         <td className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>
                           <div className={`flex flex-wrap gap-2 ${isRTL ? "justify-start" : "justify-end"}`}>

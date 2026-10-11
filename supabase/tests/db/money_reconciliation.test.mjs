@@ -89,12 +89,14 @@ describe("the daily reconciliation", () => {
 
   it("matches each Tap settlement to a bank-statement credit and never auto-closes a settlement break", async () => {
     const day = "2026-09-21";
-    await as(db, finance, `select admin_import_reconciliation_file('tap_settlement_file', $1::date, $2::jsonb, 'Tap settlement report for the day')`,
-      [day, JSON.stringify([{ object_type: "settlement", tap_object_id: "stl_rec_1", amount: "500.00", currency: "SAR" }])]);
+    // SECFIX-2 R2-H3: a console file import is staged and applied only when a second money.ledger holder approves it.
+    const approve = async (staged) => as(db, finance2, `select admin_decide_approval($1, 'approve', 'File checked against the portal')`, [staged[0].r.approval_id]);
+    await approve(await as(db, finance, `select admin_import_reconciliation_file('tap_settlement_file', $1::date, $2::jsonb, 'Tap settlement report for the day') r`,
+      [day, JSON.stringify([{ object_type: "settlement", tap_object_id: "stl_rec_1", amount: "500.00", currency: "SAR" }])]));
     await run(finance, day);
     assert.deepEqual((await breaks(day)).map((b) => b.kind), ["settlement_missing_in_bank"]);
-    await as(db, finance, `select admin_import_reconciliation_file('bank_statement', $1::date, $2::jsonb, 'Bank statement for the settlement day')`,
-      [day, JSON.stringify([{ object_type: "bank_credit", tap_object_id: "bank-line-1", reference: "stl_rec_1", amount: "495.00", currency: "SAR" }])]);
+    await approve(await as(db, finance, `select admin_import_reconciliation_file('bank_statement', $1::date, $2::jsonb, 'Bank statement for the settlement day') r`,
+      [day, JSON.stringify([{ object_type: "bank_credit", tap_object_id: "bank-line-1", reference: "stl_rec_1", amount: "495.00", currency: "SAR" }])]));
     await run(finance, day);
     const rows = await breaks(day);
     assert.deepEqual(rows.map((b) => [b.kind, b.status]), [["settlement_amount_mismatch", "open"], ["settlement_missing_in_bank", "open"]]);
@@ -107,7 +109,7 @@ describe("the daily reconciliation", () => {
     for (const user of [finance, owner, customer]) assert.equal(await outcome(importTap(DAY, []).then(() => as(db, user, `select record_tap_reconciliation_import('2026-09-20', '[]'::jsonb)`))), "42501");
     const file = (user, rows, source = "bank_statement") => as(db, user, `select admin_import_reconciliation_file($1, '2026-09-22', $2::jsonb, 'Bank statement for the day')`, [source, JSON.stringify(rows)]);
     await expectError(file(finance, [{ object_type: "bank_credit", tap_object_id: "x-1", amount: "10", currency: "USD" }]), /currency SAR/);
-    await expectError(file(finance, [{ object_type: "charge", tap_object_id: "chg_forged", amount: "10", currency: "SAR" }]), /cannot import/);
+    await expectError(file(finance, [{ object_type: "charge", tap_object_id: "chg_forged", amount: "10", currency: "SAR" }]), /charges and refunds come only from the Tap API/);
     await expectError(file(finance, [], "tap_api"), /Tap settlement file or the bank statement/);
     for (const user of [operations, analyst, customer]) assert.equal(await outcome(file(user, [])), "42501");
   });

@@ -20,7 +20,7 @@ type Status = (typeof STATUSES)[number];
 type Numeric = number | string | null;
 type ApprovalRow = {
   id: string;
-  kind: "payout_release" | "refund" | "iban_change" | "setting_change" | "ledger_settlement" | "ledger_adjustment" | "fee_rule_change" | "payout_hold" | "reward_program" | "role_change" | "booking_cancellation";
+  kind: "payout_release" | "refund" | "iban_change" | "setting_change" | "ledger_settlement" | "ledger_adjustment" | "fee_rule_change" | "payout_hold" | "reward_program" | "role_change" | "booking_cancellation" | "reconciliation_import";
   status: string;
   target_id: string | null;
   amount_sar: Numeric;
@@ -76,7 +76,7 @@ const translations = {
     kinds: { payout_release: "Payout release", refund: "Refund", iban_change: "Bank account change", setting_change: "Threshold change",
       ledger_settlement: "Manual ledger settlement", ledger_adjustment: "Ledger correction", fee_rule_change: "Fee rule change",
       payout_hold: "Payout hold", reward_program: "Reward programme change", role_change: "Console role grant",
-      booking_cancellation: "Booking cancellation with refund" },
+      booking_cancellation: "Booking cancellation with refund", reconciliation_import: "Reconciliation file import" },
     consoleRoles: { owner: "Owner", finance: "Finance", operations: "Operations", analyst: "Analyst (read-only)" } as Record<string, string>,
     noConsoleRole: "No console role",
     breakGlassClosedUntil: "Break-glass closed until {date}: an administrator who could approve this was demoted or removed",
@@ -84,7 +84,9 @@ const translations = {
     ownBreakGlass: "You used this break-glass: another administrator records the review",
     describeParts: { increase: "increase, 30 days notice", from: "from", place: "place hold", lift: "lift hold", enable: "enable", disable: "disable",
       reference: "bank reference", provider: "provider", platform: "platform", tap: "Tap object",
-      cancelBooking: "cancel booking", noShowBooking: "no-show", invoice: "invoice", refund: "refund" },
+      cancelBooking: "cancel booking", noShowBooking: "no-show", invoice: "invoice", refund: "refund",
+      sources: { tap_settlement_file: "Tap settlement file", bank_statement: "bank statement" } as Record<string, string>,
+      rows: "lines", day: "day", breakDiff: "break difference", corrected: "already corrected", partial: "partial correction" },
     columnRequest: "Request",
     columnAmount: "Amount",
     columnRequestedBy: "Requested by",
@@ -188,7 +190,7 @@ const translations = {
     kinds: { payout_release: "صرف تحويل", refund: "استرداد", iban_change: "تغيير حساب بنكي", setting_change: "تغيير حد",
       ledger_settlement: "تسوية قيد يدوية", ledger_adjustment: "تصحيح قيد", fee_rule_change: "تغيير قاعدة رسوم",
       payout_hold: "إيقاف التحويلات", reward_program: "تغيير برنامج مكافآت", role_change: "منح دور في لوحة الإدارة",
-      booking_cancellation: "إلغاء حجز مع استرداد" },
+      booking_cancellation: "إلغاء حجز مع استرداد", reconciliation_import: "استيراد ملف تسوية" },
     consoleRoles: { owner: "المالك", finance: "المالية", operations: "العمليات", analyst: "محلل (قراءة فقط)" } as Record<string, string>,
     noConsoleRole: "بلا دور في لوحة الإدارة",
     breakGlassClosedUntil: "إجراء الطوارئ مغلق حتى {date}: خُفّض دور مسؤول كان يمكنه الاعتماد أو أُزيل",
@@ -196,7 +198,9 @@ const translations = {
     ownBreakGlass: "أنت من استخدم إجراء الطوارئ: يسجّل المراجعةَ مسؤول آخر",
     describeParts: { increase: "زيادة، إشعار 30 يوماً", from: "من", place: "إيقاف", lift: "رفع الإيقاف", enable: "تفعيل", disable: "إيقاف",
       reference: "المرجع البنكي", provider: "المزود", platform: "المنصة", tap: "معرّف Tap",
-      cancelBooking: "إلغاء الحجز", noShowBooking: "عدم حضور", invoice: "الفاتورة", refund: "الاسترداد" },
+      cancelBooking: "إلغاء الحجز", noShowBooking: "عدم حضور", invoice: "الفاتورة", refund: "الاسترداد",
+      sources: { tap_settlement_file: "ملف تسويات Tap", bank_statement: "كشف الحساب البنكي" } as Record<string, string>,
+      rows: "أسطر", day: "اليوم", breakDiff: "مبلغ الفرق", corrected: "المصحَّح سابقاً", partial: "تصحيح جزئي" },
     columnRequest: "الطلب",
     columnAmount: "المبلغ",
     columnRequestedBy: "مقدّم الطلب",
@@ -371,7 +375,10 @@ function ApprovalsScreen() {
     }
     if (row.kind === "ledger_adjustment") {
       return [providerName(row), text(s.correction), `${d.provider} ${sar(toNumber(s.provider_share_delta as Numeric), lang)}`,
-        `${d.platform} ${sar(toNumber(s.platform_share_delta as Numeric), lang)}`, s.tap_object_id ? `${d.tap}: ${text(s.tap_object_id)}` : ""].filter(Boolean).join(" · ");
+        `${d.platform} ${sar(toNumber(s.platform_share_delta as Numeric), lang)}`, s.tap_object_id ? `${d.tap}: ${text(s.tap_object_id)}` : "",
+        s.break_difference !== undefined ? `${d.breakDiff} ${sar(toNumber(s.break_difference as Numeric), lang)}` : "",
+        s.break_corrected_before !== undefined && toNumber(s.break_corrected_before as Numeric) > 0 ? `${d.corrected} ${sar(toNumber(s.break_corrected_before as Numeric), lang)}` : "",
+        s.partial ? d.partial : ""].filter(Boolean).join(" · ");
     }
     if (row.kind === "fee_rule_change") {
       const after = (s.after ?? {}) as Record<string, unknown>;
@@ -380,6 +387,10 @@ function ApprovalsScreen() {
     }
     if (row.kind === "payout_hold") {
       return [providerName(row), s.action === "lift" ? d.lift : d.place].filter(Boolean).join(" · ");
+    }
+    if (row.kind === "reconciliation_import") {
+      return [d.sources[text(s.source)] ?? text(s.source), `${d.day} ${text(s.business_day)}`, `${text(s.row_count)} ${d.rows}`,
+        sar(toNumber(s.total_sar as Numeric), lang), `SHA-256 ${text(s.file_sha256).slice(0, 12)}…`].filter(Boolean).join(" · ");
     }
     if (row.kind === "booking_cancellation") {
       return [providerName(row), s.action === "no_show" ? d.noShowBooking : d.cancelBooking, s.invoice_number ? `${d.invoice} ${text(s.invoice_number)}` : "",

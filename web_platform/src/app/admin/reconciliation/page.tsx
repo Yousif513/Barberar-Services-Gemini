@@ -17,7 +17,11 @@ type Break = {
   id: string; business_day: string; kind: string; tap_object_id: string | null; ledger_id: string | null; refund_request_id: string | null;
   tap_amount: number | null; ledger_amount: number | null; difference: number | null; status: string; opened_at: string; escalate_after: string;
   escalated_at: string | null; resolved_at: string | null; provider_name_en: string | null; provider_name_ar: string | null;
-  business_days_open: number; correction_pending: boolean;
+  business_days_open: number; correction_pending: boolean; corrected_amount: number | null;
+};
+type Import = {
+  id: string; source: string; business_day: string; imported_at: string; object_count: number; status: string; file_sha256: string | null;
+  approval_request_id: string | null; approved_at: string | null; reason: string | null;
 };
 type Run = { business_day: string; status: string; counts: Record<string, number>; ran_at: string; run_count: number };
 type Refund = {
@@ -25,7 +29,7 @@ type Refund = {
   gateway_status_raw: string | null; gateway_succeeded_at: string | null; entitled_at: string; initiate_by: string; succeed_by: string;
   initiation_late: boolean; completion_late: boolean; tap_check_due: boolean; tap_checks: number; last_tap_check_at: string | null;
 };
-type Overview = { breaks: Break[]; counts: Record<string, number>; runs: Run[]; refunds: Refund[]; can_refund: boolean };
+type Overview = { breaks: Break[]; counts: Record<string, number>; runs: Run[]; refunds: Refund[]; imports: Import[]; can_refund: boolean };
 
 const PAGE = 25;
 const STATUSES = ["open", "resolved", "auto_matched"] as const;
@@ -49,7 +53,15 @@ const copy = {
     importButton: "Import",
     importBad: "Lines {lines} could not be read. Nothing was imported.",
     importEmpty: "Paste at least one line.",
-    importDone: "{n} new objects were recorded.",
+    importDone: "The file was sent for approval (SHA-256 {sha}). A different finance administrator applies it in Approvals; until then it changes nothing.",
+    importsTitle: "Imported files",
+    importsIntro: "Console files carry only Tap settlements and bank-statement lines. Charges and refunds come only from Tap's API, and only Tap's API data closes a break by itself.",
+    noImports: "No file has been imported.",
+    importStatuses: { pending_approval: "Waiting for a second person", applied: "Applied", rejected: "Rejected", withdrawn: "Withdrawn" } as Record<string, string>,
+    sources: { tap_api: "Tap API", tap_settlement_file: "Tap settlement file", bank_statement: "Bank statement" } as Record<string, string>,
+    colSource: "Source",
+    colRows: "Objects",
+    colFile: "File SHA-256",
     breaksTitle: "Breaks",
     statusOpen: "Open and escalated",
     statusResolved: "Resolved by correction",
@@ -75,16 +87,22 @@ const copy = {
       charge_missing_in_ledger: "Tap charge not in the ledger", ledger_missing_at_tap: "Ledger payment not at Tap", charge_amount_mismatch: "Charge amount differs",
       refund_missing_in_ledger: "Tap refund not recorded", refund_missing_at_tap: "Recorded refund not at Tap", refund_amount_mismatch: "Refund amount differs",
       refund_failed_at_tap: "Tap reports the refund failed", settlement_missing_in_bank: "Settlement not in the bank", settlement_amount_mismatch: "Settlement amount differs",
+      evidence_conflict: "Two sources disagree about a Tap object",
     } as Record<string, string>,
     statuses: { open: "Open", escalated: "Escalated", resolved: "Resolved", auto_matched: "Auto-matched" } as Record<string, string>,
     correctionTitle: "Propose a correction",
-    correctionIntro: "This records a linked adjustment entry citing the Tap object. Nothing changes until a different administrator approves it in Approvals.",
+    correctionIntro: "This records a linked adjustment entry citing the Tap object. Nothing changes until a different administrator approves it in Approvals. Corrections add up to the break's difference: a smaller one is recorded as partial and the break stays open.",
+    breakDifference: "Break difference",
+    correctedSoFar: "Corrected so far",
+    remaining: "Still to correct",
+    capturedDelta: "Change to the captured amount (SAR, + or -)",
     providerDelta: "Change to the provider's share (SAR, + or -)",
     platformDelta: "Change to the platform's share (SAR, + or -)",
     justification: "Justification (at least 10 characters)",
     send: "Send for approval",
     cancel: "Cancel",
     numberInvalid: "Enter amounts such as 5 or -12.50; at least one must not be zero.",
+    partialBadge: "Partly corrected",
     sent: "The correction was sent for approval.",
     runsTitle: "Recent runs",
     noRuns: "No reconciliation has run yet.",
@@ -125,7 +143,15 @@ const copy = {
     importButton: "استيراد",
     importBad: "تعذّرت قراءة الأسطر {lines}. لم يُستورد شيء.",
     importEmpty: "الصق سطراً واحداً على الأقل.",
-    importDone: "سُجّل {n} عنصراً جديداً.",
+    importDone: "أُرسل الملف للاعتماد (SHA-256 {sha}). يطبّقه مسؤول مالي آخر من صفحة الاعتمادات، ولا يغيّر شيئاً قبل ذلك.",
+    importsTitle: "الملفات المستوردة",
+    importsIntro: "لا تحمل ملفات لوحة الإدارة إلا تسويات Tap وأسطر كشف الحساب البنكي. عمليات الدفع والاسترداد تأتي من واجهة Tap فقط، ولا يُغلق فرقاً تلقائياً إلا بيانات واجهة Tap.",
+    noImports: "لم يُستورد أي ملف.",
+    importStatuses: { pending_approval: "بانتظار شخص ثانٍ", applied: "مطبّق", rejected: "مرفوض", withdrawn: "مسحوب" } as Record<string, string>,
+    sources: { tap_api: "واجهة Tap", tap_settlement_file: "ملف تسويات Tap", bank_statement: "كشف الحساب البنكي" } as Record<string, string>,
+    colSource: "المصدر",
+    colRows: "العناصر",
+    colFile: "بصمة الملف SHA-256",
     breaksTitle: "فروق التسوية",
     statusOpen: "المفتوحة والمصعّدة",
     statusResolved: "المغلقة بتصحيح",
@@ -151,16 +177,22 @@ const copy = {
       charge_missing_in_ledger: "عملية دفع في Tap غير مسجلة في الدفتر", ledger_missing_at_tap: "دفعة في الدفتر غير موجودة في Tap", charge_amount_mismatch: "اختلاف مبلغ الدفع",
       refund_missing_in_ledger: "استرداد في Tap غير مسجل", refund_missing_at_tap: "استرداد مسجل غير موجود في Tap", refund_amount_mismatch: "اختلاف مبلغ الاسترداد",
       refund_failed_at_tap: "أفاد Tap بفشل الاسترداد", settlement_missing_in_bank: "تسوية لم تصل إلى البنك", settlement_amount_mismatch: "اختلاف مبلغ التسوية",
+      evidence_conflict: "مصدران مختلفان حول عنصر في Tap",
     } as Record<string, string>,
     statuses: { open: "مفتوح", escalated: "مصعّد", resolved: "مغلق", auto_matched: "مطابق تلقائياً" } as Record<string, string>,
     correctionTitle: "اقتراح تصحيح",
-    correctionIntro: "يُسجّل قيد تعديل مرتبط يذكر عنصر Tap. لا يتغير شيء حتى يعتمده مسؤول آخر من صفحة الاعتمادات.",
+    correctionIntro: "يُسجّل قيد تعديل مرتبط يذكر عنصر Tap. لا يتغير شيء حتى يعتمده مسؤول آخر من صفحة الاعتمادات. تُجمع التصحيحات حتى تساوي مبلغ الفرق، والتصحيح الأصغر يُسجَّل جزئياً ويبقى الفرق مفتوحاً.",
+    breakDifference: "مبلغ الفرق",
+    correctedSoFar: "المصحَّح حتى الآن",
+    remaining: "المتبقي للتصحيح",
+    capturedDelta: "التغيير في المبلغ المقبوض (ر.س، + أو -)",
     providerDelta: "التغيير في حصة المزود (ر.س، + أو -)",
     platformDelta: "التغيير في حصة المنصة (ر.س، + أو -)",
     justification: "المبرر (10 أحرف على الأقل)",
     send: "إرسال للاعتماد",
     cancel: "إلغاء",
-    numberInvalid: "أدخل مبالغ مثل 5 أو -12.50؛ ويجب ألا يكون كلاهما صفراً.",
+    numberInvalid: "أدخل مبالغ مثل 5 أو -12.50؛ ويجب ألا تكون كلها صفراً.",
+    partialBadge: "مصحَّح جزئياً",
     sent: "أُرسل التصحيح للاعتماد.",
     runsTitle: "آخر عمليات التسوية",
     noRuns: "لم تُجرَ أي تسوية بعد.",
@@ -208,7 +240,7 @@ export default function AdminReconciliation() {
   const [importSource, setImportSource] = useState<ImportSource>("bank_statement");
   const [importText, setImportText] = useState("");
   const [importReason, setImportReason] = useState("");
-  const [correction, setCorrection] = useState<{ brk: Break; provider: string; platform: string; justification: string; error: string } | null>(null);
+  const [correction, setCorrection] = useState<{ brk: Break; provider: string; platform: string; captured: string; justification: string; error: string } | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -279,7 +311,8 @@ export default function AdminReconciliation() {
     if (error) { setActionError(errorMessage(error)); return; }
     setImportText("");
     setImportReason("");
-    setSuccess(fill(t.importDone, { n: (data as { new?: number })?.new ?? 0 }));
+    // SECFIX-2 R2-H3: the file is staged for a second money.ledger holder; it is applied only when they approve it.
+    setSuccess(fill(t.importDone, { sha: ((data as { file_sha256?: string })?.file_sha256 ?? "").slice(0, 12) }));
     await load();
   };
 
@@ -287,21 +320,23 @@ export default function AdminReconciliation() {
     if (!correction) return;
     const provider = correction.provider.trim() === "" ? "0" : correction.provider.trim();
     const platform = correction.platform.trim() === "" ? "0" : correction.platform.trim();
-    if (!AMOUNT.test(provider) || !AMOUNT.test(platform) || (Number(provider) === 0 && Number(platform) === 0)) {
+    const captured = correction.captured.trim() === "" ? "0" : correction.captured.trim();
+    if (!AMOUNT.test(provider) || !AMOUNT.test(platform) || !AMOUNT.test(captured)
+        || (Number(provider) === 0 && Number(platform) === 0 && Number(captured) === 0)) {
       setCorrection({ ...correction, error: t.numberInvalid });
       return;
     }
     if (correction.justification.trim().length < 10) { setCorrection({ ...correction, error: t.justification }); return; }
     setBusy("correction");
     // One proposal per break and amounts: a retry after a lost response finds the same request.
-    const idempotencyKey = `break:${correction.brk.id}:${provider}:${platform}`;
+    const idempotencyKey = `break:${correction.brk.id}:${provider}:${platform}:${captured}:${Number(correction.brk.corrected_amount ?? 0)}`;
     const { error } = await supabase.rpc("admin_propose_break_resolution", {
       p_break_id: correction.brk.id,
       p_provider_share_delta: Number(provider),
       p_platform_share_delta: Number(platform),
       p_justification: correction.justification.trim(),
       p_idempotency_key: idempotencyKey,
-      p_captured_delta: 0,
+      p_captured_delta: Number(captured),
     });
     setBusy("");
     if (error) { setCorrection({ ...correction, error: errorMessage(error) }); return; }
@@ -423,11 +458,12 @@ export default function AdminReconciliation() {
                           <span className={`rounded-full px-2 py-0.5 text-[10px] font-black ${b.status === "escalated" ? "bg-[#FEF3F2] text-[#B42318]" : b.status === "open" ? "bg-[#FFFAEB] text-[#B54708]" : "bg-[#ECFDF3] text-[#027A48]"}`}>{t.statuses[b.status] ?? b.status}</span>
                           {b.status === "escalated" ? <span className="mt-1 block text-[10px] text-[#B42318]">{t.escalated}</span> : null}
                           {b.correction_pending ? <span className="mt-1 block text-[10px] text-[#B54708]">{t.pendingCorrection}</span> : null}
+                          {Number(b.corrected_amount ?? 0) > 0 && b.status !== "resolved" ? <span className="mt-1 block text-[10px] text-[#B54708]">{t.partialBadge}: {money(b.corrected_amount)}</span> : null}
                         </td>
                         <td className={cell}>
                           {(b.status === "open" || b.status === "escalated") && !b.correction_pending ? (
                             <button type="button" className={button} aria-label={`${t.propose}: ${b.tap_object_id ?? b.id}`}
-                              onClick={() => setCorrection({ brk: b, provider: "", platform: "", justification: "", error: "" })}>{t.propose}</button>
+                              onClick={() => setCorrection({ brk: b, provider: "", platform: "", captured: "", justification: "", error: "" })}>{t.propose}</button>
                           ) : "—"}
                         </td>
                       </tr>
@@ -474,6 +510,31 @@ export default function AdminReconciliation() {
             )}
           </section>
 
+          <section aria-labelledby="imports-title" className={`${card} space-y-3`}>
+            <h3 id="imports-title" className="text-sm font-black text-gray-900">{t.importsTitle}</h3>
+            <p className="text-xs font-semibold text-gray-500">{t.importsIntro}</p>
+            {!view ? null : (view.imports ?? []).length === 0 ? <p className="text-xs font-semibold text-gray-500">{t.noImports}</p> : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[760px] text-xs">
+                  <thead className="border-b border-[#ECECEC] bg-[#FAF9F6] text-[10px] font-extrabold uppercase tracking-wider text-gray-500">
+                    <tr>{[t.colDay, t.colSource, t.colRows, t.colFile, t.colStatus].map((h) => <th key={h} scope="col" className={cell}>{h}</th>)}</tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#F5F5F5] font-semibold text-gray-700">
+                    {view.imports.map((imp) => (
+                      <tr key={imp.id}>
+                        <td className={cell}>{imp.business_day}</td>
+                        <td className={cell}>{t.sources[imp.source] ?? imp.source}</td>
+                        <td className={cell}>{imp.status === "applied" ? imp.object_count : "—"}</td>
+                        <td className={cell}><bdi dir="ltr" className="font-mono">{imp.file_sha256 ? `${imp.file_sha256.slice(0, 12)}…` : "—"}</bdi></td>
+                        <td className={cell}>{t.importStatuses[imp.status] ?? imp.status}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+
           <section aria-labelledby="runs-title" className={`${card} space-y-3`}>
             <h3 id="runs-title" className="text-sm font-black text-gray-900">{t.runsTitle}</h3>
             {!view ? null : view.runs.length === 0 ? <p className="text-xs font-semibold text-gray-500">{t.noRuns}</p> : (
@@ -501,7 +562,14 @@ export default function AdminReconciliation() {
               <dt className="font-bold text-gray-500">{t.colObject}</dt><dd><bdi dir="ltr" className="font-mono">{correction.brk.tap_object_id ?? "—"}</bdi></dd>
               <dt className="font-bold text-gray-500">{t.colTap}</dt><dd>{money(correction.brk.tap_amount)}</dd>
               <dt className="font-bold text-gray-500">{t.colLedger}</dt><dd>{money(correction.brk.ledger_amount)}</dd>
+              <dt className="font-bold text-gray-500">{t.breakDifference}</dt><dd>{money(correction.brk.difference)}</dd>
+              <dt className="font-bold text-gray-500">{t.correctedSoFar}</dt><dd>{money(Number(correction.brk.corrected_amount ?? 0))}</dd>
+              <dt className="font-bold text-gray-500">{t.remaining}</dt><dd>{money(Math.abs(Number(correction.brk.difference ?? 0)) - Number(correction.brk.corrected_amount ?? 0))}</dd>
             </dl>
+            <label className="flex flex-col gap-1 text-[11px] font-bold text-[#667085]">
+              <span>{t.capturedDelta}</span>
+              <input dir="ltr" inputMode="decimal" value={correction.captured} onChange={(e) => setCorrection({ ...correction, captured: e.target.value })} className={operationsInput} />
+            </label>
             <label className="flex flex-col gap-1 text-[11px] font-bold text-[#667085]">
               <span>{t.providerDelta}</span>
               <input dir="ltr" inputMode="decimal" value={correction.provider} onChange={(e) => setCorrection({ ...correction, provider: e.target.value })} className={operationsInput} />
