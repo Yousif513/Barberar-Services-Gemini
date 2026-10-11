@@ -149,12 +149,13 @@ describe("Q1.3-4: deadline, extension, escalation, refusal", () => {
     await expectError(call(operations, sql, [r.id, "too_busy", why]), /repetitive, manifestly unfounded or disproportionate/);
     await expectError(call(stale(operations.sub), sql, [r.id, "repetitive", why]), /step-up required/);
     await expectError(call(finance, sql, [r.id, "repetitive", why]), /privacy.manage/);
-    const refused = await call(operations, sql, [r.id, "repetitive", why]);
+    await expectError(call(operations, sql, [r.id, "repetitive", why]), /no earlier completed access request/, "L1: repetitive needs an earlier answered request");
+    const refused = await call(operations, sql, [r.id, "manifestly_unfounded", why]);
     assert.equal(refused.status, "refused");
     const note = await one(`select body_en, body_ar from notifications where user_id = $1 and title_en like '%refused%'`, [id]);
     assert.match(note.body_en, /SDAIA/);
     assert.match(note.body_ar, /سدايا/);
-    await expectError(call(operations, sql, [r.id, "repetitive", why]), /can no longer be refused/);
+    await expectError(call(operations, sql, [r.id, "manifestly_unfounded", why]), /can no longer be refused/);
   });
 
   it("lets the customer withdraw an open request but not one already approved", async () => {
@@ -663,5 +664,84 @@ describe("X1: incident register", () => {
     assert.ok(m.alerted >= 1);
     assert.equal(await count("security_alerts", `kind = 'privacy_incident_deadline' and details->>'incident_id' = $1`, [i.id]), 1);
     await call(owner, `select admin_incident_record_sdaia($1, 'notify', null, 'NDGP-2', now(), 'Awareness was on a weekend; the register was only opened on Sunday') r`, [i.id]);
+  });
+});
+
+describe("PRIVFIX: identity, the copy and redaction (review M1, M2, L1, L2, L5)", () => {
+  const buildCopy = async (id) => {
+    const r = await submit(otp(id), "copy");
+    await decide(owner, (await propose(operations, r.id)).approval_id);
+    const base = `${id}/${r.id}`;
+    await call(ROLES.service, `select privacy_export_record_built($1, $2, $3, $4, $4, '{}'::jsonb) r`,
+      [r.id, `${base}/personal-data.json`, `${base}/personal-data.pdf`, "b".repeat(64)]);
+    return r;
+  };
+
+  it("M1: the download needs a fresh one-time code and stops after 5 downloads of a file", async () => {
+    const id = await customer();
+    const r = await buildCopy(id);
+    const dl = (user, file = "pdf") => call(user, `select privacy_export_authorize_download($1, $2) r`, [r.id, file]);
+    await expectError(dl(pwd(id)), /one-time code/, "the review's reproduction: a session alone no longer releases the data");
+    await expectError(dl(otp(id, 11 * 60)), /one-time code/);
+    for (let i = 0; i < 5; i += 1) await dl(otp(id));
+    await expectError(dl(otp(id)), /downloaded 5 times/);
+    assert.ok((await dl(otp(id), "json")).path.endsWith("personal-data.json"), "the limit is per file");
+  });
+
+  it("M2: a phone swap cannot pass the identity check, and a change within 30 days blocks the release", async () => {
+    // The review's reproduction: change the phone, sign in by code to the new number, ask for a copy.
+    const id = await customer();
+    await sys(db, `update auth.users set phone = '+966512349001', phone_confirmed_at = now() where id = $1`, [id]);
+    await expectError(submit(otp(id), "copy"), /changed in the last 30 days/);
+    await expectError(submit(otp(id), "deletion", { review_choice: "delete_text" }), /changed in the last 30 days/);
+    // A request made before the change cannot be released after it.
+    const v = await customer();
+    const r = await submit(otp(v), "copy");
+    await sys(db, `update auth.users set email = $2 where id = $1`, [v, `swap${v.slice(-4)}@test.local`]);
+    await expectError(propose(operations, r.id), /cooling-off/);
+    const v2 = await customer();
+    const r2 = await submit(otp(v2), "deletion", { review_choice: "delete_text" });
+    const appr = (await propose(operations, r2.id)).approval_id;
+    await sys(db, `update auth.users set phone = '+966512349002', phone_confirmed_at = now() where id = $1`, [v2]);
+    await expectError(decide(owner2, appr), /cooling-off/);
+    assert.equal(await count("profiles", "id = $1", [v2]), 1, "nothing is deleted");
+    // After 30 days the customer can ask again.
+    await settle(v);
+    assert.equal((await propose(operations, r.id)).status, "pending_approval");
+  });
+
+  it("L1: a multiple-requests extension counts only requests the customer made or confirmed, and needs step-up", async () => {
+    const id = await customer();
+    const sql = `select admin_privacy_log_request($1, 'access', 'phone', now(), 'Caller asked what data we hold', '{}'::jsonb) r`;
+    const logged = await call(operations, sql, [id]);
+    const r = await submit(otp(id), "copy");
+    const ext = `select admin_privacy_extend_request($1, 'multiple_requests', 'Several requests from this customer this year') r`;
+    await expectError(call(operations, ext, [r.id]), /made or confirmed no other request/, "a staff-logged, unconfirmed request does not count");
+    await expectError(call(stale(operations.sub), `select admin_privacy_extend_request($1, 'disproportionate_effort', 'Ten years of bookings to collect by hand') r`, [r.id]), /step-up required/);
+    await call(otp(id), `select privacy_confirm_request($1) r`, [logged.id]);
+    assert.ok((await call(operations, ext, [r.id])).extended_due_at);
+  });
+
+  it("L2: the other party's Arabic-Indic numbers and staff names are redacted from the copy", async () => {
+    const id = await customer();
+    const name = (await one(`select e.name_en from employees e where e.id = $1`, [SEED.employee1])).name_en;
+    const conv = (await one(`insert into conversations (customer_id, provider_id) values ($1, $2) returning id`, [id, SEED.provider1])).id;
+    await sys(db, `insert into messages (conversation_id, sender_id, sender_role, body) values ($1, $2, 'provider', $3)`,
+      [conv, SEED.owner1, `Ask ${name} or call ٠٥٥١٢٣٤٥٦٧`]);
+    const r = await submit(otp(id), "copy");
+    await decide(owner, (await propose(operations, r.id)).approval_id);
+    const p = await call(ROLES.service, `select privacy_export_payload($1) r`, [r.id]);
+    const text = p.messages.find((c) => c.conversation_id === conv).messages[0].text;
+    assert.doesNotMatch(text, /٠٥٥١٢٣٤٥٦٧/);
+    assert.ok(!text.includes(name) && !text.includes(name.split(" ")[0]), text);
+    assert.match(text, /\[redacted name\]/);
+  });
+
+  it("L5: withdrawing a request and changing the review choice need a fresh code", async () => {
+    const id = await customer();
+    const r = await submit(otp(id), "deletion", { review_choice: "delete_text" });
+    await expectError(call(pwd(id), `select privacy_withdraw_request($1) r`, [r.id]), /one-time code/);
+    await expectError(call(pwd(id), `select privacy_set_review_choice($1, 'deleted_user') r`, [r.id]), /one-time code/);
+    assert.equal((await call(otp(id), `select privacy_withdraw_request($1) r`, [r.id])).status, "withdrawn");
   });
 });

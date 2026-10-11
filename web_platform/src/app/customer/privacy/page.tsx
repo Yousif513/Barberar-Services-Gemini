@@ -174,8 +174,16 @@ export default function CustomerPrivacy() {
   };
 
   const download = async (r: Request, file: "json" | "pdf") => {
+    setMessage({});
     const { data, error } = await supabase.functions.invoke("privacy-export-download", { body: { request_id: r.id, file } });
-    if (error) { setMessage({ error: errorMessage(error) }); return; }
+    if (error) {
+      // The download needs a fresh one-time code too (review M1): keep the download and open the code step.
+      const context = (error as { context?: Response }).context;
+      const body = context && typeof context.json === "function" ? await context.clone().json().catch(() => null) as { error?: string; hint?: string } | null : null;
+      if (body?.hint === "contact_otp_required") { setPending({ run: async () => { await download(r, file); } }); return; }
+      setMessage({ error: body?.error ?? errorMessage(error) });
+      return;
+    }
     const blob = data instanceof Blob ? data : new Blob([typeof data === "string" ? data : JSON.stringify(data, null, 2)], { type: file === "pdf" ? "application/pdf" : "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
