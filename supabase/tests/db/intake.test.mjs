@@ -384,15 +384,14 @@ describe("patch tests", () => {
     assert.equal((await state(booking.id)).patch_status, row.far ? "valid" : "too_late");
   });
 
-  it("shows the client their own results and the staff of that provider only", async () => {
+  it("shows the client their own results and the assigned provider only (Q2.6; security review M4(b))", async () => {
     const customer = await newCustomer();
     const booking = await makeBooking(customer);
     await record(employeeUser, booking.id, "negative", new Date(Date.now() - 86400000).toISOString());
     assert.equal((await as(db, customer, `select id from patch_test_results where customer_id = $1`, [customer.sub])).length, 1);
-    for (const user of [owner, delegate, employeeUser]) {
-      assert.equal((await as(db, user, `select id from patch_test_results where customer_id = $1`, [customer.sub])).length, 1);
-    }
-    for (const user of [await newCustomer(), otherOwner, stranger, otherProviderEmployee, admin]) {
+    assert.equal((await as(db, employeeUser, `select id from patch_test_results where customer_id = $1`, [customer.sub])).length, 1,
+      "the professional assigned to the booking");
+    for (const user of [await newCustomer(), owner, delegate, otherOwner, stranger, otherProviderEmployee, admin]) {
       assert.equal((await as(db, user, `select id from patch_test_results where customer_id = $1`, [customer.sub])).length, 0);
     }
   });

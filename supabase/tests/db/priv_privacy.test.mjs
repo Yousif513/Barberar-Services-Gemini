@@ -745,3 +745,43 @@ describe("PRIVFIX: identity, the copy and redaction (review M1, M2, L1, L2, L5)"
     assert.equal((await call(otp(id), `select privacy_withdraw_request($1) r`, [r.id])).status, "withdrawn");
   });
 });
+
+describe("PRIVFIX: health retention (review M4)", () => {
+  const answers = async (id, b) => {
+    const tpl = (await one(`insert into intake_form_templates (provider_id, name_en, name_ar) values ($1, 'Stale', 'قديم') returning id`, [SEED.provider1])).id;
+    const ver = (await one(`insert into intake_form_template_versions (template_id, provider_id, version, fields) values ($1, $2, 1, '[]'::jsonb) returning id`, [tpl, SEED.provider1])).id;
+    const sub = (await one(`insert into intake_submissions (booking_id, provider_id, customer_id, template_id, template_version_id, template_version)
+                            values ($1, $2, $3, $4, $5, 1) returning id`, [b, SEED.provider1, id, tpl, ver])).id;
+    await sys(db, `insert into intake_answers (submission_id, customer_id, answers) values ($1, $2, '{"allergy":"nuts"}')`, [sub, id]);
+    return sub;
+  };
+
+  it("(a) destroys answers of an appointment nobody closed, 30 days after its scheduled time", async () => {
+    const id = await customer();
+    const stale = await answers(id, await booking(id, "confirmed", 40));
+    const unpaid = await answers(id, await booking(id, "pending_payment", 35));
+    const recent = await answers(id, await booking(id, "confirmed", 20));
+    await call(ROLES.service, `select purge_expired_intake(false) r`);
+    const status = async (sub) => (await one(`select status from intake_submissions where id = $1`, [sub])).status;
+    assert.equal(await status(stale), "purged", "the review's reproduction: a confirmed booking never closed is no longer kept forever");
+    assert.equal(await status(unpaid), "purged");
+    assert.equal(await status(recent), "submitted", "day 20: kept");
+    assert.equal(await count("intake_answers", "submission_id = any($1::uuid[])", [[stale, unpaid]]), 0);
+  });
+
+  it("(b) destroys patch-test results under the same 30-day rule", async () => {
+    const id = await customer();
+    const old = await booking(id, "completed", 45);
+    const fresh = await booking(id, "completed", 5);
+    const ins = (b, days) => one(`insert into patch_test_results (provider_id, service_id, customer_id, booking_id, result, tested_at, recorded_by)
+                                  values ($1, $2, $3, $4, 'negative', now() - make_interval(days => $5::int), $6) returning id`,
+                                 [SEED.provider1, svc.id, id, b, days, SEED.owner1]);
+    const o = (await ins(old, 46)).id;
+    const f = (await ins(fresh, 6)).id;
+    const dry = await call(ROLES.service, `select purge_expired_intake(true) r`);
+    assert.ok(dry.patch_tests_eligible >= 1);
+    await call(ROLES.service, `select purge_expired_intake(false) r`);
+    assert.equal(await count("patch_test_results", "id = $1", [o]), 0);
+    assert.equal(await count("patch_test_results", "id = $1", [f]), 1);
+  });
+});
