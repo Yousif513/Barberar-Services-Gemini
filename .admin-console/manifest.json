@@ -8706,6 +8706,84 @@
       ],
       "status": "assumed",
       "appliesTo": []
+    },
+    {
+      "id": "privfix-patch-tests-are-health-data",
+      "decision": "Patch-test results are treated as health data under Q2.6: destroyed 30 days after the appointment they were recorded for (or after the test when there is no booking), kept longer only as the latest result per service under the 12-month reuse consent; readable by the customer, the provider assigned to that booking and the person who recorded it. The business owner also sees an uncleared positive result because only the owner clears that safety block.",
+      "reason": "Implementer assumption applying security review M4(b); the memo names intake answers, not patch tests. Owner or DPO to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011320000_privfix_health_retention.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "intake.health-retention-and-gate"
+      ]
+    },
+    {
+      "id": "privfix-stale-appointment-cutoff",
+      "decision": "An appointment never completed or cancelled counts as concluded at its scheduled end for the Q2.6 30-day destruction of health answers and patch-test results.",
+      "reason": "Coordinator instruction for security review M4(a): 30 days after the scheduled time if never completed or cancelled.",
+      "evidence": [
+        "supabase/migrations/20261011320000_privfix_health_retention.sql"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "intake.health-retention-and-gate"
+      ]
+    },
+    {
+      "id": "privfix-hold-scope-and-renewal",
+      "decision": "A court hold keeps the account (profile, contact details, login) only when it names the account category with its own reason of at least 20 characters; other named categories are re-linked to the hold's own pseudonym and the profile is deleted. Keeping a hold at its 90-day review needs a reason and an approver who is neither the proposer nor whoever last approved or renewed it.",
+      "reason": "Coordinator instruction and security review H2: holds scope only the categories they name and cannot be renewed indefinitely without a new approver and reason.",
+      "evidence": [
+        "supabase/migrations/20261011300000_privfix_deletion_engine.sql"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "privacy.legal-hold",
+        "privacy.deletion"
+      ]
+    },
+    {
+      "id": "privfix-money-records-pseudonymised",
+      "decision": "Tips, wallet credits and their redemptions, coupon, gift-card and package redemptions and loyalty balances are kept pseudonymised (customer link nulled, random token per row) for the 10-year retention instead of being deleted with the profile; an account deleted on the Auth side keeps them with the link cleared by the foreign key.",
+      "reason": "Coordinator instruction and security review M3 under Q2.4.",
+      "evidence": [
+        "supabase/migrations/20261011300000_privfix_deletion_engine.sql",
+        "supabase/migrations/20261011340000_privfix_money_cascade_and_grants.sql"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "privacy.deletion"
+      ]
+    },
+    {
+      "id": "privfix-contact-cooling-off",
+      "decision": "A verified e-mail or phone changed in the last 30 days refuses the one-time-code identity check, and a change within 30 days before a request (or since) blocks proposing, approving or releasing it; phone sign-ups need confirmation locally (enable_confirmations = true).",
+      "reason": "Coordinator instruction and security review M2. The 30-day window reuses the governance notice window for previous contacts; owner to confirm the length.",
+      "evidence": [
+        "supabase/migrations/20261011300000_privfix_deletion_engine.sql",
+        "supabase/migrations/20261011310000_privfix_identity_and_copy.sql",
+        "supabase/config.toml"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "privacy.request-intake",
+        "privacy.copy-export",
+        "privacy.deletion"
+      ]
+    },
+    {
+      "id": "privfix-archive-import-service-only",
+      "decision": "Deletion-ledger archive entries come back only through privacy_import_deletion_archive with the service key, the SHA-256 printed by the ledger export, and a completed verified deletion request with the same id; the console re-application takes no entries and the engine refuses any account that is not a customer.",
+      "reason": "Security review C1 and coordinator instruction.",
+      "evidence": [
+        "supabase/migrations/20261011300000_privfix_deletion_engine.sql"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "privacy.deletion-ledger"
+      ]
     }
   ],
   "gaps": [
@@ -10978,12 +11056,10 @@
       "id": "privacy-jobs-not-scheduled",
       "severity": "high",
       "description": "The privacy jobs exist as functions but nothing runs them: privacy_escalate_requests (daily), purge_expired_intake (daily, Q2.6 30-day destruction), privacy_release_due_holds (daily), privacy_incident_maintenance (hourly), the privacy-export Edge Function without a body (builds waiting copies and removes expired files) and privacy-erase-account (auth deletions and restored accounts). The approver's console calls the two Edge Functions right after approving.",
-      "status": "open",
-      "rationale": "Owner/operations: schedule them (pg_cron with pg_net or Supabase scheduled functions) on the hosted project.",
+      "status": "fixed",
+      "rationale": "FIXED IN SOURCE (impl-privfix-claude, 20261011320000_privfix_health_retention.sql): pg_cron jobs primora-intake-purge, primora-privacy-escalate, primora-privacy-release-holds, primora-privacy-incidents, and pg_net calls to privacy-export and privacy-erase-account every 15 minutes (the hosted project needs the Vault secrets project_url and service_role_key).",
       "evidence": [
-        "supabase/migrations/20261011200000_priv_privacy_requests.sql",
-        "supabase/migrations/20261011230000_priv_health_intake.sql",
-        "supabase/functions/privacy-export/index.ts"
+        "supabase/migrations/20261011320000_privfix_health_retention.sql"
       ]
     },
     {
@@ -11373,6 +11449,36 @@
       "evidence": [
         "docs/reviews/2026-10-11-ux-review.md"
       ]
+    },
+    {
+      "id": "deletion-archive-import-needs-request-records",
+      "severity": "medium",
+      "description": "privacy_import_deletion_archive accepts an archived ledger entry only when privacy_requests holds the completed deletion request with the same id. A restore to a point before that request was completed rolls the request back too, so the archive alone cannot re-apply that deletion.",
+      "status": "blocked",
+      "rationale": "Owner: keep the completed deletion requests in the same off-database archive (or decide another proof of approval), together with deletion-ledger-needs-off-database-archive.",
+      "evidence": [
+        "supabase/migrations/20261011300000_privfix_deletion_engine.sql"
+      ]
+    },
+    {
+      "id": "privfix-not-reviewed",
+      "severity": "medium",
+      "description": "The fixes for the 17 findings of docs/reviews/2026-10-11-security-priv.md (migrations 20261011300000-340000, privacy-erase-account, _shared/http.ts, admin privacy and incidents screens, customer privacy screen) have not been re-reviewed by an independent security pass or browser-checked with a TOTP console sign-in.",
+      "status": "open",
+      "rationale": "Next: adminwright-security with a different agent id re-runs the review's reproductions; ux-reviewer checks the hold account-reason field, the aware_at correction and the download code step.",
+      "evidence": [
+        ".admin-console/worklog/impl-privfix-claude.md"
+      ]
+    },
+    {
+      "id": "local-sms-confirmations-need-restart",
+      "severity": "low",
+      "description": "supabase/config.toml now sets [auth.sms] enable_confirmations = true; the running local stack was not restarted in this pass, so the local Auth service may still auto-confirm phone sign-ups until the next start. The hosted project must have phone confirmations on.",
+      "status": "open",
+      "rationale": "Owner/operations: restart the local stack when convenient and confirm the hosted Auth setting.",
+      "evidence": [
+        "supabase/config.toml"
+      ]
     }
   ],
   "declaredStatic": [
@@ -11542,6 +11648,16 @@
       "approvedBy": "Owner adoption of the privacy memo on 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md)",
       "evidence": [
         "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "privfix-download-limit",
+      "path": "supabase/migrations/20261011310000_privfix_identity_and_copy.sql#privacy_export_download_limit",
+      "value": "5 downloads per file of a data copy",
+      "reason": "Security review M1 (cap downloads, for example 5 per file)",
+      "approvedBy": "Coordinator instruction for the PRIV security fix pass, 2026-10-11 (owner to confirm)",
+      "evidence": [
+        "docs/reviews/2026-10-11-security-priv.md"
       ]
     }
   ],
@@ -12263,6 +12379,37 @@
         ".admin-console/evidence/ux-round1/crawl-owner-en-1440.json"
       ],
       "status": "open"
+    },
+    {
+      "id": "privfix-erasure-needs-whole-schema-search",
+      "observation": "The PRIV deletion engine passed its own per-table tests but left the subject's e-mail and phones in notice outboxes, message queues and logs and an earlier-contacts table that no test looked at; only a test that searches every public table's row text for the subject's contact values after erasure catches this class.",
+      "category": "gap",
+      "proposedChange": "security-governance / data-model: every erasure capability ships a whole-schema residue test (row::text ILIKE any contact value and the subject id, with an explicit allow-list of request-record tables).",
+      "evidence": [
+        "supabase/tests/db/priv_privacy.test.mjs"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "privfix-money-guards-block-fk-set-null",
+      "observation": "Switching money tables' customer foreign key to ON DELETE SET NULL collided with the append-only guard that freezes customer_id: an Auth-side account deletion would have been blocked. The guard had to allow exactly the foreign-key action (pg_trigger_depth() > 1) and a recorded erasure run.",
+      "category": "new-pattern",
+      "proposedChange": "admin-data-model: when an append-only or frozen-column guard exists, any foreign-key action change on a frozen column needs an explicit guard exemption and a test deleting the parent outside the engine.",
+      "evidence": [
+        "supabase/migrations/20261011340000_privfix_money_cascade_and_grants.sql",
+        "supabase/tests/db/money_append_only.test.mjs"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "privfix-pseudonym-per-row",
+      "observation": "One pseudonym per erased person shared across bookings, money rows and holds, with the hold keeping the subject id beside it, made the irreversible token reversible by one join; per-row tokens plus a per-hold token nulled on release avoid it.",
+      "category": "gap",
+      "proposedChange": "admin-data-model: pseudonymisation guidance should require a random token per retained row and forbid storing any token next to the subject identifier.",
+      "evidence": [
+        "supabase/migrations/20261011300000_privfix_deletion_engine.sql"
+      ],
+      "status": "open"
     }
   ],
   "agents": [
@@ -12457,6 +12604,15 @@
       "status": "handed-off",
       "notes": "UX round 1 over governance, money and privacy packages: /login/mfa, /admin/approvals, /admin/roles, /admin/ledger, /admin/reconciliation, /admin/platform-rules, /admin/settings, /admin/customers, /admin/bookings, /admin/disputes, /admin/audit-logs, /admin/privacy, /admin/incidents, /admin/ropa, /customer/privacy, /provider/pricing, /become-provider. Browser on localhost:3100, EN/AR, 375px and desktop.",
       "worklog": "docs/reviews/2026-10-11-ux-review.md"
+    },
+    {
+      "id": "impl-privfix-claude",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "Fixed every finding of docs/reviews/2026-10-11-security-priv.md (C1, H1-H3, M1-M7, L1-L6) in migrations 20261011300000-340000, privacy-erase-account, _shared/http.ts, and the admin/customer privacy and incident screens; capabilities left in-progress and unreviewed for the security re-review.",
+      "worklog": ".admin-console/worklog/impl-privfix-claude.md"
     }
   ]
 }
