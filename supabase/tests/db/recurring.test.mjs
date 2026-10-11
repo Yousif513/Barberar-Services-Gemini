@@ -386,7 +386,7 @@ describe("cancelling the rest", () => {
     assert.deepEqual(out.results.map((r) => r.outcome), ["cancelled", "already_cancelled", "cancelled"]);
   });
 
-  it("answers 'not found' to anybody but the customer, and an administrator needs a reason", async () => {
+  it("answers 'not found' to anybody but the customer, and a console session cancels booking by booking", async () => {
     const customer = await newCustomer();
     const anchor = await makeAnchor(customer);
     const result = await createSeries(customer, anchor.id, 1, 3);
@@ -396,10 +396,10 @@ describe("cancelling the rest", () => {
     }
     await expectError(cancelSeries(ROLES.anon, result.series_id), /Authentication required|permission denied/);
     await expectError(cancelSeries(customer, crypto.randomUUID()), /Series not found/);
-    await expectError(cancelSeries(admin, result.series_id, null), /reason of at least 3/);
+    // SECFIX-2 R2-H2: a console session cancels each booking with admin_cancel_booking (refund approval rules), not the series.
+    await expectError(cancelSeries(admin, result.series_id, "Provider closed permanently"), /admin_cancel_booking/);
     assert.equal(await count("bookings", `id in (select booking_id from booking_series_occurrences where series_id = $1) and status = 'cancelled'`, [result.series_id]), 0);
-    const out = await cancelSeries(admin, result.series_id, "Provider closed permanently");
-    assert.equal(out.cancelled, 3);
+    await as(db, admin, `select admin_cancel_booking($1, 'Provider closed permanently')`, [anchor.id]);
     assert.equal((await sys(db, `select cancelled_by from bookings where id = $1`, [anchor.id]))[0].cancelled_by, "admin");
   });
 });

@@ -212,9 +212,12 @@ await check("the provider cannot rewrite the booking status through the table", 
 
 await check("an administrator cancels only with a reason, and the audit log records it", async () => {
   assert.ok(bookingId);
-  const short = await rpc("cancel_booking", { target_booking_id: bookingId, p_reason: "x" }, tokens.admin);
+  // SECFIX-2 R2-H2: the console cancels through admin_cancel_booking (reason of at least 10 characters, refund approval rules).
+  const direct = await rpc("cancel_booking", { target_booking_id: bookingId, p_reason: "Smoke test cleanup" }, tokens.admin);
+  assert.ok(direct.status >= 400, `a console session cancelled through the self-service command: ${JSON.stringify(direct.json)}`);
+  const short = await rpc("admin_cancel_booking", { p_booking_id: bookingId, p_reason: "x" }, tokens.admin);
   assert.ok(short.status >= 400, `a one-character reason was accepted: ${JSON.stringify(short.json)}`);
-  const done = await rpc("cancel_booking", { target_booking_id: bookingId, p_reason: "Smoke test cleanup" }, tokens.admin);
+  const done = await rpc("admin_cancel_booking", { p_booking_id: bookingId, p_reason: "Smoke test cleanup" }, tokens.admin);
   assert.equal(done.status, 200, JSON.stringify(done.json));
   const logs = Number(psql(`select count(*) from public.admin_audit_logs where created_at > now() - interval '5 minutes'`));
   assert.ok(logs > 0, "no audit row was written for the administrator's write");

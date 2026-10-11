@@ -217,13 +217,13 @@ describe("the booking directory", () => {
 });
 
 describe("administrator booking commands", () => {
-  it("demand a three character reason from an administrator and none from the provider's own staff", async () => {
+  it("demand a ten character reason from an administrator (through the console commands) and none from the provider's own staff", async () => {
     let offset = 0;
     const started = async () => (await sys(db, `insert into bookings (customer_id, branch_id, employee_id, service_id, scheduled_at, duration_minutes, status, total_price, platform_commission, deposit_required)
       values ($1, $2, $3, $4, now() - interval '7 hours' - make_interval(mins => $5::int), 30, 'confirmed', 100, 10, 0) returning id`,
       [SEED.customer, SEED.branch1, SEED.employee1, svc.id, (offset += 45)]))[0].id;
     for (const reason of ["null", "''", "'   '", "'x'", "'ab'"]) {
-      for (const sql of [`select cancel_booking($1, ${reason})`, `select mark_booking_no_show($1, ${reason})`, `select employee_update_booking_status($1, 'completed', ${reason})`]) {
+      for (const sql of [`select admin_cancel_booking($1, ${reason})`, `select admin_mark_booking_no_show($1, ${reason})`, `select employee_update_booking_status($1, 'completed', ${reason})`]) {
         assert.equal(await outcome(as(db, admin, sql, [await started()])), "22023", `${sql} with ${reason}`);
       }
     }

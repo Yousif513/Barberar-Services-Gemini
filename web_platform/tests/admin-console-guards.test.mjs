@@ -86,9 +86,11 @@ describe("admin console guards", () => {
 
   it("booking commands run on the server with a reason", () => {
     const bookings = page("/bookings");
-    for (const command of ["cancel_booking", "mark_booking_no_show", "employee_update_booking_status", "admin_release_expired_holds"]) {
+    // SECFIX-2 R2-H2: console cancellations and no-shows use their own commands (step-up, reason, refund approval rules).
+    for (const command of ["admin_cancel_booking", "admin_mark_booking_no_show", "employee_update_booking_status", "admin_release_expired_holds"]) {
       assert.ok(bookings.includes(`rpc("${command}"`), `bookings must use ${command}`);
     }
+    assert.ok(!bookings.includes('rpc("cancel_booking"') && !bookings.includes('rpc("mark_booking_no_show"'), "the console never calls the self-service commands");
   });
 
   it("local developer access is opt-in and limited to the role's dashboards", () => {

@@ -273,13 +273,20 @@ describe("booking.transition: booking commands", () => {
     const started = async () => (await sys(db, `insert into bookings (customer_id, branch_id, employee_id, service_id, scheduled_at, duration_minutes, status, total_price, platform_commission, deposit_required)
       values ($1, $2, $3, $4, now() - interval '6 hours' - make_interval(mins => $5::int), 30, 'confirmed', 100, 10, 0) returning id`,
       [SEED.customer, SEED.branch1, SEED.employee1, svc.id, (offset += 45)]))[0].id;
-    for (const sql of [`select cancel_booking($1, '   ')`, `select mark_booking_no_show($1, '   ')`, `select employee_update_booking_status($1, 'completed', '   ')`, `select employee_update_booking_status($1, 'cancelled')`]) {
+    // SECFIX-2 R2-H2: the console cancels and marks no-shows through admin_cancel_booking / admin_mark_booking_no_show (reason of
+    // at least 10 characters); the self-service commands refuse a console session outright.
+    for (const sql of [`select admin_cancel_booking($1, '   ')`, `select admin_mark_booking_no_show($1, '   ')`, `select employee_update_booking_status($1, 'completed', '   ')`]) {
       const id = await started();
       assert.equal(await outcome(as(db, admin, sql, [id])), "22023", sql);
       assert.equal((await sys(db, `select status from bookings where id = $1`, [id]))[0].status, "confirmed", `${sql} changed nothing`);
     }
+    for (const sql of [`select cancel_booking($1, 'Customer rang to cancel')`, `select mark_booking_no_show($1, 'Customer never came')`, `select employee_update_booking_status($1, 'cancelled', 'Customer rang')`]) {
+      const id = await started();
+      assert.equal(await outcome(as(db, admin, sql, [id])), "42501", sql);
+      assert.equal((await sys(db, `select status from bookings where id = $1`, [id]))[0].status, "confirmed", `${sql} changed nothing`);
+    }
     const id = await started();
-    await as(db, admin, `select cancel_booking($1, 'Customer rang to cancel')`, [id]);
+    await as(db, admin, `select admin_cancel_booking($1, 'Customer rang to cancel')`, [id]);
     assert.equal((await sys(db, `select status from bookings where id = $1`, [id]))[0].status, "cancelled");
   });
 

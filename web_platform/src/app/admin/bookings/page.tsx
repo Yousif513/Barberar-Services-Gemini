@@ -42,9 +42,9 @@ const translations = {
     noShow: "No-show",
     releaseHolds: "Release expired unpaid holds",
     cancelTitle: "Cancel this booking",
-    cancelIntro: "The shop's cancellation policy and refund rules apply to this booking.",
+    cancelIntro: "Everything captured for this booking is refunded to the customer. You need a recent sign-in check; a refund needs a finance approver when you hold no refund permission, when it is SAR 1,000 or more, or when it takes you past SAR 5,000 today.",
     noShowTitle: "Mark this booking as a no-show",
-    noShowIntro: "The shop's no-show fee applies.",
+    noShowIntro: "The shop's no-show fee applies and the rest is refunded. A refund follows the same approval rules as a cancellation.",
     completeTitle: "Mark this booking as completed",
     completeIntro: "The booking is recorded as completed by a platform administrator.",
     releaseTitle: "Release expired unpaid holds",
@@ -68,6 +68,7 @@ const translations = {
     loadingInvoice: "Loading the invoice…",
     released: "Released {n} expired unpaid holds.",
     done: "Booking updated.",
+    sentForApproval: "Sent for approval: a finance approver must confirm the {amount} refund before the booking changes. It is listed under Approvals.",
     statusLabel: "Status",
     allStatuses: "All statuses",
     empty: "No bookings match these filters.",
@@ -123,9 +124,9 @@ const translations = {
     noShow: "عدم حضور",
     releaseHolds: "إطلاق الحجوزات غير المدفوعة المنتهية",
     cancelTitle: "إلغاء هذا الحجز",
-    cancelIntro: "تُطبق سياسة الإلغاء وقواعد الاسترداد الخاصة بالمركز على هذا الحجز.",
+    cancelIntro: "يُسترد للعميل كامل المبلغ المقبوض لهذا الحجز. يلزم تحقق حديث من الدخول، ويحتاج الاسترداد إلى موافقة مسؤول مالي إذا لم تكن لديك صلاحية الاسترداد، أو كان ١٬٠٠٠ ريال أو أكثر، أو تجاوز به مجموعك اليومي ٥٬٠٠٠ ريال.",
     noShowTitle: "تسجيل هذا الحجز كعدم حضور",
-    noShowIntro: "تُطبق رسوم عدم الحضور الخاصة بالمركز.",
+    noShowIntro: "تُطبق رسوم عدم الحضور الخاصة بالمركز ويُسترد الباقي، ويخضع الاسترداد لقواعد الموافقة نفسها المطبقة على الإلغاء.",
     completeTitle: "تسجيل هذا الحجز كمكتمل",
     completeIntro: "يُسجَّل الحجز كمكتمل بواسطة مسؤول المنصة.",
     releaseTitle: "إطلاق الحجوزات غير المدفوعة المنتهية",
@@ -149,6 +150,7 @@ const translations = {
     loadingInvoice: "جارٍ تحميل الفاتورة…",
     released: "تم إطلاق {n} من الحجوزات غير المدفوعة المنتهية.",
     done: "تم تحديث الحجز.",
+    sentForApproval: "أُرسل للموافقة: يجب أن يؤكد مسؤول مالي استرداد {amount} قبل تغيير الحجز. يظهر الطلب في صفحة الموافقات.",
     statusLabel: "الحالة",
     allStatuses: "كل الحالات",
     empty: "لا توجد حجوزات مطابقة لهذه التصفية.",
@@ -289,8 +291,8 @@ function BookingsScreen() {
     };
   }, [statusFilter, search, from, to, page, reloadKey, rangeInvalid]);
 
-  // Booking commands run on the server (cancel_booking, mark_booking_no_show,
-  // employee_update_booking_status); each applies the shop's policy and writes the audit log. A refusal goes back to
+  // Booking commands run on the server: admin_cancel_booking and admin_mark_booking_no_show (step-up, reason, and the refund
+  // approval rules of D-Q5, SECFIX-2 R2-H2) and employee_update_booking_status for completion; each writes the audit log. A refusal goes back to
   // the dialog, which stays open with what the operator typed; a success is announced and the list read again.
   const execute = async (command: PromiseLike<{ data: unknown; error: unknown }>, success: (data: unknown) => string): Promise<string | null> => {
     const { data, error } = await command;
@@ -359,12 +361,18 @@ function BookingsScreen() {
         facts={facts}
         reasonLabel={t.reasonLabel}
         confirmLabel={cancelling ? t.confirmCancel : t.confirmNoShow}
+        minReasonLength={10}
         onConfirm={(reason) =>
           execute(
             cancelling
-              ? supabase.rpc("cancel_booking", { target_booking_id: booking.id, p_reason: reason })
-              : supabase.rpc("mark_booking_no_show", { target_booking_id: booking.id, p_reason: reason }),
-            () => t.done,
+              ? supabase.rpc("admin_cancel_booking", { p_booking_id: booking.id, p_reason: reason })
+              : supabase.rpc("admin_mark_booking_no_show", { p_booking_id: booking.id, p_reason: reason }),
+            (data) => {
+              const result = data as { status?: string; refund_amount?: number | string } | null;
+              return result?.status === "pending_approval"
+                ? t.sentForApproval.replace("{amount}", sar(Number(result.refund_amount) || 0, lang))
+                : t.done;
+            },
           )
         }
         onClose={close}

@@ -20,7 +20,7 @@ type Status = (typeof STATUSES)[number];
 type Numeric = number | string | null;
 type ApprovalRow = {
   id: string;
-  kind: "payout_release" | "refund" | "iban_change" | "setting_change" | "ledger_settlement" | "ledger_adjustment" | "fee_rule_change" | "payout_hold" | "reward_program" | "role_change";
+  kind: "payout_release" | "refund" | "iban_change" | "setting_change" | "ledger_settlement" | "ledger_adjustment" | "fee_rule_change" | "payout_hold" | "reward_program" | "role_change" | "booking_cancellation";
   status: string;
   target_id: string | null;
   amount_sar: Numeric;
@@ -75,14 +75,16 @@ const translations = {
     tabs: { pending: "Waiting", approved: "Approved", rejected: "Rejected", cancelled: "Withdrawn" },
     kinds: { payout_release: "Payout release", refund: "Refund", iban_change: "Bank account change", setting_change: "Threshold change",
       ledger_settlement: "Manual ledger settlement", ledger_adjustment: "Ledger correction", fee_rule_change: "Fee rule change",
-      payout_hold: "Payout hold", reward_program: "Reward programme change", role_change: "Console role grant" },
+      payout_hold: "Payout hold", reward_program: "Reward programme change", role_change: "Console role grant",
+      booking_cancellation: "Booking cancellation with refund" },
     consoleRoles: { owner: "Owner", finance: "Finance", operations: "Operations", analyst: "Analyst (read-only)" } as Record<string, string>,
     noConsoleRole: "No console role",
     breakGlassClosedUntil: "Break-glass closed until {date}: an administrator who could approve this was demoted or removed",
     ownAlert: "About you or your action: another owner acknowledges it",
     ownBreakGlass: "You used this break-glass: another administrator records the review",
     describeParts: { increase: "increase, 30 days notice", from: "from", place: "place hold", lift: "lift hold", enable: "enable", disable: "disable",
-      reference: "bank reference", provider: "provider", platform: "platform", tap: "Tap object" },
+      reference: "bank reference", provider: "provider", platform: "platform", tap: "Tap object",
+      cancelBooking: "cancel booking", noShowBooking: "no-show", invoice: "invoice", refund: "refund" },
     columnRequest: "Request",
     columnAmount: "Amount",
     columnRequestedBy: "Requested by",
@@ -185,14 +187,16 @@ const translations = {
     tabs: { pending: "بانتظار القرار", approved: "معتمدة", rejected: "مرفوضة", cancelled: "مسحوبة" },
     kinds: { payout_release: "صرف تحويل", refund: "استرداد", iban_change: "تغيير حساب بنكي", setting_change: "تغيير حد",
       ledger_settlement: "تسوية قيد يدوية", ledger_adjustment: "تصحيح قيد", fee_rule_change: "تغيير قاعدة رسوم",
-      payout_hold: "إيقاف التحويلات", reward_program: "تغيير برنامج مكافآت", role_change: "منح دور في لوحة الإدارة" },
+      payout_hold: "إيقاف التحويلات", reward_program: "تغيير برنامج مكافآت", role_change: "منح دور في لوحة الإدارة",
+      booking_cancellation: "إلغاء حجز مع استرداد" },
     consoleRoles: { owner: "المالك", finance: "المالية", operations: "العمليات", analyst: "محلل (قراءة فقط)" } as Record<string, string>,
     noConsoleRole: "بلا دور في لوحة الإدارة",
     breakGlassClosedUntil: "إجراء الطوارئ مغلق حتى {date}: خُفّض دور مسؤول كان يمكنه الاعتماد أو أُزيل",
     ownAlert: "يتعلق بك أو بإجراء قمت به: يقرّ به مالك آخر",
     ownBreakGlass: "أنت من استخدم إجراء الطوارئ: يسجّل المراجعةَ مسؤول آخر",
     describeParts: { increase: "زيادة، إشعار 30 يوماً", from: "من", place: "إيقاف", lift: "رفع الإيقاف", enable: "تفعيل", disable: "إيقاف",
-      reference: "المرجع البنكي", provider: "المزود", platform: "المنصة", tap: "معرّف Tap" },
+      reference: "المرجع البنكي", provider: "المزود", platform: "المنصة", tap: "معرّف Tap",
+      cancelBooking: "إلغاء الحجز", noShowBooking: "عدم حضور", invoice: "الفاتورة", refund: "الاسترداد" },
     columnRequest: "الطلب",
     columnAmount: "المبلغ",
     columnRequestedBy: "مقدّم الطلب",
@@ -376,6 +380,10 @@ function ApprovalsScreen() {
     }
     if (row.kind === "payout_hold") {
       return [providerName(row), s.action === "lift" ? d.lift : d.place].filter(Boolean).join(" · ");
+    }
+    if (row.kind === "booking_cancellation") {
+      return [providerName(row), s.action === "no_show" ? d.noShowBooking : d.cancelBooking, s.invoice_number ? `${d.invoice} ${text(s.invoice_number)}` : "",
+        `${d.refund} ${sar(toNumber(s.refund_amount as Numeric), lang)}`].filter(Boolean).join(" · ");
     }
     if (row.kind === "role_change") {
       const role = (value: unknown) => (typeof value === "string" && value ? t.consoleRoles[value] ?? value : t.noConsoleRole);
