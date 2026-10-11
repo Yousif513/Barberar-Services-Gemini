@@ -9,6 +9,7 @@
 // (it refuses any other API address) and creates its own throw-away users.
 
 import { execFileSync } from "node:child_process";
+import { createHmac } from "node:crypto";
 import assert from "node:assert/strict";
 
 const DB_CONTAINER = process.env.SMOKE_DB_CONTAINER || "supabase_db_beauty_grooming_marketplace";
@@ -66,6 +67,40 @@ async function setPassword(id, password) {
   assert.equal(r.status, 200, `could not set a password: ${JSON.stringify(r.json)}`);
 }
 
+// RFC 6238 TOTP (HMAC-SHA1, 30-second step, 6 digits) from the base32 secret GoTrue returns at enrolment.
+function totp(secretBase32, now = Date.now()) {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+  let bits = "";
+  for (const ch of secretBase32.replace(/=+$/, "").toUpperCase()) {
+    const value = alphabet.indexOf(ch);
+    if (value < 0) throw new Error("the TOTP secret is not base32");
+    bits += value.toString(2).padStart(5, "0");
+  }
+  const key = Buffer.from(bits.match(/.{8}/g).map((byte) => parseInt(byte, 2)));
+  const counter = Buffer.alloc(8);
+  counter.writeBigUInt64BE(BigInt(Math.floor(now / 1000 / 30)));
+  const hmac = createHmac("sha1", key).update(counter).digest();
+  const offset = hmac[hmac.length - 1] & 0x0f;
+  const code = ((hmac.readUInt32BE(offset) & 0x7fffffff) % 1_000_000).toString();
+  return code.padStart(6, "0");
+}
+
+// GOV-1 (Q6): a console session is aal2. Enrol a TOTP factor for the throw-away administrator, then challenge and verify it, which
+// returns an aal2 access token whose amr carries a fresh TOTP (the step-up the money and booking commands ask for).
+async function signInWithTotp(user) {
+  const aal1 = await signIn(user);
+  const enrolled = await http("POST", "/auth/v1/factors", { token: aal1, body: { factor_type: "totp", friendly_name: `smoke-${Date.now()}` } });
+  assert.equal(enrolled.status, 200, `TOTP enrolment failed: ${JSON.stringify(enrolled.json)}`);
+  const factorId = enrolled.json.id;
+  const challenge = await http("POST", `/auth/v1/factors/${factorId}/challenge`, { token: aal1, body: {} });
+  assert.equal(challenge.status, 200, `TOTP challenge failed: ${JSON.stringify(challenge.json)}`);
+  const verified = await http("POST", `/auth/v1/factors/${factorId}/verify`, {
+    token: aal1, body: { challenge_id: challenge.json.id, code: totp(enrolled.json.totp.secret) },
+  });
+  assert.equal(verified.status, 200, `TOTP verification failed: ${JSON.stringify(verified.json)}`);
+  return verified.json.access_token;
+}
+
 const results = [];
 async function check(name, fn) {
   try {
@@ -93,6 +128,9 @@ const stranger = await createUser("stranger", PASSWORD);
 const admin = await createUser("admin", PASSWORD);
 psql(`update public.profiles set phone_number = '+9665${String(Date.now()).slice(-8)}', phone_verified = true where id = '${customer.id}'`);
 psql(`update public.profiles set role = 'admin' where id = '${admin.id}'`);
+// A console owner, assigned the way supabase/seed.sql assigns the local console accounts (GOV-1 console roles).
+psql(`insert into public.admin_role_assignments (user_id, admin_role, reason) values ('${admin.id}', 'owner', 'Smoke test console owner (throw-away account)')
+      on conflict (user_id) do update set admin_role = excluded.admin_role`);
 const owner = { id: "00000000-0000-0000-0000-000000000101", email: "faisal@elitebarber.sa", password: PASSWORD };
 const otherOwner = { id: "00000000-0000-0000-0000-000000000102", email: "sara@sarabeauty.sa", password: PASSWORD };
 await setPassword(owner.id, PASSWORD);
@@ -101,7 +139,7 @@ await setPassword(otherOwner.id, PASSWORD);
 const tokens = {
   customer: await signIn(customer),
   stranger: await signIn(stranger),
-  admin: await signIn(admin),
+  admin: await signInWithTotp(admin),
   owner: await signIn(owner),
   otherOwner: await signIn(otherOwner),
 };
@@ -138,10 +176,15 @@ await check("an administrator reads the dashboard and the audit log", async () =
   const overview = await rpc("admin_dashboard_overview", {}, tokens.admin);
   assert.equal(overview.status, 200, JSON.stringify(overview.json));
   assert.equal(typeof overview.json, "object");
-  const audit = await rest("admin_audit_logs?select=id&limit=1", tokens.admin);
-  assert.equal(audit.status, 200);
-  const hidden = await rest("admin_audit_logs?select=id&limit=1", tokens.customer);
-  assert.ok(denied(hidden));
+  // SECFIX-2 R2-M8: the owner reads the audit log only through the audited, paged function; no session reads the table directly.
+  const audit = await rpc("admin_list_audit_events", { p_limit: 1, p_purpose: "audit_review" }, tokens.admin);
+  assert.equal(audit.status, 200, JSON.stringify(audit.json));
+  assert.ok(Array.isArray(audit.json.rows));
+  const direct = await rest("admin_audit_logs?select=id&limit=1", tokens.admin);
+  assert.ok(denied(direct), `the owner read the audit table directly: ${JSON.stringify(direct.json)}`);
+  const hidden = await rpc("admin_list_audit_events", { p_limit: 1 }, tokens.customer);
+  assert.ok(hidden.status >= 400);
+  assert.ok(denied(await rest("admin_audit_logs?select=id&limit=1", tokens.customer)));
 });
 
 await check("the audit and money writers cannot be called from a client", async () => {
