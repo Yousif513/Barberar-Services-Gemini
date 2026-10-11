@@ -111,8 +111,10 @@ type Font = any;
 export async function buildExportPdf(lib: PdfLib, fontkit: unknown, payload: Payload, fonts: Fonts): Promise<Uint8Array> {
   const doc = await lib.PDFDocument.create();
   doc.registerFontkit(fontkit);
-  const ar: Font = await doc.embedFont(fonts.arabic, { subset: true });
-  const la: Font = await doc.embedFont(fonts.latin, { subset: true });
+  // The whole fonts are embedded (about 150 KB): fontkit's subsetter fails inside the Supabase Edge Runtime ("value argument is out of
+  // bounds" in TTFSubset.encode) although it works under Node, and a copy that cannot be built is worse than a larger file.
+  const ar: Font = await doc.embedFont(fonts.arabic, { subset: false });
+  const la: Font = await doc.embedFont(fonts.latin, { subset: false });
   const arSet = new Set<number>(ar.getCharacterSet());
   const laSet = new Set<number>(la.getCharacterSet());
   doc.setTitle("PRIMORA - personal data copy");
