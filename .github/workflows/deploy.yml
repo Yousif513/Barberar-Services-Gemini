@@ -98,7 +98,9 @@ jobs:
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # Pinned to the CLI the migrations and the smoke test are verified with locally (package.json devDependency).
+          # A newer CLI ships newer images whose default table privileges differ; upgrade both together, deliberately.
+          version: 2.106.0
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
