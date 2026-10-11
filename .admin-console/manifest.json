@@ -2100,7 +2100,7 @@
         "active"
       ],
       "lifecycleTransitions": [],
-      "retention": "Profile details can be cleared by an audited command; what a PDPL erasure must remove and what ZATCA retention must keep is awaiting an owner/legal decision (gap pdpl-erasure-scope-undecided).",
+      "retention": "Deleted on a verified, approved deletion request per Q2 (privacy_erase_subject_internal); records with a legal basis are pseudonymised and kept 10 years; see decisions adopted-q2-deletion-retention.",
       "capabilities": [
         {
           "id": "customer.list",
@@ -2225,37 +2225,41 @@
           ],
           "risk": "critical",
           "status": "in-progress",
-          "rationale": "Work a PDPL request through start, completion or refusal with the operator's note (impl-claude-release-gaps). Exporting the customer's data is not offered: its scope is an open owner/legal decision. Unreviewed.",
-          "entityStates": "{\"from\": [\"pending\", \"in_progress\"], \"to\": [\"in_progress\", \"completed\", \"rejected\"]}",
+          "rationale": "PRIV-1: data_subject_requests became privacy_requests (rows kept); the request is worked on /admin/privacy (privacy.* capabilities); /admin/customers lists requests and links there. admin_update_data_request was dropped. Re-implemented, so unreviewed.",
+          "entityStates": "{\"from\": [\"awaiting_verification\", \"open\", \"awaiting_approval\"], \"to\": [\"open\", \"awaiting_approval\", \"executing\", \"completed\", \"refused\"]}",
           "uiRoutes": [
+            "/admin/privacy",
             "/admin/customers"
           ],
           "serverOperations": [
-            "supabase/migrations/20261005140000_admin_customer_directory.sql#L109"
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/migrations/20261011210000_priv_copy_export.sql",
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql"
           ],
           "authorizationPolicies": [
-            "supabase/migrations/20261005140000_admin_customer_directory.sql#L39"
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
           ],
           "auditEvents": [
-            "supabase/migrations/20261005080000_release_gap_controls.sql#L69"
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
           ],
           "safeguards": [
-            "supabase/tests/db/customer_directory.test.mjs#L127"
+            "supabase/tests/db/priv_privacy.test.mjs"
           ],
-          "dataBinding": "postgres:public.data_subject_requests",
+          "dataBinding": "postgres:public.privacy_requests",
           "idempotency": "A request already in the target state is refused; closed requests cannot change.",
           "concurrency": "The request row is locked FOR UPDATE for the check and the write.",
           "recovery": "Completed and rejected are final by design; the note and reviewer remain on the request and in the audit log.",
           "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs",
             "supabase/tests/db/customer_directory.test.mjs"
           ],
           "evidence": [
-            "supabase/migrations/20261005140000_admin_customer_directory.sql#L109",
-            "supabase/tests/db/customer_directory.test.mjs#L137",
-            "web_platform/tests/admin-console-guards.test.mjs#L120"
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "supabase/tests/db/customer_directory.test.mjs"
           ],
           "owner": "",
-          "reviewStatus": "reviewed",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "sec-claude-release-review"
         },
         {
@@ -2360,16 +2364,17 @@
           ],
           "risk": "moderate",
           "status": "in-progress",
-          "rationale": "submit_data_request sets owner, status and a due date 30 days ahead in Riyadh on the server, returns the open request instead of a duplicate, and audits; the table refuses direct inserts. It only files the request: access/export and erasure themselves are not built (gap no-customer-data-rights-path). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "rationale": "PRIV-1: requests are made on /customer/privacy with a fresh one-time-code sign-in (privacy_submit_request); /privacy links there. submit_data_request was dropped. Unreviewed.",
           "entityStates": {
             "from": [],
             "to": []
           },
           "uiRoutes": [
+            "/customer/privacy",
             "/privacy"
           ],
           "serverOperations": [
-            "supabase/migrations/20261007010400_consent_and_request_evidence.sql#L83"
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
           ],
           "authorizationPolicies": [
             "supabase/tests/db/fixdba_consent_evidence.test.mjs#L69"
@@ -2380,16 +2385,19 @@
           "safeguards": [
             "supabase/tests/db/fixdba_consent_evidence.test.mjs#L88"
           ],
-          "dataBinding": "postgres:public.data_subject_requests",
+          "dataBinding": "postgres:public.privacy_requests",
           "idempotency": "A second request of the same kind returns the open one.",
           "concurrency": "",
           "recovery": "",
           "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs",
             "supabase/tests/db/fixdba_consent_evidence.test.mjs"
           ],
           "evidence": [
-            "supabase/tests/db/fixdba_consent_evidence.test.mjs#L74",
-            "web_platform/src/app/privacy/page.tsx#L116"
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "supabase/tests/db/fixdba_consent_evidence.test.mjs",
+            "scripts/verify-privacy-local.mjs"
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
@@ -5789,6 +5797,721 @@
           "reviewStatus": "unreviewed"
         }
       ]
+    },
+    {
+      "id": "privacy-request",
+      "name": "Privacy request (PDPL data-subject request)",
+      "sourceOfTruth": "postgres:public.privacy_requests",
+      "sensitivity": "restricted",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "awaiting_verification",
+        "open",
+        "awaiting_approval",
+        "executing",
+        "completed",
+        "refused",
+        "withdrawn"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "awaiting_verification",
+          "to": "open",
+          "command": "privacy.request-intake",
+          "actorRoles": [
+            "customer"
+          ]
+        },
+        {
+          "from": "open",
+          "to": "withdrawn",
+          "command": "privacy.request-intake",
+          "actorRoles": [
+            "customer"
+          ]
+        },
+        {
+          "from": "open",
+          "to": "awaiting_approval",
+          "command": "privacy.copy-export",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "open",
+          "to": "awaiting_approval",
+          "command": "privacy.deletion",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "open",
+          "to": "refused",
+          "command": "privacy.deadline-and-refusal",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "open",
+          "to": "completed",
+          "command": "privacy.correction",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "The request record outlives the account it is about (IR Art. 3(1)(d)); closed-request retention period is an owner decision (gap privacy-request-record-retention-not-set).",
+      "capabilities": [
+        {
+          "id": "privacy.request-intake",
+          "outcome": "Customers file access/copy/correction/deletion/consent-withdrawal requests in-app with a fresh one-time-code sign-in; staff log e-mail/phone/in-person requests that the customer confirms the same way",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "Q1.1-2: privacy_submit_request needs amr otp in the last 10 minutes and a verified contact; admin_privacy_log_request (privacy.manage) records channel/received_at and waits for privacy_confirm_request. Live check: OTP from the local mail catcher. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "awaiting_verification",
+              "open"
+            ],
+            "to": [
+              "open",
+              "withdrawn"
+            ]
+          },
+          "uiRoutes": [
+            "/customer/privacy",
+            "/admin/privacy"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "web_platform/src/app/customer/privacy/page.tsx"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "dataBinding": "postgres:public.privacy_requests",
+          "idempotency": "One open request per customer and type (unique partial index); repeating returns the open one.",
+          "concurrency": "Advisory lock per customer and type; row lock for every change.",
+          "recovery": "Withdrawn by the customer while not approved; a contested field is restored.",
+          "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "scripts/verify-privacy-local.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "scripts/verify-privacy-local.mjs",
+            "web_platform/src/app/customer/privacy/page.tsx"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "privacy.deadline-and-refusal",
+          "outcome": "30-day deadline, one notified extension before day 30, day-20/28 escalation, coded refusal with the SDAIA complaint right",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "Q1.3-4: due_at = receipt + 30 days; admin_privacy_extend_request once, before due_at, for disproportionate effort or multiple requests (another request in 12 months); privacy_escalate_requests records day 20/28 once with alerts and owner notices; admin_privacy_refuse_request after step-up only as repetitive/manifestly unfounded/disproportionate. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "awaiting_verification",
+              "open",
+              "awaiting_approval"
+            ],
+            "to": [
+              "refused"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/privacy"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "dataBinding": "postgres:public.privacy_requests",
+          "idempotency": "Extension columns hold one extension; refusal only from an open state.",
+          "concurrency": "Row lock FOR UPDATE.",
+          "recovery": "A refused request is final; the customer files a new one.",
+          "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "web_platform/src/app/admin/privacy/page.tsx"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "privacy.correction",
+          "outcome": "Correction with the contested field held out of processing, recipients notified, customer told",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "Q1.6: the field (first name, last name, gender) is held aside in privacy_field_restrictions and guarded by a trigger; admin_privacy_complete_correction writes the value, notifies every provider the customer booked with (privacy_recipient_notices) and the customer. Processor notification is manual (gap). In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "open"
+            ],
+            "to": [
+              "completed"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/privacy",
+            "/customer/privacy"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "dataBinding": "postgres:public.privacy_field_restrictions",
+          "idempotency": "One restriction per customer and field.",
+          "concurrency": "Row lock; profile trigger refuses other edits while restricted.",
+          "recovery": "Refusal or withdrawal restores the held value.",
+          "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "privacy.copy-export",
+          "outcome": "Access/copy released after a different owner approves; server-built JSON and Arabic/English PDF downloaded by the customer for 7 days",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "rationale": "Q1.5, Q1.7: admin_privacy_propose_execution (privacy.manage, step-up) -> approval kind privacy_export decided by a different privacy.approve holder (step-up, no break-glass); privacy-export Edge Function builds from privacy_export_payload (other party's identifiers removed, e-mails/phones in their text redacted) into the private bucket; privacy-export-download checks the customer's own token and expiry and audits. Live 4/4. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "open",
+              "awaiting_approval",
+              "executing"
+            ],
+            "to": [
+              "awaiting_approval",
+              "executing",
+              "completed"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/privacy",
+            "/customer/privacy"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011210000_priv_copy_export.sql",
+            "supabase/functions/privacy-export/index.ts",
+            "supabase/functions/privacy-export-download/index.ts",
+            "supabase/functions/_shared/privacy-export-document.ts"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011210000_priv_copy_export.sql",
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011210000_priv_copy_export.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "supabase/tests/privacy-export.test.mjs"
+          ],
+          "dataBinding": "postgres:public.privacy_exports + storage:privacy-exports",
+          "idempotency": "One export per request (unique); rebuild overwrites the same paths.",
+          "concurrency": "Approval executes once under the governance token.",
+          "recovery": "A failed build is recorded and retried; expired files are removed and a new request is made.",
+          "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "supabase/tests/privacy-export.test.mjs",
+            "scripts/verify-privacy-local.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011210000_priv_copy_export.sql",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "scripts/verify-privacy-local.mjs",
+            "supabase/tests/privacy-export.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "privacy.deletion",
+          "outcome": "Approved deletion: delete account data, destroy health answers, pseudonymise retained bookings and money records, tombstone threads, delete the auth account, completion notice",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "rationale": "Q2.1-4, Q2.8: gov_exec_privacy_deletion runs privacy_erase_subject_internal in one transaction (recorded run, booking immutability only under it), then privacy-erase-account deletes the auth user via the Auth admin API and privacy_record_auth_erasure completes with the notice to the snapshotted verified contacts. B2C invoices no longer name a buyer. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "open",
+              "awaiting_approval",
+              "executing"
+            ],
+            "to": [
+              "awaiting_approval",
+              "executing",
+              "completed"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/privacy",
+            "/customer/privacy"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql",
+            "supabase/functions/privacy-erase-account/index.ts",
+            "supabase/functions/_shared/privacy-erasure.ts"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql",
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "supabase/tests/privacy-erasure.test.mjs"
+          ],
+          "dataBinding": "postgres:public.privacy_requests + public.deletion_ledger",
+          "idempotency": "Approval executes once; the ledger upsert and auth step are idempotent (already-gone counts as done).",
+          "concurrency": "Governance token, row locks, recorded erasure run bound to the transaction id.",
+          "recovery": "Irreversible by design; the preview is shown to customer, maker and approver; records with a legal basis are kept.",
+          "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "supabase/tests/privacy-erasure.test.mjs",
+            "scripts/verify-privacy-local.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "scripts/verify-privacy-local.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "privacy.legal-hold",
+          "outcome": "Court-case or open-dispute holds with reason, reference, approver, 90-day review and release 30 days after the dispute closes",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "Q2.5: admin_privacy_propose_legal_hold -> approval kind privacy_legal_hold (different privacy.approve holder); open disputes are held automatically at deletion; health never held; admin_privacy_review_legal_hold keeps or releases; privacy_release_due_holds finishes deferred deletion. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/privacy"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "dataBinding": "postgres:public.privacy_legal_holds",
+          "idempotency": "One active dispute hold per dispute.",
+          "concurrency": "Row lock on review/release.",
+          "recovery": "A released hold cannot be re-activated; a new hold is proposed.",
+          "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql",
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "privacy.deletion-ledger",
+          "outcome": "Deletion ledger re-applied after a restore and exported for an archive outside the database",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "Q2.7: deletion_ledger (identifiers and dates only); privacy_reapply_deletion_ledger (service or privacy.approve with step-up) accepts archived entries and erases reappeared data; admin_privacy_export_deletion_ledger downloads it. Off-database archive is an owner task (gap). In-progress, unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/privacy"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "dataBinding": "postgres:public.deletion_ledger",
+          "idempotency": "Re-application is idempotent.",
+          "concurrency": "Each subject erased in its own recorded run.",
+          "recovery": "Archive entries restore the ledger itself.",
+          "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql",
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "intake.health-retention-and-gate",
+          "outcome": "Health answers destroyed 30 days after the appointment, reused only under a separate 12-month consent, read only by the assigned provider, collected only after the transfer risk assessment is recorded",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "rationale": "Q2.6, X3(6): intake_purge_internal (30 days after completed/cancelled/no-show), health_data_reuse consent, intake_is_assigned_provider, privacy_transfer_assessments gate (owner, step-up) with bilingual notices to providers and customers. Scheduling the purge is an owner gap. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/privacy",
+            "/customer/privacy"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011230000_priv_health_intake.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011230000_priv_health_intake.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011230000_priv_health_intake.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "supabase/tests/db/intake.test.mjs"
+          ],
+          "dataBinding": "postgres:public.intake_answers",
+          "idempotency": "The purge deletes only eligible rows; re-running finds none.",
+          "concurrency": "Set-based delete; gate read per call.",
+          "recovery": "Purged answers are gone by design; the customer completes a new form.",
+          "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "supabase/tests/db/intake.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011230000_priv_health_intake.sql",
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "privacy.queue",
+          "outcome": "The privacy-request queue (open by deadline with escalation flags, closed by completion) and one request with its history, audited per read",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "admin_privacy_list_requests / admin_privacy_get_request: privacy.manage or privacy.approve, purpose, gov2_log_read. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "awaiting_verification",
+              "open",
+              "awaiting_approval",
+              "executing",
+              "completed",
+              "refused",
+              "withdrawn"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/privacy",
+            "/admin/customers"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "dataBinding": "postgres:public.privacy_requests",
+          "idempotency": "Read-only.",
+          "concurrency": "Read-only.",
+          "recovery": "Read-only.",
+          "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "privacy-incident",
+      "name": "Personal data breach incident",
+      "sourceOfTruth": "postgres:public.privacy_incidents",
+      "sensitivity": "confidential",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "open",
+        "contained",
+        "closed"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "open",
+          "to": "contained",
+          "command": "incident.register",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "contained",
+          "to": "closed",
+          "command": "incident.register",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "5 years after closing (X1), deleted by privacy_incident_maintenance.",
+      "capabilities": [
+        {
+          "id": "incident.register",
+          "outcome": "Breach register with the 72-hour SDAIA clock from awareness, decisions, evidence and 5-year retention",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "X1: admin_incident_* (incident.manage, owner only; no DPO role), step-up for decisions and closing, no-harm conclusion needs reasoning, late filing needs a reason, evidence files in a private bucket, privacy_incident_maintenance alerts at 48 h and purges after 5 years. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "open",
+              "contained"
+            ],
+            "to": [
+              "contained",
+              "closed"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/incidents"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011240000_priv_incident_register.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011240000_priv_incident_register.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011240000_priv_incident_register.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "dataBinding": "postgres:public.privacy_incidents",
+          "idempotency": "References are sequence-numbered; decisions overwrite with history.",
+          "concurrency": "Row lock FOR UPDATE.",
+          "recovery": "Closed incidents are kept as recorded.",
+          "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011240000_priv_incident_register.sql",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "web_platform/src/app/admin/incidents/page.tsx"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "incident.list",
+          "outcome": "The incident register list and one incident with its history",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "admin_incident_list / admin_incident_get: incident.manage, audited. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "open",
+              "contained",
+              "closed"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/incidents"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011240000_priv_incident_register.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011240000_priv_incident_register.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011240000_priv_incident_register.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "dataBinding": "postgres:public.privacy_incidents",
+          "idempotency": "Read-only.",
+          "concurrency": "Read-only.",
+          "recovery": "Read-only.",
+          "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011240000_priv_incident_register.sql",
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "processing-register",
+      "name": "Record of processing activities (RoPA)",
+      "sourceOfTruth": "repo:docs/privacy/ropa.md",
+      "sensitivity": "internal",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "draft"
+      ],
+      "lifecycleTransitions": [],
+      "retention": "Versioned document; each entry kept 5 years after the activity ends (IR Art. 33).",
+      "capabilities": [
+        {
+          "id": "ropa.view",
+          "outcome": "Read-only RoPA in the console from the versioned document",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "low",
+          "status": "in-progress",
+          "rationale": "X2: docs/privacy/ropa.md copied into the bundle by scripts/build-ropa.mjs and checked byte for byte by a test; fields the owner must complete are marked, not invented. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "draft"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/ropa"
+          ],
+          "serverOperations": [
+            "scripts/build-ropa.mjs",
+            "web_platform/src/app/admin/ropa/page.tsx"
+          ],
+          "authorizationPolicies": [
+            "web_platform/src/app/admin/ropa/page.tsx"
+          ],
+          "auditEvents": [
+            "web_platform/tests/ropa-document.test.mjs"
+          ],
+          "safeguards": [
+            "web_platform/tests/ropa-document.test.mjs"
+          ],
+          "dataBinding": "repo:docs/privacy/ropa.md",
+          "idempotency": "Read-only.",
+          "concurrency": "Not applicable (read-only).",
+          "recovery": "The document's git history.",
+          "tests": [
+            "web_platform/tests/ropa-document.test.mjs"
+          ],
+          "evidence": [
+            "docs/privacy/ropa.md",
+            "web_platform/tests/ropa-document.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
     }
   ],
   "workQueues": [
@@ -6191,7 +6914,7 @@
       "dataSources": [
         "postgres:public.profiles",
         "postgres:public.bookings",
-        "postgres:public.data_subject_requests",
+        "postgres:public.privacy_requests",
         "postgres:public.consents"
       ],
       "capabilities": [
@@ -6207,7 +6930,7 @@
         "Change page",
         "Verify or remove phone verification",
         "Clear profile details",
-        "Start, complete or refuse a data request"
+        "Open privacy requests on /admin/privacy"
       ],
       "states": [
         "loading",
@@ -6914,12 +7637,12 @@
     {
       "id": "customer-privacy",
       "route": "/privacy",
-      "purpose": "A customer files a privacy request and sees its due date",
+      "purpose": "Public privacy notice; links signed-in customers to /customer/privacy where requests are made",
       "roles": [
         "customer"
       ],
       "dataSources": [
-        "postgres:public.data_subject_requests"
+        "postgres:public.privacy_requests"
       ],
       "capabilities": [
         "customer.submit-data-request"
@@ -6938,6 +7661,160 @@
       "rationale": "Public page with a signed-in form; creates the obligation admin-customers works. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
       "tests": [
         "supabase/tests/db/fixdba_consent_evidence.test.mjs"
+      ]
+    },
+    {
+      "id": "admin-privacy",
+      "route": "/admin/privacy",
+      "purpose": "Work PDPL privacy requests, legal holds, the deletion ledger and the health-intake gate",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "postgres:public.privacy_requests",
+        "postgres:public.privacy_legal_holds",
+        "postgres:public.deletion_ledger",
+        "postgres:public.privacy_transfer_assessments"
+      ],
+      "capabilities": [
+        "privacy.request-intake",
+        "privacy.deadline-and-refusal",
+        "privacy.correction",
+        "privacy.copy-export",
+        "privacy.deletion",
+        "privacy.legal-hold",
+        "privacy.deletion-ledger",
+        "intake.health-retention-and-gate"
+      ],
+      "actions": [
+        "Log a request",
+        "Extend once",
+        "Refuse",
+        "Complete a correction",
+        "Propose a copy or deletion",
+        "Run the next step",
+        "Propose, keep or release a legal hold",
+        "Export or re-apply the deletion ledger",
+        "Record or revoke the transfer risk assessment"
+      ],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "forbidden",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "in-progress",
+      "status": "in-progress",
+      "rationale": "PRIV package; opened in a browser with a real TOTP session on the local stack (queue, detail, ledger tab). Unreviewed.",
+      "tests": [
+        "supabase/tests/db/priv_privacy.test.mjs",
+        "web_platform/tests/admin-console-guards.test.mjs"
+      ]
+    },
+    {
+      "id": "admin-incidents",
+      "route": "/admin/incidents",
+      "purpose": "Keep the personal data breach register with the 72-hour SDAIA clock",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "postgres:public.privacy_incidents"
+      ],
+      "capabilities": [
+        "incident.register"
+      ],
+      "actions": [
+        "Record an incident",
+        "Save the assessment",
+        "Record the SDAIA decision",
+        "Record the data-subject decision",
+        "Add evidence",
+        "Close"
+      ],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "forbidden",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "in-progress",
+      "status": "in-progress",
+      "rationale": "PRIV package; opened in a browser with a real TOTP session (empty state). Unreviewed.",
+      "tests": [
+        "supabase/tests/db/priv_privacy.test.mjs"
+      ]
+    },
+    {
+      "id": "admin-ropa",
+      "route": "/admin/ropa",
+      "purpose": "Read the record of processing activities",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "repo:docs/privacy/ropa.md"
+      ],
+      "capabilities": [
+        "ropa.view"
+      ],
+      "actions": [],
+      "states": [
+        "populated"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "in-progress",
+      "status": "in-progress",
+      "rationale": "Read-only render of the versioned document. Unreviewed.",
+      "tests": [
+        "web_platform/tests/ropa-document.test.mjs"
+      ]
+    },
+    {
+      "id": "customer-privacy-account",
+      "route": "/customer/privacy",
+      "purpose": "A customer makes and follows privacy requests and downloads their copy",
+      "roles": [
+        "customer"
+      ],
+      "dataSources": [
+        "postgres:public.privacy_requests",
+        "postgres:public.privacy_exports"
+      ],
+      "capabilities": [
+        "privacy.request-intake",
+        "privacy.copy-export",
+        "privacy.deletion",
+        "customer.submit-data-request"
+      ],
+      "actions": [
+        "Make a request",
+        "Confirm with a one-time code",
+        "Withdraw",
+        "Choose what happens to reviews",
+        "Download PDF/JSON",
+        "Allow or stop health-answer reuse"
+      ],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "in-progress",
+      "status": "in-progress",
+      "rationale": "PRIV package; submitted a copy request through the one-time-code step in a browser on the local stack, Arabic RTL checked. Unreviewed.",
+      "tests": [
+        "supabase/tests/db/priv_privacy.test.mjs",
+        "scripts/verify-privacy-local.mjs"
       ]
     }
   ],
@@ -7671,6 +8548,164 @@
       "appliesTo": [
         "sponsored.configure"
       ]
+    },
+    {
+      "id": "adopted-q1-privacy-requests",
+      "decision": "Q1 privacy requests: in-app and staff-logged (e-mail, phone, in person) access/copy/correction/deletion/consent-withdrawal requests recorded in privacy_requests; identity by a fresh one-time-code sign-in to the verified contact; 30 days with one extension (disproportionate effort or multiple requests) notified before day 30; escalation at day 20 and 28; free of charge; refusal only as repetitive, manifestly unfounded or disproportionate with the SDAIA complaint right; copy as JSON plus AR/EN PDF through an authenticated link expiring after 7 days; correction restricts the contested field and notifies recipients; a different person approves deletion and export, both with step-up.",
+      "reason": "Plan of record: the 'Final decision text' in docs/legal/2026-10-10-privacy-decision-memo.md, adopted in docs/legal/2026-10-10-adopted-decisions.md.",
+      "evidence": [
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+        "supabase/migrations/20261011210000_priv_copy_export.sql",
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": []
+    },
+    {
+      "id": "adopted-q2-deletion-retention",
+      "decision": "Q2 deletion vs retention: delete auth account, profile, addresses, tokens, consents, favourites, review author link (customer choice), message content (provider tombstone, provider notified); destroy health answers; pseudonymise bookings linked to invoices/ledger with a random token and legal-basis label; retain invoices/ledger 10 years; B2C invoices carry no customer PII; legal holds only for a court case or open dispute (30 days after it closes, 90-day review); deletion_ledger re-applied after restore; completion notice with legal basis, retention end and SDAIA right.",
+      "reason": "Plan of record: the 'Final decision text' in docs/legal/2026-10-10-privacy-decision-memo.md, adopted in docs/legal/2026-10-10-adopted-decisions.md.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql",
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": []
+    },
+    {
+      "id": "adopted-q2-6-health-intake",
+      "decision": "Q2.6 health intake: answers destroyed 30 days after the appointment is completed or cancelled; reuse only with a separate consent lasting 12 months; only the assigned provider reads them; admins only through the logged owner break-glass.",
+      "reason": "Plan of record: the 'Final decision text' in docs/legal/2026-10-10-privacy-decision-memo.md, adopted in docs/legal/2026-10-10-adopted-decisions.md.",
+      "evidence": [
+        "supabase/migrations/20261011230000_priv_health_intake.sql",
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": []
+    },
+    {
+      "id": "adopted-x3-6-health-collection-gate",
+      "decision": "X3(6): health-intake collection stays off until the owner records the approved transfer risk assessment (no KSA hosting today); providers and customers see a bilingual notice; a required form does not block a visit meanwhile.",
+      "reason": "Plan of record: the 'Final decision text' in docs/legal/2026-10-10-privacy-decision-memo.md, adopted in docs/legal/2026-10-10-adopted-decisions.md.",
+      "evidence": [
+        "supabase/migrations/20261011230000_priv_health_intake.sql",
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": []
+    },
+    {
+      "id": "adopted-x1-incident-register",
+      "decision": "X1: incident register with discovered_at/aware_at and a 72-hour SDAIA clock, all listed fields, SDAIA and data-subject decisions, evidence, 5-year retention; SDAIA notified for every breach unless a reasoned no-harm conclusion is recorded.",
+      "reason": "Plan of record: the 'Final decision text' in docs/legal/2026-10-10-privacy-decision-memo.md, adopted in docs/legal/2026-10-10-adopted-decisions.md.",
+      "evidence": [
+        "supabase/migrations/20261011240000_priv_incident_register.sql",
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": []
+    },
+    {
+      "id": "adopted-x2-ropa",
+      "decision": "X2: RoPA shown read-only in the console; the controlled source is the versioned document docs/privacy/ropa.md; fields only the owner can know are marked OWNER MUST COMPLETE.",
+      "reason": "Plan of record: the 'Final decision text' in docs/legal/2026-10-10-privacy-decision-memo.md, adopted in docs/legal/2026-10-10-adopted-decisions.md.",
+      "evidence": [
+        "docs/privacy/ropa.md",
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-console-permissions",
+      "decision": "privacy.manage for owner and operations (they already read personal data), privacy.approve and incident.manage for owner only. Access requests are released like copies (approval by a different privacy.approve holder). No DPO role exists, so the owner keeps the register.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-identity-check-is-otp-sign-in",
+      "decision": "The Q1.2 'fresh login plus one-time code' is implemented as a Supabase Auth sign-in by one-time code (e-mail or SMS) within 10 minutes: the OTP sign-in is the fresh login and proves the verified contact. Staff-logged requests are confirmed by the customer in the app the same way. No supporting documents are collected, so none need destroying.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+        "scripts/verify-privacy-local.mjs"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-correction-scope-and-restriction",
+      "decision": "Correctable through the workflow: first name, last name, gender. E-mail and phone are sign-in identities changed through account settings with their own verification. Restriction = the contested value is held aside (privacy_field_restrictions) and the profile field emptied until decided.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-money-records-pseudonymised",
+      "decision": "Besides bookings, purchased packages, memberships (and their payments/redemptions), gift cards bought and payment disputes keep their money record with the customer link replaced by the pseudonym token; promotional rows (wallet credits, loyalty, referrals, redemptions, tips) follow the MONEY design and are deleted with the profile (the ledger keeps the money). A booking that carries a review kept as 'Deleted user' is pseudonymised, not deleted.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-court-hold-keeps-account",
+      "decision": "A court-case hold on any category keeps the account and that category linked to the person (a court case needs the identity); health answers are destroyed regardless. A dispute hold keeps only that booking's content and the thread with that business, unlinked from the deleted account; the hold stores the pseudonym token.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-financial-year-is-calendar-year",
+      "decision": "Retention end for pseudonymised bookings = 31 December of the booking's Gregorian year + 10, until the owner records the financial year end.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-health-concluded-and-assigned-provider",
+      "decision": "'Completed or cancelled' includes no-show (the appointment concluded); the clock runs from the cancellation/no-show time or the end of the appointment. 'Assigned provider' = the booking's professional when they have an account, otherwise the business owner.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011230000_priv_health_intake.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-pdf-fonts",
+      "decision": "The PDF embeds IBM Plex Sans Arabic (the web app's own typeface, OFL) Arabic and Latin subsets as whole fonts: fontkit's subsetter fails in the Supabase Edge Runtime. pdf-lib 1.17.1 and @pdf-lib/fontkit 1.1.1 chosen as small, well-known libraries; no external service.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/functions/_shared/privacy-export-document.ts"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-deletion-ledger-off-database",
+      "decision": "Because a restore rolls the ledger table back too, the console exports the ledger for an archive outside the database and the re-application accepts archived entries; keeping that archive is an owner task.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": []
     }
   ],
   "gaps": [
@@ -7784,8 +8819,8 @@
       "id": "no-customer-data-rights-path",
       "severity": "critical",
       "description": "There is no export, anonymisation, deletion or legal-hold capability for customer personal data anywhere in the console, the migrations or the edge functions, on a platform holding Saudi customer names, emails, phone numbers, booking history and private messages.",
-      "status": "blocked",
-      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): STILL BLOCKED on a legal decision; progress since the audit is real but partial. Customers can now file a request: privacy/page.tsx calls submit_data_request (20261007010400_consent_and_request_evidence.sql#L83, guarded by no-mock-data.test.mjs 'login, the booking dialog and the privacy page never insert into the evidence tables'); operators work the queue on /admin/customers with admin_update_data_request and can clear profile details with admin_clear_customer_profile (customer_directory.test.mjs, release_controls.test.mjs); consent withdrawal for intake health data blanks every stored answer (fixpriv_intake_withdrawal.test.mjs). STILL MISSING: a data-access/export command and a retention-aware erasure of auth identity, booking contact fields, invoices, messages and reviews. OWNER/LEGAL QUESTIONS: (1) which data classes must a PDPL access/export request return (profile, bookings, invoices, messages, reviews, consents, wallet, dependants)? (2) which must erasure remove or anonymise, and which must be kept for ZATCA record-keeping (invoices, how many years) or a legal hold? (3) who may approve an erasure and within what time (the table enforces a 30-day due date)? Until these are answered no console command can be built correctly.",
+      "status": "fixed",
+      "rationale": "Closed by impl-priv-claude (PRIV package) on the adopted Q1/Q2 decisions: copy export, deletion engine, legal holds, deletion ledger and invoice minimisation are implemented (supabase/migrations/20261011200000..240000, supabase/tests/db/priv_privacy.test.mjs, scripts/verify-privacy-local.mjs 4/4). Unreviewed; security and ux-reviewer passes pending.",
       "evidence": [
         "supabase/migrations/20261007010400_consent_and_request_evidence.sql#L83",
         "supabase/migrations/20261005140000_admin_customer_directory.sql#L109",
@@ -8073,8 +9108,8 @@
       "id": "pdpl-erasure-scope-undecided",
       "severity": "high",
       "description": "Clearing a customer profile leaves the sign-in identity (auth.users email and phone), booking contact and address fields, invoices and messages untouched. What PDPL erasure must remove and what ZATCA retention must keep has not been decided.",
-      "status": "blocked",
-      "rationale": "BLOCKED ON OWNER/LEGAL DECISION. AGENTS.md reserves PDPL erasure and ZATCA retention interpretation for a human. REMEDY once decided: one server command per data class with retention-aware anonymization, and the decision recorded in decisions[].",
+      "status": "fixed",
+      "rationale": "Closed by impl-priv-claude (PRIV package) on the adopted Q1/Q2 decisions: copy export, deletion engine, legal holds, deletion ledger and invoice minimisation are implemented (supabase/migrations/20261011200000..240000, supabase/tests/db/priv_privacy.test.mjs, scripts/verify-privacy-local.mjs 4/4). Unreviewed; security and ux-reviewer passes pending.",
       "evidence": [
         "supabase/migrations/20261005110000_admin_clear_customer_profile.sql#L54"
       ]
@@ -9516,7 +10551,7 @@
       "severity": "medium",
       "description": "Q4 item 2 names a DPO break-glass. No DPO console role exists, so read_intake_answers_break_glass is owner-only (health.break_glass). There is no console screen for it; it is callable only as an RPC.",
       "status": "blocked",
-      "rationale": "FOUND BY impl-gov2-claude. OWNER ACTION: appoint the DPO (adopted decisions, owner actions) and decide whether to add a dpo console role.",
+      "rationale": "Still blocked on the owner: no DPO console role. PRIV gives the incident register (incident.manage) and privacy approvals (privacy.approve) to the owner only; adding a DPO role means granting those two permissions to it.",
       "evidence": [
         "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L976"
       ]
@@ -9938,6 +10973,152 @@
         "web_platform/src/app/admin/approvals/governance-notices.tsx",
         "web_platform/src/app/admin/reconciliation/page.tsx"
       ]
+    },
+    {
+      "id": "privacy-jobs-not-scheduled",
+      "severity": "high",
+      "description": "The privacy jobs exist as functions but nothing runs them: privacy_escalate_requests (daily), purge_expired_intake (daily, Q2.6 30-day destruction), privacy_release_due_holds (daily), privacy_incident_maintenance (hourly), the privacy-export Edge Function without a body (builds waiting copies and removes expired files) and privacy-erase-account (auth deletions and restored accounts). The approver's console calls the two Edge Functions right after approving.",
+      "status": "open",
+      "rationale": "Owner/operations: schedule them (pg_cron with pg_net or Supabase scheduled functions) on the hosted project.",
+      "evidence": [
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+        "supabase/migrations/20261011230000_priv_health_intake.sql",
+        "supabase/functions/privacy-export/index.ts"
+      ]
+    },
+    {
+      "id": "deletion-ledger-needs-off-database-archive",
+      "severity": "high",
+      "description": "A database restore rolls deletion_ledger back too. The console exports it (admin_privacy_export_deletion_ledger) and re-application accepts archived entries, but no archive outside the database exists yet; backups must also be limited to 30 days (Q2.7, owner action list).",
+      "status": "blocked",
+      "rationale": "Owner: choose the archive (e.g. the KSA invoice archive of X3(5)) and the backup retention setting.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ]
+    },
+    {
+      "id": "privacy-notices-have-no-sender",
+      "severity": "medium",
+      "description": "Customer privacy notices (received, extended, refused with the SDAIA right, copy ready, deletion completed) are queued in governance_notifications and shown in-app while the account exists; out-of-band delivery waits for governance-notice-sender-not-chosen. The deletion completion notice to an erased customer can only go out of band.",
+      "status": "blocked",
+      "rationale": "Same decision as governance-notice-sender-not-chosen.",
+      "evidence": [
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ]
+    },
+    {
+      "id": "processor-correction-notices-manual",
+      "severity": "medium",
+      "description": "Q1.6 asks to notify every provider or processor that received a corrected field. Providers are notified in-app (privacy_recipient_notices); processors (Supabase, Tap, messaging) are not tracked per field and are not notified automatically.",
+      "status": "open",
+      "rationale": "Owner/DPO: decide which processors receive names and record the manual step, or extend privacy_recipient_notices with processor rows.",
+      "evidence": [
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+      ]
+    },
+    {
+      "id": "privacy-verification-without-app-access",
+      "severity": "medium",
+      "description": "Requests from phone or in person are confirmed by the customer in the app with a one-time code. A customer who cannot sign in (lost phone and e-mail access) has no verification path; SMS one-time codes also need an SMS provider (none configured locally).",
+      "status": "open",
+      "rationale": "Owner: define an offline verification procedure; configure the SMS provider for phone sign-in.",
+      "evidence": [
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+      ]
+    },
+    {
+      "id": "privacy-non-customer-accounts",
+      "severity": "medium",
+      "description": "Deletion is limited to customer accounts; provider owners, staff and console users are refused with 'closed through PRIMORA support'. Their data (payroll, IBAN, onboarding) needs its own retention rules.",
+      "status": "open",
+      "rationale": "Owner/counsel: retention for provider-side personal data; then extend the engine.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ]
+    },
+    {
+      "id": "unused-balances-on-deletion",
+      "severity": "medium",
+      "description": "A deleting customer may hold wallet credit, unused package sessions or an active membership; the preview shows them and they become unusable after deletion. Whether to refund or forfeit is a business/legal decision.",
+      "status": "blocked",
+      "rationale": "Owner/counsel: refund or forfeit unused paid value on deletion.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql",
+        "web_platform/src/app/customer/privacy/page.tsx"
+      ]
+    },
+    {
+      "id": "financial-year-end-not-recorded",
+      "severity": "low",
+      "description": "Pseudonymised bookings are kept until 31 December of their year + 10 (calendar financial year assumed).",
+      "status": "open",
+      "rationale": "Owner: record the financial year end.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ]
+    },
+    {
+      "id": "privacy-request-record-retention-not-set",
+      "severity": "low",
+      "description": "privacy_requests and their events are kept indefinitely as evidence; no retention period is defined for closed requests.",
+      "status": "open",
+      "rationale": "Owner/DPO: set a retention period (for example 5 years like the audit log).",
+      "evidence": [
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+      ]
+    },
+    {
+      "id": "incident-subject-notification-templates-missing",
+      "severity": "medium",
+      "description": "X1 asks for SMS/e-mail notices to affected people using pre-approved AR/EN templates. The register records the decision, channels and sent time; there is no template store or bulk sender, because the approved wording and the affected list are incident-specific.",
+      "status": "open",
+      "rationale": "DPO: approve templates; then add a sender over governance_notifications.",
+      "evidence": [
+        "supabase/migrations/20261011240000_priv_incident_register.sql"
+      ]
+    },
+    {
+      "id": "pdf-font-licence-text-not-vendored",
+      "severity": "low",
+      "description": "The PDF embeds IBM Plex Sans Arabic (OFL 1.1). OFL-NOTICE.md names the licence and its location; the verbatim licence text is not yet copied into the repository.",
+      "status": "open",
+      "rationale": "Copy the official OFL.txt next to the font modules.",
+      "evidence": [
+        "supabase/functions/_shared/fonts/OFL-NOTICE.md"
+      ]
+    },
+    {
+      "id": "provider-intake-answer-button-shows-for-owner",
+      "severity": "low",
+      "description": "Q2.6 lets only the assigned professional read answers; the provider intake screen still shows 'View answers' to the owner and delegates, who now get 'Booking not found'. can_read_booking_intake_answers exists for the screen to hide it.",
+      "status": "open",
+      "rationale": "Use can_read_booking_intake_answers on /provider/intake and the booking screens.",
+      "evidence": [
+        "supabase/migrations/20261011230000_priv_health_intake.sql",
+        "web_platform/src/app/provider/intake/page.tsx"
+      ]
+    },
+    {
+      "id": "whatsapp-erasure-needs-pepper",
+      "severity": "low",
+      "description": "WhatsApp receptionist threads are erased by the peppered hash of the customer's verified phone; privacy-erase-account waits (and reports it) while WHATSAPP_CONTACT_PEPPER is unset in an environment that has WhatsApp channels.",
+      "status": "open",
+      "rationale": "Set WHATSAPP_CONTACT_PEPPER wherever whatsapp-inbound runs.",
+      "evidence": [
+        "supabase/functions/privacy-erase-account/index.ts"
+      ]
+    },
+    {
+      "id": "priv-not-reviewed",
+      "severity": "medium",
+      "description": "The PRIV package (privacy requests, copy, deletion engine, holds, ledger, health intake, incidents, RoPA) is implemented and tested but has had no independent security or UX review.",
+      "status": "open",
+      "rationale": "adminwright-security and ux-reviewer over the privacy-request, privacy-incident and processing-register entities.",
+      "evidence": [
+        "supabase/tests/db/priv_privacy.test.mjs",
+        "scripts/verify-privacy-local.mjs"
+      ]
     }
   ],
   "declaredStatic": [
@@ -10017,6 +11198,96 @@
       "approvedBy": "Security review recommendation (docs/reviews/2026-10-10-security-gov1.md) adopted by the dispatch; owner confirmation pending",
       "evidence": [
         "docs/reviews/2026-10-10-security-gov1.md"
+      ]
+    },
+    {
+      "id": "priv-deadline-days",
+      "path": "supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_deadline_days",
+      "value": "30 days (+ one extension of up to 30)",
+      "reason": "Q1.3 / IR Art. 3(1)(a)",
+      "approvedBy": "Owner adoption of the privacy memo on 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md)",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "priv-escalation-days",
+      "path": "supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_escalate_requests",
+      "value": "day 20 and day 28; internal target 15",
+      "reason": "Q1.3",
+      "approvedBy": "Owner adoption of the privacy memo on 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md)",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "priv-otp-window",
+      "path": "supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_require_contact_otp",
+      "value": "10 minutes",
+      "reason": "Q1.2 freshness window chosen by the implementer",
+      "approvedBy": "Implementer default; owner confirmation pending",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "priv-export-expiry",
+      "path": "supabase/migrations/20261011210000_priv_copy_export.sql#privacy_export_record_built",
+      "value": "7 days",
+      "reason": "Q1.5",
+      "approvedBy": "Owner adoption of the privacy memo on 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md)",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "priv-health-retention",
+      "path": "supabase/migrations/20261011230000_priv_health_intake.sql#health_answer_retention_days",
+      "value": "30 days",
+      "reason": "Q2.6",
+      "approvedBy": "Owner adoption of the privacy memo on 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md)",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "priv-health-reuse-consent",
+      "path": "supabase/migrations/20261011230000_priv_health_intake.sql#health_reuse_consent_months",
+      "value": "12 months",
+      "reason": "Q2.6",
+      "approvedBy": "Owner adoption of the privacy memo on 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md)",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "priv-hold-review-and-release",
+      "path": "supabase/migrations/20261011220000_priv_deletion_engine.sql#admin_privacy_review_legal_hold",
+      "value": "review every 90 days; dispute holds released 30 days after closing",
+      "reason": "Q2.5",
+      "approvedBy": "Owner adoption of the privacy memo on 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md)",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "priv-retention-years",
+      "path": "supabase/migrations/20261011220000_priv_deletion_engine.sql#privacy_retention_until",
+      "value": "10 years from the end of the (calendar) year",
+      "reason": "Q2.4 / CBL Art. 8",
+      "approvedBy": "Owner adoption of the privacy memo on 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md)",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "priv-incident-clock",
+      "path": "supabase/migrations/20261011240000_priv_incident_register.sql#privacy_incident_json",
+      "value": "72 hours from aware_at; alert at 48 h; 5-year retention",
+      "reason": "X1",
+      "approvedBy": "Owner adoption of the privacy memo on 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md)",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
       ]
     }
   ],
@@ -10655,6 +11926,58 @@
         "web_platform/src/app/admin/sponsored/page.tsx"
       ],
       "status": "open"
+    },
+    {
+      "id": "priv-rename-table-ripples-into-tests",
+      "observation": "Renaming data_subject_requests to privacy_requests (the decision text names the table) broke 11 test files and 3 web tests that inserted into or read the old table and functions; the change was right but the blast radius was larger than the migration.",
+      "category": "gap",
+      "proposedChange": "In stack-adapters or build-order: before renaming a table a decision names, grep tests/fixtures for the old name and budget the test updates in the same slice.",
+      "evidence": [
+        "supabase/tests/db/qa_adversarial.test.mjs",
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "priv-edge-runtime-differs-from-node",
+      "observation": "fontkit's TTF subsetter worked under Node (the unit tests) and crashed inside the Supabase Edge Runtime; only the live run through 'supabase functions serve' caught it.",
+      "category": "gap",
+      "proposedChange": "Note in stack-adapters (Supabase): pure modules shared between Node tests and Deno Edge Functions still need one live call in the Edge Runtime before an implementer reports done.",
+      "evidence": [
+        "supabase/functions/_shared/privacy-export-document.ts",
+        "scripts/verify-privacy-local.mjs"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "priv-guard-catalogue-tests-need-helper-names",
+      "observation": "Repository tests that classify SECURITY DEFINER functions by literal guard calls (is_admin(), admin_can()) flagged every privacy command that checks through a helper; the tests had to learn the helper's name.",
+      "category": "gap",
+      "proposedChange": "In security-governance: when guards move into a helper, register the helper with the catalogue tests in the same change.",
+      "evidence": [
+        "supabase/tests/db/qa_adversarial.test.mjs"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "priv-retention-needs-off-database-ledger",
+      "observation": "A deletion ledger stored only in the database cannot survive the restore it exists for; the honest design is an exported archive plus re-application that accepts archived entries.",
+      "category": "new-pattern",
+      "proposedChange": "Add to admin-data-model (erasure): a restore-proof deletion record must live outside the database being restored.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "manifest-set-cannot-write-objects",
+      "observation": "The set command coerces any value for an object field (entityStates) into a string, which the coverage audit then ignores (as_dict of a string is empty); the only way back to an object was a locked in-place edit with the script's own FileLock and write format.",
+      "category": "tooling",
+      "proposedChange": "Teach coerce_value to parse a JSON object when the current value is a dict (or when the raw value starts with {), mirroring the list handling.",
+      "evidence": [
+        ".admin-console/manifest.json"
+      ],
+      "status": "open"
     }
   ],
   "agents": [
@@ -10811,6 +12134,35 @@
       "status": "handed-off",
       "notes": "Fixes security review round 2 findings R2-H1..H4, R2-M1..M8, R2-L1..L7 (docs/reviews/2026-10-11-security-round2.md).",
       "worklog": ".admin-console/worklog/impl-secfix2-claude.md"
+    },
+    {
+      "id": "impl-priv-claude",
+      "role": "implementer",
+      "ownsCapabilities": [
+        "customer.data-request",
+        "customer.submit-data-request",
+        "privacy.request-intake",
+        "privacy.deadline-and-refusal",
+        "privacy.correction",
+        "privacy.copy-export",
+        "privacy.deletion",
+        "privacy.legal-hold",
+        "privacy.deletion-ledger",
+        "intake.health-retention-and-gate",
+        "incident.register",
+        "ropa.view",
+        "privacy.queue",
+        "incident.list"
+      ],
+      "ownsScreens": [
+        "admin-privacy",
+        "admin-incidents",
+        "admin-ropa",
+        "customer-privacy-account"
+      ],
+      "status": "handed-off",
+      "notes": "PRIV package: Q1 privacy requests, Q2 deletion engine, Q2.6 health intake retention and gate (X3-6), X1 incident register, X2 RoPA (docs/legal/2026-10-10-privacy-decision-memo.md final decision texts).",
+      "worklog": ".admin-console/worklog/impl-priv-claude.md"
     }
   ]
 }
