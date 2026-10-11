@@ -264,7 +264,8 @@
           ],
           "serverOperations": [
             "supabase/migrations/20261005120000_admin_provider_operations.sql#L21",
-            "supabase/migrations/20261005120000_admin_provider_operations.sql#L62"
+            "supabase/migrations/20261005120000_admin_provider_operations.sql#L62",
+            "supabase/migrations/20261011140000_secfix2_mediums_lows_personal_reads.sql"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261005120000_admin_provider_operations.sql#L12"
@@ -276,13 +277,16 @@
           "concurrency": "",
           "recovery": "",
           "tests": [
-            "supabase/tests/db/provider_operations.test.mjs"
+            "supabase/tests/db/provider_operations.test.mjs",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs"
           ],
           "evidence": [
+            "supabase/migrations/20261011140000_secfix2_mediums_lows_personal_reads.sql",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
             "web_platform/tests/admin-console-guards.test.mjs#L129"
           ],
           "owner": "",
-          "reviewStatus": "reviewed",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "sec-claude-release-review"
         },
         {
@@ -619,7 +623,9 @@
           "uiRoutes": [
             "/admin/branches"
           ],
-          "serverOperations": [],
+          "serverOperations": [
+            "supabase/migrations/20261011140000_secfix2_mediums_lows_personal_reads.sql"
+          ],
           "authorizationPolicies": [
             "supabase/migrations/20260621214926_refine_branch_mutation_policies.sql#L21"
           ],
@@ -629,8 +635,12 @@
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
+          "tests": [
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs"
+          ],
           "evidence": [
+            "supabase/migrations/20261011140000_secfix2_mediums_lows_personal_reads.sql",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
             "web_platform/src/app/admin/branches/page.tsx#L67"
           ],
           "owner": "",
@@ -1068,7 +1078,8 @@
             "/admin/bookings"
           ],
           "serverOperations": [
-            "supabase/migrations/20261005180000_admin_booking_directory.sql#L8"
+            "supabase/migrations/20261005180000_admin_booking_directory.sql#L8",
+            "supabase/migrations/20261011140000_secfix2_mediums_lows_personal_reads.sql"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261005180000_admin_booking_directory.sql#L35"
@@ -1084,11 +1095,14 @@
           "concurrency": "",
           "recovery": "",
           "tests": [
-            "supabase/tests/db/booking_directory.test.mjs"
+            "supabase/tests/db/booking_directory.test.mjs",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs"
           ],
           "evidence": [
-            "web_platform/src/app/admin/bookings/page.tsx#L264",
-            "supabase/tests/db/booking_directory.test.mjs#L101"
+            "supabase/migrations/20261011140000_secfix2_mediums_lows_personal_reads.sql",
+            "supabase/tests/db/booking_directory.test.mjs#L101",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
+            "web_platform/src/app/admin/bookings/page.tsx#L264"
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
@@ -1101,7 +1115,7 @@
             "admin"
           ],
           "risk": "high",
-          "status": "implemented",
+          "status": "in-progress",
           "rationale": "The status can change only through the three commands (the provider and delegate UPDATE policies are gone); an administrator's reason is required at the database; a foreign booking is answered like a missing one (round 3). Built by impl-claude-release-gaps; unreviewed.",
           "entityStates": {
             "from": [
@@ -1120,7 +1134,8 @@
           "serverOperations": [
             "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L515",
             "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L605",
-            "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L675"
+            "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L675",
+            "supabase/migrations/20261011110000_secfix2_h2_console_cancellations.sql"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261005170000_qa_release_gate_fixes.sql#L33"
@@ -1140,14 +1155,17 @@
           "recovery": "A cancelled or no-show booking is final; refunds and fees follow the shop's policy through refund_requests.",
           "tests": [
             "supabase/tests/db/qa_adversarial.test.mjs",
-            "supabase/tests/db/qa_defect_fixes.test.mjs"
+            "supabase/tests/db/qa_defect_fixes.test.mjs",
+            "supabase/tests/db/secfix2_console_cancellations.test.mjs"
           ],
           "evidence": [
+            "supabase/migrations/20261011110000_secfix2_h2_console_cancellations.sql",
+            "supabase/tests/db/qa_defect_fixes.test.mjs#L248",
             "supabase/tests/db/qa_defect_fixes.test.mjs#L47",
-            "supabase/tests/db/qa_defect_fixes.test.mjs#L248"
+            "supabase/tests/db/secfix2_console_cancellations.test.mjs"
           ],
           "owner": "",
-          "reviewStatus": "reviewed",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "qa-claude-release-gate"
         },
         {
@@ -1336,7 +1354,9 @@
           ],
           "serverOperations": [
             "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L605",
-            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L669"
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L669",
+            "supabase/migrations/20261011120000_secfix2_h3_m4_m5_reconciliation_evidence.sql",
+            "supabase/migrations/20261011130000_secfix2_h4_governance_notice_delivery.sql"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L402"
@@ -1354,10 +1374,16 @@
           "recovery": "A release cannot be undone from the console; the audit entry records who released the share and why.",
           "tests": [
             "supabase/tests/db/money_append_only.test.mjs",
+            "supabase/tests/db/qa_adversarial.test.mjs",
             "supabase/tests/db/qa_defect_fixes.test.mjs",
-            "supabase/tests/db/qa_adversarial.test.mjs"
+            "supabase/tests/db/secfix2_governance_notices.test.mjs",
+            "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs"
           ],
           "evidence": [
+            "supabase/migrations/20261011120000_secfix2_h3_m4_m5_reconciliation_evidence.sql",
+            "supabase/migrations/20261011130000_secfix2_h4_governance_notice_delivery.sql",
+            "supabase/tests/db/secfix2_governance_notices.test.mjs",
+            "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs",
             "web_platform/src/app/admin/ledger/page.tsx#L841"
           ],
           "owner": "",
@@ -1692,7 +1718,9 @@
             "/admin/ledger"
           ],
           "serverOperations": [
-            "supabase/migrations/20261005080000_release_gap_controls.sql#L77"
+            "supabase/migrations/20261005080000_release_gap_controls.sql#L77",
+            "supabase/migrations/20261011120000_secfix2_h3_m4_m5_reconciliation_evidence.sql",
+            "supabase/migrations/20261011130000_secfix2_h4_governance_notice_delivery.sql"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261005080000_release_gap_controls.sql#L91"
@@ -1709,13 +1737,19 @@
           "concurrency": "The payout request row is locked FOR UPDATE.",
           "recovery": "A request moves requested -> processing or rejected only; a rejected request is final and the provider asks again.",
           "tests": [
-            "supabase/tests/db/release_controls.test.mjs",
+            "supabase/tests/db/admin_security_matrix.test.mjs",
             "supabase/tests/db/qa_adversarial.test.mjs",
-            "supabase/tests/db/admin_security_matrix.test.mjs"
+            "supabase/tests/db/release_controls.test.mjs",
+            "supabase/tests/db/secfix2_governance_notices.test.mjs",
+            "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs"
           ],
           "evidence": [
             "supabase/migrations/20261005080000_release_gap_controls.sql#L77",
-            "supabase/tests/db/release_controls.test.mjs#L38"
+            "supabase/migrations/20261011120000_secfix2_h3_m4_m5_reconciliation_evidence.sql",
+            "supabase/migrations/20261011130000_secfix2_h4_governance_notice_delivery.sql",
+            "supabase/tests/db/release_controls.test.mjs#L38",
+            "supabase/tests/db/secfix2_governance_notices.test.mjs",
+            "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs"
           ],
           "owner": "",
           "reviewStatus": "unreviewed",
@@ -1925,7 +1959,8 @@
           ],
           "serverOperations": [
             "supabase/functions/process-refund/index.ts",
-            "supabase/migrations/20261005010000_review_fix_money.sql#L599"
+            "supabase/migrations/20261005010000_review_fix_money.sql#L599",
+            "supabase/migrations/20261011110000_secfix2_h2_console_cancellations.sql"
           ],
           "authorizationPolicies": [
             "supabase/functions/process-refund/index.ts#L18"
@@ -1941,10 +1976,13 @@
           "concurrency": "claim_refund_request locks the row FOR UPDATE SKIP LOCKED; complete_refund_request locks it again before writing the ledger.",
           "recovery": "A refused refund is recorded as failed with the gateway's message and retried by the scheduler up to five attempts, then by an operator through refund.retry.",
           "tests": [
-            "supabase/tests/db/money.test.mjs"
+            "supabase/tests/db/money.test.mjs",
+            "supabase/tests/db/secfix2_console_cancellations.test.mjs"
           ],
           "evidence": [
-            "supabase/functions/_shared/refunds.ts"
+            "supabase/functions/_shared/refunds.ts",
+            "supabase/migrations/20261011110000_secfix2_h2_console_cancellations.sql",
+            "supabase/tests/db/secfix2_console_cancellations.test.mjs"
           ],
           "owner": "",
           "reviewStatus": "contested",
@@ -2085,7 +2123,8 @@
           ],
           "serverOperations": [
             "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L307",
-            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L354"
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L354",
+            "supabase/migrations/20261011140000_secfix2_mediums_lows_personal_reads.sql"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261005140000_admin_customer_directory.sql#L39"
@@ -2099,14 +2138,17 @@
           "concurrency": "",
           "recovery": "",
           "tests": [
-            "supabase/tests/db/gov2_audited_reads.test.mjs"
+            "supabase/tests/db/gov2_audited_reads.test.mjs",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs"
           ],
           "evidence": [
             "supabase/migrations/20261005140000_admin_customer_directory.sql#L18",
-            "supabase/tests/db/customer_directory.test.mjs#L57",
-            "web_platform/tests/admin-console-guards.test.mjs#L112",
             "supabase/migrations/20261005140000_admin_customer_directory.sql#L94",
-            "supabase/tests/db/customer_directory.test.mjs#L103"
+            "supabase/migrations/20261011140000_secfix2_mediums_lows_personal_reads.sql",
+            "supabase/tests/db/customer_directory.test.mjs#L103",
+            "supabase/tests/db/customer_directory.test.mjs#L57",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
+            "web_platform/tests/admin-console-guards.test.mjs#L112"
           ],
           "owner": "",
           "reviewStatus": "contested",
@@ -2388,7 +2430,8 @@
             "/admin/employees"
           ],
           "serverOperations": [
-            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L788"
+            "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L788",
+            "supabase/migrations/20261011140000_secfix2_mediums_lows_personal_reads.sql"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261005120000_admin_provider_operations.sql#L12"
@@ -2400,11 +2443,14 @@
           "concurrency": "",
           "recovery": "",
           "tests": [
-            "supabase/tests/db/gov2_audited_reads.test.mjs"
+            "supabase/tests/db/gov2_audited_reads.test.mjs",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs"
           ],
           "evidence": [
             "supabase/migrations/20261005120000_admin_provider_operations.sql#L12",
+            "supabase/migrations/20261011140000_secfix2_mediums_lows_personal_reads.sql",
             "supabase/tests/db/provider_operations.test.mjs#L41",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
             "web_platform/tests/admin-console-guards.test.mjs#L176"
           ],
           "owner": "",
@@ -3391,7 +3437,7 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "implemented",
+          "status": "in-progress",
           "rationale": "The audit trail now covers every base table by behaviour (not by policy text) and records role changes and self-demotions; the screen searches it server-side (round 3). Export and retention are open on audit-log-has-no-export-or-retention-rule. Built by impl-claude-release-gaps; unreviewed.",
           "entityStates": {
             "from": [
@@ -3403,6 +3449,7 @@
             "/admin/audit-logs"
           ],
           "serverOperations": [
+            "supabase/migrations/20261011100000_secfix2_h1_m8_no_direct_console_reads.sql",
             "web_platform/src/app/admin/audit-logs/page.tsx#L117"
           ],
           "authorizationPolicies": [
@@ -3418,14 +3465,17 @@
           "recovery": "Audit rows cannot be edited or deleted by any client role; a search is read-only and a wrong filter changes nothing.",
           "tests": [
             "supabase/tests/db/qa_defect_fixes.test.mjs",
+            "supabase/tests/db/secfix2_console_read_policies.test.mjs",
             "supabase/tests/db/security_hardening.test.mjs"
           ],
           "evidence": [
             "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
-            "supabase/tests/db/qa_defect_fixes.test.mjs#L288"
+            "supabase/migrations/20261011100000_secfix2_h1_m8_no_direct_console_reads.sql",
+            "supabase/tests/db/qa_defect_fixes.test.mjs#L288",
+            "supabase/tests/db/secfix2_console_read_policies.test.mjs"
           ],
           "owner": "",
-          "reviewStatus": "reviewed",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "qa-claude-release-gate"
         },
         {
@@ -3449,7 +3499,8 @@
           "uiRoutes": [],
           "serverOperations": [
             "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
-            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37",
+            "supabase/migrations/20261011140000_secfix2_mediums_lows_personal_reads.sql"
           ],
           "authorizationPolicies": [
             "supabase/tests/db/admin_security_matrix.test.mjs#L169"
@@ -3465,13 +3516,16 @@
           "concurrency": "",
           "recovery": "",
           "tests": [
-            "supabase/tests/db/security_hardening.test.mjs",
+            "supabase/tests/db/admin_security_matrix.test.mjs",
             "supabase/tests/db/release_controls.test.mjs",
-            "supabase/tests/db/admin_security_matrix.test.mjs"
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
+            "supabase/tests/db/security_hardening.test.mjs"
           ],
           "evidence": [
-            "supabase/tests/db/security_hardening.test.mjs#L43",
-            "supabase/tests/db/release_controls.test.mjs#L17"
+            "supabase/migrations/20261011140000_secfix2_mediums_lows_personal_reads.sql",
+            "supabase/tests/db/release_controls.test.mjs#L17",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
+            "supabase/tests/db/security_hardening.test.mjs#L43"
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
@@ -4557,7 +4611,9 @@
             "/admin/notifications"
           ],
           "serverOperations": [
-            "supabase/functions/dispatch-messages/index.ts#L1"
+            "supabase/functions/deliver-governance-notices/index.ts",
+            "supabase/functions/dispatch-messages/index.ts#L1",
+            "supabase/migrations/20261011130000_secfix2_h4_governance_notice_delivery.sql"
           ],
           "authorizationPolicies": [],
           "auditEvents": [],
@@ -4567,9 +4623,15 @@
           "concurrency": "",
           "recovery": "",
           "tests": [
+            "supabase/tests/db/secfix2_governance_notices.test.mjs",
+            "supabase/tests/governance-notice-delivery.test.mjs",
             "web_platform/tests/negative-authorization.test.mjs"
           ],
           "evidence": [
+            "supabase/functions/deliver-governance-notices/index.ts",
+            "supabase/migrations/20261011130000_secfix2_h4_governance_notice_delivery.sql",
+            "supabase/tests/db/secfix2_governance_notices.test.mjs",
+            "supabase/tests/governance-notice-delivery.test.mjs",
             "web_platform/src/app/admin/notifications/page.tsx#L253",
             "web_platform/tests/negative-authorization.test.mjs#L470"
           ],
@@ -4643,7 +4705,8 @@
             "/admin/sponsored"
           ],
           "serverOperations": [
-            "supabase/migrations/20261005080000_release_gap_controls.sql#L133"
+            "supabase/migrations/20261005080000_release_gap_controls.sql#L133",
+            "supabase/migrations/20261011150000_secfix2_lows_rewards_sponsored_reconcile_actor.sql"
           ],
           "authorizationPolicies": [
             "supabase/tests/db/sponsored.test.mjs#L151"
@@ -4657,12 +4720,15 @@
           "concurrency": "",
           "recovery": "Set the previous value; switching it off stops accrual.",
           "tests": [
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
             "supabase/tests/db/sponsored.test.mjs",
             "web_platform/tests/sponsored-screens.test.mjs"
           ],
           "evidence": [
-            "web_platform/src/app/admin/sponsored/page.tsx#L139",
-            "supabase/tests/db/sponsored.test.mjs#L151"
+            "supabase/migrations/20261011150000_secfix2_lows_rewards_sponsored_reconcile_actor.sql",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
+            "supabase/tests/db/sponsored.test.mjs#L151",
+            "web_platform/src/app/admin/sponsored/page.tsx#L139"
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
@@ -5222,12 +5288,15 @@
             "/admin/disputes"
           ],
           "serverOperations": [
+            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L281",
+            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L341",
             "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L380",
             "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L650",
-            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L341",
-            "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L281",
             "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#admin_approval_inbox",
-            "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#governance_decider_refusal"
+            "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#governance_decider_refusal",
+            "supabase/migrations/20261011110000_secfix2_h2_console_cancellations.sql",
+            "supabase/migrations/20261011120000_secfix2_h3_m4_m5_reconciliation_evidence.sql",
+            "supabase/migrations/20261011150000_secfix2_lows_rewards_sponsored_reconcile_actor.sql"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L411",
@@ -5244,13 +5313,22 @@
           "dataBinding": "postgres:public.admin_approval_requests",
           "tests": [
             "supabase/tests/db/gov1_maker_checker.test.mjs",
+            "supabase/tests/db/govfix_h2_role_grants.test.mjs",
             "supabase/tests/db/money.test.mjs",
-            "web_platform/tests/gov1-governance-screens.test.mjs",
-            "supabase/tests/db/govfix_h2_role_grants.test.mjs"
+            "supabase/tests/db/secfix2_console_cancellations.test.mjs",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
+            "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs",
+            "web_platform/tests/gov1-governance-screens.test.mjs"
           ],
           "evidence": [
-            "web_platform/src/app/admin/approvals/page.tsx",
-            "supabase/tests/db/gov1_maker_checker.test.mjs#L56"
+            "supabase/migrations/20261011110000_secfix2_h2_console_cancellations.sql",
+            "supabase/migrations/20261011120000_secfix2_h3_m4_m5_reconciliation_evidence.sql",
+            "supabase/migrations/20261011150000_secfix2_lows_rewards_sponsored_reconcile_actor.sql",
+            "supabase/tests/db/gov1_maker_checker.test.mjs#L56",
+            "supabase/tests/db/secfix2_console_cancellations.test.mjs",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
+            "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs",
+            "web_platform/src/app/admin/approvals/page.tsx"
           ],
           "idempotency": "one pending request per (kind, target); execution keeps admin_release_payout's idempotency key",
           "concurrency": "row lock on the request; partial unique index on pending (kind, target_id)",
@@ -5275,7 +5353,8 @@
           "serverOperations": [
             "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L496",
             "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L567",
-            "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#governance_break_glass_blocked_until"
+            "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#governance_break_glass_blocked_until",
+            "supabase/migrations/20261011120000_secfix2_h3_m4_m5_reconciliation_evidence.sql"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L496"
@@ -5290,11 +5369,14 @@
           "dataBinding": "postgres:public.break_glass_reviews",
           "tests": [
             "supabase/tests/db/gov1_maker_checker.test.mjs",
-            "supabase/tests/db/govfix_h2_role_grants.test.mjs"
+            "supabase/tests/db/govfix_h2_role_grants.test.mjs",
+            "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs"
           ],
           "evidence": [
-            "web_platform/src/app/admin/approvals/page.tsx",
-            "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql"
+            "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql",
+            "supabase/migrations/20261011120000_secfix2_h3_m4_m5_reconciliation_evidence.sql",
+            "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs",
+            "web_platform/src/app/admin/approvals/page.tsx"
           ],
           "idempotency": "",
           "concurrency": "",
@@ -5318,9 +5400,10 @@
           ],
           "serverOperations": [
             "supabase/migrations/20261010120000_gov1_iban_controls.sql#L363",
-            "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql#reveal_provider_iban",
+            "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql#admin_lift_iban_reveal_limit",
             "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql#reveal_employee_wps_iban",
-            "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql#admin_lift_iban_reveal_limit"
+            "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql#reveal_provider_iban",
+            "supabase/migrations/20261011140000_secfix2_mediums_lows_personal_reads.sql"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261010120000_gov1_iban_controls.sql#L93",
@@ -5337,12 +5420,15 @@
           "dataBinding": "postgres:public.provider_payout_destinations",
           "tests": [
             "supabase/tests/db/gov1_iban.test.mjs",
-            "web_platform/tests/gov1-governance-screens.test.mjs",
-            "supabase/tests/db/govfix_wps_iban_and_reveal.test.mjs"
+            "supabase/tests/db/govfix_wps_iban_and_reveal.test.mjs",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
+            "web_platform/tests/gov1-governance-screens.test.mjs"
           ],
           "evidence": [
-            "web_platform/src/app/admin/ledger/page.tsx",
+            "supabase/migrations/20261011140000_secfix2_mediums_lows_personal_reads.sql",
             "supabase/tests/db/gov1_iban.test.mjs#L37",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
+            "web_platform/src/app/admin/ledger/page.tsx",
             "web_platform/src/app/provider/_components/employee-extras.tsx"
           ],
           "idempotency": "",
@@ -5432,11 +5518,13 @@
             "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L642",
             "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L788",
             "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L976",
-            "supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql#admin_recent_bookings",
-            "supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql#admin_list_refund_requests",
             "supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql#admin_list_disputes",
+            "supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql#admin_list_refund_requests",
             "supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql#admin_list_reviews",
-            "supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql#admin_provider_private_directory"
+            "supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql#admin_provider_private_directory",
+            "supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql#admin_recent_bookings",
+            "supabase/migrations/20261011100000_secfix2_h1_m8_no_direct_console_reads.sql",
+            "supabase/migrations/20261011140000_secfix2_mediums_lows_personal_reads.sql"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L71",
@@ -5459,20 +5547,26 @@
           "concurrency": "Read-only snapshots; totals and pages come from the same statement.",
           "recovery": "Nothing to recover: no data changes; a refused read returns 42501 with HINT console_role_forbidden.",
           "tests": [
-            "supabase/tests/db/gov2_audited_reads.test.mjs",
             "supabase/tests/db/admin_dashboard.test.mjs",
-            "web_platform/tests/admin-console-guards.test.mjs",
-            "supabase/tests/db/govfix_gov2_remaining_reads.test.mjs"
+            "supabase/tests/db/gov2_audited_reads.test.mjs",
+            "supabase/tests/db/govfix_gov2_remaining_reads.test.mjs",
+            "supabase/tests/db/secfix2_console_read_policies.test.mjs",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
+            "web_platform/tests/admin-console-guards.test.mjs"
           ],
           "evidence": [
+            "supabase/migrations/20261011100000_secfix2_h1_m8_no_direct_console_reads.sql",
+            "supabase/migrations/20261011140000_secfix2_mediums_lows_personal_reads.sql",
             "supabase/tests/db/gov2_audited_reads.test.mjs#L112",
+            "supabase/tests/db/secfix2_console_read_policies.test.mjs",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
             "web_platform/src/app/admin/customers/page.tsx",
-            "web_platform/src/app/admin/ledger/page.tsx",
-            "web_platform/src/app/admin/reports/page.tsx",
-            "web_platform/src/app/admin/refunds/page.tsx",
             "web_platform/src/app/admin/disputes/page.tsx",
-            "web_platform/src/app/admin/reviews/page.tsx",
-            "web_platform/src/app/admin/packages/page.tsx"
+            "web_platform/src/app/admin/ledger/page.tsx",
+            "web_platform/src/app/admin/packages/page.tsx",
+            "web_platform/src/app/admin/refunds/page.tsx",
+            "web_platform/src/app/admin/reports/page.tsx",
+            "web_platform/src/app/admin/reviews/page.tsx"
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
@@ -5520,11 +5614,13 @@
             "/admin/reconciliation"
           ],
           "serverOperations": [
-            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L350",
+            "supabase/functions/reconcile-psp/index.ts",
             "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L249",
             "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L266",
             "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L319",
-            "supabase/functions/reconcile-psp/index.ts"
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L350",
+            "supabase/migrations/20261011120000_secfix2_h3_m4_m5_reconciliation_evidence.sql",
+            "supabase/migrations/20261011150000_secfix2_lows_rewards_sponsored_reconcile_actor.sql"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L276",
@@ -5545,11 +5641,18 @@
           "recovery": "breaks resolved by approved correction; timing differences auto-matched on Tap data",
           "tests": [
             "supabase/tests/db/money_reconciliation.test.mjs",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
+            "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs",
             "supabase/tests/tap-refund-status.test.mjs"
           ],
           "evidence": [
-            "web_platform/src/app/admin/reconciliation/page.tsx",
-            "supabase/tests/db/money_reconciliation.test.mjs#L115"
+            "supabase/functions/reconcile-psp/index.ts",
+            "supabase/migrations/20261011120000_secfix2_h3_m4_m5_reconciliation_evidence.sql",
+            "supabase/migrations/20261011150000_secfix2_lows_rewards_sponsored_reconcile_actor.sql",
+            "supabase/tests/db/money_reconciliation.test.mjs#L115",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
+            "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs",
+            "web_platform/src/app/admin/reconciliation/page.tsx"
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
@@ -5573,8 +5676,9 @@
             "/admin/approvals"
           ],
           "serverOperations": [
+            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L583",
             "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L486",
-            "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L583"
+            "supabase/migrations/20261011120000_secfix2_h3_m4_m5_reconciliation_evidence.sql"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L159"
@@ -5590,10 +5694,13 @@
           "concurrency": "approval row lock",
           "recovery": "a further approved correction",
           "tests": [
-            "supabase/tests/db/money_reconciliation.test.mjs"
+            "supabase/tests/db/money_reconciliation.test.mjs",
+            "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs"
           ],
           "evidence": [
-            "supabase/tests/db/money_reconciliation.test.mjs#L82"
+            "supabase/migrations/20261011120000_secfix2_h3_m4_m5_reconciliation_evidence.sql",
+            "supabase/tests/db/money_reconciliation.test.mjs#L82",
+            "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs"
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
@@ -5642,10 +5749,11 @@
             "/customer/wallet"
           ],
           "serverOperations": [
+            "supabase/migrations/20261010320000_money_reward_programs.sql#L292",
             "supabase/migrations/20261010320000_money_reward_programs.sql#L559",
             "supabase/migrations/20261010320000_money_reward_programs.sql#L642",
-            "supabase/migrations/20261010320000_money_reward_programs.sql#L292",
-            "supabase/migrations/20261010320000_money_reward_programs.sql#L711"
+            "supabase/migrations/20261010320000_money_reward_programs.sql#L711",
+            "supabase/migrations/20261011150000_secfix2_lows_rewards_sponsored_reconcile_actor.sql"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261010300000_money_append_only_and_corrections.sql#L396",
@@ -5665,12 +5773,15 @@
           "concurrency": "row lock on the referral during vesting; approval row lock",
           "recovery": "an approved change disables the programme; credits reversed by recorded reversal rows",
           "tests": [
-            "supabase/tests/db/money_rewards.test.mjs",
-            "supabase/tests/db/booking_engine_referrals.test.mjs",
             "supabase/tests/db/booking_engine_loyalty.test.mjs",
+            "supabase/tests/db/booking_engine_referrals.test.mjs",
+            "supabase/tests/db/money_rewards.test.mjs",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
             "web_platform/tests/money-screens.test.mjs"
           ],
           "evidence": [
+            "supabase/migrations/20261011150000_secfix2_lows_rewards_sponsored_reconcile_actor.sql",
+            "supabase/tests/db/secfix2_mediums_lows.test.mjs",
             "web_platform/src/app/admin/settings/reward-programmes.tsx",
             "web_platform/src/components/reward-terms.tsx"
           ],
@@ -7461,6 +7572,105 @@
       "appliesTo": [
         "gov.iban-reveal"
       ]
+    },
+    {
+      "id": "secfix2-adopt-security-round2-fixes",
+      "decision": "The recommended fixes in docs/reviews/2026-10-11-security-round2.md are the plan of record for this pass (R2-H1..H4, R2-M1..M8, R2-L1..L7), as dispatched.",
+      "reason": "Dispatch instruction from the coordinator; the review names a fix for each finding.",
+      "evidence": [
+        "docs/reviews/2026-10-11-security-round2.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "gov.audited-reads",
+        "refund.execute",
+        "reconciliation.daily",
+        "reconciliation.resolve-break",
+        "notification.dispatch"
+      ]
+    },
+    {
+      "id": "secfix2-break-glass-never-resolves-breaks",
+      "decision": "R2-L6: break-glass is not available for a ledger correction that resolves a reconciliation break; such a correction always waits for a second money.ledger holder.",
+      "reason": "D-Q9 says breaks are resolved only by approved adjustments; the stricter reading was chosen pending the owner (the review marks this an owner decision).",
+      "evidence": [
+        "supabase/migrations/20261011120000_secfix2_h3_m4_m5_reconciliation_evidence.sql",
+        "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "reconciliation.resolve-break",
+        "gov.break-glass"
+      ]
+    },
+    {
+      "id": "secfix2-break-correction-amount",
+      "decision": "A correction's amount towards a break is the absolute captured change, or the absolute net share change when nothing captured changes; corrections may not exceed the break's absolute difference; the break resolves when they equal it and stays open (partial) otherwise.",
+      "reason": "R2-M4 asks the correction to equal the break's difference or be recorded as partial; break kinds use different sign conventions, so absolute amounts are compared.",
+      "evidence": [
+        "supabase/migrations/20261011120000_secfix2_h3_m4_m5_reconciliation_evidence.sql",
+        "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "reconciliation.resolve-break",
+        "ledger.adjustment"
+      ]
+    },
+    {
+      "id": "secfix2-payout-hold-is-provider-wide",
+      "decision": "R2-M5: any open or escalated reconciliation break naming a provider blocks that provider's payout requests, payout releases and manual settlements (not only the affected ledger rows).",
+      "reason": "Simplest rule finance can see and explain; a break's ledger row may not be the row a payout would allocate. The held breaks and amount are shown on the payout list.",
+      "evidence": [
+        "supabase/migrations/20261011120000_secfix2_h3_m4_m5_reconciliation_evidence.sql",
+        "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs",
+        "web_platform/src/app/admin/ledger/page.tsx"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "payout.approve",
+        "ledger.release-payout"
+      ]
+    },
+    {
+      "id": "secfix2-notice-sent-means-provider-accepted",
+      "decision": "A governance notice is recorded 'sent' when the provider accepted it and returned a message id (Resend id, Twilio SID); handset delivery receipts are not awaited.",
+      "reason": "Neither provider is configured; acceptance is the strongest confirmation available synchronously, and nothing is marked sent without it.",
+      "evidence": [
+        "supabase/functions/_shared/governance-notice-delivery.ts",
+        "supabase/tests/governance-notice-delivery.test.mjs"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "notification.dispatch"
+      ]
+    },
+    {
+      "id": "secfix2-console-no-show-follows-refund-rules",
+      "decision": "R2-H2 is applied to console no-shows as well as cancellations: a console no-show whose remainder refund is above zero follows the same money.refund, threshold, daily cap and second-person rules (approval kind booking_cancellation, action no_show).",
+      "reason": "mark_booking_no_show let the same operations session queue a refund of up to the whole captured amount when the provider's no-show fee is 0%.",
+      "evidence": [
+        "supabase/migrations/20261011110000_secfix2_h2_console_cancellations.sql",
+        "supabase/tests/db/secfix2_console_cancellations.test.mjs"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "booking.transition",
+        "refund.execute"
+      ]
+    },
+    {
+      "id": "secfix2-sponsored-price-needs-second-owner",
+      "decision": "R2-L7: the sponsored price per new client changes through a 'sponsored_price_change' request approved by a different holder of settings.manage (owner), after a step-up.",
+      "reason": "The review asks for step-up plus setting_change approval; the existing setting_change kind is numeric-only for governance_settings.",
+      "evidence": [
+        "supabase/migrations/20261011150000_secfix2_lows_rewards_sponsored_reconcile_actor.sql",
+        "supabase/tests/db/secfix2_mediums_lows.test.mjs"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "sponsored.configure"
+      ]
     }
   ],
   "gaps": [
@@ -8321,15 +8531,12 @@
       "id": "admin-can-still-rewrite-money-tables-directly",
       "severity": "high",
       "description": "Administrator policies are still FOR ALL on transactional_ledger, wallet_credits, gift_cards, fee_rules, loyalty tables and others. Every such write is now audited, but one credential can still change ledger amounts, fee percentages and balances, and then raise, approve and release a payout. Which of these writes are legitimate, and whether they should be append-only or need a second approver and recent re-authentication, is the owner's decision.",
-      "status": "blocked",
-      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): STILL BLOCKED on the owner decision, with one table removed from the list. Re-proved on the migrated schema (probe-results.txt, probe-admin-write-policies-and-grants): the policies 'Admins manage ledger' (transactional_ledger), 'Admins manage wallet credits', 'Admins manage gift cards' and 'Admins manage loyalty ledger' are still FOR ALL for administrators and `authenticated` holds INSERT, UPDATE and DELETE on them; payout_requests keeps UPDATE and DELETE for administrators (INSERT was removed, fixmoney_grants.test.mjs). CLOSED: fee_rules - the administrator write policy was dropped and the table is read-only for clients; fee percentages change only through admin_save_fee_rule, which needs a reason, is bounded (0-50 percent, 0-1000 SAR) and is audited (20261008100200_adm1_roles_flags_fee_rules.sql; adm1_roles_flags_fee_rules.test.mjs 'refuses values outside the bounds ... and no client writes the table'). Every remaining write is audited row by row (security_hardening.test.mjs 'cover every table an administrator policy can write'), but one credential can still change ledger amounts and balances and then raise, approve and release a payout. OWNER QUESTION: which direct administrator writes on transactional_ledger, wallet_credits, gift_cards and loyalty_points_ledger are legitimate? Should these tables be read-only for clients, with all writes through reasoned, audited commands that also need a second approver and recent re-authentication above a monetary threshold (what threshold in SAR)?",
+      "status": "fixed",
+      "rationale": "CLOSED impl-secfix2-claude (2026-10-11), on the round-2 security review's verification of C-1 (docs/reviews/2026-10-11-security-round2.md, 'GOV-1 findings: closure check'): every money table refuses INSERT, UPDATE and DELETE from authenticated, column grants are removed, money.write no longer exists, guard_money_append_only is on the 19 money tables, and corrections are linked maker-checker adjustments. Evidence: the MONEY append-only migration and its tests.",
       "evidence": [
-        ".admin-console/evidence/architect-reconcile-claude/probe-results.txt#L1",
-        ".admin-console/evidence/architect-reconcile-claude/probe-admin-write-policies-and-grants.mjs#L1",
-        "supabase/migrations/20261008100200_adm1_roles_flags_fee_rules.sql#L225",
-        "supabase/tests/db/adm1_roles_flags_fee_rules.test.mjs#L114",
-        "supabase/tests/db/fixmoney_grants.test.mjs#L40",
-        "supabase/tests/db/security_hardening.test.mjs#L43"
+        "supabase/migrations/20261010300000_money_append_only_and_corrections.sql",
+        "supabase/tests/db/money_append_only.test.mjs",
+        "docs/reviews/2026-10-11-security-round2.md"
       ]
     },
     {
@@ -9191,10 +9398,14 @@
       "id": "governance-notifications-have-no-delivery-worker",
       "severity": "high",
       "description": "Out-of-band notices required by D-Q5 (break-glass), Q3 (IBAN change to the provider's channels) and Q6 (MFA lockout and reset) are queued as public.governance_notifications rows (email and sms per recipient) but no worker sends them; they stay 'pending'.",
-      "status": "open",
-      "rationale": "FOUND BY impl-gov1-claude (2026-10-10). PARTLY ADDRESSED BY impl-govfix-claude 7e0f1ed (GOV-1 review H-3): recipients now come from Auth-verified contacts, old and new, snapshotted into governance_notifications.destination; an account with none gets a 'skipped' row. STILL OPEN: no sender reads the outbox; every notice stays 'pending'. Needs the owner to choose and configure the email/SMS provider (external credentials), then a scheduled service-role Edge Function.",
+      "status": "fixed",
+      "rationale": "FIXED impl-secfix2-claude (R2-H4): deliver-governance-notices Edge Function + pure module; inert and visibly 'undeliverable: no sender configured' while no provider is configured; changed payout accounts are not paid until a change notice is sent or a second person waives it. The provider choice and credentials remain gap governance-notice-sender-not-chosen (owner).",
       "evidence": [
-        "supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L118"
+        "supabase/migrations/20261011130000_secfix2_h4_governance_notice_delivery.sql",
+        "supabase/functions/deliver-governance-notices/index.ts",
+        "supabase/functions/_shared/governance-notice-delivery.ts",
+        "supabase/tests/db/secfix2_governance_notices.test.mjs",
+        "supabase/tests/governance-notice-delivery.test.mjs"
       ]
     },
     {
@@ -9636,10 +9847,13 @@
       "id": "audit-log-read-directly-by-every-console-role",
       "severity": "medium",
       "description": "admin_audit_logs is still read directly by every console role (audit-logs screen, dashboard), and its details hold reasons and target ids; GOV-2's remaining-reads gap listed it. Not changed in GOV-FIX (the task named bookings, refunds, disputes, reviews, loyalty/redemptions and the provider directory).",
-      "status": "open",
-      "rationale": "BUILD WORK: an audited, paged admin_list_audit_logs with a permission (owner/finance?) and switch /admin/audit-logs and the dashboard; needs an owner choice on which roles review the audit log.",
+      "status": "fixed",
+      "rationale": "FIXED impl-secfix2-claude (R2-M8): restrictive console policy on admin_audit_logs; only the owner (audit.read) reads it, through the audited, paged admin_list_audit_events; the audit screen and the dashboard use it.",
       "evidence": [
-        "web_platform/src/app/admin/audit-logs/page.tsx"
+        "supabase/migrations/20261011100000_secfix2_h1_m8_no_direct_console_reads.sql",
+        "supabase/tests/db/secfix2_console_read_policies.test.mjs",
+        "web_platform/src/app/admin/audit-logs/page.tsx",
+        "web_platform/src/app/admin/page.tsx"
       ]
     },
     {
@@ -9680,6 +9894,49 @@
       "rationale": "BUILD WORK: add paging (Previous/Next with total) to /admin/reviews.",
       "evidence": [
         "web_platform/src/app/admin/reviews/page.tsx"
+      ]
+    },
+    {
+      "id": "governance-notice-sender-not-chosen",
+      "severity": "high",
+      "description": "No email or SMS provider is configured for governance notices. The sender supports Resend (GOVERNANCE_EMAIL_PROVIDER=resend, GOVERNANCE_EMAIL_API_KEY, GOVERNANCE_EMAIL_FROM) and Twilio (GOVERNANCE_SMS_PROVIDER=twilio, GOVERNANCE_SMS_ACCOUNT_SID, GOVERNANCE_SMS_AUTH_TOKEN, GOVERNANCE_SMS_FROM). Until the owner chooses a provider, signs its data processing terms (transfer outside KSA) and sets the variables in the hosted project, every notice is 'undeliverable: no sender configured' and changed bank accounts are paid only after a second person waives the notice.",
+      "status": "blocked",
+      "rationale": "Owner decision: provider, contract and credentials (AGENTS.md: external credentials and their environment are asked of a human).",
+      "evidence": [
+        "supabase/functions/_shared/governance-notice-delivery.ts",
+        "supabase/migrations/20261011130000_secfix2_h4_governance_notice_delivery.sql"
+      ]
+    },
+    {
+      "id": "deliver-governance-notices-not-scheduled",
+      "severity": "medium",
+      "description": "deliver-governance-notices must be invoked by a scheduler with the service key (for example every 5 minutes); no schedule exists in the repository, like reconcile-psp and process-refund.",
+      "status": "open",
+      "rationale": "Scheduling needs the hosted project's cron set-up and the service key; same class as reconciliation-and-tap-check-not-scheduled.",
+      "evidence": [
+        "supabase/functions/deliver-governance-notices/index.ts"
+      ]
+    },
+    {
+      "id": "tap-chargebacks-not-ingested",
+      "severity": "medium",
+      "description": "R2-L3 asks for referral and loyalty reversal on a Tap chargeback. PRIMORA records no chargebacks: payment-webhook handles no dispute events and Tap's chargeback object is not modelled, so there is nothing to hook. Rewards stay disabled (rewards-counsel-and-tax-before-enablement); reversal on refund (referral and, now, loyalty) is in place.",
+      "status": "open",
+      "rationale": "Needs Tap's chargeback/dispute webhook contract confirmed before it can be modelled; not invented.",
+      "evidence": [
+        "supabase/migrations/20261011150000_secfix2_lows_rewards_sponsored_reconcile_actor.sql",
+        "docs/reviews/2026-10-11-security-round2.md"
+      ]
+    },
+    {
+      "id": "secfix2-screens-not-browser-verified-with-totp",
+      "severity": "medium",
+      "description": "The SECFIX-2 screen changes (audit log and dashboard activity, bookings cancel/no-show with pending approval, approvals with new kinds and the notices panel, reconciliation imports and partial corrections, payout holds in the ledger, providers D4 and paging, sponsored price approval) compile, pass web tests and answer 200 on :3100, but were not clicked through with a real TOTP sign-in.",
+      "status": "open",
+      "rationale": "ux-reviewer pass with a real TOTP session.",
+      "evidence": [
+        "web_platform/src/app/admin/approvals/governance-notices.tsx",
+        "web_platform/src/app/admin/reconciliation/page.tsx"
       ]
     }
   ],
@@ -10356,6 +10613,48 @@
         "docs/reviews/2026-10-10-security-gov1.md"
       ],
       "status": "open"
+    },
+    {
+      "id": "admin-branch-in-provider-helpers-defeats-text-policy-scan",
+      "observation": "A pg_policies scan for is_admin() misses tables whose read policy calls a shared helper (can_access_provider_operation) that admits operations.write; memberships, membership redemptions and sponsored clicks/attributions leaked that way.",
+      "category": "gap",
+      "proposedChange": "In admin-data-model.md, the restrictive-read CI check must match admin helpers as well as is_admin()/admin_can().",
+      "evidence": [
+        "supabase/tests/db/secfix2_console_read_policies.test.mjs"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "null-setting-comparison-opened-a-foreign-booking",
+      "observation": "A guard written as NOT (a OR b OR current_setting(...) = id) evaluates to NULL when the setting is unset, so the IF does not fire and a foreign booking was accepted; caught by an existing foreign-vs-missing test.",
+      "category": "new-pattern",
+      "proposedChange": "Recommend COALESCE(current_setting(name, true), '') = value for every session-flag comparison inside an authorization predicate.",
+      "evidence": [
+        "supabase/migrations/20261011110000_secfix2_h2_console_cancellations.sql",
+        "supabase/tests/db/qa_round3_verification.test.mjs"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "real-stack-smoke-needs-aal2-console-owner",
+      "observation": "The coordinator reported the real-stack smoke failing because its admin was aal1 with no console role; after GOV-1 every smoke admin must enrol TOTP through GoTrue and verify to get aal2, and read audit data through the audited function.",
+      "category": "friction",
+      "proposedChange": "Add to the skill's testing guidance: any real-stack smoke must create console users the way the console role spine does and complete MFA programmatically (RFC 6238).",
+      "evidence": [
+        "scripts/smoke-local-supabase.mjs"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "pending-approval-changes-setting-commands-contract",
+      "observation": "Moving one key of a generic settings command behind maker-checker changes that command's answer to pending_approval for that key; every fixture and screen that set the key had to learn it (sponsored tests, sponsored screen).",
+      "category": "gap",
+      "proposedChange": "Note in security-governance.md: when a key moves behind approval, grep fixtures and screens for the key and give fixtures a second-approver helper.",
+      "evidence": [
+        "supabase/tests/db/gov1_fixtures.mjs",
+        "web_platform/src/app/admin/sponsored/page.tsx"
+      ],
+      "status": "open"
     }
   ],
   "agents": [
@@ -10503,6 +10802,15 @@
       "status": "handed-off",
       "notes": "Fixes remaining GOV-1 security review findings (H-1, H-2, H-3, M-2..M-6, L-1..L-4) and closes gov2-remaining-direct-admin-reads.",
       "worklog": ".admin-console/worklog/impl-govfix-claude.md"
+    },
+    {
+      "id": "impl-secfix2-claude",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "handed-off",
+      "notes": "Fixes security review round 2 findings R2-H1..H4, R2-M1..M8, R2-L1..L7 (docs/reviews/2026-10-11-security-round2.md).",
+      "worklog": ".admin-console/worklog/impl-secfix2-claude.md"
     }
   ]
 }
