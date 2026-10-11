@@ -123,6 +123,12 @@ describe("IBAN change", () => {
     assert.equal(made.iban, "SA** **** **** **** **** 1234", "new requests use the new account");
     await expectError(as(db, finance, `select admin_release_payout($1, 'hold-key', 'Weekly payout run', null)`, [made.id]), /on hold until/);
     await sys(db, `update provider_payout_destinations set hold_until = now() - interval '1 minute' where provider_id = $1 and status = 'active'`, [SEED.provider1]);
+    // SECFIX-2 R2-H4: nothing is paid to the new account until the provider's change notice was delivered.
+    await expectError(as(db, finance, `select admin_release_payout($1, 'hold-key', 'Weekly payout run', null)`, [made.id]), /not yet been told/);
+    const claimed = (await as(db, ROLES.service, `select governance_notices_claim(array['email', 'sms'], 100) r`))[0].r.claimed;
+    for (const n of claimed.filter((row) => row.template_key === "payout_account_change_requested")) {
+      await as(db, ROLES.service, `select governance_notice_record_result($1, 'sent', null, $2)`, [n.id, `msg-${n.id.slice(0, 8)}`]);
+    }
     const asked = (await as(db, finance, `select admin_release_payout($1, 'hold-key', 'Weekly payout run', null) r`, [made.id]))[0].r;
     assert.equal(asked.status, "pending_approval");
     assert.equal((await decide(owner, asked.approval_id)).result.status, "success");

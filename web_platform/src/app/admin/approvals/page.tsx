@@ -7,6 +7,7 @@ import { errorMessage } from "@/lib/error-message";
 import { CommandResult, ForbiddenNotice, isForbidden, operationsDate, sar, useOperationsLocale } from "@/components/operations-ui";
 import { CommandDialog } from "@/components/modal";
 import { oneOf, writeUrlState } from "@/lib/url-state";
+import { GovernanceNotices } from "./governance-notices";
 
 // Maker-checker inbox (GOV-1 / D-Q5). Every payout release, refunds of SAR 1,000 or more (or past SAR 5,000 per administrator
 // per Riyadh day), provider bank-account changes and threshold changes wait here for a different administrator. The database
@@ -722,6 +723,9 @@ function ApprovalsScreen() {
                   </ul>
                 )}
               </section>
+
+              <GovernanceNotices locale={lang} panelClass={panel} buttonClass={`${smallButton} border-[#FEC84B] bg-white text-[#93370D]`}
+                onDone={(message) => { setSuccess(message); reload(); }} />
             </div>
           )}
         </>
