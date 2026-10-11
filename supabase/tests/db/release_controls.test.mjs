@@ -1,6 +1,7 @@
 import { before, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { as, createMigratedDb, createUser, expectError, ROLES, SEED, sys } from "./harness.mjs";
+import { clearProfileWithApproval } from "./gov1_fixtures.mjs";
 
 let db;
 let admin;
@@ -106,15 +107,18 @@ describe("customer profile clearing", () => {
   it("clears profile details without inventing values, so repeated clears never collide", async () => {
     const first = await createUser(db, { role: "customer", phone: "+966512340002", verified: true });
     const second = await createUser(db, { role: "customer", phone: "+966512340003", verified: true });
-    await as(db, admin, `select admin_clear_customer_profile($1, 'PDPL request 1')`, [first]);
-    await as(db, admin, `select admin_clear_customer_profile($1, 'PDPL request 2')`, [second]);
+    const cleared = await clearProfileWithApproval(db, admin, first, "PDPL request 1");
+    await clearProfileWithApproval(db, admin, second, "PDPL request 2");
     const rows = await sys(db, `select first_name, last_name, email, phone_number, phone_verified from profiles where id = any($1) order by id`, [[first, second]]);
     for (const row of rows) {
       assert.deepEqual(row, { first_name: null, last_name: null, email: null, phone_number: null, phone_verified: false });
     }
     const event = (await sys(db, `select actor_id, details from admin_audit_logs where action = 'customer.profile_cleared' and target_id = $1`, [first]))[0];
-    assert.equal(event.actor_id, admin.sub);
+    assert.equal(event.actor_id, cleared.approver, "the clearing runs in the approving owner's session");
     assert.equal(event.details.reason, "PDPL request 1");
+    assert.equal(event.details.approval_request_id, cleared.approval_id);
+    const asked = (await sys(db, `select actor_id from admin_audit_logs where action = 'approval.requested' and target_id = $1`, [cleared.approval_id]))[0];
+    assert.equal(asked.actor_id, admin.sub, "the maker asked for it");
     const change = (await sys(db, `select details from admin_audit_logs where action = 'profiles.update' and target_id = $1 order by created_at desc limit 1`, [first]))[0];
     assert.equal(change.details.reason, "PDPL request 1", "the row-level audit carries the reason too");
     assert.deepEqual(change.details.changes.phone_number, { changed: true }, "the cleared phone number never enters the audit log");
