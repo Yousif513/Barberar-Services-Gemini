@@ -17,7 +17,7 @@ export interface ReplyParaphraser {
 }
 
 /** The default: no model. */
-export const noParaphrase: ReplyParaphraser = { paraphrase: async () => null }
+export const noParaphrase: ReplyParaphraser = { paraphrase: () => Promise.resolve(null) }
 
 const FACT = /https?:\/\/[^\s)]+|\d+(?:[:.,/]\d+)*/g
 

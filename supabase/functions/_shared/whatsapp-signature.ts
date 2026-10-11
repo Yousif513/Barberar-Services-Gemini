@@ -65,5 +65,5 @@ export function verifySubscription(
  */
 export async function hashCustomerId(pepper: string, channelKey: string, waId: string): Promise<string> {
   if (!pepper) throw new Error("A hashing pepper is required")
-  return hmacSha256HexBytes(pepper, `${channelKey}:${waId}`)
+  return await hmacSha256HexBytes(pepper, `${channelKey}:${waId}`)
 }

@@ -32,7 +32,7 @@ export async function hmacSha256Hex(secret: string, message: string): Promise<st
 }
 
 export async function signPayload(secret: string, body: string, timestamp: number): Promise<string> {
-  return hmacSha256Hex(secret, `${timestamp}.${body}`)
+  return await hmacSha256Hex(secret, `${timestamp}.${body}`)
 }
 
 export async function buildSignatureHeader(secret: string, body: string, timestamp: number): Promise<string> {
