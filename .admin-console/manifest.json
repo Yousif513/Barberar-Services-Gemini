@@ -11119,6 +11119,260 @@
         "supabase/tests/db/priv_privacy.test.mjs",
         "scripts/verify-privacy-local.mjs"
       ]
+    },
+    {
+      "id": "ux1-provider-pricing-shows-invented-15-percent-commission",
+      "severity": "high",
+      "description": "/provider/pricing still tells providers '15% Platform Commission' on the Lite Starter plan card (page.tsx:451), 'activate under the 15% platform split agreement' (798-799) and 'Transparent 15% booking split ledger' (878), while the same page's fee terms, computed from the fee rules in force, say 'Marketplace, a client's first visit 20% of the booking (minimum SAR 10.00, maximum SAR 40.00)'. A provider reads two contradicting commission figures on one screen; the invented-copy removal recorded by impl-money-claude is incomplete.",
+      "status": "open",
+      "rationale": "Delete the three hard-coded 15% strings (EN and AR) and point to the computed fee terms; money copy shown to providers must come from fee_rules. Severity high: contradictory fee information is a commercial and consumer-protection risk.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/provider-en-1440-_provider_pricing.png",
+        ".admin-console/evidence/ux-round1/session-log.txt#L47",
+        "web_platform/src/app/provider/pricing/page.tsx"
+      ]
+    },
+    {
+      "id": "ux1-ledger-psp-tab-contradicts-reconciliation-screen",
+      "severity": "high",
+      "description": "Reconciliation exists twice. /admin/ledger -> 'PSP Reconciliation' tab shows 'No reconciliation runs recorded yet' with its own 'Run Daily Reconciliation' button, while /admin/reconciliation (and its nav entry) lists the 2026-10-10 run made minutes earlier. Two surfaces for one domain show different truth; the ledger tab also prints the internal ticket code '(G34)' in operator copy.",
+      "status": "open",
+      "rationale": "Remove the ledger PSP tab or make it a link to /admin/reconciliation; one component, one source (tap_reconciliation_runs). Operators deciding whether money matched must not see 'never ran' on one screen and a run on another.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/tab-PSP_Reconciliation-owner.png",
+        ".admin-console/evidence/ux-round1/reconciliation-owner-en-1440.png",
+        ".admin-console/evidence/ux-round1/session-log.txt#L30"
+      ]
+    },
+    {
+      "id": "ux1-privacy-log-request-needs-full-customer-id-shown-nowhere",
+      "severity": "high",
+      "description": "'Log a request received outside the app' on /admin/privacy requires 'Customer ID (from Customers)' as a 36-character UUID, but /admin/customers shows only the first 8 characters (customers/page.tsx:411, 523, 600, 652) with no copy control. The full ID is visible only inside the destructive 'Clear profile details' confirmation dialog. An operator who receives a PDPL request by e-mail or phone cannot log it without engineering help or opening a destructive dialog.",
+      "status": "open",
+      "rationale": "Let the operator pick the customer by search (name, e-mail, phone) inside the log form, or add a copy-full-ID control on the customer record and a 'Log privacy request' action from the customer row that pre-fills it.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/session-log.txt#L41",
+        ".admin-console/evidence/ux-round1/dlg-clearprofile-owner-en-1440.png",
+        "web_platform/src/app/admin/privacy/page.tsx:437",
+        "web_platform/src/app/admin/customers/page.tsx:523"
+      ]
+    },
+    {
+      "id": "ux1-privacy-subject-id-pattern-is-invalid-regex",
+      "severity": "low",
+      "description": "The Customer ID input's pattern '[0-9a-fA-F-]{36}' is invalid under the 'v' flag browsers now apply to pattern attributes, so Chrome logs 'Pattern attribute value ... is not a valid regular expression' on every /admin/privacy load and the check is skipped ('197e449a' passes client validation).",
+      "status": "open",
+      "rationale": "Escape the hyphen ('[0-9a-fA-F\\-]{36}') or validate in code; a console error on an admin route fails the completion gate.",
+      "evidence": [
+        "web_platform/src/app/admin/privacy/page.tsx:437",
+        ".admin-console/evidence/ux-round1/session-log.txt#L42"
+      ]
+    },
+    {
+      "id": "ux1-ledger-tabs-unreachable-at-phone-width",
+      "severity": "medium",
+      "description": "At 375 px in Arabic, /admin/ledger's tab strip extends past the viewport with no scroll container: 'Accountant statements' sits at x 332-404 and 'PSP reconciliation' at x 408-469 in a 375 px viewport, so they cannot be seen or tapped; the page title wraps beside the strip. The strip is also plain buttons with no tablist/tab/aria-selected roles.",
+      "status": "open",
+      "rationale": "Wrap the strip in an overflow-x:auto region (or a select at narrow widths) and give it the APG Tabs roles and arrow-key handling.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/owner-ar-375-_admin_ledger.png",
+        ".admin-console/evidence/ux-round1/ledger-payouts-owner-ar-375.png"
+      ]
+    },
+    {
+      "id": "ux1-forbidden-notice-blames-a-missing-administrator-role",
+      "severity": "medium",
+      "description": "The shared forbidden notice (components/operations-ui.tsx:33) tells a finance administrator on /admin/customers, /admin/audit-logs, /admin/privacy and /admin/incidents to 'Ask an owner of the console to give your account the administrator role' - the account already is an administrator; what it lacks is a console-role permission (personal.read, audit.read, privacy.manage, incident.manage). The operator is sent to ask for the wrong thing.",
+      "status": "open",
+      "rationale": "Name the console role that grants the screen (from the server's refusal or a client map of permission -> role) and who can grant it.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/crawl-finance-en-1440.json",
+        ".admin-console/evidence/ux-round1/finance-en-1440-_admin_privacy.png"
+      ]
+    },
+    {
+      "id": "ux1-navigation-and-actions-not-trimmed-to-console-role",
+      "severity": "medium",
+      "description": "Finance sees exactly the owner's 30 navigation entries, including Privacy, Incidents, Audit log and Roles it cannot use; the dashboard routes finance to 'Personal data requests (PDPL)' it cannot open and fires two 403s (admin_list_audit_events) with console errors on every load; /admin/roles offers finance 'Remove from console' and 'Reset two-step verification' on every owner although the page says only an owner can; /admin/privacy shows 'Run the day-20 / day-28 check now' and the full log form under the forbidden notice.",
+      "status": "open",
+      "rationale": "Derive nav entries, dashboard rows and row actions from admin_session_state's permissions; do not call owner-only reads for other roles. Experience-design: do not expose modules a role cannot use; the action set comes from the server's authorization decision.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/finance-en-1440-_admin.png",
+        ".admin-console/evidence/ux-round1/crawl-finance-en-1440.json",
+        ".admin-console/evidence/ux-round1/session-log.txt#L24"
+      ]
+    },
+    {
+      "id": "ux1-auth-and-validation-errors-shown-in-english-on-arabic-screens",
+      "severity": "medium",
+      "description": "Arabic screens show raw English errors: /login/mfa and the step-up dialog show GoTrue's 'Invalid TOTP code entered' (no remaining-attempts count before the 10-code lockout); /customer/privacy shows 'Token has expired or is invalid' to customers; privacy extension/refusal/log forms rely on native browser validation ('Please lengthen this text to 20 characters...') which follows the browser language, not the page.",
+      "status": "open",
+      "rationale": "Map GoTrue error codes (mfa_verification_failed, otp_expired) to bilingual copy that says what to do next, and replace native validation with page-language messages tied to the field.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/mfa-wrongcode-ar-375.png",
+        ".admin-console/evidence/ux-round1/session-log.txt#L13",
+        ".admin-console/evidence/ux-round1/session-log.txt#L45"
+      ]
+    },
+    {
+      "id": "ux1-focus-escapes-dialogs-and-lands-on-body",
+      "severity": "medium",
+      "description": "Measured with the keyboard: after a wrong code the step-up dialog's input is disabled while checking and focus falls to <body> outside the modal; the same on /login/mfa; the marketplace fee proposal dialog opens with focus on <body> instead of inside it; after approving a request, after each reconciliation command and after the customer privacy code is accepted, focus ends on <body>. Code inputs carry no aria-describedby/aria-invalid linking the error. Extends focus-lost-after-commands-and-paging to the new governance and privacy dialogs.",
+      "status": "open",
+      "rationale": "Keep the input enabled (or use aria-busy) and refocus it on failure; move focus into every dialog on open; after a command, focus the result message or the next row.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/stepup-dialog-owner-en-1440.png",
+        ".admin-console/evidence/ux-round1/dlg-feeproposal-owner-en-1440.png",
+        ".admin-console/evidence/ux-round1/session-log.txt#L35"
+      ]
+    },
+    {
+      "id": "ux1-arabic-screens-mix-numeral-systems",
+      "severity": "medium",
+      "description": "Arabic screens mix Latin and Arabic-Indic digits on the same page: /admin/privacy '30 يوماً' and 'اليوم 20 / 28' next to dates in ١١‏/١٠‏/٢٠٢٦; /admin/settings '(5–120)' next to Arabic-Indic dates; /admin/reconciliation and /admin/incidents use only Latin digits while every sibling screen uses Arabic-Indic; ledger payouts count '0'; /become-provider 'حتى 3 فروع' next to '٢٩٩٫٠٠ ر.س.'; /customer/privacy '30 يوماً' next to Arabic-Indic dates.",
+      "status": "open",
+      "rationale": "Pick one numeral system for Arabic and format every interpolated number through Intl with it (copy strings must not embed literal digits). Identifiers, phones and e-mails stay Latin.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/crawl-owner-ar-375.json",
+        ".admin-console/evidence/ux-round1/customer-ar-375-_become-provider.png"
+      ]
+    },
+    {
+      "id": "ux1-sar-amount-formatting-inconsistent",
+      "severity": "low",
+      "description": "Bookings tiles read 'SAR SAR 1,640.00' (an icon rendered as the text 'SAR' before the value; a '%' glyph on the commission tile); /provider/pricing '299SAR SAR / month' and '0SAR / month'; /admin/disputes 'REFUNDED TOTAL 0 SAR' and in Arabic '٠ ريال' where every other screen uses 'ر.س.'; the become-provider Arabic page shows an untranslated 'SAR' badge.",
+      "status": "open",
+      "rationale": "Use one SAR formatter everywhere and mark decorative glyphs aria-hidden.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/owner-en-1440-_admin_bookings.png",
+        ".admin-console/evidence/ux-round1/crawl-owner-en-1440.json"
+      ]
+    },
+    {
+      "id": "ux1-reviewed-screens-have-no-h1",
+      "severity": "low",
+      "description": "/admin/approvals, /admin/roles, /admin/ledger, /admin/reconciliation, /admin/platform-rules and /admin/disputes render no <h1> in either language, so screen-reader heading navigation has no page title on six governance and money screens (siblings such as Audit Log and Privacy Requests have one).",
+      "status": "open",
+      "rationale": "Render the page title as h1 consistently across the console.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/crawl-owner-en-1440.json",
+        ".admin-console/evidence/ux-round1/crawl-owner-ar-375.json"
+      ]
+    },
+    {
+      "id": "ux1-audit-log-drowned-by-read-events",
+      "severity": "medium",
+      "description": "Opening screens writes read audit events, and the Audit Log shows them interleaved with changes: page 1 held 36 read events of 50 (approvals.inbox_read 10, roles.directory_read 6, privacy_requests.listed 4, governance_notices.listed 3, disputes.listed 3, ...). There is no reads/changes filter, so 'who changed what' needs paging through noise; the record-type filter lists raw table names, including the renamed data_subject_requests.",
+      "status": "open",
+      "rationale": "Add an event-class filter (changes, privileged reads, security) defaulting to changes, and label record types in operator vocabulary from the current schema.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/session-log.txt#L57",
+        ".admin-console/evidence/ux-round1/owner-en-1440-_admin_audit-logs.png"
+      ]
+    },
+    {
+      "id": "ux1-owner-removal-has-no-typed-confirmation",
+      "severity": "medium",
+      "description": "'Remove from console' on /admin/roles turns an owner into a customer with a reason only; the dialog has no typed confirmation of the target, unlike 'Clear profile details'. Per the confirmation table, removing console access is high risk and needs typed confirmation plus reason.",
+      "status": "open",
+      "rationale": "Add the typed-confirmation field the CommandDialog already supports (confirmWord) for role removal and MFA reset.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/dlg-roleremove-owner-en-1440.png"
+      ]
+    },
+    {
+      "id": "ux1-clear-profile-bypasses-privacy-deletion-safeguards",
+      "severity": "medium",
+      "description": "/admin/customers 'Clear profile details' irreversibly removes a customer's name, e-mail, phone, gender and push token on one operator's reason and typed confirmation, while the PRIV package requires a different owner's approval and a fresh code for a deletion request. Two erasure paths with different safeguards exist for the same data. Routed to security (data handling).",
+      "status": "open",
+      "rationale": "Decide whether clearing a profile is a privacy deletion (then route it through the privacy request and approval) or a narrower correction with its own recorded basis; record the decision.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/dlg-clearprofile-owner-en-1440.png"
+      ]
+    },
+    {
+      "id": "ux1-reconciliation-feedback-stale-and-vague",
+      "severity": "low",
+      "description": "On /admin/reconciliation the earlier success 'Reconciled 2026-10-10: No Tap data.' stays on screen when 'Fetch from Tap' then fails ('Tap is not configured (TAP_SECRET_KEY).'), so success and failure show together; 'Reconciled' is used for a run that had no Tap data to compare; a malformed import says 'Lines 2 could not be read' without the reason or the expected columns.",
+      "status": "open",
+      "rationale": "Replace, not stack, command feedback; word a no-data run as not reconciled; name the line, the column and the expected format.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/reconciliation-owner-en-1440.png",
+        ".admin-console/evidence/ux-round1/session-log.txt#L55"
+      ]
+    },
+    {
+      "id": "ux1-mfa-enrolment-cleanup-logs-404s",
+      "severity": "low",
+      "description": "/login/mfa removes abandoned unverified factors on load; each DELETE /auth/v1/factors/<id> returned 404 and logged a console error during enrolment (owner, EN).",
+      "status": "open",
+      "rationale": "Ignore not-found on cleanup or list factors after cleanup; no console errors on admin routes.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/session-log.txt#L15"
+      ]
+    },
+    {
+      "id": "ux1-customer-privacy-result-copy-and-console-errors",
+      "severity": "low",
+      "description": "After the customer enters the one-time code, /customer/privacy reports only 'تم.' ('Done.') - not that the request was received or its deadline - and focus drops to <body>. The designed first attempt (password session) logs a 403 privacy_submit_request console error before the code step.",
+      "status": "open",
+      "rationale": "Confirm what was received and when the answer is due; ask for the code before calling the RPC so the normal path is error-free.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/customer-privacy-result-ar-375.png",
+        ".admin-console/evidence/ux-round1/session-log.txt#L45"
+      ]
+    },
+    {
+      "id": "ux1-copy-defects-on-governance-and-onboarding-screens",
+      "severity": "low",
+      "description": "Dashboard h1 'Welcome back, Local' (greeting pattern the standard bans); the approval dialog for a threshold change says it re-runs 'balance, hold and duplicate' checks that do not apply to a setting; ledger copy shows ticket code '(G34)'; become-provider shows icon glyphs as letters ('G', 'E') in feature cards and 'حتى 1 فروع'; become-provider keeps the full application form editable under 'applications are closed' with a disabled submit; the step-up/threshold value field has no numeric input mode and an empty value gives no message until the server refuses it.",
+      "status": "open",
+      "rationale": "Copy pass on these strings; disable or collapse the form while applications are closed.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/approvals-decide-dialog-finance-ar-375.png",
+        ".admin-console/evidence/ux-round1/customer-ar-375-_become-provider.png",
+        ".admin-console/evidence/ux-round1/finance-en-1440-_admin.png"
+      ]
+    },
+    {
+      "id": "ux1-ropa-has-no-arabic-text",
+      "severity": "low",
+      "description": "/admin/ropa in Arabic renders the processing register body in English only (the page chrome is Arabic).",
+      "status": "open",
+      "rationale": "Either publish an Arabic version of docs/privacy/ropa.md or state on the page that the controlled register is English-only.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/owner-ar-375-_admin_ropa.png"
+      ]
+    },
+    {
+      "id": "ux1-dialogs-do-not-lock-page-scroll",
+      "severity": "low",
+      "description": "While the approval decide dialog, the step-up dialog and the threshold dialog are open, body and html overflow stay 'visible', so the page behind can scroll under the modal.",
+      "status": "open",
+      "rationale": "Lock background scroll in ModalOverlay while a modal is open.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/session-log.txt#L39"
+      ]
+    },
+    {
+      "id": "ux1-iban-reveal-and-payout-flows-not-exercisable-locally",
+      "severity": "medium",
+      "description": "The local stack has no payout requests and no approved payout destination, so the payout list, the masked IBAN and the 60-second audited reveal (and its step-up) could not be opened in a browser in this pass; the ledger Payout Requests tab shows 'No payout requests yet'.",
+      "status": "open",
+      "rationale": "Seed a provider with an approved destination past its hold and two payout requests (one under, one over the approval threshold) in supabase/seed.sql, then re-run the reveal by keyboard at 375 px.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/ledger-payouts-owner-ar-375.png"
+      ]
+    },
+    {
+      "id": "ux1-reviewed-routes-missing-from-screens",
+      "severity": "low",
+      "description": "/login/mfa, /admin/approvals, /admin/reconciliation, /provider/pricing and /become-provider were built and reviewed but have no screens[] entry, so their states, accessibility and responsive results cannot be recorded in the manifest.",
+      "status": "open",
+      "rationale": "Architect or implementer adds the five screens; the results of this pass are in docs/reviews/2026-10-11-ux-review.md.",
+      "evidence": [
+        "docs/reviews/2026-10-11-ux-review.md"
+      ]
     }
   ],
   "declaredStatic": [
@@ -11978,6 +12232,37 @@
         ".admin-console/manifest.json"
       ],
       "status": "open"
+    },
+    {
+      "id": "ux1-no-add-kind-for-quality-gates",
+      "observation": "The ux-reviewer prompt says to record an 'experience' quality gate and add a component-health gate if none exists, but 'add' has no qualityGate kind and 'set' can only change existing gates, so a reviewer cannot record either without rewriting the file (which the contract forbids).",
+      "category": "tooling",
+      "proposedChange": "Add '--kind gate' to admin_console_manifest.py add, or have the architect seed 'experience' and 'component-health' gates in every manifest.",
+      "evidence": [
+        "docs/reviews/2026-10-11-ux-review.md"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "ux1-reused-storage-state-revokes-supabase-sessions",
+      "observation": "Reusing one saved Playwright storageState across several browser contexts got the Supabase session revoked within minutes: the first context rotates the refresh token, and the next one presents the old token (refresh-token reuse detection). The fix was to save storageState back at the end of every script.",
+      "category": "new-pattern",
+      "proposedChange": "verification.md browser-evidence section: when driving a Supabase (or any rotating-refresh-token) app with saved auth state, write the state back after every context and never run two contexts on one saved state in parallel.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/session-log.txt"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "ux1-role-scoped-review-needs-second-role-crawl",
+      "observation": "The most consequential console-role defects (wrong forbidden copy, owner-only nav and controls offered to finance, dashboard 403s) appeared only when the same route set was crawled as a second, narrower console role; owner-only browser passes reported zero console errors.",
+      "category": "gap",
+      "proposedChange": "experience-design / verification: require the UX browser crawl to run once per console role on the same route list, and diff nav entries and visible commands between roles.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/crawl-finance-en-1440.json",
+        ".admin-console/evidence/ux-round1/crawl-owner-en-1440.json"
+      ],
+      "status": "open"
     }
   ],
   "agents": [
@@ -12163,6 +12448,15 @@
       "status": "handed-off",
       "notes": "PRIV package: Q1 privacy requests, Q2 deletion engine, Q2.6 health intake retention and gate (X3-6), X1 incident register, X2 RoPA (docs/legal/2026-10-10-privacy-decision-memo.md final decision texts).",
       "worklog": ".admin-console/worklog/impl-priv-claude.md"
+    },
+    {
+      "id": "ux-round1-claude",
+      "role": "ux-reviewer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "handed-off",
+      "notes": "UX round 1 over governance, money and privacy packages: /login/mfa, /admin/approvals, /admin/roles, /admin/ledger, /admin/reconciliation, /admin/platform-rules, /admin/settings, /admin/customers, /admin/bookings, /admin/disputes, /admin/audit-logs, /admin/privacy, /admin/incidents, /admin/ropa, /customer/privacy, /provider/pricing, /become-provider. Browser on localhost:3100, EN/AR, 375px and desktop.",
+      "worklog": "docs/reviews/2026-10-11-ux-review.md"
     }
   ]
 }
