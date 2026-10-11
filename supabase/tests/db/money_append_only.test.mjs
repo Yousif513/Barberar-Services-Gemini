@@ -104,14 +104,17 @@ describe("D-Q8: append-only, for every role including the table owner", () => {
     assert.equal(Number((await sys(db, `select provider_share from transactional_ledger where id = $1`, [id]))[0].provider_share), 100);
   });
 
-  it("keeps related money rows: no delete statement, frozen amounts, but an erased customer's promotional rows follow the account", async () => {
+  it("keeps related money rows: no delete statement, frozen amounts; an erased customer's money rows stay, unlinked (privacy review M3)", async () => {
     const person = await createUser(db, { role: "customer" });
     const credit = (await sys(db, `insert into wallet_credits (customer_id, amount, reason, source) values ($1, 20, 'Goodwill', 'compensation') returning id`, [person]))[0].id;
     await expectError(sys(db, `delete from wallet_credits where id = $1`, [credit]), /append-only/);
     await expectError(sys(db, `update wallet_credits set amount = 999 where id = $1`, [credit]), /cannot change/);
     await sys(db, `update wallet_credits set remaining_amount = 5 where id = $1`, [credit]);
     await sys(db, `delete from auth.users where id = $1`, [person]);
-    assert.equal((await sys(db, `select count(*)::int n from wallet_credits where id = $1`, [credit]))[0].n, 0, "the PDPL erasure cascade still works");
+    const kept = (await sys(db, `select customer_id, amount from wallet_credits where id = $1`, [credit]))[0];
+    assert.deepEqual([kept.customer_id, Number(kept.amount)], [null, 20], "Q2.4: the money record is retained without the person");
+    await expectError(sys(db, `update wallet_credits set customer_id = null where customer_id is not null and id = $1`, [credit])
+      .then(() => sys(db, `update wallet_credits set customer_id = $2 where id = $1`, [credit, SEED.customer])), /cannot change/);
     const guarded = (await sys(db, `select tgrelid::regclass::text t from pg_trigger where tgname = 'trg_money_append_only'`)).map((r) => r.t.replace(/^public\./, ""));
     for (const table of ["transactional_ledger", "payout_allocations", "payout_requests", "refund_requests", "provider_receivables", "provider_fee_invoices",
       "payment_disputes", "psp_reconciliation_runs", "fee_rules", "wallet_credits", "wallet_credit_redemptions", "loyalty_points_ledger", "customer_referrals"]) {
