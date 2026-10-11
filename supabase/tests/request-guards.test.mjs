@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { declaredLengthExceeds, readBodyLimited, serviceKeyMatches } from "../functions/_shared/request-guards.ts";
 
 // FIX-PRIV P-13: the service key is compared without an early exit, and an oversized body is refused before it is read.
@@ -64,6 +64,16 @@ describe("wiring", () => {
     const http = read("../functions/_shared/http.ts");
     assert.match(http, /serviceKeyMatches\(token, Deno\.env\.get\("SUPABASE_SERVICE_ROLE_KEY"\)\)/);
     assert.doesNotMatch(http, /token === Deno\.env\.get/);
+  });
+  it("no service-role function ships a localhost origin in its CORS allowlist (privacy review L6)", () => {
+    const fns = readdirSync(new URL("../functions/", import.meta.url), { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name);
+    for (const fn of fns) {
+      const file = fn === "_shared" ? "../functions/_shared/http.ts" : `../functions/${fn}/index.ts`;
+      let src;
+      try { src = read(file); } catch { continue; }
+      assert.doesNotMatch(src, /["']http:\/\/localhost/, fn);
+    }
+    assert.match(read("../functions/_shared/http.ts"), /APP_ORIGIN/);
   });
   it("whatsapp-inbound checks Content-Length before it reads the body", () => {
     const src = read("../functions/whatsapp-inbound/index.ts");

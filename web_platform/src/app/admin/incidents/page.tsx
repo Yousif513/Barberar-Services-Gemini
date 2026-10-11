@@ -17,7 +17,7 @@ type Incident = {
   sdaia_decision_reason: string | null; sdaia_reference: string | null; sdaia_notified_at: string | null; sdaia_late_reason: string | null;
   subjects_decision: string; subjects_decision_reason: string | null; subjects_notified_at: string | null; subjects_channels: string[] | null;
   evidence: { label: string; reference: string | null; storage_path: string | null; added_at: string }[]; status: string; closed_at: string | null;
-  retain_until: string; events?: { event: string; created_at: string }[];
+  retain_until: string; events?: { event: string; created_at: string }[]; aware_at_corrected_at?: string | null; aware_at_original?: string | null;
 };
 
 const copy = {
@@ -37,7 +37,8 @@ const copy = {
     subjectsReason: "Reason (at least 20 characters when not notifying)", subjectsAt: "Sent at (Riyadh time)", channels: "Channels", recordSubjects: "Record the decision",
     evidence: "Evidence", evidenceLabel: "Label", evidenceRef: "Where it is kept (ticket, document)", evidenceFile: "Or upload a file", addEvidence: "Add evidence",
     close: "Close the incident", closeTitle: "Close this incident", closeReason: "Outcome summary (at least 20 characters)", retain: "Kept until {date}", history: "History", done: "Saved.",
-    deadline: "SDAIA deadline",
+    deadline: "SDAIA deadline", correctAware: "Correct the awareness time (once, moves the 72-hour clock)", correctAwareAt: "Correct awareness time (Riyadh time)",
+    correctReason: "Why the recorded time was wrong (at least 20 characters)", correctSubmit: "Correct the time", corrected: "Awareness time corrected on {date}; recorded first as {old}.",
   },
   ar: {
     title: "سجل الحوادث", subtitle: "حوادث تسرب البيانات الشخصية. أبلغ سدايا خلال 72 ساعة من العلم بالحادثة، لكل حادثة ما لم تسجل استنتاجاً مسبباً بعدم إمكان وقوع ضرر. أبلغ المتأثرين دون تأخير كلما أمكن وقوع ضرر. تُحفظ السجلات 5 سنوات.",
@@ -55,7 +56,8 @@ const copy = {
     subjectsReason: "السبب (20 حرفاً على الأقل عند عدم الإبلاغ)", subjectsAt: "وقت الإرسال (بتوقيت الرياض)", channels: "القنوات", recordSubjects: "تسجيل القرار",
     evidence: "الأدلة", evidenceLabel: "الوصف", evidenceRef: "مكان حفظها (تذكرة، مستند)", evidenceFile: "أو ارفع ملفاً", addEvidence: "إضافة دليل",
     close: "إغلاق الحادثة", closeTitle: "إغلاق هذه الحادثة", closeReason: "ملخص النتيجة (20 حرفاً على الأقل)", retain: "تُحفظ حتى {date}", history: "السجل", done: "تم الحفظ.",
-    deadline: "مهلة سدايا",
+    deadline: "مهلة سدايا", correctAware: "تصحيح وقت العلم (مرة واحدة، ويغيّر مهلة 72 ساعة)", correctAwareAt: "وقت العلم الصحيح (بتوقيت الرياض)",
+    correctReason: "لماذا كان الوقت المسجل خاطئاً (20 حرفاً على الأقل)", correctSubmit: "تصحيح الوقت", corrected: "صُحح وقت العلم في {date}؛ سُجل أولاً {old}.",
   },
 };
 type T = typeof copy.en;
@@ -176,6 +178,7 @@ function IncidentDetail({ i, t, lang, run, onClose }: { i: Incident; t: T; lang:
   const [s, setS] = useState({ decision: i.sdaia_decision === "pending" ? "notify" : i.sdaia_decision, reason: i.sdaia_decision_reason ?? "", ref: i.sdaia_reference ?? "", at: "", late: i.sdaia_late_reason ?? "" });
   const [p, setP] = useState({ decision: i.subjects_decision === "pending" ? "notify" : i.subjects_decision, reason: i.subjects_decision_reason ?? "", at: "", channels: i.subjects_channels ?? [] as string[] });
   const [ev, setEv] = useState({ label: "", ref: "", file: null as File | null });
+  const [fix, setFix] = useState({ at: "", reason: "" });
   const saveAssessment = (contained: boolean) => run(supabase.rpc("admin_incident_update", { p_incident_id: i.id, p_changes: {
     subject_categories: list(a.categories), approx_subjects: a.approx === "" ? null : Number(a.approx), data_types: list(a.types), risk_level: a.risk,
     risk_assessment: a.assessment, containment_actions: a.containment, preventive_actions: a.preventive, ...(contained ? { status: "contained" } : {}) } }));
@@ -199,6 +202,16 @@ function IncidentDetail({ i, t, lang, run, onClose }: { i: Incident; t: T; lang:
         </div>
         {!closed && <button type="button" onClick={onClose} className={operationsButton}>{t.close}</button>}
       </div>
+      {i.aware_at_corrected_at && i.aware_at_original ? (
+        <p className="text-xs font-semibold text-gray-600">{t.corrected.replace("{date}", operationsDate(i.aware_at_corrected_at, lang)).replace("{old}", operationsDate(i.aware_at_original, lang))}</p>
+      ) : !closed && (
+        <form onSubmit={(e) => { e.preventDefault(); void run(supabase.rpc("admin_incident_correct_aware_at", { p_incident_id: i.id, p_aware_at: riyadhIso(fix.at), p_reason: fix.reason.trim() })).then((ok) => { if (ok) setFix({ at: "", reason: "" }); }); }}
+          className="grid gap-3 sm:grid-cols-[1fr_2fr_auto] sm:items-end" aria-label={t.correctAware}>
+          <label className={label}>{t.correctAwareAt}<input type="datetime-local" required value={fix.at} onChange={(e) => setFix({ ...fix, at: e.target.value })} className={`${operationsInput} mt-1`} /></label>
+          <label className={label}>{t.correctReason}<input required minLength={20} value={fix.reason} onChange={(e) => setFix({ ...fix, reason: e.target.value })} className={`${operationsInput} mt-1`} /></label>
+          <button type="submit" className={operationsButton}>{t.correctSubmit}</button>
+        </form>
+      )}
       <fieldset disabled={closed} className="grid gap-3 sm:grid-cols-2">
         <legend className="mb-2 text-sm font-black text-gray-900">{t.assessment}</legend>
         <label className={label}>{t.categories}<input value={a.categories} onChange={(e) => setA({ ...a, categories: e.target.value })} className={`${operationsInput} mt-1`} /></label>

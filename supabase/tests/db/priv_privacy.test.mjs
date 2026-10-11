@@ -785,3 +785,32 @@ describe("PRIVFIX: health retention (review M4)", () => {
     assert.equal(await count("patch_test_results", "id = $1", [f]), 1);
   });
 });
+
+describe("PRIVFIX: incident history (review L4)", () => {
+  it("keeps the history append-only and lets aware_at be corrected once, with a reason, after step-up", async () => {
+    const i = await call(owner, `select admin_incident_create('Mis-sent report', 'A report with customer phones went to the wrong partner', now() - interval '30 hours', now() - interval '20 hours') r`);
+    await expectError(sys(db, `update privacy_incident_events set event = 'x' where incident_id = $1`, [i.id]), /append-only/);
+    await expectError(sys(db, `delete from privacy_incident_events where incident_id = $1`, [i.id]), /append-only/);
+    await expectError(sys(db, `delete from privacy_incidents where id = $1`, [i.id]), /append-only|RESTRICT|foreign key/);
+    const fix = `select admin_incident_correct_aware_at($1, now() - interval '28 hours', $2) r`;
+    const why = "The team lead knew on the evening before; the first entry was late";
+    await expectError(call(operations, fix, [i.id, why]), /incident.manage/);
+    await expectError(call(stale(owner.sub), fix, [i.id, why]), /step-up required/);
+    await expectError(call(owner, fix, [i.id, "too short"]), /20 characters/);
+    const fixed = await call(owner, fix, [i.id, why]);
+    assert.ok(fixed.hours_left < 45, "the 72-hour clock follows the corrected time");
+    assert.ok(fixed.aware_at_original);
+    await expectError(call(owner, fix, [i.id, why]), /already corrected once/);
+    assert.equal(await count("privacy_incident_events", "incident_id = $1 and event = 'aware_at_corrected'", [i.id]), 1);
+  });
+
+  it("the 5-year purge still removes a closed incident with its history", async () => {
+    const i = await call(owner, `select admin_incident_create('Old incident', 'An old incident that is past its five years', now() - interval '6 years', now() - interval '6 years') r`);
+    await sys(db, `update privacy_incidents set status = 'closed', closed_at = now() - interval '5 years 1 day', sdaia_decision = 'not_required_no_harm',
+                   risk_level = 'no_harm_possible', sdaia_decision_reason = 'Encrypted laptop, key never stored with it, no harm possible',
+                   subjects_decision = 'not_required', subjects_decision_reason = 'No harm possible to anyone affected' where id = $1`, [i.id]);
+    const m = await call(ROLES.service, `select privacy_incident_maintenance() r`);
+    assert.ok(m.purged >= 1);
+    assert.equal(await count("privacy_incident_events", "incident_id = $1", [i.id]), 0);
+  });
+});

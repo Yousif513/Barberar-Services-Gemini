@@ -1,0 +1,8 @@
+CREATE OR REPLACE FUNCTION pg_temp.pf(p_sig regprocedure, p_from text, p_to text) RETURNS void LANGUAGE plpgsql AS $patch$
+DECLARE v_def text := replace(pg_get_functiondef(p_sig), E'
+', E'
+');
+BEGIN IF position(p_from IN v_def) = 0 THEN RAISE EXCEPTION 'nf'; END IF; EXECUTE replace(v_def, p_from, p_to); END $patch$;
+SELECT pg_temp.pf('public.privacy_incident_maintenance()'::regprocedure, $f$  DELETE FROM public.privacy_incident_events e USING public.privacy_incidents i
+   WHERE e.incident_id = i.id AND i.status = 'closed' AND i.closed_at < now() - INTERVAL '5 years';$f$, $t$  DELETE FROM public.privacy_incident_events e USING public.privacy_incidents pi
+   WHERE e.incident_id = pi.id AND pi.status = 'closed' AND pi.closed_at < now() - INTERVAL '5 years';$t$);

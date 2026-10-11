@@ -1,13 +1,17 @@
 import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.108.1"
 import { serviceKeyMatches } from "./request-guards.ts"
 
-// Origins allowed to call functions from a browser. APP_ORIGIN adds a deployment origin.
-const ALLOWED_ORIGINS = [
-  "https://primora.sa",
-  "https://barberar.vercel.app",
-  "http://localhost:3000",
-  ...(Deno.env.get("APP_ORIGIN") ? [Deno.env.get("APP_ORIGIN") as string] : []),
-]
+// Origins allowed to call functions from a browser: the production origins, plus APP_ORIGIN (comma-separated) for a deployment
+// or a local run (for example APP_ORIGIN=http://localhost:3100 in supabase/functions/.env, which is never committed). No local
+// origin ships in the production list (privacy security review L6).
+export const PRODUCTION_ORIGINS = ["https://primora.sa", "https://barberar.vercel.app"]
+
+export function allowedOrigins(appOrigin: string | undefined = Deno.env.get("APP_ORIGIN")): string[] {
+  const extra = (appOrigin ?? "").split(",").map((o) => o.trim()).filter((o) => /^https?:\/\/[A-Za-z0-9.-]+(:[0-9]{2,5})?$/.test(o))
+  return [...PRODUCTION_ORIGINS, ...extra]
+}
+
+const ALLOWED_ORIGINS = allowedOrigins()
 
 export function corsHeaders(req: Request): Record<string, string> {
   const origin = req.headers.get("Origin") || ""
