@@ -236,8 +236,9 @@ describe("the audit trail", () => {
     assert.equal((await sys(db, `select count(*)::int as n from admin_audit_logs where action in ('edited', 'forged.entry')`))[0].n, 0);
   });
 
-  it("is readable by administrators only", async () => {
-    assert.ok((await as(db, admin, `select id from admin_audit_logs limit 1`)).length === 1);
+  it("is readable by the console owner only, through the audited admin_list_audit_events (SECFIX-2 R2-M8)", async () => {
+    assert.equal((await as(db, admin, `select id from admin_audit_logs limit 1`)).length, 0, "no direct read, even for the owner");
+    assert.ok((await as(db, admin, `select admin_list_audit_events(null, null, null, null, 1, 0, null) r`))[0].r.rows.length === 1);
     for (const user of [owner, employee, customer, ROLES.anon]) {
       assert.equal((await as(db, user, `select id from admin_audit_logs`).catch(() => [])).length, 0);
     }

@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { ForbiddenNotice, isForbidden, useOperationsLocale } from "@/components/operations-ui";
 
 // The audit trail: rows written by server commands and by the audit_admin_write trigger in the same
-// transaction as each change. Admin-only by RLS ("Admins read audit logs"); rows cannot be edited.
+// transaction as each change. Only the owner reads it (audit.read), through admin_list_audit_events; rows cannot be edited.
 type AuditRow = {
   id: string;
   actor_id: string | null;
@@ -113,17 +113,17 @@ export default function AdminAuditLogPage() {
   const load = useCallback(async (pageNumber: number, active: typeof filters) => {
     setLoading(true);
     setLoadError("");
-    let query = supabase
-      .from("admin_audit_logs")
-      .select("id, actor_id, action, target_type, target_id, details, created_at", { count: "exact" })
-      .order("created_at", { ascending: false })
-      .order("id", { ascending: false })
-      .range((pageNumber - 1) * PAGE_SIZE, pageNumber * PAGE_SIZE - 1);
-    if (active.action.trim()) query = query.ilike("action", `%${active.action.trim()}%`);
-    if (active.target) query = query.eq("target_type", active.target);
-    if (active.from) query = query.gte("created_at", riyadhDayStart(active.from));
-    if (active.to) query = query.lte("created_at", riyadhDayEnd(active.to));
-    const { data, error, count } = await query;
+    // R2-M8: the audit log is read only by the owner, through the audited and paged admin_list_audit_events; the read itself
+    // is recorded (entry ids, filter, purpose). Other console roles get a forbidden answer from the server.
+    const { data, error } = await supabase.rpc("admin_list_audit_events", {
+      p_action: active.action.trim() || null,
+      p_target_type: active.target || null,
+      p_from: active.from ? riyadhDayStart(active.from) : null,
+      p_to: active.to ? riyadhDayEnd(active.to) : null,
+      p_limit: PAGE_SIZE,
+      p_offset: (pageNumber - 1) * PAGE_SIZE,
+      p_purpose: "audit_review",
+    });
     if (error) {
       setRows([]);
       setTotal(0);
@@ -132,8 +132,10 @@ export default function AdminAuditLogPage() {
       setLoading(false);
       return;
     }
+    const result = (data ?? { total: 0, rows: [] }) as { total: number | string; rows: AuditRow[] | null };
+    const count = Number(result.total) || 0;
     setLoadForbidden(false);
-    const list = (data || []) as AuditRow[];
+    const list = result.rows ?? [];
     setRows(list);
     setTotal(count || 0);
     const ids = [...new Set(list.map((r) => r.actor_id).filter((id): id is string => Boolean(id)))];

@@ -228,14 +228,15 @@ describe("ledger.release-payout and payout.mark-paid: money and access commands 
 });
 
 describe("staff leave reasons are private", () => {
-  it("are readable by the staff member, the provider's owner and administrators, and by nobody else", async () => {
+  it("are readable by the staff member and the provider's owner, and by nobody else (console sessions neither: SECFIX-2 R2-H1)", async () => {
     await sys(db, `insert into employee_time_off (employee_id, start_date, end_date, reason, status) values ($1, current_date, current_date + 3, 'Medical appointment', 'approved')`, [SEED.employee1]);
     assert.deepEqual(await as(db, customer2, `select reason from employee_time_off`), []);
     assert.deepEqual(await as(db, owner2, `select reason from employee_time_off`), []);
     assert.deepEqual(await as(db, ROLES.anon, `select reason from employee_time_off`).catch(() => []), []);
-    for (const user of [owner1, employee1, admin]) {
+    for (const user of [owner1, employee1]) {
       assert.equal((await as(db, user, `select reason from employee_time_off where reason = 'Medical appointment'`)).length, 1);
     }
+    assert.equal((await as(db, admin, `select reason from employee_time_off where reason = 'Medical appointment'`)).length, 0);
     await sys(db, `delete from employee_time_off`);
   });
 
@@ -315,13 +316,14 @@ describe("the audit log keeps values only where they are operational", () => {
     assert.ok(!text.includes("Zainab") && !text.includes("Qahtani"));
   });
 
-  it("an administrator's direct edit of a customer note or a staff leave reason is recorded as changed, without the text", async () => {
+  it("an administrator can no longer edit a customer note or a staff leave reason directly (SECFIX-2 R2-H1), and nothing leaks into the log", async () => {
     const note = (await sys(db, `insert into provider_customer_notes (provider_id, customer_id, notes) values ($1, $2, 'Allergic to latex; phone sister on 0555123123') returning id`, [SEED.provider1, SEED.customer]))[0].id;
     const leave = (await sys(db, `insert into employee_time_off (employee_id, start_date, end_date, reason, status) values ($1, current_date, current_date + 2, 'Chemotherapy appointment', 'approved') returning id`, [SEED.employee1]))[0].id;
-    await as(db, admin, `update provider_customer_notes set notes = notes || ' (edited)' where id = $1`, [note]);
-    await as(db, admin, `update employee_time_off set reason = 'Chemotherapy appointment, oncology ward' where id = $1`, [leave]);
+    assert.equal((await as(db, admin, `update provider_customer_notes set notes = notes || ' (edited)' where id = $1 returning 1`, [note])).length, 0);
+    assert.equal((await as(db, admin, `update employee_time_off set reason = 'Chemotherapy appointment, oncology ward' where id = $1 returning 1`, [leave])).length, 0);
+    assert.equal((await sys(db, `select notes from provider_customer_notes where id = $1`, [note]))[0].notes, 'Allergic to latex; phone sister on 0555123123');
     const rows = await sys(db, `select action, details from admin_audit_logs where action in ('provider_customer_notes.update', 'employee_time_off.update')`);
-    assert.equal(rows.length, 2, "both changes are recorded");
+    assert.equal(rows.length, 0, "nothing changed, nothing recorded");
     const text = JSON.stringify(rows);
     assert.ok(!text.includes("latex") && !text.includes("0555123123") && !text.includes("Chemotherapy"));
     await sys(db, `delete from employee_time_off`);
@@ -368,14 +370,14 @@ describe("three more commands answer a stranger like a missing booking, and reas
 });
 
 describe("a staff member cannot approve their own leave", () => {
-  it("refuses an approved leave row from the staff member, and accepts it from the provider's owner and from an administrator", async () => {
+  it("refuses an approved leave row from the staff member, accepts it from the provider's owner, and refuses a console session (SECFIX-2 R2-H1)", async () => {
     const insert = (status) => `insert into employee_time_off (employee_id, start_date, end_date, reason, status) values ($1, current_date + 30, current_date + 31, 'Own approval', '${status}')`;
     assert.equal(await outcome(as(db, employee1, insert("approved"), [SEED.employee1])), "42501");
     assert.equal(await outcome(as(db, employee1, insert("pending"), [SEED.employee1])), "ok", "asking is allowed");
     assert.equal(await outcome(as(db, employee1, `update employee_time_off set status = 'approved' where status = 'pending' and employee_id = $1`, [SEED.employee1])), "42501", "approving your own request is not");
     assert.equal(await outcome(as(db, owner1, `update employee_time_off set status = 'approved' where status = 'pending' and employee_id = $1`, [SEED.employee1])), "ok");
     await sys(db, `delete from employee_time_off`);
-    assert.equal(await outcome(as(db, admin, insert("approved"), [SEED.employee1])), "ok");
+    assert.equal(await outcome(as(db, admin, insert("approved"), [SEED.employee1])), "42501");
     await sys(db, `delete from employee_time_off`);
   });
 

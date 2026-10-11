@@ -304,7 +304,7 @@ describe("enqueueing on real booking transitions", () => {
     assert.equal(await count(customer), 0);
     assert.equal(await count(employee), 0);
     assert.equal(await count(ROLES.anon), 0);
-    assert.ok((await count(admin)) > 0);
+    assert.equal(await count(admin), 0, "console sessions read no delivery payloads directly (SECFIX-2 R2-H1)");
   });
 });
 

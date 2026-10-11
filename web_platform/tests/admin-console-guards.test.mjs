@@ -43,7 +43,8 @@ describe("admin console guards", () => {
 
   it("the audit log is a real screen that the old log routes lead to", () => {
     const audit = page("/audit-logs");
-    assert.ok(audit.includes('from("admin_audit_logs")') && !audit.includes('router.replace("/admin/activity")'));
+    // SECFIX-2 R2-M8: the owner reads it through the audited, paged admin_list_audit_events, never by direct select.
+    assert.ok(audit.includes('rpc("admin_list_audit_events"') && !audit.includes('from("admin_audit_logs")') && !audit.includes('router.replace("/admin/activity")'));
     const config = read("web_platform/next.config.ts");
     for (const route of ["system-logs", "webhooks"]) {
       assert.ok(config.includes(`source: "/admin/${route}", destination: "/admin/audit-logs"`), `/admin/${route} must lead to the audit log, not the booking feed`);
@@ -256,7 +257,7 @@ describe("admin console guards", () => {
   });
 
   it("paginated lists end their sort on the row ID so rows that share a time are neither repeated nor skipped", () => {
-    assert.ok(/\.order\("id"/.test(page("/audit-logs")), "/audit-logs breaks ties on id");
+    assert.ok(read("supabase/migrations/20261011100000_secfix2_h1_m8_no_direct_console_reads.sql").includes("ORDER BY a.created_at DESC, a.id DESC"), "/audit-logs breaks ties on id on the server");
     // GOV-FIX: the refunds list is paged on the server, which breaks ties on id.
     assert.ok(read("supabase/migrations/20261010450000_govfix_gov2_remaining_audited_reads.sql").includes("ORDER BY rr.created_at DESC, rr.id"), "/refunds breaks ties on id on the server");
     assert.ok(read("supabase/migrations/20261005180000_admin_booking_directory.sql").includes("ORDER BY scheduled_at DESC, id"), "the booking directory breaks ties on id on the server");

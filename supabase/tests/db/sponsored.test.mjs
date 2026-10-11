@@ -749,13 +749,13 @@ describe("row level security on the tables", () => {
   const count = (user, table, provider) =>
     as(db, user, `select count(*)::int n from ${table} where provider_id = $1`, [provider]).then((r) => r[0].n);
 
-  it("the owner, a delegate with reports and an administrator read; everyone else reads nothing", async () => {
+  it("the owner and a delegate with reports read; console sessions read only the campaign settings (SECFIX-2 R2-H1); everyone else reads nothing", async () => {
     for (const table of ["sponsored_campaigns", "sponsored_clicks", "sponsored_attributions"]) {
       const total = (await sys(db, `select count(*)::int n from ${table} where provider_id = $1`, [SEED.provider1]))[0].n;
       assert.ok(total > 0, `${table} has fixtures`);
       assert.equal(await count(owner1, table, SEED.provider1), total);
       assert.equal(await count(reporter, table, SEED.provider1), total);
-      assert.equal(await count(admin, table, SEED.provider1), total);
+      assert.equal(await count(admin, table, SEED.provider1), table === "sponsored_campaigns" ? total : 0);
       for (const user of [owner2, customer, stranger, employeeUser, frontDesk]) assert.equal(await count(user, table, SEED.provider1), 0, `${table} hidden`);
       await expectError(as(db, ROLES.anon, `select count(*) from ${table}`), /permission denied/i);
     }

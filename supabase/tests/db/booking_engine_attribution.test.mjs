@@ -168,13 +168,13 @@ describe("booking source attribution (D-02 / C-D8)", () => {
     await expectError(issue(owner1, "link", "one too many"), /At most 50/);
   });
 
-  it("row-level security: only the owner and administrators read tokens, nobody writes directly", async () => {
+  it("row-level security: only the owner reads tokens (console sessions do not, SECFIX-2 R2-H1), nobody writes directly", async () => {
     const mine = await as(db, owner1, `select count(*)::int n from provider_share_tokens`);
     assert.ok(mine[0].n > 0);
     assert.equal((await as(db, owner2, `select count(*)::int n from provider_share_tokens where provider_id = $1`, [SEED.provider1]))[0].n, 0);
     assert.equal((await as(db, customer, `select count(*)::int n from provider_share_tokens`))[0].n, 0);
     assert.equal((await as(db, employee, `select count(*)::int n from provider_share_tokens`))[0].n, 0);
-    assert.ok((await as(db, admin, `select count(*)::int n from provider_share_tokens`))[0].n >= mine[0].n);
+    assert.equal((await as(db, admin, `select count(*)::int n from provider_share_tokens`))[0].n, 0);
     await expectError(as(db, ROLES.anon, `select count(*) from provider_share_tokens`), /permission denied/);
     for (const user of [owner1, customer, admin]) {
       await expectError(as(db, user, `insert into provider_share_tokens (provider_id, source) values ($1, 'link')`, [SEED.provider1]), /permission denied|row-level security/);

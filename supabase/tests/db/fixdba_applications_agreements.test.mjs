@@ -108,7 +108,8 @@ describe("D-12 + D-07: approval needs the acceptance and a real location", () =>
   });
   it("refuses without a branch location, then approves with the location the applicant gave", async () => {
     assert.match(await message(as(db, admin, `select approve_provider_application($1, 'Documents checked')`, [appId])), /location/);
-    await as(db, admin, `update provider_applications set latitude = 21.5433, longitude = 39.1728 where id = $1`, [appId]);
+    // The applicant's location is fixture data (the console no longer reads or edits applications directly: SECFIX-2 R2-H1).
+    await sys(db, `update provider_applications set latitude = 21.5433, longitude = 39.1728 where id = $1`, [appId]);
     const r = (await as(db, admin, `select approve_provider_application($1, 'Documents checked') r`, [appId]))[0].r;
     assert.equal(r.status, "approved");
     const branch = (await sys(db, `select latitude::float8 lat, longitude::float8 lng, city from branches where id = $1`, [r.branch_id]))[0];
@@ -140,12 +141,12 @@ describe("D-24: agreement evidence", () => {
     assert.equal(await code(as(db, customer, `select record_agreement_acceptance('provider_agreement', $1, 'x y; drop')`, [version])), "22023");
     assert.equal(await code(as(db, ROLES.anon, `select record_agreement_acceptance('provider_agreement', $1)`, [version])), "42501");
   });
-  it("is readable by its owner and by administrators only", async () => {
+  it("is readable by its owner only; console sessions read it through audited functions (SECFIX-2 R2-H1)", async () => {
     const version = (await sys(db, `select version from legal_agreements where id = $1`, [agreementId]))[0].version;
     await as(db, customer, `select record_agreement_acceptance('provider_agreement', $1)`, [version]);
     const count = async (user) => (await as(db, user, `select count(*)::int c from agreement_acceptances`))[0].c;
     assert.equal(await count(customer), 1);
-    assert.ok((await count(admin)) >= 2);
+    assert.equal(await count(admin), 0);
     assert.equal(await count(ROLES.user(SEED.owner2)), 0);
   });
   it("lets nobody rewrite or delete a published version, while publishing a new one still archives the old", async () => {

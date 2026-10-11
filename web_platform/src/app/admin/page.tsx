@@ -134,6 +134,7 @@ const translations = {
     recentBookingsEmpty: "No bookings yet.",
     recentActivity: "Latest operator actions",
     recentActivityEmpty: "No operator actions recorded yet.",
+    recentActivityOwnerOnly: "The audit log is visible to the owner only. Each look at it is itself recorded.",
     viewAll: "View all",
     sectionFailed: "Could not load: {reason}",
     system: "System",
@@ -208,6 +209,7 @@ const translations = {
     recentBookingsEmpty: "لا توجد حجوزات بعد.",
     recentActivity: "أحدث إجراءات المشرفين",
     recentActivityEmpty: "لم تُسجل إجراءات للمشرفين بعد.",
+    recentActivityOwnerOnly: "سجل التدقيق متاح للمالك فقط، وكل اطلاع عليه يُسجَّل بدوره.",
     viewAll: "عرض الكل",
     sectionFailed: "تعذّر التحميل: {reason}",
     system: "النظام",
@@ -253,6 +255,7 @@ export default function AdminDashboardPage() {
   const [bookingsError, setBookingsError] = useState("");
   const [audit, setAudit] = useState<AuditRow[] | null>(null);
   const [auditError, setAuditError] = useState("");
+  const [auditForbidden, setAuditForbidden] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [loading, setLoading] = useState(true);
   const [reloadKey, setReloadKey] = useState(0);
@@ -265,11 +268,8 @@ export default function AdminDashboardPage() {
         supabase.rpc("admin_dashboard_overview"),
         // GOV-FIX (Q4): console sessions read no booking rows directly; the audited admin_recent_bookings carries nothing about the customer.
         supabase.rpc("admin_recent_bookings", { p_limit: 5, p_purpose: "customer_support" }),
-        supabase
-          .from("admin_audit_logs")
-          .select("id, action, target_type, actor_id, created_at")
-          .order("created_at", { ascending: false })
-          .limit(6),
+        // R2-M8: the owner reads the audit log only through the audited admin_list_audit_events; other roles are refused.
+        supabase.rpc("admin_list_audit_events", { p_limit: 6, p_offset: 0, p_purpose: "audit_review" }),
         supabase.auth.getUser(),
       ]);
       if (cancelled) return;
@@ -282,9 +282,11 @@ export default function AdminDashboardPage() {
 
       if (auditResult.error) {
         setAudit(null);
-        setAuditError(errorMessage(auditResult.error));
+        setAuditForbidden(isForbidden(auditResult.error));
+        setAuditError(isForbidden(auditResult.error) ? "" : errorMessage(auditResult.error));
       } else {
-        const rows = (auditResult.data ?? []) as Omit<AuditRow, "actorName">[];
+        setAuditForbidden(false);
+        const rows = ((auditResult.data as { rows?: Omit<AuditRow, "actorName">[] } | null)?.rows ?? []) as Omit<AuditRow, "actorName">[];
         const actorIds = [...new Set(rows.map((row) => row.actor_id).filter((id): id is string => Boolean(id)))];
         const names = new Map<string, string>();
         if (actorIds.length > 0) {
@@ -521,7 +523,9 @@ export default function AdminDashboardPage() {
               <h3 id="recent-activity-title" className={sectionTitle}>{t.recentActivity}</h3>
               <Link href="/admin/audit-logs" className={smallLink}>{t.viewAll}</Link>
             </div>
-            {auditError ? (
+            {auditForbidden ? (
+              <div className="mt-3 text-sm font-semibold text-gray-500">{t.recentActivityOwnerOnly}</div>
+            ) : auditError ? (
               <div role="alert" className="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-800">{fill(t.sectionFailed, { reason: auditError })}</div>
             ) : audit && audit.length === 0 ? (
               <div className="mt-3 text-sm font-semibold text-gray-500">{t.recentActivityEmpty}</div>

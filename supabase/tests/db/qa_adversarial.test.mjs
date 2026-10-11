@@ -399,11 +399,11 @@ describe("identity", () => {
   it("a demoted administrator is refused at once, by command, by table and by audit log", async () => {
     const other = ROLES.user(await createUser(db, { role: "admin" }));
     assert.equal(await outcome(as(db, other, `select admin_dashboard_overview()`)), "ok");
-    assert.ok((await as(db, other, `select id from admin_audit_logs limit 1`)).length === 1);
+    assert.ok((await as(db, other, `select admin_list_audit_events(null, null, null, null, 1, 0, null) r`))[0].r.rows.length === 1);
     await sys(db, `update profiles set role = 'customer' where id = $1`, [other.sub]);
     assert.equal(await outcome(as(db, other, `select admin_dashboard_overview()`)), "42501");
     assert.equal(await outcome(as(db, other, `select admin_set_provider_status($1, 'suspended', 'Stale session')`, [SEED.provider2])), "42501");
-    assert.equal((await as(db, other, `select id from admin_audit_logs`)).length, 0);
+    assert.equal(await outcome(as(db, other, `select admin_list_audit_events()`)), "42501");
     assert.equal((await as(db, other, `update platform_settings set updated_at = now() returning 1`).catch(() => [])).length, 0);
   });
 

@@ -181,7 +181,7 @@ describe("payout requests", () => {
 });
 
 describe("a staff day off", () => {
-  it("is private to the staff member, the owner and administrators, an approved one stops customers booking that day, a pending one does not", async () => {
+  it("is private to the staff member and the owner, an approved one stops customers booking that day, a pending one does not", async () => {
     const slot = await firstSlot(db, customer, SEED.employee1, date, svc.duration);
     const leave = (await sys(db, `insert into employee_time_off (employee_id, start_date, end_date, reason, status) values ($1, $2, $2, 'Dentist appointment', 'pending') returning id`, [SEED.employee1, date]))[0].id;
     const slots = async (user) => (await as(db, user, `select count(*)::int n from get_available_slots($1, $2::date, $3)`, [SEED.employee1, date, svc.duration]))[0].n;
@@ -189,7 +189,7 @@ describe("a staff day off", () => {
     await sys(db, `update employee_time_off set status = 'approved' where id = $1`, [leave]);
     for (const user of [customer, ROLES.anon, owner2]) assert.equal(await slots(user), 0);
     assert.equal(await outcome(as(db, customer, `select * from create_booking(target_employee_id => $1, target_service_id => $2, target_scheduled_at => $3, request_source => 'marketplace')`, [SEED.employee1, svc.id, slot])), "23P01");
-    for (const [name, user, expected] of [["customer", customer, 0], ["visitor", ROLES.anon, 0], ["other owner", owner2, 0], ["owner", owner1, 1], ["staff member", employee, 1], ["administrator", admin, 1]]) {
+    for (const [name, user, expected] of [["customer", customer, 0], ["visitor", ROLES.anon, 0], ["other owner", owner2, 0], ["owner", owner1, 1], ["staff member", employee, 1], ["administrator (console sessions read no staff leave: SECFIX-2 R2-H1)", admin, 0]]) {
       // A visitor holds no privilege on the table at all, so the read is refused instead of returning no rows.
       assert.equal((await as(db, user, `select id from employee_time_off`).catch(() => [])).length, expected, name);
     }
