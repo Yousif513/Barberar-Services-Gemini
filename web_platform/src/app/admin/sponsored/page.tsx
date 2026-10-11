@@ -39,7 +39,7 @@ const copy = {
     stateOn: "Running", stateOff: "Not running", missingNote: (names: string) => `Still unset: ${names}.`, readyNote: "All four settings are set and the switch is on.", switchOffNote: "All values are set, but the master switch is off.",
     colSetting: "Setting", colValue: "Value", colActions: "Actions", unset: "Not set", on: "On", off: "Off", days: (n: number) => `${n} days`, places: (n: number) => `${n} places`,
     edit: "Edit", switchOn: "Switch on", switchOff: "Switch off",
-    settingDialog: "Change a sponsored setting", settingReason: "Reason for the change", settingConfirm: "Save", settingSaved: "Setting saved.",
+    settingDialog: "Change a sponsored setting", settingReason: "Reason for the change", settingConfirm: "Save", settingSaved: "Setting saved.", settingPending: "Sent for approval: a different owner must approve the new price per new client before it applies. It is listed under Approvals.",
     factSetting: "Setting", factCurrent: "Current value", factNew: "New value", valueLabel: "New value",
     effectWillStayOff: (names: string) => `It will stay inactive until these are also set: ${names}.`,
     effectOn: "Providers can activate campaigns and the sponsored block starts to appear on the discover page.",
@@ -63,7 +63,7 @@ const copy = {
     stateOn: "يعمل", stateOff: "لا يعمل", missingNote: (names: string) => `ما زال غير محدد: ${names}.`, readyNote: "الإعدادات الأربعة محددة والمفتاح مفعّل.", switchOffNote: "كل القيم محددة لكن المفتاح الرئيسي متوقف.",
     colSetting: "الإعداد", colValue: "القيمة", colActions: "إجراءات", unset: "غير محدد", on: "مفعّل", off: "متوقف", days: (n: number) => `${n} يوماً`, places: (n: number) => `${n} أماكن`,
     edit: "تعديل", switchOn: "تفعيل", switchOff: "إيقاف",
-    settingDialog: "تغيير إعداد الأماكن المموّلة", settingReason: "سبب التغيير", settingConfirm: "حفظ", settingSaved: "تم حفظ الإعداد.",
+    settingDialog: "تغيير إعداد الأماكن المموّلة", settingReason: "سبب التغيير", settingConfirm: "حفظ", settingSaved: "تم حفظ الإعداد.", settingPending: "أُرسل للاعتماد: يجب أن يعتمد مالك آخر السعر الجديد لكل عميل جديد قبل تطبيقه. يظهر الطلب في صفحة الاعتمادات.",
     factSetting: "الإعداد", factCurrent: "القيمة الحالية", factNew: "القيمة الجديدة", valueLabel: "القيمة الجديدة",
     effectWillStayOff: (names: string) => `سيبقى غير فعّال حتى يتم تحديد: ${names}.`,
     effectOn: "يمكن للمزوّدين تفعيل الحملات وتبدأ الكتلة المموّلة بالظهور في صفحة الاستكشاف.",
@@ -136,9 +136,10 @@ export default function AdminSponsoredPage() {
   };
 
   const saveSetting = async (setting: SettingKey, value: number | boolean, reason: string): Promise<string | null> => {
-    const { error } = await supabase.rpc("admin_update_platform_setting", { p_key: setting, p_value: value, p_reason: reason });
+    const { data, error } = await supabase.rpc("admin_update_platform_setting", { p_key: setting, p_value: value, p_reason: reason });
     if (error) return sponsoredError(error, locale);
-    setResult({ success: t.settingSaved });
+    // SECFIX-2 R2-L7: the price per new client changes only after a different owner approves it.
+    setResult({ success: (data as { status?: string } | null)?.status === "pending_approval" ? t.settingPending : t.settingSaved });
     refresh();
     return null;
   };

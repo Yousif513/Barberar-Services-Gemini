@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.108.1"
 import { corsHeaders, json, MissingConfigError, resolveCaller, serviceClient, adminSessionAllows, bearerToken } from "../_shared/http.ts"
 import { toReconciliationEvents } from "../_shared/tap-refund-status.ts"
 
@@ -7,6 +8,9 @@ import { toReconciliationEvents } from "../_shared/tap-refund-status.ts"
 // and refund of the day is also recorded (record_tap_reconciliation_import) and matched item by item to the ledger
 // (run_tap_reconciliation), which opens a reconciliation break for anything unmatched.
 //   { "date": "2026-10-04" }   admin or scheduler
+// SECFIX-2 R2-L1: a console caller first opens the run in their own session (admin_begin_reconciliation_run: step-up,
+// money.ledger, recorded); the service RPC then runs the day only for that recorded request and under the caller's id, so a
+// stale session cannot run it and ran_by and the audit actor name the administrator. The scheduler runs as the system.
 const RIYADH_OFFSET_MS = 3 * 60 * 60 * 1000
 
 async function listAll(apiKey: string, path: "charges" | "refunds", from: number, to: number) {
@@ -60,11 +64,29 @@ serve(async (req) => {
     const refunded = Math.round(refunds.reduce((sum, r) => sum + Number(r.amount || 0), 0) * 100) / 100
 
     const db = serviceClient()
+    const events = [...toReconciliationEvents("charge", charges), ...toReconciliationEvents("refund", refunds)]
+
+    if (caller.kind === "admin") {
+      const asCaller = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_ANON_KEY") ?? "", {
+        auth: { persistSession: false, autoRefreshToken: false },
+        global: { headers: { Authorization: `Bearer ${bearerToken(req)}` } },
+      })
+      const { error: beginError } = await asCaller.rpc("admin_begin_reconciliation_run", { p_business_day: date })
+      if (beginError) {
+        const status = beginError.code === "42501" ? 403 : 409
+        return json(req, { error: beginError.message, hint: beginError.hint ?? null }, status)
+      }
+      const { data: ran, error: ranError } = await db.rpc("service_reconcile_day_for_actor", {
+        p_actor: caller.userId, p_date: date, p_psp_captured: captured, p_psp_refunded: refunded, p_psp_count: charges.length, p_events: events,
+      })
+      if (ranError) throw ranError
+      return json(req, { ...((ran?.totals ?? {}) as Record<string, unknown>), itemised: ran?.itemised, actor_id: ran?.actor_id })
+    }
+
     const { data, error } = await db.rpc("run_daily_psp_reconciliation", {
       p_date: date, p_psp_captured: captured, p_psp_refunded: refunded, p_psp_count: charges.length,
     })
     if (error) throw error
-    const events = [...toReconciliationEvents("charge", charges), ...toReconciliationEvents("refund", refunds)]
     const { error: importError } = await db.rpc("record_tap_reconciliation_import", { p_business_day: date, p_events: events })
     if (importError) throw importError
     const { data: itemised, error: runError } = await db.rpc("run_tap_reconciliation", { p_business_day: date })

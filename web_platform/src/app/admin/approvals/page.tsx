@@ -21,7 +21,7 @@ type Status = (typeof STATUSES)[number];
 type Numeric = number | string | null;
 type ApprovalRow = {
   id: string;
-  kind: "payout_release" | "refund" | "iban_change" | "setting_change" | "ledger_settlement" | "ledger_adjustment" | "fee_rule_change" | "payout_hold" | "reward_program" | "role_change" | "booking_cancellation" | "reconciliation_import";
+  kind: "payout_release" | "refund" | "iban_change" | "setting_change" | "ledger_settlement" | "ledger_adjustment" | "fee_rule_change" | "payout_hold" | "reward_program" | "role_change" | "booking_cancellation" | "reconciliation_import" | "sponsored_price_change";
   status: string;
   target_id: string | null;
   amount_sar: Numeric;
@@ -77,7 +77,8 @@ const translations = {
     kinds: { payout_release: "Payout release", refund: "Refund", iban_change: "Bank account change", setting_change: "Threshold change",
       ledger_settlement: "Manual ledger settlement", ledger_adjustment: "Ledger correction", fee_rule_change: "Fee rule change",
       payout_hold: "Payout hold", reward_program: "Reward programme change", role_change: "Console role grant",
-      booking_cancellation: "Booking cancellation with refund", reconciliation_import: "Reconciliation file import" },
+      booking_cancellation: "Booking cancellation with refund", reconciliation_import: "Reconciliation file import",
+      sponsored_price_change: "Sponsored price per new client" },
     consoleRoles: { owner: "Owner", finance: "Finance", operations: "Operations", analyst: "Analyst (read-only)" } as Record<string, string>,
     noConsoleRole: "No console role",
     breakGlassClosedUntil: "Break-glass closed until {date}: an administrator who could approve this was demoted or removed",
@@ -191,7 +192,8 @@ const translations = {
     kinds: { payout_release: "صرف تحويل", refund: "استرداد", iban_change: "تغيير حساب بنكي", setting_change: "تغيير حد",
       ledger_settlement: "تسوية قيد يدوية", ledger_adjustment: "تصحيح قيد", fee_rule_change: "تغيير قاعدة رسوم",
       payout_hold: "إيقاف التحويلات", reward_program: "تغيير برنامج مكافآت", role_change: "منح دور في لوحة الإدارة",
-      booking_cancellation: "إلغاء حجز مع استرداد", reconciliation_import: "استيراد ملف تسوية" },
+      booking_cancellation: "إلغاء حجز مع استرداد", reconciliation_import: "استيراد ملف تسوية",
+      sponsored_price_change: "سعر الإعلان لكل عميل جديد" },
     consoleRoles: { owner: "المالك", finance: "المالية", operations: "العمليات", analyst: "محلل (قراءة فقط)" } as Record<string, string>,
     noConsoleRole: "بلا دور في لوحة الإدارة",
     breakGlassClosedUntil: "إجراء الطوارئ مغلق حتى {date}: خُفّض دور مسؤول كان يمكنه الاعتماد أو أُزيل",
@@ -388,6 +390,10 @@ function ApprovalsScreen() {
     }
     if (row.kind === "payout_hold") {
       return [providerName(row), s.action === "lift" ? d.lift : d.place].filter(Boolean).join(" · ");
+    }
+    if (row.kind === "sponsored_price_change") {
+      const price = (value: unknown) => (value === null || value === undefined ? "—" : sar(toNumber(value as Numeric), lang));
+      return `${price(s.value_before)} → ${price(s.value)}`;
     }
     if (row.kind === "reconciliation_import") {
       return [d.sources[text(s.source)] ?? text(s.source), `${d.day} ${text(s.business_day)}`, `${text(s.row_count)} ${d.rows}`,
