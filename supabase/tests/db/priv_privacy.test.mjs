@@ -37,6 +37,8 @@ async function booking(customerId, status = "completed", daysAgo = 10) {
      values ($1, $2, $3, $4, $5::booking_status, now() - make_interval(days => $6::int, mins => $7::int), 30, 100, 100, 15, 0, 0, 'marketplace', false, 'Street 1')
      returning id`, [customerId, SEED.branch1, SEED.employee1, svc.id, status, daysAgo, seq * 40])).id;
 }
+// The phone added above counts as a contact change; move it out of the 30-day cooling-off window (review M2).
+const settle = (id) => sys(db, `update account_contact_changes set changed_at = now() - interval '40 days' where user_id = $1`, [id]);
 const submit = (user, type, options = {}, details = "Please act on my data") =>
   call(user, `select privacy_submit_request($1, $2, $3::jsonb) r`, [type, details, JSON.stringify(options)]);
 const propose = (user, id) => call(user, `select admin_privacy_propose_execution($1, 'Identity verified in app; scope checked') r`, [id]);
@@ -269,6 +271,7 @@ describe("Q2: the deletion engine", () => {
   it("prepares a customer with bookings, payments, an invoice, messages, a review, health answers and consents", async () => {
     id = await customer();
     await sys(db, `update auth.users set phone = '+966500000111', phone_confirmed_at = now() where id = $1`, [id]);
+    await settle(id);
     linked = await booking(id);
     unlinked = await booking(id, "cancelled", 3);
     await sys(db, `insert into transactional_ledger (booking_id, provider_id, entry_type, payment_intent_id, total_captured, platform_share, provider_share)
@@ -353,25 +356,65 @@ describe("Q2: the deletion engine", () => {
     assert.equal((await one(`select notice_contacts from privacy_requests where id = $1`, [request.id])).notice_contacts, null);
   });
 
-  it("re-applies the ledger after a restore brought the data back, and accepts entries from an archive", async () => {
+  it("re-applies the ledger after a restore brought the data back", async () => {
     await sys(db, `insert into auth.users (id, email, email_confirmed_at) values ($1, 'restored@test.local', now())`, [id]);
     await sys(db, `insert into profiles (id, first_name, email) values ($1, 'Restored', 'restored@test.local') on conflict (id) do update set first_name = 'Restored'`, [id]);
-    await expectError(call(analyst, `select privacy_reapply_deletion_ledger(null) r`), /privacy.approve/);
-    const r = await call(ROLES.service, `select privacy_reapply_deletion_ledger(null) r`);
+    await expectError(call(analyst, `select privacy_reapply_deletion_ledger() r`), /privacy.approve/);
+    const r = await call(ROLES.service, `select privacy_reapply_deletion_ledger() r`);
     assert.ok(r.reapplied >= 1);
     assert.equal(await count("profiles", "id = $1", [id]), 0);
     assert.ok(r.auth_accounts_to_delete.includes(id));
-    const ghost = "c0000000-0000-4000-8000-0000000fffff";
-    const archived = await call(ROLES.service, `select privacy_reapply_deletion_ledger($1::jsonb) r`, [JSON.stringify([{ subject_id: ghost, erased_at: "2026-10-01T00:00:00Z" }])]);
-    assert.equal(archived.added_from_archive, 1);
+    const due = await call(ROLES.service, `select privacy_auth_erasures_due() r`);
+    assert.ok(due.restored.some((x) => x.subject_id === id));
+    await sys(db, `delete from auth.users where id = $1`, [id]);
+    await call(ROLES.service, `select privacy_record_auth_erasure(null, $1) r`, [id]);
+  });
+
+  it("C1: an owner cannot erase an account through the ledger; archive entries need the service key, the digest and a completed request", async () => {
+    // The review's reproduction: the console RPC no longer takes entries.
+    const victimCustomer = await customer();
+    await expectError(call(owner, `select privacy_reapply_deletion_ledger($1::jsonb) r`,
+      [JSON.stringify([{ subject_id: victimCustomer }, { subject_id: finance.sub }])]), /does not exist|function/);
+    await expectError(call(owner, `select privacy_import_deletion_archive('[]'::jsonb, $1) r`, ["0".repeat(64)]), /permission denied|service key/);
+    assert.equal(await count("profiles", "id = any($1::uuid[])", [[victimCustomer, finance.sub]]), 2);
     const exported = await call(owner, `select admin_privacy_export_deletion_ledger() r`);
-    assert.ok(exported.entries.some((e) => e.subject_id === ghost));
+    assert.match(exported.sha256, /^[0-9a-f]{64}$/);
+    assert.ok(exported.entries.some((e) => e.subject_id === id && e.request_id === request.id));
+    // A restore rolled the ledger back: the archive brings the entry back, unconfirmed by auth until the worker deletes it again.
+    await sys(db, `delete from deletion_ledger where subject_id = $1`, [id]);
+    const archive = JSON.stringify(exported.entries);
+    await expectError(call(ROLES.service, `select privacy_import_deletion_archive($1::jsonb, $2) r`, [archive, "f".repeat(64)]), /SHA-256/);
+    const imported = await call(ROLES.service, `select privacy_import_deletion_archive($1::jsonb, $2) r`, [archive, exported.sha256]);
+    assert.equal(imported.added_from_archive, 1);
+    assert.equal((await one(`select auth_deleted_at from deletion_ledger where subject_id = $1`, [id])).auth_deleted_at, null);
+    // An entry with no completed deletion request (a staff member, another customer) is skipped, never erased.
+    const forged = [{ subject_id: victimCustomer, request_id: request.id }, { subject_id: finance.sub }];
+    const sha = (await one(`select encode(extensions.digest($1::jsonb::text, 'sha256'), 'hex') h`, [JSON.stringify(forged)])).h;
+    const out = await call(ROLES.service, `select privacy_import_deletion_archive($1::jsonb, $2) r`, [JSON.stringify(forged), sha]);
+    assert.equal(out.added_from_archive, 0);
+    assert.equal(out.skipped_without_completed_request, 2);
+    assert.equal(await count("profiles", "id = any($1::uuid[])", [[victimCustomer, finance.sub]]), 2);
     await expectError(call(operations, `select admin_privacy_export_deletion_ledger() r`), /privacy.approve/);
+  });
+
+  it("C1.3 / L3: the engine refuses any account that is not a customer", async () => {
+    await expectError(sys(db, `select privacy_erase_subject_internal($1, null, 'delete_text', 'request')`, [finance.sub]), /Only a customer account/);
+    await expectError(sys(db, `select privacy_erase_subject_internal($1, null, 'delete_text', 'request')`, [SEED.owner1]), /Only a customer account/);
+    assert.equal(await count("profiles", "id = $1", [finance.sub]), 1);
+    // A customer who became staff between proposal and approval is not deleted by the approval.
+    const c = await customer();
+    const r = await submit(otp(c), "deletion", { review_choice: "delete_text" });
+    const appr = (await propose(operations, r.id)).approval_id;
+    const prev = (await one(`select profile_id from employees where id = $1`, [SEED.employee2])).profile_id;
+    await sys(db, `update employees set profile_id = $1 where id = $2`, [c, SEED.employee2]);
+    await expectError(decide(owner2, appr), /Only a customer account/);
+    await sys(db, `update employees set profile_id = $1 where id = $2`, [prev, SEED.employee2]);
+    assert.equal(await count("profiles", "id = $1", [c]), 1);
   });
 });
 
 describe("Q2.5: legal holds", () => {
-  it("keeps the account and held records for a court case, never health data; needs a second person", async () => {
+  it("H2: a court hold keeps only the categories it names; the profile goes; health data is never held; needs a second person", async () => {
     const id = await customer();
     const b = await booking(id);
     await sys(db, `insert into transactional_ledger (booking_id, provider_id, entry_type, payment_intent_id, total_captured, platform_share, provider_share)
@@ -392,14 +435,117 @@ describe("Q2.5: legal holds", () => {
     const r = await submit(otp(id), "deletion", { review_choice: "delete_text" });
     const appr = (await propose(operations, r.id)).approval_id;
     const out = await decide(owner2, appr);
-    assert.equal(out.result.next, "done");
-    assert.equal(await count("profiles", "id = $1", [id]), 1, "the account is kept with the held records");
-    assert.equal(await count("bookings", "id = $1 and customer_id = $2", [b, id]), 1);
+    assert.equal(out.result.next, "delete_auth_account", "the account is not held by a bookings-only hold");
+    assert.equal(await count("profiles", "id = $1", [id]), 0, "the review's reproduction: a reviews/bookings hold no longer keeps the profile");
+    const h = await one(`select pseudonym_token from privacy_legal_holds where id = $1`, [hold.hold_id]);
+    const kept = await one(`select customer_id, pseudonym_token from bookings where id = $1`, [b]);
+    assert.deepEqual([kept.customer_id, kept.pseudonym_token], [null, h.pseudonym_token], "hold-scoped pseudonym");
+    assert.equal(await count("booking_home_addresses", "booking_id = $1", [b]), 1, "the held booking keeps its content");
     assert.equal(await count("intake_answers", "customer_id = $1", [id]), 0, "health answers are destroyed whatever is held");
-    assert.equal((await one(`select status from privacy_requests where id = $1`, [r.id])).status, "completed");
-    await expectError(call(operations, `select admin_privacy_review_legal_hold($1, true, 'Still pending before the court in Riyadh') r`, [hold.hold_id]), /privacy.approve/);
-    const kept = await call(owner, `select admin_privacy_review_legal_hold($1, true, 'Still pending before the court in Riyadh') r`, [hold.hold_id]);
-    assert.equal(Math.round((new Date(kept.review_due_at) - Date.now()) / 86400000), 90);
+
+    // Renewal: a new approver each time, with a reason.
+    const keep = (who) => call(who, `select admin_privacy_review_legal_hold($1, true, 'Still pending before the court in Riyadh') r`, [hold.hold_id]);
+    await expectError(keep(operations), /privacy.approve/);
+    await expectError(keep(owner), /new approver/, "the approver cannot renew their own hold");
+    const renewed = await keep(owner2);
+    assert.equal(Math.round((new Date(renewed.review_due_at) - Date.now()) / 86400000), 90);
+    await expectError(keep(owner2), /new approver/, "nor renew it twice in a row");
+    await expectError(call(owner, `select admin_privacy_review_legal_hold($1, true, 'too short') r`, [hold.hold_id]), /20 characters/);
+
+    // Release: the held booking is finished like any retained booking, with a fresh pseudonym; the hold forgets token and subject.
+    await call(owner, `select admin_privacy_review_legal_hold($1, false, 'The court case was closed by final judgment') r`, [hold.hold_id]);
+    const after = await one(`select pseudonym_token, home_address_text, retention_basis from bookings where id = $1`, [b]);
+    assert.notEqual(after.pseudonym_token, h.pseudonym_token);
+    assert.equal(await count("booking_home_addresses", "booking_id = $1", [b]), 0);
+    assert.match(after.retention_basis, /Commercial Books Law/);
+    const released = await one(`select subject_id, pseudonym_token from privacy_legal_holds where id = $1`, [hold.hold_id]);
+    assert.deepEqual([released.subject_id, released.pseudonym_token], [null, null], "M5: no token beside a person after release");
+  });
+
+  it("H1: an account kept for a court case is deleted, login included, after the hold is released, with a final notice", async () => {
+    const id = await customer();
+    await sys(db, `update auth.users set phone = '+966500000333', phone_confirmed_at = now() where id = $1`, [id]);
+    await settle(id);
+    await booking(id);
+    const sql = `select admin_privacy_propose_legal_hold($1, 'court_case', 'CASE-1447-900', $2::text[], null, $3, $4) r`;
+    const reason = "Riyadh court case 1447/900 names this customer as a party";
+    await expectError(call(operations, sql, [id, ["account", "reviews"], reason, null]), /account itself/);
+    const hold = await call(operations, sql, [id, ["account", "reviews"], reason, "The court asked for the account history of this customer"]);
+    await decide(owner, hold.approval_id);
+    const r = await submit(otp(id), "deletion", { review_choice: "delete_text" });
+    assert.equal((await decide(owner2, (await propose(operations, r.id)).approval_id)).result.next, "done");
+    assert.equal(await count("profiles", "id = $1", [id]), 1, "the account named by the hold is kept");
+    let due = await call(ROLES.service, `select privacy_auth_erasures_due() r`);
+    assert.ok(!due.held_released.some((x) => x.subject_id === id));
+    await call(owner2, `select admin_privacy_review_legal_hold($1, false, 'Proceedings ended; the court released the records') r`, [hold.hold_id]);
+    assert.equal(await count("profiles", "id = $1", [id]), 0);
+    due = await call(ROLES.service, `select privacy_auth_erasures_due() r`);
+    const task = due.held_released.find((x) => x.subject_id === id);
+    assert.ok(task, "the review's reproduction: the login is now due for deletion");
+    assert.ok(task.phones.includes("+966500000333"));
+    await sys(db, `delete from auth.users where id = $1`, [id]);
+    const done = await call(ROLES.service, `select privacy_record_auth_erasure(null, $1) r`, [id]);
+    assert.ok(done.completion_notices >= 1);
+    const notice = await one(`select payload from governance_notifications where recipient_user_id = $1 and template_key = 'privacy_deletion_completed'
+                              and payload->>'final' = 'true'`, [id]);
+    assert.equal(notice.payload.deleted.auth_account, true);
+    assert.equal(await count("privacy_erasure_pending", "subject_id = $1", [id]), 0);
+  });
+
+  it("H3, M3, M5, M7: no contact detail survives erasure; money records stay pseudonymised; one pseudonym per row", async () => {
+    const id = await customer();
+    const email = (await one(`select email from auth.users where id = $1`, [id])).email;
+    await sys(db, `update auth.users set phone = '+966512340222', phone_confirmed_at = now() where id = $1`, [id]);
+    await sys(db, `update auth.users set phone = '+966512340444', phone_confirmed_at = now() where id = $1`, [id]);
+    await settle(id);
+    await sys(db, `update profiles set phone_number = '+966512340444' where id = $1`, [id]);
+    const b1 = await booking(id);
+    const b2 = await booking(id);
+    for (const [bk, ch] of [[b1, "chg_priv_h3_1"], [b2, "chg_priv_h3_2"]]) {
+      await sys(db, `insert into transactional_ledger (booking_id, provider_id, entry_type, payment_intent_id, total_captured, platform_share, provider_share)
+                     values ($1, $2, 'booking_payment', $3, 115, 15, 100)`, [bk, SEED.provider1, ch]);
+    }
+    await sys(db, `insert into message_queue (booking_id, recipient_phone, recipient_id, channel, template_name, variables, status)
+                   values ($1, '+966512340444', $2, 'sms', 'reminder', '{"name":"Sara"}', 'sent'), ($1, '+966512340444', $2, 'sms', 'reminder', '{}', 'pending')`, [b1, id]);
+    await sys(db, `insert into message_log (booking_id, recipient_phone, recipient_id, channel, template_name, message_body, status)
+                   values ($1, '+966512340222', null, 'sms', 'reminder', 'Hi Sara, see you at 5', 'sent')`, [b1]);
+    await sys(db, `insert into governance_notifications (recipient_user_id, channel, template_key, payload, destination, status, sent_at, provider_message_id)
+                   values ($1, 'email', 'privacy_request_received', '{"x":1}', $2, 'sent', now(), 'm1')`, [id, email]);
+    await sys(db, `insert into booking_tips (booking_id, customer_id, employee_id, provider_id, amount) values ($1, $2, $3, $4, 20)`, [b1, id, SEED.employee1, SEED.provider1]);
+    await sys(db, `insert into wallet_credits (customer_id, amount, reason, source) values ($1, 50, 'Goodwill', 'compensation')`, [id]);
+    const r = await submit(otp(id), "deletion", { review_choice: "delete_text" });
+    await decide(owner2, (await propose(operations, r.id)).approval_id);
+    const due = await call(ROLES.service, `select privacy_auth_erasures_due() r`);
+    const task = due.requests.find((x) => x.request_id === r.id);
+    assert.ok(task.phones.includes("+966512340222") && task.phones.includes("+966512340444"), "M7: every phone the account held");
+    // M3: money records kept, pseudonymised, each with its own token.
+    const tip = await one(`select customer_id, pseudonym_token, amount from booking_tips where booking_id = $1`, [b1]);
+    assert.deepEqual([tip.customer_id, Number(tip.amount)], [null, 20]);
+    assert.match(tip.pseudonym_token, /^[0-9a-f]{32}$/);
+    assert.equal(await count("wallet_credits", "customer_id is null and pseudonym_token is not null and reason = 'Goodwill'"), 1);
+    const tokens = await sys(db, `select pseudonym_token from bookings where id = any($1::uuid[])`, [[b1, b2]]);
+    assert.equal(new Set(tokens.map((t) => t.pseudonym_token)).size, 2, "M5: one pseudonym per retained row");
+    // The worker finishes, the completion notice is sent, then nothing personal is left anywhere in public.
+    await sys(db, `delete from auth.users where id = $1`, [id]);
+    await call(ROLES.service, `select privacy_record_auth_erasure($1, $2) r`, [r.id, id]);
+    await sys(db, `update governance_notifications set status = 'sent', sent_at = now(), provider_message_id = 'done'
+                   where recipient_user_id = $1 and template_key = 'privacy_deletion_completed'`, [id]);
+    const tables = await sys(db, `select table_name from information_schema.tables where table_schema = 'public' and table_type = 'BASE TABLE'`);
+    const needles = [email, "+966512340222", "+966512340444", "966512340222", "966512340444"];
+    const hits = [];
+    for (const { table_name: t } of tables) {
+      const n = (await one(`select count(*)::int n from public."${t}" x where x::text ilike any($1::text[])`, [needles.map((v) => `%${v}%`)])).n;
+      if (n) hits.push(t);
+    }
+    assert.deepEqual(hits, [], "H3: the e-mail and every phone are gone from every public table");
+    // The person's id stays only on the request records and logs that document the request itself.
+    const idHits = [];
+    for (const { table_name: t } of tables) {
+      const n = (await one(`select count(*)::int n from public."${t}" x where x::text ilike $1`, [`%${id}%`])).n;
+      if (n) idHits.push(t);
+    }
+    const allowed = ["privacy_requests", "privacy_request_events", "admin_approval_requests", "deletion_ledger", "privacy_erasure_runs", "admin_audit_logs", "governance_notifications"];
+    assert.deepEqual(idHits.filter((t) => !allowed.includes(t)), []);
   });
 
   it("holds a disputed booking and its thread until 30 days after the dispute closes, then finishes the deletion", async () => {

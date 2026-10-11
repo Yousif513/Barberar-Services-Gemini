@@ -26,7 +26,7 @@ type PrivacyRequest = {
   restricted_field?: string | null; recipients_notified?: number;
 };
 type Hold = {
-  id: string; subject_id: string; basis: string; case_reference: string; booking_id: string | null; categories: string[]; reason: string;
+  id: string; subject_id: string | null; basis: string; case_reference: string; booking_id: string | null; categories: string[]; reason: string;
   status: string; review_due_at: string | null; review_overdue: boolean; created_at: string; approved_at: string | null; release_due_at: string | null;
 };
 type LedgerSummary = { entries: number; auth_pending: number; last_erased_at: string | null; last_reapplied_at: string | null };
@@ -76,11 +76,11 @@ const copy = {
     keep: "Keep (review again in 90 days)", release: "Release", releaseDue: "Release dispute holds 30 days after the dispute closed",
     reviewTitleKeep: "Keep this hold", reviewTitleRelease: "Release this hold", reviewReason: "Outcome of the review (at least 20 characters)",
     holdForm: "Propose a legal hold", holdBasis: "Basis", holdReference: "Case or dispute reference", holdCategories: "What the case needs (never health data)",
-    holdBooking: "Disputed booking ID", holdReason: "Why (at least 20 characters)", holdSubmit: "Propose the hold",
+    holdBooking: "Disputed booking ID", holdReason: "Why (at least 20 characters)", holdAccountReason: "Why the case needs the account itself: profile, contact details and login (at least 20 characters)", holdSubmit: "Propose the hold",
     categories: { account: "Account", reviews: "Reviews", messages: "Messages", bookings: "Bookings" } as Record<string, string>,
     emptyHolds: "No holds in this list.", released: "Released: {n}.",
     ledgerTitle: "Deletion ledger", ledgerEntries: "Erased customers recorded", authPending: "Sign-in accounts still to delete", lastErased: "Last erasure", lastReapplied: "Last re-application",
-    ledgerNote: "A database restore rolls this ledger back too. Download it after each deletion and keep it outside the database; after any restore, re-apply it.",
+    ledgerNote: "A database restore rolls this ledger back too. Download it after each deletion and keep it outside the database with its SHA-256; after any restore, the archive is imported with the service key (privacy_import_deletion_archive), then re-applied here.",
     download: "Download the ledger (JSON)", reapply: "Re-apply the ledger now", reapplied: "Re-applied: {n} customers erased again; {a} sign-in accounts to delete.",
     gateTitle: "Health-intake collection", gateOff: "Collection is OFF until the owner records the approved transfer risk assessment (X3 item 6).", gateOn: "Collection is ON. Approved assessment dated {date}.",
     gateForm: "Record the approved transfer risk assessment (owner)", docRef: "Signed document reference", approvedOn: "Approval date", signedBy: "Signed by", gateNotes: "Notes (optional)",
@@ -125,11 +125,11 @@ const copy = {
     keep: "إبقاء (مراجعة بعد 90 يوماً)", release: "رفع الحجز", releaseDue: "رفع حجوزات النزاعات بعد 30 يوماً من إغلاقها",
     reviewTitleKeep: "إبقاء هذا الحجز", reviewTitleRelease: "رفع هذا الحجز", reviewReason: "نتيجة المراجعة (20 حرفاً على الأقل)",
     holdForm: "اقتراح حجز قانوني", holdBasis: "الأساس", holdReference: "مرجع القضية أو النزاع", holdCategories: "ما تحتاجه القضية (لا تشمل البيانات الصحية أبداً)",
-    holdBooking: "معرّف الحجز محل النزاع", holdReason: "السبب (20 حرفاً على الأقل)", holdSubmit: "اقتراح الحجز",
+    holdBooking: "معرّف الحجز محل النزاع", holdReason: "السبب (20 حرفاً على الأقل)", holdAccountReason: "لماذا تحتاج القضية الحساب نفسه: الملف وبيانات التواصل وتسجيل الدخول (20 حرفاً على الأقل)", holdSubmit: "اقتراح الحجز",
     categories: { account: "الحساب", reviews: "التقييمات", messages: "الرسائل", bookings: "الحجوزات" } as Record<string, string>,
     emptyHolds: "لا توجد حجوزات في هذه القائمة.", released: "رُفع: {n}.",
     ledgerTitle: "سجل الحذف", ledgerEntries: "العملاء المحذوفون المسجلون", authPending: "حسابات دخول بانتظار الحذف", lastErased: "آخر حذف", lastReapplied: "آخر إعادة تطبيق",
-    ledgerNote: "استعادة قاعدة البيانات تعيد هذا السجل إلى الوراء أيضاً. نزّله بعد كل حذف واحفظه خارج قاعدة البيانات، وأعد تطبيقه بعد أي استعادة.",
+    ledgerNote: "استعادة قاعدة البيانات تعيد هذا السجل إلى الوراء أيضاً. نزّله بعد كل حذف واحفظه خارج قاعدة البيانات مع بصمة SHA-256، وبعد أي استعادة يُستورد الأرشيف بمفتاح الخدمة (privacy_import_deletion_archive) ثم يُعاد تطبيقه من هنا.",
     download: "تنزيل السجل (JSON)", reapply: "إعادة تطبيق السجل الآن", reapplied: "أُعيد التطبيق: حُذف {n} عملاء مجدداً؛ {a} حسابات دخول بانتظار الحذف.",
     gateTitle: "جمع الاستبيان الصحي", gateOff: "الجمع متوقف حتى يسجل المالك اعتماد تقييم مخاطر النقل (البند 6 من X3).", gateOn: "الجمع مفعّل. تقييم معتمد بتاريخ {date}.",
     gateForm: "تسجيل اعتماد تقييم مخاطر النقل (المالك)", docRef: "مرجع الوثيقة الموقعة", approvedOn: "تاريخ الاعتماد", signedBy: "الموقّع", gateNotes: "ملاحظات (اختياري)",
@@ -468,7 +468,7 @@ function HoldsTab({ t, lang, setNotice }: TabProps) {
   const [loadError, setLoadError] = useState<unknown>(null);
   const [reload, setReload] = useState(0);
   const [dialog, setDialog] = useState<Dialog | null>(null);
-  const [form, setForm] = useState({ subject: "", basis: "court_case", reference: "", booking: "", reason: "", categories: [] as string[] });
+  const [form, setForm] = useState({ subject: "", basis: "court_case", reference: "", booking: "", reason: "", accountReason: "", categories: [] as string[] });
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -489,9 +489,10 @@ function HoldsTab({ t, lang, setNotice }: TabProps) {
     e.preventDefault();
     const { error } = await supabase.rpc("admin_privacy_propose_legal_hold", { p_subject_id: form.subject.trim(), p_basis: form.basis,
       p_case_reference: form.reference.trim(), p_categories: form.basis === "court_case" ? form.categories : null,
-      p_booking_id: form.basis === "payment_dispute" ? form.booking.trim() : null, p_reason: form.reason.trim() });
+      p_booking_id: form.basis === "payment_dispute" ? form.booking.trim() : null, p_reason: form.reason.trim(),
+      p_account_reason: form.basis === "court_case" && form.categories.includes("account") ? form.accountReason.trim() : null });
     if (error) setNotice({ error: errorMessage(error) });
-    else { setNotice({ success: t.done }); setForm({ ...form, reference: "", booking: "", reason: "", categories: [] }); setReload((k) => k + 1); }
+    else { setNotice({ success: t.done }); setForm({ ...form, reference: "", booking: "", reason: "", accountReason: "", categories: [] }); setReload((k) => k + 1); }
   };
   return (
     <div className="space-y-6">
@@ -514,7 +515,7 @@ function HoldsTab({ t, lang, setNotice }: TabProps) {
                 <tr key={h.id}>
                   <td className="px-4 py-3">{t.basis[h.basis] ?? h.basis}</td>
                   <td className="px-4 py-3" dir="ltr">{h.case_reference}</td>
-                  <td className="px-4 py-3 font-mono text-[10px]" dir="ltr">{h.subject_id.slice(0, 8)}</td>
+                  <td className="px-4 py-3 font-mono text-[10px]" dir="ltr">{h.subject_id ? h.subject_id.slice(0, 8) : "—"}</td>
                   <td className="px-4 py-3">{h.categories.map((c) => t.categories[c] ?? c).join(", ")}</td>
                   <td className={`px-4 py-3 whitespace-nowrap ${h.review_overdue ? "font-black text-red-700" : ""}`}>{h.review_due_at ? operationsDate(h.review_due_at, lang) : t.never}</td>
                   <td className="px-4 py-3">{h.status === "active" && (
@@ -553,6 +554,9 @@ function HoldsTab({ t, lang, setNotice }: TabProps) {
             ))}</div>
           </fieldset>
         )}
+        {form.basis === "court_case" && form.categories.includes("account") && (
+          <label className="text-xs font-bold text-[#667085] sm:col-span-2">{t.holdAccountReason}<textarea required minLength={20} rows={2} value={form.accountReason} onChange={(e) => setForm({ ...form, accountReason: e.target.value })} className={`${operationsInput} mt-1`} /></label>
+        )}
         <label className="text-xs font-bold text-[#667085] sm:col-span-2">{t.holdReason}<textarea required minLength={20} rows={2} value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} className={`${operationsInput} mt-1`} /></label>
         <div className="sm:col-span-2"><button type="submit" className={operationsButton}>{t.holdSubmit}</button></div>
       </form>
@@ -587,7 +591,7 @@ function LedgerTab({ t, lang, setNotice }: TabProps) {
     URL.revokeObjectURL(url);
   };
   const reapply = async () => {
-    const { data, error } = await supabase.rpc("privacy_reapply_deletion_ledger", { p_entries: null });
+    const { data, error } = await supabase.rpc("privacy_reapply_deletion_ledger");
     if (error) { setNotice({ error: errorMessage(error) }); return; }
     const d = data as { reapplied: number; auth_accounts_to_delete: string[] };
     setNotice({ success: fill(t.reapplied, { n: d.reapplied, a: d.auth_accounts_to_delete.length }) });

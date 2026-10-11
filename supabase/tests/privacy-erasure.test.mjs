@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { classifyAuthDelete, planAuthErasures, whatsappChannelKeys, whatsappWaId } from "../functions/_shared/privacy-erasure.ts";
+import { classifyAuthDelete, planAuthErasures, plannedExportRemovals, whatsappChannelKeys, whatsappWaId, whatsappWaIds } from "../functions/_shared/privacy-erasure.ts";
 import { consoleCallerDecision, FUNCTION_PERMISSIONS } from "../functions/_shared/console-permission.ts";
 import { renderNotice } from "../functions/_shared/governance-notice-delivery.ts";
 
@@ -12,12 +12,30 @@ const R = "6f1c1a52-6b7e-4f0e-9a52-1f3f6b6f2b11";
 
 describe("planAuthErasures", () => {
   it("validates identifiers, puts approved deletions first and never lists one account twice", () => {
+    const C = "c0000000-0000-4000-8000-000000000003";
     const tasks = planAuthErasures({
-      requests: [{ request_id: R, subject_id: A, phone: "+966500000111" }, { request_id: "nope", subject_id: B }],
+      requests: [{ request_id: R, subject_id: A, phone: "+966500000111", phones: ["+966500000111", "+966 50 000 0222", "x"] },
+                 { request_id: "nope", subject_id: B }],
+      held_released: [{ subject_id: C, phones: ["+966500000333"] }, { subject_id: A }],
       restored: [{ subject_id: A }, { subject_id: B }, { subject_id: "../etc" }],
     });
-    assert.deepEqual(tasks, [{ kind: "request", requestId: R, subjectId: A, waId: "966500000111" }, { kind: "restored", subjectId: B }]);
+    assert.deepEqual(tasks, [
+      { kind: "request", requestId: R, subjectId: A, waIds: ["966500000111", "966500000222"] },
+      { kind: "held_released", subjectId: C, waIds: ["966500000333"] },
+      { kind: "restored", subjectId: B, waIds: [] },
+    ]);
     assert.deepEqual(planAuthErasures({}), []);
+  });
+
+  it("M7: erases WhatsApp threads under every phone the account held, each once", () => {
+    assert.deepEqual(whatsappWaIds("+966500000111", ["966500000111", "+966500000222", null]), ["966500000111", "966500000222"]);
+  });
+
+  it("M6: removes only copy files of the shape the builder writes", () => {
+    const ok = `${A}/${R}/personal-data.pdf`;
+    const plan = plannedExportRemovals({ export_files: [{ request_id: R, paths: [ok, "../../other/file.pdf", `${A}/${R}/personal-data.json`] },
+                                                       { request_id: "bad", paths: [ok] }] });
+    assert.deepEqual(plan, { requestIds: [R], paths: [ok, `${A}/${R}/personal-data.json`] });
   });
 
   it("derives the WhatsApp id from a verified E.164 number and keeps only well-formed channel keys", () => {
