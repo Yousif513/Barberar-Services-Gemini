@@ -175,7 +175,7 @@ export function CommandDialog({
   // A statement the operator must tick before the command can be sent (a check made outside the console).
   acknowledgement?: string;
   // One more value the command needs besides the reason (a registration number, for example), checked against a pattern.
-  field?: { label: string; initial?: string; pattern: RegExp; error: string; ltr?: boolean };
+  field?: { label: string; initial?: string; pattern: RegExp; error: string; ltr?: boolean; inputMode?: "decimal" | "numeric" | "text" };
   confirmLabel: string;
   tone?: "default" | "danger";
   // Resolves to a message when the command was refused (the dialog stays open and keeps what was typed) or null when it succeeded.
@@ -262,6 +262,7 @@ export function CommandDialog({
               id={fieldId}
               data-autofocus
               dir={field.ltr ? "ltr" : undefined}
+              inputMode={field.inputMode}
               value={extra}
               onChange={(event) => setExtra(event.target.value)}
               autoComplete="off"

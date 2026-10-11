@@ -15,6 +15,8 @@ import { GovernanceNotices } from "./governance-notices";
 // Break-glass (owner alone, no second eligible administrator) needs a 20-character justification, stays under the daily cap and
 // opens an independent review due within 7 days, which is signed off below.
 
+// Kinds whose approval moves or holds money, where the balance, hold and duplicate checks run again.
+const MONEY_KINDS: string[] = ["payout_release", "refund", "ledger_settlement", "ledger_adjustment", "payout_hold", "booking_cancellation", "reconciliation_import"];
 const PAGE_SIZE = 25;
 const STATUSES = ["pending", "approved", "rejected", "cancelled"] as const;
 type Status = (typeof STATUSES)[number];
@@ -22,7 +24,7 @@ type Numeric = number | string | null;
 type ApprovalRow = {
   id: string;
   kind: "payout_release" | "refund" | "iban_change" | "setting_change" | "ledger_settlement" | "ledger_adjustment" | "fee_rule_change" | "payout_hold" | "reward_program" | "role_change" | "booking_cancellation" | "reconciliation_import" | "sponsored_price_change"
-    | "privacy_export" | "privacy_deletion" | "privacy_legal_hold";
+    | "privacy_export" | "privacy_deletion" | "privacy_legal_hold" | "customer_profile_clear";
   status: string;
   target_id: string | null;
   amount_sar: Numeric;
@@ -80,7 +82,10 @@ const translations = {
       payout_hold: "Payout hold", reward_program: "Reward programme change", role_change: "Console role grant",
       booking_cancellation: "Booking cancellation with refund", reconciliation_import: "Reconciliation file import",
       sponsored_price_change: "Sponsored price per new client",
-      privacy_export: "Release of a customer's data copy", privacy_deletion: "Customer data deletion", privacy_legal_hold: "Legal hold on customer data" },
+      privacy_export: "Release of a customer's data copy", privacy_deletion: "Customer data deletion", privacy_legal_hold: "Legal hold on customer data",
+      customer_profile_clear: "Clearing a customer's profile details" },
+    profileClearEffect: "removes name, e-mail, phone, gender and push token; keeps sign-in, bookings, invoices and messages",
+    approveIntroChange: "Approving applies the change now, in your name, with the checks the change has. It needs a fresh authenticator code.",
     privacyTypes: { access: "access", copy: "copy", deletion: "deletion" } as Record<string, string>,
     privacyPreview: "{p} bookings pseudonymised, {d} deleted, {m} messages, {h} health answers",
     privacyFollowUp: "Approved. The next step did not run yet ({reason}); open Privacy Requests to run it again.",
@@ -199,7 +204,10 @@ const translations = {
       payout_hold: "إيقاف التحويلات", reward_program: "تغيير برنامج مكافآت", role_change: "منح دور في لوحة الإدارة",
       booking_cancellation: "إلغاء حجز مع استرداد", reconciliation_import: "استيراد ملف تسوية",
       sponsored_price_change: "سعر الإعلان لكل عميل جديد",
-      privacy_export: "تسليم نسخة من بيانات عميل", privacy_deletion: "حذف بيانات عميل", privacy_legal_hold: "حجز قانوني على بيانات عميل" },
+      privacy_export: "تسليم نسخة من بيانات عميل", privacy_deletion: "حذف بيانات عميل", privacy_legal_hold: "حجز قانوني على بيانات عميل",
+      customer_profile_clear: "مسح بيانات الملف الشخصي لعميل" },
+    profileClearEffect: "يحذف الاسم والبريد والهاتف والجنس ورمز الإشعارات؛ ويُبقي تسجيل الدخول والحجوزات والفواتير والرسائل",
+    approveIntroChange: "الاعتماد يطبّق التغيير الآن باسمك مع فحوصاته. يحتاج رمزاً جديداً من تطبيق المصادقة.",
     privacyTypes: { access: "اطلاع", copy: "نسخة", deletion: "حذف" } as Record<string, string>,
     privacyPreview: "{p} حجوزات بلا هوية، {d} محذوفة، {m} رسائل، {h} إجابات صحية",
     privacyFollowUp: "تم الاعتماد. لم تُنفَّذ الخطوة التالية بعد ({reason})؛ افتح طلبات الخصوصية لإعادة تشغيلها.",
@@ -407,6 +415,9 @@ function ApprovalsScreen() {
           .replace("{m}", text(p.messages)).replace("{h}", text(p.health_answers)) : "",
         s.deadline_at ? operationsDate(text(s.deadline_at), lang) : ""].filter(Boolean).join(" · ");
     }
+    if (row.kind === "customer_profile_clear") {
+      return [`${text(row.target_id).slice(0, 8)}`, t.profileClearEffect].filter(Boolean).join(" · ");
+    }
     if (row.kind === "privacy_legal_hold") {
       const cats = Array.isArray(s.categories) ? (s.categories as string[]).join(", ") : "";
       return [text(s.basis).replace("_", " "), text(s.case_reference), cats].filter(Boolean).join(" · ");
@@ -507,7 +518,10 @@ function ApprovalsScreen() {
       case "decide":
         return {
           title: fill(dialog.decision === "approve" ? t.approveTitle : t.rejectTitle, { kind: kindLabel(dialog.row) }),
-          intro: dialog.decision === "approve" ? t.approveIntro : t.rejectIntro,
+          // The balance, hold and duplicate checks belong to money actions; a setting, role or privacy change has its own checks.
+          intro: dialog.decision === "approve"
+            ? (MONEY_KINDS.includes(dialog.row.kind) ? t.approveIntro : t.approveIntroChange)
+            : t.rejectIntro,
           facts: [
             { label: t.columnRequest, value: describe(dialog.row) || kindLabel(dialog.row) },
             ...(dialog.row.amount_sar !== null ? [{ label: t.columnAmount, value: sar(toNumber(dialog.row.amount_sar), lang) }] : []),
@@ -557,7 +571,7 @@ function ApprovalsScreen() {
           title: t.settingTitle,
           intro: t.settingsIntro,
           facts: [{ label: t.setting, value: t.settingNames[dialog.setting.key] ?? dialog.setting.key }, { label: t.from, value: sar(toNumber(dialog.setting.value), lang) }],
-          field: { label: t.settingValue, pattern: /^[0-9]+(\.[0-9]{1,2})?$/, error: t.settingValueError, ltr: true },
+          field: { label: t.settingValue, pattern: /^[0-9]+(\.[0-9]{1,2})?$/, error: t.settingValueError, ltr: true, inputMode: "decimal" as const },
           reasonLabel: t.settingReason,
           minReasonLength: 10,
           confirmLabel: t.propose,
@@ -572,7 +586,7 @@ function ApprovalsScreen() {
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className="space-y-6 text-start">
       <div>
-        <h2 className="font-serif text-2xl font-black text-gray-900">{t.title}</h2>
+        <h1 className="font-serif text-2xl font-black text-gray-900">{t.title}</h1>
         <p className="mt-1 max-w-3xl text-xs font-semibold text-gray-500">{t.subtitle}</p>
       </div>
 

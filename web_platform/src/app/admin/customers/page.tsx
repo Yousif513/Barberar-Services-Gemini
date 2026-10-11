@@ -88,14 +88,15 @@ const translations = {
     verifyDone: "Phone number marked as verified.",
     revokeDone: "Verified mark removed.",
     clearTitle: "Clear this customer's profile details",
-    clearIntro: "The console cannot restore these details afterwards. Check the name and ID below belong to the customer you mean.",
+    clearIntro: "Clearing a profile erases what a privacy deletion erases, so it needs a different owner's approval: this records the request, and a second owner approves it on Approvals. The console cannot restore these details afterwards. Check the name and ID below belong to the customer you mean.",
     clearEffectsTitle: "What happens",
     clearEffects: [
       "Removed: name, email, phone number, gender and push token.",
       "Kept: sign-in identity, bookings, invoices and messages.",
-      "The audit log records who cleared the profile and why, but not the values that were removed.",
+      "The audit log records who asked, who approved and why, but not the values that were removed.",
     ],
-    clearConfirm: "Clear profile details",
+    clearConfirm: "Ask a second owner to approve",
+    clearRequested: "Recorded for approval. Nothing is cleared until a different owner approves it on Approvals.",
     clearDone: "Profile details cleared. Sign-in identity, bookings, invoices and messages were not changed.",
     factCustomer: "Customer",
     factEmail: "Email",
@@ -185,14 +186,15 @@ const translations = {
     verifyDone: "تم توثيق رقم الهاتف.",
     revokeDone: "تمت إزالة التوثيق.",
     clearTitle: "مسح بيانات الملف الشخصي لهذا العميل",
-    clearIntro: "لا تستطيع لوحة الإدارة استرجاع هذه البيانات بعد المسح. تأكد من أن الاسم والمعرّف أدناه يعودان للعميل المقصود.",
+    clearIntro: "مسح الملف الشخصي يحذف ما يحذفه طلب حذف البيانات الشخصية، لذا يحتاج اعتماد مالك آخر: يُسجَّل الطلب هنا ويعتمده مالك ثانٍ من شاشة الاعتمادات. لا تستطيع لوحة الإدارة استرجاع هذه البيانات بعد المسح. تأكد من أن الاسم والمعرّف أدناه يعودان للعميل المقصود.",
     clearEffectsTitle: "ما الذي سيحدث",
     clearEffects: [
       "يُحذف: الاسم والبريد ورقم الهاتف والجنس ورمز الإشعارات.",
       "يبقى: هوية تسجيل الدخول والحجوزات والفواتير والرسائل.",
-      "يسجّل سجل التدقيق من مسح الملف الشخصي وسببه، دون القيم المحذوفة.",
+      "يسجّل سجل التدقيق من طلب المسح ومن اعتمده والسبب، دون القيم المحذوفة.",
     ],
-    clearConfirm: "مسح بيانات الملف الشخصي",
+    clearConfirm: "طلب اعتماد مالك ثانٍ",
+    clearRequested: "سُجّل الطلب للاعتماد. لا يُمسح شيء قبل أن يعتمده مالك آخر من شاشة الاعتمادات.",
     clearDone: "تم مسح بيانات الملف الشخصي. لم تتغير هوية تسجيل الدخول أو الحجوزات أو الفواتير أو الرسائل.",
     factCustomer: "العميل",
     factEmail: "البريد الإلكتروني",
@@ -367,10 +369,12 @@ function CustomersScreen() {
 
   // Runs one operator command. A refusal is handed back to the dialog (which stays open and keeps what was typed);
   // a success is announced where the operator is looking and the list is read again.
-  const execute = async (command: PromiseLike<{ error: unknown }>, success: string): Promise<string | null> => {
-    const { error } = await command;
+  const execute = async (command: PromiseLike<{ data?: unknown; error: unknown }>, success: string, pendingMessage?: string): Promise<string | null> => {
+    const { data, error } = await command;
     if (error) return errorMessage(error);
-    setNotice({ success });
+    // A command that needs a second administrator answers pending_approval: it was recorded, not carried out.
+    const status = (data as { status?: string } | null)?.status;
+    setNotice({ success: status === "pending_approval" && pendingMessage ? pendingMessage : success });
     setReloadKey((key) => key + 1);
     return null;
   };
@@ -436,7 +440,7 @@ function CustomersScreen() {
           reasonLabel={t.reasonLabel}
           confirmWord={customer.id.slice(0, 8)}
           confirmLabel={t.clearConfirm}
-          onConfirm={(why) => execute(supabase.rpc("admin_clear_customer_profile", { p_customer_id: customer.id, p_reason: why }), t.clearDone)}
+          onConfirm={(why) => execute(supabase.rpc("admin_clear_customer_profile", { p_customer_id: customer.id, p_reason: why }), t.clearDone, t.clearRequested)}
           onClose={close}
         />
       );
