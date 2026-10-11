@@ -873,7 +873,9 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         join(webPlatformDir, "src/app/admin/ledger/page.tsx"),
         "utf8"
       );
-      assert.ok(adminLedgerCode.includes("run_daily_psp_reconciliation"), "Admin ledger must connect to run_daily_psp_reconciliation RPC");
+      // UXFIX: one reconciliation source; the ledger tab reads the Tap runs /admin/reconciliation shows, and runs nothing itself.
+      assert.ok(adminLedgerCode.includes('rpc("admin_reconciliation_overview"'), "Admin ledger reads the Tap reconciliation runs");
+      assert.ok(!adminLedgerCode.includes("psp_reconciliation_runs"), "Admin ledger no longer reads the older ledger-only runs");
       assert.ok(adminLedgerCode.includes('rpc("admin_list_fee_invoices"'), "Admin ledger must read provider fee invoices through the audited function");
       assert.ok(!adminLedgerCode.includes('"text-[#D1AF47] font-serif text-xs font-black">\n                  $'), "Ledger widget must not use dollar signs");
 

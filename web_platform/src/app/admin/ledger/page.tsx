@@ -3,8 +3,11 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
-import { CommandResult } from "@/components/operations-ui";
+import Link from "next/link";
+import { CommandResult, sar } from "@/components/operations-ui";
 import { CommandDialog } from "@/components/modal";
+import { knownToHold, useConsoleSession } from "@/lib/console-session";
+import { canRevealRequest, revealOutcome, secondsLeft } from "@/lib/payout-display.mjs";
 
 // Rows per list read from the audited functions (the server caps a page at 500).
 const LIST_LIMIT = 200;
@@ -18,7 +21,7 @@ const translations = {
     error: "Error",
     paymentIntent: "Payment Intent",
     grossCaptured: "Gross Captured",
-    platformShare: "Platform Share (15%)",
+    platformShare: "Platform share",
     providerShare: "Provider Share (85%)",
     payoutStatus: "Payout Status",
     actions: "Actions",
@@ -62,31 +65,32 @@ const translations = {
     tabSplits: "Transaction Splits",
     tabPayoutRequests: "Payout Requests",
     tabStatements: "Accountant Statements",
-    tabReconciliation: "PSP Reconciliation",
+    tabReconciliation: "Reconciliation & fee invoices",
+    tabsLabel: "Ledger sections",
 
-    // Reconciliation Tab
-    reconTitle: "Daily Payment Gateway Reconciliation",
-    reconSubtitle: "Audit automated daily balance matching between Tap Payments gateway and transactional ledger records.",
-    runRecon: "Run Daily Reconciliation",
-    reconciling: "Reconciling...",
-    reconDate: "Reconciliation Date",
-    reconGateway: "Gateway",
-    reconCaptured: "Captured (Gateway)",
-    reconRefunded: "Refunded (Gateway)",
-    reconLedger: "Ledger Gross",
-    reconDiscrepancy: "Discrepancy",
+    // Reconciliation Tab: the same Tap reconciliation runs as the Tap Reconciliation screen
+    reconTitle: "Tap reconciliation",
+    reconSubtitle: "The days reconciled against Tap, as recorded on the Tap Reconciliation screen, where days are run and differences resolved.",
+    openReconciliation: "Open Tap reconciliation",
+    reconDay: "Business day",
     reconStatus: "Status",
-    reconNotes: "Notes",
-    noReconRuns: "No reconciliation runs recorded yet.",
-    reconSuccess: "Daily reconciliation completed successfully.",
-    reconStatusMatched: "Matched",
-    reconStatusDiscrepant: "Discrepancy",
-    reconStatusResolved: "Resolved",
+    reconOpenBreaks: "Open differences",
+    reconTapCharges: "Tap charges",
+    reconRanAt: "Last run",
+    noReconRuns: "No day has been reconciled against Tap yet.",
+    reconStatuses: { matched: "Matched", breaks: "Differences found", no_tap_data: "Not reconciled: no Tap data" } as Record<string, string>,
+    feeInvoicesTitle: "Monthly platform fee invoices",
+    feeInvoicesSubtitle: "Platform fee statements per provider after captured deposit offsets, with VAT on the fee.",
+    invoiceNo: "Invoice no.", invoiceProvider: "Provider", invoicePeriod: "Period", invoiceBookings: "Bookings", invoiceGmv: "Gross bookings value",
+    invoiceCommission: "Platform fee", invoiceDue: "Total due (incl. VAT)", invoiceStatus: "Status",
+    noAccountOnFile: "This provider has no payout account on file. Nothing was revealed; ask the provider to add their bank account.",
+    noBankOnRequest: "No bank account on this request",
+    payoutCount: "{n} requests",
     
     // Statements Tab
     vatReportTitle: "Monthly VAT Collection Report",
     reportsFailed: "These statements could not be loaded, so the tables below are incomplete: {reason}",
-    vatReportSubtitle: "Value-Added Tax (15% VAT) collected from completed bookings.",
+    vatReportSubtitle: "Value-added tax collected from completed bookings.",
     settlementTitle: "Provider Settlement Ledger",
     settlementSubtitle: "Gross captured volume, platform commission, and released payouts per provider.",
     earningsTitle: "Employee Earnings Summary",
@@ -111,7 +115,7 @@ const translations = {
     error: "خطأ",
     paymentIntent: "معرف الدفع",
     grossCaptured: "المبلغ المقبوض",
-    platformShare: "حصة المنصة (15%)",
+    platformShare: "حصة المنصة",
     providerShare: "حصة مزود الخدمة (85%)",
     payoutStatus: "حالة التحويل",
     actions: "الإجراءات",
@@ -155,26 +159,25 @@ const translations = {
     tabSplits: "تقسيم المعاملات",
     tabPayoutRequests: "طلبات سحب الأرباح",
     tabStatements: "القوائم المحاسبية والضريبة",
-    tabReconciliation: "مطابقة بوابة الدفع",
-
-    // Reconciliation Tab
-    reconTitle: "المطابقة اليومية لبوابة الدفع (Tap Payments)",
-    reconSubtitle: "تدقيق يومي آلي يطابق المبالغ المقبوضة والمسترجعة عبر بوابة Tap مع سجلات العمليات المالية.",
-    runRecon: "تشغيل المطابقة اليومية",
-    reconciling: "جاري المطابقة...",
-    reconDate: "التاريخ",
-    reconGateway: "البوابة",
-    reconCaptured: "المقبوض (البوابة)",
-    reconRefunded: "المسترجع (البوابة)",
-    reconLedger: "إجمالي السجل",
-    reconDiscrepancy: "الفارق",
+    tabReconciliation: "المطابقة وفواتير الرسوم",
+    tabsLabel: "أقسام السجل المالي",
+    reconTitle: "مطابقة Tap",
+    reconSubtitle: "الأيام التي طوبقت مع Tap كما هي مسجلة في شاشة مطابقة Tap، حيث تُشغَّل المطابقة وتُعالج الفروقات.",
+    openReconciliation: "فتح مطابقة Tap",
+    reconDay: "يوم العمل",
     reconStatus: "الحالة",
-    reconNotes: "الملاحظات",
-    noReconRuns: "لا توجد عمليات مطابقة مسجلة بعد.",
-    reconSuccess: "تمت المطابقة اليومية بنجاح.",
-    reconStatusMatched: "مطابق",
-    reconStatusDiscrepant: "يوجد فارق",
-    reconStatusResolved: "تمت التسوية",
+    reconOpenBreaks: "فروقات مفتوحة",
+    reconTapCharges: "عمليات Tap",
+    reconRanAt: "آخر تشغيل",
+    noReconRuns: "لم يُطابَق أي يوم مع Tap بعد.",
+    reconStatuses: { matched: "مطابقة", breaks: "توجد فروقات", no_tap_data: "لم تتم المطابقة: لا توجد بيانات Tap" } as Record<string, string>,
+    feeInvoicesTitle: "فواتير رسوم المنصة الشهرية",
+    feeInvoicesSubtitle: "كشوف رسوم المنصة لكل مقدم خدمة بعد خصم العربون المقبوض، مع ضريبة القيمة المضافة على الرسوم.",
+    invoiceNo: "رقم الفاتورة", invoiceProvider: "مقدم الخدمة", invoicePeriod: "الفترة", invoiceBookings: "الحجوزات", invoiceGmv: "إجمالي قيمة الحجوزات",
+    invoiceCommission: "رسوم المنصة", invoiceDue: "المستحق (شامل الضريبة)", invoiceStatus: "الحالة",
+    noAccountOnFile: "لا يوجد حساب صرف مسجل لمقدم الخدمة هذا. لم يُكشف شيء؛ اطلب من مقدم الخدمة إضافة حسابه البنكي.",
+    noBankOnRequest: "لا يوجد حساب بنكي في هذا الطلب",
+    payoutCount: "{n} طلبات",
     
     // Statements Tab
     vatReportTitle: "تقرير ضريبة القيمة المضافة الشهري",
@@ -466,7 +469,7 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
 const commandCopy = {
   en: {
     reasonLabel: "Reason (recorded in the audit log)",
-    reconciliationHold: "Held until Tap reconciliation clears: {n} open break(s), SAR {amount}",
+    reconciliationHold: "Held until Tap reconciliation clears: {n} open differences, {amount}",
     payReasonLabel: "Bank transfer reference or note (recorded in the audit log)",
     releaseTitle: "Release this ledger entry",
     releaseIntro: "Record that the provider's share of this entry was paid outside the payout flow. A different administrator must approve it, the provider needs an approved bank account past its 48-hour hold, and the bank transfer reference is kept with the entry.",
@@ -515,12 +518,12 @@ const commandCopy = {
   },
   ar: {
     reasonLabel: "السبب (يُسجل في سجل التدقيق)",
-    reconciliationHold: "موقوف حتى تكتمل التسوية مع Tap: {n} من فروق التسوية المفتوحة بقيمة {amount} ريال",
+    reconciliationHold: "موقوف حتى تكتمل التسوية مع Tap: {n} من فروق التسوية المفتوحة بقيمة {amount}",
     payReasonLabel: "مرجع التحويل البنكي أو ملاحظة (تُسجل في سجل التدقيق)",
     releaseTitle: "صرف هذا القيد",
-    releaseIntro: "تسجيل أن حصة مقدم الخدمة من هذا القيد صُرفت خارج مسار التحويلات. يجب أن يعتمدها مسؤول آخر، وأن يكون لمقدم الخدمة حساب بنكي معتمد تجاوز فترة الانتظار (48 ساعة)، ويُحفظ مرجع التحويل البنكي مع القيد.",
+    releaseIntro: "تسجيل أن حصة مقدم الخدمة من هذا القيد صُرفت خارج مسار التحويلات. يجب أن يعتمدها مسؤول آخر، وأن يكون لمقدم الخدمة حساب بنكي معتمد تجاوز فترة الانتظار (٤٨ ساعة)، ويُحفظ مرجع التحويل البنكي مع القيد.",
     releaseReferenceLabel: "مرجع التحويل البنكي",
-    releaseReferenceError: "أدخل مرجع التحويل البنكي (من 4 إلى 64 حرفاً أو رقماً أو شرطة).",
+    releaseReferenceError: "أدخل مرجع التحويل البنكي (من ٤ إلى ٦٤ حرفاً أو رقماً أو شرطة).",
     releasePendingMsg: "أُرسل للاعتماد: يجب أن يعتمد مسؤول آخر هذه التسوية.",
     releaseConfirm: "صرف الحصة",
     processingTitle: "نقل طلب الصرف إلى المعالجة",
@@ -530,7 +533,7 @@ const commandCopy = {
     rejectIntro: "يُغلق الطلب كمرفوض، وعلى مقدم الخدمة تقديم طلب جديد.",
     rejectConfirm: "رفض الطلب",
     payTitle: "تسجيل هذا الطلب كمدفوع",
-    payIntro: "كل تحويل يحتاج مسؤولاً ثانياً: يُسجَّل صرفك للاعتماد، وعند الاعتماد تُخصَّص حصص مقدم الخدمة المعلّقة ويُسجَّل الطلب مدفوعاً. التحويل إلى حساب بنكي اعتُمد خلال آخر 48 ساعة ينتظر انتهاء فترة التعليق.",
+    payIntro: "كل تحويل يحتاج مسؤولاً ثانياً: يُسجَّل صرفك للاعتماد، وعند الاعتماد تُخصَّص حصص مقدم الخدمة المعلّقة ويُسجَّل الطلب مدفوعاً. التحويل إلى حساب بنكي اعتُمد خلال آخر ٤٨ ساعة ينتظر انتهاء فترة التعليق.",
     payConfirm: "تسجيل كمدفوع",
     factEntry: "قيد الدفتر",
     factCaptured: "المبلغ المحصّل",
@@ -549,11 +552,11 @@ const commandCopy = {
     revealFor: "كشف آيبان {name}",
     reveal: "كشف الآيبان",
     revealTitle: "كشف الآيبان كاملاً",
-    revealIntro: "للمالية والمالك فقط. يظهر الآيبان مرة واحدة لمدة 60 ثانية ولا يُحفظ في اللوحة ولا في سجل التدقيق؛ ويُسجَّل الكشف وسببه. يحتاج رمزاً جديداً من تطبيق المصادقة.",
-    revealReason: "السبب مع رقم تذكرة (PAY-1042 أو ‎#5521) أو معرّف طلب صرف لهذا المزود (15 حرفاً على الأقل)",
+    revealIntro: "للمالية والمالك فقط. يظهر الآيبان مرة واحدة لمدة ٦٠ ثانية ولا يُحفظ في اللوحة ولا في سجل التدقيق؛ ويُسجَّل الكشف وسببه. يحتاج رمزاً جديداً من تطبيق المصادقة.",
+    revealReason: "السبب مع رقم تذكرة (PAY-1042 أو ‎#5521) أو معرّف طلب صرف لهذا المزود (١٥ حرفاً على الأقل)",
     revealedTitle: "آيبان {name}",
     revealedNotApproved: "غير معتمد – لا تحوّل إليه. يظهر مخفياً جزئياً حتى يعتمده مسؤول ثانٍ.",
-    revealLimit: "بلغت الحد الأعلى لكشف الآيبان خلال 24 ساعة ({n}). يمكن لمالك آخر السماح بالمزيد من صفحة الاعتمادات.",
+    revealLimit: "بلغت الحد الأعلى لكشف الآيبان خلال ٢٤ ساعة ({n}). يمكن لمالك آخر السماح بالمزيد من صفحة الاعتمادات.",
     revealedActive: "الحساب المعتمد",
     revealedPending: "حساب بانتظار الاعتماد",
     revealedHolder: "اسم صاحب الحساب",
@@ -572,8 +575,11 @@ type MoneyAction =
   | { kind: "review"; request: any; decision: "processing" | "rejected" }
   | { kind: "pay"; request: any };
 
+const LEDGER_TABS = ["methods", "splits", "requests", "statements", "reconciliation"] as const;
+type LedgerTab = (typeof LEDGER_TABS)[number];
+
 export default function AdminLedger() {
-  const [activeTab, setActiveTab] = useState<"methods" | "splits" | "requests" | "statements" | "reconciliation">("methods");
+  const [activeTab, setActiveTab] = useState<LedgerTab>("methods");
   const [ledger, setLedger] = useState<any[]>([]);
   // GOV-2 (Q4): the ledger, payouts, statements and fee invoices come from audited, paged server functions; totals are the
   // server's figures for every matching row, not a sum of the page shown.
@@ -602,6 +608,10 @@ export default function AdminLedger() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [lang, setLang] = useState<"en" | "ar">("ar");
+  // The money commands are offered only to the roles that hold them; the server refuses everyone else regardless.
+  const session = useConsoleSession();
+  const canReveal = knownToHold(session, ["iban.reveal"]);
+  const canDecidePayouts = knownToHold(session, ["money.payout"]);
 
   // Accountant Report States
   const [vatSummary, setVatSummary] = useState<any[]>([]);
@@ -611,11 +621,9 @@ export default function AdminLedger() {
   // A failed statement query must read as a failure, not as a month with no VAT or settlements.
   const [reportsError, setReportsError] = useState("");
 
-  // Daily PSP Reconciliation & Fee Invoices States (G33, G34)
-  const [reconciliationRuns, setReconciliationRuns] = useState<any[]>([]);
+  // Tap reconciliation runs (the same source as /admin/reconciliation) and the monthly fee invoices
+  const [reconciliationRuns, setReconciliationRuns] = useState<{ business_day: string; status: string; counts: Record<string, number>; ran_at: string; run_count: number }[]>([]);
   const [reconLoading, setReconLoading] = useState(false);
-  const [runningRecon, setRunningRecon] = useState(false);
-  const [reconDateInput, setReconDateInput] = useState(new Date().toISOString().split("T")[0]);
   const [providerFeeInvoices, setProviderFeeInvoices] = useState<any[]>([]);
   const [feeInvoicesLoading, setFeeInvoicesLoading] = useState(false);
 
@@ -653,6 +661,9 @@ export default function AdminLedger() {
       hour: "2-digit",
       minute: "2-digit"
     });
+
+  const sarAmount = (value: unknown) => sar(Number(value ?? 0), lang);
+  const count = (value: unknown) => Number(value ?? 0).toLocaleString(lang === "ar" ? "ar-SA" : "en-US");
 
   const formatDateMonth = (value: string) =>
     new Date(value).toLocaleString(lang === "ar" ? "ar-SA" : "en-US", {
@@ -758,12 +769,10 @@ export default function AdminLedger() {
     try {
       setReconLoading(true);
       setReconError("");
-      const { data, error: dbError } = await supabase
-        .from("psp_reconciliation_runs")
-        .select("*")
-        .order("run_date", { ascending: false });
+      // One source for reconciliation: the Tap runs admin_reconciliation_overview answers to /admin/reconciliation too.
+      const { data, error: dbError } = await supabase.rpc("admin_reconciliation_overview", { p_status: "open", p_limit: 25, p_offset: 0 });
       if (dbError) throw dbError;
-      setReconciliationRuns(data || []);
+      setReconciliationRuns(((data as { runs?: unknown[] } | null)?.runs ?? []) as typeof reconciliationRuns);
     } catch (err) {
       setReconError(errorMessage(err));
       setReconciliationRuns([]);
@@ -788,40 +797,6 @@ export default function AdminLedger() {
       setProviderFeeInvoices([]);
     } finally {
       setFeeInvoicesLoading(false);
-    }
-  };
-
-  const handleRunReconciliation = async () => {
-    try {
-      setRunningRecon(true);
-      setError("");
-      setSuccess("");
-      // Pulls the day's captured charges and refunds from Tap (reconcile-psp) and compares them with the ledger.
-      const { data, error: fnErr } = await supabase.functions.invoke("reconcile-psp", {
-        body: { date: reconDateInput }
-      });
-      if (fnErr) {
-        let detail = fnErr.message;
-        try {
-          const body = await (fnErr as { context?: Response }).context?.json();
-          if (body?.error) detail = body.error;
-        } catch {
-          // keep the generic message
-        }
-        // Without Tap access, record ledger totals only; the run is marked "awaiting PSP data", never "matched".
-        const { error: rpcErr } = await supabase.rpc("run_daily_psp_reconciliation", { p_date: reconDateInput });
-        if (rpcErr) throw rpcErr;
-        setError(`${detail}. ${lang === "ar" ? "تم تسجيل أرصدة السجل فقط بانتظار بيانات Tap." : "Ledger totals were recorded; the run is awaiting Tap data."}`);
-        await loadReconciliationRuns();
-        return;
-      }
-      setSuccess(data?.status === "matched" ? t.reconSuccess : (lang === "ar" ? "توجد فروقات بين Tap والسجل" : "Tap totals differ from the ledger"));
-      await loadReconciliationRuns();
-    } catch (err: any) {
-      console.error("Reconciliation execution error:", err);
-      setError(err?.message || "Failed to run daily PSP reconciliation.");
-    } finally {
-      setRunningRecon(false);
     }
   };
 
@@ -890,7 +865,7 @@ export default function AdminLedger() {
     if (rpcError) return errorMessage(rpcError);
     const shown = data as { expires_at: string; active: RevealedAccount | null; pending: RevealedAccount | null; refused?: boolean; ceiling?: number };
     // GOV-FIX L-2: past the 24-hour ceiling nothing is revealed (the server records the refusal and raises an alert).
-    if (shown.refused) return commandCopy[lang].revealLimit.replace("{n}", String(shown.ceiling ?? ""));
+    if (shown.refused) return commandCopy[lang].revealLimit.replace("{n}", count(shown.ceiling ?? 0));
     setRevealed({ name: providerName, expiresAt: Math.min(new Date(shown.expires_at).getTime(), Date.now() + 60000), active: shown.active, pending: shown.pending });
     setRevealClock(Date.now());
     return null;
@@ -899,7 +874,8 @@ export default function AdminLedger() {
   const renderRevealed = () => {
     if (!revealed) return null;
     const c = commandCopy[lang];
-    const seconds = Math.max(0, Math.ceil((revealed.expiresAt - (revealClock || Date.now())) / 1000));
+    const seconds = secondsLeft(revealed.expiresAt, revealClock || Date.now());
+    const outcome = revealOutcome(revealed);
     const account = (label: string, value: RevealedAccount | null) => value && (
       <div className="rounded-xl border border-[#ECECEC] bg-[#F9F7F1] p-3">
         <p className="text-[11px] font-black text-[#667085]">{label}</p>
@@ -919,9 +895,10 @@ export default function AdminLedger() {
         className="fixed inset-x-4 bottom-4 z-[9500] mx-auto max-w-lg rounded-[24px] border border-[#D1AF47]/50 bg-white p-5 text-start shadow-2xl">
         <div className="flex items-start justify-between gap-3">
           <p className="font-serif text-lg font-black text-[#101828]">{c.revealedTitle.replace("{name}", revealed.name)}</p>
-          <span role="timer" aria-live="off" className="shrink-0 rounded-full bg-[#FFFAEB] px-2.5 py-1 text-[11px] font-black text-[#B54708]">{c.revealedExpires.replace("{n}", String(seconds))}</span>
+          <span role="timer" aria-live="off" className="shrink-0 rounded-full bg-[#FFFAEB] px-2.5 py-1 text-[11px] font-black text-[#B54708]">{c.revealedExpires.replace("{n}", count(seconds))}</span>
         </div>
         <div className="mt-3 space-y-2">
+          {outcome === "none" ? <p role="status" className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm font-semibold text-amber-950">{t.noAccountOnFile}</p> : null}
           {account(c.revealedActive, revealed.active)}
           {account(c.revealedPending, revealed.pending)}
         </div>
@@ -956,7 +933,7 @@ export default function AdminLedger() {
         />
       );
     }
-    const sarText = (value: unknown) => `${formatMoney(value as number)} ${lang === "ar" ? "ريال" : "SAR"}`;
+    const sarText = (value: unknown) => sarAmount(value);
     if (money.kind === "release") {
       const { item } = money;
       return (
@@ -1024,6 +1001,23 @@ export default function AdminLedger() {
 
   const isRTL = lang === "ar";
   const flip = isRTL ? "flex-row-reverse" : "flex-row";
+  const tabLabels: Record<LedgerTab, string> = {
+    methods: t.tabMethods, splits: t.tabSplits, requests: t.tabPayoutRequests, statements: t.tabStatements, reconciliation: t.tabReconciliation,
+  };
+  // Arrow keys move between tabs (reversed in Arabic), Home and End jump to the ends; the tab gets focus and opens.
+  const onTabKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    const keys = isRTL ? { next: "ArrowLeft", prev: "ArrowRight" } : { next: "ArrowRight", prev: "ArrowLeft" };
+    const at = LEDGER_TABS.indexOf(activeTab);
+    let next = -1;
+    if (event.key === keys.next) next = (at + 1) % LEDGER_TABS.length;
+    else if (event.key === keys.prev) next = (at - 1 + LEDGER_TABS.length) % LEDGER_TABS.length;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = LEDGER_TABS.length - 1;
+    if (next < 0) return;
+    event.preventDefault();
+    setActiveTab(LEDGER_TABS[next]);
+    document.getElementById(`ledger-tab-${LEDGER_TABS[next]}`)?.focus();
+  };
 
   // Calculate split summaries
   const totalGross = ledgerTotals?.total_captured ?? 0;
@@ -1040,42 +1034,29 @@ export default function AdminLedger() {
       {/* Title Header */}
       <div className={`flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between ${flip}`}>
         <div>
-          <h2 className="text-2xl font-serif font-black tracking-tight text-gray-900 leading-tight">{t.title}</h2>
+          <h1 className="text-2xl font-serif font-black tracking-tight text-gray-900 leading-tight">{t.title}</h1>
           <p className="text-xs text-gray-500 font-semibold mt-1">{t.subtitle}</p>
         </div>
         
-        {/* Navigation Tabs */}
-        <div className={`flex items-center gap-1 rounded-full bg-gray-100/80 border border-[#ECECEC] p-1 shadow-sm ${flip}`}>
-          <button 
-            onClick={() => setActiveTab("methods")}
-            className={`rounded-full px-4 py-2 text-[10px] font-black transition-all duration-300 ${activeTab === "methods" ? "bg-white text-gray-900 shadow-sm border border-[#ECECEC]" : "text-[#667085] hover:text-gray-900"}`}
-          >
-            {t.tabMethods}
-          </button>
-          <button 
-            onClick={() => setActiveTab("splits")}
-            className={`rounded-full px-4 py-2 text-[10px] font-black transition-all duration-300 ${activeTab === "splits" ? "bg-white text-gray-900 shadow-sm border border-[#ECECEC]" : "text-[#667085] hover:text-gray-900"}`}
-          >
-            {t.tabSplits}
-          </button>
-          <button 
-            onClick={() => setActiveTab("requests")}
-            className={`rounded-full px-4 py-2 text-[10px] font-black transition-all duration-300 ${activeTab === "requests" ? "bg-white text-gray-900 shadow-sm border border-[#ECECEC]" : "text-[#667085] hover:text-gray-900"}`}
-          >
-            {t.tabPayoutRequests}
-          </button>
-          <button 
-            onClick={() => setActiveTab("statements")}
-            className={`rounded-full px-4 py-2 text-[10px] font-black transition-all duration-300 ${activeTab === "statements" ? "bg-white text-gray-900 shadow-sm border border-[#ECECEC]" : "text-[#667085] hover:text-gray-900"}`}
-          >
-            {t.tabStatements}
-          </button>
-          <button 
-            onClick={() => setActiveTab("reconciliation")}
-            className={`rounded-full px-4 py-2 text-[10px] font-black transition-all duration-300 ${activeTab === "reconciliation" ? "bg-white text-gray-900 shadow-sm border border-[#ECECEC]" : "text-[#667085] hover:text-gray-900"}`}
-          >
-            {t.tabReconciliation}
-          </button>
+        {/* Sections: an APG tab list that scrolls sideways at phone width, so every tab stays reachable */}
+        <div className="-mx-1 max-w-full overflow-x-auto px-1 pb-1">
+          <div role="tablist" aria-label={t.tabsLabel} onKeyDown={onTabKey} className="flex w-max items-center gap-1 rounded-full bg-gray-100/80 border border-[#ECECEC] p-1 shadow-sm">
+            {LEDGER_TABS.map((key) => (
+              <button
+                key={key}
+                id={`ledger-tab-${key}`}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === key}
+                aria-controls={`ledger-panel-${key}`}
+                tabIndex={activeTab === key ? 0 : -1}
+                onClick={() => setActiveTab(key)}
+                className={`whitespace-nowrap rounded-full px-4 py-2 text-[11px] font-black transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928] ${activeTab === key ? "bg-white text-gray-900 shadow-sm border border-[#ECECEC]" : "text-[#667085] hover:text-gray-900"}`}
+              >
+                {tabLabels[key]}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -1095,7 +1076,7 @@ export default function AdminLedger() {
       {/* 0. PAYMENT METHODS REGISTRY TAB                          */}
       {/* ──────────────────────────────────────────────────────── */}
       {activeTab === "methods" && (
-        <div className="space-y-6 animate-fadeIn">
+        <div role="tabpanel" id="ledger-panel-methods" aria-labelledby="ledger-tab-methods" className="space-y-6 animate-fadeIn">
           <PaymentMethodsRegistry lang={lang} cardBase={cardBase} />
         </div>
       )}
@@ -1104,19 +1085,19 @@ export default function AdminLedger() {
       {/* 1. TRANSACTION SPLITS TAB                              */}
       {/* ──────────────────────────────────────────────────────── */}
       {activeTab === "splits" && (
-        <div className="space-y-6 animate-fadeIn">
+        <div role="tabpanel" id="ledger-panel-splits" aria-labelledby="ledger-tab-splits" className="space-y-6 animate-fadeIn">
           {/* Split summary widgets */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Gross Captured */}
             <div className={cardBase}>
               <div className={`flex items-center justify-between ${flip}`}>
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{t.totalGrossTitle}</span>
-                <div className="w-8 h-8 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center text-[#D1AF47] font-serif text-xs font-black">
+                <div className="w-8 h-8 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center text-[#D1AF47] font-serif text-xs font-black" aria-hidden="true">
                   ﷼
                 </div>
               </div>
               <strong className="block text-2xl font-serif font-black text-gray-900 mt-2.5">
-                {totalGross.toLocaleString(lang === "ar" ? "ar-SA" : "en-US")} {lang === "ar" ? "ريال" : "SAR"}
+                {sarAmount(totalGross)}
               </strong>
             </div>
 
@@ -1124,12 +1105,12 @@ export default function AdminLedger() {
             <div className={cardBase}>
               <div className={`flex items-center justify-between ${flip}`}>
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{t.totalPlatformTitle}</span>
-                <div className="w-8 h-8 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center text-amber-700 font-serif text-xs font-black">
+                <div className="w-8 h-8 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center text-amber-700 font-serif text-xs font-black" aria-hidden="true">
                   %
                 </div>
               </div>
               <strong className="block text-2xl font-serif font-black text-amber-700 mt-2.5">
-                {platformTotal.toLocaleString(lang === "ar" ? "ar-SA" : "en-US")} {lang === "ar" ? "ريال" : "SAR"}
+                {sarAmount(platformTotal)}
               </strong>
             </div>
 
@@ -1144,7 +1125,7 @@ export default function AdminLedger() {
                 </div>
               </div>
               <strong className="block text-2xl font-serif font-black text-gray-900 mt-2.5">
-                {providerTotal.toLocaleString(lang === "ar" ? "ar-SA" : "en-US")} {lang === "ar" ? "ريال" : "SAR"}
+                {sarAmount(providerTotal)}
               </strong>
             </div>
           </div>
@@ -1180,13 +1161,13 @@ export default function AdminLedger() {
                           <p className="text-[9px] text-gray-400 font-semibold mt-1">{t.bookingUuid}: {item.booking_id.substring(0, 8)}...</p>
                         </td>
                         <td className="py-4 px-6 font-serif font-black text-gray-900">
-                          {item.total_captured} {lang === "ar" ? "ريال" : "SAR"}
+                          {sarAmount(item.total_captured)}
                         </td>
                         <td className="py-4 px-6 font-serif font-black text-amber-700">
-                          {item.platform_share} {lang === "ar" ? "ريال" : "SAR"}
+                          {sarAmount(item.platform_share)}
                         </td>
                         <td className="py-4 px-6 font-serif font-black text-gray-700">
-                          {item.provider_share} {lang === "ar" ? "ريال" : "SAR"}
+                          {sarAmount(item.provider_share)}
                         </td>
                         <td className="py-4 px-6">
                           <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-block ${
@@ -1225,14 +1206,14 @@ export default function AdminLedger() {
       {/* 2. PAYOUT REQUESTS TAB                                 */}
       {/* ──────────────────────────────────────────────────────── */}
       {activeTab === "requests" && (
-        <div className="bg-white border border-[#ECECEC] rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.015)] animate-fadeIn">
+        <div role="tabpanel" id="ledger-panel-requests" aria-labelledby="ledger-tab-requests" className="bg-white border border-[#ECECEC] rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.015)] animate-fadeIn">
           <div className={`flex items-start justify-between gap-4 border-b border-[#ECECEC] bg-gray-50/50 p-5 ${flip}`}>
             <div>
               <h3 className="font-serif text-lg font-black text-gray-900">{t.payoutRequestsTitle}</h3>
               <p className="mt-1 text-xs font-semibold text-gray-500">{t.payoutRequestsSubtitle}</p>
             </div>
             <span className="rounded-full border border-[#D1AF47]/25 bg-[#D1AF47]/10 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-[#9A7211]">
-              {payoutRequests.length}
+              {t.payoutCount.replace("{n}", count(listTotals.payouts || payoutRequests.length))}
             </span>
           </div>
 
@@ -1285,19 +1266,21 @@ export default function AdminLedger() {
                         </td>
                         <td className="py-4 px-6 text-gray-500">{formatDate(request.requested_at)}</td>
                         <td className="py-4 px-6 font-serif font-black text-gray-900">
-                          {formatMoney(request.amount)} {lang === "ar" ? "ريال" : "SAR"}
+                          {sarAmount(request.amount)}
                         </td>
                         <td className="py-4 px-6">
+                          {!canRevealRequest(request) ? <p className="text-[11px] font-semibold text-gray-500">{t.noBankOnRequest}</p> : <>
                           <p className="font-bold text-gray-900">{request.bank_name}</p>
                           <p dir="ltr" className="mt-1 font-mono text-[9px] text-gray-400">{request.iban_masked}</p>
-                          <button
+                          {canReveal && <button
                             type="button"
                             aria-label={commandCopy[lang].revealFor.replace("{name}", String(providerName))}
                             onClick={() => setMoney({ kind: "reveal", request, providerName: String(providerName) })}
                             className="mt-1 text-[9px] font-black uppercase tracking-wider text-[#725517] underline focus-visible:outline-2 focus-visible:outline-[#9B7928]"
                           >
                             {commandCopy[lang].reveal}
-                          </button>
+                          </button>}
+                          </>}
                         </td>
                         <td className="py-4 px-6">
                           <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-block ${requestStatusClass(request.status)}`}>
@@ -1305,13 +1288,13 @@ export default function AdminLedger() {
                           </span>
                           {request.reconciliation_hold ? (
                             <p className="mt-1 max-w-[220px] text-[10px] font-bold text-[#B54708]">
-                              {commandCopy[lang].reconciliationHold.replace("{n}", String(request.reconciliation_hold.open_breaks)).replace("{amount}", formatMoney(request.reconciliation_hold.amount_sar))}
+                              {commandCopy[lang].reconciliationHold.replace("{n}", count(request.reconciliation_hold.open_breaks)).replace("{amount}", sarAmount(request.reconciliation_hold.amount_sar))}
                             </p>
                           ) : null}
                         </td>
                         <td className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>
                           <div className={`flex flex-wrap gap-2 ${isRTL ? "justify-start" : "justify-end"}`}>
-                            {request.status === "requested" && (
+                            {canDecidePayouts && request.status === "requested" && (
                               <button
                                 type="button"
                                 aria-label={commandCopy[lang].processingFor.replace("{id}", request.id.slice(0, 8).toUpperCase())}
@@ -1322,7 +1305,7 @@ export default function AdminLedger() {
                                 {t.markProcessing}
                               </button>
                             )}
-                            {!isClosed && (
+                            {canDecidePayouts && !isClosed && (
                               <button
                                 type="button"
                                 aria-label={commandCopy[lang].payFor.replace("{id}", request.id.slice(0, 8).toUpperCase())}
@@ -1333,7 +1316,7 @@ export default function AdminLedger() {
                                 {t.markPaid}
                               </button>
                             )}
-                            {!isClosed && (
+                            {canDecidePayouts && !isClosed && (
                               <button
                                 type="button"
                                 aria-label={commandCopy[lang].rejectFor.replace("{id}", request.id.slice(0, 8).toUpperCase())}
@@ -1363,7 +1346,7 @@ export default function AdminLedger() {
       {/* 3. ACCOUNTANT STATEMENTS TAB                            */}
       {/* ──────────────────────────────────────────────────────── */}
       {activeTab === "statements" && (
-        <div className="space-y-6 animate-fadeIn">
+        <div role="tabpanel" id="ledger-panel-statements" aria-labelledby="ledger-tab-statements" className="space-y-6 animate-fadeIn">
           {reportsError && (
             <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800">
               {t.reportsFailed.replace("{reason}", reportsError)}
@@ -1399,8 +1382,8 @@ export default function AdminLedger() {
                       <tr key={`vat-${v.month_start || "month"}-${i}`} className="hover:bg-gray-50/40">
                         <td className="py-4 px-6 font-bold text-gray-900">{formatDateMonth(v.month_start)}</td>
                         <td className="py-4 px-6 font-mono">{v.total_bookings}</td>
-                        <td className="py-4 px-6 font-serif font-black text-amber-700">{formatMoney(v.total_vat_collected)} SAR</td>
-                        <td className="py-4 px-6 font-serif font-black text-gray-900">{formatMoney(v.total_sales)} SAR</td>
+                        <td className="py-4 px-6 font-serif font-black text-amber-700">{sarAmount(v.total_vat_collected)}</td>
+                        <td className="py-4 px-6 font-serif font-black text-gray-900">{sarAmount(v.total_sales)}</td>
                       </tr>
                     ))
                   )}
@@ -1447,10 +1430,10 @@ export default function AdminLedger() {
                           <td className="py-4 px-6 font-bold text-gray-900">{formatDateMonth(s.month_start)}</td>
                           <td className="py-4 px-6 font-bold text-gray-900">{providerName}</td>
                           <td className="py-4 px-6 font-mono">{s.total_transactions}</td>
-                          <td className="py-4 px-6 font-serif font-black text-gray-900">{formatMoney(s.gross_captured_volume)} SAR</td>
-                          <td className="py-4 px-6 font-serif font-black text-amber-700">{formatMoney(s.platform_share_collected)} SAR</td>
-                          <td className="py-4 px-6 font-serif font-black text-gray-900">{formatMoney(s.provider_share_expected)} SAR</td>
-                          <td className="py-4 px-6 font-serif font-black text-[#22C55E]">{formatMoney(s.provider_share_released)} SAR</td>
+                          <td className="py-4 px-6 font-serif font-black text-gray-900">{sarAmount(s.gross_captured_volume)}</td>
+                          <td className="py-4 px-6 font-serif font-black text-amber-700">{sarAmount(s.platform_share_collected)}</td>
+                          <td className="py-4 px-6 font-serif font-black text-gray-900">{sarAmount(s.provider_share_expected)}</td>
+                          <td className="py-4 px-6 font-serif font-black text-[#22C55E]">{sarAmount(s.provider_share_released)}</td>
                         </tr>
                       );
                     })
@@ -1495,7 +1478,7 @@ export default function AdminLedger() {
                           <td className="py-4 px-6 font-bold text-gray-900">{formatDateMonth(e.month_start)}</td>
                           <td className="py-4 px-6 font-bold text-gray-900">{empName}</td>
                           <td className="py-4 px-6 font-mono">{e.total_completed_bookings}</td>
-                          <td className="py-4 px-6 font-serif font-black text-amber-700">{formatMoney(e.total_employee_earnings)} SAR</td>
+                          <td className="py-4 px-6 font-serif font-black text-amber-700">{sarAmount(e.total_employee_earnings)}</td>
                         </tr>
                       );
                     })
@@ -1508,92 +1491,53 @@ export default function AdminLedger() {
       )}
 
       {/* ──────────────────────────────────────────────────────── */}
-      {/* 4. PSP RECONCILIATION & FEE INVOICES TAB (G33, G34)     */}
+      {/* 4. TAP RECONCILIATION RUNS AND MONTHLY FEE INVOICES TAB */}
       {/* ──────────────────────────────────────────────────────── */}
       {activeTab === "reconciliation" && (
-        <div className="space-y-6 animate-fadeIn">
-          {/* Action & Run Header */}
-          <div className={cardBase}>
-            <div className={`flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between ${flip}`}>
+        <div role="tabpanel" id="ledger-panel-reconciliation" aria-labelledby="ledger-tab-reconciliation" className="space-y-6 animate-fadeIn">
+          <div className="bg-white border border-[#ECECEC] rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
+            <div className="flex flex-col gap-3 border-b border-[#ECECEC] bg-gray-50/50 p-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h3 className="font-serif text-lg font-black text-gray-900">{t.reconTitle}</h3>
+                <h2 className="font-serif text-lg font-black text-gray-900">{t.reconTitle}</h2>
                 <p className="mt-1 text-xs font-semibold text-gray-500">{t.reconSubtitle}</p>
               </div>
-              <div className={`flex flex-wrap items-center gap-3 ${flip}`}>
-                <input
-                  type="date"
-                  value={reconDateInput}
-                  onChange={(e) => setReconDateInput(e.target.value)}
-                  className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2 text-xs font-bold text-gray-800 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]"
-                />
-                <button
-                  type="button"
-                  disabled={runningRecon}
-                  onClick={handleRunReconciliation}
-                  className="rounded-xl bg-[#D1AF47] hover:bg-[#b89837] px-4 py-2 text-xs font-black text-white transition disabled:opacity-50 shadow-sm"
-                >
-                  {runningRecon ? t.reconciling : t.runRecon}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Daily Reconciliation Runs Table */}
-          <div className="bg-white border border-[#ECECEC] rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-            <div className="border-b border-[#ECECEC] bg-gray-50/50 p-5">
-              <h3 className="font-serif text-base font-black text-gray-900">{isRTL ? "سجلات مطابقة بوابة Tap اليومية" : "Daily Tap Gateway Reconciliation Runs"}</h3>
+              <Link href="/admin/reconciliation" className="shrink-0 rounded-xl bg-[#101828] px-4 py-2 text-xs font-black text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928]">{t.openReconciliation}</Link>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-xs text-left border-collapse">
+              <table className="w-full text-xs border-collapse">
                 <thead>
-                  <tr className={`border-b border-[#ECECEC] text-[#667085] bg-gray-50/30 uppercase tracking-widest font-extrabold text-[9px] ${isRTL ? "text-right" : ""}`}>
-                    <th className="py-4 px-6">{t.reconDate}</th>
-                    <th className="py-4 px-6">{t.reconGateway}</th>
-                    <th className="py-4 px-6">{t.reconCaptured}</th>
-                    <th className="py-4 px-6">{t.reconRefunded}</th>
-                    <th className="py-4 px-6">{t.reconLedger}</th>
-                    <th className="py-4 px-6">{t.reconDiscrepancy}</th>
-                    <th className="py-4 px-6">{t.reconStatus}</th>
-                    <th className="py-4 px-6">{t.reconNotes}</th>
+                  <tr className="border-b border-[#ECECEC] text-[#667085] bg-gray-50/30 uppercase tracking-widest font-extrabold text-[9px]">
+                    <th scope="col" className="py-4 px-6 text-start">{t.reconDay}</th>
+                    <th scope="col" className="py-4 px-6 text-start">{t.reconStatus}</th>
+                    <th scope="col" className="py-4 px-6 text-start">{t.reconOpenBreaks}</th>
+                    <th scope="col" className="py-4 px-6 text-start">{t.reconTapCharges}</th>
+                    <th scope="col" className="py-4 px-6 text-start">{t.reconRanAt}</th>
                   </tr>
                 </thead>
-                <tbody className={`divide-y divide-[#F5F5F5] font-semibold text-gray-700 ${isRTL ? "text-right" : "text-left"}`}>
+                <tbody className="divide-y divide-[#F5F5F5] font-semibold text-gray-700">
                   {reconLoading ? (
-                    <tr>
-                      <td colSpan={8} className="py-8 text-center text-gray-400 font-bold">{t.loading}</td>
-                    </tr>
+                    <tr><td colSpan={5} className="py-8 text-center text-gray-400 font-bold" role="status">{t.loading}</td></tr>
                   ) : reconError ? (
                     <tr>
-                      <td colSpan={8} className="py-8 text-center">
+                      <td colSpan={5} className="py-8 text-center">
                         <p role="alert" className="font-bold text-[#B42318]">{t.listFailed.replace("{reason}", reconError)}</p>
-                        <button type="button" onClick={() => void loadReconciliationRuns()} className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-xs font-bold text-gray-800 hover:border-gray-500">{t.retry}</button>
+                        <button type="button" onClick={() => void loadReconciliationRuns()} className="mt-3 rounded-xl border border-gray-300 px-4 py-2 text-xs font-bold text-gray-800 hover:border-gray-500 focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.retry}</button>
                       </td>
                     </tr>
                   ) : reconciliationRuns.length === 0 ? (
-                    <tr>
-                      <td colSpan={8} className="py-8 text-center text-gray-400 font-bold">{t.noReconRuns}</td>
-                    </tr>
+                    <tr><td colSpan={5} className="py-8 text-center text-gray-500 font-bold">{t.noReconRuns}</td></tr>
                   ) : (
                     reconciliationRuns.map((run) => (
-                      <tr key={run.id} className="hover:bg-gray-50/40">
-                        <td className="py-4 px-6 font-bold text-gray-900 font-mono">{run.run_date}</td>
-                        <td className="py-4 px-6 font-bold uppercase tracking-wider text-xs">{run.gateway}</td>
-                        <td className="py-4 px-6 font-mono text-emerald-700 font-bold">{run.total_captured_sar === null ? "—" : `${formatMoney(run.total_captured_sar)} SAR`}</td>
-                        <td className="py-4 px-6 font-mono text-rose-700 font-bold">{run.total_refunded_sar === null ? "—" : `${formatMoney(run.total_refunded_sar)} SAR`}</td>
-                        <td className="py-4 px-6 font-mono font-bold">{formatMoney(run.total_ledger_gross_sar)} SAR</td>
-                        <td className="py-4 px-6 font-mono font-bold">{formatMoney(run.discrepancy_amount_sar)} SAR</td>
+                      <tr key={run.business_day} className="hover:bg-gray-50/40">
+                        <td className="py-4 px-6 font-bold text-gray-900">{new Intl.DateTimeFormat(isRTL ? "ar-SA-u-ca-gregory" : "en-GB", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(`${run.business_day}T00:00:00Z`))}</td>
                         <td className="py-4 px-6">
-                          <span className={`inline-block rounded-full px-2.5 py-1 text-[9px] font-black uppercase tracking-wider ${
-                            run.status === "matched"
-                              ? "bg-[#ECFDF3] text-[#027A48] border border-[#D1FADF]"
-                              : run.status === "awaiting_psp_data"
-                              ? "bg-[#F2F4F7] text-[#344054] border border-[#EAECF0]"
-                              : "bg-[#FEF3F2] text-[#B42318] border border-[#FECDCA]"
-                          }`}>
-                            {run.status === "matched" ? t.reconStatusMatched : run.status === "awaiting_psp_data" ? (lang === "ar" ? "بانتظار بيانات Tap" : "Awaiting Tap data") : t.reconStatusDiscrepant}
+                          <span className={`inline-block rounded-full px-2.5 py-1 text-[10px] font-black ${run.status === "matched" ? "bg-[#ECFDF3] text-[#027A48]" : run.status === "breaks" ? "bg-[#FEF3F2] text-[#B42318]" : "bg-[#FFFAEB] text-[#B54708]"}`}>
+                            {t.reconStatuses[run.status] ?? run.status}
                           </span>
                         </td>
-                        <td className="py-4 px-6 text-gray-500 text-[11px] max-w-xs truncate">{run.notes || "—"}</td>
+                        <td className="py-4 px-6">{count(run.counts?.open_breaks)}</td>
+                        <td className="py-4 px-6">{count(run.counts?.tap_charges)}</td>
+                        <td className="py-4 px-6 text-gray-500">{formatDate(run.ran_at)}</td>
                       </tr>
                     ))
                   )}
@@ -1602,30 +1546,24 @@ export default function AdminLedger() {
             </div>
           </div>
 
-          {/* Provider Monthly Fee Invoices (G34) */}
+          {/* Monthly platform fee invoices */}
           <div className="bg-white border border-[#ECECEC] rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
             <div className="border-b border-[#ECECEC] bg-gray-50/50 p-5">
-              <h3 className="font-serif text-base font-black text-gray-900">
-                {isRTL ? "فواتير رسوم عمولات المزودين الشهرية (G34)" : "Monthly Provider Fee & Commission Invoices (G34)"}
-              </h3>
-              <p className="mt-1 text-xs font-semibold text-gray-500">
-                {isRTL 
-                  ? "فواتير عمولة المنصة الشهرية المحسوبة بعد خصم العربون المقبوض وضريبة القيمة المضافة." 
-                  : "Platform commission fee statements after captured deposit offsets and 15% VAT."}
-              </p>
+              <h2 className="font-serif text-base font-black text-gray-900">{t.feeInvoicesTitle}</h2>
+              <p className="mt-1 text-xs font-semibold text-gray-500">{t.feeInvoicesSubtitle}</p>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left border-collapse">
                 <thead>
                   <tr className={`border-b border-[#ECECEC] text-[#667085] bg-gray-50/30 uppercase tracking-widest font-extrabold text-[9px] ${isRTL ? "text-right" : ""}`}>
-                    <th className="py-4 px-6">{isRTL ? "رقم الفاتورة" : "Invoice No."}</th>
-                    <th className="py-4 px-6">{isRTL ? "مزود الخدمة" : "Provider"}</th>
-                    <th className="py-4 px-6">{isRTL ? "الفترة" : "Period"}</th>
-                    <th className="py-4 px-6">{isRTL ? "الحجوزات" : "Bookings"}</th>
-                    <th className="py-4 px-6">{isRTL ? "حجم المبيعات (GMV)" : "Gross GMV"}</th>
-                    <th className="py-4 px-6">{isRTL ? "عمولة المنصة (15%)" : "Commission"}</th>
-                    <th className="py-4 px-6">{isRTL ? "المبلغ المستحق" : "Total Due (Inc. VAT)"}</th>
-                    <th className="py-4 px-6">{isRTL ? "الحالة" : "Status"}</th>
+                    <th scope="col" className="py-4 px-6 text-start">{t.invoiceNo}</th>
+                    <th scope="col" className="py-4 px-6 text-start">{t.invoiceProvider}</th>
+                    <th scope="col" className="py-4 px-6 text-start">{t.invoicePeriod}</th>
+                    <th scope="col" className="py-4 px-6 text-start">{t.invoiceBookings}</th>
+                    <th scope="col" className="py-4 px-6 text-start">{t.invoiceGmv}</th>
+                    <th scope="col" className="py-4 px-6 text-start">{t.invoiceCommission}</th>
+                    <th scope="col" className="py-4 px-6 text-start">{t.invoiceDue}</th>
+                    <th scope="col" className="py-4 px-6 text-start">{t.invoiceStatus}</th>
                   </tr>
                 </thead>
                 <tbody className={`divide-y divide-[#F5F5F5] font-semibold text-gray-700 ${isRTL ? "text-right" : "text-left"}`}>
@@ -1654,10 +1592,10 @@ export default function AdminLedger() {
                           <td className="py-4 px-6 font-mono font-bold text-gray-900">{inv.invoice_number}</td>
                           <td className="py-4 px-6 font-bold">{provName}</td>
                           <td className="py-4 px-6 text-gray-500 font-mono text-[10px]">{inv.period_start} ~ {inv.period_end}</td>
-                          <td className="py-4 px-6 font-mono">{inv.total_bookings_count}</td>
-                          <td className="py-4 px-6 font-mono">{formatMoney(inv.gross_gmv_sar)} SAR</td>
-                          <td className="py-4 px-6 font-mono text-amber-700">{formatMoney(inv.platform_commission_sar)} SAR</td>
-                          <td className="py-4 px-6 font-serif font-black text-gray-900">{formatMoney(inv.total_invoice_due_sar)} SAR</td>
+                          <td className="py-4 px-6 font-mono">{count(inv.total_bookings_count)}</td>
+                          <td className="py-4 px-6 font-mono">{sarAmount(inv.gross_gmv_sar)}</td>
+                          <td className="py-4 px-6 font-mono text-amber-700">{sarAmount(inv.platform_commission_sar)}</td>
+                          <td className="py-4 px-6 font-serif font-black text-gray-900">{sarAmount(inv.total_invoice_due_sar)}</td>
                           <td className="py-4 px-6">
                             <span className="inline-block rounded-full bg-[#ECFDF3] border border-[#D1FADF] px-2.5 py-1 text-[9px] font-black uppercase text-[#027A48]">
                               {inv.status}
