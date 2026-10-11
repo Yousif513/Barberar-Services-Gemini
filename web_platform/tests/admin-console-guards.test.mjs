@@ -257,7 +257,8 @@ describe("admin console guards", () => {
 
   it("filters and tabs live in the address bar and dashboard drill-downs open the view they count", () => {
     const dashboard = page("");
-    for (const link of ["tab=applications&appStatus=pending", "tab=requests", "status=pending_payment"]) {
+    // UXFIX: personal data requests open the privacy screen, where they are worked (not a customers tab).
+    for (const link of ["tab=applications&appStatus=pending", "data_requests: \"/admin/privacy\"", "status=pending_payment"]) {
       assert.ok(dashboard.includes(link), `a dashboard queue opens ${link}`);
     }
     assert.ok(page("/bookings").includes("writeUrlState") && page("/customers").includes("writeUrlState"), "bookings and customers write their filters to the address bar");

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useSyncExternalStore } from "react";
+import { usePathname } from "next/navigation";
+import { consoleRoleNames, rolesGranting, screenPermissions, useConsoleSession } from "@/lib/console-session";
 
 export type OperationsLocale = "en" | "ar";
 const subscribe = (notify: () => void) => {
@@ -30,16 +32,49 @@ export function isForbidden(error: unknown): boolean {
   return code === "42501" || code === "PGRST301" || status === 401 || status === 403 || (typeof message === "string" && /permission denied|row-level security|administrator access required/i.test(message));
 }
 const forbiddenCopy = {
-  en: { title: "You do not have access to this screen", body: "Your account is signed in, but the server refused this request. Ask an owner of the console to give your account the administrator role, then sign in again. Trying again will not help until access is granted.", home: "Back to the dashboard" },
-  ar: { title: "ليس لديك صلاحية الوصول إلى هذه الشاشة", body: "حسابك مسجّل الدخول لكن الخادم رفض هذا الطلب. اطلب من مالك المنصة منح حسابك دور المسؤول ثم سجّل الدخول من جديد. إعادة المحاولة لن تفيد قبل منح الصلاحية.", home: "العودة إلى لوحة المتابعة" },
+  en: {
+    title: "You do not have access to this screen",
+    body: "Your account is signed in, but the server refused this request. Trying again will not help until access is granted.",
+    roleBody: "Your console role, {role}, does not include this screen.",
+    grantedBy: "It is part of the {roles} console role. An owner can change your console role on Roles & Permissions.",
+    grantedByMany: "It is part of these console roles: {roles}. An owner can change your console role on Roles & Permissions.",
+    grantedByNone: "No console role includes it at the moment.",
+    notAdmin: "This account is not a console account. Ask an owner of the console to add it on Roles & Permissions.",
+    home: "Back to the dashboard",
+  },
+  ar: {
+    title: "ليس لديك صلاحية الوصول إلى هذه الشاشة",
+    body: "حسابك مسجّل الدخول لكن الخادم رفض هذا الطلب. إعادة المحاولة لن تفيد قبل منح الصلاحية.",
+    roleBody: "دورك في لوحة الإدارة ({role}) لا يشمل هذه الشاشة.",
+    grantedBy: "هي ضمن دور «{roles}». يمكن للمالك تغيير دورك من شاشة الأدوار والصلاحيات.",
+    grantedByMany: "هي ضمن هذه الأدوار: {roles}. يمكن للمالك تغيير دورك من شاشة الأدوار والصلاحيات.",
+    grantedByNone: "لا يشملها أي دور في لوحة الإدارة حالياً.",
+    notAdmin: "هذا الحساب ليس حساباً في لوحة الإدارة. اطلب من مالك المنصة إضافته من شاشة الأدوار والصلاحيات.",
+    home: "العودة إلى لوحة المتابعة",
+  },
 };
-export function ForbiddenNotice({ locale }: { locale: OperationsLocale }) {
+// The refusal names what is missing: inside the console, the console role in force and the roles that include the screen (from
+// the server's role catalogue); elsewhere a plain refusal. `permissions` is what the refused read needs; by default the screen's.
+export function ForbiddenNotice({ locale, permissions }: { locale: OperationsLocale; permissions?: string[] }) {
   const t = forbiddenCopy[locale];
+  const session = useConsoleSession();
+  const pathname = usePathname() ?? "";
+  const needs = permissions ?? screenPermissions(pathname);
+  const names = consoleRoleNames[locale];
+  const separator = locale === "ar" ? "، " : ", ";
+  let body = t.body;
+  if (session.loaded && session.signedIn && !session.isAdminAccount && pathname.startsWith("/admin")) body = t.notAdmin;
+  else if (session.loaded && session.isAdminAccount && session.role && needs.length > 0) {
+    const granting = rolesGranting(session, needs).map((role) => names[role] ?? role);
+    const grant = granting.length === 0 ? t.grantedByNone
+      : (granting.length === 1 ? t.grantedBy : t.grantedByMany).replace("{roles}", granting.join(separator));
+    body = `${t.roleBody.replace("{role}", names[session.role] ?? session.role)} ${grant}`;
+  }
   return (
     <div role="alert" className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-sm text-amber-950">
       <p className="font-black">{t.title}</p>
-      <p className="mt-1 leading-6">{t.body}</p>
-      <a href="/admin" className="mt-3 inline-block rounded-lg border border-amber-400 bg-white px-3 py-1.5 text-xs font-black text-amber-900 focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.home}</a>
+      <p className="mt-1 leading-6">{body}</p>
+      <a href={pathname.startsWith("/provider") ? "/provider/dashboard" : "/admin"} className="mt-3 inline-block rounded-lg border border-amber-400 bg-white px-3 py-1.5 text-xs font-black text-amber-900 focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.home}</a>
     </div>
   );
 }

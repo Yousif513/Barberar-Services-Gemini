@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
 import { CommandResult, ForbiddenNotice, isForbidden, operationsDate, operationsInput, sar, useOperationsLocale } from "@/components/operations-ui";
-import { CommandDialog, ModalOverlay } from "@/components/modal";
+import { CommandDialog, ModalOverlay, ModalPortal } from "@/components/modal";
 
 // Platform switches and rates: feature flags, marketplace fee rules and the API limits. Every change is a server command
 // that needs the operator's reason and is recorded in the audit log (admin_set_feature_flag, admin_set_api_setting); a fee
@@ -559,6 +559,7 @@ export default function AdminPlatformRules() {
       )}
 
       {ruleForm && (
+        <ModalPortal>
         <ModalOverlay onClose={() => setRuleForm(null)} canClose={!ruleSaving} className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 px-4 py-6 backdrop-blur-sm">
           <div role="dialog" aria-modal="true" aria-labelledby="rule-dialog-title" tabIndex={-1} dir={isRTL ? "rtl" : "ltr"} className="w-full max-w-lg rounded-2xl border border-[#ECECEC] bg-white p-6 text-start shadow-[0_24px_70px_rgba(0,0,0,0.18)]">
             <h3 id="rule-dialog-title" className="font-serif text-xl font-black text-gray-900">{fill(ruleForm.id ? t.ruleTitleEdit : t.ruleTitleAdd, { visit: visitLabel(ruleForm.firstVisit) })}</h3>
@@ -598,6 +599,7 @@ export default function AdminPlatformRules() {
             </div>
           </div>
         </ModalOverlay>
+        </ModalPortal>
       )}
 
       <CommandResult success={success} locale={lang} onDismiss={() => setSuccess("")} />

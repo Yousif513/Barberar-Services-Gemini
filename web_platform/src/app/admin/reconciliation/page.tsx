@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
 import { parseReconciliationRows, type ImportSource } from "@/lib/money-display";
 import { CommandResult, ForbiddenNotice, isForbidden, operationsDate, operationsInput, sar, useOperationsLocale } from "@/components/operations-ui";
-import { ModalOverlay } from "@/components/modal";
+import { ModalOverlay, ModalPortal } from "@/components/modal";
 
 // Tap reconciliation (D-Q9, docs/legal/2026-10-10-adopted-decisions.md). Tap is the record of whether, how much and when money
 // moved; the ledger is the record of who is owed what. A daily run matches every Tap charge, refund and settlement and opens a
@@ -553,6 +553,7 @@ export default function AdminReconciliation() {
       )}
 
       {correction ? (
+        <ModalPortal>
         <ModalOverlay onClose={() => setCorrection(null)} canClose={busy !== "correction"} className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 px-4 py-6 backdrop-blur-sm">
           <div role="dialog" aria-modal="true" aria-labelledby="correction-title" tabIndex={-1} dir={isRTL ? "rtl" : "ltr"} className="w-full max-w-lg space-y-4 rounded-2xl border border-[#ECECEC] bg-white p-6 text-start">
             <h3 id="correction-title" className="font-serif text-xl font-black text-gray-900">{t.correctionTitle}</h3>
@@ -589,6 +590,7 @@ export default function AdminReconciliation() {
             </div>
           </div>
         </ModalOverlay>
+        </ModalPortal>
       ) : null}
 
       <CommandResult success={success} locale={lang} onDismiss={() => setSuccess("")} />

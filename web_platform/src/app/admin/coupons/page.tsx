@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { CommandDialog, ModalOverlay } from "@/components/modal";
+import { CommandDialog, ModalOverlay, ModalPortal } from "@/components/modal";
 import { errorMessage } from "@/lib/error-message";
 
 const translations = {
@@ -397,6 +397,7 @@ export default function AdminCoupons() {
       </div>
 
       {modalOpen && (
+        <ModalPortal>
         <ModalOverlay onClose={() => setModalOpen(false)} canClose={!saving} className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 px-4 py-6 backdrop-blur-sm">
           <div role="dialog" aria-modal="true" aria-labelledby="coupon-dialog-title" tabIndex={-1} className="w-full max-w-lg rounded-2xl border border-[#ECECEC] bg-white p-6 shadow-[0_24px_70px_rgba(0,0,0,0.18)]">
             <div className={`mb-5 flex items-start justify-between gap-4 ${flip}`}>
@@ -479,6 +480,7 @@ export default function AdminCoupons() {
             </div>
           </div>
         </ModalOverlay>
+        </ModalPortal>
       )}
     </div>
   );
