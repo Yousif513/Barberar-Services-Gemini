@@ -314,3 +314,33 @@ describe("N5: moving an incident's awareness time needs a second person and stay
     assert.equal(await count("privacy_incident_events", "incident_id = $1 and event = 'aware_at_correction_rejected'", [i.id]), 1);
   });
 });
+
+describe("N7: a patch-test recorder reads the result only while still staff of that business", () => {
+  it("the recorder loses access when their employment ends; the assigned professional keeps it", async () => {
+    const id = await customer();
+    const b = await booking(id, "confirmed", -5);
+    const recorder = ROLES.user(await createUser(db, { role: "provider_employee" }));
+    const emp = (await one(`insert into employees (branch_id, profile_id, name_en, name_ar) values ($1, $2, 'Recorder', 'المسجل') returning id`,
+      [SEED.branch1, recorder.sub])).id;
+    const assigned = ROLES.user(await createUser(db, { role: "provider_employee" }));
+    const before = (await one(`select profile_id from employees where id = $1`, [SEED.employee1])).profile_id;
+    await sys(db, `update employees set profile_id = $1 where id = $2`, [assigned.sub, SEED.employee1]);
+    try {
+      const pt = (await one(`insert into patch_test_results (provider_id, service_id, customer_id, booking_id, result, tested_at, recorded_by)
+                             values ($1, $2, $3, $4, 'negative', now(), $5) returning id`, [SEED.provider1, svc.id, id, b, recorder.sub])).id;
+      const reads = async (user) => (await as(db, user, `select id from patch_test_results where id = $1`, [pt])).length;
+      assert.equal(await reads(recorder), 1, "active staff who recorded it");
+      assert.equal(await reads(assigned), 1, "the professional assigned to the booking");
+      await sys(db, `update employees set is_active = false where id = $1`, [emp]);
+      assert.equal(await reads(recorder), 0, "the review's reproduction: a former employee still read it");
+      assert.equal(await reads(assigned), 1);
+      await sys(db, `update employees set is_active = true where id = $1`, [emp]);
+      await sys(db, `update employees set branch_id = (select id from branches where provider_id = $1 limit 1) where id = $2`, [SEED.provider2, emp]);
+      assert.equal(await reads(recorder), 0, "staff of another business now");
+      const stranger = ROLES.user(await createUser(db, { role: "provider_employee" }));
+      await expectError(as(db, stranger, `select * from patch_test_results where id = $1`, [pt]).then((r) => { if (r.length === 0) throw new Error("no rows"); }), /no rows/);
+    } finally {
+      await sys(db, `update employees set profile_id = $1 where id = $2`, [before, SEED.employee1]);
+    }
+  });
+});
