@@ -22,3 +22,23 @@ describe("F1: a profile clear under a legal hold", () => {
     assert.equal((src.match(/profileClearHeld: "/g) ?? []).length, 2);
   });
 });
+
+describe("F2: the customer lookup contract", () => {
+  const src = read("app/admin/privacy/customer-picker.tsx");
+  it("uses the last-name initial, never a full last name", () => {
+    assert.match(src, /last_initial: string \| null/);
+    assert.doesNotMatch(src, /last_name/);
+  });
+  it("explains a partial e-mail or phone and the rate limit in English and Arabic", () => {
+    for (const key of ["emailIncomplete", "phoneIncomplete", "limited"]) {
+      assert.equal((src.match(new RegExp(`${key}: "`, "g")) ?? []).length, 2, key);
+    }
+    assert.match(src, /hint === "email_incomplete" \? t\.emailIncomplete/);
+    assert.match(src, /hint === "phone_incomplete" \? t\.phoneIncomplete/);
+    assert.match(src, /if \(result\.refused\)/);
+  });
+  it("names the lookup-limit alert in the approvals inbox in both languages", () => {
+    const inbox = read("app/admin/approvals/page.tsx");
+    assert.equal((inbox.match(/privacy_lookup_limit_reached: "/g) ?? []).length, 2);
+  });
+});

@@ -4,32 +4,42 @@ import React, { useEffect, useId, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
 import { operationsInput } from "@/components/operations-ui";
+import { errorHint } from "@/lib/step-up";
 
 // Finds the customer of a privacy request received by e-mail, phone or in person (ux1-privacy-log-request-needs-full-customer-
 // id-shown-nowhere). The search runs on the server (admin_privacy_find_customers, privacy.manage only), which records each
 // lookup and answers at most 10 customer accounts with the e-mail and phone masked. The operator picks one; the form keeps its id.
+// F2 (2026-10-16 re-check): an e-mail or phone is matched only whole, a name never matches inside an e-mail, the last name comes
+// back as its initial, each search needs a fresh authenticator code, and an operator gets 10 searches per 10 minutes.
 
-export type PickedCustomer = { id: string; first_name: string | null; last_name: string | null; email_masked: string | null; phone_last4: string | null; joined_at: string };
+export type PickedCustomer = { id: string; first_name: string | null; last_initial: string | null; email_masked: string | null; phone_last4: string | null; joined_at: string };
+type LookupResult = { rows: PickedCustomer[]; more: boolean; refused?: boolean; refusal?: string; limit?: number; window_minutes?: number; retry_after?: string };
 
 const copy = {
   en: {
-    label: "Customer", hint: "Search by name, e-mail or phone (at least 3 characters). Each search is recorded in the audit log.",
+    label: "Customer", hint: "Search by at least 3 characters of the name, or the whole e-mail address or phone number. Each search is recorded in the audit log; 10 searches per 10 minutes.",
     search: "Find", searching: "Searching…", none: "No customer account matches. Check the spelling, or search by e-mail or phone.",
-    more: "More than 10 accounts match. Add more of the name, e-mail or phone.", choose: "Choose", chosen: "Selected customer",
+    more: "More than 10 accounts match. Add more of the name, or search by the whole e-mail or phone.", choose: "Choose", chosen: "Selected customer",
     change: "Choose another customer", tooShort: "Type at least 3 characters to search.", failed: "The search failed: {reason}",
     phone: "phone ending {d}", joined: "joined {date}", unnamed: "No name on the account", results: "Matching customers",
+    emailIncomplete: "Type the whole e-mail address; part of an address is not searched.",
+    phoneIncomplete: "Type the whole phone number; part of a number is not searched.",
+    limited: "You have used your {n} searches for {m} minutes. Try again after {time}. The owners were alerted.",
   },
   ar: {
-    label: "العميل", hint: "ابحث بالاسم أو البريد أو الهاتف (٣ أحرف على الأقل). يُسجَّل كل بحث في سجل التدقيق.",
+    label: "العميل", hint: "ابحث بثلاثة أحرف على الأقل من الاسم، أو بالبريد الإلكتروني أو رقم الهاتف كاملاً. يُسجَّل كل بحث في سجل التدقيق؛ ١٠ عمليات بحث كل ١٠ دقائق.",
     search: "بحث", searching: "جارٍ البحث…", none: "لا يوجد حساب عميل مطابق. تحقق من الكتابة أو ابحث بالبريد أو الهاتف.",
-    more: "أكثر من ١٠ حسابات مطابقة. أضف جزءاً أكبر من الاسم أو البريد أو الهاتف.", choose: "اختيار", chosen: "العميل المختار",
+    more: "أكثر من ١٠ حسابات مطابقة. أضف جزءاً أكبر من الاسم، أو ابحث بالبريد أو الهاتف كاملاً.", choose: "اختيار", chosen: "العميل المختار",
     change: "اختيار عميل آخر", tooShort: "اكتب ٣ أحرف على الأقل للبحث.", failed: "تعذّر البحث: {reason}",
     phone: "هاتف ينتهي بـ {d}", joined: "انضم {date}", unnamed: "لا يوجد اسم في الحساب", results: "العملاء المطابقون",
+    emailIncomplete: "اكتب البريد الإلكتروني كاملاً؛ لا يُبحث بجزء من العنوان.",
+    phoneIncomplete: "اكتب رقم الهاتف كاملاً؛ لا يُبحث بجزء من الرقم.",
+    limited: "استخدمت عمليات البحث المتاحة لك ({n} كل {m} دقائق). حاول مجدداً بعد {time}. تم تنبيه الملاك.",
   },
 };
 
-export function customerName(c: Pick<PickedCustomer, "first_name" | "last_name">, fallback: string) {
-  return [c.first_name, c.last_name].filter(Boolean).join(" ") || fallback;
+export function customerName(c: Pick<PickedCustomer, "first_name" | "last_initial">, fallback: string) {
+  return [c.first_name, c.last_initial ? `${c.last_initial}.` : null].filter(Boolean).join(" ") || fallback;
 }
 
 export function CustomerPicker({ lang, value, onChange, error, inputId }: {
@@ -64,8 +74,22 @@ export function CustomerPicker({ lang, value, onChange, error, inputId }: {
     setBusy(true); setProblem("");
     const { data, error: rpcError } = await supabase.rpc("admin_privacy_find_customers", { p_query: q, p_purpose: "privacy_request" });
     setBusy(false);
-    if (rpcError) { setRows(null); setProblem(t.failed.replace("{reason}", errorMessage(rpcError))); return; }
-    const result = data as { rows: PickedCustomer[]; more: boolean };
+    if (rpcError) {
+      setRows(null);
+      const hint = errorHint(rpcError);
+      setProblem(hint === "email_incomplete" ? t.emailIncomplete : hint === "phone_incomplete" ? t.phoneIncomplete
+        : hint === "query_too_short" ? t.tooShort : t.failed.replace("{reason}", errorMessage(rpcError)));
+      return;
+    }
+    const result = data as LookupResult;
+    if (result.refused) {
+      setRows(null);
+      const time = result.retry_after
+        ? new Intl.DateTimeFormat(lang === "ar" ? "ar-SA-u-ca-gregory" : "en-GB", { timeStyle: "short", timeZone: "Asia/Riyadh" }).format(new Date(result.retry_after))
+        : "";
+      setProblem(t.limited.replace("{n}", String(result.limit ?? "")).replace("{m}", String(result.window_minutes ?? "")).replace("{time}", time));
+      return;
+    }
     setRows(result.rows); setMore(Boolean(result.more));
   };
 

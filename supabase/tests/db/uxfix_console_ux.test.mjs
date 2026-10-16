@@ -92,8 +92,9 @@ describe("finding the customer of an off-app privacy request", () => {
     await sys(db, `update profiles set first_name = 'Nouf', last_name = 'Alharbi', email = 'nouf.harbi@example.test' where id = $1`, [target]);
   });
 
-  it("finds by name, e-mail, phone digits and account id, masking contact details", async () => {
-    for (const query of ["Nouf Alh", "nouf.harbi@", "1112233", "050 111 2233".replace(/^0/, "966"), target]) {
+  // F2 (2026-10-16 re-check): the e-mail and the phone match whole values only; partial ones are refused in f123_final_recheck.
+  it("finds by name, whole e-mail, whole phone and account id, masking contact details", async () => {
+    for (const query of ["Nouf Alh", "Nouf.Harbi@example.test", "050 111 2233", "+966501112233", target]) {
       const result = await find(owner, query);
       const row = result.rows.find((r) => r.id === target);
       assert.ok(row, `found by ${query}`);
@@ -101,6 +102,8 @@ describe("finding the customer of an off-app privacy request", () => {
       assert.equal(row.phone_last4, "2233");
       assert.equal(row.email, undefined, "the full e-mail is never returned");
       assert.equal(row.phone_number, undefined, "the full phone is never returned");
+      assert.equal(row.last_initial, "A");
+      assert.equal(row.last_name, undefined, "only the initial of the last name is returned");
     }
     assert.ok((await find(operations, "Nouf")).rows.some((r) => r.id === target), "operations works the privacy queue too");
   });

@@ -107,3 +107,97 @@ describe("F4: the approver of a profile clear needs privacy.approve, not operati
       /permission denied/);
   });
 });
+
+describe("F2: the customer lookup is no longer an oracle that defeats its own masking", () => {
+  const find = (who, query) => call(who, `select admin_privacy_find_customers($1, 'privacy_request') r`, [query]);
+  const newOperator = async () => ROLES.user(await createUser(db, { role: "admin", adminRole: "operations" }));
+  let subject;
+  before(async () => {
+    subject = await customer("Yousif", "yousif.f2@primora-test.com", "+966 50 123 4567");
+  });
+
+  it("matches a phone only as a whole number and refuses part of one (the review rebuilt numbers digit by digit)", async () => {
+    const op = await newOperator();
+    for (const whole of ["966501234567", "+966 50 123 4567", "0501234567", "00966501234567"]) {
+      const out = await find(op, whole);
+      assert.deepEqual(out.rows.map((r) => r.id), [subject], `whole number ${whole}`);
+    }
+    assert.deepEqual((await find(op, "966501234568")).rows, [], "a different whole number matches nothing");
+    for (const part of ["1234567", "50123456", "966501234", "4567"]) {
+      const err = await expectError(find(op, part), /whole phone number|at least 3 characters/);
+      assert.ok(["phone_incomplete", "query_too_short"].includes(err.hint), `refused partial ${part}`);
+    }
+  });
+
+  it("matches an e-mail only as the whole address, case-insensitively, never a substring", async () => {
+    const op = await newOperator();
+    assert.deepEqual((await find(op, "YOUSIF.F2@primora-test.com")).rows.map((r) => r.id), [subject]);
+    assert.deepEqual((await find(op, "yousif.f2@primora-test.co")).rows, [], "a prefix of the address matches nothing");
+    await expectError(find(op, "yousif.f2@"), /whole e-mail address/);
+    await expectError(find(op, "f2@primora-test"), /whole e-mail address/);
+  });
+
+  it("name mode never matches inside an e-mail (the review's 'sif@prim' style probe)", async () => {
+    const op = await newOperator();
+    assert.deepEqual((await find(op, "sif.f2")).rows, [], "text found only in the e-mail is not a name match");
+    assert.deepEqual((await find(op, "primora-test")).rows, []);
+    const byName = await find(op, "Yousif Te");
+    const row = byName.rows.find((r) => r.id === subject);
+    assert.ok(row);
+    assert.deepEqual([row.first_name, row.last_initial, row.email_masked, row.phone_last4], ["Yousif", "T", "y***@primora-test.com", "4567"]);
+    assert.equal(row.last_name, undefined);
+    assert.equal(row.email, undefined);
+    assert.equal(row.phone_number, undefined);
+  });
+
+  it("requires step-up: an aal1 session and a stale code are refused", async () => {
+    const op = await newOperator();
+    await expectError(find(aal1(op.sub), "Yousif"), /Administrator access required|step-up required/);
+    await expectError(find(stale(op.sub), "Yousif"), /step-up required/);
+    await expectError(find(finance, "Yousif"), /console role cannot do this/);
+  });
+
+  it("allows 10 lookups per actor in 10 minutes, then refuses, records the refusal and raises one alert (the review ran 200)", async () => {
+    const op = await newOperator();
+    const other = await newOperator();
+    const results = [];
+    for (let i = 0; i < 14; i += 1) results.push(await find(op, `Yousif${i % 2 ? "" : " Te"}`));
+    assert.equal(results.filter((r) => !r.refused).length, 10);
+    assert.equal(results[9].remaining, 0);
+    for (const r of results.slice(10)) {
+      assert.deepEqual([r.refused, r.refusal, r.rows.length, r.limit, r.window_minutes], [true, "lookup_limit_reached", 0, 10, 10]);
+      assert.ok(r.retry_after);
+    }
+    const n = async (action) => (await one(`select count(*)::int n from admin_audit_logs where action = $1 and actor_id = $2`, [action, op.sub])).n;
+    assert.equal(await n("privacy.subject_lookup"), 10);
+    assert.equal(await n("privacy.subject_lookup_refused"), 4);
+    assert.equal((await one(`select count(*)::int n from security_alerts where kind = 'privacy_lookup_limit_reached' and user_id = $1`, [op.sub])).n, 1,
+      "one alert for the window, not one per refusal");
+    assert.equal((await find(other, "Yousif")).refused, false, "another actor has their own allowance");
+  });
+
+  it("audits a keyed digest of the normalised query, never its text, so repeated and stepwise probing shows", async () => {
+    const op = await newOperator();
+    await find(op, "+966 50 123 4567");
+    await find(op, "0501234567");
+    await find(op, "yousif.f2@primora-test.com");
+    const rows = await sys(db, `select details from admin_audit_logs where action = 'privacy.subject_lookup' and actor_id = $1 order by created_at, id`, [op.sub]);
+    const [a, b, c] = rows.map((r) => r.details.filter);
+    assert.match(a.query_hmac, /^[0-9a-f]{64}$/);
+    assert.equal(a.query_hmac, b.query_hmac, "the same number written two ways gives the same digest");
+    assert.notEqual(a.query_hmac, c.query_hmac);
+    assert.deepEqual([a.query_kind, c.query_kind], ["phone", "email"]);
+    const plain = (await one(`select encode(extensions.digest(convert_to('phone:501234567', 'UTF8'), 'sha256'), 'hex') h`)).h;
+    assert.notEqual(a.query_hmac, plain, "keyed: an auditor cannot brute-force the number from the log");
+    const text = JSON.stringify(rows);
+    assert.ok(!text.includes("501234567") && !text.includes("yousif.f2"), "the query text stays out of the log");
+  });
+
+  it("no client role can read the digest key", async () => {
+    for (const role of ["anon", "authenticated", "service_role"]) {
+      assert.equal((await one(`select has_table_privilege($1, 'public.privacy_lookup_keys', 'SELECT') ok`, [role])).ok, false, role);
+    }
+    await expectError(as(db, owner, `select secret from privacy_lookup_keys`), /permission denied/);
+    await expectError(as(db, owner, `select privacy_lookup_digest('phone', '501234567')`), /permission denied/);
+  });
+});
