@@ -43,7 +43,10 @@ const translations = {
     noShow: "No-show",
     releaseHolds: "Release expired unpaid holds",
     cancelTitle: "Cancel this booking",
-    cancelIntro: "Everything captured for this booking is refunded to the customer. You need a recent sign-in check; a refund needs a finance approver when you hold no refund permission, when it is SAR 1,000 or more, or when it takes you past SAR 5,000 today.",
+    cancelIntro: "Everything captured for this booking is refunded to the customer. You need a recent sign-in check; a refund needs a finance approver when you hold no refund permission, when it is {single} or more, or when it takes you past {daily} today.",
+    cancelIntroNoThresholds: "Everything captured for this booking is refunded to the customer. You need a recent sign-in check; a refund needs a finance approver when you hold no refund permission, or when it reaches the single-refund or daily-total threshold set under Approvals. The current thresholds could not be loaded: {reason}",
+    thresholdsMissing: "the thresholds are not set",
+    loadingThresholds: "Everything captured for this booking is refunded to the customer. You need a recent sign-in check; a refund needs a finance approver when you hold no refund permission or when it reaches the approval thresholds (loading the current thresholds…).",
     noShowTitle: "Mark this booking as a no-show",
     noShowIntro: "The shop's no-show fee applies and the rest is refunded. A refund follows the same approval rules as a cancellation.",
     completeTitle: "Mark this booking as completed",
@@ -126,7 +129,10 @@ const translations = {
     noShow: "عدم حضور",
     releaseHolds: "إطلاق الحجوزات غير المدفوعة المنتهية",
     cancelTitle: "إلغاء هذا الحجز",
-    cancelIntro: "يُسترد للعميل كامل المبلغ المقبوض لهذا الحجز. يلزم تحقق حديث من الدخول، ويحتاج الاسترداد إلى موافقة مسؤول مالي إذا لم تكن لديك صلاحية الاسترداد، أو كان ١٬٠٠٠ ريال أو أكثر، أو تجاوز به مجموعك اليومي ٥٬٠٠٠ ريال.",
+    cancelIntro: "يُسترد للعميل كامل المبلغ المقبوض لهذا الحجز. يلزم تحقق حديث من الدخول، ويحتاج الاسترداد إلى موافقة مسؤول مالي إذا لم تكن لديك صلاحية الاسترداد، أو كان {single} أو أكثر، أو تجاوز به مجموعك اليومي {daily}.",
+    cancelIntroNoThresholds: "يُسترد للعميل كامل المبلغ المقبوض لهذا الحجز. يلزم تحقق حديث من الدخول، ويحتاج الاسترداد إلى موافقة مسؤول مالي إذا لم تكن لديك صلاحية الاسترداد، أو إذا بلغ حد الاسترداد الواحد أو حد المجموع اليومي المحددين في صفحة الموافقات. تعذّر تحميل الحدود الحالية: {reason}",
+    thresholdsMissing: "الحدود غير مضبوطة",
+    loadingThresholds: "يُسترد للعميل كامل المبلغ المقبوض لهذا الحجز. يلزم تحقق حديث من الدخول، ويحتاج الاسترداد إلى موافقة مسؤول مالي إذا لم تكن لديك صلاحية الاسترداد أو إذا بلغ حدود الاعتماد (جارٍ تحميل الحدود الحالية…).",
     noShowTitle: "تسجيل هذا الحجز كعدم حضور",
     noShowIntro: "تُطبق رسوم عدم الحضور الخاصة بالمركز ويُسترد الباقي، ويخضع الاسترداد لقواعد الموافقة نفسها المطبقة على الإلغاء.",
     completeTitle: "تسجيل هذا الحجز كمكتمل",
@@ -298,6 +304,38 @@ function BookingsScreen() {
     };
   }, [statusFilter, search, from, to, page, reloadKey, rangeInvalid]);
 
+  // The refund approval thresholds the server applies (governance_settings, changed only through an approved request), read each
+  // time a cancellation dialog opens so the dialog never states a figure the server no longer uses.
+  const [thresholds, setThresholds] = useState<{ single: number; daily: number } | { error: string } | null>(null);
+  const cancelOpen = pending?.kind === "cancel";
+  useEffect(() => {
+    if (!cancelOpen) return;
+    let cancelled = false;
+    void supabase
+      .from("governance_settings")
+      .select("key, value")
+      .in("key", ["refund_single_approval_sar", "refund_daily_cumulative_sar"])
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        const rows = (data ?? []) as { key: string; value: number | string }[];
+        const single = rows.find((r) => r.key === "refund_single_approval_sar");
+        const daily = rows.find((r) => r.key === "refund_daily_cumulative_sar");
+        if (error || !single || !daily) {
+          setThresholds({ error: error ? errorMessage(error) : "not_configured" });
+        } else {
+          setThresholds({ single: Number(single.value), daily: Number(daily.value) });
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [cancelOpen]);
+  const cancelIntro = () => {
+    if (thresholds === null) return t.loadingThresholds;
+    if ("error" in thresholds) return t.cancelIntroNoThresholds.replace("{reason}", thresholds.error === "not_configured" ? t.thresholdsMissing : thresholds.error);
+    return t.cancelIntro.replace("{single}", sar(thresholds.single, lang)).replace("{daily}", sar(thresholds.daily, lang));
+  };
+
   // Booking commands run on the server: admin_cancel_booking and admin_mark_booking_no_show (step-up, reason, and the refund
   // approval rules of D-Q5, SECFIX-2 R2-H2) and employee_update_booking_status for completion; each writes the audit log. A refusal goes back to
   // the dialog, which stays open with what the operator typed; a success is announced and the list read again.
@@ -325,7 +363,10 @@ function BookingsScreen() {
 
   const renderDialog = () => {
     if (!pending) return null;
-    const close = () => setPending(null);
+    const close = () => {
+      setPending(null);
+      setThresholds(null);
+    };
     if (pending.kind === "release") {
       return (
         <CommandDialog
@@ -365,7 +406,7 @@ function BookingsScreen() {
         locale={lang}
         tone="danger"
         title={cancelling ? t.cancelTitle : t.noShowTitle}
-        intro={cancelling ? t.cancelIntro : t.noShowIntro}
+        intro={cancelling ? cancelIntro() : t.noShowIntro}
         facts={facts}
         reasonLabel={t.reasonLabel}
         confirmLabel={cancelling ? t.confirmCancel : t.confirmNoShow}
