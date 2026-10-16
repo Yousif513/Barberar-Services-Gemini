@@ -1156,7 +1156,8 @@
           "tests": [
             "supabase/tests/db/qa_adversarial.test.mjs",
             "supabase/tests/db/qa_defect_fixes.test.mjs",
-            "supabase/tests/db/secfix2_console_cancellations.test.mjs"
+            "supabase/tests/db/secfix2_console_cancellations.test.mjs",
+            "web_platform/tests/booking-cancel-thresholds.test.mjs"
           ],
           "evidence": [
             "supabase/migrations/20261011110000_secfix2_h2_console_cancellations.sql",
@@ -6125,9 +6126,10 @@
           "concurrency": "Governance token, row locks, recorded erasure run bound to the transaction id.",
           "recovery": "Irreversible by design; the preview is shown to customer, maker and approver; records with a legal basis are kept.",
           "tests": [
+            "scripts/verify-privacy-local.mjs",
+            "supabase/tests/db/final_priv_recheck.test.mjs",
             "supabase/tests/db/priv_privacy.test.mjs",
-            "supabase/tests/privacy-erasure.test.mjs",
-            "scripts/verify-privacy-local.mjs"
+            "supabase/tests/privacy-erasure.test.mjs"
           ],
           "evidence": [
             "supabase/migrations/20261011220000_priv_deletion_engine.sql",
@@ -6171,7 +6173,9 @@
           "concurrency": "Row lock on review/release.",
           "recovery": "A released hold cannot be re-activated; a new hold is proposed.",
           "tests": [
-            "supabase/tests/db/priv_privacy.test.mjs"
+            "supabase/tests/db/final_priv_recheck.test.mjs",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "web_platform/tests/final-approval-kinds.test.mjs"
           ],
           "evidence": [
             "supabase/migrations/20261011220000_priv_deletion_engine.sql",
@@ -6214,6 +6218,7 @@
           "concurrency": "Each subject erased in its own recorded run.",
           "recovery": "Archive entries restore the ledger itself.",
           "tests": [
+            "supabase/tests/db/final_priv_recheck.test.mjs",
             "supabase/tests/db/priv_privacy.test.mjs"
           ],
           "evidence": [
@@ -6259,8 +6264,9 @@
           "concurrency": "Set-based delete; gate read per call.",
           "recovery": "Purged answers are gone by design; the customer completes a new form.",
           "tests": [
-            "supabase/tests/db/priv_privacy.test.mjs",
-            "supabase/tests/db/intake.test.mjs"
+            "supabase/tests/db/final_priv_recheck.test.mjs",
+            "supabase/tests/db/intake.test.mjs",
+            "supabase/tests/db/priv_privacy.test.mjs"
           ],
           "evidence": [
             "supabase/migrations/20261011230000_priv_health_intake.sql",
@@ -6394,7 +6400,9 @@
           "concurrency": "Row lock FOR UPDATE.",
           "recovery": "Closed incidents are kept as recorded.",
           "tests": [
-            "supabase/tests/db/priv_privacy.test.mjs"
+            "supabase/tests/db/final_priv_recheck.test.mjs",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "web_platform/tests/final-approval-kinds.test.mjs"
           ],
           "evidence": [
             "supabase/migrations/20261011240000_priv_incident_register.sql",
@@ -8994,6 +9002,80 @@
       "appliesTo": [
         "admin-dashboard",
         "admin-roles"
+      ]
+    },
+    {
+      "id": "final-money-records-restrict-booking-delete",
+      "decision": "Every money table's foreign key to bookings is ON DELETE RESTRICT and privacy_booking_is_linked counts tips, coupon, gift-card, wallet-credit, package, loyalty and referral records; a booking with any money record is pseudonymised, never deleted.",
+      "reason": "Review M3/N2 (docs/reviews/2026-10-11-security-priv-recheck.md).",
+      "evidence": [
+        "supabase/migrations/20261016100000_final_money_records_keep_booking.sql",
+        "supabase/tests/db/final_priv_recheck.test.mjs"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "privacy.deletion"
+      ]
+    },
+    {
+      "id": "final-hold-release-four-eyes",
+      "decision": "A console release of any legal hold before it ends on its own is a privacy_legal_hold_release approval request decided after step-up by a different privacy.approve holder; the scheduler's dispute-hold release 30 days after closure is unchanged.",
+      "reason": "Review N3: one person could release a court hold and erase the account at once.",
+      "evidence": [
+        "supabase/migrations/20261016120000_final_hold_release_and_renewal_four_eyes.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "privacy.legal-hold"
+      ]
+    },
+    {
+      "id": "final-hold-renewal-fresh-owner-after-3",
+      "decision": "After 3 renewals (about one year) a hold is kept only with a privacy_legal_hold_renewal request decided by an owner who never proposed, approved or renewed it. Chosen over a hard cap on total duration: a cap would release, and so irreversibly erase, records a court may still need; an unrenewed hold stays visible as overdue.",
+      "reason": "Review info note: two people could alternate renewals indefinitely. N=3 is an assumption awaiting owner confirmation.",
+      "evidence": [
+        "supabase/migrations/20261016120000_final_hold_release_and_renewal_four_eyes.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "privacy.legal-hold"
+      ]
+    },
+    {
+      "id": "final-incident-aware-at-second-person",
+      "decision": "Correcting an incident's awareness time is an incident_aware_at_correction approval request decided by a second incident.manage holder; requested, corrected and rejected are each a new append-only privacy_incident_events row; still at most one correction.",
+      "reason": "Review N5.",
+      "evidence": [
+        "supabase/migrations/20261016130000_final_incident_aware_at_second_person.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "incident.register"
+      ]
+    },
+    {
+      "id": "final-phone-tenure-scrub",
+      "decision": "Phone-based scrubbing and WhatsApp erasure apply only inside the time the erased account held the number (account_contact_changes boundaries), never to rows addressed to another account, and never by walk-in phone.",
+      "reason": "Review N6: reassigned numbers.",
+      "evidence": [
+        "supabase/migrations/20261016150000_final_contact_scrub_by_tenure.sql",
+        "supabase/functions/_shared/privacy-erasure.ts"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "privacy.deletion"
+      ]
+    },
+    {
+      "id": "final-retention-purge-anonymise-ledger-referenced",
+      "decision": "privacy_purge_expired_retention deletes an erased customer's expired customer-side money sub-records and unreferenced pseudonymised bookings, and keeps ledger-referenced bookings with the fixed marker 'retention-ended'; ledger, invoices, refunds and disputes are never deleted. Financial year assumed = calendar year (as privacy_retention_until already did). Not scheduled.",
+      "reason": "Review N8 over-retention; deleting ledger rows would change balances and payout history.",
+      "evidence": [
+        "supabase/migrations/20261016160000_final_retention_purge.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "privacy.deletion-ledger"
       ]
     }
   ],
@@ -11726,7 +11808,7 @@
       "id": "money-fee-invoice-test-is-date-dependent",
       "severity": "low",
       "description": "supabase/tests/db/money.test.mjs 'invoices the fee still owed after what the deposit already covered' books a visit in the current month and then invoices that month, which generate_provider_monthly_fee_invoice refuses ('only for a closed month'); test:db fails 1/1401 on any day the booking falls in an open month (seen 2026-10-16, unrelated to UXFIX).",
-      "status": "open",
+      "status": "fixed",
       "rationale": "Book the visit in the previous Riyadh month in the fixture.",
       "evidence": [
         "supabase/tests/db/money.test.mjs"
@@ -11736,10 +11818,62 @@
       "id": "bookings-cancel-copy-names-fixed-thresholds",
       "severity": "low",
       "description": "/admin/bookings cancel dialog copy says a refund needs a finance approver at 'SAR 1,000 or more' or 'past SAR 5,000 today'; those thresholds are governance_settings an owner can change, so the copy can contradict the rule in force.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "Interpolate the thresholds from the governance settings the server answers.",
       "evidence": [
-        "web_platform/src/app/admin/bookings/page.tsx"
+        "web_platform/src/app/admin/bookings/page.tsx",
+        "web_platform/tests/booking-cancel-thresholds.test.mjs"
+      ]
+    },
+    {
+      "id": "retention-purge-not-scheduled",
+      "severity": "medium",
+      "description": "privacy_purge_expired_retention exists (dry run by default) but no pg_cron job runs it. The owner decides the schedule and whether a dry-run report is reviewed before each real run.",
+      "status": "blocked",
+      "rationale": "Owner decision: when an irreversible purge runs in production.",
+      "evidence": [
+        "supabase/migrations/20261016160000_final_retention_purge.sql"
+      ]
+    },
+    {
+      "id": "retention-end-delete-or-anonymise-books",
+      "severity": "medium",
+      "description": "After 10 years the purge keeps ledger-referenced pseudonymised bookings as anonymous accounting records (marker 'retention-ended') and never deletes ledger, invoice, refund or dispute rows. Whether those books must be deleted rather than anonymised after the Commercial Books Law / VAT IR period, and whether the financial year is the calendar year, is a legal interpretation.",
+      "status": "blocked",
+      "rationale": "Legal interpretation (ZATCA retention, PDPL) needs a human.",
+      "evidence": [
+        "supabase/migrations/20261016160000_final_retention_purge.sql"
+      ]
+    },
+    {
+      "id": "hold-renewal-reapproval-threshold-unconfirmed",
+      "severity": "low",
+      "description": "A legal hold needs a fresh owner's approval from its 4th renewal (privacy_hold_renewals_before_reapproval = 3). The number 3 is an assumption.",
+      "status": "open",
+      "rationale": "Owner to confirm or change N.",
+      "evidence": [
+        "supabase/migrations/20261016120000_final_hold_release_and_renewal_four_eyes.sql"
+      ]
+    },
+    {
+      "id": "historic-audit-rows-link-erased-subjects-to-holds",
+      "severity": "low",
+      "description": "Audit rows written before 20261016110000 (row-level itemisation of hold proposals, privacy.note_added with note text, approval.approved results with hold references) are append-only and still pair some erased subjects with hold or booking ids or note text. New writes no longer do.",
+      "status": "open",
+      "rationale": "Security to decide whether an audited redaction of historic admin_audit_logs rows is allowed.",
+      "evidence": [
+        "supabase/migrations/20261016110000_final_erasure_unlinking_and_staff_notes.sql"
+      ]
+    },
+    {
+      "id": "final-screens-not-browser-verified",
+      "severity": "low",
+      "description": "The bookings cancel dialog thresholds and the new pending-approval messages on privacy, incidents and approvals screens are covered by source tests and typecheck only; the browser pane was not signed in to the console.",
+      "status": "open",
+      "rationale": "UX reviewer to verify with a TOTP console session.",
+      "evidence": [
+        "web_platform/tests/booking-cancel-thresholds.test.mjs",
+        "web_platform/tests/final-approval-kinds.test.mjs"
       ]
     }
   ],
@@ -12712,6 +12846,36 @@
         "web_platform/src/components/modal.tsx"
       ],
       "status": "open"
+    },
+    {
+      "id": "final-python-text-mode-writes-crlf",
+      "observation": "Editing files with Python open(p,'w') on Windows silently converts LF to CRLF; patterns then fail to match CRLF files. Use newline='' and normalise patterns to the file's line ending.",
+      "category": "tooling",
+      "proposedChange": "implementer checklist (Windows): edit with newline='' or the Edit tool.",
+      "evidence": [
+        "supabase/migrations/20261016110000_final_erasure_unlinking_and_staff_notes.sql"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "final-row-audit-can-recreate-links-erasure-removed",
+      "observation": "The generic row-level console audit trigger copies subject_id and booking_id of privacy rows into the append-only audit log, which recreates links an erasure is meant to break; privacy unlinking writes must suppress itemisation and audit explicitly.",
+      "category": "gap",
+      "proposedChange": "security-governance reference: check what the generic audit trigger copies for every pseudonymisation path.",
+      "evidence": [
+        "supabase/migrations/20261016110000_final_erasure_unlinking_and_staff_notes.sql"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "final-date-dependent-tests",
+      "observation": "A test that schedules a fixture N days before now fails for part of every month when the function refuses open months; pin fixtures to a period computed from the database clock.",
+      "category": "gap",
+      "proposedChange": "qa checklist: period-based money tests compute their period from now() in the business time zone.",
+      "evidence": [
+        "supabase/tests/db/money.test.mjs"
+      ],
+      "status": "open"
     }
   ],
   "agents": [
@@ -12924,6 +13088,15 @@
       "status": "done",
       "notes": "Fixes the 23 ux1- gaps of docs/reviews/2026-10-11-ux-review.md.",
       "worklog": ".admin-console/worklog/impl-uxfix-claude.md"
+    },
+    {
+      "id": "impl-final-claude",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "handed-off",
+      "notes": "Closes the open items of docs/reviews/2026-10-11-security-priv-recheck.md (M3/N2, M5/N1, N3-N9, info), the date-dependent fee-invoice test and the cancel dialog thresholds.",
+      "worklog": ".admin-console/worklog/impl-final-claude.md"
     }
   ]
 }
