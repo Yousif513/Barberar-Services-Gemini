@@ -27,6 +27,8 @@ export function getDevRole(): DevRole | null {
 
 export function setDevRole(role: DevRole) {
   if (!isLocalDevAccessEnabled()) return false;
+  // The admin console needs a real sign-in (console role and authenticator code): the database refuses everything else.
+  if (role === "admin") return false;
   window.localStorage.setItem(storageKey, role);
   return true;
 }

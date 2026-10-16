@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { devRoleHome, getDevRole } from "@/lib/dev-access";
+import { clearDevRole, devRoleHome, getDevRole } from "@/lib/dev-access";
 import { useOperationsLocale } from "@/components/operations-ui";
 
 type UserRole = "customer" | "provider_owner" | "provider_employee" | "admin";
@@ -38,7 +38,13 @@ export function AuthGuard({
     let active = true;
 
     const authorize = async () => {
-      const devRole = getDevRole();
+      let devRole = getDevRole();
+      // The console is authorized by the database (a console role and an authenticator-verified session), so a local
+      // preview as "admin" without signing in shows only refused screens. It is ended here and the real sign-in follows.
+      if (devRole === "admin") {
+        clearDevRole();
+        devRole = null;
+      }
       if (devRole) {
         // A local dev role opens only the dashboards that role may use, like a real session.
         if (!allowedRolesKey.split(",").includes(devRole)) {
