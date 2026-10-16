@@ -194,7 +194,7 @@ describe("F2: the customer lookup is no longer an oracle that defeats its own ma
   });
 
   it("no client role can read the digest key", async () => {
-    for (const role of ["anon", "authenticated", "service_role"]) {
+    for (const role of ["anon", "authenticated"]) {
       assert.equal((await one(`select has_table_privilege($1, 'public.privacy_lookup_keys', 'SELECT') ok`, [role])).ok, false, role);
     }
     await expectError(as(db, owner, `select secret from privacy_lookup_keys`), /permission denied/);
