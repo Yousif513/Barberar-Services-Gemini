@@ -108,3 +108,83 @@ describe("M3 / N2: a booking with any money record is pseudonymised, never delet
     assert.deepEqual(rules.filter((r) => r.d !== "r").map((r) => r.t), [], "every money table restricts the booking's deletion");
   });
 });
+
+// Every public table row that still names the person must not also name a record a hold kept (or the hold itself).
+// The person is named by their id, and also by the id of each of their privacy requests and of the approvals of those requests.
+async function rowsLinking(subjectId, needles) {
+  const ids = [subjectId, ...(await sys(db, `select id::text i from privacy_requests where subject_id = $1
+                                              union select a.id::text from admin_approval_requests a join privacy_requests q on q.id = a.target_id
+                                              where q.subject_id = $1`, [subjectId])).map((r) => r.i)];
+  const tables = await sys(db, `select table_name from information_schema.tables where table_schema = 'public' and table_type = 'BASE TABLE'`);
+  const hits = [];
+  for (const { table_name: t } of tables) {
+    const n = (await one(`select count(*)::int n from public."${t}" x where x::text ilike any($1::text[]) and x::text ilike any($2::text[])`,
+      [ids.map((v) => `%${v}%`), needles.map((v) => `%${v}%`)])).n;
+    if (n) hits.push(t);
+  }
+  return hits;
+}
+
+describe("M5 / N1: after a hold ends nothing ties the erased person to what it kept", () => {
+  it("a released dispute hold leaves no run, summary, notice, approval or audit row pairing the person with the booking", async () => {
+    const id = await customer();
+    const b = await booking(id);
+    await ledger(b, `chg_final_n1_${seq}`);
+    const dispute = (await one(`insert into payment_disputes (booking_id, customer_id, provider_id, charge_id, disputed_amount_sar, reason, status)
+                                values ($1, $2, $3, 'chg_final_n1', 115, 'Not as described', 'opened') returning id`, [b, id, SEED.provider1])).id;
+    const { request } = await erase(id);
+    const hold = await one(`select * from privacy_legal_holds where dispute_id = $1`, [dispute]);
+    assert.equal(hold.status, "active");
+    const summary = (await one(`select completion_summary from privacy_requests where id = $1`, [request.id])).completion_summary;
+    assert.equal(summary.held[0].reference, `payment_dispute:${dispute}`, "while the hold lasts the customer is told what is held");
+    await sys(db, `update payment_disputes set status = 'closed', resolved_at = now() - interval '31 days' where id = $1`, [dispute]);
+    assert.ok((await call(ROLES.service, `select privacy_release_due_holds() r`)).released >= 1);
+
+    const token = (await one(`select pseudonym_token from bookings where id = $1`, [b])).pseudonym_token;
+    assert.match(token, /^[0-9a-f]{32}$/, "the booking is kept, pseudonymised");
+    const needles = [b, dispute, hold.id, token];
+    assert.deepEqual(await rowsLinking(id, needles), [], "the review's reproduction: privacy_erasure_runs and the summaries named the booking");
+    const after = await one(`select subject_id, booking_id, dispute_id, approval_request_id, case_reference, pseudonym_token from privacy_legal_holds where id = $1`, [hold.id]);
+    assert.deepEqual([after.subject_id, after.booking_id, after.dispute_id, after.approval_request_id, after.pseudonym_token], [null, null, null, null, null]);
+    assert.equal(after.case_reference, "payment_dispute");
+    const done = (await one(`select completion_summary from privacy_requests where id = $1`, [request.id])).completion_summary;
+    assert.equal(done.held[0].reference, undefined);
+    assert.equal(done.held[0].released, true);
+    assert.deepEqual(done.held[0].categories, ["bookings", "messages"], "the customer's record still says a hold existed and ended");
+    const runs = await sys(db, `select subject_id, request_id, summary from privacy_erasure_runs where summary::text ilike $1`, [`%${b}%`]);
+    assert.deepEqual(runs, [], "no run names the booking");
+  });
+
+  it("a hold proposal is audited without the subject or the booking", async () => {
+    const id = await customer();
+    const hold = await call(operations, `select admin_privacy_propose_legal_hold($1, 'court_case', 'CASE-1447-555', $2::text[], null, $3) r`,
+      [id, ["bookings"], "Riyadh commercial court case 1447/555 names this customer"]);
+    const rows = await sys(db, `select action, details::text d from admin_audit_logs where target_id = $1`, [hold.hold_id]);
+    assert.ok(rows.some((r) => r.action === "privacy.legal_hold_proposed"));
+    assert.ok(rows.every((r) => !r.d.includes(id)), "no audit row on the hold names the person");
+    await decide(owner, hold.approval_id, "reject");
+  });
+});
+
+describe("N4: staff notes go with the account", () => {
+  it("erases the notes on every request of the person, redacts a later note and never copies a note's text into the audit log", async () => {
+    const id = await customer();
+    const access = await submit(otp(id), "access");
+    await call(operations, `select admin_privacy_add_note($1, 'Customer phoned from 0501234567 asking') r`, [access.id]);
+    const del = await submit(otp(id), "deletion", { review_choice: "delete_text" });
+    await call(operations, `select admin_privacy_add_note($1, 'Called back on 0501234567, sara@example.com') r`, [del.id]);
+    const audit = await sys(db, `select details::text d from admin_audit_logs where action = 'privacy.note_added' and target_id = any($1::uuid[])`, [[access.id, del.id]]);
+    assert.equal(audit.length, 2);
+    assert.ok(audit.every((r) => !r.d.includes("0501234567") && r.d.includes("note_length")), "the audit log keeps the length, not the text");
+    await decide(owner2, (await propose(operations, del.id)).approval_id);
+    const notes = await sys(db, `select staff_notes from privacy_requests where subject_id = $1`, [id]);
+    assert.ok(notes.length >= 2);
+    assert.deepEqual(notes.map((n) => n.staff_notes), notes.map(() => null), "the review's reproduction kept the phone on the deletion request");
+    await call(operations, `select admin_privacy_add_note($1, 'Worker retried; customer emailed from x.y@example.com and +966 50 123 4567') r`, [del.id]);
+    const later = (await one(`select staff_notes from privacy_requests where id = $1`, [del.id])).staff_notes;
+    assert.match(later, /\[redacted e-mail\]/);
+    assert.match(later, /\[redacted number\]/);
+    assert.ok(!later.includes("example.com") && !later.includes("123 4567"));
+    await expectError(call(ROLES.user(id), `select admin_privacy_add_note($1, 'my own note') r`, [del.id]), /privacy.manage|console|permission|Administrator/);
+  });
+});
