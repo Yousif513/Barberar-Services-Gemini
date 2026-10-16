@@ -8310,11 +8310,12 @@
         "supabase/migrations/20260613010000_triggers_rls.sql#L44",
         "supabase/migrations/20260615182811_harden_auth_and_booking_core.sql#L57"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "customer.list",
         "audit.search"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approved for all' — docs/OWNER-DECISIONS.md T1"
     },
     {
       "id": "real-vs-decorative-criterion",
@@ -8553,10 +8554,11 @@
       "evidence": [
         "supabase/migrations/20261010300000_money_append_only_and_corrections.sql"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "money.append-only"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approved for all' — docs/OWNER-DECISIONS.md T2"
     },
     {
       "id": "money-payment-methods-is-a-setting",
@@ -8621,11 +8623,12 @@
       "evidence": [
         "supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "gov.console-roles",
         "role.set-administrator"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approved for all' — docs/OWNER-DECISIONS.md T3"
     },
     {
       "id": "govfix-wps-iban-reveal-rights",
@@ -8691,11 +8694,12 @@
         "supabase/migrations/20261011120000_secfix2_h3_m4_m5_reconciliation_evidence.sql",
         "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "reconciliation.resolve-break",
         "ledger.adjustment"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approved for all' — docs/OWNER-DECISIONS.md T4"
     },
     {
       "id": "secfix2-payout-hold-is-provider-wide",
@@ -8864,8 +8868,9 @@
       "evidence": [
         "supabase/migrations/20261011220000_priv_deletion_engine.sql"
       ],
-      "status": "assumed",
-      "appliesTo": []
+      "status": "confirmed",
+      "appliesTo": [],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approved for all' — docs/OWNER-DECISIONS.md T5"
     },
     {
       "id": "priv-court-hold-keeps-account",
@@ -8907,8 +8912,9 @@
       "evidence": [
         "supabase/functions/_shared/privacy-export-document.ts"
       ],
-      "status": "assumed",
-      "appliesTo": []
+      "status": "confirmed",
+      "appliesTo": [],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approved for all' — docs/OWNER-DECISIONS.md T6"
     },
     {
       "id": "priv-deletion-ledger-off-database",
@@ -8917,8 +8923,9 @@
       "evidence": [
         "supabase/migrations/20261011220000_priv_deletion_engine.sql"
       ],
-      "status": "assumed",
-      "appliesTo": []
+      "status": "confirmed",
+      "appliesTo": [],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approved for all' — docs/OWNER-DECISIONS.md T7"
     },
     {
       "id": "privfix-patch-tests-are-health-data",
@@ -9050,11 +9057,12 @@
       "evidence": [
         "web_platform/src/lib/console-session.tsx"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "admin-dashboard",
         "admin-roles"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approved for all' — docs/OWNER-DECISIONS.md T8"
     },
     {
       "id": "final-money-records-restrict-booking-delete",
@@ -9064,10 +9072,11 @@
         "supabase/migrations/20261016100000_final_money_records_keep_booking.sql",
         "supabase/tests/db/final_priv_recheck.test.mjs"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "privacy.deletion"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approved for all' — docs/OWNER-DECISIONS.md T9"
     },
     {
       "id": "final-hold-release-four-eyes",
@@ -9102,10 +9111,11 @@
       "evidence": [
         "supabase/migrations/20261016130000_final_incident_aware_at_second_person.sql"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "incident.register"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approved for all' — docs/OWNER-DECISIONS.md T10"
     },
     {
       "id": "final-phone-tenure-scrub",
@@ -9115,10 +9125,11 @@
         "supabase/migrations/20261016150000_final_contact_scrub_by_tenure.sql",
         "supabase/functions/_shared/privacy-erasure.ts"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "privacy.deletion"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approved for all' — docs/OWNER-DECISIONS.md T11"
     },
     {
       "id": "final-retention-purge-anonymise-ledger-referenced",
@@ -9127,10 +9138,11 @@
       "evidence": [
         "supabase/migrations/20261016160000_final_retention_purge.sql"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "privacy.deletion-ledger"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approved for all' — docs/OWNER-DECISIONS.md T12"
     },
     {
       "id": "f1-any-active-account-hold-blocks-profile-clear",
@@ -9139,10 +9151,11 @@
       "evidence": [
         "supabase/migrations/20261016200000_f1_profile_clear_respects_account_hold.sql"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "customer.clear-profile"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approved for all' — docs/OWNER-DECISIONS.md T13"
     },
     {
       "id": "f2-lookup-exact-match-limit-and-hmac",
@@ -9164,10 +9177,11 @@
       "evidence": [
         "supabase/migrations/20261016220000_f3_retention_purge_second_person.sql"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "privacy.deletion"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approved for all' — docs/OWNER-DECISIONS.md T14"
     }
   ],
   "gaps": [
@@ -13323,6 +13337,14 @@
       "notes": "",
       "harness": "claude-code",
       "worklog": ".admin-console/worklog/impl-f123-claude.md"
+    },
+    {
+      "id": "ux-round2-claude",
+      "role": "ux-reviewer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "active",
+      "notes": "UX round 2 browser check (2026-10-17) of the privacy, legal-hold, retention-purge, incident and MFA fixes: /customer/privacy, /admin/privacy, /admin/approvals, /admin/customers, /admin/incidents, /login/mfa. Playwright against localhost:3100 and the local Supabase stack, EN/AR, 375px and 1440px. Report docs/reviews/2026-10-17-ux-browser-check.md."
     }
   ]
 }

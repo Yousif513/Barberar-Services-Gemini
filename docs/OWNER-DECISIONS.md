@@ -42,7 +42,7 @@ Recorded as confirmed decisions in `.admin-console/manifest.json`. Any of them c
 | D21 | Provider "recorded commission %" is shown read-only and sets no price; real fees come from fee rules. | |
 | D22 | `payment_methods` (which payment methods are enabled) is an owner setting, not a finance setting. | |
 
-## 2b. Technical safeguards not on the list above (approve as a batch when convenient)
+## 2b. Technical safeguards: **APPROVED by the owner on 2026-10-17 ("approved for all")**
 
 These are engineering choices made during the security fixes. Each is the stricter option. They stay "assumed" until you approve them.
 
