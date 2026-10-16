@@ -454,7 +454,10 @@ describe("Q2.5: legal holds", () => {
     await expectError(call(owner, `select admin_privacy_review_legal_hold($1, true, 'too short') r`, [hold.hold_id]), /20 characters/);
 
     // Release: the held booking is finished like any retained booking, with a fresh pseudonym; the hold forgets token and subject.
-    await call(owner, `select admin_privacy_review_legal_hold($1, false, 'The court case was closed by final judgment') r`, [hold.hold_id]);
+    // FINAL N3: an early release is a request a second privacy.approve holder decides.
+    const asked = await call(owner, `select admin_privacy_review_legal_hold($1, false, 'The court case was closed by final judgment') r`, [hold.hold_id]);
+    assert.equal(asked.status, "pending_approval");
+    await decide(owner2, asked.approval_id);
     const after = await one(`select pseudonym_token, home_address_text, retention_basis from bookings where id = $1`, [b]);
     assert.notEqual(after.pseudonym_token, h.pseudonym_token);
     assert.equal(await count("booking_home_addresses", "booking_id = $1", [b]), 0);
@@ -478,7 +481,9 @@ describe("Q2.5: legal holds", () => {
     assert.equal(await count("profiles", "id = $1", [id]), 1, "the account named by the hold is kept");
     let due = await call(ROLES.service, `select privacy_auth_erasures_due() r`);
     assert.ok(!due.held_released.some((x) => x.subject_id === id));
-    await call(owner2, `select admin_privacy_review_legal_hold($1, false, 'Proceedings ended; the court released the records') r`, [hold.hold_id]);
+    const asked = await call(owner2, `select admin_privacy_review_legal_hold($1, false, 'Proceedings ended; the court released the records') r`, [hold.hold_id]);
+    assert.equal(await count("profiles", "id = $1", [id]), 1, "FINAL N3: nothing is erased until a second person approves the release");
+    await decide(owner, asked.approval_id);
     assert.equal(await count("profiles", "id = $1", [id]), 0);
     due = await call(ROLES.service, `select privacy_auth_erasures_due() r`);
     const task = due.held_released.find((x) => x.subject_id === id);
@@ -797,7 +802,10 @@ describe("PRIVFIX: incident history (review L4)", () => {
     await expectError(call(operations, fix, [i.id, why]), /incident.manage/);
     await expectError(call(stale(owner.sub), fix, [i.id, why]), /step-up required/);
     await expectError(call(owner, fix, [i.id, "too short"]), /20 characters/);
-    const fixed = await call(owner, fix, [i.id, why]);
+    // FINAL N5: the correction is a request a second incident.manage holder approves.
+    const asked = await call(owner, fix, [i.id, why]);
+    assert.equal(asked.status, "pending_approval");
+    const fixed = await decide(owner2, asked.approval_id).then((d) => d.result);
     assert.ok(fixed.hours_left < 45, "the 72-hour clock follows the corrected time");
     assert.ok(fixed.aware_at_original);
     await expectError(call(owner, fix, [i.id, why]), /already corrected once/);

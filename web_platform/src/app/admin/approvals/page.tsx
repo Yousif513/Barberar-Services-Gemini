@@ -24,7 +24,8 @@ type Numeric = number | string | null;
 type ApprovalRow = {
   id: string;
   kind: "payout_release" | "refund" | "iban_change" | "setting_change" | "ledger_settlement" | "ledger_adjustment" | "fee_rule_change" | "payout_hold" | "reward_program" | "role_change" | "booking_cancellation" | "reconciliation_import" | "sponsored_price_change"
-    | "privacy_export" | "privacy_deletion" | "privacy_legal_hold" | "customer_profile_clear";
+    | "privacy_export" | "privacy_deletion" | "privacy_legal_hold" | "customer_profile_clear"
+    | "privacy_legal_hold_release" | "privacy_legal_hold_renewal" | "incident_aware_at_correction";
   status: string;
   target_id: string | null;
   amount_sar: Numeric;
@@ -83,7 +84,14 @@ const translations = {
       booking_cancellation: "Booking cancellation with refund", reconciliation_import: "Reconciliation file import",
       sponsored_price_change: "Sponsored price per new client",
       privacy_export: "Release of a customer's data copy", privacy_deletion: "Customer data deletion", privacy_legal_hold: "Legal hold on customer data",
-      customer_profile_clear: "Clearing a customer's profile details" },
+      customer_profile_clear: "Clearing a customer's profile details",
+      privacy_legal_hold_release: "Early release of a legal hold (erases what it kept)",
+      privacy_legal_hold_renewal: "Renewal of a legal hold kept for over a year",
+      incident_aware_at_correction: "Correction of an incident's awareness time (moves the SDAIA deadline)" },
+    holdRenewals: "renewed {n} times",
+    customerErased: "customer already erased",
+    accountHeld: "account held",
+    deadlineMove: "SDAIA deadline {from} → {to} ({h} h)",
     profileClearEffect: "removes name, e-mail, phone, gender and push token; keeps sign-in, bookings, invoices and messages",
     approveIntroChange: "Approving applies the change now, in your name, with the checks the change has. It needs a fresh authenticator code.",
     privacyTypes: { access: "access", copy: "copy", deletion: "deletion" } as Record<string, string>,
@@ -205,7 +213,14 @@ const translations = {
       booking_cancellation: "إلغاء حجز مع استرداد", reconciliation_import: "استيراد ملف تسوية",
       sponsored_price_change: "سعر الإعلان لكل عميل جديد",
       privacy_export: "تسليم نسخة من بيانات عميل", privacy_deletion: "حذف بيانات عميل", privacy_legal_hold: "حجز قانوني على بيانات عميل",
-      customer_profile_clear: "مسح بيانات الملف الشخصي لعميل" },
+      customer_profile_clear: "مسح بيانات الملف الشخصي لعميل",
+      privacy_legal_hold_release: "رفع حجز قانوني قبل موعده (يحذف ما احتفظ به)",
+      privacy_legal_hold_renewal: "تجديد حجز قانوني مضى عليه أكثر من سنة",
+      incident_aware_at_correction: "تصحيح وقت العلم بحادثة (يغيّر مهلة سدايا)" },
+    holdRenewals: "جُدد {n} مرات",
+    customerErased: "حُذف حساب العميل",
+    accountHeld: "الحساب محتجز",
+    deadlineMove: "مهلة سدايا {from} ← {to} ({h} ساعة)",
     profileClearEffect: "يحذف الاسم والبريد والهاتف والجنس ورمز الإشعارات؛ ويُبقي تسجيل الدخول والحجوزات والفواتير والرسائل",
     approveIntroChange: "الاعتماد يطبّق التغيير الآن باسمك مع فحوصاته. يحتاج رمزاً جديداً من تطبيق المصادقة.",
     privacyTypes: { access: "اطلاع", copy: "نسخة", deletion: "حذف" } as Record<string, string>,
@@ -417,6 +432,15 @@ function ApprovalsScreen() {
     }
     if (row.kind === "customer_profile_clear") {
       return [`${text(row.target_id).slice(0, 8)}`, t.profileClearEffect].filter(Boolean).join(" · ");
+    }
+    if (row.kind === "privacy_legal_hold_release" || row.kind === "privacy_legal_hold_renewal") {
+      const cats = Array.isArray(s.categories) ? (s.categories as string[]).join(", ") : "";
+      return [text(s.basis).replace("_", " "), text(s.case_reference), cats, s.account_held ? t.accountHeld : "",
+        s.customer_erased ? t.customerErased : "", t.holdRenewals.replace("{n}", text(s.renewals))].filter(Boolean).join(" · ");
+    }
+    if (row.kind === "incident_aware_at_correction") {
+      return [text(s.reference), t.deadlineMove.replace("{from}", s.deadline_from ? operationsDate(text(s.deadline_from), lang) : "—")
+        .replace("{to}", s.deadline_to ? operationsDate(text(s.deadline_to), lang) : "—").replace("{h}", text(s.moves_deadline_hours))].join(" · ");
     }
     if (row.kind === "privacy_legal_hold") {
       const cats = Array.isArray(s.categories) ? (s.categories as string[]).join(", ") : "";

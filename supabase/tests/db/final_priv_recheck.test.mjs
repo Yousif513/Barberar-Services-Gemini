@@ -188,3 +188,129 @@ describe("N4: staff notes go with the account", () => {
     await expectError(call(ROLES.user(id), `select admin_privacy_add_note($1, 'my own note') r`, [del.id]), /privacy.manage|console|permission|Administrator/);
   });
 });
+
+const reviewHold = (who, holdId, keep, note) => call(who, `select admin_privacy_review_legal_hold($1, $2, $3) r`, [holdId, keep, note]);
+async function courtHold(id, categories, ref) {
+  const hold = await call(operations, `select admin_privacy_propose_legal_hold($1, 'court_case', $2, $3::text[], null, $4) r`,
+    [id, ref, categories, `Riyadh commercial court case ${ref} names this customer`]);
+  await decide(owner, hold.approval_id);
+  return hold.hold_id;
+}
+
+describe("N3: an early release needs a second person after step-up", () => {
+  it("a court hold stays in force until a different privacy.approve holder approves its release; the proposer cannot release alone", async () => {
+    const id = await customer();
+    const b = await booking(id);
+    await ledger(b, `chg_final_n3_${seq}`);
+    const holdId = await courtHold(id, ["bookings"], "CASE-1447-301");
+    await erase(id);
+    const held = await one(`select pseudonym_token from privacy_legal_holds where id = $1`, [holdId]);
+    assert.equal((await one(`select pseudonym_token from bookings where id = $1`, [b])).pseudonym_token, held.pseudonym_token);
+    const note = "The court case was closed by final judgment";
+
+    await expectError(reviewHold(operations, holdId, false, note), /privacy.approve/);
+    await expectError(reviewHold(stale(owner.sub), holdId, false, note), /recent|verif|step|MFA|two-factor|authenticator/i);
+    const asked = await reviewHold(owner, holdId, false, note);
+    assert.equal(asked.status, "pending_approval");
+    assert.equal(asked.release_needs_approval, true);
+    assert.equal((await one(`select status from privacy_legal_holds where id = $1`, [holdId])).status, "active", "the review's reproduction released it at once");
+    assert.equal((await one(`select pseudonym_token from bookings where id = $1`, [b])).pseudonym_token, held.pseudonym_token, "nothing is finished yet");
+    const approval = await one(`select kind, requested_by, summary from admin_approval_requests where id = $1`, [asked.approval_id]);
+    assert.equal(approval.kind, "privacy_legal_hold_release");
+    assert.ok(!JSON.stringify(approval.summary).includes(id), "the approver is not shown the person's id");
+    await expectError(decide(owner, asked.approval_id), /own request/);
+    await expectError(decide(operations, asked.approval_id), /cannot decide/);
+    await expectError(decide(stale(owner2.sub), asked.approval_id), /recent|verif|step|MFA|two-factor|authenticator/i);
+    const out = await decide(owner2, asked.approval_id);
+    assert.equal(out.status, "approved");
+    const after = await one(`select status, released_by, subject_id from privacy_legal_holds where id = $1`, [holdId]);
+    assert.deepEqual([after.status, after.released_by, after.subject_id], ["released", owner2.sub, null]);
+    assert.notEqual((await one(`select pseudonym_token from bookings where id = $1`, [b])).pseudonym_token, held.pseudonym_token);
+    assert.deepEqual(await rowsLinking(id, [b, holdId]), [], "N1 also holds for a court hold released by approval");
+  });
+
+  it("a rejected release leaves the hold as it was", async () => {
+    const id = await customer();
+    const holdId = await courtHold(id, ["reviews"], "CASE-1447-302");
+    const asked = await reviewHold(owner2, holdId, false, "Counsel says the case is about to close");
+    await decide(owner, asked.approval_id, "reject");
+    assert.equal((await one(`select status, subject_id from privacy_legal_holds where id = $1`, [holdId])).status, "active");
+    const again = await reviewHold(owner2, holdId, false, "Counsel confirmed the case closed today");
+    assert.notEqual(again.approval_id, asked.approval_id);
+    await decide(owner3, again.approval_id);
+    assert.equal((await one(`select status from privacy_legal_holds where id = $1`, [holdId])).status, "released");
+  });
+});
+
+describe("Renewal note: alternating renewals need a fresh owner after 3", () => {
+  it("lets two people alternate 3 renewals, then asks an owner who never proposed, approved or renewed the hold", async () => {
+    const id = await customer();
+    const holdId = await courtHold(id, ["bookings"], "CASE-1447-303");
+    const note = "Still pending before the court in Riyadh";
+    for (const who of [owner2, owner3, owner2]) assert.equal((await reviewHold(who, holdId, true, note)).status, "active");
+    assert.equal((await one(`select renewals from privacy_legal_holds where id = $1`, [holdId])).renewals, 3);
+    const asked = await reviewHold(owner3, holdId, true, note);
+    assert.equal(asked.status, "pending_approval", "the review's reproduction renewed a 4th time without anyone new");
+    assert.equal(asked.renewal_needs_approval, true);
+    const before = await one(`select renewals, review_due_at from privacy_legal_holds where id = $1`, [holdId]);
+    assert.equal(before.renewals, 3, "not renewed until approved");
+    await expectError(decide(owner3, asked.approval_id), /own request/);
+    await expectError(decide(owner2, asked.approval_id), /never proposed, approved or renewed/, "an earlier renewer");
+    await expectError(decide(owner, asked.approval_id), /never proposed, approved or renewed/, "the approver of the hold");
+    const owner4 = ROLES.user(await createUser(db, { role: "admin", adminRole: "owner" }));
+    const out = await decide(owner4, asked.approval_id);
+    assert.equal(out.status, "approved");
+    const after = await one(`select renewals, renewed_by, last_reviewed_by from privacy_legal_holds where id = $1`, [holdId]);
+    assert.equal(after.renewals, 4);
+    assert.ok(after.renewed_by.includes(owner4.sub) && after.renewed_by.includes(owner3.sub));
+    // The next renewal again needs someone new: owner4 has now renewed it.
+    const next = await reviewHold(owner2, holdId, true, note);
+    assert.equal(next.status, "pending_approval");
+    await expectError(decide(owner4, next.approval_id), /never proposed, approved or renewed/);
+  });
+});
+
+describe("N5: moving an incident's awareness time needs a second person and stays in the history", () => {
+  const create = (who) => call(who, `select admin_incident_create('Mis-sent export', 'A report with customer phones went to the wrong partner', now() - interval '100 hours', now() - interval '99 hours') r`);
+  const fix = `select admin_incident_correct_aware_at($1, $2::timestamptz, $3) r`;
+  const why = "The person who first saw it only reported it four days later";
+
+  it("asks, then changes nothing until a different incident.manage holder approves after step-up", async () => {
+    const i = await create(owner);
+    const later = new Date(Date.now() - 2 * 3600 * 1000).toISOString();
+    await expectError(call(operations, fix, [i.id, later, why]), /incident.manage/);
+    await expectError(call(stale(owner.sub), fix, [i.id, later, why]), /step-up required/);
+    const asked = await call(owner, fix, [i.id, later, why]);
+    assert.equal(asked.status, "pending_approval");
+    const unchanged = await one(`select aware_at, aware_at_corrected_at from privacy_incidents where id = $1`, [i.id]);
+    assert.equal(unchanged.aware_at_corrected_at, null, "the review's reproduction moved the clock 99 hours on one person's word");
+    assert.equal(new Date(unchanged.aware_at).getTime(), new Date(i.aware_at).getTime());
+    await expectError(call(owner, fix, [i.id, later, why]), /already waiting for a second person/);
+    await expectError(decide(owner, asked.approval_id), /own request/);
+    await expectError(decide(operations, asked.approval_id), /cannot decide/);
+    await expectError(decide(stale(owner2.sub), asked.approval_id), /step-up required/);
+    const summary = (await one(`select summary from admin_approval_requests where id = $1`, [asked.approval_id])).summary;
+    assert.ok(Number(summary.moves_deadline_hours) > 90, "the approver sees how far the deadline moves");
+    const done = await decide(owner2, asked.approval_id);
+    assert.equal(new Date(done.result.aware_at).getTime(), new Date(later).getTime());
+    const events = await sys(db, `select event, actor_id, details from privacy_incident_events where incident_id = $1 order by created_at, event`, [i.id]);
+    const requested = events.find((e) => e.event === "aware_at_correction_requested");
+    const corrected = events.find((e) => e.event === "aware_at_corrected");
+    assert.equal(requested.actor_id, owner.sub);
+    assert.equal(corrected.actor_id, owner2.sub);
+    assert.equal(corrected.details.requested_by, owner.sub);
+    assert.equal(new Date(corrected.details.from).getTime(), new Date(i.aware_at).getTime());
+    await expectError(sys(db, `update privacy_incident_events set details = '{}' where incident_id = $1`, [i.id]), /append-only/);
+    await expectError(sys(db, `delete from privacy_incident_events where incident_id = $1 and event = 'aware_at_corrected'`, [i.id]), /append-only/);
+    assert.equal(await count("privacy_incident_events", "incident_id = $1", [i.id]), events.length);
+    await expectError(call(owner2, fix, [i.id, later, why]), /already corrected once/);
+  });
+
+  it("a rejected correction leaves the time and records the rejection", async () => {
+    const i = await create(owner2);
+    const asked = await call(owner2, fix, [i.id, new Date(Date.now() - 3600 * 1000).toISOString(), why]);
+    await decide(owner, asked.approval_id, "reject");
+    assert.equal((await one(`select aware_at_corrected_at from privacy_incidents where id = $1`, [i.id])).aware_at_corrected_at, null);
+    assert.equal(await count("privacy_incident_events", "incident_id = $1 and event = 'aware_at_correction_rejected'", [i.id]), 1);
+  });
+});

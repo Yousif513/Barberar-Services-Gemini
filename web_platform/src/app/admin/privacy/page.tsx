@@ -75,7 +75,10 @@ const copy = {
     purposeNames: { whatsapp: "WhatsApp", marketing: "Marketing", photos_portfolio: "Photos in portfolio", data_processing: "Data processing", health_data: "Health data", health_data_reuse: "Health-data reuse" } as Record<string, string>,
     holdsActive: "Active", holdsPending: "Waiting for approval", holdsClosed: "Released or withdrawn", reviewOverdue: "{n} holds are past their 90-day review.",
     holdCols: ["Basis", "Reference", "Customer", "Held", "Review due", ""], basis: { court_case: "Court case", payment_dispute: "Payment dispute" } as Record<string, string>,
-    keep: "Keep (review again in 90 days)", release: "Release", releaseDue: "Release dispute holds 30 days after the dispute closed",
+    keep: "Keep (review again in 90 days)", release: "Release", releaseAsked: "Release requested: a second privacy approver must approve it under Approvals. The hold stays in force until then.",
+    renewalAsked: "This hold was already renewed 3 times; keeping it needs an owner who has never proposed, approved or renewed it. The request is under Approvals.",
+    releaseIntro: "Releasing a hold early is decided by a second privacy approver. Once approved, what the hold kept is erased at once (and an account kept for a court case is deleted with its login).",
+    releaseDue: "Release dispute holds 30 days after the dispute closed",
     reviewTitleKeep: "Keep this hold", reviewTitleRelease: "Release this hold", reviewReason: "Outcome of the review (at least 20 characters)",
     holdForm: "Propose a legal hold", holdBasis: "Basis", holdReference: "Case or dispute reference", holdCategories: "What the case needs (never health data)",
     holdBooking: "Disputed booking ID", holdReason: "Why (at least 20 characters)", holdAccountReason: "Why the case needs the account itself: profile, contact details and login (at least 20 characters)", holdSubmit: "Propose the hold",
@@ -130,7 +133,10 @@ const copy = {
     purposeNames: { whatsapp: "واتساب", marketing: "التسويق", photos_portfolio: "الصور في المعرض", data_processing: "معالجة البيانات", health_data: "البيانات الصحية", health_data_reuse: "إعادة استخدام البيانات الصحية" } as Record<string, string>,
     holdsActive: "سارية", holdsPending: "بانتظار الاعتماد", holdsClosed: "مرفوعة أو مسحوبة", reviewOverdue: "{n} حجوزات تجاوزت مراجعة ٩٠ يوماً.",
     holdCols: ["الأساس", "المرجع", "العميل", "المحجوز", "موعد المراجعة", ""], basis: { court_case: "قضية أمام القضاء", payment_dispute: "نزاع دفع" } as Record<string, string>,
-    keep: "إبقاء (مراجعة بعد ٩٠ يوماً)", release: "رفع الحجز", releaseDue: "رفع حجوزات النزاعات بعد ٣٠ يوماً من إغلاقها",
+    keep: "إبقاء (مراجعة بعد ٩٠ يوماً)", release: "رفع الحجز", releaseAsked: "طُلب رفع الحجز: يجب أن يعتمده مسؤول خصوصية ثانٍ في صفحة الموافقات، ويبقى الحجز سارياً حتى ذلك الحين.",
+    renewalAsked: "جُدد هذا الحجز ٣ مرات من قبل؛ يتطلب إبقاؤه مالكاً لم يقترحه أو يعتمده أو يجدده من قبل. الطلب في صفحة الموافقات.",
+    releaseIntro: "يقرر رفعَ الحجز قبل موعده مسؤولُ خصوصية ثانٍ. بعد الاعتماد يُحذف ما احتفظ به الحجز فوراً (ويُحذف الحساب المحتفظ به لقضية مع بيانات دخوله).",
+    releaseDue: "رفع حجوزات النزاعات بعد ٣٠ يوماً من إغلاقها",
     reviewTitleKeep: "إبقاء هذا الحجز", reviewTitleRelease: "رفع هذا الحجز", reviewReason: "نتيجة المراجعة (٢٠ حرفاً على الأقل)",
     holdForm: "اقتراح حجز قانوني", holdBasis: "الأساس", holdReference: "مرجع القضية أو النزاع", holdCategories: "ما تحتاجه القضية (لا تشمل البيانات الصحية أبداً)",
     holdBooking: "معرّف الحجز محل النزاع", holdReason: "السبب (٢٠ حرفاً على الأقل)", holdAccountReason: "لماذا تحتاج القضية الحساب نفسه: الملف وبيانات التواصل وتسجيل الدخول (٢٠ حرفاً على الأقل)", holdSubmit: "اقتراح الحجز",
@@ -596,12 +602,15 @@ function HoldsTab({ t, lang, setNotice }: TabProps) {
       )}
       {dialog && dialog.kind === "review" && (
         <CommandDialog locale={lang} tone={dialog.keep ? "default" : "danger"} title={dialog.keep ? t.reviewTitleKeep : t.reviewTitleRelease}
+          intro={dialog.keep ? undefined : t.releaseIntro}
           facts={[{ label: t.holdCols[1], value: dialog.hold.case_reference }]} reasonLabel={t.reviewReason} minReasonLength={20}
           confirmLabel={dialog.keep ? t.keep : t.release} onClose={() => setDialog(null)}
           onConfirm={async (note) => {
-            const { error } = await supabase.rpc("admin_privacy_review_legal_hold", { p_hold_id: dialog.hold.id, p_keep: dialog.keep, p_note: note });
+            const { data, error } = await supabase.rpc("admin_privacy_review_legal_hold", { p_hold_id: dialog.hold.id, p_keep: dialog.keep, p_note: note });
             if (error) return errorMessage(error);
-            setNotice({ success: t.done }); setReload((k) => k + 1); return null;
+            const result = data as { status?: string; release_needs_approval?: boolean; renewal_needs_approval?: boolean } | null;
+            const asked = result?.status === "pending_approval";
+            setNotice({ success: asked ? (result?.release_needs_approval ? t.releaseAsked : t.renewalAsked) : t.done }); setReload((k) => k + 1); return null;
           }} />
       )}
       {canManage && <form noValidate onSubmit={(e) => void propose(e)} className={`${card} grid gap-3 sm:grid-cols-2`} aria-labelledby="hold-title">

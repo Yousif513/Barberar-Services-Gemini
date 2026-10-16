@@ -36,9 +36,9 @@ const copy = {
     recordSdaia: "Record the SDAIA decision", subjects: "People affected", subjectsDecision: "Decision", subjectsDecisions: { notify: "Notify them", not_required: "Not notified (reasoned)" } as Record<string, string>,
     subjectsReason: "Reason (at least 20 characters when not notifying)", subjectsAt: "Sent at (Riyadh time)", channels: "Channels", recordSubjects: "Record the decision",
     evidence: "Evidence", evidenceLabel: "Label", evidenceRef: "Where it is kept (ticket, document)", evidenceFile: "Or upload a file", addEvidence: "Add evidence",
-    close: "Close the incident", closeTitle: "Close this incident", closeReason: "Outcome summary (at least 20 characters)", retain: "Kept until {date}", history: "History", done: "Saved.",
-    deadline: "SDAIA deadline", correctAware: "Correct the awareness time (once, moves the 72-hour clock)", correctAwareAt: "Correct awareness time (Riyadh time)",
-    correctReason: "Why the recorded time was wrong (at least 20 characters)", correctSubmit: "Correct the time", corrected: "Awareness time corrected on {date}; recorded first as {old}.",
+    close: "Close the incident", closeTitle: "Close this incident", closeReason: "Outcome summary (at least 20 characters)", retain: "Kept until {date}", history: "History", done: "Saved.", correctionAsked: "Correction requested: a second incident manager must approve it under Approvals before the 72-hour clock moves.",
+    deadline: "SDAIA deadline", correctAware: "Correct the awareness time (once, approved by a second incident manager; moves the 72-hour clock)", correctAwareAt: "Correct awareness time (Riyadh time)",
+    correctReason: "Why the recorded time was wrong (at least 20 characters)", correctSubmit: "Request the correction", corrected: "Awareness time corrected on {date}; recorded first as {old}.",
   },
   ar: {
     title: "سجل الحوادث", subtitle: "حوادث تسرب البيانات الشخصية. أبلغ سدايا خلال ٧٢ ساعة من العلم بالحادثة، لكل حادثة ما لم تسجل استنتاجاً مسبباً بعدم إمكان وقوع ضرر. أبلغ المتأثرين دون تأخير كلما أمكن وقوع ضرر. تُحفظ السجلات ٥ سنوات.",
@@ -55,9 +55,9 @@ const copy = {
     recordSdaia: "تسجيل قرار سدايا", subjects: "المتأثرون", subjectsDecision: "القرار", subjectsDecisions: { notify: "إبلاغهم", not_required: "عدم الإبلاغ (مسبب)" } as Record<string, string>,
     subjectsReason: "السبب (٢٠ حرفاً على الأقل عند عدم الإبلاغ)", subjectsAt: "وقت الإرسال (بتوقيت الرياض)", channels: "القنوات", recordSubjects: "تسجيل القرار",
     evidence: "الأدلة", evidenceLabel: "الوصف", evidenceRef: "مكان حفظها (تذكرة، مستند)", evidenceFile: "أو ارفع ملفاً", addEvidence: "إضافة دليل",
-    close: "إغلاق الحادثة", closeTitle: "إغلاق هذه الحادثة", closeReason: "ملخص النتيجة (٢٠ حرفاً على الأقل)", retain: "تُحفظ حتى {date}", history: "السجل", done: "تم الحفظ.",
-    deadline: "مهلة سدايا", correctAware: "تصحيح وقت العلم (مرة واحدة، ويغيّر مهلة ٧٢ ساعة)", correctAwareAt: "وقت العلم الصحيح (بتوقيت الرياض)",
-    correctReason: "لماذا كان الوقت المسجل خاطئاً (٢٠ حرفاً على الأقل)", correctSubmit: "تصحيح الوقت", corrected: "صُحح وقت العلم في {date}؛ سُجل أولاً {old}.",
+    close: "إغلاق الحادثة", closeTitle: "إغلاق هذه الحادثة", closeReason: "ملخص النتيجة (٢٠ حرفاً على الأقل)", retain: "تُحفظ حتى {date}", history: "السجل", done: "تم الحفظ.", correctionAsked: "طُلب التصحيح: يجب أن يعتمده مسؤول حوادث ثانٍ في صفحة الموافقات قبل أن تتغير مهلة ٧٢ ساعة.",
+    deadline: "مهلة سدايا", correctAware: "تصحيح وقت العلم (مرة واحدة، بموافقة مسؤول حوادث ثانٍ، ويغيّر مهلة ٧٢ ساعة)", correctAwareAt: "وقت العلم الصحيح (بتوقيت الرياض)",
+    correctReason: "لماذا كان الوقت المسجل خاطئاً (٢٠ حرفاً على الأقل)", correctSubmit: "طلب التصحيح", corrected: "صُحح وقت العلم في {date}؛ سُجل أولاً {old}.",
   },
 };
 type T = typeof copy.en;
@@ -106,7 +106,7 @@ export default function AdminIncidents() {
   const run = async (call: PromiseLike<{ data: unknown; error: unknown }>) => {
     const { data, error } = await call;
     if (error) { setNotice({ error: errorMessage(error) }); return false; }
-    setNotice({ success: t.done });
+    setNotice({ success: (data as { status?: string } | null)?.status === "pending_approval" ? t.correctionAsked : t.done });
     setReload((k) => k + 1);
     const id = (data as { id?: string } | null)?.id ?? selected?.id;
     if (id) await open(id);
