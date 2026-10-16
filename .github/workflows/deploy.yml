@@ -128,6 +128,9 @@ jobs:
       - name: Verify DB Migration Integrity
         run: supabase db lint
 
+      - name: Install npm packages the Edge Functions import (npm specifiers resolve from node_modules)
+        run: npm ci --ignore-scripts
+
       - name: Verify Deno Edge Functions
         run: |
           deno lint supabase/functions
