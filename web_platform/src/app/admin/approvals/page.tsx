@@ -47,6 +47,8 @@ type ApprovalRow = {
   target_name?: string | null;
   decide_blocked_reason?: string | null;
   break_glass_blocked_until?: string | null;
+  // F1: the active legal hold on the account of a pending profile clear; approving it is refused while it lasts.
+  legal_hold?: { hold_id: string; basis: string; case_reference: string; review_due_at: string | null } | null;
 };
 type Review = { id: string; approval_request_id: string; amount_sar: Numeric; justification: string; executed_at: string; due_at: string; signed_off_at: string | null; reviewer_name: string | null; document_reference: string | null; overdue: boolean; can_sign_off?: boolean };
 type Setting = { key: string; value: Numeric; description_en: string; description_ar: string; updated_at: string };
@@ -93,6 +95,7 @@ const translations = {
     accountHeld: "account held",
     deadlineMove: "SDAIA deadline {from} → {to} ({h} h)",
     profileClearEffect: "removes name, e-mail, phone, gender and push token; keeps sign-in, bookings, invoices and messages",
+    profileClearHeld: "legal hold {ref} keeps this account: approving is refused until the hold is released; reject the request instead",
     approveIntroChange: "Approving applies the change now, in your name, with the checks the change has. It needs a fresh authenticator code.",
     privacyTypes: { access: "access", copy: "copy", deletion: "deletion" } as Record<string, string>,
     privacyPreview: "{p} bookings pseudonymised, {d} deleted, {m} messages, {h} health answers",
@@ -222,6 +225,7 @@ const translations = {
     accountHeld: "الحساب محتجز",
     deadlineMove: "مهلة سدايا {from} ← {to} ({h} ساعة)",
     profileClearEffect: "يحذف الاسم والبريد والهاتف والجنس ورمز الإشعارات؛ ويُبقي تسجيل الدخول والحجوزات والفواتير والرسائل",
+    profileClearHeld: "الحجز القانوني {ref} يحتفظ بهذا الحساب: يُرفض الاعتماد حتى يُرفع الحجز؛ ارفض الطلب بدلاً من ذلك",
     approveIntroChange: "الاعتماد يطبّق التغيير الآن باسمك مع فحوصاته. يحتاج رمزاً جديداً من تطبيق المصادقة.",
     privacyTypes: { access: "اطلاع", copy: "نسخة", deletion: "حذف" } as Record<string, string>,
     privacyPreview: "{p} حجوزات بلا هوية، {d} محذوفة، {m} رسائل، {h} إجابات صحية",
@@ -431,7 +435,8 @@ function ApprovalsScreen() {
         s.deadline_at ? operationsDate(text(s.deadline_at), lang) : ""].filter(Boolean).join(" · ");
     }
     if (row.kind === "customer_profile_clear") {
-      return [`${text(row.target_id).slice(0, 8)}`, t.profileClearEffect].filter(Boolean).join(" · ");
+      return [`${text(row.target_id).slice(0, 8)}`, t.profileClearEffect,
+        row.legal_hold ? t.profileClearHeld.replace("{ref}", text(row.legal_hold.case_reference)) : ""].filter(Boolean).join(" · ");
     }
     if (row.kind === "privacy_legal_hold_release" || row.kind === "privacy_legal_hold_renewal") {
       const cats = Array.isArray(s.categories) ? (s.categories as string[]).join(", ") : "";

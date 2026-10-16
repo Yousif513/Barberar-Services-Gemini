@@ -4,6 +4,7 @@ import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
+import { errorHint } from "@/lib/step-up";
 import { CommandResult, ForbiddenNotice, isForbidden, operationsDate, operationsInput, sar, useOperationsLocale } from "@/components/operations-ui";
 import { CommandDialog } from "@/components/modal";
 import { writeUrlState } from "@/lib/url-state";
@@ -97,6 +98,7 @@ const translations = {
     ],
     clearConfirm: "Ask a second owner to approve",
     clearRequested: "Recorded for approval. Nothing is cleared until a different owner approves it on Approvals.",
+    clearHeld: "A legal hold keeps this customer's account, so the profile cannot be cleared. Nothing was changed; the hold must be released first on Privacy Requests.",
     clearDone: "Profile details cleared. Sign-in identity, bookings, invoices and messages were not changed.",
     factCustomer: "Customer",
     factEmail: "Email",
@@ -195,6 +197,7 @@ const translations = {
     ],
     clearConfirm: "طلب اعتماد مالك ثانٍ",
     clearRequested: "سُجّل الطلب للاعتماد. لا يُمسح شيء قبل أن يعتمده مالك آخر من شاشة الاعتمادات.",
+    clearHeld: "يوجد حجز قانوني على حساب هذا العميل، فلا يمكن مسح ملفه الشخصي. لم يتغير شيء؛ يجب رفع الحجز أولاً من شاشة طلبات الخصوصية.",
     clearDone: "تم مسح بيانات الملف الشخصي. لم تتغير هوية تسجيل الدخول أو الحجوزات أو الفواتير أو الرسائل.",
     factCustomer: "العميل",
     factEmail: "البريد الإلكتروني",
@@ -371,7 +374,8 @@ function CustomersScreen() {
   // a success is announced where the operator is looking and the list is read again.
   const execute = async (command: PromiseLike<{ data?: unknown; error: unknown }>, success: string, pendingMessage?: string): Promise<string | null> => {
     const { data, error } = await command;
-    if (error) return errorMessage(error);
+    // F1: a court hold on the account refuses the clear on the server; say so in the screen's language.
+    if (error) return errorHint(error) === "legal_hold_active" ? t.clearHeld : errorMessage(error);
     // A command that needs a second administrator answers pending_approval: it was recorded, not carried out.
     const status = (data as { status?: string } | null)?.status;
     setNotice({ success: status === "pending_approval" && pendingMessage ? pendingMessage : success });
