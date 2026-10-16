@@ -344,3 +344,83 @@ describe("N7: a patch-test recorder reads the result only while still staff of t
     }
   });
 });
+
+describe("N6: the contact scrub touches only what was the person's while they held the number", () => {
+  it("keeps another person's messages under a reassigned number and erases the erased person's own", async () => {
+    const id = await customer();
+    const A = "+966511110001";
+    const B = "+966511110002";
+    const W = "+966511110009";
+    await sys(db, `update auth.users set created_at = now() - interval '400 days', phone = $2, phone_confirmed_at = now() where id = $1`, [id, A]);
+    await sys(db, `update auth.users set phone = $2, phone_confirmed_at = now() where id = $1`, [id, B]);
+    // A was added 300 days ago; it was replaced by B 40 days ago (outside the 30-day cooling-off). A was the person's in between.
+    await sys(db, `update account_contact_changes set changed_at = case when old_value is null then now() - interval '300 days'
+                                                                        else now() - interval '40 days' end where user_id = $1`, [id]);
+    const other = await customer();
+    await sys(db, `update profiles set phone_number = $2 where id = $1`, [other, A]);
+    const walkIn = await booking(id);
+    await sys(db, `update bookings set walk_in_phone = $2 where id = $1`, [walkIn, W]);
+    const q = (phone, recipient, ageDays, label) => one(
+      `insert into message_queue (recipient_phone, recipient_id, channel, template_name, variables, status, created_at)
+       values ($1, $2, 'sms', 'reminder', $3::jsonb, 'pending', now() - make_interval(days => $4::int)) returning id`,
+      [phone, recipient, JSON.stringify({ label }), ageDays]).then((r) => r.id);
+    const mine = await q(A, null, 100, "mine: A before it changed");
+    const nowMine = await q(B, null, 2, "mine: B now");
+    const theirsAfter = await q(A, null, 5, "theirs: A after it was reassigned");
+    const theirsNamed = await q(A, other, 100, "theirs: addressed to the other account");
+    const walkInOther = await q(W, other, 3, "theirs: the walk-in number is someone else's");
+    const log = (phone, ageDays, body) => one(
+      `insert into message_log (recipient_phone, recipient_id, channel, template_name, message_body, status, sent_at)
+       values ($1, null, 'sms', 'reminder', $2, 'sent', now() - make_interval(days => $3::int)) returning id`, [phone, body, ageDays]).then((r) => r.id);
+    const logMine = await log(A, 90, "Hi Sara");
+    const logTheirs = await log(A, 10, "Hi Noura");
+
+    const { request } = await erase(id);
+    assert.equal(await count("message_queue", "id = any($1::uuid[])", [[mine, nowMine]]), 0, "the person's own pending messages are gone");
+    for (const kept of [theirsAfter, theirsNamed, walkInOther]) {
+      const row = await one(`select recipient_phone, variables from message_queue where id = $1`, [kept]);
+      assert.ok(row, "the review's reproduction erased another person's message");
+      assert.notEqual(row.recipient_phone, null);
+      assert.ok(row.variables.label.startsWith("theirs"));
+    }
+    assert.equal((await one(`select message_body from message_log where id = $1`, [logMine])).message_body, null);
+    assert.equal((await one(`select message_body from message_log where id = $1`, [logTheirs])).message_body, "Hi Noura");
+
+    // The worker gets each number with its tenure; WhatsApp is erased only inside it.
+    const due = await call(ROLES.service, `select privacy_auth_erasures_due() r`);
+    const task = due.requests.find((x) => x.request_id === request.id);
+    const tA = task.phone_tenures.find((t) => t.phone === A);
+    const tB = task.phone_tenures.find((t) => t.phone === B);
+    assert.ok(tA.until && tB.until === null, "A ended when it was replaced; B is current");
+    assert.ok(!task.phone_tenures.some((t) => t.phone === W), "a walk-in phone is not an account number");
+    // One WhatsApp channel per business and one thread per number per channel: three businesses, one thread each under the number.
+    const hash = "a".repeat(64);
+    let channelNo = 0;
+    const conv = async (ageDays) => {
+      channelNo += 1;
+      const ownerId = await createUser(db, { role: "provider_owner" });
+      const provider = (await one(`insert into providers (owner_id, type, business_name_en, business_name_ar, status)
+                                   values ($1, 'salon_barber_shop', $2, 'اختبار', 'active') returning id`, [ownerId, `WA Test ${seq}-${channelNo}`])).id;
+      const channel = (await one(`insert into whatsapp_channels (provider_id, phone_number_id) values ($1, $2) returning id`, [provider, `5550${seq}${channelNo}`])).id;
+      return (await one(`insert into whatsapp_conversations (provider_id, channel_id, customer_hash, customer_last4, created_at)
+                         values ($1, $2, $3, '0001', now() - make_interval(days => $4::int)) returning id`, [provider, channel, hash, ageDays])).id;
+    };
+    const msg = (c, ageDays, body) => sys(db, `insert into whatsapp_messages (conversation_id, direction, sender, body, created_at)
+                                               values ($1, 'inbound', 'customer', $2, now() - make_interval(days => $3::int))`, [c, body, ageDays]);
+    const spanning = await conv(120);
+    await msg(spanning, 110, "mine");
+    await msg(spanning, 20, "theirs");
+    const insideOnly = await conv(100);
+    await msg(insideOnly, 95, "mine");
+    const afterOnly = await conv(15);
+    await msg(afterOnly, 14, "theirs");
+    const windows = [{ hash, from: tA.from, until: tA.until }];
+    await expectError(call(ROLES.service, `select privacy_erase_whatsapp($1, $2::jsonb) r`, [request.id, JSON.stringify([{ hash, until: tA.until }])]), /start of its tenure/);
+    await expectError(call(owner, `select privacy_erase_whatsapp($1, $2::jsonb) r`, [request.id, JSON.stringify(windows)]), /erasure worker|permission denied/);
+    const threads = await call(ROLES.service, `select privacy_erase_whatsapp($1, $2::jsonb) r`, [request.id, JSON.stringify(windows)]);
+    assert.equal(threads, 1, "only the thread that began and ended inside the tenure");
+    assert.deepEqual((await sys(db, `select body from whatsapp_messages where conversation_id = $1`, [spanning])).map((r) => r.body), ["theirs"]);
+    assert.equal(await count("whatsapp_conversations", "id = $1", [insideOnly]), 0);
+    assert.equal(await count("whatsapp_messages", "conversation_id = $1", [afterOnly]), 1);
+  });
+});

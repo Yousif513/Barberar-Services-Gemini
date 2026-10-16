@@ -8,8 +8,8 @@ import { hashCustomerId } from "../_shared/whatsapp-signature.ts"
 //   {}   handle every approved deletion whose data the database already erased, every account a released court hold had kept,
 //        and every account a restore brought back; remove the copy files of erased customers
 // Caller: the scheduler (service key) or a console session holding privacy.approve (the approver's console calls it right after
-// approving). It first erases the WhatsApp receptionist threads keyed by every number the customer's account held (the
-// peppered hash only this function can compute, WHATSAPP_CONTACT_PEPPER), then deletes the auth account (e-mail, phone, password,
+// approving). It first erases the WhatsApp receptionist messages under every number the customer's account held, only inside the
+// time it held that number (the peppered hash only this function can compute, WHATSAPP_CONTACT_PEPPER), then deletes the auth account (e-mail, phone, password,
 // MFA factors), then privacy_record_auth_erasure confirms against auth.users, completes the request and queues the completion
 // notice. Nothing personal is logged or returned.
 serve(async (req) => {
@@ -32,13 +32,14 @@ serve(async (req) => {
     const results: { kind: string; status: string; request_id?: string }[] = []
     for (const task of tasks) {
       const requestId = task.kind === "request" ? task.requestId : undefined
-      if (task.waIds.length && channels.length) {
+      if (task.waWindows.length && channels.length) {
         if (!pepper) {
           results.push({ kind: task.kind, request_id: requestId, status: "waiting: WHATSAPP_CONTACT_PEPPER not configured" })
           continue
         }
-        const hashes = await Promise.all(task.waIds.flatMap((waId) => channels.map((channel) => hashCustomerId(pepper, channel, waId))))
-        const { error: waError } = await db.rpc("privacy_erase_whatsapp", { p_request_id: requestId ?? null, p_hashes: hashes })
+        const windows = await Promise.all(task.waWindows.flatMap((w) => channels.map(async (channel) =>
+          ({ hash: await hashCustomerId(pepper, channel, w.waId), from: w.from, until: w.until }))))
+        const { error: waError } = await db.rpc("privacy_erase_whatsapp", { p_request_id: requestId ?? null, p_windows: windows })
         if (waError) throw waError
       }
       const { error: deleteError } = await db.auth.admin.deleteUser(task.subjectId)

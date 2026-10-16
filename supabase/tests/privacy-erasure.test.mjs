@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { classifyAuthDelete, planAuthErasures, plannedExportRemovals, whatsappChannelKeys, whatsappWaId, whatsappWaIds } from "../functions/_shared/privacy-erasure.ts";
+import { classifyAuthDelete, planAuthErasures, plannedExportRemovals, whatsappChannelKeys, whatsappWaId, whatsappWaIds, whatsappWindows } from "../functions/_shared/privacy-erasure.ts";
 import { consoleCallerDecision, FUNCTION_PERMISSIONS } from "../functions/_shared/console-permission.ts";
 import { renderNotice } from "../functions/_shared/governance-notice-delivery.ts";
 
@@ -13,22 +13,37 @@ const R = "6f1c1a52-6b7e-4f0e-9a52-1f3f6b6f2b11";
 describe("planAuthErasures", () => {
   it("validates identifiers, puts approved deletions first and never lists one account twice", () => {
     const C = "c0000000-0000-4000-8000-000000000003";
+    const T0 = "2025-01-01T00:00:00.000Z";
+    const T1 = "2026-03-01T00:00:00.000Z";
     const tasks = planAuthErasures({
-      requests: [{ request_id: R, subject_id: A, phone: "+966500000111", phones: ["+966500000111", "+966 50 000 0222", "x"] },
+      requests: [{ request_id: R, subject_id: A, phone: "+966500000111", phones: ["+966500000111", "+966 50 000 0222", "x"],
+                   phone_tenures: [{ phone: "+966 50 000 0222", from: T0, until: T1 }, { phone: "+966500000111", from: T1, until: null }, { phone: "x", from: T0 }] },
                  { request_id: "nope", subject_id: B }],
-      held_released: [{ subject_id: C, phones: ["+966500000333"] }, { subject_id: A }],
+      held_released: [{ subject_id: C, phones: ["+966500000333"], phone_tenures: [{ phone: "+966500000333", from: T0, until: null }] }, { subject_id: A }],
       restored: [{ subject_id: A }, { subject_id: B }, { subject_id: "../etc" }],
     });
     assert.deepEqual(tasks, [
-      { kind: "request", requestId: R, subjectId: A, waIds: ["966500000111", "966500000222"] },
-      { kind: "held_released", subjectId: C, waIds: ["966500000333"] },
-      { kind: "restored", subjectId: B, waIds: [] },
+      { kind: "request", requestId: R, subjectId: A, waWindows: [{ waId: "966500000222", from: T0, until: T1 }, { waId: "966500000111", from: T1, until: null }] },
+      { kind: "held_released", subjectId: C, waWindows: [{ waId: "966500000333", from: T0, until: null }] },
+      { kind: "restored", subjectId: B, waWindows: [] },
     ]);
     assert.deepEqual(planAuthErasures({}), []);
   });
 
   it("M7: erases WhatsApp threads under every phone the account held, each once", () => {
     assert.deepEqual(whatsappWaIds("+966500000111", ["966500000111", "+966500000222", null]), ["966500000111", "966500000222"]);
+  });
+
+  it("N6: erases under a number only inside the time the account held it; an unknown tenure erases nothing", () => {
+    assert.deepEqual(whatsappWindows([{ phone: "+966500000111", from: "2025-01-01T00:00:00Z", until: "2026-01-01T00:00:00Z" },
+                                      { phone: "+966500000111", from: "2025-01-01T00:00:00Z", until: "2026-01-01T00:00:00Z" }]),
+      [{ waId: "966500000111", from: "2025-01-01T00:00:00.000Z", until: "2026-01-01T00:00:00.000Z" }], "each window once");
+    assert.deepEqual(whatsappWindows([{ phone: "+966500000111" }, { phone: "+966500000111", from: "yesterday" },
+                                      { phone: "+966500000111", from: "2025-01-01T00:00:00Z", until: "soon" }, null, "x"]), []);
+    assert.deepEqual(whatsappWindows(undefined), []);
+    const src = readFileSync(new URL("../functions/privacy-erase-account/index.ts", import.meta.url), "utf8");
+    assert.match(src, /p_windows: windows/);
+    assert.doesNotMatch(src, /p_hashes/);
   });
 
   it("M6: removes only copy files of the shape the builder writes", () => {
