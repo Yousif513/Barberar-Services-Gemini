@@ -13,7 +13,9 @@ the end need a licensed Saudi lawyer or tax adviser.
 | P3 | Who is the **second owner**? With one owner, nobody can be made owner or finance from the console, and break-glass is the only path. | |
 | P4 | How does a locked-out lone owner recover (MFA lost)? Today an engineer must reset it in the database. | |
 
-## 2. Defaults already built: confirm or change
+## 2. Defaults already built: **APPROVED by the owner on 2026-10-17 ("approve all defaults")**
+
+Recorded as confirmed decisions in `.admin-console/manifest.json`. Any of them can still be changed later through the console approval flow.
 
 | # | Default (what the system does now) | Keep? |
 |---|------------------------------------|-------|
@@ -39,6 +41,27 @@ the end need a licensed Saudi lawyer or tax adviser.
 | D20 | The register of processing activities stays in English with an Arabic note, until the DPO approves a translation. | |
 | D21 | Provider "recorded commission %" is shown read-only and sets no price; real fees come from fee rules. | |
 | D22 | `payment_methods` (which payment methods are enabled) is an owner setting, not a finance setting. | |
+
+## 2b. Technical safeguards not on the list above (approve as a batch when convenient)
+
+These are engineering choices made during the security fixes. Each is the stricter option. They stay "assumed" until you approve them.
+
+| # | What the system does | Keep? |
+|---|----------------------|-------|
+| T1 | Treat the live database as NOT having the new migrations until we check it together. | |
+| T2 | Refunds and settlements may lower (never raise) an original ledger row; every other correction is a new entry. | |
+| T3 | Giving any money, IBAN, roles, MFA-reset, settings or break-glass permission needs a different owner's approval and a 72-hour wait. | |
+| T4 | A ledger correction can never exceed the reconciliation difference it closes. | |
+| T5 | After a deletion, purchased packages, memberships, gift cards and disputes keep their money record under a pseudonym (10 years). | |
+| T6 | The privacy PDF uses the site's own Arabic font (IBM Plex Sans Arabic, open licence). | |
+| T7 | The deletion record is exported for an archive outside the database (you choose where; see section 4). | |
+| T8 | Admin menus hide what a role cannot use; the server still refuses it anyway. | |
+| T9 | A booking with any money record (tip, coupon, gift card, wallet, package, loyalty, referral) is pseudonymised, never deleted. | |
+| T10 | Correcting an incident's "aware at" time needs a second person and keeps the full history. | |
+| T11 | Phone-based erasure only touches messages from the period the customer owned that number. | |
+| T12 | After 10 years, money-linked bookings are kept with the marker "retention-ended"; everything else is deleted. | |
+| T13 | A profile clear is refused while a court hold covers the account. | |
+| T14 | A real 10-year purge needs a second person; dry runs do not. | |
 
 ## 3. Values only you can set (features stay OFF until set)
 

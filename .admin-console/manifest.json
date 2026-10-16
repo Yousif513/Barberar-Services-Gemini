@@ -8250,10 +8250,11 @@
         "supabase/migrations/20260620181924_provider_payout_requests.sql",
         "supabase/functions/payment-checkout/index.ts"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "admin-dashboard"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D1"
     },
     {
       "id": "archetypes",
@@ -8376,10 +8377,11 @@
       "evidence": [
         "supabase/migrations/20261005120000_admin_provider_operations.sql#L2"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "provider"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D21"
     },
     {
       "id": "sec-dashboard-aggregates-need-no-per-call-audit",
@@ -8389,10 +8391,11 @@
         "supabase/tests/db/admin_security_matrix.test.mjs#L254",
         "supabase/migrations/20261005090000_admin_dashboard_overview.sql#L98"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "refund.list"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D3"
     },
     {
       "id": "redirect-entries-are-not-screens",
@@ -8468,8 +8471,9 @@
       "evidence": [
         "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L37"
       ],
-      "status": "assumed",
-      "appliesTo": []
+      "status": "confirmed",
+      "appliesTo": [],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D2"
     },
     {
       "id": "gov2-d4-queue-counts-and-staff-names",
@@ -8478,8 +8482,9 @@
       "evidence": [
         "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L1056"
       ],
-      "status": "assumed",
-      "appliesTo": []
+      "status": "confirmed",
+      "appliesTo": [],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D4"
     },
     {
       "id": "adopted-d-q8-money-append-only",
@@ -8560,10 +8565,11 @@
       "evidence": [
         "supabase/migrations/20261010300000_money_append_only_and_corrections.sql"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "money.append-only"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D22"
     },
     {
       "id": "money-reconciliation-zero-tolerance-auto-match",
@@ -8572,11 +8578,12 @@
       "evidence": [
         "supabase/migrations/20261010330000_money_tap_reconciliation.sql"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "reconciliation.daily",
         "reconciliation.resolve-break"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D7"
     },
     {
       "id": "money-referral-vesting-interpretation",
@@ -8585,10 +8592,11 @@
       "evidence": [
         "supabase/migrations/20261010320000_money_reward_programs.sql"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "reward-program.enable"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D11"
     },
     {
       "id": "govfix-adopt-security-review-fixes",
@@ -8626,10 +8634,11 @@
       "evidence": [
         "supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "gov.iban-reveal"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D9"
     },
     {
       "id": "govfix-reveal-ceiling-answers-not-raises",
@@ -8667,11 +8676,12 @@
         "supabase/migrations/20261011120000_secfix2_h3_m4_m5_reconciliation_evidence.sql",
         "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "reconciliation.resolve-break",
         "gov.break-glass"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D6"
     },
     {
       "id": "secfix2-break-correction-amount",
@@ -8696,11 +8706,12 @@
         "supabase/tests/db/secfix2_reconciliation_evidence.test.mjs",
         "web_platform/src/app/admin/ledger/page.tsx"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "payout.approve",
         "ledger.release-payout"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D8"
     },
     {
       "id": "secfix2-notice-sent-means-provider-accepted",
@@ -8710,10 +8721,11 @@
         "supabase/functions/_shared/governance-notice-delivery.ts",
         "supabase/tests/governance-notice-delivery.test.mjs"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "notification.dispatch"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D10"
     },
     {
       "id": "secfix2-console-no-show-follows-refund-rules",
@@ -8723,11 +8735,12 @@
         "supabase/migrations/20261011110000_secfix2_h2_console_cancellations.sql",
         "supabase/tests/db/secfix2_console_cancellations.test.mjs"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "booking.transition",
         "refund.execute"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D5"
     },
     {
       "id": "secfix2-sponsored-price-needs-second-owner",
@@ -8737,10 +8750,11 @@
         "supabase/migrations/20261011150000_secfix2_lows_rewards_sponsored_reconcile_actor.sql",
         "supabase/tests/db/secfix2_mediums_lows.test.mjs"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "sponsored.configure"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D12"
     },
     {
       "id": "adopted-q1-privacy-requests",
@@ -8816,8 +8830,9 @@
       "evidence": [
         "supabase/migrations/20261011200000_priv_privacy_requests.sql"
       ],
-      "status": "assumed",
-      "appliesTo": []
+      "status": "confirmed",
+      "appliesTo": [],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D2"
     },
     {
       "id": "priv-identity-check-is-otp-sign-in",
@@ -8827,8 +8842,9 @@
         "supabase/migrations/20261011200000_priv_privacy_requests.sql",
         "scripts/verify-privacy-local.mjs"
       ],
-      "status": "assumed",
-      "appliesTo": []
+      "status": "confirmed",
+      "appliesTo": [],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D13"
     },
     {
       "id": "priv-correction-scope-and-restriction",
@@ -8837,8 +8853,9 @@
       "evidence": [
         "supabase/migrations/20261011200000_priv_privacy_requests.sql"
       ],
-      "status": "assumed",
-      "appliesTo": []
+      "status": "confirmed",
+      "appliesTo": [],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D14"
     },
     {
       "id": "priv-money-records-pseudonymised",
@@ -8857,8 +8874,9 @@
       "evidence": [
         "supabase/migrations/20261011220000_priv_deletion_engine.sql"
       ],
-      "status": "assumed",
-      "appliesTo": []
+      "status": "confirmed",
+      "appliesTo": [],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D17"
     },
     {
       "id": "priv-financial-year-is-calendar-year",
@@ -8867,8 +8885,9 @@
       "evidence": [
         "supabase/migrations/20261011220000_priv_deletion_engine.sql"
       ],
-      "status": "assumed",
-      "appliesTo": []
+      "status": "confirmed",
+      "appliesTo": [],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D15"
     },
     {
       "id": "priv-health-concluded-and-assigned-provider",
@@ -8877,8 +8896,9 @@
       "evidence": [
         "supabase/migrations/20261011230000_priv_health_intake.sql"
       ],
-      "status": "assumed",
-      "appliesTo": []
+      "status": "confirmed",
+      "appliesTo": [],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D16"
     },
     {
       "id": "priv-pdf-fonts",
@@ -8907,10 +8927,11 @@
       "evidence": [
         "supabase/migrations/20261011320000_privfix_health_retention.sql"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "intake.health-retention-and-gate"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D16"
     },
     {
       "id": "privfix-stale-appointment-cutoff",
@@ -8959,12 +8980,13 @@
         "supabase/migrations/20261011310000_privfix_identity_and_copy.sql",
         "supabase/config.toml"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "privacy.request-intake",
         "privacy.copy-export",
         "privacy.deletion"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D13"
     },
     {
       "id": "privfix-archive-import-service-only",
@@ -8985,13 +9007,14 @@
       "evidence": [
         ".admin-console/evidence/ux-fix/crawl-admin.owner-ar-375.json"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "admin-privacy",
         "admin-ledger",
         "admin-reconciliation",
         "customer-privacy-account"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D19"
     },
     {
       "id": "uxfix-clear-profile-is-erasure",
@@ -9014,10 +9037,11 @@
       "evidence": [
         "web_platform/src/app/admin/ropa/page.tsx"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "admin-ropa"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D20"
     },
     {
       "id": "uxfix-console-role-trimming",
@@ -9052,10 +9076,11 @@
       "evidence": [
         "supabase/migrations/20261016120000_final_hold_release_and_renewal_four_eyes.sql"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "privacy.legal-hold"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D17"
     },
     {
       "id": "final-hold-renewal-fresh-owner-after-3",
@@ -9064,10 +9089,11 @@
       "evidence": [
         "supabase/migrations/20261016120000_final_hold_release_and_renewal_four_eyes.sql"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "privacy.legal-hold"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D17"
     },
     {
       "id": "final-incident-aware-at-second-person",
@@ -9125,10 +9151,11 @@
       "evidence": [
         "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql"
       ],
-      "status": "assumed",
+      "status": "confirmed",
       "appliesTo": [
         "privacy.request-intake"
-      ]
+      ],
+      "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approve all defaults' — docs/OWNER-DECISIONS.md D18"
     },
     {
       "id": "f3-retention-purge-approval-kind",
