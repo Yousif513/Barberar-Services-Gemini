@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
 import { CommandResult, ForbiddenNotice, isForbidden, operationsDate, operationsInput, sar, useOperationsLocale } from "@/components/operations-ui";
-import { CommandDialog, ModalOverlay } from "@/components/modal";
+import { CommandDialog, ModalOverlay, ModalPortal } from "@/components/modal";
 
 // Platform switches and rates: feature flags, marketplace fee rules and the API limits. Every change is a server command
 // that needs the operator's reason and is recorded in the audit log (admin_set_feature_flag, admin_set_api_setting); a fee
@@ -158,7 +158,7 @@ const translations = {
     flagOffDone: "تم إيقاف المفتاح.",
     updated: "آخر تحديث",
     feesTitle: "قواعد رسوم السوق",
-    feesIntro: "ما تتقاضاه المنصة على الحجز القادم من السوق. الحجوزات القادمة من رابط المزود أو رمز QR أو واتساب أو إنستغرام أو العميل الحاضر أو قائمة العملاء المستوردة تكون دائماً بلا رسوم منصة، لذلك تظهر صفوفها دون إمكانية تعديلها. التغيير نسخة جديدة تبدأ من تاريخ محدد: تسري على الحجوزات من ذلك التاريخ فقط، ويجب أن يعتمدها مسؤول آخر، والزيادة تبدأ بعد 30 يوماً على الأقل من الاعتماد ليُبلَّغ المزودون في الوقت المناسب. تُضاف ضريبة القيمة المضافة على رسوم المنصة.",
+    feesIntro: "ما تتقاضاه المنصة على الحجز القادم من السوق. الحجوزات القادمة من رابط المزود أو رمز QR أو واتساب أو إنستغرام أو العميل الحاضر أو قائمة العملاء المستوردة تكون دائماً بلا رسوم منصة، لذلك تظهر صفوفها دون إمكانية تعديلها. التغيير نسخة جديدة تبدأ من تاريخ محدد: تسري على الحجوزات من ذلك التاريخ فقط، ويجب أن يعتمدها مسؤول آخر، والزيادة تبدأ بعد ٣٠ يوماً على الأقل من الاعتماد ليُبلَّغ المزودون في الوقت المناسب. تُضاف ضريبة القيمة المضافة على رسوم المنصة.",
     columnFrom: "سارية من",
     columnTo: "حتى",
     inForce: "سارية",
@@ -166,11 +166,11 @@ const translations = {
     ended: "منتهية",
     proposeChange: "اقتراح تغيير",
     effectiveLabel: "تاريخ البدء (بتوقيت الرياض)",
-    effectiveHint: "يمكن أن تبدأ الرسوم الأقل اليوم. أما الرسوم الأعلى فتبدأ بعد 30 يوماً على الأقل من اعتمادها.",
+    effectiveHint: "يمكن أن تبدأ الرسوم الأقل اليوم. أما الرسوم الأعلى فتبدأ بعد ٣٠ يوماً على الأقل من اعتمادها.",
     effectiveInvalid: "اختر تاريخ بدء من اليوم فصاعداً.",
     ruleSent: "أُرسل تغيير الرسوم للاعتماد. يعتمده مسؤول آخر من صفحة الاعتمادات.",
     pendingTitle: "بانتظار الاعتماد",
-    increaseBadge: "زيادة: إشعار 30 يوماً",
+    increaseBadge: "زيادة: إشعار ٣٠ يوماً",
     vatNote: "تضاف ضريبة القيمة المضافة على هذه الرسوم",
     feesEmpty: "لا توجد قواعد رسوم.",
     columnChannel: "القناة",
@@ -191,25 +191,25 @@ const translations = {
     addRule: "إضافة القاعدة الناقصة: {visit}",
     ruleTitleEdit: "تغيير رسوم السوق: {visit}",
     ruleTitleAdd: "إضافة رسوم السوق: {visit}",
-    percentLabel: "نسبة الرسوم (0 إلى 50)",
+    percentLabel: "نسبة الرسوم (٠ إلى ٥٠)",
     minLabel: "الحد الأدنى للرسوم (ر.س)",
     maxLabel: "الحد الأقصى للرسوم (ر.س، فارغ لعدم التحديد)",
     descriptionLabel: "الوصف (اختياري)",
     ruleReason: "سبب هذا التغيير",
     ruleReasonHint: "يُسجَّل في سجل التدقيق باسمك.",
     ruleSaved: "أُرسل تغيير الرسوم للاعتماد.",
-    percentInvalid: "أدخل نسبة من 0 إلى 50.",
-    minInvalid: "أدخل حداً أدنى من 0 إلى 1000.",
-    maxInvalid: "الحد الأقصى فارغ أو بين الحد الأدنى و1000.",
-    reasonShort: "اكتب سبباً لا يقل عن 10 أحرف.",
+    percentInvalid: "أدخل نسبة من ٠ إلى ٥٠.",
+    minInvalid: "أدخل حداً أدنى من ٠ إلى ١٠٠٠.",
+    maxInvalid: "الحد الأقصى فارغ أو بين الحد الأدنى و١٠٠٠.",
+    reasonShort: "اكتب سبباً لا يقل عن ١٠ أحرف.",
     apiTitle: "حدود واجهة البرمجة",
     apiIntro: "حدود واجهة برمجة المزودين. الحد الذي لم يحدده أحد يظهر «غير محدد»، وتبقى الخاصية المعتمدة عليه متوقفة حتى تحدده.",
     apiEmpty: "هذه الإعدادات غير موجودة في قاعدة البيانات بعد. طبّق ترحيلات واجهة البرمجة أولاً.",
     notSet: "غير محدد",
     setValue: "تحديد القيمة",
     changeValue: "تغيير القيمة",
-    apiValueLabel: "عدد صحيح من 1 إلى 1,000,000",
-    apiValueError: "أدخل عدداً صحيحاً من 1 إلى 1,000,000.",
+    apiValueLabel: "عدد صحيح من ١ إلى ١٬٠٠٠٬٠٠٠",
+    apiValueError: "أدخل عدداً صحيحاً من ١ إلى ١٬٠٠٠٬٠٠٠.",
     apiTitleDialog: "تحديد {key}",
     apiReason: "ما سبب تغيير هذا الحد؟",
     apiDone: "تم حفظ الإعداد.",
@@ -376,7 +376,7 @@ export default function AdminPlatformRules() {
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className="space-y-8 text-start">
       <div>
-        <h2 className="font-serif text-2xl font-black text-gray-900">{t.title}</h2>
+        <h1 className="font-serif text-2xl font-black text-gray-900">{t.title}</h1>
         <p className="mt-1 max-w-3xl text-xs font-semibold text-gray-500">{t.subtitle}</p>
       </div>
 
@@ -559,6 +559,7 @@ export default function AdminPlatformRules() {
       )}
 
       {ruleForm && (
+        <ModalPortal>
         <ModalOverlay onClose={() => setRuleForm(null)} canClose={!ruleSaving} className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 px-4 py-6 backdrop-blur-sm">
           <div role="dialog" aria-modal="true" aria-labelledby="rule-dialog-title" tabIndex={-1} dir={isRTL ? "rtl" : "ltr"} className="w-full max-w-lg rounded-2xl border border-[#ECECEC] bg-white p-6 text-start shadow-[0_24px_70px_rgba(0,0,0,0.18)]">
             <h3 id="rule-dialog-title" className="font-serif text-xl font-black text-gray-900">{fill(ruleForm.id ? t.ruleTitleEdit : t.ruleTitleAdd, { visit: visitLabel(ruleForm.firstVisit) })}</h3>
@@ -598,6 +599,7 @@ export default function AdminPlatformRules() {
             </div>
           </div>
         </ModalOverlay>
+        </ModalPortal>
       )}
 
       <CommandResult success={success} locale={lang} onDismiss={() => setSuccess("")} />

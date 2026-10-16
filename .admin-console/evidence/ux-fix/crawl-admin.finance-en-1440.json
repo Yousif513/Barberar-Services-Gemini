@@ -1,0 +1,220 @@
+[
+  {
+    "route": "/",
+    "h1": [
+      "Dashboard"
+    ],
+    "overflow": 0,
+    "nav": 51,
+    "latin": 109,
+    "arabic": 0,
+    "alerts": [],
+    "dir": "ltr",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/approvals",
+    "h1": [
+      "Approvals"
+    ],
+    "overflow": 0,
+    "nav": 46,
+    "latin": 442,
+    "arabic": 0,
+    "alerts": [],
+    "dir": "ltr",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/roles",
+    "h1": [
+      "Administrators & Roles"
+    ],
+    "overflow": 0,
+    "nav": 46,
+    "latin": 402,
+    "arabic": 0,
+    "alerts": [],
+    "dir": "ltr",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/ledger",
+    "h1": [
+      "Financial Ledger & Statements"
+    ],
+    "overflow": 0,
+    "nav": 46,
+    "latin": 0,
+    "arabic": 0,
+    "alerts": [],
+    "dir": "ltr",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/reconciliation",
+    "h1": [
+      "Tap Reconciliation"
+    ],
+    "overflow": 0,
+    "nav": 46,
+    "latin": 26,
+    "arabic": 0,
+    "alerts": [],
+    "dir": "ltr",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/platform-rules",
+    "h1": [
+      "Platform Rules"
+    ],
+    "overflow": 0,
+    "nav": 46,
+    "latin": 102,
+    "arabic": 0,
+    "alerts": [],
+    "dir": "ltr",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/settings",
+    "h1": [
+      "Platform Settings"
+    ],
+    "overflow": 0,
+    "nav": 46,
+    "latin": 19,
+    "arabic": 0,
+    "alerts": [],
+    "dir": "ltr",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/customers",
+    "h1": [
+      "Customers"
+    ],
+    "overflow": 0,
+    "nav": 46,
+    "latin": 0,
+    "arabic": 0,
+    "alerts": [
+      "You do not have access to this screenYour console role, Finance, does not include this screen. It is part of these console roles: Operations"
+    ],
+    "dir": "ltr",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/bookings",
+    "h1": [
+      "Global Bookings Ledger"
+    ],
+    "overflow": 0,
+    "nav": 46,
+    "latin": 255,
+    "arabic": 0,
+    "alerts": [],
+    "dir": "ltr",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/disputes",
+    "h1": [
+      "Disputes Arbitrator Console"
+    ],
+    "overflow": 0,
+    "nav": 46,
+    "latin": 7,
+    "arabic": 0,
+    "alerts": [],
+    "dir": "ltr",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/audit-logs",
+    "h1": [
+      "Audit Logs"
+    ],
+    "overflow": 0,
+    "nav": 46,
+    "latin": 0,
+    "arabic": 0,
+    "alerts": [
+      "You do not have access to this screenYour console role, Finance, does not include this screen. It is part of the Owner console role. An owne"
+    ],
+    "dir": "ltr",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/privacy",
+    "h1": [
+      "Privacy Requests"
+    ],
+    "overflow": 0,
+    "nav": 46,
+    "latin": 0,
+    "arabic": 0,
+    "alerts": [
+      "You do not have access to this screenYour console role, Finance, does not include this screen. It is part of these console roles: Operations"
+    ],
+    "dir": "ltr",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/incidents",
+    "h1": [
+      "Incident Register"
+    ],
+    "overflow": 0,
+    "nav": 46,
+    "latin": 0,
+    "arabic": 0,
+    "alerts": [
+      "You do not have access to this screenYour console role, Finance, does not include this screen. It is part of the Owner console role. An owne"
+    ],
+    "dir": "ltr",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/ropa",
+    "h1": [
+      "Processing Register (RoPA)"
+    ],
+    "overflow": 0,
+    "nav": 46,
+    "latin": 122,
+    "arabic": 0,
+    "alerts": [],
+    "dir": "ltr",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/refunds",
+    "h1": [
+      "Refunds"
+    ],
+    "overflow": 0,
+    "nav": 46,
+    "latin": 1,
+    "arabic": 0,
+    "alerts": [],
+    "dir": "ltr",
+    "console": [],
+    "http": []
+  }
+]

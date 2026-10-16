@@ -80,6 +80,15 @@ export default function CustomerBookingIntakePage() {
     setReload((n) => n + 1);
   };
 
+  // Q2.6: with the separate reuse consent (12 months), the latest answers to the same form prefill this one; nothing is sent until submit.
+  const reuseAnswers = async () => {
+    const { data: out, error } = await supabase.rpc("get_reusable_intake_answers", { p_booking_id: bookingId });
+    if (error) { setResult({ error: describeIntakeError(error, locale) }); return; }
+    const r = out as { available: boolean; answers?: Answers };
+    if (r.available && r.answers) setDraft(r.answers);
+    else setResult({ error: locale === "ar" ? "لا توجد إجابات سابقة محفوظة لإعادة استخدامها." : "No earlier answers are kept for reuse." });
+  };
+
   const remove = async () => {
     const yes = await ask({ title: t.deleteTitle, intro: t.deleteIntro, confirmLabel: t.deleteConfirm, tone: "danger" });
     if (!yes) return;
@@ -142,7 +151,11 @@ export default function CustomerBookingIntakePage() {
         <p role="alert" className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm">{t.formUnavailable}</p>
       )}
 
-      {!loading && data && form && !data.consent_active && (!submitted) && (
+      {!loading && data && data.requirement?.form_required && data.collection && !data.collection.enabled && (
+        <p role="status" className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm">{locale === "ar" ? data.collection.notice_ar : data.collection.notice_en}</p>
+      )}
+
+      {!loading && data && form && data.collection?.enabled !== false && !data.consent_active && (!submitted) && (
         <section className={card} aria-labelledby="consent-title">
           <h2 id="consent-title" className="font-serif text-xl font-bold">{t.consentTitle}</h2>
           <h3 className="mt-4 text-sm font-bold">{t.shareHeading}</h3>
@@ -160,13 +173,16 @@ export default function CustomerBookingIntakePage() {
         </section>
       )}
 
-      {!loading && data && form && data.consent_active && upcoming && (!submitted || editing) && (
+      {!loading && data && form && data.collection?.enabled !== false && data.consent_active && upcoming && (!submitted || editing) && (
         <form onSubmit={(e) => void submit(e)} noValidate className={card} aria-labelledby="form-title">
           <h2 id="form-title" className="font-serif text-xl font-bold">{locale === "ar" ? form.name_ar : form.name_en}</h2>
           {submission && !submitted && (
             <p role="status" className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm">
               {submission.status === "withdrawn" ? t.stateWithdrawn : submission.status === "deleted" ? t.stateDeleted : t.statePurged}
             </p>
+          )}
+          {data.reuse_consent_active && !submitted && (
+            <button type="button" className={`${button} mt-3`} disabled={busy} onClick={() => void reuseAnswers()}>{locale === "ar" ? "استخدام إجاباتي السابقة" : "Use my previous answers"}</button>
           )}
           <div className="mt-4">
             <IntakeAnswerForm fields={form.fields} answers={draft} problems={problems} locale={locale} disabled={busy}

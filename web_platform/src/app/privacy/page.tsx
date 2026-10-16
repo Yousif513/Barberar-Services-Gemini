@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { errorMessage } from "@/lib/error-message";
 
 const translations = {
   en: {
@@ -19,7 +18,8 @@ const translations = {
     section3Desc: "Your location and contact number are shared only with the specialist you selected, once a booking is confirmed. We do not sell your personal records to third-party marketing companies.",
     dsrBadge: "Data request",
     dsrTitle: "Exercise Your Data Rights",
-    dsrDesc: "Submit a request about your personal data. A due date 30 days after you submit is recorded on the request, and our team reviews it.",
+    dsrDesc: "In your account you can ask for access to your data, a copy (JSON and PDF), a correction or its deletion, or withdraw a consent. Requests are free of charge and answered within 30 days; we confirm it is you with a one-time code. You can also write to the address below or call us, and we will ask you to confirm the request in your account.",
+    openRequests: "Open Privacy in my account",
     reqTypeLabel: "Request Type",
     reqAccess: "Access to my personal records",
     reqRectify: "Correct or update my information",
@@ -30,7 +30,7 @@ const translations = {
     submitBtn: "Submit Request",
     submittingBtn: "Submitting...",
     loginPrompt: "Please sign in to your Primora account before submitting a data request.",
-    loginBtn: "Sign In to Submit",
+    loginBtn: "Sign in to make a request",
     dsrSuccess: "Your request was recorded. Due date:",
     dsrExisting: "You already have an open request of this kind. Its due date is",
     dsrReference: "Reference:",
@@ -51,7 +51,8 @@ const translations = {
     section3Desc: "تُشارَك بيانات موقعك ورقم جوالك مع الأخصائي الذي اخترته فقط بعد تأكيد الحجز. نحن لا نبيع سجلاتك الشخصية لشركات التسويق الخارجية.",
     dsrBadge: "طلب بيانات",
     dsrTitle: "ممارسة حقوقك في بياناتك",
-    dsrDesc: "قدّم طلباً بخصوص بياناتك الشخصية. يُسجَّل على الطلب موعد استحقاق بعد 30 يوماً من تقديمه، ويراجعه فريقنا.",
+    dsrDesc: "من حسابك يمكنك طلب الاطلاع على بياناتك أو نسخة منها (JSON وPDF) أو تصحيحها أو حذفها، أو سحب موافقة. الطلبات مجانية ونرد خلال 30 يوماً، ونتحقق من هويتك برمز لمرة واحدة. يمكنك أيضاً مراسلتنا على العنوان أدناه أو الاتصال بنا، وسنطلب منك تأكيد الطلب في حسابك.",
+    openRequests: "فتح صفحة الخصوصية في حسابي",
     reqTypeLabel: "نوع الطلب",
     reqAccess: "الاطلاع على بياناتي الشخصية",
     reqRectify: "تصحيح بياناتي أو تحديثها",
@@ -62,7 +63,7 @@ const translations = {
     submitBtn: "إرسال الطلب",
     submittingBtn: "جاري الإرسال...",
     loginPrompt: "يرجى تسجيل الدخول بحسابك في بريمورا لتقديم طلب بخصوص بياناتك.",
-    loginBtn: "تسجيل الدخول للتقديم",
+    loginBtn: "سجّل الدخول لتقديم طلب",
     dsrSuccess: "تم تسجيل طلبك. موعد الاستحقاق:",
     dsrExisting: "لديك طلب مفتوح من هذا النوع بالفعل. موعد استحقاقه",
     dsrReference: "المرجع:",
@@ -74,11 +75,6 @@ const translations = {
 
 export default function PrivacyPage() {
   const [locale, setLocale] = useState<"en" | "ar">("ar");
-  const [requestType, setRequestType] = useState<"access" | "rectification" | "erasure" | "export">("access");
-  const [details, setDetails] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submissionSuccess, setSubmissionSuccess] = useState("");
-  const [submissionError, setSubmissionError] = useState("");
   const [user, setUser] = useState<{ id: string } | null>(null);
   const t = translations[locale];
 
@@ -100,39 +96,6 @@ export default function PrivacyPage() {
     });
   }, []);
 
-  const handleDsrSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) {
-      setSubmissionError(t.loginPrompt);
-      return;
-    }
-    setIsSubmitting(true);
-    setSubmissionSuccess("");
-    setSubmissionError("");
-
-    try {
-      // The table refuses direct inserts: submit_data_request sets the owner, the status and the 30-day due date (Riyadh date)
-      // on the server, and returns the request that is already open when the same kind was submitted before.
-      const { data, error } = await supabase.rpc("submit_data_request", {
-        p_request_type: requestType,
-        p_details: details.trim() || null,
-      });
-
-      if (error) throw error;
-
-      const result = data as { created?: boolean; id?: string; due_date?: string } | null;
-      if (!result?.id) throw new Error(t.dsrFailed);
-      const due = result.due_date
-        ? new Intl.DateTimeFormat(locale === "ar" ? "ar-SA" : "en-GB", { dateStyle: "long", timeZone: "Asia/Riyadh" }).format(new Date(`${result.due_date}T12:00:00+03:00`))
-        : "";
-      setSubmissionSuccess(`${result.created === false ? t.dsrExisting : t.dsrSuccess} ${due}. ${t.dsrReference} ${result.id}`);
-      setDetails("");
-    } catch (err: unknown) {
-      setSubmissionError(`${t.dsrFailed} ${errorMessage(err)}`);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <div 
@@ -190,83 +153,12 @@ export default function PrivacyPage() {
             <p className="text-xs text-stone-600 leading-relaxed mt-1">{t.dsrDesc}</p>
           </div>
 
-          {submissionSuccess && (
-            <div role="status" className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-xs font-semibold text-emerald-800">
-              {submissionSuccess}
-            </div>
-          )}
-
-          {submissionError && (
-            <div role="alert" className="rounded-xl border border-red-300 bg-red-50 p-4 text-xs font-semibold text-red-800">
-              {submissionError}
-            </div>
-          )}
-
-          {!user ? (
-            <div className="rounded-xl bg-stone-100 p-4 text-center space-y-3">
-              <p className="text-xs text-stone-600 font-medium">{t.loginPrompt}</p>
-              <Link
-                href="/login?returnUrl=/privacy"
-                className="inline-block rounded-xl bg-stone-900 px-5 py-2.5 text-xs font-bold text-[#D1AF47] shadow hover:bg-stone-800 transition"
-              >
-                {t.loginBtn}
-              </Link>
-            </div>
-          ) : (
-            <form onSubmit={handleDsrSubmit} className="space-y-4">
-              <div>
-                <span id="dsr-type-label" className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-2">
-                  {t.reqTypeLabel}
-                </span>
-                <div role="group" aria-labelledby="dsr-type-label" className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                  {[
-                    ["access", t.reqAccess],
-                    ["rectification", t.reqRectify],
-                    ["erasure", t.reqErase],
-                    ["export", t.reqExport],
-                  ].map(([val, label]) => (
-                    <button
-                      key={val}
-                      type="button"
-                      aria-pressed={requestType === val}
-                      onClick={() => setRequestType(val as typeof requestType)}
-                      className={`rounded-xl border px-3.5 py-2.5 text-start font-medium transition focus-visible:outline-2 focus-visible:outline-[#A57C32] ${
-                        requestType === val
-                          ? "border-[#A57C32] bg-[#A57C32]/10 text-stone-900 font-bold"
-                          : "border-stone-200 bg-stone-50 text-stone-600 hover:bg-stone-100"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="dsr-details" className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-2">
-                  {t.detailsLabel}
-                </label>
-                <textarea
-                  id="dsr-details"
-                  rows={3}
-                  maxLength={2000}
-                  value={details}
-                  onChange={(e) => setDetails(e.target.value)}
-                  placeholder={t.detailsPlaceholder}
-                  className="w-full rounded-xl border border-stone-200 bg-stone-50 p-3 text-xs outline-none focus:border-[#A57C32] focus:bg-white focus-visible:outline-2 focus-visible:outline-[#A57C32] text-stone-900"
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full rounded-xl bg-stone-900 py-3 text-xs font-black uppercase tracking-wider text-[#D1AF47] shadow transition hover:bg-stone-800 disabled:opacity-50"
-              >
-                {isSubmitting ? t.submittingBtn : t.submitBtn}
-              </button>
-            </form>
-          )}
+          <Link
+            href={user ? "/customer/privacy" : "/login?returnUrl=/customer/privacy"}
+            className="inline-block rounded-xl bg-stone-900 px-5 py-2.5 text-xs font-bold text-[#D1AF47] shadow hover:bg-stone-800 transition focus-visible:outline-2 focus-visible:outline-[#A57C32]"
+          >
+            {user ? t.openRequests : t.loginBtn}
+          </Link>
         </div>
 
         {/* Contact DPO Callout */}

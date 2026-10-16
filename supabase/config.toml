@@ -47,7 +47,8 @@ uri = "pg-functions://postgres/public/hook_mfa_verification_attempt"
 
 [auth.sms]
 enable_signup = true
-enable_confirmations = false
+# Review M2: a phone counts as verified only after its one-time code (no auto-confirmed phone sign-ups).
+enable_confirmations = true
 
 [auth.sms.test_otp]
 # SMS/WhatsApp OTP local testing provider

@@ -149,13 +149,14 @@ describe("consent and data requests are written through their commands", () => {
   it("login, the booking dialog and the privacy page never insert into the evidence tables", () => {
     for (const path of ["web_platform/src/app/login/page.tsx", "web_platform/src/app/shop/[id]/page.tsx", "web_platform/src/app/privacy/page.tsx", "web_platform/src/app/become-provider/page.tsx"]) {
       assert.ok(!/from\("consents"\)\s*\.(insert|upsert|update)/.test(byPath[path]), `${path} must record consent through record_consents`);
-      assert.ok(!/from\("data_subject_requests"\)\s*\.(insert|upsert|update)/.test(byPath[path]), `${path} must file requests through submit_data_request`);
+      assert.ok(!/from\("(data_subject_requests|privacy_requests)"\)\s*\.(insert|upsert|update)/.test(byPath[path]), `${path} must file requests through privacy_submit_request`);
       assert.ok(!/from\("agreement_acceptances"\)\s*\.(insert|upsert|update)/.test(byPath[path]), `${path} must record acceptance through record_agreement_acceptance`);
       assert.ok(!/document_version:\s*["']v1\.0["']/.test(byPath[path]), `${path} must send the published agreement version, not a typed one`);
     }
     assert.ok(byPath["web_platform/src/app/login/page.tsx"].includes('rpc("record_consents"'));
     assert.ok(byPath["web_platform/src/app/shop/[id]/page.tsx"].includes('rpc("record_consents"'));
-    assert.ok(byPath["web_platform/src/app/privacy/page.tsx"].includes('rpc("submit_data_request"'));
+    // PRIV-1: requests are made in the customer account, where identity is checked with a one-time code; the public page links there.
+    assert.ok(byPath["web_platform/src/app/privacy/page.tsx"].includes('"/customer/privacy"'));
     assert.ok(byPath["web_platform/src/app/become-provider/page.tsx"].includes('rpc("record_agreement_acceptance"'));
   });
 

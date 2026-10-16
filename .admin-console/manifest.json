@@ -1156,7 +1156,8 @@
           "tests": [
             "supabase/tests/db/qa_adversarial.test.mjs",
             "supabase/tests/db/qa_defect_fixes.test.mjs",
-            "supabase/tests/db/secfix2_console_cancellations.test.mjs"
+            "supabase/tests/db/secfix2_console_cancellations.test.mjs",
+            "web_platform/tests/booking-cancel-thresholds.test.mjs"
           ],
           "evidence": [
             "supabase/migrations/20261011110000_secfix2_h2_console_cancellations.sql",
@@ -2100,7 +2101,7 @@
         "active"
       ],
       "lifecycleTransitions": [],
-      "retention": "Profile details can be cleared by an audited command; what a PDPL erasure must remove and what ZATCA retention must keep is awaiting an owner/legal decision (gap pdpl-erasure-scope-undecided).",
+      "retention": "Deleted on a verified, approved deletion request per Q2 (privacy_erase_subject_internal); records with a legal basis are pseudonymised and kept 10 years; see decisions adopted-q2-deletion-retention.",
       "capabilities": [
         {
           "id": "customer.list",
@@ -2225,37 +2226,41 @@
           ],
           "risk": "critical",
           "status": "in-progress",
-          "rationale": "Work a PDPL request through start, completion or refusal with the operator's note (impl-claude-release-gaps). Exporting the customer's data is not offered: its scope is an open owner/legal decision. Unreviewed.",
-          "entityStates": "{\"from\": [\"pending\", \"in_progress\"], \"to\": [\"in_progress\", \"completed\", \"rejected\"]}",
+          "rationale": "PRIV-1: data_subject_requests became privacy_requests (rows kept); the request is worked on /admin/privacy (privacy.* capabilities); /admin/customers lists requests and links there. admin_update_data_request was dropped. Re-implemented, so unreviewed.",
+          "entityStates": "{\"from\": [\"awaiting_verification\", \"open\", \"awaiting_approval\"], \"to\": [\"open\", \"awaiting_approval\", \"executing\", \"completed\", \"refused\"]}",
           "uiRoutes": [
+            "/admin/privacy",
             "/admin/customers"
           ],
           "serverOperations": [
-            "supabase/migrations/20261005140000_admin_customer_directory.sql#L109"
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/migrations/20261011210000_priv_copy_export.sql",
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql"
           ],
           "authorizationPolicies": [
-            "supabase/migrations/20261005140000_admin_customer_directory.sql#L39"
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
           ],
           "auditEvents": [
-            "supabase/migrations/20261005080000_release_gap_controls.sql#L69"
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
           ],
           "safeguards": [
-            "supabase/tests/db/customer_directory.test.mjs#L127"
+            "supabase/tests/db/priv_privacy.test.mjs"
           ],
-          "dataBinding": "postgres:public.data_subject_requests",
+          "dataBinding": "postgres:public.privacy_requests",
           "idempotency": "A request already in the target state is refused; closed requests cannot change.",
           "concurrency": "The request row is locked FOR UPDATE for the check and the write.",
           "recovery": "Completed and rejected are final by design; the note and reviewer remain on the request and in the audit log.",
           "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs",
             "supabase/tests/db/customer_directory.test.mjs"
           ],
           "evidence": [
-            "supabase/migrations/20261005140000_admin_customer_directory.sql#L109",
-            "supabase/tests/db/customer_directory.test.mjs#L137",
-            "web_platform/tests/admin-console-guards.test.mjs#L120"
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "supabase/tests/db/customer_directory.test.mjs"
           ],
           "owner": "",
-          "reviewStatus": "reviewed",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "sec-claude-release-review"
         },
         {
@@ -2276,17 +2281,21 @@
             "/admin/customers"
           ],
           "serverOperations": [
-            "supabase/migrations/20261005110000_admin_clear_customer_profile.sql#L12"
+            "supabase/migrations/20261005110000_admin_clear_customer_profile.sql#L12",
+            "supabase/migrations/20261016200000_f1_profile_clear_respects_account_hold.sql#L33"
           ],
           "authorizationPolicies": [
-            "supabase/migrations/20261005110000_admin_clear_customer_profile.sql#L22"
+            "supabase/migrations/20261005110000_admin_clear_customer_profile.sql#L22",
+            "supabase/migrations/20261016200000_f1_profile_clear_respects_account_hold.sql#L65"
           ],
           "auditEvents": [
             "supabase/migrations/20261005110000_admin_clear_customer_profile.sql#L51"
           ],
           "safeguards": [
             "supabase/tests/db/customer_directory.test.mjs#L51",
-            "supabase/tests/db/release_controls.test.mjs#L97"
+            "supabase/tests/db/release_controls.test.mjs#L97",
+            "supabase/tests/db/f123_final_recheck.test.mjs#L45",
+            "supabase/tests/db/f123_final_recheck.test.mjs#L56"
           ],
           "dataBinding": "postgres:public.profiles",
           "idempotency": "Clearing an already cleared profile sets the same NULL values again and records another audit entry.",
@@ -2294,11 +2303,17 @@
           "recovery": "Not reversible by design; the audit entry records who cleared it and why, without the removed values.",
           "tests": [
             "supabase/tests/db/release_controls.test.mjs",
-            "supabase/tests/db/qa_adversarial.test.mjs"
+            "supabase/tests/db/qa_adversarial.test.mjs",
+            "supabase/tests/db/f123_final_recheck.test.mjs",
+            "web_platform/tests/f123-recheck-ui.test.mjs",
+            "supabase/tests/db/uxfix_console_ux.test.mjs"
           ],
           "evidence": [
             "supabase/migrations/20261005110000_admin_clear_customer_profile.sql#L12",
-            "web_platform/tests/admin-console-guards.test.mjs#L120"
+            "web_platform/tests/admin-console-guards.test.mjs#L120",
+            "supabase/migrations/20261016200000_f1_profile_clear_respects_account_hold.sql",
+            "supabase/tests/db/f123_final_recheck.test.mjs",
+            "web_platform/tests/f123-recheck-ui.test.mjs"
           ],
           "owner": "",
           "reviewStatus": "contested",
@@ -2360,16 +2375,17 @@
           ],
           "risk": "moderate",
           "status": "in-progress",
-          "rationale": "submit_data_request sets owner, status and a due date 30 days ahead in Riyadh on the server, returns the open request instead of a duplicate, and audits; the table refuses direct inserts. It only files the request: access/export and erasure themselves are not built (gap no-customer-data-rights-path). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "rationale": "PRIV-1: requests are made on /customer/privacy with a fresh one-time-code sign-in (privacy_submit_request); /privacy links there. submit_data_request was dropped. Unreviewed.",
           "entityStates": {
             "from": [],
             "to": []
           },
           "uiRoutes": [
+            "/customer/privacy",
             "/privacy"
           ],
           "serverOperations": [
-            "supabase/migrations/20261007010400_consent_and_request_evidence.sql#L83"
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
           ],
           "authorizationPolicies": [
             "supabase/tests/db/fixdba_consent_evidence.test.mjs#L69"
@@ -2380,16 +2396,19 @@
           "safeguards": [
             "supabase/tests/db/fixdba_consent_evidence.test.mjs#L88"
           ],
-          "dataBinding": "postgres:public.data_subject_requests",
+          "dataBinding": "postgres:public.privacy_requests",
           "idempotency": "A second request of the same kind returns the open one.",
           "concurrency": "",
           "recovery": "",
           "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs",
             "supabase/tests/db/fixdba_consent_evidence.test.mjs"
           ],
           "evidence": [
-            "supabase/tests/db/fixdba_consent_evidence.test.mjs#L74",
-            "web_platform/src/app/privacy/page.tsx#L116"
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "supabase/tests/db/fixdba_consent_evidence.test.mjs",
+            "scripts/verify-privacy-local.mjs"
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
@@ -5789,6 +5808,746 @@
           "reviewStatus": "unreviewed"
         }
       ]
+    },
+    {
+      "id": "privacy-request",
+      "name": "Privacy request (PDPL data-subject request)",
+      "sourceOfTruth": "postgres:public.privacy_requests",
+      "sensitivity": "restricted",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "awaiting_verification",
+        "open",
+        "awaiting_approval",
+        "executing",
+        "completed",
+        "refused",
+        "withdrawn"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "awaiting_verification",
+          "to": "open",
+          "command": "privacy.request-intake",
+          "actorRoles": [
+            "customer"
+          ]
+        },
+        {
+          "from": "open",
+          "to": "withdrawn",
+          "command": "privacy.request-intake",
+          "actorRoles": [
+            "customer"
+          ]
+        },
+        {
+          "from": "open",
+          "to": "awaiting_approval",
+          "command": "privacy.copy-export",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "open",
+          "to": "awaiting_approval",
+          "command": "privacy.deletion",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "open",
+          "to": "refused",
+          "command": "privacy.deadline-and-refusal",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "open",
+          "to": "completed",
+          "command": "privacy.correction",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "The request record outlives the account it is about (IR Art. 3(1)(d)); closed-request retention period is an owner decision (gap privacy-request-record-retention-not-set).",
+      "capabilities": [
+        {
+          "id": "privacy.request-intake",
+          "outcome": "Customers file access/copy/correction/deletion/consent-withdrawal requests in-app with a fresh one-time-code sign-in; staff log e-mail/phone/in-person requests that the customer confirms the same way",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "Q1.1-2: privacy_submit_request needs amr otp in the last 10 minutes and a verified contact; admin_privacy_log_request (privacy.manage) records channel/received_at and waits for privacy_confirm_request. Live check: OTP from the local mail catcher. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "awaiting_verification",
+              "open"
+            ],
+            "to": [
+              "open",
+              "withdrawn"
+            ]
+          },
+          "uiRoutes": [
+            "/customer/privacy",
+            "/admin/privacy"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "web_platform/src/app/customer/privacy/page.tsx",
+            "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql#L55"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql#L76"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql#L153"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "supabase/tests/db/f123_final_recheck.test.mjs#L160"
+          ],
+          "dataBinding": "postgres:public.privacy_requests",
+          "idempotency": "One open request per customer and type (unique partial index); repeating returns the open one.",
+          "concurrency": "Advisory lock per customer and type; row lock for every change.",
+          "recovery": "Withdrawn by the customer while not approved; a contested field is restored.",
+          "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "scripts/verify-privacy-local.mjs",
+            "supabase/tests/db/f123_final_recheck.test.mjs",
+            "web_platform/tests/f123-recheck-ui.test.mjs",
+            "supabase/tests/db/uxfix_console_ux.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "scripts/verify-privacy-local.mjs",
+            "web_platform/src/app/customer/privacy/page.tsx",
+            "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql",
+            "supabase/migrations/20261016230000_f2_lookup_key_service_role.sql",
+            "web_platform/src/app/admin/privacy/customer-picker.tsx",
+            "supabase/tests/db/f123_final_recheck.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "privacy.deadline-and-refusal",
+          "outcome": "30-day deadline, one notified extension before day 30, day-20/28 escalation, coded refusal with the SDAIA complaint right",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "Q1.3-4: due_at = receipt + 30 days; admin_privacy_extend_request once, before due_at, for disproportionate effort or multiple requests (another request in 12 months); privacy_escalate_requests records day 20/28 once with alerts and owner notices; admin_privacy_refuse_request after step-up only as repetitive/manifestly unfounded/disproportionate. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "awaiting_verification",
+              "open",
+              "awaiting_approval"
+            ],
+            "to": [
+              "refused"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/privacy"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "dataBinding": "postgres:public.privacy_requests",
+          "idempotency": "Extension columns hold one extension; refusal only from an open state.",
+          "concurrency": "Row lock FOR UPDATE.",
+          "recovery": "A refused request is final; the customer files a new one.",
+          "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "web_platform/src/app/admin/privacy/page.tsx"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "privacy.correction",
+          "outcome": "Correction with the contested field held out of processing, recipients notified, customer told",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "Q1.6: the field (first name, last name, gender) is held aside in privacy_field_restrictions and guarded by a trigger; admin_privacy_complete_correction writes the value, notifies every provider the customer booked with (privacy_recipient_notices) and the customer. Processor notification is manual (gap). In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "open"
+            ],
+            "to": [
+              "completed"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/privacy",
+            "/customer/privacy"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "dataBinding": "postgres:public.privacy_field_restrictions",
+          "idempotency": "One restriction per customer and field.",
+          "concurrency": "Row lock; profile trigger refuses other edits while restricted.",
+          "recovery": "Refusal or withdrawal restores the held value.",
+          "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "privacy.copy-export",
+          "outcome": "Access/copy released after a different owner approves; server-built JSON and Arabic/English PDF downloaded by the customer for 7 days",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "rationale": "Q1.5, Q1.7: admin_privacy_propose_execution (privacy.manage, step-up) -> approval kind privacy_export decided by a different privacy.approve holder (step-up, no break-glass); privacy-export Edge Function builds from privacy_export_payload (other party's identifiers removed, e-mails/phones in their text redacted) into the private bucket; privacy-export-download checks the customer's own token and expiry and audits. Live 4/4. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "open",
+              "awaiting_approval",
+              "executing"
+            ],
+            "to": [
+              "awaiting_approval",
+              "executing",
+              "completed"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/privacy",
+            "/customer/privacy"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011210000_priv_copy_export.sql",
+            "supabase/functions/privacy-export/index.ts",
+            "supabase/functions/privacy-export-download/index.ts",
+            "supabase/functions/_shared/privacy-export-document.ts"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011210000_priv_copy_export.sql",
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011210000_priv_copy_export.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "supabase/tests/privacy-export.test.mjs"
+          ],
+          "dataBinding": "postgres:public.privacy_exports + storage:privacy-exports",
+          "idempotency": "One export per request (unique); rebuild overwrites the same paths.",
+          "concurrency": "Approval executes once under the governance token.",
+          "recovery": "A failed build is recorded and retried; expired files are removed and a new request is made.",
+          "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "supabase/tests/privacy-export.test.mjs",
+            "scripts/verify-privacy-local.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011210000_priv_copy_export.sql",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "scripts/verify-privacy-local.mjs",
+            "supabase/tests/privacy-export.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "privacy.deletion",
+          "outcome": "Approved deletion: delete account data, destroy health answers, pseudonymise retained bookings and money records, tombstone threads, delete the auth account, completion notice",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "rationale": "Q2.1-4, Q2.8: gov_exec_privacy_deletion runs privacy_erase_subject_internal in one transaction (recorded run, booking immutability only under it), then privacy-erase-account deletes the auth user via the Auth admin API and privacy_record_auth_erasure completes with the notice to the snapshotted verified contacts. B2C invoices no longer name a buyer. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "open",
+              "awaiting_approval",
+              "executing"
+            ],
+            "to": [
+              "awaiting_approval",
+              "executing",
+              "completed"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/privacy",
+            "/customer/privacy"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql",
+            "supabase/functions/privacy-erase-account/index.ts",
+            "supabase/functions/_shared/privacy-erasure.ts",
+            "supabase/migrations/20261016220000_f3_retention_purge_second_person.sql#L105"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql",
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/migrations/20261016220000_f3_retention_purge_second_person.sql#L133"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "supabase/tests/privacy-erasure.test.mjs",
+            "supabase/tests/db/f123_final_recheck.test.mjs#L209"
+          ],
+          "dataBinding": "postgres:public.privacy_requests + public.deletion_ledger",
+          "idempotency": "Approval executes once; the ledger upsert and auth step are idempotent (already-gone counts as done).",
+          "concurrency": "Governance token, row locks, recorded erasure run bound to the transaction id.",
+          "recovery": "Irreversible by design; the preview is shown to customer, maker and approver; records with a legal basis are kept.",
+          "tests": [
+            "scripts/verify-privacy-local.mjs",
+            "supabase/tests/db/final_priv_recheck.test.mjs",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "supabase/tests/privacy-erasure.test.mjs",
+            "supabase/tests/db/f123_final_recheck.test.mjs",
+            "web_platform/tests/f123-recheck-ui.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "scripts/verify-privacy-local.mjs",
+            "supabase/migrations/20261016220000_f3_retention_purge_second_person.sql",
+            "supabase/tests/db/f123_final_recheck.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "privacy.legal-hold",
+          "outcome": "Court-case or open-dispute holds with reason, reference, approver, 90-day review and release 30 days after the dispute closes",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "Q2.5: admin_privacy_propose_legal_hold -> approval kind privacy_legal_hold (different privacy.approve holder); open disputes are held automatically at deletion; health never held; admin_privacy_review_legal_hold keeps or releases; privacy_release_due_holds finishes deferred deletion. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/privacy"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "dataBinding": "postgres:public.privacy_legal_holds",
+          "idempotency": "One active dispute hold per dispute.",
+          "concurrency": "Row lock on review/release.",
+          "recovery": "A released hold cannot be re-activated; a new hold is proposed.",
+          "tests": [
+            "supabase/tests/db/final_priv_recheck.test.mjs",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "web_platform/tests/final-approval-kinds.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql",
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "privacy.deletion-ledger",
+          "outcome": "Deletion ledger re-applied after a restore and exported for an archive outside the database",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "Q2.7: deletion_ledger (identifiers and dates only); privacy_reapply_deletion_ledger (service or privacy.approve with step-up) accepts archived entries and erases reappeared data; admin_privacy_export_deletion_ledger downloads it. Off-database archive is an owner task (gap). In-progress, unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/privacy"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "dataBinding": "postgres:public.deletion_ledger",
+          "idempotency": "Re-application is idempotent.",
+          "concurrency": "Each subject erased in its own recorded run.",
+          "recovery": "Archive entries restore the ledger itself.",
+          "tests": [
+            "supabase/tests/db/final_priv_recheck.test.mjs",
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011220000_priv_deletion_engine.sql",
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "intake.health-retention-and-gate",
+          "outcome": "Health answers destroyed 30 days after the appointment, reused only under a separate 12-month consent, read only by the assigned provider, collected only after the transfer risk assessment is recorded",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "critical",
+          "status": "in-progress",
+          "rationale": "Q2.6, X3(6): intake_purge_internal (30 days after completed/cancelled/no-show), health_data_reuse consent, intake_is_assigned_provider, privacy_transfer_assessments gate (owner, step-up) with bilingual notices to providers and customers. Scheduling the purge is an owner gap. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/privacy",
+            "/customer/privacy"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011230000_priv_health_intake.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011230000_priv_health_intake.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011230000_priv_health_intake.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "supabase/tests/db/intake.test.mjs"
+          ],
+          "dataBinding": "postgres:public.intake_answers",
+          "idempotency": "The purge deletes only eligible rows; re-running finds none.",
+          "concurrency": "Set-based delete; gate read per call.",
+          "recovery": "Purged answers are gone by design; the customer completes a new form.",
+          "tests": [
+            "supabase/tests/db/final_priv_recheck.test.mjs",
+            "supabase/tests/db/intake.test.mjs",
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011230000_priv_health_intake.sql",
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "privacy.queue",
+          "outcome": "The privacy-request queue (open by deadline with escalation flags, closed by completion) and one request with its history, audited per read",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "admin_privacy_list_requests / admin_privacy_get_request: privacy.manage or privacy.approve, purpose, gov2_log_read. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "awaiting_verification",
+              "open",
+              "awaiting_approval",
+              "executing",
+              "completed",
+              "refused",
+              "withdrawn"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/privacy",
+            "/admin/customers"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "dataBinding": "postgres:public.privacy_requests",
+          "idempotency": "Read-only.",
+          "concurrency": "Read-only.",
+          "recovery": "Read-only.",
+          "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "privacy-incident",
+      "name": "Personal data breach incident",
+      "sourceOfTruth": "postgres:public.privacy_incidents",
+      "sensitivity": "confidential",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "open",
+        "contained",
+        "closed"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "open",
+          "to": "contained",
+          "command": "incident.register",
+          "actorRoles": [
+            "admin"
+          ]
+        },
+        {
+          "from": "contained",
+          "to": "closed",
+          "command": "incident.register",
+          "actorRoles": [
+            "admin"
+          ]
+        }
+      ],
+      "retention": "5 years after closing (X1), deleted by privacy_incident_maintenance.",
+      "capabilities": [
+        {
+          "id": "incident.register",
+          "outcome": "Breach register with the 72-hour SDAIA clock from awareness, decisions, evidence and 5-year retention",
+          "kind": "command",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "X1: admin_incident_* (incident.manage, owner only; no DPO role), step-up for decisions and closing, no-harm conclusion needs reasoning, late filing needs a reason, evidence files in a private bucket, privacy_incident_maintenance alerts at 48 h and purges after 5 years. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "open",
+              "contained"
+            ],
+            "to": [
+              "contained",
+              "closed"
+            ]
+          },
+          "uiRoutes": [
+            "/admin/incidents"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011240000_priv_incident_register.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011240000_priv_incident_register.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011240000_priv_incident_register.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "dataBinding": "postgres:public.privacy_incidents",
+          "idempotency": "References are sequence-numbered; decisions overwrite with history.",
+          "concurrency": "Row lock FOR UPDATE.",
+          "recovery": "Closed incidents are kept as recorded.",
+          "tests": [
+            "supabase/tests/db/final_priv_recheck.test.mjs",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "web_platform/tests/final-approval-kinds.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011240000_priv_incident_register.sql",
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "web_platform/src/app/admin/incidents/page.tsx"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "incident.list",
+          "outcome": "The incident register list and one incident with its history",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "in-progress",
+          "rationale": "admin_incident_list / admin_incident_get: incident.manage, audited. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "open",
+              "contained",
+              "closed"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/incidents"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261011240000_priv_incident_register.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261011240000_priv_incident_register.sql"
+          ],
+          "auditEvents": [
+            "supabase/migrations/20261011240000_priv_incident_register.sql"
+          ],
+          "safeguards": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "dataBinding": "postgres:public.privacy_incidents",
+          "idempotency": "Read-only.",
+          "concurrency": "Read-only.",
+          "recovery": "Read-only.",
+          "tests": [
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261011240000_priv_incident_register.sql",
+            "supabase/tests/db/priv_privacy.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
+    },
+    {
+      "id": "processing-register",
+      "name": "Record of processing activities (RoPA)",
+      "sourceOfTruth": "repo:docs/privacy/ropa.md",
+      "sensitivity": "internal",
+      "tenantScoped": false,
+      "lifecycleStates": [
+        "draft"
+      ],
+      "lifecycleTransitions": [],
+      "retention": "Versioned document; each entry kept 5 years after the activity ends (IR Art. 33).",
+      "capabilities": [
+        {
+          "id": "ropa.view",
+          "outcome": "Read-only RoPA in the console from the versioned document",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "low",
+          "status": "in-progress",
+          "rationale": "X2: docs/privacy/ropa.md copied into the bundle by scripts/build-ropa.mjs and checked byte for byte by a test; fields the owner must complete are marked, not invented. In-progress, unreviewed.",
+          "entityStates": {
+            "from": [
+              "draft"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/ropa"
+          ],
+          "serverOperations": [
+            "scripts/build-ropa.mjs",
+            "web_platform/src/app/admin/ropa/page.tsx"
+          ],
+          "authorizationPolicies": [
+            "web_platform/src/app/admin/ropa/page.tsx"
+          ],
+          "auditEvents": [
+            "web_platform/tests/ropa-document.test.mjs"
+          ],
+          "safeguards": [
+            "web_platform/tests/ropa-document.test.mjs"
+          ],
+          "dataBinding": "repo:docs/privacy/ropa.md",
+          "idempotency": "Read-only.",
+          "concurrency": "Not applicable (read-only).",
+          "recovery": "The document's git history.",
+          "tests": [
+            "web_platform/tests/ropa-document.test.mjs"
+          ],
+          "evidence": [
+            "docs/privacy/ropa.md",
+            "web_platform/tests/ropa-document.test.mjs"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
     }
   ],
   "workQueues": [
@@ -6015,7 +6774,7 @@
         "validation",
         "success"
       ],
-      "responsive": false,
+      "responsive": true,
       "accessibilityStatus": "planned",
       "status": "in-progress",
       "rationale": "Ledger, payouts and payment methods. Payout commands run in reasoned dialogs; lists show errors with retry (adm1 item 3). No distinct forbidden notice on this screen. Payment-method writes are direct and the default switch is two writes (gap payment-method-default-switch-is-two-browser-writes-with-no-reason). Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
@@ -6191,7 +6950,7 @@
       "dataSources": [
         "postgres:public.profiles",
         "postgres:public.bookings",
-        "postgres:public.data_subject_requests",
+        "postgres:public.privacy_requests",
         "postgres:public.consents"
       ],
       "capabilities": [
@@ -6207,7 +6966,7 @@
         "Change page",
         "Verify or remove phone verification",
         "Clear profile details",
-        "Start, complete or refuse a data request"
+        "Open privacy requests on /admin/privacy"
       ],
       "states": [
         "loading",
@@ -6914,12 +7673,12 @@
     {
       "id": "customer-privacy",
       "route": "/privacy",
-      "purpose": "A customer files a privacy request and sees its due date",
+      "purpose": "Public privacy notice; links signed-in customers to /customer/privacy where requests are made",
       "roles": [
         "customer"
       ],
       "dataSources": [
-        "postgres:public.data_subject_requests"
+        "postgres:public.privacy_requests"
       ],
       "capabilities": [
         "customer.submit-data-request"
@@ -6938,6 +7697,317 @@
       "rationale": "Public page with a signed-in form; creates the obligation admin-customers works. Reconciled by architect-reconcile-claude on 2026-10-09 from the page source; responsive and accessibility are not claimed beyond what earlier passes observed (no browser pass this run), unreviewed.",
       "tests": [
         "supabase/tests/db/fixdba_consent_evidence.test.mjs"
+      ]
+    },
+    {
+      "id": "admin-privacy",
+      "route": "/admin/privacy",
+      "purpose": "Work PDPL privacy requests, legal holds, the deletion ledger and the health-intake gate",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "postgres:public.privacy_requests",
+        "postgres:public.privacy_legal_holds",
+        "postgres:public.deletion_ledger",
+        "postgres:public.privacy_transfer_assessments"
+      ],
+      "capabilities": [
+        "privacy.request-intake",
+        "privacy.deadline-and-refusal",
+        "privacy.correction",
+        "privacy.copy-export",
+        "privacy.deletion",
+        "privacy.legal-hold",
+        "privacy.deletion-ledger",
+        "intake.health-retention-and-gate"
+      ],
+      "actions": [
+        "Log a request",
+        "Extend once",
+        "Refuse",
+        "Complete a correction",
+        "Propose a copy or deletion",
+        "Run the next step",
+        "Propose, keep or release a legal hold",
+        "Export or re-apply the deletion ledger",
+        "Record or revoke the transfer risk assessment"
+      ],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "forbidden",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "in-progress",
+      "status": "in-progress",
+      "rationale": "PRIV package; opened in a browser with a real TOTP session on the local stack (queue, detail, ledger tab). Unreviewed.",
+      "tests": [
+        "supabase/tests/db/priv_privacy.test.mjs",
+        "web_platform/tests/admin-console-guards.test.mjs"
+      ]
+    },
+    {
+      "id": "admin-incidents",
+      "route": "/admin/incidents",
+      "purpose": "Keep the personal data breach register with the 72-hour SDAIA clock",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "postgres:public.privacy_incidents"
+      ],
+      "capabilities": [
+        "incident.register"
+      ],
+      "actions": [
+        "Record an incident",
+        "Save the assessment",
+        "Record the SDAIA decision",
+        "Record the data-subject decision",
+        "Add evidence",
+        "Close"
+      ],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "forbidden",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "in-progress",
+      "status": "in-progress",
+      "rationale": "PRIV package; opened in a browser with a real TOTP session (empty state). Unreviewed.",
+      "tests": [
+        "supabase/tests/db/priv_privacy.test.mjs"
+      ]
+    },
+    {
+      "id": "admin-ropa",
+      "route": "/admin/ropa",
+      "purpose": "Read the record of processing activities",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "repo:docs/privacy/ropa.md"
+      ],
+      "capabilities": [
+        "ropa.view"
+      ],
+      "actions": [],
+      "states": [
+        "populated"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "in-progress",
+      "status": "in-progress",
+      "rationale": "Read-only render of the versioned document. Unreviewed.",
+      "tests": [
+        "web_platform/tests/ropa-document.test.mjs"
+      ]
+    },
+    {
+      "id": "customer-privacy-account",
+      "route": "/customer/privacy",
+      "purpose": "A customer makes and follows privacy requests and downloads their copy",
+      "roles": [
+        "customer"
+      ],
+      "dataSources": [
+        "postgres:public.privacy_requests",
+        "postgres:public.privacy_exports"
+      ],
+      "capabilities": [
+        "privacy.request-intake",
+        "privacy.copy-export",
+        "privacy.deletion",
+        "customer.submit-data-request"
+      ],
+      "actions": [
+        "Make a request",
+        "Confirm with a one-time code",
+        "Withdraw",
+        "Choose what happens to reviews",
+        "Download PDF/JSON",
+        "Allow or stop health-answer reuse"
+      ],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "in-progress",
+      "status": "in-progress",
+      "rationale": "PRIV package; submitted a copy request through the one-time-code step in a browser on the local stack, Arabic RTL checked. Unreviewed.",
+      "tests": [
+        "supabase/tests/db/priv_privacy.test.mjs",
+        "scripts/verify-privacy-local.mjs"
+      ]
+    },
+    {
+      "id": "login-mfa",
+      "route": "/login/mfa",
+      "purpose": "Enrol and verify the authenticator app before any console session",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "supabase-auth:mfa",
+        "postgres:public.admin_session_state()"
+      ],
+      "capabilities": [
+        "gov.mfa"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "error",
+        "validation",
+        "forbidden",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "in-progress",
+      "status": "in-progress",
+      "rationale": "Added by impl-uxfix-claude (ux1-reviewed-routes-missing-from-screens); localized code errors with codes left, single preparation per load.",
+      "tests": [
+        "web_platform/tests/gov1-governance-screens.test.mjs"
+      ]
+    },
+    {
+      "id": "admin-approvals",
+      "route": "/admin/approvals",
+      "purpose": "Decide maker-checker requests, break-glass, thresholds and security alerts",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "postgres:public.admin_approval_inbox()"
+      ],
+      "capabilities": [
+        "gov.approvals"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "forbidden",
+        "validation",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "in-progress",
+      "status": "in-progress",
+      "rationale": "Added by impl-uxfix-claude; includes customer_profile_clear requests.",
+      "tests": [
+        "web_platform/tests/gov1-governance-screens.test.mjs"
+      ]
+    },
+    {
+      "id": "admin-reconciliation",
+      "route": "/admin/reconciliation",
+      "purpose": "Reconcile a day against Tap, import files and resolve breaks",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "postgres:public.admin_reconciliation_overview()"
+      ],
+      "capabilities": [
+        "reconciliation.daily",
+        "reconciliation.resolve-break"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "forbidden",
+        "validation",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "in-progress",
+      "status": "in-progress",
+      "rationale": "Added by impl-uxfix-claude; the one reconciliation source the ledger tab and dashboard also read.",
+      "tests": [
+        "web_platform/tests/money-screens.test.mjs"
+      ]
+    },
+    {
+      "id": "provider-pricing",
+      "route": "/provider/pricing",
+      "purpose": "Show plan prices and the effective platform fee, and subscribe",
+      "roles": [
+        "provider-owner"
+      ],
+      "dataSources": [
+        "postgres:public.subscription_plans",
+        "postgres:public.quote_provider_plan()",
+        "postgres:public.provider_effective_fee_terms()"
+      ],
+      "capabilities": [
+        "fee.effective-display",
+        "provider.vat-status"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "in-progress",
+      "status": "in-progress",
+      "rationale": "Added by impl-uxfix-claude; no figure written in copy.",
+      "tests": [
+        "supabase/tests/db/fixmoney_subscription_quote.test.mjs",
+        "web_platform/tests/money-screens.test.mjs"
+      ]
+    },
+    {
+      "id": "become-provider",
+      "route": "/become-provider",
+      "purpose": "Apply to become a provider under the published agreement",
+      "roles": [
+        "customer"
+      ],
+      "dataSources": [
+        "postgres:public.subscription_plans"
+      ],
+      "capabilities": [
+        "provider.vat-status"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "validation",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "in-progress",
+      "status": "in-progress",
+      "rationale": "Added by impl-uxfix-claude; no form while applications are closed.",
+      "tests": [
+        "web_platform/tests/money-screens.test.mjs"
       ]
     }
   ],
@@ -7671,6 +8741,406 @@
       "appliesTo": [
         "sponsored.configure"
       ]
+    },
+    {
+      "id": "adopted-q1-privacy-requests",
+      "decision": "Q1 privacy requests: in-app and staff-logged (e-mail, phone, in person) access/copy/correction/deletion/consent-withdrawal requests recorded in privacy_requests; identity by a fresh one-time-code sign-in to the verified contact; 30 days with one extension (disproportionate effort or multiple requests) notified before day 30; escalation at day 20 and 28; free of charge; refusal only as repetitive, manifestly unfounded or disproportionate with the SDAIA complaint right; copy as JSON plus AR/EN PDF through an authenticated link expiring after 7 days; correction restricts the contested field and notifies recipients; a different person approves deletion and export, both with step-up.",
+      "reason": "Plan of record: the 'Final decision text' in docs/legal/2026-10-10-privacy-decision-memo.md, adopted in docs/legal/2026-10-10-adopted-decisions.md.",
+      "evidence": [
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+        "supabase/migrations/20261011210000_priv_copy_export.sql",
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": []
+    },
+    {
+      "id": "adopted-q2-deletion-retention",
+      "decision": "Q2 deletion vs retention: delete auth account, profile, addresses, tokens, consents, favourites, review author link (customer choice), message content (provider tombstone, provider notified); destroy health answers; pseudonymise bookings linked to invoices/ledger with a random token and legal-basis label; retain invoices/ledger 10 years; B2C invoices carry no customer PII; legal holds only for a court case or open dispute (30 days after it closes, 90-day review); deletion_ledger re-applied after restore; completion notice with legal basis, retention end and SDAIA right.",
+      "reason": "Plan of record: the 'Final decision text' in docs/legal/2026-10-10-privacy-decision-memo.md, adopted in docs/legal/2026-10-10-adopted-decisions.md.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql",
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": []
+    },
+    {
+      "id": "adopted-q2-6-health-intake",
+      "decision": "Q2.6 health intake: answers destroyed 30 days after the appointment is completed or cancelled; reuse only with a separate consent lasting 12 months; only the assigned provider reads them; admins only through the logged owner break-glass.",
+      "reason": "Plan of record: the 'Final decision text' in docs/legal/2026-10-10-privacy-decision-memo.md, adopted in docs/legal/2026-10-10-adopted-decisions.md.",
+      "evidence": [
+        "supabase/migrations/20261011230000_priv_health_intake.sql",
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": []
+    },
+    {
+      "id": "adopted-x3-6-health-collection-gate",
+      "decision": "X3(6): health-intake collection stays off until the owner records the approved transfer risk assessment (no KSA hosting today); providers and customers see a bilingual notice; a required form does not block a visit meanwhile.",
+      "reason": "Plan of record: the 'Final decision text' in docs/legal/2026-10-10-privacy-decision-memo.md, adopted in docs/legal/2026-10-10-adopted-decisions.md.",
+      "evidence": [
+        "supabase/migrations/20261011230000_priv_health_intake.sql",
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": []
+    },
+    {
+      "id": "adopted-x1-incident-register",
+      "decision": "X1: incident register with discovered_at/aware_at and a 72-hour SDAIA clock, all listed fields, SDAIA and data-subject decisions, evidence, 5-year retention; SDAIA notified for every breach unless a reasoned no-harm conclusion is recorded.",
+      "reason": "Plan of record: the 'Final decision text' in docs/legal/2026-10-10-privacy-decision-memo.md, adopted in docs/legal/2026-10-10-adopted-decisions.md.",
+      "evidence": [
+        "supabase/migrations/20261011240000_priv_incident_register.sql",
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": []
+    },
+    {
+      "id": "adopted-x2-ropa",
+      "decision": "X2: RoPA shown read-only in the console; the controlled source is the versioned document docs/privacy/ropa.md; fields only the owner can know are marked OWNER MUST COMPLETE.",
+      "reason": "Plan of record: the 'Final decision text' in docs/legal/2026-10-10-privacy-decision-memo.md, adopted in docs/legal/2026-10-10-adopted-decisions.md.",
+      "evidence": [
+        "docs/privacy/ropa.md",
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-console-permissions",
+      "decision": "privacy.manage for owner and operations (they already read personal data), privacy.approve and incident.manage for owner only. Access requests are released like copies (approval by a different privacy.approve holder). No DPO role exists, so the owner keeps the register.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-identity-check-is-otp-sign-in",
+      "decision": "The Q1.2 'fresh login plus one-time code' is implemented as a Supabase Auth sign-in by one-time code (e-mail or SMS) within 10 minutes: the OTP sign-in is the fresh login and proves the verified contact. Staff-logged requests are confirmed by the customer in the app the same way. No supporting documents are collected, so none need destroying.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+        "scripts/verify-privacy-local.mjs"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-correction-scope-and-restriction",
+      "decision": "Correctable through the workflow: first name, last name, gender. E-mail and phone are sign-in identities changed through account settings with their own verification. Restriction = the contested value is held aside (privacy_field_restrictions) and the profile field emptied until decided.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-money-records-pseudonymised",
+      "decision": "Besides bookings, purchased packages, memberships (and their payments/redemptions), gift cards bought and payment disputes keep their money record with the customer link replaced by the pseudonym token; promotional rows (wallet credits, loyalty, referrals, redemptions, tips) follow the MONEY design and are deleted with the profile (the ledger keeps the money). A booking that carries a review kept as 'Deleted user' is pseudonymised, not deleted.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-court-hold-keeps-account",
+      "decision": "A court-case hold on any category keeps the account and that category linked to the person (a court case needs the identity); health answers are destroyed regardless. A dispute hold keeps only that booking's content and the thread with that business, unlinked from the deleted account; the hold stores the pseudonym token.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-financial-year-is-calendar-year",
+      "decision": "Retention end for pseudonymised bookings = 31 December of the booking's Gregorian year + 10, until the owner records the financial year end.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-health-concluded-and-assigned-provider",
+      "decision": "'Completed or cancelled' includes no-show (the appointment concluded); the clock runs from the cancellation/no-show time or the end of the appointment. 'Assigned provider' = the booking's professional when they have an account, otherwise the business owner.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011230000_priv_health_intake.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-pdf-fonts",
+      "decision": "The PDF embeds IBM Plex Sans Arabic (the web app's own typeface, OFL) Arabic and Latin subsets as whole fonts: fontkit's subsetter fails in the Supabase Edge Runtime. pdf-lib 1.17.1 and @pdf-lib/fontkit 1.1.1 chosen as small, well-known libraries; no external service.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/functions/_shared/privacy-export-document.ts"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "priv-deletion-ledger-off-database",
+      "decision": "Because a restore rolls the ledger table back too, the console exports the ledger for an archive outside the database and the re-application accepts archived entries; keeping that archive is an owner task.",
+      "reason": "Implementer assumption where the memo leaves the mechanism open; owner or reviewer to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "privfix-patch-tests-are-health-data",
+      "decision": "Patch-test results are treated as health data under Q2.6: destroyed 30 days after the appointment they were recorded for (or after the test when there is no booking), kept longer only as the latest result per service under the 12-month reuse consent; readable by the customer, the provider assigned to that booking and the person who recorded it. The business owner also sees an uncleared positive result because only the owner clears that safety block.",
+      "reason": "Implementer assumption applying security review M4(b); the memo names intake answers, not patch tests. Owner or DPO to confirm.",
+      "evidence": [
+        "supabase/migrations/20261011320000_privfix_health_retention.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "intake.health-retention-and-gate"
+      ]
+    },
+    {
+      "id": "privfix-stale-appointment-cutoff",
+      "decision": "An appointment never completed or cancelled counts as concluded at its scheduled end for the Q2.6 30-day destruction of health answers and patch-test results.",
+      "reason": "Coordinator instruction for security review M4(a): 30 days after the scheduled time if never completed or cancelled.",
+      "evidence": [
+        "supabase/migrations/20261011320000_privfix_health_retention.sql"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "intake.health-retention-and-gate"
+      ]
+    },
+    {
+      "id": "privfix-hold-scope-and-renewal",
+      "decision": "A court hold keeps the account (profile, contact details, login) only when it names the account category with its own reason of at least 20 characters; other named categories are re-linked to the hold's own pseudonym and the profile is deleted. Keeping a hold at its 90-day review needs a reason and an approver who is neither the proposer nor whoever last approved or renewed it.",
+      "reason": "Coordinator instruction and security review H2: holds scope only the categories they name and cannot be renewed indefinitely without a new approver and reason.",
+      "evidence": [
+        "supabase/migrations/20261011300000_privfix_deletion_engine.sql"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "privacy.legal-hold",
+        "privacy.deletion"
+      ]
+    },
+    {
+      "id": "privfix-money-records-pseudonymised",
+      "decision": "Tips, wallet credits and their redemptions, coupon, gift-card and package redemptions and loyalty balances are kept pseudonymised (customer link nulled, random token per row) for the 10-year retention instead of being deleted with the profile; an account deleted on the Auth side keeps them with the link cleared by the foreign key.",
+      "reason": "Coordinator instruction and security review M3 under Q2.4.",
+      "evidence": [
+        "supabase/migrations/20261011300000_privfix_deletion_engine.sql",
+        "supabase/migrations/20261011340000_privfix_money_cascade_and_grants.sql"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "privacy.deletion"
+      ]
+    },
+    {
+      "id": "privfix-contact-cooling-off",
+      "decision": "A verified e-mail or phone changed in the last 30 days refuses the one-time-code identity check, and a change within 30 days before a request (or since) blocks proposing, approving or releasing it; phone sign-ups need confirmation locally (enable_confirmations = true).",
+      "reason": "Coordinator instruction and security review M2. The 30-day window reuses the governance notice window for previous contacts; owner to confirm the length.",
+      "evidence": [
+        "supabase/migrations/20261011300000_privfix_deletion_engine.sql",
+        "supabase/migrations/20261011310000_privfix_identity_and_copy.sql",
+        "supabase/config.toml"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "privacy.request-intake",
+        "privacy.copy-export",
+        "privacy.deletion"
+      ]
+    },
+    {
+      "id": "privfix-archive-import-service-only",
+      "decision": "Deletion-ledger archive entries come back only through privacy_import_deletion_archive with the service key, the SHA-256 printed by the ledger export, and a completed verified deletion request with the same id; the console re-application takes no entries and the engine refuses any account that is not a customer.",
+      "reason": "Security review C1 and coordinator instruction.",
+      "evidence": [
+        "supabase/migrations/20261011300000_privfix_deletion_engine.sql"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "privacy.deletion-ledger"
+      ]
+    },
+    {
+      "id": "uxfix-arabic-indic-numerals",
+      "decision": "Arabic screens use Arabic-Indic digits for every number in copy and every interpolated value (Intl ar-SA, the formatter sar() and dates already used); identifiers, phone numbers, e-mails, IBANs and input formats stay Latin.",
+      "reason": "ux1-arabic-screens-mix-numeral-systems asks for one system; the existing locale formatter sets the convention.",
+      "evidence": [
+        ".admin-console/evidence/ux-fix/crawl-admin.owner-ar-375.json"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "admin-privacy",
+        "admin-ledger",
+        "admin-reconciliation",
+        "customer-privacy-account"
+      ]
+    },
+    {
+      "id": "uxfix-clear-profile-is-erasure",
+      "decision": "Clearing a customer's profile is erasure of the data a privacy deletion removes, so it needs a different owner's approval (privacy.approve) through the approval inbox.",
+      "reason": "Coordinator instruction and ux1-clear-profile-bypasses-privacy-deletion-safeguards.",
+      "evidence": [
+        "supabase/migrations/20261011400000_uxfix_console_ux_server_support.sql",
+        "supabase/tests/db/uxfix_console_ux.test.mjs"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "admin-customers",
+        "admin-approvals"
+      ]
+    },
+    {
+      "id": "uxfix-ropa-english-only",
+      "decision": "The RoPA register stays English-only, with an Arabic note on the page; an Arabic version needs the DPO to approve a translation.",
+      "reason": "A machine translation of a controlled legal register is not the register.",
+      "evidence": [
+        "web_platform/src/app/admin/ropa/page.tsx"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "admin-ropa"
+      ]
+    },
+    {
+      "id": "uxfix-console-role-trimming",
+      "decision": "The console hides navigation entries, screens and actions the signed-in console role cannot use, from admin_session_state's permissions and a screen-to-permission map taken from the server functions; the server stays the authority.",
+      "reason": "ux1-navigation-and-actions-not-trimmed-to-console-role.",
+      "evidence": [
+        "web_platform/src/lib/console-session.tsx"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "admin-dashboard",
+        "admin-roles"
+      ]
+    },
+    {
+      "id": "final-money-records-restrict-booking-delete",
+      "decision": "Every money table's foreign key to bookings is ON DELETE RESTRICT and privacy_booking_is_linked counts tips, coupon, gift-card, wallet-credit, package, loyalty and referral records; a booking with any money record is pseudonymised, never deleted.",
+      "reason": "Review M3/N2 (docs/reviews/2026-10-11-security-priv-recheck.md).",
+      "evidence": [
+        "supabase/migrations/20261016100000_final_money_records_keep_booking.sql",
+        "supabase/tests/db/final_priv_recheck.test.mjs"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "privacy.deletion"
+      ]
+    },
+    {
+      "id": "final-hold-release-four-eyes",
+      "decision": "A console release of any legal hold before it ends on its own is a privacy_legal_hold_release approval request decided after step-up by a different privacy.approve holder; the scheduler's dispute-hold release 30 days after closure is unchanged.",
+      "reason": "Review N3: one person could release a court hold and erase the account at once.",
+      "evidence": [
+        "supabase/migrations/20261016120000_final_hold_release_and_renewal_four_eyes.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "privacy.legal-hold"
+      ]
+    },
+    {
+      "id": "final-hold-renewal-fresh-owner-after-3",
+      "decision": "After 3 renewals (about one year) a hold is kept only with a privacy_legal_hold_renewal request decided by an owner who never proposed, approved or renewed it. Chosen over a hard cap on total duration: a cap would release, and so irreversibly erase, records a court may still need; an unrenewed hold stays visible as overdue.",
+      "reason": "Review info note: two people could alternate renewals indefinitely. N=3 is an assumption awaiting owner confirmation.",
+      "evidence": [
+        "supabase/migrations/20261016120000_final_hold_release_and_renewal_four_eyes.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "privacy.legal-hold"
+      ]
+    },
+    {
+      "id": "final-incident-aware-at-second-person",
+      "decision": "Correcting an incident's awareness time is an incident_aware_at_correction approval request decided by a second incident.manage holder; requested, corrected and rejected are each a new append-only privacy_incident_events row; still at most one correction.",
+      "reason": "Review N5.",
+      "evidence": [
+        "supabase/migrations/20261016130000_final_incident_aware_at_second_person.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "incident.register"
+      ]
+    },
+    {
+      "id": "final-phone-tenure-scrub",
+      "decision": "Phone-based scrubbing and WhatsApp erasure apply only inside the time the erased account held the number (account_contact_changes boundaries), never to rows addressed to another account, and never by walk-in phone.",
+      "reason": "Review N6: reassigned numbers.",
+      "evidence": [
+        "supabase/migrations/20261016150000_final_contact_scrub_by_tenure.sql",
+        "supabase/functions/_shared/privacy-erasure.ts"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "privacy.deletion"
+      ]
+    },
+    {
+      "id": "final-retention-purge-anonymise-ledger-referenced",
+      "decision": "privacy_purge_expired_retention deletes an erased customer's expired customer-side money sub-records and unreferenced pseudonymised bookings, and keeps ledger-referenced bookings with the fixed marker 'retention-ended'; ledger, invoices, refunds and disputes are never deleted. Financial year assumed = calendar year (as privacy_retention_until already did). Not scheduled.",
+      "reason": "Review N8 over-retention; deleting ledger rows would change balances and payout history.",
+      "evidence": [
+        "supabase/migrations/20261016160000_final_retention_purge.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "privacy.deletion-ledger"
+      ]
+    },
+    {
+      "id": "f1-any-active-account-hold-blocks-profile-clear",
+      "decision": "A profile clear is refused while any active legal hold lists 'account' for the customer (only court_case holds can, by constraint), at request and at approval; a pending account hold does not block until it is approved.",
+      "reason": "Security re-check F1; mirrors the erasure engine, which respects the same hold.",
+      "evidence": [
+        "supabase/migrations/20261016200000_f1_profile_clear_respects_account_hold.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "customer.clear-profile"
+      ]
+    },
+    {
+      "id": "f2-lookup-exact-match-limit-and-hmac",
+      "decision": "Customer lookup: phone matched whole after removing 00, 966 and a trunk 0 (at least 9 digits); e-mail by case-insensitive equality; names by substring of first and last name only, never e-mail; results carry the last-name initial, not the last name; step-up required; 10 lookups per actor per rolling 10 minutes counted from the audit log, then a returned refusal (audited, one security alert per window) rather than an exception, so the refusal and alert persist; the audit row keeps an HMAC-SHA256 of kind:normalised-query under a key in privacy_lookup_keys (no anon/authenticated grant).",
+      "reason": "Security re-check F2 recommended whole-value match, a rate limit with an alert, step-up and a salted hash; 10 per 10 minutes chosen conservatively per the coordinator instruction.",
+      "evidence": [
+        "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "privacy.request-intake"
+      ]
+    },
+    {
+      "id": "f3-retention-purge-approval-kind",
+      "decision": "A real retention purge from a console session is a privacy_retention_purge approval request (reason of 10+ characters; the approver sees the dry-run counts taken when asked; the approved execution recounts and reports what it did); the service key keeps the direct run for the future scheduler; break-glass excluded.",
+      "reason": "Security re-check F3 offered an approval kind or service-key-only; the approval kind keeps a console path with four eyes while scheduling is undecided.",
+      "evidence": [
+        "supabase/migrations/20261016220000_f3_retention_purge_second_person.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "privacy.deletion"
+      ]
     }
   ],
   "gaps": [
@@ -7784,8 +9254,8 @@
       "id": "no-customer-data-rights-path",
       "severity": "critical",
       "description": "There is no export, anonymisation, deletion or legal-hold capability for customer personal data anywhere in the console, the migrations or the edge functions, on a platform holding Saudi customer names, emails, phone numbers, booking history and private messages.",
-      "status": "blocked",
-      "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): STILL BLOCKED on a legal decision; progress since the audit is real but partial. Customers can now file a request: privacy/page.tsx calls submit_data_request (20261007010400_consent_and_request_evidence.sql#L83, guarded by no-mock-data.test.mjs 'login, the booking dialog and the privacy page never insert into the evidence tables'); operators work the queue on /admin/customers with admin_update_data_request and can clear profile details with admin_clear_customer_profile (customer_directory.test.mjs, release_controls.test.mjs); consent withdrawal for intake health data blanks every stored answer (fixpriv_intake_withdrawal.test.mjs). STILL MISSING: a data-access/export command and a retention-aware erasure of auth identity, booking contact fields, invoices, messages and reviews. OWNER/LEGAL QUESTIONS: (1) which data classes must a PDPL access/export request return (profile, bookings, invoices, messages, reviews, consents, wallet, dependants)? (2) which must erasure remove or anonymise, and which must be kept for ZATCA record-keeping (invoices, how many years) or a legal hold? (3) who may approve an erasure and within what time (the table enforces a 30-day due date)? Until these are answered no console command can be built correctly.",
+      "status": "fixed",
+      "rationale": "Closed by impl-priv-claude (PRIV package) on the adopted Q1/Q2 decisions: copy export, deletion engine, legal holds, deletion ledger and invoice minimisation are implemented (supabase/migrations/20261011200000..240000, supabase/tests/db/priv_privacy.test.mjs, scripts/verify-privacy-local.mjs 4/4). Unreviewed; security and ux-reviewer passes pending.",
       "evidence": [
         "supabase/migrations/20261007010400_consent_and_request_evidence.sql#L83",
         "supabase/migrations/20261005140000_admin_customer_directory.sql#L109",
@@ -8073,8 +9543,8 @@
       "id": "pdpl-erasure-scope-undecided",
       "severity": "high",
       "description": "Clearing a customer profile leaves the sign-in identity (auth.users email and phone), booking contact and address fields, invoices and messages untouched. What PDPL erasure must remove and what ZATCA retention must keep has not been decided.",
-      "status": "blocked",
-      "rationale": "BLOCKED ON OWNER/LEGAL DECISION. AGENTS.md reserves PDPL erasure and ZATCA retention interpretation for a human. REMEDY once decided: one server command per data class with retention-aware anonymization, and the decision recorded in decisions[].",
+      "status": "fixed",
+      "rationale": "Closed by impl-priv-claude (PRIV package) on the adopted Q1/Q2 decisions: copy export, deletion engine, legal holds, deletion ledger and invoice minimisation are implemented (supabase/migrations/20261011200000..240000, supabase/tests/db/priv_privacy.test.mjs, scripts/verify-privacy-local.mjs 4/4). Unreviewed; security and ux-reviewer passes pending.",
       "evidence": [
         "supabase/migrations/20261005110000_admin_clear_customer_profile.sql#L54"
       ]
@@ -9516,7 +10986,7 @@
       "severity": "medium",
       "description": "Q4 item 2 names a DPO break-glass. No DPO console role exists, so read_intake_answers_break_glass is owner-only (health.break_glass). There is no console screen for it; it is callable only as an RPC.",
       "status": "blocked",
-      "rationale": "FOUND BY impl-gov2-claude. OWNER ACTION: appoint the DPO (adopted decisions, owner actions) and decide whether to add a dpo console role.",
+      "rationale": "Still blocked on the owner: no DPO console role. PRIV gives the incident register (incident.manage) and privacy approvals (privacy.approve) to the owner only; adding a DPO role means granting those two permissions to it.",
       "evidence": [
         "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L976"
       ]
@@ -9938,6 +11408,602 @@
         "web_platform/src/app/admin/approvals/governance-notices.tsx",
         "web_platform/src/app/admin/reconciliation/page.tsx"
       ]
+    },
+    {
+      "id": "privacy-jobs-not-scheduled",
+      "severity": "high",
+      "description": "The privacy jobs exist as functions but nothing runs them: privacy_escalate_requests (daily), purge_expired_intake (daily, Q2.6 30-day destruction), privacy_release_due_holds (daily), privacy_incident_maintenance (hourly), the privacy-export Edge Function without a body (builds waiting copies and removes expired files) and privacy-erase-account (auth deletions and restored accounts). The approver's console calls the two Edge Functions right after approving.",
+      "status": "fixed",
+      "rationale": "FIXED IN SOURCE (impl-privfix-claude, 20261011320000_privfix_health_retention.sql): pg_cron jobs primora-intake-purge, primora-privacy-escalate, primora-privacy-release-holds, primora-privacy-incidents, and pg_net calls to privacy-export and privacy-erase-account every 15 minutes (the hosted project needs the Vault secrets project_url and service_role_key).",
+      "evidence": [
+        "supabase/migrations/20261011320000_privfix_health_retention.sql"
+      ]
+    },
+    {
+      "id": "deletion-ledger-needs-off-database-archive",
+      "severity": "high",
+      "description": "A database restore rolls deletion_ledger back too. The console exports it (admin_privacy_export_deletion_ledger) and re-application accepts archived entries, but no archive outside the database exists yet; backups must also be limited to 30 days (Q2.7, owner action list).",
+      "status": "blocked",
+      "rationale": "Owner: choose the archive (e.g. the KSA invoice archive of X3(5)) and the backup retention setting.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ]
+    },
+    {
+      "id": "privacy-notices-have-no-sender",
+      "severity": "medium",
+      "description": "Customer privacy notices (received, extended, refused with the SDAIA right, copy ready, deletion completed) are queued in governance_notifications and shown in-app while the account exists; out-of-band delivery waits for governance-notice-sender-not-chosen. The deletion completion notice to an erased customer can only go out of band.",
+      "status": "blocked",
+      "rationale": "Same decision as governance-notice-sender-not-chosen.",
+      "evidence": [
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ]
+    },
+    {
+      "id": "processor-correction-notices-manual",
+      "severity": "medium",
+      "description": "Q1.6 asks to notify every provider or processor that received a corrected field. Providers are notified in-app (privacy_recipient_notices); processors (Supabase, Tap, messaging) are not tracked per field and are not notified automatically.",
+      "status": "open",
+      "rationale": "Owner/DPO: decide which processors receive names and record the manual step, or extend privacy_recipient_notices with processor rows.",
+      "evidence": [
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+      ]
+    },
+    {
+      "id": "privacy-verification-without-app-access",
+      "severity": "medium",
+      "description": "Requests from phone or in person are confirmed by the customer in the app with a one-time code. A customer who cannot sign in (lost phone and e-mail access) has no verification path; SMS one-time codes also need an SMS provider (none configured locally).",
+      "status": "open",
+      "rationale": "Owner: define an offline verification procedure; configure the SMS provider for phone sign-in.",
+      "evidence": [
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+      ]
+    },
+    {
+      "id": "privacy-non-customer-accounts",
+      "severity": "medium",
+      "description": "Deletion is limited to customer accounts; provider owners, staff and console users are refused with 'closed through PRIMORA support'. Their data (payroll, IBAN, onboarding) needs its own retention rules.",
+      "status": "open",
+      "rationale": "Owner/counsel: retention for provider-side personal data; then extend the engine.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ]
+    },
+    {
+      "id": "unused-balances-on-deletion",
+      "severity": "medium",
+      "description": "A deleting customer may hold wallet credit, unused package sessions or an active membership; the preview shows them and they become unusable after deletion. Whether to refund or forfeit is a business/legal decision.",
+      "status": "blocked",
+      "rationale": "Owner/counsel: refund or forfeit unused paid value on deletion.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql",
+        "web_platform/src/app/customer/privacy/page.tsx"
+      ]
+    },
+    {
+      "id": "financial-year-end-not-recorded",
+      "severity": "low",
+      "description": "Pseudonymised bookings are kept until 31 December of their year + 10 (calendar financial year assumed).",
+      "status": "open",
+      "rationale": "Owner: record the financial year end.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ]
+    },
+    {
+      "id": "privacy-request-record-retention-not-set",
+      "severity": "low",
+      "description": "privacy_requests and their events are kept indefinitely as evidence; no retention period is defined for closed requests.",
+      "status": "open",
+      "rationale": "Owner/DPO: set a retention period (for example 5 years like the audit log).",
+      "evidence": [
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+      ]
+    },
+    {
+      "id": "incident-subject-notification-templates-missing",
+      "severity": "medium",
+      "description": "X1 asks for SMS/e-mail notices to affected people using pre-approved AR/EN templates. The register records the decision, channels and sent time; there is no template store or bulk sender, because the approved wording and the affected list are incident-specific.",
+      "status": "open",
+      "rationale": "DPO: approve templates; then add a sender over governance_notifications.",
+      "evidence": [
+        "supabase/migrations/20261011240000_priv_incident_register.sql"
+      ]
+    },
+    {
+      "id": "pdf-font-licence-text-not-vendored",
+      "severity": "low",
+      "description": "The PDF embeds IBM Plex Sans Arabic (OFL 1.1). OFL-NOTICE.md names the licence and its location; the verbatim licence text is not yet copied into the repository.",
+      "status": "open",
+      "rationale": "Copy the official OFL.txt next to the font modules.",
+      "evidence": [
+        "supabase/functions/_shared/fonts/OFL-NOTICE.md"
+      ]
+    },
+    {
+      "id": "provider-intake-answer-button-shows-for-owner",
+      "severity": "low",
+      "description": "Q2.6 lets only the assigned professional read answers; the provider intake screen still shows 'View answers' to the owner and delegates, who now get 'Booking not found'. can_read_booking_intake_answers exists for the screen to hide it.",
+      "status": "open",
+      "rationale": "Use can_read_booking_intake_answers on /provider/intake and the booking screens.",
+      "evidence": [
+        "supabase/migrations/20261011230000_priv_health_intake.sql",
+        "web_platform/src/app/provider/intake/page.tsx"
+      ]
+    },
+    {
+      "id": "whatsapp-erasure-needs-pepper",
+      "severity": "low",
+      "description": "WhatsApp receptionist threads are erased by the peppered hash of the customer's verified phone; privacy-erase-account waits (and reports it) while WHATSAPP_CONTACT_PEPPER is unset in an environment that has WhatsApp channels.",
+      "status": "open",
+      "rationale": "Set WHATSAPP_CONTACT_PEPPER wherever whatsapp-inbound runs.",
+      "evidence": [
+        "supabase/functions/privacy-erase-account/index.ts"
+      ]
+    },
+    {
+      "id": "priv-not-reviewed",
+      "severity": "medium",
+      "description": "The PRIV package (privacy requests, copy, deletion engine, holds, ledger, health intake, incidents, RoPA) is implemented and tested but has had no independent security or UX review.",
+      "status": "open",
+      "rationale": "adminwright-security and ux-reviewer over the privacy-request, privacy-incident and processing-register entities.",
+      "evidence": [
+        "supabase/tests/db/priv_privacy.test.mjs",
+        "scripts/verify-privacy-local.mjs"
+      ]
+    },
+    {
+      "id": "ux1-provider-pricing-shows-invented-15-percent-commission",
+      "severity": "high",
+      "description": "/provider/pricing still tells providers '15% Platform Commission' on the Lite Starter plan card (page.tsx:451), 'activate under the 15% platform split agreement' (798-799) and 'Transparent 15% booking split ledger' (878), while the same page's fee terms, computed from the fee rules in force, say 'Marketplace, a client's first visit 20% of the booking (minimum SAR 10.00, maximum SAR 40.00)'. A provider reads two contradicting commission figures on one screen; the invented-copy removal recorded by impl-money-claude is incomplete.",
+      "status": "fixed",
+      "rationale": "Delete the three hard-coded 15% strings (EN and AR) and point to the computed fee terms; money copy shown to providers must come from fee_rules. Severity high: contradictory fee information is a commercial and consumer-protection risk.",
+      "evidence": [
+        "web_platform/src/app/provider/pricing/page.tsx",
+        "web_platform/tests/money-screens.test.mjs",
+        "supabase/tests/db/fixmoney_subscription_quote.test.mjs"
+      ],
+      "resolution": "impl-uxfix-claude: Every figure on /provider/pricing now comes from subscription_plans, the fee rules (EffectiveFeeTerms) or the server quote; no commission, plan price, saving or VAT rate is written in copy."
+    },
+    {
+      "id": "ux1-ledger-psp-tab-contradicts-reconciliation-screen",
+      "severity": "high",
+      "description": "Reconciliation exists twice. /admin/ledger -> 'PSP Reconciliation' tab shows 'No reconciliation runs recorded yet' with its own 'Run Daily Reconciliation' button, while /admin/reconciliation (and its nav entry) lists the 2026-10-10 run made minutes earlier. Two surfaces for one domain show different truth; the ledger tab also prints the internal ticket code '(G34)' in operator copy.",
+      "status": "fixed",
+      "rationale": "Remove the ledger PSP tab or make it a link to /admin/reconciliation; one component, one source (tap_reconciliation_runs). Operators deciding whether money matched must not see 'never ran' on one screen and a run on another.",
+      "evidence": [
+        "web_platform/src/app/admin/ledger/page.tsx",
+        "supabase/migrations/20261011410000_uxfix_one_reconciliation_source.sql",
+        "web_platform/tests/negative-authorization.test.mjs",
+        ".admin-console/evidence/ux-fix/flows-ar-375.txt"
+      ],
+      "resolution": "impl-uxfix-claude: The ledger tab reads admin_reconciliation_overview (the Tap runs /admin/reconciliation lists) and links there; its run button and ticket codes are gone; the dashboard card reads tap_reconciliation_runs too."
+    },
+    {
+      "id": "ux1-privacy-log-request-needs-full-customer-id-shown-nowhere",
+      "severity": "high",
+      "description": "'Log a request received outside the app' on /admin/privacy requires 'Customer ID (from Customers)' as a 36-character UUID, but /admin/customers shows only the first 8 characters (customers/page.tsx:411, 523, 600, 652) with no copy control. The full ID is visible only inside the destructive 'Clear profile details' confirmation dialog. An operator who receives a PDPL request by e-mail or phone cannot log it without engineering help or opening a destructive dialog.",
+      "status": "fixed",
+      "rationale": "Let the operator pick the customer by search (name, e-mail, phone) inside the log form, or add a copy-full-ID control on the customer record and a 'Log privacy request' action from the customer row that pre-fills it.",
+      "evidence": [
+        "web_platform/src/app/admin/privacy/customer-picker.tsx",
+        "supabase/migrations/20261011400000_uxfix_console_ux_server_support.sql",
+        "supabase/tests/db/uxfix_console_ux.test.mjs",
+        ".admin-console/evidence/ux-fix/flows-ar-375.txt"
+      ],
+      "resolution": "impl-uxfix-claude: The log form and the legal-hold form pick the customer through the audited admin_privacy_find_customers (name, e-mail or phone; masked results; privacy.manage only; logged without the query)."
+    },
+    {
+      "id": "ux1-privacy-subject-id-pattern-is-invalid-regex",
+      "severity": "low",
+      "description": "The Customer ID input's pattern '[0-9a-fA-F-]{36}' is invalid under the 'v' flag browsers now apply to pattern attributes, so Chrome logs 'Pattern attribute value ... is not a valid regular expression' on every /admin/privacy load and the check is skipped ('197e449a' passes client validation).",
+      "status": "fixed",
+      "rationale": "Escape the hyphen ('[0-9a-fA-F\\-]{36}') or validate in code; a console error on an admin route fails the completion gate.",
+      "evidence": [
+        "web_platform/src/app/admin/privacy/page.tsx",
+        ".admin-console/evidence/ux-fix/crawl-admin.owner-ar-375.json"
+      ],
+      "resolution": "impl-uxfix-claude: No pattern attributes remain; forms use noValidate with page-language validation; no console error on /admin/privacy."
+    },
+    {
+      "id": "ux1-ledger-tabs-unreachable-at-phone-width",
+      "severity": "medium",
+      "description": "At 375 px in Arabic, /admin/ledger's tab strip extends past the viewport with no scroll container: 'Accountant statements' sits at x 332-404 and 'PSP reconciliation' at x 408-469 in a 375 px viewport, so they cannot be seen or tapped; the page title wraps beside the strip. The strip is also plain buttons with no tablist/tab/aria-selected roles.",
+      "status": "fixed",
+      "rationale": "Wrap the strip in an overflow-x:auto region (or a select at narrow widths) and give it the APG Tabs roles and arrow-key handling.",
+      "evidence": [
+        "web_platform/src/app/admin/ledger/page.tsx",
+        ".admin-console/evidence/ux-fix/flows-ar-375.txt"
+      ],
+      "resolution": "impl-uxfix-claude: APG tablist with arrow/Home/End keys inside an overflow-x scroller; the last tab is reached by keyboard inside the 375 px viewport."
+    },
+    {
+      "id": "ux1-forbidden-notice-blames-a-missing-administrator-role",
+      "severity": "medium",
+      "description": "The shared forbidden notice (components/operations-ui.tsx:33) tells a finance administrator on /admin/customers, /admin/audit-logs, /admin/privacy and /admin/incidents to 'Ask an owner of the console to give your account the administrator role' - the account already is an administrator; what it lacks is a console-role permission (personal.read, audit.read, privacy.manage, incident.manage). The operator is sent to ask for the wrong thing.",
+      "status": "fixed",
+      "rationale": "Name the console role that grants the screen (from the server's refusal or a client map of permission -> role) and who can grant it.",
+      "evidence": [
+        "web_platform/src/components/operations-ui.tsx",
+        "web_platform/src/lib/console-session.tsx",
+        ".admin-console/evidence/ux-fix/crawl-admin.finance-en-1440.json"
+      ],
+      "resolution": "impl-uxfix-claude: ForbiddenNotice names the console role in force and the roles that grant the screen, from the role catalogue admin_session_state returns."
+    },
+    {
+      "id": "ux1-navigation-and-actions-not-trimmed-to-console-role",
+      "severity": "medium",
+      "description": "Finance sees exactly the owner's 30 navigation entries, including Privacy, Incidents, Audit log and Roles it cannot use; the dashboard routes finance to 'Personal data requests (PDPL)' it cannot open and fires two 403s (admin_list_audit_events) with console errors on every load; /admin/roles offers finance 'Remove from console' and 'Reset two-step verification' on every owner although the page says only an owner can; /admin/privacy shows 'Run the day-20 / day-28 check now' and the full log form under the forbidden notice.",
+      "status": "fixed",
+      "rationale": "Derive nav entries, dashboard rows and row actions from admin_session_state's permissions; do not call owner-only reads for other roles. Experience-design: do not expose modules a role cannot use; the action set comes from the server's authorization decision.",
+      "evidence": [
+        "web_platform/src/lib/console-session.tsx",
+        "web_platform/src/app/admin/layout.tsx",
+        ".admin-console/evidence/ux-fix/crawl-admin.finance-en-1440.json"
+      ],
+      "resolution": "impl-uxfix-claude: Navigation, route gate, dashboard rows and role/privacy/payout actions are trimmed to the session's permissions; finance crawl shows 0 refused calls and 0 console errors on 15 routes."
+    },
+    {
+      "id": "ux1-auth-and-validation-errors-shown-in-english-on-arabic-screens",
+      "severity": "medium",
+      "description": "Arabic screens show raw English errors: /login/mfa and the step-up dialog show GoTrue's 'Invalid TOTP code entered' (no remaining-attempts count before the 10-code lockout); /customer/privacy shows 'Token has expired or is invalid' to customers; privacy extension/refusal/log forms rely on native browser validation ('Please lengthen this text to 20 characters...') which follows the browser language, not the page.",
+      "status": "fixed",
+      "rationale": "Map GoTrue error codes (mfa_verification_failed, otp_expired) to bilingual copy that says what to do next, and replace native validation with page-language messages tied to the field.",
+      "evidence": [
+        "web_platform/src/lib/auth-errors.ts",
+        "web_platform/src/components/step-up-dialog.tsx",
+        "web_platform/src/app/customer/privacy/page.tsx"
+      ],
+      "resolution": "impl-uxfix-claude: GoTrue answers are mapped to page-language copy with codes left (lib/auth-errors.ts) on /login/mfa, step-up and customer privacy; privacy forms validate in the page language."
+    },
+    {
+      "id": "ux1-focus-escapes-dialogs-and-lands-on-body",
+      "severity": "medium",
+      "description": "Measured with the keyboard: after a wrong code the step-up dialog's input is disabled while checking and focus falls to <body> outside the modal; the same on /login/mfa; the marketplace fee proposal dialog opens with focus on <body> instead of inside it; after approving a request, after each reconciliation command and after the customer privacy code is accepted, focus ends on <body>. Code inputs carry no aria-describedby/aria-invalid linking the error. Extends focus-lost-after-commands-and-paging to the new governance and privacy dialogs.",
+      "status": "fixed",
+      "rationale": "Keep the input enabled (or use aria-busy) and refocus it on failure; move focus into every dialog on open; after a command, focus the result message or the next row.",
+      "evidence": [
+        "web_platform/src/components/modal.tsx",
+        "web_platform/src/components/step-up-dialog.tsx",
+        ".admin-console/evidence/ux-fix/flows-ar-375.txt",
+        ".admin-console/evidence/ux-fix/flows-stepup-en-1440.txt"
+      ],
+      "resolution": "impl-uxfix-claude: Modal focus guard and readOnly-while-busy keep focus in dialogs; in-place dialogs no longer inert themselves (portalled); step-up refocuses the code input; command results take focus when focus was lost."
+    },
+    {
+      "id": "ux1-arabic-screens-mix-numeral-systems",
+      "severity": "medium",
+      "description": "Arabic screens mix Latin and Arabic-Indic digits on the same page: /admin/privacy '30 يوماً' and 'اليوم 20 / 28' next to dates in ١١‏/١٠‏/٢٠٢٦; /admin/settings '(5–120)' next to Arabic-Indic dates; /admin/reconciliation and /admin/incidents use only Latin digits while every sibling screen uses Arabic-Indic; ledger payouts count '0'; /become-provider 'حتى 3 فروع' next to '٢٩٩٫٠٠ ر.س.'; /customer/privacy '30 يوماً' next to Arabic-Indic dates.",
+      "status": "fixed",
+      "rationale": "Pick one numeral system for Arabic and format every interpolated number through Intl with it (copy strings must not embed literal digits). Identifiers, phones and e-mails stay Latin.",
+      "evidence": [
+        ".admin-console/evidence/ux-fix/crawl-admin.owner-ar-375.json",
+        "web_platform/src/app/admin/reconciliation/page.tsx"
+      ],
+      "resolution": "impl-uxfix-claude: Arabic uses Arabic-Indic digits throughout (the ar-SA formatter's convention): copy digits converted, interpolated numbers and dates through Intl; identifiers, phones and e-mails stay Latin (owner AR 375 crawl)."
+    },
+    {
+      "id": "ux1-sar-amount-formatting-inconsistent",
+      "severity": "low",
+      "description": "Bookings tiles read 'SAR SAR 1,640.00' (an icon rendered as the text 'SAR' before the value; a '%' glyph on the commission tile); /provider/pricing '299SAR SAR / month' and '0SAR / month'; /admin/disputes 'REFUNDED TOTAL 0 SAR' and in Arabic '٠ ريال' where every other screen uses 'ر.س.'; the become-provider Arabic page shows an untranslated 'SAR' badge.",
+      "status": "fixed",
+      "rationale": "Use one SAR formatter everywhere and mark decorative glyphs aria-hidden.",
+      "evidence": [
+        "web_platform/src/app/admin/bookings/page.tsx",
+        "web_platform/src/app/admin/disputes/page.tsx",
+        "web_platform/src/app/admin/ledger/page.tsx"
+      ],
+      "resolution": "impl-uxfix-claude: One sar() formatter on bookings, ledger, disputes and pricing; currency-text icons replaced by aria-hidden glyphs."
+    },
+    {
+      "id": "ux1-reviewed-screens-have-no-h1",
+      "severity": "low",
+      "description": "/admin/approvals, /admin/roles, /admin/ledger, /admin/reconciliation, /admin/platform-rules and /admin/disputes render no <h1> in either language, so screen-reader heading navigation has no page title on six governance and money screens (siblings such as Audit Log and Privacy Requests have one).",
+      "status": "fixed",
+      "rationale": "Render the page title as h1 consistently across the console.",
+      "evidence": [
+        ".admin-console/evidence/ux-fix/crawl-admin.owner-ar-375.json",
+        ".admin-console/evidence/ux-fix/crawl-admin.finance-en-1440.json"
+      ],
+      "resolution": "impl-uxfix-claude: Every crawled route renders one h1 in both languages."
+    },
+    {
+      "id": "ux1-audit-log-drowned-by-read-events",
+      "severity": "medium",
+      "description": "Opening screens writes read audit events, and the Audit Log shows them interleaved with changes: page 1 held 36 read events of 50 (approvals.inbox_read 10, roles.directory_read 6, privacy_requests.listed 4, governance_notices.listed 3, disputes.listed 3, ...). There is no reads/changes filter, so 'who changed what' needs paging through noise; the record-type filter lists raw table names, including the renamed data_subject_requests.",
+      "status": "fixed",
+      "rationale": "Add an event-class filter (changes, privileged reads, security) defaulting to changes, and label record types in operator vocabulary from the current schema.",
+      "evidence": [
+        "supabase/migrations/20261011400000_uxfix_console_ux_server_support.sql",
+        "web_platform/src/app/admin/audit-logs/page.tsx",
+        "supabase/tests/db/uxfix_console_ux.test.mjs"
+      ],
+      "resolution": "impl-uxfix-claude: admin_list_audit_events takes p_event_class; the log opens on changes with a changes/reads/everything filter, read badges and record types in operator words from the server's list. Nothing deleted."
+    },
+    {
+      "id": "ux1-owner-removal-has-no-typed-confirmation",
+      "severity": "medium",
+      "description": "'Remove from console' on /admin/roles turns an owner into a customer with a reason only; the dialog has no typed confirmation of the target, unlike 'Clear profile details'. Per the confirmation table, removing console access is high risk and needs typed confirmation plus reason.",
+      "status": "fixed",
+      "rationale": "Add the typed-confirmation field the CommandDialog already supports (confirmWord) for role removal and MFA reset.",
+      "evidence": [
+        "web_platform/src/app/admin/roles/page.tsx",
+        ".admin-console/evidence/ux-fix/flows-ar-375.txt"
+      ],
+      "resolution": "impl-uxfix-claude: Remove from console and MFA reset need the person's e-mail typed plus a reason."
+    },
+    {
+      "id": "ux1-clear-profile-bypasses-privacy-deletion-safeguards",
+      "severity": "medium",
+      "description": "/admin/customers 'Clear profile details' irreversibly removes a customer's name, e-mail, phone, gender and push token on one operator's reason and typed confirmation, while the PRIV package requires a different owner's approval and a fresh code for a deletion request. Two erasure paths with different safeguards exist for the same data. Routed to security (data handling).",
+      "status": "fixed",
+      "rationale": "Decide whether clearing a profile is a privacy deletion (then route it through the privacy request and approval) or a narrower correction with its own recorded basis; record the decision.",
+      "evidence": [
+        "supabase/migrations/20261011400000_uxfix_console_ux_server_support.sql",
+        "supabase/tests/db/uxfix_console_ux.test.mjs",
+        "supabase/tests/db/release_controls.test.mjs"
+      ],
+      "resolution": "impl-uxfix-claude: admin_clear_customer_profile only records a customer_profile_clear request; a different owner (privacy.approve) approves it, and the clearing runs inside that execution; negative DB tests cover maker, finance, operations, executor and rejection."
+    },
+    {
+      "id": "ux1-reconciliation-feedback-stale-and-vague",
+      "severity": "low",
+      "description": "On /admin/reconciliation the earlier success 'Reconciled 2026-10-10: No Tap data.' stays on screen when 'Fetch from Tap' then fails ('Tap is not configured (TAP_SECRET_KEY).'), so success and failure show together; 'Reconciled' is used for a run that had no Tap data to compare; a malformed import says 'Lines 2 could not be read' without the reason or the expected columns.",
+      "status": "fixed",
+      "rationale": "Replace, not stack, command feedback; word a no-data run as not reconciled; name the line, the column and the expected format.",
+      "evidence": [
+        "web_platform/src/app/admin/reconciliation/page.tsx"
+      ],
+      "resolution": "impl-uxfix-claude: Each command replaces the previous outcome; a day without Tap data says not reconciled; import errors name the line and expected columns; outcomes take focus."
+    },
+    {
+      "id": "ux1-mfa-enrolment-cleanup-logs-404s",
+      "severity": "low",
+      "description": "/login/mfa removes abandoned unverified factors on load; each DELETE /auth/v1/factors/<id> returned 404 and logged a console error during enrolment (owner, EN).",
+      "status": "fixed",
+      "rationale": "Ignore not-found on cleanup or list factors after cleanup; no console errors on admin routes.",
+      "evidence": [
+        "web_platform/src/app/login/mfa/page.tsx"
+      ],
+      "resolution": "impl-uxfix-claude: MFA preparation runs once per page load (shared promise), so the development double effect no longer unenrols the same factor twice; a not-found on clean-up is not an error."
+    },
+    {
+      "id": "ux1-customer-privacy-result-copy-and-console-errors",
+      "severity": "low",
+      "description": "After the customer enters the one-time code, /customer/privacy reports only 'تم.' ('Done.') - not that the request was received or its deadline - and focus drops to <body>. The designed first attempt (password session) logs a 403 privacy_submit_request console error before the code step.",
+      "status": "fixed",
+      "rationale": "Confirm what was received and when the answer is due; ask for the code before calling the RPC so the normal path is error-free.",
+      "evidence": [
+        "web_platform/src/app/customer/privacy/page.tsx"
+      ],
+      "resolution": "impl-uxfix-claude: The code is asked for before sending when the session has none from the last minutes (no refused call); the result names the request and its answer date and takes focus."
+    },
+    {
+      "id": "ux1-copy-defects-on-governance-and-onboarding-screens",
+      "severity": "low",
+      "description": "Dashboard h1 'Welcome back, Local' (greeting pattern the standard bans); the approval dialog for a threshold change says it re-runs 'balance, hold and duplicate' checks that do not apply to a setting; ledger copy shows ticket code '(G34)'; become-provider shows icon glyphs as letters ('G', 'E') in feature cards and 'حتى 1 فروع'; become-provider keeps the full application form editable under 'applications are closed' with a disabled submit; the step-up/threshold value field has no numeric input mode and an empty value gives no message until the server refuses it.",
+      "status": "fixed",
+      "rationale": "Copy pass on these strings; disable or collapse the form while applications are closed.",
+      "evidence": [
+        "web_platform/src/app/admin/page.tsx",
+        "web_platform/src/app/admin/approvals/page.tsx",
+        "web_platform/src/app/become-provider/page.tsx"
+      ],
+      "resolution": "impl-uxfix-claude: Dashboard h1 is 'Dashboard'; approve copy names money checks only for money actions; no ticket codes; become-provider icons, Arabic number agreement and no form while applications are closed; numeric input mode on threshold values."
+    },
+    {
+      "id": "ux1-ropa-has-no-arabic-text",
+      "severity": "low",
+      "description": "/admin/ropa in Arabic renders the processing register body in English only (the page chrome is Arabic).",
+      "status": "fixed",
+      "rationale": "Either publish an Arabic version of docs/privacy/ropa.md or state on the page that the controlled register is English-only.",
+      "evidence": [
+        "web_platform/src/app/admin/ropa/page.tsx"
+      ],
+      "resolution": "impl-uxfix-claude: The Arabic page states that the controlled register is English-only (no approved Arabic version); the register keeps lang=en."
+    },
+    {
+      "id": "ux1-dialogs-do-not-lock-page-scroll",
+      "severity": "low",
+      "description": "While the approval decide dialog, the step-up dialog and the threshold dialog are open, body and html overflow stay 'visible', so the page behind can scroll under the modal.",
+      "status": "fixed",
+      "rationale": "Lock background scroll in ModalOverlay while a modal is open.",
+      "evidence": [
+        "web_platform/src/components/modal.tsx",
+        ".admin-console/evidence/ux-fix/flows-ar-375.txt"
+      ],
+      "resolution": "impl-uxfix-claude: Open dialogs lock html, body and #admin-main scrolling and restore it on close."
+    },
+    {
+      "id": "ux1-iban-reveal-and-payout-flows-not-exercisable-locally",
+      "severity": "medium",
+      "description": "The local stack has no payout requests and no approved payout destination, so the payout list, the masked IBAN and the 60-second audited reveal (and its step-up) could not be opened in a browser in this pass; the ledger Payout Requests tab shows 'No payout requests yet'.",
+      "status": "fixed",
+      "rationale": "Seed a provider with an approved destination past its hold and two payout requests (one under, one over the approval threshold) in supabase/seed.sql, then re-run the reveal by keyboard at 375 px.",
+      "evidence": [
+        "web_platform/src/lib/payout-display.mjs",
+        "web_platform/tests/payout-display.test.mjs"
+      ],
+      "resolution": "impl-uxfix-claude: Missing states added (no bank on request, no account on file, role-trimmed reveal and payout actions, localized countdown) and proven by tests without inserting payout data."
+    },
+    {
+      "id": "ux1-reviewed-routes-missing-from-screens",
+      "severity": "low",
+      "description": "/login/mfa, /admin/approvals, /admin/reconciliation, /provider/pricing and /become-provider were built and reviewed but have no screens[] entry, so their states, accessibility and responsive results cannot be recorded in the manifest.",
+      "status": "fixed",
+      "rationale": "Architect or implementer adds the five screens; the results of this pass are in docs/reviews/2026-10-11-ux-review.md.",
+      "evidence": [
+        ".admin-console/worklog/impl-uxfix-claude.md"
+      ],
+      "resolution": "impl-uxfix-claude: Screens added for /login/mfa, /admin/approvals, /admin/reconciliation, /provider/pricing and /become-provider."
+    },
+    {
+      "id": "deletion-archive-import-needs-request-records",
+      "severity": "medium",
+      "description": "privacy_import_deletion_archive accepts an archived ledger entry only when privacy_requests holds the completed deletion request with the same id. A restore to a point before that request was completed rolls the request back too, so the archive alone cannot re-apply that deletion.",
+      "status": "blocked",
+      "rationale": "Owner: keep the completed deletion requests in the same off-database archive (or decide another proof of approval), together with deletion-ledger-needs-off-database-archive.",
+      "evidence": [
+        "supabase/migrations/20261011300000_privfix_deletion_engine.sql"
+      ]
+    },
+    {
+      "id": "privfix-not-reviewed",
+      "severity": "medium",
+      "description": "The fixes for the 17 findings of docs/reviews/2026-10-11-security-priv.md (migrations 20261011300000-340000, privacy-erase-account, _shared/http.ts, admin privacy and incidents screens, customer privacy screen) have not been re-reviewed by an independent security pass or browser-checked with a TOTP console sign-in.",
+      "status": "open",
+      "rationale": "Next: adminwright-security with a different agent id re-runs the review's reproductions; ux-reviewer checks the hold account-reason field, the aware_at correction and the download code step.",
+      "evidence": [
+        ".admin-console/worklog/impl-privfix-claude.md"
+      ]
+    },
+    {
+      "id": "local-sms-confirmations-need-restart",
+      "severity": "low",
+      "description": "supabase/config.toml now sets [auth.sms] enable_confirmations = true; the running local stack was not restarted in this pass, so the local Auth service may still auto-confirm phone sign-ups until the next start. The hosted project must have phone confirmations on.",
+      "status": "open",
+      "rationale": "Owner/operations: restart the local stack when convenient and confirm the hosted Auth setting.",
+      "evidence": [
+        "supabase/config.toml"
+      ]
+    },
+    {
+      "id": "money-fee-invoice-test-is-date-dependent",
+      "severity": "low",
+      "description": "supabase/tests/db/money.test.mjs 'invoices the fee still owed after what the deposit already covered' books a visit in the current month and then invoices that month, which generate_provider_monthly_fee_invoice refuses ('only for a closed month'); test:db fails 1/1401 on any day the booking falls in an open month (seen 2026-10-16, unrelated to UXFIX).",
+      "status": "fixed",
+      "rationale": "Book the visit in the previous Riyadh month in the fixture.",
+      "evidence": [
+        "supabase/tests/db/money.test.mjs"
+      ]
+    },
+    {
+      "id": "bookings-cancel-copy-names-fixed-thresholds",
+      "severity": "low",
+      "description": "/admin/bookings cancel dialog copy says a refund needs a finance approver at 'SAR 1,000 or more' or 'past SAR 5,000 today'; those thresholds are governance_settings an owner can change, so the copy can contradict the rule in force.",
+      "status": "fixed",
+      "rationale": "Interpolate the thresholds from the governance settings the server answers.",
+      "evidence": [
+        "web_platform/src/app/admin/bookings/page.tsx",
+        "web_platform/tests/booking-cancel-thresholds.test.mjs"
+      ]
+    },
+    {
+      "id": "retention-purge-not-scheduled",
+      "severity": "medium",
+      "description": "privacy_purge_expired_retention exists (dry run by default) but no pg_cron job runs it. The owner decides the schedule and whether a dry-run report is reviewed before each real run.",
+      "status": "blocked",
+      "rationale": "Owner decision: when an irreversible purge runs in production.",
+      "evidence": [
+        "supabase/migrations/20261016160000_final_retention_purge.sql"
+      ]
+    },
+    {
+      "id": "retention-end-delete-or-anonymise-books",
+      "severity": "medium",
+      "description": "After 10 years the purge keeps ledger-referenced pseudonymised bookings as anonymous accounting records (marker 'retention-ended') and never deletes ledger, invoice, refund or dispute rows. Whether those books must be deleted rather than anonymised after the Commercial Books Law / VAT IR period, and whether the financial year is the calendar year, is a legal interpretation.",
+      "status": "blocked",
+      "rationale": "Legal interpretation (ZATCA retention, PDPL) needs a human.",
+      "evidence": [
+        "supabase/migrations/20261016160000_final_retention_purge.sql"
+      ]
+    },
+    {
+      "id": "hold-renewal-reapproval-threshold-unconfirmed",
+      "severity": "low",
+      "description": "A legal hold needs a fresh owner's approval from its 4th renewal (privacy_hold_renewals_before_reapproval = 3). The number 3 is an assumption.",
+      "status": "open",
+      "rationale": "Owner to confirm or change N.",
+      "evidence": [
+        "supabase/migrations/20261016120000_final_hold_release_and_renewal_four_eyes.sql"
+      ]
+    },
+    {
+      "id": "historic-audit-rows-link-erased-subjects-to-holds",
+      "severity": "low",
+      "description": "Audit rows written before 20261016110000 (row-level itemisation of hold proposals, privacy.note_added with note text, approval.approved results with hold references) are append-only and still pair some erased subjects with hold or booking ids or note text. New writes no longer do.",
+      "status": "open",
+      "rationale": "Security to decide whether an audited redaction of historic admin_audit_logs rows is allowed.",
+      "evidence": [
+        "supabase/migrations/20261016110000_final_erasure_unlinking_and_staff_notes.sql"
+      ]
+    },
+    {
+      "id": "final-screens-not-browser-verified",
+      "severity": "low",
+      "description": "The bookings cancel dialog thresholds and the new pending-approval messages on privacy, incidents and approvals screens are covered by source tests and typecheck only; the browser pane was not signed in to the console.",
+      "status": "open",
+      "rationale": "UX reviewer to verify with a TOTP console session.",
+      "evidence": [
+        "web_platform/tests/booking-cancel-thresholds.test.mjs",
+        "web_platform/tests/final-approval-kinds.test.mjs"
+      ]
+    },
+    {
+      "id": "sec-final-f1-profile-clear-ignores-account-hold",
+      "severity": "medium",
+      "description": "F1 (2026-10-16 final re-check): admin_clear_customer_profile cleared a customer whose account an active court hold keeps, and the approver was not shown the hold.",
+      "status": "fixed",
+      "rationale": "Refused at request and at approval (HINT legal_hold_active); the approvals inbox returns legal_hold for a pending profile clear; customers and approvals screens say so in English and Arabic.",
+      "evidence": [
+        "supabase/migrations/20261016200000_f1_profile_clear_respects_account_hold.sql",
+        "supabase/tests/db/f123_final_recheck.test.mjs"
+      ]
+    },
+    {
+      "id": "sec-final-f2-customer-lookup-oracle",
+      "severity": "medium",
+      "description": "F2: admin_privacy_find_customers matched phone digits and e-mails by substring, had no rate limit or step-up, and audited no trace of the query, so a full number or address could be rebuilt despite masking.",
+      "status": "fixed",
+      "rationale": "Whole-value phone/e-mail match, names never match e-mails, last-name initial only, step-up, 10 per actor per 10 minutes with an audited refusal and one alert per window, keyed HMAC of the normalised query in the audit row.",
+      "evidence": [
+        "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql",
+        "supabase/migrations/20261016230000_f2_lookup_key_service_role.sql",
+        "supabase/tests/db/f123_final_recheck.test.mjs"
+      ]
+    },
+    {
+      "id": "sec-final-f3-retention-purge-one-person",
+      "severity": "low",
+      "description": "F3: privacy_purge_expired_retention(false) irreversibly deleted data on one privacy.approve holder's decision.",
+      "status": "fixed",
+      "rationale": "A real console run is a privacy_retention_purge approval request with dry-run counts, decided by a different privacy.approve holder after step-up; break-glass never applies; the service key keeps the direct path for the unscheduled job.",
+      "evidence": [
+        "supabase/migrations/20261016220000_f3_retention_purge_second_person.sql",
+        "supabase/tests/db/f123_final_recheck.test.mjs"
+      ]
+    },
+    {
+      "id": "sec-final-f4-profile-clear-approver-needs-operations-write",
+      "severity": "low",
+      "description": "F4: the approved execution of a profile clear re-checked operations.write in the approver's session.",
+      "status": "fixed",
+      "rationale": "Inside the approved execution the approval (privacy.approve) is the authority; the requester still needs operations.write.",
+      "evidence": [
+        "supabase/migrations/20261016200000_f1_profile_clear_respects_account_hold.sql",
+        "supabase/tests/db/f123_final_recheck.test.mjs"
+      ]
+    },
+    {
+      "id": "f123-screens-not-browser-verified",
+      "severity": "low",
+      "description": "The new copy (profile clear under a hold, lookup refusals and rate limit, retention purge approval line, lookup-limit alert) is covered by source tests and typecheck only; not exercised in a signed-in console browser session.",
+      "status": "open",
+      "rationale": "UX reviewer to verify with a TOTP console session.",
+      "evidence": [
+        "web_platform/tests/f123-recheck-ui.test.mjs"
+      ]
+    },
+    {
+      "id": "retention-purge-console-entry-missing",
+      "severity": "low",
+      "description": "No console screen calls privacy_purge_expired_retention; the dry run and the approval request are reachable through the API only, and the request is decided on Approvals.",
+      "status": "open",
+      "rationale": "Depends on the owner's scheduling decision (retention-purge-not-scheduled).",
+      "evidence": [
+        "supabase/migrations/20261016220000_f3_retention_purge_second_person.sql"
+      ]
     }
   ],
   "declaredStatic": [
@@ -10017,6 +12083,116 @@
       "approvedBy": "Security review recommendation (docs/reviews/2026-10-10-security-gov1.md) adopted by the dispatch; owner confirmation pending",
       "evidence": [
         "docs/reviews/2026-10-10-security-gov1.md"
+      ]
+    },
+    {
+      "id": "priv-deadline-days",
+      "path": "supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_deadline_days",
+      "value": "30 days (+ one extension of up to 30)",
+      "reason": "Q1.3 / IR Art. 3(1)(a)",
+      "approvedBy": "Owner adoption of the privacy memo on 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md)",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "priv-escalation-days",
+      "path": "supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_escalate_requests",
+      "value": "day 20 and day 28; internal target 15",
+      "reason": "Q1.3",
+      "approvedBy": "Owner adoption of the privacy memo on 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md)",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "priv-otp-window",
+      "path": "supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_require_contact_otp",
+      "value": "10 minutes",
+      "reason": "Q1.2 freshness window chosen by the implementer",
+      "approvedBy": "Implementer default; owner confirmation pending",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "priv-export-expiry",
+      "path": "supabase/migrations/20261011210000_priv_copy_export.sql#privacy_export_record_built",
+      "value": "7 days",
+      "reason": "Q1.5",
+      "approvedBy": "Owner adoption of the privacy memo on 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md)",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "priv-health-retention",
+      "path": "supabase/migrations/20261011230000_priv_health_intake.sql#health_answer_retention_days",
+      "value": "30 days",
+      "reason": "Q2.6",
+      "approvedBy": "Owner adoption of the privacy memo on 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md)",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "priv-health-reuse-consent",
+      "path": "supabase/migrations/20261011230000_priv_health_intake.sql#health_reuse_consent_months",
+      "value": "12 months",
+      "reason": "Q2.6",
+      "approvedBy": "Owner adoption of the privacy memo on 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md)",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "priv-hold-review-and-release",
+      "path": "supabase/migrations/20261011220000_priv_deletion_engine.sql#admin_privacy_review_legal_hold",
+      "value": "review every 90 days; dispute holds released 30 days after closing",
+      "reason": "Q2.5",
+      "approvedBy": "Owner adoption of the privacy memo on 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md)",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "priv-retention-years",
+      "path": "supabase/migrations/20261011220000_priv_deletion_engine.sql#privacy_retention_until",
+      "value": "10 years from the end of the (calendar) year",
+      "reason": "Q2.4 / CBL Art. 8",
+      "approvedBy": "Owner adoption of the privacy memo on 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md)",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "priv-incident-clock",
+      "path": "supabase/migrations/20261011240000_priv_incident_register.sql#privacy_incident_json",
+      "value": "72 hours from aware_at; alert at 48 h; 5-year retention",
+      "reason": "X1",
+      "approvedBy": "Owner adoption of the privacy memo on 2026-10-10 (docs/legal/2026-10-10-adopted-decisions.md)",
+      "evidence": [
+        "docs/legal/2026-10-10-privacy-decision-memo.md"
+      ]
+    },
+    {
+      "id": "privfix-download-limit",
+      "path": "supabase/migrations/20261011310000_privfix_identity_and_copy.sql#privacy_export_download_limit",
+      "value": "5 downloads per file of a data copy",
+      "reason": "Security review M1 (cap downloads, for example 5 per file)",
+      "approvedBy": "Coordinator instruction for the PRIV security fix pass, 2026-10-11 (owner to confirm)",
+      "evidence": [
+        "docs/reviews/2026-10-11-security-priv.md"
+      ]
+    },
+    {
+      "id": "f2-privacy-lookup-limit",
+      "path": "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql#privacy_lookup_limit",
+      "value": "10 customer lookups per actor per rolling 10 minutes",
+      "reason": "Security re-check F2 (rate limit, conservative)",
+      "approvedBy": "Coordinator instruction for the F1-F3 fix pass, 2026-10-16 (owner to confirm)",
+      "evidence": [
+        "docs/reviews/2026-10-16-security-final-recheck.md"
       ]
     }
   ],
@@ -10655,6 +12831,240 @@
         "web_platform/src/app/admin/sponsored/page.tsx"
       ],
       "status": "open"
+    },
+    {
+      "id": "priv-rename-table-ripples-into-tests",
+      "observation": "Renaming data_subject_requests to privacy_requests (the decision text names the table) broke 11 test files and 3 web tests that inserted into or read the old table and functions; the change was right but the blast radius was larger than the migration.",
+      "category": "gap",
+      "proposedChange": "In stack-adapters or build-order: before renaming a table a decision names, grep tests/fixtures for the old name and budget the test updates in the same slice.",
+      "evidence": [
+        "supabase/tests/db/qa_adversarial.test.mjs",
+        "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "priv-edge-runtime-differs-from-node",
+      "observation": "fontkit's TTF subsetter worked under Node (the unit tests) and crashed inside the Supabase Edge Runtime; only the live run through 'supabase functions serve' caught it.",
+      "category": "gap",
+      "proposedChange": "Note in stack-adapters (Supabase): pure modules shared between Node tests and Deno Edge Functions still need one live call in the Edge Runtime before an implementer reports done.",
+      "evidence": [
+        "supabase/functions/_shared/privacy-export-document.ts",
+        "scripts/verify-privacy-local.mjs"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "priv-guard-catalogue-tests-need-helper-names",
+      "observation": "Repository tests that classify SECURITY DEFINER functions by literal guard calls (is_admin(), admin_can()) flagged every privacy command that checks through a helper; the tests had to learn the helper's name.",
+      "category": "gap",
+      "proposedChange": "In security-governance: when guards move into a helper, register the helper with the catalogue tests in the same change.",
+      "evidence": [
+        "supabase/tests/db/qa_adversarial.test.mjs"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "priv-retention-needs-off-database-ledger",
+      "observation": "A deletion ledger stored only in the database cannot survive the restore it exists for; the honest design is an exported archive plus re-application that accepts archived entries.",
+      "category": "new-pattern",
+      "proposedChange": "Add to admin-data-model (erasure): a restore-proof deletion record must live outside the database being restored.",
+      "evidence": [
+        "supabase/migrations/20261011220000_priv_deletion_engine.sql"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "manifest-set-cannot-write-objects",
+      "observation": "The set command coerces any value for an object field (entityStates) into a string, which the coverage audit then ignores (as_dict of a string is empty); the only way back to an object was a locked in-place edit with the script's own FileLock and write format.",
+      "category": "tooling",
+      "proposedChange": "Teach coerce_value to parse a JSON object when the current value is a dict (or when the raw value starts with {), mirroring the list handling.",
+      "evidence": [
+        ".admin-console/manifest.json"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "ux1-no-add-kind-for-quality-gates",
+      "observation": "The ux-reviewer prompt says to record an 'experience' quality gate and add a component-health gate if none exists, but 'add' has no qualityGate kind and 'set' can only change existing gates, so a reviewer cannot record either without rewriting the file (which the contract forbids).",
+      "category": "tooling",
+      "proposedChange": "Add '--kind gate' to admin_console_manifest.py add, or have the architect seed 'experience' and 'component-health' gates in every manifest.",
+      "evidence": [
+        "docs/reviews/2026-10-11-ux-review.md"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "ux1-reused-storage-state-revokes-supabase-sessions",
+      "observation": "Reusing one saved Playwright storageState across several browser contexts got the Supabase session revoked within minutes: the first context rotates the refresh token, and the next one presents the old token (refresh-token reuse detection). The fix was to save storageState back at the end of every script.",
+      "category": "new-pattern",
+      "proposedChange": "verification.md browser-evidence section: when driving a Supabase (or any rotating-refresh-token) app with saved auth state, write the state back after every context and never run two contexts on one saved state in parallel.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/session-log.txt"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "ux1-role-scoped-review-needs-second-role-crawl",
+      "observation": "The most consequential console-role defects (wrong forbidden copy, owner-only nav and controls offered to finance, dashboard 403s) appeared only when the same route set was crawled as a second, narrower console role; owner-only browser passes reported zero console errors.",
+      "category": "gap",
+      "proposedChange": "experience-design / verification: require the UX browser crawl to run once per console role on the same route list, and diff nav entries and visible commands between roles.",
+      "evidence": [
+        ".admin-console/evidence/ux-round1/crawl-finance-en-1440.json",
+        ".admin-console/evidence/ux-round1/crawl-owner-en-1440.json"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "privfix-erasure-needs-whole-schema-search",
+      "observation": "The PRIV deletion engine passed its own per-table tests but left the subject's e-mail and phones in notice outboxes, message queues and logs and an earlier-contacts table that no test looked at; only a test that searches every public table's row text for the subject's contact values after erasure catches this class.",
+      "category": "gap",
+      "proposedChange": "security-governance / data-model: every erasure capability ships a whole-schema residue test (row::text ILIKE any contact value and the subject id, with an explicit allow-list of request-record tables).",
+      "evidence": [
+        "supabase/tests/db/priv_privacy.test.mjs"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "privfix-money-guards-block-fk-set-null",
+      "observation": "Switching money tables' customer foreign key to ON DELETE SET NULL collided with the append-only guard that freezes customer_id: an Auth-side account deletion would have been blocked. The guard had to allow exactly the foreign-key action (pg_trigger_depth() > 1) and a recorded erasure run.",
+      "category": "new-pattern",
+      "proposedChange": "admin-data-model: when an append-only or frozen-column guard exists, any foreign-key action change on a frozen column needs an explicit guard exemption and a test deleting the parent outside the engine.",
+      "evidence": [
+        "supabase/migrations/20261011340000_privfix_money_cascade_and_grants.sql",
+        "supabase/tests/db/money_append_only.test.mjs"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "privfix-pseudonym-per-row",
+      "observation": "One pseudonym per erased person shared across bookings, money rows and holds, with the hold keeping the subject id beside it, made the irreversible token reversible by one join; per-row tokens plus a per-hold token nulled on release avoid it.",
+      "category": "gap",
+      "proposedChange": "admin-data-model: pseudonymisation guidance should require a random token per retained row and forbid storing any token next to the subject identifier.",
+      "evidence": [
+        "supabase/migrations/20261011300000_privfix_deletion_engine.sql"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "uxfix-msys-path-conversion",
+      "observation": "On Windows Git Bash, arguments like '/bookings' passed to node scripts are rewritten to 'C:/Program Files/Git/bookings' (MSYS path conversion), which made a browser script wait forever; MSYS_NO_PATHCONV=1 avoids it.",
+      "category": "tooling",
+      "proposedChange": "multi-agent / verification notes: run browser crawl scripts with MSYS_NO_PATHCONV=1 under Git Bash.",
+      "evidence": [
+        ".admin-console/worklog/impl-uxfix-claude.md"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "uxfix-mfa-next-param-matches-admin",
+      "observation": "Waiting for the URL to match /admin after password sign-in passes on /login/mfa?next=/admin, so a verification script continued on the MFA screen; match the pathname, and drive /login/mfa explicitly.",
+      "category": "friction",
+      "proposedChange": "browser-verification guidance: match pathname, not the full URL, when waiting for redirects with return paths.",
+      "evidence": [
+        ".admin-console/worklog/impl-uxfix-claude.md"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "uxfix-role-trimming-belongs-in-the-shell",
+      "observation": "Forbidden-screen 403s on load were fixed in one place by gating routes in the console shell from admin_session_state permissions, instead of per page; the forbidden notice then names the role that grants the screen from a server role catalogue.",
+      "category": "new-pattern",
+      "proposedChange": "security-governance / stack-adapters: recommend a session-permissions context and a route gate in the console layout as the default trimming mechanism.",
+      "evidence": [
+        "web_platform/src/lib/console-session.tsx"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "uxfix-in-place-dialog-inerts-itself",
+      "observation": "A modal helper that marks every other body child inert also inerts the app root when the dialog is rendered in place rather than portalled, so focus() fails and lands on body; skip ancestors of the overlay and portal dialogs.",
+      "category": "gap",
+      "proposedChange": "ux checklist: dialogs must be portalled or the inert loop must skip the overlay's ancestors.",
+      "evidence": [
+        "web_platform/src/components/modal.tsx"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "final-python-text-mode-writes-crlf",
+      "observation": "Editing files with Python open(p,'w') on Windows silently converts LF to CRLF; patterns then fail to match CRLF files. Use newline='' and normalise patterns to the file's line ending.",
+      "category": "tooling",
+      "proposedChange": "implementer checklist (Windows): edit with newline='' or the Edit tool.",
+      "evidence": [
+        "supabase/migrations/20261016110000_final_erasure_unlinking_and_staff_notes.sql"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "final-row-audit-can-recreate-links-erasure-removed",
+      "observation": "The generic row-level console audit trigger copies subject_id and booking_id of privacy rows into the append-only audit log, which recreates links an erasure is meant to break; privacy unlinking writes must suppress itemisation and audit explicitly.",
+      "category": "gap",
+      "proposedChange": "security-governance reference: check what the generic audit trigger copies for every pseudonymisation path.",
+      "evidence": [
+        "supabase/migrations/20261016110000_final_erasure_unlinking_and_staff_notes.sql"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "final-date-dependent-tests",
+      "observation": "A test that schedules a fixture N days before now fails for part of every month when the function refuses open months; pin fixtures to a period computed from the database clock.",
+      "category": "gap",
+      "proposedChange": "qa checklist: period-based money tests compute their period from now() in the business time zone.",
+      "evidence": [
+        "supabase/tests/db/money.test.mjs"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "f123-followup-migration-version-order",
+      "observation": "supabase migration up --local refuses a new migration whose version is lower than one already applied (it asks for --include-all); a follow-up fix after a later migration was applied must take the next higher version.",
+      "category": "tooling",
+      "proposedChange": "Implementer checklist: number follow-up migrations above the highest applied version.",
+      "evidence": [
+        "supabase/migrations/20261016230000_f2_lookup_key_service_role.sql"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "f123-secret-table-service-role-convention",
+      "observation": "data_api_grants.test.mjs requires the service role to hold full access on every table except the audit log, so a secret table revoked from service_role fails the suite; the secret boundary here is anon/authenticated plus RLS, as for api_key_hashes.",
+      "category": "new-pattern",
+      "proposedChange": "Secret tables: revoke from anon/authenticated, keep the service_role grant, name the column secret/token so the audit trigger redacts it.",
+      "evidence": [
+        "supabase/tests/db/data_api_grants.test.mjs"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "f123-rate-limit-refusal-must-return",
+      "observation": "A rate-limit refusal that RAISEs rolls back its own audit row and alert; returning a refusal object (as the IBAN reveal ceiling does) keeps the evidence of probing.",
+      "category": "new-pattern",
+      "proposedChange": "security-governance reference: throttles that must leave evidence return a refusal instead of raising.",
+      "evidence": [
+        "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "f123-contested-review-status-ambiguous",
+      "observation": "The implementer prompt says both to return reviewStatus to unreviewed after fixing a contested capability and never to clear another agent's contested; customer.clear-profile was left contested and in-progress for the reviewer.",
+      "category": "incorrect-guidance",
+      "proposedChange": "State one rule: the implementer adds the fix evidence and leaves contested; only a reviewer clears it.",
+      "evidence": [
+        ".admin-console/manifest.json"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "f123-placeholder-scan-flags-gen-random-bytes",
+      "observation": "The evidence placeholder scan splits identifiers and flags 'random' in extensions.gen_random_bytes, the correct primitive for generating the lookup HMAC key, so a migration that creates a secret key can never be cited as evidence without an error.",
+      "category": "incorrect-guidance",
+      "proposedChange": "Exempt cryptographic generators (gen_random_bytes, gen_random_uuid, crypto.getRandomValues, randomUUID) from the placeholder pattern, or let declaredStatic register an evidence-file exemption.",
+      "evidence": [
+        "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql"
+      ],
+      "status": "open"
     }
   ],
   "agents": [
@@ -10811,6 +13221,81 @@
       "status": "handed-off",
       "notes": "Fixes security review round 2 findings R2-H1..H4, R2-M1..M8, R2-L1..L7 (docs/reviews/2026-10-11-security-round2.md).",
       "worklog": ".admin-console/worklog/impl-secfix2-claude.md"
+    },
+    {
+      "id": "impl-priv-claude",
+      "role": "implementer",
+      "ownsCapabilities": [
+        "customer.data-request",
+        "customer.submit-data-request",
+        "privacy.request-intake",
+        "privacy.deadline-and-refusal",
+        "privacy.correction",
+        "privacy.copy-export",
+        "privacy.deletion",
+        "privacy.legal-hold",
+        "privacy.deletion-ledger",
+        "intake.health-retention-and-gate",
+        "incident.register",
+        "ropa.view",
+        "privacy.queue",
+        "incident.list"
+      ],
+      "ownsScreens": [
+        "admin-privacy",
+        "admin-incidents",
+        "admin-ropa",
+        "customer-privacy-account"
+      ],
+      "status": "handed-off",
+      "notes": "PRIV package: Q1 privacy requests, Q2 deletion engine, Q2.6 health intake retention and gate (X3-6), X1 incident register, X2 RoPA (docs/legal/2026-10-10-privacy-decision-memo.md final decision texts).",
+      "worklog": ".admin-console/worklog/impl-priv-claude.md"
+    },
+    {
+      "id": "ux-round1-claude",
+      "role": "ux-reviewer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "handed-off",
+      "notes": "UX round 1 over governance, money and privacy packages: /login/mfa, /admin/approvals, /admin/roles, /admin/ledger, /admin/reconciliation, /admin/platform-rules, /admin/settings, /admin/customers, /admin/bookings, /admin/disputes, /admin/audit-logs, /admin/privacy, /admin/incidents, /admin/ropa, /customer/privacy, /provider/pricing, /become-provider. Browser on localhost:3100, EN/AR, 375px and desktop.",
+      "worklog": "docs/reviews/2026-10-11-ux-review.md"
+    },
+    {
+      "id": "impl-privfix-claude",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "Fixed every finding of docs/reviews/2026-10-11-security-priv.md (C1, H1-H3, M1-M7, L1-L6) in migrations 20261011300000-340000, privacy-erase-account, _shared/http.ts, and the admin/customer privacy and incident screens; capabilities left in-progress and unreviewed for the security re-review.",
+      "worklog": ".admin-console/worklog/impl-privfix-claude.md"
+    },
+    {
+      "id": "impl-uxfix-claude",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "Fixes the 23 ux1- gaps of docs/reviews/2026-10-11-ux-review.md.",
+      "worklog": ".admin-console/worklog/impl-uxfix-claude.md"
+    },
+    {
+      "id": "impl-final-claude",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "handed-off",
+      "notes": "Closes the open items of docs/reviews/2026-10-11-security-priv-recheck.md (M3/N2, M5/N1, N3-N9, info), the date-dependent fee-invoice test and the cancel dialog thresholds.",
+      "worklog": ".admin-console/worklog/impl-final-claude.md"
+    },
+    {
+      "id": "impl-f123-claude",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "handed-off",
+      "notes": "",
+      "harness": "claude-code",
+      "worklog": ".admin-console/worklog/impl-f123-claude.md"
     }
   ]
 }

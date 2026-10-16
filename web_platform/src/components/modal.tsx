@@ -10,6 +10,20 @@ import { operationError, type OperationsLocale } from "@/components/operations-u
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const openOverlays: HTMLElement[] = [];
 
+// While any dialog is open the page behind it does not scroll: the document, and the console's own scrolling main panel.
+let scrollLock: { targets: { element: HTMLElement; overflow: string }[] } | null = null;
+function lockScroll() {
+  if (scrollLock) return;
+  const targets = [document.documentElement, document.body, document.getElementById("admin-main")].filter((el): el is HTMLElement => Boolean(el));
+  scrollLock = { targets: targets.map((element) => ({ element, overflow: element.style.overflow })) };
+  for (const element of targets) element.style.overflow = "hidden";
+}
+function unlockScroll() {
+  if (!scrollLock || openOverlays.length > 0) return;
+  for (const { element, overflow } of scrollLock.targets) element.style.overflow = overflow;
+  scrollLock = null;
+}
+
 function reachable(root: HTMLElement) {
   return Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((element) => element.getClientRects().length > 0);
 }
@@ -26,14 +40,35 @@ export function useModalBehavior(overlayRef: React.RefObject<HTMLElement | null>
     const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const inerted: HTMLElement[] = [];
     for (const child of Array.from(document.body.children)) {
-      if (child === overlay || !(child instanceof HTMLElement) || child.hasAttribute("inert")) continue;
+      // A dialog rendered in place (not portalled) must never make its own ancestor inert, or it could not take focus.
+      if (child === overlay || child.contains(overlay) || !(child instanceof HTMLElement) || child.hasAttribute("inert")) continue;
       child.setAttribute("inert", "");
       inerted.push(child);
     }
     openOverlays.push(overlay);
+    lockScroll();
 
     const dialog = overlay.querySelector<HTMLElement>('[role="dialog"]') ?? overlay;
-    (overlay.querySelector<HTMLElement>("[data-autofocus]") ?? reachable(dialog)[0] ?? dialog).focus();
+    if (!dialog.hasAttribute("tabindex")) dialog.setAttribute("tabindex", "-1");
+    const home = () => overlay.querySelector<HTMLElement>("[data-autofocus]:not([disabled])") ?? reachable(dialog)[0] ?? dialog;
+    home().focus();
+
+    // Focus never leaves an open dialog: not when a control inside it is disabled while a request runs (the browser then
+    // drops focus to <body>), and not when something outside it would take focus.
+    const onFocusIn = (event: FocusEvent) => {
+      if (openOverlays[openOverlays.length - 1] !== overlay) return;
+      if (event.target instanceof Node && !overlay.contains(event.target)) home().focus();
+    };
+    const onFocusOut = (event: FocusEvent) => {
+      if (openOverlays[openOverlays.length - 1] !== overlay || event.relatedTarget) return;
+      window.setTimeout(() => {
+        if (!overlay.isConnected || openOverlays[openOverlays.length - 1] !== overlay) return;
+        const active = document.activeElement;
+        if (!active || active === document.body || !overlay.contains(active)) home().focus();
+      }, 0);
+    };
+    document.addEventListener("focusin", onFocusIn);
+    overlay.addEventListener("focusout", onFocusOut);
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (openOverlays[openOverlays.length - 1] !== overlay) return;
@@ -65,8 +100,11 @@ export function useModalBehavior(overlayRef: React.RefObject<HTMLElement | null>
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("focusin", onFocusIn);
+      overlay.removeEventListener("focusout", onFocusOut);
       const at = openOverlays.indexOf(overlay);
       if (at >= 0) openOverlays.splice(at, 1);
+      unlockScroll();
       for (const child of inerted) child.removeAttribute("inert");
       if (opener && opener.isConnected) opener.focus();
       else document.getElementById("admin-main")?.focus();
@@ -137,7 +175,7 @@ export function CommandDialog({
   // A statement the operator must tick before the command can be sent (a check made outside the console).
   acknowledgement?: string;
   // One more value the command needs besides the reason (a registration number, for example), checked against a pattern.
-  field?: { label: string; initial?: string; pattern: RegExp; error: string; ltr?: boolean };
+  field?: { label: string; initial?: string; pattern: RegExp; error: string; ltr?: boolean; inputMode?: "decimal" | "numeric" | "text" };
   confirmLabel: string;
   tone?: "default" | "danger";
   // Resolves to a message when the command was refused (the dialog stays open and keeps what was typed) or null when it succeeded.
@@ -190,8 +228,10 @@ export function CommandDialog({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={intro ? introId : undefined}
+        aria-busy={busy}
         dir={dir}
         tabIndex={-1}
+        noValidate
         onSubmit={(event) => void submit(event)}
         className={`max-h-full w-full max-w-lg overflow-y-auto rounded-[28px] border bg-white p-6 shadow-2xl ${danger ? "border-[#FECDCA]" : "border-[#D1AF47]/40"}`}
       >
@@ -222,14 +262,16 @@ export function CommandDialog({
               id={fieldId}
               data-autofocus
               dir={field.ltr ? "ltr" : undefined}
+              inputMode={field.inputMode}
               value={extra}
               onChange={(event) => setExtra(event.target.value)}
               autoComplete="off"
               aria-invalid={attempted && !field.pattern.test(extra.trim())}
-              disabled={busy}
+              aria-describedby={attempted && !field.pattern.test(extra.trim()) ? `${fieldId}-error` : undefined}
+              readOnly={busy}
               className="mt-1.5 w-full rounded-xl border border-[#D0D5DD] bg-white px-3 py-2.5 font-mono text-sm text-[#101828] outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] disabled:opacity-60"
             />
-            {attempted && !field.pattern.test(extra.trim()) && <p className="mt-1 text-xs font-semibold text-[#B42318]">{field.error}</p>}
+            {attempted && !field.pattern.test(extra.trim()) && <p id={`${fieldId}-error`} className="mt-1 text-xs font-semibold text-[#B42318]">{field.error}</p>}
           </div>
         )}
         {reasonRequired && (
@@ -243,7 +285,7 @@ export function CommandDialog({
               rows={3}
               aria-invalid={attempted && Boolean(reasonProblem)}
               aria-describedby={attempted && reasonProblem ? errorId : undefined}
-              disabled={busy}
+              readOnly={busy}
               className="mt-1.5 w-full rounded-xl border border-[#D0D5DD] bg-white px-3 py-2.5 text-sm text-[#101828] outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] disabled:opacity-60"
             />
             <p className="mt-1 text-xs text-[#667085]">{t.reasonHint}</p>
@@ -262,10 +304,11 @@ export function CommandDialog({
               autoComplete="off"
               spellCheck={false}
               aria-invalid={attempted && !confirmed}
-              disabled={busy}
+              aria-describedby={attempted && !confirmed ? `${confirmId}-error` : undefined}
+              readOnly={busy}
               className="mt-1.5 w-full rounded-xl border border-[#D0D5DD] bg-white px-3 py-2.5 font-mono text-sm text-[#101828] outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] disabled:opacity-60"
             />
-            {attempted && !confirmed && <p className="mt-1 text-xs font-semibold text-[#B42318]">{t.typedMismatch.replace("{value}", confirmWord)}</p>}
+            {attempted && !confirmed && <p id={`${confirmId}-error`} className="mt-1 text-xs font-semibold text-[#B42318]">{t.typedMismatch.replace("{value}", confirmWord)}</p>}
           </div>
         )}
         {acknowledgement && (
@@ -280,11 +323,11 @@ export function CommandDialog({
         {attempted && reasonProblem && <p id={errorId} className="mt-3 text-xs font-semibold text-[#B42318]">{reasonProblem}</p>}
         {failure && <div role="alert" className="mt-4 rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-3 py-2.5 text-sm font-semibold text-[#B42318]">{failure}</div>}
         <div className="mt-6 flex flex-wrap justify-end gap-2">
-          <button type="button" onClick={onClose} disabled={busy} className="rounded-xl border border-[#D0D5DD] bg-white px-4 py-2.5 text-sm font-bold text-[#344054] outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] disabled:opacity-50">{t.cancel}</button>
+          <button type="button" onClick={() => { if (!busy) onClose(); }} aria-disabled={busy} className="rounded-xl border border-[#D0D5DD] bg-white px-4 py-2.5 text-sm font-bold text-[#344054] outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] aria-disabled:opacity-50">{t.cancel}</button>
           <button
             type="submit"
-            disabled={busy}
-            className={`rounded-xl px-4 py-2.5 text-sm font-black text-white outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] disabled:opacity-60 ${danger ? "bg-[#B42318]" : "bg-[#101828]"}`}
+            aria-disabled={busy}
+            className={`rounded-xl px-4 py-2.5 text-sm font-black text-white outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] aria-disabled:opacity-60 ${danger ? "bg-[#B42318]" : "bg-[#101828]"}`}
           >
             {busy ? t.working : confirmLabel}
           </button>

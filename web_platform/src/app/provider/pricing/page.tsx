@@ -4,174 +4,205 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { EffectiveFeeTerms } from "@/components/effective-fee-terms";
+import { sar, useOperationsLocale } from "@/components/operations-ui";
 
 const translations = {
   en: {
     backHome: "Back to Home",
-    title: "Split Ledger & Commission Pricing",
-    subtitle: "Transparent fee splits, verified bookings, and zero upfront platform costs",
-    pricingModel: "How We Calculate Transaction Splits",
-    platformFee: "Platform Commission",
-    partnerPayout: "Partner Payout Share",
+    eyebrow: "For partners",
+    title: "Plans and platform fees",
+    subtitle: "Plan prices and the platform fee below are read from PRIMORA's records for your account.",
+    pricingModel: "How the platform fee is worked out",
+    pricingModelIntro: "Every booking is recorded in the ledger, and your share is paid out after the visit is completed.",
+    platformFee: "Platform fee",
+    partnerPayout: "Your payout",
     feeDesc: "Bookings from your own clients (your link, QR code or imported contacts) carry no platform fee. Marketplace bookings carry the platform fee shown in your fee terms above, computed from the fee rules in force on your account, plus VAT on that fee where applicable. A fee increase is announced at least 30 days before it applies.",
     payoutDesc: "What remains after the platform fee and the VAT on it is paid to your approved bank account once the visit is completed, according to the payout schedule.",
     planFeeNote: "Same platform fee terms on every plan",
-    noUpfront: "Zero Setup or Upfront Fees",
-    noUpfrontDesc: "Registering, listing your services catalog, and setting up staff availability calendars are 100% free. We only succeed when you acquire bookings.",
+    noUpfront: "No setup fee",
+    noUpfrontDesc: "Registering, listing your services and setting up staff calendars cost nothing.",
+    noCard: "No card needed to register",
     footerText: "Built for Riyadh, Saudi Arabia. All rights reserved.",
-    
-    // Subscriptions & Features
-    billingMonthly: "Monthly Billing",
-    billingAnnual: "Annual Billing (Save 20%)",
-    popular: "Most Popular",
-    selectPlan: "Select Plan",
-    currentPlan: "Current Plan",
+    billingMonthly: "Monthly billing",
+    billingAnnual: "Annual billing",
+    billingSwitch: "Bill annually",
+    selectPlan: "Select plan",
+    currentPlan: "Your current plan",
     selected: "Selected",
-    billingCycleLabel: "Billing Cycle",
-    
-    // Plan details
-    basicName: "Lite Starter",
-    basicPrice: "0",
-    basicPriceAnnual: "0",
-    basicDesc: "Perfect for independent artists & newly opened local salons",
-    
-    growthName: "Growth Pro",
-    growthPrice: "299",
-    growthPriceAnnual: "239",
-    growthDesc: "For scaling salons needing advanced analytics and marketing integrations",
-    
-    eliteName: "Elite Salon",
-    elitePrice: "799",
-    elitePriceAnnual: "639",
-    eliteDesc: "For luxury salon chains requiring dedicated managers & bespoke APIs",
-    
-    sar: "SAR",
-    perMonth: "SAR / month",
-    perYear: "SAR / year",
-    billedAnnually: "Billed annually",
+    billingCycleLabel: "Billing cycle",
+    plansLoading: "Loading plans…",
+    plansFailed: "The plans could not be loaded: {reason}",
+    plansEmpty: "No plan is offered at the moment.",
+    retry: "Try again",
+    descriptions: {
+      starter: "For independent professionals and newly opened salons",
+      growth: "For growing salons that need analytics and marketing tools",
+      elite: "For salon chains that need a dedicated account manager",
+    } as Record<string, string>,
+    free: "Free",
+    perMonth: "a month",
+    billedYearly: "Billed yearly; the amount due is in the order summary below",
     billedMonthly: "Billed monthly",
-    freeForever: "Free Forever",
-    
-    // Feature titles
-    featuresTitle: "Compare Plan Features",
-    featOnlineBooking: "Online Booking & Scheduling",
-    featZatca: "VAT 15% Tax Receipt Reporting",
-    featSms: "Appointment Alerts & Notifications",
-    featEscrow: "Automated Ledger & Payouts",
-    featAnalytics: "Advanced Business Analytics",
-    featMarketing: "Marketing Tools & Coupons",
-    featStaff: "Staff Management (Unlimited)",
-    featSupport: "24/7 Dedicated Account Manager",
-
-    // Split Ledger Details
-    splitTitle: "Automated Split Ledger Settlement",
+    upToBranches: "Up to {n} branches",
+    upToStaff: "Up to {n} staff",
+    smsIncluded: "{n} text messages a month included",
+    featuresTitle: "Compare plans",
+    feature: "Feature",
+    featOnlineBooking: "Online booking and scheduling",
+    featZatca: "VAT tax invoices",
+    featSms: "Appointment alerts and notifications",
+    featEscrow: "Ledger and payouts",
+    featAnalytics: "Business analytics",
+    featMarketing: "Marketing tools and coupons",
+    featSupport: "Dedicated account manager",
+    featBranches: "Branches",
+    featStaff: "Staff",
+    featSmsCount: "Text messages a month",
+    included: "Included",
+    notIncluded: "Not included",
+    splitTitle: "Card payments",
     splitSubtitle: "Card payments are processed by Tap Payments.",
-    payoutTimeline: "Payout Transfer Schedule",
-    payoutTimelineDesc: "Completed appointments trigger automated payout transfers directly into your registered local IBAN (Riyad Bank, SNB, Al Rajhi, etc.) via scheduled banking batches.",
-    securedEscrow: "Deposit protection policy",
-    securedEscrowDesc: "Your deposit and cancellation terms decide what is kept when a customer cancels late or does not come.",
-    
-    // Checkout
-    checkoutTitle: "Secure Plan Subscription",
-    checkoutSubtitle: "Payment is taken on Tap's secure page (Mada, Apple Pay, Visa/Mastercard).",
-    paymentMethod: "Payment Method",
-    madaApplePay: "Mada / Apple Pay / Credit Card",
-    summary: "Order Summary",
+    payoutTimeline: "Payout transfer schedule",
+    payoutTimelineDesc: "Completed appointments are paid out to your registered Saudi IBAN in scheduled bank transfers.",
+    checkoutTitle: "Subscribe to a plan",
+    checkoutSubtitle: "Payment is taken on Tap's secure page (mada, Apple Pay, Visa or Mastercard).",
+    paymentMethod: "Payment methods",
+    methods: { mada: "Saudi debit card", applePay: "Apple Pay", card: "Visa or Mastercard" } as Record<string, string>,
+    summary: "Order summary",
     subtotal: "Subtotal",
     quoteUnavailable: "Price unavailable",
-    total: "Total Due",
-    payNow: "Proceed to Secure Payment",
-    processing: "Redirecting to secure Tap Payments gateway...",
-    successMsg: "Plan subscription registered successfully! Your account will be upgraded.",
-    secureGatewayNotice: "All card details and payments are securely handled by Tap Payments. Primora never stores or processes raw card numbers.",
+    total: "Total due",
+    payNow: "Continue to secure payment",
+    activateFree: "Activate the free plan",
+    freeTitle: "This plan is free",
+    freeBody: "No card details are needed. Your account uses the platform fee terms shown above.",
+    tapTitle: "Payments by Tap",
+    acceptedMethods: "Accepted methods:",
+    processing: "Opening Tap's secure payment page…",
+    successMsg: "Your plan is active.",
+    successBody: "Your account now uses the {plan} plan.",
+    activePlan: "Active plan:",
+    billingCycle: "Billing cycle:",
+    amountPaid: "Amount paid:",
+    manage: "Manage subscription",
+    selectedPlanLabel: "Selected plan",
+    secureGatewayNotice: "All card details and payments are handled by Tap Payments. PRIMORA never stores or processes card numbers.",
+    hostedTitle: "Card payments on Tap's hosted page",
+    hostedBody: "Card details are entered on the payment provider's page, never on PRIMORA",
+    assurance: ["No card details stored on PRIMORA servers", "Payouts to your bank in Saudi Arabia", "Every booking recorded in the ledger"],
+    signInFirst: "Please sign in as a salon partner to subscribe",
+    noProvider: "No salon partner account is linked to this login",
+    checkoutFailed: "Could not open the payment page; your plan was not changed.",
+    subscribeFailed: "The subscription could not be processed",
   },
   ar: {
     backHome: "العودة للرئيسية",
-    title: "خطط نمو الشركاء والأسعار",
-    subtitle: "تقسيمات رسوم شفافة، وحجوزات موثوقة، وبدون أي تكاليف تأسيس مسبقة",
-    pricingModel: "كيف نحسب تقسيمات العمليات المالية",
-    platformFee: "عمولة المنصة",
-    partnerPayout: "حصة الشريك ومقدم الخدمة",
-    feeDesc: "لا رسوم منصة على حجوزات عملائك (رابطك أو رمز QR أو جهات الاتصال المستوردة). حجوزات السوق عليها رسوم المنصة الموضحة في شروط الرسوم أعلاه، محسوبة من قواعد الرسوم السارية على حسابك، مع ضريبة القيمة المضافة على هذه الرسوم حيثما تنطبق. أي زيادة في الرسوم يُعلن عنها قبل 30 يوماً على الأقل من تطبيقها.",
+    eyebrow: "للشركاء",
+    title: "الخطط ورسوم المنصة",
+    subtitle: "أسعار الخطط ورسوم المنصة أدناه مقروءة من سجلات بريمورا لحسابك.",
+    pricingModel: "كيف تُحسب رسوم المنصة",
+    pricingModelIntro: "تُسجل كل عملية حجز في دفتر الأستاذ، وتُصرف حصتك بعد اكتمال الزيارة.",
+    platformFee: "رسوم المنصة",
+    partnerPayout: "مستحقاتك",
+    feeDesc: "لا رسوم منصة على حجوزات عملائك (رابطك أو رمز QR أو جهات الاتصال المستوردة). حجوزات السوق عليها رسوم المنصة الموضحة في شروط الرسوم أعلاه، محسوبة من قواعد الرسوم السارية على حسابك، مع ضريبة القيمة المضافة على هذه الرسوم حيثما تنطبق. أي زيادة في الرسوم يُعلن عنها قبل ٣٠ يوماً على الأقل من تطبيقها.",
     payoutDesc: "يُحوَّل ما يتبقى بعد رسوم المنصة والضريبة عليها إلى حسابك البنكي المعتمد بعد اكتمال الزيارة، وفق جدول التحويلات.",
     planFeeNote: "شروط رسوم المنصة نفسها في كل الخطط",
-    noUpfront: "بدون أي رسوم إعداد أو تأسيس مسبقة",
-    noUpfrontDesc: "التسجيل، وإدراج قائمة خدماتك، وإعداد تقويم توافر موظفيك مجاني 100%. نحن ننجح فقط عندما تستقبل حجوزات فعلية.",
+    noUpfront: "بدون رسوم تأسيس",
+    noUpfrontDesc: "التسجيل وإدراج خدماتك وإعداد تقويم موظفيك بلا تكلفة.",
+    noCard: "لا حاجة لبطاقة للتسجيل",
     footerText: "صمم خصيصاً للرياض، المملكة العربية السعودية. جميع الحقوق محفوظة.",
-    
-    // Subscriptions & Features
     billingMonthly: "دفع شهري",
-    billingAnnual: "دفع سنوي (وفر 20%)",
-    popular: "الأكثر طلباً",
+    billingAnnual: "دفع سنوي",
+    billingSwitch: "الدفع سنوياً",
     selectPlan: "اختر الخطة",
-    currentPlan: "الخطة الحالية",
-    selected: "مختار",
+    currentPlan: "خطتك الحالية",
+    selected: "مختارة",
     billingCycleLabel: "دورة الفوترة",
-    
-    // Plan details
-    basicName: "لايت للمبتدئين",
-    basicPrice: "0",
-    basicPriceAnnual: "0",
-    basicDesc: "مثالي للمحترفين المستقلين والصالونات المحلية الجديدة",
-    
-    growthName: "برو للنمو",
-    growthPrice: "299",
-    growthPriceAnnual: "239",
-    growthDesc: "للصالونات الطموحة التي تحتاج تحليلات متقدمة وأدوات تسويق",
-    
-    eliteName: "النخبة الفاخرة",
-    elitePrice: "799",
-    elitePriceAnnual: "639",
-    eliteDesc: "لسلاسل الصالونات الفاخرة التي تتطلب ميزات خاصة ومدير حساب مخصص",
-    
-    sar: "ريال",
-    perMonth: "ريال / شهرياً",
-    perYear: "ريال / سنوياً",
-    billedAnnually: "فوترة سنوية",
-    billedMonthly: "فوترة شهرية",
-    freeForever: "مجاني للأبد",
-    
-    // Feature titles
-    featuresTitle: "قارن بين ميزات الخطط",
+    plansLoading: "جارٍ تحميل الخطط…",
+    plansFailed: "تعذّر تحميل الخطط: {reason}",
+    plansEmpty: "لا توجد خطة معروضة حالياً.",
+    retry: "إعادة المحاولة",
+    descriptions: {
+      starter: "للمحترفين المستقلين والصالونات الجديدة",
+      growth: "للصالونات النامية التي تحتاج التحليلات وأدوات التسويق",
+      elite: "لسلاسل الصالونات التي تحتاج مدير حساب مخصصاً",
+    } as Record<string, string>,
+    free: "مجانية",
+    perMonth: "شهرياً",
+    billedYearly: "تُفوتر سنوياً؛ المبلغ المستحق في ملخص الطلب أدناه",
+    billedMonthly: "تُفوتر شهرياً",
+    upToBranches: "حتى {n} من الفروع",
+    upToStaff: "حتى {n} من الموظفين",
+    smsIncluded: "{n} رسالة نصية شهرياً مشمولة",
+    featuresTitle: "قارن بين الخطط",
+    feature: "الميزة",
     featOnlineBooking: "الحجز والجدولة عبر الإنترنت",
-    featZatca: "تقارير فواتير ضريبة القيمة المضافة (15%)",
+    featZatca: "فواتير ضريبة القيمة المضافة",
     featSms: "تنبيهات وتذكيرات المواعيد",
-    featEscrow: "دفتر أستاذ آلي وصرف المستحقات",
-    featAnalytics: "تحليلات وأداء الأعمال المتقدمة",
-    featMarketing: "أدوات التسويق والكوبونات والخصومات",
-    featStaff: "إدارة الموظفين (غير محدود)",
-    featSupport: "مدير حساب مخصص متوفر 24/7",
-
-    // Split Ledger Details
-    splitTitle: "تسوية مالية مؤتمتة للمستحقات",
+    featEscrow: "دفتر الأستاذ وصرف المستحقات",
+    featAnalytics: "تحليلات الأعمال",
+    featMarketing: "أدوات التسويق والكوبونات",
+    featSupport: "مدير حساب مخصص",
+    featBranches: "الفروع",
+    featStaff: "الموظفون",
+    featSmsCount: "الرسائل النصية شهرياً",
+    included: "مشمولة",
+    notIncluded: "غير مشمولة",
+    splitTitle: "مدفوعات البطاقات",
     splitSubtitle: "تتم معالجة مدفوعات البطاقات عبر Tap Payments.",
     payoutTimeline: "جدول تحويل المستحقات",
-    payoutTimelineDesc: "تؤدي المواعيد المكتملة إلى تحويلات مستحقات تلقائية مباشرة إلى حسابك المصرفي المحلي المسجل (بنك الرياض، الأهلي SNB، الراجحي، إلخ) عبر دفعات بنكية مجدولة.",
-    securedEscrow: "سياسة حماية العربون",
-    securedEscrowDesc: "تحدد شروط العربون والإلغاء لديك ما يُحتفظ به عند الإلغاء المتأخر أو عدم الحضور.",
-    
-    // Checkout
-    checkoutTitle: "الاشتراك الآمن في الخطة",
-    checkoutSubtitle: "يتم الدفع عبر صفحة Tap الآمنة (مدى وApple Pay وبطاقات الائتمان).",
-    paymentMethod: "طريقة الدفع",
-    madaApplePay: "مدى / أبل باي / بطاقة ائتمان",
+    payoutTimelineDesc: "تُحوَّل مستحقات المواعيد المكتملة إلى رقم الآيبان السعودي المسجل لديك في تحويلات بنكية مجدولة.",
+    checkoutTitle: "الاشتراك في خطة",
+    checkoutSubtitle: "يتم الدفع عبر صفحة Tap الآمنة (مدى وApple Pay وفيزا وماستركارد).",
+    paymentMethod: "طرق الدفع",
+    methods: { mada: "بطاقة مدى", applePay: "Apple Pay", card: "فيزا أو ماستركارد" } as Record<string, string>,
     summary: "ملخص الطلب",
     subtotal: "المجموع الفرعي",
     quoteUnavailable: "السعر غير متاح",
-    total: "المبلغ الإجمالي",
-    payNow: "المتابعة إلى بوابة الدفع الآمنة",
-    processing: "جاري التحويل لبوابة الدفع الآمنة Tap Payments...",
-    successMsg: "تم تسجيل الاشتراك بالخطة بنجاح! سيتم ترقية حسابك.",
-    secureGatewayNotice: "تتم معالجة جميع بيانات البطاقات والمدفوعات بأمان عبر بوابة Tap Payments. لا تقوم بريمورا بتخزين أو استلام أرقام البطاقات إطلاقاً.",
+    total: "المبلغ المستحق",
+    payNow: "المتابعة إلى الدفع الآمن",
+    activateFree: "تفعيل الخطة المجانية",
+    freeTitle: "هذه الخطة مجانية",
+    freeBody: "لا حاجة لبيانات بطاقة. يعمل حسابك بشروط رسوم المنصة الموضحة أعلاه.",
+    tapTitle: "المدفوعات عبر Tap",
+    acceptedMethods: "طرق الدفع المدعومة:",
+    processing: "جارٍ فتح صفحة الدفع الآمنة من Tap…",
+    successMsg: "خطتك مفعّلة.",
+    successBody: "يعمل حسابك الآن بخطة {plan}.",
+    activePlan: "الخطة النشطة:",
+    billingCycle: "دورة الدفع:",
+    amountPaid: "المبلغ المدفوع:",
+    manage: "إدارة الاشتراك",
+    selectedPlanLabel: "الخطة المختارة",
+    secureGatewayNotice: "تتم معالجة جميع بيانات البطاقات والمدفوعات عبر Tap Payments. لا تخزّن بريمورا أرقام البطاقات ولا تعالجها.",
+    hostedTitle: "الدفع بالبطاقة عبر صفحة Tap المستضافة",
+    hostedBody: "تُدخل بيانات البطاقة في صفحة مزود الدفع وليس في بريمورا",
+    assurance: ["لا تُخزَّن بيانات البطاقات على خوادم بريمورا", "تحويل المستحقات إلى بنكك في السعودية", "كل حجز مسجل في دفتر الأستاذ"],
+    signInFirst: "يرجى تسجيل الدخول كشريك صالون للاشتراك",
+    noProvider: "لا يوجد حساب شريك مرتبط بهذا الدخول",
+    checkoutFailed: "تعذر فتح صفحة الدفع، لم تتغير خطتك.",
+    subscribeFailed: "تعذرت معالجة الاشتراك",
   }
 };
 
-export default function PricingPage() {
-  const [locale, setLocale] = useState<"en" | "ar">("ar");
-  const t = translations[locale];
+// A plan as subscription_plans holds it (prices, limits and included features); nothing about a plan is written on this screen.
+type Plan = {
+  id: string; name_en: string; name_ar: string; price_monthly_sar: number | string; price_yearly_sar: number | string;
+  max_branches: number | null; max_employees: number | null; included_monthly_sms: number | null;
+  features: { analytics?: boolean; marketing?: boolean; dedicated_support?: boolean } | null;
+};
+const fill = (text: string, values: Record<string, string>) => Object.entries(values).reduce((acc, [k, v]) => acc.split(`{${k}}`).join(v), text);
 
-  // Subscription Selection & Billing States
-  const [selectedPlan, setSelectedPlan] = useState<"basic" | "growth" | "elite">("growth");
+export default function PricingPage() {
+  const locale = useOperationsLocale();
+  const t = translations[locale];
+  const money = (value: number | string) => sar(Number(value), locale);
+  const count = (value: number) => new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US").format(value);
+
+  const [plans, setPlans] = useState<Plan[] | null>(null);
+  const [plansError, setPlansError] = useState("");
+  const [plansReload, setPlansReload] = useState(0);
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
   
   // Checkout State & Provider Subscription
@@ -186,16 +217,23 @@ export default function PricingPage() {
   const checkoutRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleLangSync = () => {
-      const currentLang = document.documentElement.lang as "en" | "ar";
-      if (currentLang === "en" || currentLang === "ar") {
-        setLocale(currentLang);
-      }
-    };
-    handleLangSync();
-    const interval = setInterval(handleLangSync, 1000);
-    return () => clearInterval(interval);
-  }, []);
+    let cancelled = false;
+    void supabase
+      .from("subscription_plans")
+      .select("id, name_en, name_ar, price_monthly_sar, price_yearly_sar, max_branches, max_employees, included_monthly_sms, features")
+      .eq("is_active", true)
+      .order("price_monthly_sar", { ascending: true })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) { setPlans(null); setPlansError(error.message); return; }
+        setPlansError("");
+        setPlans((data ?? []) as Plan[]);
+      });
+    return () => { cancelled = true; };
+  }, [plansReload]);
+  // Until the operator picks, the plan in force (or the first plan offered) is selected.
+  const activePlanId = selectedPlan ?? currentSubscription?.plan_id ?? plans?.[0]?.id ?? null;
+  const planName = (plan: Plan | undefined) => (plan ? (locale === "ar" ? plan.name_ar || plan.name_en : plan.name_en || plan.name_ar) : "");
 
   useEffect(() => {
     async function loadCurrentSubscription() {
@@ -217,12 +255,7 @@ export default function PricingPage() {
             .eq("provider_id", prov.id)
             .maybeSingle();
 
-          if (sub) {
-            setCurrentSubscription(sub);
-            if (sub.plan_id === "starter") setSelectedPlan("basic");
-            else if (sub.plan_id === "growth") setSelectedPlan("growth");
-            else if (sub.plan_id === "elite") setSelectedPlan("elite");
-          }
+          if (sub) setCurrentSubscription(sub);
         }
       } catch (err) {
         console.warn("Subscription fetch warning:", err);
@@ -233,7 +266,8 @@ export default function PricingPage() {
 
   useEffect(() => {
     let cancelled = false;
-    const planId = selectedPlan === "basic" ? "starter" : selectedPlan;
+    const planId = activePlanId;
+    if (!planId) return;
     setQuote(null);
     setQuoteError(false);
     supabase
@@ -244,9 +278,9 @@ export default function PricingPage() {
         setQuote({ total_sar: Number(data.total_sar), monthly_rate_sar: Number(data.monthly_rate_sar), months: Number(data.months) });
       });
     return () => { cancelled = true; };
-  }, [selectedPlan, billingCycle]);
+  }, [activePlanId, billingCycle]);
 
-  const handleSelectPlan = (plan: "basic" | "growth" | "elite") => {
+  const handleSelectPlan = (plan: string) => {
     setSelectedPlan(plan);
     setCheckoutStep("idle");
     setCheckoutError("");
@@ -260,12 +294,8 @@ export default function PricingPage() {
     setCheckoutStep("processing");
     setCheckoutError("");
 
-    const planIdMap: Record<string, string> = {
-      basic: "starter",
-      growth: "growth",
-      elite: "elite"
-    };
-    const targetPlanId = planIdMap[selectedPlan] || "growth";
+    const targetPlanId = activePlanId;
+    if (!targetPlanId) return;
     const targetInterval = billingCycle === "annual" ? "yearly" : "monthly";
 
     try {
@@ -273,7 +303,7 @@ export default function PricingPage() {
       if (!activeProviderId) {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
-          setCheckoutError(locale === "ar" ? "يرجى تسجيل الدخول كشريك صالون للاشتراك بالباقة" : "Please log in as a salon partner to subscribe");
+          setCheckoutError(t.signInFirst);
           setCheckoutStep("idle");
           return;
         }
@@ -283,7 +313,7 @@ export default function PricingPage() {
           .eq("owner_id", user.id)
           .maybeSingle();
         if (!prov) {
-          setCheckoutError(locale === "ar" ? "لم يتم العثور على حساب مزود خدمة مرتبط بهذا الحساب" : "No salon provider account associated with this login");
+          setCheckoutError(t.noProvider);
           setCheckoutStep("idle");
           return;
         }
@@ -309,20 +339,21 @@ export default function PricingPage() {
         body: { purchaseType: "subscription", purchaseId: data.purchase_id }
       });
       if (checkoutError || !checkout?.checkoutUrl) {
-        throw new Error(locale === "ar" ? "تعذر فتح صفحة الدفع، لم يتم تغيير الباقة." : "Could not open the payment page; your plan was not changed.");
+        throw new Error(t.checkoutFailed);
       }
       window.location.assign(checkout.checkoutUrl);
     } catch (err: any) {
       console.error("Subscription error:", err);
-      setCheckoutError(err?.message || (locale === "ar" ? "فشل معالجة الاشتراك" : "Failed to process subscription"));
+      setCheckoutError(err?.message || t.subscribeFailed);
       setCheckoutStep("idle");
     }
   };
 
-  // Pricing calculations based on selections
+  const selected = plans?.find((plan) => plan.id === activePlanId);
+  const selectedIsFree = selected ? Number(selected.price_monthly_sar) === 0 && Number(selected.price_yearly_sar) === 0 : false;
   const getPricingDetails = () => {
     const isAnnual = billingCycle === "annual";
-    const title = selectedPlan === "basic" ? t.basicName : selectedPlan === "growth" ? t.growthName : t.eliteName;
+    const title = planName(selected);
     // The amount charged is the server quote (annual billing = 12 x the monthly rate for annual billing); nothing is added on the screen.
     const total = quote ? quote.total_sar : null;
     return {
@@ -335,16 +366,20 @@ export default function PricingPage() {
 
   const pricingDetails = getPricingDetails();
 
-  // Comparison features matrix helper
-  const features = [
-    { name: t.featOnlineBooking, basic: true, growth: true, elite: true },
-    { name: t.featZatca, basic: true, growth: true, elite: true },
-    { name: t.featSms, basic: true, growth: true, elite: true },
-    { name: t.featEscrow, basic: true, growth: true, elite: true },
-    { name: t.featAnalytics, basic: false, growth: true, elite: true },
-    { name: t.featMarketing, basic: false, growth: true, elite: true },
-    { name: t.featStaff, basic: false, growth: true, elite: true },
-    { name: t.featSupport, basic: false, growth: false, elite: true },
+  // What each plan includes, from the plan record: the shared basics, the plan's feature switches and its limits.
+  type Cell = boolean | string;
+  const included = (value: boolean | undefined) => Boolean(value);
+  const featureRows: { name: string; cell: (plan: Plan) => Cell }[] = [
+    { name: t.featOnlineBooking, cell: () => true },
+    { name: t.featZatca, cell: () => true },
+    { name: t.featSms, cell: () => true },
+    { name: t.featEscrow, cell: () => true },
+    { name: t.featAnalytics, cell: (plan) => included(plan.features?.analytics) },
+    { name: t.featMarketing, cell: (plan) => included(plan.features?.marketing) },
+    { name: t.featSupport, cell: (plan) => included(plan.features?.dedicated_support) },
+    { name: t.featBranches, cell: (plan) => (plan.max_branches === null ? "—" : count(plan.max_branches)) },
+    { name: t.featStaff, cell: (plan) => (plan.max_employees === null ? "—" : count(plan.max_employees)) },
+    { name: t.featSmsCount, cell: (plan) => (plan.included_monthly_sms === null ? "—" : count(plan.included_monthly_sms)) },
   ];
 
   return (
@@ -376,10 +411,9 @@ export default function PricingPage() {
       {/* Main Content Container */}
       <main className="max-w-6xl mx-auto py-16 px-4 sm:px-8 space-y-16 flex-1 z-10 w-full">
         
-        {/* Title Section */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <span className="text-[10px] tracking-[0.25em] uppercase font-bold text-[#D1AF47] bg-[#D1AF47]/10 px-3 py-1 rounded-full border border-[#D1AF47]/20 inline-block">
-            {locale === "en" ? "For Premium Partners" : "شركاء الفخامة"}
+          <span className="text-[10px] tracking-[0.25em] uppercase font-bold text-[#9B7928] bg-[#D1AF47]/10 px-3 py-1 rounded-full border border-[#D1AF47]/20 inline-block">
+            {t.eyebrow}
           </span>
           <h1 className="text-3xl sm:text-5xl font-serif text-[#101828] tracking-tight leading-tight">
             {t.title}
@@ -389,255 +423,125 @@ export default function PricingPage() {
           </p>
         </div>
 
-        {/* Plan Activation Billing Cycle Toggle */}
+        {/* Billing cycle */}
         <div className="flex justify-center items-center gap-4 py-2">
-          <span className={`text-xs sm:text-sm transition-colors duration-300 ${billingCycle === "monthly" ? "text-[#101828] font-medium" : "text-[#667085]"}`}>
-            {t.billingMonthly}
-          </span>
+          <span className={`text-xs sm:text-sm ${billingCycle === "monthly" ? "text-[#101828] font-medium" : "text-[#667085]"}`}>{t.billingMonthly}</span>
           <button
+            type="button"
+            role="switch"
+            aria-checked={billingCycle === "annual"}
+            aria-label={t.billingSwitch}
             onClick={() => setBillingCycle(billingCycle === "monthly" ? "annual" : "monthly")}
-            className="w-14 h-8 bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-full p-1 border border-[rgba(255,255,255,0.1)] transition-colors duration-300 relative focus:outline-none cursor-pointer"
-            aria-label="Toggle Billing Cycle"
+            className="w-14 h-8 bg-white border border-[#D0D5DD] rounded-full p-1 relative cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928]"
           >
-            <div
-              className={`w-6 h-6 rounded-full bg-[#D1AF47] shadow-[0_0_10px_rgba(209,175,71,0.5)] transition-all duration-300 transform ${
-                billingCycle === "annual"
-                  ? (locale === "ar" ? "translate-x-[-24px]" : "translate-x-[24px]")
-                  : "translate-x-0"
+            <span
+              aria-hidden="true"
+              className={`block w-6 h-6 rounded-full bg-[#D1AF47] transition-transform duration-300 ${
+                billingCycle === "annual" ? (locale === "ar" ? "-translate-x-6" : "translate-x-6") : "translate-x-0"
               }`}
             />
           </button>
-          <span className={`text-xs sm:text-sm transition-colors duration-300 ${billingCycle === "annual" ? "text-[#D1AF47] font-medium" : "text-[#667085]"}`}>
-            {t.billingAnnual}
-          </span>
+          <span className={`text-xs sm:text-sm ${billingCycle === "annual" ? "text-[#9B7928] font-medium" : "text-[#667085]"}`}>{t.billingAnnual}</span>
         </div>
 
-        {/* Subscription Plan Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          
-          {/* Card 1: Basic Lite */}
-          <div 
-            onClick={() => handleSelectPlan("basic")}
-            className={`cursor-pointer rounded-[24px] p-6 relative overflow-hidden transition-all duration-300 hover:translate-y-[-4px] flex flex-col justify-between ${
-              selectedPlan === "basic" 
-                ? "bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border-2 border-[#D1AF47] shadow-[0_0_20px_rgba(209,175,71,0.1)]" 
-                : "bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.15)]"
-            }`}
-          >
-            <div className="space-y-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-bold text-[#101828] tracking-wide">{t.basicName}</h3>
-                  <p className="text-xs text-[#667085] mt-1 line-clamp-2">{t.basicDesc}</p>
-                </div>
-                {selectedPlan === "basic" && (
-                  <span className="bg-[#D1AF47]/10 text-[#D1AF47] text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded border border-[#D1AF47]/20">
-                    {t.selected}
-                  </span>
-                )}
-              </div>
-              <div className="pt-4">
-                <span className="text-3xl font-black text-[#101828]">{t.basicPrice}</span>
-                <span className="text-xs text-[#667085] ml-1 mr-1">
-                  {billingCycle === "annual" ? t.perYear : t.perMonth}
-                </span>
-                <div className="text-[10px] text-[#D1AF47] font-semibold mt-1">
-                  {t.freeForever}
-                </div>
-              </div>
-              <div className="border-t border-[rgba(255,255,255,0.06)] pt-4 space-y-2">
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47]" />
-                  <span>15% {t.platformFee}</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-[#667085]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#7B859C]/40" />
-                  <span>{t.featOnlineBooking}</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-[#667085]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#7B859C]/40" />
-                  <span>{t.featEscrow}</span>
-                </div>
-              </div>
-            </div>
-            <button
-              onClick={() => setSelectedPlan("basic")}
-              className={`w-full py-2.5 mt-8 rounded-xl text-xs font-bold tracking-wider transition-all duration-300 ${
-                selectedPlan === "basic"
-                  ? "bg-[#D1AF47] text-[#070B12]"
-                  : "bg-[#FBFAF7] hover:bg-gray-50 text-[#667085] border border-[#ECECEC] hover:border-[#D1AF47]/40"
-              }`}
-            >
-              {selectedPlan === "basic" ? t.currentPlan : t.selectPlan}
-            </button>
+        {/* Plans, from subscription_plans */}
+        {plansError ? (
+          <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+            <span>{fill(t.plansFailed, { reason: plansError })}</span>
+            <button type="button" onClick={() => setPlansReload((k) => k + 1)} className="rounded-xl border border-red-300 bg-white px-3 py-1.5 text-xs font-black focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.retry}</button>
           </div>
-
-          {/* Card 2: Growth Pro (Featured) */}
-          <div 
-            onClick={() => handleSelectPlan("growth")}
-            className={`cursor-pointer rounded-[24px] p-6 relative overflow-hidden transition-all duration-300 hover:translate-y-[-4px] flex flex-col justify-between ${
-              selectedPlan === "growth" 
-                ? "bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border-2 border-[#D1AF47] shadow-[0_0_25px_rgba(209,175,71,0.2)]" 
-                : "bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:border-[#D1AF47]/60"
-            }`}
-          >
-            {/* Glass shine & Popular tag */}
-            <div className="absolute top-0 right-0 bg-gradient-to-l from-[#D1AF47] to-[#E0C46A] text-[#070B12] text-[9px] uppercase font-black tracking-widest px-4 py-1.5 rounded-bl-[12px] shadow-sm">
-              {t.popular}
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex justify-between items-start pr-16">
-                <div>
-                  <h3 className="text-lg font-bold text-[#101828] tracking-wide">{t.growthName}</h3>
-                  <p className="text-xs text-[#667085] mt-1 line-clamp-2">{t.growthDesc}</p>
-                </div>
-              </div>
-              <div className="pt-4">
-                <span className="text-3xl font-black text-[#101828]">
-                  {billingCycle === "annual" ? t.growthPriceAnnual : t.growthPrice}
-                </span>
-                <span className="text-xs text-[#667085] ml-1 mr-1">
-                  {t.sar} {billingCycle === "annual" ? t.perMonth : t.perMonth}
-                </span>
-                <div className="text-[10px] text-[#22C55E] font-semibold mt-1">
-                  {billingCycle === "annual" ? "Save 720 SAR / year" : "Standard Month Rate"}
-                </div>
-              </div>
-              <div className="border-t border-[#ECECEC] pt-4 space-y-2">
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47] shadow-[0_0_6px_rgba(209,175,71,0.8)]" />
-                  <span className="text-[#344054]">{t.planFeeNote}</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-[#344054]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />
-                  <span>{t.featAnalytics}</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-[#344054]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />
-                  <span>{t.featMarketing}</span>
-                </div>
-              </div>
-            </div>
-            <button
-              onClick={() => setSelectedPlan("growth")}
-              className={`w-full py-2.5 mt-8 rounded-xl text-xs font-bold tracking-wider transition-all duration-300 ${
-                selectedPlan === "growth"
-                  ? "bg-[#D1AF47] text-[#070B12] shadow-[0_0_15px_rgba(209,175,71,0.3)]"
-                  : "bg-[#D1AF47]/10 hover:bg-[#D1AF47]/20 text-[#D1AF47] border border-[#D1AF47]/20"
-              }`}
-            >
-              {selectedPlan === "growth" ? t.currentPlan : t.selectPlan}
-            </button>
+        ) : !plans ? (
+          <p role="status" className="text-center text-sm text-[#667085]">{t.plansLoading}</p>
+        ) : plans.length === 0 ? (
+          <p className="text-center text-sm text-[#667085]">{t.plansEmpty}</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {plans.map((plan) => {
+              const monthly = Number(plan.price_monthly_sar);
+              const yearlyRate = Number(plan.price_yearly_sar);
+              const rate = billingCycle === "annual" ? yearlyRate : monthly;
+              const free = monthly === 0 && yearlyRate === 0;
+              const isSelected = plan.id === activePlanId;
+              const isCurrent = currentSubscription?.plan_id === plan.id;
+              return (
+                <section
+                  key={plan.id}
+                  aria-labelledby={`plan-${plan.id}`}
+                  className={`rounded-[24px] p-6 relative overflow-hidden flex flex-col justify-between bg-white border shadow-[0_8px_30px_rgb(0,0,0,0.015)] ${isSelected ? "border-2 border-[#D1AF47]" : "border-[#ECECEC]"}`}
+                >
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-start gap-2">
+                      <div>
+                        <h3 id={`plan-${plan.id}`} className="text-lg font-bold text-[#101828] tracking-wide">{planName(plan)}</h3>
+                        {t.descriptions[plan.id] && <p className="text-xs text-[#667085] mt-1">{t.descriptions[plan.id]}</p>}
+                      </div>
+                      {isSelected && (
+                        <span className="shrink-0 bg-[#D1AF47]/10 text-[#7A5B12] text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded border border-[#D1AF47]/20">{t.selected}</span>
+                      )}
+                    </div>
+                    <div className="pt-2">
+                      <span className="text-3xl font-black text-[#101828]">{free ? t.free : money(rate)}</span>
+                      {!free && <span className="text-xs text-[#667085] ms-1">{t.perMonth}</span>}
+                      {!free && (
+                        <div className="text-[11px] text-[#667085] font-semibold mt-1">
+                          {billingCycle === "annual" ? t.billedYearly : t.billedMonthly}
+                        </div>
+                      )}
+                    </div>
+                    <ul className="border-t border-[#ECECEC] pt-4 space-y-2 text-xs text-[#344054]">
+                      <li className="flex items-center gap-2"><span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[#D1AF47]" />{t.planFeeNote}</li>
+                      {plan.max_branches !== null && <li className="flex items-center gap-2"><span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />{fill(t.upToBranches, { n: count(plan.max_branches) })}</li>}
+                      {plan.max_employees !== null && <li className="flex items-center gap-2"><span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />{fill(t.upToStaff, { n: count(plan.max_employees) })}</li>}
+                      {plan.included_monthly_sms !== null && <li className="flex items-center gap-2"><span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />{fill(t.smsIncluded, { n: count(plan.included_monthly_sms) })}</li>}
+                    </ul>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleSelectPlan(plan.id)}
+                    aria-pressed={isSelected}
+                    className={`w-full py-2.5 mt-8 rounded-xl text-xs font-bold tracking-wider focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928] ${isSelected ? "bg-[#D1AF47] text-[#070B12]" : "bg-[#FBFAF7] text-[#344054] border border-[#ECECEC] hover:border-[#D1AF47]/40"}`}
+                  >
+                    {isCurrent ? t.currentPlan : isSelected ? t.selected : t.selectPlan}
+                  </button>
+                </section>
+              );
+            })}
           </div>
+        )}
 
-          {/* Card 3: Elite Salon */}
-          <div 
-            onClick={() => handleSelectPlan("elite")}
-            className={`cursor-pointer rounded-[24px] p-6 relative overflow-hidden transition-all duration-300 hover:translate-y-[-4px] flex flex-col justify-between ${
-              selectedPlan === "elite" 
-                ? "bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border-2 border-[#D1AF47] shadow-[0_0_20px_rgba(209,175,71,0.1)]" 
-                : "bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:border-[#D1AF47]/40"
-            }`}
-          >
-            <div className="space-y-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-bold text-[#101828] tracking-wide">{t.eliteName}</h3>
-                  <p className="text-xs text-[#667085] mt-1 line-clamp-2">{t.eliteDesc}</p>
-                </div>
-                {selectedPlan === "elite" && (
-                  <span className="bg-[#D1AF47]/10 text-[#D1AF47] text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded border border-[#D1AF47]/20">
-                    {t.selected}
-                  </span>
-                )}
-              </div>
-              <div className="pt-4">
-                <span className="text-3xl font-black text-[#101828]">
-                  {billingCycle === "annual" ? t.elitePriceAnnual : t.elitePrice}
-                </span>
-                <span className="text-xs text-[#667085] ml-1 mr-1">
-                  {t.sar} {billingCycle === "annual" ? t.perMonth : t.perMonth}
-                </span>
-                <div className="text-[10px] text-[#22C55E] font-semibold mt-1">
-                  {billingCycle === "annual" ? "Save 1920 SAR / year" : "Standard Month Rate"}
-                </div>
-              </div>
-              <div className="border-t border-[rgba(255,255,255,0.06)] pt-4 space-y-2">
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#D1AF47]" />
-                  <span>{t.planFeeNote}</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-[#344054]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />
-                  <span>{t.featSupport}</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-[#344054]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />
-                  <span>Unlimited Staff Calendars</span>
-                </div>
-              </div>
-            </div>
-            <button
-              onClick={() => setSelectedPlan("elite")}
-              className={`w-full py-2.5 mt-8 rounded-xl text-xs font-bold tracking-wider transition-all duration-300 ${
-                selectedPlan === "elite"
-                  ? "bg-[#D1AF47] text-[#070B12]"
-                  : "bg-white/5 hover:bg-white/10 text-[#101828] border border-[rgba(255,255,255,0.08)]"
-              }`}
-            >
-              {selectedPlan === "elite" ? t.currentPlan : t.selectPlan}
-            </button>
-          </div>
-
-        </div>
-
-        {/* Detailed Plan Comparison Table */}
-        <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[rgba(255,255,255,0.06)] rounded-[24px] p-6 md:p-8 space-y-6">
-          <h3 className="text-lg font-bold text-[#101828] tracking-wide">
-            {t.featuresTitle}
-          </h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs sm:text-sm">
-              <thead>
-                <tr className="border-b border-[rgba(255,255,255,0.06)] text-[#667085]">
-                  <th className="py-4 font-semibold text-start w-1/2">{locale === "en" ? "Feature" : "الميزة"}</th>
-                  <th className="py-4 font-semibold text-center">{t.basicName}</th>
-                  <th className="py-4 font-semibold text-center text-[#D1AF47]">{t.growthName}</th>
-                  <th className="py-4 font-semibold text-center">{t.eliteName}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[rgba(255,255,255,0.03)]">
-                {features.map((feature, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="py-4 font-medium text-[#101828] text-start">{feature.name}</td>
-                    <td className="py-4 text-center">
-                      {feature.basic ? (
-                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#3DDC84]" />
-                      ) : (
-                        <span className="text-[#667085]">—</span>
-                      )}
-                    </td>
-                    <td className="py-4 text-center">
-                      {feature.growth ? (
-                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D1AF47] shadow-[0_0_8px_rgba(209,175,71,0.6)]" />
-                      ) : (
-                        <span className="text-[#667085]">—</span>
-                      )}
-                    </td>
-                    <td className="py-4 text-center">
-                      {feature.elite ? (
-                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#3DDC84]" />
-                      ) : (
-                        <span className="text-[#667085]">—</span>
-                      )}
-                    </td>
+        {/* Plan comparison, from the plan records */}
+        {plans && plans.length > 0 && (
+          <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-[24px] p-6 md:p-8 space-y-6">
+            <h2 className="text-lg font-bold text-[#101828] tracking-wide">{t.featuresTitle}</h2>
+            <div className="overflow-x-auto" role="region" aria-label={t.featuresTitle} tabIndex={0}>
+              <table className="w-full border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr className="border-b border-[#ECECEC] text-[#667085]">
+                    <th scope="col" className="py-4 font-semibold text-start w-1/2">{t.feature}</th>
+                    {plans.map((plan) => <th key={plan.id} scope="col" className="py-4 font-semibold text-center">{planName(plan)}</th>)}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-[#F2F4F7]">
+                  {featureRows.map((row) => (
+                    <tr key={row.name}>
+                      <th scope="row" className="py-4 font-medium text-[#101828] text-start">{row.name}</th>
+                      {plans.map((plan) => {
+                        const value = row.cell(plan);
+                        return (
+                          <td key={plan.id} className="py-4 text-center">
+                            {typeof value === "string" ? <span className="font-semibold text-[#101828]">{value}</span>
+                              : value ? <><span aria-hidden="true" className="inline-block w-2.5 h-2.5 rounded-full bg-[#3DDC84]" /><span className="sr-only">{t.included}</span></>
+                              : <><span aria-hidden="true" className="text-[#667085]">—</span><span className="sr-only">{t.notIncluded}</span></>}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Transaction Split Calculator & Commission Breakdown */}
         <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[rgba(255,255,255,0.06)] rounded-[28px] p-6 sm:p-10 space-y-8 relative overflow-hidden">
@@ -647,11 +551,7 @@ export default function PricingPage() {
             <h2 className="text-xl font-bold text-[#101828] uppercase tracking-wide">
               {t.pricingModel}
             </h2>
-            <p className="text-xs text-[#667085] max-w-xl mx-auto">
-              {locale === "en" 
-                ? "Every booking is recorded in the ledger, and your share is paid out after the visit is completed." 
-                : "تُسجل كل عملية حجز في دفتر الأستاذ، وتُصرف حصتك بعد اكتمال الزيارة."}
-            </p>
+            <p className="text-xs text-[#667085] max-w-xl mx-auto">{t.pricingModelIntro}</p>
           </div>
           
           {/* D-D3: the effective platform fee from the fee rules in force, VAT on the fee and a worked example (no fixed split). */}
@@ -685,9 +585,7 @@ export default function PricingPage() {
               <h4 className="font-bold text-xs text-[#101828] uppercase tracking-wider">{t.noUpfront}</h4>
               <p className="text-xs text-[#667085] max-w-xl">{t.noUpfrontDesc}</p>
             </div>
-            <span className="text-xs font-bold text-[#D1AF47] bg-[#D1AF47]/10 px-3 py-1.5 rounded-lg border border-[#D1AF47]/20 whitespace-nowrap">
-              {locale === "en" ? "No Credit Card Needed to Register" : "لا حاجة لبطاقة ائتمان للتسجيل"}
-            </span>
+            <span className="text-xs font-bold text-[#7A5B12] bg-[#D1AF47]/10 px-3 py-1.5 rounded-lg border border-[#D1AF47]/20 whitespace-nowrap">{t.noCard}</span>
           </div>
 
           {/* Localized Saudi Fintech details */}
@@ -704,7 +602,7 @@ export default function PricingPage() {
 
         </div>
 
-        {/* Interactive Payment Checkout Mock Container */}
+        {/* Subscription checkout: the amount is the server quote; payment happens on Tap's page */}
         <div 
           ref={checkoutRef} 
           className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border border-[rgba(255,255,255,0.06)] rounded-[28px] p-6 sm:p-10 space-y-8 relative overflow-hidden"
@@ -731,31 +629,27 @@ export default function PricingPage() {
               </div>
               <div className="space-y-2">
                 <h4 className="text-xl font-bold text-[#101828]">{t.successMsg}</h4>
-                <p className="text-xs text-[#667085]">
-                  {locale === "en"
-                    ? `Your account has been configured with the ${pricingDetails.title} package.`
-                    : `تمت تهيئة حسابك بنجاح على باقة ${pricingDetails.title}.`}
-                </p>
+                <p className="text-xs text-[#667085]">{fill(t.successBody, { plan: pricingDetails.title })}</p>
               </div>
               <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] p-4 rounded-xl text-xs space-y-2 border border-[rgba(255,255,255,0.04)] text-start">
                 <div className="flex justify-between text-[#101828] font-medium">
-                  <span>{locale === "en" ? "Active Plan:" : "الباقة النشطة:"}</span>
+                  <span>{t.activePlan}</span>
                   <span className="text-[#D1AF47]">{pricingDetails.title}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>{locale === "en" ? "Billing Cycle:" : "دورة الدفع:"}</span>
+                  <span>{t.billingCycle}</span>
                   <span>{pricingDetails.isAnnual ? t.billingAnnual : t.billingMonthly}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>{locale === "en" ? "Amount Paid:" : "المبلغ المدفوع:"}</span>
-                  <span className="text-[#101828] font-bold">{pricingDetails.total} {t.sar}</span>
+                  <span>{t.amountPaid}</span>
+                  <span className="text-[#101828] font-bold">{pricingDetails.total !== null ? money(pricingDetails.total) : t.quoteUnavailable}</span>
                 </div>
               </div>
               <button 
                 onClick={() => setCheckoutStep("idle")}
                 className="px-6 py-2.5 rounded-full text-xs font-bold bg-[#D1AF47] text-[#070B12] hover:bg-[#E0C46A] transition-all duration-300"
               >
-                {locale === "en" ? "Manage Subscription" : "إدارة الاشتراك"}
+                {t.manage}
               </button>
             </div>
           ) : (
@@ -764,7 +658,7 @@ export default function PricingPage() {
               {/* Form Input fields */}
               <form onSubmit={handleCheckoutSubmit} className="lg:col-span-7 space-y-6">
                 {checkoutError && (
-                  <div className="bg-[#FEF3F2] border border-[#EF4444]/20 text-[#EF4444] text-xs rounded-xl p-4 font-semibold">
+                  <div role="alert" className="bg-[#FEF3F2] border border-[#EF4444]/20 text-[#B42318] text-xs rounded-xl p-4 font-semibold">
                     {checkoutError}
                   </div>
                 )}
@@ -772,32 +666,17 @@ export default function PricingPage() {
                   <h4 className="text-xs font-bold text-[#101828] uppercase tracking-wider">{t.paymentMethod}</h4>
                   
                   {/* Select Payment Type Header */}
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="border border-[#D1AF47]/40 bg-[#D1AF47]/5 p-3 rounded-xl flex flex-col items-center justify-center text-center space-y-1 cursor-pointer">
-                      <span className="text-[10px] font-bold text-[#D1AF47]">mada</span>
-                      <span className="text-[8px] text-[#667085]">Saudi Debit</span>
-                    </div>
-                    <div className="border border-[rgba(255,255,255,0.06)] bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] p-3 rounded-xl flex flex-col items-center justify-center text-center space-y-1 opacity-70 hover:opacity-100 transition-opacity">
-                      <span className="text-[10px] font-bold text-[#101828]">Apple Pay</span>
-                      <span className="text-[8px] text-[#667085]">One-click</span>
-                    </div>
-                    <div className="border border-[rgba(255,255,255,0.06)] bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] p-3 rounded-xl flex flex-col items-center justify-center text-center space-y-1 opacity-70 hover:opacity-100 transition-opacity">
-                      <span className="text-[10px] font-bold text-[#101828]">Credit Card</span>
-                      <span className="text-[8px] text-[#667085]">Visa / MC</span>
-                    </div>
-                  </div>
+                  <ul className="grid grid-cols-3 gap-3">
+                    {(["mada", "applePay", "card"] as const).map((method) => (
+                      <li key={method} className="border border-[#ECECEC] bg-white p-3 rounded-xl text-center text-[11px] font-bold text-[#101828]">{t.methods[method]}</li>
+                    ))}
+                  </ul>
                 </div>
 
-                {selectedPlan === "basic" ? (
+                {selectedIsFree ? (
                   <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-xl p-6 text-center space-y-2 text-xs">
-                    <p className="text-[#101828] font-medium">
-                      {locale === "en" ? "Lite Starter is 100% Free Upfront" : "باقة لايت للمبتدئين مجانية بالكامل مقدماً"}
-                    </p>
-                    <p className="text-[#667085]">
-                      {locale === "en" 
-                        ? "No card details are required. Your account will automatically activate under the 15% platform split agreement."
-                        : "لا توجد تفاصيل دفع مطلوبة. سيتم تفعيل حسابك تلقائياً بناءً على اتفاقية عمولة المنصة البالغة 15%."}
-                    </p>
+                    <p className="text-[#101828] font-medium">{t.freeTitle}</p>
+                    <p className="text-[#667085]">{t.freeBody}</p>
                   </div>
                 ) : (
                   <div className="bg-white border border-[#ECECEC] shadow-[0_8px_30px_rgb(0,0,0,0.015)] rounded-xl p-6 space-y-4 text-xs">
@@ -808,26 +687,22 @@ export default function PricingPage() {
                         </svg>
                       </div>
                       <div className="space-y-1">
-                        <h5 className="font-bold text-[#101828]">
-                          {locale === "en" ? "Payments by Tap" : "المدفوعات عبر Tap"}
-                        </h5>
+                        <h5 className="font-bold text-[#101828]">{t.tapTitle}</h5>
                         <p className="text-[#667085] leading-relaxed">
                           {t.secureGatewayNotice}
                         </p>
                       </div>
                     </div>
                     <div className="border-t border-[#ECECEC] pt-3 text-[11px] text-[#667085] flex flex-wrap gap-2 items-center">
-                      <span className="font-semibold text-[#101828]">{locale === "en" ? "Accepted Methods:" : "طرق الدفع المدعومة:"}</span>
-                      <span className="bg-gray-100 text-[#344054] px-2 py-0.5 rounded">mada</span>
-                      <span className="bg-gray-100 text-[#344054] px-2 py-0.5 rounded">Apple Pay</span>
-                      <span className="bg-gray-100 text-[#344054] px-2 py-0.5 rounded">Visa / Mastercard</span>
+                      <span className="font-semibold text-[#101828]">{t.acceptedMethods}</span>
+                      {(["mada", "applePay", "card"] as const).map((method) => <span key={method} className="bg-gray-100 text-[#344054] px-2 py-0.5 rounded">{t.methods[method]}</span>)}
                     </div>
                   </div>
                 )}
 
                 <button 
                   type="submit"
-                  disabled={checkoutStep === "processing"}
+                  disabled={checkoutStep === "processing" || !selected}
                   className="w-full bg-[#D1AF47] hover:bg-[#E0C46A] disabled:opacity-50 text-[#070B12] py-3.5 rounded-xl text-xs font-bold tracking-wider transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(209,175,71,0.2)]"
                 >
                   {checkoutStep === "processing" ? (
@@ -839,7 +714,7 @@ export default function PricingPage() {
                       <span>{t.processing}</span>
                     </>
                   ) : (
-                    <span>{selectedPlan === "basic" ? (locale === "en" ? "Activate Free Starter Plan" : "تفعيل باقة لايت المجانية") : t.payNow}</span>
+                    <span>{selectedIsFree ? t.activateFree : t.payNow}</span>
                   )}
                 </button>
               </form>
@@ -856,27 +731,14 @@ export default function PricingPage() {
                       </svg>
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-[#101828]">
-                        {locale === "en" ? "Card payments on Tap's hosted page" : "الدفع بالبطاقة عبر صفحة Tap المستضافة"}
-                      </h4>
-                      <p className="text-[10px] text-[#667085]">
-                        {locale === "en" ? "Card details are entered on the payment provider's page, never on PRIMORA" : "تُدخل بيانات البطاقة في صفحة مزود الدفع وليس في بريمورا"}
-                      </p>
+                      <h4 className="text-xs font-bold text-[#101828]">{t.hostedTitle}</h4>
+                      <p className="text-[10px] text-[#667085]">{t.hostedBody}</p>
                     </div>
                   </div>
                   <ul className="text-xs space-y-2 text-[#667085]">
-                    <li className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />
-                      <span>{locale === "en" ? "Zero card details stored on Primora servers" : "لا يتم تخزين أي بيانات بطاقة على خوادمنا"}</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />
-                      <span>{locale === "en" ? "Automated local bank settlement" : "تسوية مصرفية محلية مؤتمتة"}</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" />
-                      <span>{locale === "en" ? "Transparent 15% booking split ledger" : "دفتر أستاذ شفاف بنسبة عمولة 15%"}</span>
-                    </li>
+                    {t.assurance.map((line) => (
+                      <li key={line} className="flex items-center gap-2"><span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-[#3DDC84]" /><span>{line}</span></li>
+                    ))}
                   </ul>
                 </div>
 
@@ -888,7 +750,7 @@ export default function PricingPage() {
                   
                   <div className="space-y-3 text-xs">
                     <div className="flex justify-between text-[#667085]">
-                      <span>{locale === "en" ? "Selected Plan" : "الباقة المحددة"}</span>
+                      <span>{t.selectedPlanLabel}</span>
                       <span className="text-[#101828] font-medium">{pricingDetails.title}</span>
                     </div>
                     <div className="flex justify-between text-[#667085]">
@@ -902,12 +764,12 @@ export default function PricingPage() {
                     
                     <div className="flex justify-between text-[#667085]">
                       <span>{t.subtotal}</span>
-                      <span className="text-[#101828] font-medium">{pricingDetails.subtotal !== null ? `${pricingDetails.subtotal} ${t.sar}` : (quoteError ? t.quoteUnavailable : "…")}</span>
+                      <span className="text-[#101828] font-medium">{pricingDetails.subtotal !== null ? money(pricingDetails.subtotal) : (quoteError ? t.quoteUnavailable : "…")}</span>
                     </div>
 
                     <div className="border-t border-[#D1AF47]/20 pt-3 flex justify-between text-sm">
                       <span className="text-[#101828] font-bold">{t.total}</span>
-                      <span className="text-[#D1AF47] font-black">{pricingDetails.total !== null ? `${pricingDetails.total} ${t.sar}` : (quoteError ? t.quoteUnavailable : "…")}</span>
+                      <span className="text-[#D1AF47] font-black">{pricingDetails.total !== null ? money(pricingDetails.total) : (quoteError ? t.quoteUnavailable : "…")}</span>
                     </div>
                   </div>
                 </div>

@@ -35,7 +35,7 @@ const translations = {
     phoneVerified: "Verified",
     phoneUnverified: "Unverified",
     dataRightsTitle: "Saudi PDPL Data Subject Rights",
-    dataRightsDesc: "Submit an official statutory request to access, rectify, erase, or export your personal records within 30 days.",
+    dataRightsDesc: "Ask for access to, a copy of, a correction of or the deletion of your personal data, or withdraw a consent. We answer within 30 days, free of charge.",
     dataRightsBtn: "Exercise Data Rights",
     advancedSection: "Advanced & Family Profiles",
     dependentsCardTitle: "Dependents & Pets Manager",
@@ -70,7 +70,7 @@ const translations = {
     phoneVerified: "موثق",
     phoneUnverified: "غير موثق",
     dataRightsTitle: "حقوق صاحب البيانات (نظام حماية البيانات الشخصية PDPL)",
-    dataRightsDesc: "تقديم طلب نظامي للوصول إلى بياناتك الشخصية، تصحيحها، إتلافها، أو نقلها خلال مهلة 30 يوماً.",
+    dataRightsDesc: "اطلب الاطلاع على بياناتك الشخصية أو نسخة منها أو تصحيحها أو حذفها، أو اسحب موافقة. نرد خلال 30 يوماً ومجاناً.",
     dataRightsBtn: "ممارسة حقوق البيانات",
     advancedSection: "الملفات العائلية والخدمات المتقدمة",
     dependentsCardTitle: "إدارة التابعين والأليفة",
@@ -408,7 +408,7 @@ export default function CustomerSettingsPage() {
 
               <div className="pt-3 border-t border-gray-100">
                 <Link
-                  href="/privacy"
+                  href="/customer/privacy"
                   className="block text-center rounded-xl bg-stone-100 hover:bg-stone-200 p-2.5 text-[11px] font-bold text-stone-800 transition"
                 >
                   {t.dataRightsBtn} →

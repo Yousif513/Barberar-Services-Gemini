@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { CommandDialog } from "@/components/modal";
+import { sar } from "@/components/operations-ui";
 
 const translations = {
   en: {
@@ -28,7 +29,7 @@ const translations = {
   },
   ar: {
     title: "منصة التحكيم في النزاعات",
-    subtitle: "مراجعة تقييمات العملاء المعلمة (1-2 نجوم)، وطلبات استرداد المبالغ، والانتهاكات الأمنية.",
+    subtitle: "مراجعة تقييمات العملاء المعلمة (١–٢ نجمة)، وطلبات استرداد المبالغ، والانتهاكات الأمنية.",
     loading: "جاري تحميل سجل النزاعات المعلمة...",
     success: "نجاح",
     error: "خطأ",
@@ -97,7 +98,7 @@ export default function AdminDisputes() {
             bookingId: bk?.id || "N/A",
             customer: (cust ? `${cust.first_name || ""} ${cust.last_name || ""}`.trim() : "") || (d.customer_id ? t.customerHidden.replace("{id}", String(d.customer_id).slice(0, 8)) : "—"),
             provider: (lang === "ar" ? prov?.business_name_ar : prov?.business_name_en) || prov?.business_name_en || t.independent,
-            amount: `${d.disputed_amount_sar || 0} ${lang === "ar" ? "ريال" : "SAR"}`,
+            amount: sar(Number(d.disputed_amount_sar || 0), lang),
             reason: d.reason || t.noDetail,
             status: d.status === "resolved_refund" ? "REFUNDED" : d.status === "resolved_rejected" ? "DECLINED" : "OPEN"
           };
@@ -194,9 +195,9 @@ export default function AdminDisputes() {
       {/* Title Header */}
       <div className={`flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
         <div>
-          <h2 className="text-2xl font-serif font-black tracking-tight text-gray-900 leading-tight">
+          <h1 className="text-2xl font-serif font-black tracking-tight text-gray-900 leading-tight">
             {t.title}
-          </h2>
+          </h1>
           <p className="text-xs text-gray-500 font-semibold mt-1">
             {t.subtitle}
           </p>
@@ -255,7 +256,7 @@ export default function AdminDisputes() {
             </div>
           </div>
           <strong className="block text-2xl font-serif font-black text-gray-900 mt-2.5">
-            {refundedTotal.toLocaleString(lang === "ar" ? "ar-SA" : "en-US")} {lang === "ar" ? "ريال" : "SAR"}
+            {sar(refundedTotal, lang)}
           </strong>
         </div>
       </div>

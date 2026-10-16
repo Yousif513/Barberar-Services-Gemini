@@ -38,7 +38,6 @@ const translations = {
     localOnly: "LOCAL ONLY",
     devCustomer: "Customer",
     devProvider: "Provider",
-    devAdmin: "Admin",
     tabSignin: "Sign in",
     tabSignup: "Create account",
     methodPhone: "Phone",
@@ -117,7 +116,6 @@ const translations = {
     localOnly: "محلي فقط",
     devCustomer: "عميل",
     devProvider: "مقدم خدمة",
-    devAdmin: "مسؤول",
     tabSignin: "تسجيل الدخول",
     tabSignup: "حساب جديد",
     methodPhone: "الجوال",
@@ -609,11 +607,10 @@ function LoginForm() {
                   {t.localOnly}
                 </span>
               </div>
-              <div className="mt-3 grid grid-cols-3 gap-2">
+              <div className="mt-3 grid grid-cols-2 gap-2">
                 {[
                   [t.devCustomer, "customer"],
                   [t.devProvider, "provider_owner"],
-                  [t.devAdmin, "admin"],
                 ].map(([label, role]) => (
                   <button
                     key={role}

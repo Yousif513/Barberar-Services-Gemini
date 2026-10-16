@@ -1,0 +1,59 @@
+UX round 1 (agent ux-round1-claude), 2026-10-11, http://localhost:3100 against the local Supabase stack.
+Driver: Playwright 1.61.1 (npx cache, Chromium 149) in isolated contexts; scripts kept in the session scratchpad.
+Accounts: admin.owner@primora.local (owner), admin.finance@primora.local (finance) - TOTP enrolled through /login/mfa
+(both had no verified factor before this pass; each now has one verified factor), faisal@elitebarber.sa (provider owner,
+smoke fixture password), smoke.customer.1791700651579@example.test (customer, smoke fixture password; email OTP read from Mailpit).
+Data created: one "access" privacy request for the smoke customer (submitted through /customer/privacy); the daily refund
+threshold was proposed 5,000 -> 6,000 by owner, approved by finance, proposed back 6,000 -> 5,000 and approved again
+(governance_settings.refund_daily_cumulative_sar = 5000.00 afterwards); one reconciliation run for 2026-10-10 (recorded data).
+
+1. /login/mfa (owner EN 375x700, finance AR 375x700)
+   - enrol phase, code input autofocused, main dir=ltr/rtl correct, no horizontal overflow (scrollWidth 375).
+   - "12ab" -> "Enter the 6 digits..." (localized), input kept.
+   - "000000" -> alert "Invalid TOTP code entered" in BOTH languages; focus after failure = BODY.
+   - code input has no aria-describedby / aria-invalid.
+   - console: 2x 404 DELETE /auth/v1/factors/<id> (abandoned-enrolment cleanup), 422 on the wrong code.
+   - correct code -> /admin. Screens: mfa-enrol-en-375.png, mfa-wrongcode-en-375.png, mfa-enrol-ar-375.png, mfa-wrongcode-ar-375.png
+2. Route crawl (crawl-<role>-<lang>-<width>.json + one screenshot per route):
+   owner en 1440, owner ar 375, finance en 1440 over /admin, approvals, roles, ledger, reconciliation, platform-rules,
+   settings, customers, bookings, disputes, audit-logs, privacy, incidents, ropa, refunds.
+   - owner: 0 console errors on all 15 routes (EN and AR). No page-level horizontal overflow at 375 on any route.
+   - no <h1> on approvals, roles, ledger, reconciliation, platform-rules, disputes (both languages).
+   - finance: 403 + console error on /admin (admin_list_audit_events x2), /admin/customers (16 errors), /admin/audit-logs,
+     /admin/privacy, /admin/incidents; forbidden notice says "give your account the administrator role".
+   - finance nav = owner nav (30 links incl. privacy, incidents, audit-logs, roles).
+   - AR digit census (latin/arabic-indic): roles 117/161, customers 284/48, bookings 48/193, privacy 24/22,
+     reconciliation 10/0, incidents 7/0, settings 4/17, ledger payouts tab "0".
+3. /admin/ledger AR 375: tabs "Accountant statements" l=332 r=404 and "PSP reconciliation" l=408 r=469 in a 375 viewport,
+   no scroll container, no tablist/tab roles (ledger-payouts-owner-ar-375.png). No payout requests exist locally, so the
+   IBAN reveal could not be exercised (0 reveal buttons).
+   /admin/ledger PSP Reconciliation tab (owner EN): "No reconciliation runs recorded yet" while /admin/reconciliation lists
+   the 2026-10-10 run (tab-PSP_Reconciliation-owner.png, reconciliation-owner-en-1440.png).
+4. Approvals flow by keyboard: owner (EN 1440) Propose change -> dialog focus on value input, Tab cycles inside dialog,
+   empty submit shows nothing, short reason -> "Enter a reason of at least 10 characters", value and reason kept;
+   valid -> 403 step_up_required -> step-up dialog (focus on code input, Tab trapped), "12" -> localized message,
+   "000000" -> "Invalid TOTP code entered" and focus = BODY; correct code -> request created, success
+   "The change is waiting for a second administrator.", focus back on trigger.
+   finance (AR 375x600) Approve by keyboard -> decide dialog (top 32, bottom 568, buttons 550-592, inner scroll),
+   step-up dialog (top 136 bottom 464, buttons reachable), success "تم الاعتماد والتنفيذ.", focus = BODY afterwards.
+   body overflow stays "visible" while dialogs are open.
+5. /admin/privacy owner EN and AR 375: View by keyboard opens detail (focus stays on View), extension reason "too short"
+   -> native English validation message in both languages; Log-a-request accepts "197e449a" (pattern ignored);
+   console error "Pattern attribute value [0-9a-fA-F-]{36} is not a valid regular expression ... /v". Propose dialog:
+   focus on reason, Escape closes and returns focus to trigger; dialog fits 375 width.
+6. /customer/privacy AR 375 keyboard: radio -> textarea -> submit; code step opens with focus on "Send code"; code sent;
+   "000000" -> "Token has expired or is invalid" (English); Mailpit code -> request listed (اطلاع · مستلم), status "تم.",
+   focus = BODY. Console: 403 privacy_submit_request (designed first attempt) and 403 /auth/v1/verify.
+7. /provider/pricing provider EN 1440: plan card "15% Platform Commission" next to fee terms "20% of the booking
+   (minimum SAR 10.00, maximum SAR 40.00)"; "299SAR SAR / month".
+8. /become-provider customer EN 1440 / AR 375: VAT question shows VAT number field when registered; submit disabled
+   (agreement not published) with the full form still editable; AR mixes "حتى 3 فروع" with "٢٩٩٫٠٠ ر.س.".
+9. Dialog checks (Escape returns focus to trigger in every case): Clear profile details (typed confirm + reason),
+   Remove from console (reason only, no typed confirm), fee proposal (focus on open = BODY), settings programme
+   proposal is an inline disclosure without aria-expanded.
+10. /admin/reconciliation owner EN: Reconcile recorded data -> "Reconciled 2026-10-10: No Tap data."; Fetch from Tap ->
+    "Tap is not configured (TAP_SECRET_KEY)." shown together with the earlier success; malformed CSV ->
+    "Lines 2 could not be read. Nothing was imported." (CSV kept); focus = BODY after each command.
+11. /admin/audit-logs owner: page 1 = 50 rows, 36 are read events (approvals.inbox_read 10, roles.directory_read 6,
+    privacy_requests.listed 4, governance_notices.listed 3, disputes.listed 3 ...); filtered-empty state correct.
+    /admin/customers search "zzzz" -> "No customers match this search. Clear search".

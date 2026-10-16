@@ -1,0 +1,212 @@
+[
+  {
+    "route": "/",
+    "h1": [
+      "لوحة المتابعة"
+    ],
+    "overflow": 0,
+    "nav": 69,
+    "latin": 0,
+    "arabic": 193,
+    "alerts": [],
+    "dir": "rtl",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/approvals",
+    "h1": [
+      "الاعتمادات"
+    ],
+    "overflow": 0,
+    "nav": 60,
+    "latin": 0,
+    "arabic": 484,
+    "alerts": [],
+    "dir": "rtl",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/roles",
+    "h1": [
+      "المسؤولون والأدوار"
+    ],
+    "overflow": 0,
+    "nav": 60,
+    "latin": 221,
+    "arabic": 206,
+    "alerts": [],
+    "dir": "rtl",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/ledger",
+    "h1": [
+      "السجل والتقارير المالية"
+    ],
+    "overflow": 0,
+    "nav": 60,
+    "latin": 0,
+    "arabic": 0,
+    "alerts": [],
+    "dir": "rtl",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/reconciliation",
+    "h1": [
+      "التسوية مع Tap"
+    ],
+    "overflow": 0,
+    "nav": 60,
+    "latin": 0,
+    "arabic": 29,
+    "alerts": [],
+    "dir": "rtl",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/platform-rules",
+    "h1": [
+      "قواعد المنصة"
+    ],
+    "overflow": 0,
+    "nav": 60,
+    "latin": 0,
+    "arabic": 120,
+    "alerts": [],
+    "dir": "rtl",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/settings",
+    "h1": [
+      "إعدادات المنصة"
+    ],
+    "overflow": 0,
+    "nav": 60,
+    "latin": 0,
+    "arabic": 21,
+    "alerts": [],
+    "dir": "rtl",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/customers",
+    "h1": [
+      "سجل العملاء وحقوق البيانات"
+    ],
+    "overflow": 0,
+    "nav": 60,
+    "latin": 313,
+    "arabic": 52,
+    "alerts": [],
+    "dir": "rtl",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/bookings",
+    "h1": [
+      "سجل الحجوزات العام"
+    ],
+    "overflow": 0,
+    "nav": 60,
+    "latin": 53,
+    "arabic": 213,
+    "alerts": [],
+    "dir": "rtl",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/disputes",
+    "h1": [
+      "منصة التحكيم في النزاعات"
+    ],
+    "overflow": 0,
+    "nav": 60,
+    "latin": 2,
+    "arabic": 5,
+    "alerts": [],
+    "dir": "rtl",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/audit-logs",
+    "h1": [
+      "سجل التدقيق"
+    ],
+    "overflow": 0,
+    "nav": 60,
+    "latin": 834,
+    "arabic": 659,
+    "alerts": [],
+    "dir": "rtl",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/privacy",
+    "h1": [
+      "طلبات الخصوصية"
+    ],
+    "overflow": 0,
+    "nav": 60,
+    "latin": 19,
+    "arabic": 62,
+    "alerts": [],
+    "dir": "rtl",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/incidents",
+    "h1": [
+      "سجل الحوادث"
+    ],
+    "overflow": 0,
+    "nav": 60,
+    "latin": 0,
+    "arabic": 7,
+    "alerts": [],
+    "dir": "rtl",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/ropa",
+    "h1": [
+      "سجل أنشطة المعالجة"
+    ],
+    "overflow": 0,
+    "nav": 60,
+    "latin": 120,
+    "arabic": 2,
+    "alerts": [],
+    "dir": "rtl",
+    "console": [],
+    "http": []
+  },
+  {
+    "route": "/refunds",
+    "h1": [
+      "المبالغ المستردة"
+    ],
+    "overflow": 0,
+    "nav": 60,
+    "latin": 0,
+    "arabic": 1,
+    "alerts": [],
+    "dir": "rtl",
+    "console": [],
+    "http": []
+  }
+]

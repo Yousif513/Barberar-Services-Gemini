@@ -38,7 +38,9 @@ describe("console roles and permissions", () => {
     const of = (role) => rows.filter((r) => r.admin_role === role).map((r) => r.permission);
     assert.deepEqual(of("analyst"), []);
     // GOV-2 adds the audited personal-data read (personal.read) for operations and the owner-only health break-glass.
-    assert.deepEqual(of("operations"), ["operations.write", "personal.read"]);
+    // PRIV-1 adds privacy.manage (work the privacy-request queue) for operations; approvals stay with the owner.
+    assert.deepEqual(of("operations"), ["operations.write", "personal.read", "privacy.manage"]);
+    assert.ok(of("owner").includes("privacy.approve") && !of("operations").includes("privacy.approve") && !of("finance").includes("privacy.manage"));
     assert.ok(!of("finance").includes("personal.read") && of("owner").includes("health.break_glass") && !of("finance").includes("health.break_glass"));
     assert.ok(of("finance").includes("money.payout") && of("finance").includes("iban.reveal") && !of("finance").includes("operations.write"));
     assert.ok(of("owner").includes("roles.manage") && of("owner").includes("break_glass.use") && of("owner").includes("money.payout"));

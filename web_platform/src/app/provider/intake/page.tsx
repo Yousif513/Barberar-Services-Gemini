@@ -66,6 +66,14 @@ export default function ProviderIntakePage() {
   const [forbidden, setForbidden] = useState(false);
   const dismiss = useCallback(() => setResult({}), []);
 
+  // X3(6): whether health questions are collected at all (off until the owner approved the transfer risk assessment).
+  const [collection, setCollection] = useState<{ enabled: boolean; notice_en: string | null; notice_ar: string | null } | null>(null);
+  useEffect(() => {
+    let live = true;
+    void supabase.rpc("health_intake_collection_status").then(({ data, error }) => { if (live && !error) setCollection(data as typeof collection); });
+    return () => { live = false; };
+  }, []);
+
   // enforcement
   const [enforce, setEnforce] = useState<boolean | null>(null);
   const [enforceError, setEnforceError] = useState("");
@@ -259,6 +267,10 @@ export default function ProviderIntakePage() {
       {provider.status === "error" && <LoadError message={provider.message} locale={locale} onRetry={provider.retry} />}
       {provider.status === "ready" && !providerId && <p role="alert" className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm">{t.noProvider}</p>}
       {forbidden && <ForbiddenNotice locale={locale} />}
+
+      {providerId && collection && !collection.enabled && (
+        <p role="status" className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm font-semibold text-amber-950">{locale === "ar" ? collection.notice_ar : collection.notice_en}</p>
+      )}
 
       {providerId && (
         <>

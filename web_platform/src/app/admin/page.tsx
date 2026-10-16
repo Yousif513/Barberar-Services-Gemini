@@ -5,6 +5,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
 import { ForbiddenNotice, isForbidden, operationsDate, sar, useOperationsLocale, type OperationsLocale } from "@/components/operations-ui";
+import { holdsAny, knownToHold, screenPermissions, useConsoleSession } from "@/lib/console-session";
 
 // The landing page is an exception router: what is waiting for an operator, how long it has waited and
 // where to act on it, plus a few live platform figures. Every number comes from admin_dashboard_overview()
@@ -49,7 +50,8 @@ type Overview = {
   small_cell_threshold?: number;
   queues: QueueRow[];
   reconciliation: {
-    latest: { run_date: string; status: string; discrepancy_amount_sar: number | string | null; created_at: string } | null;
+    // The Tap reconciliation runs, the same rows /admin/reconciliation lists.
+    latest: { run_date: string; status: string; open_breaks: number; created_at: string } | null;
     discrepant_30d: number;
   };
 };
@@ -71,14 +73,14 @@ const QUEUE_ROUTES: Record<QueueKey, string> = {
   refund_requests: "/admin/refunds",
   disputes: "/admin/disputes",
   provider_applications: "/admin/providers?tab=applications&appStatus=pending",
-  data_requests: "/admin/customers?tab=requests",
+  data_requests: "/admin/privacy",
   expired_holds: "/admin/bookings?status=pending_payment",
   flagged_reviews: "/admin/reviews",
 };
 
 const translations = {
   en: {
-    welcome: "Welcome back",
+    title: "Dashboard",
     subtitle: "Work waiting for an operator and live platform figures. Times are shown in Riyadh time.",
     updated: "Updated {time}",
     refresh: "Refresh",
@@ -89,9 +91,9 @@ const translations = {
     retry: "Try again",
     kpiBookingsToday: "Bookings today",
     kpiBookingsTodayHint: "Scheduled for today and not cancelled",
-    kpiCaptured: "Payments captured, 7 days",
+    kpiCaptured: "Payments captured, {days} days",
     kpiCapturedHint: "Bookings, tips, packages, gift cards and subscriptions",
-    kpiCommission: "Platform commission, 7 days",
+    kpiCommission: "Platform commission, {days} days",
     kpiCommissionHint: "The platform's share of those payments",
     kpiProviders: "Live providers",
     kpiProvidersHint: "Verified, with an active branch customers can find",
@@ -99,9 +101,9 @@ const translations = {
     kpiCustomersHint: "Customer accounts on the platform",
     kpiSuppressed: "Fewer than {n}",
     kpiSuppressedHint: "Hidden because fewer than {n} people are behind this figure",
-    kpiCompletion: "Completion rate, 30 days",
+    kpiCompletion: "Completion rate, {days} days",
     kpiCompletionHint: "{completed} of {finished} finished visits",
-    kpiCompletionNone: "No finished visits in the last 30 days",
+    kpiCompletionNone: "No finished visits in the last {days} days",
     attentionTitle: "Needs attention",
     attentionSubtitle: "Each line opens the screen where it is handled.",
     nothingWaiting: "Nothing waiting",
@@ -126,10 +128,10 @@ const translations = {
     reconTitle: "Payment reconciliation",
     reconNone: "No reconciliation has run yet.",
     reconLatest: "Latest run, for {date}",
-    reconStatus: { matched: "Matched", discrepant: "Discrepancy", resolved: "Resolved" } as Record<string, string>,
-    reconDifference: "Difference {amount}",
-    reconDiscrepant30: "Days with a discrepancy in the last 30 days: {n}",
-    reconOpen: "Open the ledger",
+    reconStatus: { matched: "Matched", breaks: "Differences found", no_tap_data: "Not reconciled: no Tap data for the day" } as Record<string, string>,
+    reconBreaks: "Open differences: {n}",
+    reconDiscrepant30: "Days with differences in the last {days} days: {n}",
+    reconOpen: "Open Tap reconciliation",
     recentBookings: "Latest bookings",
     recentBookingsEmpty: "No bookings yet.",
     recentActivity: "Latest operator actions",
@@ -153,7 +155,7 @@ const translations = {
     ],
   },
   ar: {
-    welcome: "مرحباً بعودتك",
+    title: "لوحة المتابعة",
     subtitle: "الأعمال التي تنتظر إجراءً من المشرف وأرقام المنصة المباشرة. الأوقات بتوقيت الرياض.",
     updated: "آخر تحديث {time}",
     refresh: "تحديث",
@@ -164,9 +166,9 @@ const translations = {
     retry: "إعادة المحاولة",
     kpiBookingsToday: "حجوزات اليوم",
     kpiBookingsTodayHint: "المجدولة لليوم وغير الملغاة",
-    kpiCaptured: "المدفوعات المحصّلة، ٧ أيام",
+    kpiCaptured: "المدفوعات المحصّلة، {days} أيام",
     kpiCapturedHint: "الحجوزات والإكراميات والباقات وبطاقات الهدايا والاشتراكات",
-    kpiCommission: "عمولة المنصة، ٧ أيام",
+    kpiCommission: "عمولة المنصة، {days} أيام",
     kpiCommissionHint: "حصة المنصة من تلك المدفوعات",
     kpiProviders: "مقدمو الخدمة الظاهرون",
     kpiProvidersHint: "موثقون ولديهم فرع نشط يمكن للعملاء العثور عليه",
@@ -174,9 +176,9 @@ const translations = {
     kpiCustomersHint: "حسابات العملاء على المنصة",
     kpiSuppressed: "أقل من {n}",
     kpiSuppressedHint: "مخفي لأن عدد الأشخاص وراء هذا الرقم أقل من {n}",
-    kpiCompletion: "نسبة الإكمال، ٣٠ يوماً",
+    kpiCompletion: "نسبة الإكمال، {days} يوماً",
     kpiCompletionHint: "{completed} من {finished} زيارة منتهية",
-    kpiCompletionNone: "لا توجد زيارات منتهية خلال آخر ٣٠ يوماً",
+    kpiCompletionNone: "لا توجد زيارات منتهية خلال آخر {days} يوماً",
     attentionTitle: "تحتاج إلى إجراء",
     attentionSubtitle: "كل سطر يفتح الشاشة التي تتم معالجته فيها.",
     nothingWaiting: "لا شيء بالانتظار",
@@ -201,10 +203,10 @@ const translations = {
     reconTitle: "مطابقة المدفوعات",
     reconNone: "لم تُجرَ أي مطابقة بعد.",
     reconLatest: "آخر مطابقة، ليوم {date}",
-    reconStatus: { matched: "مطابقة", discrepant: "يوجد فرق", resolved: "تمت المعالجة" } as Record<string, string>,
-    reconDifference: "الفرق {amount}",
-    reconDiscrepant30: "أيام بها فروقات خلال آخر ٣٠ يوماً: {n}",
-    reconOpen: "فتح السجل المالي",
+    reconStatus: { matched: "مطابقة", breaks: "توجد فروقات", no_tap_data: "لم تتم المطابقة: لا توجد بيانات Tap لليوم" } as Record<string, string>,
+    reconBreaks: "فروقات مفتوحة: {n}",
+    reconDiscrepant30: "أيام بها فروقات خلال آخر {days} يوماً: {n}",
+    reconOpen: "فتح مطابقة Tap",
     recentBookings: "أحدث الحجوزات",
     recentBookingsEmpty: "لا توجد حجوزات بعد.",
     recentActivity: "أحدث إجراءات المشرفين",
@@ -256,21 +258,25 @@ export default function AdminDashboardPage() {
   const [audit, setAudit] = useState<AuditRow[] | null>(null);
   const [auditError, setAuditError] = useState("");
   const [auditForbidden, setAuditForbidden] = useState(false);
-  const [firstName, setFirstName] = useState("");
+  const session = useConsoleSession();
+  // R2-M8: only the owner reads the audit log (audit.read). Other roles are not asked for it, so their dashboard sends no refused call.
+  const auditAllowed = knownToHold(session, ["audit.read"]);
   const [loading, setLoading] = useState(true);
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
+    if (!session.loaded) return;
     let cancelled = false;
     const load = async () => {
       setLoading(true);
-      const [overviewResult, bookingsResult, auditResult, userResult] = await Promise.all([
+      const [overviewResult, bookingsResult, auditResult] = await Promise.all([
         supabase.rpc("admin_dashboard_overview"),
         // GOV-FIX (Q4): console sessions read no booking rows directly; the audited admin_recent_bookings carries nothing about the customer.
         supabase.rpc("admin_recent_bookings", { p_limit: 5, p_purpose: "customer_support" }),
         // R2-M8: the owner reads the audit log only through the audited admin_list_audit_events; other roles are refused.
-        supabase.rpc("admin_list_audit_events", { p_limit: 6, p_offset: 0, p_purpose: "audit_review" }),
-        supabase.auth.getUser(),
+        auditAllowed
+          ? supabase.rpc("admin_list_audit_events", { p_limit: 6, p_offset: 0, p_purpose: "audit_review", p_event_class: "changes" })
+          : Promise.resolve(null),
       ]);
       if (cancelled) return;
 
@@ -280,7 +286,11 @@ export default function AdminDashboardPage() {
       setBookings(bookingsResult.error ? null : (((bookingsResult.data as { rows?: RecentBooking[] } | null)?.rows ?? []) as RecentBooking[]));
       setBookingsError(bookingsResult.error ? errorMessage(bookingsResult.error) : "");
 
-      if (auditResult.error) {
+      if (!auditResult) {
+        setAudit(null);
+        setAuditForbidden(true);
+        setAuditError("");
+      } else if (auditResult.error) {
         setAudit(null);
         setAuditForbidden(isForbidden(auditResult.error));
         setAuditError(isForbidden(auditResult.error) ? "" : errorMessage(auditResult.error));
@@ -301,18 +311,15 @@ export default function AdminDashboardPage() {
         setAuditError("");
       }
 
-      const userId = userResult.data?.user?.id;
-      if (userId) {
-        const { data: me } = await supabase.from("profiles").select("first_name").eq("id", userId).maybeSingle();
-        if (!cancelled) setFirstName(me?.first_name ?? "");
-      }
       if (!cancelled) setLoading(false);
     };
     void load();
     return () => {
       cancelled = true;
     };
-  }, [reloadKey]);
+  }, [reloadKey, session.loaded, auditAllowed]);
+  // A link is offered only to a screen the console role can open.
+  const canOpen = (href: string) => holdsAny(session, screenPermissions(href.split("?")[0]));
 
   const cardBase = "rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]";
   const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928]";
@@ -336,16 +343,16 @@ export default function AdminDashboardPage() {
   const kpiCards = kpis
     ? [
         tile(t.kpiBookingsToday, kpis.bookings_today, (v) => count(v, locale), t.kpiBookingsTodayHint, "/admin/bookings"),
-        tile(t.kpiCaptured, kpis.captured_7d_sar, (v) => sar(Number(v), locale), t.kpiCapturedHint, "/admin/ledger"),
-        tile(t.kpiCommission, kpis.platform_share_7d_sar, (v) => sar(Number(v), locale), t.kpiCommissionHint, "/admin/ledger"),
+        tile(fill(t.kpiCaptured, { days: count(7, locale) }), kpis.captured_7d_sar, (v) => sar(Number(v), locale), t.kpiCapturedHint, "/admin/ledger"),
+        tile(fill(t.kpiCommission, { days: count(7, locale) }), kpis.platform_share_7d_sar, (v) => sar(Number(v), locale), t.kpiCommissionHint, "/admin/ledger"),
         tile(t.kpiProviders, kpis.live_providers, (v) => count(v, locale), t.kpiProvidersHint, "/admin/providers"),
         tile(t.kpiCustomers, kpis.customers, (v) => count(v, locale), t.kpiCustomersHint, "/admin/customers"),
         kpis.finished_30d === null || kpis.completed_30d === null
-          ? { label: t.kpiCompletion, value: hiddenValue, hint: hiddenHint, href: "/admin/bookings" }
+          ? { label: fill(t.kpiCompletion, { days: count(30, locale) }), value: hiddenValue, hint: hiddenHint, href: "/admin/bookings" }
           : {
-              label: t.kpiCompletion,
-              value: completion === null ? "—" : `${completion.toLocaleString(isRTL ? "ar-SA" : "en-US")}%`,
-              hint: completion === null ? t.kpiCompletionNone : fill(t.kpiCompletionHint, { completed: count(kpis.completed_30d, locale), finished: count(kpis.finished_30d, locale) }),
+              label: fill(t.kpiCompletion, { days: count(30, locale) }),
+              value: completion === null ? "—" : new Intl.NumberFormat(isRTL ? "ar-SA" : "en-US", { style: "percent", maximumFractionDigits: 1 }).format(completion / 100),
+              hint: completion === null ? fill(t.kpiCompletionNone, { days: count(30, locale) }) : fill(t.kpiCompletionHint, { completed: count(kpis.completed_30d, locale), finished: count(kpis.finished_30d, locale) }),
               href: "/admin/bookings",
             },
       ]
@@ -363,7 +370,7 @@ export default function AdminDashboardPage() {
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <h1 className="text-2xl font-serif font-black tracking-tight text-gray-900 leading-tight">
-            {firstName ? `${t.welcome}, ${firstName}` : t.welcome}
+            {t.title}
           </h1>
           <p className="mt-1 text-xs font-semibold text-gray-500">{t.subtitle}</p>
           {overview && <div className="mt-1 text-[11px] font-bold text-[#7A5B12]">{fill(t.updated, { time: generatedTime })}</div>}
@@ -409,13 +416,20 @@ export default function AdminDashboardPage() {
         <>
           {/* Live platform figures; each card opens the screen behind it */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {kpiCards.map((card) => (
-              <Link key={card.label} href={card.href} className={`${cardBase} flex flex-col gap-2 transition hover:border-[#D1AF47]/40 ${focusRing}`}>
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{card.label}</span>
-                <strong className="font-serif text-2xl font-black leading-none text-[#101828]">{card.value}</strong>
-                <span className="text-[11px] font-semibold text-gray-500">{card.hint}</span>
-              </Link>
-            ))}
+            {kpiCards.map((card) => {
+              const body = (
+                <>
+                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{card.label}</span>
+                  <strong className="font-serif text-2xl font-black leading-none text-[#101828]">{card.value}</strong>
+                  <span className="text-[11px] font-semibold text-gray-500">{card.hint}</span>
+                </>
+              );
+              return canOpen(card.href) ? (
+                <Link key={card.label} href={card.href} className={`${cardBase} flex flex-col gap-2 transition hover:border-[#D1AF47]/40 ${focusRing}`}>{body}</Link>
+              ) : (
+                <div key={card.label} className={`${cardBase} flex flex-col gap-2`}>{body}</div>
+              );
+            })}
           </div>
 
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
@@ -424,7 +438,7 @@ export default function AdminDashboardPage() {
               <h3 id="attention-title" className={sectionTitle}>{t.attentionTitle}</h3>
               <div className="mt-1 text-[11px] font-semibold text-gray-500">{t.attentionSubtitle}</div>
               <ul className="mt-3 divide-y divide-[#F2F4F7]">
-                {overview.queues.map((queue) => {
+                {overview.queues.filter((queue) => canOpen(QUEUE_ROUTES[queue.key])).map((queue) => {
                   const waiting = queue.count > 0;
                   const urgent = (queue.key === "data_requests" && (queue.overdue ?? 0) > 0) || (queue.key === "refund_requests" && ((queue.stalled ?? 0) > 0 || (queue.stuck ?? 0) > 0));
                   const details: string[] = [];
@@ -466,20 +480,22 @@ export default function AdminDashboardPage() {
               {latestRun ? (
                 <div className="mt-4 space-y-2">
                   <div className="text-[11px] font-semibold text-gray-500">{fill(t.reconLatest, { date: dateOnly(latestRun.run_date) })}</div>
-                  <div className={`inline-flex rounded-full px-3 py-1 text-xs font-black ${latestRun.status === "discrepant" ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700"}`}>
+                  <div className={`inline-flex rounded-full px-3 py-1 text-xs font-black ${latestRun.status === "breaks" ? "bg-red-50 text-red-700" : latestRun.status === "matched" ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-900"}`}>
                     {t.reconStatus[latestRun.status] ?? latestRun.status}
                   </div>
-                  {Number(latestRun.discrepancy_amount_sar ?? 0) !== 0 && (
-                    <div className="text-sm font-bold text-gray-900">{fill(t.reconDifference, { amount: sar(Number(latestRun.discrepancy_amount_sar), locale) })}</div>
+                  {Number(latestRun.open_breaks ?? 0) > 0 && (
+                    <div className="text-sm font-bold text-gray-900">{fill(t.reconBreaks, { n: count(latestRun.open_breaks, locale) })}</div>
                   )}
                 </div>
               ) : (
                 <div className="mt-4 text-sm font-semibold text-gray-500">{t.reconNone}</div>
               )}
-              <div className="mt-3 text-[11px] font-semibold text-gray-500">{fill(t.reconDiscrepant30, { n: count(overview.reconciliation.discrepant_30d, locale) })}</div>
-              <div className="mt-auto pt-4">
-                <Link href="/admin/ledger" className={smallLink}>{t.reconOpen}</Link>
-              </div>
+              <div className="mt-3 text-[11px] font-semibold text-gray-500">{fill(t.reconDiscrepant30, { days: count(30, locale), n: count(overview.reconciliation.discrepant_30d, locale) })}</div>
+              {canOpen("/admin/reconciliation") && (
+                <div className="mt-auto pt-4">
+                  <Link href="/admin/reconciliation" className={smallLink}>{t.reconOpen}</Link>
+                </div>
+              )}
             </section>
           </div>
         </>
@@ -491,7 +507,7 @@ export default function AdminDashboardPage() {
           <section aria-labelledby="recent-bookings-title" className={cardBase}>
             <div className="flex items-center justify-between gap-3">
               <h3 id="recent-bookings-title" className={sectionTitle}>{t.recentBookings}</h3>
-              <Link href="/admin/bookings" className={smallLink}>{t.viewAll}</Link>
+              {canOpen("/admin/bookings") && <Link href="/admin/bookings" className={smallLink}>{t.viewAll}</Link>}
             </div>
             {bookingsError ? (
               <div role="alert" className="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-800">{fill(t.sectionFailed, { reason: bookingsError })}</div>
@@ -521,7 +537,7 @@ export default function AdminDashboardPage() {
           <section aria-labelledby="recent-activity-title" className={cardBase}>
             <div className="flex items-center justify-between gap-3">
               <h3 id="recent-activity-title" className={sectionTitle}>{t.recentActivity}</h3>
-              <Link href="/admin/audit-logs" className={smallLink}>{t.viewAll}</Link>
+              {auditAllowed && <Link href="/admin/audit-logs" className={smallLink}>{t.viewAll}</Link>}
             </div>
             {auditForbidden ? (
               <div className="mt-3 text-sm font-semibold text-gray-500">{t.recentActivityOwnerOnly}</div>
@@ -550,7 +566,7 @@ export default function AdminDashboardPage() {
       <nav aria-label={t.goTo} className={cardBase}>
         <h3 className={sectionTitle}>{t.goTo}</h3>
         <div className="mt-3 flex flex-wrap gap-2">
-          {t.links.map((link) => (
+          {t.links.filter((link) => canOpen(link.href)).map((link) => (
             <Link
               key={link.href}
               href={link.href}

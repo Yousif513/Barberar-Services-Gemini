@@ -18,7 +18,7 @@ before(async () => {
 describe("M-3: step-up on the remaining Q6 commands", () => {
   const ID = "00000000-0000-4000-8000-0000000000ab";
   const calls = [
-    ["admin_update_data_request", `select admin_update_data_request($1, 'in_progress', 'Identity checked by phone')`, [ID]],
+    ["admin_privacy_refuse_request", `select admin_privacy_refuse_request($1, 'repetitive', 'Answered the same request last week in full')`, [ID]],
     ["admin_save_promo_code", `select admin_save_promo_code('SPRING', 'percentage', 10, 'Spring campaign approved')`, []],
     ["admin_set_promo_code_active", `select admin_set_promo_code_active($1, false, 'Campaign ended early')`, [ID]],
     ["admin_void_sponsored_attribution", `select admin_void_sponsored_attribution($1, 'void', 'Duplicate attribution')`, [ID]],

@@ -117,38 +117,36 @@ describe("customer overview", () => {
   });
 });
 
-describe("data-subject requests", () => {
+describe("privacy requests in the console (PRIV Q1)", () => {
   let request;
-  const act = (user, status, note) => as(db, user, `select admin_update_data_request($1, $2, $3) r`, [request, status, note]);
+  const note = (user, text) => as(db, user, `select admin_privacy_add_note($1, $2) r`, [request, text]);
 
   before(async () => {
-    request = (await sys(db, `insert into data_subject_requests (user_id, request_type, status, due_date)
-                              values ($1, 'export', 'pending', current_date + 20) returning id`, [layla]))[0].id;
+    request = (await sys(db, `insert into privacy_requests (subject_id, request_type, status, received_at, due_at, verified_at)
+                              values ($1, 'copy', 'open', now(), now() + interval '30 days', now()) returning id`, [layla]))[0].id;
   });
 
-  it("are for administrators only and need the operator's own note", async () => {
-    await expectError(act(owner, "in_progress", "Looking into it"), /Administrator access required/);
-    await expectError(act(customerRole, "completed", "Done"), /Administrator access required/);
-    await expectError(act(ROLES.anon, "completed", "Done"), /permission denied/);
-    await expectError(act(admin, "completed", " "), /note of at least 3 characters/);
-    await expectError(act(admin, "pending", "Back to the start"), /started, completed or rejected/);
-    await expectError(as(db, admin, `select admin_update_data_request('00000000-0000-4000-8000-000000000998', 'completed', 'Done')`), /not found/);
-    assert.equal((await sys(db, `select status from data_subject_requests where id = $1`, [request]))[0].status, "pending");
+  it("are worked by console roles holding privacy.manage only, with the operator's own note", async () => {
+    await expectError(note(owner, "Looking into it"), /Administrator access required/);
+    await expectError(note(customerRole, "Done"), /Administrator access required/);
+    await expectError(note(ROLES.anon, "Done"), /permission denied/);
+    await expectError(note(admin, " "), /3 to 1000 characters/);
+    await expectError(as(db, admin, `select admin_privacy_add_note('00000000-0000-4000-8000-000000000998', 'Done')`), /not found/);
+    assert.equal((await sys(db, `select status from privacy_requests where id = $1`, [request]))[0].status, "open");
   });
 
-  it("move through start, complete and reject once, recording who reviewed them and why", async () => {
-    await act(admin, "in_progress", "Identity confirmed by phone, export being prepared");
-    const started = (await sys(db, `select status, admin_notes, reviewed_by, reviewed_at from data_subject_requests where id = $1`, [request]))[0];
-    assert.equal(started.status, "in_progress");
-    assert.equal(started.reviewed_by, admin.sub);
-    assert.ok(started.reviewed_at);
-    await expectError(act(admin, "in_progress", "Again"), /already in_progress/);
-    await act(admin, "completed", "Export sent to the customer on 4 October");
-    await expectError(act(admin, "rejected", "Changed my mind"), /closed/);
-    const audit = (await auditRows("data_subject_requests.update")).filter((r) => r.target_id === request);
-    assert.equal(audit.length, 2);
-    assert.equal(audit.at(-1).details.reason, "Export sent to the customer on 4 October");
-    assert.equal(audit.at(-1).details.changes.status.after, "completed");
+  it("record who refused and why, once, with an audit row", async () => {
+    const refuse = () => as(db, admin, `select admin_privacy_refuse_request($1, 'manifestly_unfounded', 'The customer confirmed by phone it was sent by mistake') r`, [request]);
+    await refuse();
+    const row = (await sys(db, `select status, refusal_code, decided_by, decided_at from privacy_requests where id = $1`, [request]))[0];
+    assert.equal(row.status, "refused");
+    assert.equal(row.refusal_code, "manifestly_unfounded");
+    assert.equal(row.decided_by, admin.sub);
+    assert.ok(row.decided_at);
+    await expectError(refuse(), /can no longer be refused/);
+    const audit = (await auditRows("privacy.request_refused")).filter((r) => r.target_id === request);
+    assert.equal(audit.length, 1);
+    assert.match(audit[0].details.reason, /sent by mistake/);
   });
 });
 

@@ -54,3 +54,19 @@ export async function setPlatformSetting(db, maker, key, value, reason = "Fixtur
   const [done] = await as(db, checker, `select admin_decide_approval($1, 'approve', 'Second owner confirms the setting') r`, [first.r.approval_id]);
   return done.r.result;
 }
+
+// UXFIX: clearing a customer's profile erases what a privacy deletion erases, so it runs only with a different owner's
+// approval (privacy.approve). Fixtures that clear a profile ask as the maker and approve as a second owner created once per
+// database; answers what admin_clear_customer_profile answers when it runs, plus the approval id.
+const profileApprovers = new WeakMap();
+export async function clearProfileWithApproval(db, maker, customerId, reason) {
+  const [first] = await as(db, maker, `select admin_clear_customer_profile($1, $2) r`, [customerId, reason]);
+  if (first.r?.status !== "pending_approval") return first.r;
+  let checker = profileApprovers.get(db);
+  if (!checker) {
+    checker = ROLES.user(await createUser(db, { role: "admin", adminRole: "owner" }));
+    profileApprovers.set(db, checker);
+  }
+  const [done] = await as(db, checker, `select admin_decide_approval($1, 'approve', 'Second owner checked the request') r`, [first.r.approval_id]);
+  return { ...done.r.result, approval_id: first.r.approval_id, approver: checker.sub };
+}

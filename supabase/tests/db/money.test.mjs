@@ -11,13 +11,14 @@ let admin;
 
 // A completed visit that was paid online (deposit captured), created directly for money tests.
 let seq = 0;
-async function paidCompletedBooking({ commission = 20, deposit = 17, price = 100, customerId = SEED.customer } = {}) {
+// scheduledAt pins the visit to a given instant; by default it is 10+ days in the past.
+async function paidCompletedBooking({ commission = 20, deposit = 17, price = 100, customerId = SEED.customer, scheduledAt = null } = {}) {
   seq += 1;
   const b = (await sys(db,
     `insert into bookings (customer_id, branch_id, employee_id, service_id, status, scheduled_at, duration_minutes,
                            subtotal_price, total_price, tax_amount, deposit_required, platform_commission, source, is_first_visit)
-     values ($1, $2, $3, $4, 'confirmed', now() - make_interval(days => $5::int), 30, $6::numeric, $6::numeric, round($6::numeric * 0.15, 2), $7::numeric, $8::numeric, 'marketplace', true)
-     returning *`, [customerId, SEED.branch1, SEED.employee1, svc.id, 10 + seq, price, deposit, commission]))[0];
+     values ($1, $2, $3, $4, 'confirmed', coalesce($9::timestamptz, now() - make_interval(days => $5::int)), 30, $6::numeric, $6::numeric, round($6::numeric * 0.15, 2), $7::numeric, $8::numeric, 'marketplace', true)
+     returning *`, [customerId, SEED.branch1, SEED.employee1, svc.id, 10 + seq, price, deposit, commission, scheduledAt]))[0];
   await sys(db, `insert into transactional_ledger (booking_id, provider_id, entry_type, payment_intent_id, total_captured, platform_share, provider_share, payout_status)
                  values ($1, $2, 'booking_payment', $3, $4::numeric, least($5::numeric, $4::numeric), $4::numeric - least($5::numeric, $4::numeric), 'pending')`,
     [b.id, SEED.provider1, `chg_money_${seq}`, deposit, commission]);
@@ -128,8 +129,16 @@ describe("refunds, payouts and reports", () => {
   });
 
   it("invoices the fee still owed after what the deposit already covered", async () => {
-    const b = await paidCompletedBooking({ commission: 20, deposit: 17, price: 100 });
-    const month = new Date(b.scheduled_at).toISOString().slice(0, 10);
+    // A fee invoice is issued only for a closed Riyadh month. The visit is pinned to the middle of the previous Riyadh month
+    // (read from the database clock), so the test means the same thing on the 1st and on the 30th of any month.
+    const { visit_at: visitAt, month } = (await sys(db,
+      `select ((date_trunc('month', now() at time zone 'Asia/Riyadh') - interval '15 days' + interval '12 hours') at time zone 'Asia/Riyadh') as visit_at,
+              to_char(date_trunc('month', now() at time zone 'Asia/Riyadh') - interval '15 days', 'YYYY-MM-DD') as month`))[0];
+    const b = await paidCompletedBooking({ commission: 20, deposit: 17, price: 100, scheduledAt: visitAt });
+    assert.equal(new Date(b.scheduled_at).getTime(), new Date(visitAt).getTime());
+    // The month that is still open is refused, whatever day of it today is.
+    const today = (await sys(db, `select to_char(now() at time zone 'Asia/Riyadh', 'YYYY-MM-DD') d`))[0].d;
+    await expectError(as(db, admin, `select generate_provider_monthly_fee_invoice($1, $2::date)`, [SEED.provider1, today]), /closed month/);
     const inv = (await as(db, admin, `select generate_provider_monthly_fee_invoice($1, $2::date) r`, [SEED.provider1, month]))[0].r;
     assert.ok(Number(inv.commission_sar) >= 20);
     assert.ok(Number(inv.already_collected_sar) >= 17);

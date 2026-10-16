@@ -15,13 +15,17 @@ import { GovernanceNotices } from "./governance-notices";
 // Break-glass (owner alone, no second eligible administrator) needs a 20-character justification, stays under the daily cap and
 // opens an independent review due within 7 days, which is signed off below.
 
+// Kinds whose approval moves or holds money, where the balance, hold and duplicate checks run again.
+const MONEY_KINDS: string[] = ["payout_release", "refund", "ledger_settlement", "ledger_adjustment", "payout_hold", "booking_cancellation", "reconciliation_import"];
 const PAGE_SIZE = 25;
 const STATUSES = ["pending", "approved", "rejected", "cancelled"] as const;
 type Status = (typeof STATUSES)[number];
 type Numeric = number | string | null;
 type ApprovalRow = {
   id: string;
-  kind: "payout_release" | "refund" | "iban_change" | "setting_change" | "ledger_settlement" | "ledger_adjustment" | "fee_rule_change" | "payout_hold" | "reward_program" | "role_change" | "booking_cancellation" | "reconciliation_import" | "sponsored_price_change";
+  kind: "payout_release" | "refund" | "iban_change" | "setting_change" | "ledger_settlement" | "ledger_adjustment" | "fee_rule_change" | "payout_hold" | "reward_program" | "role_change" | "booking_cancellation" | "reconciliation_import" | "sponsored_price_change"
+    | "privacy_export" | "privacy_deletion" | "privacy_legal_hold" | "customer_profile_clear"
+    | "privacy_legal_hold_release" | "privacy_legal_hold_renewal" | "incident_aware_at_correction" | "privacy_retention_purge";
   status: string;
   target_id: string | null;
   amount_sar: Numeric;
@@ -43,6 +47,8 @@ type ApprovalRow = {
   target_name?: string | null;
   decide_blocked_reason?: string | null;
   break_glass_blocked_until?: string | null;
+  // F1: the active legal hold on the account of a pending profile clear; approving it is refused while it lasts.
+  legal_hold?: { hold_id: string; basis: string; case_reference: string; review_due_at: string | null } | null;
 };
 type Review = { id: string; approval_request_id: string; amount_sar: Numeric; justification: string; executed_at: string; due_at: string; signed_off_at: string | null; reviewer_name: string | null; document_reference: string | null; overdue: boolean; can_sign_off?: boolean };
 type Setting = { key: string; value: Numeric; description_en: string; description_ar: string; updated_at: string };
@@ -78,7 +84,24 @@ const translations = {
       ledger_settlement: "Manual ledger settlement", ledger_adjustment: "Ledger correction", fee_rule_change: "Fee rule change",
       payout_hold: "Payout hold", reward_program: "Reward programme change", role_change: "Console role grant",
       booking_cancellation: "Booking cancellation with refund", reconciliation_import: "Reconciliation file import",
-      sponsored_price_change: "Sponsored price per new client" },
+      sponsored_price_change: "Sponsored price per new client",
+      privacy_export: "Release of a customer's data copy", privacy_deletion: "Customer data deletion", privacy_legal_hold: "Legal hold on customer data",
+      customer_profile_clear: "Clearing a customer's profile details",
+      privacy_legal_hold_release: "Early release of a legal hold (erases what it kept)",
+      privacy_legal_hold_renewal: "Renewal of a legal hold kept for over a year",
+      incident_aware_at_correction: "Correction of an incident's awareness time (moves the SDAIA deadline)",
+      privacy_retention_purge: "Retention purge of erased customers' records (irreversible)" },
+    holdRenewals: "renewed {n} times",
+    customerErased: "customer already erased",
+    accountHeld: "account held",
+    deadlineMove: "SDAIA deadline {from} → {to} ({h} h)",
+    purgePreview: "dry run on {date}: {s} sub-records and {d} bookings deleted, {a} bookings kept anonymous; the approved run counts again",
+    profileClearEffect: "removes name, e-mail, phone, gender and push token; keeps sign-in, bookings, invoices and messages",
+    profileClearHeld: "legal hold {ref} keeps this account: approving is refused until the hold is released; reject the request instead",
+    approveIntroChange: "Approving applies the change now, in your name, with the checks the change has. It needs a fresh authenticator code.",
+    privacyTypes: { access: "access", copy: "copy", deletion: "deletion" } as Record<string, string>,
+    privacyPreview: "{p} bookings pseudonymised, {d} deleted, {m} messages, {h} health answers",
+    privacyFollowUp: "Approved. The next step did not run yet ({reason}); open Privacy Requests to run it again.",
     consoleRoles: { owner: "Owner", finance: "Finance", operations: "Operations", analyst: "Analyst (read-only)" } as Record<string, string>,
     noConsoleRole: "No console role",
     breakGlassClosedUntil: "Break-glass closed until {date}: an administrator who could approve this was demoted or removed",
@@ -168,6 +191,7 @@ const translations = {
       health_break_glass: "Health-intake answers opened through break-glass",
       mfa_factor_added: "Authenticator added to an administrator account",
       iban_reveal_limit_reached: "IBAN reveal ceiling reached (20 in 24 hours)",
+      privacy_lookup_limit_reached: "Customer lookup limit reached (10 searches in 10 minutes)",
     } as Record<string, string>,
     liftReveals: "Allow 10 more reveals",
     liftTitle: "Allow this administrator 10 more IBAN reveals today",
@@ -193,13 +217,30 @@ const translations = {
       ledger_settlement: "تسوية قيد يدوية", ledger_adjustment: "تصحيح قيد", fee_rule_change: "تغيير قاعدة رسوم",
       payout_hold: "إيقاف التحويلات", reward_program: "تغيير برنامج مكافآت", role_change: "منح دور في لوحة الإدارة",
       booking_cancellation: "إلغاء حجز مع استرداد", reconciliation_import: "استيراد ملف تسوية",
-      sponsored_price_change: "سعر الإعلان لكل عميل جديد" },
+      sponsored_price_change: "سعر الإعلان لكل عميل جديد",
+      privacy_export: "تسليم نسخة من بيانات عميل", privacy_deletion: "حذف بيانات عميل", privacy_legal_hold: "حجز قانوني على بيانات عميل",
+      customer_profile_clear: "مسح بيانات الملف الشخصي لعميل",
+      privacy_legal_hold_release: "رفع حجز قانوني قبل موعده (يحذف ما احتفظ به)",
+      privacy_legal_hold_renewal: "تجديد حجز قانوني مضى عليه أكثر من سنة",
+      incident_aware_at_correction: "تصحيح وقت العلم بحادثة (يغيّر مهلة سدايا)",
+      privacy_retention_purge: "حذف سجلات العملاء المحذوفين بعد انتهاء مدة الاحتفاظ (لا يمكن التراجع عنه)" },
+    holdRenewals: "جُدد {n} مرات",
+    customerErased: "حُذف حساب العميل",
+    accountHeld: "الحساب محتجز",
+    deadlineMove: "مهلة سدايا {from} ← {to} ({h} ساعة)",
+    purgePreview: "تجربة بتاريخ {date}: حذف {s} سجلاً فرعياً و{d} حجزاً، والإبقاء على {a} حجزاً دون هوية؛ يُعاد العدّ عند التنفيذ المعتمد",
+    profileClearEffect: "يحذف الاسم والبريد والهاتف والجنس ورمز الإشعارات؛ ويُبقي تسجيل الدخول والحجوزات والفواتير والرسائل",
+    profileClearHeld: "الحجز القانوني {ref} يحتفظ بهذا الحساب: يُرفض الاعتماد حتى يُرفع الحجز؛ ارفض الطلب بدلاً من ذلك",
+    approveIntroChange: "الاعتماد يطبّق التغيير الآن باسمك مع فحوصاته. يحتاج رمزاً جديداً من تطبيق المصادقة.",
+    privacyTypes: { access: "اطلاع", copy: "نسخة", deletion: "حذف" } as Record<string, string>,
+    privacyPreview: "{p} حجوزات بلا هوية، {d} محذوفة، {m} رسائل، {h} إجابات صحية",
+    privacyFollowUp: "تم الاعتماد. لم تُنفَّذ الخطوة التالية بعد ({reason})؛ افتح طلبات الخصوصية لإعادة تشغيلها.",
     consoleRoles: { owner: "المالك", finance: "المالية", operations: "العمليات", analyst: "محلل (قراءة فقط)" } as Record<string, string>,
     noConsoleRole: "بلا دور في لوحة الإدارة",
     breakGlassClosedUntil: "إجراء الطوارئ مغلق حتى {date}: خُفّض دور مسؤول كان يمكنه الاعتماد أو أُزيل",
     ownAlert: "يتعلق بك أو بإجراء قمت به: يقرّ به مالك آخر",
     ownBreakGlass: "أنت من استخدم إجراء الطوارئ: يسجّل المراجعةَ مسؤول آخر",
-    describeParts: { increase: "زيادة، إشعار 30 يوماً", from: "من", place: "إيقاف", lift: "رفع الإيقاف", enable: "تفعيل", disable: "إيقاف",
+    describeParts: { increase: "زيادة، إشعار ٣٠ يوماً", from: "من", place: "إيقاف", lift: "رفع الإيقاف", enable: "تفعيل", disable: "إيقاف",
       reference: "المرجع البنكي", provider: "المزود", platform: "المنصة", tap: "معرّف Tap",
       cancelBooking: "إلغاء الحجز", noShowBooking: "عدم حضور", invoice: "الفاتورة", refund: "الاسترداد",
       sources: { tap_settlement_file: "ملف تسويات Tap", bank_statement: "كشف الحساب البنكي" } as Record<string, string>,
@@ -218,7 +259,7 @@ const translations = {
     selectAll: "تحديد كل الطلبات التي يمكنك اعتمادها",
     yours: "طلبك: يقرره مسؤول آخر",
     noRight: "دورك في لوحة الإدارة لا يسمح بالبت في هذا النوع",
-    accountChangedRecently: "تغيّر الحساب البنكي خلال آخر 30 يوماً",
+    accountChangedRecently: "تغيّر الحساب البنكي خلال آخر ٣٠ يوماً",
     provider: "المزود",
     account: "الحساب",
     previousAccount: "الحساب السابق",
@@ -248,8 +289,8 @@ const translations = {
     cancelTitle: "سحب طلبك",
     cancelReason: "لماذا تسحبه؟",
     breakGlassTitle: "إجراء الطوارئ: التنفيذ دون مسؤول ثانٍ",
-    breakGlassIntro: "استخدمه فقط عند عدم وجود مسؤول آخر يمكنه الاعتماد. الحد {cap} في اليوم بتوقيت الرياض (استُخدم اليوم {used})، ويُبلَّغ كل مالك عبر قناة خارجية، ويُرفع تنبيه أمني، ويجب مراجعته مراجعة مستقلة خلال 7 أيام. لا يتاح أبداً للحسابات البنكية أو الحدود.",
-    breakGlassReason: "مبرر مكتوب (20 حرفاً على الأقل)",
+    breakGlassIntro: "استخدمه فقط عند عدم وجود مسؤول آخر يمكنه الاعتماد. الحد {cap} في اليوم بتوقيت الرياض (استُخدم اليوم {used})، ويُبلَّغ كل مالك عبر قناة خارجية، ويُرفع تنبيه أمني، ويجب مراجعته مراجعة مستقلة خلال ٧ أيام. لا يتاح أبداً للحسابات البنكية أو الحدود.",
+    breakGlassReason: "مبرر مكتوب (٢٠ حرفاً على الأقل)",
     reviewsTitle: "مراجعات إجراءات الطوارئ",
     reviewsEmpty: "لا يوجد إجراء طوارئ يحتاج مراجعة.",
     reviewDue: "موعد المراجعة {date}",
@@ -260,34 +301,35 @@ const translations = {
     reviewIntro: "يراجع الإجراءَ المحاسبُ الخارجي أو شخص مسمّى ليس مسؤولاً في اللوحة. سجّل اسمه ومرجع مستند المراجعة.",
     reviewName: "اسم المراجع",
     reviewRef: "مرجع مستند المراجعة",
-    reviewRefError: "أدخل مرجع المستند (3 أحرف على الأقل).",
+    reviewRefError: "أدخل مرجع المستند (٣ أحرف على الأقل).",
     settingsTitle: "الحدود",
     settingsIntro: "تغيير أي حد هو نفسه طلب يعتمده مسؤول آخر لديه صلاحيات مالية.",
     propose: "اقتراح تغيير",
     settingTitle: "اقتراح قيمة جديدة",
     settingValue: "القيمة الجديدة بالريال",
     settingValueError: "أدخل مبلغاً موجباً.",
-    settingReason: "لماذا يجب تغييره؟ (10 أحرف على الأقل)",
+    settingReason: "لماذا يجب تغييره؟ (١٠ أحرف على الأقل)",
     alertsTitle: "تنبيهات أمنية مفتوحة",
     alertsEmpty: "لا يوجد تنبيه أمني مفتوح.",
     acknowledge: "إقرار",
     alertTitle: "الإقرار بهذا التنبيه",
-    alertReason: "ما الذي تم التحقق منه؟ (10 أحرف على الأقل)",
+    alertReason: "ما الذي تم التحقق منه؟ (١٠ أحرف على الأقل)",
     alertKinds: {
-      mfa_lockout: "قفل حساب بعد 10 رموز مصادقة خاطئة",
+      mfa_lockout: "قفل حساب بعد ١٠ رموز مصادقة خاطئة",
       mfa_reset: "إعادة ضبط التحقق بخطوتين",
-      iban_reveal_volume: "أكثر من 10 عمليات كشف آيبان خلال 24 ساعة",
+      iban_reveal_volume: "أكثر من ١٠ عمليات كشف آيبان خلال ٢٤ ساعة",
       break_glass_used: "استُخدم إجراء الطوارئ",
       console_role_changed: "تغيّر دور في لوحة الإدارة",
       iban_change_requested: "طلب تغيير الحساب البنكي لمزود",
       health_break_glass: "فُتحت إجابات الاستبيان الصحي عبر إجراء الطوارئ",
       mfa_factor_added: "أُضيف تطبيق مصادقة إلى حساب مسؤول",
-      iban_reveal_limit_reached: "بلوغ الحد الأعلى لكشف الآيبان (20 خلال 24 ساعة)",
+      iban_reveal_limit_reached: "بلوغ الحد الأعلى لكشف الآيبان (٢٠ خلال ٢٤ ساعة)",
+      privacy_lookup_limit_reached: "بلوغ حد البحث عن العملاء (١٠ عمليات بحث خلال ١٠ دقائق)",
     } as Record<string, string>,
-    liftReveals: "السماح بـ 10 عمليات كشف إضافية",
-    liftTitle: "السماح لهذا المسؤول بـ 10 عمليات كشف آيبان إضافية اليوم",
-    liftIntro: "يتوقف كشف الآيبان عند 20 مرة خلال 24 ساعة. السماح بالمزيد يُسجَّل باسمك ويحتاج رمزاً جديداً من تطبيق المصادقة. لا يمكنك السماح بالمزيد لنفسك.",
-    liftReason: "لماذا تلزم عمليات كشف إضافية؟ (15 حرفاً على الأقل)",
+    liftReveals: "السماح بـ ١٠ عمليات كشف إضافية",
+    liftTitle: "السماح لهذا المسؤول بـ ١٠ عمليات كشف آيبان إضافية اليوم",
+    liftIntro: "يتوقف كشف الآيبان عند ٢٠ مرة خلال ٢٤ ساعة. السماح بالمزيد يُسجَّل باسمك ويحتاج رمزاً جديداً من تطبيق المصادقة. لا يمكنك السماح بالمزيد لنفسك.",
+    liftReason: "لماذا تلزم عمليات كشف إضافية؟ (١٥ حرفاً على الأقل)",
     settingNames: {
       refund_single_approval_sar: "استرداد واحد يحتاج معتمداً ثانياً",
       refund_daily_cumulative_sar: "إجمالي الاسترداد اليومي لكل مسؤول",
@@ -391,6 +433,35 @@ function ApprovalsScreen() {
     if (row.kind === "payout_hold") {
       return [providerName(row), s.action === "lift" ? d.lift : d.place].filter(Boolean).join(" · ");
     }
+    if (row.kind === "privacy_export" || row.kind === "privacy_deletion") {
+      const p = (s.preview ?? {}) as Record<string, unknown>;
+      return [t.privacyTypes[text(s.request_type)] ?? text(s.request_type), `${text(s.subject_id).slice(0, 8)}`,
+        row.kind === "privacy_deletion" ? t.privacyPreview.replace("{p}", text(p.bookings_to_pseudonymise)).replace("{d}", text(p.bookings_to_delete))
+          .replace("{m}", text(p.messages)).replace("{h}", text(p.health_answers)) : "",
+        s.deadline_at ? operationsDate(text(s.deadline_at), lang) : ""].filter(Boolean).join(" · ");
+    }
+    if (row.kind === "customer_profile_clear") {
+      return [`${text(row.target_id).slice(0, 8)}`, t.profileClearEffect,
+        row.legal_hold ? t.profileClearHeld.replace("{ref}", text(row.legal_hold.case_reference)) : ""].filter(Boolean).join(" · ");
+    }
+    if (row.kind === "privacy_legal_hold_release" || row.kind === "privacy_legal_hold_renewal") {
+      const cats = Array.isArray(s.categories) ? (s.categories as string[]).join(", ") : "";
+      return [text(s.basis).replace("_", " "), text(s.case_reference), cats, s.account_held ? t.accountHeld : "",
+        s.customer_erased ? t.customerErased : "", t.holdRenewals.replace("{n}", text(s.renewals))].filter(Boolean).join(" · ");
+    }
+    if (row.kind === "privacy_retention_purge") {
+      const subRecords = Object.values((s.sub_records ?? {}) as Record<string, unknown>).reduce<number>((sum, n) => sum + toNumber(n as Numeric), 0);
+      return t.purgePreview.replace("{date}", text(s.cutoff)).replace("{s}", String(subRecords))
+        .replace("{d}", text(s.bookings_deleted)).replace("{a}", text(s.bookings_anonymised));
+    }
+    if (row.kind === "incident_aware_at_correction") {
+      return [text(s.reference), t.deadlineMove.replace("{from}", s.deadline_from ? operationsDate(text(s.deadline_from), lang) : "—")
+        .replace("{to}", s.deadline_to ? operationsDate(text(s.deadline_to), lang) : "—").replace("{h}", text(s.moves_deadline_hours))].join(" · ");
+    }
+    if (row.kind === "privacy_legal_hold") {
+      const cats = Array.isArray(s.categories) ? (s.categories as string[]).join(", ") : "";
+      return [text(s.basis).replace("_", " "), text(s.case_reference), cats].filter(Boolean).join(" · ");
+    }
     if (row.kind === "sponsored_price_change") {
       const price = (value: unknown) => (value === null || value === undefined ? "—" : sar(toNumber(value as Numeric), lang));
       return `${price(s.value_before)} → ${price(s.value)}`;
@@ -416,7 +487,15 @@ function ApprovalsScreen() {
 
   const decide = async (row: ApprovalRow, decision: "approve" | "reject", reason: string): Promise<string | null> => {
     const { error } = await supabase.rpc("admin_decide_approval", { p_request_id: row.id, p_decision: decision, p_reason: reason });
-    return error ? errorMessage(error) : null;
+    if (error) return errorMessage(error);
+    // PRIV: an approved copy is built and an approved deletion's auth account removed right away by the Edge Functions (the
+    // scheduler retries them too). A failure here leaves the approval done and the next step visible on the privacy screen.
+    if (decision === "approve" && (row.kind === "privacy_export" || row.kind === "privacy_deletion")) {
+      const { error: followUp } = await supabase.functions.invoke(row.kind === "privacy_export" ? "privacy-export" : "privacy-erase-account",
+        { body: row.kind === "privacy_export" ? { request_id: row.target_id } : {} });
+      if (followUp) setFailure(t.privacyFollowUp.replace("{reason}", errorMessage(followUp)));
+    }
+    return null;
   };
 
   const confirmDialog = async (reason: string, extra: string): Promise<string | null> => {
@@ -479,7 +558,10 @@ function ApprovalsScreen() {
       case "decide":
         return {
           title: fill(dialog.decision === "approve" ? t.approveTitle : t.rejectTitle, { kind: kindLabel(dialog.row) }),
-          intro: dialog.decision === "approve" ? t.approveIntro : t.rejectIntro,
+          // The balance, hold and duplicate checks belong to money actions; a setting, role or privacy change has its own checks.
+          intro: dialog.decision === "approve"
+            ? (MONEY_KINDS.includes(dialog.row.kind) ? t.approveIntro : t.approveIntroChange)
+            : t.rejectIntro,
           facts: [
             { label: t.columnRequest, value: describe(dialog.row) || kindLabel(dialog.row) },
             ...(dialog.row.amount_sar !== null ? [{ label: t.columnAmount, value: sar(toNumber(dialog.row.amount_sar), lang) }] : []),
@@ -529,7 +611,7 @@ function ApprovalsScreen() {
           title: t.settingTitle,
           intro: t.settingsIntro,
           facts: [{ label: t.setting, value: t.settingNames[dialog.setting.key] ?? dialog.setting.key }, { label: t.from, value: sar(toNumber(dialog.setting.value), lang) }],
-          field: { label: t.settingValue, pattern: /^[0-9]+(\.[0-9]{1,2})?$/, error: t.settingValueError, ltr: true },
+          field: { label: t.settingValue, pattern: /^[0-9]+(\.[0-9]{1,2})?$/, error: t.settingValueError, ltr: true, inputMode: "decimal" as const },
           reasonLabel: t.settingReason,
           minReasonLength: 10,
           confirmLabel: t.propose,
@@ -544,7 +626,7 @@ function ApprovalsScreen() {
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className="space-y-6 text-start">
       <div>
-        <h2 className="font-serif text-2xl font-black text-gray-900">{t.title}</h2>
+        <h1 className="font-serif text-2xl font-black text-gray-900">{t.title}</h1>
         <p className="mt-1 max-w-3xl text-xs font-semibold text-gray-500">{t.subtitle}</p>
       </div>
 

@@ -4,6 +4,7 @@ import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
+import { errorHint } from "@/lib/step-up";
 import { CommandResult, ForbiddenNotice, isForbidden, operationsDate, operationsInput, sar, useOperationsLocale } from "@/components/operations-ui";
 import { CommandDialog } from "@/components/modal";
 import { writeUrlState } from "@/lib/url-state";
@@ -33,25 +34,25 @@ type CustomerRow = {
   spend: Numeric;
 };
 type Overview = { total_customers: Numeric; verified_customers: Numeric; matching: Numeric; rows: CustomerRow[] };
-type RequestStatus = "pending" | "in_progress" | "completed" | "rejected";
+// PRIV-1: privacy requests are worked on /admin/privacy; this tab lists them and links there.
 type DataRequest = {
   id: string;
-  user_id: string;
+  subject_id: string;
   request_type: string;
-  status: RequestStatus;
+  status: string;
   details: string | null;
-  due_date: string | null;
-  admin_notes: string | null;
-  reviewed_at: string | null;
-  created_at: string;
-  profiles: { first_name: string | null; last_name: string | null } | null;
+  deadline_at: string;
+  escalation: string | null;
+  decision_reason: string | null;
+  completed_at: string | null;
+  received_at: string;
+  subject: { first_name: string | null; last_name: string | null } | null;
 };
 type Consent = { id: string; user_id: string; purpose: string; status: string; document_version: string; method: string; created_at: string };
 type Notice = { error?: string; success?: string };
 type Pending =
   | { kind: "phone"; customer: CustomerRow; next: boolean }
-  | { kind: "clear"; customer: CustomerRow }
-  | { kind: "request"; request: DataRequest; status: "in_progress" | "completed" | "rejected" };
+  | { kind: "clear"; customer: CustomerRow };
 
 const translations = {
   en: {
@@ -88,14 +89,16 @@ const translations = {
     verifyDone: "Phone number marked as verified.",
     revokeDone: "Verified mark removed.",
     clearTitle: "Clear this customer's profile details",
-    clearIntro: "The console cannot restore these details afterwards. Check the name and ID below belong to the customer you mean.",
+    clearIntro: "Clearing a profile erases what a privacy deletion erases, so it needs a different owner's approval: this records the request, and a second owner approves it on Approvals. The console cannot restore these details afterwards. Check the name and ID below belong to the customer you mean.",
     clearEffectsTitle: "What happens",
     clearEffects: [
       "Removed: name, email, phone number, gender and push token.",
       "Kept: sign-in identity, bookings, invoices and messages.",
-      "The audit log records who cleared the profile and why, but not the values that were removed.",
+      "The audit log records who asked, who approved and why, but not the values that were removed.",
     ],
-    clearConfirm: "Clear profile details",
+    clearConfirm: "Ask a second owner to approve",
+    clearRequested: "Recorded for approval. Nothing is cleared until a different owner approves it on Approvals.",
+    clearHeld: "A legal hold keeps this customer's account, so the profile cannot be cleared. Nothing was changed; the hold must be released first on Privacy Requests.",
     clearDone: "Profile details cleared. Sign-in identity, bookings, invoices and messages were not changed.",
     factCustomer: "Customer",
     factEmail: "Email",
@@ -132,8 +135,9 @@ const translations = {
     dsrNotes: "Operator note",
     emptyDsr: "No data requests have been filed.",
     overdue: "Overdue",
-    requestTypes: { access: "Access", rectification: "Rectification", erasure: "Erasure", export: "Data export" } as Record<string, string>,
-    requestStatuses: { pending: "Pending", in_progress: "In progress", completed: "Completed", rejected: "Rejected" } as Record<string, string>,
+    requestTypes: { access: "Access", copy: "Copy", correction: "Correction", deletion: "Deletion", consent_withdrawal: "Consent withdrawal" } as Record<string, string>,
+    requestStatuses: { awaiting_verification: "Waiting for the customer to confirm", open: "Open", awaiting_approval: "Waiting for approval", executing: "Being carried out", completed: "Completed", refused: "Refused", withdrawn: "Withdrawn" } as Record<string, string>,
+    workInPrivacy: "Work it in Privacy Requests",
     actionStart: "Start work",
     actionComplete: "Mark completed",
     actionReject: "Refuse request",
@@ -184,14 +188,16 @@ const translations = {
     verifyDone: "تم توثيق رقم الهاتف.",
     revokeDone: "تمت إزالة التوثيق.",
     clearTitle: "مسح بيانات الملف الشخصي لهذا العميل",
-    clearIntro: "لا تستطيع لوحة الإدارة استرجاع هذه البيانات بعد المسح. تأكد من أن الاسم والمعرّف أدناه يعودان للعميل المقصود.",
+    clearIntro: "مسح الملف الشخصي يحذف ما يحذفه طلب حذف البيانات الشخصية، لذا يحتاج اعتماد مالك آخر: يُسجَّل الطلب هنا ويعتمده مالك ثانٍ من شاشة الاعتمادات. لا تستطيع لوحة الإدارة استرجاع هذه البيانات بعد المسح. تأكد من أن الاسم والمعرّف أدناه يعودان للعميل المقصود.",
     clearEffectsTitle: "ما الذي سيحدث",
     clearEffects: [
       "يُحذف: الاسم والبريد ورقم الهاتف والجنس ورمز الإشعارات.",
       "يبقى: هوية تسجيل الدخول والحجوزات والفواتير والرسائل.",
-      "يسجّل سجل التدقيق من مسح الملف الشخصي وسببه، دون القيم المحذوفة.",
+      "يسجّل سجل التدقيق من طلب المسح ومن اعتمده والسبب، دون القيم المحذوفة.",
     ],
-    clearConfirm: "مسح بيانات الملف الشخصي",
+    clearConfirm: "طلب اعتماد مالك ثانٍ",
+    clearRequested: "سُجّل الطلب للاعتماد. لا يُمسح شيء قبل أن يعتمده مالك آخر من شاشة الاعتمادات.",
+    clearHeld: "يوجد حجز قانوني على حساب هذا العميل، فلا يمكن مسح ملفه الشخصي. لم يتغير شيء؛ يجب رفع الحجز أولاً من شاشة طلبات الخصوصية.",
     clearDone: "تم مسح بيانات الملف الشخصي. لم تتغير هوية تسجيل الدخول أو الحجوزات أو الفواتير أو الرسائل.",
     factCustomer: "العميل",
     factEmail: "البريد الإلكتروني",
@@ -218,7 +224,7 @@ const translations = {
     previous: "السابق",
     next: "التالي",
     dsrTitle: "طلبات أصحاب البيانات",
-    dsrNote: "نظام حماية البيانات الشخصية: يجب الرد خلال 30 يوماً من تقديم الطلب. تظهر الطلبات المفتوحة أولاً بحسب أقرب موعد.",
+    dsrNote: "نظام حماية البيانات الشخصية: يجب الرد خلال ٣٠ يوماً من تقديم الطلب. تظهر الطلبات المفتوحة أولاً بحسب أقرب موعد.",
     dsrTruncated: "عرض أول {n} من الطلبات المفتوحة.",
     dsrType: "الطلب",
     dsrCustomer: "العميل",
@@ -228,8 +234,9 @@ const translations = {
     dsrNotes: "ملاحظة المشرف",
     emptyDsr: "لم يُقدَّم أي طلب بيانات.",
     overdue: "متأخر",
-    requestTypes: { access: "الاطلاع", rectification: "التصحيح", erasure: "المحو", export: "تصدير البيانات" } as Record<string, string>,
-    requestStatuses: { pending: "قيد الانتظار", in_progress: "قيد المعالجة", completed: "مكتمل", rejected: "مرفوض" } as Record<string, string>,
+    requestTypes: { access: "الاطلاع", copy: "نسخة", correction: "التصحيح", deletion: "الحذف", consent_withdrawal: "سحب موافقة" } as Record<string, string>,
+    requestStatuses: { awaiting_verification: "بانتظار تأكيد العميل", open: "مفتوح", awaiting_approval: "بانتظار الاعتماد", executing: "قيد التنفيذ", completed: "مكتمل", refused: "مرفوض", withdrawn: "مسحوب" } as Record<string, string>,
+    workInPrivacy: "المعالجة في طلبات الخصوصية",
     actionStart: "بدء العمل",
     actionComplete: "تسجيل كمكتمل",
     actionReject: "رفض الطلب",
@@ -251,8 +258,6 @@ const translations = {
 const fill = (template: string, values: Record<string, string | number>) =>
   Object.entries(values).reduce((text, [key, value]) => text.replace(`{${key}}`, String(value)), template);
 const toNumber = (value: Numeric | undefined) => Number(value ?? 0);
-// Characters that carry meaning in the search box are sent as typed; the server treats them as plain text.
-const riyadhToday = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Riyadh" }).format(new Date());
 
 // The view and the search term are kept in the address bar (?tab=requests&q=...), so a dashboard link, a bookmark or a
 // pasted link opens the same list.
@@ -334,8 +339,8 @@ function CustomersScreen() {
     void (async () => {
       // GOV-2 (Q4): data requests and consents are read through audited, paged functions; each read is recorded with its purpose.
       const [open, closed, consentResult] = await Promise.all([
-        supabase.rpc("admin_list_data_requests", { p_state: "open", p_limit: OPEN_REQUEST_LIMIT, p_offset: 0, p_purpose: "privacy_request" }),
-        supabase.rpc("admin_list_data_requests", { p_state: "closed", p_limit: CLOSED_REQUEST_LIMIT, p_offset: 0, p_purpose: "privacy_request" }),
+        supabase.rpc("admin_privacy_list_requests", { p_state: "open", p_limit: OPEN_REQUEST_LIMIT, p_offset: 0, p_purpose: "privacy_request" }),
+        supabase.rpc("admin_privacy_list_requests", { p_state: "closed", p_limit: CLOSED_REQUEST_LIMIT, p_offset: 0, p_purpose: "privacy_request" }),
         supabase.rpc("admin_list_consents", { p_user_id: null, p_limit: CONSENT_LIMIT, p_offset: 0, p_purpose: "privacy_request" }),
       ]);
       if (cancelled) return;
@@ -367,10 +372,13 @@ function CustomersScreen() {
 
   // Runs one operator command. A refusal is handed back to the dialog (which stays open and keeps what was typed);
   // a success is announced where the operator is looking and the list is read again.
-  const execute = async (command: PromiseLike<{ error: unknown }>, success: string): Promise<string | null> => {
-    const { error } = await command;
-    if (error) return errorMessage(error);
-    setNotice({ success });
+  const execute = async (command: PromiseLike<{ data?: unknown; error: unknown }>, success: string, pendingMessage?: string): Promise<string | null> => {
+    const { data, error } = await command;
+    // F1: a court hold on the account refuses the clear on the server; say so in the screen's language.
+    if (error) return errorHint(error) === "legal_hold_active" ? t.clearHeld : errorMessage(error);
+    // A command that needs a second administrator answers pending_approval: it was recorded, not carried out.
+    const status = (data as { status?: string } | null)?.status;
+    setNotice({ success: status === "pending_approval" && pendingMessage ? pendingMessage : success });
     setReloadKey((key) => key + 1);
     return null;
   };
@@ -386,7 +394,6 @@ function CustomersScreen() {
   const rows = overview?.rows ?? [];
   const matching = toNumber(overview?.matching);
   const pages = Math.max(1, Math.ceil(matching / PAGE_SIZE));
-  const today = riyadhToday();
   const cardBase = "rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]";
   const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928]";
   const cell = "px-4 py-3 align-top";
@@ -437,29 +444,12 @@ function CustomersScreen() {
           reasonLabel={t.reasonLabel}
           confirmWord={customer.id.slice(0, 8)}
           confirmLabel={t.clearConfirm}
-          onConfirm={(why) => execute(supabase.rpc("admin_clear_customer_profile", { p_customer_id: customer.id, p_reason: why }), t.clearDone)}
+          onConfirm={(why) => execute(supabase.rpc("admin_clear_customer_profile", { p_customer_id: customer.id, p_reason: why }), t.clearDone, t.clearRequested)}
           onClose={close}
         />
       );
     }
-    const { request, status } = pending;
-    return (
-      <CommandDialog
-        locale={lang}
-        tone={status === "rejected" ? "danger" : "default"}
-        title={status === "in_progress" ? t.requestStartTitle : status === "completed" ? t.requestCompleteTitle : t.requestRejectTitle}
-        intro={status === "rejected" ? t.requestRejectIntro : undefined}
-        facts={[
-          { label: t.factRequest, value: t.requestTypes[request.request_type] ?? request.request_type },
-          { label: t.factCustomer, value: `${personName(request.profiles) || "—"} (${request.user_id.slice(0, 8)})` },
-          { label: t.factRespondBy, value: request.due_date ? String(request.due_date).slice(0, 10) : "—" },
-        ]}
-        reasonLabel={t.noteLabel}
-        confirmLabel={status === "in_progress" ? t.actionStart : status === "completed" ? t.actionComplete : t.actionReject}
-        onConfirm={(note) => execute(supabase.rpc("admin_update_data_request", { p_request_id: request.id, p_status: status, p_note: note }), t.noteDone)}
-        onClose={close}
-      />
-    );
+    return null;
   };
 
   return (
@@ -608,40 +598,32 @@ function CustomersScreen() {
                       <tr><td colSpan={7} className="py-8 text-center font-bold text-gray-400">{t.emptyDsr}</td></tr>
                     ) : (
                       requests.map((request) => {
-                        const open = request.status === "pending" || request.status === "in_progress";
-                        const late = open && Boolean(request.due_date) && String(request.due_date) < today;
+                        const open = ["awaiting_verification", "open", "awaiting_approval", "executing"].includes(request.status);
+                        const late = open && request.escalation === "overdue";
                         return (
                           <tr key={request.id}>
                             <td className={`${cell} font-bold text-stone-900`}>{t.requestTypes[request.request_type] ?? request.request_type}</td>
                             <td className={cell}>
-                              <div className="font-bold text-gray-900">{personName(request.profiles) || "—"}</div>
-                              <div dir="ltr" className="text-start font-mono text-[11px] text-stone-600">{request.user_id.slice(0, 8)}</div>
-                              <button type="button" onClick={() => openCustomer(request.user_id)} aria-label={`${t.openRecord}: ${personName(request.profiles) || request.user_id.slice(0, 8)}`} className={`mt-1 text-[11px] font-black text-[#725517] underline underline-offset-2 ${focusRing}`}>{t.openRecord}</button>
+                              <div className="font-bold text-gray-900">{personName(request.subject) || "—"}</div>
+                              <div dir="ltr" className="text-start font-mono text-[11px] text-stone-600">{request.subject_id.slice(0, 8)}</div>
+                              {request.subject && <button type="button" onClick={() => openCustomer(request.subject_id)} aria-label={`${t.openRecord}: ${personName(request.subject) || request.subject_id.slice(0, 8)}`} className={`mt-1 text-[11px] font-black text-[#725517] underline underline-offset-2 ${focusRing}`}>{t.openRecord}</button>}
                             </td>
                             <td className={`${cell} max-w-[220px] text-[11px] text-stone-600`}><span className="line-clamp-3" title={request.details ?? ""}>{request.details || "—"}</span></td>
                             <td className={cell}>
                               <span className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-black ${
-                                request.status === "completed" ? "bg-emerald-100 text-emerald-800" : request.status === "pending" ? "bg-amber-100 text-amber-800" : request.status === "in_progress" ? "bg-blue-100 text-blue-800" : "bg-red-100 text-red-800"
+                                request.status === "completed" ? "bg-emerald-100 text-emerald-800" : open ? "bg-amber-100 text-amber-800" : "bg-red-100 text-red-800"
                               }`}>{t.requestStatuses[request.status] ?? request.status}</span>
                             </td>
                             <td className={`${cell} whitespace-nowrap text-[11px] ${late ? "font-black text-red-700" : "text-stone-700"}`}>
-                              {request.due_date ? new Intl.DateTimeFormat(isRTL ? "ar-SA-u-ca-gregory" : "en-GB", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(`${String(request.due_date).slice(0, 10)}T00:00:00Z`)) : "—"}
+                              {operationsDate(request.deadline_at, lang)}
                               {late && <div>{t.overdue}</div>}
                             </td>
                             <td className={`${cell} max-w-[220px] text-[11px] text-stone-600`}>
-                              <span className="line-clamp-3" title={request.admin_notes ?? ""}>{request.admin_notes || "—"}</span>
-                              {request.reviewed_at && <div className="text-[11px] text-stone-400">{operationsDate(request.reviewed_at, lang)}</div>}
+                              <span className="line-clamp-3" title={request.decision_reason ?? ""}>{request.decision_reason || "—"}</span>
+                              {request.completed_at && <div className="text-[11px] text-stone-400">{operationsDate(request.completed_at, lang)}</div>}
                             </td>
                             <td className={cell}>
-                              {open && (
-                                <div className="flex flex-wrap gap-2">
-                                  {request.status === "pending" && (
-                                    <button type="button" aria-label={`${t.actionStart}: ${t.requestTypes[request.request_type] ?? request.request_type} (${request.user_id.slice(0, 8)})`} onClick={() => setPending({ kind: "request", request, status: "in_progress" })} className={`${smallButton} border-blue-200 text-blue-800`}>{t.actionStart}</button>
-                                  )}
-                                  <button type="button" aria-label={`${t.actionComplete}: ${t.requestTypes[request.request_type] ?? request.request_type} (${request.user_id.slice(0, 8)})`} onClick={() => setPending({ kind: "request", request, status: "completed" })} className={`${smallButton} border-emerald-200 text-emerald-800`}>{t.actionComplete}</button>
-                                  <button type="button" aria-label={`${t.actionReject}: ${t.requestTypes[request.request_type] ?? request.request_type} (${request.user_id.slice(0, 8)})`} onClick={() => setPending({ kind: "request", request, status: "rejected" })} className={`${smallButton} border-red-200 text-red-700`}>{t.actionReject}</button>
-                                </div>
-                              )}
+                              <a href="/admin/privacy" className={`${smallButton} inline-block border-[#D1AF47] text-[#725517]`}>{t.workInPrivacy}</a>
                             </td>
                           </tr>
                         );

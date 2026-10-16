@@ -7,6 +7,7 @@ import { errorMessage } from "@/lib/error-message";
 import { CommandResult, ForbiddenNotice, isForbidden, operationsDate, operationsInput, useOperationsLocale } from "@/components/operations-ui";
 import { CommandDialog } from "@/components/modal";
 import { oneOf, writeUrlState } from "@/lib/url-state";
+import { knownToHold, useConsoleSession } from "@/lib/console-session";
 
 // Administrators and staff. The list is one server page at a time (admin_role_directory, which also records that the
 // directory was read, without the search text). Console roles (GOV-1 / D-Q5: owner, finance, operations, analyst) change only
@@ -171,18 +172,18 @@ const translations = {
     resetMfa: "إعادة ضبط التحقق بخطوتين",
     mfaOn: "مفعّل",
     mfaOff: "غير مفعّل",
-    mfaLocked: "مقفل (10 رموز خاطئة)",
+    mfaLocked: "مقفل (١٠ رموز خاطئة)",
     roleTitle: "تغيير دور {name} في لوحة الإدارة",
     roleIntro: "الدور الذي لا يضيف صلاحيات مالية أو حوكمة يسري من الطلب التالي للشخص. أما المالك والمالية فينتظران اعتماد مالك آخر. تغيير الأدوار يحتاج رمزاً جديداً من تطبيق المصادقة لديك، ويُبلَّغ الشخص.",
     removeTitle: "إزالة {name} من لوحة الإدارة",
     removeIntro: "يصبح الحساب حساب عميل ويفقد الوصول إلى لوحة الإدارة فوراً. لا يمكن إزالة آخر مالك.",
     mfaTitle: "إعادة ضبط التحقق بخطوتين لـ {name}",
-    mfaIntro: "يزيل تطبيق المصادقة لديه وينهي كل جلساته؛ وعند الدخول التالي يضيف تطبيقاً جديداً. استخدمه عند فقد الهاتف أو القفل بعد 10 رموز خاطئة. يحتاج رمزاً جديداً من تطبيقك.",
-    mfaReason: "لماذا تلزم إعادة الضبط؟ (10 أحرف على الأقل، اذكر رقم التذكرة)",
-    roleReason: "ما سبب تغيير الدور؟ (10 أحرف على الأقل)",
+    mfaIntro: "يزيل تطبيق المصادقة لديه وينهي كل جلساته؛ وعند الدخول التالي يضيف تطبيقاً جديداً. استخدمه عند فقد الهاتف أو القفل بعد ١٠ رموز خاطئة. يحتاج رمزاً جديداً من تطبيقك.",
+    mfaReason: "لماذا تلزم إعادة الضبط؟ (١٠ أحرف على الأقل، اذكر رقم التذكرة)",
+    roleReason: "ما سبب تغيير الدور؟ (١٠ أحرف على الأقل)",
     mfaDone: "تمت إعادة ضبط التحقق بخطوتين؛ يضيف الشخص تطبيقه من جديد عند الدخول التالي.",
     roleDone: "تم تغيير الدور في لوحة الإدارة.",
-    roleRequested: "هذا الدور يضيف صلاحيات مالية أو مصرفية أو صلاحيات حوكمة، لذا يجب أن يعتمده مالك آخر في صفحة الاعتمادات. يسري بعد الاعتماد، ولا يبت الشخص في الطلبات إلا بعد 72 ساعة.",
+    roleRequested: "هذا الدور يضيف صلاحيات مالية أو مصرفية أو صلاحيات حوكمة، لذا يجب أن يعتمده مالك آخر في صفحة الاعتمادات. يسري بعد الاعتماد، ولا يبت الشخص في الطلبات إلا بعد ٧٢ ساعة.",
   },
 };
 
@@ -297,6 +298,13 @@ function RolesScreen() {
     return null;
   };
   const consoleRoleOf = (person: RoleRow) => (person.console_role ? t.consoleRoles[person.console_role] : "—");
+  // Only an owner changes roles (roles.manage) or resets two-step verification (mfa.reset); other roles see the directory only.
+  const session = useConsoleSession();
+  const canManageRoles = knownToHold(session, ["roles.manage"]);
+  const canResetMfa = knownToHold(session, ["mfa.reset"]);
+  // Removing console access and resetting two-step verification are typed-confirmation commands: the operator types the
+  // person's e-mail (or name when there is none), so the wrong row cannot be acted on by a slip.
+  const confirmTarget = (person: RoleRow) => person.email || personName(person);
 
   const rows = directory?.rows ?? [];
   const matching = toNumber(directory?.matching);
@@ -315,7 +323,7 @@ function RolesScreen() {
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className="space-y-6 text-start">
       <div>
-        <h2 className="font-serif text-2xl font-black text-gray-900">{t.title}</h2>
+        <h1 className="font-serif text-2xl font-black text-gray-900">{t.title}</h1>
         <p className="mt-1 max-w-3xl text-xs font-semibold text-gray-500">{t.subtitle}</p>
       </div>
 
@@ -400,6 +408,12 @@ function RolesScreen() {
                           <td className={cell}>
                             {mine ? (
                               <span className="text-[11px] font-bold text-gray-500" title={t.selfHint}>{t.self}</span>
+                            ) : !canManageRoles && !canResetMfa ? (
+                              <span className="text-[11px] text-gray-400">—</span>
+                            ) : !canManageRoles ? (
+                              person.role === "admin" && (person.mfa_enrolled || person.mfa_locked) ? (
+                                <button type="button" onClick={() => setPending({ person, resetMfa: true })} className={`${smallButton} border-gray-300 bg-white text-gray-800`} aria-label={`${t.resetMfa}: ${personName(person)}`}>{t.resetMfa}</button>
+                              ) : <span className="text-[11px] text-gray-400">—</span>
                             ) : person.role === "admin" || person.role === "customer" ? (
                               <span className="flex flex-wrap items-center gap-1.5">
                                 <select
@@ -418,7 +432,7 @@ function RolesScreen() {
                                 {person.role === "admin" && (
                                   <button type="button" onClick={() => setPending({ person, next: null })} className={`${smallButton} border-[#FECDCA] bg-[#FEF3F2] text-[#B42318]`} aria-label={`${t.removeAccess}: ${personName(person)}`}>{t.removeAccess}</button>
                                 )}
-                                {person.role === "admin" && (person.mfa_enrolled || person.mfa_locked) && (
+                                {canResetMfa && person.role === "admin" && (person.mfa_enrolled || person.mfa_locked) && (
                                   <button type="button" onClick={() => setPending({ person, resetMfa: true })} className={`${smallButton} border-gray-300 bg-white text-gray-800`} aria-label={`${t.resetMfa}: ${personName(person)}`}>{t.resetMfa}</button>
                                 )}
                               </span>
@@ -455,6 +469,7 @@ function RolesScreen() {
           facts={[{ label: t.factPerson, value: personName(pending.person) }, { label: t.columnConsoleRole, value: consoleRoleOf(pending.person) }]}
           reasonLabel={t.mfaReason}
           minReasonLength={10}
+          confirmWord={confirmTarget(pending.person)}
           confirmLabel={t.resetMfa}
           onConfirm={changeRole}
           onClose={() => setPending(null)}
@@ -473,6 +488,7 @@ function RolesScreen() {
           ]}
           reasonLabel={t.roleReason}
           minReasonLength={10}
+          confirmWord={pending.next === null ? confirmTarget(pending.person) : undefined}
           confirmLabel={pending.next === null ? t.revokeConfirm : pending.person.role === "admin" ? t.apply : t.grantConfirm}
           onConfirm={changeRole}
           onClose={() => setPending(null)}

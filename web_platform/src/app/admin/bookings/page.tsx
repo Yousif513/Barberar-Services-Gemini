@@ -43,7 +43,10 @@ const translations = {
     noShow: "No-show",
     releaseHolds: "Release expired unpaid holds",
     cancelTitle: "Cancel this booking",
-    cancelIntro: "Everything captured for this booking is refunded to the customer. You need a recent sign-in check; a refund needs a finance approver when you hold no refund permission, when it is SAR 1,000 or more, or when it takes you past SAR 5,000 today.",
+    cancelIntro: "Everything captured for this booking is refunded to the customer. You need a recent sign-in check; a refund needs a finance approver when you hold no refund permission, when it is {single} or more, or when it takes you past {daily} today.",
+    cancelIntroNoThresholds: "Everything captured for this booking is refunded to the customer. You need a recent sign-in check; a refund needs a finance approver when you hold no refund permission, or when it reaches the single-refund or daily-total threshold set under Approvals. The current thresholds could not be loaded: {reason}",
+    thresholdsMissing: "the thresholds are not set",
+    loadingThresholds: "Everything captured for this booking is refunded to the customer. You need a recent sign-in check; a refund needs a finance approver when you hold no refund permission or when it reaches the approval thresholds (loading the current thresholds…).",
     noShowTitle: "Mark this booking as a no-show",
     noShowIntro: "The shop's no-show fee applies and the rest is refunded. A refund follows the same approval rules as a cancellation.",
     completeTitle: "Mark this booking as completed",
@@ -126,7 +129,10 @@ const translations = {
     noShow: "عدم حضور",
     releaseHolds: "إطلاق الحجوزات غير المدفوعة المنتهية",
     cancelTitle: "إلغاء هذا الحجز",
-    cancelIntro: "يُسترد للعميل كامل المبلغ المقبوض لهذا الحجز. يلزم تحقق حديث من الدخول، ويحتاج الاسترداد إلى موافقة مسؤول مالي إذا لم تكن لديك صلاحية الاسترداد، أو كان ١٬٠٠٠ ريال أو أكثر، أو تجاوز به مجموعك اليومي ٥٬٠٠٠ ريال.",
+    cancelIntro: "يُسترد للعميل كامل المبلغ المقبوض لهذا الحجز. يلزم تحقق حديث من الدخول، ويحتاج الاسترداد إلى موافقة مسؤول مالي إذا لم تكن لديك صلاحية الاسترداد، أو كان {single} أو أكثر، أو تجاوز به مجموعك اليومي {daily}.",
+    cancelIntroNoThresholds: "يُسترد للعميل كامل المبلغ المقبوض لهذا الحجز. يلزم تحقق حديث من الدخول، ويحتاج الاسترداد إلى موافقة مسؤول مالي إذا لم تكن لديك صلاحية الاسترداد، أو إذا بلغ حد الاسترداد الواحد أو حد المجموع اليومي المحددين في صفحة الموافقات. تعذّر تحميل الحدود الحالية: {reason}",
+    thresholdsMissing: "الحدود غير مضبوطة",
+    loadingThresholds: "يُسترد للعميل كامل المبلغ المقبوض لهذا الحجز. يلزم تحقق حديث من الدخول، ويحتاج الاسترداد إلى موافقة مسؤول مالي إذا لم تكن لديك صلاحية الاسترداد أو إذا بلغ حدود الاعتماد (جارٍ تحميل الحدود الحالية…).",
     noShowTitle: "تسجيل هذا الحجز كعدم حضور",
     noShowIntro: "تُطبق رسوم عدم الحضور الخاصة بالمركز ويُسترد الباقي، ويخضع الاسترداد لقواعد الموافقة نفسها المطبقة على الإلغاء.",
     completeTitle: "تسجيل هذا الحجز كمكتمل",
@@ -298,6 +304,38 @@ function BookingsScreen() {
     };
   }, [statusFilter, search, from, to, page, reloadKey, rangeInvalid]);
 
+  // The refund approval thresholds the server applies (governance_settings, changed only through an approved request), read each
+  // time a cancellation dialog opens so the dialog never states a figure the server no longer uses.
+  const [thresholds, setThresholds] = useState<{ single: number; daily: number } | { error: string } | null>(null);
+  const cancelOpen = pending?.kind === "cancel";
+  useEffect(() => {
+    if (!cancelOpen) return;
+    let cancelled = false;
+    void supabase
+      .from("governance_settings")
+      .select("key, value")
+      .in("key", ["refund_single_approval_sar", "refund_daily_cumulative_sar"])
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        const rows = (data ?? []) as { key: string; value: number | string }[];
+        const single = rows.find((r) => r.key === "refund_single_approval_sar");
+        const daily = rows.find((r) => r.key === "refund_daily_cumulative_sar");
+        if (error || !single || !daily) {
+          setThresholds({ error: error ? errorMessage(error) : "not_configured" });
+        } else {
+          setThresholds({ single: Number(single.value), daily: Number(daily.value) });
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [cancelOpen]);
+  const cancelIntro = () => {
+    if (thresholds === null) return t.loadingThresholds;
+    if ("error" in thresholds) return t.cancelIntroNoThresholds.replace("{reason}", thresholds.error === "not_configured" ? t.thresholdsMissing : thresholds.error);
+    return t.cancelIntro.replace("{single}", sar(thresholds.single, lang)).replace("{daily}", sar(thresholds.daily, lang));
+  };
+
   // Booking commands run on the server: admin_cancel_booking and admin_mark_booking_no_show (step-up, reason, and the refund
   // approval rules of D-Q5, SECFIX-2 R2-H2) and employee_update_booking_status for completion; each writes the audit log. A refusal goes back to
   // the dialog, which stays open with what the operator typed; a success is announced and the list read again.
@@ -325,7 +363,10 @@ function BookingsScreen() {
 
   const renderDialog = () => {
     if (!pending) return null;
-    const close = () => setPending(null);
+    const close = () => {
+      setPending(null);
+      setThresholds(null);
+    };
     if (pending.kind === "release") {
       return (
         <CommandDialog
@@ -365,7 +406,7 @@ function BookingsScreen() {
         locale={lang}
         tone="danger"
         title={cancelling ? t.cancelTitle : t.noShowTitle}
-        intro={cancelling ? t.cancelIntro : t.noShowIntro}
+        intro={cancelling ? cancelIntro() : t.noShowIntro}
         facts={facts}
         reasonLabel={t.reasonLabel}
         confirmLabel={cancelling ? t.confirmCancel : t.confirmNoShow}
@@ -514,8 +555,8 @@ function BookingsScreen() {
         <div className={cardBase}>
           <div className={`flex items-center justify-between ${flip}`}>
             <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#667085]">{t.totalVolume}</span>
-            <div aria-hidden="true" className="w-8 h-8 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center text-[#7A5B12] text-[11px] font-black">
-              {lang === "ar" ? "ر.س" : "SAR"}
+            <div aria-hidden="true" className="w-8 h-8 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center text-[#7A5B12]">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
           </div>
           <strong className="block text-2xl font-serif font-black text-gray-900 mt-2.5">
@@ -527,8 +568,8 @@ function BookingsScreen() {
         <div className={cardBase}>
           <div className={`flex items-center justify-between ${flip}`}>
             <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#667085]">{t.platformRevenue}</span>
-            <div aria-hidden="true" className="w-8 h-8 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center text-[#7A5B12] font-serif text-xs font-black">
-              %
+            <div aria-hidden="true" className="w-8 h-8 rounded-full bg-gray-50 border border-[#ECECEC] flex items-center justify-center text-[#7A5B12]">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
             </div>
           </div>
           <strong className="block text-2xl font-serif font-black text-amber-800 mt-2.5">

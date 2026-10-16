@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  clearDevRole,
   type DevRole,
   devRoleHome,
   getDevRole,
@@ -91,6 +92,12 @@ export function DevRoleSwitcher() {
   const switchTo = (role: DevRole) => {
     if (didDrag.current) return; // Was a drag, not a click
     if (role === current) return;
+    if (role === "admin") {
+      // The console is authorized by the database, so it opens through the real sign-in, not a local preview.
+      clearDevRole();
+      window.location.href = "/login";
+      return;
+    }
     if (!setDevRole(role)) return;
     setCurrent(role);
     window.location.href = devRoleHome[role];

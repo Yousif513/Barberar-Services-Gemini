@@ -103,20 +103,20 @@ const copy = {
     pendingTitle: "بانتظار مالك ثانٍ",
     propose: "اقتراح تغيير",
     enable: "تفعيل البرنامج",
-    reason: "السبب (10 أحرف على الأقل)",
+    reason: "السبب (١٠ أحرف على الأقل)",
     send: "إرسال للاعتماد",
     sending: "جارٍ الإرسال...",
     sent: "أُرسل للاعتماد. يعتمده مالك آخر من صفحة الاعتمادات.",
     publishTitle: "نشر الشروط",
     version: "النسخة (حروف وأرقام ونقاط وشرطات)",
-    bodyEn: "الشروط بالإنجليزية (200 حرف على الأقل)",
-    bodyAr: "الشروط بالعربية (200 حرف على الأقل)",
+    bodyEn: "الشروط بالإنجليزية (٢٠٠ حرف على الأقل)",
+    bodyAr: "الشروط بالعربية (٢٠٠ حرف على الأقل)",
     publish: "نشر",
     published: "نُشرت الشروط ولا يمكن تعديلها بعد الآن؛ انشر نسخة جديدة بدلاً من ذلك.",
     cancel: "إلغاء",
     invalidNumber: "أدخل رقماً موجباً أو اتركه فارغاً.",
-    reasonShort: "اكتب سبباً من 10 أحرف على الأقل.",
-    termsHint: "تشمل الشروط الأهلية والقيمة والحد والصلاحية والاستثناءات والتعديل والإنهاء بإشعار 30 يوماً وما يحدث عند الاسترداد. يؤكد المستشار القانوني مسألة الترخيص ويؤكد المستشار الضريبي معالجة ضريبة القيمة المضافة قبل أول تفعيل.",
+    reasonShort: "اكتب سبباً من ١٠ أحرف على الأقل.",
+    termsHint: "تشمل الشروط الأهلية والقيمة والحد والصلاحية والاستثناءات والتعديل والإنهاء بإشعار ٣٠ يوماً وما يحدث عند الاسترداد. يؤكد المستشار القانوني مسألة الترخيص ويؤكد المستشار الضريبي معالجة ضريبة القيمة المضافة قبل أول تفعيل.",
   },
 };
 
@@ -275,13 +275,13 @@ export function RewardProgrammes({ locale }: { locale: OperationsLocale }) {
               ) : null}
               {view.can_propose ? (
                 <div className="flex flex-wrap gap-2">
-                  <button type="button" className={button} onClick={() => { setFormError(""); setDone(""); setPublishing(null); setEditing({ program: p.program, form: blankForm(p) }); }}>{t.propose}</button>
-                  <button type="button" className={button} onClick={() => { setFormError(""); setDone(""); setEditing(null); setPublishing({ program: p.program, form: { version: "", en: "", ar: "", reason: "" } }); }}>{t.publishTitle}</button>
+                  <button type="button" className={button} aria-expanded={editing?.program === p.program} aria-controls={`programme-propose-${p.program}`} onClick={() => { setFormError(""); setDone(""); setPublishing(null); setEditing({ program: p.program, form: blankForm(p) }); }}>{t.propose}</button>
+                  <button type="button" className={button} aria-expanded={publishing?.program === p.program} aria-controls={`programme-publish-${p.program}`} onClick={() => { setFormError(""); setDone(""); setEditing(null); setPublishing({ program: p.program, form: { version: "", en: "", ar: "", reason: "" } }); }}>{t.publishTitle}</button>
                 </div>
               ) : null}
 
               {editing?.program === p.program ? (
-                <div className="space-y-3 border-t border-[#ECECEC] pt-3">
+                <div id={`programme-propose-${p.program}`} className="space-y-3 border-t border-[#ECECEC] pt-3">
                   <label className="flex items-center gap-2 text-xs font-bold text-gray-800">
                     <input type="checkbox" checked={editing.form.enabled} onChange={(e) => setEditing({ ...editing, form: { ...editing.form, enabled: e.target.checked } })} />
                     <span>{t.enable}</span>
@@ -317,7 +317,7 @@ export function RewardProgrammes({ locale }: { locale: OperationsLocale }) {
               ) : null}
 
               {publishing?.program === p.program ? (
-                <div className="space-y-3 border-t border-[#ECECEC] pt-3">
+                <div id={`programme-publish-${p.program}`} className="space-y-3 border-t border-[#ECECEC] pt-3">
                   <p className="text-[11px] font-semibold text-gray-500">{t.termsHint}</p>
                   <label className={label}><span>{t.version}</span><input dir="ltr" className={input} maxLength={32} value={publishing.form.version} onChange={(e) => setPublishing({ ...publishing, form: { ...publishing.form, version: e.target.value } })} /></label>
                   <label className={label}><span>{t.bodyEn}</span><textarea dir="ltr" rows={6} className={input} value={publishing.form.en} onChange={(e) => setPublishing({ ...publishing, form: { ...publishing.form, en: e.target.value } })} /></label>

@@ -1,6 +1,7 @@
 import { before, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { as, createMigratedDb, createUser, expectError, ROLES, SEED, sys } from "./harness.mjs";
+import { clearProfileWithApproval } from "./gov1_fixtures.mjs";
 
 // Fixes from the independent security review: every administrator write is audited, the audit log keeps
 // no personal values, a payout's destination is fixed once requested, anonymous visitors cannot read internal
@@ -73,7 +74,7 @@ describe("administrator writes to money and configuration tables", () => {
   it("do not copy personal values into the log, even when the command that clears them runs", async () => {
     const target = await createUser(db, { role: "customer", phone: "+966566660001", verified: true });
     await sys(db, `update profiles set first_name = 'Sara', last_name = 'Alharbi', gender = 'female', email = 'sara.private@example.com', expo_push_token = 'ExponentPushToken[secret-device]' where id = $1`, [target]);
-    await as(db, admin, `select admin_clear_customer_profile($1, 'PDPL request 77')`, [target]);
+    await clearProfileWithApproval(db, admin, target, "PDPL request 77");
     const logged = JSON.stringify((await auditRows("profiles.update")).filter((r) => r.target_id === target).map((r) => r.details));
     for (const personal of ["Sara", "Alharbi", "female", "sara.private", "secret-device", "+966566660001"]) {
       assert.ok(!logged.includes(personal), `the audit log must not hold ${personal}`);

@@ -78,8 +78,8 @@ describe("admin dashboard overview", () => {
 
     await sys(db, `insert into payout_requests (provider_id, requested_by, amount, bank_name, iban)
                    values ($1, $2, 250, 'Test Bank', 'SA0380000000608010167519')`, [SEED.provider1, SEED.owner1]);
-    await sys(db, `insert into data_subject_requests (user_id, request_type, status, due_date)
-                   values ($1, 'export', 'pending', current_date - 1)`, [SEED.customer]);
+    await sys(db, `insert into privacy_requests (subject_id, request_type, status, received_at, due_at, verified_at, details)
+                   values ($1, 'copy', 'open', now() - interval '31 days', now() - interval '1 day', now() - interval '31 days', null)`, [SEED.customer]);
     const ledger = (await sys(db, `insert into transactional_ledger (provider_id, entry_type, payment_intent_id, total_captured, platform_share, provider_share, payout_status)
                    values ($1, 'package_sale', 'chg_dashboard_refund', 80, 8, 72, 'pending') returning id`, [SEED.provider1]))[0].id;
     await sys(db, `insert into refund_requests (ledger_id, payment_intent_id, amount, reason, source, status, attempts, idempotency_key)

@@ -123,7 +123,13 @@ describe("admin console guards", () => {
 
   it("data requests and phone verification change only through commands that take the operator's own words", () => {
     const customers = page("/customers");
-    assert.ok(customers.includes('rpc("admin_update_data_request"') && customers.includes('rpc("admin_set_phone_verified"'), "both run on the server");
+    // PRIV-1: privacy requests are worked on /admin/privacy through their own commands; the customers tab lists them and links there.
+    assert.ok(customers.includes('rpc("admin_privacy_list_requests"') && customers.includes('href="/admin/privacy"') && customers.includes('rpc("admin_set_phone_verified"'), "both run on the server");
+    const privacy = page("/privacy");
+    for (const command of ["admin_privacy_extend_request", "admin_privacy_refuse_request", "admin_privacy_propose_execution", "admin_privacy_complete_correction", "admin_privacy_log_request"]) {
+      assert.ok(privacy.includes(`rpc("${command}"`), `${command} runs on the server`);
+    }
+    assert.ok(!/\.from\("privacy_requests"\)/.test(privacy), "no direct table access");
     assert.ok(!/\.from\("data_subject_requests"\)\s*\.update/.test(customers) && !customers.includes('.update({'), "no direct writes to requests or profiles");
     assert.ok(!/Fulfilled per customer request|Rejected per statutory exceptions/.test(customers), "no canned note stands in for the operator's");
     assert.ok(!/Data Portability Export|JSON\.stringify\(report/.test(customers), "a partial profile summary is not offered as a PDPL export");
@@ -251,7 +257,8 @@ describe("admin console guards", () => {
 
   it("filters and tabs live in the address bar and dashboard drill-downs open the view they count", () => {
     const dashboard = page("");
-    for (const link of ["tab=applications&appStatus=pending", "tab=requests", "status=pending_payment"]) {
+    // UXFIX: personal data requests open the privacy screen, where they are worked (not a customers tab).
+    for (const link of ["tab=applications&appStatus=pending", "data_requests: \"/admin/privacy\"", "status=pending_payment"]) {
       assert.ok(dashboard.includes(link), `a dashboard queue opens ${link}`);
     }
     assert.ok(page("/bookings").includes("writeUrlState") && page("/customers").includes("writeUrlState"), "bookings and customers write their filters to the address bar");

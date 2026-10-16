@@ -1,9 +1,10 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useId, useState } from "react";
+import { Suspense, useCallback, useEffect, useId, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
+import { totpErrorMessage } from "@/lib/auth-errors";
 import { useOperationsLocale } from "@/components/operations-ui";
 
 // Authenticator-app (TOTP) enrolment and sign-in challenge for console accounts (GOV-1 / Q6). The database refuses every
@@ -40,15 +41,15 @@ const copy = {
     enrolIntro: "يحمي كل حساب في لوحة الإدارة تسجيل الدخول بتطبيق مصادقة (Google Authenticator أو Microsoft Authenticator أو 1Password وغيرها). امسح الرمز ثم أدخل الأرقام الستة التي يعرضها التطبيق.",
     secretLabel: "لا يمكنك المسح؟ أدخل هذا المفتاح في التطبيق",
     challengeTitle: "أدخل رمز تطبيق المصادقة",
-    challengeIntro: "افتح تطبيق المصادقة وأدخل الرمز المكوّن من 6 أرقام لحساب PRIMORA.",
-    codeLabel: "الرمز المكوّن من 6 أرقام",
+    challengeIntro: "افتح تطبيق المصادقة وأدخل الرمز المكوّن من ٦ أرقام لحساب PRIMORA.",
+    codeLabel: "الرمز المكوّن من ٦ أرقام",
     verify: "تحقق",
     working: "جارٍ التحقق…",
     badCode: "أدخل الأرقام الستة الظاهرة في تطبيق المصادقة.",
-    lockWarning: "بعد 10 رموز خاطئة يُقفل الحساب ويجب أن يعيد مالك آخر ضبطه.",
+    lockWarning: "بعد ١٠ رموز خاطئة يُقفل الحساب ويجب أن يعيد مالك آخر ضبطه.",
     signedOut: "سجّل الدخول أولاً ثم عد إلى هذه الصفحة.",
     signIn: "الانتقال إلى تسجيل الدخول",
-    locked: "تم قفل هذا الحساب بعد 10 رموز خاطئة. اطلب من مالك آخر في لوحة الإدارة إعادة ضبط التحقق بخطوتين ثم سجّل الدخول من جديد.",
+    locked: "تم قفل هذا الحساب بعد ١٠ رموز خاطئة. اطلب من مالك آخر في لوحة الإدارة إعادة ضبط التحقق بخطوتين ثم سجّل الدخول من جديد.",
     signOut: "تسجيل الخروج",
     done: "تم التحقق. جارٍ فتح لوحة الإدارة…",
     loadFailed: "تعذّر تحميل التحقق بخطوتين: {reason}",
@@ -56,6 +57,36 @@ const copy = {
     qrAlt: "رمز QR لتطبيق المصادقة",
   },
 };
+
+// One preparation per page load. React runs effects twice in development, and two runs would remove the same abandoned factor
+// twice (the second answer is a 404) and enrol two factors. Both runs share this promise.
+type Prepared = { phase: "signed-out" | "locked" | "done" | "challenge" | "enrol"; factorId?: string; enrolment?: Enrolment };
+let preparing: { attempt: number; promise: Promise<Prepared> } | null = null;
+
+async function prepare(): Promise<Prepared> {
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) return { phase: "signed-out" };
+  const { data: state } = await supabase.rpc("admin_session_state");
+  if ((state as { locked?: boolean } | null)?.locked) return { phase: "locked" };
+  const { data: aal, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aalError) throw aalError;
+  if (aal?.currentLevel === "aal2") return { phase: "done" };
+  const { data: factors, error: listError } = await supabase.auth.mfa.listFactors();
+  if (listError) throw listError;
+  const verified = factors?.totp?.[0];
+  if (verified) return { phase: "challenge", factorId: verified.id };
+  // A factor left unverified by an abandoned enrolment is replaced, so the QR code always matches the app. A factor already
+  // gone (removed by another tab or by Supabase Auth's own clean-up) is not an error.
+  for (const factor of factors?.all ?? []) {
+    if (factor.status === "verified") continue;
+    const { error } = await supabase.auth.mfa.unenroll({ factorId: factor.id });
+    if (error && (error as { status?: number }).status !== 404) throw error;
+  }
+  const { data: enrolled, error: enrolError } = await supabase.auth.mfa.enroll({ factorType: "totp", friendlyName: `PRIMORA console ${new Date().toISOString().slice(0, 16)} ${crypto.randomUUID().slice(0, 6)}` });
+  if (enrolError) throw enrolError;
+  const qr = enrolled.totp.qr_code.startsWith("data:") ? enrolled.totp.qr_code : `data:image/svg+xml;utf-8,${encodeURIComponent(enrolled.totp.qr_code)}`;
+  return { phase: "enrol", factorId: enrolled.id, enrolment: { factorId: enrolled.id, qr, secret: enrolled.totp.secret } };
+}
 
 // Only paths inside this site are followed after verification.
 const safeNext = (value: string | null) => (value && value.startsWith("/") && !value.startsWith("//") ? value : "/admin");
@@ -83,6 +114,9 @@ function MfaScreen() {
   const [loadError, setLoadError] = useState("");
   const [attempt, setAttempt] = useState(0);
   const codeId = useId();
+  const hintId = useId();
+  const failureId = useId();
+  const codeRef = useRef<HTMLInputElement>(null);
 
   const finish = useCallback(() => {
     setPhase("done");
@@ -93,45 +127,18 @@ function MfaScreen() {
     let cancelled = false;
     void (async () => {
       try {
-        const { data: userData } = await supabase.auth.getUser();
-        if (!userData.user) {
-          if (!cancelled) setPhase("signed-out");
+        if (!preparing || preparing.attempt !== attempt) preparing = { attempt, promise: prepare() };
+        const result = await preparing.promise;
+        if (cancelled) return;
+        if (result.phase === "done") {
+          finish();
           return;
         }
-        const { data: state } = await supabase.rpc("admin_session_state");
-        if ((state as { locked?: boolean } | null)?.locked) {
-          if (!cancelled) setPhase("locked");
-          return;
-        }
-        const { data: aal, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-        if (aalError) throw aalError;
-        if (aal?.currentLevel === "aal2") {
-          if (!cancelled) finish();
-          return;
-        }
-        const { data: factors, error: listError } = await supabase.auth.mfa.listFactors();
-        if (listError) throw listError;
-        const verified = factors?.totp?.[0];
-        if (verified) {
-          if (!cancelled) {
-            setFactorId(verified.id);
-            setPhase("challenge");
-          }
-          return;
-        }
-        // A factor left unverified by an abandoned enrolment is replaced, so the QR code always matches the app.
-        for (const factor of factors?.all ?? []) {
-          if (factor.status !== "verified") await supabase.auth.mfa.unenroll({ factorId: factor.id });
-        }
-        const { data: enrolled, error: enrolError } = await supabase.auth.mfa.enroll({ factorType: "totp", friendlyName: `PRIMORA console ${new Date().toISOString().slice(0, 16)} ${crypto.randomUUID().slice(0, 6)}` });
-        if (enrolError) throw enrolError;
-        const qr = enrolled.totp.qr_code.startsWith("data:") ? enrolled.totp.qr_code : `data:image/svg+xml;utf-8,${encodeURIComponent(enrolled.totp.qr_code)}`;
-        if (!cancelled) {
-          setEnrolment({ factorId: enrolled.id, qr, secret: enrolled.totp.secret });
-          setFactorId(enrolled.id);
-          setPhase("enrol");
-        }
+        if (result.factorId) setFactorId(result.factorId);
+        if (result.enrolment) setEnrolment(result.enrolment);
+        setPhase(result.phase);
       } catch (error) {
+        preparing = null;
         if (!cancelled) {
           setLoadError(errorMessage(error));
           setPhase("error");
@@ -148,8 +155,10 @@ function MfaScreen() {
     const digits = code.replace(/\s+/g, "");
     if (!/^[0-9]{6}$/.test(digits)) {
       setFailure(t.badCode);
+      codeRef.current?.focus();
       return;
     }
+    if (busy) return;
     setBusy(true);
     setFailure("");
     try {
@@ -157,10 +166,12 @@ function MfaScreen() {
       if (error) throw error;
       finish();
     } catch (error) {
-      setFailure(errorMessage(error));
       setCode("");
       const { data: state } = await supabase.rpc("admin_session_state");
-      if ((state as { locked?: boolean } | null)?.locked) setPhase("locked");
+      const session = state as { locked?: boolean; mfa_attempts_left?: number } | null;
+      if (session?.locked) setPhase("locked");
+      setFailure(totpErrorMessage(error, locale, typeof session?.mfa_attempts_left === "number" ? session.mfa_attempts_left : null));
+      codeRef.current?.focus();
     } finally {
       setBusy(false);
     }
@@ -201,7 +212,7 @@ function MfaScreen() {
         )}
 
         {(phase === "enrol" || phase === "challenge") && (
-          <form onSubmit={(event) => void submit(event)} className="mt-4 space-y-4">
+          <form onSubmit={(event) => void submit(event)} noValidate aria-busy={busy} className="mt-4 space-y-4">
             <p className="text-sm leading-6 text-[#475467]">{phase === "enrol" ? t.enrolIntro : t.challengeIntro}</p>
             {phase === "enrol" && enrolment && (
               <div className="space-y-3">
@@ -215,14 +226,15 @@ function MfaScreen() {
             )}
             <div>
               <label htmlFor={codeId} className="block text-xs font-black text-[#344054]">{t.codeLabel}</label>
-              <input id={codeId} autoFocus dir="ltr" inputMode="numeric" autoComplete="one-time-code" maxLength={7} value={code} onChange={(event) => setCode(event.target.value)} disabled={busy}
+              <input id={codeId} ref={codeRef} autoFocus dir="ltr" inputMode="numeric" autoComplete="one-time-code" maxLength={7} value={code} onChange={(event) => setCode(event.target.value)} readOnly={busy}
+                aria-invalid={Boolean(failure)} aria-describedby={failure ? `${failureId} ${hintId}` : hintId}
                 className="mt-1.5 w-full rounded-xl border border-[#D0D5DD] bg-white px-3 py-2.5 text-center font-mono text-lg tracking-[0.4em] text-[#101828] focus-visible:outline-2 focus-visible:outline-[#9B7928]" />
-              <p className="mt-1 text-xs text-[#667085]">{t.lockWarning}</p>
+              <p id={hintId} className="mt-1 text-xs text-[#667085]">{t.lockWarning}</p>
             </div>
-            {failure && <p role="alert" className="rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-3 py-2 text-sm font-semibold text-[#B42318]">{failure}</p>}
+            {failure && <p id={failureId} role="alert" className="rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-3 py-2 text-sm font-semibold text-[#B42318]">{failure}</p>}
             <div className="flex flex-wrap items-center justify-between gap-2">
               <button type="button" onClick={() => void signOut()} className="text-sm font-bold text-[#667085] underline focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.signOut}</button>
-              <button type="submit" disabled={busy} className="rounded-xl bg-[#101828] px-5 py-2.5 text-sm font-black text-white focus-visible:outline-2 focus-visible:outline-[#9B7928] disabled:opacity-60">{busy ? t.working : t.verify}</button>
+              <button type="submit" aria-disabled={busy} className="rounded-xl bg-[#101828] px-5 py-2.5 text-sm font-black text-white focus-visible:outline-2 focus-visible:outline-[#9B7928] aria-disabled:opacity-60">{busy ? t.working : t.verify}</button>
             </div>
           </form>
         )}

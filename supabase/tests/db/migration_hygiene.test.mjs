@@ -26,6 +26,14 @@ describe("migration hygiene", () => {
     assert.deepEqual(offenders, [], "use dollar quoting instead of an E-string with backslashes");
   });
 
+  // Review N9 (docs/reviews/2026-10-11-security-priv-recheck.md): a scratch patch (.sql.tmp) was committed next to the migrations.
+  // The CLI skips it, so it looks applied in a review and is not; only migrations and nothing else live in this folder.
+  it("holds only <version>_<name>.sql migration files, no scratch, backup or editor files", () => {
+    const entries = readdirSync(MIGRATIONS_DIR, { withFileTypes: true });
+    const strays = entries.filter((e) => !e.isFile() || !/^[0-9]{14}_[a-z0-9_]+\.sql$/.test(e.name)).map((e) => e.name);
+    assert.deepEqual(strays, [], "move scratch files out of supabase/migrations");
+  });
+
   it("has unique, ordered timestamps", () => {
     const stamps = migrations.map((name) => name.split("_")[0]);
     assert.equal(new Set(stamps).size, stamps.length, "two migrations share a version, the CLI would refuse the second");

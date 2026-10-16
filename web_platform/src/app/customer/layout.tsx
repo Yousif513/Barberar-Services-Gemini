@@ -26,6 +26,7 @@ const translations = {
     wallet: "Wallet",
     notifications: "Notifications",
     settings: "Settings",
+    privacy: "Privacy & my data",
     logout: "Log Out",
     customerAccount: "Customer account",
     welcome: "Welcome back,",
@@ -49,6 +50,7 @@ const translations = {
     wallet: "المحفظة",
     notifications: "التنبيهات",
     settings: "الإعدادات",
+    privacy: "الخصوصية وبياناتي",
     logout: "تسجيل الخروج",
     customerAccount: "حساب العميل",
     welcome: "مرحباً بك،",
@@ -121,6 +123,13 @@ const getNavIcon = (path: string) => {
     return (
       <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+      </svg>
+    );
+  }
+  if (path.includes("privacy")) {
+    return (
+      <svg className={strokeClass} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" />
       </svg>
     );
   }
@@ -246,6 +255,7 @@ export default function CustomerLayout({
     { name: t.wallet, path: "/customer/wallet" },
     { name: t.notifications, path: "/customer/notifications" },
     { name: t.settings, path: "/customer/settings" },
+    { name: t.privacy, path: "/customer/privacy" },
   ];
 
   return (

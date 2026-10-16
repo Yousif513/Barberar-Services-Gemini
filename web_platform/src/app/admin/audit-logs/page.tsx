@@ -13,7 +13,9 @@ type AuditRow = {
   target_id: string | null;
   details: Record<string, unknown> | null;
   created_at: string;
+  is_read?: boolean;
 };
+type EventClass = "changes" | "reads" | "all";
 
 type Actor = { id: string; first_name: string | null; last_name: string | null; email: string | null };
 
@@ -26,6 +28,9 @@ const translations = {
     action: "Action contains",
     target: "Record type",
     allTypes: "All record types",
+    eventClass: "Show",
+    classes: { changes: "Changes only", reads: "Data looked at (reads)", all: "Everything" } as Record<EventClass, string>,
+    readBadge: "Read",
     from: "From",
     to: "To",
     search: "Search",
@@ -57,6 +62,9 @@ const translations = {
     action: "الإجراء يحتوي على",
     target: "نوع السجل",
     allTypes: "كل أنواع السجلات",
+    eventClass: "العرض",
+    classes: { changes: "التغييرات فقط", reads: "الاطلاع على البيانات (قراءة)", all: "الكل" } as Record<EventClass, string>,
+    readBadge: "اطلاع",
     from: "من",
     to: "إلى",
     search: "بحث",
@@ -84,11 +92,31 @@ const translations = {
   },
 };
 
-const TARGET_TYPES = [
-  "bookings", "branches", "data_subject_requests", "employee", "integrations", "inventory_products", "inventory_suppliers",
-  "branch_inventory_stock", "packages", "payment_disputes", "payment_methods", "payout_requests", "platform_settings",
-  "profiles", "promotional_codes", "provider_membership", "providers", "refund_requests", "services", "transactional_ledger",
-];
+// Operator names for the record types the log holds. The list of types comes from the server (the types that occur in the log),
+// so a renamed table still filters; a type without a name here is shown as its words.
+const RECORD_TYPE_NAMES: Record<"en" | "ar", Record<string, string>> = {
+  en: {
+    admin_approval_requests: "Approval requests", admin_audit_logs: "Audit log", analytics_events: "Analytics events", bookings: "Bookings",
+    branches: "Branches", consents: "Consents", data_subject_requests: "Privacy requests (before October 2026)", employees: "Staff", employee: "Staff",
+    governance_notifications: "Governance notices", governance_settings: "Approval thresholds", message_log: "Messages", notifications: "Notifications",
+    payment_disputes: "Payment disputes", payout_requests: "Payout requests", privacy_erasure_runs: "Erasure runs", privacy_exports: "Data copies",
+    privacy_incidents: "Privacy incidents", privacy_request_events: "Privacy request history", privacy_requests: "Privacy requests", profiles: "Accounts",
+    provider_applications: "Provider applications", provider_fee_invoices: "Fee invoices", providers: "Providers", reconciliation_breaks: "Reconciliation differences",
+    refund_requests: "Refunds", tap_reconciliation_runs: "Tap reconciliation runs", transactional_ledger: "Ledger entries", platform_settings: "Platform settings",
+    promotional_codes: "Coupons", services: "Services", packages: "Packages", integrations: "Integrations",
+  },
+  ar: {
+    admin_approval_requests: "طلبات الاعتماد", admin_audit_logs: "سجل التدقيق", analytics_events: "أحداث التحليلات", bookings: "الحجوزات",
+    branches: "الفروع", consents: "الموافقات", data_subject_requests: "طلبات الخصوصية (قبل أكتوبر ٢٠٢٦)", employees: "الموظفون", employee: "الموظفون",
+    governance_notifications: "إشعارات الحوكمة", governance_settings: "حدود الاعتماد", message_log: "الرسائل", notifications: "الإشعارات",
+    payment_disputes: "نزاعات الدفع", payout_requests: "طلبات الصرف", privacy_erasure_runs: "عمليات الحذف", privacy_exports: "نسخ البيانات",
+    privacy_incidents: "حوادث الخصوصية", privacy_request_events: "سجل طلبات الخصوصية", privacy_requests: "طلبات الخصوصية", profiles: "الحسابات",
+    provider_applications: "طلبات مقدمي الخدمة", provider_fee_invoices: "فواتير الرسوم", providers: "مقدمو الخدمة", reconciliation_breaks: "فروقات المطابقة",
+    refund_requests: "المبالغ المستردة", tap_reconciliation_runs: "عمليات مطابقة Tap", transactional_ledger: "قيود السجل المالي", platform_settings: "إعدادات المنصة",
+    promotional_codes: "الكوبونات", services: "الخدمات", packages: "الباقات", integrations: "التكاملات",
+  },
+};
+const recordTypeName = (type: string, lang: "en" | "ar") => RECORD_TYPE_NAMES[lang][type] ?? type.replace(/_/g, " ");
 
 // Riyadh is UTC+3 all year.
 const riyadhDayStart = (date: string) => new Date(`${date}T00:00:00+03:00`).toISOString();
@@ -107,8 +135,10 @@ export default function AdminAuditLogPage() {
   const [loadForbidden, setLoadForbidden] = useState(false);
   const [formError, setFormError] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [form, setForm] = useState({ action: "", target: "", from: "", to: "" });
-  const [filters, setFilters] = useState({ action: "", target: "", from: "", to: "" });
+  // The log opens on changes: read events are recorded too, but they would bury who changed what.
+  const [form, setForm] = useState({ action: "", target: "", from: "", to: "", eventClass: "changes" as EventClass });
+  const [filters, setFilters] = useState({ action: "", target: "", from: "", to: "", eventClass: "changes" as EventClass });
+  const [targetTypes, setTargetTypes] = useState<string[]>([]);
 
   const load = useCallback(async (pageNumber: number, active: typeof filters) => {
     setLoading(true);
@@ -123,6 +153,7 @@ export default function AdminAuditLogPage() {
       p_limit: PAGE_SIZE,
       p_offset: (pageNumber - 1) * PAGE_SIZE,
       p_purpose: "audit_review",
+      p_event_class: active.eventClass,
     });
     if (error) {
       setRows([]);
@@ -132,7 +163,8 @@ export default function AdminAuditLogPage() {
       setLoading(false);
       return;
     }
-    const result = (data ?? { total: 0, rows: [] }) as { total: number | string; rows: AuditRow[] | null };
+    const result = (data ?? { total: 0, rows: [] }) as { total: number | string; rows: AuditRow[] | null; target_types?: string[] };
+    if (Array.isArray(result.target_types)) setTargetTypes(result.target_types);
     const count = Number(result.total) || 0;
     setLoadForbidden(false);
     const list = result.rows ?? [];
@@ -156,7 +188,8 @@ export default function AdminAuditLogPage() {
   }, [load, page, filters]);
 
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const filtered = Boolean(filters.action || filters.target || filters.from || filters.to);
+  const filtered = Boolean(filters.action || filters.target || filters.from || filters.to || filters.eventClass !== "all");
+  const number = (value: number) => value.toLocaleString(isRTL ? "ar-SA" : "en-US");
   const formatTime = (value: string) =>
     new Intl.DateTimeFormat(isRTL ? "ar-SA-u-ca-gregory" : "en-GB", { dateStyle: "medium", timeStyle: "medium", timeZone: "Asia/Riyadh" }).format(new Date(value));
   const actorName = (id: string | null) => {
@@ -182,7 +215,7 @@ export default function AdminAuditLogPage() {
       </div>
 
       <form
-        className="grid grid-cols-1 gap-3 rounded-2xl border border-[#ECECEC] bg-white p-4 sm:grid-cols-2 lg:grid-cols-5"
+        className="grid grid-cols-1 gap-3 rounded-2xl border border-[#ECECEC] bg-white p-4 sm:grid-cols-2 lg:grid-cols-6"
         onSubmit={(e) => {
           e.preventDefault();
           if (form.from && form.to && form.from > form.to) {
@@ -195,6 +228,12 @@ export default function AdminAuditLogPage() {
         }}
       >
         <label className={labelBase}>
+          <span>{t.eventClass}</span>
+          <select className={inputBase} value={form.eventClass} onChange={(e) => setForm((f) => ({ ...f, eventClass: e.target.value as EventClass }))}>
+            {(["changes", "reads", "all"] as const).map((value) => <option key={value} value={value}>{t.classes[value]}</option>)}
+          </select>
+        </label>
+        <label className={labelBase}>
           <span>{t.action}</span>
           <input className={inputBase} value={form.action} maxLength={80} onChange={(e) => setForm((f) => ({ ...f, action: e.target.value }))} />
         </label>
@@ -202,7 +241,9 @@ export default function AdminAuditLogPage() {
           <span>{t.target}</span>
           <select className={inputBase} value={form.target} onChange={(e) => setForm((f) => ({ ...f, target: e.target.value }))}>
             <option value="">{t.allTypes}</option>
-            {TARGET_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
+            {[...new Set([...targetTypes, ...(form.target ? [form.target] : [])])]
+              .sort((a, b) => recordTypeName(a, lang).localeCompare(recordTypeName(b, lang), lang))
+              .map((type) => <option key={type} value={type}>{recordTypeName(type, lang)}</option>)}
           </select>
         </label>
         <label className={labelBase}>
@@ -218,7 +259,7 @@ export default function AdminAuditLogPage() {
           <button
             type="button"
             onClick={() => {
-              const empty = { action: "", target: "", from: "", to: "" };
+              const empty = { action: "", target: "", from: "", to: "", eventClass: "changes" as EventClass };
               setForm(empty);
               setFormError("");
               setPage(1);
@@ -264,9 +305,12 @@ export default function AdminAuditLogPage() {
                   <tr className="border-t border-[#F2F4F7] align-top">
                     <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-600">{formatTime(row.created_at)}</td>
                     <td className="px-4 py-3 text-xs font-semibold text-gray-900">{actorName(row.actor_id)}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-gray-900" dir="ltr">{row.action}</td>
-                    <td className="px-4 py-3 font-mono text-[11px] text-gray-600" dir="ltr">
-                      {row.target_type || "—"}{row.target_id ? ` · ${row.target_id.slice(0, 8)}…` : ""}
+                    <td className="px-4 py-3 text-xs text-gray-900">
+                      <span className="font-mono" dir="ltr">{row.action}</span>
+                      {row.is_read && <span className="ms-2 inline-block rounded-full bg-[#EEF4FF] px-2 py-0.5 text-[10px] font-black text-[#3538CD]">{t.readBadge}</span>}
+                    </td>
+                    <td className="px-4 py-3 text-[11px] text-gray-600">
+                      {row.target_type ? recordTypeName(row.target_type, lang) : "—"}{row.target_id ? <span className="font-mono" dir="ltr">{` · ${row.target_id.slice(0, 8)}…`}</span> : ""}
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-700">{reasonOf(row) || "—"}</td>
                     <td className="px-4 py-3">
@@ -300,7 +344,7 @@ export default function AdminAuditLogPage() {
 
       {!loadError && total > 0 && (
         <nav aria-label={t.page} className={`flex items-center justify-between gap-3 text-xs text-gray-600 ${isRTL ? "flex-row-reverse" : ""}`}>
-          <span>{t.page} {page} {t.of} {pages} · {total.toLocaleString(isRTL ? "ar-SA" : "en-US")} {t.entries}</span>
+          <span>{t.page} {number(page)} {t.of} {number(pages)} · {number(total)} {t.entries}</span>
           <div className={`flex gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
             <button type="button" aria-disabled={page <= 1 || loading} onClick={() => { if (!loading) setPage((p) => Math.max(1, p - 1)); }} className={`rounded-xl border border-[#ECECEC] px-3 py-1.5 font-bold focus-visible:outline-2 focus-visible:outline-[#9B7928] ${page <= 1 || loading ? "opacity-40" : ""}`}>{t.previous}</button>
             <button type="button" aria-disabled={page >= pages || loading} onClick={() => { if (!loading) setPage((p) => Math.min(pages, p + 1)); }} className={`rounded-xl border border-[#ECECEC] px-3 py-1.5 font-bold focus-visible:outline-2 focus-visible:outline-[#9B7928] ${page >= pages || loading ? "opacity-40" : ""}`}>{t.next}</button>

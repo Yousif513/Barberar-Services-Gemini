@@ -53,14 +53,14 @@ describe("P-14 staff contacts", () => {
   });
 });
 
-describe("P-14 patch tests", () => {
-  it("shows a patch test only to a delegate of the branch the booking belongs to", async () => {
-    assert.equal(await patch(scopedA), 1);
+describe("P-14 patch tests (narrowed to the assigned provider by Q2.6; security review M4(b))", () => {
+  it("shows a patch test to no delegate and no provider-wide manager", async () => {
+    assert.equal(await patch(scopedA), 0);
     assert.equal(await patch(scopedB), 0);
+    assert.equal(await patch(wide), 0);
   });
-  it("still shows the owner, a provider-wide manager and the client; nothing to a stranger", async () => {
-    assert.equal(await patch(owner), 1);
-    assert.equal(await patch(wide), 1);
+  it("shows the person who recorded it and the client; nothing to a stranger", async () => {
+    assert.equal(await patch(owner), 1, "the owner recorded this test");
     assert.equal(await patch(customer), 1);
     assert.equal(await patch(ROLES.user(SEED.owner2)), 0);
   });

@@ -24,7 +24,7 @@ export type IntakeField = {
 export type AnswerValue = string | boolean | string[] | null | undefined;
 export type Answers = Record<string, AnswerValue>;
 
-export type FormStatus = "not_required" | "submitted" | "missing" | "withdrawn" | "deleted" | "purged";
+export type FormStatus = "not_required" | "submitted" | "missing" | "withdrawn" | "deleted" | "purged" | "collection_paused";
 export type PatchStatus = "not_required" | "valid" | "missing" | "expired" | "too_late" | "blocked";
 
 export type StatusRow = {
@@ -53,6 +53,9 @@ export type BookingIntake = {
   service_id: string;
   provider_id: string;
   consent_active: boolean;
+  // X3(6): health questions are collected only after the owner approved the transfer risk assessment.
+  collection?: { enabled: boolean; notice_en: string | null; notice_ar: string | null };
+  reuse_consent_active?: boolean;
   requirement: { form_required: boolean; patch_test_required: boolean; patch_validity_days: number | null; patch_min_hours_before: number | null } | null;
   form: { template_id: string; version: number; name_en: string; name_ar: string; is_active: boolean; fields: IntakeField[] } | null;
   submission: {
@@ -202,6 +205,7 @@ export const intakeCopy = {
       withdrawn: "Withdrawn by client",
       deleted: "Deleted by client",
       purged: "Removed (retention)",
+      collection_paused: "Not collected (switched off)",
     } as Record<FormStatus, string>,
     patchStatus: {
       not_required: "Not required",
@@ -248,13 +252,14 @@ export const intakeCopy = {
     consentTitle: "Before you share health information",
     shareHeading: "Who can see your answers",
     shareItems: (provider: string) => [
-      `Only ${provider}: the owner, managers with booking access, and the professional assigned to this booking can open your answers, and only to prepare your service.`,
+      `Only the professional of ${provider} assigned to this booking (or the business owner when no professional is assigned) can open your answers, and only to prepare your service.`,
       "Every time someone opens your answers it is recorded, and you can see how many times below.",
       "PRIMORA administrators never see your answers. They only see counts.",
     ],
     keptHeading: "How long they are kept",
     keptItems: [
-      "Until you delete them, or until the retention period the platform sets ends.",
+      "They are destroyed 30 days after the appointment is completed or cancelled, or earlier when you delete them.",
+      "They are reused for a later booking only if you separately allow it (Privacy in your account); that permission lasts 12 months.",
       "If you withdraw your consent, answers for upcoming bookings are erased and your provider can see that you withdrew.",
     ],
     consentLabel: "I agree to share my answers to this form with this provider for the purpose above.",
@@ -422,6 +427,7 @@ export const intakeCopy = {
       withdrawn: "سحبه العميل",
       deleted: "حذفه العميل",
       purged: "أُزيل (مدة الاحتفاظ)",
+      collection_paused: "لا يُجمع (متوقف)",
     } as Record<FormStatus, string>,
     patchStatus: {
       not_required: "غير مطلوب",
@@ -467,13 +473,14 @@ export const intakeCopy = {
     consentTitle: "قبل أن تشارك معلومات صحية",
     shareHeading: "من يستطيع رؤية إجاباتك",
     shareItems: (provider: string) => [
-      `${provider} فقط: المالك والمديرون الذين لديهم صلاحية الحجوزات والمختص المعيّن لهذا الحجز يستطيعون فتح إجاباتك، وذلك لتجهيز خدمتك فقط.`,
+      `المختص المعيّن لهذا الحجز لدى ${provider} فقط (أو مالك المنشأة إن لم يُعيَّن مختص) يستطيع فتح إجاباتك، وذلك لتجهيز خدمتك فقط.`,
       "يُسجَّل كل فتح لإجاباتك، ويمكنك رؤية عدد مرات الفتح أدناه.",
       "مسؤولو بريمورا لا يرون إجاباتك أبدًا. يرون أعدادًا فقط.",
     ],
     keptHeading: "مدة الاحتفاظ بها",
     keptItems: [
-      "إلى أن تحذفها أنت، أو تنتهي مدة الاحتفاظ التي تحددها المنصة.",
+      "تُتلف بعد 30 يوماً من إتمام الموعد أو إلغائه، أو قبل ذلك إن حذفتها.",
+      "لا يُعاد استخدامها لحجز لاحق إلا إذا سمحت بذلك بشكل منفصل (صفحة الخصوصية في حسابك)؛ ويستمر هذا الإذن 12 شهراً.",
       "إن سحبت موافقتك تُمسح إجابات حجوزاتك القادمة، ويرى المزوّد أنك سحبت الموافقة.",
     ],
     consentLabel: "أوافق على مشاركة إجاباتي في هذا النموذج مع هذا المزوّد للغرض المذكور أعلاه.",
@@ -527,6 +534,7 @@ type Reason = { match: RegExp; en: string; ar: (m: RegExpMatchArray) => string }
 const reasons: Reason[] = [
   { match: /Authentication required/i, en: "Please sign in again.", ar: () => "يُرجى تسجيل الدخول من جديد." },
   { match: /Booking not found/i, en: "", ar: () => "لم يُعثر على الحجز." },
+  { match: /Health questions are not collected yet/i, en: "", ar: () => "لا تُجمع الأسئلة الصحية بعد: لم تعتمد بريمورا تقييم مخاطر النقل للبيانات الصحية." },
   { match: /Provider not found/i, en: "", ar: () => "لم يُعثر على النشاط." },
   { match: /Service not found/i, en: "", ar: () => "لم تُعثر على الخدمة." },
   { match: /Template not found/i, en: "", ar: () => "لم يُعثر على النموذج." },

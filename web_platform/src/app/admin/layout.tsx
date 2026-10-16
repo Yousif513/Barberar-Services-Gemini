@@ -6,7 +6,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/auth-guard";
 import { supabase } from "@/lib/supabase";
 import { clearDevRole } from "@/lib/dev-access";
-import { useOperationsLocale } from "@/components/operations-ui";
+import { ForbiddenNotice, useOperationsLocale } from "@/components/operations-ui";
+import { ConsoleSessionContext, consoleSessionFrom, EMPTY_CONSOLE_SESSION, holdsAny, screenPermissions, type ConsoleSession } from "@/lib/console-session";
 import { StepUpDialog } from "@/components/step-up-dialog";
 
 
@@ -57,6 +58,10 @@ const translations = {
     webhooks: "Webhooks",
     systemLogs: "System Logs",
     auditLogs: "Audit Logs",
+    privacyCompliance: "Privacy & Compliance",
+    privacy: "Privacy Requests",
+    incidents: "Incident Register",
+    ropa: "Processing Register",
     settings: "Settings",
     logout: "Log Out",
     adminAccount: "Administrator",
@@ -73,7 +78,8 @@ const translations = {
     closeMenu: "Close navigation",
     close: "Close",
     signOutFailed: "Signing out failed, so you are still signed in on this device. Check your connection and try again.",
-    pageSuffix: "PRIMORA Admin"
+    pageSuffix: "PRIMORA Admin",
+    checkingAccess: "Checking what your console role can open…"
   },
   ar: {
     activity: "سجل الأنشطة",
@@ -121,6 +127,10 @@ const translations = {
     webhooks: "تنبيهات الويب هوك",
     systemLogs: "سجلات النظام",
     auditLogs: "سجلات التدقيق",
+    privacyCompliance: "الخصوصية والامتثال",
+    privacy: "طلبات الخصوصية",
+    incidents: "سجل الحوادث",
+    ropa: "سجل أنشطة المعالجة",
     settings: "الإعدادات العامة",
     logout: "تسجيل الخروج",
     adminAccount: "حساب المشرف",
@@ -137,7 +147,8 @@ const translations = {
     closeMenu: "إغلاق القائمة",
     close: "إغلاق",
     signOutFailed: "تعذّر تسجيل الخروج، لذا ما زلت مسجلاً على هذا الجهاز. تحقق من الاتصال وحاول مجدداً.",
-    pageSuffix: "إدارة PRIMORA"
+    pageSuffix: "إدارة PRIMORA",
+    checkingAccess: "جارٍ التحقق مما يتيحه دورك في لوحة الإدارة…"
   }
 };
 
@@ -205,6 +216,12 @@ const getNavIcon = (nameKey: string) => {
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>;
     case "systemLogs":
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>;
+    case "privacy":
+      return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" /></svg>;
+    case "incidents":
+      return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>;
+    case "ropa":
+      return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h10M4 18h7" /></svg>;
     case "auditLogs":
       return <svg className={s} fill="none" stroke="currentColor" strokeWidth="2.3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>;
     case "platformRules":
@@ -283,18 +300,21 @@ export default function AdminLayout({
   }, []);
   const displayName = accountName || t.adminAccount;
 
-  // The console role in force (GOV-1). It only labels the account; every command is decided by the database.
-  const [consoleRole, setConsoleRole] = useState("");
+  // The console role in force and its permissions (GOV-1). They label the account and leave out of the navigation, and out of
+  // each screen, what the role cannot use; every read and command is still decided by the database.
+  const [session, setSession] = useState<ConsoleSession>(EMPTY_CONSOLE_SESSION);
   useEffect(() => {
     let cancelled = false;
-    void supabase.rpc("admin_session_state").then(({ data }) => {
-      const role = (data as { console_role?: string | null } | null)?.console_role;
-      if (!cancelled && role) setConsoleRole(role);
+    void supabase.rpc("admin_session_state").then(({ data, error }) => {
+      if (cancelled) return;
+      // An unreadable session state hides nothing: the screens then show the database's own answers.
+      setSession(error ? { ...EMPTY_CONSOLE_SESSION, loaded: true } : consoleSessionFrom(data));
     });
     return () => {
       cancelled = true;
     };
   }, []);
+  const consoleRole = session.role ?? "";
   const consoleRoleLabel: Record<string, string> = {
     owner: t.consoleRoleOwner,
     finance: t.consoleRoleFinance,
@@ -395,6 +415,14 @@ export default function AdminLayout({
       ]
     },
     {
+      titleKey: "privacyCompliance",
+      items: [
+        { nameKey: "privacy", path: "/admin/privacy" },
+        { nameKey: "incidents", path: "/admin/incidents" },
+        { nameKey: "ropa", path: "/admin/ropa" }
+      ]
+    },
+    {
       titleKey: "system",
       items: [
         { nameKey: "activity", path: "/admin/activity" },
@@ -405,6 +433,21 @@ export default function AdminLayout({
       ]
     }
   ];
+
+  // Only the screens the console role can read are offered. Before the role is known, screens that need a permission wait.
+  const visibleSections = navSections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => {
+        const needs = screenPermissions(item.path);
+        if (needs.length === 0) return true;
+        return session.loaded && holdsAny(session, needs);
+      }),
+    }))
+    .filter((section) => section.items.length > 0);
+  const routeNeeds = screenPermissions(pathname);
+  const routeState: "open" | "checking" | "forbidden" = routeNeeds.length === 0 ? "open"
+    : !session.loaded ? "checking" : holdsAny(session, routeNeeds) ? "open" : "forbidden";
 
   const currentItem = navSections
     .flatMap((section) => section.items)
@@ -461,7 +504,7 @@ export default function AdminLayout({
 
       {/* Grouped Links (Scrollable) */}
       <nav aria-label={t.mainNavigation} className="mt-6 min-h-0 flex-1 space-y-3 overflow-y-auto pe-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {navSections.map((sec) => (
+        {visibleSections.map((sec) => (
           <div key={sec.titleKey} className="space-y-1">
             <span className={`block px-4 text-[11px] font-bold text-[#B8B2A4] uppercase tracking-widest ${isRTL ? "text-right" : "text-left"}`}>
               {t[sec.titleKey as keyof typeof t] || sec.titleKey.toUpperCase()}
@@ -557,6 +600,7 @@ export default function AdminLayout({
 
   return (
     <AuthGuard allowedRoles={["admin"]}>
+      <ConsoleSessionContext.Provider value={session}>
       <StepUpDialog />
       <div className="primora-dashboard-skin flex flex-col md:flex-row bg-[#F7F6F3] text-black font-sans selection:bg-[#D1AF47] selection:text-white md:h-screen md:overflow-hidden">
         
@@ -656,12 +700,20 @@ export default function AdminLayout({
         <div inert={mobileMenuOpen} className="flex min-w-0 flex-1 flex-col md:overflow-hidden">
           <main id="admin-main" tabIndex={-1} className="primora-dashboard-content flex-grow p-4 focus:outline-none md:p-6 md:overflow-y-auto">
             <div className="max-w-[1500px] mx-auto h-full">
-              {children}
+              {routeState === "open" ? children : routeState === "checking" ? (
+                  <p role="status" className="rounded-2xl border border-[#ECECEC] bg-white p-5 text-sm font-semibold text-[#667085]">{t.checkingAccess}</p>
+                ) : (
+                  <div className="space-y-4">
+                    <h1 className="font-serif text-2xl font-black text-gray-900">{currentName}</h1>
+                    <ForbiddenNotice locale={locale} permissions={routeNeeds} />
+                  </div>
+                )}
             </div>
           </main>
         </div>
 
       </div>
+      </ConsoleSessionContext.Provider>
     </AuthGuard>
   );
 }

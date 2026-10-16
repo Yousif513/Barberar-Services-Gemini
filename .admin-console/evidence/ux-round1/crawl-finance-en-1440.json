@@ -1,0 +1,460 @@
+[
+ {
+  "route": "/admin",
+  "ms": 3988,
+  "url": "/admin",
+  "lang": "en",
+  "dir": "ltr",
+  "scrollW": 1440,
+  "clientW": 1440,
+  "h1": "Welcome back, Local",
+  "alerts": [],
+  "latinDigitsInAr": null,
+  "arabicDigits": 0,
+  "usd": false,
+  "sar": 5,
+  "overflow": [],
+  "text": "Welcome back, Local Work waiting for an operator and live platform figures. Times are shown in Riyadh time. Updated 09:44 Refresh Platform activity Help Center BOOKINGS TODAY Fewer than 5 Hidden because fewer than 5 people are behind this figure PAYMENTS CAPTURED, 7 DAYS Fewer than 5 Hidden because fewer than 5 people are behind this figure PLATFORM COMMISSION, 7 DAYS Fewer than 5 Hidden because fewer than 5 people are behind this figure LIVE PROVIDERS Fewer than 5 Hidden because fewer than 5 people are behind this figure CUSTOMERS 11 Customer accounts on the platform COMPLETION RATE, 30 DAYS — No finished visits in the last 30 days NEEDS ATTENTION Each line opens the screen where it is hand",
+  "console": [
+   {
+    "url": "http://localhost:3100/admin",
+    "type": "http403",
+    "text": "http://127.0.0.1:54321/rest/v1/rpc/admin_list_audit_events"
+   },
+   {
+    "url": "http://localhost:3100/admin",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   },
+   {
+    "url": "http://localhost:3100/admin",
+    "type": "http403",
+    "text": "http://127.0.0.1:54321/rest/v1/rpc/admin_list_audit_events"
+   },
+   {
+    "url": "http://localhost:3100/admin",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   }
+  ],
+  "shot": "finance-en-1440-_admin.png"
+ },
+ {
+  "route": "/admin/approvals",
+  "ms": 3891,
+  "url": "/admin/approvals",
+  "lang": "en",
+  "dir": "ltr",
+  "scrollW": 1440,
+  "clientW": 1440,
+  "h1": "",
+  "alerts": [],
+  "latinDigitsInAr": null,
+  "arabicDigits": 0,
+  "usd": false,
+  "sar": 3,
+  "overflow": [],
+  "text": "Approvals Actions that need a second administrator. You cannot approve your own request; the server refuses it for every role, owners included. Waiting Approved4 Rejected Withdrawn1 No request is waiting for a decision. Break-glass reviews No break-glass action needs a review. Thresholds Changing a threshold is itself a request that another administrator with money rights approves. Break-glass daily cap Most an owner may execute alone through break-glass in one Riyadh day SAR 10,000.00 Daily refund total per administrator Refunds by one administrator above this total in one Riyadh day need a second administrator SAR 5,000.00 Single refund needing a second approver A single refund of this amo",
+  "console": [],
+  "shot": "finance-en-1440-_admin_approvals.png"
+ },
+ {
+  "route": "/admin/roles",
+  "ms": 3826,
+  "url": "/admin/roles",
+  "lang": "en",
+  "dir": "ltr",
+  "scrollW": 1440,
+  "clientW": 1440,
+  "h1": "",
+  "alerts": [],
+  "latinDigitsInAr": null,
+  "arabicDigits": 0,
+  "usd": false,
+  "sar": 0,
+  "overflow": [],
+  "text": "Administrators & Roles Who can operate the console, with which console role, and who works for a provider. Only an owner changes console roles or resets two-step verification; each change needs a reason and a fresh authenticator code and is recorded in the audit log. Administrators and staff Administrators7 Provider owners5 Provider employees2 Find a customer Search by name, email, phone or ID A customer is listed only when you search for one. PERSON EMAIL ROLE CONSOLE ROLE TWO-STEP VERIFICATION PROVIDER SINCE ACTIONS Privacy Owner privacy.owner.1791700009164@example.test Administrator Owner Enrolled — 11 Oct 2026, 09:26 Owner Finance Operations Analyst (read-only) Apply Remove from console ",
+  "console": [],
+  "shot": "finance-en-1440-_admin_roles.png"
+ },
+ {
+  "route": "/admin/ledger",
+  "ms": 3841,
+  "url": "/admin/ledger",
+  "lang": "en",
+  "dir": "ltr",
+  "scrollW": 1440,
+  "clientW": 1440,
+  "h1": "",
+  "alerts": [],
+  "latinDigitsInAr": null,
+  "arabicDigits": 0,
+  "usd": false,
+  "sar": 0,
+  "overflow": [],
+  "text": "Financial Ledger & Statements Audit ledger entries, manage provider payout requests, and view accountant summaries. Payment Methods Transaction Splits Payout Requests Accountant Statements PSP Reconciliation Payment Methods (KSA) Enable, disable and set the default — changes reflect instantly at customer checkout and provider payout screens. ACTIVE PAYMENT APIS TAP PAYMENTS · TEST mada GATEWAY: TAP · TEST CONNECTED API: TAP PAYMENTS SELECT GATEWAY PROVIDER Select gateway provider Tap Payments - test CUSTOMER ★ DEFAULT Apple Pay GATEWAY: TAP · TEST CONNECTED API: TAP PAYMENTS SELECT GATEWAY PROVIDER Select gateway provider Tap Payments - test CUSTOMER MAKE DEFAULT Visa GATEWAY: TAP · TEST CON",
+  "console": [],
+  "shot": "finance-en-1440-_admin_ledger.png"
+ },
+ {
+  "route": "/admin/reconciliation",
+  "ms": 3812,
+  "url": "/admin/reconciliation",
+  "lang": "en",
+  "dir": "ltr",
+  "scrollW": 1440,
+  "clientW": 1440,
+  "h1": "",
+  "alerts": [],
+  "latinDigitsInAr": null,
+  "arabicDigits": 0,
+  "usd": false,
+  "sar": 0,
+  "overflow": [],
+  "text": "Tap Reconciliation Tap is the record of money movement and the ledger the record of what is owed. Every difference is a break, resolved only by a correction a second administrator approves. Run a day Business day (Riyadh) Fetch from Tap and reconcile Reconcile recorded data Import a file File Bank statement (bank_line_id,amount,settlement_id) Tap settlement report (settlement_id,amount) Paste the lines (CSV) Reason (at least 10 characters) Import Breaks Open and escalated (0) Resolved by correction (0) Matched later by Tap data (0) No breaks with this status. Refund timelines A refund starts at Tap within 3 business days of the customer becoming entitled and must succeed at Tap within 14 day",
+  "console": [],
+  "shot": "finance-en-1440-_admin_reconciliation.png"
+ },
+ {
+  "route": "/admin/platform-rules",
+  "ms": 3771,
+  "url": "/admin/platform-rules",
+  "lang": "en",
+  "dir": "ltr",
+  "scrollW": 1440,
+  "clientW": 1440,
+  "h1": "",
+  "alerts": [],
+  "latinDigitsInAr": null,
+  "arabicDigits": 0,
+  "usd": false,
+  "sar": 4,
+  "overflow": [],
+  "text": "Platform Rules Feature flags, marketplace fees and API limits. Each change needs a reason and is recorded in the audit log. Feature flags A flag switches a whole capability on or off for everyone. payments_marketplace_split Tap Marketplace sub-merchant onboarding and split at capture (OFF until owner confirms legal opinion on fund custody) Updated: 9 Oct 2026, 19:16 Off Turn on Marketplace fee rules What the platform charges on a booking that comes through the marketplace. Bookings that come through a provider's own link, QR code, WhatsApp, Instagram, walk-in or imported client are always free of platform fee, so those rows are shown but cannot be changed. A change is a new version from a st",
+  "console": [],
+  "shot": "finance-en-1440-_admin_platform-rules.png"
+ },
+ {
+  "route": "/admin/settings",
+  "ms": 3943,
+  "url": "/admin/settings",
+  "lang": "en",
+  "dir": "ltr",
+  "scrollW": 1440,
+  "clientW": 1440,
+  "h1": "Platform Settings",
+  "alerts": [],
+  "latinDigitsInAr": null,
+  "arabicDigits": 0,
+  "usd": false,
+  "sar": 10,
+  "overflow": [],
+  "text": "Platform Settings Settings the booking engine reads. Every change needs a reason and is written to the audit log. Unpaid booking hold Minutes an unpaid booking keeps its time slot before it is released (5–120). Hold minutes Reason for this change SAVE Last changed: 9 Oct 2026, 19:16 Referral and loyalty programmes Both programmes are off until every value is set and a different owner approves. Credits are funded by the platform, cannot be withdrawn as cash, transferred, bought or topped up, are usable only on PRIMORA and expire as published. Customers accept the published terms in Arabic and English before they enrol. Loyalty points Disabled SAR value of one point Not set Points earned per S",
+  "console": [],
+  "shot": "finance-en-1440-_admin_settings.png"
+ },
+ {
+  "route": "/admin/customers",
+  "ms": 3861,
+  "url": "/admin/customers",
+  "lang": "en",
+  "dir": "ltr",
+  "scrollW": 1440,
+  "clientW": 1440,
+  "h1": "Customer Directory & Data Rights",
+  "alerts": [
+   "You do not have access to this screen\n\nYour account is signed in, but the server refused this request. Ask an owner of the console to give your account the administrator role, then sign in again. Tryi"
+  ],
+  "latinDigitsInAr": null,
+  "arabicDigits": 0,
+  "usd": false,
+  "sar": 0,
+  "overflow": [],
+  "text": "Customer Directory & Data Rights Look up customer accounts and their booking history, and work through PDPL data requests and recorded consents. Customer Directory PDPL Data Rights & Consents TOTAL CUSTOMERS — VERIFIED PHONE ACCOUNTS — OPEN DATA REQUESTS — Search by name, email, phone or ID You do not have access to this screen Your account is signed in, but the server refused this request. Ask an owner of the console to give your account the administrator role, then sign in again. Trying again will not help until access is granted. Back to the dashboard",
+  "console": [
+   {
+    "url": "http://localhost:3100/admin/customers",
+    "type": "http403",
+    "text": "http://127.0.0.1:54321/rest/v1/rpc/admin_list_consents"
+   },
+   {
+    "url": "http://localhost:3100/admin/customers",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   },
+   {
+    "url": "http://localhost:3100/admin/customers",
+    "type": "http403",
+    "text": "http://127.0.0.1:54321/rest/v1/rpc/admin_customer_overview"
+   },
+   {
+    "url": "http://localhost:3100/admin/customers",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   },
+   {
+    "url": "http://localhost:3100/admin/customers",
+    "type": "http403",
+    "text": "http://127.0.0.1:54321/rest/v1/rpc/admin_privacy_list_requests"
+   },
+   {
+    "url": "http://localhost:3100/admin/customers",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   },
+   {
+    "url": "http://localhost:3100/admin/customers",
+    "type": "http403",
+    "text": "http://127.0.0.1:54321/rest/v1/rpc/admin_privacy_list_requests"
+   },
+   {
+    "url": "http://localhost:3100/admin/customers",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   },
+   {
+    "url": "http://localhost:3100/admin/customers",
+    "type": "http403",
+    "text": "http://127.0.0.1:54321/rest/v1/rpc/admin_privacy_list_requests"
+   },
+   {
+    "url": "http://localhost:3100/admin/customers",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   },
+   {
+    "url": "http://localhost:3100/admin/customers",
+    "type": "http403",
+    "text": "http://127.0.0.1:54321/rest/v1/rpc/admin_list_consents"
+   },
+   {
+    "url": "http://localhost:3100/admin/customers",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   },
+   {
+    "url": "http://localhost:3100/admin/customers",
+    "type": "http403",
+    "text": "http://127.0.0.1:54321/rest/v1/rpc/admin_customer_overview"
+   },
+   {
+    "url": "http://localhost:3100/admin/customers",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   },
+   {
+    "url": "http://localhost:3100/admin/customers",
+    "type": "http403",
+    "text": "http://127.0.0.1:54321/rest/v1/rpc/admin_privacy_list_requests"
+   },
+   {
+    "url": "http://localhost:3100/admin/customers",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   }
+  ],
+  "shot": "finance-en-1440-_admin_customers.png"
+ },
+ {
+  "route": "/admin/bookings",
+  "ms": 3844,
+  "url": "/admin/bookings",
+  "lang": "en",
+  "dir": "ltr",
+  "scrollW": 1440,
+  "clientW": 1440,
+  "h1": "Global Bookings Ledger",
+  "alerts": [],
+  "latinDigitsInAr": null,
+  "arabicDigits": 0,
+  "usd": false,
+  "sar": 21,
+  "overflow": [],
+  "text": "Global Bookings Ledger Audit active client scheduling logs, platform split captures, and status indicators. Times are shown in Riyadh time. Search by booking ID, invoice number, customer or provider From (Riyadh date) To (Riyadh date) Status All statuses Awaiting payment Confirmed Completed Cancelled No-show Release expired unpaid holds Totals cover every booking that matches the filters, not only the page below. VALUE OF MATCHING BOOKINGS SAR SAR 1,640.00 PLATFORM COMMISSION ON MATCHING BOOKINGS % SAR 288.00 AWAITING PAYMENT OR CONFIRMED (MATCHING) 1 BOOKING DETAILS CLIENT / CUSTOMER PROVIDER / BRANCH CAPTURED PRICE PLATFORM COMMISSION STATUS ACTIONS 15 Oct 2026, 10:00 ID: 3f2acd0c Guest El",
+  "console": [],
+  "shot": "finance-en-1440-_admin_bookings.png"
+ },
+ {
+  "route": "/admin/disputes",
+  "ms": 3864,
+  "url": "/admin/disputes",
+  "lang": "en",
+  "dir": "ltr",
+  "scrollW": 1440,
+  "clientW": 1440,
+  "h1": "",
+  "alerts": [],
+  "latinDigitsInAr": null,
+  "arabicDigits": 0,
+  "usd": false,
+  "sar": 1,
+  "overflow": [],
+  "text": "Disputes Arbitrator Console Review flagged client ratings (1-2 stars), refund appeals, and safety violations. TOTAL DISPUTES # 0 PENDING DISPUTES ! 0 REFUNDED TOTAL 0 SAR",
+  "console": [],
+  "shot": "finance-en-1440-_admin_disputes.png"
+ },
+ {
+  "route": "/admin/audit-logs",
+  "ms": 3825,
+  "url": "/admin/audit-logs",
+  "lang": "en",
+  "dir": "ltr",
+  "scrollW": 1440,
+  "clientW": 1440,
+  "h1": "Audit Log",
+  "alerts": [
+   "You do not have access to this screen\n\nYour account is signed in, but the server refused this request. Ask an owner of the console to give your account the administrator role, then sign in again. Tryi"
+  ],
+  "latinDigitsInAr": null,
+  "arabicDigits": 0,
+  "usd": false,
+  "sar": 0,
+  "overflow": [],
+  "text": "Audit Log Who changed what, when and why. Entries are written by the server in the same transaction as the change. Action contains Record type All record types bookings branches data_subject_requests employee integrations inventory_products inventory_suppliers branch_inventory_stock packages payment_disputes payment_methods payout_requests platform_settings profiles promotional_codes provider_membership providers refund_requests services transactional_ledger From To Search Clear filters You do not have access to this screen Your account is signed in, but the server refused this request. Ask an owner of the console to give your account the administrator role, then sign in again. Trying again ",
+  "console": [
+   {
+    "url": "http://localhost:3100/admin/audit-logs",
+    "type": "http403",
+    "text": "http://127.0.0.1:54321/rest/v1/rpc/admin_list_audit_events"
+   },
+   {
+    "url": "http://localhost:3100/admin/audit-logs",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   },
+   {
+    "url": "http://localhost:3100/admin/audit-logs",
+    "type": "http403",
+    "text": "http://127.0.0.1:54321/rest/v1/rpc/admin_list_audit_events"
+   },
+   {
+    "url": "http://localhost:3100/admin/audit-logs",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   }
+  ],
+  "shot": "finance-en-1440-_admin_audit-logs.png"
+ },
+ {
+  "route": "/admin/privacy",
+  "ms": 3797,
+  "url": "/admin/privacy",
+  "lang": "en",
+  "dir": "ltr",
+  "scrollW": 1440,
+  "clientW": 1440,
+  "h1": "Privacy Requests",
+  "alerts": [
+   "You do not have access to this screen\n\nYour account is signed in, but the server refused this request. Ask an owner of the console to give your account the administrator role, then sign in again. Tryi"
+  ],
+  "latinDigitsInAr": null,
+  "arabicDigits": 0,
+  "usd": false,
+  "sar": 0,
+  "overflow": [],
+  "text": "Privacy Requests PDPL requests from customers: 30 days from receipt, one extension of up to 30 days notified before day 30, free of charge. A copy, a deletion and a legal hold run only after a different owner approves them. Requests Legal holds Deletion ledger & health intake Open Closed Run the day-20 / day-28 check now You do not have access to this screen Your account is signed in, but the server refused this request. Ask an owner of the console to give your account the administrator role, then sign in again. Trying again will not help until access is granted. Back to the dashboard Log a request received outside the app Customer ID (from Customers) Type Access Copy Correction Deletion Con",
+  "console": [
+   {
+    "url": "http://localhost:3100/admin/privacy",
+    "type": "http403",
+    "text": "http://127.0.0.1:54321/rest/v1/rpc/admin_privacy_list_requests"
+   },
+   {
+    "url": "http://localhost:3100/admin/privacy",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   },
+   {
+    "url": "http://localhost:3100/admin/privacy",
+    "type": "http403",
+    "text": "http://127.0.0.1:54321/rest/v1/rpc/admin_privacy_list_requests"
+   },
+   {
+    "url": "http://localhost:3100/admin/privacy",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   }
+  ],
+  "shot": "finance-en-1440-_admin_privacy.png"
+ },
+ {
+  "route": "/admin/incidents",
+  "ms": 3801,
+  "url": "/admin/incidents",
+  "lang": "en",
+  "dir": "ltr",
+  "scrollW": 1440,
+  "clientW": 1440,
+  "h1": "Incident Register",
+  "alerts": [
+   "You do not have access to this screen\n\nYour account is signed in, but the server refused this request. Ask an owner of the console to give your account the administrator role, then sign in again. Tryi"
+  ],
+  "latinDigitsInAr": null,
+  "arabicDigits": 0,
+  "usd": false,
+  "sar": 0,
+  "overflow": [],
+  "text": "Incident Register Personal data breaches. Notify SDAIA within 72 hours of becoming aware, for every breach unless you record a reasoned conclusion that no harm is possible. Tell the people affected without undue delay whenever harm is possible. Records are kept 5 years. Open Closed You do not have access to this screen Your account is signed in, but the server refused this request. Ask an owner of the console to give your account the administrator role, then sign in again. Trying again will not help until access is granted. Back to the dashboard Record a new incident Short title Discovered at (Riyadh time) PRIMORA became aware at (Riyadh time) — starts the 72-hour clock What happened (at lea",
+  "console": [
+   {
+    "url": "http://localhost:3100/admin/incidents",
+    "type": "http403",
+    "text": "http://127.0.0.1:54321/rest/v1/rpc/admin_incident_list"
+   },
+   {
+    "url": "http://localhost:3100/admin/incidents",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   },
+   {
+    "url": "http://localhost:3100/admin/incidents",
+    "type": "http403",
+    "text": "http://127.0.0.1:54321/rest/v1/rpc/admin_incident_list"
+   },
+   {
+    "url": "http://localhost:3100/admin/incidents",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   }
+  ],
+  "shot": "finance-en-1440-_admin_incidents.png"
+ },
+ {
+  "route": "/admin/ropa",
+  "ms": 3873,
+  "url": "/admin/ropa",
+  "lang": "en",
+  "dir": "ltr",
+  "scrollW": 1440,
+  "clientW": 1440,
+  "h1": "Processing Register (RoPA)",
+  "alerts": [],
+  "latinDigitsInAr": null,
+  "arabicDigits": 0,
+  "usd": false,
+  "sar": 0,
+  "overflow": [],
+  "text": "Processing Register (RoPA) Read-only. The controlled source is the versioned document; changes are made there and reviewed every quarter and on every schema change that adds personal data. Source: docs/privacy/ropa.md · SHA-256 aff75d39ebe0183b… 21 fields wait for the owner (marked OWNER MUST COMPLETE). Record of Processing Activities (RoPA) Version: 0.1 (draft, prepared by engineering from the code on 2026-10-11) Owner of this record: the DPO (not yet appointed; see \"Owner must complete\") Basis: PDPL Art. 31; Implementing Regulation Art. 33 (written, current, kept for the processing period plus 5 years, minimum contents in Art. 33(5)); X2 \"Final decision text\" in docs/legal/2026-10-10-priva",
+  "console": [],
+  "shot": "finance-en-1440-_admin_ropa.png"
+ },
+ {
+  "route": "/admin/refunds",
+  "ms": 3880,
+  "url": "/admin/refunds",
+  "lang": "en",
+  "dir": "ltr",
+  "scrollW": 1440,
+  "clientW": 1440,
+  "h1": "Refunds",
+  "alerts": [],
+  "latinDigitsInAr": null,
+  "arabicDigits": 0,
+  "usd": false,
+  "sar": 0,
+  "overflow": [],
+  "text": "Refunds Refunds owed to customers. Money is returned only through the payment gateway, for exactly the recorded amount. Show Needs attention Failed Waiting In progress Returned All 0 refunds No refunds are waiting.",
+  "console": [],
+  "shot": "finance-en-1440-_admin_refunds.png"
+ }
+]

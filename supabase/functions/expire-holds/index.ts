@@ -1,12 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.108.1"
-import { adminSessionAllows } from "../_shared/http.ts"
+import { adminSessionAllows, allowedOrigins } from "../_shared/http.ts"
 
-const ALLOWED_ORIGINS = [
-  "https://barberar.vercel.app",
-  "https://primora.sa",
-  "http://localhost:3000",
-]
+// Production origins plus APP_ORIGIN for a local run; no localhost in the shipped list (privacy security review L6).
+const ALLOWED_ORIGINS = allowedOrigins()
 
 function getCorsHeaders(req: Request) {
   const origin = req.headers.get("Origin") || ""
