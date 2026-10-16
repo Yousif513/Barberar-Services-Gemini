@@ -201,3 +201,65 @@ describe("F2: the customer lookup is no longer an oracle that defeats its own ma
     await expectError(as(db, owner, `select privacy_lookup_digest('phone', '501234567')`), /permission denied/);
   });
 });
+
+describe("F3: a real retention purge from the console needs a second person", () => {
+  const purge = (who, dry, reason = null) => call(who, `select privacy_purge_expired_retention($1, $2) r`, [dry, reason]);
+  const runs = async () => (await one(`select count(*)::int n from privacy_retention_purge_runs where dry_run = false`)).n;
+
+  it("one privacy.approve holder's real run only asks, with the dry-run counts for the approver (the review's run deleted at once)", async () => {
+    const before = await runs();
+    await expectError(purge(owner, false), /at least 10 characters/);
+    await expectError(purge(operations, false, "Operations tries to purge"), /privacy.approve/);
+    await expectError(purge(stale(owner.sub), false, "Stale session tries to purge"), /step-up required/);
+    const asked = await purge(owner, false, "Annual retention purge for closed accounts");
+    assert.equal(asked.status, "pending_approval");
+    assert.equal(asked.kind, "privacy_retention_purge");
+    assert.equal(asked.preview.dry_run, true);
+    assert.equal(await runs(), before, "nothing was deleted by the request");
+    const again = await purge(owner, false, "Annual retention purge for closed accounts");
+    assert.equal(again.approval_id, asked.approval_id, "one request waits at a time");
+    const req = await one(`select kind, status, requested_by, summary from admin_approval_requests where id = $1`, [asked.approval_id]);
+    assert.deepEqual([req.kind, req.status, req.requested_by], ["privacy_retention_purge", "pending", owner.sub]);
+    assert.ok("bookings_deleted" in req.summary && "sub_records" in req.summary, "the approver sees what would be deleted");
+
+    await expectError(decide(owner, asked.approval_id), /own request/);
+    await expectError(decide(operations, asked.approval_id), /cannot decide privacy_retention_purge/);
+    await expectError(decide(finance, asked.approval_id), /cannot decide privacy_retention_purge/);
+    await expectError(decide(stale(owner2.sub), asked.approval_id), /step-up required/);
+    await expectError(call(owner2, `select admin_break_glass_execute($1, 'Nobody else is around to approve this purge') r`, [asked.approval_id]),
+      /never available|second administrator|approve or reject/);
+    await expectError(as(db, owner, `select gov_exec_privacy_retention_purge(r) from admin_approval_requests r where r.id = $1`, [asked.approval_id]),
+      /permission denied/);
+    await expectError(as(db, owner, `select privacy_request_retention_purge('Calling the helper directly')`), /permission denied/);
+    assert.equal(await runs(), before);
+
+    const out = await decide(owner2, asked.approval_id);
+    assert.equal(out.status, "approved");
+    assert.equal(out.result.dry_run, false);
+    assert.equal(await runs(), before + 1, "the approved execution ran the purge");
+    const run = await one(`select actor_id from privacy_retention_purge_runs where id = $1`, [out.result.run_id]);
+    assert.equal(run.actor_id, owner2.sub);
+    const audit = await one(`select details from admin_audit_logs where action = 'privacy.retention_purged' and target_id = $1`, [out.result.run_id]);
+    assert.equal(audit.details.approval_request_id, asked.approval_id);
+    assert.equal(audit.details.reason, "Annual retention purge for closed accounts");
+  });
+
+  it("a forged governance token does not open the real run, and a dry run stays one person's call", async () => {
+    const before = await runs();
+    await expectError(db.transaction(async (tx) => {
+      await tx.exec(`SET LOCAL ROLE authenticated`);
+      await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify({ role: "authenticated", sub: owner.sub,
+        session_id: owner.sub, aal: "aal2", amr: [{ method: "totp", timestamp: nowS() }] })]);
+      await tx.query(`select set_config('primora.governance_token', gen_random_uuid()::text, true)`);
+      const r = (await tx.query(`select privacy_purge_expired_retention(false, 'Forged token attempt here') r`)).rows[0].r;
+      if (r.status !== "pending_approval") throw new Error("ran without approval");
+      throw new Error("asked only");
+    }), /asked only/);
+    assert.equal(await runs(), before);
+    const dry = await purge(owner, true);
+    assert.equal(dry.dry_run, true);
+    assert.ok(dry.run_id);
+    const service = await purge(ROLES.service, false);
+    assert.equal(service.dry_run, false, "the service key (the future scheduler) still runs it directly");
+  });
+});

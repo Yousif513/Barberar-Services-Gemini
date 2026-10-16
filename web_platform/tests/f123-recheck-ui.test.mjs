@@ -42,3 +42,12 @@ describe("F2: the customer lookup contract", () => {
     assert.equal((inbox.match(/privacy_lookup_limit_reached: "/g) ?? []).length, 2);
   });
 });
+
+describe("F3: the retention purge is a second-person request", () => {
+  it("the approvals inbox names it in English and Arabic and shows the dry-run counts", () => {
+    const src = read("app/admin/approvals/page.tsx");
+    assert.equal((src.match(/privacy_retention_purge: "/g) ?? []).length, 2);
+    assert.match(src, /row\.kind === "privacy_retention_purge"/);
+    assert.equal((src.match(/purgePreview: "/g) ?? []).length, 2);
+  });
+});

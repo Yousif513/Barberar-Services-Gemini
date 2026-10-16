@@ -25,7 +25,7 @@ type ApprovalRow = {
   id: string;
   kind: "payout_release" | "refund" | "iban_change" | "setting_change" | "ledger_settlement" | "ledger_adjustment" | "fee_rule_change" | "payout_hold" | "reward_program" | "role_change" | "booking_cancellation" | "reconciliation_import" | "sponsored_price_change"
     | "privacy_export" | "privacy_deletion" | "privacy_legal_hold" | "customer_profile_clear"
-    | "privacy_legal_hold_release" | "privacy_legal_hold_renewal" | "incident_aware_at_correction";
+    | "privacy_legal_hold_release" | "privacy_legal_hold_renewal" | "incident_aware_at_correction" | "privacy_retention_purge";
   status: string;
   target_id: string | null;
   amount_sar: Numeric;
@@ -89,11 +89,13 @@ const translations = {
       customer_profile_clear: "Clearing a customer's profile details",
       privacy_legal_hold_release: "Early release of a legal hold (erases what it kept)",
       privacy_legal_hold_renewal: "Renewal of a legal hold kept for over a year",
-      incident_aware_at_correction: "Correction of an incident's awareness time (moves the SDAIA deadline)" },
+      incident_aware_at_correction: "Correction of an incident's awareness time (moves the SDAIA deadline)",
+      privacy_retention_purge: "Retention purge of erased customers' records (irreversible)" },
     holdRenewals: "renewed {n} times",
     customerErased: "customer already erased",
     accountHeld: "account held",
     deadlineMove: "SDAIA deadline {from} → {to} ({h} h)",
+    purgePreview: "dry run on {date}: {s} sub-records and {d} bookings deleted, {a} bookings kept anonymous; the approved run counts again",
     profileClearEffect: "removes name, e-mail, phone, gender and push token; keeps sign-in, bookings, invoices and messages",
     profileClearHeld: "legal hold {ref} keeps this account: approving is refused until the hold is released; reject the request instead",
     approveIntroChange: "Approving applies the change now, in your name, with the checks the change has. It needs a fresh authenticator code.",
@@ -220,11 +222,13 @@ const translations = {
       customer_profile_clear: "مسح بيانات الملف الشخصي لعميل",
       privacy_legal_hold_release: "رفع حجز قانوني قبل موعده (يحذف ما احتفظ به)",
       privacy_legal_hold_renewal: "تجديد حجز قانوني مضى عليه أكثر من سنة",
-      incident_aware_at_correction: "تصحيح وقت العلم بحادثة (يغيّر مهلة سدايا)" },
+      incident_aware_at_correction: "تصحيح وقت العلم بحادثة (يغيّر مهلة سدايا)",
+      privacy_retention_purge: "حذف سجلات العملاء المحذوفين بعد انتهاء مدة الاحتفاظ (لا يمكن التراجع عنه)" },
     holdRenewals: "جُدد {n} مرات",
     customerErased: "حُذف حساب العميل",
     accountHeld: "الحساب محتجز",
     deadlineMove: "مهلة سدايا {from} ← {to} ({h} ساعة)",
+    purgePreview: "تجربة بتاريخ {date}: حذف {s} سجلاً فرعياً و{d} حجزاً، والإبقاء على {a} حجزاً دون هوية؛ يُعاد العدّ عند التنفيذ المعتمد",
     profileClearEffect: "يحذف الاسم والبريد والهاتف والجنس ورمز الإشعارات؛ ويُبقي تسجيل الدخول والحجوزات والفواتير والرسائل",
     profileClearHeld: "الحجز القانوني {ref} يحتفظ بهذا الحساب: يُرفض الاعتماد حتى يُرفع الحجز؛ ارفض الطلب بدلاً من ذلك",
     approveIntroChange: "الاعتماد يطبّق التغيير الآن باسمك مع فحوصاته. يحتاج رمزاً جديداً من تطبيق المصادقة.",
@@ -444,6 +448,11 @@ function ApprovalsScreen() {
       const cats = Array.isArray(s.categories) ? (s.categories as string[]).join(", ") : "";
       return [text(s.basis).replace("_", " "), text(s.case_reference), cats, s.account_held ? t.accountHeld : "",
         s.customer_erased ? t.customerErased : "", t.holdRenewals.replace("{n}", text(s.renewals))].filter(Boolean).join(" · ");
+    }
+    if (row.kind === "privacy_retention_purge") {
+      const subRecords = Object.values((s.sub_records ?? {}) as Record<string, unknown>).reduce<number>((sum, n) => sum + toNumber(n as Numeric), 0);
+      return t.purgePreview.replace("{date}", text(s.cutoff)).replace("{s}", String(subRecords))
+        .replace("{d}", text(s.bookings_deleted)).replace("{a}", text(s.bookings_anonymised));
     }
     if (row.kind === "incident_aware_at_correction") {
       return [text(s.reference), t.deadlineMove.replace("{from}", s.deadline_from ? operationsDate(text(s.deadline_from), lang) : "—")
