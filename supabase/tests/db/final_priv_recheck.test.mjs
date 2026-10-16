@@ -424,3 +424,77 @@ describe("N6: the contact scrub touches only what was the person's while they he
     assert.equal(await count("whatsapp_messages", "conversation_id = $1", [afterOnly]), 1);
   });
 });
+
+describe("N8: records an erasure kept are purged once their 10 years have passed (not scheduled)", () => {
+  it("deletes expired sub-records and bookings nothing points at, keeps ledger-referenced ones anonymous, and touches nothing else", async () => {
+    const id = await customer();
+    const tipOnly = await booking(id, "cancelled", 3);
+    const paid = await booking(id);
+    const recent = await booking(id, "cancelled", 4);
+    await ledger(paid, `chg_final_n8_${seq}`);
+    for (const b of [tipOnly, recent]) {
+      await sys(db, `insert into booking_tips (booking_id, customer_id, employee_id, provider_id, amount) values ($1, $2, $3, $4, 10)`, [b, id, SEED.employee1, SEED.provider1]);
+    }
+    await sys(db, `insert into wallet_credits (customer_id, amount, reason, source) values ($1, 30, 'Old goodwill', 'compensation')`, [id]);
+    await erase(id);
+    // Eleven years pass for two of the bookings and their records (the retention of each is 10 years from the end of its year).
+    // (Test clock: the guard that keeps a pseudonymised booking's retention date fixed is lifted for this one fixture update.)
+    await db.transaction(async (tx) => {
+      await tx.exec(`alter table bookings disable trigger protect_booking_immutable_fields_before_update`);
+      await tx.query(`update bookings set retention_until = current_date - 1 where id = any($1::uuid[])`, [[tipOnly, paid]]);
+      await tx.exec(`alter table bookings enable trigger protect_booking_immutable_fields_before_update`);
+    });
+    await sys(db, `update booking_tips set created_at = now() - interval '12 years' where booking_id = $1`, [tipOnly]);
+    await db.transaction(async (tx) => {
+      await tx.exec(`alter table wallet_credits disable trigger trg_money_append_only`);
+      await tx.query(`update wallet_credits set created_at = now() - interval '12 years' where reason = 'Old goodwill'`);
+      await tx.exec(`alter table wallet_credits enable trigger trg_money_append_only`);
+    });
+    const live = await customer();
+    const liveBooking = await booking(live, "cancelled", 3);
+    await sys(db, `insert into booking_tips (booking_id, customer_id, employee_id, provider_id, amount, created_at) values ($1, $2, $3, $4, 10, now() - interval '12 years')`,
+      [liveBooking, live, SEED.employee1, SEED.provider1]);
+
+    const purge = (who, dry) => call(who, `select privacy_purge_expired_retention($1) r`, [dry]);
+    await expectError(purge(ROLES.user(live), true), /Administrator|privacy.approve|permission/);
+    await expectError(purge(operations, true), /privacy.approve/);
+    await expectError(purge(stale(owner.sub), true), /step-up required/);
+    await expectError(as(db, ROLES.anon, `select privacy_purge_expired_retention(true)`), /permission denied/);
+
+    const dry = await purge(owner, true);
+    assert.equal(dry.dry_run, true);
+    assert.equal(dry.sub_records.booking_tips, 1);
+    assert.equal(dry.sub_records.wallet_credits, 1);
+    assert.equal(dry.bookings_deleted, 1);
+    assert.ok(dry.bookings_anonymised >= 1);
+    assert.equal(await count("bookings", "id = $1", [tipOnly]), 1, "a dry run changes nothing");
+    assert.equal(await count("booking_tips", "booking_id = $1", [tipOnly]), 1);
+
+    const run = await purge(ROLES.service, false);
+    assert.equal(run.dry_run, false);
+    assert.deepEqual([run.sub_records, run.bookings_deleted], [dry.sub_records, dry.bookings_deleted], "the dry run said exactly this");
+    assert.equal(await count("bookings", "id = $1", [tipOnly]), 0, "nothing points at it any more");
+    assert.equal(await count("booking_tips", "booking_id = $1", [tipOnly]), 0);
+    assert.equal(await count("wallet_credits", "reason = 'Old goodwill'"), 0);
+    const kept = await one(`select customer_id, pseudonym_token, retention_basis from bookings where id = $1`, [paid]);
+    assert.deepEqual([kept.customer_id, kept.pseudonym_token], [null, "retention-ended"], "the ledger still references it: kept, anonymous");
+    assert.match(kept.retention_basis, /^Retention ended/);
+    assert.equal(await count("transactional_ledger", "booking_id = $1", [paid]), 1, "the ledger is never purged");
+    assert.match((await one(`select pseudonym_token from bookings where id = $1`, [recent])).pseudonym_token, /^[0-9a-f]{32}$/, "still within retention");
+    assert.equal(await count("booking_tips", "booking_id = $1", [recent]), 1);
+    assert.equal(await count("booking_tips", "booking_id = $1 and customer_id = $2", [liveBooking, live]), 1, "a live customer's records are not this purge's business");
+    assert.equal((await purge(ROLES.service, false)).bookings_anonymised, 0, "a second run finds nothing new");
+    assert.ok(await count("admin_audit_logs", "action = 'privacy.retention_purged'") >= 2);
+  });
+
+  it("outside a recorded purge run the append-only guard still refuses the delete, even with the setting forged", async () => {
+    const id = await customer();
+    const b = await booking(id, "cancelled", 3);
+    await sys(db, `insert into booking_tips (booking_id, customer_id, employee_id, provider_id, amount) values ($1, $2, $3, $4, 10)`, [b, id, SEED.employee1, SEED.provider1]);
+    await expectError(db.transaction(async (tx) => {
+      await tx.query(`select set_config('primora.retention_purge_run', gen_random_uuid()::text, true)`);
+      await tx.query(`delete from booking_tips where booking_id = $1`, [b]);
+    }), /append-only/);
+    assert.equal(await count("booking_tips", "booking_id = $1", [b]), 1);
+  });
+});
