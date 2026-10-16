@@ -250,7 +250,7 @@ describe("F3: a real retention purge from the console needs a second person", ()
       await tx.exec(`SET LOCAL ROLE authenticated`);
       await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify({ role: "authenticated", sub: owner.sub,
         session_id: owner.sub, aal: "aal2", amr: [{ method: "totp", timestamp: nowS() }] })]);
-      await tx.query(`select set_config('primora.governance_token', gen_random_uuid()::text, true)`);
+      await tx.query(`select set_config('primora.governance_token', '7f3c2a10-0f12-4f00-8f00-00000000f003', true)`);
       const r = (await tx.query(`select privacy_purge_expired_retention(false, 'Forged token attempt here') r`)).rows[0].r;
       if (r.status !== "pending_approval") throw new Error("ran without approval");
       throw new Error("asked only");

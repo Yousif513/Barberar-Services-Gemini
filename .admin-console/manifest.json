@@ -2281,17 +2281,21 @@
             "/admin/customers"
           ],
           "serverOperations": [
-            "supabase/migrations/20261005110000_admin_clear_customer_profile.sql#L12"
+            "supabase/migrations/20261005110000_admin_clear_customer_profile.sql#L12",
+            "supabase/migrations/20261016200000_f1_profile_clear_respects_account_hold.sql#L33"
           ],
           "authorizationPolicies": [
-            "supabase/migrations/20261005110000_admin_clear_customer_profile.sql#L22"
+            "supabase/migrations/20261005110000_admin_clear_customer_profile.sql#L22",
+            "supabase/migrations/20261016200000_f1_profile_clear_respects_account_hold.sql#L65"
           ],
           "auditEvents": [
             "supabase/migrations/20261005110000_admin_clear_customer_profile.sql#L51"
           ],
           "safeguards": [
             "supabase/tests/db/customer_directory.test.mjs#L51",
-            "supabase/tests/db/release_controls.test.mjs#L97"
+            "supabase/tests/db/release_controls.test.mjs#L97",
+            "supabase/tests/db/f123_final_recheck.test.mjs#L45",
+            "supabase/tests/db/f123_final_recheck.test.mjs#L56"
           ],
           "dataBinding": "postgres:public.profiles",
           "idempotency": "Clearing an already cleared profile sets the same NULL values again and records another audit entry.",
@@ -2299,11 +2303,17 @@
           "recovery": "Not reversible by design; the audit entry records who cleared it and why, without the removed values.",
           "tests": [
             "supabase/tests/db/release_controls.test.mjs",
-            "supabase/tests/db/qa_adversarial.test.mjs"
+            "supabase/tests/db/qa_adversarial.test.mjs",
+            "supabase/tests/db/f123_final_recheck.test.mjs",
+            "web_platform/tests/f123-recheck-ui.test.mjs",
+            "supabase/tests/db/uxfix_console_ux.test.mjs"
           ],
           "evidence": [
             "supabase/migrations/20261005110000_admin_clear_customer_profile.sql#L12",
-            "web_platform/tests/admin-console-guards.test.mjs#L120"
+            "web_platform/tests/admin-console-guards.test.mjs#L120",
+            "supabase/migrations/20261016200000_f1_profile_clear_respects_account_hold.sql",
+            "supabase/tests/db/f123_final_recheck.test.mjs",
+            "web_platform/tests/f123-recheck-ui.test.mjs"
           ],
           "owner": "",
           "reviewStatus": "contested",
@@ -5892,16 +5902,20 @@
           ],
           "serverOperations": [
             "supabase/migrations/20261011200000_priv_privacy_requests.sql",
-            "web_platform/src/app/customer/privacy/page.tsx"
+            "web_platform/src/app/customer/privacy/page.tsx",
+            "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql#L55"
           ],
           "authorizationPolicies": [
-            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql#L76"
           ],
           "auditEvents": [
-            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql#L153"
           ],
           "safeguards": [
-            "supabase/tests/db/priv_privacy.test.mjs"
+            "supabase/tests/db/priv_privacy.test.mjs",
+            "supabase/tests/db/f123_final_recheck.test.mjs#L160"
           ],
           "dataBinding": "postgres:public.privacy_requests",
           "idempotency": "One open request per customer and type (unique partial index); repeating returns the open one.",
@@ -5909,13 +5923,20 @@
           "recovery": "Withdrawn by the customer while not approved; a contested field is restored.",
           "tests": [
             "supabase/tests/db/priv_privacy.test.mjs",
-            "scripts/verify-privacy-local.mjs"
+            "scripts/verify-privacy-local.mjs",
+            "supabase/tests/db/f123_final_recheck.test.mjs",
+            "web_platform/tests/f123-recheck-ui.test.mjs",
+            "supabase/tests/db/uxfix_console_ux.test.mjs"
           ],
           "evidence": [
             "supabase/migrations/20261011200000_priv_privacy_requests.sql",
             "supabase/tests/db/priv_privacy.test.mjs",
             "scripts/verify-privacy-local.mjs",
-            "web_platform/src/app/customer/privacy/page.tsx"
+            "web_platform/src/app/customer/privacy/page.tsx",
+            "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql",
+            "supabase/migrations/20261016230000_f2_lookup_key_service_role.sql",
+            "web_platform/src/app/admin/privacy/customer-picker.tsx",
+            "supabase/tests/db/f123_final_recheck.test.mjs"
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
@@ -6108,18 +6129,21 @@
           "serverOperations": [
             "supabase/migrations/20261011220000_priv_deletion_engine.sql",
             "supabase/functions/privacy-erase-account/index.ts",
-            "supabase/functions/_shared/privacy-erasure.ts"
+            "supabase/functions/_shared/privacy-erasure.ts",
+            "supabase/migrations/20261016220000_f3_retention_purge_second_person.sql#L105"
           ],
           "authorizationPolicies": [
             "supabase/migrations/20261011220000_priv_deletion_engine.sql",
-            "supabase/migrations/20261011200000_priv_privacy_requests.sql"
+            "supabase/migrations/20261011200000_priv_privacy_requests.sql",
+            "supabase/migrations/20261016220000_f3_retention_purge_second_person.sql#L133"
           ],
           "auditEvents": [
             "supabase/migrations/20261011220000_priv_deletion_engine.sql"
           ],
           "safeguards": [
             "supabase/tests/db/priv_privacy.test.mjs",
-            "supabase/tests/privacy-erasure.test.mjs"
+            "supabase/tests/privacy-erasure.test.mjs",
+            "supabase/tests/db/f123_final_recheck.test.mjs#L209"
           ],
           "dataBinding": "postgres:public.privacy_requests + public.deletion_ledger",
           "idempotency": "Approval executes once; the ledger upsert and auth step are idempotent (already-gone counts as done).",
@@ -6129,12 +6153,16 @@
             "scripts/verify-privacy-local.mjs",
             "supabase/tests/db/final_priv_recheck.test.mjs",
             "supabase/tests/db/priv_privacy.test.mjs",
-            "supabase/tests/privacy-erasure.test.mjs"
+            "supabase/tests/privacy-erasure.test.mjs",
+            "supabase/tests/db/f123_final_recheck.test.mjs",
+            "web_platform/tests/f123-recheck-ui.test.mjs"
           ],
           "evidence": [
             "supabase/migrations/20261011220000_priv_deletion_engine.sql",
             "supabase/tests/db/priv_privacy.test.mjs",
-            "scripts/verify-privacy-local.mjs"
+            "scripts/verify-privacy-local.mjs",
+            "supabase/migrations/20261016220000_f3_retention_purge_second_person.sql",
+            "supabase/tests/db/f123_final_recheck.test.mjs"
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
@@ -9077,6 +9105,42 @@
       "appliesTo": [
         "privacy.deletion-ledger"
       ]
+    },
+    {
+      "id": "f1-any-active-account-hold-blocks-profile-clear",
+      "decision": "A profile clear is refused while any active legal hold lists 'account' for the customer (only court_case holds can, by constraint), at request and at approval; a pending account hold does not block until it is approved.",
+      "reason": "Security re-check F1; mirrors the erasure engine, which respects the same hold.",
+      "evidence": [
+        "supabase/migrations/20261016200000_f1_profile_clear_respects_account_hold.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "customer.clear-profile"
+      ]
+    },
+    {
+      "id": "f2-lookup-exact-match-limit-and-hmac",
+      "decision": "Customer lookup: phone matched whole after removing 00, 966 and a trunk 0 (at least 9 digits); e-mail by case-insensitive equality; names by substring of first and last name only, never e-mail; results carry the last-name initial, not the last name; step-up required; 10 lookups per actor per rolling 10 minutes counted from the audit log, then a returned refusal (audited, one security alert per window) rather than an exception, so the refusal and alert persist; the audit row keeps an HMAC-SHA256 of kind:normalised-query under a key in privacy_lookup_keys (no anon/authenticated grant).",
+      "reason": "Security re-check F2 recommended whole-value match, a rate limit with an alert, step-up and a salted hash; 10 per 10 minutes chosen conservatively per the coordinator instruction.",
+      "evidence": [
+        "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "privacy.request-intake"
+      ]
+    },
+    {
+      "id": "f3-retention-purge-approval-kind",
+      "decision": "A real retention purge from a console session is a privacy_retention_purge approval request (reason of 10+ characters; the approver sees the dry-run counts taken when asked; the approved execution recounts and reports what it did); the service key keeps the direct run for the future scheduler; break-glass excluded.",
+      "reason": "Security re-check F3 offered an approval kind or service-key-only; the approval kind keeps a console path with four eyes while scheduling is undecided.",
+      "evidence": [
+        "supabase/migrations/20261016220000_f3_retention_purge_second_person.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "privacy.deletion"
+      ]
     }
   ],
   "gaps": [
@@ -11875,6 +11939,71 @@
         "web_platform/tests/booking-cancel-thresholds.test.mjs",
         "web_platform/tests/final-approval-kinds.test.mjs"
       ]
+    },
+    {
+      "id": "sec-final-f1-profile-clear-ignores-account-hold",
+      "severity": "medium",
+      "description": "F1 (2026-10-16 final re-check): admin_clear_customer_profile cleared a customer whose account an active court hold keeps, and the approver was not shown the hold.",
+      "status": "fixed",
+      "rationale": "Refused at request and at approval (HINT legal_hold_active); the approvals inbox returns legal_hold for a pending profile clear; customers and approvals screens say so in English and Arabic.",
+      "evidence": [
+        "supabase/migrations/20261016200000_f1_profile_clear_respects_account_hold.sql",
+        "supabase/tests/db/f123_final_recheck.test.mjs"
+      ]
+    },
+    {
+      "id": "sec-final-f2-customer-lookup-oracle",
+      "severity": "medium",
+      "description": "F2: admin_privacy_find_customers matched phone digits and e-mails by substring, had no rate limit or step-up, and audited no trace of the query, so a full number or address could be rebuilt despite masking.",
+      "status": "fixed",
+      "rationale": "Whole-value phone/e-mail match, names never match e-mails, last-name initial only, step-up, 10 per actor per 10 minutes with an audited refusal and one alert per window, keyed HMAC of the normalised query in the audit row.",
+      "evidence": [
+        "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql",
+        "supabase/migrations/20261016230000_f2_lookup_key_service_role.sql",
+        "supabase/tests/db/f123_final_recheck.test.mjs"
+      ]
+    },
+    {
+      "id": "sec-final-f3-retention-purge-one-person",
+      "severity": "low",
+      "description": "F3: privacy_purge_expired_retention(false) irreversibly deleted data on one privacy.approve holder's decision.",
+      "status": "fixed",
+      "rationale": "A real console run is a privacy_retention_purge approval request with dry-run counts, decided by a different privacy.approve holder after step-up; break-glass never applies; the service key keeps the direct path for the unscheduled job.",
+      "evidence": [
+        "supabase/migrations/20261016220000_f3_retention_purge_second_person.sql",
+        "supabase/tests/db/f123_final_recheck.test.mjs"
+      ]
+    },
+    {
+      "id": "sec-final-f4-profile-clear-approver-needs-operations-write",
+      "severity": "low",
+      "description": "F4: the approved execution of a profile clear re-checked operations.write in the approver's session.",
+      "status": "fixed",
+      "rationale": "Inside the approved execution the approval (privacy.approve) is the authority; the requester still needs operations.write.",
+      "evidence": [
+        "supabase/migrations/20261016200000_f1_profile_clear_respects_account_hold.sql",
+        "supabase/tests/db/f123_final_recheck.test.mjs"
+      ]
+    },
+    {
+      "id": "f123-screens-not-browser-verified",
+      "severity": "low",
+      "description": "The new copy (profile clear under a hold, lookup refusals and rate limit, retention purge approval line, lookup-limit alert) is covered by source tests and typecheck only; not exercised in a signed-in console browser session.",
+      "status": "open",
+      "rationale": "UX reviewer to verify with a TOTP console session.",
+      "evidence": [
+        "web_platform/tests/f123-recheck-ui.test.mjs"
+      ]
+    },
+    {
+      "id": "retention-purge-console-entry-missing",
+      "severity": "low",
+      "description": "No console screen calls privacy_purge_expired_retention; the dry run and the approval request are reachable through the API only, and the request is decided on Approvals.",
+      "status": "open",
+      "rationale": "Depends on the owner's scheduling decision (retention-purge-not-scheduled).",
+      "evidence": [
+        "supabase/migrations/20261016220000_f3_retention_purge_second_person.sql"
+      ]
     }
   ],
   "declaredStatic": [
@@ -12054,6 +12183,16 @@
       "approvedBy": "Coordinator instruction for the PRIV security fix pass, 2026-10-11 (owner to confirm)",
       "evidence": [
         "docs/reviews/2026-10-11-security-priv.md"
+      ]
+    },
+    {
+      "id": "f2-privacy-lookup-limit",
+      "path": "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql#privacy_lookup_limit",
+      "value": "10 customer lookups per actor per rolling 10 minutes",
+      "reason": "Security re-check F2 (rate limit, conservative)",
+      "approvedBy": "Coordinator instruction for the F1-F3 fix pass, 2026-10-16 (owner to confirm)",
+      "evidence": [
+        "docs/reviews/2026-10-16-security-final-recheck.md"
       ]
     }
   ],
@@ -12876,6 +13015,56 @@
         "supabase/tests/db/money.test.mjs"
       ],
       "status": "open"
+    },
+    {
+      "id": "f123-followup-migration-version-order",
+      "observation": "supabase migration up --local refuses a new migration whose version is lower than one already applied (it asks for --include-all); a follow-up fix after a later migration was applied must take the next higher version.",
+      "category": "tooling",
+      "proposedChange": "Implementer checklist: number follow-up migrations above the highest applied version.",
+      "evidence": [
+        "supabase/migrations/20261016230000_f2_lookup_key_service_role.sql"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "f123-secret-table-service-role-convention",
+      "observation": "data_api_grants.test.mjs requires the service role to hold full access on every table except the audit log, so a secret table revoked from service_role fails the suite; the secret boundary here is anon/authenticated plus RLS, as for api_key_hashes.",
+      "category": "new-pattern",
+      "proposedChange": "Secret tables: revoke from anon/authenticated, keep the service_role grant, name the column secret/token so the audit trigger redacts it.",
+      "evidence": [
+        "supabase/tests/db/data_api_grants.test.mjs"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "f123-rate-limit-refusal-must-return",
+      "observation": "A rate-limit refusal that RAISEs rolls back its own audit row and alert; returning a refusal object (as the IBAN reveal ceiling does) keeps the evidence of probing.",
+      "category": "new-pattern",
+      "proposedChange": "security-governance reference: throttles that must leave evidence return a refusal instead of raising.",
+      "evidence": [
+        "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "f123-contested-review-status-ambiguous",
+      "observation": "The implementer prompt says both to return reviewStatus to unreviewed after fixing a contested capability and never to clear another agent's contested; customer.clear-profile was left contested and in-progress for the reviewer.",
+      "category": "incorrect-guidance",
+      "proposedChange": "State one rule: the implementer adds the fix evidence and leaves contested; only a reviewer clears it.",
+      "evidence": [
+        ".admin-console/manifest.json"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "f123-placeholder-scan-flags-gen-random-bytes",
+      "observation": "The evidence placeholder scan splits identifiers and flags 'random' in extensions.gen_random_bytes, the correct primitive for generating the lookup HMAC key, so a migration that creates a secret key can never be cited as evidence without an error.",
+      "category": "incorrect-guidance",
+      "proposedChange": "Exempt cryptographic generators (gen_random_bytes, gen_random_uuid, crypto.getRandomValues, randomUUID) from the placeholder pattern, or let declaredStatic register an evidence-file exemption.",
+      "evidence": [
+        "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql"
+      ],
+      "status": "open"
     }
   ],
   "agents": [
@@ -13097,6 +13286,16 @@
       "status": "handed-off",
       "notes": "Closes the open items of docs/reviews/2026-10-11-security-priv-recheck.md (M3/N2, M5/N1, N3-N9, info), the date-dependent fee-invoice test and the cancel dialog thresholds.",
       "worklog": ".admin-console/worklog/impl-final-claude.md"
+    },
+    {
+      "id": "impl-f123-claude",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "handed-off",
+      "notes": "",
+      "harness": "claude-code",
+      "worklog": ".admin-console/worklog/impl-f123-claude.md"
     }
   ]
 }
