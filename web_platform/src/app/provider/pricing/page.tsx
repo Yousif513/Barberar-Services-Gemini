@@ -41,9 +41,8 @@ const translations = {
     } as Record<string, string>,
     free: "Free",
     perMonth: "a month",
-    billedYearly: "Billed {total} a year",
+    billedYearly: "Billed yearly; the amount due is in the order summary below",
     billedMonthly: "Billed monthly",
-    saving: "Saves {amount} a year compared with monthly billing",
     upToBranches: "Up to {n} branches",
     upToStaff: "Up to {n} staff",
     smsIncluded: "{n} text messages a month included",
@@ -130,9 +129,8 @@ const translations = {
     } as Record<string, string>,
     free: "مجانية",
     perMonth: "شهرياً",
-    billedYearly: "تُفوتر {total} سنوياً",
+    billedYearly: "تُفوتر سنوياً؛ المبلغ المستحق في ملخص الطلب أدناه",
     billedMonthly: "تُفوتر شهرياً",
-    saving: "توفر {amount} سنوياً مقارنة بالدفع الشهري",
     upToBranches: "حتى {n} من الفروع",
     upToStaff: "حتى {n} من الموظفين",
     smsIncluded: "{n} رسالة نصية شهرياً مشمولة",
@@ -463,7 +461,6 @@ export default function PricingPage() {
               const yearlyRate = Number(plan.price_yearly_sar);
               const rate = billingCycle === "annual" ? yearlyRate : monthly;
               const free = monthly === 0 && yearlyRate === 0;
-              const saving = Math.round((monthly - yearlyRate) * 12 * 100) / 100;
               const isSelected = plan.id === activePlanId;
               const isCurrent = currentSubscription?.plan_id === plan.id;
               return (
@@ -487,11 +484,8 @@ export default function PricingPage() {
                       {!free && <span className="text-xs text-[#667085] ms-1">{t.perMonth}</span>}
                       {!free && (
                         <div className="text-[11px] text-[#667085] font-semibold mt-1">
-                          {billingCycle === "annual" ? fill(t.billedYearly, { total: money(Math.round(yearlyRate * 12 * 100) / 100) }) : t.billedMonthly}
+                          {billingCycle === "annual" ? t.billedYearly : t.billedMonthly}
                         </div>
-                      )}
-                      {!free && billingCycle === "annual" && saving > 0 && (
-                        <div className="text-[11px] text-[#067647] font-semibold mt-1">{fill(t.saving, { amount: money(saving) })}</div>
                       )}
                     </div>
                     <ul className="border-t border-[#ECECEC] pt-4 space-y-2 text-xs text-[#344054]">
