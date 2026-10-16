@@ -558,7 +558,9 @@ describe("Negative Authorization & Security Boundary Tests", () => {
 
       const adminBookings = readFileSync(join(webPlatformDir, "src/app/admin/bookings/page.tsx"), "utf8");
       assert.ok(!adminBookings.includes(`text-[#D1AF47] text-[10px] font-black">\n            $`), "No USD $ symbol in KPI badge");
-      assert.ok(adminBookings.includes(`{lang === "ar" ? "ر.س" : "SAR"}`), "Must render SAR currency");
+      // UXFIX: amounts go through the one SAR formatter; the tile icon is a glyph, not the text "SAR" before "SAR 1,640.00".
+      assert.ok(adminBookings.includes("sar(totalVolume, lang)"), "Must render SAR currency through the shared formatter");
+      assert.ok(!adminBookings.includes(`{lang === "ar" ? "ر.س" : "SAR"}`), "No currency text used as an icon");
     });
 
     it("CRM, promotions and notifications connect to real tables without mock fallbacks (G31, G32)", () => {

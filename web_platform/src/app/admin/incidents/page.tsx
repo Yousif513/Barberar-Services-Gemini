@@ -41,23 +41,23 @@ const copy = {
     correctReason: "Why the recorded time was wrong (at least 20 characters)", correctSubmit: "Correct the time", corrected: "Awareness time corrected on {date}; recorded first as {old}.",
   },
   ar: {
-    title: "سجل الحوادث", subtitle: "حوادث تسرب البيانات الشخصية. أبلغ سدايا خلال 72 ساعة من العلم بالحادثة، لكل حادثة ما لم تسجل استنتاجاً مسبباً بعدم إمكان وقوع ضرر. أبلغ المتأثرين دون تأخير كلما أمكن وقوع ضرر. تُحفظ السجلات 5 سنوات.",
-    open: "مفتوحة", closed: "مغلقة", newTitle: "تسجيل حادثة جديدة", titleLabel: "عنوان مختصر", description: "ما الذي حدث (20 حرفاً على الأقل)",
-    discovered: "وقت الاكتشاف (بتوقيت الرياض)", aware: "وقت علم بريمورا (بتوقيت الرياض) — يبدأ مهلة 72 ساعة", create: "تسجيل الحادثة",
+    title: "سجل الحوادث", subtitle: "حوادث تسرب البيانات الشخصية. أبلغ سدايا خلال ٧٢ ساعة من العلم بالحادثة، لكل حادثة ما لم تسجل استنتاجاً مسبباً بعدم إمكان وقوع ضرر. أبلغ المتأثرين دون تأخير كلما أمكن وقوع ضرر. تُحفظ السجلات ٥ سنوات.",
+    open: "مفتوحة", closed: "مغلقة", newTitle: "تسجيل حادثة جديدة", titleLabel: "عنوان مختصر", description: "ما الذي حدث (٢٠ حرفاً على الأقل)",
+    discovered: "وقت الاكتشاف (بتوقيت الرياض)", aware: "وقت علم بريمورا (بتوقيت الرياض) — يبدأ مهلة ٧٢ ساعة", create: "تسجيل الحادثة",
     cols: ["المرجع", "الحادثة", "العلم", "مهلة سدايا", "الحالة", ""], view: "عرض", empty: "لا توجد حوادث في هذه القائمة.", loading: "جارٍ التحميل…",
-    loadFailed: "تعذّر تحميل السجل: {reason}", hoursLeft: "متبقٍ {h} ساعة", overdue: "انقضت 72 ساعة", filed: "أُبلغت سدايا", noHarm: "استنتاج عدم الضرر",
+    loadFailed: "تعذّر تحميل السجل: {reason}", hoursLeft: "متبقٍ {h} ساعة", overdue: "انقضت ٧٢ ساعة", filed: "أُبلغت سدايا", noHarm: "استنتاج عدم الضرر",
     statuses: { open: "مفتوحة", contained: "محتواة", closed: "مغلقة" } as Record<string, string>,
     assessment: "التقييم", categories: "فئات أصحاب البيانات (مفصولة بفواصل)", approx: "العدد التقريبي لأصحاب البيانات", dataTypes: "أنواع البيانات (مفصولة بفواصل)",
     risk: "مستوى الخطر", risks: { unassessed: "لم يُقيَّم", no_harm_possible: "لا ضرر ممكن", low: "منخفض", medium: "متوسط", high: "مرتفع" } as Record<string, string>,
     riskAssessment: "تقييم المخاطر", containment: "إجراءات الاحتواء", preventive: "الإجراءات الوقائية", markContained: "تم الاحتواء", save: "حفظ التقييم",
     sdaia: "إبلاغ سدايا", sdaiaDecision: "القرار", sdaiaDecisions: { notify: "إبلاغ سدايا", not_required_no_harm: "عدم الإبلاغ: لا ضرر ممكن (مسبب)" } as Record<string, string>,
-    sdaiaReason: "استنتاج مسبب بعدم الضرر (30 حرفاً على الأقل)", sdaiaRef: "مرجع سدايا", sdaiaAt: "وقت الإبلاغ (بتوقيت الرياض)", lateReason: "سبب الإبلاغ بعد 72 ساعة",
+    sdaiaReason: "استنتاج مسبب بعدم الضرر (٣٠ حرفاً على الأقل)", sdaiaRef: "مرجع سدايا", sdaiaAt: "وقت الإبلاغ (بتوقيت الرياض)", lateReason: "سبب الإبلاغ بعد ٧٢ ساعة",
     recordSdaia: "تسجيل قرار سدايا", subjects: "المتأثرون", subjectsDecision: "القرار", subjectsDecisions: { notify: "إبلاغهم", not_required: "عدم الإبلاغ (مسبب)" } as Record<string, string>,
-    subjectsReason: "السبب (20 حرفاً على الأقل عند عدم الإبلاغ)", subjectsAt: "وقت الإرسال (بتوقيت الرياض)", channels: "القنوات", recordSubjects: "تسجيل القرار",
+    subjectsReason: "السبب (٢٠ حرفاً على الأقل عند عدم الإبلاغ)", subjectsAt: "وقت الإرسال (بتوقيت الرياض)", channels: "القنوات", recordSubjects: "تسجيل القرار",
     evidence: "الأدلة", evidenceLabel: "الوصف", evidenceRef: "مكان حفظها (تذكرة، مستند)", evidenceFile: "أو ارفع ملفاً", addEvidence: "إضافة دليل",
-    close: "إغلاق الحادثة", closeTitle: "إغلاق هذه الحادثة", closeReason: "ملخص النتيجة (20 حرفاً على الأقل)", retain: "تُحفظ حتى {date}", history: "السجل", done: "تم الحفظ.",
-    deadline: "مهلة سدايا", correctAware: "تصحيح وقت العلم (مرة واحدة، ويغيّر مهلة 72 ساعة)", correctAwareAt: "وقت العلم الصحيح (بتوقيت الرياض)",
-    correctReason: "لماذا كان الوقت المسجل خاطئاً (20 حرفاً على الأقل)", correctSubmit: "تصحيح الوقت", corrected: "صُحح وقت العلم في {date}؛ سُجل أولاً {old}.",
+    close: "إغلاق الحادثة", closeTitle: "إغلاق هذه الحادثة", closeReason: "ملخص النتيجة (٢٠ حرفاً على الأقل)", retain: "تُحفظ حتى {date}", history: "السجل", done: "تم الحفظ.",
+    deadline: "مهلة سدايا", correctAware: "تصحيح وقت العلم (مرة واحدة، ويغيّر مهلة ٧٢ ساعة)", correctAwareAt: "وقت العلم الصحيح (بتوقيت الرياض)",
+    correctReason: "لماذا كان الوقت المسجل خاطئاً (٢٠ حرفاً على الأقل)", correctSubmit: "تصحيح الوقت", corrected: "صُحح وقت العلم في {date}؛ سُجل أولاً {old}.",
   },
 };
 type T = typeof copy.en;
@@ -67,14 +67,14 @@ const label = "text-xs font-bold text-[#667085]";
 const riyadhIso = (local: string) => (local ? new Date(`${local}:00+03:00`).toISOString() : null);
 const list = (s: string) => s.split(",").map((x) => x.trim()).filter(Boolean);
 
-function Clock({ i, t }: { i: Incident; t: T }) {
+function Clock({ i, t, lang }: { i: Incident; t: T; lang: "en" | "ar" }) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => { const id = window.setInterval(() => setNow(Date.now()), 60000); return () => window.clearInterval(id); }, []);
   if (i.sdaia_notified_at) return <span className="font-black text-emerald-700">{t.filed}</span>;
   if (i.sdaia_decision === "not_required_no_harm") return <span className="font-black text-gray-700">{t.noHarm}</span>;
   const hours = (new Date(i.sdaia_deadline_at).getTime() - now) / 3600000;
   return hours <= 0 ? <span className="font-black text-red-700">{t.overdue}</span>
-    : <span className={`font-black ${hours < 24 ? "text-red-700" : "text-amber-800"}`}>{t.hoursLeft.replace("{h}", hours.toFixed(1))}</span>;
+    : <span className={`font-black ${hours < 24 ? "text-red-700" : "text-amber-800"}`}>{t.hoursLeft.replace("{h}", new Intl.NumberFormat(lang === "ar" ? "ar-SA" : "en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(hours))}</span>;
 }
 
 export default function AdminIncidents() {
@@ -140,7 +140,7 @@ export default function AdminIncidents() {
                   <td className="px-4 py-3 font-mono" dir="ltr">{i.reference}</td>
                   <td className="px-4 py-3 font-bold text-gray-900">{i.title}</td>
                   <td className="px-4 py-3 whitespace-nowrap">{operationsDate(i.aware_at, lang)}</td>
-                  <td className="px-4 py-3"><Clock i={i} t={t} /></td>
+                  <td className="px-4 py-3"><Clock i={i} t={t} lang={lang} /></td>
                   <td className="px-4 py-3">{t.statuses[i.status]}</td>
                   <td className="px-4 py-3"><button type="button" onClick={() => void open(i.id)} className={`rounded-lg border border-[#ECECEC] px-2.5 py-1.5 text-[11px] font-black ${focusRing}`} aria-label={`${t.view}: ${i.reference}`}>{t.view}</button></td>
                 </tr>
@@ -198,7 +198,7 @@ function IncidentDetail({ i, t, lang, run, onClose }: { i: Incident; t: T; lang:
         <div>
           <h2 id="incident-detail" className="font-serif text-lg font-black text-gray-900"><bdi dir="ltr">{i.reference}</bdi> · {i.title}</h2>
           <p className="mt-1 text-xs text-gray-600">{i.description}</p>
-          <p className="mt-1 text-xs font-semibold text-gray-500">{t.deadline}: {operationsDate(i.sdaia_deadline_at, lang)} · <Clock i={i} t={t} /> · {t.retain.replace("{date}", operationsDate(i.retain_until, lang))}</p>
+          <p className="mt-1 text-xs font-semibold text-gray-500">{t.deadline}: {operationsDate(i.sdaia_deadline_at, lang)} · <Clock i={i} t={t} lang={lang} /> · {t.retain.replace("{date}", operationsDate(i.retain_until, lang))}</p>
         </div>
         {!closed && <button type="button" onClick={onClose} className={operationsButton}>{t.close}</button>}
       </div>

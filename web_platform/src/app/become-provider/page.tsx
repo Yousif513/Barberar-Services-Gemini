@@ -36,6 +36,8 @@ const translations = {
     planPerMonth: "/ month",
     planBranches: "Up to {n} branches",
     planStaff: "Up to {n} staff members",
+    planBranchesPlural: { one: "Up to 1 branch", other: "Up to {n} branches" } as Record<string, string>,
+    planStaffPlural: { one: "Up to 1 staff member", other: "Up to {n} staff members" } as Record<string, string>,
     planSms: "{n} SMS per month included",
     feesNote: "Platform fees depend on how a booking reaches you and are stated in the Provider Agreement and in your provider dashboard. Read them before you accept.",
     appTitle: "Provider Onboarding Application",
@@ -131,6 +133,9 @@ const translations = {
     planPerMonth: "/ شهرياً",
     planBranches: "حتى {n} فروع",
     planStaff: "حتى {n} موظفين",
+    // Arabic counts agree with the number: one, two, three to ten, eleven and more.
+    planBranchesPlural: { one: "حتى فرع واحد", two: "حتى فرعين", few: "حتى {n} فروع", many: "حتى {n} فرعاً", other: "حتى {n} فرع" } as Record<string, string>,
+    planStaffPlural: { one: "حتى موظف واحد", two: "حتى موظفَين", few: "حتى {n} موظفين", many: "حتى {n} موظفاً", other: "حتى {n} موظف" } as Record<string, string>,
     planSms: "{n} رسالة نصية شهرياً مشمولة",
     feesNote: "تعتمد رسوم المنصة على طريقة وصول الحجز إليك وتُذكر في اتفاقية مقدم الخدمة وفي لوحة تحكمك. اقرأها قبل الموافقة.",
     appTitle: "طلب انضمام مزود خدمة جديد",
@@ -146,12 +151,12 @@ const translations = {
     spa: "سبا وعافية",
     freelancer: "أخصائي / عمل حر",
     crLabel: "رقم السجل التجاري",
-    taxLabel: "الرقم الضريبي (15 رقماً يبدأ وينتهي بالرقم 3)",
+    taxLabel: "الرقم الضريبي (١٥ رقماً يبدأ وينتهي بالرقم ٣)",
     vatStatusLabel: "التسجيل في ضريبة القيمة المضافة *",
     vatRegistered: "منشأتي مسجلة في ضريبة القيمة المضافة",
     vatNotRegistered: "منشأتي غير مسجلة في ضريبة القيمة المضافة",
     vatStatusRequired: "حدد ما إذا كانت منشأتك مسجلة في ضريبة القيمة المضافة.",
-    vatNumberInvalid: "الرقم الضريبي 15 رقماً يبدأ وينتهي بالرقم 3.",
+    vatNumberInvalid: "الرقم الضريبي ١٥ رقماً يبدأ وينتهي بالرقم ٣.",
     vatStatusHint: "يحدد هذا طريقة إصدار الفواتير لحجوزاتك. تتحقق بريمورا من الرقم لدى هيئة الزكاة والضريبة والجمارك.",
     contactEmailLabel: "البريد الإلكتروني للنشاط",
     contactPhoneLabel: "رقم جوال التواصل (+966)",
@@ -168,7 +173,7 @@ const translations = {
     locating: "جارٍ تحديد الموقع...",
     locationDenied: "لم يشارك المتصفح الموقع:",
     coordsPair: "أدخل خط العرض وخط الطول معاً، أو اترك الحقلين فارغين.",
-    coordsRange: "يجب أن يكون خط العرض بين -90 و90 وخط الطول بين -180 و180.",
+    coordsRange: "يجب أن يكون خط العرض بين −٩٠ و٩٠ وخط الطول بين −١٨٠ و١٨٠.",
     cityRequired: "يرجى إدخال مدينة الفرع.",
     tradeLicenseHint: "رابط يبدأ بـ https:// للوثيقة، أو اتركه فارغاً.",
     tradeLicenseInvalid: "يجب أن يبدأ رابط الرخصة التجارية بـ https://",
@@ -435,6 +440,12 @@ export default function BecomeProviderRootPage() {
     }
   };
 
+  const number = (value: number | string | null | undefined) => Number(value ?? 0).toLocaleString(isRTL ? "ar-SA" : "en-US");
+  const counted = (forms: Record<string, string>, value: number | string | null | undefined) => {
+    const n = Number(value ?? 0);
+    const form = forms[new Intl.PluralRules(isRTL ? "ar" : "en").select(n)] ?? forms.other;
+    return form.replace("{n}", number(n));
+  };
   return (
     <div 
       className="min-h-screen bg-stone-50 text-stone-900 flex flex-col font-sans antialiased"
@@ -515,7 +526,7 @@ export default function BecomeProviderRootPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="space-y-3">
             <div className="w-10 h-10 rounded-full bg-stone-100 border border-stone-200 flex items-center justify-center font-bold text-stone-800">
-              SAR
+              <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
             <h3 className="font-bold text-xs text-stone-900 uppercase tracking-wide">{t.value1Title}</h3>
             <p className="text-xs text-stone-500 leading-relaxed font-light">{t.value1Desc}</p>
@@ -523,7 +534,7 @@ export default function BecomeProviderRootPage() {
 
           <div className="space-y-3">
             <div className="w-10 h-10 rounded-full bg-stone-100 border border-stone-200 flex items-center justify-center font-bold text-stone-800">
-              G
+              <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
             </div>
             <h3 className="font-bold text-xs text-stone-900 uppercase tracking-wide">{t.value2Title}</h3>
             <p className="text-xs text-stone-500 leading-relaxed font-light">{t.value2Desc}</p>
@@ -531,7 +542,7 @@ export default function BecomeProviderRootPage() {
 
           <div className="space-y-3">
             <div className="w-10 h-10 rounded-full bg-stone-100 border border-stone-200 flex items-center justify-center font-bold text-stone-800">
-              E
+              <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
             </div>
             <h3 className="font-bold text-xs text-stone-900 uppercase tracking-wide">{t.value3Title}</h3>
             <p className="text-xs text-stone-500 leading-relaxed font-light">{t.value3Desc}</p>
@@ -564,9 +575,9 @@ export default function BecomeProviderRootPage() {
                       {price === 0 ? null : <span className="text-xs font-semibold text-stone-500"> {t.planPerMonth}</span>}
                     </p>
                     <ul className="space-y-1.5 text-xs text-stone-600 font-light">
-                      <li>{t.planBranches.replace("{n}", String(plan.max_branches))}</li>
-                      <li>{t.planStaff.replace("{n}", String(plan.max_employees))}</li>
-                      <li>{t.planSms.replace("{n}", String(plan.included_monthly_sms))}</li>
+                      <li>{counted(t.planBranchesPlural, plan.max_branches)}</li>
+                      <li>{counted(t.planStaffPlural, plan.max_employees)}</li>
+                      <li>{t.planSms.replace("{n}", number(plan.included_monthly_sms))}</li>
                     </ul>
                   </div>
                 );
@@ -654,6 +665,12 @@ export default function BecomeProviderRootPage() {
                 </Link>
               </div>
             </div>
+          ) : agreement.state === "unpublished" ? (
+            // While the agreement is unpublished nothing can be submitted, so no form is offered to fill in.
+            <div role="status" className="rounded-3xl border border-amber-200 bg-amber-50 p-8 sm:p-12 text-center space-y-3">
+              <h3 className="font-serif text-2xl font-black text-amber-950">{t.agreementUnpublishedTitle}</h3>
+              <p className="text-sm text-amber-900 max-w-lg mx-auto leading-relaxed">{t.agreementUnpublished}</p>
+            </div>
           ) : (
             <form onSubmit={handleSubmitApplication} className="rounded-3xl border border-stone-200 bg-white p-6 sm:p-10 shadow-sm space-y-6">
               {existingApp && existingApp.status === "rejected" && (
@@ -665,12 +682,6 @@ export default function BecomeProviderRootPage() {
 
               {agreement.state === "loading" && (
                 <p role="status" className="text-xs font-semibold text-stone-500">{t.agreementLoading}</p>
-              )}
-              {agreement.state === "unpublished" && (
-                <div role="alert" className="rounded-2xl border border-[#FEDF89] bg-[#FFFAEB] p-4 text-xs text-[#93370D] space-y-1">
-                  <strong className="block font-bold">{t.agreementUnpublishedTitle}</strong>
-                  <p>{t.agreementUnpublished}</p>
-                </div>
               )}
               {agreement.state === "error" && (
                 <div role="alert" className="rounded-2xl border border-[#FECDCA] bg-[#FEF3F2] p-4 text-xs font-bold text-[#B42318]">

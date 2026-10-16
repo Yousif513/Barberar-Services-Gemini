@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { consoleRoleNames, rolesGranting, screenPermissions, useConsoleSession } from "@/lib/console-session";
 
@@ -85,6 +85,11 @@ export const signOutFailedText: Record<OperationsLocale, string> = {
 // A command's result, pinned to the bottom of the viewport so it is seen wherever the operator was working in a long
 // table. A refusal stays until dismissed; a success clears itself.
 export function CommandResult({ error, success, locale, onDismiss }: { error?: string; success?: string; locale: OperationsLocale; onDismiss: () => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  // When the command left the focus nowhere (its control was disabled or removed), the result takes it.
+  useEffect(() => {
+    if ((error || success) && (!document.activeElement || document.activeElement === document.body)) ref.current?.focus();
+  }, [error, success]);
   useEffect(() => {
     if (!success || error) return;
     const timer = window.setTimeout(onDismiss, 9000);
@@ -95,6 +100,8 @@ export function CommandResult({ error, success, locale, onDismiss }: { error?: s
   return (
     <div className="pointer-events-none fixed inset-x-4 bottom-4 z-[9000] flex justify-center">
       <div
+        ref={ref}
+        tabIndex={-1}
         role={failed ? "alert" : "status"}
         className={`pointer-events-auto flex w-full max-w-xl items-start gap-3 rounded-2xl border p-4 text-sm font-semibold shadow-2xl ${failed ? "border-red-300 bg-red-50 text-red-900" : "border-green-300 bg-green-50 text-green-900"}`}
       >
