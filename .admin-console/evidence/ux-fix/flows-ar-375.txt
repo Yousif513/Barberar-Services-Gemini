@@ -1,0 +1,13 @@
+ledger tabs: 5 ["طرق الدفع","تقسيم المعاملات","طلبات سحب الأرباح","القوائم المحاسبية والضريبة","المطابقة وفواتير الرسوم"]
+ledger last tab by arrows: {"text":"المطابقة وفواتير الرسوم","selected":"true","left":183,"right":317,"vw":375} (inside viewport: true)
+ledger reconciliation panel: مطابقة Tap الأيام التي طوبقت مع Tap كما هي مسجلة في شاشة مطابقة Tap، حيث تُشغَّل المطابقة وتُعالج الفروقات. فتح مطابقة Tap يوم العمل الحالة فروقات مفتوحة عمليات TAP آخر تشغيل ١٠‏/١٠‏/٢٠٢٦ لم تتم المطابقة: لا توجد بيانا
+reconciliation runs: آخر عمليات التسوية ١٠‏/١٠‏/٢٠٢٦ لا توجد بيانات Tap ١١‏/١٠‏/٢٠٢٦، ٣:٤٧ م
+privacy lookup 'smoke': 8 matches; status: 
+after choosing, focus on: BUTTON
+privacy empty submit errors: ["صف ما طلبه العميل في ١٠ إلى ٢٠٠٠ حرف (الآن ٠)."]; focus: TEXTAREA
+remove dialog typed-confirm field: true; focus: TEXTAREA#_r_6_; scroll lock html/body/main: hidden/hidden/hidden
+after Escape focus: BUTTON(إزالة من لوحة الإدارة: privacy.ownerb.17); scroll restored: /
+audit log default class: changes; read badges on page: 0
+fee dialog opened, focus: INPUT, inside dialog: true
+console errors: []
+4xx: []

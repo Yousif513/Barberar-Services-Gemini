@@ -1,0 +1,6 @@
+buttons: ["Waiting","Approved10","Rejected","Withdrawn1","Propose change","Propose change","Propose change","Acknowledge","Acknowledge","Acknowledge","Acknowledge","Acknowledge","Acknowledge","Acknowledge","Acknowledge","Acknowledge","Acknowledge","Acknowledge","Acknowledge","Acknowledge"]
+dialog focus: INPUT[off] in-dialog=true
+alert: That code is not correct. Enter the code your authenticator app shows now; it changes every 30 seconds.
+focus after wrong code: INPUT[one-time-code] in-dialog=true
+after cancelling step-up, command dialog says: Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)
+errors: ["http://localhost:3100/admin/approvals :: Failed to load resource: the server responded with a status of 403 (Forbidden)","http://localhost:3100/admin/approvals :: Failed to load resource: the server responded with a status of 422 (Unprocessable Entity)"] ["403 POST http://127.0.0.1:54321/rest/v1/rpc/admin_request_setting_change @ http://localhost:3100/admin/approvals","422 POST http://127.0.0.1:54321/auth/v1/factors/9244db30-8b99-4677-947d-f16e199d0aac/verify @ http://localhost:3100/admin/approvals"]
