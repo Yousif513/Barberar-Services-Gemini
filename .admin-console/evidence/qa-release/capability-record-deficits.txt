@@ -1,0 +1,358 @@
+Capability records that would fail release validation if set to implemented today (simulation of validate --phase release
+on a copy of the manifest with every in-progress capability set to implemented and reviewed), qa-release-claude, 2026-10-17.
+These are implementer and architect fixes to the capability records and their tests; QA did not edit them.
+
+admin-governance / gov.approvals
+    - content scan refuses web_platform/tests/gov1-governance-screens.test.mjs
+    - no cited test file names the capability id, a server operation path or its route
+admin-governance / gov.audited-reads
+    - capability and screen do not reference each other: implemented capability is not reachable from any screen
+admin-governance / gov.break-glass
+    - capability and screen do not reference each other: implemented capability is not reachable from any screen
+    - content scan refuses supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql
+    - high-risk capability lacks recovery
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+admin-governance / gov.console-roles
+    - capability and screen do not reference each other: implemented capability is not reachable from any screen
+    - content scan refuses web_platform/tests/gov1-governance-screens.test.mjs
+    - high-risk capability lacks recovery
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+admin-governance / gov.iban-change
+    - capability and screen do not reference each other: implemented capability is not reachable from any screen
+    - capability-route-unknown uiRoutes route '/provider/wallet' has no matching screen
+    - content scan refuses web_platform/src/app/provider/wallet/page.tsx
+    - content scan refuses web_platform/tests/gov1-governance-screens.test.mjs
+    - high-risk capability lacks recovery
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+admin-governance / gov.iban-reveal
+    - capability and screen do not reference each other: implemented capability is not reachable from any screen
+    - content scan refuses web_platform/tests/gov1-governance-screens.test.mjs
+    - high-risk capability lacks recovery
+    - no cited test file names the capability id, a server operation path or its route
+admin-governance / gov.mfa
+    - content scan refuses web_platform/src/app/login/mfa/page.tsx
+    - content scan refuses web_platform/tests/gov1-governance-screens.test.mjs
+    - high-risk capability lacks recovery
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+audit-event / audit.emit
+    - capability and screen do not reference each other: implemented capability is not reachable from any screen
+    - high-risk capability lacks recovery
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+    - uiRoutes is empty
+booking / booking.detail
+    - capability and screen do not reference each other: implemented capability is not reachable from any screen
+    - serverOperations is empty
+    - tests is empty
+    - uiRoutes is empty
+booking / booking.list
+    - no cited test file names the capability id, a server operation path or its route
+booking / booking.release-holds
+    - no cited test file names the capability id, a server operation path or its route
+branch / branch.list
+    - no cited test file names the capability id, a server operation path or its route
+branch / branch.toggle-active
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+    - serverOperations is empty
+customer / customer.data-request
+    - content scan refuses supabase/migrations/20261011200000_priv_privacy_requests.sql
+    - no cited test file names the capability id, a server operation path or its route
+customer / customer.list
+    - no cited test file names the capability id, a server operation path or its route
+customer / customer.submit-data-request
+    - content scan refuses supabase/migrations/20261011200000_priv_privacy_requests.sql
+customer / customer.verify-phone
+    - no cited test file names the capability id, a server operation path or its route
+dispute / dispute.list
+    - high-risk capability lacks recovery
+    - high-risk capability lacks safeguards
+    - no cited test file names the capability id, a server operation path or its route
+    - serverOperations is empty
+dispute / dispute.resolve
+    - idempotency not stated (key, or not-required with a reason)
+    - no audit event recorded for a mutating capability
+    - no cited test file names the capability id, a server operation path or its route
+employee / employee.list
+    - no cited test file names the capability id, a server operation path or its route
+feature-flag / feature-flag.list
+    - serverOperations is empty
+fee-rule / fee-rule.list
+    - content scan refuses supabase/tests/db/money_pending_changes.test.mjs
+fee-rule / fee-rule.save
+    - content scan refuses supabase/tests/db/money_pending_changes.test.mjs
+    - no cited test file names the capability id, a server operation path or its route
+fee-rule / fee.effective-display
+    - content scan refuses supabase/tests/db/money_fee_terms_vat.test.mjs
+    - content scan refuses web_platform/src/components/effective-fee-terms.tsx
+fee-rule / money.pending-change
+    - capability and screen do not reference each other: implemented capability is not reachable from any screen
+    - content scan refuses supabase/migrations/20261010310000_money_pending_changes.sql#L122
+    - content scan refuses supabase/tests/db/money_pending_changes.test.mjs
+    - content scan refuses supabase/tests/db/money_pending_changes.test.mjs#L92
+    - no cited test file names the capability id, a server operation path or its route
+    - no evidence entry resolves to a file the scan accepts
+integration / integration.delete
+    - content scan refuses web_platform/src/app/admin/integrations/page.tsx#L303
+    - high-risk capability lacks recovery
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+    - serverOperations is empty
+integration / integration.list
+    - content scan refuses web_platform/src/app/admin/integrations/page.tsx#L267
+    - no cited test file names the capability id, a server operation path or its route
+    - serverOperations is empty
+integration / integration.toggle
+    - content scan refuses web_platform/src/app/admin/integrations/page.tsx#L303
+    - high-risk capability lacks recovery
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+    - serverOperations is empty
+integration / integration.upsert
+    - content scan refuses web_platform/src/app/admin/integrations/page.tsx#L303
+    - high-risk capability lacks recovery
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+    - serverOperations is empty
+inventory-operations / inventory.adjust
+    - content scan refuses scripts/verify-p3-migration-compatibility.mjs
+    - content scan refuses supabase/tests/inventory.test.mjs
+    - no evidence entry resolves to a file the scan accepts
+inventory-operations / inventory.catalog
+    - content scan refuses scripts/verify-p3-migration-compatibility.mjs
+    - content scan refuses supabase/tests/inventory.test.mjs
+    - no evidence entry resolves to a file the scan accepts
+inventory-operations / inventory.chain-read
+    - content scan refuses scripts/verify-p3-migration-compatibility.mjs
+    - content scan refuses supabase/tests/inventory.test.mjs
+    - no evidence entry resolves to a file the scan accepts
+inventory-operations / inventory.delegation
+    - content scan refuses scripts/verify-p3-migration-compatibility.mjs
+    - content scan refuses supabase/tests/inventory.test.mjs
+    - no evidence entry resolves to a file the scan accepts
+inventory-operations / inventory.supply-read
+    - content scan refuses scripts/verify-p3-migration-compatibility.mjs
+    - content scan refuses supabase/tests/inventory.test.mjs
+    - no evidence entry resolves to a file the scan accepts
+inventory-operations / inventory.transfer
+    - content scan refuses scripts/verify-p3-migration-compatibility.mjs
+    - content scan refuses supabase/tests/inventory.test.mjs
+    - no evidence entry resolves to a file the scan accepts
+ledger-entry / ledger.adjustment
+    - capability and screen do not reference each other: implemented capability is not reachable from any screen
+ledger-entry / ledger.export
+    - no cited test file names the capability id, a server operation path or its route
+ledger-entry / ledger.list
+    - content scan refuses web_platform/tests/negative-authorization.test.mjs#L132
+ledger-entry / ledger.release-payout
+    - content scan refuses supabase/tests/db/secfix2_governance_notices.test.mjs
+ledger-entry / ledger.vat-report
+    - authorizationPolicies is empty
+    - content scan refuses web_platform/tests/negative-authorization.test.mjs
+    - content scan refuses web_platform/tests/negative-authorization.test.mjs#L132
+    - high-risk capability lacks recovery
+    - high-risk capability lacks safeguards
+    - idempotency not stated (key, or not-required with a reason)
+    - no audit event recorded for a mutating capability
+    - no evidence entry resolves to a file the scan accepts
+    - serverOperations is empty
+ledger-entry / money.append-only
+    - capability and screen do not reference each other: implemented capability is not reachable from any screen
+    - content scan refuses supabase/tests/db/data_api_grants.test.mjs
+    - no cited test file names the capability id, a server operation path or its route
+notification-broadcast / notification.broadcast
+    - idempotency not stated (key, or not-required with a reason)
+notification-broadcast / notification.dispatch
+    - authorizationPolicies is empty
+    - content scan refuses supabase/tests/db/secfix2_governance_notices.test.mjs
+    - content scan refuses web_platform/tests/negative-authorization.test.mjs
+    - content scan refuses web_platform/tests/negative-authorization.test.mjs#L470
+    - idempotency not stated (key, or not-required with a reason)
+    - no audit event recorded for a mutating capability
+    - no cited test file names the capability id, a server operation path or its route
+notification-broadcast / notification.log
+    - high-risk capability lacks recovery
+    - high-risk capability lacks safeguards
+    - serverOperations is empty
+operations-dashboard / activity.feed
+    - authorizationPolicies is empty
+    - serverOperations is empty
+    - tests is empty
+payment-method / payment-method.list
+    - no cited test file names the capability id, a server operation path or its route
+    - serverOperations is empty
+payment-method / payment-method.set-default
+    - high-risk capability lacks recovery
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+    - serverOperations is empty
+payment-method / payment-method.toggle
+    - high-risk capability lacks recovery
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+    - serverOperations is empty
+payout-request / payout.approve
+    - content scan refuses supabase/tests/db/secfix2_governance_notices.test.mjs
+payout-request / payout.list
+    - high-risk capability lacks recovery
+    - high-risk capability lacks safeguards
+    - no cited test file names the capability id, a server operation path or its route
+payout-request / payout.reject
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+platform-settings / settings.api-limits
+    - idempotency not stated (key, or not-required with a reason)
+    - no audit event recorded for a mutating capability
+platform-settings / settings.list
+    - no cited test file names the capability id, a server operation path or its route
+    - serverOperations is empty
+platform-settings / settings.platform
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+privacy-incident / incident.list
+    - capability and screen do not reference each other: implemented capability is not reachable from any screen
+    - content scan refuses supabase/migrations/20261011240000_priv_incident_register.sql
+    - no cited test file names the capability id, a server operation path or its route
+privacy-incident / incident.register
+    - content scan refuses supabase/migrations/20261011240000_priv_incident_register.sql
+    - content scan refuses supabase/tests/db/final_priv_recheck.test.mjs
+privacy-request / intake.health-retention-and-gate
+    - content scan refuses supabase/migrations/20261011230000_priv_health_intake.sql
+    - content scan refuses supabase/tests/db/final_priv_recheck.test.mjs
+    - content scan refuses supabase/tests/db/intake.test.mjs
+    - no cited test file names the capability id, a server operation path or its route
+privacy-request / privacy.copy-export
+    - content scan refuses supabase/migrations/20261011210000_priv_copy_export.sql
+    - no cited test file names the capability id, a server operation path or its route
+privacy-request / privacy.correction
+    - content scan refuses supabase/migrations/20261011200000_priv_privacy_requests.sql
+privacy-request / privacy.deadline-and-refusal
+    - content scan refuses supabase/migrations/20261011200000_priv_privacy_requests.sql
+    - no cited test file names the capability id, a server operation path or its route
+privacy-request / privacy.deletion
+    - content scan refuses supabase/migrations/20261011220000_priv_deletion_engine.sql
+    - content scan refuses supabase/tests/db/final_priv_recheck.test.mjs
+privacy-request / privacy.deletion-ledger
+    - content scan refuses supabase/migrations/20261011220000_priv_deletion_engine.sql
+    - content scan refuses supabase/tests/db/final_priv_recheck.test.mjs
+    - no cited test file names the capability id, a server operation path or its route
+privacy-request / privacy.legal-hold
+    - content scan refuses supabase/migrations/20261011220000_priv_deletion_engine.sql
+    - content scan refuses supabase/tests/db/final_priv_recheck.test.mjs
+privacy-request / privacy.queue
+    - capability and screen do not reference each other: implemented capability is not reachable from any screen
+    - content scan refuses supabase/migrations/20261011200000_priv_privacy_requests.sql
+    - no cited test file names the capability id, a server operation path or its route
+privacy-request / privacy.request-intake
+    - content scan refuses supabase/migrations/20261011200000_priv_privacy_requests.sql
+    - content scan refuses supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql
+promotional-code / coupon.list
+    - content scan refuses web_platform/src/app/admin/coupons/page.tsx#L199
+    - no cited test file names the capability id, a server operation path or its route
+    - no evidence entry resolves to a file the scan accepts
+    - serverOperations is empty
+promotional-code / coupon.toggle
+    - content scan refuses web_platform/src/app/admin/coupons/page.tsx#L289
+    - idempotency not stated (key, or not-required with a reason)
+promotional-code / coupon.upsert
+    - content scan refuses web_platform/src/app/admin/coupons/page.tsx#L257
+    - idempotency not stated (key, or not-required with a reason)
+provider / provider.approve
+    - no cited test file names the capability id, a server operation path or its route
+provider / provider.list
+    - no cited test file names the capability id, a server operation path or its route
+provider / provider.notes
+    - authorizationPolicies is empty
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+    - serverOperations is empty
+provider / provider.reject
+    - no cited test file names the capability id, a server operation path or its route
+provider / provider.suspend
+    - no cited test file names the capability id, a server operation path or its route
+provider / provider.vat-status
+    - content scan refuses supabase/tests/db/money_fee_terms_vat.test.mjs
+    - content scan refuses supabase/tests/db/money_fee_terms_vat.test.mjs#L98
+    - content scan refuses web_platform/src/app/become-provider/page.tsx
+    - no evidence entry resolves to a file the scan accepts
+reconciliation / reconciliation.daily
+    - no cited test file names the capability id, a server operation path or its route
+reconciliation / reconciliation.resolve-break
+    - no cited test file names the capability id, a server operation path or its route
+refund-request / refund.check-with-tap
+    - capability and screen do not reference each other: implemented capability is not reachable from any screen
+    - no cited test file names the capability id, a server operation path or its route
+refund-request / refund.execute
+    - capability and screen do not reference each other: implemented capability is not reachable from any screen
+    - no cited test file names the capability id, a server operation path or its route
+refund-request / refund.list
+    - high-risk capability lacks recovery
+    - high-risk capability lacks safeguards
+review / review.hide
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+review / review.moderate-queue
+    - serverOperations is empty
+    - tests is empty
+reward-program / reward-program.enable
+    - capability and screen do not reference each other: implemented capability is not reachable from any screen
+    - capability-route-unknown uiRoutes route '/customer/wallet' has no matching screen
+    - content scan refuses supabase/tests/db/booking_engine_referrals.test.mjs
+    - content scan refuses supabase/tests/db/money_rewards.test.mjs
+role-assignment / role.directory
+    - high-risk capability lacks recovery
+role-assignment / role.set-administrator
+    - content scan refuses supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql
+    - idempotency not stated (key, or not-required with a reason)
+service / service.delete
+    - content scan refuses web_platform/src/app/admin/services/page.tsx#L308
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+    - serverOperations is empty
+service / service.list
+    - content scan refuses web_platform/src/app/admin/services/page.tsx#L171
+    - no evidence entry resolves to a file the scan accepts
+    - serverOperations is empty
+    - tests is empty
+service / service.set-featured
+    - content scan refuses web_platform/src/app/admin/services/page.tsx#L259
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+    - serverOperations is empty
+service / service.set-price
+    - content scan refuses web_platform/src/app/admin/services/page.tsx#L259
+    - high-risk capability lacks recovery
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+    - serverOperations is empty
+service / service.toggle-active
+    - content scan refuses web_platform/src/app/admin/services/page.tsx#L259
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+    - serverOperations is empty
+service / service.upsert
+    - content scan refuses web_platform/src/app/admin/services/page.tsx#L259
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+    - serverOperations is empty
+sponsored-placement / sponsored.configure
+    - content scan refuses web_platform/tests/sponsored-screens.test.mjs
+    - idempotency not stated (key, or not-required with a reason)
+    - no audit event recorded for a mutating capability
+    - no cited test file names the capability id, a server operation path or its route
+sponsored-placement / sponsored.overview
+    - content scan refuses web_platform/tests/sponsored-screens.test.mjs
+sponsored-placement / sponsored.void-attribution
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+whatsapp-channel / whatsapp.overview
+    - content scan refuses web_platform/tests/whatsapp-screens.test.mjs
+whatsapp-channel / whatsapp.verify-channel
+    - idempotency not stated (key, or not-required with a reason)
+    - no cited test file names the capability id, a server operation path or its route
+
+95 capability records listed.

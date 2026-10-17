@@ -1,0 +1,41 @@
+Evidence excerpt for gap ux1-navigation-and-actions-not-trimmed-to-console-role, evidence[1] (qa-release-claude, 2026-10-17, commit 4043546).
+Source: web_platform/src/app/admin/layout.tsx, lines 425-460. The release scanner refuses the whole source file for an unused translation key for a search hint (line 69);
+that hit is a false positive, so this excerpt is cited in its place. The source file is unchanged and remains the record.
+Lines that themselves carry a scanner-reserved token are left out and marked; read them in the source.
+
+  425:     {
+  426:       titleKey: "system",
+  427:       items: [
+  428:         { nameKey: "activity", path: "/admin/activity" },
+  429:         { nameKey: "notifications", path: "/admin/notifications" },
+  430:         { nameKey: "auditLogs", path: "/admin/audit-logs" },
+  431:         { nameKey: "integrations", path: "/admin/integrations" },
+  432:         { nameKey: "settings", path: "/admin/settings" }
+  433:       ]
+  434:     }
+  435:   ];
+  436: 
+  437:   // Only the screens the console role can read are offered. Before the role is known, screens that need a permission wait.
+  438:   const visibleSections = navSections
+  439:     .map((section) => ({
+  440:       ...section,
+  441:       items: section.items.filter((item) => {
+  442:         const needs = screenPermissions(item.path);
+  443:         if (needs.length === 0) return true;
+  444:         return session.loaded && holdsAny(session, needs);
+  445:       }),
+  446:     }))
+  447:     .filter((section) => section.items.length > 0);
+  448:   const routeNeeds = screenPermissions(pathname);
+  449:   const routeState: "open" | "checking" | "forbidden" = routeNeeds.length === 0 ? "open"
+  450:     : !session.loaded ? "checking" : holdsAny(session, routeNeeds) ? "open" : "forbidden";
+  451: 
+  452:   const currentItem = navSections
+  453:     .flatMap((section) => section.items)
+  454:     .filter((item) => (item.path === "/admin" ? pathname === "/admin" || pathname === "/admin/" : pathname.startsWith(item.path)))
+  455:     .sort((a, b) => b.path.length - a.path.length)[0];
+  456:   const currentName = currentItem ? t[currentItem.nameKey as keyof typeof t] : pathname.startsWith("/admin/help") ? t.helpSubtitle : "";
+  457:   // The page title follows the screen and the language. The framework applies its own title again once the page's
+  458:   // metadata has streamed in, so the title is re-asserted whenever the head changes while this shell is on screen.
+  459:   useEffect(() => {
+  460:     const title = currentName ? `${currentName} · ${t.pageSuffix}` : t.pageSuffix;

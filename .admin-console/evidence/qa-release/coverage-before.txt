@@ -1,0 +1,14 @@
+# Structural coverage audit
+
+Profile: regulated (manifest)
+
+| Severity | Rule | Path | Finding |
+|---|---|---|---|
+| error | capability-route-unknown | entities[admin-governance].capabilities[gov.iban-change].uiRoutes | route '/provider/wallet' has no matching screen |
+| error | entity-query-missing | entities[reconciliation].capabilities | entity has no query capability, so operators cannot observe it |
+| error | lifecycle-observable | entities[reconciliation].lifecycleStates | state 'escalated' appears in no capability entityStates, so it is invisible to operators |
+| error | lifecycle-reachable | entities[reconciliation].lifecycleStates | state 'escalated' is the target of no command capability, so operators cannot put a record into it |
+| error | entity-query-missing | entities[reward-program].capabilities | entity has no query capability, so operators cannot observe it |
+| error | capability-route-unknown | entities[reward-program].capabilities[reward-program.enable].uiRoutes | route '/customer/wallet' has no matching screen |
+
+6 error(s), 0 warning(s)

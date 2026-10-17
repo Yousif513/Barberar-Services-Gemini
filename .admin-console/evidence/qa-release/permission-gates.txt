@@ -1,0 +1,74 @@
+permission gates of targeted console commands, non-existent target 00000000-0000-0000-0000-0000000000a1, 2026-10-16T21:52:22.018Z
+fn | finance | operations | owner
+admin_acknowledge_security_alert | DENY:Only an owner can acknowledge security alerts | DENY:Only an owner can acknowledge security alerts | pass-gate:P0002 Alert not found
+admin_begin_tap_refund_check | pass-gate:P0002 Refund request not found | DENY:Your console role cannot check refunds with Tap | pass-gate:P0002 Refund request not found
+admin_break_glass_execute | DENY:Only an owner can use break-glass | DENY:Only an owner can use break-glass | pass-gate:P0002 Approval request not found
+admin_cancel_approval | pass-gate:P0002 Approval request not found | pass-gate:P0002 Approval request not found | pass-gate:P0002 Approval request not found
+admin_cancel_booking | DENY:Your console role cannot change bookings | pass-gate:P0002 Booking not found | pass-gate:P0002 Booking not found
+admin_clear_customer_profile | DENY:Administrator access required | pass-gate:P0002 Customer not found | pass-gate:P0002 Customer not found
+admin_clear_no_show | DENY:Administrator access required | pass-gate:P0002 No-show booking not found | pass-gate:P0002 No-show booking not found
+admin_confirm_application_cr | DENY:Administrator role required | pass-gate:P0002 Provider application not found | pass-gate:P0002 Provider application not found
+admin_create_refund_request | pass-gate:22023 Nothing refundable remains on this booking | DENY:Administrator role required | pass-gate:22023 Nothing refundable remains on this booking
+admin_decide_approval | pass-gate:P0002 Approval request not found | pass-gate:P0002 Approval request not found | pass-gate:P0002 Approval request not found
+admin_employee_performance_report | OK(200) | OK(200) | OK(200)
+admin_finance_summary | pass-gate:22023 Unknown statement QA permission-gate probe (qa-rel | DENY:Your console role cannot read financial statements | pass-gate:22023 Unknown statement QA permission-gate probe (qa-rel
+admin_get_booking_invoice | OK(200) | DENY:Your console role cannot read tax invoices | OK(200)
+admin_incident_add_evidence | DENY:Your console role cannot do this (incident.manage required) | DENY:Your console role cannot do this (incident.manage required) | pass-gate:22023 Evidence files are stored under the incident's fol
+admin_incident_close | DENY:Your console role cannot do this (incident.manage required) | DENY:Your console role cannot do this (incident.manage required) | pass-gate:P0002 Incident not found
+admin_incident_correct_aware_at | DENY:Your console role cannot do this (incident.manage required) | DENY:Your console role cannot do this (incident.manage required) | pass-gate:P0002 Incident not found
+admin_incident_get | DENY:Your console role cannot do this (incident.manage required) | DENY:Your console role cannot do this (incident.manage required) | pass-gate:P0002 Incident not found
+admin_incident_record_sdaia | DENY:Your console role cannot do this (incident.manage required) | DENY:Your console role cannot do this (incident.manage required) | pass-gate:22023 Decision must be notify or not_required_no_harm
+admin_incident_record_subjects | DENY:Your console role cannot do this (incident.manage required) | DENY:Your console role cannot do this (incident.manage required) | pass-gate:22023 Decision must be notify or not_required
+admin_incident_update | DENY:Your console role cannot do this (incident.manage required) | DENY:Your console role cannot do this (incident.manage required) | pass-gate:P0002 Incident not found
+admin_lift_iban_reveal_limit | DENY:Only an owner can allow more IBAN reveals | DENY:Only an owner can allow more IBAN reveals | pass-gate:22023 This person cannot reveal IBANs
+admin_list_consents | DENY:Your console role cannot read consent records | OK(200) | OK(200)
+admin_list_employees | DENY:Your console role cannot read staff records | pass-gate:22023 The status must be all, active or inactive | pass-gate:22023 The status must be all, active or inactive
+admin_list_fee_invoices | OK(200) | DENY:Your console role cannot read provider fee invoices | OK(200)
+admin_list_ledger_entries | OK(200) | DENY:Your console role cannot read the ledger | OK(200)
+admin_list_payout_requests | OK(200) | DENY:Your console role cannot read payout requests | OK(200)
+admin_mark_booking_no_show | DENY:Your console role cannot change bookings | pass-gate:P0002 Booking not found | pass-gate:P0002 Booking not found
+admin_mark_fee_invoice_paid | pass-gate:P0002 Fee invoice not found | DENY:Administrator access required | pass-gate:P0002 Fee invoice not found
+admin_people_names | OK(200) | OK(200) | OK(200)
+admin_privacy_add_note | DENY:Your console role cannot do this (privacy.manage required) | pass-gate:P0002 Request not found | pass-gate:P0002 Request not found
+admin_privacy_complete_correction | DENY:Your console role cannot do this (privacy.manage required) | pass-gate:P0002 Correction request not found | pass-gate:P0002 Correction request not found
+admin_privacy_deletion_preview | DENY:Your console role cannot read privacy requests | pass-gate:P0002 Request not found | pass-gate:P0002 Request not found
+admin_privacy_extend_request | DENY:Your console role cannot do this (privacy.manage required) | pass-gate:22023 An extension is allowed only for disproportionate  | pass-gate:22023 An extension is allowed only for disproportionate 
+admin_privacy_get_request | DENY:Your console role cannot read privacy requests | pass-gate:P0002 Request not found | pass-gate:P0002 Request not found
+admin_privacy_log_request | DENY:Your console role cannot do this (privacy.manage required) | pass-gate:22023 The channel must be email, phone or in_person | pass-gate:22023 The channel must be email, phone or in_person
+admin_privacy_propose_execution | DENY:Your console role cannot do this (privacy.manage required) | pass-gate:P0002 Request not found | pass-gate:P0002 Request not found
+admin_privacy_propose_legal_hold | DENY:Your console role cannot do this (privacy.manage required) | pass-gate:22023 A hold is only for a court case naming the custome | pass-gate:22023 A hold is only for a court case naming the custome
+admin_privacy_refuse_request | DENY:Your console role cannot do this (privacy.manage required) | pass-gate:22023 A request may be refused only as repetitive, manif | pass-gate:22023 A request may be refused only as repetitive, manif
+admin_privacy_review_legal_hold | DENY:Your console role cannot do this (privacy.approve required) | DENY:Your console role cannot do this (privacy.approve required) | pass-gate:P0002 Active hold not found
+admin_propose_break_resolution | pass-gate:P0002 Reconciliation break not found | DENY:Your console role cannot resolve reconciliation breaks | pass-gate:P0002 Reconciliation break not found
+admin_propose_ledger_adjustment | pass-gate:22023 A correction is an adjustment or a reversal | DENY:Your console role cannot propose ledger corrections | pass-gate:22023 A correction is an adjustment or a reversal
+admin_publish_agreement | DENY:Administrator role required | DENY:Administrator role required | pass-gate:22023 Only a draft agreement can be published
+admin_record_cr_review | DENY:Administrator role required | pass-gate:22023 Commercial Registration number must be 10 digits | pass-gate:22023 Commercial Registration number must be 10 digits
+admin_release_ledger_item | pass-gate:P0002 Ledger row not found | DENY:Your console role cannot settle ledger rows | pass-gate:P0002 Ledger row not found
+admin_release_payout | pass-gate:P0002 Payout request not found | DENY:Only administrators can release payouts | pass-gate:P0002 Payout request not found
+admin_reopen_stuck_refund | pass-gate:P0002 Refund request not found | DENY:Administrator access required | pass-gate:P0002 Refund request not found
+admin_request_payout_hold | pass-gate:22023 The action is place or lift | DENY:Your console role cannot hold payouts | pass-gate:22023 The action is place or lift
+admin_request_refund | pass-gate:P0002 Booking not found | DENY:Administrator role required | pass-gate:P0002 Booking not found
+admin_reset_mfa | DENY:Only an owner can reset another administrator's MFA | DENY:Only an owner can reset another administrator's MFA | pass-gate:22023 MFA reset here is for administrator accounts only
+admin_retry_refund_request | pass-gate:P0002 Refund request not found | DENY:Administrator access required | pass-gate:P0002 Refund request not found
+admin_review_client_import | DENY:Administrator access required | pass-gate:P0002 Import not found | pass-gate:P0002 Import not found
+admin_review_payout_request | pass-gate:22023 Decision must be processing or rejected | DENY:Administrator access required | pass-gate:22023 Decision must be processing or rejected
+admin_revoke_api_key | DENY:Administrator access required | DENY:Administrator access required | pass-gate:P0002 API key not found
+admin_save_promo_code | pass-gate:22023 A code is 4 to 20 letters, digits, dashes or under | DENY:Administrator access required | pass-gate:22023 A code is 4 to 20 letters, digits, dashes or under
+admin_set_branch_country | DENY:Administrator access required | pass-gate:P0002 Branch not found | pass-gate:P0002 Branch not found
+admin_set_console_role | DENY:Only an owner can change console roles | DENY:Only an owner can change console roles | pass-gate:22023 Unknown console role
+admin_set_phone_verified | DENY:Administrator access required | pass-gate:P0002 Customer not found | pass-gate:P0002 Customer not found
+admin_set_promo_code_active | pass-gate:P0002 Promotion code not found | DENY:Administrator access required | pass-gate:P0002 Promotion code not found
+admin_set_provider_status | pass-gate:22P02 invalid input value for enum provider_status: "QA  | pass-gate:22P02 invalid input value for enum provider_status: "QA  | pass-gate:22P02 invalid input value for enum provider_status: "QA 
+admin_set_whatsapp_channel_verified | DENY:Administrator access required | pass-gate:P0002 Channel not found | pass-gate:P0002 Channel not found
+admin_sign_off_break_glass | pass-gate:P0002 Break-glass review not found | DENY:Your console role cannot record a break-glass review | pass-gate:P0002 Break-glass review not found
+admin_uphold_no_show_contest | DENY:Administrator access required | pass-gate:P0002 Contest not found | pass-gate:P0002 Contest not found
+admin_void_sponsored_attribution | pass-gate:22023 The action must be void or waive | DENY:Administrator access required | pass-gate:22023 The action must be void or waive
+admin_waive_payout_account_notice | pass-gate:P0002 Bank account not found | DENY:Your console role cannot waive bank account notices | pass-gate:P0002 Bank account not found
+reveal_employee_wps_iban | pass-gate:22023 A reason of at least 15 characters with a ticket r | DENY:Only the provider owner, finance or an owner can reveal a sa | pass-gate:22023 A reason of at least 15 characters with a ticket r
+reveal_provider_iban | pass-gate:22023 Include a ticket reference (for example PAY-1042 o | DENY:Only finance or an owner can reveal an IBAN | pass-gate:22023 Include a ticket reference (for example PAY-1042 o
+
+re-probe with a valid status value:
+admin_set_provider_status(suspended, missing provider) as finance: 403 42501 Administrator access required
+admin_set_provider_status(suspended, missing provider) as operations: 500 P0002 Provider not found
+admin_set_provider_status(suspended, missing provider) as analyst: 403 42501 Administrator access required
+admin_set_provider_status(suspended, missing provider) as owner: 500 P0002 Provider not found

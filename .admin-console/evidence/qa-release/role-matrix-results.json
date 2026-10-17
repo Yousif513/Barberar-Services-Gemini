@@ -1,0 +1,5956 @@
+[
+ {
+  "fn": "admin_acknowledge_security_alert",
+  "args": "p_alert_id:uuid, p_note:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_acknowledge_security_alert",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only an owner can acknowledge security alerts",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only an owner can acknowledge security alerts",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only an owner can acknowledge security alerts",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only an owner can acknowledge security alerts",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_approval_inbox",
+  "args": "p_status:text, p_limit:integer, p_offset:integer",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_approval_inbox",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 400,
+    "code": "22023",
+    "message": "Unknown status",
+    "hint": null,
+    "cls": "refused-other"
+   }
+  },
+  "ownerControl": {
+   "status": 400,
+   "code": "22023",
+   "message": "Unknown status"
+  }
+ },
+ {
+  "fn": "admin_begin_reconciliation_run",
+  "args": "p_business_day:date",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_begin_reconciliation_run",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot run reconciliation",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_begin_tap_refund_check",
+  "args": "p_refund_id:uuid",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_begin_tap_refund_check",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot check refunds with Tap",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_booking_channel_counts",
+  "args": "p_from:date, p_to:date",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_booking_channel_counts",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "{\"to\":\"2026-10-01\",\"from\":\"2026-10-01\",\"bookings\":0,\"walk_ins\":0,\"attributed\":0,\"by_channel\":[],\"by_campaign\":[],\"unattr",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_booking_directory",
+  "args": "p_search:text, p_status:text, p_from:date, p_to:date, p_limit:integer, p_offset:integer, p_purpose:text",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_booking_directory",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read bookings",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 400,
+   "code": "22023",
+   "message": "Unknown booking status"
+  }
+ },
+ {
+  "fn": "admin_branch_performance_report",
+  "args": "",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_branch_performance_report",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "[{\"branch_id\":\"b0000000-0000-0000-0000-000000000002\",\"provider_id\":\"a0000000-0000-0000-0000-000000000002\",\"total_booking",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_break_glass_execute",
+  "args": "p_request_id:uuid, p_justification:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_break_glass_execute",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only an owner can use break-glass",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_broadcast_notification",
+  "args": "p_audience:text, p_title_en:text, p_title_ar:text, p_body_en:text, p_body_ar:text, p_in_app:boolean, p_whatsapp:boolean",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_broadcast_notification",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only administrators can send broadcasts",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only administrators can send broadcasts",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only administrators can send broadcasts",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only administrators can send broadcasts",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_can",
+  "args": "p_permission:text",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_can",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 200,
+    "code": null,
+    "message": "false",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "provider": {
+    "status": 200,
+    "code": null,
+    "message": "false",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "owner-aal1": {
+    "status": 200,
+    "code": null,
+    "message": "false",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "false",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_cancel_approval",
+  "args": "p_request_id:uuid, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_cancel_approval",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 500,
+    "code": "P0002",
+    "message": "Approval request not found",
+    "hint": null,
+    "cls": "refused-other"
+   }
+  }
+ },
+ {
+  "fn": "admin_cancel_booking",
+  "args": "p_booking_id:uuid, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_cancel_booking",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot change bookings",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_change_professional_handle",
+  "args": "p_handle:text, p_new_handle:text, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_change_professional_handle",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_clear_customer_profile",
+  "args": "p_customer_id:uuid, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_clear_customer_profile",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_clear_no_show",
+  "args": "p_booking_id:uuid, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_clear_no_show",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_confirm_application_cr",
+  "args": "p_application_id:uuid, p_notes:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_confirm_application_cr",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator role required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator role required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator role required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator role required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_create_refund_request",
+  "args": "p_booking_id:uuid, p_amount:numeric, p_reason:text, p_idempotency_key:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_create_refund_request",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator role required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_customer_overview",
+  "args": "p_search:text, p_limit:integer, p_offset:integer, p_purpose:text",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_customer_overview",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read customer personal data",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_dashboard_overview",
+  "args": "",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_dashboard_overview",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "{\"kpis\":{\"customers\":21,\"suppressed\":[\"live_providers\"],\"finished_30d\":7,\"completed_30d\":0,\"bookings_today\":0,\"live_prov",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_decide_approval",
+  "args": "p_request_id:uuid, p_decision:text, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_decide_approval",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 400,
+    "code": "22023",
+    "message": "Decision must be approve or reject",
+    "hint": null,
+    "cls": "refused-other"
+   }
+  }
+ },
+ {
+  "fn": "admin_employee_performance_report",
+  "args": "p_provider_id:uuid, p_purpose:text, p_limit:integer, p_offset:integer",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_employee_performance_report",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read staff performance",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_export_finance_report",
+  "args": "p_report:text, p_from:date, p_to:date",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_export_finance_report",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read financial exports",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 400,
+   "code": "22023",
+   "message": "Unknown report QA role-matrix probe (qa-release-claude)"
+  }
+ },
+ {
+  "fn": "admin_fee_rule_versions",
+  "args": "",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_fee_rule_versions",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "{\"pending\":[],\"versions\":[{\"id\":\"d858f32e-7a42-4cc6-aa63-2c7cc0bdb815\",\"channel\":\"import\",\"in_force\":true,\"is_active\":tr",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_finance_summary",
+  "args": "p_kind:text, p_from:date, p_to:date, p_provider_id:uuid, p_limit:integer, p_offset:integer, p_purpose:text",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_finance_summary",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read financial statements",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 400,
+   "code": "22023",
+   "message": "Unknown statement QA role-matrix probe (qa-release-claude)"
+  }
+ },
+ {
+  "fn": "admin_get_booking_invoice",
+  "args": "p_booking_id:uuid, p_purpose:text",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_get_booking_invoice",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read tax invoices",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_get_event_counts",
+  "args": "p_start_date:date, p_end_date:date",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_get_event_counts",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "[]",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_group_booking_counts",
+  "args": "",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_group_booking_counts",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "{\"by_occasion\":{\"other\":0,\"party\":0,\"family\":0,\"wedding\":0},\"groups_total\":0,\"guests_total\":0,\"groups_active\":0,\"groups_",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_import_reconciliation_file",
+  "args": "p_source:text, p_business_day:date, p_rows:jsonb, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_import_reconciliation_file",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot import reconciliation files",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_incident_add_evidence",
+  "args": "p_incident_id:uuid, p_label:text, p_reference:text, p_storage_path:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_incident_add_evidence",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (incident.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_incident_close",
+  "args": "p_incident_id:uuid, p_note:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_incident_close",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (incident.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_incident_correct_aware_at",
+  "args": "p_incident_id:uuid, p_aware_at:timestamp with time zone, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_incident_correct_aware_at",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (incident.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_incident_create",
+  "args": "p_title:text, p_description:text, p_discovered_at:timestamp with time zone, p_aware_at:timestamp with time zone",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_incident_create",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (incident.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_incident_get",
+  "args": "p_incident_id:uuid",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_incident_get",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (incident.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_incident_list",
+  "args": "p_state:text, p_limit:integer, p_offset:integer",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_incident_list",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (incident.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 400,
+   "code": "22023",
+   "message": "The state must be open or closed"
+  }
+ },
+ {
+  "fn": "admin_incident_record_sdaia",
+  "args": "p_incident_id:uuid, p_decision:text, p_reason:text, p_reference:text, p_notified_at:timestamp with time zone, p_late_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_incident_record_sdaia",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (incident.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_incident_record_subjects",
+  "args": "p_incident_id:uuid, p_decision:text, p_reason:text, p_notified_at:timestamp with time zone, p_channels:text[]",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_incident_record_subjects",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (incident.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_incident_update",
+  "args": "p_incident_id:uuid, p_changes:jsonb",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_incident_update",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (incident.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_intake_overview",
+  "args": "",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_intake_overview",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "{\"templates\":0,\"requirements\":0,\"retention_days\":30,\"active_patch_blocks\":0,\"providers_enforcing\":0,\"patch_tests_by_resu",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_lift_iban_reveal_limit",
+  "args": "p_user_id:uuid, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_lift_iban_reveal_limit",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only an owner can allow more IBAN reveals",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_list_audit_events",
+  "args": "p_action:text, p_target_type:text, p_from:timestamp with time zone, p_to:timestamp with time zone, p_limit:integer, p_offset:integer, p_purpose:text, p_event_class:text",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_list_audit_events",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read the audit log",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 400,
+   "code": "22023",
+   "message": "The event class is all, changes or reads"
+  }
+ },
+ {
+  "fn": "admin_list_consents",
+  "args": "p_user_id:uuid, p_limit:integer, p_offset:integer, p_purpose:text",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_list_consents",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read consent records",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_list_disputes",
+  "args": "p_status:text, p_limit:integer, p_offset:integer, p_purpose:text",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_list_disputes",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read payment disputes",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_list_employees",
+  "args": "p_search:text, p_status:text, p_provider_id:uuid, p_limit:integer, p_offset:integer, p_purpose:text",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_list_employees",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read staff records",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 400,
+   "code": "22023",
+   "message": "The status must be all, active or inactive"
+  }
+ },
+ {
+  "fn": "admin_list_fee_invoices",
+  "args": "p_status:text, p_provider_id:uuid, p_limit:integer, p_offset:integer, p_purpose:text",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_list_fee_invoices",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read provider fee invoices",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_list_governance_notices",
+  "args": "p_status:text, p_limit:integer, p_offset:integer",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_list_governance_notices",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 400,
+    "code": "22023",
+    "message": "Unknown status",
+    "hint": null,
+    "cls": "refused-other"
+   }
+  },
+  "ownerControl": {
+   "status": 400,
+   "code": "22023",
+   "message": "Unknown status"
+  }
+ },
+ {
+  "fn": "admin_list_ledger_entries",
+  "args": "p_from:date, p_to:date, p_provider_id:uuid, p_payout_status:text, p_limit:integer, p_offset:integer, p_purpose:text",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_list_ledger_entries",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read the ledger",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_list_message_log",
+  "args": "p_status:text, p_channel:text, p_limit:integer, p_offset:integer, p_purpose:text",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_list_message_log",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read the message log",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_list_payout_requests",
+  "args": "p_status:text, p_provider_id:uuid, p_limit:integer, p_offset:integer, p_purpose:text",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_list_payout_requests",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read payout requests",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_list_provider_applications",
+  "args": "p_status:text, p_limit:integer, p_offset:integer, p_purpose:text",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_list_provider_applications",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read provider applications",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_list_refund_requests",
+  "args": "p_filter:text, p_limit:integer, p_offset:integer, p_purpose:text",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_list_refund_requests",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read refunds",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 400,
+   "code": "22023",
+   "message": "Unknown filter QA role-matrix probe (qa-release-claude)"
+  }
+ },
+ {
+  "fn": "admin_list_reviews",
+  "args": "p_status:text, p_limit:integer, p_offset:integer, p_purpose:text",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_list_reviews",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read reviews for moderation",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_mark_booking_no_show",
+  "args": "p_booking_id:uuid, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_mark_booking_no_show",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot change bookings",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_mark_fee_invoice_paid",
+  "args": "p_invoice_id:uuid, p_payment_method:text, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_mark_fee_invoice_paid",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_message_queue_summary",
+  "args": "",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_message_queue_summary",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "{\"pending\":4,\"deferred\":0}",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_package_usage_summary",
+  "args": "",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_package_usage_summary",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "{\"redemptions\":0,\"active_vouchers\":0,\"redemptions_suppressed\":false,\"active_vouchers_suppressed\":false}",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_people_names",
+  "args": "p_ids:uuid[], p_purpose:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_people_names",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "[]",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  }
+ },
+ {
+  "fn": "admin_privacy_add_note",
+  "args": "p_request_id:uuid, p_note:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_privacy_add_note",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (privacy.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_privacy_complete_correction",
+  "args": "p_request_id:uuid, p_note:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_privacy_complete_correction",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (privacy.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_privacy_deletion_ledger_summary",
+  "args": "",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_privacy_deletion_ledger_summary",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read the deletion ledger",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_privacy_deletion_preview",
+  "args": "p_request_id:uuid",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_privacy_deletion_preview",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read privacy requests",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 500,
+   "code": "P0002",
+   "message": "Request not found"
+  }
+ },
+ {
+  "fn": "admin_privacy_export_deletion_ledger",
+  "args": "",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_privacy_export_deletion_ledger",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (privacy.approve required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_privacy_extend_request",
+  "args": "p_request_id:uuid, p_code:text, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_privacy_extend_request",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (privacy.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_privacy_find_customers",
+  "args": "p_query:text, p_purpose:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_privacy_find_customers",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (privacy.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_privacy_get_request",
+  "args": "p_request_id:uuid, p_purpose:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_privacy_get_request",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read privacy requests",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_privacy_list_legal_holds",
+  "args": "p_state:text, p_limit:integer, p_offset:integer",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_privacy_list_legal_holds",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read legal holds",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_privacy_list_requests",
+  "args": "p_state:text, p_limit:integer, p_offset:integer, p_purpose:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_privacy_list_requests",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read privacy requests",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_privacy_log_request",
+  "args": "p_subject_id:uuid, p_request_type:text, p_channel:text, p_received_at:timestamp with time zone, p_details:text, p_options:jsonb",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_privacy_log_request",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (privacy.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_privacy_propose_execution",
+  "args": "p_request_id:uuid, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_privacy_propose_execution",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (privacy.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_privacy_propose_legal_hold",
+  "args": "p_subject_id:uuid, p_basis:text, p_case_reference:text, p_categories:text[], p_booking_id:uuid, p_reason:text, p_account_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_privacy_propose_legal_hold",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (privacy.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_privacy_record_transfer_assessment",
+  "args": "p_document_reference:text, p_approved_on:date, p_signed_by:text, p_notes:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_privacy_record_transfer_assessment",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only an owner records the transfer risk assessment approval",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_privacy_refuse_request",
+  "args": "p_request_id:uuid, p_code:text, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_privacy_refuse_request",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (privacy.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_privacy_review_legal_hold",
+  "args": "p_hold_id:uuid, p_keep:boolean, p_note:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_privacy_review_legal_hold",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (privacy.approve required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_privacy_revoke_transfer_assessment",
+  "args": "p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_privacy_revoke_transfer_assessment",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only an owner revokes the transfer risk assessment approval",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_propose_break_resolution",
+  "args": "p_break_id:uuid, p_provider_share_delta:numeric, p_platform_share_delta:numeric, p_justification:text, p_idempotency_key:text, p_captured_delta:numeric",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_propose_break_resolution",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot resolve reconciliation breaks",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_propose_fee_rule_change",
+  "args": "p_channel:text, p_is_first_visit:boolean, p_fee_percentage:numeric, p_min_fee_sar:numeric, p_max_fee_sar:numeric, p_effective_from:timestamp with time zone, p_reason:text, p_description:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_propose_fee_rule_change",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot propose fee changes",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_propose_ledger_adjustment",
+  "args": "p_entry_id:uuid, p_kind:text, p_provider_share_delta:numeric, p_platform_share_delta:numeric, p_reason_code:text, p_justification:text, p_idempotency_key:text, p_tap_object_id:text, p_provider_id:uuid, p_captured_delta:numeric, p_break_id:uuid",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_propose_ledger_adjustment",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot propose ledger corrections",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_propose_reward_program",
+  "args": "p_program:text, p_enabled:boolean, p_reward_value_sar:numeric, p_customer_monthly_cap_sar:numeric, p_monthly_budget_sar:numeric, p_credit_expiry_days:integer, p_terms_version:text, p_reason:text, p_points_per_sar:numeric, p_min_redeem_points:integer, p_min_qualifying_sar:numeric",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_propose_reward_program",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot propose programme changes",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_provider_private_directory",
+  "args": "p_purpose:text, p_limit:integer, p_offset:integer",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_provider_private_directory",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read provider contact details",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_publish_agreement",
+  "args": "p_agreement_id:uuid, p_review_note:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_publish_agreement",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator role required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator role required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator role required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator role required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_publish_reward_terms",
+  "args": "p_program:text, p_version:text, p_body_en:text, p_body_ar:text, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_publish_reward_terms",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot publish programme terms",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_purge_demo_data",
+  "args": "p_reason:text, p_confirmation:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_purge_demo_data",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only an administrator can remove the demo data",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_purge_expired_intake",
+  "args": "p_reason:text, p_dry_run:boolean",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_purge_expired_intake",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_recent_bookings",
+  "args": "p_limit:integer, p_purpose:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_recent_bookings",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "{\"rows\":[{\"id\":\"cf75fd93-f155-44be-956c-e3b1f8ce63c5\",\"status\":\"cancelled\",\"branches\":{\"name_ar\":\"فرع الملقا\",\"name_en\":",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  }
+ },
+ {
+  "fn": "admin_reconciliation_overview",
+  "args": "p_status:text, p_limit:integer, p_offset:integer",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_reconciliation_overview",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read reconciliation",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read reconciliation",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read reconciliation",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot read reconciliation",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  },
+  "ownerControl": {
+   "status": 400,
+   "code": "22023",
+   "message": "Unknown status"
+  }
+ },
+ {
+  "fn": "admin_record_cr_review",
+  "args": "p_provider_id:uuid, p_cr_number:text, p_notes:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_record_cr_review",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator role required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator role required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator role required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator role required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_release_expired_holds",
+  "args": "p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_release_expired_holds",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_release_ledger_item",
+  "args": "p_ledger_id:uuid, p_reason:text, p_bank_reference:text, p_idempotency_key:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_release_ledger_item",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot settle ledger rows",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_release_payout",
+  "args": "p_payout_request_id:uuid, p_idempotency_key:text, p_reason:text, p_admin_note:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_release_payout",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only administrators can release payouts",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_reopen_stuck_refund",
+  "args": "p_refund_id:uuid, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_reopen_stuck_refund",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_request_payout_hold",
+  "args": "p_provider_id:uuid, p_action:text, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_request_payout_hold",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot hold payouts",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_request_refund",
+  "args": "p_booking_id:uuid, p_amount:numeric, p_reason:text, p_idempotency_key:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_request_refund",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator role required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_request_setting_change",
+  "args": "p_key:text, p_value:numeric, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_request_setting_change",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only an owner can propose a governance threshold change",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_reset_mfa",
+  "args": "p_user_id:uuid, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_reset_mfa",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only an owner can reset another administrator's MFA",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_retry_refund_request",
+  "args": "p_refund_id:uuid, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_retry_refund_request",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_review_client_import",
+  "args": "p_import_id:uuid, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_review_client_import",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_review_payout_request",
+  "args": "p_payout_request_id:uuid, p_decision:text, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_review_payout_request",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_revoke_api_key",
+  "args": "p_key_id:uuid, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_revoke_api_key",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_reward_programs",
+  "args": "",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_reward_programs",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "{\"terms\":[],\"pending\":[],\"programs\":[{\"enabled\":false,\"program\":\"loyalty\",\"updated_at\":\"2026-10-10T15:50:34.325811+00:00",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  }
+ },
+ {
+  "fn": "admin_role",
+  "args": "",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_role",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 200,
+    "code": null,
+    "message": "null",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "provider": {
+    "status": 200,
+    "code": null,
+    "message": "null",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "owner-aal1": {
+    "status": 200,
+    "code": null,
+    "message": "null",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "\"analyst\"",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  }
+ },
+ {
+  "fn": "admin_role_directory",
+  "args": "p_role:text, p_search:text, p_limit:integer, p_offset:integer",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_role_directory",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 400,
+    "code": "22023",
+    "message": "Unknown role",
+    "hint": null,
+    "cls": "refused-other"
+   }
+  },
+  "ownerControl": {
+   "status": 400,
+   "code": "22023",
+   "message": "Unknown role"
+  }
+ },
+ {
+  "fn": "admin_role_of_account",
+  "args": "",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_role_of_account",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 200,
+    "code": null,
+    "message": "null",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "provider": {
+    "status": 200,
+    "code": null,
+    "message": "null",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "owner-aal1": {
+    "status": 200,
+    "code": null,
+    "message": "\"owner\"",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "\"analyst\"",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  }
+ },
+ {
+  "fn": "admin_save_promo_code",
+  "args": "p_code:text, p_discount_type:text, p_discount_value:numeric, p_reason:text, p_id:uuid, p_max_redemptions:integer, p_funding_source:text, p_min_order_amount:numeric, p_max_discount_cap:numeric, p_per_customer_limit:integer, p_first_booking_only:boolean, p_is_active:boolean, p_starts_at:timestamp with time zone, p_ends_at:timestamp with time zone",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_save_promo_code",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_session_state",
+  "args": "",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_session_state",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 200,
+    "code": null,
+    "message": "{\"aal\":\"aal1\",\"active\":false,\"locked\":false,\"signed_in\":true,\"permissions\":[],\"console_role\":null,\"session_live\":true,\"i",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "provider": {
+    "status": 200,
+    "code": null,
+    "message": "{\"aal\":\"aal1\",\"active\":false,\"locked\":false,\"signed_in\":true,\"permissions\":[],\"console_role\":null,\"session_live\":true,\"i",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "owner-aal1": {
+    "status": 200,
+    "code": null,
+    "message": "{\"aal\":\"aal1\",\"active\":false,\"locked\":false,\"signed_in\":true,\"permissions\":[],\"console_role\":\"owner\",\"session_live\":true",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "{\"aal\":\"aal2\",\"active\":true,\"locked\":false,\"signed_in\":true,\"permissions\":[],\"console_role\":\"analyst\",\"session_live\":tru",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_set_api_setting",
+  "args": "p_key:text, p_value:jsonb, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_set_api_setting",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_set_branch_country",
+  "args": "p_branch_id:uuid, p_country_code:text, p_timezone:text, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_set_branch_country",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_set_console_role",
+  "args": "p_user_id:uuid, p_admin_role:text, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_set_console_role",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only an owner can change console roles",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_set_feature_flag",
+  "args": "p_flag_key:text, p_enabled:boolean, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_set_feature_flag",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_set_phone_verified",
+  "args": "p_customer_id:uuid, p_verified:boolean, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_set_phone_verified",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_set_professional_visibility",
+  "args": "p_handle:text, p_hidden:boolean, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_set_professional_visibility",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_set_promo_code_active",
+  "args": "p_id:uuid, p_active:boolean, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_set_promo_code_active",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_set_provider_status",
+  "args": "p_provider_id:uuid, p_status:provider_status, p_reason:text",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_set_provider_status",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 400,
+    "code": "22P02",
+    "message": "invalid input value for enum provider_status: \"QA role-matrix probe (qa-release-claude)\"",
+    "hint": null,
+    "cls": "refused-other"
+   },
+   "provider": {
+    "status": 400,
+    "code": "22P02",
+    "message": "invalid input value for enum provider_status: \"QA role-matrix probe (qa-release-claude)\"",
+    "hint": null,
+    "cls": "refused-other"
+   },
+   "owner-aal1": {
+    "status": 400,
+    "code": "22P02",
+    "message": "invalid input value for enum provider_status: \"QA role-matrix probe (qa-release-claude)\"",
+    "hint": null,
+    "cls": "refused-other"
+   },
+   "analyst": {
+    "status": 400,
+    "code": "22P02",
+    "message": "invalid input value for enum provider_status: \"QA role-matrix probe (qa-release-claude)\"",
+    "hint": null,
+    "cls": "refused-other"
+   }
+  },
+  "ownerControl": {
+   "status": 400,
+   "code": "22P02",
+   "message": "invalid input value for enum provider_status: \"QA role-matrix probe (qa-release-claude)\""
+  }
+ },
+ {
+  "fn": "admin_set_whatsapp_channel_verified",
+  "args": "p_channel_id:uuid, p_verified:boolean, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_set_whatsapp_channel_verified",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_sign_off_break_glass",
+  "args": "p_review_id:uuid, p_reviewer_name:text, p_document_reference:text, p_notes:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_sign_off_break_glass",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot record a break-glass review",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot record a break-glass review",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot record a break-glass review",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot record a break-glass review",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_sponsored_overview",
+  "args": "p_month:date",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_sponsored_overview",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "{\"month\":\"2026-10\",\"config\":{\"enabled\":false,\"missing\":[\"sponsored.price_per_new_client_sar\",\"sponsored.max_slots_per_se",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "admin_table_write_allowed",
+  "args": "p_permission:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_table_write_allowed",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 200,
+    "code": null,
+    "message": "true",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "provider": {
+    "status": 200,
+    "code": null,
+    "message": "true",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "owner-aal1": {
+    "status": 200,
+    "code": null,
+    "message": "false",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "false",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  }
+ },
+ {
+  "fn": "admin_update_platform_setting",
+  "args": "p_key:text, p_value:jsonb, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_update_platform_setting",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_uphold_no_show_contest",
+  "args": "p_booking_id:uuid, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_uphold_no_show_contest",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_upsert_country",
+  "args": "p_code:text, p_name_en:text, p_name_ar:text, p_currency_code:text, p_currency_minor_units:integer, p_timezone:text, p_vat_rate_percent:numeric, p_phone_dial_code:text, p_active:boolean, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_upsert_country",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_void_sponsored_attribution",
+  "args": "p_attribution_id:uuid, p_action:text, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_void_sponsored_attribution",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_waive_payout_account_notice",
+  "args": "p_destination_id:uuid, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_waive_payout_account_notice",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot waive bank account notices",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "admin_whatsapp_overview",
+  "args": "",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function admin_whatsapp_overview",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "{\"channels\":{\"total\":0,\"enabled\":0,\"verified\":0,\"receptionist_on\":0,\"pending_verification\":0},\"settings\":{\"session_windo",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "privacy_confirm_request",
+  "args": "p_request_id:uuid",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function privacy_confirm_request",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm it is you: sign in with a one-time code sent to your verified e-mail or phone, then repeat the request",
+    "hint": "contact_otp_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm it is you: sign in with a one-time code sent to your verified e-mail or phone, then repeat the request",
+    "hint": "contact_otp_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm it is you: sign in with a one-time code sent to your verified e-mail or phone, then repeat the request",
+    "hint": "contact_otp_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm it is you: sign in with a one-time code sent to your verified e-mail or phone, then repeat the request",
+    "hint": "contact_otp_required",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "privacy_deletion_preview",
+  "args": "",
+  "read": true,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function privacy_deletion_preview",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 200,
+    "code": null,
+    "message": "{\"reviews\":0,\"consents\":0,\"messages\":0,\"favourites\":0,\"active_holds\":0,\"conversations\":0,\"device_tokens\":0,\"open_dispute",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "provider": {
+    "status": 200,
+    "code": null,
+    "message": "{\"reviews\":0,\"consents\":0,\"messages\":0,\"favourites\":0,\"active_holds\":0,\"conversations\":0,\"device_tokens\":0,\"open_dispute",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "owner-aal1": {
+    "status": 200,
+    "code": null,
+    "message": "{\"reviews\":0,\"consents\":0,\"messages\":0,\"favourites\":0,\"active_holds\":0,\"conversations\":0,\"device_tokens\":0,\"open_dispute",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "{\"reviews\":0,\"consents\":0,\"messages\":0,\"favourites\":0,\"active_holds\":0,\"conversations\":0,\"device_tokens\":0,\"open_dispute",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  },
+  "ownerControl": {
+   "status": 200,
+   "code": null,
+   "message": ""
+  }
+ },
+ {
+  "fn": "privacy_erasure_active",
+  "args": "",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function privacy_erasure_active",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 200,
+    "code": null,
+    "message": "false",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "provider": {
+    "status": 200,
+    "code": null,
+    "message": "false",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "owner-aal1": {
+    "status": 200,
+    "code": null,
+    "message": "false",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "false",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  }
+ },
+ {
+  "fn": "privacy_escalate_requests",
+  "args": "",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function privacy_escalate_requests",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (privacy.manage required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "privacy_export_authorize_download",
+  "args": "p_request_id:uuid, p_file:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function privacy_export_authorize_download",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 400,
+    "code": "22023",
+    "message": "The file must be json or pdf",
+    "hint": null,
+    "cls": "refused-other"
+   },
+   "provider": {
+    "status": 400,
+    "code": "22023",
+    "message": "The file must be json or pdf",
+    "hint": null,
+    "cls": "refused-other"
+   },
+   "owner-aal1": {
+    "status": 400,
+    "code": "22023",
+    "message": "The file must be json or pdf",
+    "hint": null,
+    "cls": "refused-other"
+   },
+   "analyst": {
+    "status": 400,
+    "code": "22023",
+    "message": "The file must be json or pdf",
+    "hint": null,
+    "cls": "refused-other"
+   }
+  }
+ },
+ {
+  "fn": "privacy_my_requests",
+  "args": "",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function privacy_my_requests",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 200,
+    "code": null,
+    "message": "[]",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "provider": {
+    "status": 200,
+    "code": null,
+    "message": "[]",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "owner-aal1": {
+    "status": 200,
+    "code": null,
+    "message": "[]",
+    "hint": null,
+    "cls": "ALLOWED"
+   },
+   "analyst": {
+    "status": 200,
+    "code": null,
+    "message": "[]",
+    "hint": null,
+    "cls": "ALLOWED"
+   }
+  }
+ },
+ {
+  "fn": "privacy_purge_expired_retention",
+  "args": "p_dry_run:boolean, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function privacy_purge_expired_retention",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (privacy.approve required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "privacy_reapply_deletion_ledger",
+  "args": "",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function privacy_reapply_deletion_ledger",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (privacy.approve required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "privacy_release_due_holds",
+  "args": "",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function privacy_release_due_holds",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Your console role cannot do this (privacy.approve required)",
+    "hint": "console_role_forbidden",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "privacy_require_contact_otp",
+  "args": "",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function privacy_require_contact_otp",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm it is you: sign in with a one-time code sent to your verified e-mail or phone, then repeat the request",
+    "hint": "contact_otp_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm it is you: sign in with a one-time code sent to your verified e-mail or phone, then repeat the request",
+    "hint": "contact_otp_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm it is you: sign in with a one-time code sent to your verified e-mail or phone, then repeat the request",
+    "hint": "contact_otp_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm it is you: sign in with a one-time code sent to your verified e-mail or phone, then repeat the request",
+    "hint": "contact_otp_required",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "privacy_set_review_choice",
+  "args": "p_request_id:uuid, p_choice:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function privacy_set_review_choice",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm it is you: sign in with a one-time code sent to your verified e-mail or phone, then repeat the request",
+    "hint": "contact_otp_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm it is you: sign in with a one-time code sent to your verified e-mail or phone, then repeat the request",
+    "hint": "contact_otp_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm it is you: sign in with a one-time code sent to your verified e-mail or phone, then repeat the request",
+    "hint": "contact_otp_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm it is you: sign in with a one-time code sent to your verified e-mail or phone, then repeat the request",
+    "hint": "contact_otp_required",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "privacy_submit_request",
+  "args": "p_request_type:text, p_details:text, p_options:jsonb",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function privacy_submit_request",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 400,
+    "code": "22023",
+    "message": "Unknown request type",
+    "hint": null,
+    "cls": "refused-other"
+   },
+   "provider": {
+    "status": 400,
+    "code": "22023",
+    "message": "Unknown request type",
+    "hint": null,
+    "cls": "refused-other"
+   },
+   "owner-aal1": {
+    "status": 400,
+    "code": "22023",
+    "message": "Unknown request type",
+    "hint": null,
+    "cls": "refused-other"
+   },
+   "analyst": {
+    "status": 400,
+    "code": "22023",
+    "message": "Unknown request type",
+    "hint": null,
+    "cls": "refused-other"
+   }
+  }
+ },
+ {
+  "fn": "privacy_withdraw_request",
+  "args": "p_request_id:uuid",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function privacy_withdraw_request",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm it is you: sign in with a one-time code sent to your verified e-mail or phone, then repeat the request",
+    "hint": "contact_otp_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm it is you: sign in with a one-time code sent to your verified e-mail or phone, then repeat the request",
+    "hint": "contact_otp_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm it is you: sign in with a one-time code sent to your verified e-mail or phone, then repeat the request",
+    "hint": "contact_otp_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm it is you: sign in with a one-time code sent to your verified e-mail or phone, then repeat the request",
+    "hint": "contact_otp_required",
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "read_intake_answers_break_glass",
+  "args": "p_submission_id:uuid, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function read_intake_answers_break_glass",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Administrator access required",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only the data protection break-glass holder can read health answers",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "reveal_employee_wps_iban",
+  "args": "p_employee_id:uuid, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function reveal_employee_wps_iban",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only the provider owner, finance or an owner can reveal a salary account",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ },
+ {
+  "fn": "reveal_provider_iban",
+  "args": "p_provider_id:uuid, p_reason:text",
+  "read": false,
+  "answers": {
+   "anon": {
+    "status": 401,
+    "code": "42501",
+    "message": "permission denied for function reveal_provider_iban",
+    "hint": null,
+    "cls": "refused-authz"
+   },
+   "customer": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "provider": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "owner-aal1": {
+    "status": 403,
+    "code": "42501",
+    "message": "Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)",
+    "hint": "step_up_required",
+    "cls": "refused-authz"
+   },
+   "analyst": {
+    "status": 403,
+    "code": "42501",
+    "message": "Only finance or an owner can reveal an IBAN",
+    "hint": null,
+    "cls": "refused-authz"
+   }
+  }
+ }
+]

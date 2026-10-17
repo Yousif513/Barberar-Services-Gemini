@@ -1,0 +1,53 @@
+{
+ "phase": "falsesuccess",
+ "app": "http://localhost:3100",
+ "api": "http://127.0.0.1:54321",
+ "started": "2026-10-16T21:58:35.819Z",
+ "ended": "2026-10-16T21:59:01.479Z",
+ "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+ "axe": "axe-core 4.12.1 (node_modules)",
+ "results": [
+  {
+   "as": "analyst",
+   "route": "/admin/services",
+   "button": "/^(INACTIVE|ACTIVE)$/i",
+   "confirm": "null",
+   "read": "[...document.querySelectorAll(\"main tbody tr\")][0]?.innerText.replace(/\\s+/g, \" \").slice(0, 160)",
+   "clicked": "INACTIVE",
+   "confirmed": null,
+   "before": "Luxury Beard Grooming ID: 50000000-0000-0000-0000-000000000001 Beard Grooming SAR 1 ACTIVE ☆ LANDING ☆ SERVICES EDIT INACTIVE ARCHIVE",
+   "afterRow": "Luxury Beard Grooming ID: 50000000-0000-0000-0000-000000000001 Beard Grooming SAR 1 INACTIVE ☆ LANDING ☆ SERVICES EDIT ACTIVE ARCHIVE",
+   "alertsAfterClick": [],
+   "textAfterClick": "Global Services Directory Manage the master services catalog, configure baseline price metrics, and organize categories. + Add service Service catalog updated successfully! TOTAL SERVICES # 33 ACTIVE CATEGORIES ✓ 10 AVERAGE BASE PRICE % 151.5 SAR All categories Moroccan Bath Gel Manicure Balayage & ",
+   "reloaded": "Luxury Beard Grooming ID: 50000000-0000-0000-0000-000000000001 Beard Grooming SAR 1 ACTIVE ☆ LANDING ☆ SERVICES EDIT INACTIVE ARCHIVE"
+  },
+  {
+   "as": "analyst",
+   "route": "/admin/branches",
+   "button": "/^TOGGLE$/i",
+   "confirm": "/^(Deactivate|Reactivate)$/i",
+   "read": "(document.querySelector(\"main\")?.innerText || \"\").replace(/\\s+/g, \" \").slice(0, 400)",
+   "clicked": "TOGGLE",
+   "confirmed": "Deactivate",
+   "before": "Branches & Outlets Matrix Monitor provider outlet locations, active schedules, and verification statuses. TOTAL BRANCHES 5 ONLINE OUTLETS 5 AVERAGE SERVICE RADIUS 8.0 KM BRANCH NAME PROVIDER / SALON LOCATION / CITY STATE Olaya Branch Sara Beauty Salon & Spa Tahlia Street, Olaya, Riyadh ONLINE TOGGLE Al-Malqa Branch Elite Grooming Lounge Anas Bin Malik Road, Al-Malqa, Riyadh ONLINE TOGGLE Riyadh Ce",
+   "afterRow": "Branches & Outlets Matrix Monitor provider outlet locations, active schedules, and verification statuses. TOTAL BRANCHES 5 ONLINE OUTLETS 4 AVERAGE SERVICE RADIUS 8.0 KM BRANCH NAME PROVIDER / SALON LOCATION / CITY STATE Olaya Branch Sara Beauty Salon & Spa Tahlia Street, Olaya, Riyadh MAINTENANCE TOGGLE Al-Malqa Branch Elite Grooming Lounge Anas Bin Malik Road, Al-Malqa, Riyadh ONLINE TOGGLE Riya",
+   "alertsAfterClick": [],
+   "textAfterClick": "Branches & Outlets Matrix Monitor provider outlet locations, active schedules, and verification statuses. TOTAL BRANCHES 5 ONLINE OUTLETS 4 AVERAGE SERVICE RADIUS 8.0 KM BRANCH NAME PROVIDER / SALON LOCATION / CITY STATE Olaya Branch Sara Beauty Salon & Spa Tahlia Street, Olaya, Riyadh MAINTENANCE T",
+   "reloaded": "Branches & Outlets Matrix Monitor provider outlet locations, active schedules, and verification statuses. TOTAL BRANCHES 5 ONLINE OUTLETS 5 AVERAGE SERVICE RADIUS 8.0 KM BRANCH NAME PROVIDER / SALON LOCATION / CITY STATE Olaya Branch Sara Beauty Salon & Spa Tahlia Street, Olaya, Riyadh ONLINE TOGGLE Al-Malqa Branch Elite Grooming Lounge Anas Bin Malik Road, Al-Malqa, Riyadh ONLINE TOGGLE Riyadh Ce"
+  },
+  {
+   "as": "finance",
+   "route": "/admin/integrations",
+   "button": "/^DISABLE$/i",
+   "confirm": "/^(Disable|Confirm|DISABLE)$/i",
+   "read": "(document.querySelector(\"main\")?.innerText || \"\").replace(/\\s+/g, \" \").slice(0, 400)",
+   "clicked": "DISABLE",
+   "confirmed": "Disable",
+   "before": "API & Integrations Enable, disable and switch environments for every connected service. Credentials stay server-side — only masked hints are shown here. + ADD API ACTIVE APIS 1 CONFIGURED KEYS 1 LIVE MODE 1 SECTIONS LINKED 9 All sections Payments Maps & Location SMS / OTP Push Notifications Email WhatsApp Business Calendar Sync Analytics AI Concierge Authentication Storage Logistics PAYMENTS Moyas",
+   "afterRow": "API & Integrations Enable, disable and switch environments for every connected service. Credentials stay server-side — only masked hints are shown here. + ADD API API integration disabled. ACTIVE APIS 1 CONFIGURED KEYS 1 LIVE MODE 1 SECTIONS LINKED 9 All sections Payments Maps & Location SMS / OTP Push Notifications Email WhatsApp Business Calendar Sync Analytics AI Concierge Authentication Storag",
+   "alertsAfterClick": [],
+   "textAfterClick": "API & Integrations Enable, disable and switch environments for every connected service. Credentials stay server-side — only masked hints are shown here. + ADD API API integration disabled. ACTIVE APIS 1 CONFIGURED KEYS 1 LIVE MODE 1 SECTIONS LINKED 9 All sections Payments Maps & Location SMS / OTP P",
+   "reloaded": "API & Integrations Enable, disable and switch environments for every connected service. Credentials stay server-side — only masked hints are shown here. + ADD API ACTIVE APIS 1 CONFIGURED KEYS 1 LIVE MODE 1 SECTIONS LINKED 9 All sections Payments Maps & Location SMS / OTP Push Notifications Email WhatsApp Business Calendar Sync Analytics AI Concierge Authentication Storage Logistics PAYMENTS Moyas"
+  }
+ ]
+}

@@ -1,0 +1,68 @@
+Excerpt, qa-release-claude 2026-10-17: the referral and loyalty controls as installed in the local database (pg_get_functiondef),
+re-read for gap referral-and-loyalty-values-self-approved-and-unbounded.
+
+1. admin_update_platform_setting no longer edits the programmes:
+  IF p_key IN ('loyalty_program', 'referral_program') THEN
+    RAISE EXCEPTION 'Referral and loyalty change only through an approved programme change (admin_propose_reward_program, D-Q7)'
+      USING ERRCODE = '42501', HINT = 'reward_program_approval';
+
+2. admin_propose_reward_program (the only way to change or enable a programme):
+  PERFORM public.require_recent_mfa();
+  IF NOT public.admin_can('money.config') THEN
+    RAISE EXCEPTION 'Your console role cannot propose programme changes' USING ERRCODE = '42501';
+  END IF;
+  IF p_program IS NULL OR p_program NOT IN ('referral', 'loyalty') THEN
+    RAISE EXCEPTION 'The programme is referral or loyalty' USING ERRCODE = '22023';
+  END IF;
+  IF p_enabled IS NULL THEN
+    RAISE EXCEPTION 'Say whether the programme is enabled' USING ERRCODE = '22023';
+  END IF;
+  IF v_reason IS NULL OR char_length(v_reason) < 10 THEN
+    RAISE EXCEPTION 'A reason of at least 10 characters is required' USING ERRCODE = '22023';
+  END IF;
+  SELECT * INTO v_current FROM public.reward_programs WHERE program = p_program;
+  IF p_enabled THEN
+    IF p_reward_value_sar IS NULL THEN v_missing := array_append(v_missing, 'reward value'); END IF;
+    IF p_customer_monthly_cap_sar IS NULL THEN v_missing := array_append(v_missing, 'per-customer monthly cap'); END IF;
+    IF p_monthly_budget_sar IS NULL THEN v_missing := array_append(v_missing, 'programme monthly budget'); END IF;
+    IF p_credit_expiry_days IS NULL THEN v_missing := array_append(v_missing, 'credit expiry'); END IF;
+    IF NULLIF(btrim(COALESCE(p_terms_version, '')), '') IS NULL THEN v_missing := array_append(v_missing, 'published terms version'); END IF;
+    IF p_program = 'loyalty' AND p_points_per_sar IS NULL THEN v_missing := array_append(v_missing, 'points per SAR'); END IF;
+    IF p_program = 'loyalty' AND p_min_redeem_points IS NULL THEN v_missing := array_append(v_missing, 'minimum points to redeem'); END IF;
+    IF cardinality(v_missing) > 0 THEN
+      RAISE EXCEPTION 'The programme cannot be enabled while these are unset: %', array_to_string(v_missing, ', ')
+        USING ERRCODE = '22023', HINT = 'reward_values_required';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM public.reward_terms WHERE program = p_program AND version = btrim(p_terms_version)) THEN
+      RAISE EXCEPTION 'Terms version % is not published for this programme', btrim(p_terms_version) USING ERRCODE = '22023';
+    END IF;
+  END IF;
+  IF (p_reward_value_sar IS NOT NULL AND (p_reward_value_sar <= 0 OR p_reward_value_sar > 10000))
+     OR (p_customer_monthly_cap_sar IS NOT NULL AND (p_customer_monthly_cap_sar <= 0 OR p_customer_monthly_cap_sar > 100000))
+     OR (p_monthly_budget_sar IS NOT NULL AND (p_monthly_budget_sar <= 0 OR p_monthly_budget_sar > 100000000))
+     OR (p_credit_expiry_days IS NOT NULL AND (p_credit_expiry_days < 1 OR p_credit_expiry_days > 3650))
+     OR (p_points_per_sar IS NOT NULL AND (p_points_per_sar <= 0 OR p_points_per_sar > 1000))
+     OR (p_min_redeem_points IS NOT NULL AND (p_min_redeem_points < 1 OR p_min_redeem_points > 1000000))
+     OR (p_min_qualifying_sar IS NOT NULL AND (p_min_qualifying_sar < 0 OR p_min_qualifying_sar > 100000)) THEN
+    RAISE EXCEPTION 'A value is outside its allowed range' USING ERRCODE = '22023';
+  END IF;
+  IF p_enabled AND p_customer_monthly_cap_sar > p_monthly_budget_sar THEN
+    RAISE EXCEPTION 'The per-customer monthly cap cannot exceed the programme monthly budget' USING ERRCODE = '22023';
+  END IF;
+  IF p_program = 'referral' AND (p_points_per_sar IS NOT NULL OR p_min_redeem_points IS NOT NULL) THEN
+    RAISE EXCEPTION 'Points apply to the loyalty programme only' USING ERRCODE = '22023';
+  END IF;
+
+  RETURN public.governance_request('reward_program', 'reward_programs', md5('reward_program:' || p_program)::uuid, NULL,
+    jsonb_build_object('program', p_program, 'enabled', p_enabled, 'reward_value_sar', p_reward_value_sar,
+                       'customer_monthly_cap_sar', p_customer_monthly_cap_sar, 'monthly_budget_sar', p_monthly_budget_sar,
+
+3. The approval kind reward_program is decided only by a holder of:
+rewards.approve
+   held by:
+owner
+   and admin_decide_approval refuses the requester (four eyes for every role), see maker-checker-live.txt.
+
+Test cases (supabase/tests/db/money_rewards.test.mjs, passing in the 1429-test run): is refused while any value is unset, naming what is missing;
+needs a different owner to approve, finance proposes but never approves, and nobody approves their own; refuses every role
+without money.config, and every direct write; cannot be enabled with one administrator: break-glass never applies.

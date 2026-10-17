@@ -1,0 +1,12 @@
+direct table writes by console role, no-op PATCH (column set to its current value), 2026-10-16T21:57:58.223Z, http://127.0.0.1:54321
+services.is_active (console permission operations.write) | analyst:no row (RLS) | finance:no row (RLS) | operations:WROTE | owner:WROTE | customer:no row (RLS)
+integrations.enabled (console permission settings.manage) | analyst:no row (RLS) | finance:no row (RLS) | operations:no row (RLS) | owner:WROTE | customer:no row (RLS)
+payment_methods.enabled (console permission settings.manage) | analyst:no row (RLS) | finance:no row (RLS) | operations:no row (RLS) | owner:WROTE | customer:no row (RLS)
+branches.is_active (console permission operations.write) | analyst:no row (RLS) | finance:no row (RLS) | operations:WROTE | owner:WROTE | customer:no row (RLS)
+providers.status (console permission operations.write (column grants: command only)) | analyst:refused 403 42501 | finance:refused 403 42501 | operations:refused 403 42501 | owner:refused 403 42501 | customer:refused 403 42501
+categories.name_en (console permission operations.write) | analyst:no row (RLS) | finance:no row (RLS) | operations:WROTE | owner:WROTE | customer:no row (RLS)
+message_templates.is_transactional (console permission settings.manage) | analyst:no row (RLS) | finance:no row (RLS) | operations:no row (RLS) | owner:WROTE | customer:no row (RLS)
+platform_settings.description (console permission (expected: command only)) | analyst:refused 403 42501 | finance:refused 403 42501 | operations:refused 403 42501 | owner:refused 403 42501 | customer:refused 403 42501
+platform_feature_flags.description (console permission (expected: command only)) | analyst:refused 403 42501 | finance:refused 403 42501 | operations:refused 403 42501 | owner:refused 403 42501 | customer:refused 403 42501
+promotional_codes: no rows to probe
+provider_promos: no rows to probe

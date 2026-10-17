@@ -1,0 +1,321 @@
+Profile: regulated (manifest)
+Phase: release
+ERROR: [crosscutting-flag] crossCutting.audit.capturesActorTargetReasonResult: must be true for release
+ERROR: [crosscutting-flag] crossCutting.audit.privilegedMutations: must be true for release
+ERROR: [privileged-read-audit] crossCutting.audit.privilegedReadsWhenRequired: privileged reads of regulated data must be audited
+ERROR: [crosscutting-flag] crossCutting.audit.tamperProtected: must be true for release
+ERROR: [crosscutting-flag] crossCutting.authentication.mfaForPrivilegedRoles: must be true for release
+ERROR: [crosscutting-flag] crossCutting.authentication.sessionRevocation: must be true for release
+ERROR: [crosscutting-flag] crossCutting.data.releaseUsesRealSources: must be true for release
+ERROR: [crosscutting-flag] crossCutting.data.retentionDefined: must be true for release
+ERROR: [crosscutting-flag] crossCutting.data.sensitiveFieldsClassified: must be true for release
+ERROR: [crosscutting-evidence] crossCutting.experience.evidence: a boolean is not evidence; record at least one artifact that proves this section
+ERROR: [crosscutting-flag] crossCutting.experience.keyboardCriticalFlowsTested: must be true for release
+ERROR: [crosscutting-flag] crossCutting.experience.localizationRequirementsHandled: must be true for release
+ERROR: [crosscutting-flag] crossCutting.experience.responsiveCriticalFlowsTested: must be true for release
+ERROR: [crosscutting-flag] crossCutting.observability.adminApiInstrumented: must be true for release
+ERROR: [crosscutting-flag] crossCutting.observability.correlationIdsExposedSafely: must be true for release
+ERROR: [crosscutting-evidence] crossCutting.observability.evidence: a boolean is not evidence; record at least one artifact that proves this section
+ERROR: [crosscutting-flag] crossCutting.observability.highRiskActionsDetectable: must be true for release
+ERROR: [crosscutting-flag] crossCutting.observability.jobsAndIntegrationsMonitored: must be true for release
+ERROR: [crosscutting-evidence] crossCutting.safety.evidence: a boolean is not evidence; record at least one artifact that proves this section
+ERROR: [crosscutting-flag] crossCutting.safety.recoveryDefined: must be true for release
+ERROR: [crosscutting-flag] crossCutting.safety.riskClassifiedActions: must be true for release
+ERROR: [release-status-unresolved] entities[admin-governance].capabilities[gov.approvals].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[admin-governance].capabilities[gov.audited-reads].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[admin-governance].capabilities[gov.break-glass].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[admin-governance].capabilities[gov.console-roles].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[admin-governance].capabilities[gov.iban-change].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [capability-route-unknown] entities[admin-governance].capabilities[gov.iban-change].uiRoutes: route '/provider/wallet' has no matching screen
+ERROR: [release-status-unresolved] entities[admin-governance].capabilities[gov.iban-reveal].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[admin-governance].capabilities[gov.mfa].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[analytics-event].capabilities[analytics.funnel].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[audit-event].capabilities[audit.emit].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[audit-event].capabilities[audit.search].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[booking].capabilities[booking.detail].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[booking].capabilities[booking.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[booking].capabilities[booking.release-holds].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[booking].capabilities[booking.transition].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[branch].capabilities[branch.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[branch].capabilities[branch.toggle-active].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[country].capabilities[country.configure].status: is 'planned'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[country].capabilities[country.list].status: is 'planned'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[customer].capabilities[customer.clear-profile].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[customer].capabilities[customer.data-request].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[customer].capabilities[customer.detail].status: is 'deferred'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[customer].capabilities[customer.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[customer].capabilities[customer.submit-data-request].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[customer].capabilities[customer.suspend].status: is 'deferred'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[customer].capabilities[customer.verify-phone].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[dispute].capabilities[dispute.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[dispute].capabilities[dispute.resolve].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[employee].capabilities[employee.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[feature-flag].capabilities[feature-flag.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[feature-flag].capabilities[feature-flag.set].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[fee-rule].capabilities[fee-rule.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[fee-rule].capabilities[fee-rule.save].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[fee-rule].capabilities[fee.effective-display].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[fee-rule].capabilities[money.pending-change].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[integration].capabilities[integration.delete].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[integration].capabilities[integration.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[integration].capabilities[integration.toggle].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[integration].capabilities[integration.upsert].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[inventory-operations].capabilities[inventory.adjust].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[inventory-operations].capabilities[inventory.catalog].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[inventory-operations].capabilities[inventory.chain-read].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[inventory-operations].capabilities[inventory.delegation].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[inventory-operations].capabilities[inventory.supply-read].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[inventory-operations].capabilities[inventory.transfer].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[ledger-entry].capabilities[ledger.adjustment].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[ledger-entry].capabilities[ledger.export].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[ledger-entry].capabilities[ledger.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[ledger-entry].capabilities[ledger.release-payout].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[ledger-entry].capabilities[ledger.vat-report].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[ledger-entry].capabilities[money.append-only].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[notification-broadcast].capabilities[notification.broadcast].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[notification-broadcast].capabilities[notification.dispatch].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[notification-broadcast].capabilities[notification.log].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[operations-dashboard].capabilities[activity.feed].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[operations-dashboard].capabilities[dashboard.overview].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[package].capabilities[package.list].status: is 'discovered'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[package].capabilities[package.toggle].status: is 'discovered'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[payment-method].capabilities[payment-method.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[payment-method].capabilities[payment-method.set-default].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[payment-method].capabilities[payment-method.toggle].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[payout-request].capabilities[payout.approve].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[payout-request].capabilities[payout.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[payout-request].capabilities[payout.mark-paid].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[payout-request].capabilities[payout.reject].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[platform-settings].capabilities[settings.api-limits].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[platform-settings].capabilities[settings.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[platform-settings].capabilities[settings.platform].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[platform-settings].capabilities[settings.vat-rate].status: is 'deferred'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-incident].capabilities[incident.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-incident].capabilities[incident.register].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[intake.health-retention-and-gate].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[privacy.copy-export].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[privacy.correction].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[privacy.deadline-and-refusal].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[privacy.deletion-ledger].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[privacy.deletion].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[privacy.legal-hold].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[privacy.queue].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[privacy.request-intake].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[processing-register].capabilities[ropa.view].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[promotional-code].capabilities[coupon.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[promotional-code].capabilities[coupon.toggle].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[promotional-code].capabilities[coupon.upsert].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[provider].capabilities[provider.approve].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[provider].capabilities[provider.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[provider].capabilities[provider.notes].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[provider].capabilities[provider.reject].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[provider].capabilities[provider.suspend].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[provider].capabilities[provider.vat-status].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [entity-query-missing] entities[reconciliation].capabilities: entity has no query capability, so operators cannot observe it
+ERROR: [release-status-unresolved] entities[reconciliation].capabilities[reconciliation.daily].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[reconciliation].capabilities[reconciliation.resolve-break].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [lifecycle-observable] entities[reconciliation].lifecycleStates: state 'escalated' appears in no capability entityStates, so it is invisible to operators
+ERROR: [lifecycle-reachable] entities[reconciliation].lifecycleStates: state 'escalated' is the target of no command capability, so operators cannot put a record into it
+ERROR: [release-status-unresolved] entities[refund-request].capabilities[refund.check-with-tap].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[refund-request].capabilities[refund.execute].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[refund-request].capabilities[refund.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[refund-request].capabilities[refund.retry].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[review].capabilities[review.hide].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[review].capabilities[review.moderate-queue].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [entity-query-missing] entities[reward-program].capabilities: entity has no query capability, so operators cannot observe it
+ERROR: [release-status-unresolved] entities[reward-program].capabilities[reward-program.enable].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [capability-route-unknown] entities[reward-program].capabilities[reward-program.enable].uiRoutes: route '/customer/wallet' has no matching screen
+ERROR: [release-status-unresolved] entities[role-assignment].capabilities[role.directory].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[role-assignment].capabilities[role.set-administrator].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[service].capabilities[service.delete].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[service].capabilities[service.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[service].capabilities[service.set-featured].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[service].capabilities[service.set-price].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[service].capabilities[service.toggle-active].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[service].capabilities[service.upsert].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[sponsored-placement].capabilities[sponsored.configure].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[sponsored-placement].capabilities[sponsored.overview].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[sponsored-placement].capabilities[sponsored.void-attribution].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[support-contact].capabilities[support.contact].status: is 'blocked'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[whatsapp-channel].capabilities[whatsapp.overview].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[whatsapp-channel].capabilities[whatsapp.verify-channel].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [gap-unresolved] gaps[admin-sessions-have-no-mfa-or-step-up].status: unresolved high gap blocks release
+ERROR: [evidence-not-resolvable] gaps[analyst-read-only-not-enforced-through-shared-provider-helpers].evidence: no entry resolves to a non-empty local path; URL and manual entries are supplemental only
+ERROR: [placeholder-scan] gaps[analyst-read-only-not-enforced-through-shared-provider-helpers].evidence[0]: evidence file contains placeholder text: supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L470
+ERROR: [gap-unresolved] gaps[deletion-ledger-needs-off-database-archive].status: unresolved high gap blocks release
+ERROR: [placeholder-scan] gaps[employee-wps-iban-not-masked].evidence[0]: evidence file contains placeholder text: supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql
+ERROR: [placeholder-scan] gaps[export-step-up-is-not-server-enforced].evidence[0]: evidence file contains placeholder text: supabase/migrations/20261010200000_gov2_audited_admin_reads.sql
+ERROR: [gap-unresolved] gaps[governance-notice-sender-not-chosen].status: unresolved high gap blocks release
+ERROR: [placeholder-scan] gaps[governance-notifications-have-no-delivery-worker].evidence[3]: evidence file contains placeholder text: supabase/tests/db/secfix2_governance_notices.test.mjs
+ERROR: [gap-unresolved] gaps[hosted-auth-settings-must-match-gov1].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[iban-unmasked-to-every-admin].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[no-separation-of-duties].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[referral-and-loyalty-values-self-approved-and-unbounded].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[refund-outcomes-that-cannot-be-known-have-no-recovery].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[rewards-counsel-and-tax-before-enablement].status: unresolved high gap blocks release
+ERROR: [placeholder-scan] gaps[sec-final-f2-customer-lookup-oracle].evidence[0]: evidence file contains placeholder text: supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql
+ERROR: [placeholder-scan] gaps[sec-gov1-h2-self-approval-by-proxy].evidence[0]: evidence file contains placeholder text: supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql
+ERROR: [placeholder-scan] gaps[sec-gov1-h3-notices-to-unverified-contacts].evidence[0]: evidence file contains placeholder text: supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql
+ERROR: [placeholder-scan] gaps[sec-gov1-l2-weak-reveal-references].evidence[0]: evidence file contains placeholder text: supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql
+ERROR: [placeholder-scan] gaps[sec-gov1-l3-pending-iban-revealed].evidence[0]: evidence file contains placeholder text: supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql
+ERROR: [placeholder-scan] gaps[sec-gov1-m4-break-glass-review-not-independent].evidence[0]: evidence file contains placeholder text: supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql
+ERROR: [placeholder-scan] gaps[sec-gov1-m5-employee-wps-iban-unmasked].evidence[0]: evidence file contains placeholder text: supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql
+ERROR: [placeholder-scan] gaps[sec-gov1-m6-mfa-factor-persistence].evidence[0]: evidence file contains placeholder text: supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql
+ERROR: [gap-unresolved] gaps[sole-owner-cannot-grant-approver-roles].status: unresolved high gap blocks release
+ERROR: [placeholder-scan] gaps[ux1-auth-and-validation-errors-shown-in-english-on-arabic-screens].evidence[0]: evidence file contains placeholder text: web_platform/src/lib/auth-errors.ts
+ERROR: [placeholder-scan] gaps[ux1-copy-defects-on-governance-and-onboarding-screens].evidence[2]: evidence file contains placeholder text: web_platform/src/app/become-provider/page.tsx
+ERROR: [placeholder-scan] gaps[ux1-ledger-psp-tab-contradicts-reconciliation-screen].evidence[2]: evidence file contains placeholder text: web_platform/tests/negative-authorization.test.mjs
+ERROR: [evidence-not-resolvable] gaps[ux1-mfa-enrolment-cleanup-logs-404s].evidence: no entry resolves to a non-empty local path; URL and manual entries are supplemental only
+ERROR: [placeholder-scan] gaps[ux1-mfa-enrolment-cleanup-logs-404s].evidence[0]: evidence file contains placeholder text: web_platform/src/app/login/mfa/page.tsx
+ERROR: [placeholder-scan] gaps[ux1-navigation-and-actions-not-trimmed-to-console-role].evidence[1]: evidence file contains placeholder text: web_platform/src/app/admin/layout.tsx
+ERROR: [gap-unresolved] gaps[zatca-vat-number-verification-not-integrated].status: unresolved high gap blocks release
+ERROR: [release-status-unresolved] integrations[expo-push].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] integrations[sms-otp].status: is 'discovered'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] integrations[tap-payments].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [gate-not-passed] qualityGates[accessibility].status: is 'failed', not passed
+ERROR: [nonfunctional-gate-required] qualityGates[accessibility].status: the accessibility gate must pass at this profile; not-applicable is only allowed at profile internal
+ERROR: [gate-not-passed] qualityGates[browser].status: is 'pending', not passed
+ERROR: [gate-not-passed] qualityGates[performance].status: is 'pending', not passed
+ERROR: [nonfunctional-gate-required] qualityGates[performance].status: the performance gate must pass at this profile; not-applicable is only allowed at profile internal
+ERROR: [gate-not-passed] qualityGates[security].status: is 'failed', not passed
+ERROR: [screen-accessibility] screens[admin-activity].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[admin-activity].responsive: must be true for release
+ERROR: [screen-state-missing] screens[admin-activity].states: is missing: loading, forbidden
+ERROR: [release-status-unresolved] screens[admin-activity].status: must be implemented for release
+ERROR: [required-field-empty] screens[admin-activity].tests: must not be empty for release
+ERROR: [screen-accessibility] screens[admin-approvals].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-approvals].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-audit-logs].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-audit-logs].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-bookings].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[admin-bookings].responsive: must be true for release
+ERROR: [release-status-unresolved] screens[admin-bookings].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-branches].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[admin-branches].responsive: must be true for release
+ERROR: [screen-state-missing] screens[admin-branches].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[admin-branches].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-coupons].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[admin-coupons].responsive: must be true for release
+ERROR: [screen-state-missing] screens[admin-coupons].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[admin-coupons].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-customers].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-customers].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-dashboard].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-dashboard].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-disputes].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[admin-disputes].responsive: must be true for release
+ERROR: [screen-state-missing] screens[admin-disputes].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[admin-disputes].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-employees].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-employees].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-help].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[admin-help].responsive: must be true for release
+ERROR: [screen-state-missing] screens[admin-help].states: is missing: loading, error, forbidden
+ERROR: [release-status-unresolved] screens[admin-help].status: must be implemented for release
+ERROR: [required-field-empty] screens[admin-help].tests: must not be empty for release
+ERROR: [screen-accessibility] screens[admin-incidents].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-incidents].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-integrations].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[admin-integrations].responsive: must be true for release
+ERROR: [screen-state-missing] screens[admin-integrations].states: is missing: loading, forbidden
+ERROR: [release-status-unresolved] screens[admin-integrations].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-ledger].accessibilityStatus: must be implemented for release
+ERROR: [screen-state-missing] screens[admin-ledger].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[admin-ledger].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-notifications].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[admin-notifications].responsive: must be true for release
+ERROR: [screen-state-missing] screens[admin-notifications].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[admin-notifications].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-packages].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[admin-packages].responsive: must be true for release
+ERROR: [screen-state-missing] screens[admin-packages].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[admin-packages].status: must be implemented for release
+ERROR: [required-field-empty] screens[admin-packages].tests: must not be empty for release
+ERROR: [screen-accessibility] screens[admin-platform-rules].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[admin-platform-rules].responsive: must be true for release
+ERROR: [release-status-unresolved] screens[admin-platform-rules].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-privacy].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-privacy].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-providers].accessibilityStatus: must be implemented for release
+ERROR: [screen-state-missing] screens[admin-providers].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[admin-providers].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-reconciliation].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-reconciliation].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-refunds].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-refunds].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-reports].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-reports].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-reviews].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[admin-reviews].responsive: must be true for release
+ERROR: [screen-state-missing] screens[admin-reviews].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[admin-reviews].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-roles].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[admin-roles].responsive: must be true for release
+ERROR: [release-status-unresolved] screens[admin-roles].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-ropa].accessibilityStatus: must be implemented for release
+ERROR: [screen-state-missing] screens[admin-ropa].states: is missing: loading, error, forbidden
+ERROR: [release-status-unresolved] screens[admin-ropa].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-services].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[admin-services].responsive: must be true for release
+ERROR: [screen-state-missing] screens[admin-services].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[admin-services].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-settings].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-settings].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-sponsored].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[admin-sponsored].responsive: must be true for release
+ERROR: [release-status-unresolved] screens[admin-sponsored].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-supply].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[admin-supply].responsive: must be true for release
+ERROR: [screen-state-missing] screens[admin-supply].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[admin-supply].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-taxes].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-taxes].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-whatsapp].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[admin-whatsapp].responsive: must be true for release
+ERROR: [release-status-unresolved] screens[admin-whatsapp].status: must be implemented for release
+ERROR: [screen-accessibility] screens[become-provider].accessibilityStatus: must be implemented for release
+ERROR: [screen-state-missing] screens[become-provider].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[become-provider].status: must be implemented for release
+ERROR: [screen-accessibility] screens[customer-privacy-account].accessibilityStatus: must be implemented for release
+ERROR: [screen-state-missing] screens[customer-privacy-account].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[customer-privacy-account].status: must be implemented for release
+ERROR: [screen-accessibility] screens[customer-privacy].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[customer-privacy].responsive: must be true for release
+ERROR: [screen-state-missing] screens[customer-privacy].states: is missing: loading, forbidden
+ERROR: [release-status-unresolved] screens[customer-privacy].status: must be implemented for release
+ERROR: [screen-accessibility] screens[login-mfa].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[login-mfa].status: must be implemented for release
+ERROR: [screen-accessibility] screens[provider-chain].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[provider-chain].responsive: must be true for release
+ERROR: [release-status-unresolved] screens[provider-chain].status: must be implemented for release
+ERROR: [screen-accessibility] screens[provider-inventory].accessibilityStatus: must be implemented for release
+ERROR: [screen-responsive] screens[provider-inventory].responsive: must be true for release
+ERROR: [release-status-unresolved] screens[provider-inventory].status: must be implemented for release
+ERROR: [screen-accessibility] screens[provider-pricing].accessibilityStatus: must be implemented for release
+ERROR: [screen-state-missing] screens[provider-pricing].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[provider-pricing].status: must be implemented for release
+ERROR: [release-status-unresolved] workQueues[failed-payment].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] workQueues[payout-approval].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] workQueues[provider-onboarding].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] workQueues[refund-arbitration].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] workQueues[webhook-failure].status: is 'discovered'; release requires implemented or not-applicable
+WARN: [declared-static-unused] declaredStatic: path 'entities[inventory-operations].lifecycleStates' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#d4_small_cell_threshold' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#gov_exec_role_change' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#governance_break_glass_blocked_until' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#governance_decider_refusal' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql#gov_request_payout_destination' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql#queue_governance_notice' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql#iban_reveal_ceiling' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_deadline_days' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_escalate_requests' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_require_contact_otp' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011210000_priv_copy_export.sql#privacy_export_record_built' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011220000_priv_deletion_engine.sql#admin_privacy_review_legal_hold' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011220000_priv_deletion_engine.sql#privacy_retention_until' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011230000_priv_health_intake.sql#health_answer_retention_days' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011230000_priv_health_intake.sql#health_reuse_consent_months' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011240000_priv_incident_register.sql#privacy_incident_json' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011310000_privfix_identity_and_copy.sql#privacy_export_download_limit' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql#privacy_lookup_limit' does not match any scanned manifest field
+Validation complete: 299 error(s), 19 warning(s)

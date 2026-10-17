@@ -1,0 +1,2480 @@
+{
+ "phase": "states",
+ "app": "http://localhost:3100",
+ "api": "http://127.0.0.1:54321",
+ "started": "2026-10-16T21:59:13.069Z",
+ "ended": "2026-10-16T22:09:11.902Z",
+ "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+ "axe": "axe-core 4.12.1 (node_modules)",
+ "results": [
+  {
+   "route": "/admin",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin",
+    "title": "Dashboard · PRIMORA Admin",
+    "text": "Dashboard Work waiting for an operator and live platform figures. Times are shown in Riyadh time. Refresh Platform activity Help Center Loading the overview… GO TO Bookings Providers Ledger & payouts Refunds Disputes Customers Supply Notifications Audit log",
+    "alerts": [
+     "Loading the overview…"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin",
+    "title": "Dashboard · PRIMORA Admin",
+    "text": "Dashboard Work waiting for an operator and live platform figures. Times are shown in Riyadh time. Updated 00:59 Refresh Platform activity Help Center BOOKINGS TODAY 0 Scheduled for today and not cancelled PAYMENTS CAPTURED, 7 DAYS SAR 0.00 Bookings, tips, packages, gift cards and subscriptions PLATFORM COMMISSION, 7 DAYS SAR 0.00 The platform's share of those payments LIVE PROVIDERS Fewer than 5 Hidden because fewer than 5 people are behind this figure CUSTOMERS 20 Customer accounts on the platform COMPLETION RATE, 30 DAYS 0% 0 of 7 finished visits NEEDS ATTENTION Each line opens the screen wh",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin",
+    "title": "Dashboard · PRIMORA Admin",
+    "text": "Dashboard Work waiting for an operator and live platform figures. Times are shown in Riyadh time. Refresh Platform activity Help Center The overview could not be loaded: service unavailable (QA injected) Try again LATEST BOOKINGS View all Could not load: service unavailable (QA injected) LATEST OPERATOR ACTIONS View all Could not load: service unavailable (QA injected) GO TO Bookings Providers Ledger & payouts Refunds Disputes Customers Supply Notifications Audit log",
+    "alerts": [
+     "The overview could not be loaded: service unavailable (QA injected) Try again",
+     "Could not load: service unavailable (QA injected)",
+     "Could not load: service unavailable (QA injected)"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 6
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin",
+    "title": "Dashboard · PRIMORA Admin",
+    "text": "Dashboard Work waiting for an operator and live platform figures. Times are shown in Riyadh time. Refresh Platform activity Help Center You do not have access to this screen Your account is signed in, but the server refused this request. Trying again will not help until access is granted. Back to the dashboard LATEST BOOKINGS View all Could not load: permission denied (QA injected) LATEST OPERATOR ACTIONS View all The audit log is visible to the owner only. Each look at it is itself recorded. GO TO Bookings Providers Ledger & payouts Refunds Disputes Customers Supply Notifications Audit log",
+    "alerts": [
+     "You do not have access to this screen Your account is signed in, but the server refused this request. Trying again will not help until access is granted. Back to the dashboard",
+     "Could not load: permission denied (QA injected)"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 6
+   }
+  },
+  {
+   "route": "/admin/providers",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/providers",
+    "title": "Providers · PRIMORA Admin",
+    "text": "Providers Review applications and registered providers, their branches, services, employees and recorded performance. Providers join by application. Review new applications in the Applications tab. Active Providers Registry 0 Applications Review Queue PROVIDERS 0 APPLICATIONS 0 APPROVED 0 SHOPS 0 EMPLOYEES 0 REVENUE SAR 0.00 ALL PENDING APPROVED REJECTED ACTIVE SUSPENDED INACTIVE Recent activity Revenue (high) Rating (high) PROVIDER CONTACT APPLICATION ACCOUNT SHOPS MANAGED REVENUE RATING ACTIONS Loading providers…",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 6
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/providers",
+    "title": "Providers · PRIMORA Admin",
+    "text": "Providers Review applications and registered providers, their branches, services, employees and recorded performance. Providers join by application. Review new applications in the Applications tab. Active Providers Registry 0 Applications Review Queue PROVIDERS 0 APPLICATIONS 0 APPROVED 0 SHOPS 0 EMPLOYEES 0 REVENUE SAR 0.00 ALL PENDING APPROVED REJECTED ACTIVE SUSPENDED INACTIVE Recent activity Revenue (high) Rating (high) PROVIDER CONTACT APPLICATION ACCOUNT SHOPS MANAGED REVENUE RATING ACTIONS No providers yet.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/providers",
+    "title": "Providers · PRIMORA Admin",
+    "text": "Providers Review applications and registered providers, their branches, services, employees and recorded performance. Providers join by application. Review new applications in the Applications tab. Active Providers Registry 0 Applications Review Queue PROVIDERS 0 APPLICATIONS 0 APPROVED 0 SHOPS 0 EMPLOYEES 0 REVENUE SAR 0.00 ALL PENDING APPROVED REJECTED ACTIVE SUSPENDED INACTIVE Recent activity Revenue (high) Rating (high) PROVIDER CONTACT APPLICATION ACCOUNT SHOPS MANAGED REVENUE RATING ACTIONS Loading providers…",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 3
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/providers",
+    "title": "Providers · PRIMORA Admin",
+    "text": "Providers Review applications and registered providers, their branches, services, employees and recorded performance. Providers join by application. Review new applications in the Applications tab. Could not load providers. permission denied (QA injected) Dismiss Active Providers Registry 0 Applications Review Queue PROVIDERS 0 APPLICATIONS 0 APPROVED 0 SHOPS 0 EMPLOYEES 0 REVENUE SAR 0.00 ALL PENDING APPROVED REJECTED ACTIVE SUSPENDED INACTIVE Recent activity Revenue (high) Rating (high) PROVIDER CONTACT APPLICATION ACCOUNT SHOPS MANAGED REVENUE RATING ACTIONS Could not load providers.",
+    "alerts": [
+     "Could not load providers. permission denied (QA injected) Dismiss"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   }
+  },
+  {
+   "route": "/admin/ledger",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/ledger",
+    "title": "Ledger & Splits · PRIMORA Admin",
+    "text": "Financial Ledger & Statements Audit ledger entries, manage provider payout requests, and view accountant summaries. Payment Methods Transaction Splits Payout Requests Accountant Statements Reconciliation & fee invoices Payment Methods (KSA) Enable, disable and set the default — changes reflect instantly at customer checkout and provider payout screens. ACTIVE PAYMENT APIS BLOCKED: CHOOSE A CONNECTED PAYMENT API No payment methods yet — apply the database migration and reload.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/ledger",
+    "title": "Ledger & Splits · PRIMORA Admin",
+    "text": "Financial Ledger & Statements Audit ledger entries, manage provider payout requests, and view accountant summaries. Payment Methods Transaction Splits Payout Requests Accountant Statements Reconciliation & fee invoices Payment Methods (KSA) Enable, disable and set the default — changes reflect instantly at customer checkout and provider payout screens. ACTIVE PAYMENT APIS BLOCKED: CHOOSE A CONNECTED PAYMENT API No payment methods yet — apply the database migration and reload.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/ledger",
+    "title": "Ledger & Splits · PRIMORA Admin",
+    "text": "Financial Ledger & Statements Audit ledger entries, manage provider payout requests, and view accountant summaries. Payment Methods Transaction Splits Payout Requests Accountant Statements Reconciliation & fee invoices Error: Failed to load financial records. service unavailable (QA injected) Dismiss Payment Methods (KSA) Enable, disable and set the default — changes reflect instantly at customer checkout and provider payout screens. ACTIVE PAYMENT APIS BLOCKED: CHOOSE A CONNECTED PAYMENT API No payment methods yet — apply the database migration and reload.",
+    "alerts": [
+     "Error: Failed to load financial records. service unavailable (QA injected) Dismiss"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 42
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/ledger",
+    "title": "Ledger & Splits · PRIMORA Admin",
+    "text": "Financial Ledger & Statements Audit ledger entries, manage provider payout requests, and view accountant summaries. Payment Methods Transaction Splits Payout Requests Accountant Statements Reconciliation & fee invoices Error: Failed to load financial records. permission denied (QA injected) Dismiss Payment Methods (KSA) Enable, disable and set the default — changes reflect instantly at customer checkout and provider payout screens. Failed to load real payment methods. Apply the Supabase migrations and verify admin permissions. ACTIVE PAYMENT APIS BLOCKED: CHOOSE A CONNECTED PAYMENT API No paym",
+    "alerts": [
+     "Error: Failed to load financial records. permission denied (QA injected) Dismiss"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 36
+   }
+  },
+  {
+   "route": "/admin/services",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/services",
+    "title": "Services · PRIMORA Admin",
+    "text": "Global Services Directory Manage the master services catalog, configure baseline price metrics, and organize categories. + Add service TOTAL SERVICES # 0 ACTIVE CATEGORIES ✓ 0 AVERAGE BASE PRICE % 0.0 SAR All categories All statuses Active Inactive SERVICE NAME CATEGORY BASELINE PRICE ACTIVE PROVIDERS STATUS FEATURED ACTIONS Loading master services catalog...",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 36
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/services",
+    "title": "Services · PRIMORA Admin",
+    "text": "Global Services Directory Manage the master services catalog, configure baseline price metrics, and organize categories. + Add service TOTAL SERVICES # 0 ACTIVE CATEGORIES ✓ 0 AVERAGE BASE PRICE % 0.0 SAR All categories All statuses Active Inactive SERVICE NAME CATEGORY BASELINE PRICE ACTIVE PROVIDERS STATUS FEATURED ACTIONS No matching services. Add a new service to get started.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/services",
+    "title": "Services · PRIMORA Admin",
+    "text": "Global Services Directory Manage the master services catalog, configure baseline price metrics, and organize categories. + Add service TOTAL SERVICES # 0 ACTIVE CATEGORIES ✓ 0 AVERAGE BASE PRICE % 0.0 SAR All categories All statuses Active Inactive SERVICE NAME CATEGORY BASELINE PRICE ACTIVE PROVIDERS STATUS FEATURED ACTIONS Loading master services catalog...",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 14
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/services",
+    "title": "Services · PRIMORA Admin",
+    "text": "Global Services Directory Manage the master services catalog, configure baseline price metrics, and organize categories. + Add service Failed to update service catalog. TOTAL SERVICES # 0 ACTIVE CATEGORIES ✓ 0 AVERAGE BASE PRICE % 0.0 SAR All categories All statuses Active Inactive SERVICE NAME CATEGORY BASELINE PRICE ACTIVE PROVIDERS STATUS FEATURED ACTIONS No matching services. Add a new service to get started.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 7
+   }
+  },
+  {
+   "route": "/admin/integrations",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/integrations",
+    "title": "API & Integrations · PRIMORA Admin",
+    "text": "API & Integrations Enable, disable and switch environments for every connected service. Credentials stay server-side — only masked hints are shown here. + ADD API ACTIVE APIS 0 CONFIGURED KEYS 0 LIVE MODE 0 SECTIONS LINKED 0 All sections Payments Maps & Location SMS / OTP Push Notifications Email WhatsApp Business Calendar Sync Analytics AI Concierge Authentication Storage Logistics No integrations yet — apply the database migration and reload.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 7
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/integrations",
+    "title": "API & Integrations · PRIMORA Admin",
+    "text": "API & Integrations Enable, disable and switch environments for every connected service. Credentials stay server-side — only masked hints are shown here. + ADD API ACTIVE APIS 0 CONFIGURED KEYS 0 LIVE MODE 0 SECTIONS LINKED 0 All sections Payments Maps & Location SMS / OTP Push Notifications Email WhatsApp Business Calendar Sync Analytics AI Concierge Authentication Storage Logistics No integrations yet — apply the database migration and reload.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/integrations",
+    "title": "API & Integrations · PRIMORA Admin",
+    "text": "API & Integrations Enable, disable and switch environments for every connected service. Credentials stay server-side — only masked hints are shown here. + ADD API ACTIVE APIS 0 CONFIGURED KEYS 0 LIVE MODE 0 SECTIONS LINKED 0 All sections Payments Maps & Location SMS / OTP Push Notifications Email WhatsApp Business Calendar Sync Analytics AI Concierge Authentication Storage Logistics No integrations yet — apply the database migration and reload.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 6
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/integrations",
+    "title": "API & Integrations · PRIMORA Admin",
+    "text": "API & Integrations Enable, disable and switch environments for every connected service. Credentials stay server-side — only masked hints are shown here. + ADD API Failed to load real integrations. Apply the Supabase migrations and verify admin table permissions. ACTIVE APIS 0 CONFIGURED KEYS 0 LIVE MODE 0 SECTIONS LINKED 0 All sections Payments Maps & Location SMS / OTP Push Notifications Email WhatsApp Business Calendar Sync Analytics AI Concierge Authentication Storage Logistics No integrations yet — apply the database migration and reload.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 3
+   }
+  },
+  {
+   "route": "/admin/coupons",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/coupons",
+    "title": "Coupons & Offers · PRIMORA Admin",
+    "text": "Coupons & Offers Builder Generate platform promo codes, manage discount percentages, and schedule validity. ADD COUPON ACTIVE COUPONS 0 Codes TOTAL REDEMPTIONS 0 SWITCHED-OFF CODES 0 Codes PROMO CODE DISCOUNT TYPE VALUE REDEEMED COUNT PER CUSTOMER STATUS ACTIONS Loading promotional codes...",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 3
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/coupons",
+    "title": "Coupons & Offers · PRIMORA Admin",
+    "text": "Coupons & Offers Builder Generate platform promo codes, manage discount percentages, and schedule validity. ADD COUPON ACTIVE COUPONS 0 Codes TOTAL REDEMPTIONS 0 SWITCHED-OFF CODES 0 Codes PROMO CODE DISCOUNT TYPE VALUE REDEEMED COUNT PER CUSTOMER STATUS ACTIONS No promotional codes yet.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/coupons",
+    "title": "Coupons & Offers · PRIMORA Admin",
+    "text": "Coupons & Offers Builder Generate platform promo codes, manage discount percentages, and schedule validity. ADD COUPON ACTIVE COUPONS 0 Codes TOTAL REDEMPTIONS 0 SWITCHED-OFF CODES 0 Codes PROMO CODE DISCOUNT TYPE VALUE REDEEMED COUNT PER CUSTOMER STATUS ACTIONS Loading promotional codes...",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 6
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/coupons",
+    "title": "Coupons & Offers · PRIMORA Admin",
+    "text": "Coupons & Offers Builder Generate platform promo codes, manage discount percentages, and schedule validity. ADD COUPON Failed to load promotional codes. permission denied (QA injected) Retry ACTIVE COUPONS 0 Codes TOTAL REDEMPTIONS 0 SWITCHED-OFF CODES 0 Codes PROMO CODE DISCOUNT TYPE VALUE REDEEMED COUNT PER CUSTOMER STATUS ACTIONS No promotional codes yet.",
+    "alerts": [
+     "Failed to load promotional codes. permission denied (QA injected) Retry"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 3
+   }
+  },
+  {
+   "route": "/admin/bookings",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/bookings",
+    "title": "Bookings · PRIMORA Admin",
+    "text": "Global Bookings Ledger Audit active client scheduling logs, platform split captures, and status indicators. Times are shown in Riyadh time. Search by booking ID, invoice number, customer or provider From (Riyadh date) To (Riyadh date) Status All statuses Awaiting payment Confirmed Completed Cancelled No-show Release expired unpaid holds BOOKING DETAILS CLIENT / CUSTOMER PROVIDER / BRANCH CAPTURED PRICE PLATFORM COMMISSION STATUS ACTIONS Loading booking sheets...",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 3
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/bookings",
+    "title": "Bookings · PRIMORA Admin",
+    "text": "Global Bookings Ledger Audit active client scheduling logs, platform split captures, and status indicators. Times are shown in Riyadh time. Search by booking ID, invoice number, customer or provider From (Riyadh date) To (Riyadh date) Status All statuses Awaiting payment Confirmed Completed Cancelled No-show Release expired unpaid holds Totals cover every booking that matches the filters, not only the page below. VALUE OF MATCHING BOOKINGS SAR 2,360.00 PLATFORM COMMISSION ON MATCHING BOOKINGS SAR 432.00 AWAITING PAYMENT OR CONFIRMED (MATCHING) 1 BOOKING DETAILS CLIENT / CUSTOMER PROVIDER / BRA",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/bookings",
+    "title": "Bookings · PRIMORA Admin",
+    "text": "Global Bookings Ledger Audit active client scheduling logs, platform split captures, and status indicators. Times are shown in Riyadh time. Search by booking ID, invoice number, customer or provider From (Riyadh date) To (Riyadh date) Status All statuses Awaiting payment Confirmed Completed Cancelled No-show Release expired unpaid holds BOOKING DETAILS CLIENT / CUSTOMER PROVIDER / BRANCH CAPTURED PRICE PLATFORM COMMISSION STATUS ACTIONS Bookings could not be loaded: service unavailable (QA injected) Try again",
+    "alerts": [
+     "Bookings could not be loaded: service unavailable (QA injected) Try again"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/bookings",
+    "title": "Bookings · PRIMORA Admin",
+    "text": "Global Bookings Ledger Audit active client scheduling logs, platform split captures, and status indicators. Times are shown in Riyadh time. Search by booking ID, invoice number, customer or provider From (Riyadh date) To (Riyadh date) Status All statuses Awaiting payment Confirmed Completed Cancelled No-show Release expired unpaid holds BOOKING DETAILS CLIENT / CUSTOMER PROVIDER / BRANCH CAPTURED PRICE PLATFORM COMMISSION STATUS ACTIONS You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Finance, Operations, Owner. An",
+    "alerts": [
+     "You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Finance, Operations, Owner. An owner can change your console role on Roles & Permissions. B"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   }
+  },
+  {
+   "route": "/admin/customers",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/customers",
+    "title": "Customers · PRIMORA Admin",
+    "text": "Customer Directory & Data Rights Look up customer accounts and their booking history, and work through PDPL data requests and recorded consents. Customer Directory PDPL Data Rights & Consents TOTAL CUSTOMERS — VERIFIED PHONE ACCOUNTS — OPEN DATA REQUESTS — Search by name, email, phone or ID Loading customers…",
+    "alerts": [
+     "Loading customers…"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/customers",
+    "title": "Customers · PRIMORA Admin",
+    "text": "Customer Directory & Data Rights Look up customer accounts and their booking history, and work through PDPL data requests and recorded consents. Customer Directory PDPL Data Rights & Consents TOTAL CUSTOMERS 20 VERIFIED PHONE ACCOUNTS 2 OPEN DATA REQUESTS 0 Search by name, email, phone or ID No customer accounts yet.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/customers",
+    "title": "Customers · PRIMORA Admin",
+    "text": "Customer Directory & Data Rights Look up customer accounts and their booking history, and work through PDPL data requests and recorded consents. Customer Directory PDPL Data Rights & Consents TOTAL CUSTOMERS — VERIFIED PHONE ACCOUNTS — OPEN DATA REQUESTS — Search by name, email, phone or ID Customers could not be loaded: service unavailable (QA injected) Try again",
+    "alerts": [
+     "Customers could not be loaded: service unavailable (QA injected) Try again"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 8
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/customers",
+    "title": "Customers · PRIMORA Admin",
+    "text": "Customer Directory & Data Rights Look up customer accounts and their booking history, and work through PDPL data requests and recorded consents. Customer Directory PDPL Data Rights & Consents TOTAL CUSTOMERS — VERIFIED PHONE ACCOUNTS — OPEN DATA REQUESTS — Search by name, email, phone or ID You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Operations, Owner. An owner can change your console role on Roles & Permissions. Back to the dashboard",
+    "alerts": [
+     "You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Operations, Owner. An owner can change your console role on Roles & Permissions. Back to th"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 8
+   }
+  },
+  {
+   "route": "/admin/branches",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/branches",
+    "title": "Venues & Rooms · PRIMORA Admin",
+    "text": "Branches & Outlets Matrix Monitor provider outlet locations, active schedules, and verification statuses. TOTAL BRANCHES 0 ONLINE OUTLETS 0 AVERAGE SERVICE RADIUS 0.0 KM BRANCH NAME PROVIDER / SALON LOCATION / CITY STATE Loading branch matrix...",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 8
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/branches",
+    "title": "Venues & Rooms · PRIMORA Admin",
+    "text": "Branches & Outlets Matrix Monitor provider outlet locations, active schedules, and verification statuses. TOTAL BRANCHES 0 ONLINE OUTLETS 0 AVERAGE SERVICE RADIUS 0.0 KM BRANCH NAME PROVIDER / SALON LOCATION / CITY STATE No branches found yet.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/branches",
+    "title": "Venues & Rooms · PRIMORA Admin",
+    "text": "Branches & Outlets Matrix Monitor provider outlet locations, active schedules, and verification statuses. TOTAL BRANCHES 0 ONLINE OUTLETS 0 AVERAGE SERVICE RADIUS 0.0 KM BRANCH NAME PROVIDER / SALON LOCATION / CITY STATE Loading branch matrix...",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 4
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/branches",
+    "title": "Venues & Rooms · PRIMORA Admin",
+    "text": "Branches & Outlets Matrix Monitor provider outlet locations, active schedules, and verification statuses. Failed to load branches. TOTAL BRANCHES 0 ONLINE OUTLETS 0 AVERAGE SERVICE RADIUS 0.0 KM BRANCH NAME PROVIDER / SALON LOCATION / CITY STATE No branches found yet.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   }
+  },
+  {
+   "route": "/admin/disputes",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/disputes",
+    "title": "Disputes · PRIMORA Admin",
+    "text": "Disputes Arbitrator Console Review flagged client ratings (1-2 stars), refund appeals, and safety violations. TOTAL DISPUTES # 0 PENDING DISPUTES ! 0 REFUNDED TOTAL SAR 0.00 Loading flagged dispute logs...",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/disputes",
+    "title": "Disputes · PRIMORA Admin",
+    "text": "Disputes Arbitrator Console Review flagged client ratings (1-2 stars), refund appeals, and safety violations. TOTAL DISPUTES # 0 PENDING DISPUTES ! 0 REFUNDED TOTAL SAR 0.00",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/disputes",
+    "title": "Disputes · PRIMORA Admin",
+    "text": "Disputes Arbitrator Console Review flagged client ratings (1-2 stars), refund appeals, and safety violations. Error: service unavailable (QA injected) TOTAL DISPUTES # 0 PENDING DISPUTES ! 0 REFUNDED TOTAL SAR 0.00",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 3
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/disputes",
+    "title": "Disputes · PRIMORA Admin",
+    "text": "Disputes Arbitrator Console Review flagged client ratings (1-2 stars), refund appeals, and safety violations. Error: permission denied (QA injected) TOTAL DISPUTES # 0 PENDING DISPUTES ! 0 REFUNDED TOTAL SAR 0.00",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 3
+   }
+  },
+  {
+   "route": "/admin/activity",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/activity",
+    "title": "Activity Feed · PRIMORA Admin",
+    "text": "Platform Activity The most recent bookings and provider sign-ups. For who changed what and why, open the Audit Log. EVENTS SHOWN 0 RECENT BOOKINGS SHOWN 0 RECENT PROVIDERS SHOWN 0 RECENT EVENTS Latest All Bookings Providers Payments No activity recorded for this filter yet.",
+    "alerts": [],
+    "busy": 1,
+    "latin": null,
+    "consoleErrors": 3
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/activity",
+    "title": "Activity Feed · PRIMORA Admin",
+    "text": "Platform Activity The most recent bookings and provider sign-ups. For who changed what and why, open the Audit Log. EVENTS SHOWN 0 RECENT BOOKINGS SHOWN 0 RECENT PROVIDERS SHOWN 0 RECENT EVENTS Latest All Bookings Providers Payments No activity recorded for this filter yet.",
+    "alerts": [],
+    "busy": 1,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/activity",
+    "title": "Activity Feed · PRIMORA Admin",
+    "text": "Platform Activity The most recent bookings and provider sign-ups. For who changed what and why, open the Audit Log. EVENTS SHOWN 0 RECENT BOOKINGS SHOWN 0 RECENT PROVIDERS SHOWN 0 RECENT EVENTS Latest All Bookings Providers Payments No activity recorded for this filter yet.",
+    "alerts": [],
+    "busy": 1,
+    "latin": null,
+    "consoleErrors": 6
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/activity",
+    "title": "Activity Feed · PRIMORA Admin",
+    "text": "Platform Activity The most recent bookings and provider sign-ups. For who changed what and why, open the Audit Log. permission denied (QA injected) RECENT EVENTS Latest All Bookings Providers Payments No activity recorded for this filter yet.",
+    "alerts": [],
+    "busy": 1,
+    "latin": null,
+    "consoleErrors": 4
+   }
+  },
+  {
+   "route": "/admin/employees",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/employees",
+    "title": "Staff & Teams · PRIMORA Admin",
+    "text": "Employees Staff registered by providers. Providers manage their own teams, so this directory is read-only. Search by name or title Provider All providers Status All Active Inactive Loading employees…",
+    "alerts": [
+     "Loading employees…"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 4
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/employees",
+    "title": "Staff & Teams · PRIMORA Admin",
+    "text": "Employees Staff registered by providers. Providers manage their own teams, so this directory is read-only. Search by name or title Provider All providers Status All Active Inactive 0 employees No employees have been registered yet.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/employees",
+    "title": "Staff & Teams · PRIMORA Admin",
+    "text": "Employees Staff registered by providers. Providers manage their own teams, so this directory is read-only. Search by name or title Provider All providers Status All Active Inactive Employees could not be loaded: service unavailable (QA injected) Try again",
+    "alerts": [
+     "Employees could not be loaded: service unavailable (QA injected) Try again"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 6
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/employees",
+    "title": "Staff & Teams · PRIMORA Admin",
+    "text": "Employees Staff registered by providers. Providers manage their own teams, so this directory is read-only. Search by name or title Provider All providers Status All Active Inactive The provider list could not be loaded, so you cannot filter by provider: permission denied (QA injected) Try again You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Finance, Operations, Owner. An owner can change your console role on Roles & Permissions. Back to the dashboard",
+    "alerts": [
+     "The provider list could not be loaded, so you cannot filter by provider: permission denied (QA injected) Try again",
+     "You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Finance, Operations, Owner. An owner can change your console role on Roles & Permissions. B"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 4
+   }
+  },
+  {
+   "route": "/admin/reviews",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reviews",
+    "title": "Reviews · PRIMORA Admin",
+    "text": "Client Reviews & Moderation Queue Audit customer ratings, manage provider responses, and moderate flagged reviews. TOTAL REVIEWS 0 AVERAGE RATING 0.0 / 5.0 FLAGGED / HIDDEN 0 Loading reviews...",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 4
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reviews",
+    "title": "Reviews · PRIMORA Admin",
+    "text": "Client Reviews & Moderation Queue Audit customer ratings, manage provider responses, and moderate flagged reviews. TOTAL REVIEWS 0 AVERAGE RATING 0.0 / 5.0 FLAGGED / HIDDEN 0 No customer reviews recorded yet.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reviews",
+    "title": "Reviews · PRIMORA Admin",
+    "text": "Client Reviews & Moderation Queue Audit customer ratings, manage provider responses, and moderate flagged reviews. service unavailable (QA injected) TOTAL REVIEWS 0 AVERAGE RATING 0.0 / 5.0 FLAGGED / HIDDEN 0 No customer reviews recorded yet.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reviews",
+    "title": "Reviews · PRIMORA Admin",
+    "text": "Client Reviews & Moderation Queue Audit customer ratings, manage provider responses, and moderate flagged reviews. permission denied (QA injected) TOTAL REVIEWS 0 AVERAGE RATING 0.0 / 5.0 FLAGGED / HIDDEN 0 No customer reviews recorded yet.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   }
+  },
+  {
+   "route": "/admin/taxes",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/taxes",
+    "title": "Taxes & Fees · PRIMORA Admin",
+    "text": "Taxes & Platform Fees The rates the server applies to every booking. They are shown here for reference. VAT 15% Added to the taxable amount of every booking and shown on each tax invoice. OTHER CHARGES None No municipality or service fee is added to customer prices. PLATFORM COMMISSION Loading fee rules... Tips: 0%, the full tip goes to the professional. If no active rule matches a booking source, the server applies 15%. How to change a rate Rates change only through a reviewed database migration approved by the platform owner, so pricing, invoices and reports always agree.",
+    "alerts": [
+     "Loading fee rules..."
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/taxes",
+    "title": "Taxes & Fees · PRIMORA Admin",
+    "text": "Taxes & Platform Fees The rates the server applies to every booking. They are shown here for reference. VAT 15% Added to the taxable amount of every booking and shown on each tax invoice. OTHER CHARGES None No municipality or service fee is added to customer prices. PLATFORM COMMISSION No active fee rules. Tips: 0%, the full tip goes to the professional. If no active rule matches a booking source, the server applies 15%. How to change a rate Rates change only through a reviewed database migration approved by the platform owner, so pricing, invoices and reports always agree.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/taxes",
+    "title": "Taxes & Fees · PRIMORA Admin",
+    "text": "Taxes & Platform Fees The rates the server applies to every booking. They are shown here for reference. VAT 15% Added to the taxable amount of every booking and shown on each tax invoice. OTHER CHARGES None No municipality or service fee is added to customer prices. PLATFORM COMMISSION Loading fee rules... Tips: 0%, the full tip goes to the professional. If no active rule matches a booking source, the server applies 15%. How to change a rate Rates change only through a reviewed database migration approved by the platform owner, so pricing, invoices and reports always agree.",
+    "alerts": [
+     "Loading fee rules..."
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 4
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/taxes",
+    "title": "Taxes & Fees · PRIMORA Admin",
+    "text": "Taxes & Platform Fees The rates the server applies to every booking. They are shown here for reference. VAT 15% Added to the taxable amount of every booking and shown on each tax invoice. OTHER CHARGES None No municipality or service fee is added to customer prices. PLATFORM COMMISSION You do not have access to this screen Your account is signed in, but the server refused this request. Trying again will not help until access is granted. Back to the dashboard Tips: 0%, the full tip goes to the professional. If no active rule matches a booking source, the server applies 15%. How to change a rate",
+    "alerts": [
+     "You do not have access to this screen Your account is signed in, but the server refused this request. Trying again will not help until access is granted. Back to the dashboard"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   }
+  },
+  {
+   "route": "/admin/settings",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/settings",
+    "title": "Settings · PRIMORA Admin",
+    "text": "Platform Settings Settings the booking engine reads. Every change needs a reason and is written to the audit log. Loading settings... Loading programmes...",
+    "alerts": [
+     "Loading settings...",
+     "Loading programmes..."
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/settings",
+    "title": "Settings · PRIMORA Admin",
+    "text": "Platform Settings Settings the booking engine reads. Every change needs a reason and is written to the audit log. Unpaid booking hold Minutes an unpaid booking keeps its time slot before it is released (5–120). Hold minutes Reason for this change SAVE Last changed: — Referral and loyalty programmes Both programmes are off until every value is set and a different owner approves. Credits are funded by the platform, cannot be withdrawn as cash, transferred, bought or topped up, are usable only on PRIMORA and expire as published. Customers accept the published terms in Arabic and English before th",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/settings",
+    "title": "Settings · PRIMORA Admin",
+    "text": "Platform Settings Settings the booking engine reads. Every change needs a reason and is written to the audit log. Loading settings... service unavailable (QA injected) Retry",
+    "alerts": [
+     "Loading settings...",
+     "service unavailable (QA injected) Retry"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 5
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/settings",
+    "title": "Settings · PRIMORA Admin",
+    "text": "Platform Settings Settings the booking engine reads. Every change needs a reason and is written to the audit log. You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Finance, Owner. An owner can change your console role on Roles & Permissions. Back to the dashboard You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Finance, Owner. An owner can change your console role on Roles & Permissions. Back to the dashboard",
+    "alerts": [
+     "You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Finance, Owner. An owner can change your console role on Roles & Permissions. Back to the d",
+     "You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Finance, Owner. An owner can change your console role on Roles & Permissions. Back to the d"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 3
+   }
+  },
+  {
+   "route": "/admin/reports",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reports",
+    "title": "Reports · PRIMORA Admin",
+    "text": "Financial Reports & Exports Download CSV files built from the live ledger and bookings. Dates and calendar months are in Riyadh time and amounts are in SAR. PERIOD From To These files contain financial data and are for finance and the owner. The server builds each file, asks for a fresh authenticator code, and records the report, the period and the number of rows in the audit log. Payments ledger Every payment the ledger recorded in the period: amount captured, platform, provider and employee shares, refunds and payout status. DOWNLOAD CSV VAT summary Completed bookings by month, provider and ",
+    "alerts": [
+     "Loading events..."
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 3
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reports",
+    "title": "Reports · PRIMORA Admin",
+    "text": "Financial Reports & Exports Download CSV files built from the live ledger and bookings. Dates and calendar months are in Riyadh time and amounts are in SAR. PERIOD From To These files contain financial data and are for finance and the owner. The server builds each file, asks for a fresh authenticator code, and records the report, the period and the number of rows in the audit log. Payments ledger Every payment the ledger recorded in the period: amount captured, platform, provider and employee shares, refunds and payout status. DOWNLOAD CSV VAT summary Completed bookings by month, provider and ",
+    "alerts": [
+     "No events were recorded in this period."
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reports",
+    "title": "Reports · PRIMORA Admin",
+    "text": "Financial Reports & Exports Download CSV files built from the live ledger and bookings. Dates and calendar months are in Riyadh time and amounts are in SAR. PERIOD From To These files contain financial data and are for finance and the owner. The server builds each file, asks for a fresh authenticator code, and records the report, the period and the number of rows in the audit log. Payments ledger Every payment the ledger recorded in the period: amount captured, platform, provider and employee shares, refunds and payout status. DOWNLOAD CSV VAT summary Completed bookings by month, provider and ",
+    "alerts": [
+     "The events could not be loaded: service unavailable (QA injected) Retry",
+     "The events could not be loaded: service unavailable (QA injected)"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reports",
+    "title": "Reports · PRIMORA Admin",
+    "text": "Financial Reports & Exports Download CSV files built from the live ledger and bookings. Dates and calendar months are in Riyadh time and amounts are in SAR. PERIOD From To These files contain financial data and are for finance and the owner. The server builds each file, asks for a fresh authenticator code, and records the report, the period and the number of rows in the audit log. Payments ledger Every payment the ledger recorded in the period: amount captured, platform, provider and employee shares, refunds and payout status. DOWNLOAD CSV VAT summary Completed bookings by month, provider and ",
+    "alerts": [
+     "The events could not be loaded: permission denied (QA injected) Retry",
+     "The events could not be loaded: permission denied (QA injected)"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   }
+  },
+  {
+   "route": "/admin/packages",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/packages",
+    "title": "Packages · PRIMORA Admin",
+    "text": "Service Packages & Passes Manage bundled discount offers, wellness passes, and multi-session vouchers. TOTAL PACKAGES 0 ACTIVE SOLD PASSES 0 TOTAL REDEMPTIONS 0 Loading wellness packages...",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/packages",
+    "title": "Packages · PRIMORA Admin",
+    "text": "Service Packages & Passes Manage bundled discount offers, wellness passes, and multi-session vouchers. TOTAL PACKAGES 0 ACTIVE SOLD PASSES 0 TOTAL REDEMPTIONS 0 No service packages found in database.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/packages",
+    "title": "Packages · PRIMORA Admin",
+    "text": "Service Packages & Passes Manage bundled discount offers, wellness passes, and multi-session vouchers. TOTAL PACKAGES 0 ACTIVE SOLD PASSES 0 TOTAL REDEMPTIONS 0 Loading wellness packages...",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 4
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/packages",
+    "title": "Packages · PRIMORA Admin",
+    "text": "Service Packages & Passes Manage bundled discount offers, wellness passes, and multi-session vouchers. تعذر تحميل الباقات من قاعدة البيانات. TOTAL PACKAGES 0 ACTIVE SOLD PASSES 0 TOTAL REDEMPTIONS 0 No service packages found in database.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 4
+   }
+  },
+  {
+   "route": "/admin/notifications",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/notifications",
+    "title": "Notifications · PRIMORA Admin",
+    "text": "Messaging & Notification Engine Manage transactional WhatsApp appointment reminders, confirmations, post-visit reviews, and targeted broadcasts. WhatsApp Pipeline & Logs Broadcast Composer PENDING IN QUEUE 0 DELIVERED 0 QUIET HOURS DEFERRALS 0 CONSENT/VERIFY SKIPS 0 TOTAL COST 0 SAR Recent Live Transmissions Saudi Quiet Hours: 22:00 - 09:00 AST (UTC+3) · Costs come from your WhatsApp Business account billing Dispatch Pending Queue Now Loading message logs...",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 4
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/notifications",
+    "title": "Notifications · PRIMORA Admin",
+    "text": "Messaging & Notification Engine Manage transactional WhatsApp appointment reminders, confirmations, post-visit reviews, and targeted broadcasts. WhatsApp Pipeline & Logs Broadcast Composer PENDING IN QUEUE 4 DELIVERED 0 QUIET HOURS DEFERRALS 0 CONSENT/VERIFY SKIPS 0 TOTAL COST 0 SAR Recent Live Transmissions Saudi Quiet Hours: 22:00 - 09:00 AST (UTC+3) · Costs come from your WhatsApp Business account billing Dispatch Pending Queue Now No message records found. When bookings occur, automated confirmations and reminders will appear here.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/notifications",
+    "title": "Notifications · PRIMORA Admin",
+    "text": "Messaging & Notification Engine Manage transactional WhatsApp appointment reminders, confirmations, post-visit reviews, and targeted broadcasts. WhatsApp Pipeline & Logs Broadcast Composer PENDING IN QUEUE 0 DELIVERED 0 QUIET HOURS DEFERRALS 0 CONSENT/VERIFY SKIPS 0 TOTAL COST 0 SAR Recent Live Transmissions Saudi Quiet Hours: 22:00 - 09:00 AST (UTC+3) · Costs come from your WhatsApp Business account billing Dispatch Pending Queue Now The message log could not be loaded, so an empty list would be wrong: service unavailable (QA injected) Retry",
+    "alerts": [
+     "The message log could not be loaded, so an empty list would be wrong: service unavailable (QA injected)"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/notifications",
+    "title": "Notifications · PRIMORA Admin",
+    "text": "Messaging & Notification Engine Manage transactional WhatsApp appointment reminders, confirmations, post-visit reviews, and targeted broadcasts. WhatsApp Pipeline & Logs Broadcast Composer PENDING IN QUEUE 0 DELIVERED 0 QUIET HOURS DEFERRALS 0 CONSENT/VERIFY SKIPS 0 TOTAL COST 0 SAR Recent Live Transmissions Saudi Quiet Hours: 22:00 - 09:00 AST (UTC+3) · Costs come from your WhatsApp Business account billing Dispatch Pending Queue Now The message log could not be loaded, so an empty list would be wrong: permission denied (QA injected) Retry",
+    "alerts": [
+     "The message log could not be loaded, so an empty list would be wrong: permission denied (QA injected)"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   }
+  },
+  {
+   "route": "/admin/help",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/help",
+    "title": "Help Center · PRIMORA Admin",
+    "text": "Help Center Support channels, operational guides, and answers for platform administrators. SUPPORT CHANNELS WhatsApp Business Priority line for operational incidents Open Email Support Response within 24 hours Open Admin Guides Console manuals & runbooks Open FREQUENTLY ASKED QUESTIONS How do I verify a new provider? Open Providers, then Applications. Check the Commercial Registration with Wathq (or record a manual review with a note) and approve the application. A provider appears in customer search once verified and with at least one active branch. How are payment splits calculated? How do I",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/help",
+    "title": "Help Center · PRIMORA Admin",
+    "text": "Help Center Support channels, operational guides, and answers for platform administrators. SUPPORT CHANNELS WhatsApp Business Priority line for operational incidents Open Email Support Response within 24 hours Open Admin Guides Console manuals & runbooks Open FREQUENTLY ASKED QUESTIONS How do I verify a new provider? Open Providers, then Applications. Check the Commercial Registration with Wathq (or record a manual review with a note) and approve the application. A provider appears in customer search once verified and with at least one active branch. How are payment splits calculated? How do I",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/help",
+    "title": "Help Center · PRIMORA Admin",
+    "text": "Help Center Support channels, operational guides, and answers for platform administrators. SUPPORT CHANNELS WhatsApp Business Priority line for operational incidents Open Email Support Response within 24 hours Open Admin Guides Console manuals & runbooks Open FREQUENTLY ASKED QUESTIONS How do I verify a new provider? Open Providers, then Applications. Check the Commercial Registration with Wathq (or record a manual review with a note) and approve the application. A provider appears in customer search once verified and with at least one active branch. How are payment splits calculated? How do I",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/help",
+    "title": "Help Center · PRIMORA Admin",
+    "text": "Help Center Support channels, operational guides, and answers for platform administrators. SUPPORT CHANNELS WhatsApp Business Priority line for operational incidents Open Email Support Response within 24 hours Open Admin Guides Console manuals & runbooks Open FREQUENTLY ASKED QUESTIONS How do I verify a new provider? Open Providers, then Applications. Check the Commercial Registration with Wathq (or record a manual review with a note) and approve the application. A provider appears in customer search once verified and with at least one active branch. How are payment splits calculated? How do I",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   }
+  },
+  {
+   "route": "/admin/supply",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/supply",
+    "title": "Supply Oversight · PRIMORA Admin",
+    "text": "Supply Oversight Monitor provider inventory, supplier orders and recorded stock reductions. Provider, supplier or order ID Order status All statuses Draft Submitted Approved Received Cancelled Search Refresh Loading live supply data...",
+    "alerts": [
+     "Loading live supply data..."
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/supply",
+    "title": "Supply Oversight · PRIMORA Admin",
+    "text": "Supply Oversight Monitor provider inventory, supplier orders and recorded stock reductions. Provider, supplier or order ID Order status All statuses Draft Submitted Approved Received Cancelled Search Refresh Inventory metrics cover the selected provider scope. The status filter applies to orders. Waste records · 30 days 0 Pending supplier orders 0 Low-stock combinations 0 Stock at cost SAR 0.00 Negative adjustments · 30 days 0 Supplier purchase orders (0) No records match these filters. Provider inventory health (0) No records match these filters. Stock reductions · last 30 days (0) Recorded w",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/supply",
+    "title": "Supply Oversight · PRIMORA Admin",
+    "text": "Supply Oversight Monitor provider inventory, supplier orders and recorded stock reductions. Provider, supplier or order ID Order status All statuses Draft Submitted Approved Received Cancelled Search Refresh service unavailable (QA injected)",
+    "alerts": [
+     "service unavailable (QA injected)"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/supply",
+    "title": "Supply Oversight · PRIMORA Admin",
+    "text": "Supply Oversight Monitor provider inventory, supplier orders and recorded stock reductions. Provider, supplier or order ID Order status All statuses Draft Submitted Approved Received Cancelled Search Refresh permission denied (QA injected)",
+    "alerts": [
+     "permission denied (QA injected)"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   }
+  },
+  {
+   "route": "/admin/refunds",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/refunds",
+    "title": "Refunds · PRIMORA Admin",
+    "text": "Refunds Refunds owed to customers. Money is returned only through the payment gateway, for exactly the recorded amount. Show Needs attention Failed Waiting In progress Returned All Loading refunds…",
+    "alerts": [
+     "Loading refunds…"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/refunds",
+    "title": "Refunds · PRIMORA Admin",
+    "text": "Refunds Refunds owed to customers. Money is returned only through the payment gateway, for exactly the recorded amount. Show Needs attention Failed Waiting In progress Returned All 0 refunds No refunds are waiting.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/refunds",
+    "title": "Refunds · PRIMORA Admin",
+    "text": "Refunds Refunds owed to customers. Money is returned only through the payment gateway, for exactly the recorded amount. Show Needs attention Failed Waiting In progress Returned All Refunds could not be loaded: service unavailable (QA injected) Try again",
+    "alerts": [
+     "Refunds could not be loaded: service unavailable (QA injected) Try again"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/refunds",
+    "title": "Refunds · PRIMORA Admin",
+    "text": "Refunds Refunds owed to customers. Money is returned only through the payment gateway, for exactly the recorded amount. Show Needs attention Failed Waiting In progress Returned All You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Finance, Owner. An owner can change your console role on Roles & Permissions. Back to the dashboard",
+    "alerts": [
+     "You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Finance, Owner. An owner can change your console role on Roles & Permissions. Back to the d"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   }
+  },
+  {
+   "route": "/admin/audit-logs",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/audit-logs",
+    "title": "Audit Logs · PRIMORA Admin",
+    "text": "Audit Log Who changed what, when and why. Entries are written by the server in the same transaction as the change. Show Changes only Data looked at (reads) Everything Action contains Record type All record types From To Search Clear filters Loading audit entries...",
+    "alerts": [
+     "Loading audit entries..."
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/audit-logs",
+    "title": "Audit Logs · PRIMORA Admin",
+    "text": "Audit Log Who changed what, when and why. Entries are written by the server in the same transaction as the change. Show Changes only Data looked at (reads) Everything Action contains Record type All record types From To Search Clear filters No entries match these filters.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/audit-logs",
+    "title": "Audit Logs · PRIMORA Admin",
+    "text": "Audit Log Who changed what, when and why. Entries are written by the server in the same transaction as the change. Show Changes only Data looked at (reads) Everything Action contains Record type All record types From To Search Clear filters Could not load the audit log: service unavailable (QA injected) Retry",
+    "alerts": [
+     "Could not load the audit log: service unavailable (QA injected) Retry"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/audit-logs",
+    "title": "Audit Logs · PRIMORA Admin",
+    "text": "Audit Log Who changed what, when and why. Entries are written by the server in the same transaction as the change. Show Changes only Data looked at (reads) Everything Action contains Record type All record types From To Search Clear filters You do not have access to this screen Your console role, Owner, does not include this screen. It is part of the Owner console role. An owner can change your console role on Roles & Permissions. Back to the dashboard",
+    "alerts": [
+     "You do not have access to this screen Your console role, Owner, does not include this screen. It is part of the Owner console role. An owner can change your console role on Roles & Permissions. Back to the dashboard"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   }
+  },
+  {
+   "route": "/admin/platform-rules",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/platform-rules",
+    "title": "Platform Rules · PRIMORA Admin",
+    "text": "Platform Rules Feature flags, marketplace fees and API limits. Each change needs a reason and is recorded in the audit log. Feature flags A flag switches a whole capability on or off for everyone. Loading... Marketplace fee rules What the platform charges on a booking that comes through the marketplace. Bookings that come through a provider's own link, QR code, WhatsApp, Instagram, walk-in or imported client are always free of platform fee, so those rows are shown but cannot be changed. A change is a new version from a start date: it applies to bookings made from that date only, a different ad",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/platform-rules",
+    "title": "Platform Rules · PRIMORA Admin",
+    "text": "Platform Rules Feature flags, marketplace fees and API limits. Each change needs a reason and is recorded in the audit log. Feature flags A flag switches a whole capability on or off for everyone. There are no feature flags. Marketplace fee rules What the platform charges on a booking that comes through the marketplace. Bookings that come through a provider's own link, QR code, WhatsApp, Instagram, walk-in or imported client are always free of platform fee, so those rows are shown but cannot be changed. A change is a new version from a start date: it applies to bookings made from that date onl",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/platform-rules",
+    "title": "Platform Rules · PRIMORA Admin",
+    "text": "Platform Rules Feature flags, marketplace fees and API limits. Each change needs a reason and is recorded in the audit log. Feature flags A flag switches a whole capability on or off for everyone. Loading... Marketplace fee rules What the platform charges on a booking that comes through the marketplace. Bookings that come through a provider's own link, QR code, WhatsApp, Instagram, walk-in or imported client are always free of platform fee, so those rows are shown but cannot be changed. A change is a new version from a start date: it applies to bookings made from that date only, a different ad",
+    "alerts": [
+     "This section could not be loaded: service unavailable (QA injected)"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 5
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/platform-rules",
+    "title": "Platform Rules · PRIMORA Admin",
+    "text": "Platform Rules Feature flags, marketplace fees and API limits. Each change needs a reason and is recorded in the audit log. You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Finance, Owner. An owner can change your console role on Roles & Permissions. Back to the dashboard",
+    "alerts": [
+     "You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Finance, Owner. An owner can change your console role on Roles & Permissions. Back to the d"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 3
+   }
+  },
+  {
+   "route": "/admin/roles",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/roles",
+    "title": "Roles & Permissions · PRIMORA Admin",
+    "text": "Administrators & Roles Who can operate the console, with which console role, and who works for a provider. Only an owner changes console roles or resets two-step verification; each change needs a reason and a fresh authenticator code and is recorded in the audit log. Administrators and staff Administrators Provider owners Provider employees Find a customer Search by name, email, phone or ID A customer is listed only when you search for one. Loading people...",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 3
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/roles",
+    "title": "Roles & Permissions · PRIMORA Admin",
+    "text": "Administrators & Roles Who can operate the console, with which console role, and who works for a provider. Only an owner changes console roles or resets two-step verification; each change needs a reason and a fresh authenticator code and is recorded in the audit log. Administrators and staff Administrators28 Provider owners5 Provider employees2 Find a customer Search by name, email, phone or ID A customer is listed only when you search for one. Nobody matches this view.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/roles",
+    "title": "Roles & Permissions · PRIMORA Admin",
+    "text": "Administrators & Roles Who can operate the console, with which console role, and who works for a provider. Only an owner changes console roles or resets two-step verification; each change needs a reason and a fresh authenticator code and is recorded in the audit log. Administrators and staff Administrators Provider owners Provider employees Find a customer Search by name, email, phone or ID A customer is listed only when you search for one. The people could not be loaded: service unavailable (QA injected) Retry",
+    "alerts": [
+     "The people could not be loaded: service unavailable (QA injected)"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/roles",
+    "title": "Roles & Permissions · PRIMORA Admin",
+    "text": "Administrators & Roles Who can operate the console, with which console role, and who works for a provider. Only an owner changes console roles or resets two-step verification; each change needs a reason and a fresh authenticator code and is recorded in the audit log. You do not have access to this screen Your account is signed in, but the server refused this request. Trying again will not help until access is granted. Back to the dashboard",
+    "alerts": [
+     "You do not have access to this screen Your account is signed in, but the server refused this request. Trying again will not help until access is granted. Back to the dashboard"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   }
+  },
+  {
+   "route": "/admin/sponsored",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/sponsored",
+    "title": "Sponsored placement · PRIMORA Admin",
+    "text": "Sponsored placement Labelled sponsored places on the discover page, paid per NEW client. The platform owner sets the price; nothing runs until every setting below has a value and the switch is on. Loading sponsored placement...",
+    "alerts": [
+     "Loading sponsored placement..."
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/sponsored",
+    "title": "Sponsored placement · PRIMORA Admin",
+    "text": "Sponsored placement Labelled sponsored places on the discover page, paid per NEW client. The platform owner sets the price; nothing runs until every setting below has a value and the switch is on. Owner settings Not running Still unset: Price per new client, Sponsored places per search, Attribution window. Changing a value never changes a fee that was already charged: each fee keeps the price it was charged at. Every change asks for a reason and is audited. Setting Value Actions Master switch Off Switch on Price per new client Not set Edit Sponsored places per search Not set Edit Attribution w",
+    "alerts": [
+     "Not running"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/sponsored",
+    "title": "Sponsored placement · PRIMORA Admin",
+    "text": "Sponsored placement Labelled sponsored places on the discover page, paid per NEW client. The platform owner sets the price; nothing runs until every setting below has a value and the switch is on. We could not load sponsored placement. service unavailable (QA injected) Try again",
+    "alerts": [
+     "We could not load sponsored placement. service unavailable (QA injected) Try again"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 1
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/sponsored",
+    "title": "Sponsored placement · PRIMORA Admin",
+    "text": "Sponsored placement Labelled sponsored places on the discover page, paid per NEW client. The platform owner sets the price; nothing runs until every setting below has a value and the switch is on. You do not have access to this screen Your account is signed in, but the server refused this request. Trying again will not help until access is granted. Back to the dashboard",
+    "alerts": [
+     "You do not have access to this screen Your account is signed in, but the server refused this request. Trying again will not help until access is granted. Back to the dashboard"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 1
+   }
+  },
+  {
+   "route": "/admin/whatsapp",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/whatsapp",
+    "title": "WhatsApp Receptionist · PRIMORA Admin",
+    "text": "WhatsApp receptionist Counts only. No customer number, hash or message text is shown here. Loading…",
+    "alerts": [
+     "Loading…"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 1
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/whatsapp",
+    "title": "WhatsApp Receptionist · PRIMORA Admin",
+    "text": "WhatsApp receptionist Counts only. No customer number, hash or message text is shown here. Channels Connected businesses 0 Receiving messages 0 Receptionist on 0 Verified numbers 0 Waiting for verification 0 Conversations All conversations 0 With the receptionist 0 Waiting for a person 0 Resolved 0 Unsubscribed 0 Messages in the last 7 days From customers 0 Sent to customers 0 Platform settings Reply window (hours) Not set Message retention (days) Not set Both are set by the platform owner in the platform rules. While the window is not set, nothing is sent automatically; while retention is not",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/whatsapp",
+    "title": "WhatsApp Receptionist · PRIMORA Admin",
+    "text": "WhatsApp receptionist Counts only. No customer number, hash or message text is shown here. The overview could not be loaded. service unavailable (QA injected) Try again",
+    "alerts": [
+     "The overview could not be loaded. service unavailable (QA injected) Try again"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/whatsapp",
+    "title": "WhatsApp Receptionist · PRIMORA Admin",
+    "text": "WhatsApp receptionist Counts only. No customer number, hash or message text is shown here. You do not have access to this screen Your account is signed in, but the server refused this request. Trying again will not help until access is granted. Back to the dashboard",
+    "alerts": [
+     "You do not have access to this screen Your account is signed in, but the server refused this request. Trying again will not help until access is granted. Back to the dashboard"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   }
+  },
+  {
+   "route": "/admin/privacy",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/privacy",
+    "title": "Privacy Requests · PRIMORA Admin",
+    "text": "Privacy Requests PDPL requests from customers: 30 days from receipt, one extension of up to 30 days notified before day 30, free of charge. A copy, a deletion and a legal hold run only after a different owner approves them. Requests Legal holds Deletion ledger & health intake Open Closed Run the day-20 / day-28 check now Loading… Log a request received outside the app Customer Find Search by at least 3 characters of the name, or the whole e-mail address or phone number. Each search is recorded in the audit log; 10 searches per 10 minutes. Type Access Copy Correction Deletion Consent withdrawal",
+    "alerts": [
+     "Loading…"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/privacy",
+    "title": "Privacy Requests · PRIMORA Admin",
+    "text": "Privacy Requests PDPL requests from customers: 30 days from receipt, one extension of up to 30 days notified before day 30, free of charge. A copy, a deletion and a legal hold run only after a different owner approves them. Requests Legal holds Deletion ledger & health intake Open (0) Closed Run the day-20 / day-28 check now No open privacy requests. Log a request received outside the app Customer Find Search by at least 3 characters of the name, or the whole e-mail address or phone number. Each search is recorded in the audit log; 10 searches per 10 minutes. Type Access Copy Correction Deleti",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/privacy",
+    "title": "Privacy Requests · PRIMORA Admin",
+    "text": "Privacy Requests PDPL requests from customers: 30 days from receipt, one extension of up to 30 days notified before day 30, free of charge. A copy, a deletion and a legal hold run only after a different owner approves them. Requests Legal holds Deletion ledger & health intake Open Closed Run the day-20 / day-28 check now Privacy requests could not be loaded: service unavailable (QA injected) Try again Log a request received outside the app Customer Find Search by at least 3 characters of the name, or the whole e-mail address or phone number. Each search is recorded in the audit log; 10 searche",
+    "alerts": [
+     "Privacy requests could not be loaded: service unavailable (QA injected) Try again"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/privacy",
+    "title": "Privacy Requests · PRIMORA Admin",
+    "text": "Privacy Requests PDPL requests from customers: 30 days from receipt, one extension of up to 30 days notified before day 30, free of charge. A copy, a deletion and a legal hold run only after a different owner approves them. Requests Legal holds Deletion ledger & health intake Open Closed Run the day-20 / day-28 check now You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Operations, Owner. An owner can change your console role on Roles & Permissions. Back to the dashboard Log a request received outside the app Custom",
+    "alerts": [
+     "You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Operations, Owner. An owner can change your console role on Roles & Permissions. Back to th"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   }
+  },
+  {
+   "route": "/admin/incidents",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/incidents",
+    "title": "Incident Register · PRIMORA Admin",
+    "text": "Incident Register Personal data breaches. Notify SDAIA within 72 hours of becoming aware, for every breach unless you record a reasoned conclusion that no harm is possible. Tell the people affected without undue delay whenever harm is possible. Records are kept 5 years. Open Closed Loading… Record a new incident Short title Discovered at (Riyadh time) PRIMORA became aware at (Riyadh time) — starts the 72-hour clock What happened (at least 20 characters) Record the incident",
+    "alerts": [
+     "Loading…"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/incidents",
+    "title": "Incident Register · PRIMORA Admin",
+    "text": "Incident Register Personal data breaches. Notify SDAIA within 72 hours of becoming aware, for every breach unless you record a reasoned conclusion that no harm is possible. Tell the people affected without undue delay whenever harm is possible. Records are kept 5 years. Open Closed No incidents in this list. Record a new incident Short title Discovered at (Riyadh time) PRIMORA became aware at (Riyadh time) — starts the 72-hour clock What happened (at least 20 characters) Record the incident",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/incidents",
+    "title": "Incident Register · PRIMORA Admin",
+    "text": "Incident Register Personal data breaches. Notify SDAIA within 72 hours of becoming aware, for every breach unless you record a reasoned conclusion that no harm is possible. Tell the people affected without undue delay whenever harm is possible. Records are kept 5 years. Open Closed The register could not be loaded: service unavailable (QA injected) Record a new incident Short title Discovered at (Riyadh time) PRIMORA became aware at (Riyadh time) — starts the 72-hour clock What happened (at least 20 characters) Record the incident",
+    "alerts": [
+     "The register could not be loaded: service unavailable (QA injected)"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/incidents",
+    "title": "Incident Register · PRIMORA Admin",
+    "text": "Incident Register Personal data breaches. Notify SDAIA within 72 hours of becoming aware, for every breach unless you record a reasoned conclusion that no harm is possible. Tell the people affected without undue delay whenever harm is possible. Records are kept 5 years. Open Closed You do not have access to this screen Your console role, Owner, does not include this screen. It is part of the Owner console role. An owner can change your console role on Roles & Permissions. Back to the dashboard Record a new incident Short title Discovered at (Riyadh time) PRIMORA became aware at (Riyadh time) —",
+    "alerts": [
+     "You do not have access to this screen Your console role, Owner, does not include this screen. It is part of the Owner console role. An owner can change your console role on Roles & Permissions. Back to the dashboard"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   }
+  },
+  {
+   "route": "/admin/ropa",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/ropa",
+    "title": "Processing Register · PRIMORA Admin",
+    "text": "Processing Register (RoPA) Read-only. The controlled source is the versioned document; changes are made there and reviewed every quarter and on every schema change that adds personal data. Source: docs/privacy/ropa.md · SHA-256 aff75d39ebe0183b… 21 fields wait for the owner (marked OWNER MUST COMPLETE). Record of Processing Activities (RoPA) Version: 0.1 (draft, prepared by engineering from the code on 2026-10-11) Owner of this record: the DPO (not yet appointed; see \"Owner must complete\") Basis: PDPL Art. 31; Implementing Regulation Art. 33 (written, current, kept for the processing period pl",
+    "alerts": [
+     "21 fields wait for the owner (marked OWNER MUST COMPLETE)."
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/ropa",
+    "title": "Processing Register · PRIMORA Admin",
+    "text": "Processing Register (RoPA) Read-only. The controlled source is the versioned document; changes are made there and reviewed every quarter and on every schema change that adds personal data. Source: docs/privacy/ropa.md · SHA-256 aff75d39ebe0183b… 21 fields wait for the owner (marked OWNER MUST COMPLETE). Record of Processing Activities (RoPA) Version: 0.1 (draft, prepared by engineering from the code on 2026-10-11) Owner of this record: the DPO (not yet appointed; see \"Owner must complete\") Basis: PDPL Art. 31; Implementing Regulation Art. 33 (written, current, kept for the processing period pl",
+    "alerts": [
+     "21 fields wait for the owner (marked OWNER MUST COMPLETE)."
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/ropa",
+    "title": "Processing Register · PRIMORA Admin",
+    "text": "Processing Register (RoPA) Read-only. The controlled source is the versioned document; changes are made there and reviewed every quarter and on every schema change that adds personal data. Source: docs/privacy/ropa.md · SHA-256 aff75d39ebe0183b… 21 fields wait for the owner (marked OWNER MUST COMPLETE). Record of Processing Activities (RoPA) Version: 0.1 (draft, prepared by engineering from the code on 2026-10-11) Owner of this record: the DPO (not yet appointed; see \"Owner must complete\") Basis: PDPL Art. 31; Implementing Regulation Art. 33 (written, current, kept for the processing period pl",
+    "alerts": [
+     "21 fields wait for the owner (marked OWNER MUST COMPLETE)."
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/ropa",
+    "title": "Processing Register · PRIMORA Admin",
+    "text": "Processing Register (RoPA) Read-only. The controlled source is the versioned document; changes are made there and reviewed every quarter and on every schema change that adds personal data. Source: docs/privacy/ropa.md · SHA-256 aff75d39ebe0183b… 21 fields wait for the owner (marked OWNER MUST COMPLETE). Record of Processing Activities (RoPA) Version: 0.1 (draft, prepared by engineering from the code on 2026-10-11) Owner of this record: the DPO (not yet appointed; see \"Owner must complete\") Basis: PDPL Art. 31; Implementing Regulation Art. 33 (written, current, kept for the processing period pl",
+    "alerts": [
+     "21 fields wait for the owner (marked OWNER MUST COMPLETE)."
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   }
+  },
+  {
+   "route": "/admin/approvals",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/approvals",
+    "title": "Approvals · PRIMORA Admin",
+    "text": "Approvals Actions that need a second administrator. You cannot approve your own request; the server refuses it for every role, owners included. Waiting Approved Rejected Withdrawn Loading requests...",
+    "alerts": [
+     "Loading requests..."
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/approvals",
+    "title": "Approvals · PRIMORA Admin",
+    "text": "Approvals Actions that need a second administrator. You cannot approve your own request; the server refuses it for every role, owners included. Waiting2 Approved19 Rejected Withdrawn1 No request is waiting for a decision. Break-glass reviews No break-glass action needs a review. Thresholds Changing a threshold is itself a request that another administrator with money rights approves. Open security alerts No open security alert. Out-of-band notices Security notices sent by email or SMS to verified contacts: bank account changes, break-glass, console roles, sign-in verification and escalated rec",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/approvals",
+    "title": "Approvals · PRIMORA Admin",
+    "text": "Approvals Actions that need a second administrator. You cannot approve your own request; the server refuses it for every role, owners included. Waiting Approved Rejected Withdrawn The requests could not be loaded: service unavailable (QA injected) Retry",
+    "alerts": [
+     "The requests could not be loaded: service unavailable (QA injected)"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/approvals",
+    "title": "Approvals · PRIMORA Admin",
+    "text": "Approvals Actions that need a second administrator. You cannot approve your own request; the server refuses it for every role, owners included. You do not have access to this screen Your account is signed in, but the server refused this request. Trying again will not help until access is granted. Back to the dashboard",
+    "alerts": [
+     "You do not have access to this screen Your account is signed in, but the server refused this request. Trying again will not help until access is granted. Back to the dashboard"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   }
+  },
+  {
+   "route": "/admin/reconciliation",
+   "as": "owner",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reconciliation",
+    "title": "Tap Reconciliation · PRIMORA Admin",
+    "text": "Tap Reconciliation Tap is the record of money movement and the ledger the record of what is owed. Every difference is a break, resolved only by a correction a second administrator approves. Run a day Business day (Riyadh) Fetch from Tap and reconcile Reconcile recorded data Import a file File Bank statement (bank_line_id,amount,settlement_id) Tap settlement report (settlement_id,amount) Paste the lines (CSV) Reason (at least 10 characters) Import Breaks Open and escalated Resolved by correction Matched later by Tap data Loading... Refund timelines A refund starts at Tap within 3 business days ",
+    "alerts": [
+     "Loading..."
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 2
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reconciliation",
+    "title": "Tap Reconciliation · PRIMORA Admin",
+    "text": "Tap Reconciliation Tap is the record of money movement and the ledger the record of what is owed. Every difference is a break, resolved only by a correction a second administrator approves. Run a day Business day (Riyadh) Fetch from Tap and reconcile Reconcile recorded data Import a file File Bank statement (bank_line_id,amount,settlement_id) Tap settlement report (settlement_id,amount) Paste the lines (CSV) Reason (at least 10 characters) Import Breaks Open and escalated (0) Resolved by correction (0) Matched later by Tap data (0) No breaks with this status. Refund timelines A refund starts a",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reconciliation",
+    "title": "Tap Reconciliation · PRIMORA Admin",
+    "text": "Tap Reconciliation Tap is the record of money movement and the ledger the record of what is owed. Every difference is a break, resolved only by a correction a second administrator approves. Run a day Business day (Riyadh) Fetch from Tap and reconcile Reconcile recorded data Import a file File Bank statement (bank_line_id,amount,settlement_id) Tap settlement report (settlement_id,amount) Paste the lines (CSV) Reason (at least 10 characters) Import Breaks Open and escalated Resolved by correction Matched later by Tap data Reconciliation could not be loaded: service unavailable (QA injected) Retr",
+    "alerts": [
+     "Reconciliation could not be loaded: service unavailable (QA injected) Retry"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 1
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reconciliation",
+    "title": "Tap Reconciliation · PRIMORA Admin",
+    "text": "Tap Reconciliation Tap is the record of money movement and the ledger the record of what is owed. Every difference is a break, resolved only by a correction a second administrator approves. You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Finance, Owner. An owner can change your console role on Roles & Permissions. Back to the dashboard",
+    "alerts": [
+     "You do not have access to this screen Your console role, Owner, does not include this screen. It is part of these console roles: Finance, Owner. An owner can change your console role on Roles & Permissions. Back to the d"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 1
+   }
+  },
+  {
+   "route": "/provider/inventory",
+   "as": "provider",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/inventory",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Loading your business…",
+    "alerts": [
+     "Loading your business…"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/inventory",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "STOCK & SUPPLY OPERATIONS Inventory & Suppliers Enterprise stock control, supplier ordering, and branch-level reorder visibility. Add Supplier Add Product Create PO",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/inventory",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Your business could not be loaded: service unavailable (QA injected) Try again",
+    "alerts": [
+     "Your business could not be loaded: service unavailable (QA injected) Try again"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 5
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/inventory",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Your business could not be loaded: permission denied (QA injected) Try again",
+    "alerts": [
+     "Your business could not be loaded: permission denied (QA injected) Try again"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 3
+   }
+  },
+  {
+   "route": "/provider/chain",
+   "as": "provider",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/chain",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Loading your business…",
+    "alerts": [
+     "Loading your business…"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 3
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/chain",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Chain Operations Review branch performance and delegate access to registered staff. Manage inventory Manage employees From To Retry Completed service revenue SAR 0.00 Active staff 1 Bookings 9 Reorder alerts 0 Stock at cost SAR 0.00 Completed bookings 0 Branch performance No branches or staff memberships available. Branch manager access Add access No branches or staff memberships available.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/chain",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Your business could not be loaded: service unavailable (QA injected) Try again",
+    "alerts": [
+     "Your business could not be loaded: service unavailable (QA injected) Try again"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 5
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/chain",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Your business could not be loaded: permission denied (QA injected) Try again",
+    "alerts": [
+     "Your business could not be loaded: permission denied (QA injected) Try again"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 3
+   }
+  },
+  {
+   "route": "/provider/pricing",
+   "as": "provider",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/pricing",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Loading your business…",
+    "alerts": [
+     "Loading your business…"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 3
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/pricing",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "PRIMORA BACK TO HOME FOR PARTNERS Plans and platform fees Plan prices and the platform fee below are read from PRIMORA's records for your account. Monthly billing Annual billing No plan is offered at the moment. HOW THE PLATFORM FEE IS WORKED OUT Every booking is recorded in the ledger, and your share is paid out after the visit is completed. Your platform fee Computed from the fee rules in force on this account. Bookings from your own link, QR code, WhatsApp, Instagram, walk-ins and imported clients carry no platform fee. Worked example: Booking amount (SAR) VAT registration Not declared Upda",
+    "alerts": [],
+    "busy": 1,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/pricing",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Your business could not be loaded: service unavailable (QA injected) Try again",
+    "alerts": [
+     "Your business could not be loaded: service unavailable (QA injected) Try again"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 5
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/pricing",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Your business could not be loaded: permission denied (QA injected) Try again",
+    "alerts": [
+     "Your business could not be loaded: permission denied (QA injected) Try again"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 3
+   }
+  },
+  {
+   "route": "/customer/privacy",
+   "as": "customer",
+   "loading": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/customer/privacy",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Privacy & my data Ask for access to your data, a copy of it, a correction or its deletion, or withdraw a consent. Every request is free of charge and answered within 30 days. Make a request What do you need? See my data A copy of my data (JSON and PDF) Correct a detail Delete my account and data Withdraw a consent Anything we should know (optional) Send the request My requests Health answers for later bookings",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/customer/privacy",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Privacy & my data Ask for access to your data, a copy of it, a correction or its deletion, or withdraw a consent. Every request is free of charge and answered within 30 days. Make a request What do you need? See my data A copy of my data (JSON and PDF) Correct a detail Delete my account and data Withdraw a consent Anything we should know (optional) Send the request My requests You have not made any privacy request. Health answers for later bookings Your health-intake answers are used only for the booking they were given for and destroyed 30 days after it. Allow reuse for 12 months",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/customer/privacy",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Privacy & my data Ask for access to your data, a copy of it, a correction or its deletion, or withdraw a consent. Every request is free of charge and answered within 30 days. Make a request What do you need? See my data A copy of my data (JSON and PDF) Correct a detail Delete my account and data Withdraw a consent Anything we should know (optional) Send the request My requests Health answers for later bookings",
+    "alerts": [],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 10
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/customer/privacy",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Privacy & my data Ask for access to your data, a copy of it, a correction or its deletion, or withdraw a consent. Every request is free of charge and answered within 30 days. Make a request What do you need? See my data A copy of my data (JSON and PDF) Correct a detail Delete my account and data Withdraw a consent Anything we should know (optional) Send the request My requests Your requests could not be loaded: permission denied (QA injected) Try again Health answers for later bookings Your health-intake answers are used only for the booking they were given for and destroyed 30 days after it. ",
+    "alerts": [
+     "Your requests could not be loaded: permission denied (QA injected) Try again"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 6
+   }
+  },
+  {
+   "route": "/become-provider",
+   "as": "customer",
+   "loading": {
+    "vw": 1440,
+    "sw": 1425,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/become-provider",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "BECOME A PROVIDER Bring Your Salon, Barbershop or Spa to Primora List your business, set your services and hours, and accept bookings with deposits paid on Tap's hosted payment page. REGISTER AS PROVIDER NOW TAP DEPOSITS, PAYOUTS ON REQUEST Customers pay the deposit on Tap's hosted payment page. Your earnings are recorded in your provider ledger and you request payouts to your registered bank account. SALON AND HOME SERVICE Offer services at your branch, and at the customer's address where you enable home service. STAFF AND AVAILABILITY Customize specialist calendars, shifts, services, and blo",
+    "alerts": [
+     "Loading plans..."
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 6
+   },
+   "empty": {
+    "vw": 1440,
+    "sw": 1425,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/become-provider",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "BECOME A PROVIDER Bring Your Salon, Barbershop or Spa to Primora List your business, set your services and hours, and accept bookings with deposits paid on Tap's hosted payment page. REGISTER AS PROVIDER NOW TAP DEPOSITS, PAYOUTS ON REQUEST Customers pay the deposit on Tap's hosted payment page. Your earnings are recorded in your provider ledger and you request payouts to your registered bank account. SALON AND HOME SERVICE Offer services at your branch, and at the customer's address where you enable home service. STAFF AND AVAILABILITY Customize specialist calendars, shifts, services, and blo",
+    "alerts": [
+     "Applications are closed for now The Provider Agreement has not been published yet, so applications cannot be submitted. Please check back soon."
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 0
+   },
+   "error": {
+    "vw": 1440,
+    "sw": 1425,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/become-provider",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "BECOME A PROVIDER Bring Your Salon, Barbershop or Spa to Primora List your business, set your services and hours, and accept bookings with deposits paid on Tap's hosted payment page. REGISTER AS PROVIDER NOW TAP DEPOSITS, PAYOUTS ON REQUEST Customers pay the deposit on Tap's hosted payment page. Your earnings are recorded in your provider ledger and you request payouts to your registered bank account. SALON AND HOME SERVICE Offer services at your branch, and at the customer's address where you enable home service. STAFF AND AVAILABILITY Customize specialist calendars, shifts, services, and blo",
+    "alerts": [
+     "Loading plans..."
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 12
+   },
+   "refused": {
+    "vw": 1440,
+    "sw": 1425,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/become-provider",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "BECOME A PROVIDER Bring Your Salon, Barbershop or Spa to Primora List your business, set your services and hours, and accept bookings with deposits paid on Tap's hosted payment page. REGISTER AS PROVIDER NOW TAP DEPOSITS, PAYOUTS ON REQUEST Customers pay the deposit on Tap's hosted payment page. Your earnings are recorded in your provider ledger and you request payouts to your registered bank account. SALON AND HOME SERVICE Offer services at your branch, and at the customer's address where you enable home service. STAFF AND AVAILABILITY Customize specialist calendars, shifts, services, and blo",
+    "alerts": [
+     "The plans could not be loaded: permission denied (QA injected)",
+     "Your existing application could not be loaded: permission denied (QA injected)",
+     "The Provider Agreement could not be loaded, so applications cannot be submitted right now: permission denied (QA injected)"
+    ],
+    "busy": 0,
+    "latin": null,
+    "consoleErrors": 6
+   }
+  }
+ ]
+}

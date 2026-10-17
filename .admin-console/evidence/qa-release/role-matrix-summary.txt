@@ -1,0 +1,57 @@
+QA role x operation matrix over the database command surface, 2026-10-16T21:51:30.991Z, local stack http://127.0.0.1:54321
+functions executable by the authenticated role and swept: 137 (reads 40, commands 97)
+anon        allowed   0  refused-authz 137  refused-other   0
+customer    allowed   8  refused-authz 126  refused-other   3
+provider    allowed   8  refused-authz 126  refused-other   3
+owner-aal1  allowed   8  refused-authz 126  refused-other   3
+analyst     allowed  22  refused-authz 107  refused-other   8
+owner aal2 positive control on reads: 27 of 40 answered 200
+
+findings (identity allowed where it must be refused):
+customer ALLOWED admin_can -> 200 false
+provider ALLOWED admin_can -> 200 false
+owner-aal1 ALLOWED admin_can -> 200 false
+analyst ALLOWED non-read admin_people_names -> 200 []
+analyst ALLOWED non-read admin_recent_bookings -> 200 {"rows":[{"id":"cf75fd93-f155-44be-956c-e3b1f8ce63c5","status":"cancelled","branches":{"name_ar":"فرع الملقا","name_en":
+analyst ALLOWED non-read admin_reward_programs -> 200 {"terms":[],"pending":[],"programs":[{"enabled":false,"program":"loyalty","updated_at":"2026-10-10T15:50:34.325811+00:00
+customer ALLOWED admin_role -> 200 null
+provider ALLOWED admin_role -> 200 null
+owner-aal1 ALLOWED admin_role -> 200 null
+analyst ALLOWED non-read admin_role -> 200 "analyst"
+customer ALLOWED admin_role_of_account -> 200 null
+provider ALLOWED admin_role_of_account -> 200 null
+owner-aal1 ALLOWED admin_role_of_account -> 200 "owner"
+analyst ALLOWED non-read admin_role_of_account -> 200 "analyst"
+customer ALLOWED admin_session_state -> 200 {"aal":"aal1","active":false,"locked":false,"signed_in":true,"permissions":[],"console_role":null,"session_live":true,"i
+provider ALLOWED admin_session_state -> 200 {"aal":"aal1","active":false,"locked":false,"signed_in":true,"permissions":[],"console_role":null,"session_live":true,"i
+owner-aal1 ALLOWED admin_session_state -> 200 {"aal":"aal1","active":false,"locked":false,"signed_in":true,"permissions":[],"console_role":"owner","session_live":true
+customer ALLOWED admin_table_write_allowed -> 200 true
+provider ALLOWED admin_table_write_allowed -> 200 true
+owner-aal1 ALLOWED admin_table_write_allowed -> 200 false
+analyst ALLOWED non-read admin_table_write_allowed -> 200 false
+
+every non-authz refusal for anon/customer/provider/owner-aal1 on a console function (read the message: a refusal that is not about authority may mean the check runs after the lookup):
+  customer admin_set_provider_status: 400 22P02 invalid input value for enum provider_status: "QA role-matrix probe (qa-release-claude)"
+  provider admin_set_provider_status: 400 22P02 invalid input value for enum provider_status: "QA role-matrix probe (qa-release-claude)"
+  owner-aal1 admin_set_provider_status: 400 22P02 invalid input value for enum provider_status: "QA role-matrix probe (qa-release-claude)"
+
+analyst answers on console functions that were ALLOWED (reads):
+  admin_booking_channel_counts (read): 200 {"to":"2026-10-01","from":"2026-10-01","bookings":0,"walk_ins":0,"attributed":0,"by_channe
+  admin_branch_performance_report (read): 200 [{"branch_id":"b0000000-0000-0000-0000-000000000002","provider_id":"a0000000-0000-0000-000
+  admin_can (read): 200 false
+  admin_dashboard_overview (read): 200 {"kpis":{"customers":21,"suppressed":["live_providers"],"finished_30d":7,"completed_30d":0
+  admin_fee_rule_versions (read): 200 {"pending":[],"versions":[{"id":"d858f32e-7a42-4cc6-aa63-2c7cc0bdb815","channel":"import",
+  admin_get_event_counts (read): 200 []
+  admin_group_booking_counts (read): 200 {"by_occasion":{"other":0,"party":0,"family":0,"wedding":0},"groups_total":0,"guests_total
+  admin_intake_overview (read): 200 {"templates":0,"requirements":0,"retention_days":30,"active_patch_blocks":0,"providers_enf
+  admin_message_queue_summary (read): 200 {"pending":4,"deferred":0}
+  admin_package_usage_summary (read): 200 {"redemptions":0,"active_vouchers":0,"redemptions_suppressed":false,"active_vouchers_suppr
+  admin_people_names (COMMAND): 200 []
+  admin_recent_bookings (COMMAND): 200 {"rows":[{"id":"cf75fd93-f155-44be-956c-e3b1f8ce63c5","status":"cancelled","branches":{"na
+  admin_reward_programs (COMMAND): 200 {"terms":[],"pending":[],"programs":[{"enabled":false,"program":"loyalty","updated_at":"20
+  admin_role (COMMAND): 200 "analyst"
+  admin_role_of_account (COMMAND): 200 "analyst"
+  admin_session_state (read): 200 {"aal":"aal2","active":true,"locked":false,"signed_in":true,"permissions":[],"console_role
+  admin_sponsored_overview (read): 200 {"month":"2026-10","config":{"enabled":false,"missing":["sponsored.price_per_new_client_sa
+  admin_table_write_allowed (COMMAND): 200 false
+  admin_whatsapp_overview (read): 200 {"channels":{"total":0,"enabled":0,"verified":0,"receptionist_on":0,"pending_verification"

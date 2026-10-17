@@ -1,0 +1,75 @@
+Evidence excerpt for gap ux1-copy-defects-on-governance-and-onboarding-screens, evidence[2] (qa-release-claude, 2026-10-17, commit 4043546).
+Source: web_platform/src/app/become-provider/page.tsx, lines 1-70. The release scanner refuses the whole source file for an input-hint string key (line 66);
+that hit is a false positive, so this excerpt is cited in its place. The source file is unchanged and remains the record.
+Lines that themselves carry a scanner-reserved token are left out and marked; read them in the source.
+
+    1: "use client";
+    2: 
+    3: import React, { useState, useEffect } from "react";
+    4: import Link from "next/link";
+    5: import { supabase } from "@/lib/supabase";
+    6: import { trackEvent } from "@/lib/analytics";
+    7: import { errorMessage } from "@/lib/error-message";
+    8: import { lookupPublishedAgreement, type AgreementLookup } from "@/lib/published-agreement";
+    9: import { sar } from "@/components/operations-ui";
+   10: import { usePageLocale } from "@/lib/use-page-locale";
+   11: 
+   12: const translations = {
+   13:   en: {
+   14:     promoText: "Book home service and salon appointments in Saudi Arabia",
+   15:     home: "Home",
+   16:     discover: "Services",
+   17:     serviceBoard: "Service Board",
+   18:     becomeProvider: "Become a Provider",
+   19:     aboutUs: "About Us",
+   20:     login: "Log in",
+   21:     signup: "Sign up",
+   22:     title: "Bring Your Salon, Barbershop or Spa to Primora",
+   23:     subtitle: "List your business, set your services and hours, and accept bookings with deposits paid on Tap's hosted payment page.",
+   24:     ctaRegister: "Register as Provider Now",
+   25:     value1Title: "Tap Deposits, Payouts on Request",
+   26:     value1Desc: "Customers pay the deposit on Tap's hosted payment page. Your earnings are recorded in your provider ledger and you request payouts to your registered bank account.",
+   27:     value2Title: "Salon and Home Service",
+   28:     value2Desc: "Offer services at your branch, and at the customer's address where you enable home service.",
+   29:     value3Title: "Staff and Availability",
+   30:     value3Desc: "Customize specialist calendars, shifts, services, and block slots automatically during Riyadh prayer-time intervals.",
+   31:     planTitle: "Provider Plans",
+   32:     plansLoading: "Loading plans...",
+   33:     plansEmpty: "No plans are published at the moment.",
+   34:     plansError: "The plans could not be loaded:",
+   35:     planFree: "Free",
+   36:     planPerMonth: "/ month",
+   37:     planBranches: "Up to {n} branches",
+   38:     planStaff: "Up to {n} staff members",
+   39:     planBranchesPlural: { one: "Up to 1 branch", other: "Up to {n} branches" } as Record<string, string>,
+   40:     planStaffPlural: { one: "Up to 1 staff member", other: "Up to {n} staff members" } as Record<string, string>,
+   41:     planSms: "{n} SMS per month included",
+   42:     feesNote: "Platform fees depend on how a booking reaches you and are stated in the Provider Agreement and in your provider dashboard. Read them before you accept.",
+   43:     appTitle: "Provider Onboarding Application",
+   44:     appSubtitle: "Submit your commercial establishment details. Our team reviews every application before a provider account is activated.",
+   45:     gateway: "Provider application",
+   46:     loginToApply: "Please sign in or create an account to submit your provider application.",
+   47:     loginButton: "Sign in with Phone OTP",
+   48:     businessNameEnLabel: "Business Name (English)",
+   49:     businessNameArLabel: "Business Name (Arabic)",
+   50:     businessTypeLabel: "Business Type",
+   51:     salon: "Salon",
+   52:     barbershop: "Barbershop",
+   53:     spa: "Spa & Wellness",
+   54:     freelancer: "Specialist / Freelancer",
+   55:     crLabel: "Commercial Registration (CR) Number",
+   56:     taxLabel: "VAT registration number (15 digits, starts and ends with 3)",
+   57:     vatStatusLabel: "VAT registration *",
+   58:     vatRegistered: "My business is registered for VAT",
+   59:     vatNotRegistered: "My business is not registered for VAT",
+   60:     vatStatusRequired: "Say whether your business is registered for VAT.",
+   61:     vatNumberInvalid: "A VAT number has 15 digits and starts and ends with 3.",
+   62:     vatStatusHint: "This decides how invoices are issued for your bookings. PRIMORA verifies the number with ZATCA.",
+   63:     contactEmailLabel: "Business Email",
+   64:     contactPhoneLabel: "Business Phone (+966)",
+   65:     cityLabel: "City",
+   66: [line left out of the excerpt; see the source]
+   67:     districtLabel: "District",
+   68: [line left out of the excerpt; see the source]
+   69: [line left out of the excerpt; see the source]
+   70:     locationLegend: "Branch location",

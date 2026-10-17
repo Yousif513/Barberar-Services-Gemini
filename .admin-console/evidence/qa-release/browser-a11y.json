@@ -1,0 +1,6265 @@
+{
+ "phase": "a11y",
+ "app": "http://localhost:3100",
+ "api": "http://127.0.0.1:54321",
+ "started": "2026-10-16T21:49:25.546Z",
+ "ended": "2026-10-16T21:55:17.864Z",
+ "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+ "axe": "axe-core 4.12.1 (node_modules)",
+ "results": [
+  {
+   "route": "/admin",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1817,
+   "landed": "/admin",
+   "axe": {
+    "violations": [],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin",
+    "title": "Dashboard · PRIMORA Admin",
+    "text": "Dashboard Work waiting for an operator and live platform figures. Times are shown in Riyadh time. Updated 00:49 Refresh Platform activity Help Center BOOKINGS TODAY 0 Scheduled for today and not cancelled PAYMENTS CAPTURED, 7 DAYS SAR 0.00 ",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 2197,
+   "landed": "/admin",
+   "axe": {
+    "violations": [],
+    "passes": 22,
+    "incomplete": 1,
+    "url": "/admin"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin",
+    "title": "Dashboard · PRIMORA Admin",
+    "text": "Dashboard Work waiting for an operator and live platform figures. Times are shown in Riyadh time. Updated 00:49 Refresh Platform activity Help Center BOOKINGS TODAY 0 Scheduled for today and not cancelled PAYMENTS CAPTURED, 7 DAYS SAR 0.00 ",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 4187,
+   "landed": "/admin",
+   "axe": {
+    "violations": [],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin",
+    "title": "لوحة المتابعة · إدارة PRIMORA",
+    "text": "لوحة المتابعة الأعمال التي تنتظر إجراءً من المشرف وأرقام المنصة المباشرة. الأوقات بتوقيت الرياض. آخر تحديث ١٢:٤٩ ص تحديث نشاط المنصة مركز المساعدة حجوزات اليوم ٠ المجدولة لليوم وغير الملغاة المدفوعات المحصّلة، ٧ أيام ‏٠٫٠٠ ر.س.‏ الحجوزات وا",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "analyst",
+     "profiles",
+     "privacy",
+     "Abdulrahman",
+     "Shehri",
+     "privacy",
+     "privacy",
+     "privacy",
+     "privacy"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1638,
+   "landed": "/admin",
+   "axe": {
+    "violations": [],
+    "passes": 22,
+    "incomplete": 1,
+    "url": "/admin"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin",
+    "title": "لوحة المتابعة · إدارة PRIMORA",
+    "text": "لوحة المتابعة الأعمال التي تنتظر إجراءً من المشرف وأرقام المنصة المباشرة. الأوقات بتوقيت الرياض. آخر تحديث ١٢:٤٩ ص تحديث نشاط المنصة مركز المساعدة حجوزات اليوم ٠ المجدولة لليوم وغير الملغاة المدفوعات المحصّلة، ٧ أيام ‏٠٫٠٠ ر.س.‏ الحجوزات وا",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "analyst",
+     "profiles",
+     "privacy",
+     "Abdulrahman",
+     "Shehri",
+     "privacy",
+     "privacy",
+     "privacy",
+     "privacy"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/providers",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1762,
+   "landed": "/admin/providers",
+   "axe": {
+    "violations": [],
+    "passes": 26,
+    "incomplete": 1,
+    "url": "/admin/providers"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/providers",
+    "title": "Providers · PRIMORA Admin",
+    "text": "Providers Review applications and registered providers, their branches, services, employees and recorded performance. Providers join by application. Review new applications in the Applications tab. Active Providers Registry 5 Applications R",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/providers",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1625,
+   "landed": "/admin/providers",
+   "axe": {
+    "violations": [],
+    "passes": 26,
+    "incomplete": 1,
+    "url": "/admin/providers"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/providers",
+    "title": "Providers · PRIMORA Admin",
+    "text": "Providers Review applications and registered providers, their branches, services, employees and recorded performance. Providers join by application. Review new applications in the Applications tab. Active Providers Registry 5 Applications R",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/providers",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1684,
+   "landed": "/admin/providers",
+   "axe": {
+    "violations": [],
+    "passes": 26,
+    "incomplete": 1,
+    "url": "/admin/providers"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/providers",
+    "title": "مقدمو الخدمات · إدارة PRIMORA",
+    "text": "مزودو الخدمات مراجعة الطلبات والمزودين المسجلين وفروعهم وخدماتهم وموظفيهم وأدائهم المسجل. ينضم المزودون عبر طلب انضمام. راجع الطلبات الجديدة في تبويب الطلبات. سجل مزودي الخدمة المعتمدين ٥ طابور مراجعة طلبات الانضمام المزودون ٥ الطلبات ٠ معت",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Elite",
+     "Grooming",
+     "Lounge",
+     "Sara",
+     "Beauty",
+     "Salon",
+     "Lumi",
+     "Skin",
+     "Studio",
+     "lumi",
+     "primora",
+     "local",
+     "Elite",
+     "Barbershop",
+     "Riyadh",
+     "elite",
+     "primora",
+     "local",
+     "Royal",
+     "Grooming",
+     "House",
+     "royal",
+     "primora",
+     "local"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/providers",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1770,
+   "landed": "/admin/providers",
+   "axe": {
+    "violations": [],
+    "passes": 27,
+    "incomplete": 1,
+    "url": "/admin/providers"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/providers",
+    "title": "مقدمو الخدمات · إدارة PRIMORA",
+    "text": "مزودو الخدمات مراجعة الطلبات والمزودين المسجلين وفروعهم وخدماتهم وموظفيهم وأدائهم المسجل. ينضم المزودون عبر طلب انضمام. راجع الطلبات الجديدة في تبويب الطلبات. سجل مزودي الخدمة المعتمدين ٥ طابور مراجعة طلبات الانضمام المزودون ٥ الطلبات ٠ معت",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Elite",
+     "Grooming",
+     "Lounge",
+     "Sara",
+     "Beauty",
+     "Salon",
+     "Lumi",
+     "Skin",
+     "Studio",
+     "lumi",
+     "primora",
+     "local",
+     "Elite",
+     "Barbershop",
+     "Riyadh",
+     "elite",
+     "primora",
+     "local",
+     "Royal",
+     "Grooming",
+     "House",
+     "royal",
+     "primora",
+     "local"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/ledger",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1733,
+   "landed": "/admin/ledger",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/ledger"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/ledger",
+    "title": "Ledger & Splits · PRIMORA Admin",
+    "text": "Financial Ledger & Statements Audit ledger entries, manage provider payout requests, and view accountant summaries. Payment Methods Transaction Splits Payout Requests Accountant Statements Reconciliation & fee invoices Payment Methods (KSA)",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/ledger",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1707,
+   "landed": "/admin/ledger",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/ledger"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/ledger",
+    "title": "Ledger & Splits · PRIMORA Admin",
+    "text": "Financial Ledger & Statements Audit ledger entries, manage provider payout requests, and view accountant summaries. Payment Methods Transaction Splits Payout Requests Accountant Statements Reconciliation & fee invoices Payment Methods (KSA)",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/ledger",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1683,
+   "landed": "/admin/ledger",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/ledger"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/ledger",
+    "title": "دفتر الحسابات والعمولات · إدارة PRIMORA",
+    "text": "السجل والتقارير المالية تدقيق سجلات تقسيم الضمان المالي لمزودي الخدمة، وإدارة طلبات سحب الأرباح، والاطلاع على التقارير المحاسبية. طرق الدفع تقسيم المعاملات طلبات سحب الأرباح القوائم المحاسبية والضريبة المطابقة وفواتير الرسوم طرق الدفع (السو",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "APIS",
+     "PAYMENTS",
+     "TEST",
+     "TEST",
+     "PAYMENTS",
+     "Payments",
+     "test",
+     "TEST",
+     "PAYMENTS",
+     "Payments",
+     "test",
+     "TEST",
+     "PAYMENTS",
+     "Payments",
+     "test",
+     "TEST",
+     "PAYMENTS",
+     "Payments",
+     "test",
+     "TEST",
+     "PAYMENTS",
+     "Payments",
+     "test",
+     "TAMARA",
+     "TEST",
+     "TABBY",
+     "TEST",
+     "INTERNAL",
+     "TEST",
+     "INTERNAL",
+     "TEST",
+     "INTERNAL",
+     "TEST"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/ledger",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1636,
+   "landed": "/admin/ledger",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/ledger"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/ledger",
+    "title": "دفتر الحسابات والعمولات · إدارة PRIMORA",
+    "text": "السجل والتقارير المالية تدقيق سجلات تقسيم الضمان المالي لمزودي الخدمة، وإدارة طلبات سحب الأرباح، والاطلاع على التقارير المحاسبية. طرق الدفع تقسيم المعاملات طلبات سحب الأرباح القوائم المحاسبية والضريبة المطابقة وفواتير الرسوم طرق الدفع (السو",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "APIS",
+     "PAYMENTS",
+     "TEST",
+     "TEST",
+     "PAYMENTS",
+     "Payments",
+     "test",
+     "TEST",
+     "PAYMENTS",
+     "Payments",
+     "test",
+     "TEST",
+     "PAYMENTS",
+     "Payments",
+     "test",
+     "TEST",
+     "PAYMENTS",
+     "Payments",
+     "test",
+     "TEST",
+     "PAYMENTS",
+     "Payments",
+     "test",
+     "TAMARA",
+     "TEST",
+     "TABBY",
+     "TEST",
+     "INTERNAL",
+     "TEST",
+     "INTERNAL",
+     "TEST",
+     "INTERNAL",
+     "TEST"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/services",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 2368,
+   "landed": "/admin/services",
+   "axe": {
+    "violations": [
+     {
+      "id": "label",
+      "impact": "critical",
+      "help": "Form elements must have labels",
+      "nodes": 33,
+      "targets": [
+       "input[value=\"150\"]",
+       ".hover\\:bg-gray-50\\/40:nth-child(2) > td:nth-child(3) > .gap-1.flex-row.items-center > .w-16.bg-gray-50[value=\"120\"]",
+       "input[value=\"650\"]",
+       ".hover\\:bg-gray-50\\/40:nth-child(4) > td:nth-child(3) > .gap-1.flex-row.items-center > .w-16.bg-gray-50[value=\"180\"]"
+      ],
+      "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or r"
+     },
+     {
+      "id": "select-name",
+      "impact": "critical",
+      "help": "Select element must have an accessible name",
+      "nodes": 2,
+      "targets": [
+       "select:nth-child(2)",
+       "select:nth-child(3)"
+      ],
+      "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or r"
+     }
+    ],
+    "passes": 26,
+    "incomplete": 1,
+    "url": "/admin/services"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/services",
+    "title": "Services · PRIMORA Admin",
+    "text": "Global Services Directory Manage the master services catalog, configure baseline price metrics, and organize categories. + Add service TOTAL SERVICES # 33 ACTIVE CATEGORIES ✓ 10 AVERAGE BASE PRICE % 151.5 SAR All categories Gel Manicure Apo",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/services",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1629,
+   "landed": "/admin/services",
+   "axe": {
+    "violations": [
+     {
+      "id": "label",
+      "impact": "critical",
+      "help": "Form elements must have labels",
+      "nodes": 33,
+      "targets": [
+       "input[value=\"150\"]",
+       ".hover\\:bg-gray-50\\/40:nth-child(2) > td:nth-child(3) > .gap-1.flex-row.items-center > .w-16.bg-gray-50[value=\"120\"]",
+       "input[value=\"650\"]",
+       ".hover\\:bg-gray-50\\/40:nth-child(4) > td:nth-child(3) > .gap-1.flex-row.items-center > .w-16.bg-gray-50[value=\"180\"]"
+      ],
+      "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or r"
+     },
+     {
+      "id": "select-name",
+      "impact": "critical",
+      "help": "Select element must have an accessible name",
+      "nodes": 2,
+      "targets": [
+       "select:nth-child(2)",
+       "select:nth-child(3)"
+      ],
+      "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or r"
+     }
+    ],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/services"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/services",
+    "title": "Services · PRIMORA Admin",
+    "text": "Global Services Directory Manage the master services catalog, configure baseline price metrics, and organize categories. + Add service TOTAL SERVICES # 33 ACTIVE CATEGORIES ✓ 10 AVERAGE BASE PRICE % 151.5 SAR All categories Gel Manicure Apo",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/services",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1720,
+   "landed": "/admin/services",
+   "axe": {
+    "violations": [
+     {
+      "id": "label",
+      "impact": "critical",
+      "help": "Form elements must have labels",
+      "nodes": 33,
+      "targets": [
+       "input[value=\"150\"]",
+       ".hover\\:bg-gray-50\\/40:nth-child(2) > td:nth-child(3) > .gap-1.flex-row-reverse.items-center > .w-16.bg-gray-50[value=\"120\"]",
+       "input[value=\"650\"]",
+       ".hover\\:bg-gray-50\\/40:nth-child(4) > td:nth-child(3) > .gap-1.flex-row-reverse.items-center > .w-16.bg-gray-50[value=\"180\"]"
+      ],
+      "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or r"
+     },
+     {
+      "id": "select-name",
+      "impact": "critical",
+      "help": "Select element must have an accessible name",
+      "nodes": 2,
+      "targets": [
+       "select:nth-child(2)",
+       "select:nth-child(3)"
+      ],
+      "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or r"
+     }
+    ],
+    "passes": 26,
+    "incomplete": 1,
+    "url": "/admin/services"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/services",
+    "title": "الخدمات · إدارة PRIMORA",
+    "text": "سجل الخدمات العام إدارة الدليل الشامل للخدمات، تحديد أسعار الحد الأدنى القياسية، وترتيب الفئات والنشاطات. + إضافة خدمة إجمالي الخدمات # 33 الفئات النشطة ✓ 10 متوسط السعر المرجعي % ١٥١٫٥ ريال كل الفئات جلسة جل مانيكير للأظافر العناية بالبشرة",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Beard",
+     "Grooming",
+     "Haircut",
+     "Balayage",
+     "Highlights",
+     "Manicure",
+     "cccccccc",
+     "cccc",
+     "Wellness",
+     "cccccccc",
+     "cccc",
+     "Wellness",
+     "cccccccc",
+     "cccc",
+     "Barber",
+     "Hair",
+     "cccccccc",
+     "cccc",
+     "Signature",
+     "Packages",
+     "cccccccc",
+     "cccc",
+     "Nails",
+     "Hands",
+     "cccccccc",
+     "cccc",
+     "Beard",
+     "Shave",
+     "cccccccc",
+     "cccc",
+     "Skincare",
+     "Facials",
+     "cccccccc",
+     "cccc",
+     "Skincare",
+     "Facials",
+     "Wellness",
+     "Wellness",
+     "Wellness",
+     "Nails"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/services",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1722,
+   "landed": "/admin/services",
+   "axe": {
+    "violations": [
+     {
+      "id": "label",
+      "impact": "critical",
+      "help": "Form elements must have labels",
+      "nodes": 33,
+      "targets": [
+       "input[value=\"150\"]",
+       ".hover\\:bg-gray-50\\/40:nth-child(2) > td:nth-child(3) > .gap-1.flex-row-reverse.items-center > .w-16.bg-gray-50[value=\"120\"]",
+       "input[value=\"650\"]",
+       ".hover\\:bg-gray-50\\/40:nth-child(4) > td:nth-child(3) > .gap-1.flex-row-reverse.items-center > .w-16.bg-gray-50[value=\"180\"]"
+      ],
+      "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or r"
+     },
+     {
+      "id": "select-name",
+      "impact": "critical",
+      "help": "Select element must have an accessible name",
+      "nodes": 2,
+      "targets": [
+       "select:nth-child(2)",
+       "select:nth-child(3)"
+      ],
+      "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or r"
+     }
+    ],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/services"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/services",
+    "title": "الخدمات · إدارة PRIMORA",
+    "text": "سجل الخدمات العام إدارة الدليل الشامل للخدمات، تحديد أسعار الحد الأدنى القياسية، وترتيب الفئات والنشاطات. + إضافة خدمة إجمالي الخدمات # 33 الفئات النشطة ✓ 10 متوسط السعر المرجعي % ١٥١٫٥ ريال كل الفئات جلسة جل مانيكير للأظافر العناية بالبشرة",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Beard",
+     "Grooming",
+     "Haircut",
+     "Balayage",
+     "Highlights",
+     "Manicure",
+     "cccccccc",
+     "cccc",
+     "Wellness",
+     "cccccccc",
+     "cccc",
+     "Wellness",
+     "cccccccc",
+     "cccc",
+     "Barber",
+     "Hair",
+     "cccccccc",
+     "cccc",
+     "Signature",
+     "Packages",
+     "cccccccc",
+     "cccc",
+     "Nails",
+     "Hands",
+     "cccccccc",
+     "cccc",
+     "Beard",
+     "Shave",
+     "cccccccc",
+     "cccc",
+     "Skincare",
+     "Facials",
+     "cccccccc",
+     "cccc",
+     "Skincare",
+     "Facials",
+     "Wellness",
+     "Wellness",
+     "Wellness",
+     "Nails"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/integrations",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 2465,
+   "landed": "/admin/integrations",
+   "axe": {
+    "violations": [
+     {
+      "id": "select-name",
+      "impact": "critical",
+      "help": "Select element must have an accessible name",
+      "nodes": 1,
+      "targets": [
+       "select"
+      ],
+      "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or r"
+     }
+    ],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/integrations"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/integrations",
+    "title": "API & Integrations · PRIMORA Admin",
+    "text": "API & Integrations Enable, disable and switch environments for every connected service. Credentials stay server-side — only masked hints are shown here. + ADD API ACTIVE APIS 1 CONFIGURED KEYS 1 LIVE MODE 1 SECTIONS LINKED 9 All sections Pa",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/integrations",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 2201,
+   "landed": "/admin/integrations",
+   "axe": {
+    "violations": [
+     {
+      "id": "select-name",
+      "impact": "critical",
+      "help": "Select element must have an accessible name",
+      "nodes": 1,
+      "targets": [
+       "select"
+      ],
+      "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or r"
+     }
+    ],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/integrations"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/integrations",
+    "title": "API & Integrations · PRIMORA Admin",
+    "text": "API & Integrations Enable, disable and switch environments for every connected service. Credentials stay server-side — only masked hints are shown here. + ADD API ACTIVE APIS 1 CONFIGURED KEYS 1 LIVE MODE 1 SECTIONS LINKED 9 All sections Pa",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/integrations",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1807,
+   "landed": "/admin/integrations",
+   "axe": {
+    "violations": [
+     {
+      "id": "select-name",
+      "impact": "critical",
+      "help": "Select element must have an accessible name",
+      "nodes": 1,
+      "targets": [
+       "select"
+      ],
+      "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or r"
+     }
+    ],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/integrations"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/integrations",
+    "title": "الربط والدمج (API) · إدارة PRIMORA",
+    "text": "الربط البرمجي والتكاملات فعّل وعطّل وبدّل البيئات لكل خدمة خارجية. تبقى المفاتيح في الخادم — تظهر هنا قيم مقنّعة فقط. + إضافة API API مفعلة 1 مفاتيح مهيأة 1 وضع مباشر 1 أقسام مربوطة 9 كل الأقسام المدفوعات الخرائط والمواقع الرسائل / رمز التح",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Moyasar",
+     "MOYASAR",
+     "https",
+     "moyasar",
+     "Managed",
+     "from",
+     "Admin",
+     "Integrations",
+     "MADA",
+     "APPLE",
+     "VISA",
+     "MASTERCARD",
+     "MyFatoorah",
+     "MYFATOORAH",
+     "https",
+     "myfatoorah",
+     "Payment",
+     "gateway",
+     "supporting",
+     "cards",
+     "Mada",
+     "Apple",
+     "MADA",
+     "APPLE",
+     "VISA",
+     "MASTERCARD",
+     "PayTabs",
+     "PAYTABS",
+     "https",
+     "secure",
+     "paytabs",
+     "payment",
+     "Payment",
+     "gateway",
+     "supporting",
+     "cards",
+     "Mada",
+     "Apple",
+     "MADA",
+     "APPLE"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/integrations",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1644,
+   "landed": "/admin/integrations",
+   "axe": {
+    "violations": [
+     {
+      "id": "select-name",
+      "impact": "critical",
+      "help": "Select element must have an accessible name",
+      "nodes": 1,
+      "targets": [
+       "select"
+      ],
+      "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or r"
+     }
+    ],
+    "passes": 22,
+    "incomplete": 1,
+    "url": "/admin/integrations"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/integrations",
+    "title": "الربط والدمج (API) · إدارة PRIMORA",
+    "text": "الربط البرمجي والتكاملات فعّل وعطّل وبدّل البيئات لكل خدمة خارجية. تبقى المفاتيح في الخادم — تظهر هنا قيم مقنّعة فقط. + إضافة API API مفعلة 1 مفاتيح مهيأة 1 وضع مباشر 1 أقسام مربوطة 9 كل الأقسام المدفوعات الخرائط والمواقع الرسائل / رمز التح",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Moyasar",
+     "MOYASAR",
+     "https",
+     "moyasar",
+     "Managed",
+     "from",
+     "Admin",
+     "Integrations",
+     "MADA",
+     "APPLE",
+     "VISA",
+     "MASTERCARD",
+     "MyFatoorah",
+     "MYFATOORAH",
+     "https",
+     "myfatoorah",
+     "Payment",
+     "gateway",
+     "supporting",
+     "cards",
+     "Mada",
+     "Apple",
+     "MADA",
+     "APPLE",
+     "VISA",
+     "MASTERCARD",
+     "PayTabs",
+     "PAYTABS",
+     "https",
+     "secure",
+     "paytabs",
+     "payment",
+     "Payment",
+     "gateway",
+     "supporting",
+     "cards",
+     "Mada",
+     "Apple",
+     "MADA",
+     "APPLE"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/coupons",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1689,
+   "landed": "/admin/coupons",
+   "axe": {
+    "violations": [],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/coupons"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/coupons",
+    "title": "Coupons & Offers · PRIMORA Admin",
+    "text": "Coupons & Offers Builder Generate platform promo codes, manage discount percentages, and schedule validity. ADD COUPON ACTIVE COUPONS 0 Codes TOTAL REDEMPTIONS 0 SWITCHED-OFF CODES 0 Codes PROMO CODE DISCOUNT TYPE VALUE REDEEMED COUNT PER C",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/coupons",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 2729,
+   "landed": "/admin/coupons",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 1,
+      "targets": [
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.84 (foreground color: #b8952e, background color: #ffffff, font size: 6.0pt (8px), font weight: bold). Expected contrast ratio of 4.5:1"
+     },
+     {
+      "id": "scrollable-region-focusable",
+      "impact": "serious",
+      "help": "Scrollable region must have keyboard access",
+      "nodes": 1,
+      "targets": [
+       ".overflow-x-auto"
+      ],
+      "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+     }
+    ],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/coupons"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/coupons",
+    "title": "Coupons & Offers · PRIMORA Admin",
+    "text": "Coupons & Offers Builder Generate platform promo codes, manage discount percentages, and schedule validity. ADD COUPON ACTIVE COUPONS 0 Codes TOTAL REDEMPTIONS 0 SWITCHED-OFF CODES 0 Codes PROMO CODE DISCOUNT TYPE VALUE REDEEMED COUNT PER C",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/coupons",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 2196,
+   "landed": "/admin/coupons",
+   "axe": {
+    "violations": [],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/coupons"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/coupons",
+    "title": "الكوبونات والعروض · إدارة PRIMORA",
+    "text": "منشئ الكوبونات والعروض توليد أكواد الخصومات الترويجية، تحديد قيم التوفير، وتحديد أوقات الفعالية. إضافة كوبون الكوبونات النشطة ٠ رمز إجمالي الاستخدامات ٠ إجمالي توفير العملاء ٠ رمز رمز الكوبون نوع الخصم القيمة مرات الاستخدام لكل عميل الحالة ",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/coupons",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 2017,
+   "landed": "/admin/coupons",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 1,
+      "targets": [
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.84 (foreground color: #b8952e, background color: #ffffff, font size: 6.0pt (8px), font weight: bold). Expected contrast ratio of 4.5:1"
+     },
+     {
+      "id": "scrollable-region-focusable",
+      "impact": "serious",
+      "help": "Scrollable region must have keyboard access",
+      "nodes": 1,
+      "targets": [
+       ".overflow-x-auto"
+      ],
+      "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+     }
+    ],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/coupons"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/coupons",
+    "title": "الكوبونات والعروض · إدارة PRIMORA",
+    "text": "منشئ الكوبونات والعروض توليد أكواد الخصومات الترويجية، تحديد قيم التوفير، وتحديد أوقات الفعالية. إضافة كوبون الكوبونات النشطة ٠ رمز إجمالي الاستخدامات ٠ إجمالي توفير العملاء ٠ رمز رمز الكوبون نوع الخصم القيمة مرات الاستخدام لكل عميل الحالة ",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/bookings",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1713,
+   "landed": "/admin/bookings",
+   "axe": {
+    "violations": [],
+    "passes": 27,
+    "incomplete": 1,
+    "url": "/admin/bookings"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/bookings",
+    "title": "Bookings · PRIMORA Admin",
+    "text": "Global Bookings Ledger Audit active client scheduling logs, platform split captures, and status indicators. Times are shown in Riyadh time. Search by booking ID, invoice number, customer or provider From (Riyadh date) To (Riyadh date) Statu",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/bookings",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1675,
+   "landed": "/admin/bookings",
+   "axe": {
+    "violations": [],
+    "passes": 27,
+    "incomplete": 1,
+    "url": "/admin/bookings"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/bookings",
+    "title": "Bookings · PRIMORA Admin",
+    "text": "Global Bookings Ledger Audit active client scheduling logs, platform split captures, and status indicators. Times are shown in Riyadh time. Search by booking ID, invoice number, customer or provider From (Riyadh date) To (Riyadh date) Statu",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/bookings",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 2612,
+   "landed": "/admin/bookings",
+   "axe": {
+    "violations": [],
+    "passes": 27,
+    "incomplete": 1,
+    "url": "/admin/bookings"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/bookings",
+    "title": "الحجوزات · إدارة PRIMORA",
+    "text": "سجل الحجوزات العام تدقيق سجلات الحجوزات النشطة للعملاء، وتقسيم المبالغ المستلمة، ومؤشرات الحالة. الأوقات بتوقيت الرياض. ابحث برقم الحجز أو رقم الفاتورة أو العميل أو مقدم الخدمة من (تاريخ الرياض) إلى (تاريخ الرياض) الحالة كل الحالات بانتظار ",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Yousif",
+     "Saud",
+     "Yousif",
+     "Saud"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/bookings",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 2227,
+   "landed": "/admin/bookings",
+   "axe": {
+    "violations": [],
+    "passes": 27,
+    "incomplete": 1,
+    "url": "/admin/bookings"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/bookings",
+    "title": "الحجوزات · إدارة PRIMORA",
+    "text": "سجل الحجوزات العام تدقيق سجلات الحجوزات النشطة للعملاء، وتقسيم المبالغ المستلمة، ومؤشرات الحالة. الأوقات بتوقيت الرياض. ابحث برقم الحجز أو رقم الفاتورة أو العميل أو مقدم الخدمة من (تاريخ الرياض) إلى (تاريخ الرياض) الحالة كل الحالات بانتظار ",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Yousif",
+     "Saud",
+     "Yousif",
+     "Saud"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/customers",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1674,
+   "landed": "/admin/customers",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/customers"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/customers",
+    "title": "Customers · PRIMORA Admin",
+    "text": "Customer Directory & Data Rights Look up customer accounts and their booking history, and work through PDPL data requests and recorded consents. Customer Directory PDPL Data Rights & Consents TOTAL CUSTOMERS 21 VERIFIED PHONE ACCOUNTS 2 OPE",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/customers",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1711,
+   "landed": "/admin/customers",
+   "axe": {
+    "violations": [],
+    "passes": 24,
+    "incomplete": 1,
+    "url": "/admin/customers"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/customers",
+    "title": "Customers · PRIMORA Admin",
+    "text": "Customer Directory & Data Rights Look up customer accounts and their booking history, and work through PDPL data requests and recorded consents. Customer Directory PDPL Data Rights & Consents TOTAL CUSTOMERS 21 VERIFIED PHONE ACCOUNTS 2 OPE",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/customers",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 2551,
+   "landed": "/admin/customers",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/customers"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/customers",
+    "title": "العملاء · إدارة PRIMORA",
+    "text": "سجل العملاء وحقوق البيانات ابحث عن حسابات العملاء وسجل حجوزاتهم، وتابع طلبات حقوق البيانات الشخصية (PDPL) والموافقات المسجلة. سجل العملاء حقوق البيانات والموافقات (PDPL) إجمالي العملاء ٢١ حسابات بأرقام موثقة ٢ طلبات بيانات مفتوحة ٦ ابحث بال",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "PDPL",
+     "PDPL",
+     "Customer",
+     "qacustomer",
+     "example",
+     "test",
+     "Maryam",
+     "Bint",
+     "Abdullah",
+     "Dosari",
+     "Alqahtani",
+     "example",
+     "test",
+     "Abdulrahman",
+     "Shehri",
+     "example",
+     "test",
+     "example",
+     "test",
+     "smoke",
+     "customer",
+     "example",
+     "test",
+     "smoke",
+     "customer",
+     "example",
+     "test",
+     "smoke",
+     "customer",
+     "example",
+     "test",
+     "smoke",
+     "customer",
+     "example",
+     "test",
+     "smoke",
+     "customer",
+     "example",
+     "test",
+     "smoke"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/customers",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 2349,
+   "landed": "/admin/customers",
+   "axe": {
+    "violations": [],
+    "passes": 24,
+    "incomplete": 1,
+    "url": "/admin/customers"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/customers",
+    "title": "العملاء · إدارة PRIMORA",
+    "text": "سجل العملاء وحقوق البيانات ابحث عن حسابات العملاء وسجل حجوزاتهم، وتابع طلبات حقوق البيانات الشخصية (PDPL) والموافقات المسجلة. سجل العملاء حقوق البيانات والموافقات (PDPL) إجمالي العملاء ٢١ حسابات بأرقام موثقة ٢ طلبات بيانات مفتوحة ٦ ابحث بال",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "PDPL",
+     "PDPL",
+     "Customer",
+     "qacustomer",
+     "example",
+     "test",
+     "Maryam",
+     "Bint",
+     "Abdullah",
+     "Dosari",
+     "Alqahtani",
+     "example",
+     "test",
+     "Abdulrahman",
+     "Shehri",
+     "example",
+     "test",
+     "example",
+     "test",
+     "smoke",
+     "customer",
+     "example",
+     "test",
+     "smoke",
+     "customer",
+     "example",
+     "test",
+     "smoke",
+     "customer",
+     "example",
+     "test",
+     "smoke",
+     "customer",
+     "example",
+     "test",
+     "smoke",
+     "customer",
+     "example",
+     "test",
+     "smoke"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/branches",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 2010,
+   "landed": "/admin/branches",
+   "axe": {
+    "violations": [],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/branches"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/branches",
+    "title": "Venues & Rooms · PRIMORA Admin",
+    "text": "Branches & Outlets Matrix Monitor provider outlet locations, active schedules, and verification statuses. TOTAL BRANCHES 5 ONLINE OUTLETS 5 AVERAGE SERVICE RADIUS 8.0 KM BRANCH NAME PROVIDER / SALON LOCATION / CITY STATE Al-Malqa Branch Eli",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/branches",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1637,
+   "landed": "/admin/branches",
+   "axe": {
+    "violations": [],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/branches"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/branches",
+    "title": "Venues & Rooms · PRIMORA Admin",
+    "text": "Branches & Outlets Matrix Monitor provider outlet locations, active schedules, and verification statuses. TOTAL BRANCHES 5 ONLINE OUTLETS 5 AVERAGE SERVICE RADIUS 8.0 KM BRANCH NAME PROVIDER / SALON LOCATION / CITY STATE Al-Malqa Branch Eli",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/branches",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 2664,
+   "landed": "/admin/branches",
+   "axe": {
+    "violations": [],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/branches"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/branches",
+    "title": "الفروع والغرف والمواقع · إدارة PRIMORA",
+    "text": "سجل وإدارة فروع الشركاء متابعة مواقع فروع مقدمي الخدمة، جداول المواعيد النشطة، وحالتها التشغيلية. إجمالي الفروع 5 الفروع النشطة 5 متوسط نطاق الخدمة 8.0 KM اسم الفرع مزود الخدمة / الصالون الموقع / المدينة الحالة التشغيلية فرع الملقا صالون إي",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/branches",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 2444,
+   "landed": "/admin/branches",
+   "axe": {
+    "violations": [],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/branches"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/branches",
+    "title": "الفروع والغرف والمواقع · إدارة PRIMORA",
+    "text": "سجل وإدارة فروع الشركاء متابعة مواقع فروع مقدمي الخدمة، جداول المواعيد النشطة، وحالتها التشغيلية. إجمالي الفروع 5 الفروع النشطة 5 متوسط نطاق الخدمة 8.0 KM اسم الفرع مزود الخدمة / الصالون الموقع / المدينة الحالة التشغيلية فرع الملقا صالون إي",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/disputes",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1664,
+   "landed": "/admin/disputes",
+   "axe": {
+    "violations": [],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/disputes"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/disputes",
+    "title": "Disputes · PRIMORA Admin",
+    "text": "Disputes Arbitrator Console Review flagged client ratings (1-2 stars), refund appeals, and safety violations. TOTAL DISPUTES # 0 PENDING DISPUTES ! 0 REFUNDED TOTAL SAR 0.00",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/disputes",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1735,
+   "landed": "/admin/disputes",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 1,
+      "targets": [
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.84 (foreground color: #b8952e, background color: #ffffff, font size: 6.0pt (8px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/disputes"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/disputes",
+    "title": "Disputes · PRIMORA Admin",
+    "text": "Disputes Arbitrator Console Review flagged client ratings (1-2 stars), refund appeals, and safety violations. TOTAL DISPUTES # 0 PENDING DISPUTES ! 0 REFUNDED TOTAL SAR 0.00",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/disputes",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 2591,
+   "landed": "/admin/disputes",
+   "axe": {
+    "violations": [],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/disputes"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/disputes",
+    "title": "النزاعات والشكاوى · إدارة PRIMORA",
+    "text": "منصة التحكيم في النزاعات مراجعة تقييمات العملاء المعلمة (١–٢ نجمة)، وطلبات استرداد المبالغ، والانتهاكات الأمنية. إجمالي النزاعات # ٠ النزاعات المعلقة ! ٠ إجمالي المبالغ المستردة ‏٠٫٠٠ ر.س.‏",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/disputes",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 2987,
+   "landed": "/admin/disputes",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 1,
+      "targets": [
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.84 (foreground color: #b8952e, background color: #ffffff, font size: 6.0pt (8px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/disputes"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/disputes",
+    "title": "النزاعات والشكاوى · إدارة PRIMORA",
+    "text": "منصة التحكيم في النزاعات مراجعة تقييمات العملاء المعلمة (١–٢ نجمة)، وطلبات استرداد المبالغ، والانتهاكات الأمنية. إجمالي النزاعات # ٠ النزاعات المعلقة ! ٠ إجمالي المبالغ المستردة ‏٠٫٠٠ ر.س.‏",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/activity",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 3189,
+   "landed": "/admin/activity",
+   "axe": {
+    "violations": [],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/activity"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/activity",
+    "title": "Activity Feed · PRIMORA Admin",
+    "text": "Platform Activity The most recent bookings and provider sign-ups. For who changed what and why, open the Audit Log. EVENTS SHOWN 10 RECENT BOOKINGS SHOWN 6 RECENT PROVIDERS SHOWN 4 RECENT EVENTS Latest All Bookings Providers Payments Bookin",
+    "alerts": [],
+    "busy": 1,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/activity",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1918,
+   "landed": "/admin/activity",
+   "axe": {
+    "violations": [],
+    "passes": 20,
+    "incomplete": 1,
+    "url": "/admin/activity"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/activity",
+    "title": "Activity Feed · PRIMORA Admin",
+    "text": "Platform Activity The most recent bookings and provider sign-ups. For who changed what and why, open the Audit Log. EVENTS SHOWN 10 RECENT BOOKINGS SHOWN 6 RECENT PROVIDERS SHOWN 4 RECENT EVENTS Latest All Bookings Providers Payments Bookin",
+    "alerts": [],
+    "busy": 1,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/activity",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1681,
+   "landed": "/admin/activity",
+   "axe": {
+    "violations": [],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/activity"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/activity",
+    "title": "سجل الأنشطة · إدارة PRIMORA",
+    "text": "نشاط المنصة أحدث الحجوزات وتسجيلات المزودين. لمعرفة من غيّر ماذا ولماذا، افتح سجل التدقيق. الأحداث المعروضة 10 أحدث الحجوزات المعروضة 6 أحدث المزودين المعروضين 4 أحدث الأحداث الأحدث الكل الحجوزات المزودون المدفوعات حجز حجز قيد الدفع — قص ال",
+    "alerts": [],
+    "busy": 1,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/activity",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 3117,
+   "landed": "/admin/activity",
+   "axe": {
+    "violations": [],
+    "passes": 20,
+    "incomplete": 1,
+    "url": "/admin/activity"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/activity",
+    "title": "سجل الأنشطة · إدارة PRIMORA",
+    "text": "نشاط المنصة أحدث الحجوزات وتسجيلات المزودين. لمعرفة من غيّر ماذا ولماذا، افتح سجل التدقيق. الأحداث المعروضة 10 أحدث الحجوزات المعروضة 6 أحدث المزودين المعروضين 4 أحدث الأحداث الأحدث الكل الحجوزات المزودون المدفوعات حجز حجز قيد الدفع — قص ال",
+    "alerts": [],
+    "busy": 1,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/admin/employees",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 4423,
+   "landed": "/admin/employees",
+   "axe": {
+    "violations": [],
+    "passes": 28,
+    "incomplete": 1,
+    "url": "/admin/employees"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/employees",
+    "title": "Staff & Teams · PRIMORA Admin",
+    "text": "Employees Staff registered by providers. Providers manage their own teams, so this directory is read-only. Search by name or title Provider All providers Elite Barbershop Riyadh Elite Grooming Lounge Lumi Skin & Spa Studio Royal Grooming Ho",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/employees",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 3606,
+   "landed": "/admin/employees",
+   "axe": {
+    "violations": [],
+    "passes": 27,
+    "incomplete": 1,
+    "url": "/admin/employees"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/employees",
+    "title": "Staff & Teams · PRIMORA Admin",
+    "text": "Employees Staff registered by providers. Providers manage their own teams, so this directory is read-only. Search by name or title Provider All providers Elite Barbershop Riyadh Elite Grooming Lounge Lumi Skin & Spa Studio Royal Grooming Ho",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/employees",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 4512,
+   "landed": "/admin/employees",
+   "axe": {
+    "violations": [],
+    "passes": 28,
+    "incomplete": 1,
+    "url": "/admin/employees"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/employees",
+    "title": "الموظفون · إدارة PRIMORA",
+    "text": "الموظفون الموظفون المسجلون لدى مقدمي الخدمة. يدير كل مقدم خدمة فريقه بنفسه، لذلك هذا الدليل للعرض فقط. ابحث بالاسم أو المسمى مقدم الخدمة كل مقدمي الخدمة إليت باربرشوب الرياض صالون إيليت الرجالي لومي للعناية بالبشرة والسبا رويال هاوس للعناية",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/employees",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 3234,
+   "landed": "/admin/employees",
+   "axe": {
+    "violations": [],
+    "passes": 27,
+    "incomplete": 1,
+    "url": "/admin/employees"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/employees",
+    "title": "الموظفون · إدارة PRIMORA",
+    "text": "الموظفون الموظفون المسجلون لدى مقدمي الخدمة. يدير كل مقدم خدمة فريقه بنفسه، لذلك هذا الدليل للعرض فقط. ابحث بالاسم أو المسمى مقدم الخدمة كل مقدمي الخدمة إليت باربرشوب الرياض صالون إيليت الرجالي لومي للعناية بالبشرة والسبا رويال هاوس للعناية",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/reviews",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 2519,
+   "landed": "/admin/reviews",
+   "axe": {
+    "violations": [],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/reviews"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reviews",
+    "title": "Reviews · PRIMORA Admin",
+    "text": "Client Reviews & Moderation Queue Audit customer ratings, manage provider responses, and moderate flagged reviews. TOTAL REVIEWS 0 AVERAGE RATING 0.0 / 5.0 FLAGGED / HIDDEN 0 No customer reviews recorded yet.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/reviews",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1646,
+   "landed": "/admin/reviews",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 1,
+      "targets": [
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.84 (foreground color: #b8952e, background color: #ffffff, font size: 6.0pt (8px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/reviews"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reviews",
+    "title": "Reviews · PRIMORA Admin",
+    "text": "Client Reviews & Moderation Queue Audit customer ratings, manage provider responses, and moderate flagged reviews. TOTAL REVIEWS 0 AVERAGE RATING 0.0 / 5.0 FLAGGED / HIDDEN 0 No customer reviews recorded yet.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/reviews",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1826,
+   "landed": "/admin/reviews",
+   "axe": {
+    "violations": [],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/reviews"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/reviews",
+    "title": "التقييمات · إدارة PRIMORA",
+    "text": "تدقيق ومراجعة التقييمات إدارة ومراقبة تقييمات العملاء، وحجب التعليقات المخالفة، ومتابعة ردود المتاجر. إجمالي التقييمات ٠ متوسط التقييم العام 0.0 / 5.0 التقييمات المبلّغ عنها / المحجوبة ٠ لا توجد تقييمات مسجلة حتى الآن.",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/reviews",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1695,
+   "landed": "/admin/reviews",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 1,
+      "targets": [
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.84 (foreground color: #b8952e, background color: #ffffff, font size: 6.0pt (8px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/reviews"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/reviews",
+    "title": "التقييمات · إدارة PRIMORA",
+    "text": "تدقيق ومراجعة التقييمات إدارة ومراقبة تقييمات العملاء، وحجب التعليقات المخالفة، ومتابعة ردود المتاجر. إجمالي التقييمات ٠ متوسط التقييم العام 0.0 / 5.0 التقييمات المبلّغ عنها / المحجوبة ٠ لا توجد تقييمات مسجلة حتى الآن.",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/taxes",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 4199,
+   "landed": "/admin/taxes",
+   "axe": {
+    "violations": [
+     {
+      "id": "scrollable-region-focusable",
+      "impact": "serious",
+      "help": "Scrollable region must have keyboard access",
+      "nodes": 1,
+      "targets": [
+       "#admin-main"
+      ],
+      "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+     }
+    ],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/taxes"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/taxes",
+    "title": "Taxes & Fees · PRIMORA Admin",
+    "text": "Taxes & Platform Fees The rates the server applies to every booking. They are shown here for reference. VAT 15% Added to the taxable amount of every booking and shown on each tax invoice. OTHER CHARGES None No municipality or service fee is",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/taxes",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 3004,
+   "landed": "/admin/taxes",
+   "axe": {
+    "violations": [],
+    "passes": 22,
+    "incomplete": 1,
+    "url": "/admin/taxes"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/taxes",
+    "title": "Taxes & Fees · PRIMORA Admin",
+    "text": "Taxes & Platform Fees The rates the server applies to every booking. They are shown here for reference. VAT 15% Added to the taxable amount of every booking and shown on each tax invoice. OTHER CHARGES None No municipality or service fee is",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/taxes",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 2863,
+   "landed": "/admin/taxes",
+   "axe": {
+    "violations": [],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/taxes"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/taxes",
+    "title": "الضرائب والرسوم · إدارة PRIMORA",
+    "text": "الضرائب والرسوم المالية النسب التي يطبقها الخادم على كل حجز، معروضة هنا للمرجعية. ضريبة القيمة المضافة 15% تُضاف إلى المبلغ الخاضع للضريبة في كل حجز وتظهر في كل فاتورة ضريبية. رسوم أخرى لا يوجد لا تُضاف رسوم بلدية أو رسوم خدمة إلى أسعار الع",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/taxes",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1695,
+   "landed": "/admin/taxes",
+   "axe": {
+    "violations": [],
+    "passes": 22,
+    "incomplete": 1,
+    "url": "/admin/taxes"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/taxes",
+    "title": "الضرائب والرسوم · إدارة PRIMORA",
+    "text": "الضرائب والرسوم المالية النسب التي يطبقها الخادم على كل حجز، معروضة هنا للمرجعية. ضريبة القيمة المضافة 15% تُضاف إلى المبلغ الخاضع للضريبة في كل حجز وتظهر في كل فاتورة ضريبية. رسوم أخرى لا يوجد لا تُضاف رسوم بلدية أو رسوم خدمة إلى أسعار الع",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/settings",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 2667,
+   "landed": "/admin/settings",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/settings"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/settings",
+    "title": "Settings · PRIMORA Admin",
+    "text": "Platform Settings Settings the booking engine reads. Every change needs a reason and is written to the audit log. Unpaid booking hold Minutes an unpaid booking keeps its time slot before it is released (5–120). Hold minutes Reason for this ",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/settings",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 3047,
+   "landed": "/admin/settings",
+   "axe": {
+    "violations": [],
+    "passes": 24,
+    "incomplete": 1,
+    "url": "/admin/settings"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/settings",
+    "title": "Settings · PRIMORA Admin",
+    "text": "Platform Settings Settings the booking engine reads. Every change needs a reason and is written to the audit log. Unpaid booking hold Minutes an unpaid booking keeps its time slot before it is released (5–120). Hold minutes Reason for this ",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/settings",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1938,
+   "landed": "/admin/settings",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/settings"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/settings",
+    "title": "الإعدادات العامة · إدارة PRIMORA",
+    "text": "إعدادات المنصة إعدادات يقرؤها محرك الحجز. كل تغيير يتطلب سبباً ويُسجل في سجل التدقيق. مهلة الحجز غير المدفوع عدد الدقائق التي يحتفظ فيها الحجز غير المدفوع بموعده قبل إطلاقه (٥–١٢٠). دقائق المهلة سبب هذا التغيير حفظ آخر تغيير: ٠٩‏/١٠‏/٢٠٢٦، ",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "PRIMORA"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/settings",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1727,
+   "landed": "/admin/settings",
+   "axe": {
+    "violations": [],
+    "passes": 24,
+    "incomplete": 1,
+    "url": "/admin/settings"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/settings",
+    "title": "الإعدادات العامة · إدارة PRIMORA",
+    "text": "إعدادات المنصة إعدادات يقرؤها محرك الحجز. كل تغيير يتطلب سبباً ويُسجل في سجل التدقيق. مهلة الحجز غير المدفوع عدد الدقائق التي يحتفظ فيها الحجز غير المدفوع بموعده قبل إطلاقه (٥–١٢٠). دقائق المهلة سبب هذا التغيير حفظ آخر تغيير: ٠٩‏/١٠‏/٢٠٢٦، ",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "PRIMORA"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/reports",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 4491,
+   "landed": "/admin/reports",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/reports"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reports",
+    "title": "Reports · PRIMORA Admin",
+    "text": "Financial Reports & Exports Download CSV files built from the live ledger and bookings. Dates and calendar months are in Riyadh time and amounts are in SAR. PERIOD From To These files contain financial data and are for finance and the owner",
+    "alerts": [
+     "EVENT SOURCE EVENTS MOST PEOPLE IN ONE DAY DAYS WITH EVENTS Booking confirmed Server 0 Days on which fewer than 5 people made an event are not counted, so no one can be singled out: 1 such day(s). — 1 Payment received Se"
+    ],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/reports",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1704,
+   "landed": "/admin/reports",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 3,
+      "targets": [
+       ".text-\\[8px\\]",
+       ".py-1\\.5.hover\\:bg-\\[\\#F7F7F5\\].hover\\:text-\\[\\#101828\\]:nth-child(2)",
+       ".py-1\\.5.hover\\:bg-\\[\\#F7F7F5\\].hover\\:text-\\[\\#101828\\]:nth-child(3)"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.56 (foreground color: #b8952e, background color: #f3f3f4, font size: 6.0pt (8px), font weight: bold). Expected contrast ratio of 4.5:1"
+     },
+     {
+      "id": "scrollable-region-focusable",
+      "impact": "serious",
+      "help": "Scrollable region must have keyboard access",
+      "nodes": 1,
+      "targets": [
+       ".overflow-x-auto"
+      ],
+      "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+     }
+    ],
+    "passes": 24,
+    "incomplete": 1,
+    "url": "/admin/reports"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reports",
+    "title": "Reports · PRIMORA Admin",
+    "text": "Financial Reports & Exports Download CSV files built from the live ledger and bookings. Dates and calendar months are in Riyadh time and amounts are in SAR. PERIOD From To These files contain financial data and are for finance and the owner",
+    "alerts": [
+     "EVENT SOURCE EVENTS MOST PEOPLE IN ONE DAY DAYS WITH EVENTS Booking confirmed Server 0 Days on which fewer than 5 people made an event are not counted, so no one can be singled out: 1 such day(s). — 1 Payment received Se"
+    ],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/reports",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1676,
+   "landed": "/admin/reports",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/reports"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/reports",
+    "title": "التقارير · إدارة PRIMORA",
+    "text": "التقارير المالية والتصدير حمّل ملفات CSV مبنية من دفتر الحسابات والحجوزات الحالية. التواريخ والأشهر التقويمية بتوقيت الرياض والمبالغ بالريال السعودي. الفترة من إلى تحتوي هذه الملفات على بيانات مالية وهي للمالية والمالك فقط. يبني الخادم كل م",
+    "alerts": [
+     "الحدث المصدر الأحداث أكثر عدد أشخاص في يوم واحد أيام فيها أحداث تأكيد الحجز الخادم ٠ لا تُحسب الأيام التي سجل فيها أقل من 5 أشخاص أحداثاً حتى لا يمكن تمييز أحد: ١ يوم/أيام. — ١ استلام الدفعة الخادم ٠ لا تُحسب الأيام التي"
+    ],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/reports",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1643,
+   "landed": "/admin/reports",
+   "axe": {
+    "violations": [
+     {
+      "id": "scrollable-region-focusable",
+      "impact": "serious",
+      "help": "Scrollable region must have keyboard access",
+      "nodes": 1,
+      "targets": [
+       ".overflow-x-auto"
+      ],
+      "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+     }
+    ],
+    "passes": 24,
+    "incomplete": 1,
+    "url": "/admin/reports"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/reports",
+    "title": "التقارير · إدارة PRIMORA",
+    "text": "التقارير المالية والتصدير حمّل ملفات CSV مبنية من دفتر الحسابات والحجوزات الحالية. التواريخ والأشهر التقويمية بتوقيت الرياض والمبالغ بالريال السعودي. الفترة من إلى تحتوي هذه الملفات على بيانات مالية وهي للمالية والمالك فقط. يبني الخادم كل م",
+    "alerts": [
+     "الحدث المصدر الأحداث أكثر عدد أشخاص في يوم واحد أيام فيها أحداث تأكيد الحجز الخادم ٠ لا تُحسب الأيام التي سجل فيها أقل من 5 أشخاص أحداثاً حتى لا يمكن تمييز أحد: ١ يوم/أيام. — ١ استلام الدفعة الخادم ٠ لا تُحسب الأيام التي"
+    ],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/packages",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1628,
+   "landed": "/admin/packages",
+   "axe": {
+    "violations": [],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/packages"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/packages",
+    "title": "Packages · PRIMORA Admin",
+    "text": "Service Packages & Passes Manage bundled discount offers, wellness passes, and multi-session vouchers. TOTAL PACKAGES 0 ACTIVE SOLD PASSES 0 TOTAL REDEMPTIONS 0 No service packages found in database.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/packages",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1646,
+   "landed": "/admin/packages",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 1,
+      "targets": [
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.84 (foreground color: #b8952e, background color: #ffffff, font size: 6.0pt (8px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/packages"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/packages",
+    "title": "Packages · PRIMORA Admin",
+    "text": "Service Packages & Passes Manage bundled discount offers, wellness passes, and multi-session vouchers. TOTAL PACKAGES 0 ACTIVE SOLD PASSES 0 TOTAL REDEMPTIONS 0 No service packages found in database.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/packages",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1708,
+   "landed": "/admin/packages",
+   "axe": {
+    "violations": [],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/packages"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/packages",
+    "title": "الباقات · إدارة PRIMORA",
+    "text": "باقات الخدمات وعروض التوفير إدارة باقات الخدمات المجمعة، بطاقات جلسات العناية المتعددة، وقسائم الخصم. إجمالي الباقات 0 البطاقات المباعة النشطة 0 إجمالي الجلسات المستخدمة 0 لا توجد باقات خدمات مسجلة في قاعدة البيانات.",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/packages",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1728,
+   "landed": "/admin/packages",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 1,
+      "targets": [
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.84 (foreground color: #b8952e, background color: #ffffff, font size: 6.0pt (8px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/packages"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/packages",
+    "title": "الباقات · إدارة PRIMORA",
+    "text": "باقات الخدمات وعروض التوفير إدارة باقات الخدمات المجمعة، بطاقات جلسات العناية المتعددة، وقسائم الخصم. إجمالي الباقات 0 البطاقات المباعة النشطة 0 إجمالي الجلسات المستخدمة 0 لا توجد باقات خدمات مسجلة في قاعدة البيانات.",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/notifications",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1771,
+   "landed": "/admin/notifications",
+   "axe": {
+    "violations": [],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/notifications"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/notifications",
+    "title": "Notifications · PRIMORA Admin",
+    "text": "Messaging & Notification Engine Manage transactional WhatsApp appointment reminders, confirmations, post-visit reviews, and targeted broadcasts. WhatsApp Pipeline & Logs Broadcast Composer PENDING IN QUEUE 4 DELIVERED 0 QUIET HOURS DEFERRAL",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/notifications",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1885,
+   "landed": "/admin/notifications",
+   "axe": {
+    "violations": [],
+    "passes": 20,
+    "incomplete": 1,
+    "url": "/admin/notifications"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/notifications",
+    "title": "Notifications · PRIMORA Admin",
+    "text": "Messaging & Notification Engine Manage transactional WhatsApp appointment reminders, confirmations, post-visit reviews, and targeted broadcasts. WhatsApp Pipeline & Logs Broadcast Composer PENDING IN QUEUE 4 DELIVERED 0 QUIET HOURS DEFERRAL",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/notifications",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1664,
+   "landed": "/admin/notifications",
+   "axe": {
+    "violations": [],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/notifications"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/notifications",
+    "title": "الإشعارات · إدارة PRIMORA",
+    "text": "محرك المراسلة وإشعارات واتساب إدارة إشعارات واتساب الآلية لتأكيد المواعيد، والتذكيرات (قبل 24 و2 ساعة)، ورسائل التقييم وإعادة الحجز، والبث الجماعي. طابور وسجل رسائل واتساب منشئ البث المباشر قيد الانتظار بالطابور 4 تم تسليمها 0 مؤجلة لساعات ",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Saudi",
+     "Quiet",
+     "Hours",
+     "Costs",
+     "come",
+     "from",
+     "your",
+     "WhatsApp",
+     "Business",
+     "account",
+     "billing"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/notifications",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 2019,
+   "landed": "/admin/notifications",
+   "axe": {
+    "violations": [],
+    "passes": 20,
+    "incomplete": 1,
+    "url": "/admin/notifications"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/notifications",
+    "title": "الإشعارات · إدارة PRIMORA",
+    "text": "محرك المراسلة وإشعارات واتساب إدارة إشعارات واتساب الآلية لتأكيد المواعيد، والتذكيرات (قبل 24 و2 ساعة)، ورسائل التقييم وإعادة الحجز، والبث الجماعي. طابور وسجل رسائل واتساب منشئ البث المباشر قيد الانتظار بالطابور 4 تم تسليمها 0 مؤجلة لساعات ",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Saudi",
+     "Quiet",
+     "Hours",
+     "Costs",
+     "come",
+     "from",
+     "your",
+     "WhatsApp",
+     "Business",
+     "account",
+     "billing"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/help",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1644,
+   "landed": "/admin/help",
+   "axe": {
+    "violations": [],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/help"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/help",
+    "title": "Help Center · PRIMORA Admin",
+    "text": "Help Center Support channels, operational guides, and answers for platform administrators. SUPPORT CHANNELS WhatsApp Business Priority line for operational incidents Open Email Support Response within 24 hours Open Admin Guides Console manu",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/help",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1706,
+   "landed": "/admin/help",
+   "axe": {
+    "violations": [],
+    "passes": 20,
+    "incomplete": 1,
+    "url": "/admin/help"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/help",
+    "title": "Help Center · PRIMORA Admin",
+    "text": "Help Center Support channels, operational guides, and answers for platform administrators. SUPPORT CHANNELS WhatsApp Business Priority line for operational incidents Open Email Support Response within 24 hours Open Admin Guides Console manu",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/help",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1587,
+   "landed": "/admin/help",
+   "axe": {
+    "violations": [],
+    "passes": 21,
+    "incomplete": 1,
+    "url": "/admin/help"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/help",
+    "title": "مركز المساعدة · إدارة PRIMORA",
+    "text": "مركز المساعدة قنوات الدعم، الأدلة التشغيلية، وإجابات مشرفي المنصة. قنوات الدعم واتساب الأعمال خط أولوية للحوادث التشغيلية فتح الدعم عبر البريد الرد خلال ٢٤ ساعة فتح أدلة المشرف كتيبات لوحة التحكم وإجراءات التشغيل فتح الأسئلة الشائعة كيف أوث",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/help",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1622,
+   "landed": "/admin/help",
+   "axe": {
+    "violations": [],
+    "passes": 20,
+    "incomplete": 1,
+    "url": "/admin/help"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/help",
+    "title": "مركز المساعدة · إدارة PRIMORA",
+    "text": "مركز المساعدة قنوات الدعم، الأدلة التشغيلية، وإجابات مشرفي المنصة. قنوات الدعم واتساب الأعمال خط أولوية للحوادث التشغيلية فتح الدعم عبر البريد الرد خلال ٢٤ ساعة فتح أدلة المشرف كتيبات لوحة التحكم وإجراءات التشغيل فتح الأسئلة الشائعة كيف أوث",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/supply",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1620,
+   "landed": "/admin/supply",
+   "axe": {
+    "violations": [],
+    "passes": 24,
+    "incomplete": 1,
+    "url": "/admin/supply"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/supply",
+    "title": "Supply Oversight · PRIMORA Admin",
+    "text": "Supply Oversight Monitor provider inventory, supplier orders and recorded stock reductions. Provider, supplier or order ID Order status All statuses Draft Submitted Approved Received Cancelled Search Refresh Inventory metrics cover the sele",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/supply",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1923,
+   "landed": "/admin/supply",
+   "axe": {
+    "violations": [],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/supply"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/supply",
+    "title": "Supply Oversight · PRIMORA Admin",
+    "text": "Supply Oversight Monitor provider inventory, supplier orders and recorded stock reductions. Provider, supplier or order ID Order status All statuses Draft Submitted Approved Received Cancelled Search Refresh Inventory metrics cover the sele",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/supply",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1600,
+   "landed": "/admin/supply",
+   "axe": {
+    "violations": [],
+    "passes": 24,
+    "incomplete": 1,
+    "url": "/admin/supply"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/supply",
+    "title": "الإشراف على التوريد · إدارة PRIMORA",
+    "text": "الإشراف على التوريد تابع مخزون المزودين وطلبات الموردين وعمليات خفض المخزون المسجلة. المزود أو المورد أو رقم الطلب حالة الطلب جميع الحالات مسودة مرسل معتمد مستلم ملغى بحث تحديث مؤشرات المخزون تغطي نطاق المزود المحدد. تصفية الحالة تنطبق على ",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/supply",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1999,
+   "landed": "/admin/supply",
+   "axe": {
+    "violations": [],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/supply"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/supply",
+    "title": "الإشراف على التوريد · إدارة PRIMORA",
+    "text": "الإشراف على التوريد تابع مخزون المزودين وطلبات الموردين وعمليات خفض المخزون المسجلة. المزود أو المورد أو رقم الطلب حالة الطلب جميع الحالات مسودة مرسل معتمد مستلم ملغى بحث تحديث مؤشرات المخزون تغطي نطاق المزود المحدد. تصفية الحالة تنطبق على ",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/refunds",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1651,
+   "landed": "/admin/refunds",
+   "axe": {
+    "violations": [],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/refunds"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/refunds",
+    "title": "Refunds · PRIMORA Admin",
+    "text": "Refunds Refunds owed to customers. Money is returned only through the payment gateway, for exactly the recorded amount. Show Needs attention Failed Waiting In progress Returned All 0 refunds No refunds are waiting.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/refunds",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1763,
+   "landed": "/admin/refunds",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 1,
+      "targets": [
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.84 (foreground color: #b8952e, background color: #ffffff, font size: 6.0pt (8px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/refunds"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/refunds",
+    "title": "Refunds · PRIMORA Admin",
+    "text": "Refunds Refunds owed to customers. Money is returned only through the payment gateway, for exactly the recorded amount. Show Needs attention Failed Waiting In progress Returned All 0 refunds No refunds are waiting.",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/refunds",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1623,
+   "landed": "/admin/refunds",
+   "axe": {
+    "violations": [],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/refunds"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/refunds",
+    "title": "المبالغ المستردة · إدارة PRIMORA",
+    "text": "المبالغ المستردة المبالغ المستحقة للعملاء. تُعاد الأموال عبر بوابة الدفع فقط وبالمبلغ المسجل تماماً. عرض تحتاج إلى إجراء فشلت بالانتظار قيد المعالجة أُعيدت الكل عدد عمليات الاسترداد: ٠ لا توجد مبالغ مستردة بالانتظار.",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/refunds",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1993,
+   "landed": "/admin/refunds",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 1,
+      "targets": [
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.84 (foreground color: #b8952e, background color: #ffffff, font size: 6.0pt (8px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/refunds"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/refunds",
+    "title": "المبالغ المستردة · إدارة PRIMORA",
+    "text": "المبالغ المستردة المبالغ المستحقة للعملاء. تُعاد الأموال عبر بوابة الدفع فقط وبالمبلغ المسجل تماماً. عرض تحتاج إلى إجراء فشلت بالانتظار قيد المعالجة أُعيدت الكل عدد عمليات الاسترداد: ٠ لا توجد مبالغ مستردة بالانتظار.",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/audit-logs",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1756,
+   "landed": "/admin/audit-logs",
+   "axe": {
+    "violations": [],
+    "passes": 26,
+    "incomplete": 1,
+    "url": "/admin/audit-logs"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/audit-logs",
+    "title": "Audit Logs · PRIMORA Admin",
+    "text": "Audit Log Who changed what, when and why. Entries are written by the server in the same transaction as the change. Show Changes only Data looked at (reads) Everything Action contains Record type All record types Accounts Analytics events Ap",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/audit-logs",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1646,
+   "landed": "/admin/audit-logs",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/audit-logs"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/audit-logs",
+    "title": "Audit Logs · PRIMORA Admin",
+    "text": "Audit Log Who changed what, when and why. Entries are written by the server in the same transaction as the change. Show Changes only Data looked at (reads) Everything Action contains Record type All record types Accounts Analytics events Ap",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/audit-logs",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1652,
+   "landed": "/admin/audit-logs",
+   "axe": {
+    "violations": [],
+    "passes": 26,
+    "incomplete": 1,
+    "url": "/admin/audit-logs"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/audit-logs",
+    "title": "سجلات التدقيق · إدارة PRIMORA",
+    "text": "سجل التدقيق من غيّر ماذا ومتى ولماذا. يكتب الخادم كل سجل في نفس معاملة التغيير. العرض التغييرات فقط الاطلاع على البيانات (قراءة) الكل الإجراء يحتوي على نوع السجل كل أنواع السجلات أحداث التحليلات إشعارات الحوكمة الإشعارات الحجوزات الحسابات ا",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "group",
+     "bookings",
+     "intake",
+     "submissions",
+     "invoices",
+     "privacy",
+     "field",
+     "restrictions",
+     "provider",
+     "reviews",
+     "Owner",
+     "insert",
+     "Owner",
+     "privacy",
+     "Owner",
+     "delete",
+     "privacy",
+     "field",
+     "restrictions",
+     "Owner",
+     "notifications",
+     "Owner",
+     "insert",
+     "Owner",
+     "update",
+     "Owner",
+     "profiles",
+     "update",
+     "Owner",
+     "insert",
+     "Owner",
+     "approval",
+     "requested",
+     "Customer",
+     "confirmed",
+     "deletion",
+     "open",
+     "disputes",
+     "balance",
+     "found"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/audit-logs",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1870,
+   "landed": "/admin/audit-logs",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/audit-logs"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/audit-logs",
+    "title": "سجلات التدقيق · إدارة PRIMORA",
+    "text": "سجل التدقيق من غيّر ماذا ومتى ولماذا. يكتب الخادم كل سجل في نفس معاملة التغيير. العرض التغييرات فقط الاطلاع على البيانات (قراءة) الكل الإجراء يحتوي على نوع السجل كل أنواع السجلات أحداث التحليلات إشعارات الحوكمة الإشعارات الحجوزات الحسابات ا",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "group",
+     "bookings",
+     "intake",
+     "submissions",
+     "invoices",
+     "privacy",
+     "field",
+     "restrictions",
+     "provider",
+     "reviews",
+     "Owner",
+     "privacy",
+     "caller",
+     "could",
+     "answer",
+     "account",
+     "question",
+     "number",
+     "differs",
+     "from",
+     "account",
+     "verified",
+     "phone",
+     "Owner",
+     "notifications",
+     "insert",
+     "Owner",
+     "insert",
+     "Owner",
+     "insert",
+     "Owner",
+     "update",
+     "Owner",
+     "insert",
+     "Owner",
+     "privacy",
+     "Owner",
+     "delete",
+     "privacy",
+     "field"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/platform-rules",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1747,
+   "landed": "/admin/platform-rules",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/platform-rules"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/platform-rules",
+    "title": "Platform Rules · PRIMORA Admin",
+    "text": "Platform Rules Feature flags, marketplace fees and API limits. Each change needs a reason and is recorded in the audit log. Feature flags A flag switches a whole capability on or off for everyone. payments_marketplace_split Tap Marketplace ",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/platform-rules",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1765,
+   "landed": "/admin/platform-rules",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/platform-rules"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/platform-rules",
+    "title": "Platform Rules · PRIMORA Admin",
+    "text": "Platform Rules Feature flags, marketplace fees and API limits. Each change needs a reason and is recorded in the audit log. Feature flags A flag switches a whole capability on or off for everyone. payments_marketplace_split Tap Marketplace ",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/platform-rules",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1682,
+   "landed": "/admin/platform-rules",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/platform-rules"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/platform-rules",
+    "title": "قواعد المنصة · إدارة PRIMORA",
+    "text": "قواعد المنصة مفاتيح الميزات ورسوم السوق وحدود واجهة البرمجة. كل تغيير يحتاج إلى سبب ويُسجَّل في سجل التدقيق. مفاتيح الميزات المفتاح يشغّل خاصية كاملة أو يوقفها لجميع المستخدمين. payments_marketplace_split Tap Marketplace sub-merchant onboar",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Marketplace",
+     "merchant",
+     "onboarding",
+     "split",
+     "capture",
+     "until",
+     "owner",
+     "confirms",
+     "legal",
+     "opinion",
+     "fund",
+     "custody",
+     "import",
+     "instagram",
+     "link",
+     "marketplace",
+     "marketplace",
+     "whatsapp"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/platform-rules",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 2101,
+   "landed": "/admin/platform-rules",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/platform-rules"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/platform-rules",
+    "title": "قواعد المنصة · إدارة PRIMORA",
+    "text": "قواعد المنصة مفاتيح الميزات ورسوم السوق وحدود واجهة البرمجة. كل تغيير يحتاج إلى سبب ويُسجَّل في سجل التدقيق. مفاتيح الميزات المفتاح يشغّل خاصية كاملة أو يوقفها لجميع المستخدمين. payments_marketplace_split Tap Marketplace sub-merchant onboar",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Marketplace",
+     "merchant",
+     "onboarding",
+     "split",
+     "capture",
+     "until",
+     "owner",
+     "confirms",
+     "legal",
+     "opinion",
+     "fund",
+     "custody",
+     "import",
+     "instagram",
+     "link",
+     "marketplace",
+     "marketplace",
+     "whatsapp"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/roles",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1650,
+   "landed": "/admin/roles",
+   "axe": {
+    "violations": [],
+    "passes": 29,
+    "incomplete": 1,
+    "url": "/admin/roles"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/roles",
+    "title": "Roles & Permissions · PRIMORA Admin",
+    "text": "Administrators & Roles Who can operate the console, with which console role, and who works for a provider. Only an owner changes console roles or resets two-step verification; each change needs a reason and a fresh authenticator code and is",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/roles",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1829,
+   "landed": "/admin/roles",
+   "axe": {
+    "violations": [],
+    "passes": 29,
+    "incomplete": 1,
+    "url": "/admin/roles"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/roles",
+    "title": "Roles & Permissions · PRIMORA Admin",
+    "text": "Administrators & Roles Who can operate the console, with which console role, and who works for a provider. Only an owner changes console roles or resets two-step verification; each change needs a reason and a fresh authenticator code and is",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/roles",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1798,
+   "landed": "/admin/roles",
+   "axe": {
+    "violations": [],
+    "passes": 29,
+    "incomplete": 1,
+    "url": "/admin/roles"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/roles",
+    "title": "الأدوار والصلاحيات · إدارة PRIMORA",
+    "text": "المسؤولون والأدوار من يشغّل لوحة الإدارة وبأي دور، ومن يعمل لدى مزود خدمة. المالك وحده يغيّر الأدوار أو يعيد ضبط التحقق بخطوتين؛ وكل تغيير يحتاج سبباً ورمزاً جديداً من تطبيق المصادقة ويُسجَّل في سجل التدقيق. المسؤولون والموظفون المسؤولون٢٨ ",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Owner",
+     "ownerh",
+     "example",
+     "test",
+     "Owner",
+     "ownerg",
+     "example",
+     "test",
+     "analyst",
+     "qaanalyst",
+     "example",
+     "test",
+     "operations",
+     "qaoperations",
+     "example",
+     "test",
+     "finance",
+     "qafinance",
+     "example",
+     "test",
+     "owner",
+     "qaownerb",
+     "example",
+     "test",
+     "owner",
+     "qaownera",
+     "example",
+     "test",
+     "Owner",
+     "ownerf",
+     "example",
+     "test",
+     "Owner",
+     "ownere",
+     "example",
+     "test",
+     "Owner",
+     "ownerd",
+     "example",
+     "test"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/roles",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1819,
+   "landed": "/admin/roles",
+   "axe": {
+    "violations": [],
+    "passes": 29,
+    "incomplete": 1,
+    "url": "/admin/roles"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/roles",
+    "title": "الأدوار والصلاحيات · إدارة PRIMORA",
+    "text": "المسؤولون والأدوار من يشغّل لوحة الإدارة وبأي دور، ومن يعمل لدى مزود خدمة. المالك وحده يغيّر الأدوار أو يعيد ضبط التحقق بخطوتين؛ وكل تغيير يحتاج سبباً ورمزاً جديداً من تطبيق المصادقة ويُسجَّل في سجل التدقيق. المسؤولون والموظفون المسؤولون٢٨ ",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Owner",
+     "ownerh",
+     "example",
+     "test",
+     "Owner",
+     "ownerg",
+     "example",
+     "test",
+     "analyst",
+     "qaanalyst",
+     "example",
+     "test",
+     "operations",
+     "qaoperations",
+     "example",
+     "test",
+     "finance",
+     "qafinance",
+     "example",
+     "test",
+     "owner",
+     "qaownerb",
+     "example",
+     "test",
+     "owner",
+     "qaownera",
+     "example",
+     "test",
+     "Owner",
+     "ownerf",
+     "example",
+     "test",
+     "Owner",
+     "ownere",
+     "example",
+     "test",
+     "Owner",
+     "ownerd",
+     "example",
+     "test"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/sponsored",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1615,
+   "landed": "/admin/sponsored",
+   "axe": {
+    "violations": [],
+    "passes": 27,
+    "incomplete": 1,
+    "url": "/admin/sponsored"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/sponsored",
+    "title": "Sponsored placement · PRIMORA Admin",
+    "text": "Sponsored placement Labelled sponsored places on the discover page, paid per NEW client. The platform owner sets the price; nothing runs until every setting below has a value and the switch is on. Owner settings Not running Still unset: Pri",
+    "alerts": [
+     "Not running"
+    ],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/sponsored",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1960,
+   "landed": "/admin/sponsored",
+   "axe": {
+    "violations": [],
+    "passes": 26,
+    "incomplete": 1,
+    "url": "/admin/sponsored"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/sponsored",
+    "title": "Sponsored placement · PRIMORA Admin",
+    "text": "Sponsored placement Labelled sponsored places on the discover page, paid per NEW client. The platform owner sets the price; nothing runs until every setting below has a value and the switch is on. Owner settings Not running Still unset: Pri",
+    "alerts": [
+     "Not running"
+    ],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/sponsored",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1651,
+   "landed": "/admin/sponsored",
+   "axe": {
+    "violations": [],
+    "passes": 27,
+    "incomplete": 1,
+    "url": "/admin/sponsored"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/sponsored",
+    "title": "الأماكن المموّلة · إدارة PRIMORA",
+    "text": "الأماكن المموّلة أماكن مموّلة وموسومة في صفحة الاستكشاف، تُدفع عن كل عميل جديد. مالك المنصة يحدّد السعر، ولا يعمل شيء قبل أن يكون لكل إعداد أدناه قيمة وأن يكون المفتاح مفعّلاً. إعدادات المالك لا يعمل ما زال غير محدد: السعر لكل عميل جديد, عد",
+    "alerts": [
+     "لا يعمل"
+    ],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/sponsored",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1645,
+   "landed": "/admin/sponsored",
+   "axe": {
+    "violations": [],
+    "passes": 26,
+    "incomplete": 1,
+    "url": "/admin/sponsored"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/sponsored",
+    "title": "الأماكن المموّلة · إدارة PRIMORA",
+    "text": "الأماكن المموّلة أماكن مموّلة وموسومة في صفحة الاستكشاف، تُدفع عن كل عميل جديد. مالك المنصة يحدّد السعر، ولا يعمل شيء قبل أن يكون لكل إعداد أدناه قيمة وأن يكون المفتاح مفعّلاً. إعدادات المالك لا يعمل ما زال غير محدد: السعر لكل عميل جديد, عد",
+    "alerts": [
+     "لا يعمل"
+    ],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/whatsapp",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1615,
+   "landed": "/admin/whatsapp",
+   "axe": {
+    "violations": [
+     {
+      "id": "scrollable-region-focusable",
+      "impact": "serious",
+      "help": "Scrollable region must have keyboard access",
+      "nodes": 1,
+      "targets": [
+       "#admin-main"
+      ],
+      "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+     }
+    ],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/whatsapp"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/whatsapp",
+    "title": "WhatsApp Receptionist · PRIMORA Admin",
+    "text": "WhatsApp receptionist Counts only. No customer number, hash or message text is shown here. Channels Connected businesses 0 Receiving messages 0 Receptionist on 0 Verified numbers 0 Waiting for verification 0 Conversations All conversations ",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/whatsapp",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1628,
+   "landed": "/admin/whatsapp",
+   "axe": {
+    "violations": [],
+    "passes": 22,
+    "incomplete": 1,
+    "url": "/admin/whatsapp"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/whatsapp",
+    "title": "WhatsApp Receptionist · PRIMORA Admin",
+    "text": "WhatsApp receptionist Counts only. No customer number, hash or message text is shown here. Channels Connected businesses 0 Receiving messages 0 Receptionist on 0 Verified numbers 0 Waiting for verification 0 Conversations All conversations ",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/whatsapp",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1634,
+   "landed": "/admin/whatsapp",
+   "axe": {
+    "violations": [
+     {
+      "id": "scrollable-region-focusable",
+      "impact": "serious",
+      "help": "Scrollable region must have keyboard access",
+      "nodes": 1,
+      "targets": [
+       "#admin-main"
+      ],
+      "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+     }
+    ],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/whatsapp"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/whatsapp",
+    "title": "مساعد واتساب · إدارة PRIMORA",
+    "text": "مساعد واتساب للحجز أعداد فقط. لا يظهر هنا رقم عميل ولا بصمته ولا نص رسالة. القنوات الأنشطة المرتبطة 0 تستقبل الرسائل 0 المساعد مفعّل 0 أرقام تم التحقق منها 0 بانتظار التحقق 0 المحادثات كل المحادثات 0 مع المساعد 0 بانتظار موظف 0 تمت معالجتها",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/whatsapp",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1628,
+   "landed": "/admin/whatsapp",
+   "axe": {
+    "violations": [],
+    "passes": 22,
+    "incomplete": 1,
+    "url": "/admin/whatsapp"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/whatsapp",
+    "title": "مساعد واتساب · إدارة PRIMORA",
+    "text": "مساعد واتساب للحجز أعداد فقط. لا يظهر هنا رقم عميل ولا بصمته ولا نص رسالة. القنوات الأنشطة المرتبطة 0 تستقبل الرسائل 0 المساعد مفعّل 0 أرقام تم التحقق منها 0 بانتظار التحقق 0 المحادثات كل المحادثات 0 مع المساعد 0 بانتظار موظف 0 تمت معالجتها",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/privacy",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1617,
+   "landed": "/admin/privacy",
+   "axe": {
+    "violations": [],
+    "passes": 28,
+    "incomplete": 1,
+    "url": "/admin/privacy"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/privacy",
+    "title": "Privacy Requests · PRIMORA Admin",
+    "text": "Privacy Requests PDPL requests from customers: 30 days from receipt, one extension of up to 30 days notified before day 30, free of charge. A copy, a deletion and a legal hold run only after a different owner approves them. Requests Legal h",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/privacy",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1628,
+   "landed": "/admin/privacy",
+   "axe": {
+    "violations": [],
+    "passes": 26,
+    "incomplete": 1,
+    "url": "/admin/privacy"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/privacy",
+    "title": "Privacy Requests · PRIMORA Admin",
+    "text": "Privacy Requests PDPL requests from customers: 30 days from receipt, one extension of up to 30 days notified before day 30, free of charge. A copy, a deletion and a legal hold run only after a different owner approves them. Requests Legal h",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/privacy",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1620,
+   "landed": "/admin/privacy",
+   "axe": {
+    "violations": [],
+    "passes": 27,
+    "incomplete": 1,
+    "url": "/admin/privacy"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/privacy",
+    "title": "طلبات الخصوصية · إدارة PRIMORA",
+    "text": "طلبات الخصوصية طلبات العملاء وفق نظام حماية البيانات الشخصية: ٣٠ يوماً من الاستلام، وتمديد واحد حتى ٣٠ يوماً يُبلَّغ قبل اليوم ٣٠، ومجاناً. لا تُنفَّذ النسخة أو الحذف أو الحجز القانوني إلا بعد اعتماد مالك آخر. الطلبات الحجز القانوني سجل الح",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Noura",
+     "Test",
+     "Qahtani",
+     "Abdulrahman",
+     "Shehri",
+     "Qahtani"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/privacy",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1717,
+   "landed": "/admin/privacy",
+   "axe": {
+    "violations": [],
+    "passes": 26,
+    "incomplete": 1,
+    "url": "/admin/privacy"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/privacy",
+    "title": "طلبات الخصوصية · إدارة PRIMORA",
+    "text": "طلبات الخصوصية طلبات العملاء وفق نظام حماية البيانات الشخصية: ٣٠ يوماً من الاستلام، وتمديد واحد حتى ٣٠ يوماً يُبلَّغ قبل اليوم ٣٠، ومجاناً. لا تُنفَّذ النسخة أو الحذف أو الحجز القانوني إلا بعد اعتماد مالك آخر. الطلبات الحجز القانوني سجل الح",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Noura",
+     "Test",
+     "Qahtani",
+     "Abdulrahman",
+     "Shehri",
+     "Qahtani"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/incidents",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1675,
+   "landed": "/admin/incidents",
+   "axe": {
+    "violations": [],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/incidents"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/incidents",
+    "title": "Incident Register · PRIMORA Admin",
+    "text": "Incident Register Personal data breaches. Notify SDAIA within 72 hours of becoming aware, for every breach unless you record a reasoned conclusion that no harm is possible. Tell the people affected without undue delay whenever harm is possi",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/incidents",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 2155,
+   "landed": "/admin/incidents",
+   "axe": {
+    "violations": [],
+    "passes": 22,
+    "incomplete": 1,
+    "url": "/admin/incidents"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/incidents",
+    "title": "Incident Register · PRIMORA Admin",
+    "text": "Incident Register Personal data breaches. Notify SDAIA within 72 hours of becoming aware, for every breach unless you record a reasoned conclusion that no harm is possible. Tell the people affected without undue delay whenever harm is possi",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/incidents",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 2048,
+   "landed": "/admin/incidents",
+   "axe": {
+    "violations": [],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/incidents"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/incidents",
+    "title": "سجل الحوادث · إدارة PRIMORA",
+    "text": "سجل الحوادث حوادث تسرب البيانات الشخصية. أبلغ سدايا خلال ٧٢ ساعة من العلم بالحادثة، لكل حادثة ما لم تسجل استنتاجاً مسبباً بعدم إمكان وقوع ضرر. أبلغ المتأثرين دون تأخير كلما أمكن وقوع ضرر. تُحفظ السجلات ٥ سنوات. مفتوحة مغلقة لا توجد حوادث في",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/incidents",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1624,
+   "landed": "/admin/incidents",
+   "axe": {
+    "violations": [],
+    "passes": 22,
+    "incomplete": 1,
+    "url": "/admin/incidents"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/incidents",
+    "title": "سجل الحوادث · إدارة PRIMORA",
+    "text": "سجل الحوادث حوادث تسرب البيانات الشخصية. أبلغ سدايا خلال ٧٢ ساعة من العلم بالحادثة، لكل حادثة ما لم تسجل استنتاجاً مسبباً بعدم إمكان وقوع ضرر. أبلغ المتأثرين دون تأخير كلما أمكن وقوع ضرر. تُحفظ السجلات ٥ سنوات. مفتوحة مغلقة لا توجد حوادث في",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/ropa",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1640,
+   "landed": "/admin/ropa",
+   "axe": {
+    "violations": [],
+    "passes": 24,
+    "incomplete": 1,
+    "url": "/admin/ropa"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/ropa",
+    "title": "Processing Register · PRIMORA Admin",
+    "text": "Processing Register (RoPA) Read-only. The controlled source is the versioned document; changes are made there and reviewed every quarter and on every schema change that adds personal data. Source: docs/privacy/ropa.md · SHA-256 aff75d39ebe0",
+    "alerts": [
+     "21 fields wait for the owner (marked OWNER MUST COMPLETE)."
+    ],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/ropa",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1642,
+   "landed": "/admin/ropa",
+   "axe": {
+    "violations": [],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/ropa"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/ropa",
+    "title": "Processing Register · PRIMORA Admin",
+    "text": "Processing Register (RoPA) Read-only. The controlled source is the versioned document; changes are made there and reviewed every quarter and on every schema change that adds personal data. Source: docs/privacy/ropa.md · SHA-256 aff75d39ebe0",
+    "alerts": [
+     "21 fields wait for the owner (marked OWNER MUST COMPLETE)."
+    ],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/ropa",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1652,
+   "landed": "/admin/ropa",
+   "axe": {
+    "violations": [],
+    "passes": 24,
+    "incomplete": 1,
+    "url": "/admin/ropa"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/ropa",
+    "title": "سجل أنشطة المعالجة · إدارة PRIMORA",
+    "text": "سجل أنشطة المعالجة للقراءة فقط. المصدر المعتمد هو الوثيقة ذات الإصدارات؛ تُجرى التعديلات فيها وتُراجع كل ربع سنة وعند كل تغيير يضيف بيانات شخصية. المصدر: docs/privacy/ropa.md · SHA-256 aff75d39ebe0183b… ٢١ حقول بانتظار المالك (موسومة OWNER ",
+    "alerts": [
+     "٢١ حقول بانتظار المالك (موسومة OWNER MUST COMPLETE)."
+    ],
+    "busy": 0,
+    "latin": [
+     "docs",
+     "privacy",
+     "ropa",
+     "OWNER",
+     "MUST",
+     "COMPLETE",
+     "Record",
+     "Processing",
+     "Activities",
+     "RoPA",
+     "Version",
+     "draft",
+     "prepared",
+     "engineering",
+     "from",
+     "code",
+     "Owner",
+     "this",
+     "record",
+     "appointed",
+     "Owner",
+     "must",
+     "complete",
+     "Basis",
+     "PDPL",
+     "Implementing",
+     "Regulation",
+     "written",
+     "current",
+     "kept",
+     "processing",
+     "period",
+     "plus",
+     "years",
+     "minimum",
+     "contents",
+     "Final",
+     "decision",
+     "text",
+     "docs"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/ropa",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1704,
+   "landed": "/admin/ropa",
+   "axe": {
+    "violations": [],
+    "passes": 23,
+    "incomplete": 1,
+    "url": "/admin/ropa"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/ropa",
+    "title": "سجل أنشطة المعالجة · إدارة PRIMORA",
+    "text": "سجل أنشطة المعالجة للقراءة فقط. المصدر المعتمد هو الوثيقة ذات الإصدارات؛ تُجرى التعديلات فيها وتُراجع كل ربع سنة وعند كل تغيير يضيف بيانات شخصية. المصدر: docs/privacy/ropa.md · SHA-256 aff75d39ebe0183b… ٢١ حقول بانتظار المالك (موسومة OWNER ",
+    "alerts": [
+     "٢١ حقول بانتظار المالك (موسومة OWNER MUST COMPLETE)."
+    ],
+    "busy": 0,
+    "latin": [
+     "docs",
+     "privacy",
+     "ropa",
+     "OWNER",
+     "MUST",
+     "COMPLETE",
+     "Record",
+     "Processing",
+     "Activities",
+     "RoPA",
+     "Version",
+     "draft",
+     "prepared",
+     "engineering",
+     "from",
+     "code",
+     "Owner",
+     "this",
+     "record",
+     "appointed",
+     "Owner",
+     "must",
+     "complete",
+     "Basis",
+     "PDPL",
+     "Implementing",
+     "Regulation",
+     "written",
+     "current",
+     "kept",
+     "processing",
+     "period",
+     "plus",
+     "years",
+     "minimum",
+     "contents",
+     "Final",
+     "decision",
+     "text",
+     "docs"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/approvals",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1614,
+   "landed": "/admin/approvals",
+   "axe": {
+    "violations": [],
+    "passes": 29,
+    "incomplete": 1,
+    "url": "/admin/approvals"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/approvals",
+    "title": "Approvals · PRIMORA Admin",
+    "text": "Approvals Actions that need a second administrator. You cannot approve your own request; the server refuses it for every role, owners included. Waiting1 Approved15 Rejected Withdrawn1 Approve selected (0) REQUEST AMOUNT REQUESTED BY REASON ",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/approvals",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 4418,
+   "landed": "/admin/approvals",
+   "axe": {
+    "violations": [],
+    "passes": 29,
+    "incomplete": 1,
+    "url": "/admin/approvals"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/approvals",
+    "title": "Approvals · PRIMORA Admin",
+    "text": "Approvals Actions that need a second administrator. You cannot approve your own request; the server refuses it for every role, owners included. Waiting1 Approved15 Rejected Withdrawn1 Approve selected (0) REQUEST AMOUNT REQUESTED BY REASON ",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/approvals",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1753,
+   "landed": "/admin/approvals",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/approvals"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/approvals",
+    "title": "الاعتمادات · إدارة PRIMORA",
+    "text": "الاعتمادات إجراءات تحتاج إلى مسؤول ثانٍ. لا يمكنك اعتماد طلبك بنفسك؛ يرفض الخادم ذلك لكل الأدوار بما فيها المالك. بانتظار القرار معتمدة١٦ مرفوضة مسحوبة١ لا يوجد طلب بانتظار القرار. مراجعات إجراءات الطوارئ لا يوجد إجراء طوارئ يحتاج مراجعة. ا",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "recipient",
+     "account",
+     "erased"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/approvals",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1705,
+   "landed": "/admin/approvals",
+   "axe": {
+    "violations": [],
+    "passes": 24,
+    "incomplete": 1,
+    "url": "/admin/approvals"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/approvals",
+    "title": "الاعتمادات · إدارة PRIMORA",
+    "text": "الاعتمادات إجراءات تحتاج إلى مسؤول ثانٍ. لا يمكنك اعتماد طلبك بنفسك؛ يرفض الخادم ذلك لكل الأدوار بما فيها المالك. بانتظار القرار معتمدة١٦ مرفوضة مسحوبة١ لا يوجد طلب بانتظار القرار. مراجعات إجراءات الطوارئ لا يوجد إجراء طوارئ يحتاج مراجعة. ا",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "recipient",
+     "account",
+     "erased"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/reconciliation",
+   "as": "owner",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 1650,
+   "landed": "/admin/reconciliation",
+   "axe": {
+    "violations": [],
+    "passes": 26,
+    "incomplete": 1,
+    "url": "/admin/reconciliation"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reconciliation",
+    "title": "Tap Reconciliation · PRIMORA Admin",
+    "text": "Tap Reconciliation Tap is the record of money movement and the ledger the record of what is owed. Every difference is a break, resolved only by a correction a second administrator approves. Run a day Business day (Riyadh) Fetch from Tap and",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/reconciliation",
+   "as": "owner",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1544,
+   "landed": "/admin/reconciliation",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 1,
+      "targets": [
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.84 (foreground color: #b8952e, background color: #ffffff, font size: 6.0pt (8px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 26,
+    "incomplete": 1,
+    "url": "/admin/reconciliation"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/admin/reconciliation",
+    "title": "Tap Reconciliation · PRIMORA Admin",
+    "text": "Tap Reconciliation Tap is the record of money movement and the ledger the record of what is owed. Every difference is a break, resolved only by a correction a second administrator approves. Run a day Business day (Riyadh) Fetch from Tap and",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/reconciliation",
+   "as": "owner",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1786,
+   "landed": "/admin/reconciliation",
+   "axe": {
+    "violations": [],
+    "passes": 26,
+    "incomplete": 1,
+    "url": "/admin/reconciliation"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/reconciliation",
+    "title": "التسوية مع Tap · إدارة PRIMORA",
+    "text": "التسوية مع Tap Tap هو سجل حركة الأموال ودفتر الحسابات هو سجل المستحقات. كل فرق يُسجَّل كفرق تسوية ولا يُغلق إلا بتصحيح يعتمده مسؤول آخر. تسوية يوم يوم العمل (بتوقيت الرياض) جلب البيانات من Tap والتسوية تسوية البيانات المسجلة استيراد ملف الم",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "amount",
+     "amount"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/admin/reconciliation",
+   "as": "owner",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1707,
+   "landed": "/admin/reconciliation",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/admin/reconciliation"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/admin/reconciliation",
+    "title": "التسوية مع Tap · إدارة PRIMORA",
+    "text": "التسوية مع Tap Tap هو سجل حركة الأموال ودفتر الحسابات هو سجل المستحقات. كل فرق يُسجَّل كفرق تسوية ولا يُغلق إلا بتصحيح يعتمده مسؤول آخر. تسوية يوم يوم العمل (بتوقيت الرياض) جلب البيانات من Tap والتسوية تسوية البيانات المسجلة استيراد ملف الم",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "amount",
+     "amount"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/provider/inventory",
+   "as": "provider",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 3785,
+   "landed": "/provider/inventory",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/provider/inventory"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/inventory",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "STOCK & SUPPLY OPERATIONS Inventory & Suppliers Enterprise stock control, supplier ordering, and branch-level reorder visibility. Add Supplier Add Product Create PO Manage stock & catalog Edit supplier Choose a record Edit product Choose a ",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/provider/inventory",
+   "as": "provider",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1726,
+   "landed": "/provider/inventory",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 1,
+      "targets": [
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.82 (foreground color: #b8952e, background color: #fffefe, font size: 6.0pt (8px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/provider/inventory"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/inventory",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "STOCK & SUPPLY OPERATIONS Inventory & Suppliers Enterprise stock control, supplier ordering, and branch-level reorder visibility. Add Supplier Add Product Create PO Manage stock & catalog Edit supplier Choose a record Edit product Choose a ",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/provider/inventory",
+   "as": "provider",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1987,
+   "landed": "/provider/inventory",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/provider/inventory"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/provider/inventory",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "عمليات المخزون والتوريد المخزون والموردون تحكم مؤسسي بالمخزون وطلبات الموردين وتنبيهات إعادة الطلب لكل فرع. إضافة مورد إضافة منتج إنشاء طلب إدارة المخزون والكتالوج تعديل المورد اختر سجلا تعديل المنتج اختر سجلا تعديل المخزون نقل بين الفروع ا",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/provider/inventory",
+   "as": "provider",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1797,
+   "landed": "/provider/inventory",
+   "axe": {
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/provider/inventory"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/provider/inventory",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "عمليات المخزون والتوريد المخزون والموردون تحكم مؤسسي بالمخزون وطلبات الموردين وتنبيهات إعادة الطلب لكل فرع. إضافة مورد إضافة منتج إنشاء طلب إدارة المخزون والكتالوج تعديل المورد اختر سجلا تعديل المنتج اختر سجلا تعديل المخزون نقل بين الفروع ا",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/provider/chain",
+   "as": "provider",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 4280,
+   "landed": "/provider/chain",
+   "axe": {
+    "violations": [],
+    "passes": 26,
+    "incomplete": 1,
+    "url": "/provider/chain"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/chain",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Chain Operations Review branch performance and delegate access to registered staff. Manage inventory Manage employees From To Retry Completed service revenue SAR 0.00 Active staff 1 Bookings 9 Reorder alerts 0 Stock at cost SAR 0.00 Complet",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/provider/chain",
+   "as": "provider",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1761,
+   "landed": "/provider/chain",
+   "axe": {
+    "violations": [
+     {
+      "id": "scrollable-region-focusable",
+      "impact": "serious",
+      "help": "Scrollable region must have keyboard access",
+      "nodes": 1,
+      "targets": [
+       ".overflow-x-auto"
+      ],
+      "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+     }
+    ],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/provider/chain"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/chain",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Chain Operations Review branch performance and delegate access to registered staff. Manage inventory Manage employees From To Retry Completed service revenue SAR 0.00 Active staff 1 Bookings 9 Reorder alerts 0 Stock at cost SAR 0.00 Complet",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/provider/chain",
+   "as": "provider",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1608,
+   "landed": "/provider/chain",
+   "axe": {
+    "violations": [],
+    "passes": 26,
+    "incomplete": 1,
+    "url": "/provider/chain"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/provider/chain",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "عمليات الفروع راجع أداء الفروع وفوض الصلاحيات للموظفين المسجلين. إدارة المخزون إدارة الموظفين من إلى إعادة المحاولة إيراد الخدمات المكتملة ‏٠٫٠٠ ر.س.‏ الموظفون النشطون 1 الحجوزات 9 تنبيهات إعادة الطلب 0 المخزون بالتكلفة ‏٠٫٠٠ ر.س.‏ الحجوزات",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/provider/chain",
+   "as": "provider",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1698,
+   "landed": "/provider/chain",
+   "axe": {
+    "violations": [
+     {
+      "id": "scrollable-region-focusable",
+      "impact": "serious",
+      "help": "Scrollable region must have keyboard access",
+      "nodes": 1,
+      "targets": [
+       ".overflow-x-auto"
+      ],
+      "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+     }
+    ],
+    "passes": 25,
+    "incomplete": 1,
+    "url": "/provider/chain"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/provider/chain",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "عمليات الفروع راجع أداء الفروع وفوض الصلاحيات للموظفين المسجلين. إدارة المخزون إدارة الموظفين من إلى إعادة المحاولة إيراد الخدمات المكتملة ‏٠٫٠٠ ر.س.‏ الموظفون النشطون 1 الحجوزات 9 تنبيهات إعادة الطلب 0 المخزون بالتكلفة ‏٠٫٠٠ ر.س.‏ الحجوزات",
+    "alerts": [],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/provider/pricing",
+   "as": "provider",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 4875,
+   "landed": "/provider/pricing",
+   "axe": {
+    "violations": [],
+    "passes": 29,
+    "incomplete": 1,
+    "url": "/provider/pricing"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/pricing",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "PRIMORA BACK TO HOME FOR PARTNERS Plans and platform fees Plan prices and the platform fee below are read from PRIMORA's records for your account. Monthly billing Annual billing Lite Starter For independent professionals and newly opened sa",
+    "alerts": [],
+    "busy": 1,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/provider/pricing",
+   "as": "provider",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1976,
+   "landed": "/provider/pricing",
+   "axe": {
+    "violations": [],
+    "passes": 27,
+    "incomplete": 1,
+    "url": "/provider/pricing"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/provider/pricing",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "PRIMORA BACK TO HOME FOR PARTNERS Plans and platform fees Plan prices and the platform fee below are read from PRIMORA's records for your account. Monthly billing Annual billing Lite Starter For independent professionals and newly opened sa",
+    "alerts": [],
+    "busy": 1,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/provider/pricing",
+   "as": "provider",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 3273,
+   "landed": "/provider/pricing",
+   "axe": {
+    "violations": [],
+    "passes": 29,
+    "incomplete": 1,
+    "url": "/provider/pricing"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/provider/pricing",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "PRIMORA العودة للرئيسية للشركاء الخطط ورسوم المنصة أسعار الخطط ورسوم المنصة أدناه مقروءة من سجلات بريمورا لحسابك. دفع شهري دفع سنوي الباقة الأساسية للمحترفين المستقلين والصالونات الجديدة مختارة مجانية شروط رسوم المنصة نفسها في كل الخطط حتى ",
+    "alerts": [],
+    "busy": 1,
+    "latin": [
+     "PRIMORA",
+     "Payments",
+     "Apple",
+     "Apple",
+     "PRIMORA"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/provider/pricing",
+   "as": "provider",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1803,
+   "landed": "/provider/pricing",
+   "axe": {
+    "violations": [],
+    "passes": 27,
+    "incomplete": 1,
+    "url": "/provider/pricing"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/provider/pricing",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "PRIMORA العودة للرئيسية للشركاء الخطط ورسوم المنصة أسعار الخطط ورسوم المنصة أدناه مقروءة من سجلات بريمورا لحسابك. دفع شهري دفع سنوي الباقة الأساسية للمحترفين المستقلين والصالونات الجديدة مختارة مجانية شروط رسوم المنصة نفسها في كل الخطط حتى ",
+    "alerts": [],
+    "busy": 1,
+    "latin": [
+     "PRIMORA",
+     "Payments",
+     "Apple",
+     "Apple",
+     "PRIMORA"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/customer/privacy",
+   "as": "customer",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 6426,
+   "landed": "/customer/privacy",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 3,
+      "targets": [
+       ".text-gray-400",
+       ".text-stone-500",
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.55 (foreground color: #99a1af, background color: #fdfdfb, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 24,
+    "incomplete": 1,
+    "url": "/customer/privacy"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/customer/privacy",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Privacy & my data Ask for access to your data, a copy of it, a correction or its deletion, or withdraw a consent. Every request is free of charge and answered within 30 days. Make a request What do you need? See my data A copy of my data (J",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/customer/privacy",
+   "as": "customer",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 2667,
+   "landed": "/customer/privacy",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 2,
+      "targets": [
+       ".text-stone-500",
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.32 (foreground color: #79716b, background color: #f7f3ea, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 24,
+    "incomplete": 1,
+    "url": "/customer/privacy"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/customer/privacy",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "Privacy & my data Ask for access to your data, a copy of it, a correction or its deletion, or withdraw a consent. Every request is free of charge and answered within 30 days. Make a request What do you need? See my data A copy of my data (J",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/customer/privacy",
+   "as": "customer",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 3215,
+   "landed": "/customer/privacy",
+   "axe": {
+    "violations": [],
+    "passes": 24,
+    "incomplete": 1,
+    "url": "/customer/privacy"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/customer/privacy",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "الخصوصية وبياناتي اطلب الاطلاع على بياناتك أو نسخة منها أو تصحيحها أو حذفها، أو اسحب موافقة. كل طلب مجاني ونرد عليه خلال ٣٠ يوماً. تقديم طلب ما الذي تحتاجه؟ الاطلاع على بياناتي نسخة من بياناتي (JSON وPDF) تصحيح بيان حذف حسابي وبياناتي سحب م",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "JSON"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/customer/privacy",
+   "as": "customer",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1753,
+   "landed": "/customer/privacy",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 2,
+      "targets": [
+       ".text-stone-500",
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.32 (foreground color: #79716b, background color: #f7f3ea, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 24,
+    "incomplete": 1,
+    "url": "/customer/privacy"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/customer/privacy",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "الخصوصية وبياناتي اطلب الاطلاع على بياناتك أو نسخة منها أو تصحيحها أو حذفها، أو اسحب موافقة. كل طلب مجاني ونرد عليه خلال ٣٠ يوماً. تقديم طلب ما الذي تحتاجه؟ الاطلاع على بياناتي نسخة من بياناتي (JSON وPDF) تصحيح بيان حذف حسابي وبياناتي سحب م",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "JSON"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/become-provider",
+   "as": "customer",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 5631,
+   "landed": "/become-provider",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 5,
+      "targets": [
+       ".space-y-4.text-center > .text-stone-400",
+       ".text-\\[\\#D1AF47\\]",
+       ".md\\:grid-cols-4 > .space-y-4 > .font-light.leading-relaxed.text-stone-500",
+       ".pt-8 > p"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.47 (foreground color: #a6a09b, background color: #fafaf9, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 24,
+    "incomplete": 0,
+    "url": "/become-provider"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1425,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/become-provider",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "BECOME A PROVIDER Bring Your Salon, Barbershop or Spa to Primora List your business, set your services and hours, and accept bookings with deposits paid on Tap's hosted payment page. REGISTER AS PROVIDER NOW TAP DEPOSITS, PAYOUTS ON REQUEST",
+    "alerts": [
+     "Applications are closed for now The Provider Agreement has not been published yet, so applications cannot be submitted. Please check back soon."
+    ],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/become-provider",
+   "as": "customer",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 3517,
+   "landed": "/become-provider",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 5,
+      "targets": [
+       ".space-y-4.text-center > .text-stone-400",
+       ".text-\\[\\#D1AF47\\]",
+       ".md\\:grid-cols-4 > .space-y-4 > .font-light.leading-relaxed.text-stone-500",
+       ".pt-8 > p"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.47 (foreground color: #a6a09b, background color: #fafaf9, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 24,
+    "incomplete": 0,
+    "url": "/become-provider"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/become-provider",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "BECOME A PROVIDER Bring Your Salon, Barbershop or Spa to Primora List your business, set your services and hours, and accept bookings with deposits paid on Tap's hosted payment page. REGISTER AS PROVIDER NOW TAP DEPOSITS, PAYOUTS ON REQUEST",
+    "alerts": [
+     "Applications are closed for now The Provider Agreement has not been published yet, so applications cannot be submitted. Please check back soon."
+    ],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/become-provider",
+   "as": "customer",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1544,
+   "landed": "/become-provider",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 4,
+      "targets": [
+       ".text-stone-400.font-extrabold.text-\\[10px\\]",
+       ".text-\\[\\#D1AF47\\]",
+       ".pt-8 > p",
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.47 (foreground color: #a6a09b, background color: #fafaf9, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 24,
+    "incomplete": 0,
+    "url": "/become-provider"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1425,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/become-provider",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "انضم كمزود خدمة أضف صالونك أو محل الحلاقة أو السبا إلى بريمورا أدرج منشأتك وحدّد خدماتك وأوقات عملك واستقبل الحجوزات مع عربون يُدفع في صفحة الدفع المستضافة لدى Tap. سجل كمزود خدمة الآن عربون عبر TAP وتحويل عند الطلب يدفع العملاء العربون في ",
+    "alerts": [
+     "باب التقديم مغلق حالياً لم تُنشر اتفاقية مقدم الخدمة بعد، لذلك لا يمكن تقديم الطلبات. يرجى المحاولة قريباً."
+    ],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/become-provider",
+   "as": "customer",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 2650,
+   "landed": "/become-provider",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 4,
+      "targets": [
+       ".space-y-4.text-center > .text-stone-400",
+       ".text-\\[\\#D1AF47\\]",
+       ".pt-8 > p",
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.47 (foreground color: #a6a09b, background color: #fafaf9, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 24,
+    "incomplete": 0,
+    "url": "/become-provider"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/become-provider",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "انضم كمزود خدمة أضف صالونك أو محل الحلاقة أو السبا إلى بريمورا أدرج منشأتك وحدّد خدماتك وأوقات عملك واستقبل الحجوزات مع عربون يُدفع في صفحة الدفع المستضافة لدى Tap. سجل كمزود خدمة الآن عربون عبر TAP وتحويل عند الطلب يدفع العملاء العربون في ",
+    "alerts": [
+     "باب التقديم مغلق حالياً لم تُنشر اتفاقية مقدم الخدمة بعد، لذلك لا يمكن تقديم الطلبات. يرجى المحاولة قريباً."
+    ],
+    "busy": 0,
+    "latin": []
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": [
+    "https://images.unsplash.com"
+   ]
+  },
+  {
+   "route": "/privacy",
+   "as": "anon",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 5527,
+   "landed": "/privacy",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 4,
+      "targets": [
+       ".font-extrabold",
+       ".tracking-wider.text-\\[\\#A57C32\\]",
+       "footer > p",
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.63 (foreground color: #a57c32, background color: #fafaf9, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 20,
+    "incomplete": 0,
+    "url": "/privacy"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1425,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/privacy",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "PRIVACY POLICY Privacy & Data Protection How Primora handles your personal data and how to exercise your data rights. 1. DATA COLLECTION We collect customer contact information, appointment preferences, in-app messages, and service address ",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/privacy",
+   "as": "anon",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 2731,
+   "landed": "/privacy",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 4,
+      "targets": [
+       ".font-extrabold",
+       ".tracking-wider.text-\\[\\#A57C32\\]",
+       "footer > p",
+       ".text-\\[8px\\]"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.63 (foreground color: #a57c32, background color: #fafaf9, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 20,
+    "incomplete": 0,
+    "url": "/privacy"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/privacy",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "PRIVACY POLICY Privacy & Data Protection How Primora handles your personal data and how to exercise your data rights. 1. DATA COLLECTION We collect customer contact information, appointment preferences, in-app messages, and service address ",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/privacy",
+   "as": "anon",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1651,
+   "landed": "/privacy",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 1,
+      "targets": [
+       "footer > p"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.38 (foreground color: #79716b, background color: #f5f5f4, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 20,
+    "incomplete": 0,
+    "url": "/privacy"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1425,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/privacy",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "سياسة الخصوصية الخصوصية وحماية البيانات كيف تتعامل بريمورا مع بياناتك الشخصية وكيف تمارس حقوقك. 1. جمع البيانات نجمع معلومات الاتصال وتفضيلات المواعيد والرسائل داخل المنصة وتفاصيل عنوان تقديم الخدمة. تُدخل بيانات البطاقة في صفحة Tap Payment",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Payments",
+     "JSON",
+     "privacy",
+     "primora"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/privacy",
+   "as": "anon",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 7185,
+   "landed": "/privacy",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 1,
+      "targets": [
+       "footer > p"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.38 (foreground color: #79716b, background color: #f5f5f4, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 20,
+    "incomplete": 0,
+    "url": "/privacy"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/privacy",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "سياسة الخصوصية الخصوصية وحماية البيانات كيف تتعامل بريمورا مع بياناتك الشخصية وكيف تمارس حقوقك. 1. جمع البيانات نجمع معلومات الاتصال وتفضيلات المواعيد والرسائل داخل المنصة وتفاصيل عنوان تقديم الخدمة. تُدخل بيانات البطاقة في صفحة Tap Payment",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "Payments",
+     "JSON",
+     "privacy",
+     "primora"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/login/mfa",
+   "as": "mfa-pending",
+   "lang": "en",
+   "width": 1440,
+   "loadMs": 2788,
+   "landed": "/login/mfa",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 2,
+      "targets": [
+       ".text-\\[11px\\]",
+       "span"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.07 (foreground color: #9b7928, background color: #ffffff, font size: 8.3pt (11px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 22,
+    "incomplete": 0,
+    "url": "/login/mfa"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/login/mfa",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "PRIMORA Enter your authenticator code Open your authenticator app and enter the 6-digit code for PRIMORA. 6-digit code After 10 wrong codes the account locks and another owner must reset it. Sign out Verify",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/login/mfa",
+   "as": "mfa-pending",
+   "lang": "en",
+   "width": 375,
+   "loadMs": 1667,
+   "landed": "/login/mfa",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 2,
+      "targets": [
+       ".text-\\[11px\\]",
+       "span"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.07 (foreground color: #9b7928, background color: #ffffff, font size: 8.3pt (11px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 20,
+    "incomplete": 0,
+    "url": "/login/mfa"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "ltr",
+    "lang": "en",
+    "path": "/login/mfa",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "PRIMORA Two-step verification Sign in first, then come back to this page. Go to sign in",
+    "alerts": [],
+    "busy": 0,
+    "latin": null
+   },
+   "consoleErrors": [
+    "log(network): Failed to load resource: the server responded with a status of 403 (Forbidden) http://127.0.0.1:54321/auth/v1/user"
+   ],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/login/mfa",
+   "as": "mfa-pending",
+   "lang": "ar",
+   "width": 1440,
+   "loadMs": 1689,
+   "landed": "/login/mfa",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 2,
+      "targets": [
+       ".text-\\[11px\\]",
+       "span"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.07 (foreground color: #9b7928, background color: #ffffff, font size: 8.3pt (11px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 20,
+    "incomplete": 0,
+    "url": "/login/mfa"
+   },
+   "layout": {
+    "vw": 1440,
+    "sw": 1440,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/login/mfa",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "PRIMORA التحقق بخطوتين سجّل الدخول أولاً ثم عد إلى هذه الصفحة. الانتقال إلى تسجيل الدخول",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "PRIMORA"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  },
+  {
+   "route": "/login/mfa",
+   "as": "mfa-pending",
+   "lang": "ar",
+   "width": 375,
+   "loadMs": 1527,
+   "landed": "/login/mfa",
+   "axe": {
+    "violations": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": 2,
+      "targets": [
+       ".text-\\[11px\\]",
+       "span"
+      ],
+      "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.07 (foreground color: #9b7928, background color: #ffffff, font size: 8.3pt (11px), font weight: bold). Expected contrast ratio of 4.5:1"
+     }
+    ],
+    "passes": 20,
+    "incomplete": 0,
+    "url": "/login/mfa"
+   },
+   "layout": {
+    "vw": 375,
+    "sw": 375,
+    "overflow": false,
+    "offenders": [],
+    "dir": "rtl",
+    "lang": "ar",
+    "path": "/login/mfa",
+    "title": "PRIMORA - Beauty & Grooming Marketplace",
+    "text": "PRIMORA التحقق بخطوتين سجّل الدخول أولاً ثم عد إلى هذه الصفحة. الانتقال إلى تسجيل الدخول",
+    "alerts": [],
+    "busy": 0,
+    "latin": [
+     "PRIMORA"
+    ]
+   },
+   "consoleErrors": [],
+   "failed": [],
+   "nonLocalHosts": []
+  }
+ ]
+}
