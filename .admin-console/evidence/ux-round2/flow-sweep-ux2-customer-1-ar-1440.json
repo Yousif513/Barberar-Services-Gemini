@@ -1,0 +1,31 @@
+{
+  "who": "ux2-customer-1",
+  "lang": "ar",
+  "width": 1440,
+  "height": 900,
+  "routes": [
+    {
+      "route": "/customer/privacy",
+      "h1": "الخصوصية وبياناتي",
+      "dir": "rtl",
+      "overflow": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      },
+      "shot": ".admin-console/evidence/ux-round2/sweep_customer_privacy-ar-1440.png",
+      "newConsoleErrors": []
+    }
+  ],
+  "dialogs": [],
+  "label": "ux2-customer-1",
+  "consoleErrors": [],
+  "httpFailures": [],
+  "aborted": [
+    "net::ERR_ABORTED http://127.0.0.1:54321/rest/v1/conversations",
+    "net::ERR_ABORTED http://127.0.0.1:54321/rest/v1/conversations",
+    "net::ERR_ABORTED http://127.0.0.1:54321/rest/v1/notifications",
+    "net::ERR_ABORTED http://127.0.0.1:54321/rest/v1/notifications",
+    "net::ERR_ABORTED http://127.0.0.1:54321/rest/v1/conversations",
+    "net::ERR_ABORTED http://127.0.0.1:54321/rest/v1/conversations"
+  ]
+}

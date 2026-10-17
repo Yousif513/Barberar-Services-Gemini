@@ -1,0 +1,26 @@
+{
+  "phase": "renew",
+  "steps": [
+    {
+      "name": "keep by ux2-owner-c",
+      "rows": [
+        "Court case CRT-2026-0412 Riyadh Commercial Court 0a17b8f1 Account, Bookings 15 Jan 2027, 01:03 Keep (review again in 90 days) Release"
+      ],
+      "title": "Keep this hold",
+      "stepUp": false,
+      "closed": true,
+      "notice": [
+        "Done.\n\nDismiss"
+      ],
+      "db": "active\t3\t7d5efa61-f287-4e56-9686-de9ba7feb9cd,a4f8e0d8-7ca8-455b-94d5-15b5e0e45334,7d5efa61-f287-4e56-9686-de9ba7feb9cd",
+      "shot": ".admin-console/evidence/ux-round2/holds-keep-ux2-owner-c-en-1440.png"
+    }
+  ],
+  "summary": {
+    "label": "ux2-owner-c",
+    "lang": "en",
+    "width": 1440,
+    "consoleErrors": [],
+    "httpFailures": []
+  }
+}

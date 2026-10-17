@@ -1,0 +1,206 @@
+{
+  "phase": "a1",
+  "steps": [
+    {
+      "name": "list",
+      "rows": [
+        "Copy Noura Test 8552d631 In the app 11 Oct 2026, 09:25 10 Nov 2026, 09:25 Open View",
+        "Access 197e449a 197e449a In the app 11 Oct 2026, 15:43 10 Nov 2026, 15:43 Open View",
+        "Access نورة 4e0eea46 In the app 17 Oct 2026, 00:42 16 Nov 2026, 00:42 Open View",
+        "Copy نورة 4e0eea46 In the app 17 Oct 2026, 00:48 16 Nov 2026, 00:48 Open View",
+        "Correction نورة 4e0eea46 In the app 17 Oct 2026, 00:48 16 Nov 2026, 00:48 Open View",
+        "Deletion Abdulrahman Al-Shehri f6104388 In the app 17 Oct 2026, 00:49 16 Nov 2026, 00:49 Open View"
+      ],
+      "shot": ".admin-console/evidence/ux-round2/admin-privacy-list-en-1440.png"
+    },
+    {
+      "name": "log-empty-submit",
+      "errors": [
+        "Find and choose the customer first.",
+        "Describe what the customer asked in 10 to 2000 characters (0 now)."
+      ],
+      "focus": "log-subject"
+    },
+    {
+      "name": "search-too-short",
+      "q": "ab",
+      "status": "Type at least 3 characters to search.",
+      "rows": []
+    },
+    {
+      "name": "search-partial-email",
+      "q": "ux2.cust3.179…@example",
+      "status": "Type the whole e-mail address; part of an address is not searched.",
+      "rows": []
+    },
+    {
+      "name": "search-partial-phone",
+      "q": "244978",
+      "status": "Type the whole phone number; part of a number is not searched.",
+      "rows": []
+    },
+    {
+      "name": "search-name-latin",
+      "q": "Maryam",
+      "status": "",
+      "rows": [
+        "Maryam B. / u***@example.test · phone ending 4978 · joined 17 Oct 2026 / Choose"
+      ]
+    },
+    {
+      "name": "search-name-arabic",
+      "q": "نورة",
+      "status": "",
+      "rows": [
+        "نورة / u***@example.test · phone ending 4976 · joined 17 Oct 2026 / Choose"
+      ]
+    },
+    {
+      "name": "search-name-inside-email",
+      "q": "ux2.cust",
+      "status": "No customer account matches. Check the spelling, or search by e-mail or phone.",
+      "rows": []
+    },
+    {
+      "name": "search-phone-local-format",
+      "q": "0586244978",
+      "status": "",
+      "rows": [
+        "Maryam B. / u***@example.test · phone ending 4978 · joined 17 Oct 2026 / Choose"
+      ]
+    },
+    {
+      "name": "search-whole-email",
+      "q": "UX2.CUST3.179…@EXAMPLE.TEST",
+      "status": "",
+      "rows": [
+        "Maryam B. / u***@example.test · phone ending 4978 · joined 17 Oct 2026 / Choose"
+      ]
+    },
+    {
+      "name": "lookup-audit-rows",
+      "before": 0,
+      "after": 5,
+      "recorded": 5
+    },
+    {
+      "name": "picked",
+      "chosen": "Maryam B.\nu***@example.test · phone ending 4978\nChoose another customer",
+      "focus": "Choose another customer"
+    },
+    {
+      "name": "log-short-details",
+      "errors": [
+        "Describe what the customer asked in 10 to 2000 characters (5 now)."
+      ],
+      "keptText": "short"
+    },
+    {
+      "name": "log-submitted",
+      "notice": [
+        "Logged. The customer was asked to confirm it in the app.\n\nDismiss"
+      ],
+      "shot": ".admin-console/evidence/ux-round2/admin-privacy-logged-en-1440.png"
+    },
+    {
+      "name": "extend-empty",
+      "error": "Write at least 20 characters (0 now).",
+      "focus": "INPUT"
+    },
+    {
+      "name": "extended",
+      "notice": [
+        "Done.\n\nDismiss"
+      ],
+      "detail": "Request 4252da16 · Access · Open\nReceived\n17 Oct 2026, 00:42 · In the app\nIdentity confirmed\n17 Oct 2026, 00:42\nDeadline\n16 Dec 2026, 00:42 (Extended once)\nExtension reason\nDisproportionate effort: We need records from three salons in two cities to answer your access request in full.\nAdd a note\nPropose for approval\nRefuse\nRepetitive\nManifestly unfounded\nDisproportionate\nReason the customer will read with their right to complain to SDAIA (at least 20 characters)\nRefuse the request\nHISTORY\n17 Oct 2026, 00:42 · identity verified · customer\n17 Oct 2026, 00:42 · received · customer\n17 Oct 2026, 00:52 · extended · console",
+      "extendFormGone": true,
+      "shot": ".admin-console/evidence/ux-round2/admin-privacy-extended-en-1440.png"
+    },
+    {
+      "name": "propose-copy",
+      "title": "Propose this Copy for approval",
+      "stepUp": false,
+      "closed": true
+    },
+    {
+      "name": "propose-copy-after",
+      "notice": [
+        "Done.\n\nDismiss"
+      ],
+      "status": "Request b1eadbf3 · Copy · Waiting for approval"
+    },
+    {
+      "name": "deletion-detail",
+      "preview": "0 bookings pseudonymised and kept 10 years with their invoices, 0 bookings deleted, 0 messages deleted, 0 health answers destroyed, 0 consents and 0 favourites deleted. Open disputes: 0. Wallet balance: 0 SAR, unused package sessions: 0."
+    },
+    {
+      "name": "deletion-dialog",
+      "text": "Propose this Deletion for approval\n\nA different owner approves it on the Approvals screen; you cannot approve your own proposal. Both of you confirm a fresh authenticator code.\n\nCustomer\nAbdulrahman Al-Shehri\nDeadline\n16 Nov 2026, 00:49\n\nWhat the deletion does\n\n0 bookings pseudonymised and kept 10 years with their invoices, 0 bookings deleted, 0 messages deleted, 0 health answers destroyed, 0 consents and 0 favourites deleted. Open disputes: 0. Wallet balance: 0 SAR, unused package sessions: 0.\nWhat you checked (at least 10 characters)\n\nRecorded in the audit log with your name.\n\nCancel\nPropose for approval",
+      "shot": ".admin-console/evidence/ux-round2/admin-privacy-deletion-dialog-en-1440.png"
+    },
+    {
+      "name": "propose-deletion",
+      "title": "Propose this Deletion for approval",
+      "stepUp": false,
+      "closed": true
+    },
+    {
+      "name": "correction",
+      "title": "Complete the correction",
+      "stepUp": false,
+      "closed": true
+    },
+    {
+      "name": "correction-after",
+      "notice": [
+        "Done.\n\nDismiss"
+      ],
+      "status": "Request abef6941 · Correction · Completed"
+    },
+    {
+      "name": "refuse-short",
+      "error": "Write at least 20 characters (5 now)."
+    },
+    {
+      "name": "refused",
+      "notice": [
+        "Done.\n\nDismiss"
+      ],
+      "status": "Request e3441497 · Copy · Refused",
+      "shot": ".admin-console/evidence/ux-round2/admin-privacy-refused-en-1440.png"
+    },
+    {
+      "name": "overflow",
+      "scrollWidth": 1440,
+      "clientWidth": 1440
+    }
+  ],
+  "summary": {
+    "label": "owner-a",
+    "lang": "en",
+    "width": 1440,
+    "consoleErrors": [
+      {
+        "route": "/admin/privacy",
+        "text": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+      },
+      {
+        "route": "/admin/privacy",
+        "text": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+      }
+    ],
+    "httpFailures": [
+      {
+        "route": "/admin/privacy",
+        "status": 400,
+        "url": "API/rest/v1/rpc/admin_privacy_find_customers"
+      },
+      {
+        "route": "/admin/privacy",
+        "status": 400,
+        "url": "API/rest/v1/rpc/admin_privacy_find_customers"
+      }
+    ]
+  },
+  "aborted": []
+}

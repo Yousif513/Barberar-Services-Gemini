@@ -2325,8 +2325,8 @@
             ".admin-console/evidence/qa-release/capability-review.txt"
           ],
           "owner": "",
-          "reviewStatus": "reviewed",
-          "reviewedBy": "qa-release-claude"
+          "reviewStatus": "contested",
+          "reviewedBy": "ux-round2-claude"
         },
         {
           "id": "customer.verify-phone",
@@ -5319,7 +5319,7 @@
           ],
           "risk": "critical",
           "status": "in-progress",
-          "reviewStatus": "unreviewed",
+          "reviewStatus": "contested",
           "rationale": "D-Q5: admin_approval_requests; admin_release_payout records every payout for a second administrator; refunds >= SAR 1,000 or past SAR 5,000 per admin per Riyadh day (governance_settings) wait too; admin_decide_approval refuses self-approval for every role, requires the kind's permission and step-up, and runs the original command in the approver's session under a one-time token. Thresholds change only through an approved setting_change. Inbox at /admin/approvals with per-item bulk approval. Unreviewed.",
           "entityStates": "{\"from\": [\"pending\"], \"to\": [\"approved\", \"rejected\", \"cancelled\"]}",
           "uiRoutes": [
@@ -5373,7 +5373,8 @@
           "idempotency": "one pending request per (kind, target); execution keeps admin_release_payout's idempotency key",
           "concurrency": "row lock on the request; partial unique index on pending (kind, target_id)",
           "recovery": "a rejected or cancelled request changes nothing; a failed execution rolls the decision back",
-          "owner": ""
+          "owner": "",
+          "reviewedBy": "ux-round2-claude"
         },
         {
           "id": "gov.break-glass",
@@ -6186,7 +6187,8 @@
             "supabase/tests/db/f123_final_recheck.test.mjs"
           ],
           "owner": "",
-          "reviewStatus": "unreviewed"
+          "reviewStatus": "contested",
+          "reviewedBy": "ux-round2-claude"
         },
         {
           "id": "privacy.legal-hold",
@@ -7001,10 +7003,10 @@
         "forbidden",
         "success"
       ],
-      "responsive": true,
+      "responsive": false,
       "accessibilityStatus": "implemented",
       "status": "in-progress",
-      "rationale": "Rebuilt by impl-claude-release-gaps: server-computed pages with exact figures, audited reads, reasoned commands for every change, honest load failures for the directory, requests and consents. Not yet exercised in a browser against any API; unreviewed. QA-RELEASE (qa-release-claude, 2026-10-17): axe clean in EN/AR at 1440 and 375 px, keyboard skip link, focus ring and drawer verified (.admin-console/evidence/qa-release/browser-summary.txt). Screen-reader review not done.",
+      "rationale": "Rebuilt by impl-claude-release-gaps: server-computed pages with exact figures, audited reads, reasoned commands for every change, honest load failures for the directory, requests and consents. Not yet exercised in a browser against any API; unreviewed. QA-RELEASE (qa-release-claude, 2026-10-17): axe clean in EN/AR at 1440 and 375 px, keyboard skip link, focus ring and drawer verified (.admin-console/evidence/qa-release/browser-summary.txt). Screen-reader review not done. UX-ROUND2 (ux-round2-claude, 2026-10-17): profile clear requested, refused under an account legal hold (localized), swept in EN 375 and AR 1440. Responsive false: at 375 x 600 the clear dialog is 1,101 px tall and its confirm button cannot be reached (ux2-command-dialog-height-uncapped-confirm-unreachable). Evidence .admin-console/evidence/ux-round2/probe-dialog-en.json, flow-holds-h3.json.",
       "tests": [
         "supabase/tests/db/customer_directory.test.mjs",
         "supabase/tests/db/release_controls.test.mjs"
@@ -7768,12 +7770,13 @@
         "empty",
         "error",
         "forbidden",
-        "success"
+        "success",
+        "validation"
       ],
       "responsive": true,
       "accessibilityStatus": "implemented",
       "status": "in-progress",
-      "rationale": "PRIV package; opened in a browser with a real TOTP session on the local stack (queue, detail, ledger tab). Unreviewed. QA-RELEASE (qa-release-claude, 2026-10-17): axe clean in EN/AR at 1440 and 375 px, keyboard skip link, focus ring and drawer verified (.admin-console/evidence/qa-release/browser-summary.txt). Screen-reader review not done.",
+      "rationale": "PRIV package; opened in a browser with a real TOTP session on the local stack (queue, detail, ledger tab). Unreviewed. QA-RELEASE (qa-release-claude, 2026-10-17): axe clean in EN/AR at 1440 and 375 px, keyboard skip link, focus ring and drawer verified (.admin-console/evidence/qa-release/browser-summary.txt). Screen-reader review not done. UX-ROUND2 (ux-round2-claude, 2026-10-17): lookup (min length, partial e-mail/phone, names, 10/10-minute limit, step-up), off-app logging, extension, refusal, proposals, correction and holds exercised in EN 1440 and AR 375 (keyboard for lookup and limit), swept in EN 375 and AR 1440; no horizontal overflow; note dialog fits 375 x 600 and Escape returns focus. Longer CommandDialogs are subject to ux2-command-dialog-height-uncapped-confirm-unreachable. Evidence .admin-console/evidence/ux-round2/flow-admin-requests-a1.json, flow-limit.json, flow-holds-h1.json; docs/reviews/2026-10-17-ux-browser-check.md.",
       "tests": [
         "supabase/tests/db/priv_privacy.test.mjs",
         "web_platform/tests/admin-console-guards.test.mjs"
@@ -7806,12 +7809,14 @@
         "empty",
         "error",
         "forbidden",
-        "success"
+        "success",
+        "validation",
+        "conflict"
       ],
       "responsive": true,
       "accessibilityStatus": "implemented",
       "status": "in-progress",
-      "rationale": "PRIV package; opened in a browser with a real TOTP session (empty state). Unreviewed. QA-RELEASE (qa-release-claude, 2026-10-17): axe clean in EN/AR at 1440 and 375 px, keyboard skip link, focus ring and drawer verified (.admin-console/evidence/qa-release/browser-summary.txt). Screen-reader review not done.",
+      "rationale": "PRIV package; opened in a browser with a real TOTP session (empty state). Unreviewed. QA-RELEASE (qa-release-claude, 2026-10-17): axe clean in EN/AR at 1440 and 375 px, keyboard skip link, focus ring and drawer verified (.admin-console/evidence/qa-release/browser-summary.txt). Screen-reader review not done. UX-ROUND2 (ux-round2-claude, 2026-10-17): create, invalid and valid aware-at correction, duplicate request refused, second-person approval and the corrected-time line verified in EN 1440 and AR 375, swept in EN 375 and AR 1440; close dialog fits 375 x 600. Findings ux2-incident-pending-correction-and-discovery-not-shown, ux2-arabic-console-shows-english-server-refusals. Evidence .admin-console/evidence/ux-round2/flow-incident-purge-i1b.json, flow-incident-purge-i2.json.",
       "tests": [
         "supabase/tests/db/priv_privacy.test.mjs"
       ]
@@ -7872,12 +7877,13 @@
         "empty",
         "error",
         "success",
-        "forbidden"
+        "forbidden",
+        "validation"
       ],
       "responsive": true,
       "accessibilityStatus": "in-progress",
       "status": "in-progress",
-      "rationale": "PRIV package; submitted a copy request through the one-time-code step in a browser on the local stack, Arabic RTL checked. Unreviewed. QA-RELEASE (qa-release-claude, 2026-10-17): verified states forbidden (.admin-console/evidence/qa-release/browser-summary.txt). Screen-reader review not done.",
+      "rationale": "PRIV package; submitted a copy request through the one-time-code step in a browser on the local stack, Arabic RTL checked. Unreviewed. QA-RELEASE (qa-release-claude, 2026-10-17): verified states forbidden (.admin-console/evidence/qa-release/browser-summary.txt). Screen-reader review not done. UX-ROUND2 (ux-round2-claude, 2026-10-17): every request type, the one-time-code step (send, malformed, wrong, correct), tracking, PDF/JSON download with a fresh code and the refusal view exercised in EN 1440, AR 375 keyboard-only, EN 375 and AR 1440; no horizontal overflow; focus moves to the code step and to the result. Findings ux2-customer-deletion-preview-latin-zero-reads-as-five, ux2-native-validation-english-on-customer-privacy-and-incidents, ux2-customer-privacy-feedback-not-specific, ux2-operator-reason-text-not-bidi-isolated. Evidence .admin-console/evidence/ux-round2/flow-customer-submit.json, flow-customer-track.json; docs/reviews/2026-10-17-ux-browser-check.md.",
       "tests": [
         "supabase/tests/db/priv_privacy.test.mjs",
         "scripts/verify-privacy-local.mjs"
@@ -7909,7 +7915,7 @@
       "responsive": true,
       "accessibilityStatus": "in-progress",
       "status": "in-progress",
-      "rationale": "Added by impl-uxfix-claude (ux1-reviewed-routes-missing-from-screens); localized code errors with codes left, single preparation per load.",
+      "rationale": "Added by impl-uxfix-claude (ux1-reviewed-routes-missing-from-screens); localized code errors with codes left, single preparation per load. UX-ROUND2 (ux-round2-claude, 2026-10-17): fresh-account enrolment in EN 1440 and AR 375 keyboard-only, validation with focus kept, reload and second tab replace the unverified factor with no 404 and 0 console errors on clean runs; stale first tab finding ux2-mfa-stale-enrolment-tab-message. Evidence .admin-console/evidence/ux-round2/flow-mfa-ux2-owner-g.json, flow-mfa-tabs.json.",
       "tests": [
         "web_platform/tests/gov1-governance-screens.test.mjs"
       ]
@@ -7935,12 +7941,13 @@
         "error",
         "forbidden",
         "validation",
-        "success"
+        "success",
+        "conflict"
       ],
-      "responsive": true,
+      "responsive": false,
       "accessibilityStatus": "implemented",
       "status": "in-progress",
-      "rationale": "Added by impl-uxfix-claude; includes customer_profile_clear requests. QA-RELEASE (qa-release-claude, 2026-10-17): axe clean in EN/AR at 1440 and 375 px, keyboard skip link, focus ring and drawer verified (.admin-console/evidence/qa-release/browser-summary.txt). Screen-reader review not done.",
+      "rationale": "Added by impl-uxfix-claude; includes customer_profile_clear requests. QA-RELEASE (qa-release-claude, 2026-10-17): axe clean in EN/AR at 1440 and 375 px, keyboard skip link, focus ring and drawer verified (.admin-console/evidence/qa-release/browser-summary.txt). Screen-reader review not done. UX-ROUND2 (ux-round2-claude, 2026-10-17): privacy copy/deletion, legal hold, held profile clear (refused), 4th renewal (refused for a used owner, approved by a fresh one), early release, incident aware-at correction and retention purge (rejected) decided in AR 375 and EN 1440. Responsive false: at 375 the actions start off-screen (ux2-approvals-actions-offscreen-at-375) and the decision dialog is taller than 600 px (ux2-command-dialog-height-uncapped-confirm-unreachable). Evidence .admin-console/evidence/ux-round2/flow-holds-h2.json, flow-sweep-ux2-owner-c-en-375.json; docs/reviews/2026-10-17-ux-browser-check.md.",
       "tests": [
         "web_platform/tests/gov1-governance-screens.test.mjs"
       ]
@@ -8287,6 +8294,28 @@
         ".admin-console/evidence/qa-release/browser-perf-prod-build.json"
       ],
       "rationale": "Measured 2026-10-17 on the production build with the local fixture set: worst warm LCP 548 ms, worst data-settled 548 ms, worst cold LCP 860 ms across 38 routes (well inside a 2.5 s LCP budget). Not passed because the threshold is a production-volume budget: the data volume is 20 customers and 15 bookings (fixtures-too-tidy-for-state-coverage), lists are unpaginated (no-pagination-or-server-side-filtering), and the owner has not set a budget."
+    },
+    {
+      "id": "experience",
+      "status": "failed",
+      "threshold": "Every reviewed operator and customer workflow completes in a real browser in EN and AR at 375 px and desktop, with keyboard where it matters, no unreachable primary action and no medium or higher UX gap open",
+      "evidence": [
+        "docs/reviews/2026-10-17-ux-browser-check.md",
+        ".admin-console/evidence/ux-round2/run-log.txt",
+        ".admin-console/evidence/ux-round2/probe-dialog-en.json"
+      ],
+      "rationale": "Run 2026-10-17 by ux-round2-claude (Playwright, local stack, TOTP sessions): routes /customer/privacy, /admin/privacy (requests, holds, ledger), /admin/approvals, /admin/customers, /admin/incidents, /login/mfa in EN 1440, AR 375, EN 375, AR 1440. Pressed: every customer request type with the one-time-code step, PDF/JSON download, lookup (10 and 12 searches), off-app log, extend, refuse, propose, correction, second-owner approvals, hold place/keep x4/release, profile clear under a hold, incident aware-at correction, MFA enrolment with reload and two tabs. Console: only designed 4xx refusals (400 x5, 403 x6, 404 x1). Failed on ux2-command-dialog-height-uncapped-confirm-unreachable (high) and three medium gaps (ux2-approvals-actions-offscreen-at-375, ux2-arabic-console-shows-english-server-refusals, ux2-customer-deletion-preview-latin-zero-reads-as-five)."
+    },
+    {
+      "id": "component-health",
+      "status": "failed",
+      "threshold": "Shared components (CommandDialog, StepUpDialog, CustomerPicker, CommandResult) render, cap their size, keep focus and close with Escape at 375 x 600 and desktop in EN and AR",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/flow-sweep-ux2-owner-c-en-375.json",
+        ".admin-console/evidence/ux-round2/probe-dialog-en.json",
+        ".admin-console/evidence/ux-round2/flow-stepup-lookup.json"
+      ],
+      "rationale": "Measured 2026-10-17 by ux-round2-claude: CommandDialog is position fixed with no transformed ancestor, locks the page, takes focus and closes on Escape with focus back on its trigger, but the compiled CSS has no .max-h-full rule, so a long dialog (customers clear 1,101 px, approvals decide 667 px) overflows a 600 px viewport and its confirm button is unreachable. StepUpDialog takes focus and accepts a keyboard code; its copy is money-specific (ux2-step-up-copy-says-money-for-lookups). CustomerPicker moves focus to 'Choose another customer' after a pick and announces results in a polite live region."
     }
   ],
   "decisions": [
@@ -12027,7 +12056,7 @@
       "severity": "low",
       "description": "The bookings cancel dialog thresholds and the new pending-approval messages on privacy, incidents and approvals screens are covered by source tests and typecheck only; the browser pane was not signed in to the console.",
       "status": "open",
-      "rationale": "UX reviewer to verify with a TOTP console session.",
+      "rationale": "UX reviewer to verify with a TOTP console session. 2026-10-17 ux-round2-claude verified in the browser the pending-approval messages for hold release and 4th renewal (privacy holds), the incident aware-at correction (incidents) and their Approvals lines (docs/reviews/2026-10-17-ux-browser-check.md). Still not browser-verified: the bookings cancel dialog thresholds.",
       "evidence": [
         "web_platform/tests/booking-cancel-thresholds.test.mjs",
         "web_platform/tests/final-approval-kinds.test.mjs"
@@ -12082,11 +12111,12 @@
       "id": "f123-screens-not-browser-verified",
       "severity": "low",
       "description": "The new copy (profile clear under a hold, lookup refusals and rate limit, retention purge approval line, lookup-limit alert) is covered by source tests and typecheck only; not exercised in a signed-in console browser session.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "UX reviewer to verify with a TOTP console session.",
       "evidence": [
         "web_platform/tests/f123-recheck-ui.test.mjs"
-      ]
+      ],
+      "resolution": "ux-round2-claude exercised the copy in signed-in TOTP sessions on 2026-10-17 (EN 1440, AR 375): profile clear under a hold (requester localized; approver English refusal filed as ux2-arabic-console-shows-english-server-refusals), lookup refusals and the 10/10-minute limit, the retention purge approval line and the lookup-limit alert. Findings are separate ux2- gaps; see docs/reviews/2026-10-17-ux-browser-check.md."
     },
     {
       "id": "retention-purge-console-entry-missing",
@@ -12245,6 +12275,186 @@
       "rationale": "Found by qa-release-claude. Owner: ux-reviewer or architect to record a confirmed decision that these states do not apply, or serve the content through an audited read.",
       "evidence": [
         ".admin-console/evidence/qa-release/browser-summary.txt"
+      ]
+    },
+    {
+      "id": "ux2-command-dialog-height-uncapped-confirm-unreachable",
+      "severity": "high",
+      "description": "The shared CommandDialog (web_platform/src/components/modal.tsx) relies on the class max-h-full, but the compiled CSS served by the dev server has no .max-h-full rule (computed max-height: none; 12 other max-h-* rules exist). On a short viewport the dialog grows past the screen while the overlay is overflow:visible and html/body are scroll-locked. At 375 x 600 'Clear profile details' on /admin/customers is 1,101 px tall (top -250, confirm button 786-826): wheel and Tab do not bring the title, typed confirmation or confirm button into view, so the command cannot be completed on a phone (still taller than an 812 px screen). The Approvals decision dialog is 667 px (top -33, submit 567-609).",
+      "status": "open",
+      "rationale": "Found by measuring every dialog at 375 x 600 in a real browser (ux-round2-claude). REMEDY: give the dialog a real cap (e.g. max-h-[calc(100dvh-4rem)] or make the overlay overflow-y-auto) and check why max-h-full is not generated; re-measure every CommandDialog at 375 x 600 in EN and AR, and check the production CSS build.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/probe-dialog-en.json",
+        ".admin-console/evidence/ux-round2/dialog-customer-clear-en-375.png",
+        ".admin-console/evidence/ux-round2/dialog-customer-clear-after-scroll-en-375.png",
+        ".admin-console/evidence/ux-round2/flow-sweep-ux2-owner-c-en-375.json",
+        "docs/reviews/2026-10-17-ux-browser-check.md"
+      ]
+    },
+    {
+      "id": "ux2-approvals-actions-offscreen-at-375",
+      "severity": "medium",
+      "description": "On /admin/approvals at 375 px (Arabic) the table region is 482 px inside 341 px: the first Approve button sits at x -108..-58, off-screen until the operator scrolls the table sideways; the request column wraps one word per line and the reason column is clipped at the edge.",
+      "status": "open",
+      "rationale": "Essential actions must stay reachable at narrow widths (experience-design: responsive behaviour). REMEDY: a stacked card layout or a sticky action column below sm, with the request summary allowed to wrap normally.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/flow-holds-h2.json",
+        ".admin-console/evidence/ux-round2/approvals-privacy-pending-ar-375.png"
+      ]
+    },
+    {
+      "id": "ux2-arabic-console-shows-english-server-refusals",
+      "severity": "medium",
+      "description": "In the Arabic console, refusals from the server are shown as raw English text: approving a profile clear under an account legal hold ('An active legal hold (...) keeps this customer's account; ...'), approving a 4th hold renewal by an owner who renewed it ('A hold renewed 3 times is kept only with an owner who ...'), keeping a hold as its creator ('A hold is kept only by a new approver ...'), an incident aware-at correction before the discovery time and a duplicate correction ('... already waiting for a second person'). The customers page maps the legal_hold_active hint to Arabic; Approvals, holds and incidents do not.",
+      "status": "open",
+      "rationale": "Bilingual UI is mandatory (AGENTS.md); an Arabic-speaking approver cannot read why a high-risk decision was refused. REMEDY: map the server hints (legal_hold_active, fresh_owner_required, new_approver_required and the incident checks) to EN/AR copy in approvals, privacy and incidents, as admin/customers already does.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/approvals-refused-h2-ar-375.png",
+        ".admin-console/evidence/ux-round2/flow-holds-h2.json",
+        ".admin-console/evidence/ux-round2/flow-holds-decide-ux2-owner-c-renewal-c.json",
+        ".admin-console/evidence/ux-round2/flow-incident-purge-i1.json"
+      ]
+    },
+    {
+      "id": "ux2-customer-deletion-preview-latin-zero-reads-as-five",
+      "severity": "medium",
+      "description": "On /customer/privacy in Arabic, the deletion preview and the balance warning interpolate raw numbers (web_platform/src/app/customer/privacy/page.tsx, fill(t.deletionPreview ...) and fill(t.balance ...)) into Arabic-Indic copy. The Arabic font draws the Latin '0' as a small ring that reads as the Arabic five, so a customer with nothing kept reads that 5 bookings are kept and 5 deleted before an irreversible deletion ('تُحفظ 0 حجوزات ... وتُحذف 0 حجوزات').",
+      "status": "open",
+      "rationale": "Consequences of an irreversible action must be unambiguous. REMEDY: format with Intl.NumberFormat('ar-SA') like the rest of the page, and use proper zero/plural wording.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/cust-submit-deletion-keyboard-ar-375.png",
+        ".admin-console/evidence/ux-round2/flow-customer-submit.json"
+      ]
+    },
+    {
+      "id": "ux2-approvals-arabic-summaries-raw-values",
+      "severity": "low",
+      "description": "Arabic approval summaries carry untranslated values and Latin digits: hold rows show 'court case' and 'account, bookings', 'جُدد 3 مرات'; privacy rows '0 حجوزات بلا هوية، 0 محذوفة'; the purge line 'تجربة بتاريخ 2026-10-17: حذف 0 سجلاً فرعياً و0 حجزاً'; the incident line '(-0.7 ساعة)'; the lookup-limit message '(10 كل 10 دقائق)' while the hint above it says '١٠'. Holds list categories are joined with a Latin comma.",
+      "status": "open",
+      "rationale": "Arabic copy elsewhere uses Arabic-Indic digits through Intl (impl-uxfix decision). REMEDY: translate basis/category codes and format every interpolated number and date with the page locale in approvals/page.tsx describe() and customer-picker.tsx.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/flow-holds-decide-ux2-owner-d-renewal-d.json",
+        ".admin-console/evidence/ux-round2/flow-incident-purge-i2.json",
+        ".admin-console/evidence/ux-round2/lookup-limit-ar-375.png"
+      ]
+    },
+    {
+      "id": "ux2-hold-renewal-kind-label-inaccurate",
+      "severity": "low",
+      "description": "The approval kind privacy_legal_hold_renewal is labelled 'Renewal of a legal hold kept for over a year' / 'تجديد حجز قانوني مضى عليه أكثر من سنة', but the request is raised by the 4th renewal whenever it happens; in this check it was raised minutes after the hold was placed.",
+      "status": "open",
+      "rationale": "Copy must state the actual trigger. REMEDY: 'Renewal of a legal hold already renewed 3 times'.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/flow-holds-decide-ux2-owner-c-renewal-c.json"
+      ]
+    },
+    {
+      "id": "ux2-holds-pending-and-eligibility-not-shown",
+      "severity": "low",
+      "description": "The legal holds list shows no renewal count and no pending release or renewal, and keeps offering Keep and Release while one waits. Keep is offered to the hold's creator and to the last renewer, and Approve on Approvals to an owner who already renewed the hold; each is refused only after the operator has filled the dialog.",
+      "status": "open",
+      "rationale": "Unavailable actions should say why before the operator commits (experience-design: row actions). REMEDY: show renewals and a pending marker on the row; disable Keep/Approve with the reason for people the server will refuse.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/flow-holds-h3.json",
+        ".admin-console/evidence/ux-round2/flow-holds-release-ux2-owner-a.json",
+        ".admin-console/evidence/ux-round2/flow-holds-renew-ux2-owner-b-4.json"
+      ]
+    },
+    {
+      "id": "ux2-incident-pending-correction-and-discovery-not-shown",
+      "severity": "low",
+      "description": "After an awareness-time correction is requested, the incident detail shows no pending state and still offers the correction form (a second request is refused by the server). The detail never shows the discovery time, yet the refusal says the awareness time must be after the discovery.",
+      "status": "open",
+      "rationale": "REMEDY: show 'Correction to <time> waiting for approval since <time>' instead of the form while pending, and show discovered_at and aware_at in the detail.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/flow-incident-purge-i1b.json",
+        ".admin-console/evidence/ux-round2/incident-correction-requested-en-1440.png"
+      ]
+    },
+    {
+      "id": "ux2-native-validation-english-on-customer-privacy-and-incidents",
+      "severity": "low",
+      "description": "/customer/privacy and /admin/incidents rely on browser-native validation (required/minLength), so the messages are in the browser's language and do not name the fix ('Please fill out this field.', 'Please select one of these options.' on the Arabic page, 'Please lengthen this text to 20 characters or more'). The consent-withdrawal submit is disabled with no explanation until a consent is ticked. Admin privacy forms already use noValidate with in-language field errors.",
+      "status": "open",
+      "rationale": "REMEDY: reuse the admin privacy pattern (noValidate, FieldError, focus first invalid) on these forms.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/flow-customer-submit.json",
+        ".admin-console/evidence/ux-round2/flow-incident-purge-i1.json"
+      ]
+    },
+    {
+      "id": "ux2-customer-privacy-feedback-not-specific",
+      "severity": "low",
+      "description": "On /customer/privacy: submitting a type that is already open (server returns created:false) is reported as 'We received your Access request ...' as if new, after an unnecessary code step; a consent withdrawal of a consent that was never active (completion_summary not_active: whatsapp) is reported as 'complete' with no mention; the code step says 'Enter it here; the request is then sent' when the pending action is a download.",
+      "status": "open",
+      "rationale": "Truthful feedback after actions. REMEDY: read created/not_active and word the result accordingly; give the code step a download-specific sentence.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/flow-customer-submit.json",
+        ".admin-console/evidence/ux-round2/flow-customer-track.json"
+      ]
+    },
+    {
+      "id": "ux2-console-privacy-commands-answer-done",
+      "severity": "low",
+      "description": "Propose for approval, extend, refuse, complete correction, propose hold, keep hold and incident create/save answer a bare 'Done.' / 'Saved.' (EN) or 'تم.' (AR); only the detail heading shows what changed.",
+      "status": "open",
+      "rationale": "REMEDY: name the result and the next step, e.g. 'Proposed: waiting for a different owner on Approvals' or 'Extended to 16 Dec 2026; the customer was told'.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/flow-admin-requests-a1.json"
+      ]
+    },
+    {
+      "id": "ux2-step-up-copy-says-money-for-lookups",
+      "severity": "low",
+      "description": "The step-up dialog asked for a customer lookup on /admin/privacy says 'This action moves money, reveals bank details or changes access' (components/step-up-dialog.tsx), which is untrue for a lookup and for the privacy, hold and incident commands that also ask for it.",
+      "status": "open",
+      "rationale": "REMEDY: generic wording ('This action is sensitive, so it needs a code from the last 5 minutes') or per-command wording.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/flow-stepup-lookup.json",
+        ".admin-console/evidence/ux-round2/lookup-stepup-en-1440.png"
+      ]
+    },
+    {
+      "id": "ux2-lookup-partial-queries-log-console-errors",
+      "severity": "low",
+      "description": "A partial e-mail or phone in the customer picker is sent to admin_privacy_find_customers and refused with HTTP 400, which the browser logs as a console error on /admin/privacy; the picker could detect both cases before calling. The server returns 'remaining' searches but the picker never shows it, so the operator meets the 10/10-minute limit without warning.",
+      "status": "open",
+      "rationale": "Release gate: no browser console errors on admin routes. REMEDY: client-side incomplete e-mail/phone check; show 'n searches left' after each search.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/flow-admin-requests-a1.json",
+        ".admin-console/evidence/ux-round2/flow-limit.json"
+      ]
+    },
+    {
+      "id": "ux2-mfa-stale-enrolment-tab-message",
+      "severity": "low",
+      "description": "If /login/mfa is opened in a second tab during enrolment, the first tab's factor is replaced (no 404 on load, as fixed); entering a code in the first tab then calls /factors/<old>/challenge (404, console error) and shows 'تعذّر التحقق من الرمز. حاول مجدداً بعد قليل.' ('try again shortly'), which can never succeed; the authenticator app keeps an orphan entry.",
+      "status": "open",
+      "rationale": "REMEDY: on a 404 from challenge, say the set-up was restarted in another window and offer reload.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/flow-mfa-tabs.json",
+        ".admin-console/evidence/ux-round2/mfa-stale-tab-ux2-owner-h-ar-375.png"
+      ]
+    },
+    {
+      "id": "ux2-login-error-english-on-arabic",
+      "severity": "low",
+      "description": "/login in Arabic shows GoTrue's English 'Invalid login credentials' after a failed password sign-in (seen when a deleted customer signs in).",
+      "status": "open",
+      "rationale": "REMEDY: map auth error codes to EN/AR in login/page.tsx as lib/auth-errors.ts does for OTP and TOTP.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/cust-deleted-signin-ar-375.png",
+        ".admin-console/evidence/ux-round2/flow-customer-track.json"
+      ]
+    },
+    {
+      "id": "ux2-operator-reason-text-not-bidi-isolated",
+      "severity": "low",
+      "description": "Extension and refusal reasons typed by an operator are shown to the customer verbatim inside Arabic sentences without bidi isolation, so an English reason's final period lands at the wrong end ('.cities to answer ...'); the console does not tell the operator that the reason is shown to the customer in the customer's language.",
+      "status": "open",
+      "rationale": "REMEDY: wrap operator text in <bdi>, and label the reason fields 'shown to the customer as written'.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/cust-track-ar-375.png"
       ]
     }
   ],
@@ -13359,6 +13569,38 @@
         ".admin-console/evidence/qa-release/harness/qa-browser-harness.mjs"
       ],
       "status": "open"
+    },
+    {
+      "id": "ux2-parallel-build-breaks-shared-dev-server",
+      "observation": "While the ux-reviewer drove the running next dev server, a parallel QA pass ran `npm run build` in the same web_platform directory and its browser pass compiled /robots.txt; every route then answered 500 for about five minutes (next-metadata-route-loader parse error on the apostrophe path). The browser review had to wait and re-run steps.",
+      "category": "friction",
+      "proposedChange": "In multi-agent.md (Fan-out patterns, 'Fails' table) add: a production build or any route crawl against the directory of a dev server another reviewer is driving; build in a separate worktree or distDir, and have the browser reviewer detect 5xx and wait rather than record defects.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/dev-server-500-during-run-en-1440.png",
+        ".admin-console/evidence/ux-round2/run-log.txt"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "ux2-harness-navigation-fakes-console-errors",
+      "observation": "Navigating the page by script while the app still had requests in flight (forcing /login/mfa instead of letting the console redirect, or opening a route right after sign-in) aborted those requests and logged 'TypeError: Failed to fetch' console errors that looked like app defects (16 in the first runs). Letting the app redirect itself and settling 2.5 s before each navigation removed all of them.",
+      "category": "tooling",
+      "proposedChange": "In verification.md (Browser verification) say: count console errors only from navigations the app itself performs or after the page has settled; record requestfailed/ERR_ABORTED alongside console errors so harness aborts are distinguishable from app failures.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/flow-mfa.json",
+        ".admin-console/evidence/ux-round2/flow-mfa-ux2-owner-g.json"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "ux2-dialog-measurement-caught-missing-utility",
+      "observation": "The 375 x 600 dialog measurement in the ux-reviewer prompt found a high defect no test or validator saw: the dialog's height cap class (max-h-full) was absent from the compiled CSS, so computed max-height was none and the confirm button was unreachable. Reading the component source showed a correct-looking class.",
+      "category": "new-pattern",
+      "proposedChange": "In experience-design.md (Responsive behavior) add: for each dialog, assert the computed max-height is finite and the primary action is inside the viewport after scrolling the dialog; a class name in source is not evidence that the utility was generated.",
+      "evidence": [
+        ".admin-console/evidence/ux-round2/probe-dialog-en.json"
+      ],
+      "status": "open"
     }
   ],
   "agents": [
@@ -13596,8 +13838,9 @@
       "role": "ux-reviewer",
       "ownsCapabilities": [],
       "ownsScreens": [],
-      "status": "active",
-      "notes": "UX round 2 browser check (2026-10-17) of the privacy, legal-hold, retention-purge, incident and MFA fixes: /customer/privacy, /admin/privacy, /admin/approvals, /admin/customers, /admin/incidents, /login/mfa. Playwright against localhost:3100 and the local Supabase stack, EN/AR, 375px and 1440px. Report docs/reviews/2026-10-17-ux-browser-check.md."
+      "status": "handed-off",
+      "notes": "UX round 2 browser check (2026-10-17) of the privacy, legal-hold, retention-purge, incident and MFA fixes: /customer/privacy, /admin/privacy, /admin/approvals, /admin/customers, /admin/incidents, /login/mfa. Playwright against localhost:3100 and the local Supabase stack, EN/AR, 375px and 1440px. Report docs/reviews/2026-10-17-ux-browser-check.md.",
+      "worklog": ".admin-console/worklog/ux-round2-claude.md"
     },
     {
       "id": "qa-release-claude",

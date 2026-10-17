@@ -1,0 +1,23 @@
+{
+  "phase": "decide",
+  "steps": [
+    {
+      "name": "approve رفع حجز قانوني by ux2-owner-b",
+      "title": "اعتماد: رفع حجز قانوني قبل موعده (يحذف ما احتفظ به)",
+      "stepUp": false,
+      "closed": true,
+      "rowText": " رفع حجز قانوني قبل موعده (يحذف ما احتفظ به) court case · CRT-2026-0412 Riyadh Commercial Court · account, bookings · الحساب محتجز · جُدد 4 مرات ١٧‏/١٠‏/٢٠٢٦، ١:٠٨ ص — UX2 Owner A The court closed case 0412 on 15 October; the hold is no longer needed. اعتماد رفض",
+      "notice": [
+        "تم الاعتماد والتنفيذ.\n\nإغلاق"
+      ],
+      "db": "released\t4\t7d5efa61-f287-4e56-9686-de9ba7feb9cd,a4f8e0d8-7ca8-455b-94d5-15b5e0e45334,7d5efa61-f287-4e56-9686-de9ba7feb9cd,a4f8e0d8-7ca8-455b-94d5-15b5e0e45334,1c8e2b54-f110-4e1c-91e1-0f1025f59598"
+    }
+  ],
+  "summary": {
+    "label": "ux2-owner-b",
+    "lang": "ar",
+    "width": 375,
+    "consoleErrors": [],
+    "httpFailures": []
+  }
+}

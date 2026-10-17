@@ -1,0 +1,151 @@
+[
+  {
+    "initial": "My requests\nAccess\nReceived\n\nReceived: 17 Oct 2026 · Answer by: 16 Nov 2026\n\nWithdraw",
+    "shot": ".admin-console/evidence/ux-round2/cust-initial-en-1440.png"
+  },
+  {
+    "consentNoneTicked": {
+      "disabled": true,
+      "describedBy": null,
+      "title": null
+    }
+  },
+  {
+    "type": "access",
+    "label": "duplicate",
+    "code": {
+      "opened": true,
+      "body": "Confirm it is you\n\nWe send a one-time code to ux2.cust1.1792186244975@example.test. Enter it here; the request is then sent.\n\nSend the code",
+      "focusOnOpen": "BUTTON:Send the code",
+      "focusAfterSend": "one-time-code",
+      "badFormat": "Enter the 6 digits from the message we sent."
+    },
+    "result": {
+      "role": "status",
+      "text": "We received your Access request. We will answer by 16 Nov 2026; it is free of charge.",
+      "focused": true
+    },
+    "list": [
+      "Access / Received / Received: 17 Oct 2026 · Answer by: 16 Nov 2026 / Withdraw"
+    ],
+    "shot": ".admin-console/evidence/ux-round2/cust-submit-access-duplicate-en-1440.png"
+  },
+  {
+    "type": "copy",
+    "code": {
+      "opened": false
+    },
+    "result": {
+      "role": "status",
+      "text": "We received your Copy request. We will answer by 16 Nov 2026; it is free of charge.",
+      "focused": true
+    },
+    "list": [
+      "Copy / Received / Received: 17 Oct 2026 · Answer by: 16 Nov 2026 / Withdraw",
+      "Access / Received / Received: 17 Oct 2026 · Answer by: 16 Nov 2026 / Withdraw"
+    ],
+    "shot": ".admin-console/evidence/ux-round2/cust-submit-copy-en-1440.png"
+  },
+  {
+    "type": "correction",
+    "emptyValue": "Please fill out this field.",
+    "code": {
+      "opened": false
+    },
+    "result": {
+      "role": "status",
+      "text": "We received your Correction request. We will answer by 16 Nov 2026; it is free of charge.",
+      "focused": true
+    },
+    "list": [
+      "Correction / Received / Received: 17 Oct 2026 · Answer by: 16 Nov 2026 / Withdraw",
+      "Copy / Received / Received: 17 Oct 2026 · Answer by: 16 Nov 2026 / Withdraw",
+      "Access / Received / Received: 17 Oct 2026 · Answer by: 16 Nov 2026 / Withdraw"
+    ],
+    "shot": ".admin-console/evidence/ux-round2/cust-submit-correction-en-1440.png"
+  },
+  {
+    "type": "consent_withdrawal",
+    "code": {
+      "opened": false
+    },
+    "result": {
+      "role": "status",
+      "text": "Your Consent withdrawal request is complete.",
+      "focused": true
+    },
+    "list": [
+      "Consent withdrawal / Completed / Received: 17 Oct 2026 · Answer by: 16 Nov 2026",
+      "Correction / Received / Received: 17 Oct 2026 · Answer by: 16 Nov 2026 / Withdraw",
+      "Copy / Received / Received: 17 Oct 2026 · Answer by: 16 Nov 2026 / Withdraw",
+      "Access / Received / Received: 17 Oct 2026 · Answer by: 16 Nov 2026 / Withdraw"
+    ],
+    "shot": ".admin-console/evidence/ux-round2/cust-submit-consent_withdrawal-en-1440.png"
+  },
+  {
+    "overflow": {
+      "scrollWidth": 1440,
+      "clientWidth": 1440
+    },
+    "summary": {
+      "label": "customer-1",
+      "lang": "en",
+      "width": 1440,
+      "consoleErrors": [
+        {
+          "route": "/customer/privacy",
+          "text": "TypeError: Failed to fetch\n    at stepUpAwareFetch (webpack-internal:///(app-pages-browser)/./src/lib/supabase.ts:47:28)\n    at eval (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/helpers.js:119:29)\n    at _handleRequest (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/fetch.js:122:24)\n    at _request (webpack-in"
+        },
+        {
+          "route": "/customer/privacy",
+          "text": "TypeError: Failed to fetch\n    at stepUpAwareFetch (webpack-internal:///(app-pages-browser)/./src/lib/supabase.ts:47:28)\n    at eval (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/helpers.js:119:29)\n    at _handleRequest (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/fetch.js:122:24)\n    at _request (webpack-in"
+        },
+        {
+          "route": "/customer/privacy",
+          "text": "TypeError: Failed to fetch\n    at stepUpAwareFetch (webpack-internal:///(app-pages-browser)/./src/lib/supabase.ts:47:28)\n    at eval (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/helpers.js:119:29)\n    at _handleRequest (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/fetch.js:122:24)\n    at _request (webpack-in"
+        }
+      ],
+      "httpFailures": []
+    }
+  },
+  {
+    "type": "deletion",
+    "keyboard": true,
+    "deletionChecked": true,
+    "preview": "ما الذي سيحدث: يُحذف حسابك وملفك الشخصي وبيانات التواصل والموافقات والمفضلة ورموز الأجهزة وكل رسائلك، وتُتلف إجابات الاستبيان الصحي. تُحفظ 0 حجوزات مرتبطة بفاتورة ضريبية أو دفعة لمدة ١٠ سنوات دون اسمك (المادة ٨ من نظام الدفاتر التجارية وأحكام ضريبة القيمة المضافة)، وتُحذف 0 حجوزات أخرى. السجل المرتبط بنزاع دفع مفتوح يُحفظ حتى ٣٠ يوماً بعد إغلاقه.",
+    "noReviewChoice": "Please select one of these options.",
+    "noReviewPanel": 0,
+    "code": {
+      "opened": true,
+      "body": "تأكيد هويتك\n\nنرسل رمزاً لمرة واحدة إلى ux2.cust2.1792186244975@example.test. أدخله هنا ثم يُرسل الطلب.\n\nإرسال الرمز",
+      "focusOnOpen": "BUTTON:إرسال الرمز",
+      "focusAfterSend": "one-time-code",
+      "badFormat": "أدخل الأرقام الستة من الرسالة التي أرسلناها."
+    },
+    "result": {
+      "role": "status",
+      "text": "استلمنا طلب حذف. سنرد قبل ١٦‏/١١‏/٢٠٢٦، والطلب مجاني.",
+      "focused": true
+    },
+    "list": [],
+    "shot": ".admin-console/evidence/ux-round2/cust-submit-deletion-keyboard-ar-375.png",
+    "overflow": {
+      "scrollWidth": 375,
+      "clientWidth": 375
+    }
+  },
+  {
+    "summary": {
+      "label": "customer-2",
+      "lang": "ar",
+      "width": 375,
+      "consoleErrors": [
+        {
+          "route": "/customer/privacy",
+          "text": "TypeError: Failed to fetch\n    at stepUpAwareFetch (webpack-internal:///(app-pages-browser)/./src/lib/supabase.ts:47:28)\n    at eval (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/helpers.js:119:29)\n    at _handleRequest (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/fetch.js:122:24)\n    at _request (webpack-in"
+        }
+      ],
+      "httpFailures": []
+    }
+  }
+]

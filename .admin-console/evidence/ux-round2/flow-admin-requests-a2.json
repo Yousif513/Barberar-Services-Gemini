@@ -1,0 +1,56 @@
+{
+  "phase": "a2",
+  "steps": [
+    {
+      "name": "list-after-approval",
+      "rows": [
+        "Copy Noura Test 8552d631 In the app 11 Oct 2026, 09:25 10 Nov 2026, 09:25 Open View",
+        "Access 197e449a 197e449a In the app 11 Oct 2026, 15:43 10 Nov 2026, 15:43 Open View",
+        "Access نورة القحطاني-Al Qahtani 4e0eea46 In the app 17 Oct 2026, 00:42 16 Dec 2026, 00:42 Open View"
+      ]
+    },
+    {
+      "name": "next Copy",
+      "note": "request not in the open list"
+    },
+    {
+      "name": "next Deletion",
+      "note": "request not in the open list"
+    },
+    {
+      "name": "closed-list",
+      "rows": [
+        "Deletion f6104388 f6104388 In the app 17 Oct 2026, 00:49 16 Nov 2026, 00:49 Completed View",
+        "Copy نورة القحطاني-Al Qahtani 4e0eea46 In the app 17 Oct 2026, 00:48 16 Nov 2026, 00:48 Completed View",
+        "Copy Maryam Bint Abdullah Al-Dosari-Alqahtani 0a17b8f1 Phone 17 Oct 2026, 00:52 16 Nov 2026, 00:52 Refused View",
+        "Correction نورة القحطاني-Al Qahtani 4e0eea46 In the app 17 Oct 2026, 00:48 16 Nov 2026, 00:48 Completed View",
+        "Consent withdrawal نورة القحطاني-Al Qahtani 4e0eea46 In the app 17 Oct 2026, 00:49 16 Nov 2026, 00:49 Completed View",
+        "Deletion 1836a001 1836a001 In the app 16 Oct 2026, 19:46 15 Nov 2026, 19:46 Completed View",
+        "Deletion fa2e6d21 fa2e6d21 In the app 16 Oct 2026, 19:45 15 Nov 2026, 19:45 Completed View",
+        "Copy 1836a001 1836a001 In the app 16 Oct 2026, 19:46 15 Nov 2026, 19:46 Completed View",
+        "Copy fa2e6d21 fa2e6d21 In the app 16 Oct 2026, 19:45 15 Nov 2026, 19:45 Withdrawn View",
+        "Deletion 95cca6f4 95cca6f4 In the app 11 Oct 2026, 16:03 10 Nov 2026, 16:03 Completed View",
+        "Deletion c3310335 c3310335 In the app 11 Oct 2026, 16:03 10 Nov 2026, 16:03 Completed View",
+        "Copy 95cca6f4 95cca6f4 In the app 11 Oct 2026, 16:03 10 Nov 2026, 16:03 Completed View",
+        "Copy c3310335 c3310335 In the app 11 Oct 2026, 16:03 10 Nov 2026, 16:03 Withdrawn View",
+        "Deletion 6980fced 6980fced In the app 11 Oct 2026, 09:24 10 Nov 2026, 09:24 Completed View",
+        "Copy 6980fced 6980fced In the app 11 Oct 2026, 09:24 10 Nov 2026, 09:24 Completed View",
+        "Copy b4c69b2f b4c69b2f In the app 11 Oct 2026, 09:23 10 Nov 2026, 09:23 Completed View",
+        "Deletion b4c69b2f b4c69b2f In the app 11 Oct 2026, 09:23 10 Nov 2026, 09:23 Completed View"
+      ],
+      "shot": ".admin-console/evidence/ux-round2/admin-privacy-closed-en-1440.png"
+    },
+    {
+      "name": "approvals-approved-tab",
+      "text": "Approvals\n\nActions that need a second administrator. You cannot approve your own request; the server refuses it for every role, owners included.\n\nWaiting\nApproved18\nRejected\nWithdrawn1\n\nNo request is waiting for a decision.\n\nBreak-glass reviews\n\nNo break-glass action needs a review.\n\nThresholds\n\nChanging a threshold is itself a request that another administrator with money rights approves.\n\nBreak-glass daily cap\nMost an owner may execute alone through break-glass in one Riyadh day\nSAR 10,000.00\nPropose change\nDaily refund total per administrator\nRefunds by one administrator above this total in one Riyadh day need a second administrator\nSAR 5,000.00\nPropose change\nSingle refund needing a second approver\nA single refund of this amount or more needs a second administrator\nSAR 1,000.00\nPropose change\nOpen security alerts\nAuthenticator added to an administrator account\n17 Oct 2026, 00:52\nAcknowledge\nAuthenticator added to an administrator account\n17 Oct 2026, 00:51\nAcknowledge\nAuthenticator added to an administrator account\n17 Oct 2026, 00:49\nAcknowledge\nAuthenticator added to an administrator account\n17 Oct 2026, 00:42\nAcknowledge\nAuthenticator added to an administrator account\n17 Oct 2026, 00:41\nAcknowledge\nAuthenticator added to an administrator account\n17 Oct 2026, 00:40\nAcknowledge\nAuthenticator added to an administrator account\n17 Oct 2026, 00:37\nAcknowledge\nAuthenticator added to an administrator account\n17 Oct 2026, 00:33\nAcknowledge\nAuthenticator added to an administrator"
+    }
+  ],
+  "summary": {
+    "label": "owner-a",
+    "lang": "en",
+    "width": 1440,
+    "consoleErrors": [],
+    "httpFailures": []
+  },
+  "aborted": []
+}

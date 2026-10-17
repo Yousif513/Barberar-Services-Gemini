@@ -1,0 +1,27 @@
+[
+  {
+    "account": "ux2-owner-g",
+    "lang": "ar",
+    "width": 375,
+    "steps": [
+      "after password: /login/mfa",
+      "console sent the account to: /login/mfa",
+      "enrol phase shown, h1=\"إعداد تطبيق المصادقة\""
+    ],
+    "factorsAfterFirstLoad": "1",
+    "screens": [
+      ".admin-console/evidence/ux-round2/mfa-enrol-ux2-owner-g-ar-375.png",
+      ".admin-console/evidence/ux-round2/mfa-validation-ux2-owner-g-ar-375.png",
+      ".admin-console/evidence/ux-round2/mfa-landed-ux2-owner-g-ar-375.png"
+    ],
+    "focusOnLoad": "one-time-code",
+    "validation": "أدخل الأرقام الستة الظاهرة في تطبيق المصادقة.",
+    "focusAfterValidation": "one-time-code",
+    "landedOn": "/admin",
+    "verifiedFactors": "1",
+    "unverifiedLeft": "0",
+    "label": "ux2-owner-g",
+    "consoleErrors": [],
+    "httpFailures": []
+  }
+]

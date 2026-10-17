@@ -1,0 +1,199 @@
+{
+  "who": "ux2-owner-c",
+  "lang": "en",
+  "width": 375,
+  "height": 600,
+  "routes": [
+    {
+      "route": "/admin/privacy",
+      "h1": "Privacy Requests",
+      "dir": "ltr",
+      "overflow": {
+        "scrollWidth": 375,
+        "clientWidth": 375
+      },
+      "shot": ".admin-console/evidence/ux-round2/sweep_admin_privacy-en-375.png",
+      "newConsoleErrors": []
+    },
+    {
+      "route": "/admin/privacy?tab=holds",
+      "h1": "Privacy Requests",
+      "dir": "ltr",
+      "overflow": {
+        "scrollWidth": 375,
+        "clientWidth": 375
+      },
+      "shot": ".admin-console/evidence/ux-round2/sweep_admin_privacy_tab_holds-en-375.png",
+      "newConsoleErrors": []
+    },
+    {
+      "route": "/admin/privacy?tab=ledger",
+      "h1": "Privacy Requests",
+      "dir": "ltr",
+      "overflow": {
+        "scrollWidth": 375,
+        "clientWidth": 375
+      },
+      "shot": ".admin-console/evidence/ux-round2/sweep_admin_privacy_tab_ledger-en-375.png",
+      "newConsoleErrors": []
+    },
+    {
+      "route": "/admin/approvals",
+      "h1": "Approvals",
+      "dir": "ltr",
+      "overflow": {
+        "scrollWidth": 375,
+        "clientWidth": 375
+      },
+      "shot": ".admin-console/evidence/ux-round2/sweep_admin_approvals-en-375.png",
+      "newConsoleErrors": []
+    },
+    {
+      "route": "/admin/incidents",
+      "h1": "Incident Register",
+      "dir": "ltr",
+      "overflow": {
+        "scrollWidth": 375,
+        "clientWidth": 375
+      },
+      "shot": ".admin-console/evidence/ux-round2/sweep_admin_incidents-en-375.png",
+      "newConsoleErrors": []
+    },
+    {
+      "route": "/admin/customers",
+      "h1": "Customer Directory & Data Rights",
+      "dir": "ltr",
+      "overflow": {
+        "scrollWidth": 375,
+        "clientWidth": 375
+      },
+      "shot": ".admin-console/evidence/ux-round2/sweep_admin_customers-en-375.png",
+      "newConsoleErrors": []
+    }
+  ],
+  "dialogs": [
+    {
+      "name": "privacy-note",
+      "overlayPosition": "fixed",
+      "containingBlockAncestor": null,
+      "dialog": [
+        16,
+        147,
+        359,
+        454
+      ],
+      "submitVisible": true,
+      "submit": [
+        219,
+        387,
+        334,
+        429
+      ],
+      "bodyScrollLocked": true,
+      "focusInside": true,
+      "viewport": [
+        375,
+        600
+      ],
+      "shot": ".admin-console/evidence/ux-round2/dialog-privacy-note-en-375.png",
+      "closedByEscape": true,
+      "focusAfterClose": "Add a note"
+    },
+    {
+      "name": "approvals-reject",
+      "overlayPosition": "fixed",
+      "containingBlockAncestor": null,
+      "dialog": [
+        16,
+        -33,
+        359,
+        634
+      ],
+      "submitVisible": false,
+      "submit": [
+        253,
+        567,
+        334,
+        609
+      ],
+      "bodyScrollLocked": true,
+      "focusInside": true,
+      "viewport": [
+        375,
+        600
+      ],
+      "shot": ".admin-console/evidence/ux-round2/dialog-approvals-reject-en-375.png",
+      "closedByEscape": true,
+      "focusAfterClose": "Reject"
+    },
+    {
+      "name": "incident-close",
+      "overlayPosition": "fixed",
+      "containingBlockAncestor": null,
+      "dialog": [
+        16,
+        111,
+        359,
+        490
+      ],
+      "submitVisible": true,
+      "submit": [
+        163,
+        423,
+        334,
+        465
+      ],
+      "bodyScrollLocked": true,
+      "focusInside": true,
+      "viewport": [
+        375,
+        600
+      ],
+      "shot": ".admin-console/evidence/ux-round2/dialog-incident-close-en-375.png",
+      "closedByEscape": true,
+      "focusAfterClose": "Close the incident"
+    },
+    {
+      "name": "customer-clear",
+      "overlayPosition": "fixed",
+      "containingBlockAncestor": null,
+      "dialog": [
+        16,
+        -250,
+        359,
+        851
+      ],
+      "submitVisible": false,
+      "submit": [
+        62,
+        786,
+        334,
+        826
+      ],
+      "bodyScrollLocked": true,
+      "focusInside": true,
+      "viewport": [
+        375,
+        600
+      ],
+      "shot": ".admin-console/evidence/ux-round2/dialog-customer-clear-en-375.png",
+      "closedByEscape": true,
+      "focusAfterClose": "Clear profile details"
+    }
+  ],
+  "label": "ux2-owner-c",
+  "consoleErrors": [
+    {
+      "route": "/login/mfa",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    }
+  ],
+  "httpFailures": [
+    {
+      "route": "/login/mfa",
+      "status": 401,
+      "url": "API/rest/v1/rpc/admin_session_state"
+    }
+  ],
+  "aborted": []
+}

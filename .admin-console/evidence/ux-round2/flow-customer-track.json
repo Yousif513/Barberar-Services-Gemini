@@ -1,0 +1,94 @@
+[
+  {
+    "who": "customer-1 ar 375",
+    "list": [
+      "سحب موافقة / مكتمل / الاستلام: ١٧‏/١٠‏/٢٠٢٦ · الرد قبل: ١٦‏/١١‏/٢٠٢٦",
+      "تصحيح / مكتمل / الاستلام: ١٧‏/١٠‏/٢٠٢٦ · الرد قبل: ١٦‏/١١‏/٢٠٢٦",
+      "نسخة / مكتمل / الاستلام: ١٧‏/١٠‏/٢٠٢٦ · الرد قبل: ١٦‏/١١‏/٢٠٢٦ / تنزيل PDF / تنزيل JSON / متاح حتى ٢٤‏/١٠‏/٢٠٢٦ · تتوفر نسخة مطبوعة عند الطلب.",
+      "اطلاع / مستلم / الاستلام: ١٧‏/١٠‏/٢٠٢٦ · الرد قبل: ١٦‏/١٢‏/٢٠٢٦ / مُدِّد مرة واحدة: We need records from three salons in two cities to answer your access request in full. / سحب الطلب"
+    ],
+    "shotList": ".admin-console/evidence/ux-round2/cust-track-ar-375.png",
+    "codeStepOpened": true,
+    "panelText": "تأكيد هويتك\n\nنرسل رمزاً لمرة واحدة إلى ux2.cust1.1792186244975@example.test. أدخله هنا ثم يُرسل الطلب.\n\nإرسال الرمز",
+    "focusOnPanel": "إرسال الرمز",
+    "wrongCode": "الرمز غير صحيح أو انتهت صلاحيته. اطلب رمزاً جديداً وأدخله خلال دقائق.",
+    "focusAfterWrong": "one-time-code",
+    "pdfDownload": "primora-personal-data.pdf",
+    "pdfBytes": 76559,
+    "pdfMagic": "%PDF-",
+    "codeStepForJson": false,
+    "jsonDownload": "primora-personal-data.json",
+    "jsonStartsWith": "{ \"format\": \"primora-personal-data-copy/1\", \"profile\": {",
+    "after": [
+      "سحب موافقة / مكتمل / الاستلام: ١٧‏/١٠‏/٢٠٢٦ · الرد قبل: ١٦‏/١١‏/٢٠٢٦",
+      "تصحيح / مكتمل / الاستلام: ١٧‏/١٠‏/٢٠٢٦ · الرد قبل: ١٦‏/١١‏/٢٠٢٦"
+    ],
+    "shotAfter": ".admin-console/evidence/ux-round2/cust-track-after-download-ar-375.png",
+    "overflow": {
+      "scrollWidth": 375,
+      "clientWidth": 375
+    },
+    "label": "customer-1",
+    "lang": "ar",
+    "width": 375,
+    "consoleErrors": [
+      {
+        "route": "/customer/privacy",
+        "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      }
+    ],
+    "httpFailures": [
+      {
+        "route": "/customer/privacy",
+        "status": 403,
+        "url": "API/auth/v1/verify"
+      }
+    ],
+    "aborted": [
+      "net::ERR_ABORTED http://127.0.0.1:54321/rest/v1/conversations",
+      "net::ERR_ABORTED http://127.0.0.1:54321/rest/v1/conversations",
+      "net::ERR_ABORTED http://127.0.0.1:54321/rest/v1/notifications",
+      "net::ERR_ABORTED http://127.0.0.1:54321/rest/v1/notifications",
+      "net::ERR_ABORTED http://127.0.0.1:54321/rest/v1/conversations",
+      "net::ERR_ABORTED http://127.0.0.1:54321/rest/v1/conversations"
+    ]
+  },
+  {
+    "who": "customer-3 en 375",
+    "list": [
+      "Copy / Refused / Received: 17 Oct 2026 · Answer by: 16 Nov 2026 / Reason: The caller could not answer any account question and the number differs from the account's verified phone. You have the right to complain to the Saudi Data and AI Authority (SDAIA) within 90 days."
+    ],
+    "shot": ".admin-console/evidence/ux-round2/cust-refused-en-375.png",
+    "overflow": {
+      "scrollWidth": 375,
+      "clientWidth": 375
+    },
+    "label": "customer-3",
+    "lang": "en",
+    "width": 375,
+    "consoleErrors": [],
+    "httpFailures": []
+  },
+  {
+    "who": "customer-2 (deleted) ar 375",
+    "path": "/login",
+    "message": "Invalid login credentials | ",
+    "shot": ".admin-console/evidence/ux-round2/cust-deleted-signin-ar-375.png",
+    "label": "customer-2",
+    "lang": "ar",
+    "width": 375,
+    "consoleErrors": [
+      {
+        "route": "/login",
+        "text": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+      }
+    ],
+    "httpFailures": [
+      {
+        "route": "/login",
+        "status": 400,
+        "url": "API/auth/v1/token"
+      }
+    ]
+  }
+]

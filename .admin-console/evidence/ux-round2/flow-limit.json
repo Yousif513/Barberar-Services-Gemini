@@ -1,0 +1,90 @@
+{
+  "usedBefore": 0,
+  "searches": [
+    {
+      "i": 1,
+      "stepUpAsked": false,
+      "rows": 1,
+      "status": ""
+    },
+    {
+      "i": 2,
+      "stepUpAsked": false,
+      "rows": 1,
+      "status": ""
+    },
+    {
+      "i": 3,
+      "stepUpAsked": false,
+      "rows": 1,
+      "status": ""
+    },
+    {
+      "i": 4,
+      "stepUpAsked": false,
+      "rows": 1,
+      "status": ""
+    },
+    {
+      "i": 5,
+      "stepUpAsked": false,
+      "rows": 1,
+      "status": ""
+    },
+    {
+      "i": 6,
+      "stepUpAsked": false,
+      "rows": 1,
+      "status": ""
+    },
+    {
+      "i": 7,
+      "stepUpAsked": false,
+      "rows": 1,
+      "status": ""
+    },
+    {
+      "i": 8,
+      "stepUpAsked": false,
+      "rows": 1,
+      "status": ""
+    },
+    {
+      "i": 9,
+      "stepUpAsked": false,
+      "rows": 1,
+      "status": ""
+    },
+    {
+      "i": 10,
+      "stepUpAsked": false,
+      "rows": 1,
+      "status": ""
+    },
+    {
+      "i": 11,
+      "stepUpAsked": false,
+      "rows": 0,
+      "status": "استخدمت عمليات البحث المتاحة لك (10 كل 10 دقائق). حاول مجدداً بعد ١٠:٣٩ ص. تم تنبيه الملاك."
+    },
+    {
+      "i": 12,
+      "stepUpAsked": false,
+      "rows": 0,
+      "status": "استخدمت عمليات البحث المتاحة لك (10 كل 10 دقائق). حاول مجدداً بعد ١٠:٣٩ ص. تم تنبيه الملاك."
+    }
+  ],
+  "limitShot": ".admin-console/evidence/ux-round2/lookup-limit-ar-375.png",
+  "focus": "log-subject",
+  "alerts": "1",
+  "refusedAudit": "2",
+  "overflow": {
+    "scrollWidth": 375,
+    "clientWidth": 375
+  },
+  "label": "owner-c",
+  "lang": "ar",
+  "width": 375,
+  "consoleErrors": [],
+  "httpFailures": []
+}

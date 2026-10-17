@@ -1,0 +1,153 @@
+[
+  {
+    "account": "ux2-owner-a",
+    "lang": "en",
+    "width": 1440,
+    "steps": [
+      "after password: /admin",
+      "enrol phase shown, h1=\"Set up your authenticator app\"",
+      "reload: new key differs (old factor replaced)"
+    ],
+    "factorsAfterFirstLoad": "1",
+    "factorsAfterReload": "1",
+    "screens": [
+      ".admin-console/evidence/ux-round2/mfa-enrol-ux2-owner-a-en-1440.png",
+      ".admin-console/evidence/ux-round2/mfa-validation-ux2-owner-a-en-1440.png",
+      ".admin-console/evidence/ux-round2/mfa-landed-ux2-owner-a-en-1440.png"
+    ],
+    "focusOnLoad": "one-time-code",
+    "validation": "Enter the 6 digits shown in your authenticator app.",
+    "focusAfterValidation": "one-time-code",
+    "landedOn": "/admin",
+    "verifiedFactors": "1",
+    "unverifiedLeft": "0",
+    "label": "ux2-owner-a",
+    "consoleErrors": [],
+    "httpFailures": []
+  },
+  {
+    "account": "ux2-owner-b",
+    "lang": "ar",
+    "width": 375,
+    "steps": [
+      "after password: /admin",
+      "enrol phase shown, h1=\"إعداد تطبيق المصادقة\"",
+      "reload: new key differs (old factor replaced)"
+    ],
+    "factorsAfterFirstLoad": "1",
+    "factorsAfterReload": "1",
+    "screens": [
+      ".admin-console/evidence/ux-round2/mfa-enrol-ux2-owner-b-ar-375.png",
+      ".admin-console/evidence/ux-round2/mfa-validation-ux2-owner-b-ar-375.png",
+      ".admin-console/evidence/ux-round2/mfa-landed-ux2-owner-b-ar-375.png"
+    ],
+    "focusOnLoad": "one-time-code",
+    "validation": "أدخل الأرقام الستة الظاهرة في تطبيق المصادقة.",
+    "focusAfterValidation": "one-time-code",
+    "landedOn": "/admin",
+    "verifiedFactors": "1",
+    "unverifiedLeft": "0",
+    "label": "ux2-owner-b",
+    "consoleErrors": [
+      {
+        "route": "/login/mfa",
+        "text": "TypeError: Failed to fetch\n    at stepUpAwareFetch (webpack-internal:///(app-pages-browser)/./src/lib/supabase.ts:47:28)\n    at eval (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/helpers.js:119:29)\n    at _handleRequest (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/fetch.js:122:24)\n    at _request (webpack-in"
+      },
+      {
+        "route": "/login/mfa",
+        "text": "TypeError: Failed to fetch\n    at stepUpAwareFetch (webpack-internal:///(app-pages-browser)/./src/lib/supabase.ts:47:28)\n    at eval (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/helpers.js:119:29)\n    at _handleRequest (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/fetch.js:122:24)\n    at _request (webpack-in"
+      },
+      {
+        "route": "/login/mfa",
+        "text": "TypeError: Failed to fetch\n    at stepUpAwareFetch (webpack-internal:///(app-pages-browser)/./src/lib/supabase.ts:47:28)\n    at eval (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/helpers.js:119:29)\n    at _handleRequest (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/fetch.js:122:24)\n    at _request (webpack-in"
+      },
+      {
+        "route": "/login/mfa",
+        "text": "TypeError: Failed to fetch\n    at stepUpAwareFetch (webpack-internal:///(app-pages-browser)/./src/lib/supabase.ts:47:28)\n    at eval (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/helpers.js:119:29)\n    at _handleRequest (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/fetch.js:122:24)\n    at _request (webpack-in"
+      }
+    ],
+    "httpFailures": []
+  },
+  {
+    "account": "ux2-owner-c",
+    "lang": "en",
+    "width": 1440,
+    "steps": [
+      "after password: /admin",
+      "enrol phase shown, h1=\"Set up your authenticator app\""
+    ],
+    "factorsAfterFirstLoad": "1",
+    "screens": [
+      ".admin-console/evidence/ux-round2/mfa-enrol-ux2-owner-c-en-1440.png",
+      ".admin-console/evidence/ux-round2/mfa-validation-ux2-owner-c-en-1440.png",
+      ".admin-console/evidence/ux-round2/mfa-landed-ux2-owner-c-en-1440.png"
+    ],
+    "focusOnLoad": "one-time-code",
+    "validation": "Enter the 6 digits shown in your authenticator app.",
+    "focusAfterValidation": "one-time-code",
+    "landedOn": "/admin",
+    "verifiedFactors": "1",
+    "unverifiedLeft": "0",
+    "label": "ux2-owner-c",
+    "consoleErrors": [
+      {
+        "route": "/login/mfa",
+        "text": "TypeError: Failed to fetch\n    at stepUpAwareFetch (webpack-internal:///(app-pages-browser)/./src/lib/supabase.ts:47:28)\n    at eval (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/helpers.js:119:29)\n    at _handleRequest (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/fetch.js:122:24)\n    at _request (webpack-in"
+      },
+      {
+        "route": "/login/mfa",
+        "text": "TypeError: Failed to fetch\n    at stepUpAwareFetch (webpack-internal:///(app-pages-browser)/./src/lib/supabase.ts:47:28)\n    at eval (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/helpers.js:119:29)\n    at _handleRequest (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/fetch.js:122:24)\n    at _request (webpack-in"
+      },
+      {
+        "route": "/login/mfa",
+        "text": "TypeError: Failed to fetch\n    at stepUpAwareFetch (webpack-internal:///(app-pages-browser)/./src/lib/supabase.ts:47:28)\n    at eval (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/helpers.js:119:29)\n    at _handleRequest (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/fetch.js:122:24)\n    at _request (webpack-in"
+      },
+      {
+        "route": "/login/mfa",
+        "text": "TypeError: Failed to fetch\n    at stepUpAwareFetch (webpack-internal:///(app-pages-browser)/./src/lib/supabase.ts:47:28)\n    at eval (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/helpers.js:119:29)\n    at _handleRequest (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/fetch.js:122:24)\n    at _request (webpack-in"
+      }
+    ],
+    "httpFailures": []
+  },
+  {
+    "account": "ux2-owner-d",
+    "lang": "en",
+    "width": 1440,
+    "steps": [
+      "after password: /admin",
+      "enrol phase shown, h1=\"Set up your authenticator app\""
+    ],
+    "factorsAfterFirstLoad": "1",
+    "screens": [
+      ".admin-console/evidence/ux-round2/mfa-enrol-ux2-owner-d-en-1440.png",
+      ".admin-console/evidence/ux-round2/mfa-validation-ux2-owner-d-en-1440.png",
+      ".admin-console/evidence/ux-round2/mfa-landed-ux2-owner-d-en-1440.png"
+    ],
+    "focusOnLoad": "one-time-code",
+    "validation": "Enter the 6 digits shown in your authenticator app.",
+    "focusAfterValidation": "one-time-code",
+    "landedOn": "/admin",
+    "verifiedFactors": "1",
+    "unverifiedLeft": "0",
+    "label": "ux2-owner-d",
+    "consoleErrors": [
+      {
+        "route": "/login/mfa",
+        "text": "TypeError: Failed to fetch\n    at stepUpAwareFetch (webpack-internal:///(app-pages-browser)/./src/lib/supabase.ts:47:28)\n    at eval (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/helpers.js:119:29)\n    at _handleRequest (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/fetch.js:122:24)\n    at _request (webpack-in"
+      },
+      {
+        "route": "/login/mfa",
+        "text": "TypeError: Failed to fetch\n    at stepUpAwareFetch (webpack-internal:///(app-pages-browser)/./src/lib/supabase.ts:47:28)\n    at eval (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/helpers.js:119:29)\n    at _handleRequest (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/fetch.js:122:24)\n    at _request (webpack-in"
+      },
+      {
+        "route": "/login/mfa",
+        "text": "TypeError: Failed to fetch\n    at stepUpAwareFetch (webpack-internal:///(app-pages-browser)/./src/lib/supabase.ts:47:28)\n    at eval (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/helpers.js:119:29)\n    at _handleRequest (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/fetch.js:122:24)\n    at _request (webpack-in"
+      },
+      {
+        "route": "/login/mfa",
+        "text": "TypeError: Failed to fetch\n    at stepUpAwareFetch (webpack-internal:///(app-pages-browser)/./src/lib/supabase.ts:47:28)\n    at eval (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/helpers.js:119:29)\n    at _handleRequest (webpack-internal:///(app-pages-browser)/../node_modules/@supabase/auth-js/dist/module/lib/fetch.js:122:24)\n    at _request (webpack-in"
+      }
+    ],
+    "httpFailures": []
+  }
+]

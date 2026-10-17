@@ -1,0 +1,56 @@
+{
+  "chain": [
+    {
+      "tag": "FORM",
+      "cls": "max-h-full w-full max-w-lg overflow-y-auto rounded-[28px] border bg-white p-6 shadow-2xl b",
+      "position": "static",
+      "overflowY": "auto",
+      "maxHeight": "none",
+      "height": 1101,
+      "scrollH": 1099,
+      "clientH": 1099
+    },
+    {
+      "tag": "DIV",
+      "cls": "fixed inset-0 z-[9999] flex items-center justify-center bg-[#101828]/55 px-4 py-8 backdrop",
+      "position": "fixed",
+      "overflowY": "visible",
+      "maxHeight": "none",
+      "height": 600,
+      "scrollH": 851,
+      "clientH": 600
+    },
+    {
+      "tag": "BODY",
+      "cls": "min-h-full flex flex-col font-sans bg-stone-50 text-stone-900",
+      "position": "static",
+      "overflowY": "hidden",
+      "maxHeight": "none",
+      "height": 1010,
+      "scrollH": 1010,
+      "clientH": 1010
+    },
+    {
+      "tag": "HTML",
+      "cls": "h-full antialiased __variable_f9ef76",
+      "position": "static",
+      "overflowY": "hidden",
+      "maxHeight": "none",
+      "height": 600,
+      "scrollH": 1010,
+      "clientH": 600
+    }
+  ],
+  "afterWheel": [
+    786,
+    826
+  ],
+  "titleAfterWheel": -225,
+  "focused": {
+    "text": "Cancel",
+    "tag": "BUTTON",
+    "top": 736,
+    "bottom": 778
+  },
+  "shot": ".admin-console/evidence/ux-round2/dialog-customer-clear-after-scroll-en-375.png"
+}

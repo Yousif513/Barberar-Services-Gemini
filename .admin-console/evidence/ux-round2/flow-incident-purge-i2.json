@@ -1,0 +1,49 @@
+{
+  "phase": "i2",
+  "steps": [
+    {
+      "name": "approvals-rows",
+      "rows": [
+        " تصحيح وقت العلم بحادثة (يغيّر مهلة سدايا) INC-2026-0002 · مهلة سدايا ٢٠‏/١٠‏/٢٠٢٦، ٥:٢٦ ص ← ٢٠‏/١٠‏/٢٠٢٦، ٤:٤٢ ص (-0.7 ساعة) ١٧‏/١٠‏/٢٠٢٦، ١٠:٢٧ ص — UX2 Owner A The salon reported receiving the file 45 minutes before our first log entry. اعتماد رفض",
+        " حذف سجلات العملاء المحذوفين بعد انتهاء مدة الاحتفاظ (لا يمكن التراجع عنه) تجربة بتاريخ 2026-10-17: حذف 0 سجلاً فرعياً و0 حجزاً، والإبقاء على 0 حجزاً دون هوية؛ يُعاد العدّ عند التنفيذ المعتمد ١٧‏/١٠‏/٢٠٢٦، ١٠:٢٦ ص — UX2 Owner A UX round-2 check: real purge must become an approval request اعتماد رفض"
+      ],
+      "shot": ".admin-console/evidence/ux-round2/approvals-incident-purge-ar-375.png"
+    },
+    {
+      "name": "approve تصحيح وقت العلم",
+      "dialogText": "اعتماد: تصحيح وقت العلم بحادثة (يغيّر مهلة سدايا)\n\nالاعتماد يطبّق التغيير الآن باسمك مع فحوصاته. يحتاج رمزاً جديداً من تطبيق المصادقة.\n\nالطلب\nINC-2026-0002 · مهلة سدايا ٢٠‏/١٠‏/٢٠٢٦، ٥:٢٦ ص ← ٢٠‏/١٠‏/٢٠٢٦، ٤:٤٢ ص (-0.7 ساعة)\nمقدّم الطلب\nUX2 Owner A\nالسبب\nThe salon reported receiving the file 45 minutes before our first log entry.\nما سبب قرارك؟\n\nيُسجَّل في سجل التدقيق باسمك.\n\nإلغاء\nاعتماد",
+      "title": "اعتماد: تصحيح وقت العلم بحادثة (يغيّر مهلة سدايا)",
+      "stepUp": false,
+      "closed": true,
+      "notice": [
+        "تم الاعتماد والتنفيذ.\n\nإغلاق"
+      ]
+    },
+    {
+      "name": "reject حذف سجلات العملاء المحذوفين",
+      "dialogText": "رفض: حذف سجلات العملاء المحذوفين بعد انتهاء مدة الاحتفاظ (لا يمكن التراجع عنه)\n\nالرفض يغلق الطلب؛ لا يُدفع أو يُسترد أو يتغير شيء.\n\nالطلب\nتجربة بتاريخ 2026-10-17: حذف 0 سجلاً فرعياً و0 حجزاً، والإبقاء على 0 حجزاً دون هوية؛ يُعاد العدّ عند التنفيذ المعتمد\nمقدّم الطلب\nUX2 Owner A\nالسبب\nUX round-2 check: real purge must become an approval request\nما سبب قرارك؟\n\nيُسجَّل في سجل التدقيق باسمك.\n\nإلغاء\nرفض",
+      "title": "رفض: حذف سجلات العملاء المحذوفين بعد انتهاء مدة الاحتفاظ (لا يمكن التراجع عنه)",
+      "stepUp": false,
+      "closed": true,
+      "notice": [
+        "تم الرفض.\n\nإغلاق"
+      ]
+    },
+    {
+      "name": "incident-after",
+      "detail": "INC-2026-0002 · UX2 test: provider export e-mailed to the wrong salon\n\nA provider payout export with 37 customer names and phone numbers was e-mailed to the wrong salon owner at 18:40.\n\nمهلة سدايا: ٢٠‏/١٠‏/٢٠٢٦، ٤:٤٢ ص · متبقٍ ٦٦٫٢ ساعة · تُحفظ حتى ١٧‏/١٠‏/٢٠٣١، ١٠:٢٦ ص\n\nإغلاق الحادثة\n\nصُحح وقت العلم في ١٧‏/١٠‏/٢٠٢٦، ١٠:٢٨ ص؛ سُجل أولاً ١٧‏/١٠‏/٢٠٢٦، ٥:٢٦ ص.\n\nالتقييم\nفئات أصحاب البيانات (مفصولة بفواصل)\nالعدد التقريبي لأصحاب البيانات\nأنواع البيانات (مفصولة بفواصل)\nمستوى الخطر\nلم يُقيَّم\nلا ضرر ممكن\nمنخفض\nمتوسط\nمرتفع\nتقييم المخاطر\nإجراءات الاحتواء\nالإجراءات الوقائية\nحفظ التقييم\nتم الاحتواء\nإبلاغ سدايا\nالقرار\nإبلاغ سدايا\nعدم الإبلاغ: لا ضرر ممكن (مسبب)\nمرجع سدايا\nوقت الإبلاغ (بتوقيت الرياض)\nسبب",
+      "overflow": {
+        "scrollWidth": 375,
+        "clientWidth": 375
+      },
+      "shot": ".admin-console/evidence/ux-round2/incident-corrected-ar-375.png"
+    }
+  ],
+  "summary": {
+    "label": "owner-b",
+    "lang": "ar",
+    "width": 375,
+    "consoleErrors": [],
+    "httpFailures": []
+  }
+}
