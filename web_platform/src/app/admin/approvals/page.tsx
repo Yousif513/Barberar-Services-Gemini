@@ -16,7 +16,8 @@ import { GovernanceNotices } from "./governance-notices";
 // opens an independent review due within 7 days, which is signed off below.
 
 // Kinds whose approval moves or holds money, where the balance, hold and duplicate checks run again.
-const MONEY_KINDS: string[] = ["payout_release", "refund", "ledger_settlement", "ledger_adjustment", "payout_hold", "booking_cancellation", "reconciliation_import"];
+const MONEY_KINDS: string[] = ["payout_release", "refund", "ledger_settlement", "ledger_adjustment", "payout_hold", "booking_cancellation", "reconciliation_import",
+  "refund_outcome", "membership_cancellation"];
 const PAGE_SIZE = 25;
 const STATUSES = ["pending", "approved", "rejected", "cancelled"] as const;
 type Status = (typeof STATUSES)[number];
@@ -25,7 +26,8 @@ type ApprovalRow = {
   id: string;
   kind: "payout_release" | "refund" | "iban_change" | "setting_change" | "ledger_settlement" | "ledger_adjustment" | "fee_rule_change" | "payout_hold" | "reward_program" | "role_change" | "booking_cancellation" | "reconciliation_import" | "sponsored_price_change"
     | "privacy_export" | "privacy_deletion" | "privacy_legal_hold" | "customer_profile_clear"
-    | "privacy_legal_hold_release" | "privacy_legal_hold_renewal" | "incident_aware_at_correction" | "privacy_retention_purge";
+    | "privacy_legal_hold_release" | "privacy_legal_hold_renewal" | "incident_aware_at_correction" | "privacy_retention_purge"
+    | "refund_outcome" | "membership_cancellation";
   status: string;
   target_id: string | null;
   amount_sar: Numeric;
@@ -90,7 +92,9 @@ const translations = {
       privacy_legal_hold_release: "Early release of a legal hold (erases what it kept)",
       privacy_legal_hold_renewal: "Renewal of a legal hold kept for over a year",
       incident_aware_at_correction: "Correction of an incident's awareness time (moves the SDAIA deadline)",
-      privacy_retention_purge: "Retention purge of erased customers' records (irreversible)" },
+      privacy_retention_purge: "Retention purge of erased customers' records (irreversible)",
+      refund_outcome: "Outcome of a refund Tap did not confirm",
+      membership_cancellation: "Membership cancellation with refund" },
     holdRenewals: "renewed {n} times",
     customerErased: "customer already erased",
     accountHeld: "account held",
@@ -110,6 +114,7 @@ const translations = {
     describeParts: { increase: "increase, 30 days notice", from: "from", place: "place hold", lift: "lift hold", enable: "enable", disable: "disable",
       reference: "bank reference", provider: "provider", platform: "platform", tap: "Tap object",
       cancelBooking: "cancel booking", noShowBooking: "no-show", invoice: "invoice", refund: "refund",
+      tapPaid: "Tap shows it paid", tapNotPaid: "Tap shows no refund", tapRefundId: "Tap refund", unusedVisits: "visits left",
       sources: { tap_settlement_file: "Tap settlement file", bank_statement: "bank statement" } as Record<string, string>,
       rows: "lines", day: "day", breakDiff: "break difference", corrected: "already corrected", partial: "partial correction" },
     columnRequest: "Request",
@@ -224,7 +229,9 @@ const translations = {
       privacy_legal_hold_release: "رفع حجز قانوني قبل موعده (يحذف ما احتفظ به)",
       privacy_legal_hold_renewal: "تجديد حجز قانوني مضى عليه أكثر من سنة",
       incident_aware_at_correction: "تصحيح وقت العلم بحادثة (يغيّر مهلة سدايا)",
-      privacy_retention_purge: "حذف سجلات العملاء المحذوفين بعد انتهاء مدة الاحتفاظ (لا يمكن التراجع عنه)" },
+      privacy_retention_purge: "حذف سجلات العملاء المحذوفين بعد انتهاء مدة الاحتفاظ (لا يمكن التراجع عنه)",
+      refund_outcome: "نتيجة استرداد لم تؤكدها Tap",
+      membership_cancellation: "إلغاء عضوية مع استرداد" },
     holdRenewals: "جُدد {n} مرات",
     customerErased: "حُذف حساب العميل",
     accountHeld: "الحساب محتجز",
@@ -244,6 +251,7 @@ const translations = {
     describeParts: { increase: "زيادة، إشعار ٣٠ يوماً", from: "من", place: "إيقاف", lift: "رفع الإيقاف", enable: "تفعيل", disable: "إيقاف",
       reference: "المرجع البنكي", provider: "المزود", platform: "المنصة", tap: "معرّف Tap",
       cancelBooking: "إلغاء الحجز", noShowBooking: "عدم حضور", invoice: "الفاتورة", refund: "الاسترداد",
+      tapPaid: "تظهر Tap أنه دُفع", tapNotPaid: "لا تظهر Tap أي استرداد", tapRefundId: "استرداد Tap", unusedVisits: "زيارات متبقية",
       sources: { tap_settlement_file: "ملف تسويات Tap", bank_statement: "كشف الحساب البنكي" } as Record<string, string>,
       rows: "أسطر", day: "اليوم", breakDiff: "مبلغ الفرق", corrected: "المصحَّح سابقاً", partial: "تصحيح جزئي" },
     columnRequest: "الطلب",
@@ -475,6 +483,14 @@ function ApprovalsScreen() {
     if (row.kind === "booking_cancellation") {
       return [providerName(row), s.action === "no_show" ? d.noShowBooking : d.cancelBooking, s.invoice_number ? `${d.invoice} ${text(s.invoice_number)}` : "",
         `${d.refund} ${sar(toNumber(s.refund_amount as Numeric), lang)}`].filter(Boolean).join(" · ");
+    }
+    if (row.kind === "refund_outcome") {
+      return [providerName(row), s.outcome === "refunded_at_tap" ? d.tapPaid : d.tapNotPaid, s.tap_refund_id ? `${d.tapRefundId} ${text(s.tap_refund_id)}` : "",
+        `${d.refund} ${sar(toNumber(s.amount as Numeric), lang)}`].filter(Boolean).join(" · ");
+    }
+    if (row.kind === "membership_cancellation") {
+      return [providerName(row), lang === "ar" ? text(s.plan_name_ar) : text(s.plan_name_en),
+        `${text(s.visits_remaining)}/${text(s.visits_per_period)} ${d.unusedVisits}`, `${d.refund} ${sar(toNumber(s.refund_amount as Numeric), lang)}`].filter(Boolean).join(" · ");
     }
     if (row.kind === "role_change") {
       const role = (value: unknown) => (typeof value === "string" && value ? t.consoleRoles[value] ?? value : t.noConsoleRole);

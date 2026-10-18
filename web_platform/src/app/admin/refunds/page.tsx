@@ -34,6 +34,7 @@ type RefundRow = {
   last_tap_check_at?: string | null;
   outcome_unknown_at?: string | null;
   pending_decision_id?: string | null;
+  purchase_type?: string | null;
 };
 
 type Filter = "attention" | "unknown" | "failed" | "pending" | "processing" | "succeeded" | "all";
@@ -61,7 +62,13 @@ const translations = {
       dispute: "Dispute",
       admin: "Operator",
       late_payment_conflict: "Late payment for a released slot",
+      admin_cancellation: "Console cancellation",
+      admin_no_show: "Console no-show",
+      customer_membership_cancellation: "Membership cancelled by the customer",
+      provider_membership_cancellation: "Membership cancelled by the provider",
+      admin_membership_cancellation: "Membership cancelled from the console",
     } as Record<string, string>,
+    purchases: { membership: "Membership", package: "Package" } as Record<string, string>,
     statuses: { pending: "Waiting", processing: "In progress", succeeded: "Returned", failed: "Failed", unknown: "Outcome unknown" } as Record<string, string>,
     attempt: "Attempt {n} of {max}",
     stalled: "No longer retried automatically",
@@ -152,7 +159,13 @@ const translations = {
       dispute: "نزاع",
       admin: "المشرف",
       late_payment_conflict: "دفع متأخر لموعد أُطلق",
+      admin_cancellation: "إلغاء من لوحة الإدارة",
+      admin_no_show: "عدم حضور مسجل من لوحة الإدارة",
+      customer_membership_cancellation: "عضوية ألغاها العميل",
+      provider_membership_cancellation: "عضوية ألغاها مقدم الخدمة",
+      admin_membership_cancellation: "عضوية أُلغيت من لوحة الإدارة",
     } as Record<string, string>,
+    purchases: { membership: "عضوية", package: "باقة" } as Record<string, string>,
     statuses: { pending: "بالانتظار", processing: "قيد المعالجة", succeeded: "أُعيدت", failed: "فشلت", unknown: "النتيجة غير معروفة" } as Record<string, string>,
     attempt: "المحاولة {n} من {max}",
     stalled: "لم تعد تُعاد محاولتها تلقائياً",
@@ -573,7 +586,7 @@ export default function AdminRefundsPage() {
                       <span className="line-clamp-2" title={row.reason}>{row.reason}</span>
                     </td>
                     <td className={`${cell} whitespace-nowrap text-xs text-gray-700`}>
-                      {row.bookings?.invoice_number ? `#${row.bookings.invoice_number}` : row.booking_id ? <span dir="ltr" className="font-mono">{row.booking_id.slice(0, 8)}</span> : "—"}
+                      {row.bookings?.invoice_number ? `#${row.bookings.invoice_number}` : row.booking_id ? <span dir="ltr" className="font-mono">{row.booking_id.slice(0, 8)}</span> : row.purchase_type ? (t.purchases[row.purchase_type] ?? row.purchase_type) : "—"}
                     </td>
                   </tr>
                 );

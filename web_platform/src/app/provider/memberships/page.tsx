@@ -77,7 +77,9 @@ const copy = {
     redeemIntro: "Pick the member's confirmed or completed booking this visit pays for. One booking carries one visit.",
     booking: "Booking", recorded: "Recorded on", pickBooking: "Choose a booking...", noEligible: "This member has no confirmed or completed booking at your salon that this membership covers and that has not already been used.",
     notes: "Notes (optional)", redeemConfirm: "Record visit", redeemed: "Visit recorded.", loadingBookings: "Loading bookings...",
-    cancelMembership: "Cancel membership", cancelTitle: "Cancel this membership?", cancelIntro: "The member forfeits the remaining visits. This does not refund a payment; refunds go through the refund process.",
+    cancelMembership: "Cancel membership", cancelTitle: "Cancel this membership?", cancelIntro: "The membership ends now and the customer is refunded to their original payment method: the greater of the unused visits and the unused time. The refunded part is never paid out to you.",
+    refundFact: "Refund to the customer", previewFailed: "The refund for this membership could not be worked out, so nothing was cancelled. Try again.",
+    cancelledRefund: "Membership cancelled. {sum} is being refunded to the customer.",
     cancelReason: "Reason for cancelling", cancelConfirm: "Cancel membership", cancelled: "Membership cancelled.",
     voidVisit: "Void", voidTitle: "Void this visit?", voidIntro: "The visit goes back to the member if the membership is still active, and the booking can be used again.",
     voidReason: "Reason for voiding", voidConfirm: "Void visit", voided: "Visit voided.", voidedTag: "Voided",
@@ -112,7 +114,9 @@ const copy = {
     redeemIntro: "اختر حجز العضو المؤكد أو المكتمل الذي تغطيه هذه الزيارة. كل حجز يحمل زيارة واحدة.",
     booking: "الحجز", recorded: "تاريخ التسجيل", pickBooking: "اختر حجزاً...", noEligible: "لا يوجد لهذا العضو حجز مؤكد أو مكتمل لدى صالونك تشمله العضوية ولم يُستخدم من قبل.",
     notes: "ملاحظات (اختياري)", redeemConfirm: "تسجيل الزيارة", redeemed: "تم تسجيل الزيارة.", loadingBookings: "جارٍ تحميل الحجوزات...",
-    cancelMembership: "إلغاء العضوية", cancelTitle: "إلغاء هذه العضوية؟", cancelIntro: "يفقد العضو زياراته المتبقية. هذا لا يعيد أي مبلغ؛ الاسترداد يتم عبر مسار الاسترداد.",
+    cancelMembership: "إلغاء العضوية", cancelTitle: "إلغاء هذه العضوية؟", cancelIntro: "تنتهي العضوية الآن ويُعاد للعميل إلى وسيلة الدفع الأصلية الأكبرُ من نصيب الزيارات غير المستخدمة ونصيب المدة المتبقية. لا يُصرف لك الجزء المُعاد أبداً.",
+    refundFact: "المبلغ المُعاد للعميل", previewFailed: "تعذر حساب المبلغ المسترد لهذه العضوية، لذلك لم يُلغَ شيء. حاول مجدداً.",
+    cancelledRefund: "أُلغيت العضوية. يُعاد للعميل {sum}.",
     cancelReason: "سبب الإلغاء", cancelConfirm: "إلغاء العضوية", cancelled: "تم إلغاء العضوية.",
     voidVisit: "إبطال", voidTitle: "إبطال هذه الزيارة؟", voidIntro: "تعود الزيارة إلى العضو إذا كانت العضوية نشطة، ويمكن استخدام الحجز من جديد.",
     voidReason: "سبب الإبطال", voidConfirm: "إبطال الزيارة", voided: "تم إبطال الزيارة.", voidedTag: "مُبطلة",
@@ -307,6 +311,15 @@ export default function ProviderMembershipsPage() {
   const [planDialog, setPlanDialog] = useState<{ id: string | null; form: PlanForm } | null>(null);
   const [redeemFor, setRedeemFor] = useState<MemberRow | null>(null);
   const [cancelFor, setCancelFor] = useState<MemberRow | null>(null);
+  // The refund the server will queue if the owner cancels now (preview_membership_cancellation).
+  const [cancelRefund, setCancelRefund] = useState<number | null>(null);
+  const askCancel = async (member: MemberRow) => {
+    setError("");
+    const { data, error: previewError } = await supabase.rpc("preview_membership_cancellation", { p_membership_id: member.membership_id });
+    if (previewError || !data) { setError(previewError ? membershipError(previewError, locale) : t.previewFailed); return; }
+    setCancelRefund(Number((data as { refund_amount?: number | string }).refund_amount ?? 0));
+    setCancelFor(member);
+  };
   const [voidFor, setVoidFor] = useState<Redemption | null>(null);
 
   useEffect(() => { writeUrlState({ tab: tab === "plans" ? "" : tab, status: statusFilter }); }, [tab, statusFilter]);
@@ -485,7 +498,7 @@ export default function ProviderMembershipsPage() {
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap gap-2">
                           {m.status === "active" && <button type="button" className={operationsButton} onClick={() => setRedeemFor(m)} aria-label={`${t.redeem}: ${m.customer_name ?? ""}`}>{t.redeem}</button>}
-                          {(m.status === "active" || m.status === "pending_payment") && <button type="button" className="rounded-xl border border-red-200 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-[#9B7928]" onClick={() => setCancelFor(m)} aria-label={`${t.cancelMembership}: ${m.customer_name ?? ""}`}>{t.cancelMembership}</button>}
+                          {(m.status === "active" || m.status === "pending_payment") && <button type="button" className="rounded-xl border border-red-200 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-[#9B7928]" onClick={() => void askCancel(m)} aria-label={`${t.cancelMembership}: ${m.customer_name ?? ""}`}>{t.cancelMembership}</button>}
                         </div>
                       </td>
                     </tr>
@@ -534,16 +547,18 @@ export default function ProviderMembershipsPage() {
       {redeemFor && <RedeemDialog locale={locale} t={t} member={redeemFor} onClose={() => setRedeemFor(null)} onDone={(message) => { setSuccess(message); void load(); }} />}
       {cancelFor && (
         <CommandDialog locale={locale} tone="danger" title={t.cancelTitle} intro={t.cancelIntro}
-          facts={[{ label: t.customer, value: cancelFor.customer_name ?? "—" }, { label: t.plan, value: locale === "ar" ? cancelFor.plan_name_ar : cancelFor.plan_name_en }]}
+          facts={[{ label: t.customer, value: cancelFor.customer_name ?? "—" }, { label: t.plan, value: locale === "ar" ? cancelFor.plan_name_ar : cancelFor.plan_name_en },
+            ...(cancelFor.status === "active" ? [{ label: t.refundFact, value: sar(cancelRefund ?? 0, locale) }] : [])]}
           reasonLabel={t.cancelReason} confirmLabel={t.cancelConfirm}
           onConfirm={async (reason) => {
-            const { error: rpcError } = await supabase.rpc("cancel_membership", { p_membership_id: cancelFor.membership_id, p_reason: reason });
+            const { data, error: rpcError } = await supabase.rpc("cancel_membership", { p_membership_id: cancelFor.membership_id, p_reason: reason });
             if (rpcError) return membershipError(rpcError, locale);
-            setSuccess(t.cancelled);
+            const back = Number((data as { refund_amount?: number | string } | null)?.refund_amount ?? 0);
+            setSuccess(back > 0 ? t.cancelledRefund.replace("{sum}", sar(back, locale)) : t.cancelled);
             await load();
             return null;
           }}
-          onClose={() => setCancelFor(null)} />
+          onClose={() => { setCancelFor(null); setCancelRefund(null); }} />
       )}
       {voidFor && (
         <CommandDialog locale={locale} tone="danger" title={t.voidTitle} intro={t.voidIntro}

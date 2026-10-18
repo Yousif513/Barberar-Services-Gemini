@@ -48,3 +48,55 @@ describe("refunds console: unknown refund outcomes (QA item 4)", () => {
     assert.match(page, /rpc\("admin_reopen_stuck_refund"/);
   });
 });
+
+describe("memberships and packages: refunds on cancellation and the customer's dispute path (RT-H2, RT-M3)", () => {
+  const customerMemberships = read("src/app/customer/memberships/page.tsx");
+  const customerPackages = read("src/app/customer/packages/page.tsx");
+  const providerMemberships = read("src/app/provider/memberships/page.tsx");
+  const shared = read("src/lib/purchase-disputes.ts");
+
+  it("customers report a problem through the server command only, in English and Arabic, with a 10-character reason", () => {
+    assert.match(shared, /rpc\("open_purchase_dispute", \{ p_purchase_type: type, p_purchase_id: id, p_reason: reason \}\)/);
+    assert.match(shared, /status !== "opened"\) throw/, "a report is shown as sent only when the server recorded it");
+    assert.match(shared, /report: "Report a problem"/);
+    assert.match(shared, /report: "الإبلاغ عن مشكلة"/);
+    for (const page of [customerMemberships, customerPackages]) {
+      assert.match(page, /openPurchaseDispute\("(membership|package)"/);
+      assert.match(page, /minReasonLength=\{10\}/);
+      assert.match(page, /loadPurchaseMoney\("(membership|package)"/);
+      assert.match(page, /disputeLabel\(d\.status, locale\)/);
+      assert.match(page, /refundStates\[r\.status\]/);
+      assert.doesNotMatch(page, /from\("payment_disputes"\)\s*\.(insert|update|upsert|delete)/);
+    }
+    assert.match(shared, /if \(disputes\.error\) throw disputes\.error;/, "a failed read is an error, not an empty list");
+  });
+
+  it("cancelling shows the refund the server will make before the person confirms, and reports what was refunded", () => {
+    for (const page of [customerMemberships, providerMemberships]) {
+      assert.match(page, /rpc\("preview_membership_cancellation", \{ p_membership_id: /);
+      assert.match(page, /refund_amount/);
+      assert.match(page, /rpc\("cancel_membership"/);
+    }
+    assert.doesNotMatch(customerMemberships, /does not refund a payment/);
+    assert.doesNotMatch(providerMemberships, /does not refund a payment/);
+    assert.match(customerMemberships, /cancelIntro: "يُنهي الإلغاء عضويتك الآن/);
+    assert.match(providerMemberships, /greater of the unused visits and the unused time/);
+  });
+
+  it("a bought package shows the terms it was bought with, not the package's live row", () => {
+    assert.match(customerPackages, /const totalSessions = item\.session_count \|\| 1;/);
+    assert.match(customerPackages, /item\.package_name_ar \|\| item\.package_name_en/);
+    assert.match(customerPackages, /sar\(Number\(item\.amount_paid\), locale\)/);
+  });
+
+  it("the console names purchase disputes and the two new approval kinds in both languages", () => {
+    const disputes = read("src/app/admin/disputes/page.tsx");
+    assert.match(disputes, /subjectMembership: "Membership"/);
+    assert.match(disputes, /subjectMembership: "العضوية"/);
+    const approvals = read("src/app/admin/approvals/page.tsx");
+    for (const kind of ["refund_outcome", "membership_cancellation"]) {
+      assert.equal(count(approvals, new RegExp(`${kind}: "`, "g")), 2, `${kind} has an English and an Arabic label`);
+      assert.match(approvals, new RegExp(`row\.kind === "${kind}"`));
+    }
+  });
+});
