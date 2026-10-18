@@ -123,6 +123,11 @@ export const HINT_TEXT = {
   service_price_invalid: { ar: "السعر مبلغ بالريال يساوي صفراً أو أكثر." },
   service_duration_invalid: { ar: "المدة بين ٥ و١٤٤٠ دقيقة." },
   service_image_invalid: { ar: `الصورة رابط يبدأ بـ ${isolate("https://")} أو مسار في الموقع يبدأ بـ /.` },
+  chat_server_only: { ar: "تُكتب المحادثات عبر أوامر الخادم فقط، لذا لم يتغير شيء." },
+  chat_message_immutable: { ar: "لا تتغير الرسالة بعد إرسالها." },
+  chat_participants_immutable: { ar: "لا يتغير طرفا المحادثة بعد إنشائها." },
+  chat_closed: { ar: "أُغلقت هذه المحادثة، ولا يمكن إرسال رسائل جديدة فيها." },
+  chat_rate_limited: { ar: "أرسلت رسائل كثيرة في وقت قصير. انتظر قليلاً ثم حاول مجدداً." },
 };
 
 // Frequent refusals that carry no HINT, matched on the server's English text.

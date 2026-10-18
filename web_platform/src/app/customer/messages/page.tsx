@@ -149,7 +149,9 @@ export default function CustomerMessages() {
     loadMessages(selectedId);
     const conv = conversations.find((c) => c.id === selectedId);
     if (conv?.unread) {
-      supabase.from("conversations").update({ unread_for_customer: false }).eq("id", selectedId).then(() => {
+      // RT-H1: the server clears this customer's unread flag; the thread is shown read only once it has.
+      supabase.rpc("mark_conversation_read", { p_conversation_id: selectedId }).then(({ error }) => {
+        if (error) return;
         setConversations((prev) => prev.map((c) => (c.id === selectedId ? { ...c, unread: false } : c)));
       });
     }
@@ -183,12 +185,8 @@ export default function CustomerMessages() {
     setSending(true);
     setSendError("");
     try {
-      const { error } = await supabase.from("messages").insert({
-        conversation_id: selectedConv.id,
-        sender_id: currentUserId,
-        sender_role: "customer",
-        body,
-      });
+      // RT-H1: the server sets the sender, side and time; the client sends only the thread and the text.
+      const { error } = await supabase.rpc("send_message", { p_conversation_id: selectedConv.id, p_body: body });
       if (error) throw error;
       setInputMessage("");
       await loadMessages(selectedConv.id);

@@ -3,7 +3,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { checkedWrite } from "@/lib/write-result.mjs";
 import { errorMessage } from "@/lib/error-message";
 
 interface Conversation {
@@ -166,8 +165,9 @@ export default function ProviderMessages() {
     const conv = conversations.find((c) => c.id === selectedId);
     if (conv?.unread) {
       // The conversation is shown as read only when the server stored it; otherwise it stays marked unread.
-      supabase.from("conversations").update({ unread_for_provider: false }).eq("id", selectedId).select("id").then((answer) => {
-        if (checkedWrite(answer, { expected: 1 }).error) return;
+      // RT-H1: the server clears the provider side's unread flag through mark_conversation_read.
+      supabase.rpc("mark_conversation_read", { p_conversation_id: selectedId }).then(({ error }) => {
+        if (error) return;
         setConversations((prev) => prev.map((c) => (c.id === selectedId ? { ...c, unread: false } : c)));
       });
     }
@@ -203,12 +203,8 @@ export default function ProviderMessages() {
     setSending(true);
     setSendError("");
     try {
-      const { error } = await supabase.from("messages").insert({
-        conversation_id: activeConv.id,
-        sender_id: currentUserId,
-        sender_role: "provider",
-        body,
-      });
+      // RT-H1: the server sets the sender, side and time; the client sends only the thread and the text.
+      const { error } = await supabase.rpc("send_message", { p_conversation_id: activeConv.id, p_body: body });
       if (error) throw error;
       setInputMessage("");
       await loadMessages(activeConv.id);

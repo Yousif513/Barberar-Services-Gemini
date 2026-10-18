@@ -167,8 +167,9 @@ export default function MessagesScreen() {
     setMessages([]);
     await loadMessages(thread.id);
     if (thread.unread) {
-      await supabase.from("conversations").update({ unread_for_customer: false }).eq("id", thread.id);
-      setThreads(prev => prev.map(x => (x.id === thread.id ? { ...x, unread: false } : x)));
+      // RT-H1: the server clears this customer's unread flag; the thread is shown read only once it has.
+      const { error } = await supabase.rpc("mark_conversation_read", { p_conversation_id: thread.id });
+      if (!error) setThreads(prev => prev.map(x => (x.id === thread.id ? { ...x, unread: false } : x)));
     }
   };
 
@@ -177,12 +178,8 @@ export default function MessagesScreen() {
     if (!body || !selectedThread || !userId || sending) return;
     setSending(true);
     try {
-      const { error } = await supabase.from("messages").insert({
-        conversation_id: selectedThread.id,
-        sender_id: userId,
-        sender_role: "customer",
-        body,
-      });
+      // RT-H1: the server sets the sender, side and time; the app sends only the thread and the text.
+      const { error } = await supabase.rpc("send_message", { p_conversation_id: selectedThread.id, p_body: body });
       if (error) throw error;
       setInputText("");
       await loadMessages(selectedThread.id);
