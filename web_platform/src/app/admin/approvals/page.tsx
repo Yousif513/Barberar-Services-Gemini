@@ -204,6 +204,7 @@ const translations = {
     } as Record<string, string>,
     done: "Done.",
     approvedDone: "Approved and executed.",
+    notPendingAnymore: "Nothing was changed: this request is no longer waiting ({status}). Reload the list.",
     rejectedDone: "Rejected.",
     proposedDone: "The change is waiting for a second administrator.",
     unnamed: "Unnamed account",
@@ -337,6 +338,7 @@ const translations = {
     } as Record<string, string>,
     done: "تم.",
     approvedDone: "تم الاعتماد والتنفيذ.",
+    notPendingAnymore: "لم يتغير شيء: لم يعد هذا الطلب بانتظار القرار ({status}). أعد تحميل القائمة.",
     rejectedDone: "تم الرفض.",
     proposedDone: "التغيير بانتظار اعتماد مسؤول ثانٍ.",
     unnamed: "حساب بلا اسم",
@@ -486,8 +488,15 @@ function ApprovalsScreen() {
   const requester = (row: ApprovalRow) => row.requested_by_name || (row.requested_role === "provider" ? t.provider_request : t.unnamed);
 
   const decide = async (row: ApprovalRow, decision: "approve" | "reject", reason: string): Promise<string | null> => {
-    const { error } = await supabase.rpc("admin_decide_approval", { p_request_id: row.id, p_decision: decision, p_reason: reason });
+    const { data, error } = await supabase.rpc("admin_decide_approval", { p_request_id: row.id, p_decision: decision, p_reason: reason });
     if (error) return describeConsoleError(error, lang);
+    // QAFIX: a request decided or withdrawn meanwhile is answered { unchanged: true, status } (a replay is harmless), which is
+    // not a decision of this person: it is said as such, never as "approved and executed".
+    const answer = data as { status?: string; unchanged?: boolean } | null;
+    if (answer?.unchanged || answer?.status !== (decision === "approve" ? "approved" : "rejected")) {
+      const status = answer?.status ?? "";
+      return fill(t.notPendingAnymore, { status: (t.tabs as Record<string, string>)[status] ?? status });
+    }
     // PRIV: an approved copy is built and an approved deletion's auth account removed right away by the Edge Functions (the
     // scheduler retries them too). A failure here leaves the approval done and the next step visible on the privacy screen.
     if (decision === "approve" && (row.kind === "privacy_export" || row.kind === "privacy_deletion")) {

@@ -281,7 +281,14 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
     })();
   }, [lang, reloadKey]);
 
-  const flash = (msg: string) => { setMethodError(""); setNote(msg); setTimeout(() => setNote(""), 4000); };
+  // One timer for the confirmation: a newer message is not cleared by the timer of the one before it.
+  const noteTimer = React.useRef<number | undefined>(undefined);
+  const flash = (msg: string) => {
+    setMethodError("");
+    setNote(msg);
+    window.clearTimeout(noteTimer.current);
+    noteTimer.current = window.setTimeout(() => setNote(""), 6000);
+  };
   const replaceMethod = (answer: PayMethod) => setMethods((prev) => prev.map((x) => (x.id === answer.id ? normalizePayMethod(answer) : x)));
 
   const toggleEnabled = (m: PayMethod) => { setNote(""); setMethodConfirm({ kind: "toggle", method: m }); };

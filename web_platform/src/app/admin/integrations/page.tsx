@@ -346,7 +346,14 @@ export default function AdminIntegrations() {
     logistics: lang === "ar" ? "التوصيل والتشغيل" : "Logistics"
   };
 
-  const flash = (msg: string) => { setError(""); setNote(msg); setTimeout(() => setNote(""), 4000); };
+  // One timer for the confirmation: a newer message is not cleared by the timer of the one before it.
+  const noteTimer = React.useRef<number | undefined>(undefined);
+  const flash = (msg: string) => {
+    setError("");
+    setNote(msg);
+    window.clearTimeout(noteTimer.current);
+    noteTimer.current = window.setTimeout(() => setNote(""), 6000);
+  };
   const replaceItem = (answer: Integration) => setItems((prev) => prev.map((x) => (x.id === answer.id ? normalizeIntegration(answer) : x)));
 
   // On/off, environment and connection status: admin_set_integration_state needs settings.manage, a fresh code and a reason,

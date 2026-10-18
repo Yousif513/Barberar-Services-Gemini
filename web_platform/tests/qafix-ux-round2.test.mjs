@@ -63,3 +63,11 @@ describe("retention-purge-console-entry-missing", () => {
     assert.ok(read("app/admin/privacy/page.tsx").includes("<RetentionPurgePanel lang={lang} onNotice={setNotice} />"));
   });
 });
+
+describe("approvals never report a decision the server did not make", () => {
+  it("treats the { unchanged: true } answer for a request decided or withdrawn meanwhile as a refusal", () => {
+    const code = read("app/admin/approvals/page.tsx");
+    assert.ok(code.includes('if (answer?.unchanged || answer?.status !== (decision === "approve" ? "approved" : "rejected"))'));
+    assert.ok(code.includes("t.notPendingAnymore"));
+  });
+});
