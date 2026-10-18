@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { checkedWrite } from "@/lib/write-result.mjs";
 import { ToastContainer } from "@/components/toast";
 
 interface Package {
@@ -214,15 +215,17 @@ export default function PackagesPage() {
 
   async function togglePackageStatus(id: string, currentStatus: boolean) {
     try {
-      const { error: updateError } = await supabase
+      const { error: updateError } = checkedWrite(await supabase
         .from("packages")
         .update({ is_active: !currentStatus })
-        .eq("id", id);
+        .eq("id", id)
+        .select("id"), { expected: 1 });
 
       if (updateError) throw updateError;
       loadPackages();
     } catch (err: any) {
-      console.error("Error updating package:", err.message);
+      // A refused or failed switch is said, never swallowed: the list then still shows the stored state.
+      addToast(err?.message || "Failed to update package.", "error");
     }
   }
 

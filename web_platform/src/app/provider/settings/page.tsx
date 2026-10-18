@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { checkedWrite } from "@/lib/write-result.mjs";
 import { BookingPolicyCard } from "../_components/booking-policy-card";
 import { DAY_KEYS, HoursApplyDialog, isOvernight, type DayKey, type StaffHours, type WeeklyHours } from "../_components/hours-apply";
 import { errorMessage } from "@/lib/error-message";
@@ -303,7 +304,7 @@ export default function ProviderSettingsPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user session");
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = checkedWrite(await supabase
         .from("providers")
         .update({
           business_name_en: businessNameEn,
@@ -312,7 +313,8 @@ export default function ProviderSettingsPage() {
           description_ar: descriptionAr,
           contact_phone: phone.trim() || null
         })
-        .eq("owner_id", user.id);
+        .eq("owner_id", user.id)
+        .select("id"), { lang: locale === "ar" ? "ar" : "en" });
 
       if (updateError) throw updateError;
 
@@ -333,7 +335,8 @@ export default function ProviderSettingsPage() {
     if (radiusTimer.current) clearTimeout(radiusTimer.current);
     radiusTimer.current = setTimeout(async () => {
       const { error: radiusError } = branchIds.length
-        ? await supabase.from("branches").update({ geofence_radius_km: val }).in("id", branchIds)
+        ? checkedWrite(await supabase.from("branches").update({ geofence_radius_km: val }).in("id", branchIds).select("id"),
+          { expected: branchIds.length, lang: locale === "ar" ? "ar" : "en" })
         : { error: new Error(locale === "en" ? "Add a branch first." : "أضف فرعاً أولاً.") };
       setGeofenceAutosaving(false);
       setGeofenceAutosaveText(radiusError

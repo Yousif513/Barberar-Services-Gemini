@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { checkedWrite } from "@/lib/write-result.mjs";
 import { errorMessage } from "@/lib/error-message";
 import { useConfirm } from "@/components/modal";
 import { riyadhDateKey } from "@/lib/booking-display.mjs";
@@ -118,7 +119,7 @@ export function MyLeaveSection({ lang, employeeId }: { lang: Lang; employeeId: s
     if (!yes) return;
     setBusy(true);
     setFailure("");
-    const { error } = await supabase.from("employee_time_off").delete().eq("id", row.id).eq("status", "pending");
+    const { error } = checkedWrite(await supabase.from("employee_time_off").delete().eq("id", row.id).eq("status", "pending").select("id"), { expected: 1, lang });
     setBusy(false);
     if (error) { setFailure(t.saveFailed + errorMessage(error)); return; }
     setVersion((value) => value + 1);

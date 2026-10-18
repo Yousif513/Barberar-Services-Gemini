@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { checkedWrite } from "@/lib/write-result.mjs";
 
 const translations = {
   en: {
@@ -181,15 +182,17 @@ export default function ResourcesPage() {
 
   async function toggleResourceStatus(id: string, currentStatus: boolean) {
     try {
-      const { error: updateError } = await supabase
+      const { error: updateError } = checkedWrite(await supabase
         .from("resources")
         .update({ is_active: !currentStatus })
-        .eq("id", id);
+        .eq("id", id)
+        .select("id"), { expected: 1, lang: locale === "ar" ? "ar" : "en" });
 
       if (updateError) throw updateError;
       loadResources();
     } catch (err: any) {
-      console.error("Error updating resource:", err.message);
+      // A refused or failed switch is said, never swallowed: the list then still shows the stored state.
+      setError(err?.message || (locale === "ar" ? "تعذر تحديث المورد." : "Failed to update resource."));
     }
   }
 

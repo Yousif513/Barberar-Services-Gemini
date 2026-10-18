@@ -159,7 +159,9 @@ describe("admin console guards", () => {
   it("provider edits write only the fields the operator changed and keep the dialog open on failure", () => {
     const providers = files.find((f) => f.path === `${ADMIN_ROOT}/providers/provider-management.tsx`).code;
     assert.ok(providers.includes("payload.contact_email =") && providers.includes("!== editing.contactEmail"), "unchanged values are not rewritten");
-    assert.ok(providers.includes("setDraftError(errorMessage(updateError))"), "a failed save is shown inside the dialog");
+    // QAFIX: the edit names the row it changed, so a refusing row policy (no row) is a failure shown in the dialog too.
+    assert.ok(providers.includes("setDraftError(describeConsoleError(editOutcome.error, lang))"), "a failed save is shown inside the dialog");
+    assert.ok(providers.includes('.eq("id", editing.id).select("id"), 1)'), "zero rows changed is a failure, not a save");
   });
 
   it("a failed applications query is reported, not shown as an empty queue", () => {
@@ -323,7 +325,8 @@ describe("admin console guards", () => {
     }
     // GOV-1 (Q3): the fourth is reveal_provider_iban, which also needs a referenced reason.
     assert.ok(ledger.includes('"reveal_provider_iban", { p_provider_id: request.provider_id, p_reason: reason }'), "an IBAN is revealed only with a reason");
-    assert.equal((ledger.match(/p_reason: reason/g) ?? []).length, 4, "all four ledger commands send the reason from the dialog");
+    // QAFIX: the payment-method switch, default and gateway commands take the dialog's reason too (4 money + 3 settings).
+    assert.equal((ledger.match(/p_reason: reason/g) ?? []).length, 7, "all seven ledger commands send the reason from the dialog");
     assert.ok(ledger.includes("confirmWord={Number(request.amount || 0).toFixed(2)}"), "paying out needs the amount typed");
     assert.ok(page("/disputes").includes("<CommandDialog") && page("/reviews").includes("<CommandDialog"), "dispute decisions and review moderation use the dialog");
     const providers = files.find((f) => f.path === `${ADMIN_ROOT}/providers/provider-management.tsx`).code;

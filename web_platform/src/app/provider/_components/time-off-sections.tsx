@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { checkedWrite } from "@/lib/write-result.mjs";
 import { errorMessage } from "@/lib/error-message";
 import { useConfirm } from "@/components/modal";
 import { riyadhDateKey } from "@/lib/booking-display.mjs";
@@ -279,7 +280,7 @@ export function ClosuresSection({ lang, providerId, branches }: { lang: Lang; pr
     });
     if (!yes) return;
     setBusy(true);
-    const { error } = await supabase.from("provider_closures").delete().eq("id", row.id);
+    const { error } = checkedWrite(await supabase.from("provider_closures").delete().eq("id", row.id).select("id"), { expected: 1, lang });
     setBusy(false);
     if (error) { setFailure(t.saveFailed + errorMessage(error)); return; }
     setVersion((value) => value + 1);
@@ -408,7 +409,7 @@ export function SeasonsSection({ lang, providerId, branches }: { lang: Lang; pro
   const toggle = async (row: SeasonRow) => {
     setBusy(true);
     setFailure("");
-    const { error } = await supabase.from("seasonal_schedules").update({ is_active: !row.is_active }).eq("id", row.id);
+    const { error } = checkedWrite(await supabase.from("seasonal_schedules").update({ is_active: !row.is_active }).eq("id", row.id).select("id"), { expected: 1, lang });
     setBusy(false);
     if (error) { setFailure(t.saveFailed + errorMessage(error)); return; }
     setVersion((value) => value + 1);
@@ -418,7 +419,7 @@ export function SeasonsSection({ lang, providerId, branches }: { lang: Lang; pro
     const yes = await askConfirm({ title: t.deleteSeasonTitle, intro: t.deleteSeasonIntro, facts: [{ label: t.seasonName, value: row.season_name }], confirmLabel: t.delete, tone: "danger" });
     if (!yes) return;
     setBusy(true);
-    const { error } = await supabase.from("seasonal_schedules").delete().eq("id", row.id);
+    const { error } = checkedWrite(await supabase.from("seasonal_schedules").delete().eq("id", row.id).select("id"), { expected: 1, lang });
     setBusy(false);
     if (error) { setFailure(t.saveFailed + errorMessage(error)); return; }
     setVersion((value) => value + 1);
@@ -551,7 +552,7 @@ export function LeaveSection({ lang, branches }: { lang: Lang; branches: BranchO
     }
     setBusy(true);
     setFailure("");
-    const { error } = await supabase.from("employee_time_off").update({ status }).eq("id", row.id);
+    const { error } = checkedWrite(await supabase.from("employee_time_off").update({ status }).eq("id", row.id).select("id"), { expected: 1, lang });
     setBusy(false);
     if (error) { setFailure(t.saveFailed + errorMessage(error)); return; }
     setVersion((value) => value + 1);

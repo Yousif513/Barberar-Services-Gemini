@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { checkedWrite } from "@/lib/write-result.mjs";
 import { errorMessage } from "@/lib/error-message";
 
 interface Conversation {
@@ -164,7 +165,9 @@ export default function ProviderMessages() {
     loadMessages(selectedId);
     const conv = conversations.find((c) => c.id === selectedId);
     if (conv?.unread) {
-      supabase.from("conversations").update({ unread_for_provider: false }).eq("id", selectedId).then(() => {
+      // The conversation is shown as read only when the server stored it; otherwise it stays marked unread.
+      supabase.from("conversations").update({ unread_for_provider: false }).eq("id", selectedId).select("id").then((answer) => {
+        if (checkedWrite(answer, { expected: 1 }).error) return;
         setConversations((prev) => prev.map((c) => (c.id === selectedId ? { ...c, unread: false } : c)));
       });
     }

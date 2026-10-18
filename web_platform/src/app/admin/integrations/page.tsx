@@ -1,12 +1,17 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { useConfirm } from "@/components/modal";
+import { CommandDialog, ModalOverlay, ModalPortal } from "@/components/modal";
+import { ReadFailure } from "@/components/read-failure";
+import { commandOutcome } from "@/lib/write-result.mjs";
+import { describeConsoleError, unchangedText } from "@/lib/console-errors.mjs";
+import { knownToHold, useConsoleSession } from "@/lib/console-session";
 
 /* Integrations registry — the admin control plane for every external API.
    Secrets never live client-side: `key_masked` is a display-only hint and the
    real credentials stay in server-side (edge function) environment secrets.
-   Every enable/disable or env flip is written to integration_audit_log. */
+   Every change goes through admin_set_integration_state or admin_save_integration, which need settings.manage, a fresh
+   authenticator code and a reason, and write integration_audit_log on the server (QAFIX). */
 
 const translations = {
   en: {
@@ -33,7 +38,8 @@ const translations = {
     catCalendar: "Calendar Sync",
     catAnalytics: "Analytics",
     catAi: "AI Concierge",
-    empty: "No integrations yet — apply the database migration and reload."
+    empty: "No integrations are registered yet.",
+    filteredEmpty: "No integration matches this search or section."
   },
   ar: {
     title: "الربط البرمجي والتكاملات",
@@ -59,7 +65,8 @@ const translations = {
     catCalendar: "مزامنة التقويم",
     catAnalytics: "التحليلات",
     catAi: "المساعد الذكي",
-    empty: "لا توجد تكاملات بعد — طبّق ترحيل قاعدة البيانات ثم أعد التحميل."
+    empty: "لا توجد تكاملات مسجلة بعد.",
+    filteredEmpty: "لا يوجد تكامل يطابق هذا البحث أو القسم."
   }
 };
 
@@ -79,6 +86,7 @@ type Integration = {
   webhook_url: string | null;
   last_checked_at: string | null;
   created_at?: string | null;
+  updated_at?: string | null;
 };
 
 type IntegrationForm = {
@@ -128,7 +136,26 @@ const extraTranslations = {
     search: "Search APIs, sections, or base URLs...",
     allSections: "All sections",
     allPlatform: "All platform",
-    notSet: "Not set"
+    notSet: "Not set",
+    keyId: "API key ID",
+    keyFixed: "The key of a registered integration does not change: payment methods name their gateway by it.",
+    reasonLabel: "Reason for this change (recorded in the audit log)",
+    reasonShort: "Enter a reason of at least 3 characters.",
+    enableTitle: "Enable this integration",
+    disableTitle: "Disable this integration",
+    enableIntro: "The platform starts using this service again.",
+    disableIntro: "The platform stops using this service. Its configuration stays in the registry and can be enabled again.",
+    envTitle: "Switch the environment",
+    envIntroLive: "Live mode sends real requests (and real money, for payments) through this service.",
+    envIntroTest: "Test mode sends requests to the provider's sandbox only.",
+    statusTitle: "Change the connection status",
+    statusIntro: "Payment methods route only through connected payment integrations.",
+    enabledDone: "Integration enabled.",
+    disabledDone: "Integration disabled.",
+    envDone: "Environment switched.",
+    statusDone: "Connection status saved.",
+    toggleLabel: "{state}: {name}",
+    what: "The integration registry"
   },
   ar: {
     addApi: "إضافة API",
@@ -160,7 +187,26 @@ const extraTranslations = {
     search: "ابحث عن API أو قسم أو رابط...",
     allSections: "كل الأقسام",
     allPlatform: "كل المنصة",
-    notSet: "غير محدد"
+    notSet: "غير محدد",
+    keyId: "معرّف مفتاح API",
+    keyFixed: "لا يتغير مفتاح تكامل مسجل: طرق الدفع تذكر بوابتها به.",
+    reasonLabel: "سبب هذا التغيير (يُسجَّل في سجل التدقيق)",
+    reasonShort: "اكتب سبباً لا يقل عن 3 أحرف.",
+    enableTitle: "تفعيل هذا التكامل",
+    disableTitle: "تعطيل هذا التكامل",
+    enableIntro: "تعود المنصة إلى استخدام هذه الخدمة.",
+    disableIntro: "تتوقف المنصة عن استخدام هذه الخدمة، ويبقى إعدادها في السجل ويمكن إعادة تفعيلها.",
+    envTitle: "تبديل البيئة",
+    envIntroLive: "الوضع المباشر يرسل طلبات حقيقية (وأموالاً حقيقية في المدفوعات) عبر هذه الخدمة.",
+    envIntroTest: "الوضع التجريبي يرسل الطلبات إلى بيئة الاختبار لدى المزود فقط.",
+    statusTitle: "تغيير حالة الاتصال",
+    statusIntro: "لا تمر طرق الدفع إلا عبر تكاملات دفع متصلة.",
+    enabledDone: "تم تفعيل التكامل.",
+    disabledDone: "تم تعطيل التكامل.",
+    envDone: "تم تبديل البيئة.",
+    statusDone: "تم حفظ حالة الاتصال.",
+    toggleLabel: "{state}: {name}",
+    what: "سجل التكاملات"
   }
 };
 
@@ -249,6 +295,14 @@ export default function AdminIntegrations() {
   const [search, setSearch] = useState("");
   const [sectionFilter, setSectionFilter] = useState("all");
   const [form, setForm] = useState<IntegrationForm>(() => blankForm());
+  const [formReason, setFormReason] = useState("");
+  const [formUpdatedAt, setFormUpdatedAt] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<unknown>(null);
+  const [loaded, setLoaded] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+  const [pending, setPending] = useState<{ item: Integration; changes: Partial<Pick<Integration, "enabled" | "env" | "status">> } | null>(null);
+  // Write controls only for a console role with settings.manage (the server refuses every other role anyway).
+  const canWrite = knownToHold(useConsoleSession(), ["settings.manage"]);
 
   useEffect(() => {
     const checkLang = () => {
@@ -264,17 +318,18 @@ export default function AdminIntegrations() {
   useEffect(() => {
     (async () => {
       try {
-        const { data, error: loadError } = await supabase.from("integrations").select(INTEGRATION_COLUMNS).order("category").order("name");
-        if (loadError) throw loadError;
+        setLoadError(null);
+        const { data, error: readError } = await supabase.from("integrations").select(INTEGRATION_COLUMNS).order("category").order("name");
+        if (readError) throw readError;
         setItems(((data ?? []) as Integration[]).map(normalizeIntegration));
-      } catch {
+      } catch (err) {
         setItems([]);
-        setError(lang === "ar"
-          ? "فشل تحميل التكاملات الحقيقية. تأكد من تطبيق ترحيلات Supabase وصلاحيات المشرف."
-          : "Failed to load real integrations. Apply the Supabase migrations and verify admin table permissions.");
+        setLoadError(err);
+      } finally {
+        setLoaded(true);
       }
     })();
-  }, [lang]);
+  }, [lang, reloadKey]);
 
   const t = translations[lang];
   const xt = extraTranslations[lang];
@@ -291,33 +346,31 @@ export default function AdminIntegrations() {
     logistics: lang === "ar" ? "التوصيل والتشغيل" : "Logistics"
   };
 
-  const flash = (msg: string) => { setError(""); setNote(msg); setTimeout(() => setNote(""), 3000); };
+  const flash = (msg: string) => { setError(""); setNote(msg); setTimeout(() => setNote(""), 4000); };
+  const replaceItem = (answer: Integration) => setItems((prev) => prev.map((x) => (x.id === answer.id ? normalizeIntegration(answer) : x)));
 
-  const audit = async (key: string, change: string) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      await supabase.from("integration_audit_log").insert({ integration_key: key, actor_id: user?.id ?? null, change });
-    } catch { /* audit is best-effort in dev preview */ }
+  // On/off, environment and connection status: admin_set_integration_state needs settings.manage, a fresh code and a reason,
+  // refuses a stale card and answers the stored row; the card changes only after that answer. A refusal stays in the dialog.
+  const runStateChange = async (reason: string): Promise<string | null> => {
+    if (!pending) return null;
+    const { item, changes } = pending;
+    const outcome = commandOutcome(await supabase.rpc("admin_set_integration_state", {
+      p_integration_id: item.id, p_changes: changes, p_reason: reason, p_expected_updated_at: item.updated_at ?? null,
+    }));
+    if (!outcome.ok) return describeConsoleError(outcome.error, lang);
+    replaceItem(outcome.data.integration as Integration);
+    const done = "enabled" in changes ? (changes.enabled ? xt.enabledDone : xt.disabledDone) : "env" in changes ? xt.envDone : xt.statusDone;
+    flash(outcome.changed ? done : unchangedText(lang));
+    return null;
   };
 
-  const patch = async (item: Integration, fields: Partial<Integration>, change: string) => {
-    const previous = items;
-    setItems((prev) => prev.map((x) => (x.id === item.id ? { ...x, ...fields } : x)));
-    try {
-      const { error: updateError } = await supabase.from("integrations").update(fields).eq("id", item.id);
-      if (updateError) throw updateError;
-      await audit(item.key, change);
-      flash(t.saved);
-    } catch {
-      setItems(previous);
-      setNote("");
-      setError(lang === "ar"
-        ? "لم يتم حفظ تغيير التكامل. تأكد من جدول integrations وصلاحيات المشرف."
-        : "Integration change was not saved. Check the integrations table, migration, and admin permissions.");
-    }
+  const askState = (item: Integration, changes: Partial<Pick<Integration, "enabled" | "env" | "status">>) => {
+    setNote("");
+    setError("");
+    setPending({ item, changes });
   };
 
-  const openNew = () => { setForm(blankForm()); setError(""); setModalOpen(true); };
+  const openNew = () => { setForm(blankForm()); setFormReason(""); setFormUpdatedAt(null); setError(""); setModalOpen(true); };
 
   const openEdit = (item: Integration) => {
     setForm({
@@ -335,12 +388,17 @@ export default function AdminIntegrations() {
       description: item.description || "",
       supported_payment_method_keys: item.supported_payment_method_keys?.length ? item.supported_payment_method_keys : defaultPaymentMethodSupport(item.key)
     });
+    setFormReason("");
+    setFormUpdatedAt(item.updated_at ?? null);
     setError("");
     setModalOpen(true);
   };
 
+  // Registry details through admin_save_integration (settings.manage, fresh code, reason). A refusal keeps the dialog open
+  // with everything typed.
   const saveIntegration = async (event?: React.FormEvent) => {
     event?.preventDefault();
+    if (saving) return;
     const isEdit = Boolean(form.id);
     const key = form.key || slugifyKey(form.name);
     const hint = form.key_masked.trim();
@@ -353,11 +411,15 @@ export default function AdminIntegrations() {
       setError(xt.hintInvalid);
       return;
     }
+    if (formReason.trim().length < 3) {
+      setError(xt.reasonShort);
+      return;
+    }
 
     setSaving(true);
     setError("");
 
-    const payload: Partial<Integration> = {
+    const values: Record<string, unknown> = {
       key,
       name: form.name.trim(),
       category: form.category,
@@ -372,64 +434,58 @@ export default function AdminIntegrations() {
       supported_payment_method_keys: form.category === "payments" ? form.supported_payment_method_keys : []
     };
 
-    try {
-      if (isEdit) {
-        const { data, error: updateError } = await supabase
-          .from("integrations")
-          .update(payload)
-          .eq("id", form.id)
-          .select(INTEGRATION_COLUMNS)
-          .single();
-        if (updateError) throw updateError;
-        setItems((prev) => prev.map((item) => (item.id === form.id ? normalizeIntegration(data as Integration) : item)));
-        await audit(key, "updated integration details");
-        flash(xt.updated);
-      } else {
-        const { data, error: insertError } = await supabase
-          .from("integrations")
-          .insert(payload)
-          .select(INTEGRATION_COLUMNS)
-          .single();
-        if (insertError) throw insertError;
-        setItems((prev) => [normalizeIntegration(data as Integration), ...prev.filter((item) => item.key !== key)]);
-        await audit(key, "created integration");
-        flash(xt.created);
-      }
-      setModalOpen(false);
-    } catch {
-      setError(lang === "ar"
-        ? "لم يتم حفظ API. تأكد من تطبيق الترحيلات وأن حسابك مشرف."
-        : "API was not saved. Apply the migrations and verify your admin permissions.");
-    } finally {
-      setSaving(false);
+    const outcome = commandOutcome(await supabase.rpc("admin_save_integration", {
+      p_integration_id: isEdit ? form.id : null,
+      p_values: values,
+      p_reason: formReason.trim(),
+      p_expected_updated_at: isEdit ? formUpdatedAt : null,
+    }));
+    setSaving(false);
+    if (!outcome.ok) {
+      setError(describeConsoleError(outcome.error, lang));
+      return;
     }
+    const saved = normalizeIntegration(outcome.data.integration as Integration);
+    setItems((prev) => (isEdit ? prev.map((item) => (item.id === saved.id ? saved : item)) : [saved, ...prev.filter((item) => item.key !== saved.key)]));
+    setModalOpen(false);
+    flash(!outcome.changed ? unchangedText(lang) : isEdit ? xt.updated : xt.created);
   };
 
-  const [confirmNode, ask] = useConfirm(lang);
-
-  const deleteIntegration = async (item: Integration) => {
-    const message = xt.confirmDelete.replace("{name}", item.name);
-    if (!(await ask({
-      title: lang === "ar" ? "تعطيل هذا الربط" : "Disable this integration",
-      intro: message,
-      facts: [{ label: lang === "ar" ? "الربط" : "Integration", value: item.name }],
-      confirmLabel: lang === "ar" ? "تعطيل" : "Disable",
-      tone: "danger",
-    }))) return;
-    const previous = items;
-    setItems((prev) => prev.map((x) => (x.id === item.id ? { ...x, enabled: false } : x)));
-    try {
-      const { error: disableError } = await supabase.from("integrations").update({ enabled: false }).eq("id", item.id);
-      if (disableError) throw disableError;
-      await audit(item.key, "disabled integration");
-      flash(xt.deleted);
-    } catch {
-      setItems(previous);
-      setNote("");
-      setError(lang === "ar"
-        ? "لم يتم تعطيل API. تأكد من صلاحيات المشرف."
-        : "API was not disabled. Verify admin permissions and try again.");
+  const renderStateDialog = () => {
+    if (!pending) return null;
+    const { item, changes } = pending;
+    const ar = lang === "ar";
+    let title = xt.statusTitle;
+    let intro = xt.statusIntro;
+    let confirmLabel = ar ? "حفظ" : "Save";
+    let danger = false;
+    if ("enabled" in changes) {
+      title = changes.enabled ? xt.enableTitle : xt.disableTitle;
+      intro = changes.enabled ? xt.enableIntro : xt.disableIntro;
+      confirmLabel = changes.enabled ? (ar ? "تفعيل" : "Enable") : (ar ? "تعطيل" : "Disable");
+      danger = !changes.enabled;
+    } else if ("env" in changes) {
+      title = xt.envTitle;
+      intro = changes.env === "live" ? xt.envIntroLive : xt.envIntroTest;
+      confirmLabel = changes.env === "live" ? t.live : t.test;
+      danger = changes.env === "live";
     }
+    const facts = [{ label: ar ? "التكامل" : "Integration", value: `${item.name} (${item.key})` }];
+    if ("env" in changes) facts.push({ label: xt.envLabel, value: `${item.env === "live" ? t.live : t.test} → ${changes.env === "live" ? t.live : t.test}` });
+    if ("status" in changes) facts.push({ label: xt.status, value: `${item.status === "connected" ? t.connected : t.disconnected} → ${changes.status === "connected" ? t.connected : t.disconnected}` });
+    return (
+      <CommandDialog
+        locale={lang}
+        tone={danger ? "danger" : "default"}
+        title={title}
+        intro={intro}
+        facts={facts}
+        reasonLabel={xt.reasonLabel}
+        confirmLabel={confirmLabel}
+        onConfirm={runStateChange}
+        onClose={() => setPending(null)}
+      />
+    );
   };
 
   const filteredItems = items.filter((item) => {
@@ -455,27 +511,35 @@ export default function AdminIntegrations() {
 
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className={`space-y-6 ${isRTL ? "text-right" : "text-left"}`}>
-      {confirmNode}
+      {renderStateDialog()}
       <div className={`flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between ${isRTL ? "lg:flex-row-reverse" : ""}`}>
         <div>
           <h2 className="text-2xl font-serif font-black text-gray-900 leading-tight">{t.title}</h2>
           <p className="text-xs text-gray-500 font-semibold mt-1 max-w-2xl">{t.subtitle}</p>
         </div>
-        <button
-          onClick={openNew}
-          className="inline-flex items-center justify-center rounded-2xl bg-[#111827] px-5 py-3 text-xs font-black uppercase tracking-[0.16em] text-white shadow-[0_16px_32px_rgba(17,24,39,0.18)] transition hover:bg-[#D1AF47] hover:text-[#111827]"
-        >
-          + {xt.addApi}
-        </button>
+        {canWrite && (
+          <button
+            type="button"
+            onClick={openNew}
+            className="inline-flex items-center justify-center rounded-2xl bg-[#111827] px-5 py-3 text-xs font-black uppercase tracking-[0.16em] text-white shadow-[0_16px_32px_rgba(17,24,39,0.18)] transition hover:bg-[#D1AF47] hover:text-[#111827] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928]"
+          >
+            + {xt.addApi}
+          </button>
+        )}
       </div>
 
-      {note && <div className="rounded-xl border border-[#D1FADF] bg-[#ECFDF3] px-4 py-3 text-xs font-bold text-[#027A48]">{note}</div>}
-      {error && <div className="rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-4 py-3 text-xs font-bold text-[#B42318]">{error}</div>}
+      {note && <div role="status" className="rounded-xl border border-[#D1FADF] bg-[#ECFDF3] px-4 py-3 text-xs font-bold text-[#027A48]">{note}</div>}
+      {error && !modalOpen && <div role="alert" className="rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-4 py-3 text-xs font-bold text-[#B42318]">{error}</div>}
+
+      {loadError ? (
+        <ReadFailure error={loadError} locale={lang} what={xt.what} onRetry={() => setReloadKey((n) => n + 1)} />
+      ) : (
+      <>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map((stat) => (
           <div key={stat.label} className="rounded-2xl border border-[#E7D8A2]/70 bg-white/80 p-4 shadow-[0_12px_32px_rgba(17,24,39,0.04)]">
-            <p className="text-[9px] font-black uppercase tracking-[0.18em] text-[#8A7A40]">{stat.label}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#6B5A1E]">{stat.label}</p>
             <strong className="mt-2 block text-2xl font-serif font-black text-[#111827]">{stat.value}</strong>
           </div>
         ))}
@@ -483,12 +547,15 @@ export default function AdminIntegrations() {
 
       <div className={`flex flex-col gap-3 rounded-[24px] border border-[#ECECEC] bg-white/85 p-3 shadow-[0_12px_36px_rgba(17,24,39,0.04)] lg:flex-row lg:items-center ${isRTL ? "lg:flex-row-reverse" : ""}`}>
         <input
+          type="search"
+          aria-label={xt.search}
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder={xt.search}
           className="min-h-11 flex-1 rounded-2xl border border-[#ECECEC] bg-[#F8F8F7] px-4 text-sm font-semibold text-gray-800 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] transition focus:border-[#D1AF47] focus:bg-white"
         />
         <select
+          aria-label={xt.section}
           value={sectionFilter}
           onChange={(event) => setSectionFilter(event.target.value)}
           className="min-h-11 rounded-2xl border border-[#ECECEC] bg-[#F8F8F7] px-4 text-xs font-black uppercase tracking-wider text-gray-700 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] transition focus:border-[#D1AF47] focus:bg-white"
@@ -500,8 +567,10 @@ export default function AdminIntegrations() {
         </select>
       </div>
 
-      {filteredItems.length === 0 ? (
-        <div className={cardBase}><p className="py-6 text-center text-xs font-semibold text-gray-400">{t.empty}</p></div>
+      {!loaded ? (
+        <div className={cardBase}><p role="status" className="py-6 text-center text-xs font-semibold text-gray-500">{lang === "ar" ? "جارٍ تحميل التكاملات..." : "Loading integrations..."}</p></div>
+      ) : filteredItems.length === 0 ? (
+        <div className={cardBase}><p className="py-6 text-center text-xs font-semibold text-gray-500">{items.length > 0 ? t.filteredEmpty : t.empty}</p></div>
       ) : (
         grouped.map(({ cat, list }) => (
           <div key={cat}>
@@ -520,13 +589,20 @@ export default function AdminIntegrations() {
                         {item.status === "connected" ? t.connected : t.disconnected}
                       </span>
                     </div>
-                    <button
-                      onClick={() => patch(item, { enabled: !item.enabled }, `${item.enabled ? "disabled" : "enabled"} integration`)}
-                      aria-label={item.enabled ? t.disabledLabel : t.enabledLabel}
-                      className={`relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition ${item.enabled ? "bg-[#D1AF47]" : "bg-gray-300"}`}
-                    >
-                      <span className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform" style={{ transform: item.enabled ? "translateX(18px)" : "translateX(2px)" }} />
-                    </button>
+                    {canWrite ? (
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={item.enabled}
+                        onClick={() => askState(item, { enabled: !item.enabled })}
+                        aria-label={xt.toggleLabel.replace("{state}", t.enabledLabel).replace("{name}", item.name)}
+                        className={`relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928] ${item.enabled ? "bg-[#D1AF47]" : "bg-gray-400"}`}
+                      >
+                        <span className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform" style={{ transform: item.enabled ? "translateX(18px)" : "translateX(2px)" }} />
+                      </button>
+                    ) : (
+                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-black text-gray-700">{item.enabled ? t.enabledLabel : t.disabledLabel}</span>
+                    )}
                   </div>
 
                   <div className="mt-3.5 space-y-1.5 text-[10px] font-semibold text-gray-500">
@@ -552,52 +628,68 @@ export default function AdminIntegrations() {
                     </div>
                   </div>
 
-                  <div className={`mt-3.5 flex items-center gap-1 rounded-full border border-[#ECECEC] bg-gray-50 p-0.5 w-fit ${flip}`}>
-                    {(["test", "live"] as const).map((e) => (
-                      <button
-                        key={e}
-                        onClick={() => item.env !== e && patch(item, { env: e }, `switched env to ${e}`)}
-                        className={`rounded-full px-3 py-1 text-[9px] font-black uppercase transition ${
-                          item.env === e ? (e === "live" ? "bg-[#16A34A] text-white" : "bg-white text-gray-900 shadow-sm border border-[#ECECEC]") : "text-gray-400 hover:text-gray-700"
-                        }`}
-                      >
-                        {e === "test" ? t.test : t.live}
-                      </button>
-                    ))}
-                  </div>
+                  {canWrite ? (
+                    <div role="group" aria-label={`${xt.envLabel}: ${item.name}`} className={`mt-3.5 flex items-center gap-1 rounded-full border border-[#ECECEC] bg-gray-50 p-0.5 w-fit ${flip}`}>
+                      {(["test", "live"] as const).map((e) => (
+                        <button
+                          key={e}
+                          type="button"
+                          aria-pressed={item.env === e}
+                          onClick={() => { if (item.env !== e) askState(item, { env: e }); }}
+                          className={`rounded-full px-3 py-1 text-[10px] font-black uppercase transition focus-visible:outline-2 focus-visible:outline-[#9B7928] ${
+                            item.env === e ? (e === "live" ? "bg-[#15803D] text-white" : "bg-white text-gray-900 shadow-sm border border-[#ECECEC]") : "text-gray-600 hover:text-gray-900"
+                          }`}
+                        >
+                          {e === "test" ? t.test : t.live}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-3.5 text-[10px] font-black uppercase text-gray-700">{xt.envLabel}: {item.env === "live" ? t.live : t.test}</p>
+                  )}
                   {item.description && <p className="mt-3 line-clamp-2 text-[11px] font-semibold leading-relaxed text-gray-500">{item.description}</p>}
                   {item.category === "payments" && (
                     <div className={`mt-3 flex flex-wrap gap-1.5 ${isRTL ? "justify-end" : "justify-start"}`}>
                       {(item.supported_payment_method_keys?.length ? item.supported_payment_method_keys : defaultPaymentMethodSupport(item.key)).map((methodKey) => {
                         const method = PAYMENT_METHOD_OPTIONS.find((option) => option.key === methodKey);
                         return (
-                          <span key={methodKey} className="rounded-full border border-[#D1AF47]/25 bg-[#FFFAEB] px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-[#9A7211]">
+                          <span key={methodKey} className="rounded-full border border-[#D1AF47]/25 bg-[#FFFAEB] px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-[#6B5A1E]">
                             {method?.label || methodKey}
                           </span>
                         );
                       })}
                     </div>
                   )}
+                  {canWrite && (
                   <div className={`mt-4 flex flex-wrap items-center gap-2 ${isRTL ? "justify-end" : "justify-start"}`}>
                     <button
-                      onClick={() => patch(item, { status: item.status === "connected" ? "disconnected" : "connected" }, `set status ${item.status === "connected" ? "disconnected" : "connected"}`)}
-                      className="rounded-xl border border-[#D1AF47]/30 bg-[#FFF8E1] px-3 py-2 text-[10px] font-black uppercase tracking-wider text-[#8A6A10] transition hover:border-[#D1AF47]"
+                      type="button"
+                      onClick={() => askState(item, { status: item.status === "connected" ? "disconnected" : "connected" })}
+                      aria-label={`${xt.status}: ${item.status === "connected" ? t.disconnected : t.connected} — ${item.name}`}
+                      className="rounded-xl border border-[#D1AF47]/30 bg-[#FFF8E1] px-3 py-2 text-[10px] font-black uppercase tracking-wider text-[#6B5A1E] transition hover:border-[#D1AF47] focus-visible:outline-2 focus-visible:outline-[#9B7928]"
                     >
                       {item.status === "connected" ? t.disconnected : t.connected}
                     </button>
                     <button
+                      type="button"
                       onClick={() => openEdit(item)}
-                      className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-gray-700 transition hover:border-[#D1AF47] hover:text-[#8A6A10]"
+                      aria-label={`${xt.edit}: ${item.name}`}
+                      className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-gray-700 transition hover:border-[#D1AF47] hover:text-[#6B5A1E] focus-visible:outline-2 focus-visible:outline-[#9B7928]"
                     >
                       {xt.edit}
                     </button>
-                    <button
-                      onClick={() => deleteIntegration(item)}
-                      className="rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-3 py-2 text-[10px] font-black uppercase tracking-wider text-[#B42318] transition hover:bg-[#FEE4E2]"
-                    >
-                      {xt.delete}
-                    </button>
+                    {item.enabled && (
+                      <button
+                        type="button"
+                        onClick={() => askState(item, { enabled: false })}
+                        aria-label={`${xt.delete}: ${item.name}`}
+                        className="rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-3 py-2 text-[10px] font-black uppercase tracking-wider text-[#B42318] transition hover:bg-[#FEE4E2] focus-visible:outline-2 focus-visible:outline-[#9B7928]"
+                      >
+                        {xt.delete}
+                      </button>
+                    )}
                   </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -605,41 +697,53 @@ export default function AdminIntegrations() {
         ))
       )}
 
-      {modalOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-start justify-center overflow-y-auto bg-[#101828]/55 px-4 py-8 backdrop-blur-sm" onClick={() => setModalOpen(false)}>
+      </>
+      )}
+
+      {modalOpen && canWrite && (
+        <ModalPortal>
+        <ModalOverlay onClose={() => { if (!saving) setModalOpen(false); }} canClose={!saving} className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#101828]/55 px-4 py-4 backdrop-blur-sm">
           <form
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="integration-dialog-title"
             onSubmit={saveIntegration}
-            onClick={(event) => event.stopPropagation()}
-            className="w-full max-w-3xl rounded-[32px] border border-[#E7D8A2] bg-[#FDFBF7] p-5 shadow-[0_30px_80px_rgba(17,24,39,0.28)]"
+            noValidate
+            dir={isRTL ? "rtl" : "ltr"}
+            style={{ maxHeight: "calc(100dvh - 2rem)" }}
+            className="flex w-full max-w-3xl flex-col overflow-hidden rounded-[32px] border border-[#E7D8A2] bg-[#FDFBF7] shadow-[0_30px_80px_rgba(17,24,39,0.28)]"
           >
-            <div className={`flex items-start justify-between gap-4 border-b border-[#E7D8A2]/60 pb-4 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+            <div className={`flex shrink-0 items-start justify-between gap-4 border-b border-[#E7D8A2]/60 px-5 pb-4 pt-5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8A6A10]">{xt.section}</p>
-                <h3 className="mt-1 text-2xl font-serif font-black text-gray-950">{form.id ? xt.update : xt.addApi}</h3>
-                <p className="mt-1 max-w-xl text-xs font-semibold text-gray-500">{xt.keyHint}</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#6B5A1E]">{xt.section}</p>
+                <h3 id="integration-dialog-title" className="mt-1 text-2xl font-serif font-black text-gray-950">{form.id ? xt.update : xt.addApi}</h3>
+                <p className="mt-1 max-w-xl text-xs font-semibold text-gray-600">{xt.keyHint}</p>
               </div>
-              <button type="button" onClick={() => setModalOpen(false)} className="rounded-full border border-[#ECECEC] bg-white px-3 py-2 text-xs font-black text-gray-500">×</button>
+              <button type="button" onClick={() => setModalOpen(false)} disabled={saving} aria-label={xt.cancel} className="rounded-full border border-[#ECECEC] bg-white px-3 py-2 text-xs font-black text-gray-600 focus-visible:outline-2 focus-visible:outline-[#9B7928]">×</button>
             </div>
 
-            <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+            {error && <div role="alert" className="mb-4 rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-4 py-3 text-xs font-bold text-[#B42318]">{error}</div>}
+            <div className="grid gap-4 md:grid-cols-2">
               <label className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.apiName}</span>
-                <input value={form.name} onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value, key: prev.id ? prev.key : slugifyKey(event.target.value) }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-bold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
+                <span className="text-[10px] font-black uppercase tracking-wider text-gray-600">{xt.apiName}</span>
+                <input data-autofocus value={form.name} onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value, key: prev.id ? prev.key : slugifyKey(event.target.value) }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-bold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
               <label className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">API key ID</span>
-                <input value={form.key} onChange={(event) => setForm((prev) => ({ ...prev, key: slugifyKey(event.target.value) }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" dir="ltr" />
+                <span className="text-[10px] font-black uppercase tracking-wider text-gray-600">{xt.keyId}</span>
+                <input value={form.key} readOnly={Boolean(form.id)} aria-describedby={form.id ? "integration-key-fixed" : undefined} onChange={(event) => setForm((prev) => (prev.id ? prev : { ...prev, key: slugifyKey(event.target.value) }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47] read-only:bg-gray-50" dir="ltr" />
+                {form.id && <span id="integration-key-fixed" className="block text-[11px] font-semibold text-gray-600">{xt.keyFixed}</span>}
               </label>
               <label className="space-y-2 md:col-span-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.baseUrl}</span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-gray-600">{xt.baseUrl}</span>
                 <input value={form.base_url} onChange={(event) => setForm((prev) => ({ ...prev, base_url: event.target.value }))} placeholder="https://api.example.com" className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" dir="ltr" />
               </label>
               <label className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.keyHintLabel}</span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-gray-600">{xt.keyHintLabel}</span>
                 <input value={form.key_masked} maxLength={16} placeholder="••••1234" onChange={(event) => setForm((prev) => ({ ...prev, key_masked: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" dir="ltr" />
               </label>
               <label className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.section}</span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-gray-600">{xt.section}</span>
                 <select
                   value={form.category}
                   onChange={(event) => setForm((prev) => ({
@@ -655,13 +759,13 @@ export default function AdminIntegrations() {
                 </select>
               </label>
               {form.category === "payments" && (
-                <div className="space-y-2 md:col-span-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{lang === "ar" ? "طرق الدفع المدعومة" : "Supported payment methods"}</span>
+                <fieldset className="space-y-2 md:col-span-2">
+                  <legend className="text-[10px] font-black uppercase tracking-wider text-gray-600">{lang === "ar" ? "طرق الدفع المدعومة" : "Supported payment methods"}</legend>
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                     {PAYMENT_METHOD_OPTIONS.map((option) => {
                       const checked = form.supported_payment_method_keys.includes(option.key);
                       return (
-                        <label key={option.key} className={`flex cursor-pointer items-center gap-2 rounded-2xl border px-3 py-2 text-[10px] font-black uppercase tracking-wider transition ${checked ? "border-[#D1AF47] bg-[#FFFAEB] text-[#8A6A10]" : "border-[#ECECEC] bg-white text-gray-500"}`}>
+                        <label key={option.key} className={`flex cursor-pointer items-center gap-2 rounded-2xl border px-3 py-2 text-[10px] font-black uppercase tracking-wider transition ${checked ? "border-[#D1AF47] bg-[#FFFAEB] text-[#6B5A1E]" : "border-[#ECECEC] bg-white text-gray-600"}`}>
                           <input
                             type="checkbox"
                             checked={checked}
@@ -678,50 +782,54 @@ export default function AdminIntegrations() {
                       );
                     })}
                   </div>
-                </div>
+                </fieldset>
               )}
               <label className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.platformArea}</span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-gray-600">{xt.platformArea}</span>
                 <select value={form.platform_area} onChange={(event) => setForm((prev) => ({ ...prev, platform_area: event.target.value }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-black outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
                   {PLATFORM_AREAS.map((area) => <option key={area} value={area}>{platformLabel(area, lang)}</option>)}
                 </select>
               </label>
               <label className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.status}</span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-gray-600">{xt.status}</span>
                 <select value={form.status} onChange={(event) => setForm((prev) => ({ ...prev, status: event.target.value as Integration["status"] }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-black outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
                   <option value="connected">{t.connected}</option>
                   <option value="disconnected">{t.disconnected}</option>
                 </select>
               </label>
               <label className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.envLabel}</span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-gray-600">{xt.envLabel}</span>
                 <select value={form.env} onChange={(event) => setForm((prev) => ({ ...prev, env: event.target.value as Integration["env"] }))} className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-black outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
                   <option value="test">{t.test}</option>
                   <option value="live">{t.live}</option>
                 </select>
               </label>
               <label className="space-y-2 md:col-span-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{t.webhook}</span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-gray-600">{t.webhook}</span>
                 <input value={form.webhook_url} onChange={(event) => setForm((prev) => ({ ...prev, webhook_url: event.target.value }))} placeholder="/functions/v1/example-webhook" className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 font-mono text-sm font-bold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" dir="ltr" />
               </label>
               <label className="space-y-2 md:col-span-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">{xt.description}</span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-gray-600">{xt.description}</span>
                 <textarea value={form.description} onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))} rows={3} className="w-full resize-none rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-semibold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
-            </div>
-
-            <div className={`mt-5 flex flex-col gap-3 border-t border-[#E7D8A2]/60 pt-4 sm:flex-row sm:items-center sm:justify-between ${isRTL ? "sm:flex-row-reverse" : ""}`}>
-              <label className={`flex items-center gap-3 text-xs font-black text-gray-700 ${isRTL ? "flex-row-reverse" : ""}`}>
+              <label className={`flex items-center gap-3 text-xs font-black text-gray-700 md:col-span-2 ${isRTL ? "flex-row-reverse justify-end" : ""}`}>
                 <input type="checkbox" checked={form.enabled} onChange={(event) => setForm((prev) => ({ ...prev, enabled: event.target.checked }))} className="h-4 w-4 accent-[#D1AF47]" />
                 {t.enabledLabel}
               </label>
-              <div className={`flex gap-2 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                <button type="button" onClick={() => setModalOpen(false)} className="rounded-2xl border border-[#ECECEC] bg-white px-5 py-3 text-xs font-black uppercase tracking-wider text-gray-600">{xt.cancel}</button>
-                <button type="submit" disabled={saving} className="rounded-2xl bg-[#D1AF47] px-5 py-3 text-xs font-black uppercase tracking-wider text-[#111827] shadow-[0_14px_28px_rgba(209,175,71,0.28)] disabled:opacity-60">{saving ? "..." : form.id ? xt.update : xt.save}</button>
-              </div>
+              <label className="space-y-2 md:col-span-2">
+                <span className="text-[10px] font-black uppercase tracking-wider text-gray-600">{xt.reasonLabel}</span>
+                <textarea value={formReason} onChange={(event) => setFormReason(event.target.value)} rows={2} className="w-full resize-none rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 text-sm font-semibold outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
+              </label>
+            </div>
+            </div>
+
+            <div className={`flex shrink-0 justify-end gap-2 border-t border-[#E7D8A2]/60 bg-[#FDFBF7] px-5 py-4 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+              <button type="button" onClick={() => setModalOpen(false)} disabled={saving} className="rounded-2xl border border-[#ECECEC] bg-white px-5 py-3 text-xs font-black uppercase tracking-wider text-gray-700 focus-visible:outline-2 focus-visible:outline-[#9B7928]">{xt.cancel}</button>
+              <button type="submit" aria-disabled={saving} className="rounded-2xl bg-[#D1AF47] px-5 py-3 text-xs font-black uppercase tracking-wider text-[#111827] shadow-[0_14px_28px_rgba(209,175,71,0.28)] aria-disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-[#9B7928]">{saving ? "..." : form.id ? xt.update : xt.save}</button>
             </div>
           </form>
-        </div>
+        </ModalOverlay>
+        </ModalPortal>
       )}
     </div>
   );

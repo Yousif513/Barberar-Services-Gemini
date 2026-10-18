@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
+import { checkedWrite } from "@/lib/write-result.mjs";
 import { errorMessage } from "@/lib/error-message";
 import { CommandDialog } from "@/components/modal";
 import { MAX_IMPORT_ROWS, parseClientCsv } from "@/lib/client-import.mjs";
@@ -431,10 +432,11 @@ export default function ProviderCustomersPage() {
         .single();
 
       if (providerInfo && String(editingClient.id).startsWith("contact:")) {
-        const { error: contactError } = await supabase
+        const { error: contactError } = checkedWrite(await supabase
           .from("provider_client_contacts")
           .update({ notes: noteText })
-          .eq("id", String(editingClient.id).slice("contact:".length));
+          .eq("id", String(editingClient.id).slice("contact:".length))
+          .select("id"), { expected: 1 });
         if (contactError) throw contactError;
       } else if (providerInfo) {
         const { error: upsertError } = await supabase

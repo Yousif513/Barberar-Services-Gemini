@@ -35,6 +35,7 @@ const ALLOW_DIRECT_CONSOLE_READ = {
   platform_settings: "platform configuration",
   promotional_codes: "promotion catalogue",
   services: "service catalogue",
+  packages: "service package catalogue; customers' vouchers are in user_packages (QAFIX: switched-off packages stay visible to the console)",
   service_variants: "service catalogue",
   provider_group_settings: "provider booking configuration",
   provider_recurring_settings: "provider booking configuration",

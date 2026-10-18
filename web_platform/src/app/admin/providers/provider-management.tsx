@@ -6,6 +6,8 @@ import { createPortal } from "react-dom";
 import { CommandDialog, ModalOverlay } from "@/components/modal";
 import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
+import { tableWriteOutcome } from "@/lib/write-result.mjs";
+import { describeConsoleError } from "@/lib/console-errors.mjs";
 import { CommandResult, sar } from "@/components/operations-ui";
 import { EffectiveFeeTerms } from "@/components/effective-fee-terms";
 import { oneOf, writeUrlState } from "@/lib/url-state";
@@ -1002,9 +1004,11 @@ export default function AdminProviderManagement() {
   const saveNotes = async () => {
     if (!detail) return;
     setError("");
-    const { error: notesError } = await supabase.from("providers").update({ admin_notes: notesDraft }).eq("id", detail.id);
-    if (notesError) {
-      setError(errorMessage(notesError));
+    // The row policy refuses a console role without operations.write by matching no row, so the write names the rows it
+    // changed and zero rows is a refusal, never "saved" (QAFIX).
+    const notesOutcome = tableWriteOutcome(await supabase.from("providers").update({ admin_notes: notesDraft }).eq("id", detail.id).select("id"), 1);
+    if (!notesOutcome.ok) {
+      setError(describeConsoleError(notesOutcome.error, lang));
       return;
     }
     setNotice(t.notesSaved);
@@ -1054,11 +1058,11 @@ export default function AdminProviderManagement() {
     }
     setSavingEdit(true);
     setDraftError("");
-    const { error: updateError } = await supabase.from("providers").update(payload).eq("id", editing.id);
+    const editOutcome = tableWriteOutcome(await supabase.from("providers").update(payload).eq("id", editing.id).select("id"), 1);
     setSavingEdit(false);
-    if (updateError) {
+    if (!editOutcome.ok) {
       // The dialog stays open with the operator's input intact.
-      setDraftError(errorMessage(updateError));
+      setDraftError(describeConsoleError(editOutcome.error, lang));
       return;
     }
     setEditing(null);
