@@ -109,3 +109,39 @@ describe("the console screens call the commands and believe only their answer", 
     assert.ok(!/onChange=\{\(e\) => handlePriceChange/.test(code));
   });
 });
+
+// QA items 2 and 3: write controls follow the session's permissions (admin_session_state); a failed or refused read shows
+// the refusal or the reason, never the empty-list text.
+describe("controls and read states follow the server", () => {
+  const gated = {
+    "web_platform/src/app/admin/services/page.tsx": ['knownToHold(useConsoleSession(), ["operations.write"])', "canWrite &&"],
+    "web_platform/src/app/admin/branches/page.tsx": ['knownToHold(useConsoleSession(), ["operations.write"])', "canWrite &&"],
+    "web_platform/src/app/admin/packages/page.tsx": ['knownToHold(useConsoleSession(), ["operations.write"])', "canWrite &&"],
+    "web_platform/src/app/admin/integrations/page.tsx": ['knownToHold(useConsoleSession(), ["settings.manage"])', "canWrite &&"],
+    "web_platform/src/app/admin/ledger/page.tsx": ['knownToHold(useConsoleSession(), ["settings.manage"])', "canWrite ?"],
+    "web_platform/src/app/admin/coupons/page.tsx": ['knownToHold(useConsoleSession(), ["money.config"])', "canWrite &&"],
+    "web_platform/src/app/admin/sponsored/page.tsx": ['knownToHold(session, ["settings.manage"])', 'knownToHold(session, ["money.ledger"])', "canConfigure &&", "canDecide &&"],
+    "web_platform/src/app/admin/reviews/page.tsx": ['knownToHold(useConsoleSession(), ["operations.write"])', "canModerate &&"],
+  };
+  for (const [path, needles] of Object.entries(gated)) {
+    it(`${path.split("/").slice(-2, -1)[0]} shows its write controls only to a role that holds the permission`, () => {
+      const code = read(path);
+      for (const needle of needles) assert.ok(code.includes(needle), needle);
+    });
+  }
+
+  for (const route of ["services", "branches", "packages", "coupons", "integrations", "activity", "reviews"]) {
+    it(`${route} renders the refusal or the failure instead of its empty state when the read failed`, () => {
+      const code = read(`web_platform/src/app/admin/${route}/page.tsx`);
+      assert.ok(code.includes("<ReadFailure"), "a failed read has its own state");
+      assert.ok(/\{loadError \? \(\s*<ReadFailure/.test(code), "the list and its empty text render only when the read succeeded");
+    });
+  }
+
+  it("ReadFailure shows the forbidden notice for a refusal and the reason with a retry otherwise", () => {
+    const code = read("web_platform/src/components/read-failure.tsx");
+    assert.ok(code.includes("isForbidden(error)") && code.includes("<ForbiddenNotice"));
+    assert.ok(code.includes("describeConsoleError(error, locale)") && code.includes("onRetry"));
+    assert.ok(code.includes('role="alert"'));
+  });
+});

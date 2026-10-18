@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { errorMessage } from "@/lib/error-message";
+import { ReadFailure } from "@/components/read-failure";
 
 const translations = {
   en: {
@@ -51,7 +51,9 @@ export default function AdminActivityPage() {
   const [filter, setFilter] = useState<"all" | EventType>("all");
   const [events, setEvents] = useState<ActivityEvent[]>([]);
   const [stats, setStats] = useState({ events: 0, bookings: 0, providers: 0 });
-  const [loadError, setLoadError] = useState("");
+  const [loadError, setLoadError] = useState<unknown>(null);
+  const [loading, setLoading] = useState(true);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     const checkLang = () => {
@@ -67,6 +69,8 @@ export default function AdminActivityPage() {
   useEffect(() => {
     (async () => {
       try {
+        setLoading(true);
+        setLoadError(null);
         const [bookingRes, providerRes] = await Promise.all([
           // GOV-FIX (Q4): bookings come from the audited admin_recent_bookings, never a direct table read.
           supabase.rpc("admin_recent_bookings", { p_limit: 6, p_purpose: "customer_support" }),
@@ -100,10 +104,12 @@ export default function AdminActivityPage() {
         setStats({ events: mapped.length, bookings: (bookings ?? []).length, providers: (providers ?? []).length });
       } catch (err) {
         setEvents([]);
-        setLoadError(errorMessage(err));
+        setLoadError(err);
+      } finally {
+        setLoading(false);
       }
     })();
-  }, []);
+  }, [reloadKey]);
 
   const t = translations[lang];
   const isRTL = lang === "ar";
@@ -132,11 +138,11 @@ export default function AdminActivityPage() {
         <p className="text-xs text-gray-500 font-semibold mt-1">{t.subtitle}</p>
       </div>
 
-      {loadError && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-700">{loadError}</div>
-      )}
-
-      {!loadError && (
+      {loadError ? (
+        <ReadFailure error={loadError} locale={lang} what={isRTL ? "سجل النشاط" : "The activity feed"} onRetry={() => setReloadKey((n) => n + 1)} />
+      ) : (
+      <>
+      {(
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[[t.events24h, String(stats.events)], [t.newBookings, String(stats.bookings)], [t.newProviders, String(stats.providers)]].map(([label, value]) => (
           <div key={label} className={cardBase}>
@@ -169,8 +175,10 @@ export default function AdminActivityPage() {
           </div>
         </div>
 
-        {shown.length === 0 ? (
-          <p className="py-8 text-center text-xs font-semibold text-[#667085]">{t.empty}</p>
+        {loading ? (
+          <p role="status" className="py-8 text-center text-xs font-semibold text-[#475467]">{isRTL ? "جارٍ تحميل النشاط..." : "Loading activity..."}</p>
+        ) : shown.length === 0 ? (
+          <p className="py-8 text-center text-xs font-semibold text-[#475467]">{events.length === 0 ? t.empty : (isRTL ? "لا يوجد نشاط لهذا الفلتر؛ اختر «الكل» لرؤية كل النشاط." : "Nothing of this kind; choose All to see every event.")}</p>
         ) : (
           <div className="divide-y divide-[#F5F5F5]">
             {shown.map((e) => (
@@ -185,6 +193,8 @@ export default function AdminActivityPage() {
           </div>
         )}
       </div>
+      </>
+      )}
     </div>
   );
 }

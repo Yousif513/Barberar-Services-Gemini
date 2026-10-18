@@ -6,6 +6,7 @@ import {
   CommandResult, ForbiddenNotice, OperationsField, OperationsPanel, isForbidden, operationsButton, operationsDate, operationsInput, sar, useOperationsLocale,
 } from "@/components/operations-ui";
 import { CommandDialog } from "@/components/modal";
+import { knownToHold, useConsoleSession } from "@/lib/console-session";
 import {
   monthName, parseSarAmount, recentMonths, settingLabel, sponsoredError, statusLabel, waivedReason,
   type AttributionStatus, type CampaignStatus, type SponsoredConfig,
@@ -91,6 +92,10 @@ export default function AdminSponsoredPage() {
   const [answer, setAnswer] = useState<{ key: string; overview: Overview | null; error: string; forbidden: boolean } | null>(null);
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const [result, setResult] = useState<{ error?: string; success?: string }>({});
+  // Controls only for the console roles the commands accept: settings for settings.manage, fee decisions for money.ledger.
+  const session = useConsoleSession();
+  const canConfigure = knownToHold(session, ["settings.manage"]);
+  const canDecide = knownToHold(session, ["money.ledger"]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -225,7 +230,7 @@ export default function AdminSponsoredPage() {
               <table className="w-full min-w-[520px] text-sm">
                 <thead>
                   <tr className="border-b border-[#ECE7D9] text-xs text-[#667085]">
-                    {[t.colSetting, t.colValue, t.colActions].map((h) => <th key={h} scope="col" className="px-2 py-2 text-start font-semibold">{h}</th>)}
+                    {(canConfigure ? [t.colSetting, t.colValue, t.colActions] : [t.colSetting, t.colValue]).map((h) => <th key={h} scope="col" className="px-2 py-2 text-start font-semibold">{h}</th>)}
                   </tr>
                 </thead>
                 <tbody>
@@ -233,11 +238,13 @@ export default function AdminSponsoredPage() {
                     <tr key={setting} className="border-b border-[#F2EEE2]">
                       <th scope="row" className="px-2 py-3 text-start font-semibold">{settingLabel[locale][setting]}</th>
                       <td className="px-2 py-3">{valueText(config, setting)}</td>
+                      {canConfigure && (
                       <td className="px-2 py-3">
                         <button type="button" className={actionClass} aria-label={`${setting === "sponsored.enabled" ? (config.enabled ? t.switchOff : t.switchOn) : t.edit}: ${settingLabel[locale][setting]}`} onClick={() => setDialog({ kind: "setting", key: setting })}>
                           {setting === "sponsored.enabled" ? (config.enabled ? t.switchOff : t.switchOn) : t.edit}
                         </button>
                       </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -317,7 +324,7 @@ export default function AdminSponsoredPage() {
                           <td className="px-2 py-2.5">{money(row.fee_amount_sar)}</td>
                           <td className="px-2 py-2.5 text-xs">{row.status === "accrued" ? (row.billed ? t.billedNote : "-") : (row.status_reason ? waivedReason[locale][row.status_reason] ?? row.status_reason : "-")}</td>
                           <td className="px-2 py-2.5">
-                            {decidable && (
+                            {decidable && canDecide && (
                               <div className="flex flex-wrap gap-2">
                                 <button type="button" className={actionClass} aria-label={`${t.waive}: ${name} ${row.booking_id.slice(0, 8)}`} onClick={() => setDialog({ kind: "decide", row, action: "waive" })}>{t.waive}</button>
                                 <button type="button" className={actionClass} aria-label={`${t.voidAction}: ${name} ${row.booking_id.slice(0, 8)}`} onClick={() => setDialog({ kind: "decide", row, action: "void" })}>{t.voidAction}</button>

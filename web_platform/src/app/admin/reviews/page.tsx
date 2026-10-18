@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { CommandDialog } from "@/components/modal";
+import { ReadFailure } from "@/components/read-failure";
+import { describeConsoleError } from "@/lib/console-errors.mjs";
+import { knownToHold, useConsoleSession } from "@/lib/console-session";
 
 const translations = {
   en: {
@@ -54,6 +57,9 @@ export default function AdminReviews() {
   const [loading, setLoading] = useState(true);
   const [lang, setLang] = useState<"en" | "ar">("ar");
   const [actionError, setActionError] = useState("");
+  const [loadError, setLoadError] = useState<unknown>(null);
+  // moderate_review needs operations.write: the moderation buttons show only to roles holding it.
+  const canModerate = knownToHold(useConsoleSession(), ["operations.write"]);
 
   useEffect(() => {
     const checkLang = () => {
@@ -74,6 +80,7 @@ export default function AdminReviews() {
     try {
       setLoading(true);
       setActionError("");
+      setLoadError(null);
       // GOV-FIX (Q4): reviews in every moderation state come from the audited admin_list_reviews (operations and owner);
       // reviewers' names are included only with personal.read. The newest 200 are shown.
       const { data, error } = await supabase.rpc("admin_list_reviews", { p_status: null, p_limit: 200, p_offset: 0, p_purpose: "review_moderation" });
@@ -81,9 +88,8 @@ export default function AdminReviews() {
       if (error) throw error;
       const rows = ((data as { rows?: Array<Record<string, any>> } | null)?.rows ?? []);
       setReviews(rows);
-    } catch (err: any) {
-      console.warn("Failed to load live reviews:", err.message);
-      setActionError(err?.message || "Failed to sync reviews from database.");
+    } catch (err) {
+      setLoadError(err);
       setReviews([]);
     } finally {
       setLoading(false);
@@ -99,7 +105,7 @@ export default function AdminReviews() {
       p_status: status,
       p_reason: reason
     });
-    if (error) return error.message || "Failed to update review status.";
+    if (error) return describeConsoleError(error, lang);
     setActionError("");
     setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, moderation_status: status } : r));
     return null;
@@ -163,11 +169,15 @@ export default function AdminReviews() {
 
       {renderModerationDialog()}
       {actionError && (
-        <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl font-bold">
+        <div role="alert" className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl font-bold">
           {actionError}
         </div>
       )}
 
+      {loadError ? (
+        <ReadFailure error={loadError} locale={lang} what={isRTL ? "التقييمات" : "The reviews"} onRetry={() => void loadReviews()} />
+      ) : (
+      <>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className={cardBase}>
           <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085] block">{t.totalReviews}</span>
@@ -177,7 +187,7 @@ export default function AdminReviews() {
         </div>
         <div className={cardBase}>
           <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085] block">{t.avgRating}</span>
-          <strong className="block text-2xl font-serif font-black text-[#D1AF47] mt-2.5">
+          <strong className="block text-2xl font-serif font-black text-[#7A5B12] mt-2.5">
             {avgScore} / 5.0
           </strong>
         </div>
@@ -245,6 +255,7 @@ export default function AdminReviews() {
                   </div>
                 )}
 
+                {canModerate && (
                 <div className={`flex gap-2 pt-2 border-t border-[#F5F5F5] ${isRTL ? "justify-start" : "justify-end"}`}>
                   <button 
                     onClick={() => handleModerate(r.id, "hidden")} 
@@ -265,11 +276,14 @@ export default function AdminReviews() {
                     {t.approveBtn}
                   </button>
                 </div>
+                )}
               </div>
             );
           })
         )}
       </div>
+      </>
+      )}
     </div>
   );
 }
