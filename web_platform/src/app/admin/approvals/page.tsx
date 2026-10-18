@@ -3,7 +3,7 @@
 import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { errorMessage } from "@/lib/error-message";
+import { describeConsoleError } from "@/lib/console-errors.mjs";
 import { CommandResult, ForbiddenNotice, isForbidden, operationsDate, sar, useOperationsLocale } from "@/components/operations-ui";
 import { CommandDialog } from "@/components/modal";
 import { oneOf, writeUrlState } from "@/lib/url-state";
@@ -388,7 +388,7 @@ function ApprovalsScreen() {
       if (cancelled) return;
       if (error) {
         setInbox(null);
-        setLoadError(errorMessage(error));
+        setLoadError(describeConsoleError(error, lang));
         setForbidden(isForbidden(error));
       } else {
         setInbox(data as Inbox);
@@ -487,13 +487,13 @@ function ApprovalsScreen() {
 
   const decide = async (row: ApprovalRow, decision: "approve" | "reject", reason: string): Promise<string | null> => {
     const { error } = await supabase.rpc("admin_decide_approval", { p_request_id: row.id, p_decision: decision, p_reason: reason });
-    if (error) return errorMessage(error);
+    if (error) return describeConsoleError(error, lang);
     // PRIV: an approved copy is built and an approved deletion's auth account removed right away by the Edge Functions (the
     // scheduler retries them too). A failure here leaves the approval done and the next step visible on the privacy screen.
     if (decision === "approve" && (row.kind === "privacy_export" || row.kind === "privacy_deletion")) {
       const { error: followUp } = await supabase.functions.invoke(row.kind === "privacy_export" ? "privacy-export" : "privacy-erase-account",
         { body: row.kind === "privacy_export" ? { request_id: row.target_id } : {} });
-      if (followUp) setFailure(t.privacyFollowUp.replace("{reason}", errorMessage(followUp)));
+      if (followUp) setFailure(t.privacyFollowUp.replace("{reason}", describeConsoleError(followUp, lang)));
     }
     return null;
   };
@@ -516,27 +516,27 @@ function ApprovalsScreen() {
       else setSuccess(summaryText);
     } else if (dialog.type === "cancel") {
       const { error } = await supabase.rpc("admin_cancel_approval", { p_request_id: dialog.row.id, p_reason: reason });
-      message = error ? errorMessage(error) : null;
+      message = error ? describeConsoleError(error, lang) : null;
       if (!message) setSuccess(t.done);
     } else if (dialog.type === "break-glass") {
       const { error } = await supabase.rpc("admin_break_glass_execute", { p_request_id: dialog.row.id, p_justification: reason });
-      message = error ? errorMessage(error) : null;
+      message = error ? describeConsoleError(error, lang) : null;
       if (!message) setSuccess(t.approvedDone);
     } else if (dialog.type === "review") {
       const { error } = await supabase.rpc("admin_sign_off_break_glass", { p_review_id: dialog.review.id, p_reviewer_name: reason, p_document_reference: extra, p_notes: null });
-      message = error ? errorMessage(error) : null;
+      message = error ? describeConsoleError(error, lang) : null;
       if (!message) setSuccess(t.done);
     } else if (dialog.type === "setting") {
       const { error } = await supabase.rpc("admin_request_setting_change", { p_key: dialog.setting.key, p_value: Number(extra), p_reason: reason });
-      message = error ? errorMessage(error) : null;
+      message = error ? describeConsoleError(error, lang) : null;
       if (!message) setSuccess(t.proposedDone);
     } else if (dialog.type === "lift") {
       const { error } = await supabase.rpc("admin_lift_iban_reveal_limit", { p_user_id: dialog.alert.user_id, p_reason: reason });
-      message = error ? errorMessage(error) : null;
+      message = error ? describeConsoleError(error, lang) : null;
       if (!message) setSuccess(t.done);
     } else if (dialog.type === "alert") {
       const { error } = await supabase.rpc("admin_acknowledge_security_alert", { p_alert_id: dialog.alert.id, p_note: reason });
-      message = error ? errorMessage(error) : null;
+      message = error ? describeConsoleError(error, lang) : null;
       if (!message) setSuccess(t.done);
     }
     if (!message) reload();
@@ -549,6 +549,33 @@ function ApprovalsScreen() {
   const pages = Math.max(1, Math.ceil(matching / PAGE_SIZE));
   const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928]";
   const cell = "px-4 py-3 align-top";
+  const requestDetails = (row: ApprovalRow) => (
+    <>
+      <p className="font-black text-gray-900">{kindLabel(row)}{row.break_glass ? <span className="ms-2 rounded-full bg-[#FEF3F2] px-2 py-0.5 text-[10px] font-black text-[#B42318]">{t.breakGlassBadge}</span> : null}</p>
+      <p className="mt-0.5 text-[11px] text-gray-600"><bdi>{describe(row)}</bdi></p>
+      {row.summary?.destination_changed_recently === true && <p className="mt-1 text-[11px] font-black text-[#B54708]">{t.accountChangedRecently}</p>}
+      {row.kind === "iban_change" && row.summary?.previous_iban_masked ? <p className="mt-1 text-[11px] text-gray-600">{t.previousAccount}: <bdi dir="ltr">{text(row.summary.previous_iban_masked)}</bdi></p> : null}
+      {row.kind === "iban_change" && row.summary?.account_holder_name ? <p className="mt-1 text-[11px] text-gray-600">{t.holder}: {text(row.summary.account_holder_name)}</p> : null}
+      <p className="mt-1 text-[10px] text-gray-600">{operationsDate(row.requested_at, lang)}</p>
+    </>
+  );
+  const reasonDetails = (row: ApprovalRow) => (
+    <>
+      <p className="break-words">{row.request_reason}</p>
+      {row.decided_at && <p className="mt-1 text-[10px] text-gray-600">{fill(t.decidedBy, { name: row.decided_by_name || t.unnamed, date: operationsDate(row.decided_at, lang) })}{row.decision_reason ? ` — ${row.decision_reason}` : ""}</p>}
+    </>
+  );
+  const rowActions = (row: ApprovalRow, smallButton: string) => (row.status === "pending" ? (
+    <span className="flex flex-wrap gap-1.5">
+      {row.can_decide && <button type="button" onClick={() => setDialog({ type: "decide", row, decision: "approve" })} aria-label={`${t.approve}: ${kindLabel(row)}`} className={`${smallButton} border-[#101828] bg-[#101828] text-white`}>{t.approve}</button>}
+      {row.can_decide && <button type="button" onClick={() => setDialog({ type: "decide", row, decision: "reject" })} aria-label={`${t.reject}: ${kindLabel(row)}`} className={`${smallButton} border-[#FECDCA] bg-[#FEF3F2] text-[#B42318]`}>{t.reject}</button>}
+      {row.can_cancel && <button type="button" onClick={() => setDialog({ type: "cancel", row })} className={`${smallButton} border-gray-300 bg-white text-gray-800`}>{t.withdraw}</button>}
+      {row.can_break_glass && <button type="button" onClick={() => setDialog({ type: "break-glass", row })} className={`${smallButton} border-[#B42318] bg-white text-[#B42318]`}>{t.breakGlass}</button>}
+      {!row.can_decide && !row.can_cancel && <span className="text-[11px] text-gray-600">{row.decide_blocked_reason || t.noRight}</span>}
+      {row.can_cancel && row.break_glass_blocked_until ? <span className="w-full text-[10px] font-bold text-[#B54708]">{fill(t.breakGlassClosedUntil, { date: operationsDate(row.break_glass_blocked_until, lang) })}</span> : null}
+      {row.can_cancel && !row.can_break_glass && <span className="w-full text-[10px] text-gray-600">{t.yours}</span>}
+    </span>
+  ) : null);
   const smallButton = `whitespace-nowrap rounded-lg border px-2.5 py-1.5 text-[11px] font-black disabled:opacity-50 ${focusRing}`;
   const panel = "rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]";
 
@@ -673,7 +700,31 @@ function ApprovalsScreen() {
             ) : rows.length === 0 ? (
               <p className="p-8 text-center text-xs font-semibold text-gray-500">{status === "pending" ? t.emptyPending : t.empty}</p>
             ) : (
-              <div className="overflow-x-auto">
+              <>
+              <ul className="divide-y divide-[#F5F5F5] md:hidden" aria-label={t.columnRequest}>
+                {rows.map((row) => (
+                  <li key={row.id} className="space-y-3 p-4 text-xs font-semibold text-gray-700">
+                    <div className="flex items-start gap-3">
+                      {status === "pending" && row.can_decide ? (
+                        <input type="checkbox" aria-label={`${t.selectRow}: ${kindLabel(row)}`} checked={selected.includes(row.id)}
+                          onChange={(event) => setSelected((current) => event.target.checked ? [...current, row.id] : current.filter((id) => id !== row.id))}
+                          className="mt-0.5 h-4 w-4 shrink-0 accent-[#9B7928]" />
+                      ) : null}
+                      <div className="min-w-0 flex-1">{requestDetails(row)}</div>
+                    </div>
+                    <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
+                      <dt className="text-gray-600">{t.columnAmount}</dt>
+                      <dd className="min-w-0">{row.amount_sar !== null ? sar(toNumber(row.amount_sar), lang) : "—"}</dd>
+                      <dt className="text-gray-600">{t.columnRequestedBy}</dt>
+                      <dd className="min-w-0 break-words">{requester(row)}</dd>
+                      <dt className="text-gray-600">{t.columnReason}</dt>
+                      <dd className="min-w-0">{reasonDetails(row)}</dd>
+                    </dl>
+                    {rowActions(row, `${smallButton} min-h-11`)}
+                  </li>
+                ))}
+              </ul>
+              <div className="hidden overflow-x-auto md:block">
                 <table className="w-full min-w-[860px] text-xs">
                   <thead className="border-b border-[#ECECEC] bg-[#FAF9F6] text-[10px] font-extrabold uppercase tracking-wider text-gray-500">
                     <tr>
@@ -703,38 +754,17 @@ function ApprovalsScreen() {
                             ) : null}
                           </td>
                         )}
-                        <td className={cell}>
-                          <p className="font-black text-gray-900">{kindLabel(row)}{row.break_glass ? <span className="ms-2 rounded-full bg-[#FEF3F2] px-2 py-0.5 text-[10px] font-black text-[#B42318]">{t.breakGlassBadge}</span> : null}</p>
-                          <p className="mt-0.5 text-[11px] text-gray-500"><bdi>{describe(row)}</bdi></p>
-                          {row.summary?.destination_changed_recently === true && <p className="mt-1 text-[11px] font-black text-[#B54708]">{t.accountChangedRecently}</p>}
-                          {row.kind === "iban_change" && row.summary?.previous_iban_masked ? <p className="mt-1 text-[11px] text-gray-500">{t.previousAccount}: <bdi dir="ltr">{text(row.summary.previous_iban_masked)}</bdi></p> : null}
-                          {row.kind === "iban_change" && row.summary?.account_holder_name ? <p className="mt-1 text-[11px] text-gray-500">{t.holder}: {text(row.summary.account_holder_name)}</p> : null}
-                          <p className="mt-1 text-[10px] text-gray-400">{operationsDate(row.requested_at, lang)}</p>
-                        </td>
+                        <td className={cell}>{requestDetails(row)}</td>
                         <td className={`${cell} whitespace-nowrap`}>{row.amount_sar !== null ? sar(toNumber(row.amount_sar), lang) : "—"}</td>
                         <td className={cell}>{requester(row)}</td>
-                        <td className={`${cell} max-w-[260px]`}>
-                          <p className="break-words">{row.request_reason}</p>
-                          {row.decided_at && <p className="mt-1 text-[10px] text-gray-500">{fill(t.decidedBy, { name: row.decided_by_name || t.unnamed, date: operationsDate(row.decided_at, lang) })}{row.decision_reason ? ` — ${row.decision_reason}` : ""}</p>}
-                        </td>
-                        <td className={cell}>
-                          {row.status === "pending" ? (
-                            <span className="flex flex-wrap gap-1.5">
-                              {row.can_decide && <button type="button" onClick={() => setDialog({ type: "decide", row, decision: "approve" })} className={`${smallButton} border-[#101828] bg-[#101828] text-white`}>{t.approve}</button>}
-                              {row.can_decide && <button type="button" onClick={() => setDialog({ type: "decide", row, decision: "reject" })} className={`${smallButton} border-[#FECDCA] bg-[#FEF3F2] text-[#B42318]`}>{t.reject}</button>}
-                              {row.can_cancel && <button type="button" onClick={() => setDialog({ type: "cancel", row })} className={`${smallButton} border-gray-300 bg-white text-gray-800`}>{t.withdraw}</button>}
-                              {row.can_break_glass && <button type="button" onClick={() => setDialog({ type: "break-glass", row })} className={`${smallButton} border-[#B42318] bg-white text-[#B42318]`}>{t.breakGlass}</button>}
-                              {!row.can_decide && !row.can_cancel && <span className="text-[11px] text-gray-500">{row.decide_blocked_reason || t.noRight}</span>}
-                              {row.can_cancel && row.break_glass_blocked_until ? <span className="w-full text-[10px] font-bold text-[#B54708]">{fill(t.breakGlassClosedUntil, { date: operationsDate(row.break_glass_blocked_until, lang) })}</span> : null}
-                              {row.can_cancel && !row.can_break_glass && <span className="w-full text-[10px] text-gray-500">{t.yours}</span>}
-                            </span>
-                          ) : null}
-                        </td>
+                        <td className={`${cell} max-w-[260px]`}>{reasonDetails(row)}</td>
+                        <td className={cell}>{rowActions(row, smallButton)}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
+              </>
             )}
             {!loading && !loadError && rows.length > 0 ? (
               <div className="flex items-center justify-between gap-3 border-t border-[#ECECEC] px-4 py-3 text-xs font-bold text-gray-600">

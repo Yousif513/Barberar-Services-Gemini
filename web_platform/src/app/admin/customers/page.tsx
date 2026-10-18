@@ -3,7 +3,7 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { errorMessage } from "@/lib/error-message";
+import { describeConsoleError } from "@/lib/console-errors.mjs";
 import { errorHint } from "@/lib/step-up";
 import { CommandResult, ForbiddenNotice, isForbidden, operationsDate, operationsInput, sar, useOperationsLocale } from "@/components/operations-ui";
 import { CommandDialog } from "@/components/modal";
@@ -321,7 +321,7 @@ function CustomersScreen() {
       if (cancelled) return;
       if (error) {
         setOverview(null);
-        setCustomersError(errorMessage(error));
+        setCustomersError(describeConsoleError(error, lang));
         setCustomersForbidden(isForbidden(error));
       } else {
         setOverview(data as Overview);
@@ -347,7 +347,7 @@ function CustomersScreen() {
       const failure = open.error ?? closed.error;
       if (failure) {
         setRequests(null);
-        setRequestsError(errorMessage(failure));
+        setRequestsError(describeConsoleError(failure, lang));
         setRequestsForbidden(isForbidden(failure));
       } else {
         setRequestsForbidden(false);
@@ -359,7 +359,7 @@ function CustomersScreen() {
       }
       if (consentResult.error) {
         setConsents(null);
-        setConsentsError(errorMessage(consentResult.error));
+        setConsentsError(describeConsoleError(consentResult.error, lang));
       } else {
         setConsents(((consentResult.data as { rows: Consent[] } | null)?.rows ?? []) as Consent[]);
         setConsentsError("");
@@ -375,7 +375,7 @@ function CustomersScreen() {
   const execute = async (command: PromiseLike<{ data?: unknown; error: unknown }>, success: string, pendingMessage?: string): Promise<string | null> => {
     const { data, error } = await command;
     // F1: a court hold on the account refuses the clear on the server; say so in the screen's language.
-    if (error) return errorHint(error) === "legal_hold_active" ? t.clearHeld : errorMessage(error);
+    if (error) return errorHint(error) === "legal_hold_active" ? t.clearHeld : describeConsoleError(error, lang);
     // A command that needs a second administrator answers pending_approval: it was recorded, not carried out.
     const status = (data as { status?: string } | null)?.status;
     setNotice({ success: status === "pending_approval" && pendingMessage ? pendingMessage : success });

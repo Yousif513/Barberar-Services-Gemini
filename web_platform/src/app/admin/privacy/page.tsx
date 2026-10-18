@@ -3,12 +3,13 @@
 import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { errorMessage } from "@/lib/error-message";
+import { describeConsoleError } from "@/lib/console-errors.mjs";
 import { CommandResult, ForbiddenNotice, isForbidden, operationsButton, operationsDate, operationsInput, useOperationsLocale } from "@/components/operations-ui";
 import { CommandDialog } from "@/components/modal";
 import { writeUrlState } from "@/lib/url-state";
 import { knownToHold, useConsoleSession } from "@/lib/console-session";
 import { CustomerPicker, type PickedCustomer } from "./customer-picker";
+import { RetentionPurgePanel } from "./retention-purge";
 
 // Privacy requests, legal holds, the deletion ledger and the health-intake collection gate (PRIV package; Q1, Q2, Q2.6, X3(6) of
 // docs/legal/2026-10-10-privacy-decision-memo.md). Every read goes through an audited server function and every change through a
@@ -238,7 +239,7 @@ function RequestsTab({ t, lang, setNotice }: TabProps) {
 
   const open = async (id: string) => {
     const { data, error } = await supabase.rpc("admin_privacy_get_request", { p_request_id: id, p_purpose: "privacy_request" });
-    if (error) { setNotice({ error: errorMessage(error) }); return; }
+    if (error) { setNotice({ error: describeConsoleError(error, lang) }); return; }
     const r = data as PrivacyRequest;
     setSelected(r);
     setPreview(null);
@@ -249,7 +250,7 @@ function RequestsTab({ t, lang, setNotice }: TabProps) {
   };
   const run = async (call: Rpc, success: string): Promise<string | null> => {
     const { error } = await call;
-    if (error) return errorMessage(error);
+    if (error) return describeConsoleError(error, lang);
     setNotice({ success });
     refresh();
     if (selected) await open(selected.id);
@@ -257,12 +258,12 @@ function RequestsTab({ t, lang, setNotice }: TabProps) {
   };
   const invoke = async (name: "privacy-export" | "privacy-erase-account", body: Record<string, unknown>) => {
     const { error } = await supabase.functions.invoke(name, { body });
-    if (error) setNotice({ error: errorMessage(error) });
+    if (error) setNotice({ error: describeConsoleError(error, lang) });
     else { setNotice({ success: t.done }); refresh(); if (selected) await open(selected.id); }
   };
   const escalate = async () => {
     const { data, error } = await supabase.rpc("privacy_escalate_requests");
-    if (error) setNotice({ error: errorMessage(error) });
+    if (error) setNotice({ error: describeConsoleError(error, lang) });
     else { const d = data as { day_20: number; day_28: number }; setNotice({ success: fill(t.escalated, { a: num(d.day_20, lang), b: num(d.day_28, lang) }) }); refresh(); }
   };
   const name = (r: PrivacyRequest) => [r.subject?.first_name, r.subject?.last_name].filter(Boolean).join(" ") || r.subject_id.slice(0, 8);
@@ -282,7 +283,7 @@ function RequestsTab({ t, lang, setNotice }: TabProps) {
 
       {forbidden ? <ForbiddenNotice locale={lang} /> : loadError ? (
         <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-          <span>{fill(t.loadFailed, { reason: errorMessage(loadError) })}</span>
+          <span>{fill(t.loadFailed, { reason: describeConsoleError(loadError, lang) })}</span>
           <button type="button" onClick={refresh} className={`rounded-xl border border-red-300 bg-white px-3 py-1.5 text-xs font-black ${focusRing}`}>{t.retry}</button>
         </div>
       ) : !rows ? <div role="status" className={card}>{t.loading}</div> : rows.length === 0 ? (
@@ -483,7 +484,7 @@ function LogRequestForm({ t, lang, onDone, onError }: { t: T; lang: "en" | "ar";
     const { error } = await supabase.rpc("admin_privacy_log_request", { p_subject_id: subject.id, p_request_type: type, p_channel: channel,
       p_received_at: received, p_details: details.trim(), p_options: options });
     setBusy(false);
-    if (error) onError(errorMessage(error));
+    if (error) onError(describeConsoleError(error, lang));
     else { onDone(t.logged); setSubject(null); setDetails(""); setValue(""); setPurposes([]); setReceivedAt(""); }
   };
   const invalid = (key: string) => ({ "aria-invalid": Boolean(problems[key]), "aria-describedby": problems[key] ? `log-${key}-error` : undefined });
@@ -542,7 +543,7 @@ function HoldsTab({ t, lang, setNotice }: TabProps) {
   }, [state, reload]);
   const releaseDue = async () => {
     const { data, error } = await supabase.rpc("privacy_release_due_holds");
-    if (error) setNotice({ error: errorMessage(error) });
+    if (error) setNotice({ error: describeConsoleError(error, lang) });
     else { setNotice({ success: fill(t.released, { n: num((data as { released: number }).released, lang) }) }); setReload((k) => k + 1); }
   };
   const propose = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -560,7 +561,7 @@ function HoldsTab({ t, lang, setNotice }: TabProps) {
       p_case_reference: form.reference.trim(), p_categories: form.basis === "court_case" ? form.categories : null,
       p_booking_id: form.basis === "payment_dispute" ? form.booking.trim() : null, p_reason: form.reason.trim(),
       p_account_reason: form.basis === "court_case" && form.categories.includes("account") ? form.accountReason.trim() : null });
-    if (error) setNotice({ error: errorMessage(error) });
+    if (error) setNotice({ error: describeConsoleError(error, lang) });
     else { setNotice({ success: t.done }); setForm({ ...form, reference: "", booking: "", reason: "", accountReason: "", categories: [] }); setHoldSubject(null); setReload((k) => k + 1); }
   };
   const invalid = (key: string) => ({ "aria-invalid": Boolean(holdProblems[key]), "aria-describedby": holdProblems[key] ? `hold-${key}-error` : undefined });
@@ -575,7 +576,7 @@ function HoldsTab({ t, lang, setNotice }: TabProps) {
         {canManage && <button type="button" onClick={() => void releaseDue()} className={operationsButton}>{t.releaseDue}</button>}
       </div>
       {overdue > 0 && <p role="status" className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs font-bold text-amber-950">{fill(t.reviewOverdue, { n: num(overdue, lang) })}</p>}
-      {loadError ? (isForbidden(loadError) ? <ForbiddenNotice locale={lang} /> : <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{fill(t.loadFailed, { reason: errorMessage(loadError) })}</p>)
+      {loadError ? (isForbidden(loadError) ? <ForbiddenNotice locale={lang} /> : <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{fill(t.loadFailed, { reason: describeConsoleError(loadError, lang) })}</p>)
         : !rows ? <div role="status" className={card}>{t.loading}</div> : rows.length === 0 ? <div className={`${card} text-sm font-semibold text-gray-500`}>{t.emptyHolds}</div> : (
         <div role="region" aria-label={t.tabs.holds} tabIndex={0} className={`overflow-x-auto rounded-2xl border border-[#ECECEC] bg-white ${focusRing}`}>
           <table className="w-full min-w-[760px] text-xs">
@@ -607,7 +608,7 @@ function HoldsTab({ t, lang, setNotice }: TabProps) {
           confirmLabel={dialog.keep ? t.keep : t.release} onClose={() => setDialog(null)}
           onConfirm={async (note) => {
             const { data, error } = await supabase.rpc("admin_privacy_review_legal_hold", { p_hold_id: dialog.hold.id, p_keep: dialog.keep, p_note: note });
-            if (error) return errorMessage(error);
+            if (error) return describeConsoleError(error, lang);
             const result = data as { status?: string; release_needs_approval?: boolean; renewal_needs_approval?: boolean } | null;
             const asked = result?.status === "pending_approval";
             setNotice({ success: asked ? (result?.release_needs_approval ? t.releaseAsked : t.renewalAsked) : t.done }); setReload((k) => k + 1); return null;
@@ -658,7 +659,7 @@ function LedgerTab({ t, lang, setNotice }: TabProps) {
   }, [reload]);
   const download = async () => {
     const { data, error } = await supabase.rpc("admin_privacy_export_deletion_ledger");
-    if (error) { setNotice({ error: errorMessage(error) }); return; }
+    if (error) { setNotice({ error: describeConsoleError(error, lang) }); return; }
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -667,7 +668,7 @@ function LedgerTab({ t, lang, setNotice }: TabProps) {
   };
   const reapply = async () => {
     const { data, error } = await supabase.rpc("privacy_reapply_deletion_ledger");
-    if (error) { setNotice({ error: errorMessage(error) }); return; }
+    if (error) { setNotice({ error: describeConsoleError(error, lang) }); return; }
     const d = data as { reapplied: number; auth_accounts_to_delete: string[] };
     setNotice({ success: fill(t.reapplied, { n: num(d.reapplied, lang), a: num(d.auth_accounts_to_delete.length, lang) }) });
     if (d.auth_accounts_to_delete.length) await supabase.functions.invoke("privacy-erase-account", { body: {} });
@@ -683,7 +684,7 @@ function LedgerTab({ t, lang, setNotice }: TabProps) {
     if (Object.keys(found).length > 0) { focusFirstInvalid(e.currentTarget); return; }
     const { error } = await supabase.rpc("admin_privacy_record_transfer_assessment", { p_document_reference: gateForm.ref.trim(), p_approved_on: gateForm.date,
       p_signed_by: gateForm.signer.trim(), p_notes: gateForm.notes.trim() || null });
-    if (error) setNotice({ error: errorMessage(error) }); else { setNotice({ success: t.done }); setReload((k) => k + 1); }
+    if (error) setNotice({ error: describeConsoleError(error, lang) }); else { setNotice({ success: t.done }); setReload((k) => k + 1); }
   };
   const stat = (label: string, value: React.ReactNode) => <div className={card}><span className="text-[11px] font-extrabold uppercase tracking-widest text-[#667085]">{label}</span><strong className="mt-2 block text-xl font-black text-gray-900">{value}</strong></div>;
   const notice = useMemo(() => (gate ? (lang === "ar" ? gate.notice_ar : gate.notice_en) : null), [gate, lang]);
@@ -691,7 +692,7 @@ function LedgerTab({ t, lang, setNotice }: TabProps) {
     <div className="space-y-6">
       <section aria-labelledby="ledger-title" className="space-y-3">
         <h2 id="ledger-title" className="font-serif text-lg font-black text-gray-900">{t.ledgerTitle}</h2>
-        {loadError ? (isForbidden(loadError) ? <ForbiddenNotice locale={lang} /> : <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{fill(t.loadFailed, { reason: errorMessage(loadError) })}</p>) : !summary ? <div role="status" className={card}>{t.loading}</div> : (
+        {loadError ? (isForbidden(loadError) ? <ForbiddenNotice locale={lang} /> : <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{fill(t.loadFailed, { reason: describeConsoleError(loadError, lang) })}</p>) : !summary ? <div role="status" className={card}>{t.loading}</div> : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
             {stat(t.ledgerEntries, num(summary.entries, lang))}
             {stat(t.authPending, num(summary.auth_pending, lang))}
@@ -705,6 +706,7 @@ function LedgerTab({ t, lang, setNotice }: TabProps) {
           <button type="button" onClick={() => void reapply()} className={operationsButton}>{t.reapply}</button>
         </div>
       </section>
+      <RetentionPurgePanel lang={lang} onNotice={setNotice} />
       <section aria-labelledby="gate-title" className={`${card} space-y-3`}>
         <h2 id="gate-title" className="font-serif text-lg font-black text-gray-900">{t.gateTitle}</h2>
         {gate && (gate.enabled ? (
@@ -732,7 +734,7 @@ function LedgerTab({ t, lang, setNotice }: TabProps) {
           onClose={() => setRevoking(false)}
           onConfirm={async (reason) => {
             const { error } = await supabase.rpc("admin_privacy_revoke_transfer_assessment", { p_reason: reason });
-            if (error) return errorMessage(error);
+            if (error) return describeConsoleError(error, lang);
             setNotice({ success: t.done }); setReload((k) => k + 1); return null;
           }} />
       )}

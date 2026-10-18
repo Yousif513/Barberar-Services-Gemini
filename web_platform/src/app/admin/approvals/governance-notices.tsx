@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { errorMessage } from "@/lib/error-message";
+import { describeConsoleError } from "@/lib/console-errors.mjs";
 import { ForbiddenNotice, isForbidden, operationsDate, type OperationsLocale } from "@/components/operations-ui";
 import { CommandDialog } from "@/components/modal";
 
@@ -86,7 +86,7 @@ export function GovernanceNotices({ locale, panelClass, buttonClass, onDone }: {
     const { data, error: loadError } = await supabase.rpc("admin_list_governance_notices", { p_status: null, p_limit: 25, p_offset: 0 });
     if (loadError) {
       setView(null);
-      setError(errorMessage(loadError));
+      setError(describeConsoleError(loadError, locale));
       setForbidden(isForbidden(loadError));
       return;
     }
@@ -151,7 +151,7 @@ export function GovernanceNotices({ locale, panelClass, buttonClass, onDone }: {
           confirmLabel={t.waiveConfirm}
           onConfirm={async (reason) => {
             const { error: waiveError } = await supabase.rpc("admin_waive_payout_account_notice", { p_destination_id: waiving.destination_id, p_reason: reason });
-            if (waiveError) return errorMessage(waiveError);
+            if (waiveError) return describeConsoleError(waiveError, locale);
             setWaiving(null);
             onDone(t.waived);
             setReloadKey((k) => k + 1);
