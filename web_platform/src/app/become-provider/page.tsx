@@ -461,7 +461,7 @@ export default function BecomeProviderRootPage() {
         <Link href="/" className="text-2xl font-serif font-black tracking-widest text-stone-900 hover:opacity-80 transition flex-shrink-0">
           PRIMORA
         </Link>
-        <nav className="hidden lg:flex items-center justify-center gap-8 text-xs font-bold uppercase tracking-wider text-stone-500 flex-1 mx-8">
+        <nav className="hidden lg:flex items-center justify-center gap-8 text-xs font-bold uppercase tracking-wider text-stone-600 flex-1 mx-8">
           <Link href="/" className="hover:text-stone-950 transition-colors">{t.home}</Link>
           <Link href="/services" className="hover:text-stone-950 transition-colors">{t.discover}</Link>
           <Link href="/service-board" className="hover:text-stone-950 transition-colors">{t.serviceBoard}</Link>
@@ -498,9 +498,9 @@ export default function BecomeProviderRootPage() {
       <main className="max-w-4xl mx-auto py-16 px-6 sm:px-8 space-y-16 flex-grow">
         {/* Title Section */}
         <div className="text-center space-y-4">
-          <span className="text-[10px] tracking-widest uppercase font-extrabold text-stone-400">{t.becomeProvider}</span>
+          <span className="text-[10px] tracking-widest uppercase font-extrabold text-stone-600">{t.becomeProvider}</span>
           <h1 className="text-4xl sm:text-5xl font-serif text-stone-950 tracking-tight leading-tight max-w-3xl mx-auto">{t.title}</h1>
-          <p className="text-sm sm:text-base text-stone-500 font-light max-w-xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-stone-600 font-light max-w-xl mx-auto leading-relaxed">
             {t.subtitle}
           </p>
           <div className="pt-4">
@@ -529,7 +529,7 @@ export default function BecomeProviderRootPage() {
               <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
             <h3 className="font-bold text-xs text-stone-900 uppercase tracking-wide">{t.value1Title}</h3>
-            <p className="text-xs text-stone-500 leading-relaxed font-light">{t.value1Desc}</p>
+            <p className="text-xs text-stone-600 leading-relaxed font-light">{t.value1Desc}</p>
           </div>
 
           <div className="space-y-3">
@@ -537,7 +537,7 @@ export default function BecomeProviderRootPage() {
               <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
             </div>
             <h3 className="font-bold text-xs text-stone-900 uppercase tracking-wide">{t.value2Title}</h3>
-            <p className="text-xs text-stone-500 leading-relaxed font-light">{t.value2Desc}</p>
+            <p className="text-xs text-stone-600 leading-relaxed font-light">{t.value2Desc}</p>
           </div>
 
           <div className="space-y-3">
@@ -545,7 +545,7 @@ export default function BecomeProviderRootPage() {
               <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
             </div>
             <h3 className="font-bold text-xs text-stone-900 uppercase tracking-wide">{t.value3Title}</h3>
-            <p className="text-xs text-stone-500 leading-relaxed font-light">{t.value3Desc}</p>
+            <p className="text-xs text-stone-600 leading-relaxed font-light">{t.value3Desc}</p>
           </div>
         </div>
 
@@ -560,9 +560,9 @@ export default function BecomeProviderRootPage() {
               {t.plansError} {plansError}
             </div>
           ) : plans === null ? (
-            <p role="status" className="text-center text-xs font-semibold text-stone-500">{t.plansLoading}</p>
+            <p role="status" className="text-center text-xs font-semibold text-stone-600">{t.plansLoading}</p>
           ) : plans.length === 0 ? (
-            <p className="text-center text-xs font-semibold text-stone-500">{t.plansEmpty}</p>
+            <p className="text-center text-xs font-semibold text-stone-600">{t.plansEmpty}</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {plans.map((plan) => {
@@ -572,7 +572,7 @@ export default function BecomeProviderRootPage() {
                     <h3 className="font-bold text-base text-stone-950">{isRTL ? plan.name_ar : plan.name_en}</h3>
                     <p className="text-2xl font-black text-stone-900">
                       {price === 0 ? t.planFree : sar(price, locale)}
-                      {price === 0 ? null : <span className="text-xs font-semibold text-stone-500"> {t.planPerMonth}</span>}
+                      {price === 0 ? null : <span className="text-xs font-semibold text-stone-600"> {t.planPerMonth}</span>}
                     </p>
                     <ul className="space-y-1.5 text-xs text-stone-600 font-light">
                       <li>{counted(t.planBranchesPlural, plan.max_branches)}</li>
@@ -584,7 +584,7 @@ export default function BecomeProviderRootPage() {
               })}
             </div>
           )}
-          <p className="mx-auto max-w-2xl text-center text-xs leading-relaxed text-stone-500">{t.feesNote}</p>
+          <p className="mx-auto max-w-2xl text-center text-xs leading-relaxed text-stone-600">{t.feesNote}</p>
         </div>
 
         <hr className="border-stone-200" />
@@ -592,11 +592,11 @@ export default function BecomeProviderRootPage() {
         {/* 5. ONBOARDING APPLICATION SECTION */}
         <section id="application-form" className="space-y-8 scroll-mt-24">
           <div className="text-center space-y-3">
-            <span className="text-[10px] tracking-widest uppercase font-extrabold text-[#D1AF47]">
+            <span className="text-[10px] tracking-widest uppercase font-extrabold text-[#7A5B12]">
               {t.gateway}
             </span>
             <h2 className="text-3xl font-serif font-black text-stone-950">{t.appTitle}</h2>
-            <p className="text-sm text-stone-500 max-w-xl mx-auto leading-relaxed">{t.appSubtitle}</p>
+            <p className="text-sm text-stone-600 max-w-xl mx-auto leading-relaxed">{t.appSubtitle}</p>
           </div>
 
           {appLoadError && (
@@ -606,7 +606,7 @@ export default function BecomeProviderRootPage() {
           )}
 
           {checkingApp ? (
-            <div className="rounded-2xl border border-stone-200 bg-white p-12 text-center text-sm font-semibold text-stone-500">
+            <div className="rounded-2xl border border-stone-200 bg-white p-12 text-center text-sm font-semibold text-stone-600">
               {isRTL ? "جاري التحقق من بيانات الحساب..." : "Checking account credentials..."}
             </div>
           ) : !currentUser ? (
@@ -616,7 +616,7 @@ export default function BecomeProviderRootPage() {
               </div>
               <div className="space-y-2 max-w-md mx-auto">
                 <h3 className="font-serif text-xl font-bold text-stone-950">{t.loginToApply}</h3>
-                <p className="text-xs text-stone-500 leading-relaxed">
+                <p className="text-xs text-stone-600 leading-relaxed">
                   {isRTL
                     ? "يتطلب تقديم الطلب تسجيل حساب وتوثيق رقم الجوال لربط المنشأة بحساب المالك بصورة نظامية آمنة."
                     : "Submitting an application requires an authenticated account to securely link your commercial entity with owner credentials."}
@@ -640,11 +640,11 @@ export default function BecomeProviderRootPage() {
               <p className="text-sm text-stone-600 max-w-lg mx-auto leading-relaxed">{t.underReviewMsg}</p>
               <div className="pt-4 border-t border-[#FEDF89]/50 max-w-md mx-auto grid grid-cols-2 gap-4 text-xs font-bold text-stone-700">
                 <div>
-                  <span className="block text-[10px] text-stone-400 uppercase font-extrabold">{isRTL ? "المنشأة" : "Business"}</span>
+                  <span className="block text-[10px] text-stone-600 uppercase font-extrabold">{isRTL ? "المنشأة" : "Business"}</span>
                   <span>{isRTL ? existingApp.business_name_ar : existingApp.business_name_en}</span>
                 </div>
                 <div>
-                  <span className="block text-[10px] text-stone-400 uppercase font-extrabold">{isRTL ? "تاريخ التقديم" : "Submitted"}</span>
+                  <span className="block text-[10px] text-stone-600 uppercase font-extrabold">{isRTL ? "تاريخ التقديم" : "Submitted"}</span>
                   <span>{new Intl.DateTimeFormat(isRTL ? "ar-SA-u-ca-gregory" : "en-GB", { dateStyle: "medium", timeZone: "Asia/Riyadh" }).format(new Date(existingApp.created_at))}</span>
                 </div>
               </div>
@@ -681,7 +681,7 @@ export default function BecomeProviderRootPage() {
               )}
 
               {agreement.state === "loading" && (
-                <p role="status" className="text-xs font-semibold text-stone-500">{t.agreementLoading}</p>
+                <p role="status" className="text-xs font-semibold text-stone-600">{t.agreementLoading}</p>
               )}
               {agreement.state === "error" && (
                 <div role="alert" className="rounded-2xl border border-[#FECDCA] bg-[#FEF3F2] p-4 text-xs font-bold text-[#B42318]">
@@ -761,7 +761,7 @@ export default function BecomeProviderRootPage() {
                       <input type="radio" name="bp-vat-status" checked={appForm.vatStatus === "not_registered"} onChange={() => setAppForm((prev) => ({ ...prev, vatStatus: "not_registered", taxNumber: "" }))} />
                       {t.vatNotRegistered}
                     </label>
-                    <p className="text-[11px] text-stone-500">{t.vatStatusHint}</p>
+                    <p className="text-[11px] text-stone-600">{t.vatStatusHint}</p>
                   </fieldset>
                   {appForm.vatStatus === "registered" ? (
                     <div>
@@ -843,7 +843,7 @@ export default function BecomeProviderRootPage() {
 
               <fieldset className="space-y-3 rounded-2xl border border-stone-200 p-4">
                 <legend className="px-2 text-xs font-bold text-stone-700">{t.locationLegend}</legend>
-                <p className="text-xs leading-relaxed text-stone-500">{t.locationHelp}</p>
+                <p className="text-xs leading-relaxed text-stone-600">{t.locationHelp}</p>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
                     <label htmlFor="bp-latitude" className="block text-xs font-bold text-stone-700 mb-1.5">{t.latitudeLabel}</label>
@@ -939,7 +939,7 @@ export default function BecomeProviderRootPage() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div className="space-y-4">
             <h4 className="text-white font-serif font-black tracking-widest text-lg">PRIMORA</h4>
-            <p className="text-xs text-stone-500 font-light leading-relaxed">
+            <p className="text-xs text-stone-400 font-light leading-relaxed">
               {t.footerDesc}
             </p>
           </div>
@@ -969,7 +969,7 @@ export default function BecomeProviderRootPage() {
             </ul>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto pt-8 border-t border-stone-900 text-center text-xs text-stone-600 font-medium">
+        <div className="max-w-7xl mx-auto pt-8 border-t border-stone-900 text-center text-xs text-stone-400 font-medium">
           <p>© {new Date().getFullYear()} PRIMORA. {t.allRightsReserved}</p>
         </div>
       </footer>

@@ -698,7 +698,7 @@ export default function AdminLayout({
         {/* MAIN PANEL CONTENT                                      */}
         {/* ═══════════════════════════════════════════════════════ */}
         <div inert={mobileMenuOpen} className="flex min-w-0 flex-1 flex-col md:overflow-hidden">
-          <main id="admin-main" tabIndex={-1} className="primora-dashboard-content flex-grow p-4 focus:outline-none md:p-6 md:overflow-y-auto">
+          <main id="admin-main" tabIndex={0} className="primora-dashboard-content flex-grow p-4 focus:outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#9B7928] md:p-6 md:overflow-y-auto">
             <div className="max-w-[1500px] mx-auto h-full">
               {routeState === "open" ? children : routeState === "checking" ? (
                   <p role="status" className="rounded-2xl border border-[#ECECEC] bg-white p-5 text-sm font-semibold text-[#667085]">{t.checkingAccess}</p>

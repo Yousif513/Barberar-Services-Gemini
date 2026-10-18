@@ -397,7 +397,7 @@ export default function CustomerLayout({
               <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
                 {firstName.trim() && (
                   <div className={`text-right hidden sm:block ${isRTL ? "text-left" : "text-right"}`}>
-                    <p className="text-[10px] text-gray-400 font-bold leading-none mb-1">{t.welcome}</p>
+                    <p className="text-[10px] text-gray-600 font-bold leading-none mb-1">{t.welcome}</p>
                     <p className="text-xs font-bold text-gray-900 leading-tight">{firstName}</p>
                   </div>
                 )}

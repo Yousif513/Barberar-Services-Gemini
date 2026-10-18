@@ -104,7 +104,7 @@ export default function AdminWhatsappPage() {
           </Panel>
           <Panel title={t.pendingTitle}>
             {overview.pending_channels.length === 0 ? <p className="text-sm text-[#667085]">{t.pendingEmpty}</p> : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-[#9B7928]" tabIndex={0} role="region" aria-label={t.pendingTitle}>
                 <table className="w-full min-w-[560px] text-start text-sm">
                   <caption className="sr-only">{t.pendingTitle}</caption>
                   <thead>

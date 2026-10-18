@@ -268,7 +268,7 @@ function FunnelSection({ range, lang }: { range: Range; lang: OperationsLocale }
         ) : !current.rows || current.rows.length === 0 ? (
           <p className="text-xs font-semibold text-gray-500">{t.empty}</p>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-[#9B7928]" tabIndex={0} role="region" aria-label={t.event}>
             <table className="w-full min-w-[520px] text-xs">
               <thead className="border-b border-[#ECECEC] bg-[#FAF9F6] text-[10px] font-extrabold uppercase tracking-wider text-gray-500">
                 <tr>

@@ -36,7 +36,7 @@ export function CommandHeader({
           {initials}
         </div>
         <div className="min-w-0">
-          <span className="block text-[8px] font-black uppercase tracking-[0.2em] text-[#B8952E]">{eyebrow}</span>
+          <span className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#7A5B12]">{eyebrow}</span>
           <h2 className="truncate font-serif text-lg font-black text-[#101828]">{title}</h2>
           <p className="mt-0.5 truncate text-[10px] font-semibold text-[#667085]">{subtitle}</p>
         </div>
@@ -72,7 +72,7 @@ export function CommandHeader({
 export function KpiStrip({ items }: { items: KpiItem[] }) {
   const tone = {
     green: "text-[#22C55E]",
-    gold: "text-[#B8952E]",
+    gold: "text-[#7A5B12]",
     red: "text-[#EF4444]",
     slate: "text-[#667085]",
   };
@@ -111,7 +111,7 @@ export function Panel({
     <section className={`flex flex-col rounded-[24px] border border-[#EAEAEA] bg-white p-6 shadow-[0_12px_30px_rgba(0,0,0,0.06)] ${className}`}>
       <div className="mb-5 flex items-center justify-between gap-3">
         <h3 className="font-serif text-base font-black text-[#101828]">{title}</h3>
-        {badge && <span className="rounded-full border border-[#D1AF47]/20 bg-[#F4E7B6]/40 px-2.5 py-1 text-[8px] font-black uppercase tracking-wider text-[#B8952E]">{badge}</span>}
+        {badge && <span className="rounded-full border border-[#D1AF47]/20 bg-[#F4E7B6]/40 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-[#7A5B12]">{badge}</span>}
       </div>
       <div className="flex-1">{children}</div>
       {footer && <div className="mt-5 border-t border-[#EAEAEA] pt-3 text-[10px] font-semibold text-[#667085]">{footer}</div>}
@@ -131,7 +131,7 @@ export function MetricCard({
   tone?: "gold" | "green" | "red" | "blue";
 }) {
   const styles = {
-    gold: "bg-[#F4E7B6]/30 text-[#B8952E]",
+    gold: "bg-[#F4E7B6]/30 text-[#7A5B12]",
     green: "bg-[#22C55E]/10 text-[#22C55E]",
     red: "bg-[#EF4444]/10 text-[#EF4444]",
     blue: "bg-[#3B82F6]/10 text-[#3B82F6]",

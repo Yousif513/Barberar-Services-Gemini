@@ -335,7 +335,7 @@ export default function CustomerPrivacy() {
           <div role="alert" className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
             <span>{fill(t.loadFailed, { reason: loadError })}</span><button type="button" onClick={load} className={ghost}>{t.retry}</button>
           </div>
-        ) : !requests ? null : requests.length === 0 ? <p className="text-sm text-stone-500">{t.none}</p> : (
+        ) : !requests ? null : requests.length === 0 ? <p className="text-sm text-stone-600">{t.none}</p> : (
           <ul className="space-y-3">
             {requests.map((r) => (
               <li key={r.id} className="space-y-2 rounded-2xl border border-stone-200 bg-white p-4 text-sm">
@@ -365,9 +365,9 @@ export default function CustomerPrivacy() {
                   <div className="flex flex-wrap items-center gap-2">
                     <button type="button" onClick={() => void download(r, "pdf")} className={ghost}>{fill(t.download, { file: "PDF" })}</button>
                     <button type="button" onClick={() => void download(r, "json")} className={ghost}>{fill(t.download, { file: "JSON" })}</button>
-                    {r.export.expires_at && <span className="text-xs text-stone-500">{fill(t.expires, { date: date(r.export.expires_at) })} · {t.printed}</span>}
+                    {r.export.expires_at && <span className="text-xs text-stone-600">{fill(t.expires, { date: date(r.export.expires_at) })} · {t.printed}</span>}
                   </div>
-                ) : r.export.status === "expired" ? <p className="text-xs text-stone-500">{t.expired}</p> : null)}
+                ) : r.export.status === "expired" ? <p className="text-xs text-stone-600">{t.expired}</p> : null)}
               </li>
             ))}
           </ul>

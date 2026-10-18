@@ -187,7 +187,7 @@ function MfaScreen() {
   return (
     <main dir={locale === "ar" ? "rtl" : "ltr"} className="grid min-h-screen place-items-center bg-[#F7F6F3] px-4 py-10 text-start">
       <div className={card}>
-        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#9B7928]">PRIMORA</p>
+        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#7A5B12]">PRIMORA</p>
         <h1 className="mt-1 font-serif text-2xl font-black text-[#101828]">{phase === "enrol" ? t.enrolTitle : phase === "challenge" ? t.challengeTitle : t.title}</h1>
 
         {phase === "loading" && <p role="status" className="mt-4 text-sm text-[#667085]">{t.working}</p>}

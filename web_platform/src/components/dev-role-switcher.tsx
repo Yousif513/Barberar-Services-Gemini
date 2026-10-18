@@ -129,7 +129,7 @@ export function DevRoleSwitcher() {
           type="button"
           onMouseDown={(e) => e.stopPropagation()}
           onClick={toggleCollapse}
-          className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[#B8952E] hover:bg-[#F4E7B6]/40 transition"
+          className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[#7A5B12] hover:bg-[#F4E7B6]/40 transition"
           title={collapsed ? "Expand" : "Collapse"}
         >
           {collapsed ? (
@@ -138,7 +138,7 @@ export function DevRoleSwitcher() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           ) : (
-            <span className="text-[8px] font-black uppercase tracking-[0.15em]">Dev</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.15em]">Dev</span>
           )}
         </button>
 
@@ -153,8 +153,8 @@ export function DevRoleSwitcher() {
               onClick={() => switchTo(role.id)}
               className={`rounded-full px-3 py-1.5 text-[10px] font-black transition ${
                 active
-                  ? "bg-[#D1AF47] text-white shadow-sm shadow-[#D1AF47]/30"
-                  : "text-[#667085] hover:bg-[#F7F7F5] hover:text-[#101828]"
+                  ? "bg-[#7A5B12] text-white shadow-sm shadow-[#D1AF47]/30"
+                  : "text-[#475467] hover:bg-[#F7F7F5] hover:text-[#101828]"
               }`}
             >
               {role.label}
