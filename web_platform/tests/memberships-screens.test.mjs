@@ -41,7 +41,9 @@ describe("membership screens", () => {
   });
 
   it("the Edge Functions read the amount from the database row and route the membership purchase type to its own confirmation", () => {
-    assert.match(checkout, /case "membership"[\s\S]*from\("memberships"\)\.select\("id, amount_due, status"\)[\s\S]*eq\("customer_id", userId\)/);
+    assert.match(checkout, /case "membership"[\s\S]*from\("memberships"\)\.select\("id, amount_due, status, provider_id"\)[\s\S]*eq\("customer_id", userId\)/);
+    // RT-M3: a provider that is not active and verified takes no payment.
+    assert.match(checkout, /case "membership"[\s\S]*providerIsSelling\(db, data\.provider_id\)/);
     assert.match(checkout, /status === "pending_payment"/);
     assert.match(webhook, /purchaseType === "membership"[\s\S]*confirm_membership_payment/);
     assert.match(webhook, /p_payment_intent_id: chargeId/);
