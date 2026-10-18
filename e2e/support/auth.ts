@@ -5,6 +5,7 @@
 // deleted afterwards. The seeded console accounts (admin.owner@primora.local and the others) are never used or changed.
 
 import { randomBytes, randomUUID } from "node:crypto";
+import { expect } from "@playwright/test";
 import { lit, sql } from "./db";
 import { stack } from "./stack";
 import { totp } from "./totp";
@@ -82,6 +83,22 @@ export async function deleteAccount(id: string): Promise<void> {
   await gotrue("DELETE", `/auth/v1/admin/users/${id}`, { admin: true }).catch(() => undefined);
 }
 
+/**
+ * PostgREST refuses a token in the second it was issued ("JWT issued at future", PGRST303): its clock is cached per second
+ * and can trail GoTrue's. A fresh session is handed to a test only once PostgREST accepts it, checked by polling a cheap
+ * read (no fixed wait), so the page's first request is never refused for a reason the app does not control.
+ */
+async function accepted(session: Session): Promise<Session> {
+  const s = stack();
+  await expect.poll(async () => {
+    const reply = await fetch(`${s.apiUrl}/rest/v1/profiles?select=id&limit=1`, {
+      headers: { apikey: s.anonKey, authorization: `Bearer ${session.access_token}` },
+    });
+    return reply.status;
+  }, { message: "PostgREST to accept the new session", timeout: 10_000, intervals: [100, 200, 300] }).toBe(200);
+  return session;
+}
+
 function withExpiry(json: any): Session {
   const expiresAt = typeof json.expires_at === "number" ? json.expires_at : Math.floor(Date.now() / 1000) + Number(json.expires_in ?? 900);
   return {
@@ -96,12 +113,12 @@ function withExpiry(json: any): Session {
 
 export async function passwordSession(account: Account): Promise<Session> {
   const json = expectOk(await gotrue("POST", "/auth/v1/token?grant_type=password", { body: { email: account.email, password: account.password } }), `signing in ${account.label}`);
-  return withExpiry(json);
+  return accepted(withExpiry(json));
 }
 
 export async function refreshSession(session: Session): Promise<Session> {
   const json = expectOk(await gotrue("POST", "/auth/v1/token?grant_type=refresh_token", { body: { refresh_token: session.refresh_token } }), "refreshing a session");
-  return withExpiry(json);
+  return accepted(withExpiry(json));
 }
 
 /** Enrols a TOTP factor and keeps its secret on the account (memory only), without verifying it. */
@@ -118,7 +135,7 @@ export async function verifyTotp(account: Account, session: Session): Promise<Se
   const json = expectOk(await gotrue("POST", `/auth/v1/factors/${account.factor.id}/verify`, {
     token: session.access_token, body: { challenge_id: challenge.id, code: totp(account.factor.secret) },
   }), "a TOTP verification");
-  return withExpiry(json);
+  return accepted(withExpiry(json));
 }
 
 /** Password sign-in, TOTP enrolment (first time) and verification: an aal2 console session. */

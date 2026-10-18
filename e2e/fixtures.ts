@@ -10,7 +10,7 @@
 
 import { test as base, expect, type Browser, type BrowserContext, type Page } from "@playwright/test";
 import { aal2Session, createAccount, deleteAccount, passwordSession, uniquePhone, type Account, type Session } from "./support/auth";
-import { lit, one, sql } from "./support/db";
+import { lit, sql, written } from "./support/db";
 import { sessionStorageKey, stack } from "./support/stack";
 
 export type Locale = "en" | "ar";
@@ -136,7 +136,7 @@ export const test = base.extend<{ factory: Factory; openAs: (person: Person | nu
         const lateCancellationFeePercent = options.lateCancellationFeePercent ?? 50;
         // A verified provider with one branch, one professional who works around the clock every day (so any test time has
         // free slots, whatever the weekday), and one service.
-        const ids = one<{ provider_id: string; branch_id: string; employee_id: string; service_id: string }>(`
+        const ids = written<{ provider_id: string; branch_id: string; employee_id: string; service_id: string }>(`
           with owner as (
             update public.profiles set role = 'provider_owner', first_name = 'Owner', last_name = ${lit(tag)},
                    phone_number = ${lit(uniquePhone())}, phone_verified = true
@@ -166,8 +166,8 @@ export const test = base.extend<{ factory: Factory; openAs: (person: Person | nu
             insert into public.employee_availability (employee_id, day_of_week, start_time, end_time, is_working_day)
             select e.id, d, '00:00:00', '00:00:00', true from e, generate_series(0, 6) d returning employee_id
           )
-          select (select id from p) as provider_id, (select id from b) as branch_id, (select id from e) as employee_id,
-                 (select id from s) as service_id, (select count(*) from es) + (select count(*) from av) as _rows`);
+          select json_build_object('provider_id', (select id from p), 'branch_id', (select id from b), 'employee_id', (select id from e),
+                 'service_id', (select id from s), 'rows', (select count(*) from es) + (select count(*) from av))`);
         const owner: Person = { ...ownerAccount, session: await passwordSession(ownerAccount) };
         return {
           owner, providerId: ids.provider_id, branchId: ids.branch_id, employeeId: ids.employee_id, serviceId: ids.service_id,

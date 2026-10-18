@@ -35,6 +35,17 @@ export function rows<T = Record<string, unknown>>(query: string): T[] {
   return JSON.parse(out) as T[];
 }
 
+/**
+ * Runs a write whose last output is one JSON value (an INSERT ... RETURNING json_build_object(...), or a data-modifying WITH
+ * that ends in SELECT json_build_object(...)) and returns it parsed. Writes cannot be wrapped like rows() reads are.
+ */
+export function written<T = Record<string, unknown>>(statement: string): T {
+  // Fixture writes run as the service role, the identity server jobs use (supabase/seed.sql does the same), so the guards that
+  // stop a browser session from setting control fields (verification, status, owner) leave arranged rows as written.
+  const lines = sql(`select set_config('request.jwt.claims', '{"role":"service_role"}', false);\n${statement}`).split(/\r?\n/).map((line) => line.trim()).filter((line) => line !== "");
+  return JSON.parse(lines[lines.length - 1]) as T;
+}
+
 export function one<T = Record<string, unknown>>(query: string): T {
   const found = rows<T>(query);
   if (found.length !== 1) throw new Error(`expected one row, got ${found.length}`);
