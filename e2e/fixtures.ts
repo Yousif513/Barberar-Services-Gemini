@@ -26,6 +26,7 @@ export type Provider = {
   providerId: string;
   branchId: string;
   employeeId: string;
+  employeeName: string;
   serviceId: string;
   serviceName: string;
   servicePrice: number;
@@ -130,6 +131,7 @@ export const test = base.extend<{ factory: Factory; openAs: (person: Person | nu
         const tag = `${ownerAccount.id.slice(0, 6)}${providerSerial}`;
         const businessName = `E2E Salon ${tag}`;
         const serviceName = `E2E Haircut ${tag}`;
+        const employeeName = `E2E Barber ${tag}`;
         const price = options.price ?? 200;
         const depositPercent = options.depositPercent ?? 20;
         const freeCancellationHours = options.freeCancellationHours ?? 24;
@@ -153,7 +155,7 @@ export const test = base.extend<{ factory: Factory; openAs: (person: Person | nu
             returning id, provider_id
           ), e as (
             insert into public.employees (branch_id, name_en, name_ar, title_en, title_ar, is_active)
-            select id, ${lit(`E2E Barber ${tag}`)}, ${lit(`حلاق اختبار ${tag}`)}, 'Barber', 'حلاق', true from b
+            select id, ${lit(employeeName)}, ${lit(`حلاق اختبار ${tag}`)}, 'Barber', 'حلاق', true from b
             returning id
           ), s as (
             insert into public.services (provider_id, category_id, name_en, name_ar, description_en, description_ar, base_price, base_duration_minutes, is_active)
@@ -170,7 +172,7 @@ export const test = base.extend<{ factory: Factory; openAs: (person: Person | nu
                  'service_id', (select id from s), 'rows', (select count(*) from es) + (select count(*) from av))`);
         const owner: Person = { ...ownerAccount, session: await passwordSession(ownerAccount) };
         return {
-          owner, providerId: ids.provider_id, branchId: ids.branch_id, employeeId: ids.employee_id, serviceId: ids.service_id,
+          owner, providerId: ids.provider_id, branchId: ids.branch_id, employeeId: ids.employee_id, employeeName, serviceId: ids.service_id,
           serviceName, servicePrice: price, serviceMinutes: 60, depositPercent, freeCancellationHours, lateCancellationFeePercent, businessName,
         };
       },
