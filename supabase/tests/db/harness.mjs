@@ -68,7 +68,10 @@ export function migrationFiles() {
 // the first failure so a broken chain is reported exactly as the CLI would report it.
 // activateDemo: the migrations leave the three demo salons switched off (nobody can book a salon that does not exist), but the
 // tests need salons that can be booked, so the harness turns them on explicitly. Pass false to test the migrated state itself.
-export async function createMigratedDb({ activateDemo = true } = {}) {
+// holdLimits: RT-M1 limits one customer's open unpaid booking holds (platform_settings 'booking_hold_limits', 2 per business and
+// 3 overall). Most suites book many unpaid fixtures for the seeded customer, so the harness raises the limits unless a suite
+// passes holdLimits: null to test the migrated values (supabase/tests/db/dbsec2_booking_holds.test.mjs does).
+export async function createMigratedDb({ activateDemo = true, holdLimits = { per_provider: 1000, overall: 1000 } } = {}) {
   const db = new PGlite({ extensions: { btree_gist, pgcrypto, uuid_ossp } });
   await db.exec(BOOTSTRAP);
   await db.exec(`ALTER DATABASE postgres SET search_path TO "$user", public, extensions; SET search_path TO "$user", public, extensions;`);
@@ -84,6 +87,9 @@ export async function createMigratedDb({ activateDemo = true } = {}) {
       await db.exec("ROLLBACK;").catch(() => {});
       throw new Error(`Migration ${m.name} failed: ${error.message}`);
     }
+  }
+  if (holdLimits) {
+    await db.query(`update public.platform_settings set value = $1::jsonb where key = 'booking_hold_limits'`, [JSON.stringify(holdLimits)]);
   }
   if (activateDemo) {
     await db.exec(`select set_config('request.jwt.claims', '{"role":"service_role"}', false);

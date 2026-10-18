@@ -241,6 +241,9 @@ describe("booking engine", () => {
     assert.equal(Number(b.gift_card_amount), 30);
     const card = (await sys(db, `select remaining_balance from gift_cards where code = 'PRM-TEST-GIFT'`))[0];
     assert.equal(Number(card.remaining_balance), 0);
+    // RT-M1: the unpaid hold reserves the code; it is consumed when the deposit is paid.
+    assert.equal((await sys(db, `select redeemed_count from promotional_codes where code = 'SAVE10'`))[0].redeemed_count, 0);
+    await confirmPayment(b);
     const coupon = (await sys(db, `select redeemed_count from promotional_codes where code = 'SAVE10'`))[0];
     assert.equal(coupon.redeemed_count, 1);
 

@@ -26,7 +26,10 @@ const book = (user, code) => {
   return as(db, user, `select * from create_booking(target_employee_id => $1, target_service_id => $2, target_scheduled_at => $3, request_coupon_code => $4)`,
     [SEED.employee1, svc.id, riyadh(hhmm), code]).then((r) => r[0]);
 };
-const uses = async (code) => (await sys(db, `select redeemed_count n from promotional_codes where code = $1`, [code]))[0].n;
+// Uses of a code: its redemptions that were not given back. Since RT-M1 an unpaid hold reserves a use and the code's
+// redeemed_count grows only when the booking is paid (supabase/tests/db/dbsec2_booking_holds.test.mjs).
+const uses = async (code) => (await sys(db, `select count(*)::int n from coupon_redemptions cr join promotional_codes pc on pc.id = cr.coupon_id
+                                              where pc.code = $1 and cr.reversed_at is null`, [code]))[0].n;
 
 before(async () => {
   db = await createMigratedDb();

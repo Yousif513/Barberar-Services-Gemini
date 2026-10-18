@@ -132,6 +132,7 @@ export const HINT_TEXT = {
   chat_participants_immutable: { ar: "لا يتغير طرفا المحادثة بعد إنشائها." },
   chat_closed: { ar: "أُغلقت هذه المحادثة، ولا يمكن إرسال رسائل جديدة فيها." },
   chat_rate_limited: { ar: "أرسلت رسائل كثيرة في وقت قصير. انتظر قليلاً ثم حاول مجدداً." },
+  booking_hold_limit: { ar: "لديك حجوزات بانتظار دفع العربون بالحد المسموح. ادفع عربون أحدها أو ألغه، ثم احجز مجدداً." },
 };
 
 // Frequent refusals that carry no HINT, matched on the server's English text.

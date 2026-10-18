@@ -43,6 +43,9 @@ describe("provider promo codes (R9)", () => {
     assert.ok(Number(row.discount_amount) > 0, "a discount was applied");
     assert.ok(row.coupon_id);
     assert.equal(Number(row.discount_amount), Math.round(Number(row.subtotal_price) * 20) / 100);
+    // RT-M1: consumed when the deposit is paid, not while the booking is an unpaid hold.
+    assert.equal((await sys(db, `select redeemed_count from promotional_codes where code = 'EID20'`))[0].redeemed_count, 0);
+    await as(db, ROLES.service, `select confirm_booking_payment($1, $2, $3)`, [booked.id, `chg_${booked.id}`, booked.deposit_required]);
     assert.equal((await sys(db, `select redeemed_count from promotional_codes where code = 'EID20'`))[0].redeemed_count, 1);
     const svc2 = await serviceFor(db, SEED.employee2);
     const other = await sys(db, `select e.id from employees e join branches b on b.id = e.branch_id where b.provider_id = $1 limit 1`, [SEED.provider2]);
