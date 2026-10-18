@@ -83,3 +83,18 @@ describe("wiring", () => {
     assert.doesNotMatch(src, /req\.arrayBuffer\(\)/);
   });
 });
+
+// PAY-WAVE2 (P-13 / RT-L6): send-notification and expire-holds were the last functions comparing the service key with ===.
+describe("no function compares the service key with ===", () => {
+  it("every Edge Function uses serviceKeyMatches", () => {
+    const dirs = readdirSync(new URL("../functions/", import.meta.url), { withFileTypes: true }).filter((d) => d.isDirectory() && d.name !== "_shared");
+    for (const dir of dirs) {
+      let source;
+      try { source = readFileSync(new URL(`../functions/${dir.name}/index.ts`, import.meta.url), "utf8"); } catch { continue; }
+      assert.doesNotMatch(source, /={2,3}\s*serviceKey\b|\bserviceKey\s*={2,3}/, `${dir.name} compares the service key with ===`);
+    }
+    for (const name of ["send-notification", "expire-holds"]) {
+      assert.match(readFileSync(new URL(`../functions/${name}/index.ts`, import.meta.url), "utf8"), /serviceKeyMatches\(token, serviceKey\)/);
+    }
+  });
+});

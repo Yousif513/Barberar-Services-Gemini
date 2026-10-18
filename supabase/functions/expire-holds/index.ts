@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.108.1"
 import { adminSessionAllows, allowedOrigins } from "../_shared/http.ts"
+import { serviceKeyMatches } from "../_shared/request-guards.ts"
 
 // Production origins plus APP_ORIGIN for a local run; no localhost in the shipped list (privacy security review L6).
 const ALLOWED_ORIGINS = allowedOrigins()
@@ -43,7 +44,8 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace(/^Bearer\s+/i, "")
-    const isServiceRole = token === serviceKey
+    // P-13 / RT-L6: constant-time comparison that refuses an empty key, as every other function does.
+    const isServiceRole = serviceKeyMatches(token, serviceKey)
 
     if (!isServiceRole) {
       const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY") || serviceKey)

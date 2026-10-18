@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.108.1"
 import { adminSessionAllows, corsHeaders as sharedCorsHeaders } from "../_shared/http.ts"
+import { serviceKeyMatches } from "../_shared/request-guards.ts"
 
 serve(async (req) => {
   const corsHeaders = sharedCorsHeaders(req)
@@ -35,7 +36,8 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, serviceKey)
     const token = authHeader.replace(/^Bearer\s+/i, "")
 
-    const isServiceRole = token === serviceKey
+    // P-13 / RT-L6: constant-time comparison that refuses an empty key, as every other function does.
+    const isServiceRole = serviceKeyMatches(token, serviceKey)
 
     if (!isServiceRole) {
       // Authenticate caller
