@@ -297,7 +297,7 @@ export default function AdminNotificationsPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-serif font-black text-gray-900 leading-tight">{t.title}</h2>
+          <h1 className="text-2xl font-serif font-black text-gray-900 leading-tight">{t.title}</h1>
           <p className="text-xs text-gray-500 font-semibold mt-1 max-w-2xl">{t.subtitle}</p>
         </div>
         <div className={`flex items-center gap-2 rounded-xl bg-[#F7F6F3] p-1 border border-[#ECECEC] ${flip}`}>

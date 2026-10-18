@@ -175,7 +175,7 @@ export default function AdminBranches() {
     <div dir={isRTL ? "rtl" : "ltr"} className={`space-y-6 ${isRTL ? "text-right" : "text-left"}`}>
       {renderToggleDialog()}
       <div>
-        <h2 className="text-2xl font-serif font-black text-gray-900 leading-tight">{t.title}</h2>
+        <h1 className="text-2xl font-serif font-black text-gray-900 leading-tight">{t.title}</h1>
         <p className="text-xs text-gray-500 font-semibold mt-1">{t.subtitle}</p>
       </div>
 

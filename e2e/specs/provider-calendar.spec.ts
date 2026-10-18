@@ -49,10 +49,8 @@ test("another provider's owner does not see the booking through the calendar's o
   expect(await read(other.owner.session.access_token)).toEqual([]);
 });
 
-// APP DEFECT: the calendar's date picker shows selectedDate.toISOString() (a UTC date). Between 00:00 and 03:00 Riyadh time
-// it therefore shows yesterday while the planner loads today. Expected to fail until the picker uses the Riyadh date.
+// Fixed (QAFIX): the date picker shows the Riyadh day (riyadhDateKey), so between 00:00 and 03:00 Riyadh it shows today.
 test("just after midnight in Riyadh the date picker shows today's date", async ({ factory, openAs }) => {
-  test.fail(true, "APP DEFECT: provider calendar date picker shows the UTC date (yesterday) between 00:00 and 03:00 Riyadh");
   const provider = await factory.provider();
   // The most recent 01:30 Riyadh time that is not in the future (the session's tokens stay valid on a clock set back).
   const now = dbNow();

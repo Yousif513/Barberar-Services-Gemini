@@ -409,9 +409,9 @@ export default function AdminServices() {
       {/* Header */}
       <div className={`flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between ${flip}`}>
         <div>
-          <h2 className="text-2xl font-serif font-black tracking-tight text-gray-900 leading-tight">
+          <h1 className="text-2xl font-serif font-black tracking-tight text-gray-900 leading-tight">
             {t.title}
-          </h2>
+          </h1>
           <p className="text-xs text-gray-500 font-semibold mt-1">
             {t.subtitle}
           </p>

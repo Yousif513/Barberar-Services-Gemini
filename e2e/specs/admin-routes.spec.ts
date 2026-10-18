@@ -53,13 +53,10 @@ for (const route of ADMIN_ROUTES) {
   }
 }
 
-// APP DEFECT (accessibility, WCAG 2.4.6 / 1.3.1): these screens title themselves with an h2 and have no h1, unlike the rest
-// of the console. Expected to fail until they get a page heading; when it starts passing, remove test.fail.
-const SCREENS_WITHOUT_H1 = ["/admin/services", "/admin/packages", "/admin/reviews", "/admin/branches", "/admin/coupons",
-  "/admin/activity", "/admin/notifications", "/admin/integrations", "/admin/help"];
+// Fixed (QAFIX, WCAG 2.4.6 / 1.3.1): services, packages, reviews, branches, coupons, activity, notifications, integrations
+// and help used to title themselves with an h2; each now has one h1.
 
 test("every admin screen has one page heading (h1)", async ({ sweepOwner, openAs }) => {
-  test.fail(true, `APP DEFECT: no h1 on ${SCREENS_WITHOUT_H1.join(", ")}`);
   test.setTimeout(600_000);
   const person = { ...sweepOwner, session: await aal2Session(sweepOwner) };
   const { page } = await openAs(person, { locale: "en", width: "desktop" });

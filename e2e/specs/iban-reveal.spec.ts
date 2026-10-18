@@ -82,11 +82,8 @@ test("Arabic on a phone: the IBAN hides itself after 60 seconds and a reload doe
   expect(errors.unexpected()).toEqual([]);
 });
 
-// APP DEFECT (both widths, both languages): the revealed-IBAN panel (fixed, bottom, z-[9500]) paints underneath the payout
-// table, whose cells take the pointer, so "Hide now" cannot be pressed and the IBAN shows faintly through the table until
-// the 60-second timer removes it. Expected to fail until the panel stacks above the page; remove test.fail when it passes.
+// Fixed (QAFIX): the revealed-IBAN panel is portalled to <body>, above the payout table, so "Hide now" can be pressed.
 test("Arabic on a phone: 'Hide now' can be pressed and removes the IBAN at once", async ({ factory, openAs }) => {
-  test.fail(true, "APP DEFECT: revealed-IBAN panel is covered by the payout table; Hide now is not clickable");
   const { page, shown, payout } = await revealInArabicOnPhone(factory, openAs);
   await shown.getByRole("button", { name: "إخفاء الآن" }).click({ timeout: 5_000 });
   await expect(shown).toHaveCount(0);
@@ -94,7 +91,6 @@ test("Arabic on a phone: 'Hide now' can be pressed and removes the IBAN at once"
 });
 
 test("English on a desktop: 'Hide now' removes the IBAN at once", async ({ factory, openAs }) => {
-  test.fail(true, "APP DEFECT: revealed-IBAN panel is covered by the payout table; Hide now is not clickable");
   const provider = await factory.provider();
   const payout = payoutRequest(provider.providerId, provider.owner.id);
   const finance = await factory.consoleUser("finance");

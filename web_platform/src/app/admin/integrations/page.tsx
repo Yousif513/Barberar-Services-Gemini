@@ -521,7 +521,7 @@ export default function AdminIntegrations() {
       {renderStateDialog()}
       <div className={`flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between ${isRTL ? "lg:flex-row-reverse" : ""}`}>
         <div>
-          <h2 className="text-2xl font-serif font-black text-gray-900 leading-tight">{t.title}</h2>
+          <h1 className="text-2xl font-serif font-black text-gray-900 leading-tight">{t.title}</h1>
           <p className="text-xs text-gray-500 font-semibold mt-1 max-w-2xl">{t.subtitle}</p>
         </div>
         {canWrite && (

@@ -321,7 +321,7 @@ export default function AdminCoupons() {
       )}
       <div className={`flex items-start justify-between gap-4 ${flip}`}>
         <div>
-          <h2 className="text-2xl font-serif font-black text-gray-900 leading-tight">{t.title}</h2>
+          <h1 className="text-2xl font-serif font-black text-gray-900 leading-tight">{t.title}</h1>
           <p className="text-xs text-gray-500 font-semibold mt-1">{t.subtitle}</p>
         </div>
         {canWrite && (

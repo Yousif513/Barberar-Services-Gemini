@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
 import Link from "next/link";
 import { CommandResult, sar } from "@/components/operations-ui";
-import { CommandDialog } from "@/components/modal";
+import { CommandDialog, ModalPortal } from "@/components/modal";
 import { knownToHold, useConsoleSession } from "@/lib/console-session";
 import { canRevealRequest, revealOutcome, secondsLeft } from "@/lib/payout-display.mjs";
 import { commandOutcome } from "@/lib/write-result.mjs";
@@ -906,7 +906,10 @@ export default function AdminLedger() {
         <p className="mt-1 text-xs text-[#475467]">{c.revealedBank}: {value.bank_name} · {c.revealedHolder}: {value.account_holder_name || c.notProvided}</p>
       </div>
     );
+    // Portalled to <body>: inside the console's scrolling panel (its own stacking context) the payout table was painted over
+    // it and took the pointer, so "Hide now" could not be pressed (e2e iban-reveal.spec.ts).
     return (
+      <ModalPortal>
       <div role="dialog" aria-modal="false" aria-label={c.revealedTitle.replace("{name}", revealed.name)} dir={lang === "ar" ? "rtl" : "ltr"}
         className="fixed inset-x-4 bottom-4 z-[9500] mx-auto max-w-lg rounded-[24px] border border-[#D1AF47]/50 bg-white p-5 text-start shadow-2xl">
         <div className="flex items-start justify-between gap-3">
@@ -922,6 +925,7 @@ export default function AdminLedger() {
           <button type="button" onClick={() => setRevealed(null)} className="rounded-xl border border-[#D0D5DD] px-4 py-2 text-sm font-bold text-[#344054] focus-visible:outline-2 focus-visible:outline-[#9B7928]">{c.hideNow}</button>
         </div>
       </div>
+      </ModalPortal>
     );
   };
 
