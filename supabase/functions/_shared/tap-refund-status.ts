@@ -34,6 +34,70 @@ export function parseTapRefund(body: unknown): TapRefund | null {
   return { id, status, state: tapRefundState(status), amount, currency, chargeId }
 }
 
+// What an answer to POST /v2/refunds proves (QA release gate item 4). Only an answer that names a refund, or an error Tap can give
+// only before creating anything, is definite. A timeout, a dropped connection, a 5xx, a 408/409/425 or an answer without a refund
+// id may hide a refund Tap made, so it is 'unknown': the refund is never sent again until Check with Tap or a second person settles it.
+// The status list is the one in tapRefundState; it has not been confirmed against Tap's sandbox (gap tap-refund-status-values-unconfirmed).
+export type RefundCreationOutcome =
+  | { kind: "accepted"; gatewayRefundId: string; gatewayStatus: string; amount: number | null }
+  | { kind: "refused"; gatewayRefundId: string | null; detail: string }
+  | { kind: "unknown"; gatewayRefundId: string | null; gatewayStatus: string | null; detail: string }
+
+const INDETERMINATE_HTTP = new Set([408, 409, 425])
+
+export function classifyRefundCreation(input: { httpStatus?: number; body?: unknown; thrown?: unknown }): RefundCreationOutcome {
+  if (input.thrown !== undefined || typeof input.httpStatus !== "number") {
+    const reason = input.thrown instanceof Error ? input.thrown.message : "no answer"
+    return { kind: "unknown", gatewayRefundId: null, gatewayStatus: null,
+      detail: `No answer from Tap (${reason.slice(0, 200)}); Tap may have made the refund` }
+  }
+  const status = input.httpStatus
+  const errors = (() => {
+    const record = input.body && typeof input.body === "object" ? (input.body as Record<string, unknown>) : null
+    return JSON.stringify(record?.errors ?? record ?? null).slice(0, 400)
+  })()
+  if (status >= 200 && status < 300) {
+    const refund = parseTapRefund(input.body)
+    if (!refund) {
+      return { kind: "unknown", gatewayRefundId: null, gatewayStatus: null, detail: `Tap answered ${status} without a refund id` }
+    }
+    if (refund.state === "succeeded" || refund.state === "processing") {
+      return { kind: "accepted", gatewayRefundId: refund.id, gatewayStatus: refund.status, amount: refund.currency === "SAR" ? refund.amount : null }
+    }
+    if (refund.state === "failed") {
+      return { kind: "refused", gatewayRefundId: refund.id, detail: `Tap refund ${refund.id} is ${refund.status}` }
+    }
+    return { kind: "unknown", gatewayRefundId: refund.id, gatewayStatus: refund.status,
+      detail: `Tap refund ${refund.id} has a status PRIMORA does not know (${refund.status || "none"})` }
+  }
+  if (status >= 500 || INDETERMINATE_HTTP.has(status)) {
+    return { kind: "unknown", gatewayRefundId: null, gatewayStatus: null, detail: `Tap answered ${status}; Tap may have made the refund: ${errors}` }
+  }
+  return { kind: "refused", gatewayRefundId: null, detail: `Tap refund rejected (${status}): ${errors}` }
+}
+
+export type RefundSearchResult = { match: TapRefund | null; ambiguous: boolean; hasMore: boolean; lastId: string | null }
+
+// Finds, in one page of POST /v2/refunds/list, the refund PRIMORA sent for a refund request: same charge, and the refund request id
+// in the metadata PRIMORA puts on every refund. Two matches mean Tap holds two refunds for one request (ambiguous). The list
+// envelope ("refunds", with "has_more") is read defensively; it has not been confirmed against Tap's sandbox.
+export function findRefundForRequest(body: unknown, wanted: { refundRequestId: string; chargeId: string }): RefundSearchResult {
+  const record = body && typeof body === "object" ? (body as Record<string, unknown>) : {}
+  const items: unknown[] = ([record.refunds, record.data, record.items].find(Array.isArray) as unknown[] | undefined) ?? []
+  const matches: TapRefund[] = []
+  let lastId: string | null = null
+  for (const raw of items) {
+    if (!raw || typeof raw !== "object") continue
+    const item = raw as Record<string, unknown>
+    const parsed = parseTapRefund(item)
+    if (!parsed) continue
+    lastId = parsed.id
+    const metadata = item.metadata && typeof item.metadata === "object" ? (item.metadata as Record<string, unknown>) : {}
+    if (parsed.chargeId === wanted.chargeId && metadata.refund_request_id === wanted.refundRequestId) matches.push(parsed)
+  }
+  return { match: matches.length === 1 ? matches[0] : null, ambiguous: matches.length > 1, hasMore: record.has_more === true, lastId }
+}
+
 // The Riyadh calendar day (YYYY-MM-DD) of a moment.
 export function riyadhDay(at: Date): string {
   return new Date(at.getTime() + 3 * 60 * 60 * 1000).toISOString().slice(0, 10)

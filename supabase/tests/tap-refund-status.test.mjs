@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { parseTapRefund, riyadhDay, saudiBusinessDaysBetween, tapRefundState, toReconciliationEvents } from "../functions/_shared/tap-refund-status.ts";
+import { classifyRefundCreation, findRefundForRequest, parseTapRefund, riyadhDay, saudiBusinessDaysBetween, tapRefundState, toReconciliationEvents } from "../functions/_shared/tap-refund-status.ts";
 
 // MONEY part 4 (D-Q9): the pure logic behind "Check with Tap" and the itemised reconciliation import.
 
@@ -77,10 +77,83 @@ describe("the Edge Function", () => {
     assert.match(source, /Deno\.env\.get\("TAP_SECRET_KEY"\)/);
     assert.doesNotMatch(source, /sk_(test|live)_/);
     assert.match(source, /method: "GET"/);
-    assert.doesNotMatch(source, /method: "POST"[\s\S]*api\.tap\.company/);
+    // Only reads at Tap: GET one refund, or POST /v2/refunds/list (Tap's list endpoint); never POST /v2/refunds (a new refund).
+    const tapCalls = [...source.matchAll(/fetch\(\s*[`"]https:\/\/api\.tap\.company\/v2\/([^`"]*)[`"]/g)].map((m) => m[1]);
+    assert.ok(tapCalls.length >= 2, "reads a refund by id and lists refunds");
+    for (const path of tapCalls) assert.match(path, /^refunds\/(list|\$\{encodeURIComponent\(begun\.gateway_refund_id\)\})$/, path);
     assert.match(source, /admin_begin_tap_refund_check/);
     assert.match(source, /apply_tap_refund_status/);
+    assert.match(source, /apply_tap_refund_lookup/);
     assert.match(source, /corsHeaders\(req\)/);
     assert.doesNotMatch(source, /Access-Control-Allow-Origin": "\*"/);
+  });
+});
+
+// PAY-WAVE2 (QA release gate item 4): only an answer that proves what happened is definite; everything else is unknown and the refund
+// is never sent again automatically.
+describe("classifyRefundCreation", () => {
+  it("treats a timeout, a dropped connection and a missing answer as unknown", () => {
+    for (const thrown of [new DOMException("The signal has been aborted", "TimeoutError"), new TypeError("connection reset"), "x"]) {
+      const outcome = classifyRefundCreation({ thrown });
+      assert.equal(outcome.kind, "unknown");
+      assert.equal(outcome.gatewayRefundId, null);
+    }
+    assert.equal(classifyRefundCreation({}).kind, "unknown");
+  });
+
+  it("treats 5xx, 408, 409, 425 and a 2xx without a refund id as unknown", () => {
+    for (const httpStatus of [500, 502, 503, 504, 408, 409, 425]) assert.equal(classifyRefundCreation({ httpStatus, body: {} }).kind, "unknown", String(httpStatus));
+    assert.equal(classifyRefundCreation({ httpStatus: 200, body: undefined }).kind, "unknown");
+    assert.equal(classifyRefundCreation({ httpStatus: 200, body: { status: "REFUNDED" } }).kind, "unknown");
+    const odd = classifyRefundCreation({ httpStatus: 200, body: { id: "re_odd", status: "SOMETHING_NEW" } });
+    assert.deepEqual([odd.kind, odd.gatewayRefundId, odd.gatewayStatus], ["unknown", "re_odd", "SOMETHING_NEW"]);
+  });
+
+  it("accepts a named refund that Tap reports as refunded or pending, and keeps the SAR amount only", () => {
+    const done = classifyRefundCreation({ httpStatus: 200, body: { id: "re_1", status: "REFUNDED", amount: 40, currency: "SAR" } });
+    assert.deepEqual(done, { kind: "accepted", gatewayRefundId: "re_1", gatewayStatus: "REFUNDED", amount: 40 });
+    const pending = classifyRefundCreation({ httpStatus: 201, body: { id: "re_2", status: "pending", amount: 40, currency: "USD" } });
+    assert.deepEqual([pending.kind, pending.gatewayStatus, pending.amount], ["accepted", "PENDING", null]);
+  });
+
+  it("is a definite refusal only for Tap's own failed refund or a 4xx it gives before creating anything", () => {
+    const failed = classifyRefundCreation({ httpStatus: 200, body: { id: "re_3", status: "DECLINED" } });
+    assert.deepEqual([failed.kind, failed.gatewayRefundId], ["refused", "re_3"]);
+    for (const httpStatus of [400, 401, 403, 404, 422, 429]) assert.equal(classifyRefundCreation({ httpStatus, body: { errors: [{ code: "1" }] } }).kind, "refused", String(httpStatus));
+  });
+});
+
+describe("findRefundForRequest", () => {
+  const wanted = { refundRequestId: "11111111-1111-4111-8111-111111111111", chargeId: "chg_1" };
+  const item = (id, over = {}) => ({ id, status: "REFUNDED", amount: 40, currency: "SAR", charge_id: "chg_1", metadata: { refund_request_id: wanted.refundRequestId }, ...over });
+
+  it("matches the refund of the same charge that carries the refund request id", () => {
+    const found = findRefundForRequest({ refunds: [item("re_other", { metadata: { refund_request_id: "x" } }), item("re_mine"), item("re_c", { charge_id: "chg_2" })], has_more: true }, wanted);
+    assert.equal(found.match.id, "re_mine");
+    assert.equal(found.ambiguous, false);
+    assert.equal(found.hasMore, true);
+    assert.equal(found.lastId, "re_c");
+  });
+
+  it("reports two refunds for one request as ambiguous and finds nothing in an empty or malformed list", () => {
+    const twice = findRefundForRequest({ refunds: [item("re_a"), item("re_b")] }, wanted);
+    assert.deepEqual([twice.match, twice.ambiguous], [null, true]);
+    for (const body of [null, {}, { refunds: "nope" }, { refunds: [null, { id: "../x" }] }]) {
+      const none = findRefundForRequest(body, wanted);
+      assert.deepEqual([none.match, none.ambiguous, none.hasMore], [null, false, false]);
+    }
+  });
+});
+
+describe("process-refund", () => {
+  const refunds = readFileSync(new URL("../functions/_shared/refunds.ts", import.meta.url), "utf8");
+  const endpoint = readFileSync(new URL("../functions/process-refund/index.ts", import.meta.url), "utf8");
+  it("bounds the Tap call, records an indeterminate answer as unknown and never as a refusal", () => {
+    assert.match(refunds, /signal: AbortSignal\.timeout\(TAP_TIMEOUT_MS\)/);
+    assert.match(refunds, /classifyRefundCreation\(\{ thrown: error \}\)/);
+    assert.match(refunds, /outcome\.kind === "unknown"[\s\S]*record_refund_outcome_unknown/);
+    assert.doesNotMatch(refunds, /catch \(error\) \{\s*failure =/);
+    assert.match(endpoint, /\.in\("status", \["pending", "failed"\]\)/, "the queue never holds an unknown refund");
+    assert.match(endpoint, /outcome\.status === "unknown" \? 202/);
   });
 });
