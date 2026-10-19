@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 import { clearDevRole } from "@/lib/dev-access";
 import { ForbiddenNotice, useOperationsLocale } from "@/components/operations-ui";
 import { ConsoleSessionContext, consoleSessionFrom, EMPTY_CONSOLE_SESSION, holdsAny, screenPermissions, type ConsoleSession } from "@/lib/console-session";
+import { loadSessionStateWithRetry } from "@/lib/session-state-retry.mjs";
 import { StepUpDialog } from "@/components/step-up-dialog";
 
 
@@ -24,6 +25,8 @@ const translations = {
     consoleRoleFinance: "Finance",
     consoleRoleOperations: "Operations",
     consoleRoleAnalyst: "Analyst (read-only)",
+    sessionStateFailed: "Your console permissions could not be loaded, so actions that need them are hidden. The database still decides every request.",
+    sessionStateRetry: "Load permissions again",
     idleSignedOut: "You were signed out after 30 minutes without activity.",
     employees: "Staff & Teams",
     branches: "Venues & Rooms",
@@ -93,6 +96,8 @@ const translations = {
     consoleRoleFinance: "المالية",
     consoleRoleOperations: "العمليات",
     consoleRoleAnalyst: "محلل (قراءة فقط)",
+    sessionStateFailed: "تعذّر تحميل صلاحياتك في لوحة الإدارة، لذا أُخفيت الإجراءات التي تحتاجها. تبقى قاعدة البيانات هي من يقرر في كل طلب.",
+    sessionStateRetry: "إعادة تحميل الصلاحيات",
     idleSignedOut: "تم تسجيل خروجك بعد 30 دقيقة دون نشاط.",
     employees: "الموظفون",
     branches: "الفروع والغرف والمواقع",
@@ -303,17 +308,25 @@ export default function AdminLayout({
   // The console role in force and its permissions (GOV-1). They label the account and leave out of the navigation, and out of
   // each screen, what the role cannot use; every read and command is still decided by the database.
   const [session, setSession] = useState<ConsoleSession>(EMPTY_CONSOLE_SESSION);
+  const [sessionStateFailed, setSessionStateFailed] = useState(false);
+  const [sessionStateAttempt, setSessionStateAttempt] = useState(0);
   useEffect(() => {
     let cancelled = false;
-    void supabase.rpc("admin_session_state").then(({ data, error }) => {
+    // A token used in the second it was issued is refused by PostgREST (PGRST303); such a failure is retried, after reading the
+    // session again, instead of silently hiding the role's actions. A failure that remains is shown with a way to retry.
+    void loadSessionStateWithRetry(() => supabase.rpc("admin_session_state"), {
+      beforeRetry: async () => { await supabase.auth.getSession(); },
+      isCancelled: () => cancelled,
+    }).then(({ data, error }) => {
       if (cancelled) return;
-      // An unreadable session state hides nothing: the screens then show the database's own answers.
+      // An unreadable session state hides nothing the database would allow: the screens then show the database's own answers.
+      setSessionStateFailed(Boolean(error));
       setSession(error ? { ...EMPTY_CONSOLE_SESSION, loaded: true } : consoleSessionFrom(data));
     });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [sessionStateAttempt]);
   const consoleRole = session.role ?? "";
   const consoleRoleLabel: Record<string, string> = {
     owner: t.consoleRoleOwner,
@@ -700,6 +713,12 @@ export default function AdminLayout({
         <div inert={mobileMenuOpen} className="flex min-w-0 flex-1 flex-col md:overflow-hidden">
           <main id="admin-main" tabIndex={0} className="primora-dashboard-content flex-grow p-4 focus:outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#9B7928] md:p-6 md:overflow-y-auto">
             <div className="max-w-[1500px] mx-auto h-full">
+              {sessionStateFailed && (
+                <div role="alert" className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm font-semibold text-amber-900">
+                  <p className="min-w-0 flex-1">{t.sessionStateFailed}</p>
+                  <button type="button" onClick={() => setSessionStateAttempt((n) => n + 1)} className="rounded-xl border border-amber-400 bg-white px-3 py-1.5 text-xs font-black focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.sessionStateRetry}</button>
+                </div>
+              )}
               {routeState === "open" ? children : routeState === "checking" ? (
                   <p role="status" className="rounded-2xl border border-[#ECECEC] bg-white p-5 text-sm font-semibold text-[#667085]">{t.checkingAccess}</p>
                 ) : (
