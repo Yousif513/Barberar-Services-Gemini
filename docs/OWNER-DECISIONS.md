@@ -63,6 +63,29 @@ These are engineering choices made during the security fixes. Each is the strict
 | T13 | A profile clear is refused while a court hold covers the account. | |
 | T14 | A real 10-year purge needs a second person; dry runs do not. | |
 
+## 2c. New defaults from the wave-2 fixes (2026-10-19), approve as a batch
+
+| # | What the system does now | Keep? |
+|---|--------------------------|-------|
+| R1 | Customer cancels a membership: refund = price × unused visits. | |
+| R2 | Provider or admin cancels a membership: refund = the larger of unused visits or unused time. | |
+| R3 | Rounding in the customer's favour; nothing refundable once the period has ended. | |
+| R4 | Prepaid membership/package money becomes the provider's only as visits are delivered; unused value goes to the provider at expiry; a package session recorded without a booking counts as delivered. | |
+| R5 | A refund whose result at Tap is unknown is never re-sent; only "Check with Tap" or a second person's decision settles it; no emergency override for it. | |
+| R6 | Staff at any of a provider's branches can see that provider's member list. | |
+| C1 | Admin changes that are refused say exactly which permission is missing (English/Arabic). | |
+| C2 | Branch, package, integration and payment-method changes need a reason; integration and payment-method changes also need a fresh authenticator code. | |
+| C3 | One default payment method per audience (customers vs provider payouts). | |
+| C4 | An integration's key cannot be renamed once registered. | |
+| C5 | The main admin panel is keyboard-scrollable (accessibility). | |
+| B1 | Unpaid booking holds: at most 2 with one business and 3 across the platform; a group or series counts as one. | |
+| B2 | A promo code use is reserved by an unpaid hold and counted only when paid. | |
+| B3 | Chat: no editing of sent messages; 20 new conversations a day, 20 messages a minute, 2,000 characters per message. | |
+| B4 | Providers cannot create promo codes named like platform campaigns (RAMADAN, EID2026, NATIONALDAY, FOUNDINGDAY, WELCOME) or starting with PRIMORA. | |
+| B5 | WhatsApp number ownership is confirmed by an operator in Meta Business Manager (no automatic check yet). | |
+| B6 | Granting the operations role (it sees personal data) needs a second owner; analyst applies at once. | |
+| B7 | If the admin session check fails right after sign-in, the console retries and shows a retry button. | |
+
 ## 3. Values only you can set (features stay OFF until set)
 
 | # | Value | Your answer |
