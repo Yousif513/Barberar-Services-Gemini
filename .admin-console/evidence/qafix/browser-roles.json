@@ -1,0 +1,194 @@
+{
+ "agent": "impl-qafix-claude",
+ "app": "http://localhost:3100",
+ "api": "http://127.0.0.1:54321",
+ "at": "2026-10-18T18:35:59.476Z",
+ "results": [
+  {
+   "phase": "roles",
+   "as": "analyst",
+   "route": "/admin/services",
+   "writeControls": 0,
+   "priceInputs": 0,
+   "switches": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "analyst",
+   "route": "/admin/branches",
+   "writeControls": 0,
+   "priceInputs": null,
+   "switches": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "analyst",
+   "route": "/admin/integrations",
+   "writeControls": 0,
+   "priceInputs": null,
+   "switches": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "analyst",
+   "route": "/admin/packages",
+   "writeControls": 0,
+   "priceInputs": null,
+   "switches": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "analyst",
+   "route": "/admin/coupons",
+   "writeControls": 0,
+   "priceInputs": null,
+   "switches": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "analyst",
+   "route": "/admin/sponsored",
+   "writeControls": 0,
+   "priceInputs": null,
+   "switches": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "analyst",
+   "route": "/admin/ledger (payment methods)",
+   "switches": 0,
+   "makeDefault": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "finance",
+   "route": "/admin/services",
+   "writeControls": 0,
+   "priceInputs": 0,
+   "switches": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "finance",
+   "route": "/admin/branches",
+   "writeControls": 0,
+   "priceInputs": null,
+   "switches": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "finance",
+   "route": "/admin/integrations",
+   "writeControls": 0,
+   "priceInputs": null,
+   "switches": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "finance",
+   "route": "/admin/packages",
+   "writeControls": 0,
+   "priceInputs": null,
+   "switches": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "finance",
+   "route": "/admin/coupons",
+   "writeControls": 1,
+   "priceInputs": null,
+   "switches": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "finance",
+   "route": "/admin/sponsored",
+   "writeControls": 0,
+   "priceInputs": null,
+   "switches": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "finance",
+   "route": "/admin/ledger (payment methods)",
+   "switches": 0,
+   "makeDefault": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "owner-a",
+   "route": "/admin/services",
+   "writeControls": 187,
+   "priceInputs": 62,
+   "switches": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "owner-a",
+   "route": "/admin/branches",
+   "writeControls": 34,
+   "priceInputs": null,
+   "switches": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "owner-a",
+   "route": "/admin/integrations",
+   "writeControls": 16,
+   "priceInputs": null,
+   "switches": 15,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "owner-a",
+   "route": "/admin/packages",
+   "writeControls": 0,
+   "priceInputs": null,
+   "switches": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "owner-a",
+   "route": "/admin/coupons",
+   "writeControls": 1,
+   "priceInputs": null,
+   "switches": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "owner-a",
+   "route": "/admin/sponsored",
+   "writeControls": 0,
+   "priceInputs": null,
+   "switches": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "roles",
+   "as": "owner-a",
+   "route": "/admin/ledger (payment methods)",
+   "switches": 10,
+   "makeDefault": 8,
+   "consoleErrors": []
+  }
+ ]
+}

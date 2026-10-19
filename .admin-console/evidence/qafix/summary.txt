@@ -1,0 +1,30 @@
+QAFIX browser verification (impl-qafix-claude, 2026-10-18/19). Playwright 1.61.1 driving local Chrome (headless) against the
+dev server http://localhost:3100 and the local Supabase stack http://127.0.0.1:54321 only. Script: kept in the agent scratchpad
+(qafix-browser.mjs); results in browser-*.json, screenshots in shots/. Accounts: throw-away qafix.* (owner-a, owner-b,
+analyst, ops, customer) created through the GoTrue admin API, TOTP enrolled by script; plus admin.finance@primora.local.
+Logins only in supabase/.temp/local-admin-logins.txt. admin.owner@primora.local was not used.
+
+1. Roles (browser-roles.json): analyst and finance see no write control on services, branches, integrations, packages,
+   sponsored or the payment methods (0 controls, 0 price inputs, 0 switches); finance keeps Add coupon (holds money.config);
+   owner sees all controls. 0 console errors.
+2. Refused write, not success (browser-stale.json): an account loaded as owner, its console role switched to analyst before
+   the press. services (EN, AR): the server refusal is shown ("Your console role does not include operations changes
+   (operations.write), so nothing was changed" / Arabic), no success message, the row stays Active, reload agrees.
+   branches and integrations: the refusal is shown inside the reason dialog, which stays open; nothing changes.
+3. Success paths as owner (browser-success.json): service off -> draft/false in the DB, on -> active/true; price +1 saved on
+   leaving the field and restored with Enter; branch offline/online with reasons (audit branch.deactivated/reactivated,
+   "1 upcoming bookings ... stay booked"); integration Product Analytics on/off with reasons, integration_audit_log rows
+   written by the server with the actor; cash off/on; default Apple Pay then Mada: provider default bank_transfer kept.
+4. Read states (browser-states.json): 403/42501 injected for services, branches, packages, coupons, integrations, activity,
+   reviews -> forbidden notice, never the empty-list text; 503 -> "could not be loaded" with Try again after the client's
+   own retries (about 10 s).
+5. Dialogs at 375x600 (browser-dialogs.json): Clear profile details (customers) and service edit, EN and AR: dialog 16..584,
+   confirm/save button inside the viewport.
+6. Retention purge and approvals (browser-purge.json): dry run shows the Riyadh cutoff and counts; the real purge becomes an
+   approval request; on Approvals in Arabic at 375x600 the Approve button is on screen, no horizontal overflow; the request
+   withdrawn meanwhile -> the approve dialog shows "لم يتغير شيء: لم يعد هذا الطلب بانتظار القرار (مسحوبة)" (this run found
+   and fixed a false "Approved and executed" for an unchanged decision). The test requests were withdrawn; nothing approved.
+7. axe-core 4.12.1 (WCAG 2.0/2.1/2.2 A+AA) EN/AR x 1440/375 on 22 screens (browser-axe.json + browser-axe-rerun.json):
+   88 runs clean after the reconciliation scroll-region fix and with a working provider session (the first pass's provider
+   rows landed on /login). No horizontal overflow at 375. /become-provider loads one image from images.unsplash.com
+   (pre-existing, not changed here).

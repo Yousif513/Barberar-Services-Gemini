@@ -1,0 +1,192 @@
+{
+ "agent": "impl-qafix-claude",
+ "app": "http://localhost:3100",
+ "api": "http://127.0.0.1:54321",
+ "at": "2026-10-19T04:23:49.312Z",
+ "results": [
+  {
+   "phase": "axe",
+   "route": "/admin/reconciliation",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/admin/reconciliation",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/reconciliation",
+   "lang": "en",
+   "width": 375,
+   "landed": "/admin/reconciliation",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/reconciliation",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/admin/reconciliation",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/reconciliation",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/admin/reconciliation",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/provider/inventory",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/provider/inventory",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/provider/inventory",
+   "lang": "en",
+   "width": 375,
+   "landed": "/provider/inventory",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/provider/inventory",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/provider/inventory",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/provider/inventory",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/provider/inventory",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/provider/chain",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/provider/chain",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/provider/chain",
+   "lang": "en",
+   "width": 375,
+   "landed": "/provider/chain",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/provider/chain",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/provider/chain",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/provider/chain",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/provider/chain",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/become-provider",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/become-provider",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": [
+    "non-local request: https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=1200&auto=fo"
+   ]
+  },
+  {
+   "phase": "axe",
+   "route": "/become-provider",
+   "lang": "en",
+   "width": 375,
+   "landed": "/become-provider",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": [
+    "non-local request: https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=1200&auto=fo"
+   ]
+  },
+  {
+   "phase": "axe",
+   "route": "/become-provider",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/become-provider",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": [
+    "non-local request: https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=1200&auto=fo"
+   ]
+  },
+  {
+   "phase": "axe",
+   "route": "/become-provider",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/become-provider",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": [
+    "non-local request: https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=1200&auto=fo"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,1084 @@
+{
+ "agent": "impl-qafix-claude",
+ "app": "http://localhost:3100",
+ "api": "http://127.0.0.1:54321",
+ "at": "2026-10-18T23:42:32.488Z",
+ "results": [
+  {
+   "phase": "axe",
+   "route": "/admin/services",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/admin/services",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/services",
+   "lang": "en",
+   "width": 375,
+   "landed": "/admin/services",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/services",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/admin/services",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/services",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/admin/services",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/integrations",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/admin/integrations",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/integrations",
+   "lang": "en",
+   "width": 375,
+   "landed": "/admin/integrations",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/integrations",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/admin/integrations",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/integrations",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/admin/integrations",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/coupons",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/admin/coupons",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/coupons",
+   "lang": "en",
+   "width": 375,
+   "landed": "/admin/coupons",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/coupons",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/admin/coupons",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/coupons",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/admin/coupons",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/disputes",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/admin/disputes",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/disputes",
+   "lang": "en",
+   "width": 375,
+   "landed": "/admin/disputes",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/disputes",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/admin/disputes",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/disputes",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/admin/disputes",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/reviews",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/admin/reviews",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/reviews",
+   "lang": "en",
+   "width": 375,
+   "landed": "/admin/reviews",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/reviews",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/admin/reviews",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/reviews",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/admin/reviews",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/reports",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/admin/reports",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/reports",
+   "lang": "en",
+   "width": 375,
+   "landed": "/admin/reports",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/reports",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/admin/reports",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/reports",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/admin/reports",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/packages",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/admin/packages",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/packages",
+   "lang": "en",
+   "width": 375,
+   "landed": "/admin/packages",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/packages",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/admin/packages",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/packages",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/admin/packages",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/refunds",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/admin/refunds",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/refunds",
+   "lang": "en",
+   "width": 375,
+   "landed": "/admin/refunds",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/refunds",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/admin/refunds",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/refunds",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/admin/refunds",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/reconciliation",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/admin/reconciliation",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/reconciliation",
+   "lang": "en",
+   "width": 375,
+   "landed": "/admin/reconciliation",
+   "violations": [
+    {
+     "id": "scrollable-region-focusable",
+     "impact": "serious",
+     "nodes": 1,
+     "targets": [
+      ".overflow-x-auto"
+     ],
+     "summary": "Fix any of the following:   Element should have focusable content"
+    }
+   ],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/reconciliation",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/admin/reconciliation",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/reconciliation",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/admin/reconciliation",
+   "violations": [
+    {
+     "id": "scrollable-region-focusable",
+     "impact": "serious",
+     "nodes": 1,
+     "targets": [
+      ".overflow-x-auto"
+     ],
+     "summary": "Fix any of the following:   Element should have focusable content"
+    }
+   ],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/taxes",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/admin/taxes",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/taxes",
+   "lang": "en",
+   "width": 375,
+   "landed": "/admin/taxes",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/taxes",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/admin/taxes",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/taxes",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/admin/taxes",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/whatsapp",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/admin/whatsapp",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/whatsapp",
+   "lang": "en",
+   "width": 375,
+   "landed": "/admin/whatsapp",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/whatsapp",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/admin/whatsapp",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/whatsapp",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/admin/whatsapp",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/branches",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/admin/branches",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/branches",
+   "lang": "en",
+   "width": 375,
+   "landed": "/admin/branches",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/branches",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/admin/branches",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/branches",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/admin/branches",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/ledger",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/admin/ledger",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/ledger",
+   "lang": "en",
+   "width": 375,
+   "landed": "/admin/ledger",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/ledger",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/admin/ledger",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/ledger",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/admin/ledger",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/approvals",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/admin/approvals",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/approvals",
+   "lang": "en",
+   "width": 375,
+   "landed": "/admin/approvals",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/approvals",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/admin/approvals",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/approvals",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/admin/approvals",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/privacy?tab=ledger",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/admin/privacy",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/privacy?tab=ledger",
+   "lang": "en",
+   "width": 375,
+   "landed": "/admin/privacy",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/privacy?tab=ledger",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/admin/privacy",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/privacy?tab=ledger",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/admin/privacy",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/activity",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/admin/activity",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/activity",
+   "lang": "en",
+   "width": 375,
+   "landed": "/admin/activity",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/activity",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/admin/activity",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/admin/activity",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/admin/activity",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/provider/inventory",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/login",
+   "violations": [
+    {
+     "id": "color-contrast",
+     "impact": "serious",
+     "nodes": 1,
+     "targets": [
+      ".mt-6"
+     ],
+     "summary": "Fix any of the following:   Element has insufficient color contrast of 3.46 (foreground color: #667085, background color: #151b28, font size: 7.5pt (10px), font weight: normal). Expected contrast rati"
+    }
+   ],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ]
+  },
+  {
+   "phase": "axe",
+   "route": "/provider/inventory",
+   "lang": "en",
+   "width": 375,
+   "landed": "/login",
+   "violations": [
+    {
+     "id": "color-contrast",
+     "impact": "serious",
+     "nodes": 1,
+     "targets": [
+      ".mt-6"
+     ],
+     "summary": "Fix any of the following:   Element has insufficient color contrast of 3.46 (foreground color: #667085, background color: #151b28, font size: 7.5pt (10px), font weight: normal). Expected contrast rati"
+    }
+   ],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ]
+  },
+  {
+   "phase": "axe",
+   "route": "/provider/inventory",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/login",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ]
+  },
+  {
+   "phase": "axe",
+   "route": "/provider/inventory",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/login",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ]
+  },
+  {
+   "phase": "axe",
+   "route": "/provider/chain",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/login",
+   "violations": [
+    {
+     "id": "color-contrast",
+     "impact": "serious",
+     "nodes": 1,
+     "targets": [
+      ".mt-6"
+     ],
+     "summary": "Fix any of the following:   Element has insufficient color contrast of 3.46 (foreground color: #667085, background color: #151b28, font size: 7.5pt (10px), font weight: normal). Expected contrast rati"
+    }
+   ],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ]
+  },
+  {
+   "phase": "axe",
+   "route": "/provider/chain",
+   "lang": "en",
+   "width": 375,
+   "landed": "/login",
+   "violations": [
+    {
+     "id": "color-contrast",
+     "impact": "serious",
+     "nodes": 1,
+     "targets": [
+      ".mt-6"
+     ],
+     "summary": "Fix any of the following:   Element has insufficient color contrast of 3.46 (foreground color: #667085, background color: #151b28, font size: 7.5pt (10px), font weight: normal). Expected contrast rati"
+    }
+   ],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ]
+  },
+  {
+   "phase": "axe",
+   "route": "/provider/chain",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/login",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ]
+  },
+  {
+   "phase": "axe",
+   "route": "/provider/chain",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/login",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ]
+  },
+  {
+   "phase": "axe",
+   "route": "/customer/privacy",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/customer/privacy",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/customer/privacy",
+   "lang": "en",
+   "width": 375,
+   "landed": "/customer/privacy",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/customer/privacy",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/customer/privacy",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/customer/privacy",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/customer/privacy",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/become-provider",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/become-provider",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": [
+    "non-local request: https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=1200&auto=fo"
+   ]
+  },
+  {
+   "phase": "axe",
+   "route": "/become-provider",
+   "lang": "en",
+   "width": 375,
+   "landed": "/become-provider",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": [
+    "non-local request: https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=1200&auto=fo"
+   ]
+  },
+  {
+   "phase": "axe",
+   "route": "/become-provider",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/become-provider",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": [
+    "non-local request: https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=1200&auto=fo"
+   ]
+  },
+  {
+   "phase": "axe",
+   "route": "/become-provider",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/become-provider",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": [
+    "non-local request: https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=1200&auto=fo"
+   ]
+  },
+  {
+   "phase": "axe",
+   "route": "/privacy",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/privacy",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/privacy",
+   "lang": "en",
+   "width": 375,
+   "landed": "/privacy",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/privacy",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/privacy",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/privacy",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/privacy",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/login/mfa",
+   "lang": "en",
+   "width": 1440,
+   "landed": "/login/mfa",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/login/mfa",
+   "lang": "en",
+   "width": 375,
+   "landed": "/login/mfa",
+   "violations": [],
+   "overflow": false,
+   "dir": "ltr",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/login/mfa",
+   "lang": "ar",
+   "width": 1440,
+   "landed": "/login/mfa",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  },
+  {
+   "phase": "axe",
+   "route": "/login/mfa",
+   "lang": "ar",
+   "width": 375,
+   "landed": "/login/mfa",
+   "violations": [],
+   "overflow": false,
+   "dir": "rtl",
+   "consoleErrors": []
+  }
+ ]
+}

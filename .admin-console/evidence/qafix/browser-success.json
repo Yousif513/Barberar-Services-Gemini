@@ -1,0 +1,92 @@
+{
+ "agent": "impl-qafix-claude",
+ "app": "http://localhost:3100",
+ "api": "http://127.0.0.1:54321",
+ "at": "2026-10-18T18:39:47.234Z",
+ "results": [
+  {
+   "phase": "success",
+   "route": "/admin/services",
+   "offStored": "draft/false",
+   "offStatus": [
+    "Service switched off."
+   ],
+   "onStored": "active/true",
+   "priceBefore": "200.00",
+   "priceAfter": "201.00",
+   "priceRestored": "200.00",
+   "audit": "4",
+   "consoleErrors": []
+  },
+  {
+   "phase": "success",
+   "route": "/admin/branches",
+   "reason": "Water leak, closed for repairs",
+   "audit": "branch.deactivated E2E Branch active=false",
+   "status": [
+    "Branch taken offline. 1 upcoming bookings at this branch stay booked; contact the customers if needed."
+   ],
+   "dialogOpen": 0
+  },
+  {
+   "phase": "success",
+   "route": "/admin/branches",
+   "reason": "Repairs finished",
+   "audit": "branch.reactivated E2E Branch active=true",
+   "status": [
+    "Branch back online."
+   ],
+   "dialogOpen": 0
+  },
+  {
+   "phase": "success",
+   "route": "/admin/integrations",
+   "reason": "Turn on for the funnel review",
+   "stored": "t",
+   "history": "enabled (reason: Turn on for the funnel review)",
+   "status": [
+    "Integration enabled."
+   ],
+   "dialogOpen": 0
+  },
+  {
+   "phase": "success",
+   "route": "/admin/integrations",
+   "reason": "Funnel review done",
+   "stored": "f",
+   "history": "disabled (reason: Funnel review done)",
+   "status": [],
+   "dialogOpen": 0
+  },
+  {
+   "phase": "success",
+   "route": "/admin/ledger cash",
+   "reason": "Cash desk closed today",
+   "stored": "f",
+   "dialogOpen": 0
+  },
+  {
+   "phase": "success",
+   "route": "/admin/ledger cash",
+   "reason": "Cash desk open again",
+   "stored": "t",
+   "dialogOpen": 0
+  },
+  {
+   "phase": "success",
+   "route": "/admin/ledger default",
+   "label": "Apple Pay",
+   "defaults": "apple_pay,bank_transfer",
+   "dialogOpen": 0,
+   "consoleErrors": []
+  },
+  {
+   "phase": "success",
+   "route": "/admin/ledger default",
+   "label": "Mada",
+   "defaults": "bank_transfer,mada",
+   "dialogOpen": 0,
+   "consoleErrors": []
+  }
+ ]
+}

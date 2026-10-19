@@ -1,0 +1,64 @@
+{
+ "agent": "impl-qafix-claude",
+ "app": "http://localhost:3100",
+ "api": "http://127.0.0.1:54321",
+ "at": "2026-10-18T18:45:46.219Z",
+ "results": [
+  {
+   "phase": "dialogs",
+   "lang": "en",
+   "route": "/admin/customers clear profile",
+   "found": 1,
+   "dialog": {
+    "top": 16,
+    "bottom": 584
+   },
+   "submit": {
+    "top": 527,
+    "bottom": 567
+   },
+   "viewport": 600,
+   "submitInView": true,
+   "dialogInView": true,
+   "consoleErrors": []
+  },
+  {
+   "phase": "dialogs",
+   "lang": "en",
+   "route": "/admin/services edit",
+   "dialog": {
+    "top": 16,
+    "bottom": 584
+   },
+   "saveInView": true
+  },
+  {
+   "phase": "dialogs",
+   "lang": "ar",
+   "route": "/admin/customers clear profile",
+   "found": 1,
+   "dialog": {
+    "top": 16,
+    "bottom": 584
+   },
+   "submit": {
+    "top": 525,
+    "bottom": 567
+   },
+   "viewport": 600,
+   "submitInView": true,
+   "dialogInView": true,
+   "consoleErrors": []
+  },
+  {
+   "phase": "dialogs",
+   "lang": "ar",
+   "route": "/admin/services edit",
+   "dialog": {
+    "top": 16,
+    "bottom": 584
+   },
+   "saveInView": true
+  }
+ ]
+}
