@@ -7,6 +7,7 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { identifyUser, trackEvent } from "@/lib/analytics";
 import { devRoleHome, isLocalDevAccessEnabled, setDevRole, type DevRole } from "@/lib/dev-access";
 import { errorMessage } from "@/lib/error-message";
+import { safeInternalPath } from "@/lib/safe-redirect.mjs";
 import { usePageLocale } from "@/lib/use-page-locale";
 import { lookupPublishedAgreement, type AgreementLookup } from "@/lib/published-agreement";
 
@@ -176,7 +177,8 @@ const translations = {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const returnUrl = searchParams.get("returnUrl");
+  // RT-M2: only a path on this site is followed after sign-in; anything else falls back to the role home.
+  const returnUrl = safeInternalPath(searchParams.get("returnUrl"), "");
   const [locale, setLocale] = usePageLocale();
   const t = translations[locale];
   const isRTL = locale === "ar";
@@ -245,7 +247,7 @@ function LoginForm() {
     identifyUser(userId);
     trackEvent("auth_completed", { method: phone && otpSent ? "phone_otp" : "email", user_id: userId });
 
-    if (returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("//")) {
+    if (returnUrl) {
       router.replace(returnUrl);
       router.refresh();
       return;
