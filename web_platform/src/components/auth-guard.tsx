@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { clearDevRole, devRoleHome, getDevRole } from "@/lib/dev-access";
 import { useOperationsLocale } from "@/components/operations-ui";
+import { accountLoginPath } from "@/lib/account-flow.mjs";
 
 type UserRole = "customer" | "provider_owner" | "provider_employee" | "admin";
 
@@ -60,7 +61,7 @@ export function AuthGuard({
       } = await supabase.auth.getUser();
 
       if (!user) {
-        router.replace("/login");
+        router.replace(accountLoginPath(`${window.location.pathname}${window.location.search}${window.location.hash}`));
         return;
       }
 
@@ -78,7 +79,7 @@ export function AuthGuard({
       }
       if (!profile) {
         await supabase.auth.signOut({ scope: "local" });
-        router.replace("/login");
+        router.replace(accountLoginPath(`${window.location.pathname}${window.location.search}${window.location.hash}`));
         return;
       }
 
@@ -113,7 +114,8 @@ export function AuthGuard({
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") {
-        router.replace("/login");
+        if (active) setIsAuthorized(false);
+        router.replace(accountLoginPath(`${window.location.pathname}${window.location.search}${window.location.hash}`));
       }
     });
 

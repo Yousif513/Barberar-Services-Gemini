@@ -670,7 +670,9 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         "utf8"
       );
       assert.ok(shopCode.includes('id: "any"'), "Must provide 'any' specialist selection option");
-      assert.ok(shopCode.includes("get_branch_available_slots"), "Must call get_branch_available_slots when 'any' is selected");
+      const availabilityCode = readFileSync(join(webPlatformDir, "src/lib/booking-availability.mjs"), "utf8");
+      assert.ok(shopCode.includes("loadBookingSlots(supabase"), "Must load the current visit through the availability adapter");
+      assert.ok(availabilityCode.includes("get_branch_available_slots"), "The adapter must use the server's full-visit availability");
       assert.ok(shopCode.includes('selectedSpecialist.id === "any" ? null : selectedSpecialist.id'), "Must pass null target_employee_id for auto-assignment");
     });
 

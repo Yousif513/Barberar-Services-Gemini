@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { errorMessage } from "@/lib/error-message";
 import { useOperationsLocale } from "@/components/operations-ui";
+import { persistCustomerProfile } from "@/lib/account-flow.mjs";
 
 const translations = {
   en: {
@@ -84,6 +85,7 @@ export default function CustomerSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [savingProfile, setSavingProfile] = useState(false);
 
   // Profile Form States
   const [profile, setProfile] = useState({
@@ -198,7 +200,9 @@ export default function CustomerSettingsPage() {
 
   async function saveProfile(e: React.FormEvent) {
     e.preventDefault();
+    if (savingProfile) return;
     try {
+      setSavingProfile(true);
       setSuccess("");
       setError("");
       const { data: { user } } = await supabase.auth.getUser();
@@ -206,21 +210,15 @@ export default function CustomerSettingsPage() {
         throw new Error("No active user session.");
       }
 
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({
-          first_name: profile.firstName,
-          last_name: profile.lastName,
-          phone_number: profile.phone
-        })
-        .eq("id", user.id);
-
-      if (updateError) throw updateError;
+      const saved = await persistCustomerProfile(supabase, user.id, profile, locale);
+      setProfile(previous => ({ ...previous, ...saved }));
       setSuccess(t.savedMsg);
       setTimeout(() => setSuccess(""), 4000);
     } catch (err: any) {
       console.warn("Failed to save profile settings:", err.message);
       setError(err.message || "Failed to update settings.");
+    } finally {
+      setSavingProfile(false);
     }
   }
 
@@ -257,6 +255,7 @@ export default function CustomerSettingsPage() {
                 <input
                   id="settings-first-name"
                   type="text"
+                  disabled={savingProfile}
                   value={profile.firstName}
                   onChange={(e) => setProfile(prev => ({ ...prev, firstName: e.target.value }))}
                   className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 font-semibold"
@@ -267,6 +266,7 @@ export default function CustomerSettingsPage() {
                 <input
                   id="settings-last-name"
                   type="text"
+                  disabled={savingProfile}
                   value={profile.lastName}
                   onChange={(e) => setProfile(prev => ({ ...prev, lastName: e.target.value }))}
                   className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 font-semibold"
@@ -297,6 +297,7 @@ export default function CustomerSettingsPage() {
               <input
                 id="settings-phone"
                 type="text"
+                disabled={savingProfile}
                 value={profile.phone}
                 onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))}
                 className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[hsl(45,60%,55%)] text-gray-700 font-semibold"
@@ -305,7 +306,9 @@ export default function CustomerSettingsPage() {
 
             <button
               type="submit"
-              className="py-2.5 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl px-6 transition mt-4"
+              disabled={savingProfile}
+              aria-busy={savingProfile}
+              className="py-2.5 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl px-6 transition mt-4 disabled:opacity-60"
             >
               {t.saveProfile}
             </button>

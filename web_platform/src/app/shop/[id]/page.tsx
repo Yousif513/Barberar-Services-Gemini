@@ -14,6 +14,8 @@ import { formatBookingDate, formatBookingTime, riyadhDateKey } from "@/lib/booki
 import { lookupPublishedAgreement, type AgreementLookup } from "@/lib/published-agreement";
 import { usePageLocale } from "@/lib/use-page-locale";
 import { attributionRefToken, recordBookingAttribution } from "@/lib/attribution";
+import { loadBookingSlots } from "@/lib/booking-availability.mjs";
+import { normalizeSaudiMobile } from "@/lib/phone.mjs";
 
 export const dynamic = "force-dynamic";
 
@@ -278,6 +280,7 @@ export default function ShopDetailsPage() {
   };
 
   const handleToggleService = (srv: ServiceItem) => {
+    setSelectedSlot("");
     setSelectedServices(prev => {
       const exists = prev.some(s => s.id === srv.id);
       if (exists) {
@@ -303,6 +306,7 @@ export default function ShopDetailsPage() {
   const [coordinates, setCoordinates] = useState({ lat: 24.7136, lng: 46.6753 });
   const [dbSlots, setDbSlots] = useState<string[]>([]);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
+  const [loadedSlotsKey, setLoadedSlotsKey] = useState("");
   const [isHomeService, setIsHomeService] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -838,17 +842,25 @@ export default function ShopDetailsPage() {
   }, [serviceId, shopLoadState, filteredServices, t.bookAgainMissing]);
 
   // Hook to restore pending booking selection from sessionStorage (G16)
+  const restoredPendingFor = useRef<string | null>(null);
   useEffect(() => {
+    if (shopLoadState !== "ready" || restoredPendingFor.current === shop.id) return;
+    restoredPendingFor.current = shop.id;
     try {
       const raw = sessionStorage.getItem("primora_pending_booking");
       if (!raw) return;
       const saved = JSON.parse(raw);
       if (saved.providerId === shop.id && Date.now() - (saved.savedAt || 0) < 7200000) {
-        if (saved.serviceId && filteredServices.length > 0) {
-          const matchedService = filteredServices.find(s => s.id === saved.serviceId);
-          if (matchedService) setSelectedService(matchedService);
+        const savedIds = Array.isArray(saved.serviceIds) ? saved.serviceIds : [saved.serviceId];
+        const restoredServices = savedIds
+          .map((id: unknown) => filteredServices.find((service) => service.id === id))
+          .filter((service: ServiceItem | undefined): service is ServiceItem => !!service);
+        if (restoredServices.length > 0) {
+          setSelectedServices(restoredServices);
         }
-        if (saved.specialistId && shop.specialists && shop.specialists.length > 0) {
+        if (saved.specialistId === "any") {
+          setSelectedSpecialist({ id: "any", name: { en: "Any Available Professional", ar: "أي أخصائي متاح" }, role: { en: "First Available Staff", ar: "الأسرع توفراً من الفريق" }, rating: null, avatar: "" });
+        } else if (saved.specialistId && shop.specialists && shop.specialists.length > 0) {
           const matchedSpecialist = shop.specialists.find(sp => sp.id === saved.specialistId);
           if (matchedSpecialist) setSelectedSpecialist(matchedSpecialist);
         }
@@ -860,7 +872,7 @@ export default function ShopDetailsPage() {
     } catch (e) {
       console.warn("Failed to restore booking context:", e);
     }
-  }, [shop.id, shop.specialists, filteredServices, locale]);
+  }, [shop.id, shop.specialists, shopLoadState, filteredServices, locale]);
 
   const defaultBuffers = {
     fajr: { before: 10, after: 30 },
@@ -908,53 +920,57 @@ export default function ShopDetailsPage() {
 
   // Fetch available slots from the database (prayer windows computed with Umm al-Qura are excluded server-side)
   const [slotError, setSlotError] = useState("");
+  const serviceIdsKey = JSON.stringify(selectedServices.map((service) => service.id));
+  const specialistId = selectedSpecialist?.id || "";
+  const slotsKey = JSON.stringify([shop.branchId, serviceIdsKey, specialistId, selectedDate, coordinates.lat, coordinates.lng, isHomeService]);
+  const slotsAreCurrent = loadedSlotsKey === slotsKey && !isLoadingSlots && !slotError;
+  const currentSlots = slotsAreCurrent ? dbSlots : [];
   useEffect(() => {
+    let cancelled = false;
     async function fetchSlots() {
+      setDbSlots([]);
       setSlotError("");
-      if (!selectedSpecialist || !selectedDate || !selectedService || !shop.branchId) {
-        setDbSlots([]);
+      setLoadedSlotsKey("");
+      const serviceIds: string[] = JSON.parse(serviceIdsKey);
+      if (!specialistId || !selectedDate || !serviceIds.length || !shop.branchId) {
+        setIsLoadingSlots(false);
         return;
       }
       setIsLoadingSlots(true);
       try {
         const { starts, ends } = getPrayerWindowsForDate(selectedDate);
-        const duration = totalCombinedDuration || selectedService.duration;
-        if (selectedSpecialist.id === "any") {
-          const { data, error } = await supabase.rpc("get_branch_available_slots", {
-            target_branch_id: shop.branchId,
-            target_service_id: selectedService.id,
-            target_date: selectedDate,
-            prayer_window_starts: starts,
-            prayer_window_ends: ends,
-          });
-          if (error) throw error;
-          setDbSlots((data || []).map((s: any) => s.slot_start));
-        } else {
-          const { data, error } = await supabase.rpc("get_available_slots", {
-            target_employee_id: selectedSpecialist.id,
-            target_date: selectedDate,
-            service_duration_minutes: duration,
-            prayer_window_starts: starts,
-            prayer_window_ends: ends,
-          });
-          if (error) throw error;
-          setDbSlots((data || []).map((s: any) => s.slot_start));
+        const slots = await loadBookingSlots(supabase, {
+          branchId: shop.branchId,
+          serviceIds,
+          specialistId,
+          date: selectedDate,
+          prayerStarts: starts,
+          prayerEnds: ends,
+        });
+        if (!cancelled) {
+          setDbSlots(slots);
+          setLoadedSlotsKey(slotsKey);
+          setSelectedSlot((previous) => slots.includes(previous) ? previous : "");
         }
-      } catch (err: any) {
-        setDbSlots([]);
-        setSlotError(locale === "ar" ? `تعذر تحميل المواعيد: ${err?.message || ""}` : `Could not load available times: ${err?.message || ""}`);
+      } catch (err: unknown) {
+        if (!cancelled) {
+          setDbSlots([]);
+          setLoadedSlotsKey(slotsKey);
+          setSlotError(locale === "ar" ? `تعذر تحميل المواعيد: ${errorMessage(err)}` : `Could not load available times: ${errorMessage(err)}`);
+        }
       } finally {
-        setIsLoadingSlots(false);
+        if (!cancelled) setIsLoadingSlots(false);
       }
     }
-    fetchSlots();
-  }, [selectedSpecialist, selectedDate, selectedService, coordinates, totalCombinedDuration, shop.branchId]);
+    void fetchSlots();
+    return () => { cancelled = true; };
+  }, [serviceIdsKey, specialistId, selectedDate, coordinates.lat, coordinates.lng, shop.branchId, slotsKey, locale]);
 
   // Prayer windows for the selected date, shown so customers understand the gaps in the schedule.
   const prayerWindowsForDay = selectedDate ? getPrayerWindowsForDate(selectedDate).list : [];
 
   const getAvailableSlots = () =>
-    dbSlots.map((iso) => ({ slot: iso, label: formatSlotLabel(iso, locale), available: true, prayerLocked: false, prayerName: "" }));
+    currentSlots.map((iso) => ({ slot: iso, label: formatSlotLabel(iso, locale), available: true, prayerLocked: false, prayerName: "" }));
 
   // Estimate only; the server prices the booking (fee rules, discounts, VAT, deposit policy).
   const calculateEscrowSplit = () => {
@@ -974,12 +990,8 @@ export default function ShopDetailsPage() {
   const splits = calculateEscrowSplit();
 
   const handleModalSendOtp = async () => {
-    let digits = authPhone.replace(/[^\d+]/g, "");
-    if (digits.startsWith("05")) digits = "+966" + digits.slice(1);
-    else if (digits.startsWith("5")) digits = "+966" + digits;
-    else if (!digits.startsWith("+966")) digits = "+966" + digits;
-
-    if (!digits.startsWith("+9665") || digits.length !== 13) {
+    const digits = normalizeSaudiMobile(authPhone);
+    if (!digits) {
       setAuthModalError(locale === "ar" ? "يرجى إدخال رقم جوال سعودي صالح (05xxxxxxxx)" : "Please enter a valid Saudi mobile number (05XXXXXXXX)");
       return;
     }
@@ -1004,10 +1016,11 @@ export default function ShopDetailsPage() {
   };
 
   const handleModalVerifyOtp = async () => {
-    let digits = authPhone.replace(/[^\d+]/g, "");
-    if (digits.startsWith("05")) digits = "+966" + digits.slice(1);
-    else if (digits.startsWith("5")) digits = "+966" + digits;
-    else if (!digits.startsWith("+966")) digits = "+966" + digits;
+    const digits = normalizeSaudiMobile(authPhone);
+    if (!digits) {
+      setAuthModalError(locale === "ar" ? "يرجى إدخال رقم جوال سعودي صالح (05xxxxxxxx)" : "Please enter a valid Saudi mobile number (05XXXXXXXX)");
+      return;
+    }
 
     if (!authOtpCode || authOtpCode.trim().length !== 6) {
       setAuthModalError(locale === "ar" ? "أدخل رمز التحقق المكون من 6 أرقام" : "Enter the 6-digit code");
@@ -1063,7 +1076,7 @@ export default function ShopDetailsPage() {
   };
 
   const handleBook = async () => {
-    if (!selectedService || !selectedSpecialist || !selectedDate || !selectedSlot) {
+    if (isLoading || !selectedService || !selectedSpecialist || !selectedDate || !selectedSlot || !slotsAreCurrent || !currentSlots.includes(selectedSlot)) {
       setMessage(t.errorSelectDetails);
       return;
     }
@@ -1082,6 +1095,7 @@ export default function ShopDetailsPage() {
         sessionStorage.setItem("primora_pending_booking", JSON.stringify({
           providerId: shop.id,
           serviceId: selectedService.id,
+          serviceIds: selectedServices.map((service) => service.id),
           specialistId: selectedSpecialist.id,
           date: selectedDate,
           slot: selectedSlot,
@@ -1766,8 +1780,8 @@ export default function ShopDetailsPage() {
                       {isLoadingSlots && (
                         <p className="text-[10px] text-stone-400">{locale === "ar" ? "جاري تحميل المواعيد..." : "Loading available times..."}</p>
                       )}
-                      {slotError && <p className="text-[10px] text-red-600 font-bold">{slotError}</p>}
-                      {!isLoadingSlots && !slotError && dbSlots.length === 0 && (
+                      {loadedSlotsKey === slotsKey && slotError && <p role="alert" className="text-[10px] text-red-600 font-bold">{slotError}</p>}
+                      {slotsAreCurrent && currentSlots.length === 0 && (
                         <p className="text-[10px] text-stone-500">
                           {locale === "ar" ? "لا توجد مواعيد متاحة في هذا اليوم. جرّب يوماً آخر أو انضم لقائمة الانتظار." : "No times are available on this day. Try another day or join the waitlist."}
                         </p>
@@ -1776,7 +1790,7 @@ export default function ShopDetailsPage() {
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {getAvailableSlots().map(({ slot, label, available, prayerLocked, prayerName }) => {
                           const isSelected = selectedSlot === slot;
-                          const isDisabled = !available || prayerLocked;
+                          const isDisabled = !slotsAreCurrent || !available || prayerLocked;
                           return (
                             <button
                               key={slot}
@@ -2056,7 +2070,7 @@ export default function ShopDetailsPage() {
                   {/* Checkout Confirm Button */}
                   <button
                     onClick={handleBook}
-                    disabled={isLoading || !selectedDate || !selectedSlot || !selectedSpecialist || !!customerEligibility?.isBlocked}
+                    disabled={isLoading || !slotsAreCurrent || !currentSlots.includes(selectedSlot) || !selectedDate || !selectedSlot || !selectedSpecialist || !!customerEligibility?.isBlocked}
                     className="w-full py-3 bg-stone-900 hover:bg-stone-850 text-stone-50 font-bold uppercase tracking-wider text-xs rounded-xl transition shadow-sm disabled:opacity-45"
                   >
                     {isLoading ? "..." : `${t.payButton} (${money(splits.deposit)})`}

@@ -8,6 +8,7 @@ import { errorMessage } from "@/lib/error-message";
 import { lookupPublishedAgreement, type AgreementLookup } from "@/lib/published-agreement";
 import { sar } from "@/components/operations-ui";
 import { usePageLocale } from "@/lib/use-page-locale";
+import { providerApplicationType } from "@/lib/account-flow.mjs";
 
 const translations = {
   en: {
@@ -413,7 +414,7 @@ export default function BecomeProviderRootPage() {
         user_id: currentUser.id,
         business_name_en: appForm.businessNameEn.trim(),
         business_name_ar: appForm.businessNameAr.trim(),
-        business_type: appForm.businessType,
+        business_type: providerApplicationType(appForm.businessType),
         cr_number: appForm.crNumber.trim() || null,
         tax_number: appForm.vatStatus === "registered" ? appForm.taxNumber.replace(/\s+/g, "") : null,
         vat_registration_status: appForm.vatStatus,

@@ -8,7 +8,7 @@ import { supabase } from "@/lib/supabase";
 // imagery per category when a service has no photos of its own.
 type FeaturedRow = {
   id: string;
-  provider_id: string;
+  provider_id: string | null;
   rating: number | null;
   reviews: number;
   name_en: string;
@@ -66,6 +66,8 @@ const translations = {
     shopByCategory: "Shop by Category",
     featuredArtists: "Featured Services",
     featuredArtistsSub: "Hand-picked treatments, curated by the PRIMORA team",
+    catalogueExampleLabel: "Catalogue example · indicative price",
+    catalogueExamplesSub: "Choose a provider to see their services and current prices.",
     howItWorks: "How It Works",
     how1Title: "Select Service",
     how1Desc: "Find the perfect grooming, massage, or salon treatment based on reviews, locations, and transparent pricing.",
@@ -118,6 +120,8 @@ const translations = {
     shopByCategory: "تسوق حسب الفئة",
     featuredArtists: "خدمات مميزة",
     featuredArtistsSub: "علاجات مختارة بعناية من فريق بريمورا",
+    catalogueExampleLabel: "مثال من الدليل · سعر استرشادي",
+    catalogueExamplesSub: "اختر مقدم خدمة للاطلاع على خدماته وأسعاره الحالية.",
     howItWorks: "كيف يعمل؟",
     how1Title: "اختر الخدمة",
     how1Desc: "ابحث عن العلاج أو الحلاقة أو خدمة الصالون المثالية بناءً على التقييمات والمواقع والأسعار الواضحة.",
@@ -233,6 +237,7 @@ export default function Home() {
     id: r.id,
     // a service that belongs to a provider opens that provider's shop; a catalogue entry opens the search
     href: r.provider_id ? `/shop/${r.provider_id}` : "/discover",
+    isCatalogueExample: !r.provider_id,
     name: locale === "ar" ? r.name_ar : r.name_en,
     category: locale === "ar" ? r.category_ar : r.category_en,
     rating: r.rating,
@@ -471,7 +476,7 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <h2 className="text-2xl sm:text-3xl font-serif text-[#10120F] font-bold tracking-tight">{t.featuredArtists}</h2>
-              <p className="text-xs text-[#746B5D]">{t.featuredArtistsSub}</p>
+              <p className="text-xs text-[#746B5D]">{bestSellers.some((item) => item.isCatalogueExample) ? t.catalogueExamplesSub : t.featuredArtistsSub}</p>
             </div>
             
             {/* Carousel navigation controls */}
@@ -514,10 +519,10 @@ export default function Home() {
                   <div>
                     {/* Stars */}
                     <div className="flex items-center gap-1">
-                      <svg className="w-3.5 h-3.5 text-[#D1AF47] fill-current" viewBox="0 0 20 20">
+                      {!item.isCatalogueExample && <svg className="w-3.5 h-3.5 text-[#D1AF47] fill-current" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <span className="text-[10px] font-bold text-[#5F584D]">{item.rating !== null ? <>{item.rating} <span className="text-[#9C8C69] font-normal">({item.reviews})</span></> : (locale === "ar" ? "جديد" : "New")}</span>
+                      </svg>}
+                      <span className="text-[10px] font-bold text-[#5F584D]">{item.isCatalogueExample ? t.catalogueExampleLabel : item.rating !== null ? <>{item.rating} <span className="text-[#9C8C69] font-normal">({item.reviews})</span></> : (locale === "ar" ? "جديد" : "New")}</span>
                     </div>
 
                     <h4 className="font-bold text-[#10120F] text-xs sm:text-sm mt-1 group-hover:text-[#B8952E] transition-colors line-clamp-1">{item.name}</h4>

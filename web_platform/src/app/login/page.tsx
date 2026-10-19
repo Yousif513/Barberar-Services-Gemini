@@ -10,6 +10,7 @@ import { errorMessage } from "@/lib/error-message";
 import { safeInternalPath } from "@/lib/safe-redirect.mjs";
 import { usePageLocale } from "@/lib/use-page-locale";
 import { lookupPublishedAgreement, type AgreementLookup } from "@/lib/published-agreement";
+import { accountDestination, accountLoginPath, phoneOtpOptions, readSignupChoiceDraft, signupChoiceDraft, SIGNUP_DRAFT_KEY } from "@/lib/account-flow.mjs";
 
 type Portal = "customer" | "provider";
 type AuthMode = "signin" | "signup";
@@ -84,7 +85,10 @@ const translations = {
     createFailed: "Account creation failed.",
     authGeneric: "Unable to authenticate. Please try again.",
     createdDev: "Account created. Email confirmation is still required for real auth, or use Local development access on this page while building.",
-    created: "Account created. Check your email to confirm it, then sign in. Your consent choices are not saved until you sign in and accept the terms again.",
+    created: "Check your email to confirm your account. Then review your choices and accept the published terms to finish setup. Your choices have not been saved to your account yet.",
+    completeSignup: "Review your choices and accept the published terms to finish setup for your signed-in account. Choices from another device are not preselected.",
+    finishSignup: "Finish account setup",
+    termsRequired: "Please accept the published terms before continuing.",
     unreachable: "Cannot reach the authentication service. The site is missing its Supabase configuration (see the notice above). Contact the site owner if this persists.",
     confirmDevHint: "Use the Local development access buttons on this page to keep building without email verification.",
     enterEmailFirst: "Enter your account email first.",
@@ -162,7 +166,10 @@ const translations = {
     createFailed: "فشل إنشاء الحساب.",
     authGeneric: "تعذرت المصادقة. يرجى المحاولة مرة أخرى.",
     createdDev: "تم إنشاء الحساب. ما زال تأكيد البريد مطلوباً للدخول الفعلي، أو استخدم دخول التطوير المحلي في هذه الصفحة أثناء التطوير.",
-    created: "تم إنشاء الحساب. تحقق من بريدك لتأكيده ثم سجّل الدخول. لا تُحفظ خيارات الموافقة إلا عند تسجيل الدخول والموافقة على الشروط مرة أخرى.",
+    created: "تحقق من بريدك لتأكيد الحساب، ثم راجع اختياراتك ووافق على الشروط المنشورة لإكمال الإعداد. لم تُحفظ اختياراتك في حسابك بعد.",
+    completeSignup: "راجع اختياراتك ووافق على الشروط المنشورة لإكمال إعداد الحساب المسجل دخوله. لا تُحدد اختيارات من جهاز آخر مسبقاً.",
+    finishSignup: "إكمال إعداد الحساب",
+    termsRequired: "يرجى الموافقة على الشروط المنشورة قبل المتابعة.",
     unreachable: "تعذر الوصول إلى خدمة المصادقة. الموقع يفتقد إعدادات Supabase (انظر التنبيه أعلاه). تواصل مع مالك الموقع إن استمرت المشكلة.",
     confirmDevHint: "استخدم أزرار دخول التطوير المحلي في هذه الصفحة لمواصلة التطوير دون تأكيد البريد.",
     enterEmailFirst: "أدخل بريد حسابك أولاً.",
@@ -179,12 +186,13 @@ function LoginForm() {
   const searchParams = useSearchParams();
   // RT-M2: only a path on this site is followed after sign-in; anything else falls back to the role home.
   const returnUrl = safeInternalPath(searchParams.get("returnUrl"), "");
+  const completingSignup = searchParams.get("completeSignup") === "1";
   const [locale, setLocale] = usePageLocale();
   const t = translations[locale];
   const isRTL = locale === "ar";
-  const [portal, setPortal] = useState<Portal>("customer");
+  const [portal, setPortal] = useState<Portal>(() => searchParams.get("portal") === "provider" ? "provider" : "customer");
   const [mode, setMode] = useState<AuthMode>("signin");
-  const [authMethod, setAuthMethod] = useState<AuthMethod>("phone");
+  const [authMethod, setAuthMethod] = useState<AuthMethod>(completingSignup ? "email" : "phone");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
@@ -201,21 +209,45 @@ function LoginForm() {
 
   const [termsLookup, setTermsLookup] = useState<AgreementLookup>({ state: "loading" });
   const [consentRetryUserId, setConsentRetryUserId] = useState<string | null>(null);
+  const [requiresSignupConsent, setRequiresSignupConsent] = useState(completingSignup);
+  const [confirmedUserId, setConfirmedUserId] = useState<string | null>(null);
+  const needsSignupConsent = mode === "signup" || requiresSignupConsent;
 
   useEffect(() => {
     setDevAccessEnabled(isLocalDevAccessEnabled());
   }, []);
 
   useEffect(() => {
+    if (!completingSignup || !isSupabaseConfigured) return;
+    let active = true;
+    // URL-session detection completes before getUser returns; no consent is recorded just by opening the link.
+    void supabase.auth.getUser().then(({ data }) => {
+      if (!active) return;
+      setConfirmedUserId(data.user?.id ?? null);
+    });
+    return () => { active = false; };
+  }, [completingSignup]);
+
+  useEffect(() => {
     if (!isSupabaseConfigured) return;
     let active = true;
     lookupPublishedAgreement("customer_terms", errorMessage).then((result) => {
-      if (active) setTermsLookup(result);
+      if (!active) return;
+      setTermsLookup(result);
+      if (completingSignup && result.state === "ready") {
+        try {
+          const draft = readSignupChoiceDraft(sessionStorage.getItem(SIGNUP_DRAFT_KEY), result.agreement.version);
+          if (draft) {
+            setWhatsappConsent(draft.whatsapp);
+            setMarketingConsent(draft.marketing);
+          }
+        } catch { /* Browser storage is optional; the person can choose again. */ }
+      }
     });
     return () => {
       active = false;
     };
-  }, []);
+  }, [completingSignup]);
 
   // A sign-up cannot be completed while no customer terms are published: the acceptance would have no version to point at.
   const termsBlockMessage =
@@ -224,12 +256,13 @@ function LoginForm() {
       : termsLookup.state === "error"
         ? `${t.termsError} ${termsLookup.message}`
         : "";
-  const signupBlocked = mode === "signup" && termsLookup.state !== "ready" && isSupabaseConfigured;
+  const signupBlocked = needsSignupConsent && termsLookup.state !== "ready" && isSupabaseConfigured;
 
   // Saves the sign-up consent choices through the record_consents command (the table refuses direct writes). The terms are
   // recorded against the version that was published when the person ticked the box; a failure is raised, never swallowed.
   const recordConsents = async (): Promise<void> => {
-    if (mode !== "signup" || !termsAccepted) return;
+    if (!needsSignupConsent) return;
+    if (!termsAccepted) throw new Error(t.termsRequired);
     if (termsLookup.state !== "ready") throw new Error(termsBlockMessage || t.termsLoading);
     const purposes = ["terms_privacy"];
     if (whatsappConsent) purposes.push("whatsapp");
@@ -241,17 +274,12 @@ function LoginForm() {
       p_method: "web_auth_form",
     });
     if (consentError) throw consentError;
+    try { sessionStorage.removeItem(SIGNUP_DRAFT_KEY); } catch { /* No persisted draft is required. */ }
   };
 
   const finishRouting = async (userId: string) => {
     identifyUser(userId);
     trackEvent("auth_completed", { method: phone && otpSent ? "phone_otp" : "email", user_id: userId });
-
-    if (returnUrl) {
-      router.replace(returnUrl);
-      router.refresh();
-      return;
-    }
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
@@ -261,15 +289,7 @@ function LoginForm() {
 
     if (profileError) throw profileError;
 
-    if (profile?.role === "admin") {
-      router.replace("/admin");
-    } else if (profile?.role === "provider_owner" || profile?.role === "provider_employee") {
-      router.replace("/provider/dashboard");
-    } else if (portal === "provider") {
-      router.replace("/provider/become");
-    } else {
-      router.replace("/customer/dashboard");
-    }
+    router.replace(accountDestination(profile?.role, portal, returnUrl));
     router.refresh();
   };
 
@@ -311,6 +331,10 @@ function LoginForm() {
   };
 
   const handleSendPhoneOtp = async () => {
+    if (needsSignupConsent && (!termsAccepted || termsLookup.state !== "ready")) {
+      setError(termsBlockMessage || t.termsRequired);
+      return;
+    }
     const formatted = normalizeSaudiPhone(phone);
     if (!formatted.startsWith("+9665") || formatted.length !== 13) {
       setError(t.invalidPhone);
@@ -322,11 +346,10 @@ function LoginForm() {
     try {
       const { error: otpError } = await supabase.auth.signInWithOtp({
         phone: formatted,
-        options: {
-          channel: "sms",
-        },
+        options: phoneOtpOptions(mode),
       });
       if (otpError) throw otpError;
+      if (mode === "signup") setRequiresSignupConsent(true);
       setOtpSent(true);
       trackEvent("auth_started", { method: "phone_otp", step: "otp_sent" });
       setMessage(t.otpSent);
@@ -371,6 +394,13 @@ function LoginForm() {
     setMessage("");
 
     try {
+      if (needsSignupConsent && (!termsAccepted || termsLookup.state !== "ready")) {
+        throw new Error(termsBlockMessage || t.termsRequired);
+      }
+      if (confirmedUserId) {
+        await routeAuthenticatedUser(confirmedUserId);
+        return;
+      }
       if (mode === "signin") {
         const { data, error: signInError } = await supabase.auth.signInWithPassword({
           email: email.trim(),
@@ -389,9 +419,9 @@ function LoginForm() {
         email: email.trim(),
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/login`,
+          emailRedirectTo: `${window.location.origin}${accountLoginPath(returnUrl, portal, true)}`,
           data: {
-            language_preference: "ar",
+            language_preference: locale,
             requested_portal: portal,
           },
         },
@@ -402,6 +432,13 @@ function LoginForm() {
       }
 
       if (!data.session) {
+        if (termsLookup.state === "ready") {
+          try {
+            sessionStorage.setItem(SIGNUP_DRAFT_KEY, signupChoiceDraft(termsLookup.agreement.version, whatsappConsent, marketingConsent));
+          } catch { /* Confirmation still works when browser storage is unavailable. */ }
+        }
+        setRequiresSignupConsent(true);
+        setTermsAccepted(false);
         setMessage(devAccessEnabled ? t.createdDev : t.created);
         setMode("signin");
         return;
@@ -449,7 +486,7 @@ function LoginForm() {
         type: "signup",
         email: email.trim(),
         options: {
-          emailRedirectTo: `${window.location.origin}/login`,
+          emailRedirectTo: `${window.location.origin}${accountLoginPath(returnUrl, portal, true)}`,
         },
       });
 
@@ -492,7 +529,7 @@ function LoginForm() {
   );
 
   const consentFields =
-    mode === "signup" ? (
+    needsSignupConsent ? (
       <div className="space-y-3 pt-2 text-xs">
         {termsLookup.state === "loading" && isSupabaseConfigured && (
           <p role="status" className="text-[#98A2B3]">{t.termsLoading}</p>
@@ -674,13 +711,25 @@ function LoginForm() {
               )}
             </div>
           )}
-          {message && (
+          {(message || completingSignup) && (
             <div role="status" className="mb-5 rounded-xl border border-emerald-400/20 bg-emerald-400/10 p-3.5 text-xs font-semibold leading-5 text-emerald-300">
-              {message}
+              {message || t.completeSignup}
             </div>
           )}
 
-          {authMethod === "phone" ? (
+          {confirmedUserId ? (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {portalFieldset}
+              {consentFields}
+              <button
+                type="submit"
+                disabled={isLoading || signupBlocked}
+                className="w-full rounded-xl bg-[#D1AF47] py-3.5 text-xs font-black uppercase tracking-[0.12em] text-[#101828] transition hover:bg-[#E0C46A] focus-visible:outline-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isLoading ? t.processing : t.finishSignup}
+              </button>
+            </form>
+          ) : authMethod === "phone" ? (
             <form onSubmit={otpSent ? handleVerifyPhoneOtp : (e) => { e.preventDefault(); handleSendPhoneOtp(); }} className="space-y-5">
               {portalFieldset}
 
