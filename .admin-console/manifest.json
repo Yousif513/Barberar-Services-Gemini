@@ -9477,6 +9477,81 @@
       ],
       "status": "assumed",
       "appliesTo": []
+    },
+    {
+      "id": "dbsec2-booking-hold-limits",
+      "decision": "A customer may keep at most 2 open unpaid booking holds with one business and 3 across the marketplace (platform_settings booking_hold_limits). A group booking or a series of regular appointments counts as one hold; paid or confirmed bookings never count; the customer's own lapsed holds are released before counting.",
+      "reason": "RT-M1: unpaid holds were unlimited, so one account could empty a professional's calendar. Conservative defaults; the owner confirms or changes the values in the setting.",
+      "evidence": [
+        "supabase/migrations/20261018210000_dbsec2_booking_hold_limits.sql",
+        "supabase/tests/db/dbsec2_booking_holds.test.mjs"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "dbsec2-promo-consumed-at-payment",
+      "decision": "A promo-code redemption is consumed (redeemed_count) when the booking is paid or needs no payment. A live unpaid hold reserves the use, so a code is never over-redeemed; a lapsed hold frees the reservation without changing the count.",
+      "reason": "RT-M1: holds that were never paid exhausted limited codes. Reserving instead of consuming keeps the redemption limit exact; the owner may instead prefer no reservation (risk of over-redemption).",
+      "evidence": [
+        "supabase/migrations/20261018210000_dbsec2_booking_hold_limits.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "dbsec2-chat-server-commands",
+      "decision": "Chat is written only through start_conversation, send_message and mark_conversation_read. Messages are insert-only with server-set sender, side and time; participants never change; there is no message editing. Limits (platform_settings chat_limits): 20 new conversations per customer per day, 20 messages per minute per sender per conversation, 2000 characters.",
+      "reason": "RT-H1: either party could rewrite, backdate or move messages and re-point conversations; chat is dispute evidence and the P-03 relationship. Editing is not a product feature; adding it would need an owner decision and an edit history.",
+      "evidence": [
+        "supabase/migrations/20261018200000_dbsec2_chat_integrity.sql",
+        "supabase/tests/db/dbsec2_chat_integrity.test.mjs"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "dbsec2-reserved-promo-names",
+      "decision": "Provider codes cannot use the names in platform_settings promo.reserved_codes (a starting list of campaign names such as RAMADAN, EID2026, NATIONALDAY, FOUNDINGDAY, WELCOME) or the PRIMORA prefix; the platform can still create them.",
+      "reason": "RT-L1: providers could pre-register the platform's campaign names. The owner confirms and extends the list.",
+      "evidence": [
+        "supabase/migrations/20261018220000_dbsec2_whatsapp_and_code_squatting.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "dbsec2-whatsapp-verified-claims",
+      "decision": "Only a verified WhatsApp channel claims its phone number id; verification by operations evicts and notifies unverified claims on the number. Ownership is still confirmed by an operator in Meta Business Manager; automatic verification through the Graph API needs Meta credentials and stays deferred.",
+      "reason": "P-05: the first unverified save blocked the real business. Choosing and storing Meta credentials is a human decision.",
+      "evidence": [
+        "supabase/migrations/20261018220000_dbsec2_whatsapp_and_code_squatting.sql",
+        "supabase/tests/db/dbsec2_whatsapp_squatting.test.mjs"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "dbsec2-operations-grant-second-owner",
+      "decision": "personal.read, privacy.manage and privacy.approve are privileged console permissions, so granting operations (or any role that adds them) waits for a different owner, like finance and owner. Analyst holds no permission and applies at once.",
+      "reason": "E2E observation 2026-10-17: operations reads customer personal data and works the PDPL queue, so one owner should not grant it alone.",
+      "evidence": [
+        "supabase/migrations/20261018230000_dbsec2_operations_role_needs_second_owner.sql",
+        "supabase/tests/db/govfix_h2_role_grants.test.mjs"
+      ],
+      "status": "assumed",
+      "appliesTo": []
+    },
+    {
+      "id": "dbsec2-session-state-retry",
+      "decision": "The console retries admin_session_state on transient refusals (PGRST303 token issued in the future, expired token, network) and shows an alert with a retry button if it still fails, instead of silently hiding role-gated actions.",
+      "reason": "E2E observation 2026-10-17: a token used in its first second was refused and buttons disappeared without a message.",
+      "evidence": [
+        "web_platform/src/lib/session-state-retry.mjs",
+        "web_platform/tests/session-state-retry.test.mjs"
+      ],
+      "status": "assumed",
+      "appliesTo": []
     }
   ],
   "gaps": [
@@ -12748,6 +12823,26 @@
         "e2e/specs/provider-calendar.spec.ts",
         "e2e/specs/admin-routes.spec.ts"
       ]
+    },
+    {
+      "id": "booking-create-edge-rate-limit",
+      "severity": "low",
+      "description": "Booking creation has no per-IP or per-account request rate limit at the edge (RT-M1 bullet 3); Supabase rate limits do not cover RPC calls. The per-customer hold cap (dbsec2-booking-hold-limits) is the server control, but throwaway accounts can still each hold up to the cap.",
+      "status": "open",
+      "rationale": "FOUND BY dbsec-wave2. Needs an edge layer (gateway or Edge Function front) in front of create_booking; a release-engineering decision.",
+      "evidence": [
+        "supabase/migrations/20261018210000_dbsec2_booking_hold_limits.sql"
+      ]
+    },
+    {
+      "id": "whatsapp-ownership-graph-verification",
+      "severity": "low",
+      "description": "WhatsApp channel ownership is confirmed by an operator; there is no automatic check that the provider controls the phone number id (Graph API GET /{phone-number-id} with the provider's token, or a one-time code to the display number).",
+      "status": "blocked",
+      "rationale": "FOUND BY dbsec-wave2 (P-05 remainder). Needs Meta credentials and their environment, which a human must decide.",
+      "evidence": [
+        "supabase/migrations/20261018220000_dbsec2_whatsapp_and_code_squatting.sql"
+      ]
     }
   ],
   "declaredStatic": [
@@ -14197,6 +14292,14 @@
       "ownsScreens": [],
       "status": "handed-off",
       "notes": "QA release-gate fixes (docs/reviews/2026-10-17-qa-release-gate.md items 1, 2, 3, 5), UX round-2 items (dialog height, approvals at 375, Arabic refusals, Arabic digits, retention purge entry) and three e2e-pinned defects. Claims taken at the end of the pass, per the coordinator's instruction to write the manifest last."
+    },
+    {
+      "id": "dbsec-wave2",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "Database and authorization wave 2 (2026-10-18/19): RT-H1 chat server commands and immutability (P-03 closed), RT-M1 hold limits and promo consumption at payment, RT-M2 safe redirects, P-05 WhatsApp verified-only claims, RT-L1 reserved promo names, operations grant needs a second owner, console session-state retry. Migrations 20261018200000-230000. No capability review state changed (implementer). Worklog .admin-console/worklog/dbsec-wave2.md."
     }
   ]
 }
