@@ -1,0 +1,1797 @@
+{
+ "phase": "perf",
+ "app": "http://localhost:3201",
+ "api": "http://127.0.0.1:54321",
+ "started": "2026-10-17T07:26:51.887Z",
+ "ended": "2026-10-17T07:28:46.954Z",
+ "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+ "axe": "axe-core 4.12.1 (node_modules)",
+ "results": [
+  {
+   "route": "/admin",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 4,
+     "dcl": 24,
+     "load": 78,
+     "lcp": 300,
+     "requests": 79,
+     "transferKB": 658,
+     "settledMs": 361,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 20,
+     "lcp": 80,
+     "requests": 79,
+     "transferKB": 72,
+     "settledMs": 108,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 9,
+     "load": 15,
+     "lcp": 80,
+     "requests": 79,
+     "transferKB": 72,
+     "settledMs": 101,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 80,
+    "load": 20,
+    "settledMs": 108
+   }
+  },
+  {
+   "route": "/admin/providers",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 2,
+     "dcl": 12,
+     "load": 28,
+     "lcp": 100,
+     "requests": 74,
+     "transferKB": 633,
+     "settledMs": 198,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/providers"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 19,
+     "lcp": 72,
+     "requests": 74,
+     "transferKB": 67,
+     "settledMs": 103,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/providers"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 13,
+     "lcp": 64,
+     "requests": 74,
+     "transferKB": 67,
+     "settledMs": 105,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/providers"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 72,
+    "load": 19,
+    "settledMs": 105
+   }
+  },
+  {
+   "route": "/admin/ledger",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 2,
+     "dcl": 12,
+     "load": 28,
+     "lcp": 92,
+     "requests": 87,
+     "transferKB": 633,
+     "settledMs": 199,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/ledger"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 18,
+     "lcp": 460,
+     "requests": 87,
+     "transferKB": 67,
+     "settledMs": 104,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/ledger"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 12,
+     "lcp": 304,
+     "requests": 87,
+     "transferKB": 67,
+     "settledMs": 105,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/ledger"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 460,
+    "load": 18,
+    "settledMs": 105
+   }
+  },
+  {
+   "route": "/admin/services",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 2,
+     "dcl": 11,
+     "load": 34,
+     "lcp": 328,
+     "requests": 73,
+     "transferKB": 633,
+     "settledMs": 415,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/services"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 21,
+     "lcp": 96,
+     "requests": 73,
+     "transferKB": 67,
+     "settledMs": 105,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/services"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 13,
+     "lcp": 60,
+     "requests": 73,
+     "transferKB": 67,
+     "settledMs": 104,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/services"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 96,
+    "load": 21,
+    "settledMs": 105
+   }
+  },
+  {
+   "route": "/admin/integrations",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 14,
+     "dcl": 24,
+     "load": 39,
+     "lcp": 100,
+     "requests": 72,
+     "transferKB": 641,
+     "settledMs": 122,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/integrations"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 20,
+     "lcp": 72,
+     "requests": 72,
+     "transferKB": 67,
+     "settledMs": 102,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/integrations"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 13,
+     "lcp": 64,
+     "requests": 72,
+     "transferKB": 67,
+     "settledMs": 107,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/integrations"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 72,
+    "load": 20,
+    "settledMs": 107
+   }
+  },
+  {
+   "route": "/admin/coupons",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 13,
+     "dcl": 23,
+     "load": 38,
+     "lcp": 100,
+     "requests": 72,
+     "transferKB": 639,
+     "settledMs": 121,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/coupons"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 18,
+     "lcp": 72,
+     "requests": 72,
+     "transferKB": 67,
+     "settledMs": 103,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/coupons"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 13,
+     "lcp": 548,
+     "requests": 72,
+     "transferKB": 67,
+     "settledMs": 105,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/coupons"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 548,
+    "load": 18,
+    "settledMs": 105
+   }
+  },
+  {
+   "route": "/admin/bookings",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 2,
+     "dcl": 12,
+     "load": 26,
+     "lcp": 392,
+     "requests": 70,
+     "transferKB": 633,
+     "settledMs": 325,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/bookings"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 17,
+     "lcp": 168,
+     "requests": 70,
+     "transferKB": 67,
+     "settledMs": 87,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/bookings"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 12,
+     "lcp": 64,
+     "requests": 70,
+     "transferKB": 67,
+     "settledMs": 105,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/bookings"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 168,
+    "load": 17,
+    "settledMs": 105
+   }
+  },
+  {
+   "route": "/admin/customers",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 2,
+     "dcl": 13,
+     "load": 30,
+     "lcp": 92,
+     "requests": 73,
+     "transferKB": 633,
+     "settledMs": 127,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/customers"
+    },
+    {
+     "ttfb": 3,
+     "dcl": 10,
+     "load": 23,
+     "lcp": 80,
+     "requests": 73,
+     "transferKB": 67,
+     "settledMs": 107,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/customers"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 13,
+     "lcp": 72,
+     "requests": 73,
+     "transferKB": 67,
+     "settledMs": 105,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/customers"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 80,
+    "load": 23,
+    "settledMs": 107
+   }
+  },
+  {
+   "route": "/admin/branches",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 12,
+     "dcl": 22,
+     "load": 37,
+     "lcp": 88,
+     "requests": 71,
+     "transferKB": 636,
+     "settledMs": 123,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/branches"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 18,
+     "lcp": 508,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 109,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/branches"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 14,
+     "lcp": 64,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 102,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/branches"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 508,
+    "load": 18,
+    "settledMs": 109
+   }
+  },
+  {
+   "route": "/admin/disputes",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 2,
+     "dcl": 11,
+     "load": 25,
+     "lcp": 84,
+     "requests": 71,
+     "transferKB": 633,
+     "settledMs": 102,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/disputes"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 18,
+     "lcp": 68,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 108,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/disputes"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 13,
+     "lcp": 64,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 105,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/disputes"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 68,
+    "load": 18,
+    "settledMs": 108
+   }
+  },
+  {
+   "route": "/admin/activity",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 2,
+     "dcl": 11,
+     "load": 25,
+     "lcp": 84,
+     "requests": 72,
+     "transferKB": 636,
+     "settledMs": 102,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/activity"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 17,
+     "lcp": 64,
+     "requests": 72,
+     "transferKB": 67,
+     "settledMs": 106,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/activity"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 12,
+     "lcp": 64,
+     "requests": 72,
+     "transferKB": 67,
+     "settledMs": 99,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/activity"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 64,
+    "load": 17,
+    "settledMs": 106
+   }
+  },
+  {
+   "route": "/admin/employees",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 12,
+     "dcl": 22,
+     "load": 36,
+     "lcp": 88,
+     "requests": 80,
+     "transferKB": 775,
+     "settledMs": 1210,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/employees"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 17,
+     "lcp": 244,
+     "requests": 80,
+     "transferKB": 67,
+     "settledMs": 103,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/employees"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 12,
+     "lcp": 72,
+     "requests": 80,
+     "transferKB": 67,
+     "settledMs": 103,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/employees"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 244,
+    "load": 17,
+    "settledMs": 103
+   }
+  },
+  {
+   "route": "/admin/reviews",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 2,
+     "dcl": 11,
+     "load": 25,
+     "lcp": 84,
+     "requests": 70,
+     "transferKB": 633,
+     "settledMs": 100,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/reviews"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 20,
+     "lcp": 68,
+     "requests": 70,
+     "transferKB": 67,
+     "settledMs": 100,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/reviews"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 13,
+     "lcp": 64,
+     "requests": 70,
+     "transferKB": 67,
+     "settledMs": 100,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/reviews"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 68,
+    "load": 20,
+    "settledMs": 100
+   }
+  },
+  {
+   "route": "/admin/taxes",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 12,
+     "dcl": 22,
+     "load": 36,
+     "lcp": 108,
+     "requests": 71,
+     "transferKB": 636,
+     "settledMs": 123,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/taxes"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 17,
+     "lcp": 524,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 102,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/taxes"
+    },
+    {
+     "ttfb": 3,
+     "dcl": 11,
+     "load": 17,
+     "lcp": 432,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 98,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/taxes"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 524,
+    "load": 17,
+    "settledMs": 102
+   }
+  },
+  {
+   "route": "/admin/settings",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 14,
+     "dcl": 25,
+     "load": 39,
+     "lcp": 316,
+     "requests": 72,
+     "transferKB": 640,
+     "settledMs": 321,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/settings"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 18,
+     "lcp": 76,
+     "requests": 72,
+     "transferKB": 67,
+     "settledMs": 105,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/settings"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 14,
+     "lcp": 80,
+     "requests": 72,
+     "transferKB": 67,
+     "settledMs": 106,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/settings"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 80,
+    "load": 18,
+    "settledMs": 106
+   }
+  },
+  {
+   "route": "/admin/reports",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 15,
+     "dcl": 27,
+     "load": 48,
+     "lcp": 120,
+     "requests": 71,
+     "transferKB": 639,
+     "settledMs": 123,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/reports"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 18,
+     "lcp": 524,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 107,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/reports"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 12,
+     "lcp": 372,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 412,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/reports"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 524,
+    "load": 18,
+    "settledMs": 412
+   }
+  },
+  {
+   "route": "/admin/packages",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 2,
+     "dcl": 13,
+     "load": 27,
+     "lcp": 76,
+     "requests": 71,
+     "transferKB": 633,
+     "settledMs": 106,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/packages"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 17,
+     "lcp": 64,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 102,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/packages"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 12,
+     "lcp": 64,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 105,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/packages"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 64,
+    "load": 17,
+    "settledMs": 105
+   }
+  },
+  {
+   "route": "/admin/notifications",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 13,
+     "dcl": 23,
+     "load": 36,
+     "lcp": 104,
+     "requests": 72,
+     "transferKB": 638,
+     "settledMs": 116,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/notifications"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 18,
+     "lcp": 64,
+     "requests": 72,
+     "transferKB": 67,
+     "settledMs": 105,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/notifications"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 13,
+     "lcp": 60,
+     "requests": 72,
+     "transferKB": 67,
+     "settledMs": 104,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/notifications"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 64,
+    "load": 18,
+    "settledMs": 105
+   }
+  },
+  {
+   "route": "/admin/help",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 2,
+     "dcl": 13,
+     "load": 29,
+     "lcp": 92,
+     "requests": 71,
+     "transferKB": 636,
+     "settledMs": 107,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/help"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 18,
+     "lcp": 72,
+     "requests": 71,
+     "transferKB": 69,
+     "settledMs": 110,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/help"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 13,
+     "lcp": 68,
+     "requests": 71,
+     "transferKB": 69,
+     "settledMs": 106,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/help"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 72,
+    "load": 18,
+    "settledMs": 110
+   }
+  },
+  {
+   "route": "/admin/supply",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 13,
+     "dcl": 23,
+     "load": 37,
+     "lcp": 116,
+     "requests": 71,
+     "transferKB": 637,
+     "settledMs": 122,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/supply"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 19,
+     "lcp": 88,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 105,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/supply"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 13,
+     "lcp": 80,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 111,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/supply"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 88,
+    "load": 19,
+    "settledMs": 111
+   }
+  },
+  {
+   "route": "/admin/refunds",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 2,
+     "dcl": 12,
+     "load": 28,
+     "lcp": 84,
+     "requests": 70,
+     "transferKB": 633,
+     "settledMs": 110,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/refunds"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 18,
+     "lcp": 68,
+     "requests": 70,
+     "transferKB": 67,
+     "settledMs": 104,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/refunds"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 9,
+     "load": 16,
+     "lcp": 72,
+     "requests": 70,
+     "transferKB": 67,
+     "settledMs": 104,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/refunds"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 72,
+    "load": 18,
+    "settledMs": 104
+   }
+  },
+  {
+   "route": "/admin/audit-logs",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 13,
+     "dcl": 23,
+     "load": 40,
+     "lcp": 92,
+     "requests": 72,
+     "transferKB": 638,
+     "settledMs": 215,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/audit-logs"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 18,
+     "lcp": 424,
+     "requests": 72,
+     "transferKB": 67,
+     "settledMs": 105,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/audit-logs"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 12,
+     "lcp": 268,
+     "requests": 72,
+     "transferKB": 67,
+     "settledMs": 310,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/audit-logs"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 424,
+    "load": 18,
+    "settledMs": 310
+   }
+  },
+  {
+   "route": "/admin/platform-rules",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 12,
+     "dcl": 23,
+     "load": 38,
+     "lcp": 100,
+     "requests": 73,
+     "transferKB": 642,
+     "settledMs": 123,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/platform-rules"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 19,
+     "lcp": 68,
+     "requests": 73,
+     "transferKB": 67,
+     "settledMs": 104,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/platform-rules"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 14,
+     "lcp": 68,
+     "requests": 73,
+     "transferKB": 67,
+     "settledMs": 106,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/platform-rules"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 68,
+    "load": 19,
+    "settledMs": 106
+   }
+  },
+  {
+   "route": "/admin/roles",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 15,
+     "dcl": 25,
+     "load": 41,
+     "lcp": 100,
+     "requests": 72,
+     "transferKB": 640,
+     "settledMs": 214,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/roles"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 9,
+     "load": 20,
+     "lcp": 444,
+     "requests": 72,
+     "transferKB": 67,
+     "settledMs": 104,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/roles"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 13,
+     "lcp": 296,
+     "requests": 72,
+     "transferKB": 67,
+     "settledMs": 329,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/roles"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 444,
+    "load": 20,
+    "settledMs": 329
+   }
+  },
+  {
+   "route": "/admin/sponsored",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 14,
+     "dcl": 24,
+     "load": 39,
+     "lcp": 92,
+     "requests": 71,
+     "transferKB": 642,
+     "settledMs": 117,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/sponsored"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 19,
+     "lcp": 76,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 102,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/sponsored"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 13,
+     "lcp": 60,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 104,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/sponsored"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 76,
+    "load": 19,
+    "settledMs": 104
+   }
+  },
+  {
+   "route": "/admin/whatsapp",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 14,
+     "dcl": 25,
+     "load": 40,
+     "lcp": 120,
+     "requests": 71,
+     "transferKB": 641,
+     "settledMs": 127,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/whatsapp"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 19,
+     "lcp": 104,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 110,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/whatsapp"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 14,
+     "lcp": 72,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 106,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/whatsapp"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 104,
+    "load": 19,
+    "settledMs": 110
+   }
+  },
+  {
+   "route": "/admin/privacy",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 2,
+     "dcl": 13,
+     "load": 28,
+     "lcp": 88,
+     "requests": 71,
+     "transferKB": 649,
+     "settledMs": 202,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/privacy"
+    },
+    {
+     "ttfb": 3,
+     "dcl": 10,
+     "load": 21,
+     "lcp": 464,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 529,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/privacy"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 12,
+     "lcp": 432,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 107,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/privacy"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 464,
+    "load": 21,
+    "settledMs": 529
+   }
+  },
+  {
+   "route": "/admin/incidents",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 14,
+     "dcl": 25,
+     "load": 39,
+     "lcp": 276,
+     "requests": 71,
+     "transferKB": 640,
+     "settledMs": 323,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/incidents"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 10,
+     "load": 27,
+     "lcp": 76,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 101,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/incidents"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 13,
+     "lcp": 60,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 104,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/incidents"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 76,
+    "load": 27,
+    "settledMs": 104
+   }
+  },
+  {
+   "route": "/admin/ropa",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 13,
+     "dcl": 24,
+     "load": 40,
+     "lcp": 544,
+     "requests": 70,
+     "transferKB": 638,
+     "settledMs": 551,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/ropa"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 20,
+     "lcp": 80,
+     "requests": 70,
+     "transferKB": 67,
+     "settledMs": 106,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/ropa"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 13,
+     "lcp": 68,
+     "requests": 70,
+     "transferKB": 67,
+     "settledMs": 110,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/ropa"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 80,
+    "load": 20,
+    "settledMs": 110
+   }
+  },
+  {
+   "route": "/admin/approvals",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 2,
+     "dcl": 13,
+     "load": 32,
+     "lcp": 100,
+     "requests": 71,
+     "transferKB": 633,
+     "settledMs": 197,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/approvals"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 9,
+     "load": 20,
+     "lcp": 436,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 107,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/approvals"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 13,
+     "lcp": 300,
+     "requests": 71,
+     "transferKB": 67,
+     "settledMs": 107,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/approvals"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 436,
+    "load": 20,
+    "settledMs": 107
+   }
+  },
+  {
+   "route": "/admin/reconciliation",
+   "as": "owner",
+   "runs": [
+    {
+     "ttfb": 3,
+     "dcl": 15,
+     "load": 30,
+     "lcp": 164,
+     "requests": 70,
+     "transferKB": 633,
+     "settledMs": 197,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/admin/reconciliation"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 18,
+     "lcp": 72,
+     "requests": 70,
+     "transferKB": 67,
+     "settledMs": 107,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/reconciliation"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 13,
+     "lcp": 60,
+     "requests": 70,
+     "transferKB": 67,
+     "settledMs": 103,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/admin/reconciliation"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 72,
+    "load": 18,
+    "settledMs": 107
+   }
+  },
+  {
+   "route": "/provider/inventory",
+   "as": "provider",
+   "runs": [
+    {
+     "ttfb": 13,
+     "dcl": 26,
+     "load": 72,
+     "lcp": 208,
+     "requests": 85,
+     "transferKB": 732,
+     "settledMs": 290,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/provider/inventory"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 20,
+     "lcp": 148,
+     "requests": 85,
+     "transferKB": 73,
+     "settledMs": 106,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/provider/inventory"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 13,
+     "lcp": 144,
+     "requests": 85,
+     "transferKB": 73,
+     "settledMs": 104,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/provider/inventory"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 148,
+    "load": 20,
+    "settledMs": 106
+   }
+  },
+  {
+   "route": "/provider/chain",
+   "as": "provider",
+   "runs": [
+    {
+     "ttfb": 2,
+     "dcl": 12,
+     "load": 26,
+     "lcp": 84,
+     "requests": 83,
+     "transferKB": 763,
+     "settledMs": 105,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/provider/chain"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 17,
+     "lcp": 100,
+     "requests": 83,
+     "transferKB": 75,
+     "settledMs": 105,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/provider/chain"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 14,
+     "lcp": 96,
+     "requests": 83,
+     "transferKB": 75,
+     "settledMs": 106,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/provider/chain"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 100,
+    "load": 17,
+    "settledMs": 106
+   }
+  },
+  {
+   "route": "/provider/pricing",
+   "as": "provider",
+   "runs": [
+    {
+     "ttfb": 13,
+     "dcl": 23,
+     "load": 42,
+     "lcp": 168,
+     "requests": 84,
+     "transferKB": 745,
+     "settledMs": 223,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/provider/pricing"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 18,
+     "lcp": 428,
+     "requests": 84,
+     "transferKB": 73,
+     "settledMs": 104,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/provider/pricing"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 7,
+     "load": 12,
+     "lcp": 280,
+     "requests": 84,
+     "transferKB": 73,
+     "settledMs": 322,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/provider/pricing"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 428,
+    "load": 18,
+    "settledMs": 322
+   }
+  },
+  {
+   "route": "/customer/privacy",
+   "as": "customer",
+   "runs": [
+    {
+     "ttfb": 12,
+     "dcl": 24,
+     "load": 68,
+     "lcp": 152,
+     "requests": 80,
+     "transferKB": 669,
+     "settledMs": 272,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/customer/privacy"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 21,
+     "lcp": 72,
+     "requests": 80,
+     "transferKB": 75,
+     "settledMs": 103,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/customer/privacy"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 14,
+     "lcp": 64,
+     "requests": 80,
+     "transferKB": 75,
+     "settledMs": 107,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/customer/privacy"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 72,
+    "load": 21,
+    "settledMs": 107
+   }
+  },
+  {
+   "route": "/become-provider",
+   "as": "customer",
+   "runs": [
+    {
+     "ttfb": 11,
+     "dcl": 22,
+     "load": 826,
+     "lcp": 860,
+     "requests": 42,
+     "transferKB": 793,
+     "settledMs": 905,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/become-provider"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 20,
+     "lcp": 36,
+     "requests": 42,
+     "transferKB": 43,
+     "settledMs": 109,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/become-provider"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 9,
+     "load": 19,
+     "lcp": 536,
+     "requests": 42,
+     "transferKB": 43,
+     "settledMs": 548,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/become-provider"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 536,
+    "load": 20,
+    "settledMs": 548
+   }
+  },
+  {
+   "route": "/privacy",
+   "as": "anon",
+   "runs": [
+    {
+     "ttfb": 19,
+     "dcl": 35,
+     "load": 118,
+     "lcp": 100,
+     "requests": 26,
+     "transferKB": 482,
+     "settledMs": 184,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/privacy"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 9,
+     "load": 22,
+     "lcp": 28,
+     "requests": 26,
+     "transferKB": 32,
+     "settledMs": 107,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/privacy"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 15,
+     "lcp": 20,
+     "requests": 26,
+     "transferKB": 32,
+     "settledMs": 100,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/privacy"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 28,
+    "load": 22,
+    "settledMs": 107
+   }
+  },
+  {
+   "route": "/login/mfa",
+   "as": "mfa-pending",
+   "runs": [
+    {
+     "ttfb": 13,
+     "dcl": 26,
+     "load": 71,
+     "lcp": 180,
+     "requests": 22,
+     "transferKB": 452,
+     "settledMs": 184,
+     "cold": true,
+     "consoleErrors": 0,
+     "landed": "/login/mfa"
+    },
+    {
+     "ttfb": 3,
+     "dcl": 8,
+     "load": 18,
+     "lcp": 84,
+     "requests": 22,
+     "transferKB": 26,
+     "settledMs": 105,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/login/mfa"
+    },
+    {
+     "ttfb": 2,
+     "dcl": 8,
+     "load": 13,
+     "lcp": 88,
+     "requests": 22,
+     "transferKB": 26,
+     "settledMs": 106,
+     "cold": false,
+     "consoleErrors": 0,
+     "landed": "/login/mfa"
+    }
+   ],
+   "warmMedian": {
+    "lcp": 88,
+    "load": 18,
+    "settledMs": 106
+   }
+  }
+ ]
+}

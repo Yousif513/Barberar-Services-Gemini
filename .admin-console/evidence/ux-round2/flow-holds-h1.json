@@ -1,0 +1,47 @@
+{
+  "phase": "h1",
+  "steps": [
+    {
+      "name": "clear-before-hold",
+      "dialogText": "Clear this customer's profile details\n\nClearing a profile erases what a privacy deletion erases, so it needs a different owner's approval: this records the request, and a second owner approves it on Approvals. The console cannot restore these details afterwards. Check the name and ID below belong to the customer you mean.\n\nCustomer\nMaryam Bint Abdullah Al-Dosari-Alqahtani\nEmail\nux2.cust3.1792186244975@example.test\nPhone\n+966586244978\nID\n0a17b8f1-cefe-4ad5-b717-244489b1ded2\n\nWhat happens\n\nRemoved: name, email, phone number, gender and push token.\nKept: sign-in identity, bookings, invoices and messages.\nThe audit log records who asked, who approved and why, but not the values that were removed.\nReason (recorded in the audit log)\n\nRecorded in the audit log with your name.\n\nType to confirm0a17b8f1\nCancel\nAsk a second owner to approve",
+      "closed": true,
+      "refusal": null,
+      "notice": [
+        "Recorded for approval. Nothing is cleared until a different owner approves it on Approvals.\n\nDismiss"
+      ],
+      "shot": ".admin-console/evidence/ux-round2/clear-profile-h1-en-1440.png"
+    },
+    {
+      "name": "holds-active",
+      "rows": []
+    },
+    {
+      "name": "hold-empty-submit",
+      "errors": [
+        "Find and choose the customer first.",
+        "Write at least 3 characters (0 now).",
+        "Tick at least one thing the case needs.",
+        "Write at least 20 characters (0 now)."
+      ],
+      "focus": "hold-subject"
+    },
+    {
+      "name": "hold-proposed",
+      "notice": [
+        "Done.\n\nDismiss"
+      ],
+      "pending": [
+        "Court case CRT-2026-0412 Riyadh Commercial Court 0a17b8f1 Account, Bookings — "
+      ],
+      "db": "pending_approval\t0",
+      "shot": ".admin-console/evidence/ux-round2/holds-pending-en-1440.png"
+    }
+  ],
+  "summary": {
+    "label": "ux2-owner-a",
+    "lang": "en",
+    "width": 1440,
+    "consoleErrors": [],
+    "httpFailures": []
+  }
+}

@@ -26,7 +26,8 @@ describe("MFA: aal2 for administrators, enrolment and challenge, step-up", () =>
     assert.match(mfa, /mfa\.enroll\(\{ factorType: "totp"/);
     assert.match(mfa, /mfa\.challengeAndVerify\(\{ factorId, code: digits \}\)/);
     assert.match(mfa, /rpc\("admin_session_state"\)/);
-    assert.match(mfa, /value\.startsWith\("\/"\) && !value\.startsWith\("\/\/"\)/);
+    // RT-M2: the prefix check is replaced by a parsing check (tests/safe-redirect.test.mjs has the bypass payloads).
+    assert.match(mfa, /safeInternalPath\(value, "\/admin"\)/);
     assert.match(mfa, /enrolTitle: "إعداد تطبيق المصادقة"/, "Arabic copy");
   });
 

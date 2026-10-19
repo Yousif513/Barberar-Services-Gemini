@@ -1,0 +1,36 @@
+{
+  "phase": "release",
+  "steps": [
+    {
+      "name": "release by ux2-owner-a",
+      "title": "Release this hold",
+      "stepUp": false,
+      "closed": true,
+      "notice": [
+        "Release requested: a second privacy approver must approve it under Approvals. The hold stays in force until then.\n\nDismiss"
+      ],
+      "db": "active\t4\t7d5efa61-f287-4e56-9686-de9ba7feb9cd,a4f8e0d8-7ca8-455b-94d5-15b5e0e45334,7d5efa61-f287-4e56-9686-de9ba7feb9cd,a4f8e0d8-7ca8-455b-94d5-15b5e0e45334,1c8e2b54-f110-4e1c-91e1-0f1025f59598",
+      "rowsAfter": [
+        "Court case CRT-2026-0412 Riyadh Commercial Court 0a17b8f1 Account, Bookings 15 Jan 2027, 01:07 Keep (review again in 90 days) Release"
+      ],
+      "shot": ".admin-console/evidence/ux-round2/holds-release-ux2-owner-a-en-1440.png"
+    },
+    {
+      "name": "release again by ux2-owner-a",
+      "title": "Release this hold",
+      "stepUp": false,
+      "closed": true,
+      "notice": [
+        "Release requested: a second privacy approver must approve it under Approvals. The hold stays in force until then.\n\nDismiss"
+      ],
+      "pendingApprovals": "1"
+    }
+  ],
+  "summary": {
+    "label": "ux2-owner-a",
+    "lang": "en",
+    "width": 1440,
+    "consoleErrors": [],
+    "httpFailures": []
+  }
+}

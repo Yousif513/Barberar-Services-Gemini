@@ -1,0 +1,23 @@
+{
+  "phase": "decide",
+  "steps": [
+    {
+      "name": "approve تجديد حجز قانوني by ux2-owner-d",
+      "title": "اعتماد: تجديد حجز قانوني مضى عليه أكثر من سنة",
+      "stepUp": false,
+      "closed": true,
+      "rowText": " تجديد حجز قانوني مضى عليه أكثر من سنة court case · CRT-2026-0412 Riyadh Commercial Court · account, bookings · الحساب محتجز · جُدد 3 مرات ١٧‏/١٠‏/٢٠٢٦، ١:٠٥ ص — UX2 Owner B Court case 0412 still pending; the hold remains necessary for the hearing. اعتماد رفض",
+      "notice": [
+        "تم الاعتماد والتنفيذ.\n\nإغلاق"
+      ],
+      "db": "active\t4\t7d5efa61-f287-4e56-9686-de9ba7feb9cd,a4f8e0d8-7ca8-455b-94d5-15b5e0e45334,7d5efa61-f287-4e56-9686-de9ba7feb9cd,a4f8e0d8-7ca8-455b-94d5-15b5e0e45334,1c8e2b54-f110-4e1c-91e1-0f1025f59598"
+    }
+  ],
+  "summary": {
+    "label": "ux2-owner-d",
+    "lang": "ar",
+    "width": 375,
+    "consoleErrors": [],
+    "httpFailures": []
+  }
+}

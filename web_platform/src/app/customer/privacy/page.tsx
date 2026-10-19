@@ -98,6 +98,11 @@ const input = "w-full rounded-xl border border-stone-200 bg-white px-3 py-2.5 te
 const button = "rounded-xl bg-stone-900 px-4 py-2.5 text-xs font-black text-[#D1AF47] shadow transition hover:bg-stone-800 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#A57C32]";
 const ghost = "rounded-xl border border-stone-300 bg-white px-3 py-2 text-xs font-bold text-stone-800 hover:bg-stone-50 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-[#A57C32]";
 const fill = (s: string, v: Record<string, string | number>) => Object.entries(v).reduce((acc, [k, x]) => acc.split(`{${k}}`).join(String(x)), s);
+// Counts and amounts are written in the page's digits: in Arabic the Latin 0 reads as the Arabic five (ux2-customer-deletion-
+// preview-latin-zero-reads-as-five).
+const count = (value: unknown, lang: "en" | "ar") => new Intl.NumberFormat(lang === "ar" ? "ar-SA" : "en-US").format(Number(value ?? 0) || 0);
+const amount = (value: unknown, lang: "en" | "ar") =>
+  new Intl.NumberFormat(lang === "ar" ? "ar-SA" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value ?? 0) || 0);
 
 export default function CustomerPrivacy() {
   const lang = useOperationsLocale();
@@ -307,9 +312,9 @@ export default function CustomerPrivacy() {
         )}
         {type === "deletion" && (
           <div className="space-y-3">
-            {preview && <p className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-950">{fill(t.deletionPreview, { p: preview.bookings_to_pseudonymise ?? 0, d: preview.bookings_to_delete ?? 0 })}</p>}
+            {preview && <p className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-950">{fill(t.deletionPreview, { p: count(preview.bookings_to_pseudonymise, lang), d: count(preview.bookings_to_delete, lang) })}</p>}
             {preview && (Number(preview.wallet_balance_sar) > 0 || Number(preview.unused_package_sessions) > 0) && (
-              <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-800">{fill(t.balance, { w: preview.wallet_balance_sar, s: preview.unused_package_sessions })}</p>
+              <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-800">{fill(t.balance, { w: amount(preview.wallet_balance_sar, lang), s: count(preview.unused_package_sessions, lang) })}</p>
             )}
             <fieldset><legend className="text-xs font-bold text-stone-700">{t.reviews}</legend>
               {Object.entries(t.reviewChoices).map(([k, v]) => (
@@ -335,7 +340,7 @@ export default function CustomerPrivacy() {
           <div role="alert" className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
             <span>{fill(t.loadFailed, { reason: loadError })}</span><button type="button" onClick={load} className={ghost}>{t.retry}</button>
           </div>
-        ) : !requests ? null : requests.length === 0 ? <p className="text-sm text-stone-500">{t.none}</p> : (
+        ) : !requests ? null : requests.length === 0 ? <p className="text-sm text-stone-600">{t.none}</p> : (
           <ul className="space-y-3">
             {requests.map((r) => (
               <li key={r.id} className="space-y-2 rounded-2xl border border-stone-200 bg-white p-4 text-sm">
@@ -365,9 +370,9 @@ export default function CustomerPrivacy() {
                   <div className="flex flex-wrap items-center gap-2">
                     <button type="button" onClick={() => void download(r, "pdf")} className={ghost}>{fill(t.download, { file: "PDF" })}</button>
                     <button type="button" onClick={() => void download(r, "json")} className={ghost}>{fill(t.download, { file: "JSON" })}</button>
-                    {r.export.expires_at && <span className="text-xs text-stone-500">{fill(t.expires, { date: date(r.export.expires_at) })} · {t.printed}</span>}
+                    {r.export.expires_at && <span className="text-xs text-stone-600">{fill(t.expires, { date: date(r.export.expires_at) })} · {t.printed}</span>}
                   </div>
-                ) : r.export.status === "expired" ? <p className="text-xs text-stone-500">{t.expired}</p> : null)}
+                ) : r.export.status === "expired" ? <p className="text-xs text-stone-600">{t.expired}</p> : null)}
               </li>
             ))}
           </ul>

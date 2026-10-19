@@ -108,7 +108,7 @@ export default function PrivacyPage() {
         <Link href="/" className="text-xl font-serif font-black tracking-widest text-stone-900">
           PRIMORA
         </Link>
-        <Link href="/" className="text-xs font-bold uppercase tracking-wider text-stone-500 hover:text-stone-950 transition">
+        <Link href="/" className="text-xs font-bold uppercase tracking-wider text-stone-600 hover:text-stone-950 transition">
           {t.backHome}
         </Link>
       </header>
@@ -118,9 +118,9 @@ export default function PrivacyPage() {
         
         {/* Title Section */}
         <div className="space-y-4">
-          <span className="text-[10px] tracking-widest uppercase font-extrabold text-[#A57C32]">{t.privacy}</span>
+          <span className="text-[10px] tracking-widest uppercase font-extrabold text-[#7A5B12]">{t.privacy}</span>
           <h1 className="text-3xl sm:text-4xl font-serif text-stone-950 tracking-tight">{t.title}</h1>
-          <p className="text-xs sm:text-sm text-stone-500 leading-relaxed font-light">
+          <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-light">
             {t.subtitle}
           </p>
         </div>
@@ -148,7 +148,7 @@ export default function PrivacyPage() {
         {/* DSR Interactive Form (G13) */}
         <div className="rounded-2xl border border-[#A57C32]/30 bg-white p-6 sm:p-8 shadow-sm space-y-6">
           <div>
-            <span className="text-[10px] font-black uppercase tracking-wider text-[#A57C32]">{t.dsrBadge}</span>
+            <span className="text-[10px] font-black uppercase tracking-wider text-[#7A5B12]">{t.dsrBadge}</span>
             <h3 className="text-lg font-serif font-bold text-stone-900 mt-1">{t.dsrTitle}</h3>
             <p className="text-xs text-stone-600 leading-relaxed mt-1">{t.dsrDesc}</p>
           </div>
@@ -169,7 +169,7 @@ export default function PrivacyPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-stone-100 border-t border-stone-200 py-6 text-center text-xs text-stone-500 font-medium">
+      <footer className="bg-stone-100 border-t border-stone-200 py-6 text-center text-xs text-stone-600 font-medium">
         <p>© {new Date().getFullYear()} PRIMORA. {t.footerText}</p>
       </footer>
 

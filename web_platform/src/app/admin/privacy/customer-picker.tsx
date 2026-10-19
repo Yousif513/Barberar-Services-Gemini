@@ -2,7 +2,7 @@
 
 import React, { useEffect, useId, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { errorMessage } from "@/lib/error-message";
+import { describeConsoleError } from "@/lib/console-errors.mjs";
 import { operationsInput } from "@/components/operations-ui";
 import { errorHint } from "@/lib/step-up";
 
@@ -78,7 +78,7 @@ export function CustomerPicker({ lang, value, onChange, error, inputId }: {
       setRows(null);
       const hint = errorHint(rpcError);
       setProblem(hint === "email_incomplete" ? t.emailIncomplete : hint === "phone_incomplete" ? t.phoneIncomplete
-        : hint === "query_too_short" ? t.tooShort : t.failed.replace("{reason}", errorMessage(rpcError)));
+        : hint === "query_too_short" ? t.tooShort : t.failed.replace("{reason}", describeConsoleError(rpcError, lang)));
       return;
     }
     const result = data as LookupResult;

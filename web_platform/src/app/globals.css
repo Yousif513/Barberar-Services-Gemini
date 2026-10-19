@@ -14,6 +14,16 @@
   --font-sans: var(--font-outfit);
 }
 
+/* UX round 2 (ux2-command-dialog-height-uncapped-confirm-unreachable): no modal dialog grows past the screen; its content
+   scrolls inside it. A base-layer default, so a dialog's own max-height or overflow utility still wins; drawers (aside) keep
+   their full height. */
+@layer base {
+  [role="dialog"][aria-modal="true"]:not(aside) {
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

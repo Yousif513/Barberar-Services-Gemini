@@ -1,0 +1,51 @@
+Evidence excerpt for gap analyst-read-only-not-enforced-through-shared-provider-helpers, evidence[0] (qa-release-claude, 2026-10-17, commit 4043546).
+Source: supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql, lines 455-500. The release scanner refuses the whole source file for a uuid generator column default at line 130;
+that hit is a false positive, so this excerpt is cited in its place. The source file is unchanged and remains the record.
+Lines that themselves carry a scanner-reserved token are left out and marked; read them in the source.
+
+  455: END
+  456: $gov$;
+  457: 
+  458: -- ---------------------------------------------------------------------------------------------------------------------
+  459: -- 7. Existing commands: the administrator branch of every command that changes data now needs the permission for it.
+  460: --    Read commands keep public.is_admin() (every console role, including analyst). Each listed function is patched in
+  461: --    place from its latest definition.
+  462: -- ---------------------------------------------------------------------------------------------------------------------
+  463: 
+  464: DO $gov$
+  465: DECLARE
+  466:   m RECORD;
+  467:   f RECORD;
+  468:   v_def TEXT;
+  469:   v_new TEXT;
+  470:   v_hits INTEGER;
+  471: BEGIN
+  472:   FOR m IN
+  473:     SELECT * FROM (VALUES
+  474:       ('admin_change_professional_handle', 'operations.write', FALSE),
+  475:       ('admin_clear_customer_profile', 'operations.write', TRUE),
+  476:       ('admin_clear_no_show', 'operations.write', FALSE),
+  477:       ('admin_confirm_application_cr', 'operations.write', FALSE),
+  478:       ('admin_create_refund_request', 'money.refund', TRUE),
+  479:       ('admin_mark_fee_invoice_paid', 'money.ledger', TRUE),
+  480:       ('admin_publish_agreement', 'settings.manage', FALSE),
+  481:       ('admin_purge_demo_data', 'settings.manage', TRUE),
+  482:       ('admin_purge_expired_intake', 'operations.write', TRUE),
+  483:       ('admin_record_cr_review', 'operations.write', FALSE),
+  484:       ('admin_release_expired_holds', 'operations.write', FALSE),
+  485:       ('admin_release_ledger_item', 'money.ledger', TRUE),
+  486:       ('admin_release_payout', 'money.payout', TRUE),
+  487:       ('admin_reopen_stuck_refund', 'money.refund', TRUE),
+  488:       ('admin_retry_refund_request', 'money.refund', TRUE),
+  489:       ('admin_review_client_import', 'operations.write', FALSE),
+  490:       ('admin_review_payout_request', 'money.payout', FALSE),
+  491:       ('admin_revoke_api_key', 'settings.manage', FALSE),
+  492:       ('admin_save_fee_rule', 'money.config', FALSE),
+  493:       ('admin_save_promo_code', 'money.config', FALSE),
+  494:       ('admin_set_api_setting', 'settings.manage', FALSE),
+  495:       ('admin_set_branch_country', 'operations.write', FALSE),
+  496:       ('admin_set_feature_flag', 'settings.manage', FALSE),
+  497:       ('admin_set_phone_verified', 'operations.write', FALSE),
+  498:       ('admin_set_professional_visibility', 'operations.write', FALSE),
+  499:       ('admin_set_promo_code_active', 'money.config', FALSE),
+  500:       ('admin_set_provider_status', 'operations.write', FALSE),

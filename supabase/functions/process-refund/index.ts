@@ -8,6 +8,7 @@ import { processRefundRequest } from "../_shared/refunds.ts"
 //
 //   { "refundRequestId": "<uuid>" }   admin or scheduler: process one request
 //   { "processPending": true }         scheduler (service key) only: process the pending queue
+// A refund whose outcome at Tap is unknown is never in the queue: only 'pending' and 'failed' rows are claimed.
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders(req) })
   if (req.method !== "POST") return json(req, { error: "Method not allowed." }, 405)
@@ -46,7 +47,8 @@ serve(async (req) => {
     if (!refundRequestId) return json(req, { error: "refundRequestId is required." }, 400)
 
     const outcome = await processRefundRequest(db, tapSecretKey, refundRequestId)
-    const status = outcome.status === "succeeded" ? 200 : outcome.status === "skipped" ? 409 : 502
+    // 202: Tap gave no definite answer; the refund is recorded as unknown and is not sent again (QA item 4).
+    const status = outcome.status === "succeeded" ? 200 : outcome.status === "unknown" ? 202 : outcome.status === "skipped" ? 409 : 502
     return json(req, outcome, status)
   } catch (error) {
     if (error instanceof MissingConfigError) return json(req, { error: error.message }, 503)

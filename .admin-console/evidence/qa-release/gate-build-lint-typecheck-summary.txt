@@ -1,0 +1,8 @@
+### npm run lint
+exit 0
+### npm run typecheck:mobile
+exit 0
+### npx tsc -p web_platform --noEmit
+exit 0
+### npm run build --workspace=web_platform (NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321)
+exit 0

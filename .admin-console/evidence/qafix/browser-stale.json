@@ -1,0 +1,92 @@
+{
+ "agent": "impl-qafix-claude",
+ "app": "http://localhost:3100",
+ "api": "http://127.0.0.1:54321",
+ "at": "2026-10-18T18:37:29.710Z",
+ "results": [
+  {
+   "phase": "stale",
+   "lang": "en",
+   "route": "/admin/services",
+   "before": "E2E Haircut 76e76c3 ID: fecf1f84-6752-40b2-99fe-fb72a01c80cf Men's Haircut SAR 1 ACTIVE ☆ LANDING ☆ SERVICES EDIT INACTI",
+   "after": "E2E Haircut 76e76c3 ID: fecf1f84-6752-40b2-99fe-fb72a01c80cf Men's Haircut SAR 1 ACTIVE ☆ LANDING ☆ SERVICES EDIT INACTI",
+   "reloaded": "E2E Haircut 76e76c3 ID: fecf1f84-6752-40b2-99fe-fb72a01c80cf Men's Haircut 200 SAR 1 ACTIVE —",
+   "alert": [
+    "Your console role does not include operations changes (operations.write), so nothing was changed. An owner can change console roles on Roles & Permissions.",
+    ""
+   ],
+   "success": [],
+   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ]
+  },
+  {
+   "phase": "stale",
+   "lang": "en",
+   "route": "/admin/branches",
+   "dialogAlert": [
+    "Your console role does not include operations changes (operations.write), so nothing was changed. An owner can change console roles on Roles & Permissions."
+   ],
+   "dialogStillOpen": 1,
+   "onlineAfterReload": 37,
+   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ]
+  },
+  {
+   "phase": "stale",
+   "lang": "en",
+   "route": "/admin/integrations",
+   "alert": [
+    "Your console role does not include platform settings (settings.manage), so nothing was changed. An owner can change console roles on Roles & Permissions."
+   ],
+   "switchBefore": "false",
+   "switchAfter": "false",
+   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ]
+  },
+  {
+   "phase": "stale",
+   "lang": "ar",
+   "route": "/admin/services",
+   "before": "قصة اختبار 5fdb2f4 ID: 8122ea16-a520-4e9f-872c-2322c41d22c7 Men's Haircut ريال 1 نشط ☆ الرئيسية ☆ الخدمات تعديل معطل أرش",
+   "after": "قصة اختبار 5fdb2f4 ID: 8122ea16-a520-4e9f-872c-2322c41d22c7 Men's Haircut ريال 1 نشط ☆ الرئيسية ☆ الخدمات تعديل معطل أرش",
+   "reloaded": "قصة اختبار 5497145 ID: 5521a01f-352c-462d-aecc-328b66c21b24 Men's Haircut ٢٠٠ ريال 1 نشط —",
+   "alert": [
+    "لا يشمل دورك في لوحة الإدارة صلاحية «تعديلات العمليات» (⁨operations.write⁩)، لذا لم يتغير شيء. يمكن للمالك تغيير الأدوار من شاشة الأدوار والصلاحيات.",
+    ""
+   ],
+   "success": [],
+   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ]
+  },
+  {
+   "phase": "stale",
+   "lang": "ar",
+   "route": "/admin/branches",
+   "dialogAlert": [
+    "لا يشمل دورك في لوحة الإدارة صلاحية «تعديلات العمليات» (⁨operations.write⁩)، لذا لم يتغير شيء. يمكن للمالك تغيير الأدوار من شاشة الأدوار والصلاحيات."
+   ],
+   "dialogStillOpen": 1,
+   "onlineAfterReload": 40,
+   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ]
+  },
+  {
+   "phase": "stale",
+   "lang": "ar",
+   "route": "/admin/integrations",
+   "alert": [
+    "لا يشمل دورك في لوحة الإدارة صلاحية «إعدادات المنصة» (⁨settings.manage⁩)، لذا لم يتغير شيء. يمكن للمالك تغيير الأدوار من شاشة الأدوار والصلاحيات."
+   ],
+   "switchBefore": "false",
+   "switchAfter": "false",
+   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ]
+  }
+ ]
+}

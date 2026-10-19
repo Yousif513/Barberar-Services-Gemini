@@ -1,0 +1,11 @@
+session revocation, stale permission and step-up window probe, token minted 2026-10-16T22:05:48.340Z, finished 2026-10-16T22:11:08.397Z, http://127.0.0.1:54321
+ok   analyst aal2 token reads the dashboard :: 200
+ok   sign-out accepted :: 204
+ok   the same unexpired token is refused console access after sign-out :: {"status":403,"json":{"code":"42501","details":null,"hint":null,"message":"Administrator access required"}}
+ok   operations token holds operations.write before removal :: ["operations.write","personal.read","privacy.manage"]
+ok   after the console role is removed, the issued token is refused a console command :: {"status":403,"json":{"code":"42501","details":null,"hint":null,"message":"Administrator access required"}}
+ok   restored for the remaining probes :: "operations"
+ok   fresh code: the step-up command passes the step-up check (reaches the provider lookup) :: {"status":500,"json":{"code":"P0002","details":null,"hint":null,"message":"Provider not found"}}
+ok   code older than 5 minutes: refused with hint step_up_required :: {"status":403,"json":{"code":"42501","details":null,"hint":"step_up_required","message":"Confirm a fresh code from your authenticator app to continue (step-up required within 5 minutes)"}}
+ok   the same aal2 session still reads (step-up applies to sensitive commands only) :: 200
+9/9 passed

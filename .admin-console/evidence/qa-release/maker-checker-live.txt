@@ -1,0 +1,26 @@
+live maker-checker probe 2026-10-16T21:55:16.449Z on http://127.0.0.1:54321, provider a0000000-0000-0000-0000-000000000002, approval c14b1250-6ee3-4735-b3dc-0f8704b334d0, lift 2cc00487-10bd-423d-9b75-a312b0348665
+ok   precondition: provider not on hold :: "f"
+ok   a 5-character reason is refused (a hold needs 10) :: {"status":400,"json":{"code":"22023","details":null,"hint":null,"message":"A reason of at least 10 characters is required"}}
+ok   operations cannot request a payout hold :: {"status":403,"json":{"code":"42501","details":null,"hint":null,"message":"Your console role cannot hold payouts"}}
+ok   the owner's request returns pending_approval, not an effect :: {"status":200,"json":{"kind":"payout_hold","amount":null,"status":"pending_approval","existing":false,"approval_id":"c14b1250-6ee3-4735-b3dc-0f8704b334d0"}}
+ok   no hold yet: one person executed nothing :: "f"
+ok   a replayed request returns the same pending approval :: {"status":200,"json":{"kind":"payout_hold","amount":null,"status":"pending_approval","existing":true,"approval_id":"c14b1250-6ee3-4735-b3dc-0f8704b334d0","requested_by":"e311184b-14e8-4cf1-9856-a86eef167c22"}}
+ok   exactly one pending approval exists for the target :: "1"
+ok   the requester cannot approve their own request :: {"status":403,"json":{"code":"42501","details":null,"hint":null,"message":"You cannot approve or reject your own request; a different administrator decides it"}}
+ok   the analyst cannot approve :: {"status":403,"json":{"code":"42501","details":null,"hint":null,"message":"Your console role cannot decide payout_hold requests"}}
+ok   operations (no money.payout) cannot approve :: {"status":403,"json":{"code":"42501","details":null,"hint":null,"message":"Your console role cannot decide payout_hold requests"}}
+ok   an approval without a reason is refused :: {"status":400,"json":{"code":"22023","details":null,"hint":null,"message":"A reason of at least 3 characters is required"}}
+ok   finance approves and the hold executes in the approver's session :: {"status":200,"json":{"id":"c14b1250-6ee3-4735-b3dc-0f8704b334d0","result":{"status":"held","hold_id":"5a7aa5b9-2250-47e5-b618-3fae19cfa79f"},"status":"approved"}}
+ok   the hold is active after approval :: "t"
+ok   a replayed approval changes nothing :: {"status":200,"json":{"id":"c14b1250-6ee3-4735-b3dc-0f8704b334d0","status":"approved","unchanged":true}}
+ok   audit: approval.requested by the owner and approval.approved by finance, each with its reason :: ["admin_approval_requests.insert|e311184b-14e8-4cf1-9856-a86eef167c22|","approval.requested|e311184b-14e8-4cf1-9856-a86eef167c22|QA maker-checker live probe, ticket QA-1017","admin_approval_requests.update|8d445a8c-fcac-42a2-be66-faa3c87ee383|","admin_approval
+ok   the lift is approved by a different person and the hold is gone :: {"status":200,"json":{"id":"2cc00487-10bd-423d-9b75-a312b0348665","result":{"status":"lifted","hold_id":"5a7aa5b9-2250-47e5-b618-3fae19cfa79f"},"status":"approved"}}
+ok   owner: a direct PATCH of an approval row changes nothing :: {"status":403,"body":{"code":"42501","details":null,"hint":null,"message":"permission denied for table admin_approval_requests"}}
+ok   owner: a direct DELETE of audit rows is refused :: {"status":403,"body":{"code":"42501","details":null,"hint":null,"message":"permission denied for table admin_audit_logs"}}
+ok   owner: a forged audit INSERT naming another actor is refused :: {"status":403,"body":{"code":"42501","details":null,"hint":null,"message":"permission denied for table admin_audit_logs"}}
+ok   finance: a direct PATCH of an approval row changes nothing :: {"status":403,"body":{"code":"42501","details":null,"hint":null,"message":"permission denied for table admin_approval_requests"}}
+ok   finance: a direct DELETE of audit rows is refused :: {"status":403,"body":{"code":"42501","details":null,"hint":null,"message":"permission denied for table admin_audit_logs"}}
+ok   finance: a forged audit INSERT naming another actor is refused :: {"status":403,"body":{"code":"42501","details":null,"hint":null,"message":"permission denied for table admin_audit_logs"}}
+ok   the approval's audit rows are still present after the delete attempts :: "6"
+ok   the approval row is still approved after the PATCH attempts :: "approved"
+24/24 passed

@@ -1,0 +1,87 @@
+[
+ {
+  "gap": "analyst-read-only-not-enforced-through-shared-provider-helpers",
+  "index": 0,
+  "path": ".admin-console/evidence/qa-release/scan-excerpts/analyst-read-only-not-enforced-through-shared-provider-helpers--e0.txt"
+ },
+ {
+  "gap": "employee-wps-iban-not-masked",
+  "index": 0,
+  "path": ".admin-console/evidence/qa-release/scan-excerpts/employee-wps-iban-not-masked--e0.txt"
+ },
+ {
+  "gap": "export-step-up-is-not-server-enforced",
+  "index": 0,
+  "path": ".admin-console/evidence/qa-release/scan-excerpts/export-step-up-is-not-server-enforced--e0.txt"
+ },
+ {
+  "gap": "governance-notifications-have-no-delivery-worker",
+  "index": 3,
+  "path": ".admin-console/evidence/qa-release/scan-excerpts/governance-notifications-have-no-delivery-worker--e3.txt"
+ },
+ {
+  "gap": "sec-final-f2-customer-lookup-oracle",
+  "index": 0,
+  "path": ".admin-console/evidence/qa-release/scan-excerpts/sec-final-f2-customer-lookup-oracle--e0.txt"
+ },
+ {
+  "gap": "sec-gov1-h2-self-approval-by-proxy",
+  "index": 0,
+  "path": ".admin-console/evidence/qa-release/scan-excerpts/sec-gov1-h2-self-approval-by-proxy--e0.txt"
+ },
+ {
+  "gap": "sec-gov1-h3-notices-to-unverified-contacts",
+  "index": 0,
+  "path": ".admin-console/evidence/qa-release/scan-excerpts/sec-gov1-h3-notices-to-unverified-contacts--e0.txt"
+ },
+ {
+  "gap": "sec-gov1-l2-weak-reveal-references",
+  "index": 0,
+  "path": ".admin-console/evidence/qa-release/scan-excerpts/sec-gov1-l2-weak-reveal-references--e0.txt"
+ },
+ {
+  "gap": "sec-gov1-l3-pending-iban-revealed",
+  "index": 0,
+  "path": ".admin-console/evidence/qa-release/scan-excerpts/sec-gov1-l3-pending-iban-revealed--e0.txt"
+ },
+ {
+  "gap": "sec-gov1-m4-break-glass-review-not-independent",
+  "index": 0,
+  "path": ".admin-console/evidence/qa-release/scan-excerpts/sec-gov1-m4-break-glass-review-not-independent--e0.txt"
+ },
+ {
+  "gap": "sec-gov1-m5-employee-wps-iban-unmasked",
+  "index": 0,
+  "path": ".admin-console/evidence/qa-release/scan-excerpts/sec-gov1-m5-employee-wps-iban-unmasked--e0.txt"
+ },
+ {
+  "gap": "sec-gov1-m6-mfa-factor-persistence",
+  "index": 0,
+  "path": ".admin-console/evidence/qa-release/scan-excerpts/sec-gov1-m6-mfa-factor-persistence--e0.txt"
+ },
+ {
+  "gap": "ux1-auth-and-validation-errors-shown-in-english-on-arabic-screens",
+  "index": 0,
+  "path": ".admin-console/evidence/qa-release/scan-excerpts/ux1-auth-and-validation-errors-shown-in-english-on-arabic-screens--e0.txt"
+ },
+ {
+  "gap": "ux1-copy-defects-on-governance-and-onboarding-screens",
+  "index": 2,
+  "path": ".admin-console/evidence/qa-release/scan-excerpts/ux1-copy-defects-on-governance-and-onboarding-screens--e2.txt"
+ },
+ {
+  "gap": "ux1-ledger-psp-tab-contradicts-reconciliation-screen",
+  "index": 2,
+  "path": ".admin-console/evidence/qa-release/scan-excerpts/ux1-ledger-psp-tab-contradicts-reconciliation-screen--e2.txt"
+ },
+ {
+  "gap": "ux1-mfa-enrolment-cleanup-logs-404s",
+  "index": 0,
+  "path": ".admin-console/evidence/qa-release/scan-excerpts/ux1-mfa-enrolment-cleanup-logs-404s--e0.txt"
+ },
+ {
+  "gap": "ux1-navigation-and-actions-not-trimmed-to-console-role",
+  "index": 1,
+  "path": ".admin-console/evidence/qa-release/scan-excerpts/ux1-navigation-and-actions-not-trimmed-to-console-role--e1.txt"
+ }
+]

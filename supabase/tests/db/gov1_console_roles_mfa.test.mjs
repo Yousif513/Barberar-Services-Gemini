@@ -159,7 +159,10 @@ describe("admin_set_console_role", () => {
     assert.equal((await sys(db, `select role from profiles where id = $1`, [person]))[0].role, "admin");
     assert.equal((await sys(db, `select admin_role from admin_role_assignments where user_id = $1`, [person]))[0].admin_role, "finance");
     assert.equal((await setRole(owner, person, "finance")).changed, false, "the same role again changes nothing");
-    await setRole(owner, person, "operations", "Moved to operations this week");
+    // dbsec-wave2: finance -> operations adds personal.read and privacy.manage, so it waits for a different owner too.
+    const moved = await setRole(owner, person, "operations", "Moved to operations this week");
+    assert.deepEqual([moved.status, moved.changed], ["pending_approval", false]);
+    await as(db, owner2, `select admin_decide_approval($1, 'approve', 'Confirmed the move with the operations lead')`, [moved.approval_id]);
     const [audit] = await sys(db, `select details from admin_audit_logs where action = 'admin.console_role_changed' and target_id = $1 order by created_at desc limit 1`, [person]);
     assert.deepEqual([audit.details.role_before, audit.details.role_after, audit.details.reason], ["finance", "operations", "Moved to operations this week"]);
     assert.ok((await sys(db, `select count(*)::int n from security_alerts where kind = 'console_role_changed' and user_id = $1`, [person]))[0].n >= 2);

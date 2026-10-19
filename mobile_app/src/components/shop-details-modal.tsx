@@ -316,17 +316,9 @@ export function ShopDetailsModal({
     try {
       const user = await requireUser();
       if (!user) return;
-      const { data: existing, error: findError } = await supabase
-        .from("conversations").select("id").eq("customer_id", user.id).eq("provider_id", shop.providerId).maybeSingle();
-      if (findError) throw findError;
-      if (!existing) {
-        const { error } = await supabase.from("conversations").insert({
-          customer_id: user.id,
-          provider_id: shop.providerId,
-          subject: shop.name[locale],
-        });
-        if (error) throw error;
-      }
+      // RT-H1: the server opens or reuses the conversation; the customer is always the signed-in account.
+      const { error } = await supabase.rpc("start_conversation", { p_provider_id: shop.providerId, p_subject: shop.name[locale] });
+      if (error) throw error;
       Alert.alert(t.messageShop, t.conversationReady);
     } catch (err) {
       Alert.alert(t.bookingFailed, errorMessage(err));

@@ -1,0 +1,36 @@
+{
+  "phase": "decide",
+  "steps": [
+    {
+      "name": "approve Renewal of a legal hold by ux2-owner-c",
+      "title": "Approve: Renewal of a legal hold kept for over a year",
+      "stepUp": false,
+      "closed": false,
+      "refusal": "A hold renewed 3 times is kept only with an owner who has never proposed, approved or renewed it",
+      "rowText": " Renewal of a legal hold kept for over a year court case · CRT-2026-0412 Riyadh Commercial Court · account, bookings · account held · renewed 3 times 17 Oct 2026, 01:05 — UX2 Owner B Court case 0412 still pending; the hold remains necessary for the hearing. Approve Reject",
+      "notice": [
+        "A hold renewed 3 times is kept only with an owner who has never proposed, approved or renewed it"
+      ],
+      "shot": ".admin-console/evidence/ux-round2/approvals-refused-decide-en-1440.png",
+      "db": "active\t3\t7d5efa61-f287-4e56-9686-de9ba7feb9cd,a4f8e0d8-7ca8-455b-94d5-15b5e0e45334,7d5efa61-f287-4e56-9686-de9ba7feb9cd"
+    }
+  ],
+  "summary": {
+    "label": "ux2-owner-c",
+    "lang": "en",
+    "width": 1440,
+    "consoleErrors": [
+      {
+        "route": "/admin/approvals",
+        "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      }
+    ],
+    "httpFailures": [
+      {
+        "route": "/admin/approvals",
+        "status": 403,
+        "url": "API/rest/v1/rpc/admin_decide_approval"
+      }
+    ]
+  }
+}

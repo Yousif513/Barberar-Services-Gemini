@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { checkedWrite } from "@/lib/write-result.mjs";
 import { errorMessage } from "@/lib/error-message";
 import { isReauthRequired } from "@/lib/step-up";
 import { useConfirm } from "@/components/modal";
@@ -203,7 +204,7 @@ export function CommissionRulesDialog({ lang, providerId, employeeId, employeeNa
     if (iban.trim() !== "") values.wps_iban = normalizeIban(iban);
     else if (removeIban) values.wps_iban = null;
     const { error } = ruleExists
-      ? await supabase.from("employee_commission_rules").update(values).eq("employee_id", employeeId)
+      ? checkedWrite(await supabase.from("employee_commission_rules").update(values).eq("employee_id", employeeId).select("employee_id"), { expected: 1, lang })
       : await supabase.from("employee_commission_rules").insert({ employee_id: employeeId, provider_id: providerId, ...values });
     setSaving(false);
     if (error) { setFailure(t.saveFailed + errorMessage(error)); return; }
@@ -345,7 +346,7 @@ export function PortfolioDialog({ lang, employeeId, employeeName, onClose }: {
     if (!yes) return;
     setBusy(true);
     setFailure("");
-    const { error } = await supabase.from("employee_portfolios").delete().eq("id", row.id);
+    const { error } = checkedWrite(await supabase.from("employee_portfolios").delete().eq("id", row.id).select("id"), { expected: 1, lang });
     setBusy(false);
     if (error) { setFailure(t.portfolioFailed + errorMessage(error)); return; }
     reload();

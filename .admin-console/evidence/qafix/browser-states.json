@@ -1,0 +1,134 @@
+{
+ "agent": "impl-qafix-claude",
+ "app": "http://localhost:3100",
+ "api": "http://127.0.0.1:54321",
+ "at": "2026-10-18T18:44:54.663Z",
+ "results": [
+  {
+   "phase": "states",
+   "route": "/admin/services",
+   "kind": "refused",
+   "forbiddenNotice": true,
+   "failureShown": false,
+   "retry": false,
+   "emptyTextShown": false
+  },
+  {
+   "phase": "states",
+   "route": "/admin/services",
+   "kind": "outage",
+   "forbiddenNotice": false,
+   "failureShown": true,
+   "retry": true,
+   "emptyTextShown": false
+  },
+  {
+   "phase": "states",
+   "route": "/admin/branches",
+   "kind": "refused",
+   "forbiddenNotice": true,
+   "failureShown": false,
+   "retry": false,
+   "emptyTextShown": false
+  },
+  {
+   "phase": "states",
+   "route": "/admin/branches",
+   "kind": "outage",
+   "forbiddenNotice": false,
+   "failureShown": true,
+   "retry": true,
+   "emptyTextShown": false
+  },
+  {
+   "phase": "states",
+   "route": "/admin/packages",
+   "kind": "refused",
+   "forbiddenNotice": true,
+   "failureShown": false,
+   "retry": false,
+   "emptyTextShown": false
+  },
+  {
+   "phase": "states",
+   "route": "/admin/packages",
+   "kind": "outage",
+   "forbiddenNotice": false,
+   "failureShown": true,
+   "retry": true,
+   "emptyTextShown": false
+  },
+  {
+   "phase": "states",
+   "route": "/admin/coupons",
+   "kind": "refused",
+   "forbiddenNotice": true,
+   "failureShown": false,
+   "retry": false,
+   "emptyTextShown": false
+  },
+  {
+   "phase": "states",
+   "route": "/admin/coupons",
+   "kind": "outage",
+   "forbiddenNotice": false,
+   "failureShown": true,
+   "retry": true,
+   "emptyTextShown": false
+  },
+  {
+   "phase": "states",
+   "route": "/admin/integrations",
+   "kind": "refused",
+   "forbiddenNotice": true,
+   "failureShown": false,
+   "retry": false,
+   "emptyTextShown": false
+  },
+  {
+   "phase": "states",
+   "route": "/admin/integrations",
+   "kind": "outage",
+   "forbiddenNotice": false,
+   "failureShown": true,
+   "retry": true,
+   "emptyTextShown": false
+  },
+  {
+   "phase": "states",
+   "route": "/admin/activity",
+   "kind": "refused",
+   "forbiddenNotice": true,
+   "failureShown": false,
+   "retry": false,
+   "emptyTextShown": false
+  },
+  {
+   "phase": "states",
+   "route": "/admin/activity",
+   "kind": "outage",
+   "forbiddenNotice": false,
+   "failureShown": true,
+   "retry": true,
+   "emptyTextShown": false
+  },
+  {
+   "phase": "states",
+   "route": "/admin/reviews",
+   "kind": "refused",
+   "forbiddenNotice": true,
+   "failureShown": false,
+   "retry": false,
+   "emptyTextShown": false
+  },
+  {
+   "phase": "states",
+   "route": "/admin/reviews",
+   "kind": "outage",
+   "forbiddenNotice": false,
+   "failureShown": true,
+   "retry": true,
+   "emptyTextShown": false
+  }
+ ]
+}

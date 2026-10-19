@@ -53,8 +53,12 @@ serve(async (req) => {
           break
         }
         case "package": {
-          const { data } = await db.from("user_packages").select("id, amount_paid, status")
+          const { data } = await db.from("user_packages").select("id, amount_paid, status, provider_id")
             .eq("id", id).eq("customer_id", userId).maybeSingle()
+          // RT-M3: only an active, verified provider takes payment for a package or a membership.
+          if (data?.status === "pending_payment" && !(await providerIsSelling(db, data.provider_id))) {
+            return json(req, { error: "This salon is not taking payments right now, so nothing was charged." }, 409)
+          }
           if (data?.status === "pending_payment") {
             payable = { amount: Number(data.amount_paid), description: `Package ${data.id}`,
               metadata: { purchase_type: "package", purchase_id: data.id }, redirectPath: `/customer/packages?purchase=${data.id}` }
@@ -63,8 +67,11 @@ serve(async (req) => {
         }
         case "membership": {
           // The amount is the price snapshotted on the membership row when it was bought, never anything from the request.
-          const { data } = await db.from("memberships").select("id, amount_due, status")
+          const { data } = await db.from("memberships").select("id, amount_due, status, provider_id")
             .eq("id", id).eq("customer_id", userId).maybeSingle()
+          if (data?.status === "pending_payment" && !(await providerIsSelling(db, data.provider_id))) {
+            return json(req, { error: "This salon is not taking payments right now, so nothing was charged." }, 409)
+          }
           if (data?.status === "pending_payment") {
             payable = { amount: Number(data.amount_due), description: `Membership ${data.id}`,
               metadata: { purchase_type: "membership", purchase_id: data.id }, redirectPath: `/customer/memberships?purchase=${data.id}` }
@@ -149,3 +156,11 @@ serve(async (req) => {
     return json(req, { error: error instanceof Error ? error.message : "Unexpected checkout error." }, 500)
   }
 })
+
+// The same rule as public.provider_is_selling: an active, verified provider.
+async function providerIsSelling(db: ReturnType<typeof serviceClient>, providerId: string | null | undefined): Promise<boolean> {
+  if (!providerId) return false
+  const { data, error } = await db.rpc("provider_is_selling", { p_provider_id: providerId })
+  if (error) throw error
+  return data === true
+}

@@ -1,0 +1,50 @@
+{
+  "phase": "h3",
+  "steps": [
+    {
+      "name": "clear-while-held",
+      "dialogText": "Clear this customer's profile details\n\nClearing a profile erases what a privacy deletion erases, so it needs a different owner's approval: this records the request, and a second owner approves it on Approvals. The console cannot restore these details afterwards. Check the name and ID below belong to the customer you mean.\n\nCustomer\nMaryam Bint Abdullah Al-Dosari-Alqahtani\nEmail\nux2.cust3.1792186244975@example.test\nPhone\n+966586244978\nID\n0a17b8f1-cefe-4ad5-b717-244489b1ded2\n\nWhat happens\n\nRemoved: name, email, phone number, gender and push token.\nKept: sign-in identity, bookings, invoices and messages.\nThe audit log records who asked, who approved and why, but not the values that were removed.\nReason (recorded in the audit log)\n\nRecorded in the audit log with your name.\n\nType to confirm0a17b8f1\nCancel\nAsk a second owner to approve",
+      "closed": false,
+      "refusal": "A legal hold keeps this customer's account, so the profile cannot be cleared. Nothing was changed; the hold must be released first on Privacy Requests.",
+      "notice": [],
+      "shot": ".admin-console/evidence/ux-round2/clear-profile-h3-en-1440.png"
+    },
+    {
+      "name": "creator-keeps",
+      "title": "Keep this hold",
+      "stepUp": false,
+      "closed": false,
+      "refusal": "A hold is kept only by a new approver: not the person who proposed it or who last approved or renewed it",
+      "notice": [
+        "A hold is kept only by a new approver: not the person who proposed it or who last approved or renewed it"
+      ]
+    }
+  ],
+  "summary": {
+    "label": "ux2-owner-a",
+    "lang": "en",
+    "width": 1440,
+    "consoleErrors": [
+      {
+        "route": "/admin/customers",
+        "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      },
+      {
+        "route": "/admin/privacy?tab=holds",
+        "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      }
+    ],
+    "httpFailures": [
+      {
+        "route": "/admin/customers",
+        "status": 403,
+        "url": "API/rest/v1/rpc/admin_clear_customer_profile"
+      },
+      {
+        "route": "/admin/privacy?tab=holds",
+        "status": 403,
+        "url": "API/rest/v1/rpc/admin_privacy_review_legal_hold"
+      }
+    ]
+  }
+}

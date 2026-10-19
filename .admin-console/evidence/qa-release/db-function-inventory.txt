@@ -1,0 +1,238 @@
+admin_acknowledge_security_alert | p_alert_id uuid, p_note text | f | t | t
+admin_approval_inbox | p_status text, p_limit integer, p_offset integer | f | t | t
+admin_begin_reconciliation_run | p_business_day date | f | t | t
+admin_begin_tap_refund_check | p_refund_id uuid | f | t | t
+admin_booking_channel_counts | p_from date, p_to date | f | t | t
+admin_booking_directory | p_search text, p_status text, p_from date, p_to date, p_limit integer, p_offset integer, p_purpose text | f | t | t
+admin_branch_performance_report |  | f | t | t
+admin_break_glass_execute | p_request_id uuid, p_justification text | f | t | t
+admin_broadcast_notification | p_audience text, p_title_en text, p_title_ar text, p_body_en text, p_body_ar text, p_in_app boolean, p_whatsapp boolean | f | t | t
+admin_can | p_permission text | f | t | t
+admin_cancel_approval | p_request_id uuid, p_reason text | f | t | t
+admin_cancel_booking | p_booking_id uuid, p_reason text | f | t | t
+admin_change_professional_handle | p_handle text, p_new_handle text, p_reason text | f | t | t
+admin_clear_customer_profile | p_customer_id uuid, p_reason text | f | t | t
+admin_clear_no_show | p_booking_id uuid, p_reason text | f | t | t
+admin_confirm_application_cr | p_application_id uuid, p_notes text | f | t | t
+admin_create_refund_request | p_booking_id uuid, p_amount numeric, p_reason text, p_idempotency_key text | f | t | t
+admin_customer_overview | p_search text, p_limit integer, p_offset integer, p_purpose text | f | t | t
+admin_dashboard_overview |  | f | t | t
+admin_decide_approval | p_request_id uuid, p_decision text, p_reason text | f | t | t
+admin_employee_performance_report | p_provider_id uuid, p_purpose text, p_limit integer, p_offset integer | f | t | t
+admin_export_finance_report | p_report text, p_from date, p_to date | f | t | t
+admin_fee_rule_versions |  | f | t | t
+admin_finance_summary | p_kind text, p_from date, p_to date, p_provider_id uuid, p_limit integer, p_offset integer, p_purpose text | f | t | t
+admin_get_booking_invoice | p_booking_id uuid, p_purpose text | f | t | t
+admin_get_event_counts | p_start_date date, p_end_date date | f | t | t
+admin_group_booking_counts |  | f | t | t
+admin_import_reconciliation_file | p_source text, p_business_day date, p_rows jsonb, p_reason text | f | t | t
+admin_incident_add_evidence | p_incident_id uuid, p_label text, p_reference text, p_storage_path text | f | t | t
+admin_incident_close | p_incident_id uuid, p_note text | f | t | t
+admin_incident_correct_aware_at | p_incident_id uuid, p_aware_at timestamp with time zone, p_reason text | f | t | t
+admin_incident_create | p_title text, p_description text, p_discovered_at timestamp with time zone, p_aware_at timestamp with time zone | f | t | t
+admin_incident_get | p_incident_id uuid | f | t | t
+admin_incident_list | p_state text, p_limit integer, p_offset integer | f | t | t
+admin_incident_record_sdaia | p_incident_id uuid, p_decision text, p_reason text, p_reference text, p_notified_at timestamp with time zone, p_late_reason text | f | t | t
+admin_incident_record_subjects | p_incident_id uuid, p_decision text, p_reason text, p_notified_at timestamp with time zone, p_channels text[] | f | t | t
+admin_incident_update | p_incident_id uuid, p_changes jsonb | f | t | t
+admin_intake_overview |  | f | t | t
+admin_lift_iban_reveal_limit | p_user_id uuid, p_reason text | f | t | t
+admin_list_audit_events | p_action text, p_target_type text, p_from timestamp with time zone, p_to timestamp with time zone, p_limit integer, p_offset integer, p_purpose text, p_event_class text | f | t | t
+admin_list_consents | p_user_id uuid, p_limit integer, p_offset integer, p_purpose text | f | t | t
+admin_list_disputes | p_status text, p_limit integer, p_offset integer, p_purpose text | f | t | t
+admin_list_employees | p_search text, p_status text, p_provider_id uuid, p_limit integer, p_offset integer, p_purpose text | f | t | t
+admin_list_fee_invoices | p_status text, p_provider_id uuid, p_limit integer, p_offset integer, p_purpose text | f | t | t
+admin_list_governance_notices | p_status text, p_limit integer, p_offset integer | f | t | t
+admin_list_ledger_entries | p_from date, p_to date, p_provider_id uuid, p_payout_status text, p_limit integer, p_offset integer, p_purpose text | f | t | t
+admin_list_message_log | p_status text, p_channel text, p_limit integer, p_offset integer, p_purpose text | f | t | t
+admin_list_payout_requests | p_status text, p_provider_id uuid, p_limit integer, p_offset integer, p_purpose text | f | t | t
+admin_list_provider_applications | p_status text, p_limit integer, p_offset integer, p_purpose text | f | t | t
+admin_list_refund_requests | p_filter text, p_limit integer, p_offset integer, p_purpose text | f | t | t
+admin_list_reviews | p_status text, p_limit integer, p_offset integer, p_purpose text | f | t | t
+admin_mark_booking_no_show | p_booking_id uuid, p_reason text | f | t | t
+admin_mark_fee_invoice_paid | p_invoice_id uuid, p_payment_method text, p_reason text | f | t | t
+admin_message_queue_summary |  | f | t | t
+admin_package_usage_summary |  | f | t | t
+admin_people_names | p_ids uuid[], p_purpose text | f | t | t
+admin_privacy_add_note | p_request_id uuid, p_note text | f | t | t
+admin_privacy_complete_correction | p_request_id uuid, p_note text | f | t | t
+admin_privacy_deletion_ledger_summary |  | f | t | t
+admin_privacy_deletion_preview | p_request_id uuid | f | t | t
+admin_privacy_export_deletion_ledger |  | f | t | t
+admin_privacy_extend_request | p_request_id uuid, p_code text, p_reason text | f | t | t
+admin_privacy_find_customers | p_query text, p_purpose text | f | t | t
+admin_privacy_get_request | p_request_id uuid, p_purpose text | f | t | t
+admin_privacy_list_legal_holds | p_state text, p_limit integer, p_offset integer | f | t | t
+admin_privacy_list_requests | p_state text, p_limit integer, p_offset integer, p_purpose text | f | t | t
+admin_privacy_log_request | p_subject_id uuid, p_request_type text, p_channel text, p_received_at timestamp with time zone, p_details text, p_options jsonb | f | t | t
+admin_privacy_propose_execution | p_request_id uuid, p_reason text | f | t | t
+admin_privacy_propose_legal_hold | p_subject_id uuid, p_basis text, p_case_reference text, p_categories text[], p_booking_id uuid, p_reason text, p_account_reason text | f | t | t
+admin_privacy_record_transfer_assessment | p_document_reference text, p_approved_on date, p_signed_by text, p_notes text | f | t | t
+admin_privacy_refuse_request | p_request_id uuid, p_code text, p_reason text | f | t | t
+admin_privacy_review_legal_hold | p_hold_id uuid, p_keep boolean, p_note text | f | t | t
+admin_privacy_revoke_transfer_assessment | p_reason text | f | t | t
+admin_propose_break_resolution | p_break_id uuid, p_provider_share_delta numeric, p_platform_share_delta numeric, p_justification text, p_idempotency_key text, p_captured_delta numeric | f | t | t
+admin_propose_fee_rule_change | p_channel text, p_is_first_visit boolean, p_fee_percentage numeric, p_min_fee_sar numeric, p_max_fee_sar numeric, p_effective_from timestamp with time zone, p_reason text, p_description text | f | t | t
+admin_propose_ledger_adjustment | p_entry_id uuid, p_kind text, p_provider_share_delta numeric, p_platform_share_delta numeric, p_reason_code text, p_justification text, p_idempotency_key text, p_tap_object_id text, p_provider_id uuid, p_captured_delta numeric, p_break_id uuid | f | t | t
+admin_propose_reward_program | p_program text, p_enabled boolean, p_reward_value_sar numeric, p_customer_monthly_cap_sar numeric, p_monthly_budget_sar numeric, p_credit_expiry_days integer, p_terms_version text, p_reason text, p_points_per_sar numeric, p_min_redeem_points integer, p_min_qualifying_sar numeric | f | t | t
+admin_provider_private_directory | p_purpose text, p_limit integer, p_offset integer | f | t | t
+admin_publish_agreement | p_agreement_id uuid, p_review_note text | f | t | t
+admin_publish_reward_terms | p_program text, p_version text, p_body_en text, p_body_ar text, p_reason text | f | t | t
+admin_purge_demo_data | p_reason text, p_confirmation text | f | t | t
+admin_purge_expired_intake | p_reason text, p_dry_run boolean | f | t | t
+admin_recent_bookings | p_limit integer, p_purpose text | f | t | t
+admin_reconciliation_overview | p_status text, p_limit integer, p_offset integer | f | t | t
+admin_record_cr_review | p_provider_id uuid, p_cr_number text, p_notes text | f | t | t
+admin_record_export | p_report text, p_from date, p_to date, p_row_count integer | f | f | t
+admin_release_expired_holds | p_reason text | f | t | t
+admin_release_ledger_item | p_ledger_id uuid, p_reason text, p_bank_reference text, p_idempotency_key text | f | t | t
+admin_release_payout | p_payout_request_id uuid, p_idempotency_key text, p_reason text, p_admin_note text | f | t | t
+admin_reopen_stuck_refund | p_refund_id uuid, p_reason text | f | t | t
+admin_request_payout_hold | p_provider_id uuid, p_action text, p_reason text | f | t | t
+admin_request_refund | p_booking_id uuid, p_amount numeric, p_reason text, p_idempotency_key text | f | t | t
+admin_request_setting_change | p_key text, p_value numeric, p_reason text | f | t | t
+admin_reset_mfa | p_user_id uuid, p_reason text | f | t | t
+admin_retry_refund_request | p_refund_id uuid, p_reason text | f | t | t
+admin_review_client_import | p_import_id uuid, p_reason text | f | t | t
+admin_review_payout_request | p_payout_request_id uuid, p_decision text, p_reason text | f | t | t
+admin_revoke_api_key | p_key_id uuid, p_reason text | f | t | t
+admin_reward_programs |  | f | t | t
+admin_role |  | f | t | t
+admin_role_directory | p_role text, p_search text, p_limit integer, p_offset integer | f | t | t
+admin_role_of_account |  | f | t | t
+admin_save_promo_code | p_code text, p_discount_type text, p_discount_value numeric, p_reason text, p_id uuid, p_max_redemptions integer, p_funding_source text, p_min_order_amount numeric, p_max_discount_cap numeric, p_per_customer_limit integer, p_first_booking_only boolean, p_is_active boolean, p_starts_at timestamp with time zone, p_ends_at timestamp with time zone | f | t | t
+admin_session_state |  | f | t | t
+admin_set_api_setting | p_key text, p_value jsonb, p_reason text | f | t | t
+admin_set_branch_country | p_branch_id uuid, p_country_code text, p_timezone text, p_reason text | f | t | t
+admin_set_console_role | p_user_id uuid, p_admin_role text, p_reason text | f | t | t
+admin_set_feature_flag | p_flag_key text, p_enabled boolean, p_reason text | f | t | t
+admin_set_phone_verified | p_customer_id uuid, p_verified boolean, p_reason text | f | t | t
+admin_set_professional_visibility | p_handle text, p_hidden boolean, p_reason text | f | t | t
+admin_set_promo_code_active | p_id uuid, p_active boolean, p_reason text | f | t | t
+admin_set_provider_status | p_provider_id uuid, p_status provider_status, p_reason text | f | t | t
+admin_set_whatsapp_channel_verified | p_channel_id uuid, p_verified boolean, p_reason text | f | t | t
+admin_sign_off_break_glass | p_review_id uuid, p_reviewer_name text, p_document_reference text, p_notes text | f | t | t
+admin_sponsored_overview | p_month date | f | t | t
+admin_table_write_allowed | p_permission text | f | t | t
+admin_update_platform_setting | p_key text, p_value jsonb, p_reason text | f | t | t
+admin_uphold_no_show_contest | p_booking_id uuid, p_reason text | f | t | t
+admin_upsert_country | p_code text, p_name_en text, p_name_ar text, p_currency_code text, p_currency_minor_units integer, p_timezone text, p_vat_rate_percent numeric, p_phone_dial_code text, p_active boolean, p_reason text | f | t | t
+admin_void_sponsored_attribution | p_attribution_id uuid, p_action text, p_reason text | f | t | t
+admin_waive_payout_account_notice | p_destination_id uuid, p_reason text | f | t | t
+admin_whatsapp_overview |  | f | t | t
+gov2_log_read | p_action text, p_target_type text, p_target_ids uuid[], p_fields text[], p_purpose text, p_filter jsonb, p_rows integer | f | f | t
+gov2_read_purpose | p_purpose text, p_default text | f | f | f
+gov2_require_read | p_permissions text[], p_what text | f | f | t
+gov2_required_purpose | p_purpose text | f | f | f
+gov2_search_digest | p_search text | f | f | f
+gov_activate_payout_destination | p_destination_id uuid | f | f | t
+gov_exec_booking_cancellation | p_req admin_approval_requests | f | f | t
+gov_exec_customer_profile_clear | p_req admin_approval_requests | f | f | t
+gov_exec_fee_rule_change | p_req admin_approval_requests | f | f | t
+gov_exec_incident_aware_at_correction | p_req admin_approval_requests | f | f | t
+gov_exec_ledger_adjustment | p_req admin_approval_requests | f | f | t
+gov_exec_ledger_settlement | p_req admin_approval_requests | f | f | t
+gov_exec_payout_hold | p_req admin_approval_requests | f | f | t
+gov_exec_privacy_deletion | p_req admin_approval_requests | f | f | t
+gov_exec_privacy_export | p_req admin_approval_requests | f | f | t
+gov_exec_privacy_legal_hold | p_req admin_approval_requests | f | f | t
+gov_exec_privacy_legal_hold_release | p_req admin_approval_requests | f | f | t
+gov_exec_privacy_legal_hold_renewal | p_req admin_approval_requests | f | f | t
+gov_exec_privacy_retention_purge | p_req admin_approval_requests | f | f | t
+gov_exec_reconciliation_import | p_req admin_approval_requests | f | f | t
+gov_exec_reward_program | p_req admin_approval_requests | f | f | t
+gov_exec_role_change | p_req admin_approval_requests | f | f | t
+gov_exec_sponsored_price_change | p_req admin_approval_requests | f | f | t
+gov_reject_payout_destination | p_destination_id uuid | f | f | t
+gov_request_payout_destination | p_provider_id uuid, p_bank_name text, p_holder text, p_iban text | f | f | t
+governance_approver_permission | p_kind text | f | f | f
+governance_break_glass_blocked_until | p_kind text, p_requester uuid | f | f | t
+governance_decider_refusal | p_requested_by uuid | f | f | t
+governance_execute | p_request_id uuid | f | f | t
+governance_execution_active | p_kind text, p_target uuid | f | f | t
+governance_notice_record_result | p_id uuid, p_outcome text, p_error text, p_provider_message_id text | f | f | t
+governance_notices_claim | p_configured_channels text[], p_limit integer | f | f | t
+governance_request | p_kind text, p_target_type text, p_target_id uuid, p_amount numeric, p_payload jsonb, p_reason text, p_summary jsonb | f | f | t
+governance_second_approver_exists | p_kind text, p_requester uuid | f | f | t
+governance_setting | p_key text | f | f | t
+privacy_account_hold_summary | p_subject uuid | f | f | t
+privacy_approval_closed | p_approval_id uuid, p_outcome text, p_reason text | f | f | t
+privacy_auth_erasures_due |  | f | f | t
+privacy_booking_is_linked | p_booking_id uuid | f | f | t
+privacy_complaint_right |  | f | f | f
+privacy_confirm_request | p_request_id uuid | f | t | t
+privacy_contact_changed_recently | p_subject uuid, p_since timestamp with time zone | f | f | t
+privacy_court_hold_for | p_subject uuid, p_category text, p_except uuid | f | f | t
+privacy_deadline_days |  | f | f | f
+privacy_deletion_preview |  | f | t | t
+privacy_deletion_preview_internal | p_subject uuid | f | f | t
+privacy_erase_subject_internal | p_subject uuid, p_request_id uuid, p_review_choice text, p_mode text | f | f | t
+privacy_erase_whatsapp | p_request_id uuid, p_windows jsonb | f | f | t
+privacy_erasure_active |  | f | t | t
+privacy_escalate_requests |  | f | t | t
+privacy_events_append_only |  | f | f | f
+privacy_expire_exports |  | f | f | t
+privacy_export_authorize_download | p_request_id uuid, p_file text | f | t | t
+privacy_export_download_limit |  | f | f | f
+privacy_export_payload | p_request_id uuid | f | f | t
+privacy_export_record_built | p_request_id uuid, p_json_path text, p_pdf_path text, p_json_sha256 text, p_pdf_sha256 text, p_row_counts jsonb | f | f | t
+privacy_export_record_failure | p_request_id uuid, p_error text | f | f | t
+privacy_exports_to_build | p_limit integer | f | f | t
+privacy_finish_court_hold | h privacy_legal_holds, l deletion_ledger | f | f | t
+privacy_finish_deletion | p_request_id uuid | f | f | t
+privacy_finish_held_booking | h privacy_legal_holds | f | f | t
+privacy_forget_hold_reference | p_subject uuid, p_reference text | f | f | t
+privacy_guard_restricted_profile_fields |  | f | f | t
+privacy_has_completed_deletion | p_subject uuid | f | f | t
+privacy_hold_approval_summary | h privacy_legal_holds, p_note text | f | f | t
+privacy_hold_renewals_before_reapproval |  | f | f | f
+privacy_import_deletion_archive | p_entries jsonb, p_archive_sha256 text | f | f | t
+privacy_incident_check_aware_at | i privacy_incidents, p_aware_at timestamp with time zone | f | f | t
+privacy_incident_events_append_only |  | f | f | f
+privacy_incident_json | i privacy_incidents | f | f | t
+privacy_incident_maintenance |  | f | f | t
+privacy_incident_text_array | p jsonb | f | f | f
+privacy_log_event | p_request_id uuid, p_event text, p_details jsonb | f | f | t
+privacy_lookup_digest | p_kind text, p_normalised text | f | f | t
+privacy_lookup_limit |  | f | f | f
+privacy_lookup_window |  | f | f | f
+privacy_my_requests |  | f | t | t
+privacy_new_token |  | f | f | f
+privacy_notify_customer | p_subject uuid, p_template text, p_title_en text, p_title_ar text, p_body_en text, p_body_ar text, p_payload jsonb | f | f | t
+privacy_phone_canonical | p_phone text | f | f | f
+privacy_phone_in_tenure | p_phone text, p_at timestamp with time zone, p_tenures jsonb | f | f | f
+privacy_phone_tenures | p_subject uuid | f | f | t
+privacy_purge_expired_retention | p_dry_run boolean, p_reason text | f | t | t
+privacy_reapply_deletion_ledger |  | f | t | t
+privacy_record_auth_erasure | p_request_id uuid, p_subject_id uuid | f | f | t
+privacy_record_export_files_removed | p_request_ids uuid[] | f | f | t
+privacy_redact_provider_text | p_text text, p_provider_id uuid | f | f | t
+privacy_redact_text | p_text text | f | f | f
+privacy_release_due_holds |  | f | t | t
+privacy_release_field | p_request_id uuid, p_restore boolean | f | f | t
+privacy_release_hold_internal | p_hold_id uuid, p_reason text | f | f | t
+privacy_renew_hold_internal | h privacy_legal_holds, p_note text, p_renewer uuid | f | f | t
+privacy_request_json | r privacy_requests, p_with_subject boolean | f | f | t
+privacy_request_options | p_subject uuid, p_type text, p_options jsonb | f | f | t
+privacy_request_retention_purge | p_reason text | f | f | t
+privacy_require_console | p_permission text | f | f | t
+privacy_require_contact_otp |  | f | t | t
+privacy_require_customer_subject | p_subject uuid | f | f | t
+privacy_require_unchanged_contacts | r privacy_requests | f | f | t
+privacy_restrict_field | r privacy_requests | f | f | t
+privacy_retention_purge_active |  | f | f | t
+privacy_retention_purge_approved |  | f | f | t
+privacy_retention_until | p_at timestamp with time zone | f | f | f
+privacy_scrub_contact_traces | p_subject uuid, p_bookings uuid[], p_tenures jsonb | f | f | t
+privacy_scrub_sent_completion_notice |  | f | f | f
+privacy_set_review_choice | p_request_id uuid, p_choice text | f | t | t
+privacy_start_request | p_id uuid | f | f | t
+privacy_strip_held_reference | p_summary jsonb, p_reference text | f | f | f
+privacy_submit_request | p_request_type text, p_details text, p_options jsonb | f | t | t
+privacy_summary_without_references | p_summary jsonb | f | f | f
+privacy_withdraw_consents | r privacy_requests | f | f | t
+privacy_withdraw_request | p_request_id uuid | f | t | t
+reveal_employee_wps_iban | p_employee_id uuid, p_reason text | f | t | t
+reveal_provider_iban | p_provider_id uuid, p_reason text | f | t | t
+run_tap_reconciliation | p_business_day date | f | t | t
+set_user_role | target_user_id uuid, target_role user_role, p_reason text | f | t | t

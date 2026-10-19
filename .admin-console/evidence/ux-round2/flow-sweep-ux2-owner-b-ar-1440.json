@@ -1,0 +1,82 @@
+{
+  "who": "ux2-owner-b",
+  "lang": "ar",
+  "width": 1440,
+  "height": 900,
+  "routes": [
+    {
+      "route": "/admin/privacy",
+      "h1": "طلبات الخصوصية",
+      "dir": "rtl",
+      "overflow": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      },
+      "shot": ".admin-console/evidence/ux-round2/sweep_admin_privacy-ar-1440.png",
+      "newConsoleErrors": []
+    },
+    {
+      "route": "/admin/privacy?tab=holds",
+      "h1": "طلبات الخصوصية",
+      "dir": "rtl",
+      "overflow": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      },
+      "shot": ".admin-console/evidence/ux-round2/sweep_admin_privacy_tab_holds-ar-1440.png",
+      "newConsoleErrors": []
+    },
+    {
+      "route": "/admin/privacy?tab=ledger",
+      "h1": "طلبات الخصوصية",
+      "dir": "rtl",
+      "overflow": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      },
+      "shot": ".admin-console/evidence/ux-round2/sweep_admin_privacy_tab_ledger-ar-1440.png",
+      "newConsoleErrors": []
+    },
+    {
+      "route": "/admin/approvals",
+      "h1": "الاعتمادات",
+      "dir": "rtl",
+      "overflow": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      },
+      "shot": ".admin-console/evidence/ux-round2/sweep_admin_approvals-ar-1440.png",
+      "newConsoleErrors": []
+    },
+    {
+      "route": "/admin/incidents",
+      "h1": "سجل الحوادث",
+      "dir": "rtl",
+      "overflow": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      },
+      "shot": ".admin-console/evidence/ux-round2/sweep_admin_incidents-ar-1440.png",
+      "newConsoleErrors": []
+    },
+    {
+      "route": "/admin/customers",
+      "h1": "سجل العملاء وحقوق البيانات",
+      "dir": "rtl",
+      "overflow": {
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      },
+      "shot": ".admin-console/evidence/ux-round2/sweep_admin_customers-ar-1440.png",
+      "newConsoleErrors": []
+    }
+  ],
+  "dialogs": [],
+  "label": "ux2-owner-b",
+  "consoleErrors": [],
+  "httpFailures": [],
+  "aborted": [
+    "net::ERR_ABORTED http://localhost:3100/admin/incidents",
+    "net::ERR_ABORTED http://localhost:3100/_next/static/webpack/8849a5d01af72f00.webpack.hot-update.json"
+  ]
+}

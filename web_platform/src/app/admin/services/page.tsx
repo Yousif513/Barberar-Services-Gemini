@@ -2,7 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { useConfirm } from "@/components/modal";
+import { ModalOverlay, ModalPortal, useConfirm } from "@/components/modal";
+import { commandOutcome, optimisticWrite } from "@/lib/write-result.mjs";
+import { describeConsoleError, unchangedText } from "@/lib/console-errors.mjs";
+import { knownToHold, useConsoleSession } from "@/lib/console-session";
+import { ReadFailure } from "@/components/read-failure";
 
 const translations = {
   en: {
@@ -55,7 +59,13 @@ const translations = {
     deletedMsg: "Service archived.",
     saving: "Saving...",
     required: "Name and category are required.",
-    filterBy: "Filter"
+    filterBy: "Filter",
+    archived: "Archived",
+    switchedOn: "Service switched on.",
+    switchedOff: "Service switched off.",
+    featuredSaved: "Featured placement saved.",
+    priceSaved: "Price saved.",
+    priceInvalid: "Enter a price of zero or more in SAR."
   },
   ar: {
     title: "سجل الخدمات العام",
@@ -107,7 +117,13 @@ const translations = {
     deletedMsg: "تمت أرشفة الخدمة.",
     saving: "جارٍ الحفظ...",
     required: "الاسم والفئة مطلوبان.",
-    filterBy: "تصفية"
+    filterBy: "تصفية",
+    archived: "مؤرشفة",
+    switchedOn: "تم تفعيل الخدمة.",
+    switchedOff: "تم إيقاف الخدمة.",
+    featuredSaved: "تم حفظ موضع الإبراز.",
+    priceSaved: "تم حفظ السعر.",
+    priceInvalid: "أدخل سعراً يساوي صفراً أو أكثر بالريال."
   }
 };
 
@@ -125,18 +141,48 @@ type EditableService = {
   providerId: string;
   providersCount: number;
   is_active: boolean;
+  status: "active" | "draft" | "archived";
   featured_on_landing: boolean;
   featured_in_services: boolean;
+  updatedAt: string | null;
 };
 
 const blankService = (): EditableService => ({
   id: "", nameEn: "", nameAr: "", categoryId: "", category: "", price: 0, duration: 30,
   descriptionEn: "", descriptionAr: "", image: "", providerId: "", providersCount: 0,
-  is_active: true, featured_on_landing: false, featured_in_services: false
+  is_active: true, status: "active", featured_on_landing: false, featured_in_services: false, updatedAt: null
+});
+
+// A row as the screen shows it, from a table row or from the answer of admin_save_service (which has no category join).
+type ServiceAnswer = {
+  id: string; name_en: string; name_ar: string; category_id: string | null; base_price: number | string; base_duration_minutes: number;
+  description_en: string | null; description_ar: string | null; images: string[] | null; provider_id: string | null;
+  status: string; is_active: boolean; featured_on_landing: boolean; featured_in_services: boolean; updated_at: string | null;
+};
+const fromServiceAnswer = (s: ServiceAnswer, category: string, providersCount: number): EditableService => ({
+  id: s.id,
+  nameEn: s.name_en,
+  nameAr: s.name_ar,
+  categoryId: s.category_id || "",
+  category,
+  price: Number(s.base_price) || 0,
+  duration: Number(s.base_duration_minutes) || 0,
+  descriptionEn: s.description_en || "",
+  descriptionAr: s.description_ar || "",
+  image: Array.isArray(s.images) && s.images.length ? s.images[0] : "",
+  providerId: s.provider_id || "",
+  providersCount,
+  is_active: !!s.is_active,
+  status: s.status === "archived" ? "archived" : s.status === "draft" ? "draft" : "active",
+  featured_on_landing: !!s.featured_on_landing,
+  featured_in_services: !!s.featured_in_services,
+  updatedAt: s.updated_at ?? null
 });
 
 export default function AdminServices() {
-  const [services, setServices] = useState<any[]>([]);
+  const [services, setServices] = useState<EditableService[]>([]);
+  // The price typed in a row, kept until it is saved (on leaving the field or Enter), so typing never writes per keystroke.
+  const [priceDrafts, setPriceDrafts] = useState<Record<string, string>>({});
   const [categories, setCategories] = useState<{ id: string; name_en: string; name_ar: string }[]>([]);
   const [providersList, setProvidersList] = useState<{ id: string; name_en: string; name_ar: string }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -145,7 +191,11 @@ export default function AdminServices() {
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [loadError, setLoadError] = useState<unknown>(null);
+  const [formError, setFormError] = useState("");
   const [lang, setLang] = useState<"en" | "ar">("ar");
+  // Write controls only for a console role that holds operations.write (the server refuses the others anyway).
+  const canWrite = knownToHold(useConsoleSession(), ["operations.write"]);
   const [modalOpen, setModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<EditableService>(() => blankService());
@@ -166,10 +216,10 @@ export default function AdminServices() {
   const loadServices = async () => {
     try {
       setLoading(true);
-      setError("");
+      setLoadError(null);
       const { data, error } = await supabase
         .from("services")
-        .select("id, name_en, name_ar, base_price, base_duration_minutes, description_en, description_ar, images, is_active, provider_id, category_id, featured_on_landing, featured_in_services, categories(name_en, name_ar)")
+        .select("id, name_en, name_ar, base_price, base_duration_minutes, description_en, description_ar, images, is_active, status, updated_at, provider_id, category_id, featured_on_landing, featured_in_services, categories(name_en, name_ar)")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -181,33 +231,19 @@ export default function AdminServices() {
           counts[key] = (counts[key] || 0) + 1;
         });
 
-        setServices(data.map((s, idx) => {
+        setServices(data.map((s) => {
           const key = String(s.name_en || "").toLowerCase().trim();
-          return {
-            id: s.id,
-            nameEn: s.name_en,
-            nameAr: s.name_ar,
-            categoryId: (s as any).category_id || "",
-            category: (s.categories as any)?.name_en || (s.categories as any)?.name_ar || "Uncategorized",
-            price: Number(s.base_price) || 0,
-            duration: Number(s.base_duration_minutes) || 0,
-            descriptionEn: (s as any).description_en || "",
-            descriptionAr: (s as any).description_ar || "",
-            image: Array.isArray((s as any).images) && (s as any).images.length ? (s as any).images[0] : "",
-            providerId: (s as any).provider_id || "",
-            providersCount: counts[key] || 1,
-            is_active: !!s.is_active,
-            featured_on_landing: !!s.featured_on_landing,
-            featured_in_services: !!s.featured_in_services
-          };
+          const category = (s.categories as any)?.name_en || (s.categories as any)?.name_ar || "Uncategorized";
+          return fromServiceAnswer(s as unknown as ServiceAnswer, category, counts[key] || 1);
         }));
       } else {
         setServices([]);
       }
+      setPriceDrafts({});
     } catch (err) {
-      // An empty catalogue is an empty table, not an error; a failed query shows its reason.
+      // An empty catalogue is an empty table; a failed or refused read shows its reason instead of the empty-list text.
       setServices([]);
-      setError(`${translations[lang].errorMsg} ${err instanceof Error ? err.message : ""}`.trim());
+      setLoadError(err);
     } finally {
       setLoading(false);
     }
@@ -233,34 +269,26 @@ export default function AdminServices() {
     })();
   }, []);
 
-  const openNew = () => { setForm(blankService()); setModalOpen(true); };
+  const openNew = () => { setForm(blankService()); setFormError(""); setModalOpen(true); };
 
-  const openEdit = (item: any) => {
-    setForm({
-      id: item.id,
-      nameEn: item.nameEn || "",
-      nameAr: item.nameAr || "",
-      categoryId: item.categoryId || "",
-      category: item.category || "",
-      price: Number(item.price) || 0,
-      duration: Number(item.duration) || 30,
-      descriptionEn: item.descriptionEn || "",
-      descriptionAr: item.descriptionAr || "",
-      image: item.image || "",
-      providerId: item.providerId || "",
-      providersCount: item.providersCount || 0,
-      is_active: item.is_active !== false,
-      featured_on_landing: !!item.featured_on_landing,
-      featured_in_services: !!item.featured_in_services,
-    });
+  const openEdit = (item: EditableService) => {
+    setForm({ ...item, duration: Number(item.duration) || 30 });
+    setFormError("");
     setModalOpen(true);
   };
 
+  // Every write goes through admin_save_service, which checks operations.write, refuses a missing or changed row and answers
+  // the stored row. The screen shows a change only when that answer confirms it (AGENTS.md defect 1).
+  const replaceRow = (answer: ServiceAnswer) => {
+    setServices((prev) => prev.map((s) => (s.id === answer.id ? fromServiceAnswer(answer, s.category, s.providersCount) : s)));
+  };
+
   const saveService = async () => {
-    setSuccess(""); setError("");
-    if (!form.nameEn.trim() || !form.categoryId) { setError(translations[lang].required); return; }
+    if (saving) return;
+    setSuccess(""); setError(""); setFormError("");
+    if (!form.nameEn.trim() || !form.categoryId) { setFormError(translations[lang].required); return; }
     setSaving(true);
-    const payload: Record<string, unknown> = {
+    const values: Record<string, unknown> = {
       name_en: form.nameEn.trim(),
       name_ar: (form.nameAr || form.nameEn).trim(),
       category_id: form.categoryId,
@@ -268,34 +296,32 @@ export default function AdminServices() {
       base_duration_minutes: form.duration,
       description_en: form.descriptionEn || null,
       description_ar: form.descriptionAr || null,
-      images: form.image ? [form.image] : [],
+      images: form.image ? [form.image.trim()] : [],
       provider_id: form.providerId || null,
-      status: form.is_active ? "active" : "draft",
+      status: form.status === "archived" && !form.is_active ? "archived" : form.is_active ? "active" : "draft",
       featured_on_landing: form.featured_on_landing,
       featured_in_services: form.featured_in_services,
     };
-    try {
-      if (form.id) {
-        const { error: upErr } = await supabase.from("services").update(payload).eq("id", form.id);
-        if (upErr) throw upErr;
-      } else {
-        const { error: insErr } = await supabase.from("services").insert(payload);
-        if (insErr) throw insErr;
-      }
-      setModalOpen(false);
-      setSuccess(form.id ? translations[lang].successMsg : translations[lang].createdMsg);
-      await loadServices();
-    } catch (err: any) {
-      console.warn("Service save failed:", err?.message || err);
-      setError(translations[lang].errorMsg);
-    } finally {
-      setSaving(false);
+    const outcome = commandOutcome(await supabase.rpc("admin_save_service", {
+      p_service_id: form.id || null,
+      p_values: values,
+      p_reason: null,
+      p_expected_updated_at: form.id ? form.updatedAt : null,
+    }));
+    setSaving(false);
+    if (!outcome.ok) {
+      // The dialog stays open with everything the operator typed.
+      setFormError(describeConsoleError(outcome.error, lang));
+      return;
     }
+    setModalOpen(false);
+    setSuccess(!outcome.changed ? unchangedText(lang) : form.id ? translations[lang].successMsg : translations[lang].createdMsg);
+    await loadServices();
   };
 
   const [confirmNode, ask] = useConfirm(lang);
 
-  const deleteService = async (item: any) => {
+  const deleteService = async (item: EditableService) => {
     const name = lang === "ar" ? item.nameAr : item.nameEn;
     if (!(await ask({
       title: lang === "ar" ? "أرشفة هذه الخدمة" : "Archive this service",
@@ -305,70 +331,54 @@ export default function AdminServices() {
       tone: "danger",
     }))) return;
     setSuccess(""); setError("");
-    const { error: archiveErr } = await supabase.from("services").update({ is_active: false }).eq("id", item.id);
-    if (archiveErr) { setError(`${translations[lang].errorMsg} ${archiveErr.message}`); return; }
-    setServices((prev) => prev.map((s) => (s.id === item.id ? { ...s, is_active: false } : s)));
-    setSuccess(translations[lang].deletedMsg);
+    const outcome = commandOutcome(await supabase.rpc("admin_save_service", {
+      p_service_id: item.id, p_values: { status: "archived" }, p_reason: null, p_expected_updated_at: item.updatedAt,
+    }));
+    if (!outcome.ok) { setError(describeConsoleError(outcome.error, lang)); return; }
+    replaceRow(outcome.data.service as ServiceAnswer);
+    setSuccess(outcome.changed ? translations[lang].deletedMsg : unchangedText(lang));
   };
 
-  const handleToggleActive = async (id: string, currentStatus: boolean) => {
+  // One field of one row, shown at once and kept only when the server confirms it; otherwise the row is put back.
+  const writeRow = async (item: EditableService, values: Record<string, unknown>, shown: Partial<EditableService>, done: string) => {
     setSuccess("");
     setError("");
-    const nextStatus = !currentStatus;
-    setServices((prev) => prev.map((s) => (s.id === id ? { ...s, is_active: nextStatus } : s)));
-
-    const { error: updateError } = await supabase
-      .from("services")
-      .update({ is_active: nextStatus })
-      .eq("id", id);
-
-    if (updateError) {
-      setServices((prev) => prev.map((s) => (s.id === id ? { ...s, is_active: currentStatus } : s)));
-      setError(translations[lang].errorMsg);
-      return;
+    const outcome = await optimisticWrite({
+      apply: () => setServices((prev) => prev.map((s) => (s.id === item.id ? { ...s, ...shown } : s))),
+      rollback: () => setServices((prev) => prev.map((s) => (s.id === item.id ? item : s))),
+      send: () => supabase.rpc("admin_save_service", { p_service_id: item.id, p_values: values, p_reason: null, p_expected_updated_at: item.updatedAt }),
+    });
+    if (!outcome.ok) {
+      setError(describeConsoleError(outcome.error, lang));
+      return false;
     }
-
-    setSuccess(translations[lang].successMsg);
+    replaceRow(outcome.data.service as ServiceAnswer);
+    setSuccess(outcome.changed ? done : unchangedText(lang));
+    return true;
   };
 
-  const handleToggleFeatured = async (id: string, field: "featured_on_landing" | "featured_in_services", current: boolean) => {
-    setSuccess("");
-    setError("");
-    const next = !current;
-    setServices((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: next } : s)));
-
-    const { error: updateError } = await supabase
-      .from("services")
-      .update({ [field]: next })
-      .eq("id", id);
-
-    if (updateError) {
-      setServices((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: current } : s)));
-      setError(translations[lang].errorMsg);
-      return;
-    }
-
-    setSuccess(translations[lang].successMsg);
+  const handleToggleActive = (item: EditableService) => {
+    const next = !item.is_active;
+    return writeRow(item, { status: next ? "active" : "draft" }, { is_active: next, status: next ? "active" : "draft" },
+      next ? translations[lang].switchedOn : translations[lang].switchedOff);
   };
 
-  const handlePriceChange = async (id: string, newPrice: number) => {
-    setSuccess("");
-    setError("");
-    const previous = services.find((s) => s.id === id)?.price ?? 0;
-    setServices((prev) => prev.map((s) => (s.id === id ? { ...s, price: newPrice } : s)));
+  const handleToggleFeatured = (item: EditableService, field: "featured_on_landing" | "featured_in_services") =>
+    writeRow(item, { [field]: !item[field] }, { [field]: !item[field] }, translations[lang].featuredSaved);
 
-    const { error: updateError } = await supabase
-      .from("services")
-      .update({ base_price: newPrice })
-      .eq("id", id);
-
-    if (updateError) {
-      setServices((prev) => prev.map((s) => (s.id === id ? { ...s, price: previous } : s)));
-      setError(translations[lang].errorMsg);
+  const commitPrice = async (item: EditableService) => {
+    const draft = priceDrafts[item.id];
+    if (draft === undefined) return;
+    const clearDraft = () => setPriceDrafts((prev) => { const next = { ...prev }; delete next[item.id]; return next; });
+    const value = Number(draft.replace(",", "."));
+    if (draft.trim() === "" || !Number.isFinite(value) || value < 0) {
+      setError(translations[lang].priceInvalid);
+      clearDraft();
       return;
     }
-
-    setSuccess(translations[lang].successMsg);
+    clearDraft();
+    if (value === item.price) return;
+    await writeRow(item, { base_price: value }, { price: value }, translations[lang].priceSaved);
   };
 
   const t = translations[lang];
@@ -399,36 +409,42 @@ export default function AdminServices() {
       {/* Header */}
       <div className={`flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between ${flip}`}>
         <div>
-          <h2 className="text-2xl font-serif font-black tracking-tight text-gray-900 leading-tight">
+          <h1 className="text-2xl font-serif font-black tracking-tight text-gray-900 leading-tight">
             {t.title}
-          </h2>
+          </h1>
           <p className="text-xs text-gray-500 font-semibold mt-1">
             {t.subtitle}
           </p>
         </div>
-        <button onClick={openNew} className="rounded-2xl bg-[#D1AF47] px-5 py-3 text-sm font-black text-[#101828] shadow-[0_14px_34px_rgba(209,175,71,0.24)] hover:bg-[#E0C46A] transition">
-          {t.addBtn}
-        </button>
+        {canWrite && (
+          <button onClick={openNew} className="rounded-2xl bg-[#D1AF47] px-5 py-3 text-sm font-black text-[#101828] shadow-[0_14px_34px_rgba(209,175,71,0.24)] hover:bg-[#E0C46A] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928]">
+            {t.addBtn}
+          </button>
+        )}
       </div>
 
       {success && (
-        <div className={`bg-[#ECFDF3] border border-[#D1FADF] text-[#027A48] text-xs rounded-xl p-4 font-bold ${isRTL ? "text-right" : "text-left"}`}>
-          {t.successMsg}
+        <div role="status" className={`bg-[#ECFDF3] border border-[#D1FADF] text-[#027A48] text-xs rounded-xl p-4 font-bold ${isRTL ? "text-right" : "text-left"}`}>
+          {success}
         </div>
       )}
 
-      {error && (
-        <div className={`bg-[#FEF3F2] border border-[#FECDCA] text-[#B42318] text-xs rounded-xl p-4 font-bold ${isRTL ? "text-right" : "text-left"}`}>
+      {error && !modalOpen && (
+        <div role="alert" className={`bg-[#FEF3F2] border border-[#FECDCA] text-[#B42318] text-xs rounded-xl p-4 font-bold ${isRTL ? "text-right" : "text-left"}`}>
           {error}
         </div>
       )}
 
+      {loadError ? (
+        <ReadFailure error={loadError} locale={lang} what={lang === "ar" ? "دليل الخدمات" : "The service catalogue"} onRetry={() => void loadServices()} />
+      ) : (
+      <>
       {/* Summary KPI Widgets */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className={cardBase}>
           <div className={`flex items-center justify-between ${flip}`}>
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{t.totalServices}</span>
-            <span className="text-xs font-black text-[#D1AF47]">#</span>
+            <span aria-hidden="true" className="text-xs font-black text-[#7A5B12]">#</span>
           </div>
           <strong className="block text-2xl font-serif font-black text-gray-900 mt-2.5">
             {totalServices}
@@ -438,7 +454,7 @@ export default function AdminServices() {
         <div className={cardBase}>
           <div className={`flex items-center justify-between ${flip}`}>
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{t.activeCategories}</span>
-            <span className="text-xs font-black text-emerald-700">✓</span>
+            <span aria-hidden="true" className="text-xs font-black text-emerald-700">✓</span>
           </div>
           <strong className="block text-2xl font-serif font-black text-emerald-700 mt-2.5">
             {activeCategoriesCount}
@@ -448,7 +464,7 @@ export default function AdminServices() {
         <div className={cardBase}>
           <div className={`flex items-center justify-between ${flip}`}>
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085]">{t.avgPrice}</span>
-            <span className="text-xs font-black text-amber-700">%</span>
+            <span aria-hidden="true" className="text-xs font-black text-amber-700">%</span>
           </div>
           <strong className="block text-2xl font-serif font-black text-gray-900 mt-2.5">
             {avgServicePrice.toLocaleString(lang === "ar" ? "ar-SA" : "en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} {lang === "ar" ? "ريال" : "SAR"}
@@ -460,18 +476,19 @@ export default function AdminServices() {
       <div className={`flex flex-col gap-3 sm:flex-row sm:items-center ${flip}`}>
         <div className="relative flex-grow">
           <input
-            type="text"
+            type="search"
+            aria-label={t.searchPlaceholder}
             placeholder={t.searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className={`w-full bg-white border border-[#ECECEC] rounded-xl px-4 py-2.5 text-xs text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47] transition duration-150 ${isRTL ? "text-right" : "text-left"}`}
           />
         </div>
-        <select value={catFilter} onChange={(e) => setCatFilter(e.target.value)} className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-xs font-bold text-gray-700 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
+        <select aria-label={t.category} value={catFilter} onChange={(e) => setCatFilter(e.target.value)} className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-xs font-bold text-gray-700 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
           <option value="all">{t.allCategories}</option>
           {categories.map((c) => <option key={c.id} value={c.id}>{lang === "ar" ? c.name_ar : c.name_en}</option>)}
         </select>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)} className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-xs font-bold text-gray-700 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
+        <select aria-label={t.status} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)} className="rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-xs font-bold text-gray-700 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
           <option value="all">{t.allStatuses}</option>
           <option value="active">{t.active}</option>
           <option value="inactive">{t.inactive}</option>
@@ -480,7 +497,7 @@ export default function AdminServices() {
 
       {/* Data Table */}
       <div className="bg-white border border-[#ECECEC] rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label={t.title}>
           <table className="w-full text-xs border-collapse">
             <thead>
               <tr className={`border-b border-[#ECECEC] text-[#667085] bg-gray-50/50 uppercase tracking-widest font-extrabold text-[9px] ${isRTL ? "text-right" : ""}`}>
@@ -490,90 +507,122 @@ export default function AdminServices() {
                 <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>{t.activeProviders}</th>
                 <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>{t.status}</th>
                 <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`} title={t.featuredHint}>{t.featured}</th>
-                <th className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>{t.actions}</th>
+                {canWrite && <th className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>{t.actions}</th>}
               </tr>
             </thead>
             <tbody className={`divide-y divide-[#F5F5F5] font-semibold text-gray-700 ${isRTL ? "text-right" : "text-left"}`}>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-gray-400 font-bold">{t.loading}</td>
+                  <td colSpan={7} className="py-8 text-center text-gray-500 font-bold" role="status">{t.loading}</td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-gray-400 font-bold">
-                    {lang === "ar" ? "لا توجد خدمات مطابقة. أضف خدمة جديدة للبدء." : "No matching services. Add a new service to get started."}
+                  <td colSpan={7} className="py-12 text-center text-gray-500 font-bold">
+                    {services.length > 0
+                      ? (lang === "ar" ? "لا توجد خدمات تطابق البحث أو التصفية." : "No services match this search or filter.")
+                      : (lang === "ar" ? "لا توجد خدمات بعد. أضف خدمة جديدة للبدء." : "No services yet. Add a new service to get started.")}
                   </td>
                 </tr>
               ) : (
-                filtered.map((item) => (
+                filtered.map((item) => {
+                  const name = lang === "ar" ? item.nameAr : item.nameEn;
+                  const statusLabel = item.status === "archived" ? t.archived : item.is_active ? t.active : t.inactive;
+                  return (
                   <tr key={item.id} className="hover:bg-gray-50/40 transition duration-150">
                     <td className="py-4 px-6">
-                      <p className="font-bold text-gray-900">{lang === "ar" ? item.nameAr : item.nameEn}</p>
-                      <p className="text-[9px] text-gray-400 font-semibold mt-1">ID: {item.id}</p>
+                      <p className="font-bold text-gray-900">{name}</p>
+                      <p className="text-[9px] text-gray-500 font-semibold mt-1">ID: {item.id}</p>
                     </td>
                     <td className="py-4 px-6 capitalize">
                       {item.category}
                     </td>
                     <td className="py-4 px-6">
-                      <div className={`flex items-center gap-1 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                        <input
-                          type="number"
-                          value={item.price}
-                          onChange={(e) => handlePriceChange(item.id, parseFloat(e.target.value) || 0)}
-                          className="w-16 bg-gray-50 border border-[#ECECEC] rounded-lg px-2 py-1 text-center font-bold text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]"
-                        />
-                        <span className="font-bold text-gray-400">{lang === "ar" ? "ريال" : "SAR"}</span>
-                      </div>
+                      {canWrite ? (
+                        <div className={`flex items-center gap-1 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                          <input
+                            type="number"
+                            min={0}
+                            step="0.01"
+                            inputMode="decimal"
+                            aria-label={lang === "ar" ? `السعر المرجعي لخدمة ${name} بالريال` : `Baseline price of ${name} in SAR`}
+                            value={priceDrafts[item.id] ?? String(item.price)}
+                            onChange={(e) => { const value = e.target.value; setPriceDrafts((prev) => ({ ...prev, [item.id]: value })); }}
+                            onBlur={() => void commitPrice(item)}
+                            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void commitPrice(item); } }}
+                            className="w-20 bg-gray-50 border border-[#ECECEC] rounded-lg px-2 py-1 text-center font-bold text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]"
+                          />
+                          <span className="font-bold text-gray-500">{lang === "ar" ? "ريال" : "SAR"}</span>
+                        </div>
+                      ) : (
+                        <span className="font-bold text-gray-900">{item.price.toLocaleString(lang === "ar" ? "ar-SA" : "en-US")} {lang === "ar" ? "ريال" : "SAR"}</span>
+                      )}
                     </td>
                     <td className="py-4 px-6 font-serif font-black">
                       {item.providersCount}
                     </td>
                     <td className="py-4 px-6">
-                      <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-block ${
-                        item.is_active 
-                          ? "bg-[#ECFDF3] text-[#15803D]" 
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider inline-block ${
+                        item.is_active
+                          ? "bg-[#ECFDF3] text-[#15803D]"
                           : "bg-[#FEF3F2] text-[#B91C1C]"
                       }`}>
-                        {item.is_active ? t.active : t.inactive}
+                        {statusLabel}
                       </span>
                     </td>
                     <td className="py-4 px-6">
-                      <div className={`flex items-center gap-1.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
-                        <button
-                          onClick={() => handleToggleFeatured(item.id, "featured_on_landing", item.featured_on_landing)}
-                          title={t.featuredHint}
-                          className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border transition duration-150 ${
-                            item.featured_on_landing
-                              ? "bg-[#FFFAEB] text-[#B8952E] border-[#D1AF47]/40"
-                              : "bg-white text-gray-400 border-[#ECECEC] hover:border-[#D1AF47]/30 hover:text-gray-600"
-                          }`}
-                        >
-                          {item.featured_on_landing ? "★" : "☆"} {t.featLanding}
-                        </button>
-                        <button
-                          onClick={() => handleToggleFeatured(item.id, "featured_in_services", item.featured_in_services)}
-                          title={t.featuredHint}
-                          className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border transition duration-150 ${
-                            item.featured_in_services
-                              ? "bg-[#FFFAEB] text-[#B8952E] border-[#D1AF47]/40"
-                              : "bg-white text-gray-400 border-[#ECECEC] hover:border-[#D1AF47]/30 hover:text-gray-600"
-                          }`}
-                        >
-                          {item.featured_in_services ? "★" : "☆"} {t.featServices}
-                        </button>
-                      </div>
+                      {canWrite ? (
+                        <div className={`flex items-center gap-1.5 ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                          <button
+                            type="button"
+                            onClick={() => void handleToggleFeatured(item, "featured_on_landing")}
+                            title={t.featuredHint}
+                            aria-pressed={item.featured_on_landing}
+                            aria-label={`${t.featured}: ${t.featLanding} — ${name}`}
+                            className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border transition duration-150 focus-visible:outline-2 focus-visible:outline-[#9B7928] ${
+                              item.featured_on_landing
+                                ? "bg-[#FFFAEB] text-[#7A5B12] border-[#D1AF47]/40"
+                                : "bg-white text-gray-600 border-[#ECECEC] hover:border-[#D1AF47]/30 hover:text-gray-800"
+                            }`}
+                          >
+                            <span aria-hidden="true">{item.featured_on_landing ? "★" : "☆"}</span> {t.featLanding}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => void handleToggleFeatured(item, "featured_in_services")}
+                            title={t.featuredHint}
+                            aria-pressed={item.featured_in_services}
+                            aria-label={`${t.featured}: ${t.featServices} — ${name}`}
+                            className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border transition duration-150 focus-visible:outline-2 focus-visible:outline-[#9B7928] ${
+                              item.featured_in_services
+                                ? "bg-[#FFFAEB] text-[#7A5B12] border-[#D1AF47]/40"
+                                : "bg-white text-gray-600 border-[#ECECEC] hover:border-[#D1AF47]/30 hover:text-gray-800"
+                            }`}
+                          >
+                            <span aria-hidden="true">{item.featured_in_services ? "★" : "☆"}</span> {t.featServices}
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-[10px] font-bold text-gray-600">
+                          {[item.featured_on_landing && t.featLanding, item.featured_in_services && t.featServices].filter(Boolean).join(" · ") || "—"}
+                        </span>
+                      )}
                     </td>
+                    {canWrite && (
                     <td className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>
                       <div className={`flex flex-wrap gap-1.5 ${isRTL ? "justify-start" : "justify-end"}`}>
                         <button
+                          type="button"
                           onClick={() => openEdit(item)}
-                          className="px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition duration-150 border border-[#D1AF47]/30 bg-[#D1AF47]/10 text-[#9A741F] hover:border-[#D1AF47]/50"
+                          aria-label={`${t.editBtn}: ${name}`}
+                          className="px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition duration-150 border border-[#D1AF47]/30 bg-[#D1AF47]/10 text-[#7A5B12] hover:border-[#D1AF47]/50 focus-visible:outline-2 focus-visible:outline-[#9B7928]"
                         >
                           {t.editBtn}
                         </button>
                         <button
-                          onClick={() => handleToggleActive(item.id, item.is_active)}
-                          className={`px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition duration-150 border ${
+                          type="button"
+                          onClick={() => void handleToggleActive(item)}
+                          aria-label={`${item.is_active ? t.inactive : t.active}: ${name}`}
+                          className={`px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition duration-150 border focus-visible:outline-2 focus-visible:outline-[#9B7928] ${
                             item.is_active
                               ? "bg-white hover:bg-gray-50 text-gray-700 border-[#ECECEC]"
                               : "bg-gray-900 hover:bg-gray-800 text-white border-transparent"
@@ -581,65 +630,82 @@ export default function AdminServices() {
                         >
                           {item.is_active ? t.inactive : t.active}
                         </button>
-                        <button
-                          onClick={() => deleteService(item)}
-                          className="px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition duration-150 border border-[#FECDCA] bg-[#FEF3F2] text-[#B42318] hover:border-[#F97066]"
-                        >
-                          {t.deleteBtn}
-                        </button>
+                        {item.status !== "archived" && (
+                          <button
+                            type="button"
+                            onClick={() => void deleteService(item)}
+                            aria-label={`${t.deleteBtn}: ${name}`}
+                            className="px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition duration-150 border border-[#FECDCA] bg-[#FEF3F2] text-[#B42318] hover:border-[#F97066] focus-visible:outline-2 focus-visible:outline-[#9B7928]"
+                          >
+                            {t.deleteBtn}
+                          </button>
+                        )}
                       </div>
                     </td>
+                    )}
                   </tr>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
       </div>
+      </>
+      )}
 
       {/* Create / Edit service modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-start justify-center overflow-y-auto bg-[#101828]/55 px-4 py-8 backdrop-blur-sm" onClick={() => setModalOpen(false)}>
-          <div dir={isRTL ? "rtl" : "ltr"} onClick={(e) => e.stopPropagation()} className={`w-full max-w-2xl rounded-[24px] border border-[#D1AF47]/25 bg-[#F9F7F1] p-6 shadow-2xl ${isRTL ? "text-right" : "text-left"}`}>
-            <div className={`mb-5 flex items-center justify-between gap-4 ${flip}`}>
-              <h3 className="font-serif text-xl font-black text-gray-900">{form.id ? t.editService : t.newService}</h3>
-              <button onClick={() => setModalOpen(false)} className="rounded-full border border-[#ECECEC] px-3 py-1 text-xs font-black text-[#667085]">{t.cancelBtn}</button>
+      {modalOpen && canWrite && (
+        <ModalPortal>
+        <ModalOverlay onClose={() => { if (!saving) setModalOpen(false); }} canClose={!saving} className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#101828]/55 px-4 py-4 backdrop-blur-sm">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="service-dialog-title"
+            dir={isRTL ? "rtl" : "ltr"}
+            style={{ maxHeight: "calc(100dvh - 2rem)" }}
+            className={`flex w-full max-w-2xl flex-col overflow-hidden rounded-[24px] border border-[#D1AF47]/25 bg-[#F9F7F1] shadow-2xl ${isRTL ? "text-right" : "text-left"}`}
+          >
+            <div className={`flex shrink-0 items-center justify-between gap-4 border-b border-[#ECECEC] px-6 pb-4 pt-6 ${flip}`}>
+              <h3 id="service-dialog-title" className="font-serif text-xl font-black text-gray-900">{form.id ? t.editService : t.newService}</h3>
+              <button type="button" onClick={() => setModalOpen(false)} disabled={saving} className="rounded-full border border-[#ECECEC] px-3 py-1 text-xs font-black text-[#475467] focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.cancelBtn}</button>
             </div>
 
-            {error && <div className="mb-4 rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-4 py-2.5 text-xs font-bold text-[#B42318]">{error}</div>}
+            <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
+            {formError && <div role="alert" className="mb-4 rounded-xl border border-[#FECDCA] bg-[#FEF3F2] px-4 py-2.5 text-xs font-bold text-[#B42318]">{formError}</div>}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.nameEnLabel}
-                <input value={form.nameEn} onChange={(e) => setForm((f) => ({ ...f, nameEn: e.target.value }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#475467]">{t.nameEnLabel}
+                <input data-autofocus value={form.nameEn} onChange={(e) => setForm((f) => ({ ...f, nameEn: e.target.value }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
-              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.nameArLabel}
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#475467]">{t.nameArLabel}
                 <input value={form.nameAr} onChange={(e) => setForm((f) => ({ ...f, nameAr: e.target.value }))} dir="rtl" className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
-              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.categorySel}
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#475467]">{t.categorySel}
                 <select value={form.categoryId} onChange={(e) => setForm((f) => ({ ...f, categoryId: e.target.value }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
                   <option value="">{t.categorySel}…</option>
                   {categories.map((c) => <option key={c.id} value={c.id}>{lang === "ar" ? c.name_ar : c.name_en}</option>)}
                 </select>
               </label>
-              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.assignProvider}
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#475467]">{t.assignProvider}
                 <select value={form.providerId} onChange={(e) => setForm((f) => ({ ...f, providerId: e.target.value }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]">
                   <option value="">{t.unassigned}</option>
                   {providersList.map((p) => <option key={p.id} value={p.id}>{lang === "ar" ? p.name_ar : p.name_en}</option>)}
                 </select>
               </label>
-              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.priceLabel}
-                <input type="number" min={0} value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: Number(e.target.value) || 0 }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#475467]">{t.priceLabel}
+                <input type="number" min={0} step="0.01" inputMode="decimal" value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: Number(e.target.value) || 0 }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
-              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085]">{t.durationLabel}
-                <input type="number" min={0} value={form.duration} onChange={(e) => setForm((f) => ({ ...f, duration: Number(e.target.value) || 0 }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#475467]">{t.durationLabel}
+                <input type="number" min={5} max={1440} inputMode="numeric" value={form.duration} onChange={(e) => setForm((f) => ({ ...f, duration: Number(e.target.value) || 0 }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
-              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085] sm:col-span-2">{t.imageLabel}
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#475467] sm:col-span-2">{t.imageLabel}
                 <input value={form.image} onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))} placeholder="https://…" dir="ltr" className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
-              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085] sm:col-span-2">{t.descEnLabel}
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#475467] sm:col-span-2">{t.descEnLabel}
                 <textarea rows={2} value={form.descriptionEn} onChange={(e) => setForm((f) => ({ ...f, descriptionEn: e.target.value }))} className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
-              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#667085] sm:col-span-2">{t.descArLabel}
+              <label className="space-y-1.5 text-[10px] font-black uppercase tracking-widest text-[#475467] sm:col-span-2">{t.descArLabel}
                 <textarea rows={2} value={form.descriptionAr} onChange={(e) => setForm((f) => ({ ...f, descriptionAr: e.target.value }))} dir="rtl" className="w-full rounded-xl border border-[#ECECEC] bg-white px-3 py-2.5 text-sm normal-case tracking-normal text-gray-900 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]" />
               </label>
             </div>
@@ -653,22 +719,25 @@ export default function AdminServices() {
                 <button
                   key={key}
                   type="button"
+                  aria-pressed={form[key]}
                   onClick={() => setForm((f) => ({ ...f, [key]: !f[key] }))}
-                  className={`rounded-full border px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition ${
-                    form[key] ? "border-[#D1AF47]/40 bg-[#FFFAEB] text-[#B8952E]" : "border-[#ECECEC] bg-white text-gray-400 hover:border-[#D1AF47]/30"
+                  className={`rounded-full border px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition focus-visible:outline-2 focus-visible:outline-[#9B7928] ${
+                    form[key] ? "border-[#D1AF47]/40 bg-[#FFFAEB] text-[#7A5B12]" : "border-[#ECECEC] bg-white text-gray-600 hover:border-[#D1AF47]/30"
                   }`}
                 >
-                  {form[key] ? "★" : "☆"} {label}
+                  <span aria-hidden="true">{form[key] ? "★" : "☆"}</span> {label}
                 </button>
               ))}
             </div>
+            </div>
 
-            <div className={`mt-6 flex justify-end gap-3 ${flip}`}>
-              <button onClick={() => setModalOpen(false)} className="rounded-xl border border-[#ECECEC] px-5 py-2.5 text-xs font-black text-[#667085]">{t.cancelBtn}</button>
-              <button onClick={() => void saveService()} disabled={saving} className="rounded-xl bg-[#D1AF47] px-5 py-2.5 text-xs font-black text-[#101828] hover:bg-[#E0C46A] disabled:opacity-60">{saving ? t.saving : t.saveBtn}</button>
+            <div className={`flex shrink-0 justify-end gap-3 border-t border-[#ECECEC] bg-[#F9F7F1] px-6 py-4 ${flip}`}>
+              <button type="button" onClick={() => setModalOpen(false)} disabled={saving} className="rounded-xl border border-[#ECECEC] px-5 py-2.5 text-xs font-black text-[#475467] focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.cancelBtn}</button>
+              <button type="button" onClick={() => void saveService()} aria-disabled={saving} className="rounded-xl bg-[#D1AF47] px-5 py-2.5 text-xs font-black text-[#101828] hover:bg-[#E0C46A] aria-disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-[#9B7928]">{saving ? t.saving : t.saveBtn}</button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
+        </ModalPortal>
       )}
     </div>
   );

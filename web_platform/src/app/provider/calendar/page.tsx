@@ -15,6 +15,7 @@ const translations = {
     calendarTitle: "Riyadh Calendar & Scheduling Engine",
     subtitle: "Real-time dispatch, prayer time buffers, and roster overrides control panel",
     today: "Today",
+    pickDate: "Day shown in the planner",
     weekView: "Week View",
     dayView: "Day View",
     stylistFilter: "All Stylists",
@@ -75,6 +76,7 @@ const translations = {
     calendarTitle: "محرك جدولة ومواعيد الرياض",
     subtitle: "لوحة التحكم الفوري للخدمات، فترات الصلاة، ومناوبات الموظفين",
     today: "اليوم",
+    pickDate: "اليوم المعروض في الجدول",
     weekView: "عرض الأسبوع",
     dayView: "عرض اليوم",
     stylistFilter: "جميع المصففين",
@@ -1107,8 +1109,10 @@ export default function ProviderCalendarPage() {
           {/* Date Picker */}
           <input
             type="date"
-            value={selectedDate.toISOString().split("T")[0]}
-            onChange={(e) => setSelectedDate(new Date(e.target.value))}
+            // The Riyadh day, the same day the planner loads (a UTC date showed yesterday between 00:00 and 03:00 Riyadh).
+            aria-label={t.pickDate}
+            value={riyadhDateKey(selectedDate)}
+            onChange={(e) => { if (e.target.value) setSelectedDate(new Date(`${e.target.value}T12:00:00+03:00`)); }}
             className="px-4 py-2.5 bg-[#F9FAFB] border border-[#ECECEC] text-xs font-bold rounded-2xl text-[#101828] outline-none focus:border-[#D1AF47]/40 transition-all duration-300 cursor-pointer"
           />
 

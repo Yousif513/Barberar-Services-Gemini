@@ -2,6 +2,7 @@
 
 import React, { useCallback, useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { checkedWrite } from "@/lib/write-result.mjs";
 import { useConfirm } from "@/components/modal";
 
 const translations = {
@@ -356,11 +357,12 @@ export default function ProviderServicesPage() {
         base_price: priceValue,
         base_duration_minutes: durationValue,
         is_home_service_eligible: serviceForm.isHomeService,
-        is_active: serviceForm.isActive
+        // services.is_active follows services.status (sync_service_status_fields), so the state is written as the status.
+        status: serviceForm.isActive ? "active" : "draft"
       };
 
       const result = serviceForm.id
-        ? await supabase.from("services").update(payload).eq("id", serviceForm.id)
+        ? checkedWrite(await supabase.from("services").update(payload).eq("id", serviceForm.id).select("id"), { expected: 1, lang })
         : await supabase.from("services").insert(payload);
 
       if (result.error) throw result.error;
@@ -384,16 +386,19 @@ export default function ProviderServicesPage() {
       setSaving(true);
       setError("");
       setSuccess("");
-      const { error: deleteError } = await supabase
+      const { error: deleteError } = checkedWrite(await supabase
         .from("services")
         .delete()
-        .eq("id", service.id);
+        .eq("id", service.id)
+        .select("id"), { expected: 1, lang });
 
       if (deleteError) {
-        const { error: deactivateError } = await supabase
+        // A service with bookings cannot be deleted; it is archived instead (kept with its history, no longer bookable).
+        const { error: deactivateError } = checkedWrite(await supabase
           .from("services")
-          .update({ is_active: false })
-          .eq("id", service.id);
+          .update({ status: "archived" })
+          .eq("id", service.id)
+          .select("id"), { expected: 1, lang });
         if (deactivateError) throw deactivateError;
         setSuccess(serviceCopy.deactivated);
       } else {

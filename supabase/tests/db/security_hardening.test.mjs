@@ -179,14 +179,16 @@ describe("refunds stuck in progress", () => {
     assert.equal((await sys(db, `select status from refund_requests where id = $1`, [stuck]))[0].status, "processing");
   });
 
-  it("go back to failed so the operator can retry them, with the reason in the audit log", async () => {
+  // PAY-WAVE2 (QA item 4): the worker may have stopped after Tap accepted the refund, so a reopened refund is of unknown outcome and
+  // is never sent again until Check with Tap or an approved decision settles it (supabase/tests/db/paywave2_refund_unknown.test.mjs).
+  it("become of unknown outcome, never retried, with the reason in the audit log", async () => {
     const stuck = await refund({ claimedMinutesAgo: 45 });
-    await as(db, admin, `select admin_reopen_stuck_refund($1, 'Checked the gateway: no refund was issued')`, [stuck]);
-    assert.equal((await sys(db, `select status from refund_requests where id = $1`, [stuck]))[0].status, "failed");
+    await as(db, admin, `select admin_reopen_stuck_refund($1, 'The gateway never answered the worker')`, [stuck]);
+    assert.equal((await sys(db, `select status from refund_requests where id = $1`, [stuck]))[0].status, "unknown");
     const audit = (await auditRows("refund.reopened")).find((r) => r.target_id === stuck);
     assert.equal(audit.actor_id, admin.sub);
-    assert.equal(audit.details.reason, "Checked the gateway: no refund was issued");
-    await as(db, admin, `select admin_retry_refund_request($1, 'Customer is waiting')`, [stuck]);
+    assert.equal(audit.details.reason, "The gateway never answered the worker");
+    await expectError(as(db, admin, `select admin_retry_refund_request($1, 'Customer is waiting')`, [stuck]), /never sent again/);
   });
 
   it("are counted as stuck on the dashboard", async () => {

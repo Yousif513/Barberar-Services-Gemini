@@ -1,0 +1,59 @@
+{
+ "phase": "workflow",
+ "app": "http://localhost:3100",
+ "api": "http://127.0.0.1:54321",
+ "started": "2026-10-17T07:24:33.781Z",
+ "ended": "2026-10-17T07:25:05.269Z",
+ "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+ "axe": "axe-core 4.12.1 (node_modules)",
+ "results": [
+  {
+   "asked": {
+    "kind": "payout_hold",
+    "amount": null,
+    "status": "pending_approval",
+    "existing": true,
+    "approval_id": "11ceb50c-b4bd-4b8c-8579-6ed975940ccf",
+    "requested_by": "e311184b-14e8-4cf1-9856-a86eef167c22"
+   },
+   "finance": {
+    "mfa": "/login/mfa",
+    "landed": "/admin",
+    "decision": {
+     "opened": "clicked",
+     "dialog": "Approve: Payout hold Approving runs the action now, in your name, with every check the action has (balance, hold, idempotency). It needs a fresh authenticator code. Request Sara Beauty Salon & Spa · place hold Requested by QA qa-owner-a Reason QA UI workflow 1792188468144: place hold, ticket QA-1017",
+     "confirm": "Approve",
+     "alerts": [
+      "Approved and executed. Dismiss"
+     ],
+     "consoleErrors": [],
+     "pendingRowStillListed": false
+    }
+   },
+   "holdAfterFinanceApproval": "t",
+   "asked2": {
+    "kind": "payout_hold",
+    "amount": null,
+    "status": "pending_approval",
+    "existing": false,
+    "approval_id": "038e893c-856f-4f93-b387-3c9a4000d985"
+   },
+   "owner": {
+    "mfa": "/login/mfa",
+    "landed": "/admin",
+    "decision": {
+     "opened": "clicked",
+     "dialog": "Approve: Payout hold Approving runs the action now, in your name, with every check the action has (balance, hold, idempotency). It needs a fresh authenticator code. Request Sara Beauty Salon & Spa · lift hold Requested by QA qa-finance Reason QA UI workflow 1792221889273: lift hold, ticket QA-1017 W",
+     "confirm": "Approve",
+     "alerts": [
+      "Approved and executed. Dismiss"
+     ],
+     "consoleErrors": [],
+     "pendingRowStillListed": false
+    }
+   },
+   "holdAfterOwnerApproval": "f",
+   "audit": "approval.requested:e311184b-14e8-4cf1-9856-a86eef167c22 ; approval.approved:8d445a8c-fcac-42a2-be66-faa3c87ee383 ; approval.requested:8d445a8c-fcac-42a2-be66-faa3c87ee383 ; approval.approved:e311184b-14e8-4cf1-9856-a86eef167c22"
+  }
+ ]
+}

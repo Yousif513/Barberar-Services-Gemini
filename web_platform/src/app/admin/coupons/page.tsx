@@ -2,7 +2,10 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { CommandDialog, ModalOverlay, ModalPortal } from "@/components/modal";
-import { errorMessage } from "@/lib/error-message";
+import { describeConsoleError, unchangedText } from "@/lib/console-errors.mjs";
+import { commandOutcome } from "@/lib/write-result.mjs";
+import { knownToHold, useConsoleSession } from "@/lib/console-session";
+import { ReadFailure } from "@/components/read-failure";
 
 const translations = {
   en: {
@@ -153,6 +156,9 @@ export default function AdminCoupons() {
   const [couponForm, setCouponForm] = useState(emptyCouponForm);
   const [formError, setFormError] = useState("");
   const [statusPending, setStatusPending] = useState<{ coupon: any; next: boolean } | null>(null);
+  const [loadError, setLoadError] = useState<unknown>(null);
+  // admin_save_promo_code and admin_set_promo_code_active need money.config: the controls show only to roles holding it.
+  const canWrite = knownToHold(useConsoleSession(), ["money.config"]);
   const [lang, setLang] = useState<"en" | "ar">("ar");
 
   useEffect(() => {
@@ -195,6 +201,7 @@ export default function AdminCoupons() {
     try {
       setLoading(true);
       setError("");
+      setLoadError(null);
       const { data, error: dbError } = await supabase
         .from("promotional_codes")
         .select("id, code, discount_type, discount_value, max_redemptions, redeemed_count, funding_source, min_order_amount, max_discount_cap, per_customer_limit, first_booking_only, starts_at, ends_at, is_active, created_at")
@@ -204,7 +211,7 @@ export default function AdminCoupons() {
       setCoupons((data || []).map(formatCoupon));
     } catch (err) {
       setCoupons([]);
-      setError(`${t.errorLoad} ${errorMessage(err)}`.trim());
+      setLoadError(err);
     } finally {
       setLoading(false);
     }
@@ -254,7 +261,7 @@ export default function AdminCoupons() {
     if (couponForm.reason.trim().length < 3) { setFormError(t.reasonShort); return; }
     setSaving(true);
     setFormError("");
-    const { error: rpcError } = await supabase.rpc("admin_save_promo_code", {
+    const outcome = commandOutcome(await supabase.rpc("admin_save_promo_code", {
       p_code: couponForm.code.trim().toUpperCase(),
       p_discount_type: couponForm.discountType,
       p_discount_value: discountValue,
@@ -269,13 +276,13 @@ export default function AdminCoupons() {
       p_is_active: couponForm.isActive,
       p_starts_at: riyadhStart(couponForm.startsOn),
       p_ends_at: riyadhEnd(couponForm.endsOn)
-    });
+    }));
     setSaving(false);
-    if (rpcError) {
-      setFormError(errorMessage(rpcError) || t.errorSave);
+    if (!outcome.ok) {
+      setFormError(describeConsoleError(outcome.error, lang) || t.errorSave);
       return;
     }
-    setSuccess(t.saved);
+    setSuccess(outcome.changed ? t.saved : unchangedText(lang));
     setModalOpen(false);
     await loadCoupons();
   };
@@ -286,11 +293,12 @@ export default function AdminCoupons() {
   const runStatusChange = async (reason: string): Promise<string | null> => {
     if (!statusPending) return null;
     const { coupon, next } = statusPending;
-    const { error: rpcError } = await supabase.rpc("admin_set_promo_code_active", { p_id: coupon.id, p_active: next, p_reason: reason });
-    if (rpcError) return errorMessage(rpcError) || t.errorToggle;
+    const outcome = commandOutcome(await supabase.rpc("admin_set_promo_code_active", { p_id: coupon.id, p_active: next, p_reason: reason }));
+    if (!outcome.ok) return describeConsoleError(outcome.error, lang) || t.errorToggle;
+    const stored = typeof outcome.data?.is_active === "boolean" ? outcome.data.is_active : next;
     setError("");
-    setSuccess(next ? t.activated : t.deactivated);
-    setCoupons(prev => prev.map(item => item.id === coupon.id ? { ...item, active: next } : item));
+    setSuccess(!outcome.changed ? unchangedText(lang) : stored ? t.activated : t.deactivated);
+    setCoupons(prev => prev.map(item => item.id === coupon.id ? { ...item, active: stored } : item));
     return null;
   };
 
@@ -313,12 +321,14 @@ export default function AdminCoupons() {
       )}
       <div className={`flex items-start justify-between gap-4 ${flip}`}>
         <div>
-          <h2 className="text-2xl font-serif font-black text-gray-900 leading-tight">{t.title}</h2>
+          <h1 className="text-2xl font-serif font-black text-gray-900 leading-tight">{t.title}</h1>
           <p className="text-xs text-gray-500 font-semibold mt-1">{t.subtitle}</p>
         </div>
-        <button onClick={openAddCoupon} className="rounded-xl bg-gray-900 px-4 py-2 text-[10px] font-black uppercase tracking-wider text-white transition hover:bg-gray-800">
-          {t.addCoupon}
-        </button>
+        {canWrite && (
+          <button type="button" onClick={openAddCoupon} className="rounded-xl bg-gray-900 px-4 py-2 text-[10px] font-black uppercase tracking-wider text-white transition hover:bg-gray-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928]">
+            {t.addCoupon}
+          </button>
+        )}
       </div>
 
       {error && (
@@ -327,8 +337,12 @@ export default function AdminCoupons() {
           <button type="button" onClick={() => void loadCoupons()} className="rounded-lg border border-[#B42318]/40 px-3 py-1.5 text-[11px] font-black hover:bg-white">{t.retry}</button>
         </div>
       )}
-      {success && <div className="bg-[#ECFDF3] border border-[#D1FADF] text-[#027A48] text-xs rounded-xl p-4 font-bold">{success}</div>}
+      {success && <div role="status" className="bg-[#ECFDF3] border border-[#D1FADF] text-[#027A48] text-xs rounded-xl p-4 font-bold">{success}</div>}
 
+      {loadError ? (
+        <ReadFailure error={loadError} locale={lang} what={isRTL ? "رموز الخصم" : "The promotion codes"} onRetry={() => void loadCoupons()} />
+      ) : (
+      <>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className={cardBase}>
           <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085] block">{t.activeCoupons}</span>
@@ -336,7 +350,7 @@ export default function AdminCoupons() {
         </div>
         <div className={cardBase}>
           <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085] block">{t.totalRedeemed}</span>
-          <strong className="block text-2xl font-serif font-black text-[#D1AF47] mt-2.5">{totalRedeemed.toLocaleString(isRTL ? "ar-SA" : "en-US")}</strong>
+          <strong className="block text-2xl font-serif font-black text-[#7A5B12] mt-2.5">{totalRedeemed.toLocaleString(isRTL ? "ar-SA" : "en-US")}</strong>
         </div>
         <div className={cardBase}>
           <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085] block">{t.savedValue}</span>
@@ -345,7 +359,7 @@ export default function AdminCoupons() {
       </div>
 
       <div className="bg-white border border-[#ECECEC] rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label={t.title}>
           <table className="w-full text-xs border-collapse">
             <thead>
               <tr className={`border-b border-[#ECECEC] text-[#667085] bg-gray-50/50 uppercase tracking-widest font-extrabold text-[9px] ${isRTL ? "text-right" : ""}`}>
@@ -355,17 +369,17 @@ export default function AdminCoupons() {
                 <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>{t.usageCount}</th>
                 <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>{t.perCustomerColumn}</th>
                 <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>{t.status}</th>
-                <th className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>{t.actions}</th>
+                {canWrite && <th className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>{t.actions}</th>}
               </tr>
             </thead>
             <tbody className={`divide-y divide-[#F5F5F5] font-semibold text-gray-700 ${isRTL ? "text-right" : "text-left"}`}>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-gray-400 font-bold">{t.loading}</td>
+                  <td colSpan={7} className="py-8 text-center text-gray-500 font-bold" role="status">{t.loading}</td>
                 </tr>
               ) : coupons.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-gray-400 font-bold">{t.noCoupons}</td>
+                  <td colSpan={7} className="py-8 text-center text-gray-500 font-bold">{t.noCoupons}</td>
                 </tr>
               ) : coupons.map(c => (
                 <tr key={c.id} className="hover:bg-gray-50/40 transition duration-150">
@@ -382,21 +396,25 @@ export default function AdminCoupons() {
                       c.active ? "bg-[#ECFDF3] text-[#15803D]" : "bg-[#FEF3F2] text-[#B91C1C]"
                     }`}>{c.active ? t.active : t.expired}</span>
                   </td>
+                  {canWrite && (
                   <td className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>
                     <div className={`flex gap-2 ${isRTL ? "justify-start" : "justify-end"}`}>
-                      <button onClick={() => openEditCoupon(c)} className="px-3 py-1.5 bg-white border border-gray-200 text-gray-900 rounded-lg text-[10px] uppercase font-black tracking-wider hover:border-[#D1AF47] transition">{t.edit}</button>
-                      <button onClick={() => handleToggle(c)} className="px-3 py-1.5 bg-gray-900 text-white rounded-lg text-[10px] uppercase font-black tracking-wider hover:bg-gray-800 transition">{t.toggle}</button>
-                      <button onClick={() => deleteCoupon(c)} className="px-3 py-1.5 bg-[#FEF3F2] text-[#B42318] rounded-lg text-[10px] uppercase font-black tracking-wider hover:bg-[#FEE4E2] transition">{t.delete}</button>
+                      <button type="button" onClick={() => openEditCoupon(c)} aria-label={`${t.edit}: ${c.code}`} className="px-3 py-1.5 bg-white border border-gray-200 text-gray-900 rounded-lg text-[10px] uppercase font-black tracking-wider hover:border-[#D1AF47] transition focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.edit}</button>
+                      <button type="button" onClick={() => handleToggle(c)} aria-label={`${c.active ? t.delete : t.activateTitle}: ${c.code}`} className="px-3 py-1.5 bg-gray-900 text-white rounded-lg text-[10px] uppercase font-black tracking-wider hover:bg-gray-800 transition focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.toggle}</button>
+                      {c.active && <button type="button" onClick={() => deleteCoupon(c)} aria-label={`${t.delete}: ${c.code}`} className="px-3 py-1.5 bg-[#FEF3F2] text-[#B42318] rounded-lg text-[10px] uppercase font-black tracking-wider hover:bg-[#FEE4E2] transition focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.delete}</button>}
                     </div>
                   </td>
+                  )}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
+      </>
+      )}
 
-      {modalOpen && (
+      {modalOpen && canWrite && (
         <ModalPortal>
         <ModalOverlay onClose={() => setModalOpen(false)} canClose={!saving} className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 px-4 py-6 backdrop-blur-sm">
           <div role="dialog" aria-modal="true" aria-labelledby="coupon-dialog-title" tabIndex={-1} className="w-full max-w-lg rounded-2xl border border-[#ECECEC] bg-white p-6 shadow-[0_24px_70px_rgba(0,0,0,0.18)]">

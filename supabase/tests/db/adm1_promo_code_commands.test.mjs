@@ -59,6 +59,9 @@ describe("admin_save_promo_code", () => {
       `select * from create_booking(target_employee_id => $1, target_service_id => $2, target_scheduled_at => $3, request_source => 'marketplace', request_coupon_code => 'BOOK10', request_gift_card_code => null, request_loyalty_points => 0)`,
       [SEED.employee1, svc.id, slot]);
     assert.ok(booked[0]);
+    // RT-M1: consumed when the deposit is paid, not while the booking is an unpaid hold.
+    assert.equal((await sys(db, `select redeemed_count from promotional_codes where id = $1`, [created.id]))[0].redeemed_count, 0);
+    await as(db, ROLES.service, `select confirm_booking_payment($1, $2, $3)`, [booked[0].id, `chg_${booked[0].id}`, booked[0].deposit_required]);
     assert.equal((await sys(db, `select redeemed_count from promotional_codes where id = $1`, [created.id]))[0].redeemed_count, 1);
     await expectError(save(admin, { id: created.id, code: "RENAMED10", value: 10 }), /already used keeps its name/);
     await expectError(save(admin, { id: created.id, code: "BOOK10", value: 10, max: 1 }).then(() => save(admin, { id: created.id, code: "BOOK10", value: 10, max: 0 })), /between 1 and 1000000/);

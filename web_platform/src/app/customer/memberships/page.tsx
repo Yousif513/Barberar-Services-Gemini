@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { CommandResult, operationsButton, operationsDate, sar, useOperationsLocale } from "@/components/operations-ui";
 import { CommandDialog } from "@/components/modal";
 import { membershipError, membershipStatusLabel, newRequestKey, type MembershipStatus } from "@/lib/membership-copy";
+import { disputeLabel, loadPurchaseMoney, openPurchaseDispute, purchaseDisputeError, purchaseMoneyCopy, type PurchaseDispute, type PurchaseRefund } from "@/lib/purchase-disputes";
 
 type ProviderName = { business_name_en: string | null; business_name_ar: string | null } | null;
 
@@ -24,6 +25,7 @@ type Membership = {
   period_start: string | null;
   period_end: string | null;
   renewal_of: string | null;
+  paid_at: string | null;
   providers: ProviderName;
 };
 
@@ -64,7 +66,10 @@ const copy = {
     renewHint: "Renewing opens a new payment for the next period. It starts when this period ends, and unused visits do not carry over.",
     cancel: "Cancel membership",
     cancelling: "Cancel this membership?",
-    cancelIntro: "Your remaining visits will be forfeited. Cancelling does not refund a payment; ask the salon for a refund if you need one.",
+    cancelIntro: "Cancelling ends your membership now. The share of the visits you have not used is refunded to your original payment method.",
+    refundBack: "You get back",
+    cancelledWithRefund: "Membership cancelled. {sum} is being refunded to your original payment method.",
+    previewFailed: "We could not work out the refund for this membership, so nothing was cancelled. Try again.",
     cancelIntroPending: "This purchase has not been paid. Cancelling closes it and no payment is taken.",
     cancelReason: "Why are you cancelling?",
     cancelConfirm: "Cancel membership",
@@ -103,7 +108,10 @@ const copy = {
     renewHint: "التجديد يفتح دفعة جديدة للفترة التالية. تبدأ عند انتهاء الفترة الحالية، ولا تُرحَّل الزيارات غير المستخدمة.",
     cancel: "إلغاء العضوية",
     cancelling: "إلغاء هذه العضوية؟",
-    cancelIntro: "ستسقط زياراتك المتبقية. الإلغاء لا يعيد أي مبلغ مدفوع؛ اطلب الاسترداد من الصالون إذا احتجت.",
+    cancelIntro: "يُنهي الإلغاء عضويتك الآن، ويُعاد نصيب الزيارات التي لم تستخدمها إلى وسيلة الدفع الأصلية.",
+    refundBack: "المبلغ المُعاد إليك",
+    cancelledWithRefund: "أُلغيت العضوية. يُعاد إليك {sum} إلى وسيلة الدفع الأصلية.",
+    previewFailed: "تعذر حساب المبلغ المسترد لهذه العضوية، لذلك لم يُلغَ شيء. حاول مجدداً.",
     cancelIntroPending: "لم يتم دفع هذا الطلب. الإلغاء يغلقه دون أي خصم.",
     cancelReason: "ما سبب الإلغاء؟",
     cancelConfirm: "إلغاء العضوية",
@@ -123,7 +131,7 @@ const copy = {
 };
 
 const MEMBERSHIP_COLUMNS =
-  "id, status, plan_id, plan_name_en, plan_name_ar, amount_due, period_days, visits_per_period, visits_remaining, covers_all_services, covered_service_ids, period_start, period_end, renewal_of, providers(business_name_en, business_name_ar)";
+  "id, status, plan_id, plan_name_en, plan_name_ar, amount_due, period_days, visits_per_period, visits_remaining, covers_all_services, covered_service_ids, period_start, period_end, renewal_of, paid_at, providers(business_name_en, business_name_ar)";
 const PLAN_COLUMNS =
   "id, name_en, name_ar, description_en, description_ar, price, period_days, visits_per_period, covers_all_services, providers(business_name_en, business_name_ar), membership_plan_services(services(name_en, name_ar))";
 
@@ -143,6 +151,12 @@ export default function CustomerMembershipsPage() {
   const [returning, setReturning] = useState(false);
   const [now] = useState(() => Date.now());
   const [cancelFor, setCancelFor] = useState<Membership | null>(null);
+  // What the server says a cancellation gives back now (preview_membership_cancellation); shown before the customer confirms.
+  const [cancelRefund, setCancelRefund] = useState<number | null>(null);
+  const [reportFor, setReportFor] = useState<Membership | null>(null);
+  const [disputes, setDisputes] = useState<PurchaseDispute[]>([]);
+  const [refunds, setRefunds] = useState<PurchaseRefund[]>([]);
+  const m$ = purchaseMoneyCopy[locale];
   // One request key per intended purchase or renewal, kept until the command succeeds so a double tap cannot buy twice.
   const keys = useRef<Map<string, string>>(new Map());
 
@@ -161,7 +175,11 @@ export default function CustomerMembershipsPage() {
         ]);
         if (mine.error) throw mine.error;
         if (available.error) throw available.error;
-        setMemberships((mine.data ?? []) as unknown as Membership[]);
+        const rows = (mine.data ?? []) as unknown as Membership[];
+        const money = await loadPurchaseMoney("membership", rows.filter((m) => m.paid_at).map((m) => m.id));
+        setDisputes(money.disputes);
+        setRefunds(money.refunds);
+        setMemberships(rows);
         setPlans((available.data ?? []) as unknown as Plan[]);
       } else {
         setMemberships([]);
@@ -241,10 +259,29 @@ export default function CustomerMembershipsPage() {
 
   const pay = (membership: Membership) => run(`pay:${membership.id}`, () => openCheckout(membership.id));
 
+  const askCancel = (membership: Membership) => run(`cancel:${membership.id}`, async () => {
+    const { data, error: previewError } = await supabase.rpc("preview_membership_cancellation", { p_membership_id: membership.id });
+    if (previewError || !data) throw new Error(previewError ? membershipError(previewError, locale) : t.previewFailed);
+    setCancelRefund(Number((data as { refund_amount?: number | string }).refund_amount ?? 0));
+    setCancelFor(membership);
+  });
+
   const cancelMembership = async (membership: Membership, reason: string): Promise<string | null> => {
-    const { error: rpcError } = await supabase.rpc("cancel_membership", { p_membership_id: membership.id, p_reason: reason });
+    const { data, error: rpcError } = await supabase.rpc("cancel_membership", { p_membership_id: membership.id, p_reason: reason });
     if (rpcError) return membershipError(rpcError, locale);
-    setSuccess(t.cancelled);
+    const back = Number((data as { refund_amount?: number | string } | null)?.refund_amount ?? 0);
+    setSuccess(back > 0 ? t.cancelledWithRefund.replace("{sum}", sar(back, locale)) : t.cancelled);
+    await load();
+    return null;
+  };
+
+  const reportProblem = async (membership: Membership, reason: string): Promise<string | null> => {
+    try {
+      await openPurchaseDispute("membership", membership.id, reason);
+    } catch (failure) {
+      return purchaseDisputeError(failure, locale);
+    }
+    setSuccess(m$.reportSent);
     await load();
     return null;
   };
@@ -322,6 +359,14 @@ export default function CustomerMembershipsPage() {
                         <p className="text-[11px] text-gray-500">{used} / {m.visits_per_period}</p>
                       </div>
                     )}
+                    {disputes.filter((d) => d.purchase_id === m.id).slice(0, 1).map((d) => (
+                      <p key={d.id} role="status" className="rounded-lg bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900">{disputeLabel(d.status, locale)}</p>
+                    ))}
+                    {refunds.filter((r) => r.purchase_id === m.id).map((r) => (
+                      <p key={r.id} className="text-xs font-semibold text-gray-700">
+                        {m$.refundLine.replace("{sum}", sar(Number(r.value), locale)).replace("{state}", m$.refundStates[r.status] ?? r.status)}
+                      </p>
+                    ))}
                     {m.period_end && (
                       <p className={`text-xs font-bold ${endsSoon ? "text-red-600" : "text-gray-700"}`}>
                         {m.period_start && new Date(m.period_start).getTime() > now ? `${t.startsOn} ${operationsDate(m.period_start, locale)}` : `${t.validUntil} ${operationsDate(m.period_end, locale)}`}
@@ -337,8 +382,11 @@ export default function CustomerMembershipsPage() {
                     {(m.status === "active" || m.status === "expired") && m.plan_id && !hasOpenRenewal(m) && (
                       <button type="button" disabled={busy} onClick={() => void renew(m)} aria-describedby={`renew-hint-${m.id}`} className={operationsButton}>{busyId === `renew:${m.id}` ? t.working : t.renew}</button>
                     )}
+                    {m.paid_at && !disputes.some((d) => d.purchase_id === m.id && (d.status === "opened" || d.status === "under_review")) && (
+                      <button type="button" disabled={busy} onClick={() => setReportFor(m)} className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-[#9B7928] disabled:opacity-50">{m$.report}</button>
+                    )}
                     {(m.status === "active" || m.status === "pending_payment") && (
-                      <button type="button" disabled={busy} onClick={() => setCancelFor(m)} className="rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-[#9B7928] disabled:opacity-50">{t.cancel}</button>
+                      <button type="button" disabled={busy} onClick={() => void askCancel(m)} className="rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-[#9B7928] disabled:opacity-50">{t.cancel}</button>
                     )}
                     {(m.status === "active" || m.status === "expired") && <span id={`renew-hint-${m.id}`} className="basis-full text-[11px] text-gray-500">{t.renewHint}</span>}
                   </div>
@@ -389,11 +437,32 @@ export default function CustomerMembershipsPage() {
           tone="danger"
           title={t.cancelling}
           intro={cancelFor.status === "pending_payment" ? t.cancelIntroPending : t.cancelIntro}
-          facts={[{ label: t.plan, value: locale === "ar" ? cancelFor.plan_name_ar : cancelFor.plan_name_en }, { label: t.visitsLeft, value: String(cancelFor.visits_remaining) }]}
+          facts={[
+            { label: t.plan, value: locale === "ar" ? cancelFor.plan_name_ar : cancelFor.plan_name_en },
+            { label: t.visitsLeft, value: String(cancelFor.visits_remaining) },
+            ...(cancelFor.status === "active" ? [{ label: t.refundBack, value: sar(cancelRefund ?? 0, locale) }] : []),
+          ]}
           reasonLabel={t.cancelReason}
           confirmLabel={t.cancelConfirm}
           onConfirm={(reason) => cancelMembership(cancelFor, reason)}
-          onClose={() => setCancelFor(null)}
+          onClose={() => { setCancelFor(null); setCancelRefund(null); }}
+        />
+      )}
+
+      {reportFor && (
+        <CommandDialog
+          locale={locale}
+          title={m$.reportTitle}
+          intro={m$.reportIntro}
+          facts={[
+            { label: t.plan, value: locale === "ar" ? reportFor.plan_name_ar : reportFor.plan_name_en },
+            { label: m$.paidFact, value: sar(reportFor.amount_due, locale) },
+          ]}
+          reasonLabel={m$.reportReason}
+          minReasonLength={10}
+          confirmLabel={m$.reportConfirm}
+          onConfirm={(reason) => reportProblem(reportFor, reason)}
+          onClose={() => setReportFor(null)}
         />
       )}
     </div>

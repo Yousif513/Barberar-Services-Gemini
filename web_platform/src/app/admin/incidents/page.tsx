@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { errorMessage } from "@/lib/error-message";
+import { describeConsoleError } from "@/lib/console-errors.mjs";
 import { CommandResult, ForbiddenNotice, isForbidden, operationsButton, operationsDate, operationsInput, useOperationsLocale } from "@/components/operations-ui";
 import { CommandDialog } from "@/components/modal";
 
@@ -101,11 +101,11 @@ export default function AdminIncidents() {
 
   const open = useCallback(async (id: string) => {
     const { data, error } = await supabase.rpc("admin_incident_get", { p_incident_id: id });
-    if (error) setNotice({ error: errorMessage(error) }); else setSelected(data as Incident);
+    if (error) setNotice({ error: describeConsoleError(error, lang) }); else setSelected(data as Incident);
   }, []);
   const run = async (call: PromiseLike<{ data: unknown; error: unknown }>) => {
     const { data, error } = await call;
-    if (error) { setNotice({ error: errorMessage(error) }); return false; }
+    if (error) { setNotice({ error: describeConsoleError(error, lang) }); return false; }
     setNotice({ success: (data as { status?: string } | null)?.status === "pending_approval" ? t.correctionAsked : t.done });
     setReload((k) => k + 1);
     const id = (data as { id?: string } | null)?.id ?? selected?.id;
@@ -129,7 +129,7 @@ export default function AdminIncidents() {
       <div role="group" className="flex w-fit rounded-xl border border-gray-200 bg-gray-50 p-1 text-xs font-bold">
         {(["open", "closed"] as const).map((v) => <button key={v} type="button" aria-pressed={state === v} onClick={() => { setState(v); setSelected(null); }} className={`rounded-lg px-3 py-1.5 ${focusRing} ${state === v ? "bg-white shadow-sm" : "text-gray-500"}`}>{t[v]}</button>)}
       </div>
-      {loadError ? (isForbidden(loadError) ? <ForbiddenNotice locale={lang} /> : <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{t.loadFailed.replace("{reason}", errorMessage(loadError))}</p>)
+      {loadError ? (isForbidden(loadError) ? <ForbiddenNotice locale={lang} /> : <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{t.loadFailed.replace("{reason}", describeConsoleError(loadError, lang))}</p>)
         : !rows ? <div role="status" className={card}>{t.loading}</div> : rows.length === 0 ? <div className={`${card} text-sm font-semibold text-gray-500`}>{t.empty}</div> : (
         <div role="region" aria-label={t.title} tabIndex={0} className={`overflow-x-auto rounded-2xl border border-[#ECECEC] bg-white ${focusRing}`}>
           <table className="w-full min-w-[760px] text-xs">
@@ -155,7 +155,7 @@ export default function AdminIncidents() {
           confirmLabel={t.close} onClose={() => setClosing(false)}
           onConfirm={async (note) => {
             const { error } = await supabase.rpc("admin_incident_close", { p_incident_id: selected.id, p_note: note });
-            if (error) return errorMessage(error);
+            if (error) return describeConsoleError(error, lang);
             setNotice({ success: t.done }); setReload((k) => k + 1); await open(selected.id); return null;
           }} />
       )}

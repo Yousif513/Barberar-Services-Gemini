@@ -640,17 +640,9 @@ export default function ShopDetailsPage() {
         setShowAuthModal(true);
         return;
       }
-      const { data: existing, error: findError } = await supabase
-        .from("conversations").select("id").eq("customer_id", user.id).eq("provider_id", shopId).maybeSingle();
-      if (findError) throw findError;
-      if (!existing) {
-        const { error } = await supabase.from("conversations").insert({
-          customer_id: user.id,
-          provider_id: shopId,
-          subject: shop?.name[locale] || null,
-        });
-        if (error) throw error;
-      }
+      // RT-H1: the server opens or reuses the conversation; the customer is always the signed-in account.
+      const { error } = await supabase.rpc("start_conversation", { p_provider_id: shopId, p_subject: shop?.name[locale] || null });
+      if (error) throw error;
       router.push("/customer/messages");
     } catch (err: unknown) {
       addToast(errorMessage(err), "error");

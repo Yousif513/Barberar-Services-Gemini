@@ -1,0 +1,23 @@
+{
+  "asked": true,
+  "dialog": "Confirm it is you\n\nThis action moves money, reveals bank details or changes access, so it needs a code from your authenticator app from the last 5 minutes.\n\n6-digit code from your authenticator app\n\nAfter 10 wrong codes the account locks until another owner resets it.\n\nCancel\nConfirm",
+  "focus": "one-time-code",
+  "shot": ".admin-console/evidence/ux-round2/lookup-stepup-en-1440.png",
+  "rowsAfter": 1,
+  "label": "owner-d",
+  "lang": "en",
+  "width": 1440,
+  "consoleErrors": [
+    {
+      "route": "/admin/privacy",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    }
+  ],
+  "httpFailures": [
+    {
+      "route": "/admin/privacy",
+      "status": 403,
+      "url": "API/rest/v1/rpc/admin_privacy_find_customers"
+    }
+  ]
+}

@@ -3,11 +3,19 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { CommandDialog } from "@/components/modal";
+import { sar } from "@/components/operations-ui";
+import { disputeLabel, loadPurchaseMoney, openPurchaseDispute, purchaseDisputeError, purchaseMoneyCopy, type PurchaseDispute, type PurchaseRefund } from "@/lib/purchase-disputes";
 
+// RT-M3: the name, sessions and price shown are those the customer bought (user_packages snapshot), not the package's live row.
 interface UserPackage {
   id: string;
   remaining_sessions: number;
   expires_at: string;
+  amount_paid: number;
+  session_count: number;
+  package_name_en: string;
+  package_name_ar: string;
   packages: {
     id: string;
     name_en: string;
@@ -90,8 +98,12 @@ export default function CustomerPackagesPage() {
   const [purchasingId, setPurchasingId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [reportFor, setReportFor] = useState<UserPackage | null>(null);
+  const [disputes, setDisputes] = useState<PurchaseDispute[]>([]);
+  const [refunds, setRefunds] = useState<PurchaseRefund[]>([]);
 
   const t = translations[locale];
+  const m$ = purchaseMoneyCopy[locale];
   const isRTL = locale === "ar";
 
   useEffect(() => {
@@ -126,6 +138,10 @@ export default function CustomerPackagesPage() {
             status,
             remaining_sessions,
             expires_at,
+            amount_paid,
+            session_count,
+            package_name_en,
+            package_name_ar,
             packages (
               id,
               name_en,
@@ -145,7 +161,11 @@ export default function CustomerPackagesPage() {
           .order("created_at", { ascending: false });
 
         if (myError) throw myError;
-        setUserPackages((myData as any) || []);
+        const mine = ((myData as any) || []) as UserPackage[];
+        const money = await loadPurchaseMoney("package", mine.map((item) => item.id));
+        setDisputes(money.disputes);
+        setRefunds(money.refunds);
+        setUserPackages(mine);
       }
 
       // Load available marketplace packages
@@ -176,6 +196,17 @@ export default function CustomerPackagesPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function reportProblem(item: UserPackage, reason: string): Promise<string | null> {
+    try {
+      await openPurchaseDispute("package", item.id, reason);
+    } catch (failure) {
+      return purchaseDisputeError(failure, locale);
+    }
+    setSuccessMsg(m$.reportSent);
+    await loadAllPackages();
+    return null;
   }
 
   async function handlePurchase(packageId: string) {
@@ -281,11 +312,12 @@ export default function CustomerPackagesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {userPackages.map((item) => {
-              const totalSessions = item.packages?.session_count || 1;
+              const totalSessions = item.session_count || 1;
               const pctRemaining = Math.round((item.remaining_sessions / totalSessions) * 100);
               const isExpiringSoon = item.expires_at && (new Date(item.expires_at).getTime() - Date.now() < 7 * 24 * 60 * 60 * 1000);
 
-              const pkgName = isRTL ? item.packages?.name_ar || item.packages?.name_en : item.packages?.name_en || item.packages?.name_ar;
+              const pkgName = isRTL ? item.package_name_ar || item.package_name_en : item.package_name_en || item.package_name_ar;
+              const openReport = disputes.some((d) => d.purchase_id === item.id && (d.status === "opened" || d.status === "under_review"));
               const provName = isRTL ? item.packages?.providers?.business_name_ar || item.packages?.providers?.business_name_en : item.packages?.providers?.business_name_en || item.packages?.providers?.business_name_ar;
               const desc = isRTL ? item.packages?.description_ar || item.packages?.description_en : item.packages?.description_en || item.packages?.description_ar;
 
@@ -303,11 +335,20 @@ export default function CustomerPackagesPage() {
                         <h3 className="font-bold text-base text-gray-900 mt-1">{pkgName}</h3>
                       </div>
                       <span className="text-xs font-black px-2.5 py-1 bg-gray-100 rounded-lg text-gray-700">
-                        {item.packages?.price} {t.priceSar}
+                        {sar(Number(item.amount_paid), locale)}
                       </span>
                     </div>
 
                     {desc && <p className="text-xs text-gray-500 mb-6 line-clamp-2">{desc}</p>}
+
+                    {disputes.filter((d) => d.purchase_id === item.id).slice(0, 1).map((d) => (
+                      <p key={d.id} role="status" className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900">{disputeLabel(d.status, locale)}</p>
+                    ))}
+                    {refunds.filter((r) => r.purchase_id === item.id).map((r) => (
+                      <p key={r.id} className="mb-3 text-xs font-semibold text-gray-700">
+                        {m$.refundLine.replace("{sum}", sar(Number(r.value), locale)).replace("{state}", m$.refundStates[r.status] ?? r.status)}
+                      </p>
+                    ))}
 
                     {/* SESSIONS BALANCE PROGRESS BAR */}
                     <div className="space-y-2 mb-6">
@@ -331,12 +372,23 @@ export default function CustomerPackagesPage() {
                         {item.expires_at ? new Date(item.expires_at).toLocaleDateString(isRTL ? "ar-SA" : "en-GB") : "—"}
                       </span>
                     </div>
-                    <Link
-                      href="/customer/book"
-                      className="px-4 py-2 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl transition duration-150 shadow-sm"
-                    >
-                      {t.bookSession}
-                    </Link>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {!openReport && (
+                        <button
+                          type="button"
+                          onClick={() => setReportFor(item)}
+                          className="px-4 py-2 border border-gray-300 text-gray-800 font-bold text-xs rounded-xl hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-[#9B7928]"
+                        >
+                          {m$.report}
+                        </button>
+                      )}
+                      <Link
+                        href="/customer/book"
+                        className="px-4 py-2 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl transition duration-150 shadow-sm"
+                      >
+                        {t.bookSession}
+                      </Link>
+                    </div>
                   </div>
                 </div>
               );
@@ -393,6 +445,23 @@ export default function CustomerPackagesPage() {
             })}
           </div>
         )
+      )}
+
+      {reportFor && (
+        <CommandDialog
+          locale={locale}
+          title={m$.reportTitle}
+          intro={m$.reportIntro}
+          facts={[
+            { label: t.sessionsRemaining, value: `${reportFor.remaining_sessions} / ${reportFor.session_count}` },
+            { label: m$.paidFact, value: sar(Number(reportFor.amount_paid), locale) },
+          ]}
+          reasonLabel={m$.reportReason}
+          minReasonLength={10}
+          confirmLabel={m$.reportConfirm}
+          onConfirm={(reason) => reportProblem(reportFor, reason)}
+          onClose={() => setReportFor(null)}
+        />
       )}
     </div>
   );

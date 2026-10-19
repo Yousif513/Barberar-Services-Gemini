@@ -5,9 +5,12 @@ import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
 import Link from "next/link";
 import { CommandResult, sar } from "@/components/operations-ui";
-import { CommandDialog } from "@/components/modal";
+import { CommandDialog, ModalPortal } from "@/components/modal";
 import { knownToHold, useConsoleSession } from "@/lib/console-session";
 import { canRevealRequest, revealOutcome, secondsLeft } from "@/lib/payout-display.mjs";
+import { commandOutcome } from "@/lib/write-result.mjs";
+import { describeConsoleError, unchangedText } from "@/lib/console-errors.mjs";
+import { ReadFailure } from "@/components/read-failure";
 
 // Rows per list read from the audited functions (the server caps a page at 500).
 const LIST_LIMIT = 200;
@@ -243,11 +246,15 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
   const [paymentIntegrations, setPaymentIntegrations] = useState<PaymentIntegration[]>([]);
   const [note, setNote] = useState("");
   const [methodError, setMethodError] = useState("");
-  // Turning a payment method off or changing the default is confirmed in a dialog that names the method.
-  const [methodConfirm, setMethodConfirm] = useState<{ kind: "toggle" | "default"; method: PayMethod } | null>(null);
+  const [loadError, setLoadError] = useState<unknown>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+  // Every change is confirmed in a dialog that names the method, captures the reason and keeps it when the server refuses.
+  const [methodConfirm, setMethodConfirm] = useState<{ kind: "toggle" | "default" | "gateway"; method: PayMethod; gatewayKey?: string } | null>(null);
+  // Only a console role with settings.manage gets the controls (the server refuses every other role anyway).
+  const canWrite = knownToHold(useConsoleSession(), ["settings.manage"]);
   const L = lang === "ar"
-    ? { title: "طرق الدفع (السوق السعودي)", subtitle: "فعّل أو عطّل الطرق وحدد الافتراضية — تنعكس فوراً على صفحة الدفع لدى العميل وشاشة مستحقات المزود.", enabled: "مفعلة", disabled: "معطلة", makeDefault: "افتراضية", isDefault: "★ الافتراضية", roles: "متاحة لـ", customer: "العميل", provider: "المزود", gateway: "البوابة", saved: "تم حفظ إعدادات طرق الدفع.", empty: "لا توجد طرق دفع — طبّق ترحيل قاعدة البيانات ثم أعد التحميل." }
-    : { title: "Payment Methods (KSA)", subtitle: "Enable, disable and set the default — changes reflect instantly at customer checkout and provider payout screens.", enabled: "Enabled", disabled: "Disabled", makeDefault: "Make default", isDefault: "★ Default", roles: "Available to", customer: "Customer", provider: "Provider", gateway: "Gateway", saved: "Payment method settings saved.", empty: "No payment methods yet — apply the database migration and reload." };
+    ? { title: "طرق الدفع (السوق السعودي)", subtitle: "فعّل أو عطّل الطرق وحدد الافتراضية — تنعكس فوراً على صفحة الدفع لدى العميل وشاشة مستحقات المزود.", enabled: "مفعلة", disabled: "معطلة", makeDefault: "افتراضية", isDefault: "★ الافتراضية", roles: "متاحة لـ", customer: "العميل", provider: "المزود", gateway: "البوابة", saved: "تم حفظ إعدادات طرق الدفع.", empty: "لا توجد طرق دفع مسجلة بعد.", what: "طرق الدفع", reason: "سبب التغيير (يُسجَّل في سجل التدقيق)", gatewayTitle: "تغيير بوابة الدفع", gatewayIntro: "تمر مدفوعات هذه الطريقة عبر البوابة المختارة وفي بيئتها.", defaultCleared: "لم تعد هذه الطرق افتراضية: {keys}." }
+    : { title: "Payment Methods (KSA)", subtitle: "Enable, disable and set the default — changes reflect instantly at customer checkout and provider payout screens.", enabled: "Enabled", disabled: "Disabled", makeDefault: "Make default", isDefault: "★ Default", roles: "Available to", customer: "Customer", provider: "Provider", gateway: "Gateway", saved: "Payment method settings saved.", empty: "No payment methods are registered yet.", what: "Payment methods", reason: "Reason for this change (recorded in the audit log)", gatewayTitle: "Change the payment gateway", gatewayIntro: "Payments with this method go through the chosen gateway, in its environment.", defaultCleared: "No longer the default: {keys}." };
 
   const P = lang === "ar"
     ? { activeApi: "API متصل", blocked: "محجوب: اختر API دفع متصل", noGateway: "لا يحتاج API", selectGateway: "اختيار مزود الدفع", activeApis: "APIs المفعلة" }
@@ -256,6 +263,7 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
   useEffect(() => {
     (async () => {
       try {
+        setLoadError(null);
         const [{ data: methodRows, error: methodLoadError }, { data: integrationRows, error: integrationLoadError }] = await Promise.all([
           supabase.from("payment_methods").select("*").order("sort_order"),
           supabase.from("integrations").select("id, key, name, category, status, enabled, env, supported_payment_method_keys").eq("category", "payments").order("name")
@@ -265,37 +273,33 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
         setMethods(((methodRows ?? []) as PayMethod[]).map(normalizePayMethod));
         setPaymentIntegrations((integrationRows ?? []) as PaymentIntegration[]);
         setMethodError("");
-      } catch {
+      } catch (err) {
         setMethods([]);
         setPaymentIntegrations([]);
-        setMethodError(lang === "ar"
-          ? "فشل تحميل طرق الدفع الحقيقية. طبّق ترحيلات Supabase وتأكد من صلاحيات المشرف."
-          : "Failed to load real payment methods. Apply the Supabase migrations and verify admin permissions.");
+        setLoadError(err);
       }
     })();
-  }, [lang]);
+  }, [lang, reloadKey]);
 
-  const flash = (msg: string) => { setMethodError(""); setNote(msg); setTimeout(() => setNote(""), 3000); };
-  const fail = (previous: PayMethod[]) => {
-    setMethods(previous);
-    setNote("");
-    setMethodError(lang === "ar"
-      ? "لم يتم حفظ تغيير طريقة الدفع. تأكد من الترحيلات وصلاحيات المشرف."
-      : "Payment method change was not saved. Check the migrations and admin permissions.");
+  // One timer for the confirmation: a newer message is not cleared by the timer of the one before it.
+  const noteTimer = React.useRef<number | undefined>(undefined);
+  const flash = (msg: string) => {
+    setMethodError("");
+    setNote(msg);
+    window.clearTimeout(noteTimer.current);
+    noteTimer.current = window.setTimeout(() => setNote(""), 6000);
   };
+  const replaceMethod = (answer: PayMethod) => setMethods((prev) => prev.map((x) => (x.id === answer.id ? normalizePayMethod(answer) : x)));
 
-  const toggleEnabled = (m: PayMethod) => setMethodConfirm({ kind: "toggle", method: m });
+  const toggleEnabled = (m: PayMethod) => { setNote(""); setMethodConfirm({ kind: "toggle", method: m }); };
 
-  const applyToggle = async (m: PayMethod) => {
-    const previous = methods;
-    setMethods((prev) => prev.map((x) => (x.id === m.id ? { ...x, enabled: !m.enabled } : x)));
-    try {
-      const { error: updateError } = await supabase.from("payment_methods").update({ enabled: !m.enabled }).eq("key", m.key);
-      if (updateError) throw updateError;
-      flash(L.saved);
-    } catch {
-      fail(previous);
-    }
+  // admin_set_payment_method: settings.manage, a fresh code and a reason; the card changes only after the stored answer.
+  const applyToggle = async (m: PayMethod, reason: string): Promise<string | null> => {
+    const outcome = commandOutcome(await supabase.rpc("admin_set_payment_method", { p_method_id: m.id, p_changes: { enabled: !m.enabled }, p_reason: reason }));
+    if (!outcome.ok) return describeConsoleError(outcome.error, lang);
+    replaceMethod(outcome.data.method as PayMethod);
+    flash(outcome.changed ? L.saved : unchangedText(lang));
+    return null;
   };
 
   const makeDefault = (m: PayMethod) => {
@@ -303,21 +307,19 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
       setMethodError(P.blocked);
       return;
     }
+    setNote("");
     setMethodConfirm({ kind: "default", method: m });
   };
 
-  const applyDefault = async (m: PayMethod) => {
-    const previous = methods;
-    setMethods((prev) => prev.map((x) => ({ ...x, is_default: x.id === m.id })));
-    try {
-      const { error: resetError } = await supabase.from("payment_methods").update({ is_default: false }).neq("id", m.id);
-      if (resetError) throw resetError;
-      const { error: updateError } = await supabase.from("payment_methods").update({ is_default: true, enabled: true }).eq("id", m.id);
-      if (updateError) throw updateError;
-      flash(L.saved);
-    } catch {
-      fail(previous);
-    }
+  // admin_set_default_payment_method: one step on the server, one default per audience (customer, provider).
+  const applyDefault = async (m: PayMethod, reason: string): Promise<string | null> => {
+    const outcome = commandOutcome(await supabase.rpc("admin_set_default_payment_method", { p_method_id: m.id, p_reason: reason }));
+    if (!outcome.ok) return describeConsoleError(outcome.error, lang);
+    const stored = normalizePayMethod(outcome.data.method as PayMethod);
+    const cleared: string[] = Array.isArray(outcome.data.cleared) ? outcome.data.cleared : [];
+    setMethods((prev) => prev.map((x) => (x.id === stored.id ? stored : cleared.includes(x.key) ? { ...x, is_default: false } : x)));
+    flash(!outcome.changed ? unchangedText(lang) : cleared.length > 0 ? `${L.saved} ${L.defaultCleared.replace("{keys}", cleared.join(isRTL ? "، " : ", "))}` : L.saved);
+    return null;
   };
 
   const activeGatewaysFor = (m: PayMethod) =>
@@ -334,48 +336,48 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
   const isOperational = (m: PayMethod) =>
     !m.requires_gateway || m.gateway_key === "internal" || activeGatewaysFor(m).some((integration) => integration.key === m.gateway_key && integration.env === m.env);
 
-  const changeGateway = async (m: PayMethod, gatewayKey: string) => {
-    const gateway = paymentIntegrations.find((integration) => integration.key === gatewayKey);
-    if (!gateway) return;
-    const previous = methods;
-    const nextFields = { gateway_key: gateway.key, env: gateway.env };
-    setMethods((prev) => prev.map((x) => (x.id === m.id ? { ...x, ...nextFields } : x)));
-    try {
-      const { error: updateError } = await supabase.from("payment_methods").update(nextFields).eq("id", m.id);
-      if (updateError) throw updateError;
-      flash(L.saved);
-    } catch {
-      fail(previous);
-    }
+  const changeGateway = (m: PayMethod, gatewayKey: string) => {
+    if (!gatewayKey || gatewayKey === m.gateway_key) return;
+    setNote("");
+    setMethodConfirm({ kind: "gateway", method: m, gatewayKey });
+  };
+
+  const applyGateway = async (m: PayMethod, gatewayKey: string, reason: string): Promise<string | null> => {
+    const outcome = commandOutcome(await supabase.rpc("admin_set_payment_method", { p_method_id: m.id, p_changes: { gateway_key: gatewayKey }, p_reason: reason }));
+    if (!outcome.ok) return describeConsoleError(outcome.error, lang);
+    replaceMethod(outcome.data.method as PayMethod);
+    flash(outcome.changed ? L.saved : unchangedText(lang));
+    return null;
   };
 
   const renderMethodConfirm = () => {
     if (!methodConfirm) return null;
-    const { kind, method } = methodConfirm;
+    const { kind, method, gatewayKey } = methodConfirm;
     const name = lang === "ar" ? method.label_ar : method.label_en;
     const disabling = kind === "toggle" && method.enabled;
     const ar = lang === "ar";
+    const gateway = gatewayKey ? paymentIntegrations.find((integration) => integration.key === gatewayKey) : undefined;
+    const facts = [
+      { label: ar ? "طريقة الدفع" : "Payment method", value: name },
+      { label: ar ? "البوابة" : "Gateway", value: `${method.gateway_key ?? "—"} · ${method.env}` },
+    ];
+    if (kind === "gateway" && gateway) facts.push({ label: ar ? "البوابة الجديدة" : "New gateway", value: `${gateway.name} · ${gateway.env}` });
     return (
       <CommandDialog
         locale={lang}
         tone={disabling ? "danger" : "default"}
-        title={kind === "default" ? (ar ? "تعيين طريقة الدفع الافتراضية" : "Set the default payment method") : disabling ? (ar ? "إيقاف طريقة الدفع" : "Disable this payment method") : (ar ? "تفعيل طريقة الدفع" : "Enable this payment method")}
+        title={kind === "default" ? (ar ? "تعيين طريقة الدفع الافتراضية" : "Set the default payment method") : kind === "gateway" ? L.gatewayTitle : disabling ? (ar ? "إيقاف طريقة الدفع" : "Disable this payment method") : (ar ? "تفعيل طريقة الدفع" : "Enable this payment method")}
         intro={kind === "default"
-          ? (ar ? "تصبح هذه الطريقة الخيار الأول عند الدفع وتُفعَّل إن كانت معطلة." : "This becomes the first choice at checkout, and is enabled if it was off.")
-          : disabling
-            ? (ar ? "لن تظهر هذه الطريقة للعملاء عند الدفع." : "Customers will no longer see this method at checkout.")
-            : (ar ? "ستظهر هذه الطريقة للعملاء عند الدفع." : "Customers will see this method at checkout.")}
-        facts={[
-          { label: ar ? "طريقة الدفع" : "Payment method", value: name },
-          { label: ar ? "البوابة" : "Gateway", value: `${method.gateway_key ?? "—"} · ${method.env}` },
-        ]}
-        reasonLabel=""
-        reasonRequired={false}
-        confirmLabel={kind === "default" ? (ar ? "تعيين كافتراضية" : "Make default") : disabling ? (ar ? "إيقاف" : "Disable") : (ar ? "تفعيل" : "Enable")}
-        onConfirm={async () => {
-          await (kind === "default" ? applyDefault(method) : applyToggle(method));
-          return null;
-        }}
+          ? (ar ? "تصبح هذه الطريقة الخيار الأول عند الدفع لجمهورها (العملاء أو المزودين) وتُفعَّل إن كانت معطلة." : "This becomes the first choice for its audience (customers or providers), and is enabled if it was off.")
+          : kind === "gateway"
+            ? L.gatewayIntro
+            : disabling
+              ? (ar ? "لن تظهر هذه الطريقة للعملاء عند الدفع." : "Customers will no longer see this method at checkout.")
+              : (ar ? "ستظهر هذه الطريقة للعملاء عند الدفع." : "Customers will see this method at checkout.")}
+        facts={facts}
+        reasonLabel={L.reason}
+        confirmLabel={kind === "default" ? (ar ? "تعيين كافتراضية" : "Make default") : kind === "gateway" ? (ar ? "تغيير البوابة" : "Change gateway") : disabling ? (ar ? "إيقاف" : "Disable") : (ar ? "تفعيل" : "Enable")}
+        onConfirm={(reason) => (kind === "default" ? applyDefault(method, reason) : kind === "gateway" && gatewayKey ? applyGateway(method, gatewayKey, reason) : applyToggle(method, reason))}
         onClose={() => setMethodConfirm(null)}
       />
     );
@@ -386,57 +388,69 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
       {renderMethodConfirm()}
       <div className="mb-4">
         <h3 className="text-sm font-serif font-black text-gray-900">{L.title}</h3>
-        <p className="text-[11px] text-gray-500 font-semibold mt-0.5">{L.subtitle}</p>
+        <p className="text-[11px] text-gray-600 font-semibold mt-0.5">{L.subtitle}</p>
       </div>
-      {note && <div className="mb-3 rounded-xl bg-[#ECFDF3] border border-[#D1FADF] px-3 py-2 text-[11px] font-bold text-[#027A48]">{note}</div>}
-      {methodError && <div className="mb-3 rounded-xl bg-[#FEF3F2] border border-[#FECDCA] px-3 py-2 text-[11px] font-bold text-[#B42318]">{methodError}</div>}
+      {note && <div role="status" className="mb-3 rounded-xl bg-[#ECFDF3] border border-[#D1FADF] px-3 py-2 text-[11px] font-bold text-[#027A48]">{note}</div>}
+      {methodError && <div role="alert" className="mb-3 rounded-xl bg-[#FEF3F2] border border-[#FECDCA] px-3 py-2 text-[11px] font-bold text-[#B42318]">{methodError}</div>}
+      {loadError ? (
+        <ReadFailure error={loadError} locale={lang} what={L.what} onRetry={() => setReloadKey((n) => n + 1)} />
+      ) : (
+      <>
       <div className={`mb-3 flex flex-wrap items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
-        <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">{P.activeApis}</span>
+        <span className="text-[10px] font-black uppercase tracking-widest text-gray-600">{P.activeApis}</span>
         {paymentIntegrations.filter((api) => api.enabled && api.status === "connected").length === 0 ? (
-          <span className="rounded-full border border-[#FECDCA] bg-[#FEF3F2] px-2.5 py-1 text-[9px] font-black uppercase text-[#B42318]">{P.blocked}</span>
+          <span className="rounded-full border border-[#FECDCA] bg-[#FEF3F2] px-2.5 py-1 text-[10px] font-black uppercase text-[#B42318]">{P.blocked}</span>
         ) : (
           paymentIntegrations.filter((api) => api.enabled && api.status === "connected").map((api) => (
-            <span key={api.key} className="rounded-full border border-[#D1FADF] bg-[#ECFDF3] px-2.5 py-1 text-[9px] font-black uppercase text-[#027A48]">
+            <span key={api.key} className="rounded-full border border-[#D1FADF] bg-[#ECFDF3] px-2.5 py-1 text-[10px] font-black uppercase text-[#027A48]">
               {api.name} · {api.env}
             </span>
           ))
         )}
       </div>
       {methods.length === 0 ? (
-        <p className="py-6 text-center text-xs font-semibold text-gray-400">{L.empty}</p>
+        <p className="py-6 text-center text-xs font-semibold text-gray-600">{L.empty}</p>
       ) : (
         <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
           {methods.map((m) => {
             const candidates = activeGatewaysFor(m);
             const selectedGateway = selectedGatewayFor(m);
             const operational = isOperational(m);
+            const name = lang === "ar" ? m.label_ar : m.label_en;
             return (
-            <div key={m.id} className={`rounded-xl border p-3.5 transition ${m.enabled && operational ? "border-[#D1AF47]/25 bg-[#FFFDF7]" : "border-[#ECECEC] bg-gray-50/60 opacity-80"}`}>
+            <div key={m.id} className={`rounded-xl border p-3.5 transition ${m.enabled && operational ? "border-[#D1AF47]/25 bg-[#FFFDF7]" : "border-[#ECECEC] bg-gray-50/60"}`}>
               <div className={`flex items-center justify-between gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
                 <div className={isRTL ? "text-right" : "text-left"}>
-                  <strong className="block text-xs font-black text-gray-900">{lang === "ar" ? m.label_ar : m.label_en}</strong>
-                  <span className="mt-0.5 block text-[9px] font-bold uppercase tracking-wider text-gray-400">{L.gateway}: {m.gateway_key ?? "—"} · {m.env}</span>
+                  <strong className="block text-xs font-black text-gray-900">{name}</strong>
+                  <span className="mt-0.5 block text-[10px] font-bold uppercase tracking-wider text-gray-600">{L.gateway}: {m.gateway_key ?? "—"} · {m.env}</span>
                 </div>
-                <button
-                  onClick={() => toggleEnabled(m)}
-                  aria-label={m.enabled ? L.disabled : L.enabled}
-                  className={`relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition ${m.enabled ? "bg-[#D1AF47]" : "bg-gray-300"}`}
-                >
-                  <span className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform" style={{ transform: m.enabled ? "translateX(18px)" : "translateX(2px)" }} />
-                </button>
+                {canWrite ? (
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={m.enabled}
+                    onClick={() => toggleEnabled(m)}
+                    aria-label={`${L.enabled}: ${name}`}
+                    className={`relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928] ${m.enabled ? "bg-[#D1AF47]" : "bg-gray-400"}`}
+                  >
+                    <span className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform" style={{ transform: m.enabled ? "translateX(18px)" : "translateX(2px)" }} />
+                  </button>
+                ) : (
+                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-black text-gray-700">{m.enabled ? L.enabled : L.disabled}</span>
+                )}
               </div>
-              <div className={`mt-2 rounded-xl border px-2.5 py-2 text-[9px] font-black uppercase tracking-wider ${
+              <div className={`mt-2 rounded-xl border px-2.5 py-2 text-[10px] font-black uppercase tracking-wider ${
                 operational ? "border-[#D1FADF] bg-[#ECFDF3] text-[#027A48]" : "border-[#FECDCA] bg-[#FEF3F2] text-[#B42318]"
               }`}>
                 {operational ? `${P.activeApi}: ${m.requires_gateway ? selectedGateway?.name || m.gateway_key : P.noGateway}` : P.blocked}
               </div>
-              {m.requires_gateway && (
+              {m.requires_gateway && canWrite && (
                 <label className="mt-2 block space-y-1">
-                  <span className="text-[8px] font-black uppercase tracking-widest text-gray-400">{P.selectGateway}</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-600">{P.selectGateway}</span>
                   <select
                     value={operational ? (m.gateway_key || "") : ""}
                     onChange={(event) => changeGateway(m, event.target.value)}
-                    className="w-full rounded-xl border border-[#ECECEC] bg-white px-2.5 py-2 text-[10px] font-black text-gray-700 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]"
+                    className="w-full rounded-xl border border-[#ECECEC] bg-white px-2.5 py-2 text-[11px] font-black text-gray-700 outline-2 outline-offset-2 outline-transparent focus-visible:outline-[#9B7928] focus:border-[#D1AF47]"
                   >
                     <option value="" disabled>{candidates.length ? P.selectGateway : P.blocked}</option>
                     {candidates.map((gateway) => (
@@ -447,18 +461,20 @@ function PaymentMethodsRegistry({ lang, cardBase }: { lang: "en" | "ar"; cardBas
               )}
               <div className={`mt-2.5 flex flex-wrap items-center gap-1.5 ${isRTL ? "flex-row-reverse" : ""}`}>
                 {(m.enabled_for_roles ?? []).map((r) => (
-                  <span key={r} className="rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[8px] font-black uppercase text-[#3B82F6]">{r === "customer" ? L.customer : r === "provider" ? L.provider : r}</span>
+                  <span key={r} className="rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[10px] font-black uppercase text-[#1D4ED8]">{r === "customer" ? L.customer : r === "provider" ? L.provider : r}</span>
                 ))}
                 {m.is_default ? (
-                  <span className="rounded-full bg-[#FFFAEB] px-2 py-0.5 text-[8px] font-black uppercase text-[#B8952E]">{L.isDefault}</span>
-                ) : (
-                  <button onClick={() => makeDefault(m)} className="rounded-full border border-[#ECECEC] bg-white px-2 py-0.5 text-[8px] font-black uppercase text-gray-400 transition hover:border-[#D1AF47]/40 hover:text-[#B8952E]">{L.makeDefault}</button>
-                )}
+                  <span className="rounded-full bg-[#FFFAEB] px-2 py-0.5 text-[10px] font-black uppercase text-[#7A5B12]">{L.isDefault}</span>
+                ) : canWrite ? (
+                  <button type="button" onClick={() => makeDefault(m)} aria-label={`${L.makeDefault}: ${name}`} className="rounded-full border border-[#ECECEC] bg-white px-2 py-0.5 text-[10px] font-black uppercase text-gray-600 transition hover:border-[#D1AF47]/40 hover:text-[#7A5B12] focus-visible:outline-2 focus-visible:outline-[#9B7928]">{L.makeDefault}</button>
+                ) : null}
               </div>
             </div>
             );
           })}
         </div>
+      )}
+      </>
       )}
     </div>
   );
@@ -890,7 +906,10 @@ export default function AdminLedger() {
         <p className="mt-1 text-xs text-[#475467]">{c.revealedBank}: {value.bank_name} · {c.revealedHolder}: {value.account_holder_name || c.notProvided}</p>
       </div>
     );
+    // Portalled to <body>: inside the console's scrolling panel (its own stacking context) the payout table was painted over
+    // it and took the pointer, so "Hide now" could not be pressed (e2e iban-reveal.spec.ts).
     return (
+      <ModalPortal>
       <div role="dialog" aria-modal="false" aria-label={c.revealedTitle.replace("{name}", revealed.name)} dir={lang === "ar" ? "rtl" : "ltr"}
         className="fixed inset-x-4 bottom-4 z-[9500] mx-auto max-w-lg rounded-[24px] border border-[#D1AF47]/50 bg-white p-5 text-start shadow-2xl">
         <div className="flex items-start justify-between gap-3">
@@ -906,6 +925,7 @@ export default function AdminLedger() {
           <button type="button" onClick={() => setRevealed(null)} className="rounded-xl border border-[#D0D5DD] px-4 py-2 text-sm font-bold text-[#344054] focus-visible:outline-2 focus-visible:outline-[#9B7928]">{c.hideNow}</button>
         </div>
       </div>
+      </ModalPortal>
     );
   };
 

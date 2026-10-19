@@ -1,0 +1,82 @@
+Independent capability review, qa-release-claude (qa), 2026-10-17. Did not implement any capability reviewed here.
+Method per capability: re-read the server operation as installed in the local database (pg_get_functiondef), read the cited
+test files and the test cases that exercise the operation (all 1429 database tests pass, gate-summary.txt), and attack the
+operation through local PostgREST with real tokens (role-matrix-summary.txt, permission-gates.txt, maker-checker-live.txt,
+session-and-step-up-live.txt, privileged-reads-live.txt, direct-table-writes.txt) and the browser (browser-summary.txt).
+
+REVIEWED (status implemented, reviewStatus reviewed)
+
+booking.transition (high) - console_booking_command via admin_cancel_booking / admin_mark_booking_no_show:
+  require_recent_mfa (5-minute step-up), operations.write unless executing an approved request, reason >= 10 characters,
+  booking row locked FOR UPDATE, cancel only from pending_payment/confirmed and no-show only from confirmed, a refund above the
+  threshold or from a role without money.refund becomes a booking_cancellation approval, the approved amount caps the refund,
+  audit entry booking.console_cancelled / console_no_show with reason, role and approval id.
+  Tests: secfix2_console_cancellations.test.mjs "needs a step-up, operations.write and a reason of at least 10 characters",
+  "from operations, a captured booking becomes a request a different money.refund holder approves",
+  "a money.refund holder cancels a small refund directly, but SAR 1,000 or more needs a different person";
+  qa_defect_fixes.test.mjs "cannot cancel a paid booking directly ..." and "refuse a blank reason from an administrator".
+  Live: finance DENY "Your console role cannot change bookings", operations and owner reach the lookup (permission-gates.txt);
+  anon, customer, provider and an aal1 owner refused (role-matrix-summary.txt); a removed console role is refused on an
+  issued token (session-and-step-up-live.txt).
+
+payout.mark-paid (critical) - admin_release_payout:
+  step-up, money.payout, idempotency key required and replay returns already_processed, reason >= 3, request locked, only
+  requested/processing, destination must be an approved account past its 48-hour hold, payout hold and open reconciliation
+  breaks and undelivered bank-change notices refuse, maker-checker: outside an approved execution it only files a
+  payout_release request for a different money.payout holder; allocation refuses the whole payout if the ledger cannot cover it.
+  Tests: qa_adversarial.test.mjs "releasing the same payout twice with the same key pays once", "releasing a paid payout again
+  under a different key is refused, not paid twice", "a payout that the ledger cannot cover is refused whole and allocates nothing".
+  Live: operations DENY "Only administrators can release payouts", finance and owner reach the lookup (permission-gates.txt);
+  the approvals framework it relies on refused self-approval, analyst and operations approvals, blank reasons and replays, and
+  recorded requester and approver separately (maker-checker-live.txt 24/24; browser workflow in browser-summary.txt section 5).
+  Not verifiable here: the bank transfer itself.
+
+customer.clear-profile (critical) - admin_clear_customer_profile:
+  step-up, operations.write to ask, approval (privacy.approve, a different person) to execute, reason >= 3, customer profiles
+  only, refused while an active court hold covers the account (at request and at approval), clears name, e-mail, phone,
+  gender and push token, audit entry customer.profile_cleared without the removed values.
+  Tests: f123_final_recheck.test.mjs "refuses the request while a court hold covers the account", "refuses the approval when the
+  hold was placed after the request", "clears once the hold is no longer active", "runs the approved clear without the
+  operations.write check, and still refuses a requester without it"; qa_adversarial.test.mjs "repeating a payout review, a
+  provider status change or a profile clear does not repeat the effect".
+  Live: finance DENY, operations and owner reach the lookup (permission-gates.txt); analyst and non-console accounts refused.
+
+audit.search (critical) - admin_list_audit_events:
+  gov2_require_read(audit.read) (owner only), purpose required, paged (limit clamped to 100), filters validated, every read is
+  itself audited (audit.listed with filter and row count). The table is append-only to every client role.
+  Tests: admin_security_matrix.test.mjs "is readable by the console owner only, through the audited admin_list_audit_events";
+  qa_defect_fixes.test.mjs "has the audit trigger on every base table except the audit logs themselves".
+  Live: finance, operations and analyst see the forbidden notice on /admin/audit-logs (browser-roles.json); owner and finance
+  direct DELETE / forged INSERT on admin_audit_logs refused with 42501 and the rows stayed (maker-checker-live.txt).
+
+feature-flag.set (high) - admin_set_feature_flag: settings.manage (owner), reason >= 3, unknown flag and null refused, row
+  locked, no-op when unchanged, audit feature_flag.changed with before/after and reason; no client writes the table
+  (direct PATCH by every role refused 42501, direct-table-writes.txt). Step-up is not required by the adopted Q6 list.
+  Tests: adm1_roles_flags_fee_rules.test.mjs "switches an existing flag with a reason, idempotently, and audits it once",
+  "refuses a missing reason, an unknown flag, a null value and every non-administrator, and no client writes the table".
+
+dashboard.overview (moderate) - admin_dashboard_overview: is_admin (aal2 console session), counts and SAR totals only, no
+  names; small cells suppressed. Tests: admin_dashboard.test.mjs "is readable by administrators only", "counts work waiting for an
+  operator from live rows". Live: every console role opens /admin with no console error; non-console accounts redirected.
+
+analytics.funnel (low) - admin_get_event_counts: is_admin, range validated (<= 366 days), counts per Riyadh day with cells of
+  1-4 people suppressed. Tests: fixdbb_analytics_events.test.mjs "counts events per Riyadh day and person for an administrator
+  only", "cannot be read or written directly by any client, administrators included".
+
+CONTESTED (paired gaps)
+
+refund.retry - the retry command is sound (money.refund, step-up, reason, row lock, one more attempt), but the money path it
+  re-opens still records any thrown fetch error as a definite refusal (supabase/functions/_shared/refunds.ts line 53), so an
+  operator retry can resend a refund Tap may have executed. Paired gap: refund-outcomes-that-cannot-be-known-have-no-recovery.
+ropa.view - the register is compiled into the browser bundle and the only gate is the client AuthGuard; paired gap
+  ropa-register-ships-in-the-client-bundle.
+service.upsert, service.toggle-active, service.set-price, service.delete, service.set-featured, branch.toggle-active,
+integration.toggle, integration.upsert, integration.delete, payment-method.toggle, payment-method.set-default - the row
+  policies are correct (direct-table-writes.txt), but the screens report success when the policy matched no row
+  (browser-summary.txt section 6). Paired gap: direct-table-updates-report-success-when-the-row-policy-refuses.
+
+LEFT IN PROGRESS (not reviewable to release standard in this pass)
+  The remaining in-progress capabilities cannot be marked implemented without new validator errors on their own records:
+  missing serverOperations, idempotency or recovery statements, tests that do not name the capability, or evidence files the
+  content scan refuses. capability-record-deficits.txt lists each one with the exact finding. Their behaviour was exercised
+  by the role matrix and permission-gate sweeps (no authority leak found), which is evidence for the gap, not a review.

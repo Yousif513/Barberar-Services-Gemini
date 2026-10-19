@@ -228,7 +228,8 @@ describe("Negative Authorization & Security Boundary Tests", () => {
         "utf8"
       );
       assert.ok(loginCode.includes('searchParams.get("returnUrl")'), "Must read returnUrl from searchParams");
-      assert.ok(loginCode.includes('returnUrl.startsWith("/")') || loginCode.includes("returnUrl.startsWith('/')"), "Must validate returnUrl is relative path");
+      // RT-M2: a prefix check let a backslash or a tab after the first slash through; the page now parses the value (tests/safe-redirect.test.mjs).
+      assert.ok(loginCode.includes('safeInternalPath(searchParams.get("returnUrl"), "")'), "Must validate returnUrl is a same-site path");
       assert.ok(loginCode.includes("signInWithOtp"), "Must support phone OTP sign-in");
       assert.ok(loginCode.includes("verifyOtp"), "Must support phone OTP verification");
     });

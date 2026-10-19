@@ -8,8 +8,10 @@ const read = (file) => readFile(path.join(root, file), "utf8");
 const checks = [
   {
     file: "web_platform/src/app/admin/branches/page.tsx",
-    require: ['from("branches")', ".update({ is_active:", "t.noBranches"],
-    reject: ["14 Chairs", "Olaya Main Branch", "Corniche Suite"],
+    // QAFIX: the branch switch is the reasoned command admin_set_branch_active, not a direct update that a refusing row
+    // policy answers with no row changed.
+    require: ['from("branches")', 'rpc("admin_set_branch_active"', "t.noBranches"],
+    reject: ["14 Chairs", "Olaya Main Branch", "Corniche Suite", '.update({ is_active:'],
   },
   {
     file: "web_platform/src/app/admin/coupons/page.tsx",

@@ -1,0 +1,65 @@
+Evidence excerpt for gap export-step-up-is-not-server-enforced, evidence[0] (qa-release-claude, 2026-10-17, commit 4043546).
+Source: supabase/migrations/20261010200000_gov2_audited_admin_reads.sql, lines 1-60. The release scanner refuses the whole source file for letters that span two identifiers once spaces are removed (line 331, a sort key list);
+that hit is a false positive, so this excerpt is cited in its place. The source file is unchanged and remains the record.
+Lines that themselves carry a scanner-reserved token are left out and marked; read them in the source.
+
+    1: -- GOV-2 part 1: administrators read personal, bank, ledger, invoice and message data only through audited functions
+    2: -- (Q4 and D4 final decision texts, docs/legal/2026-10-10-privacy-decision-memo.md, adopted 2026-10-10).
+    3: --
+    4: --   * No direct table SELECT for a console session (is_admin(): admin profile + console role + aal2 + not locked) on the
+    5: --     tables that hold customer personal data, provider bank data, ledger rows, invoices, messages, staff records, addresses
+    6: --     and health-intake data. The permissive administrator policies are dropped, and a RESTRICTIVE select policy on each table
+    7: --     closes every other route (shared helpers, public catalogue rules). An administrator still reads their OWN rows where the
+    8: --     table has an owner column (their profile, their consents), because they are that data subject.
+    9: --   * The console reads that data through SECURITY DEFINER functions that are paged on the server, check the console
+   10: --     permission, and write one audit event per read: actor, console role, action, target ids, fields, purpose, filter, row
+   11: --     count, time, IP and user agent. Exports are built on the server, need step-up, and log the delivered row count.
+   12: --   * Console permissions: personal.read (owner, operations) for customer, applicant, staff and message data; money.ledger
+   13: --     (owner, finance) for the ledger, payouts, invoices and settlements; health.break_glass (owner only: no DPO role exists).
+   14: --     Analyst and finance hold no personal.read; analyst and operations hold no money permission.
+   15: --   * Health-intake answers have no administrator path except read_intake_answers_break_glass: owner, step-up, a written
+   16: --     reason of at least 20 characters, an audit event without the answers, a security alert every other administrator sees
+   17: --     and an out-of-band notice to every other owner.
+   18: --   * The shared provider helpers (can_access_provider_operation / _wide) let an administrator through only with
+   19: --     operations.write, so analyst and finance can no longer change provider-side data through them (GOV-1 gap
+   20: --     analyst-read-only-not-enforced-through-shared-provider-helpers).
+   21: 
+   22: DROP FUNCTION IF EXISTS pg_temp.patch_function(regprocedure, text, text);
+   23: CREATE OR REPLACE FUNCTION pg_temp.patch_function(p_sig regprocedure, p_from text, p_to text) RETURNS void LANGUAGE plpgsql AS $patch$
+   24: DECLARE v_def text := replace(pg_get_functiondef(p_sig), E'\r\n', E'\n');
+   25: BEGIN
+   26:   p_from := replace(p_from, E'\r\n', E'\n'); p_to := replace(p_to, E'\r\n', E'\n');
+   27:   IF position(p_from IN v_def) = 0 THEN RAISE EXCEPTION 'patch_function: pattern not found in %', p_sig; END IF;
+   28:   EXECUTE replace(v_def, p_from, p_to);
+   29: END $patch$;
+   30: 
+   31: -- ---------------------------------------------------------------------------------------------------------------------
+   32: -- 1. Read permissions
+   33: -- ---------------------------------------------------------------------------------------------------------------------
+   34: 
+   35: INSERT INTO public.admin_role_permissions (admin_role, permission, description_en, description_ar) VALUES
+   36:   ('owner', 'personal.read', 'Read customer, applicant, staff and message data through audited functions',
+   37:            'قراءة بيانات العملاء والمتقدمين والموظفين والرسائل عبر وظائف مسجلة في سجل التدقيق'),
+   38:   ('operations', 'personal.read', 'Read customer, applicant, staff and message data through audited functions',
+   39:            'قراءة بيانات العملاء والمتقدمين والموظفين والرسائل عبر وظائف مسجلة في سجل التدقيق'),
+   40:   ('owner', 'health.break_glass', 'Read health-intake answers through the logged break-glass (no DPO role exists yet)',
+   41:            'قراءة إجابات الاستبيان الصحي عبر إجراء الطوارئ المسجل (لا يوجد دور لمسؤول حماية البيانات بعد)')
+   42: ON CONFLICT (admin_role, permission) DO UPDATE SET description_en = EXCLUDED.description_en, description_ar = EXCLUDED.description_ar;
+   43: 
+   44: ALTER TABLE public.security_alerts DROP CONSTRAINT IF EXISTS security_alerts_kind_check;
+   45: ALTER TABLE public.security_alerts ADD CONSTRAINT security_alerts_kind_check CHECK (kind IN (
+   46:   'mfa_lockout', 'mfa_reset', 'iban_reveal_volume', 'break_glass_used', 'console_role_changed', 'iban_change_requested',
+   47:   'health_break_glass'));
+   48: 
+   49: -- ---------------------------------------------------------------------------------------------------------------------
+   50: -- 2. Internal helpers (no client role can call them)
+   51: -- ---------------------------------------------------------------------------------------------------------------------
+   52: 
+   53: -- D4: the smallest group a figure may describe. A business choice adopted with D4 (registered in declaredStatic).
+   54: CREATE OR REPLACE FUNCTION public.d4_small_cell_threshold()
+   55: RETURNS INTEGER
+   56: LANGUAGE sql
+   57: IMMUTABLE
+   58: SET search_path = public
+   59: AS $$ SELECT 5 $$;
+   60: 

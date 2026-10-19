@@ -1,0 +1,65 @@
+Evidence excerpt for gap sec-gov1-m6-mfa-factor-persistence, evidence[0] (qa-release-claude, 2026-10-17, commit 4043546).
+Source: supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql, lines 1-60. The release scanner refuses the whole source file for a uuid generator column default at line 25;
+that hit is a false positive, so this excerpt is cited in its place. The source file is unchanged and remains the record.
+Lines that themselves carry a scanner-reserved token are left out and marked; read them in the source.
+
+    1: -- GOV-FIX H-3 and M-6 (docs/reviews/2026-10-10-security-gov1.md).
+    2: --
+    3: -- H-3. Out-of-band governance notices (IBAN change requested/approved/rejected, break-glass, MFA lockout/reset, console role
+    4: -- changes) were addressed to profiles.email and profiles.phone_number, which the account holder edits freely. Someone who took
+    5: -- over a provider account set their own contacts first, so the "your bank account is changing" notice reached the attacker.
+    6: --   * Recipients now come from auth.users only: the email when email_confirmed_at is set, the phone when phone_confirmed_at is
+    7: --     set. The address is snapshotted into the notice row when the notice is queued (governance_notifications.destination).
+    8: --   * A verified email or phone that was replaced in the last 30 days is notified too ("previous_verified"), so a change of
+    9: --     IBAN (or anything else) reaches both the old and the new channel (Q3).
+   10: --   * Every change of a verified contact is recorded (account_contact_changes, written by a trigger on auth.users), and a
+   11: --     provider bank-account change is refused for 48 hours after the owner's verified email or phone changed.
+   12: --   * An account with no verified contact gets a 'skipped' row that says so, instead of silence.
+   13: --   * No sender reads governance_notifications yet: that remains gap governance-notifications-have-no-delivery-worker (the
+   14: --     email/SMS provider and its credentials are an owner decision).
+   15: --   * Console sessions no longer read the address column: notices hold personal contact data.
+   16: -- M-6. A verified MFA factor added to an administrator account raises a security alert (mfa_factor_added), writes an audit
+   17: --   event and notifies the account's verified contacts, so a factor planted from a stolen session is visible. The number of
+   18: --   factors per account drops to 2 in supabase/config.toml (hosted setting: gap hosted-auth-settings-must-match-gov1).
+   19: 
+   20: -- ---------------------------------------------------------------------------------------------------------------------
+   21: -- 1. Verified contact changes
+   22: -- ---------------------------------------------------------------------------------------------------------------------
+   23: 
+   24: CREATE TABLE IF NOT EXISTS public.account_contact_changes (
+   25: [line left out of the excerpt; see the source]
+   26:   user_id UUID NOT NULL,
+   27:   channel TEXT NOT NULL CHECK (channel IN ('email', 'sms')),
+   28:   -- The previously verified address, kept so the old channel is told about later sensitive changes; NULL when the old one was
+   29:   -- never verified.
+   30:   old_value TEXT,
+   31:   changed_at TIMESTAMPTZ NOT NULL DEFAULT now()
+   32: );
+   33: CREATE INDEX IF NOT EXISTS idx_account_contact_changes_user ON public.account_contact_changes (user_id, changed_at DESC);
+   34: ALTER TABLE public.account_contact_changes ENABLE ROW LEVEL SECURITY;
+   35: REVOKE ALL ON public.account_contact_changes FROM anon, authenticated;
+   36: REVOKE UPDATE, DELETE, TRUNCATE ON public.account_contact_changes FROM service_role;
+   37: GRANT SELECT, INSERT ON public.account_contact_changes TO service_role;
+   38: SELECT public.attach_admin_audit_trigger('public.account_contact_changes');
+   39: 
+   40: CREATE OR REPLACE FUNCTION public.record_account_contact_change()
+   41: RETURNS TRIGGER
+   42: LANGUAGE plpgsql
+   43: SECURITY DEFINER
+   44: SET search_path = public
+   45: AS $$
+   46: BEGIN
+   47:   IF OLD.email IS DISTINCT FROM NEW.email
+   48:      OR (OLD.email_confirmed_at IS NOT NULL AND NEW.email_confirmed_at IS NULL) THEN
+   49:     INSERT INTO public.account_contact_changes (user_id, channel, old_value)
+   50:     VALUES (NEW.id, 'email', CASE WHEN OLD.email_confirmed_at IS NOT NULL THEN NULLIF(lower(btrim(COALESCE(OLD.email, ''))), '') END);
+   51:   END IF;
+   52:   IF OLD.phone IS DISTINCT FROM NEW.phone
+   53:      OR (OLD.phone_confirmed_at IS NOT NULL AND NEW.phone_confirmed_at IS NULL) THEN
+   54:     INSERT INTO public.account_contact_changes (user_id, channel, old_value)
+   55:     VALUES (NEW.id, 'sms', CASE WHEN OLD.phone_confirmed_at IS NOT NULL THEN NULLIF(btrim(COALESCE(OLD.phone, '')), '') END);
+   56:   END IF;
+   57:   RETURN NEW;
+   58: END;
+   59: $$;
+   60: REVOKE ALL ON FUNCTION public.record_account_contact_change() FROM PUBLIC, anon, authenticated;

@@ -1,0 +1,18 @@
+Project gates re-run by qa-release-claude on 2026-10-17 (local checkout primora-fix, branch claude-code, commit 4043546, Node v24.15.0).
+Full logs sit next to this file (gate-*.log). Counts read from the node test runner summary lines.
+
+npm run test:db          exit 0  tests 1429 pass 1429 fail 0 
+npm run test:inventory   exit 0  tests 10 pass 10 fail 0 
+npm run test:edge        exit 0  tests 46 pass 46 fail 0 
+npm run test:mobile      exit 0  tests 27 pass 27 fail 0 
+npm run test:ui-schema   exit 0  checked 290 rpc calls and 197 select strings (35 dynamic calls not checked); 0 mismatches, 0 in the baseline
+npm run test:security-core exit 0  Security core verification passed.
+npm run test:admin-controls exit 0  Admin controls verification passed.
+npm run test:p3-compat   exit 0  Full-chain owner writes, scoped delegation, duplicate retry and revoked-permission denial passed.
+web_platform tests        exit 0  tests 753 pass 753 fail 0 
+npm run lint              exit 0  web and mobile: 0 errors (warnings only; mobile 14 warnings)
+npm run typecheck:mobile  exit 0  no diagnostics
+npx tsc -p web_platform --noEmit  exit 0  no diagnostics (empty output)
+npm run build --workspace=web_platform  exit 0  (NEXT_PUBLIC_SUPABASE_URL set to the local stack so nothing points at the hosted project); 107 routes listed
+
+Summary: every configured gate exits 0. A green suite proves the suites pass, not that the console is complete.

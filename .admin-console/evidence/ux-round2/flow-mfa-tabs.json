@@ -1,0 +1,32 @@
+{
+  "account": "ux2-owner-h",
+  "steps": [
+    "first load: enrol, factors=unverified",
+    "reload: key new, factors=unverified",
+    "tab 2 opened: key new, factors=unverified"
+  ],
+  "staleTabMessage": "تعذّر التحقق من الرمز. حاول مجدداً بعد قليل.",
+  "staleTabPath": "/login/mfa",
+  "screens": [
+    ".admin-console/evidence/ux-round2/mfa-stale-tab-ux2-owner-h-ar-375.png"
+  ],
+  "tab2Landed": "/admin",
+  "factorsEnd": "verified",
+  "failures": "0",
+  "label": "ux2-owner-h",
+  "lang": "ar",
+  "width": 375,
+  "consoleErrors": [
+    {
+      "route": "/login/mfa (tab 1, stale key)",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    }
+  ],
+  "httpFailures": [
+    {
+      "route": "/login/mfa (tab 1, stale key)",
+      "status": 404,
+      "url": "API/auth/v1/factors/cc22d18c-88fc-4852-87d2-831e11846b74/challenge"
+    }
+  ]
+}

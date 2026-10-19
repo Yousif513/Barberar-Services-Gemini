@@ -459,7 +459,7 @@ export default function AdminReconciliation() {
                 <button type="button" onClick={() => void load()} className={`underline ${focusRing}`}>{t.retry}</button>
               </p>
             ) : !view || view.breaks.length === 0 ? <p className="text-xs font-semibold text-gray-500">{t.empty}</p> : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-[#9B7928]" tabIndex={0} role="region" aria-labelledby="breaks-title">
                 <table className="w-full min-w-[920px] text-xs">
                   <thead className="border-b border-[#ECECEC] bg-[#FAF9F6] text-[10px] font-extrabold uppercase tracking-wider text-gray-500">
                     <tr>
@@ -504,7 +504,7 @@ export default function AdminReconciliation() {
             <h3 id="refunds-title" className="text-sm font-black text-gray-900">{t.refundsTitle}</h3>
             <p className="text-xs font-semibold text-gray-500">{t.refundsIntro}</p>
             {!view ? null : view.refunds.length === 0 ? <p className="text-xs font-semibold text-gray-500">{t.noRefunds}</p> : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-[#9B7928]" tabIndex={0} role="region" aria-labelledby="refunds-title">
                 <table className="w-full min-w-[860px] text-xs">
                   <thead className="border-b border-[#ECECEC] bg-[#FAF9F6] text-[10px] font-extrabold uppercase tracking-wider text-gray-500">
                     <tr>{[t.colAmount, t.colEntitled, t.colInitiate, t.colSucceed, t.colTapStatus, t.colActions].map((h) => <th key={h} scope="col" className={cell}>{h}</th>)}</tr>
@@ -536,7 +536,7 @@ export default function AdminReconciliation() {
             <h3 id="imports-title" className="text-sm font-black text-gray-900">{t.importsTitle}</h3>
             <p className="text-xs font-semibold text-gray-500">{t.importsIntro}</p>
             {!view ? null : (view.imports ?? []).length === 0 ? <p className="text-xs font-semibold text-gray-500">{t.noImports}</p> : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-[#9B7928]" tabIndex={0} role="region" aria-labelledby="imports-title">
                 <table className="w-full min-w-[760px] text-xs">
                   <thead className="border-b border-[#ECECEC] bg-[#FAF9F6] text-[10px] font-extrabold uppercase tracking-wider text-gray-500">
                     <tr>{[t.colDay, t.colSource, t.colRows, t.colFile, t.colStatus].map((h) => <th key={h} scope="col" className={cell}>{h}</th>)}</tr>

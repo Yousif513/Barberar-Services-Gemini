@@ -2,6 +2,7 @@
 
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { checkedWrite } from "@/lib/write-result.mjs";
 import { errorMessage } from "@/lib/error-message";
 import { useConfirm } from "@/components/modal";
 import { ProviderDialog } from "../_components/dialog";
@@ -661,7 +662,7 @@ export default function ProviderEmployeesPage() {
       };
 
       const result = staffForm.id
-        ? await supabase.from("employees").update(payload).eq("id", staffForm.id)
+        ? checkedWrite(await supabase.from("employees").update(payload).eq("id", staffForm.id).select("id"), { expected: 1, lang })
         : await supabase.from("employees").insert(payload);
 
       if (result.error) throw result.error;
@@ -690,17 +691,19 @@ export default function ProviderEmployeesPage() {
       setSaving(true);
       setError("");
       setSuccess("");
-      const { error: deleteError } = await supabase
+      const { error: deleteError } = checkedWrite(await supabase
         .from("employees")
         .delete()
-        .eq("id", member.id);
+        .eq("id", member.id)
+        .select("id"), { expected: 1, lang });
 
       if (deleteError) {
         if (deleteError.code !== "23503") throw deleteError;
-        const { error: deactivateError } = await supabase
+        const { error: deactivateError } = checkedWrite(await supabase
           .from("employees")
           .update({ is_active: false })
-          .eq("id", member.id);
+          .eq("id", member.id)
+          .select("id"), { expected: 1, lang });
         if (deactivateError) throw deactivateError;
         setSuccess(teamCopy.deactivated);
       } else {

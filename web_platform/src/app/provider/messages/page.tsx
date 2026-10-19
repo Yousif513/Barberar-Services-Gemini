@@ -164,7 +164,10 @@ export default function ProviderMessages() {
     loadMessages(selectedId);
     const conv = conversations.find((c) => c.id === selectedId);
     if (conv?.unread) {
-      supabase.from("conversations").update({ unread_for_provider: false }).eq("id", selectedId).then(() => {
+      // The conversation is shown as read only when the server stored it; otherwise it stays marked unread.
+      // RT-H1: the server clears the provider side's unread flag through mark_conversation_read.
+      supabase.rpc("mark_conversation_read", { p_conversation_id: selectedId }).then(({ error }) => {
+        if (error) return;
         setConversations((prev) => prev.map((c) => (c.id === selectedId ? { ...c, unread: false } : c)));
       });
     }
@@ -200,12 +203,8 @@ export default function ProviderMessages() {
     setSending(true);
     setSendError("");
     try {
-      const { error } = await supabase.from("messages").insert({
-        conversation_id: activeConv.id,
-        sender_id: currentUserId,
-        sender_role: "provider",
-        body,
-      });
+      // RT-H1: the server sets the sender, side and time; the client sends only the thread and the text.
+      const { error } = await supabase.rpc("send_message", { p_conversation_id: activeConv.id, p_body: body });
       if (error) throw error;
       setInputMessage("");
       await loadMessages(activeConv.id);

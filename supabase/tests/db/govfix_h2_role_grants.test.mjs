@@ -46,10 +46,17 @@ describe("a privileged console role is granted only with a different owner's app
     assert.equal((await decide(ownerB, asked.approval_id, "reject", "Not a staff member")).status, "rejected");
   });
 
-  it("grants nothing privileged at once: analyst and operations apply immediately, owner -> finance too", async () => {
+  it("grants nothing privileged at once: analyst applies immediately, operations waits for a different owner", async () => {
     const person = await createUser(db);
     assert.equal((await setRole(ownerA, person, "analyst", "Joined the analytics team")).changed, true);
-    assert.equal((await setRole(ownerA, person, "operations", "Moved to the operations desk")).changed, true);
+    // dbsec-wave2 (e2e observation): operations adds personal.read and privacy.manage, which are privileged since
+    // 20261018230000, so this grant now follows the different-owner approval like finance.
+    const asked = await setRole(ownerA, person, "operations", "Moved to the operations desk");
+    assert.deepEqual([asked.status, asked.changed], ["pending_approval", false]);
+    assert.equal((await assignment(person)).admin_role, "analyst", "nothing changed yet");
+    await expectError(decide(ownerA, asked.approval_id), /your own request/);
+    await expectError(decide(finance, asked.approval_id), /cannot decide role_change/);
+    assert.equal((await decide(ownerB, asked.approval_id)).status, "approved");
     assert.equal((await assignment(person)).admin_role, "operations");
   });
 

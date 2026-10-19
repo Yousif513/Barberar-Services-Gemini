@@ -1,0 +1,28 @@
+privileged-read probe 2026-10-16T22:06:30.216Z, http://127.0.0.1:54321
+ok   owner: direct SELECT profiles returns no other person's rows :: {"status":200,"rows":0}
+ok   owner: direct SELECT payout_requests returns no other person's rows :: {"status":403,"rows":null,"code":"42501","message":"permission denied for table payout_requests"}
+ok   owner: direct SELECT provider_payout_destinations returns no other person's rows :: {"status":403,"rows":null,"code":"42501","message":"permission denied for table provider_payout_destinations"}
+ok   owner: direct SELECT transactional_ledger returns no other person's rows :: {"status":200,"rows":0}
+ok   owner: direct SELECT invoices returns no other person's rows :: {"status":200,"rows":0}
+ok   owner: direct SELECT messages returns no other person's rows :: {"status":200,"rows":0}
+ok   owner: direct SELECT employees returns no other person's rows :: {"status":403,"rows":null,"code":"42501","message":"permission denied for table employees"}
+ok   owner: direct SELECT bookings returns no other person's rows :: {"status":200,"rows":0}
+ok   owner: direct SELECT privacy_requests returns no other person's rows :: {"status":403,"rows":null,"code":"42501","message":"permission denied for table privacy_requests"}
+ok   owner: direct SELECT refund_requests returns no other person's rows :: {"status":200,"rows":0}
+ok   owner: direct SELECT intake_answers returns no other person's rows :: {"status":400,"rows":null,"code":"42703","message":"column intake_answers.id does not exist"}
+ok   owner: direct SELECT admin_audit_logs returns no other person's rows :: {"status":200,"rows":0}
+ok   finance: direct SELECT profiles returns no other person's rows :: {"status":200,"rows":0}
+ok   finance: direct SELECT payout_requests returns no other person's rows :: {"status":403,"rows":null,"code":"42501","message":"permission denied for table payout_requests"}
+ok   finance: direct SELECT provider_payout_destinations returns no other person's rows :: {"status":403,"rows":null,"code":"42501","message":"permission denied for table provider_payout_destinations"}
+ok   finance: direct SELECT transactional_ledger returns no other person's rows :: {"status":200,"rows":0}
+ok   finance: direct SELECT invoices returns no other person's rows :: {"status":200,"rows":0}
+ok   finance: direct SELECT messages returns no other person's rows :: {"status":200,"rows":0}
+ok   finance: direct SELECT employees returns no other person's rows :: {"status":403,"rows":null,"code":"42501","message":"permission denied for table employees"}
+ok   finance: direct SELECT bookings returns no other person's rows :: {"status":200,"rows":0}
+ok   finance: direct SELECT privacy_requests returns no other person's rows :: {"status":403,"rows":null,"code":"42501","message":"permission denied for table privacy_requests"}
+ok   finance: direct SELECT refund_requests returns no other person's rows :: {"status":200,"rows":0}
+ok   finance: direct SELECT intake_answers returns no other person's rows :: {"status":400,"rows":null,"code":"42703","message":"column intake_answers.id does not exist"}
+ok   finance: direct SELECT admin_audit_logs returns no other person's rows :: {"status":200,"rows":0}
+ok   finance reads payout requests through the audited function :: {"status":200}
+ok   the audited read leaves one audit row naming finance as the actor, with purpose and row count :: {"before":55,"after":56,"last":"payout_requests.listed | payout_review | rows=0"}
+26/26 passed

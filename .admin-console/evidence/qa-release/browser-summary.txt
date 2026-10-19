@@ -1,0 +1,201 @@
+Browser verification summary, qa-release-claude, 2026-10-17. Real headless Chrome driven over the DevTools protocol by
+harness/qa-browser-harness.mjs against the local app (dev server http://localhost:3100; performance on the production build
+http://localhost:3201) and the local Supabase stack. No request reached a non-local Supabase host in any run.
+Sessions: throw-away console accounts (owner, finance, operations, analyst), a seeded provider owner and a throw-away customer;
+console sessions are aal2 with a TOTP code computed from the local factor secret. axe-core 4.12.1 from node_modules, tags
+wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa. Raw results: browser-*.json; screenshots in a11y-shots, state-shots, role-shots,
+workflow-shots, falsesuccess-shots.
+
+1. Accessibility (axe) and layout, per screen: EN and AR at 1440 and 375 px (152 page loads)
+  admin-dashboard            /admin                 axe clean in all four, no overflow, rtl in Arabic
+  admin-providers            /admin/providers       axe clean in all four, no overflow, rtl in Arabic
+  admin-ledger               /admin/ledger          axe clean in all four, no overflow, rtl in Arabic
+  admin-services             /admin/services        en1440: label(33),select-name(2); en375: label(33),select-name(2); ar1440: label(33),select-name(2); ar375: label(33),select-name(2)
+  admin-integrations         /admin/integrations    en1440: select-name(1); en375: select-name(1); ar1440: select-name(1); ar375: select-name(1)
+  admin-coupons              /admin/coupons         en375: color-contrast(1),scrollable-region-focusable(1); ar375: color-contrast(1),scrollable-region-focusable(1)
+  admin-bookings             /admin/bookings        axe clean in all four, no overflow, rtl in Arabic
+  admin-customers            /admin/customers       axe clean in all four, no overflow, rtl in Arabic
+  admin-branches             /admin/branches        axe clean in all four, no overflow, rtl in Arabic
+  admin-disputes             /admin/disputes        en375: color-contrast(1); ar375: color-contrast(1)
+  admin-activity             /admin/activity        axe clean in all four, no overflow, rtl in Arabic
+  admin-employees            /admin/employees       axe clean in all four, no overflow, rtl in Arabic
+  admin-reviews              /admin/reviews         en375: color-contrast(1); ar375: color-contrast(1)
+  admin-taxes                /admin/taxes           en1440: scrollable-region-focusable(1)
+  admin-settings             /admin/settings        axe clean in all four, no overflow, rtl in Arabic
+  admin-reports              /admin/reports         en375: color-contrast(3),scrollable-region-focusable(1); ar375: scrollable-region-focusable(1)
+  admin-packages             /admin/packages        en375: color-contrast(1); ar375: color-contrast(1)
+  admin-notifications        /admin/notifications   axe clean in all four, no overflow, rtl in Arabic
+  admin-help                 /admin/help            axe clean in all four, no overflow, rtl in Arabic
+  admin-supply               /admin/supply          axe clean in all four, no overflow, rtl in Arabic
+  admin-refunds              /admin/refunds         en375: color-contrast(1); ar375: color-contrast(1)
+  admin-audit-logs           /admin/audit-logs      axe clean in all four, no overflow, rtl in Arabic
+  admin-platform-rules       /admin/platform-rules  axe clean in all four, no overflow, rtl in Arabic
+  admin-roles                /admin/roles           axe clean in all four, no overflow, rtl in Arabic
+  admin-sponsored            /admin/sponsored       axe clean in all four, no overflow, rtl in Arabic
+  admin-whatsapp             /admin/whatsapp        en1440: scrollable-region-focusable(1); ar1440: scrollable-region-focusable(1)
+  admin-privacy              /admin/privacy         axe clean in all four, no overflow, rtl in Arabic
+  admin-incidents            /admin/incidents       axe clean in all four, no overflow, rtl in Arabic
+  admin-ropa                 /admin/ropa            axe clean in all four, no overflow, rtl in Arabic
+  admin-approvals            /admin/approvals       axe clean in all four, no overflow, rtl in Arabic
+  admin-reconciliation       /admin/reconciliation  en375: color-contrast(1)
+  provider-inventory         /provider/inventory    en375: color-contrast(1)
+  provider-chain             /provider/chain        en375: scrollable-region-focusable(1); ar375: scrollable-region-focusable(1)
+  provider-pricing           /provider/pricing      axe clean in all four, no overflow, rtl in Arabic
+  customer-privacy-account   /customer/privacy      en1440: color-contrast(3); en375: color-contrast(2); ar375: color-contrast(2)
+  become-provider            /become-provider       en1440: color-contrast(5); en375: color-contrast(5); ar1440: color-contrast(4); ar375: color-contrast(4)
+  customer-privacy           /privacy               en1440: color-contrast(4); en375: color-contrast(4); ar1440: color-contrast(1); ar375: color-contrast(1)
+  login-mfa                  /login/mfa             en1440: color-contrast(2); en375: color-contrast(2); ar1440: color-contrast(2); ar375: color-contrast(2)
+  screens clean in all four runs: 21 of 38
+  no horizontal page overflow at 375 px on any screen; every Arabic run had dir=rtl.
+
+2. Keyboard (EN, 1440 px): skip link, 30 Tab stops after it, visible focus; phone drawer at 375 px (open with Enter, Escape closes, focus returns)
+  admin-dashboard            skip link yes; stops 30, in main 29; drawer ok
+  admin-providers            skip link yes; stops 30, in main 27; drawer ok
+  admin-ledger               skip link yes; stops 30, in main 26; drawer ok
+  admin-services             skip link yes; stops 30, in main 30; drawer ok
+  admin-integrations         skip link yes; stops 30, in main 30; drawer ok
+  admin-coupons              skip link yes; stops 28, in main 1; drawer ok
+  admin-bookings             skip link yes; stops 30, in main 29; drawer ok
+  admin-customers            skip link yes; stops 30, in main 30; drawer ok
+  admin-branches             skip link yes; stops 28, in main 5; drawer ok
+  admin-disputes             skip link yes; stops 28, in main 0; drawer ok
+  admin-activity             skip link yes; stops 28, in main 4; drawer ok
+  admin-employees            skip link yes; stops 29, in main 4; drawer ok
+  admin-reviews              skip link yes; stops 28, in main 0; drawer ok
+  admin-taxes                skip link yes; stops 28, in main 0; drawer ok
+  admin-settings             skip link yes; stops 28, in main 7; drawer ok
+  admin-reports              skip link yes; stops 28, in main 11; drawer ok
+  admin-packages             skip link yes; stops 29, in main 0; drawer ok
+  admin-notifications        skip link yes; stops 28, in main 3; drawer ok
+  admin-help                 skip link yes; stops 28, in main 8; drawer ok
+  admin-supply               skip link yes; stops 28, in main 4; drawer ok
+  admin-refunds              skip link yes; stops 28, in main 1; drawer ok
+  admin-audit-logs           skip link yes; stops 30, in main 30; drawer ok
+  admin-platform-rules       skip link yes; stops 29, in main 8; drawer ok
+  admin-roles                skip link yes; stops 30, in main 30; drawer ok
+  admin-sponsored            skip link yes; stops 28, in main 5; drawer ok
+  admin-whatsapp             skip link yes; stops 28, in main 0; drawer ok
+  admin-privacy              skip link yes; stops 28, in main 23; drawer ok
+  admin-incidents            skip link yes; stops 28, in main 19; drawer ok
+  admin-ropa                 skip link yes; stops 29, in main 4; drawer ok
+  admin-approvals            skip link yes; stops 30, in main 30; drawer ok
+  admin-reconciliation       skip link yes; stops 28, in main 13; drawer ok
+  provider-inventory         skip link none (not a console page); stops 30, in main 3; drawer n/a
+  provider-chain             skip link none (not a console page); stops 30, in main 3; drawer n/a
+  provider-pricing           skip link none (not a console page); stops 30, in main 3; drawer n/a
+  customer-privacy-account   skip link none (not a console page); stops 28, in main 4; drawer n/a
+  become-provider            skip link none (not a console page); stops 28, in main 1; drawer n/a
+  customer-privacy           skip link none (not a console page); stops 24, in main 3; drawer n/a
+  login-mfa                  skip link none (not a console page); stops 24, in main 9; drawer n/a
+  focus ring follow-up on inputs (120 ms after Tab): /admin/reports date outline solid 2px rgb(155, 121, 40); /admin/bookings search outline solid 2px rgb(155, 121, 40); /admin/audit-logs text outline auto 1px rgb(155, 121, 40)
+
+3. Screen states (owner session; data requests held 6 s, emptied, answered 503, answered 403/42501)
+  admin-dashboard            loading indicator; 503 message; 403 message
+  admin-providers            loading indicator; 503 still loading after 503 (client retries) or none; 403 message
+  admin-ledger               loading none seen; 503 message; 403 message
+  admin-services             loading indicator; 503 still loading after 503 (client retries) or none; 403 message + empty-state text at the same time
+  admin-integrations         loading none seen; 503 still loading after 503 (client retries) or none; 403 message + empty-state text at the same time
+  admin-coupons              loading indicator; 503 still loading after 503 (client retries) or none; 403 message + empty-state text at the same time
+  admin-bookings             loading indicator; 503 message; 403 message
+  admin-customers            loading indicator; 503 message; 403 message
+  admin-branches             loading indicator; 503 still loading after 503 (client retries) or none; 403 message + empty-state text at the same time
+  admin-disputes             loading indicator; 503 message; 403 message
+  admin-activity             loading indicator; 503 still loading after 503 (client retries) or none; 403 message + empty-state text at the same time
+  admin-employees            loading indicator; 503 message; 403 message
+  admin-reviews              loading indicator; 503 message; 403 message + empty-state text at the same time
+  admin-taxes                loading indicator; 503 still loading after 503 (client retries) or none; 403 message
+  admin-settings             loading indicator; 503 message; 403 message
+  admin-reports              loading none seen; 503 message; 403 message
+  admin-packages             loading indicator; 503 still loading after 503 (client retries) or none; 403 message + empty-state text at the same time
+  admin-notifications        loading indicator; 503 message; 403 message
+  admin-help                 loading none seen; 503 still loading after 503 (client retries) or none; 403 none
+  admin-supply               loading indicator; 503 message; 403 message
+  admin-refunds              loading indicator; 503 message; 403 message
+  admin-audit-logs           loading indicator; 503 message; 403 message
+  admin-platform-rules       loading indicator; 503 message; 403 message
+  admin-roles                loading indicator; 503 message; 403 message
+  admin-sponsored            loading indicator; 503 message; 403 message
+  admin-whatsapp             loading indicator; 503 message; 403 message
+  admin-privacy              loading indicator; 503 message; 403 message
+  admin-incidents            loading indicator; 503 message; 403 message
+  admin-ropa                 loading none seen; 503 still loading after 503 (client retries) or none; 403 none
+  admin-approvals            loading indicator; 503 message; 403 message
+  admin-reconciliation       loading indicator; 503 message; 403 message
+  provider-inventory         loading indicator; 503 message; 403 message
+  provider-chain             loading indicator; 503 message; 403 message
+  provider-pricing           loading indicator; 503 message; 403 message
+  customer-privacy-account   loading none seen; 503 still loading after 503 (client retries) or none; 403 message
+  become-provider            loading none seen; 503 still loading after 503 (client retries) or none; 403 message
+
+4. Real console roles on every admin route (layout gate and database answers)
+  analyst    opened           16: / /services /integrations /coupons /branches /activity /taxes /reports /packages /help /supply /roles /sponsored /whatsapp /ropa /approvals
+  analyst    forbidden notice 15: /providers /ledger /bookings /customers /disputes /employees /reviews /settings /notifications /refunds /audit-logs /platform-rules /privacy /incidents /reconciliation
+  finance    opened           23: / /ledger /services /integrations /coupons /bookings /branches /disputes /activity /taxes /settings /reports /packages /help /supply /refunds /platform-rules /roles /sponsored /whatsapp /ropa /approvals /reconciliation
+  finance    forbidden notice  8: /providers /customers /employees /reviews /notifications /audit-logs /privacy /incidents
+  operations opened           24: / /providers /services /integrations /coupons /bookings /customers /branches /disputes /activity /employees /reviews /taxes /reports /packages /notifications /help /supply /roles /sponsored /whatsapp /privacy /ropa /approvals
+  operations forbidden notice  7: /ledger /settings /refunds /audit-logs /platform-rules /incidents /reconciliation
+  customer   redirected       31: / /providers /ledger /services /integrations /coupons /bookings /customers /branches /disputes /activity /employees /reviews /taxes /settings /reports /packages /notifications /help /supply /refunds /audit-logs /platform-rules /roles /sponsored /whatsapp /privacy /incidents /ropa /approvals /reconciliation
+  console errors during role visits: [('finance', '/admin/employees', 2)]
+
+5. Critical workflow through the UI (sign-in with password, /login/mfa with an authenticator code, Approvals, decide)
+  owner asked (API) a payout hold; finance signed in through the UI (mfa page /login/mfa, landed /admin), approved: ['Approved and executed. Dismiss']; hold active after: t
+  finance asked (API) to lift it; owner signed in through the UI (landed /admin), approved: ['Approved and executed. Dismiss']; hold active after: f
+  console errors during both: none; audit rows: approval.requested:e311184b-14e8-4cf1-9856-a86eef167c22 ; approval.approved:8d445a8c-fcac-42a2-be66-faa3c87ee383 ; approval.requested:8d445a8c-fcac-42a2-be66-faa3c87ee383 ; approval.approved:e311184b-14e8-4cf1-9856-a86eef167c22
+
+6. Write controls pressed by a console role without the table permission (server refuses; what the screen says)
+  analyst /admin/services: pressed INACTIVE
+     after the click the screen showed the change; after reload the stored value was unchanged:
+     before  Luxury Beard Grooming ID: 50000000-0000-0000-0000-000000000001 Beard Grooming SAR 1 ACTIVE ☆ LANDING ☆ SERVICES EDIT INACTIVE ARCHIVE
+     after   Luxury Beard Grooming ID: 50000000-0000-0000-0000-000000000001 Beard Grooming SAR 1 INACTIVE ☆ LANDING ☆ SERVICES EDIT ACTIVE ARCHIVE
+     reload  Luxury Beard Grooming ID: 50000000-0000-0000-0000-000000000001 Beard Grooming SAR 1 ACTIVE ☆ LANDING ☆ SERVICES EDIT INACTIVE ARCHIVE
+  analyst /admin/branches: pressed TOGGLE then Deactivate
+     after the click the screen showed the change; after reload the stored value was unchanged:
+     before  Branches & Outlets Matrix Monitor provider outlet locations, active schedules, and verification statuses. TOTAL BRANCHES 5 ONLINE OUTLETS 5 AVERAGE SE
+     after   Branches & Outlets Matrix Monitor provider outlet locations, active schedules, and verification statuses. TOTAL BRANCHES 5 ONLINE OUTLETS 4 AVERAGE SE
+     reload  Branches & Outlets Matrix Monitor provider outlet locations, active schedules, and verification statuses. TOTAL BRANCHES 5 ONLINE OUTLETS 5 AVERAGE SE
+  finance /admin/integrations: pressed DISABLE then Disable
+     after the click the screen showed the change; after reload the stored value was unchanged:
+     before  API & Integrations Enable, disable and switch environments for every connected service. Credentials stay server-side — only masked hints are shown her
+     after   API & Integrations Enable, disable and switch environments for every connected service. Credentials stay server-side — only masked hints are shown her
+     reload  API & Integrations Enable, disable and switch environments for every connected service. Credentials stay server-side — only masked hints are shown her
+
+7. Performance, production build (next start), local fixture volume, 3 loads per route (first cold), Chrome headless 1440 px
+  admin-dashboard            warm LCP   80 ms, data settled  108 ms, cold LCP  300 ms, 79 requests, 658 KB
+  admin-providers            warm LCP   72 ms, data settled  105 ms, cold LCP  100 ms, 74 requests, 633 KB
+  admin-ledger               warm LCP  460 ms, data settled  105 ms, cold LCP   92 ms, 87 requests, 633 KB
+  admin-services             warm LCP   96 ms, data settled  105 ms, cold LCP  328 ms, 73 requests, 633 KB
+  admin-integrations         warm LCP   72 ms, data settled  107 ms, cold LCP  100 ms, 72 requests, 641 KB
+  admin-coupons              warm LCP  548 ms, data settled  105 ms, cold LCP  100 ms, 72 requests, 639 KB
+  admin-bookings             warm LCP  168 ms, data settled  105 ms, cold LCP  392 ms, 70 requests, 633 KB
+  admin-customers            warm LCP   80 ms, data settled  107 ms, cold LCP   92 ms, 73 requests, 633 KB
+  admin-branches             warm LCP  508 ms, data settled  109 ms, cold LCP   88 ms, 71 requests, 636 KB
+  admin-disputes             warm LCP   68 ms, data settled  108 ms, cold LCP   84 ms, 71 requests, 633 KB
+  admin-activity             warm LCP   64 ms, data settled  106 ms, cold LCP   84 ms, 72 requests, 636 KB
+  admin-employees            warm LCP  244 ms, data settled  103 ms, cold LCP   88 ms, 80 requests, 775 KB
+  admin-reviews              warm LCP   68 ms, data settled  100 ms, cold LCP   84 ms, 70 requests, 633 KB
+  admin-taxes                warm LCP  524 ms, data settled  102 ms, cold LCP  108 ms, 71 requests, 636 KB
+  admin-settings             warm LCP   80 ms, data settled  106 ms, cold LCP  316 ms, 72 requests, 640 KB
+  admin-reports              warm LCP  524 ms, data settled  412 ms, cold LCP  120 ms, 71 requests, 639 KB
+  admin-packages             warm LCP   64 ms, data settled  105 ms, cold LCP   76 ms, 71 requests, 633 KB
+  admin-notifications        warm LCP   64 ms, data settled  105 ms, cold LCP  104 ms, 72 requests, 638 KB
+  admin-help                 warm LCP   72 ms, data settled  110 ms, cold LCP   92 ms, 71 requests, 636 KB
+  admin-supply               warm LCP   88 ms, data settled  111 ms, cold LCP  116 ms, 71 requests, 637 KB
+  admin-refunds              warm LCP   72 ms, data settled  104 ms, cold LCP   84 ms, 70 requests, 633 KB
+  admin-audit-logs           warm LCP  424 ms, data settled  310 ms, cold LCP   92 ms, 72 requests, 638 KB
+  admin-platform-rules       warm LCP   68 ms, data settled  106 ms, cold LCP  100 ms, 73 requests, 642 KB
+  admin-roles                warm LCP  444 ms, data settled  329 ms, cold LCP  100 ms, 72 requests, 640 KB
+  admin-sponsored            warm LCP   76 ms, data settled  104 ms, cold LCP   92 ms, 71 requests, 642 KB
+  admin-whatsapp             warm LCP  104 ms, data settled  110 ms, cold LCP  120 ms, 71 requests, 641 KB
+  admin-privacy              warm LCP  464 ms, data settled  529 ms, cold LCP   88 ms, 71 requests, 649 KB
+  admin-incidents            warm LCP   76 ms, data settled  104 ms, cold LCP  276 ms, 71 requests, 640 KB
+  admin-ropa                 warm LCP   80 ms, data settled  110 ms, cold LCP  544 ms, 70 requests, 638 KB
+  admin-approvals            warm LCP  436 ms, data settled  107 ms, cold LCP  100 ms, 71 requests, 633 KB
+  admin-reconciliation       warm LCP   72 ms, data settled  107 ms, cold LCP  164 ms, 70 requests, 633 KB
+  provider-inventory         warm LCP  148 ms, data settled  106 ms, cold LCP  208 ms, 85 requests, 732 KB
+  provider-chain             warm LCP  100 ms, data settled  106 ms, cold LCP   84 ms, 83 requests, 763 KB
+  provider-pricing           warm LCP  428 ms, data settled  322 ms, cold LCP  168 ms, 84 requests, 745 KB
+  customer-privacy-account   warm LCP   72 ms, data settled  107 ms, cold LCP  152 ms, 80 requests, 669 KB
+  become-provider            warm LCP  536 ms, data settled  548 ms, cold LCP  860 ms, 42 requests, 793 KB
+  customer-privacy           warm LCP   28 ms, data settled  107 ms, cold LCP  100 ms, 26 requests, 482 KB
+  login-mfa                  warm LCP   88 ms, data settled  106 ms, cold LCP  180 ms, 22 requests, 452 KB
+  worst warm LCP 548 ms, worst data-settled 548 ms, worst cold LCP 860 ms. Data volume is the local fixture set (20 customers, 15 bookings), not production volume.

@@ -69,7 +69,8 @@ describe("client-executable functions are accounted for", () => {
       .filter((f) => f.definer)
       // gov2_require_read (GOV-2) is is_admin() plus admin_can() in one internal helper that no client can call.
       // privacy_require_console (PRIV-1) is the same pair for the privacy commands: is_admin() then admin_can(permission).
-      .filter((f) => !/auth\.uid\(\)|is_admin\(\)|admin_can\(|admin_role\(\)|auth\.jwt\(\)|service_role|can_access_provider_operation|can_access_provider_wide|is_booking_staff|gov2_require_read\(|privacy_require_console\(/.test(f.body))
+      // console_require_permission (QAFIX) is admin_can(permission) that names the missing permission; no client can call it.
+      .filter((f) => !/auth\.uid\(\)|is_admin\(\)|admin_can\(|admin_role\(\)|auth\.jwt\(\)|service_role|can_access_provider_operation|can_access_provider_wide|is_booking_staff|gov2_require_read\(|privacy_require_console\(|console_require_permission\(/.test(f.body))
       .map((f) => f.signature.split("(")[0])
       .sort();
     // privacy_erasure_active (PRIV-3) only answers whether a deletion-engine run recorded in the caller's own transaction is open; the

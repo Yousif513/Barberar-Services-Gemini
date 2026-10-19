@@ -1,0 +1,38 @@
+Triage of the 17 placeholder-scan errors in validate --phase release (before this pass), qa-release-claude 2026-10-17.
+Each hit is an evidence file cited by a gap; the scanner refuses the whole file for one reserved word (it ignores the #Lnn anchor).
+Match = the token the scanner matched and the first line it occurs on.
+
+gap analyst-read-only-not-enforced-through-shared-provider-helpers [fixed] evidence[0] supabase/migrations/20261010100000_gov1_console_roles_and_mfa.sql#L470
+    token 'random' at line 130: id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+gap employee-wps-iban-not-masked [fixed] evidence[0] supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql
+    token 'random' at line 102: id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+gap export-step-up-is-not-server-enforced [fixed] evidence[0] supabase/migrations/20261010200000_gov2_audited_admin_reads.sql
+    token 'tbD' at line ?: 
+gap governance-notifications-have-no-delivery-worker [fixed] evidence[3] supabase/tests/db/secfix2_governance_notices.test.mjs
+    token 'random' at line 77: await expectError(as(db, user, `select governance_notice_record_result(gen_random_uuid(), 'sent', null, 'x')`)
+gap sec-final-f2-customer-lookup-oracle [fixed] evidence[0] supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql
+    token 'random' at line 24: INSERT INTO public.privacy_lookup_keys (id, secret) VALUES (1, extensions.gen_random_bytes(32)) ON CONFLICT (i
+gap sec-gov1-h2-self-approval-by-proxy [fixed] evidence[0] supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql
+    token 'random' at line 36: id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+gap sec-gov1-h3-notices-to-unverified-contacts [fixed] evidence[0] supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql
+    token 'random' at line 25: id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+gap sec-gov1-l2-weak-reveal-references [fixed] evidence[0] supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql
+    token 'random' at line 102: id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+gap sec-gov1-l3-pending-iban-revealed [fixed] evidence[0] supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql
+    token 'random' at line 102: id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+gap sec-gov1-m4-break-glass-review-not-independent [fixed] evidence[0] supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql
+    token 'random' at line 36: id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+gap sec-gov1-m5-employee-wps-iban-unmasked [fixed] evidence[0] supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql
+    token 'random' at line 102: id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+gap sec-gov1-m6-mfa-factor-persistence [fixed] evidence[0] supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql
+    token 'random' at line 25: id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+gap ux1-auth-and-validation-errors-shown-in-english-on-arabic-screens [fixed] evidence[0] web_platform/src/lib/auth-errors.ts
+    token 'todo' at line ?: 
+gap ux1-copy-defects-on-governance-and-onboarding-screens [fixed] evidence[2] web_platform/src/app/become-provider/page.tsx
+    token 'Placeholder' at line 66: cityPlaceholder: "e.g. Riyadh",
+gap ux1-ledger-psp-tab-contradicts-reconciliation-screen [fixed] evidence[2] web_platform/tests/negative-authorization.test.mjs
+    token 'mock' at line 132: it("admin/ledger never falls back to mock demo records on empty or failed queries", () => {
+gap ux1-mfa-enrolment-cleanup-logs-404s [fixed] evidence[0] web_platform/src/app/login/mfa/page.tsx
+    token 'random' at line 85: const { data: enrolled, error: enrolError } = await supabase.auth.mfa.enroll({ factorType: "totp", friendlyNam
+gap ux1-navigation-and-actions-not-trimmed-to-console-role [fixed] evidence[1] web_platform/src/app/admin/layout.tsx
+    token 'Placeholder' at line 69: searchPlaceholder: "Search for anything...",

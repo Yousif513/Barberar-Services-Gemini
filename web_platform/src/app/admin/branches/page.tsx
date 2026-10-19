@@ -1,8 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { useConfirm } from "@/components/modal";
+import { CommandDialog } from "@/components/modal";
 import { useOperationsLocale } from "@/components/operations-ui";
+import { ReadFailure } from "@/components/read-failure";
+import { commandOutcome } from "@/lib/write-result.mjs";
+import { describeConsoleError, unchangedText } from "@/lib/console-errors.mjs";
+import { knownToHold, useConsoleSession } from "@/lib/console-session";
 
 const translations = {
   en: {
@@ -22,7 +26,12 @@ const translations = {
     noBranches: "No branches found yet.",
     errorLoad: "Failed to load branches.",
     errorToggle: "Failed to update branch state.",
-    toggle: "Toggle"
+    toggle: "Toggle",
+    reasonLabel: "Reason (recorded in the audit log)",
+    deactivated: "Branch taken offline.",
+    reactivated: "Branch back online.",
+    upcoming: "{n} upcoming bookings at this branch stay booked; contact the customers if needed.",
+    what: "The branch list"
   },
   ar: {
     title: "سجل وإدارة فروع الشركاء",
@@ -41,7 +50,12 @@ const translations = {
     noBranches: "لا توجد فروع بعد.",
     errorLoad: "تعذر تحميل الفروع.",
     errorToggle: "تعذر تحديث حالة الفرع.",
-    toggle: "تبديل"
+    toggle: "تبديل",
+    reasonLabel: "السبب (يُسجَّل في سجل التدقيق)",
+    deactivated: "تم إيقاف الفرع.",
+    reactivated: "عاد الفرع إلى العمل.",
+    upcoming: "تبقى {n} حجوزات قادمة في هذا الفرع قائمة؛ تواصل مع العملاء عند الحاجة.",
+    what: "قائمة الفروع"
   }
 };
 
@@ -49,6 +63,11 @@ export default function AdminBranches() {
   const [branches, setBranches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [loadError, setLoadError] = useState<unknown>(null);
+  const [success, setSuccess] = useState("");
+  const [pendingToggle, setPendingToggle] = useState<any | null>(null);
+  // Only a console role with operations.write gets the control (the server refuses every other role anyway).
+  const canWrite = knownToHold(useConsoleSession(), ["operations.write"]);
   // The language follows the admin shell (<html lang>), the same source the other operator screens use.
   const lang = useOperationsLocale();
 
@@ -62,7 +81,7 @@ export default function AdminBranches() {
   const loadBranches = async () => {
     try {
       setLoading(true);
-      setError("");
+      setLoadError(null);
       const { data, error: dbError } = await supabase
         .from("branches")
         .select(`
@@ -98,8 +117,7 @@ export default function AdminBranches() {
       }));
     } catch (err) {
       setBranches([]);
-      setError(t.errorLoad);
-      console.warn("Admin branches load warning:", err);
+      setLoadError(err);
     } finally {
       setLoading(false);
     }
@@ -109,45 +127,65 @@ export default function AdminBranches() {
     void loadBranches();
   }, [lang]);
 
-  const [confirmNode, ask] = useConfirm(lang);
+  // admin_set_branch_active checks operations.write, needs a reason, refuses a missing branch and answers the stored state;
+  // the row changes on screen only after that answer, and a refusal stays in the dialog with the reason the operator typed.
+  const runToggle = async (branch: any, reason: string): Promise<string | null> => {
+    const next = !branch.active;
+    const outcome = commandOutcome(await supabase.rpc("admin_set_branch_active", { p_branch_id: branch.id, p_active: next, p_reason: reason }));
+    if (!outcome.ok) return describeConsoleError(outcome.error, lang);
+    const stored = Boolean(outcome.data?.is_active);
+    setBranches(prev => prev.map(item => item.id === branch.id ? { ...item, active: stored } : item));
+    const upcoming = Number(outcome.data?.upcoming_bookings ?? 0);
+    const done = outcome.changed ? (stored ? t.reactivated : t.deactivated) : unchangedText(lang);
+    setError("");
+    setSuccess(!stored && outcome.changed && upcoming > 0
+      ? `${done} ${t.upcoming.replace("{n}", upcoming.toLocaleString(lang === "ar" ? "ar-SA" : "en-US"))}`
+      : done);
+    return null;
+  };
 
-  const handleToggle = async (branch: any) => {
+  const renderToggleDialog = () => {
+    if (!pendingToggle) return null;
+    const branch = pendingToggle;
     const branchName = (lang === "ar" ? branch.nameAr || branch.nameEn : branch.nameEn || branch.nameAr) || "";
     const question = branch.active
       ? (lang === "ar" ? `إيقاف الفرع "${branchName}"؟ يختفي من البحث ولا يقبل حجوزات جديدة؛ تبقى الحجوزات القائمة.` : `Deactivate branch "${branchName}"? It leaves search and stops taking new bookings; existing bookings stay.`)
-      : (lang === "ar" ? `إعادة تفعيل الفرع "${branchName}"؟` : `Reactivate branch "${branchName}"?`);
-    if (!(await ask({
-      title: branch.active ? (lang === "ar" ? "إيقاف الفرع" : "Deactivate this branch") : (lang === "ar" ? "إعادة تفعيل الفرع" : "Reactivate this branch"),
-      intro: question,
-      confirmLabel: branch.active ? (lang === "ar" ? "إيقاف" : "Deactivate") : (lang === "ar" ? "إعادة التفعيل" : "Reactivate"),
-      tone: branch.active ? "danger" : "default",
-    }))) return;
-    try {
-      setError("");
-      const { error: dbError } = await supabase
-        .from("branches")
-        .update({ is_active: !branch.active })
-        .eq("id", branch.id);
-
-      if (dbError) throw dbError;
-      setBranches(prev => prev.map(item => item.id === branch.id ? { ...item, active: !branch.active } : item));
-    } catch (err) {
-      setError(`${t.errorToggle} ${err instanceof Error ? err.message : ""}`.trim());
-    }
+      : (lang === "ar" ? `إعادة تفعيل الفرع "${branchName}"؟ يعود إلى البحث ويقبل حجوزات جديدة.` : `Reactivate branch "${branchName}"? It returns to search and takes new bookings.`);
+    return (
+      <CommandDialog
+        locale={lang}
+        tone={branch.active ? "danger" : "default"}
+        title={branch.active ? (lang === "ar" ? "إيقاف الفرع" : "Deactivate this branch") : (lang === "ar" ? "إعادة تفعيل الفرع" : "Reactivate this branch")}
+        intro={question}
+        facts={[
+          { label: t.branchName, value: branchName },
+          { label: t.providerName, value: lang === "ar" ? branch.providerAr : branch.providerEn },
+        ]}
+        reasonLabel={t.reasonLabel}
+        confirmLabel={branch.active ? (lang === "ar" ? "إيقاف" : "Deactivate") : (lang === "ar" ? "إعادة التفعيل" : "Reactivate")}
+        onConfirm={(reason) => runToggle(branch, reason)}
+        onClose={() => setPendingToggle(null)}
+      />
+    );
   };
 
   const cardBase = "rounded-2xl border border-[#ECECEC] bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] transition-all duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.035)] hover:border-[#D1AF47]/20";
 
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className={`space-y-6 ${isRTL ? "text-right" : "text-left"}`}>
-      {confirmNode}
+      {renderToggleDialog()}
       <div>
-        <h2 className="text-2xl font-serif font-black text-gray-900 leading-tight">{t.title}</h2>
+        <h1 className="text-2xl font-serif font-black text-gray-900 leading-tight">{t.title}</h1>
         <p className="text-xs text-gray-500 font-semibold mt-1">{t.subtitle}</p>
       </div>
 
-      {error && <div className="bg-[#FEF3F2] border border-[#FEE4E2] text-[#B42318] text-xs rounded-xl p-4 font-bold">{error}</div>}
+      {success && <div role="status" className="bg-[#ECFDF3] border border-[#D1FADF] text-[#027A48] text-xs rounded-xl p-4 font-bold">{success}</div>}
+      {error && <div role="alert" className="bg-[#FEF3F2] border border-[#FEE4E2] text-[#B42318] text-xs rounded-xl p-4 font-bold">{error}</div>}
 
+      {loadError ? (
+        <ReadFailure error={loadError} locale={lang} what={t.what} onRetry={() => void loadBranches()} />
+      ) : (
+      <>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className={cardBase}>
           <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#667085] block">{t.totalBranches}</span>
@@ -164,7 +202,7 @@ export default function AdminBranches() {
       </div>
 
       <div className="bg-white border border-[#ECECEC] rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label={t.title}>
           <table className="w-full text-xs border-collapse">
             <thead>
               <tr className={`border-b border-[#ECECEC] text-[#667085] bg-gray-50/50 uppercase tracking-widest font-extrabold text-[9px] ${isRTL ? "text-right" : ""}`}>
@@ -172,17 +210,17 @@ export default function AdminBranches() {
                 <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>{t.providerName}</th>
                 <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>{t.location}</th>
                 <th className={`py-4 px-6 ${isRTL ? "text-right" : "text-left"}`}>{t.status}</th>
-                <th className="py-4 px-6 text-right"></th>
+                {canWrite && <th className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>{t.actions}</th>}
               </tr>
             </thead>
             <tbody className={`divide-y divide-[#F5F5F5] font-semibold text-gray-700 ${isRTL ? "text-right" : "text-left"}`}>
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="py-8 text-center text-gray-400 font-bold">{t.loading}</td>
+                  <td colSpan={5} className="py-8 text-center text-gray-500 font-bold" role="status">{t.loading}</td>
                 </tr>
               ) : branches.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-8 text-center text-gray-400 font-bold">{t.noBranches}</td>
+                  <td colSpan={5} className="py-8 text-center text-gray-500 font-bold">{t.noBranches}</td>
                 </tr>
               ) : branches.map(b => (
                 <tr key={b.id} className="hover:bg-gray-50/40 transition duration-150">
@@ -194,15 +232,19 @@ export default function AdminBranches() {
                       b.active ? "bg-[#ECFDF3] text-[#15803D]" : "bg-[#FEF3F2] text-[#B91C1C]"
                     }`}>{b.active ? t.active : t.inactive}</span>
                   </td>
+                  {canWrite && (
                   <td className={`py-4 px-6 ${isRTL ? "text-left" : "text-right"}`}>
-                    <button onClick={() => handleToggle(b)} className="px-3 py-1.5 bg-gray-900 text-white rounded-lg text-[10px] uppercase font-black tracking-wider hover:bg-gray-800 transition">{t.toggle}</button>
+                    <button type="button" onClick={() => { setSuccess(""); setPendingToggle(b); }} aria-label={`${t.toggle}: ${lang === "ar" ? b.nameAr : b.nameEn}`} className="px-3 py-1.5 bg-gray-900 text-white rounded-lg text-[10px] uppercase font-black tracking-wider hover:bg-gray-800 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928]">{t.toggle}</button>
                   </td>
+                  )}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }

@@ -1,0 +1,113 @@
+{
+  "phase": "i1",
+  "steps": [
+    {
+      "name": "purge-entry",
+      "purgeControl": false,
+      "buttons": [
+        "Requests",
+        "Legal holds",
+        "Deletion ledger & health intake",
+        "Download the ledger (JSON)",
+        "Re-apply the ledger now",
+        "Record and switch collection on"
+      ],
+      "shot": ".admin-console/evidence/ux-round2/privacy-ledger-tab-en-1440.png"
+    },
+    {
+      "name": "purge-dry-run",
+      "data": {
+        "cutoff": "2026-10-17",
+        "run_id": "07886c9d-e3d3-478a-9a1e-a03841972cc9",
+        "dry_run": true,
+        "sub_records": {},
+        "bookings_deleted": 0,
+        "bookings_anonymised": 0
+      },
+      "error": null
+    },
+    {
+      "name": "purge-real",
+      "data": {
+        "kind": "privacy_retention_purge",
+        "amount": null,
+        "status": "pending_approval",
+        "preview": {
+          "cutoff": "2026-10-17",
+          "run_id": "76df5298-99b9-42f1-bdd1-c53ab4336285",
+          "dry_run": true,
+          "sub_records": {},
+          "bookings_deleted": 0,
+          "bookings_anonymised": 0
+        },
+        "existing": false,
+        "approval_id": "d7a39ed1-a384-4fae-be38-1ca689bf835b"
+      },
+      "error": null
+    },
+    {
+      "name": "create-empty",
+      "validation": "Please fill out this field.",
+      "focus": "INPUT"
+    },
+    {
+      "name": "created",
+      "notice": [
+        "Saved.\n\nDismiss"
+      ],
+      "rows": [
+        "INC-2026-0002 UX2 test: provider export e-mailed to the wrong salon 17 Oct 2026, 05:26 67.0 h left Open View"
+      ]
+    },
+    {
+      "name": "aware-correction",
+      "before": "INC-2026-0002 · UX2 test: provider export e-mailed to the wrong salon\n\nA provider payout export with 37 customer names and phone numbers was e-mailed to the wrong salon owner at 18:40.\n\nSDAIA deadline: 20 Oct 2026, 05:26 · 67.0 h left · Kept until 17 Oct 2031, 10:26\n\nClose the incident\nCorrect awareness time (Riyadh time)\nWhy the recorded time was wrong (at least 20 characters)\nRequest the correct",
+      "shortMsg": "Please lengthen this text to 20 characters or more (you are currently using 9 characters).",
+      "notice": [
+        "The awareness time must be after the discovery and not in the future\n\nDismiss"
+      ],
+      "after": "INC-2026-0002 · UX2 test: provider export e-mailed to the wrong salon\n\nA provider payout export with 37 customer names and phone numbers was e-mailed to the wrong salon owner at 18:40.\n\nSDAIA deadline: 20 Oct 2026, 05:26 · 67.0 h left · Kept until 17 Oct 2031, 10:26\n\nClose the incident\nCorrect awareness time (Riyadh time)\nWhy the recorded time was wrong (at least 20 characters)\nRequest the correction\nAssessment\nCategories of data subjects (comma separated)\nApproximate number of data subjects\nData types (comma separated)\nRisk level\nNot assessed\nNo harm possible\nLow\nMedium\nHigh\nRisk assessment\nContainment actions\nPreventive actions\nSave the assessment\nContained\nSDAIA notification\nDecision\nNoti",
+      "formStillShown": 1,
+      "shot": ".admin-console/evidence/ux-round2/incident-correction-requested-en-1440.png"
+    },
+    {
+      "name": "aware-correction-again",
+      "notice": [
+        "The awareness time must be after the discovery and not in the future\n\nDismiss"
+      ],
+      "pending": "0"
+    },
+    {
+      "name": "overflow",
+      "scrollWidth": 1440,
+      "clientWidth": 1440
+    }
+  ],
+  "summary": {
+    "label": "owner-a",
+    "lang": "en",
+    "width": 1440,
+    "consoleErrors": [
+      {
+        "route": "/admin/incidents",
+        "text": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+      },
+      {
+        "route": "/admin/incidents",
+        "text": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+      }
+    ],
+    "httpFailures": [
+      {
+        "route": "/admin/incidents",
+        "status": 400,
+        "url": "API/rest/v1/rpc/admin_incident_correct_aware_at"
+      },
+      {
+        "route": "/admin/incidents",
+        "status": 400,
+        "url": "API/rest/v1/rpc/admin_incident_correct_aware_at"
+      }
+    ]
+  }
+}

@@ -14,6 +14,8 @@ const translations = {
     error: "Error",
     disputedAmount: "Disputed Amount",
     bookingId: "Booking ID",
+    subjectMembership: "Membership",
+    subjectPackage: "Package",
     disputeDetail: "Dispute Detail / Reason",
     selectAction: "Refund the customer or reject the dispute",
     declineRefund: "Decline Refund",
@@ -35,6 +37,8 @@ const translations = {
     error: "خطأ",
     disputedAmount: "المبلغ المتنازع عليه",
     bookingId: "رقم الحجز",
+    subjectMembership: "العضوية",
+    subjectPackage: "الباقة",
     disputeDetail: "تفاصيل / سبب النزاع",
     selectAction: "اختر إجراءً لتحرير مبلغ الضمان أو رفض بلاغ المخالفة",
     declineRefund: "رفض الاسترجاع",
@@ -93,9 +97,14 @@ export default function AdminDisputes() {
           const cust = d.customer as { first_name: string | null; last_name: string | null } | null | undefined;
           const prov = d.provider as any;
           const bk = d.booking as any;
+          // PAY-WAVE2: a dispute is about a booking or about a membership or package the customer bought.
+          const purchase = d.purchase as { type: string; name_en: string | null; name_ar: string | null } | null | undefined;
+          const purchaseName = purchase ? ((lang === "ar" ? purchase.name_ar : purchase.name_en) || purchase.name_en || "") : "";
           return {
             id: d.id,
             bookingId: bk?.id || "N/A",
+            subjectLabel: purchase ? (purchase.type === "membership" ? t.subjectMembership : t.subjectPackage) : t.bookingId,
+            subjectValue: purchase ? purchaseName : `${String(bk?.id || "N/A").substring(0, 8)}...`,
             customer: (cust ? `${cust.first_name || ""} ${cust.last_name || ""}`.trim() : "") || (d.customer_id ? t.customerHidden.replace("{id}", String(d.customer_id).slice(0, 8)) : "—"),
             provider: (lang === "ar" ? prov?.business_name_ar : prov?.business_name_en) || prov?.business_name_en || t.independent,
             amount: sar(Number(d.disputed_amount_sar || 0), lang),
@@ -165,7 +174,7 @@ export default function AdminDisputes() {
           : (ar ? "يُغلق النزاع دون استرداد. لا يمكن التراجع عن القرار من لوحة الإدارة." : "The dispute is closed with no refund. The decision cannot be undone from the console.")}
         facts={[
           { label: ar ? "النزاع" : "Dispute", value: String(dispute.id).slice(0, 8) },
-          { label: ar ? "الحجز" : "Booking", value: String(dispute.bookingId).slice(0, 8) },
+          { label: dispute.subjectLabel, value: dispute.subjectValue },
           { label: ar ? "العميل" : "Customer", value: dispute.customer },
           { label: ar ? "مقدم الخدمة" : "Provider", value: dispute.provider },
           { label: ar ? "المبلغ" : "Amount", value: dispute.amount },
@@ -286,7 +295,7 @@ export default function AdminDisputes() {
                     </span>
                   </div>
                   <p className="text-[10px] text-gray-500 font-semibold mt-2.5 uppercase tracking-widest">
-                    {t.bookingId}: <span className="font-mono text-gray-900 font-bold">{d.bookingId.substring(0, 8)}...</span>
+                    {d.subjectLabel}: <span className="font-mono text-gray-900 font-bold">{d.subjectValue}</span>
                   </p>
                 </div>
                 

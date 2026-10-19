@@ -263,6 +263,8 @@ describe("confirm_membership_payment (webhook): money", () => {
     const [mb] = await ledgerFor("chg_eq_mem");
     assert.deepEqual(mb, pk, "same entry type, provider, captured, platform share, provider share and payout status");
     assert.equal(money(b2 - b1), money(b1 - b0), "the provider is credited the same amount");
+    // PAY-WAVE2 RT-H2: prepaid value is earned visit by visit, so neither sale is payable at the moment of sale.
+    assert.equal(money(b1 - b0), 0);
     assert.equal(mb.entry_type, "package_sale");
     assert.equal(money(mb.platform_share), 0);
     assert.equal(money(mb.provider_share), 300);
@@ -336,14 +338,18 @@ describe("renewing and cancelling", () => {
     assert.equal(row.cancelled_by, SEED.customer);
   });
 
-  it("cancelling an active membership forfeits its visits and leaves the ledger untouched; staff other than the owner cannot", async () => {
+  // PAY-WAVE2 RT-H2: the provider's cancellation refunds the customer (supabase/tests/db/paywave2_prepaid.test.mjs has the rules).
+  it("cancelling an active membership by the provider queues the customer's refund and leaves the ledger row to the refund; staff other than the owner cannot", async () => {
     const id = await paidMembership();
     const intent = (await mem(id)).payment_intent_id;
     await expectError(as(db, staff1, `select cancel_membership($1, 'staff try')`, [id]), /Only the provider owner/);
-    await as(db, owner1, `select cancel_membership($1, 'abuse of the plan')`, [id]);
+    const r = (await as(db, owner1, `select cancel_membership($1, 'abuse of the plan') r`, [id]))[0].r;
     assert.equal((await mem(id)).status, "cancelled");
+    assert.equal(money(r.refund_amount), 300, "no visit used: everything back");
+    const refund = (await sys(db, `select amount, source, status from refund_requests where id = $1`, [r.refund_request_id]))[0];
+    assert.deepEqual([money(refund.amount), refund.source, refund.status], [300, "provider_membership_cancellation", "pending"]);
     assert.equal((await ledgerFor(intent)).length, 1);
-    assert.equal(money((await ledgerFor(intent))[0].provider_share), 300);
+    assert.equal(money((await ledgerFor(intent))[0].provider_share), 300, "the share falls only when Tap returns the money");
   });
 });
 

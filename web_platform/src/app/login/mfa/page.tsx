@@ -4,6 +4,7 @@ import { Suspense, useCallback, useEffect, useId, useRef, useState } from "react
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
+import { safeInternalPath } from "@/lib/safe-redirect.mjs";
 import { totpErrorMessage } from "@/lib/auth-errors";
 import { useOperationsLocale } from "@/components/operations-ui";
 
@@ -88,8 +89,8 @@ async function prepare(): Promise<Prepared> {
   return { phase: "enrol", factorId: enrolled.id, enrolment: { factorId: enrolled.id, qr, secret: enrolled.totp.secret } };
 }
 
-// Only paths inside this site are followed after verification.
-const safeNext = (value: string | null) => (value && value.startsWith("/") && !value.startsWith("//") ? value : "/admin");
+// RT-M2: only a path on this site is followed after verification (a backslash, tab or encoded slash cannot lead off it).
+const safeNext = (value: string | null) => safeInternalPath(value, "/admin");
 
 export default function MfaPage() {
   return (
@@ -187,7 +188,7 @@ function MfaScreen() {
   return (
     <main dir={locale === "ar" ? "rtl" : "ltr"} className="grid min-h-screen place-items-center bg-[#F7F6F3] px-4 py-10 text-start">
       <div className={card}>
-        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#9B7928]">PRIMORA</p>
+        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#7A5B12]">PRIMORA</p>
         <h1 className="mt-1 font-serif text-2xl font-black text-[#101828]">{phase === "enrol" ? t.enrolTitle : phase === "challenge" ? t.challengeTitle : t.title}</h1>
 
         {phase === "loading" && <p role="status" className="mt-4 text-sm text-[#667085]">{t.working}</p>}
@@ -195,7 +196,7 @@ function MfaScreen() {
         {phase === "signed-out" && (
           <div className="mt-4 space-y-3 text-sm text-[#475467]">
             <p>{t.signedOut}</p>
-            <a href={`/login?returnUrl=${encodeURIComponent(`/login/mfa?next=${next}`)}`} className="inline-block rounded-xl bg-[#101828] px-4 py-2.5 text-sm font-black text-white focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.signIn}</a>
+            <a href={`/login?returnUrl=${encodeURIComponent(`/login/mfa?next=${encodeURIComponent(next)}`)}`} className="inline-block rounded-xl bg-[#101828] px-4 py-2.5 text-sm font-black text-white focus-visible:outline-2 focus-visible:outline-[#9B7928]">{t.signIn}</a>
           </div>
         )}
         {phase === "locked" && (

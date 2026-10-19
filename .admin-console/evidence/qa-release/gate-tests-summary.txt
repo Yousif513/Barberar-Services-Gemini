@@ -1,0 +1,18 @@
+### npm run test:db  (2026-10-17T00:34:51+03:00)
+exit 0
+### npm run test:inventory  (2026-10-17T00:37:08+03:00)
+exit 0
+### npm run test:edge  (2026-10-17T00:37:10+03:00)
+exit 0
+### npm run test:mobile  (2026-10-17T00:37:11+03:00)
+exit 0
+### npm run test:ui-schema  (2026-10-17T00:37:11+03:00)
+exit 0
+### npm run test:security-core  (2026-10-17T00:37:15+03:00)
+exit 0
+### npm run test:admin-controls  (2026-10-17T00:37:15+03:00)
+exit 0
+### npm run test:p3-compat  (2026-10-17T00:37:16+03:00)
+exit 0
+### web tests
+exit 0
