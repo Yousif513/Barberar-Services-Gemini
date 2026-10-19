@@ -654,8 +654,8 @@
             "admin"
           ],
           "risk": "high",
-          "status": "in-progress",
-          "rationale": "Deactivating or reactivating a venue now asks first and names the impact (existing bookings stay, new ones stop) in a confirmation dialog; the write is a direct table update that rolls back its on-screen state on failure and is recorded by the administrator audit trigger with before and after values. No operator reason is captured and the number of affected future bookings is not shown. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented. QA-RELEASE (qa-release-claude, 2026-10-17): contested, paired gap direct-table-updates-report-success-when-the-row-policy-refuses; see .admin-console/evidence/qa-release/capability-review.txt.",
+          "status": "implemented",
+          "rationale": "QAFIX (impl-qafix-claude, 2026-10-18): the screen calls the command, which checks the console permission (missing_permission names it), refuses a missing or stale row, validates and answers the stored row; the screen changes state only on that answer, rolls back otherwise and words the refusal in EN/AR. Write controls show only to roles holding the permission. Browser: refused write shown as a refusal with no success and the row unchanged after reload; success paths stored as shown (.admin-console/evidence/qafix/summary.txt). Paired gap direct-table-updates-report-success-when-the-row-policy-refuses fixed.",
           "entityStates": {
             "from": [
               "active"
@@ -667,30 +667,37 @@
           "uiRoutes": [
             "/admin/branches"
           ],
-          "serverOperations": [],
+          "serverOperations": [
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L211"
+          ],
           "authorizationPolicies": [
-            "supabase/migrations/20260621214926_refine_branch_mutation_policies.sql#L21"
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L27",
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L211"
           ],
           "auditEvents": [
-            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
-            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L123",
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13"
           ],
           "safeguards": [
-            "web_platform/src/app/admin/branches/page.tsx#L114"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L123",
+            "web_platform/src/app/admin/branches/page.tsx#L134"
           ],
           "dataBinding": "postgres:public.branches",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "Reactivate the branch with the same control.",
+          "idempotency": "Setting the state the branch has answers changed:false and writes no audit row.",
+          "concurrency": "Row lock (SELECT ... FOR UPDATE); the screen shows the stored state from the answer.",
+          "recovery": "Reactivate with a reason; existing bookings were never touched and the answer counts the upcoming ones.",
           "tests": [
-            "supabase/tests/db/security_hardening.test.mjs"
+            "supabase/tests/db/qafix_console_commands.test.mjs",
+            "web_platform/tests/qafix-console-writes.test.mjs",
+            "web_platform/tests/write-result.test.mjs"
           ],
           "evidence": [
-            "web_platform/src/app/admin/branches/page.tsx#L129",
-            "supabase/tests/db/security_hardening.test.mjs#L43"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L123",
+            "web_platform/src/app/admin/branches/page.tsx#L134",
+            ".admin-console/evidence/qafix/summary.txt"
           ],
           "owner": "",
-          "reviewStatus": "contested",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "qa-release-claude"
         }
       ]
@@ -772,8 +779,8 @@
             "admin"
           ],
           "risk": "moderate",
-          "status": "in-progress",
-          "rationale": "Saves with surfaced errors and the dialog stays open on failure. The write is a direct table update by an administrator, recorded by the audit trigger with before and after values and the actor. No operator reason is captured. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented. QA-RELEASE (qa-release-claude, 2026-10-17): contested, paired gap direct-table-updates-report-success-when-the-row-policy-refuses; see .admin-console/evidence/qa-release/capability-review.txt.",
+          "status": "implemented",
+          "rationale": "QAFIX (impl-qafix-claude, 2026-10-18): the screen calls the command, which checks the console permission (missing_permission names it), refuses a missing or stale row, validates and answers the stored row; the screen changes state only on that answer, rolls back otherwise and words the refusal in EN/AR. Write controls show only to roles holding the permission. Browser: refused write shown as a refusal with no success and the row unchanged after reload; success paths stored as shown (.admin-console/evidence/qafix/summary.txt). Paired gap direct-table-updates-report-success-when-the-row-policy-refuses fixed.",
           "entityStates": {
             "from": [
               "active",
@@ -787,30 +794,37 @@
           "uiRoutes": [
             "/admin/services"
           ],
-          "serverOperations": [],
+          "serverOperations": [
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L67"
+          ],
           "authorizationPolicies": [
-            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L50"
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L27",
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L67"
           ],
           "auditEvents": [
-            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
-            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L109",
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13"
           ],
           "safeguards": [
-            "web_platform/src/app/admin/services/page.tsx#L290"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L91",
+            "web_platform/src/app/admin/services/page.tsx#L305"
           ],
           "dataBinding": "postgres:public.services",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
+          "idempotency": "Saving the values a service already has answers changed:false and writes nothing; a create is a new row each time (not-required for creates: the operator confirms in the dialog).",
+          "concurrency": "p_expected_updated_at: a save over a newer change is refused (40001 stale_write) and the dialog keeps the input.",
+          "recovery": "Edit the service again; every change is in the audit log (services.update before/after).",
           "tests": [
-            "supabase/tests/db/release_controls.test.mjs"
+            "supabase/tests/db/qafix_console_commands.test.mjs",
+            "web_platform/tests/qafix-console-writes.test.mjs",
+            "web_platform/tests/write-result.test.mjs"
           ],
           "evidence": [
-            "supabase/tests/db/release_controls.test.mjs#L17",
-            "web_platform/src/app/admin/services/page.tsx#L259"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L66",
+            ".admin-console/evidence/qafix/browser-success.json",
+            ".admin-console/evidence/qafix/summary.txt"
           ],
           "owner": "",
-          "reviewStatus": "contested",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "qa-release-claude"
         },
         {
@@ -821,8 +835,8 @@
             "admin"
           ],
           "risk": "moderate",
-          "status": "in-progress",
-          "rationale": "Applies the change on screen first and rolls it back when the write fails (the only optimistic update that rolls back). The write is a direct table update by an administrator, recorded by the audit trigger with before and after values and the actor. No operator reason is captured. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented. QA-RELEASE (qa-release-claude, 2026-10-17): contested, paired gap direct-table-updates-report-success-when-the-row-policy-refuses; see .admin-console/evidence/qa-release/capability-review.txt.",
+          "status": "implemented",
+          "rationale": "QAFIX (impl-qafix-claude, 2026-10-18): the screen calls the command, which checks the console permission (missing_permission names it), refuses a missing or stale row, validates and answers the stored row; the screen changes state only on that answer, rolls back otherwise and words the refusal in EN/AR. Write controls show only to roles holding the permission. Browser: refused write shown as a refusal with no success and the row unchanged after reload; success paths stored as shown (.admin-console/evidence/qafix/summary.txt). Paired gap direct-table-updates-report-success-when-the-row-policy-refuses fixed.",
           "entityStates": {
             "from": [
               "active"
@@ -834,30 +848,37 @@
           "uiRoutes": [
             "/admin/services"
           ],
-          "serverOperations": [],
+          "serverOperations": [
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L67"
+          ],
           "authorizationPolicies": [
-            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L50"
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L27",
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L67"
           ],
           "auditEvents": [
-            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
-            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L66",
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13"
           ],
           "safeguards": [
-            "web_platform/src/app/admin/services/page.tsx#L290"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L50",
+            "web_platform/src/app/admin/services/page.tsx#L305"
           ],
           "dataBinding": "postgres:public.services",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
+          "idempotency": "Switching to the state the service already has answers changed:false.",
+          "concurrency": "p_expected_updated_at refuses a write over a newer change.",
+          "recovery": "Switch it back with the same control; the status (active/draft) is stored, not the derived is_active.",
           "tests": [
-            "supabase/tests/db/release_controls.test.mjs"
+            "supabase/tests/db/qafix_console_commands.test.mjs",
+            "web_platform/tests/qafix-console-writes.test.mjs",
+            "web_platform/tests/write-result.test.mjs"
           ],
           "evidence": [
-            "supabase/tests/db/release_controls.test.mjs#L17",
-            "web_platform/src/app/admin/services/page.tsx#L259"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L66",
+            ".admin-console/evidence/qafix/browser-success.json",
+            ".admin-console/evidence/qafix/summary.txt"
           ],
           "owner": "",
-          "reviewStatus": "contested",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "qa-release-claude"
         },
         {
@@ -868,8 +889,8 @@
             "admin"
           ],
           "risk": "high",
-          "status": "in-progress",
-          "rationale": "Rolls the on-screen price back when the write fails; the audit row carries the old and new base_price (release_controls.test.mjs asserts both values). The write is a direct table update by an administrator, recorded by the audit trigger with before and after values and the actor. No operator reason is captured. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented. QA-RELEASE (qa-release-claude, 2026-10-17): contested, paired gap direct-table-updates-report-success-when-the-row-policy-refuses; see .admin-console/evidence/qa-release/capability-review.txt.",
+          "status": "implemented",
+          "rationale": "QAFIX (impl-qafix-claude, 2026-10-18): the screen calls the command, which checks the console permission (missing_permission names it), refuses a missing or stale row, validates and answers the stored row; the screen changes state only on that answer, rolls back otherwise and words the refusal in EN/AR. Write controls show only to roles holding the permission. Browser: refused write shown as a refusal with no success and the row unchanged after reload; success paths stored as shown (.admin-console/evidence/qafix/summary.txt). Paired gap direct-table-updates-report-success-when-the-row-policy-refuses fixed.",
           "entityStates": {
             "from": [
               "active",
@@ -883,30 +904,37 @@
           "uiRoutes": [
             "/admin/services"
           ],
-          "serverOperations": [],
+          "serverOperations": [
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L67"
+          ],
           "authorizationPolicies": [
-            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L50"
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L27",
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L67"
           ],
           "auditEvents": [
-            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
-            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L91",
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13"
           ],
           "safeguards": [
-            "web_platform/src/app/admin/services/page.tsx#L290"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L91",
+            "web_platform/src/app/admin/services/page.tsx#L305"
           ],
           "dataBinding": "postgres:public.services",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
+          "idempotency": "The same price answers changed:false; the field saves on leaving it or Enter, not per keystroke.",
+          "concurrency": "p_expected_updated_at refuses a price over a newer change.",
+          "recovery": "Type the previous price; the audit log keeps before/after.",
           "tests": [
-            "supabase/tests/db/release_controls.test.mjs"
+            "supabase/tests/db/qafix_console_commands.test.mjs",
+            "web_platform/tests/qafix-console-writes.test.mjs",
+            "web_platform/tests/write-result.test.mjs"
           ],
           "evidence": [
-            "supabase/tests/db/release_controls.test.mjs#L17",
-            "web_platform/src/app/admin/services/page.tsx#L259"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L66",
+            ".admin-console/evidence/qafix/browser-success.json",
+            ".admin-console/evidence/qafix/summary.txt"
           ],
           "owner": "",
-          "reviewStatus": "contested",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "qa-release-claude"
         },
         {
@@ -917,8 +945,8 @@
             "admin"
           ],
           "risk": "high",
-          "status": "in-progress",
-          "rationale": "The hard DELETE is gone: the control is now 'Archive', behind a confirmation that names the service, and it only sets is_active to false, so booking history keeps its service row and the service can be switched back on. Audited by the trigger; no reason captured. The id keeps its old name. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented. QA-RELEASE (qa-release-claude, 2026-10-17): contested, paired gap direct-table-updates-report-success-when-the-row-policy-refuses; see .admin-console/evidence/qa-release/capability-review.txt.",
+          "status": "implemented",
+          "rationale": "QAFIX (impl-qafix-claude, 2026-10-18): the screen calls the command, which checks the console permission (missing_permission names it), refuses a missing or stale row, validates and answers the stored row; the screen changes state only on that answer, rolls back otherwise and words the refusal in EN/AR. Write controls show only to roles holding the permission. Browser: refused write shown as a refusal with no success and the row unchanged after reload; success paths stored as shown (.admin-console/evidence/qafix/summary.txt). Paired gap direct-table-updates-report-success-when-the-row-policy-refuses fixed.",
           "entityStates": {
             "from": [
               "active",
@@ -929,30 +957,37 @@
           "uiRoutes": [
             "/admin/services"
           ],
-          "serverOperations": [],
+          "serverOperations": [
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L67"
+          ],
           "authorizationPolicies": [
-            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L50"
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L27",
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L67"
           ],
           "auditEvents": [
-            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
-            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L83",
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13"
           ],
           "safeguards": [
-            "web_platform/src/app/admin/services/page.tsx#L298"
+            "web_platform/src/app/admin/services/page.tsx#L324",
+            "web_platform/src/app/admin/services/page.tsx#L305"
           ],
           "dataBinding": "postgres:public.services",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "Switch the service back on with service.toggle-active.",
+          "idempotency": "Archiving an archived service answers changed:false.",
+          "concurrency": "p_expected_updated_at refuses an archive over a newer change.",
+          "recovery": "Archive keeps the row, bookings and history; Active switches it back on.",
           "tests": [
-            "supabase/tests/db/release_controls.test.mjs"
+            "supabase/tests/db/qafix_console_commands.test.mjs",
+            "web_platform/tests/qafix-console-writes.test.mjs",
+            "web_platform/tests/write-result.test.mjs"
           ],
           "evidence": [
-            "web_platform/src/app/admin/services/page.tsx#L308",
-            "supabase/tests/db/release_controls.test.mjs#L17"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L66",
+            ".admin-console/evidence/qafix/browser-success.json",
+            ".admin-console/evidence/qafix/summary.txt"
           ],
           "owner": "",
-          "reviewStatus": "contested",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "qa-release-claude"
         },
         {
@@ -963,8 +998,8 @@
             "admin"
           ],
           "risk": "moderate",
-          "status": "in-progress",
-          "rationale": "Rolls the on-screen switch back when the write fails. The write is a direct table update by an administrator, recorded by the audit trigger with before and after values and the actor. No operator reason is captured. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented. QA-RELEASE (qa-release-claude, 2026-10-17): contested, paired gap direct-table-updates-report-success-when-the-row-policy-refuses; see .admin-console/evidence/qa-release/capability-review.txt.",
+          "status": "implemented",
+          "rationale": "QAFIX (impl-qafix-claude, 2026-10-18): the screen calls the command, which checks the console permission (missing_permission names it), refuses a missing or stale row, validates and answers the stored row; the screen changes state only on that answer, rolls back otherwise and words the refusal in EN/AR. Write controls show only to roles holding the permission. Browser: refused write shown as a refusal with no success and the row unchanged after reload; success paths stored as shown (.admin-console/evidence/qafix/summary.txt). Paired gap direct-table-updates-report-success-when-the-row-policy-refuses fixed.",
           "entityStates": {
             "from": [
               "active"
@@ -976,30 +1011,37 @@
           "uiRoutes": [
             "/admin/services"
           ],
-          "serverOperations": [],
+          "serverOperations": [
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L67"
+          ],
           "authorizationPolicies": [
-            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L50"
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L27",
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L67"
           ],
           "auditEvents": [
-            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
-            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L66",
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13"
           ],
           "safeguards": [
-            "web_platform/src/app/admin/services/page.tsx#L290"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L50",
+            "web_platform/src/app/admin/services/page.tsx#L305"
           ],
           "dataBinding": "postgres:public.services",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
+          "idempotency": "The same flag answers changed:false.",
+          "concurrency": "p_expected_updated_at refuses a write over a newer change.",
+          "recovery": "Press the flag again.",
           "tests": [
-            "supabase/tests/db/release_controls.test.mjs"
+            "supabase/tests/db/qafix_console_commands.test.mjs",
+            "web_platform/tests/qafix-console-writes.test.mjs",
+            "web_platform/tests/write-result.test.mjs"
           ],
           "evidence": [
-            "supabase/tests/db/release_controls.test.mjs#L17",
-            "web_platform/src/app/admin/services/page.tsx#L259"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L66",
+            ".admin-console/evidence/qafix/browser-success.json",
+            ".admin-console/evidence/qafix/summary.txt"
           ],
           "owner": "",
-          "reviewStatus": "contested",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "qa-release-claude"
         }
       ]
@@ -2936,8 +2978,8 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "in-progress",
-          "rationale": "Enabling or disabling an integration is a direct update with the on-screen state rolled back on failure and an administrator audit-trigger record with before and after values. No operator reason is captured. The screen also writes a second, client-supplied row to integration_audit_log and swallows its failure (gap integration-audit-log-accepts-client-written-rows). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented. QA-RELEASE (qa-release-claude, 2026-10-17): contested, paired gap direct-table-updates-report-success-when-the-row-policy-refuses; see .admin-console/evidence/qa-release/capability-review.txt.",
+          "status": "implemented",
+          "rationale": "QAFIX (impl-qafix-claude, 2026-10-18): the screen calls the command, which checks the console permission (missing_permission names it), refuses a missing or stale row, validates and answers the stored row; the screen changes state only on that answer, rolls back otherwise and words the refusal in EN/AR. Write controls show only to roles holding the permission. Browser: refused write shown as a refusal with no success and the row unchanged after reload; success paths stored as shown (.admin-console/evidence/qafix/summary.txt). Paired gap direct-table-updates-report-success-when-the-row-policy-refuses fixed.",
           "entityStates": {
             "from": [
               "disconnected"
@@ -2949,30 +2991,37 @@
           "uiRoutes": [
             "/admin/integrations"
           ],
-          "serverOperations": [],
+          "serverOperations": [
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L318"
+          ],
           "authorizationPolicies": [
-            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L122"
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L27",
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L318"
           ],
           "auditEvents": [
-            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
-            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L160",
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13"
           ],
           "safeguards": [
-            "supabase/tests/db/fixdba_access_hardening.test.mjs#L158"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L160",
+            "web_platform/src/app/admin/integrations/page.tsx#L364"
           ],
           "dataBinding": "postgres:public.integrations",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
+          "idempotency": "The same state answers changed:false and writes no history row.",
+          "concurrency": "p_expected_updated_at refuses a switch over a newer change.",
+          "recovery": "Switch back with a reason; integration_audit_log (server-written) and admin_audit_logs keep both changes.",
           "tests": [
-            "supabase/tests/db/fixdba_access_hardening.test.mjs"
+            "supabase/tests/db/qafix_console_commands.test.mjs",
+            "web_platform/tests/qafix-console-writes.test.mjs",
+            "web_platform/tests/write-result.test.mjs"
           ],
           "evidence": [
-            "web_platform/src/app/admin/integrations/page.tsx#L303",
-            "supabase/tests/db/security_hardening.test.mjs#L43"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L171",
+            ".admin-console/evidence/qafix/browser-success.json",
+            ".admin-console/evidence/qafix/browser-stale.json"
           ],
           "owner": "",
-          "reviewStatus": "contested",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "qa-release-claude"
         },
         {
@@ -2983,8 +3032,8 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "in-progress",
-          "rationale": "Creating or editing an integration is a direct write; key_masked refuses anything shaped like a real key (23514), and the audit trigger records the change. No operator reason is captured. The screen also writes a second, client-supplied row to integration_audit_log and swallows its failure (gap integration-audit-log-accepts-client-written-rows). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented. QA-RELEASE (qa-release-claude, 2026-10-17): contested, paired gap direct-table-updates-report-success-when-the-row-policy-refuses; see .admin-console/evidence/qa-release/capability-review.txt.",
+          "status": "implemented",
+          "rationale": "QAFIX (impl-qafix-claude, 2026-10-18): the screen calls the command, which checks the console permission (missing_permission names it), refuses a missing or stale row, validates and answers the stored row; the screen changes state only on that answer, rolls back otherwise and words the refusal in EN/AR. Write controls show only to roles holding the permission. Browser: refused write shown as a refusal with no success and the row unchanged after reload; success paths stored as shown (.admin-console/evidence/qafix/summary.txt). Paired gap direct-table-updates-report-success-when-the-row-policy-refuses fixed.",
           "entityStates": {
             "from": [
               "connected",
@@ -2998,30 +3047,37 @@
           "uiRoutes": [
             "/admin/integrations"
           ],
-          "serverOperations": [],
+          "serverOperations": [
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L408"
+          ],
           "authorizationPolicies": [
-            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L122"
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L27",
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L408"
           ],
           "auditEvents": [
-            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
-            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L190",
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13"
           ],
           "safeguards": [
-            "supabase/tests/db/fixdba_access_hardening.test.mjs#L158"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L190",
+            "web_platform/src/app/admin/integrations/page.tsx#L364"
           ],
           "dataBinding": "postgres:public.integrations",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
+          "idempotency": "Same values answer changed:false; a second create with the same key is refused (23505).",
+          "concurrency": "p_expected_updated_at refuses an edit over a newer change; the key of a registered integration is fixed.",
+          "recovery": "Edit again; history and audit rows keep the earlier values.",
           "tests": [
-            "supabase/tests/db/fixdba_access_hardening.test.mjs"
+            "supabase/tests/db/qafix_console_commands.test.mjs",
+            "web_platform/tests/qafix-console-writes.test.mjs",
+            "web_platform/tests/write-result.test.mjs"
           ],
           "evidence": [
-            "web_platform/src/app/admin/integrations/page.tsx#L303",
-            "supabase/tests/db/security_hardening.test.mjs#L43"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L171",
+            ".admin-console/evidence/qafix/browser-success.json",
+            ".admin-console/evidence/qafix/browser-stale.json"
           ],
           "owner": "",
-          "reviewStatus": "contested",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "qa-release-claude"
         },
         {
@@ -3032,8 +3088,8 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "in-progress",
-          "rationale": "Deleting is now 'Disable' behind a confirmation naming the integration: it sets enabled to false, so nothing is destroyed and the row can be re-enabled. No operator reason is captured. The screen also writes a second, client-supplied row to integration_audit_log and swallows its failure (gap integration-audit-log-accepts-client-written-rows). Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented. QA-RELEASE (qa-release-claude, 2026-10-17): contested, paired gap direct-table-updates-report-success-when-the-row-policy-refuses; see .admin-console/evidence/qa-release/capability-review.txt.",
+          "status": "implemented",
+          "rationale": "QAFIX (impl-qafix-claude, 2026-10-18): the screen calls the command, which checks the console permission (missing_permission names it), refuses a missing or stale row, validates and answers the stored row; the screen changes state only on that answer, rolls back otherwise and words the refusal in EN/AR. Write controls show only to roles holding the permission. Browser: refused write shown as a refusal with no success and the row unchanged after reload; success paths stored as shown (.admin-console/evidence/qafix/summary.txt). Paired gap direct-table-updates-report-success-when-the-row-policy-refuses fixed.",
           "entityStates": {
             "from": [
               "connected",
@@ -3045,30 +3101,37 @@
           "uiRoutes": [
             "/admin/integrations"
           ],
-          "serverOperations": [],
+          "serverOperations": [
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L318"
+          ],
           "authorizationPolicies": [
-            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L122"
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L27",
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L318"
           ],
           "auditEvents": [
-            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
-            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L160",
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13"
           ],
           "safeguards": [
-            "supabase/tests/db/fixdba_access_hardening.test.mjs#L158"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L160",
+            "web_platform/src/app/admin/integrations/page.tsx#L364"
           ],
           "dataBinding": "postgres:public.integrations",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
+          "idempotency": "Disabling a disabled integration answers changed:false.",
+          "concurrency": "p_expected_updated_at refuses a write over a newer change.",
+          "recovery": "Disable never deletes: enable it again with a reason.",
           "tests": [
-            "supabase/tests/db/fixdba_access_hardening.test.mjs"
+            "supabase/tests/db/qafix_console_commands.test.mjs",
+            "web_platform/tests/qafix-console-writes.test.mjs",
+            "web_platform/tests/write-result.test.mjs"
           ],
           "evidence": [
-            "web_platform/src/app/admin/integrations/page.tsx#L303",
-            "supabase/tests/db/security_hardening.test.mjs#L43"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L171",
+            ".admin-console/evidence/qafix/browser-success.json",
+            ".admin-console/evidence/qafix/browser-stale.json"
           ],
           "owner": "",
-          "reviewStatus": "contested",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "qa-release-claude"
         }
       ]
@@ -3111,8 +3174,8 @@
             "admin"
           ],
           "risk": "critical",
-          "status": "in-progress",
-          "rationale": "Enabling or disabling a payment method now asks first (CommandDialog naming the method) and is rolled back on screen when the write fails; the write is a direct table update recorded by the audit trigger. No operator reason is captured. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented. QA-RELEASE (qa-release-claude, 2026-10-17): contested, paired gap direct-table-updates-report-success-when-the-row-policy-refuses; see .admin-console/evidence/qa-release/capability-review.txt.",
+          "status": "implemented",
+          "rationale": "QAFIX (impl-qafix-claude, 2026-10-18): the screen calls the command, which checks the console permission (missing_permission names it), refuses a missing or stale row, validates and answers the stored row; the screen changes state only on that answer, rolls back otherwise and words the refusal in EN/AR. Write controls show only to roles holding the permission. Browser: refused write shown as a refusal with no success and the row unchanged after reload; success paths stored as shown (.admin-console/evidence/qafix/summary.txt). Paired gap direct-table-updates-report-success-when-the-row-policy-refuses fixed.",
           "entityStates": {
             "from": [
               "disabled"
@@ -3124,30 +3187,37 @@
           "uiRoutes": [
             "/admin/ledger"
           ],
-          "serverOperations": [],
+          "serverOperations": [
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L596"
+          ],
           "authorizationPolicies": [
-            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L83"
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L27",
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L596"
           ],
           "auditEvents": [
-            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
-            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L211",
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13"
           ],
           "safeguards": [
-            "web_platform/src/app/admin/ledger/page.tsx#L275"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L211",
+            "web_platform/src/app/admin/ledger/page.tsx#L298"
           ],
           "dataBinding": "postgres:public.payment_methods",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
+          "idempotency": "The same state answers changed:false.",
+          "concurrency": "Row lock; gateway changes must name a connected integration that supports the method.",
+          "recovery": "Switch it back with a reason; payment_method.changed audit row keeps before/after.",
           "tests": [
-            "supabase/tests/db/security_hardening.test.mjs"
+            "supabase/tests/db/qafix_console_commands.test.mjs",
+            "web_platform/tests/qafix-console-writes.test.mjs",
+            "web_platform/tests/write-result.test.mjs"
           ],
           "evidence": [
-            "web_platform/src/app/admin/ledger/page.tsx#L277",
-            "supabase/tests/db/security_hardening.test.mjs#L43"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L211",
+            "web_platform/src/app/admin/ledger/page.tsx#L298",
+            ".admin-console/evidence/qafix/summary.txt"
           ],
           "owner": "",
-          "reviewStatus": "contested",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "qa-release-claude"
         },
         {
@@ -3158,8 +3228,8 @@
             "admin"
           ],
           "risk": "high",
-          "status": "in-progress",
-          "rationale": "Still two separate browser writes (clear every other default, then set one), see gap payment-method-default-switch-is-two-browser-writes-with-no-reason; a confirmation now precedes it and the on-screen state rolls back on failure, and the audit trigger records each row change. Not atomic, no reason. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed, not implemented. QA-RELEASE (qa-release-claude, 2026-10-17): contested, paired gap direct-table-updates-report-success-when-the-row-policy-refuses; see .admin-console/evidence/qa-release/capability-review.txt.",
+          "status": "implemented",
+          "rationale": "QAFIX (impl-qafix-claude, 2026-10-18): the screen calls the command, which checks the console permission (missing_permission names it), refuses a missing or stale row, validates and answers the stored row; the screen changes state only on that answer, rolls back otherwise and words the refusal in EN/AR. Write controls show only to roles holding the permission. Browser: refused write shown as a refusal with no success and the row unchanged after reload; success paths stored as shown (.admin-console/evidence/qafix/summary.txt). Paired gap direct-table-updates-report-success-when-the-row-policy-refuses fixed.",
           "entityStates": {
             "from": [
               "enabled"
@@ -3171,30 +3241,37 @@
           "uiRoutes": [
             "/admin/ledger"
           ],
-          "serverOperations": [],
+          "serverOperations": [
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L676"
+          ],
           "authorizationPolicies": [
-            "supabase/migrations/20260703014433_phase2_admin_control_plane.sql#L83"
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L27",
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L676"
           ],
           "auditEvents": [
-            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13",
-            "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L37"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L220",
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13"
           ],
           "safeguards": [
-            "web_platform/src/app/admin/ledger/page.tsx#L289"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L220",
+            "web_platform/src/app/admin/ledger/page.tsx#L316"
           ],
           "dataBinding": "postgres:public.payment_methods",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
+          "idempotency": "Choosing the current sole default of its audience answers changed:false.",
+          "concurrency": "All methods locked in one order; one default per audience in one transaction.",
+          "recovery": "Make the previous default the default again; the audit row lists the defaults it cleared.",
           "tests": [
-            "supabase/tests/db/security_hardening.test.mjs"
+            "supabase/tests/db/qafix_console_commands.test.mjs",
+            "web_platform/tests/qafix-console-writes.test.mjs",
+            "web_platform/tests/write-result.test.mjs"
           ],
           "evidence": [
-            "web_platform/src/app/admin/ledger/page.tsx#L297",
-            "supabase/tests/db/security_hardening.test.mjs#L43"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L220",
+            "web_platform/src/app/admin/ledger/page.tsx#L316",
+            ".admin-console/evidence/qafix/summary.txt"
           ],
           "owner": "",
-          "reviewStatus": "contested",
+          "reviewStatus": "unreviewed",
           "reviewedBy": "qa-release-claude"
         },
         {
@@ -4467,8 +4544,8 @@
             "admin"
           ],
           "risk": "low",
-          "status": "discovered",
-          "rationale": "Does not work as described: administrators have no read policy on packages beyond the public one (active only) or on user_packages, so inactive packages and the voucher counter are invisible (gap admin-packages-screen-controls-reach-no-rows). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "status": "implemented",
+          "rationale": "QAFIX (impl-qafix-claude): a console account reads every package (policy 'Console accounts read every package'), so switched-off packages stay visible to switch on again; the voucher counts come from admin_package_usage_summary; a refused or failed read shows the refusal or reason, never the empty text.",
           "entityStates": {
             "from": [],
             "to": []
@@ -4476,18 +4553,26 @@
           "uiRoutes": [
             "/admin/packages"
           ],
-          "serverOperations": [],
-          "authorizationPolicies": [],
+          "serverOperations": [
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L297"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L297"
+          ],
           "auditEvents": [],
           "safeguards": [],
-          "dataBinding": "postgres:public.packages",
+          "dataBinding": "postgres:public.packages + rpc:admin_package_usage_summary",
           "idempotency": "",
           "concurrency": "",
           "recovery": "",
-          "tests": [],
+          "tests": [
+            "supabase/tests/db/qafix_console_commands.test.mjs",
+            "web_platform/tests/qafix-console-writes.test.mjs"
+          ],
           "evidence": [
-            ".admin-console/evidence/architect-reconcile-claude/probe-results.txt#L1",
-            "web_platform/src/app/admin/packages/page.tsx#L76"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L143",
+            "web_platform/src/app/admin/packages/page.tsx#L135",
+            ".admin-console/evidence/qafix/summary.txt"
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
@@ -4500,8 +4585,8 @@
             "admin"
           ],
           "risk": "moderate",
-          "status": "discovered",
-          "rationale": "Does not work: the update matches zero rows for an administrator and the page reports success anyway (gap admin-packages-screen-controls-reach-no-rows). Added by architect-reconcile-claude on 2026-10-09 from the code and tests cited here; status in-progress means built and unreviewed.",
+          "status": "implemented",
+          "rationale": "QAFIX (impl-qafix-claude, 2026-10-18): the screen calls the command, which checks the console permission (missing_permission names it), refuses a missing or stale row, validates and answers the stored row; the screen changes state only on that answer, rolls back otherwise and words the refusal in EN/AR. Write controls show only to roles holding the permission. Browser: refused write shown as a refusal with no success and the row unchanged after reload; success paths stored as shown (.admin-console/evidence/qafix/summary.txt). Paired gap direct-table-updates-report-success-when-the-row-policy-refuses fixed.",
           "entityStates": {
             "from": [
               "active",
@@ -4515,18 +4600,34 @@
           "uiRoutes": [
             "/admin/packages"
           ],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
+          "serverOperations": [
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L258"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L27",
+            "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql#L258"
+          ],
+          "auditEvents": [
+            "supabase/tests/db/qafix_console_commands.test.mjs#L143",
+            "supabase/migrations/20261005190000_audit_values_by_allow_list.sql#L13"
+          ],
+          "safeguards": [
+            "supabase/tests/db/qafix_console_commands.test.mjs#L143",
+            "web_platform/src/app/admin/packages/page.tsx#L135"
+          ],
           "dataBinding": "postgres:public.packages",
-          "idempotency": "",
-          "concurrency": "",
-          "recovery": "",
-          "tests": [],
+          "idempotency": "Setting the state the package has answers changed:false.",
+          "concurrency": "Row lock; the screen shows the stored state from the answer.",
+          "recovery": "Switch it on again with a reason; bought vouchers keep working while it is off.",
+          "tests": [
+            "supabase/tests/db/qafix_console_commands.test.mjs",
+            "web_platform/tests/qafix-console-writes.test.mjs",
+            "web_platform/tests/write-result.test.mjs"
+          ],
           "evidence": [
-            ".admin-console/evidence/architect-reconcile-claude/probe-results.txt#L1",
-            "web_platform/src/app/admin/packages/page.tsx#L121"
+            "supabase/tests/db/qafix_console_commands.test.mjs#L143",
+            "web_platform/src/app/admin/packages/page.tsx#L135",
+            ".admin-console/evidence/qafix/summary.txt"
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
@@ -9312,6 +9413,70 @@
       ],
       "status": "assumed",
       "appliesTo": []
+    },
+    {
+      "id": "qafix-console-commands-raise-and-name-the-permission",
+      "decision": "Catalogue, branch, package, integration and payment-method writes go through commands that raise 42501 with HINT missing_permission and the permission key in DETAIL; the screens word it in EN/AR.",
+      "reason": "QA item 1 preferred server commands over row-count checks; the hint lets every screen say what is missing.",
+      "evidence": [
+        "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "service.upsert",
+        "branch.toggle-active",
+        "integration.toggle",
+        "payment-method.set-default"
+      ]
+    },
+    {
+      "id": "qafix-reasons-and-step-up-by-risk",
+      "decision": "Branch, package, integration and payment-method changes need a reason (3+ chars); integration and payment-method changes also need a fresh authenticator code; service catalogue edits take an optional reason.",
+      "reason": "High/critical risk get reason and step-up; catalogue edits are reversible and audited with before/after.",
+      "evidence": [
+        "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "integration.toggle",
+        "payment-method.toggle",
+        "branch.toggle-active"
+      ]
+    },
+    {
+      "id": "qafix-one-default-payment-method-per-audience",
+      "decision": "A default is per audience (enabled_for_roles): choosing a customer default never clears the provider payout default.",
+      "reason": "The seeded data has one customer and one provider default; the old browser code cleared every other default.",
+      "evidence": [
+        "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql",
+        "supabase/tests/db/qafix_console_commands.test.mjs"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "payment-method.set-default"
+      ]
+    },
+    {
+      "id": "qafix-integration-key-fixed",
+      "decision": "The key of a registered integration cannot be changed; payment methods name their gateway by it.",
+      "reason": "Integrity of payment routing.",
+      "evidence": [
+        "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "integration.upsert"
+      ]
+    },
+    {
+      "id": "qafix-console-main-panel-focusable",
+      "decision": "#admin-main is tabIndex 0 with a keyboard-only focus ring, so screens without links can be scrolled by keyboard (axe scrollable-region-focusable).",
+      "reason": "One fix for every long screen; adds one tab stop.",
+      "evidence": [
+        "web_platform/src/app/admin/layout.tsx"
+      ],
+      "status": "assumed",
+      "appliesTo": []
     }
   ],
   "gaps": [
@@ -10760,11 +10925,11 @@
       "id": "packages-and-services-load-errors-ignore-the-interface-language",
       "severity": "low",
       "description": "The Packages and Services screens start their language state as Arabic and build their error text when the request fails, so an English operator sees 'تعذر تحميل الباقات من قاعدة البيانات.' and 'فشل ت...' on a failed load. Both screens are outside the ten reviewed screens. The repository rule is that no UI string may ignore the active locale.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "FOUND BY qa-claude-release-gate in the browser with the stand-in refusing the table (English interface, Arabic error). REMEDY: derive the language from the shell's locale hook (useOperationsLocale) instead of local state defaulting to ar.",
       "evidence": [
-        "web_platform/src/app/admin/packages/page.tsx#L53",
-        "web_platform/src/app/admin/services/page.tsx#L147"
+        "web_platform/src/components/read-failure.tsx",
+        ".admin-console/evidence/qafix/summary.txt"
       ]
     },
     {
@@ -10914,13 +11079,11 @@
       "id": "admin-packages-screen-controls-reach-no-rows",
       "severity": "medium",
       "description": "/admin/packages reads and switches packages and counts sold vouchers, but no policy lets an administrator see an inactive package, change any package, or read user_packages. Reproduced on the migrated schema as an administrator: select from packages returns 0 rows when the only package is inactive, update packages set is_active = true returns 0 rows, select count from user_packages returns 0. The page's toggle calls update().eq('id') and reports success when no error is returned, so zero rows changed is shown as 'updated', and the voucher counter silently shows 0.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "FOUND BY architect-reconcile-claude (2026-10-09). The only policies on packages are 'Owners manage packages' (providers) and 'Public read on packages' (is_active = true); user_packages has only 'Customers view own packages' (probe-results.txt, probe-admin-packages-visibility). The page never checks how many rows an update changed. BUILD WORK: either give administrators a read policy and an audited, reasoned toggle command (and a voucher count command), or remove the toggle and the counters and show the screen read-only; and make every console write that can match zero rows say so instead of reporting success. Package pricing and whether the platform may switch a provider's package off is a business decision for the owner.",
       "evidence": [
-        ".admin-console/evidence/architect-reconcile-claude/probe-results.txt#L1",
-        ".admin-console/evidence/architect-reconcile-claude/probe-admin-packages-visibility.mjs#L1",
-        "web_platform/src/app/admin/packages/page.tsx#L121",
-        "web_platform/src/app/admin/packages/page.tsx#L100"
+        "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql",
+        "supabase/tests/db/qafix_console_commands.test.mjs"
       ]
     },
     {
@@ -10978,24 +11141,22 @@
       "id": "payment-method-default-switch-is-two-browser-writes-with-no-reason",
       "severity": "medium",
       "description": "Making a payment method the platform default clears is_default on every other row and then sets it on one, as two separate PostgREST writes from the browser handler, so a failure between them leaves the platform with no default; enabling, disabling and re-pointing a method at a gateway are direct table writes with a confirmation but no operator reason. They are audited row by row by the trigger. This is the money-mutation-in-the-browser pattern from AGENTS.md defect 3 applied to payment configuration.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "FOUND BY architect-reconcile-claude (2026-10-09) re-reading admin/ledger/page.tsx; the older note on payment-method.set-default is still true. BUILD WORK: one reasoned, audited, atomic command (set default, enable, change gateway) and revoke the administrator write policy on payment_methods. Which gateway a payment method may be pointed at is a financial-control decision for the owner.",
       "evidence": [
-        "web_platform/src/app/admin/ledger/page.tsx#L297",
-        "web_platform/src/app/admin/ledger/page.tsx#L325",
-        ".admin-console/evidence/architect-reconcile-claude/probe-results.txt#L1"
+        "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql",
+        "supabase/tests/db/qafix_console_commands.test.mjs"
       ]
     },
     {
       "id": "integration-audit-log-accepts-client-written-rows",
       "severity": "medium",
       "description": "The /admin/integrations screen writes its own audit rows straight into integration_audit_log with a client-supplied actor_id and free-text change, swallowing any failure ('audit is best-effort'). The policy 'Admins write integration audit log' lets any administrator insert rows with any actor, and the table is excluded from the automatic audit trigger. The authoritative record is admin_audit_logs (the trigger covers integrations), so the second log is both forgeable and redundant.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "FOUND BY architect-reconcile-claude (2026-10-09): integrations/page.tsx writes the row in audit(), the table grants INSERT to authenticated (20260714153000_expand_integrations_registry.sql) and the trigger helper skips it (20261006000000_attach_admin_audit_trigger_helper.sql). BUILD WORK: stop writing it from the browser, revoke INSERT for clients, and read integration history from admin_audit_logs.",
       "evidence": [
-        "web_platform/src/app/admin/integrations/page.tsx#L296",
-        "supabase/migrations/20260714153000_expand_integrations_registry.sql#L58",
-        "supabase/migrations/20261006000000_attach_admin_audit_trigger_helper.sql#L31"
+        "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql",
+        "supabase/tests/db/qafix_console_commands.test.mjs"
       ]
     },
     {
@@ -11880,8 +12041,7 @@
       "status": "fixed",
       "rationale": "Render the page title as h1 consistently across the console.",
       "evidence": [
-        ".admin-console/evidence/ux-fix/crawl-admin.owner-ar-375.json",
-        ".admin-console/evidence/ux-fix/crawl-admin.finance-en-1440.json"
+        "e2e/specs/admin-routes.spec.ts"
       ],
       "resolution": "impl-uxfix-claude: Every crawled route renders one h1 in both languages."
     },
@@ -12177,67 +12337,72 @@
       "id": "retention-purge-console-entry-missing",
       "severity": "low",
       "description": "No console screen calls privacy_purge_expired_retention; the dry run and the approval request are reachable through the API only, and the request is decided on Approvals.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "Depends on the owner's scheduling decision (retention-purge-not-scheduled).",
       "evidence": [
-        "supabase/migrations/20261016220000_f3_retention_purge_second_person.sql"
+        "web_platform/src/app/admin/privacy/retention-purge.tsx",
+        "web_platform/tests/qafix-ux-round2.test.mjs",
+        ".admin-console/evidence/qafix/summary.txt"
       ]
     },
     {
       "id": "direct-table-updates-report-success-when-the-row-policy-refuses",
       "severity": "critical",
       "description": "Console screens that write tables directly (services toggle/featured/price/archive/edit, branches toggle, integrations patch/disable/edit, payment methods toggle/default/edit in the ledger screen, packages toggle) check only the error field of the PostgREST answer. When the console role lacks the table permission, the restrictive row policy matches no row and PostgREST answers 200 with nothing changed, so the screen keeps its optimistic state and reports success. Reproduced in a real browser: the analyst pressed INACTIVE on a service and Deactivate on a branch, finance pressed Disable on an integration; each screen showed the change (the integration screen said 'API integration disabled.'), and a reload showed the stored value unchanged. The server boundary is correct (direct-table-writes.txt); the operator is told a change happened that did not.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "Found by qa-release-claude. False success is release-blocking (AGENTS.md defect class 1). REMEDY: make every direct update ask for the affected rows (.select() or count) and treat zero rows as a refusal that rolls the optimistic state back and names the missing permission; better, move these writes behind reasoned commands like the rest of the console; and leave the controls out for roles that cannot use them (read-only-roles-see-enabled-write-controls). Add a browser or component test per screen that presses the control as a role without the permission.",
       "evidence": [
-        ".admin-console/evidence/qa-release/browser-summary.txt",
-        ".admin-console/evidence/qa-release/browser-falsesuccess.json",
-        ".admin-console/evidence/qa-release/direct-table-writes.txt",
-        "web_platform/src/app/admin/branches/page.tsx#L126"
+        "supabase/migrations/20261017100000_qafix_console_catalogue_commands.sql",
+        "supabase/tests/db/qafix_console_commands.test.mjs",
+        "web_platform/tests/qafix-console-writes.test.mjs",
+        ".admin-console/evidence/qafix/summary.txt"
       ]
     },
     {
       "id": "refused-reads-shown-with-an-empty-state",
       "severity": "medium",
       "description": "When the database refuses a screen's read (403/42501 injected at the data boundary in a real browser), services, branches, packages, coupons, integrations, activity and reviews show their empty-state text ('No matching services. Add a new service to get started.', 'No branches found yet.', 'No service packages found in database.', 'No activity recorded for this filter yet.') together with, or instead of, the refusal. Services words a load failure as 'Failed to update service catalog.'; integrations tells the operator to apply migrations; packages answers in Arabic on an English screen. A refused or failed read must not look like an empty platform.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "Found by qa-release-claude (states phase, browser-states.json). REMEDY: render the error or forbidden state instead of the empty state whenever the read failed, with copy that names the reason (permission or outage), role=alert, and a retry; reuse ForbiddenNotice for 42501 as taxes, approvals and the privacy screens already do.",
       "evidence": [
-        ".admin-console/evidence/qa-release/browser-summary.txt",
-        ".admin-console/evidence/qa-release/browser-states.json"
+        "web_platform/src/components/read-failure.tsx",
+        "web_platform/tests/qafix-console-writes.test.mjs",
+        ".admin-console/evidence/qafix/summary.txt"
       ]
     },
     {
       "id": "axe-critical-unlabelled-controls-on-services-and-integrations",
       "severity": "medium",
       "description": "axe-core (WCAG 2.x A/AA) reports critical violations in every language and width: /admin/services has 33 inline price/duration inputs without a label and 2 filter selects without a name; /admin/integrations has a select without a name. Screen-reader users cannot tell which service a price field edits.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "Found by qa-release-claude (a11y phase, 152 runs). REMEDY: aria-label each inline input with the service name and field, label the selects; re-run the axe phase of harness/qa-browser-harness.mjs.",
       "evidence": [
-        ".admin-console/evidence/qa-release/browser-summary.txt",
-        ".admin-console/evidence/qa-release/browser-a11y.json"
+        ".admin-console/evidence/qafix/browser-axe.json",
+        ".admin-console/evidence/qafix/browser-axe-rerun.json",
+        ".admin-console/evidence/qafix/summary.txt"
       ]
     },
     {
       "id": "axe-contrast-and-scroll-region-failures",
       "severity": "medium",
       "description": "axe-core serious violations: color-contrast at 375 px on coupons, disputes, reviews, reports, packages, refunds, reconciliation and provider inventory (the 8 px #B8952E eyebrow in components/control-center.tsx, 2.84:1), and on /customer/privacy, /become-provider, /privacy and /login/mfa (stone-400/500, #A57C32 and #9B7928 small text, 2.5 to 4.3:1); scrollable-region-focusable on coupons and reports at 375 px, taxes and whatsapp at 1440 px (#admin-main) and provider chain at 375 px, so keyboard users cannot scroll those regions.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "Found by qa-release-claude. REMEDY: raise the eyebrow and small-text colours to 4.5:1, give scroll containers tabindex=0 with a name (or make their content focusable); re-run the axe phase. Overlaps low-contrast-status-text-and-micro-typography for other elements.",
       "evidence": [
-        ".admin-console/evidence/qa-release/browser-summary.txt",
-        ".admin-console/evidence/qa-release/browser-a11y.json"
+        ".admin-console/evidence/qafix/browser-axe.json",
+        ".admin-console/evidence/qafix/browser-axe-rerun.json",
+        ".admin-console/evidence/qafix/summary.txt"
       ]
     },
     {
       "id": "read-only-roles-see-enabled-write-controls",
       "severity": "medium",
       "description": "The analyst (read-only) sees enabled write controls on /admin/services (Add service, featured toggles, Edit, status, Archive), /admin/integrations (Add API, environment, Edit, Disable), /admin/branches (Toggle), /admin/coupons (Add coupon) and /admin/sponsored (Switch on, Edit); finance sees the same on services, integrations, branches, coupons and sponsored although it holds neither operations.write nor settings.manage. The server refuses every one (direct-table-writes.txt, permission-gates.txt), and on the direct-write screens the refusal is then reported as success.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "Found by qa-release-claude (roles phase, browser-roles.json). ux1-navigation-and-actions-not-trimmed-to-console-role fixed navigation and named screens, not these. REMEDY: derive each control from admin_session_state permissions (knownToHold) as approvals and roles already do.",
       "evidence": [
-        ".admin-console/evidence/qa-release/browser-summary.txt",
-        ".admin-console/evidence/qa-release/browser-roles.json"
+        "web_platform/tests/qafix-console-writes.test.mjs",
+        ".admin-console/evidence/qafix/summary.txt"
       ]
     },
     {
@@ -12254,10 +12419,11 @@
       "id": "console-refusals-say-administrator-access-required",
       "severity": "low",
       "description": "Twenty console commands answer a console administrator who lacks the needed permission with 'Administrator access required' or 'Administrator role required' (for example operations calling admin_retry_refund_request, finance calling admin_clear_customer_profile or admin_set_provider_status), which tells an administrator they are not one. Others name the role or permission ('Your console role cannot change bookings').",
-      "status": "open",
+      "status": "fixed",
       "rationale": "Found by qa-release-claude (permission-gates.txt). REMEDY: use one refusal wording that names the missing permission for console sessions.",
       "evidence": [
-        ".admin-console/evidence/qa-release/permission-gates.txt"
+        "web_platform/src/lib/console-errors.mjs",
+        "web_platform/tests/console-errors.test.mjs"
       ]
     },
     {
@@ -12336,49 +12502,43 @@
       "id": "ux2-command-dialog-height-uncapped-confirm-unreachable",
       "severity": "high",
       "description": "The shared CommandDialog (web_platform/src/components/modal.tsx) relies on the class max-h-full, but the compiled CSS served by the dev server has no .max-h-full rule (computed max-height: none; 12 other max-h-* rules exist). On a short viewport the dialog grows past the screen while the overlay is overflow:visible and html/body are scroll-locked. At 375 x 600 'Clear profile details' on /admin/customers is 1,101 px tall (top -250, confirm button 786-826): wheel and Tab do not bring the title, typed confirmation or confirm button into view, so the command cannot be completed on a phone (still taller than an 812 px screen). The Approvals decision dialog is 667 px (top -33, submit 567-609).",
-      "status": "open",
+      "status": "fixed",
       "rationale": "Found by measuring every dialog at 375 x 600 in a real browser (ux-round2-claude). REMEDY: give the dialog a real cap (e.g. max-h-[calc(100dvh-4rem)] or make the overlay overflow-y-auto) and check why max-h-full is not generated; re-measure every CommandDialog at 375 x 600 in EN and AR, and check the production CSS build.",
       "evidence": [
-        ".admin-console/evidence/ux-round2/probe-dialog-en.json",
-        ".admin-console/evidence/ux-round2/dialog-customer-clear-en-375.png",
-        ".admin-console/evidence/ux-round2/dialog-customer-clear-after-scroll-en-375.png",
-        ".admin-console/evidence/ux-round2/flow-sweep-ux2-owner-c-en-375.json",
-        "docs/reviews/2026-10-17-ux-browser-check.md"
+        "web_platform/tests/qafix-ux-round2.test.mjs",
+        ".admin-console/evidence/qafix/summary.txt"
       ]
     },
     {
       "id": "ux2-approvals-actions-offscreen-at-375",
       "severity": "medium",
       "description": "On /admin/approvals at 375 px (Arabic) the table region is 482 px inside 341 px: the first Approve button sits at x -108..-58, off-screen until the operator scrolls the table sideways; the request column wraps one word per line and the reason column is clipped at the edge.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "Essential actions must stay reachable at narrow widths (experience-design: responsive behaviour). REMEDY: a stacked card layout or a sticky action column below sm, with the request summary allowed to wrap normally.",
       "evidence": [
-        ".admin-console/evidence/ux-round2/flow-holds-h2.json",
-        ".admin-console/evidence/ux-round2/approvals-privacy-pending-ar-375.png"
+        "web_platform/tests/qafix-ux-round2.test.mjs",
+        ".admin-console/evidence/qafix/summary.txt"
       ]
     },
     {
       "id": "ux2-arabic-console-shows-english-server-refusals",
       "severity": "medium",
       "description": "In the Arabic console, refusals from the server are shown as raw English text: approving a profile clear under an account legal hold ('An active legal hold (...) keeps this customer's account; ...'), approving a 4th hold renewal by an owner who renewed it ('A hold renewed 3 times is kept only with an owner who ...'), keeping a hold as its creator ('A hold is kept only by a new approver ...'), an incident aware-at correction before the discovery time and a duplicate correction ('... already waiting for a second person'). The customers page maps the legal_hold_active hint to Arabic; Approvals, holds and incidents do not.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "Bilingual UI is mandatory (AGENTS.md); an Arabic-speaking approver cannot read why a high-risk decision was refused. REMEDY: map the server hints (legal_hold_active, fresh_owner_required, new_approver_required and the incident checks) to EN/AR copy in approvals, privacy and incidents, as admin/customers already does.",
       "evidence": [
-        ".admin-console/evidence/ux-round2/approvals-refused-h2-ar-375.png",
-        ".admin-console/evidence/ux-round2/flow-holds-h2.json",
-        ".admin-console/evidence/ux-round2/flow-holds-decide-ux2-owner-c-renewal-c.json",
-        ".admin-console/evidence/ux-round2/flow-incident-purge-i1.json"
+        "web_platform/tests/console-errors.test.mjs",
+        "web_platform/tests/qafix-ux-round2.test.mjs"
       ]
     },
     {
       "id": "ux2-customer-deletion-preview-latin-zero-reads-as-five",
       "severity": "medium",
       "description": "On /customer/privacy in Arabic, the deletion preview and the balance warning interpolate raw numbers (web_platform/src/app/customer/privacy/page.tsx, fill(t.deletionPreview ...) and fill(t.balance ...)) into Arabic-Indic copy. The Arabic font draws the Latin '0' as a small ring that reads as the Arabic five, so a customer with nothing kept reads that 5 bookings are kept and 5 deleted before an irreversible deletion ('تُحفظ 0 حجوزات ... وتُحذف 0 حجوزات').",
-      "status": "open",
+      "status": "fixed",
       "rationale": "Consequences of an irreversible action must be unambiguous. REMEDY: format with Intl.NumberFormat('ar-SA') like the rest of the page, and use proper zero/plural wording.",
       "evidence": [
-        ".admin-console/evidence/ux-round2/cust-submit-deletion-keyboard-ar-375.png",
-        ".admin-console/evidence/ux-round2/flow-customer-submit.json"
+        "web_platform/tests/qafix-ux-round2.test.mjs"
       ]
     },
     {
@@ -12542,6 +12702,51 @@
       "rationale": "FOUND BY pay-wave2. Serve the balance from a provider-owner command that calls provider_available_balance.",
       "evidence": [
         "web_platform/src/app/provider/wallet/page.tsx"
+      ]
+    },
+    {
+      "id": "approvals-unchanged-decision-reported-as-approved",
+      "severity": "high",
+      "description": "admin_decide_approval answers { unchanged: true, status } for a request decided or withdrawn meanwhile; /admin/approvals reported it as 'Approved and executed'. Found by the QAFIX browser run.",
+      "status": "fixed",
+      "rationale": "Found and fixed by impl-qafix-claude: the screen treats an unchanged answer as 'nothing was changed (status)'.",
+      "evidence": [
+        "web_platform/tests/qafix-ux-round2.test.mjs",
+        ".admin-console/evidence/qafix/browser-purge.json"
+      ]
+    },
+    {
+      "id": "services-status-trigger-reverted-console-toggles",
+      "severity": "high",
+      "description": "services.is_active is derived from services.status by sync_service_status_fields, so the console's Inactive/Archive and the provider portal's deactivate wrote is_active and were reverted for every role while the screen said saved.",
+      "status": "fixed",
+      "rationale": "Found and fixed by impl-qafix-claude: console via admin_save_service status; provider portal writes status.",
+      "evidence": [
+        "supabase/tests/db/qafix_console_commands.test.mjs",
+        "web_platform/tests/qafix-console-writes.test.mjs"
+      ]
+    },
+    {
+      "id": "provider-portal-direct-writes-ignored-zero-rows",
+      "severity": "medium",
+      "description": "Provider portal updates/deletes (staff, services, packages, resources, settings, closures, seasons, leave, commission rules, portfolio, client notes, read marker) checked only the error field; a row-policy refusal matched no row and the screen reported success.",
+      "status": "fixed",
+      "rationale": "Fixed by impl-qafix-claude: each asks for its rows (.select) and checkedWrite turns zero rows into the existing error path.",
+      "evidence": [
+        "web_platform/tests/qafix-console-writes.test.mjs",
+        "web_platform/tests/write-result.test.mjs"
+      ]
+    },
+    {
+      "id": "e2e-pinned-iban-panel-calendar-date-h1",
+      "severity": "medium",
+      "description": "Three defects pinned by the e2e suite: revealed-IBAN panel under the payout table (Hide now unclickable), provider calendar picker on the UTC date between 00:00 and 03:00 Riyadh, nine screens without an h1.",
+      "status": "fixed",
+      "rationale": "Fixed by impl-qafix-claude; the test.fail markers are normal assertions and pass.",
+      "evidence": [
+        "e2e/specs/iban-reveal.spec.ts",
+        "e2e/specs/provider-calendar.spec.ts",
+        "e2e/specs/admin-routes.spec.ts"
       ]
     }
   ],
@@ -13688,6 +13893,46 @@
         ".admin-console/evidence/ux-round2/probe-dialog-en.json"
       ],
       "status": "open"
+    },
+    {
+      "id": "browser-stale-role-probe-proves-refusal-ui",
+      "observation": "Hiding write controls removes the QA false-success reproduction; switching a loaded session's console role in the database before the press reproduces the server refusal against a screen that still shows the control, which proves the refusal path in the browser.",
+      "category": "new-pattern",
+      "proposedChange": "In the qa and implementer prompts: after gating controls by role, verify the refused-write UI with a role changed mid-session.",
+      "evidence": [],
+      "status": "open"
+    },
+    {
+      "id": "msys-path-conversion-eats-double-slash-args",
+      "observation": "On Git Bash (MSYS), a command-line argument starting with // is converted to /, so a marker string '// Copy ...' passed to a helper script matched one character late and deleted a slash from source. Pass such strings through files or set MSYS_NO_PATHCONV=1.",
+      "category": "tooling",
+      "proposedChange": "In multi-agent.md tooling notes: never pass code fragments as shell arguments on Windows Git Bash; write them to a file.",
+      "evidence": [],
+      "status": "open"
+    },
+    {
+      "id": "browser-run-must-target-its-own-approval-rows",
+      "observation": "A browser step that pressed the first Approve button on a shared local stack could have approved another agent's pending request. Select rows by the exact kind or id the run created and abort if the opened dialog is not that request.",
+      "category": "friction",
+      "proposedChange": "In multi-agent.md: browser probes on a shared stack act only on records they created, identified by id.",
+      "evidence": [],
+      "status": "open"
+    },
+    {
+      "id": "idempotent-replay-answers-are-a-false-success-source",
+      "observation": "Commands that answer { unchanged: true } or { changed: false } for a replay are correct server-side but screens read them as success. The approvals screen said 'Approved and executed' for a withdrawn request.",
+      "category": "gap",
+      "proposedChange": "In admin-data-model.md command contract: the UI must branch on changed/unchanged in the answer, not only on error.",
+      "evidence": [],
+      "status": "open"
+    },
+    {
+      "id": "compiled-css-missing-max-h-full",
+      "observation": "The Tailwind 4 build had no rule for max-h-full while other max-h utilities existed; the UX round measured it. Inline style for the cap plus a base-layer default for role=dialog fixed every dialog.",
+      "category": "tooling",
+      "proposedChange": "Recommend measuring computed max-height of dialogs rather than reading class names.",
+      "evidence": [],
+      "status": "open"
     }
   ],
   "agents": [
@@ -13944,6 +14189,14 @@
       "ownsScreens": [],
       "status": "done",
       "notes": "Payments wave 2 (2026-10-18/19): RT-H2 membership cancellation refunds, prepaid value payable only as earned, purchase disputes; RT-M3 package terms snapshot and seller status; QA item 4 unknown refund outcome; P-13 and the money part of P-14. Migrations 20261018100000-150000. No capability review state changed (implementer). Worklog .admin-console/worklog/pay-wave2.md."
+    },
+    {
+      "id": "impl-qafix-claude",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "handed-off",
+      "notes": "QA release-gate fixes (docs/reviews/2026-10-17-qa-release-gate.md items 1, 2, 3, 5), UX round-2 items (dialog height, approvals at 375, Arabic refusals, Arabic digits, retention purge entry) and three e2e-pinned defects. Claims taken at the end of the pass, per the coordinator's instruction to write the manifest last."
     }
   ]
 }
