@@ -92,8 +92,11 @@ describe("channel configuration", () => {
     assert.equal(again.id, saved.id);
     assert.equal(await count("whatsapp_channels"), 1);
   });
-  it("one phone number id cannot be connected to two businesses", async () => {
-    await expectError(saveChannel(otherOwner, SEED.provider2, { pnid: PNID }), /already connected/);
+  it("an unverified claim on a number blocks nobody (P-05; the verified-number rule is in dbsec2_whatsapp_squatting.test.mjs)", async () => {
+    // P-05 changed this rule: before it, the first unverified save held the number and the real business was refused.
+    const squat = await saveChannel(otherOwner, SEED.provider2, { pnid: PNID, enabled: false, ai: false });
+    assert.equal(squat.verified_at, null);
+    await sys(db, `delete from whatsapp_channels where id = $1`, [squat.id]); // the suites below expect provider 1's channel only
   });
   it("direct writes are refused: the table has no client write privilege", async () => {
     await expectError(as(db, owner, `insert into whatsapp_channels (provider_id, phone_number_id) values ($1, '999999999')`, [SEED.provider1]), /permission denied/);
