@@ -303,7 +303,7 @@ describe("a console cancellation applies the refund approval rules", () => {
     const asked = await consoleCancel(consoleOwner, big.id);
     assert.equal(asked.status, "pending_approval");
     assert.equal((await sys(db, `select status from memberships where id = $1`, [big.id]))[0].status, "active");
-    await expectError(as(db, consoleOwner, `select admin_break_glass_execute($1, 'Only one admin is around today to do this')`, [asked.approval_id]), /never available|Break-glass|permission/i);
+    await expectError(as(db, consoleOwner, `select admin_break_glass_execute($1, 'Only one admin is on duty for this request')`, [asked.approval_id]), /never available|Break-glass|permission/i);
     const done = (await as(db, finance, `select admin_decide_approval($1, 'approve', 'Second person agrees') r`, [asked.approval_id]))[0].r;
     assert.equal(done.result.status, "cancelled");
   });

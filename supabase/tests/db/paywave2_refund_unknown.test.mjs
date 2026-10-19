@@ -201,7 +201,7 @@ describe("an approved decision on an unknown refund", () => {
     await expectError(decide(finance, asked.approval_id), /cannot approve or reject your own request/);
     await expectError(decide(operations, asked.approval_id), /cannot decide refund_outcome requests/);
     await expectError(decide(analyst, asked.approval_id), /cannot decide refund_outcome requests/);
-    await expectError(as(db, finance, `select admin_break_glass_execute($1, 'Only one admin is around today to do this')`, [asked.approval_id]), /never available|Break-glass|permission/i);
+    await expectError(as(db, finance, `select admin_break_glass_execute($1, 'Only one admin is on duty for this request')`, [asked.approval_id]), /never available|Break-glass|permission/i);
     // The approver's session cannot complete a refund outside the approved execution.
     await expectError(as(db, finance2, `select complete_refund_request($1, true, 're_direct', null)`, [r.id]), /permission denied|Service role required/);
     const done = await decide(finance2, asked.approval_id);

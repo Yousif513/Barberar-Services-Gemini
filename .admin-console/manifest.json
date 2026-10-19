@@ -9260,6 +9260,58 @@
         "privacy.deletion"
       ],
       "confirmedBy": "Owner (Yousif) on 2026-10-17: 'approved for all' — docs/OWNER-DECISIONS.md T14"
+    },
+    {
+      "id": "paywave2-membership-refund-rule",
+      "decision": "Cancelling a paid, active membership refunds the customer in the same transaction through the refund queue, to the original payment method: the customer's own cancellation returns price x unused visits / visits per period; a cancellation by the provider owner or from the console returns price x the greater of the unused visits and the unused time. Rounded to the halala, half up. Nothing is refundable once the period has ended.",
+      "reason": "RT-H2: no plan-of-record rule existed for memberships; the most customer-protective pro-rata default was chosen as instructed (a full refund on any provider cancellation would refund visits already delivered). Business choice for the owner; E-Commerce Law Art. 13/14 applicability is for counsel.",
+      "evidence": [
+        "supabase/migrations/20261018120000_paywave2_prepaid_refunds_and_earning.sql",
+        "supabase/tests/db/paywave2_prepaid.test.mjs"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "refund.execute",
+        "dispute.resolve"
+      ]
+    },
+    {
+      "id": "paywave2-prepaid-earned-as-delivered",
+      "decision": "Membership and package sales are payable to the provider only as earned: price x delivered visits or sessions (a redemption whose booking is completed; a package session recorded without a booking counts when recorded), everything left once the membership or package has ended (unused value is the provider's at expiry), never what an open refund or an open dispute holds. Gift cards stay a platform liability settled at booking completion.",
+      "reason": "RT-H2 fix 2 and M-09 for prepaid products. Breakage at expiry and the in-person session rule are business choices for the owner.",
+      "evidence": [
+        "supabase/migrations/20261018120000_paywave2_prepaid_refunds_and_earning.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "ledger.release-payout",
+        "payout.approve"
+      ]
+    },
+    {
+      "id": "paywave2-unknown-refund-resolution",
+      "decision": "A refund whose outcome at Tap is unknown is never sent again; it is settled only by Check with Tap (issued: completed; failed: retryable; not found: unchanged) or by a refund_outcome approval in which a money.refund holder cites what the Tap dashboard shows (the Tap refund id when a refund exists) and a different money.refund holder approves. No break-glass for refund_outcome or membership_cancellation.",
+      "reason": "QA release gate item 4 and D-Q9 (breaks resolved by approved entries citing the Tap object id).",
+      "evidence": [
+        "supabase/migrations/20261018100000_paywave2_refund_outcome_unknown.sql",
+        "supabase/tests/db/paywave2_refund_unknown.test.mjs"
+      ],
+      "status": "assumed",
+      "appliesTo": [
+        "refund.retry",
+        "refund.execute",
+        "refund.check-with-tap"
+      ]
+    },
+    {
+      "id": "paywave2-membership-member-list-staff",
+      "decision": "Membership rows, redemptions and draft plans are read by the provider owner and provider-wide bookings delegates; branch-scoped delegates no longer pass by naming no branch. The member list command stays open to the provider's active employees at any branch, because a membership is redeemable at every branch.",
+      "reason": "P-14 remainder; counter staff need to verify members.",
+      "evidence": [
+        "supabase/migrations/20261018140000_paywave2_membership_branch_scope.sql"
+      ],
+      "status": "assumed",
+      "appliesTo": []
     }
   ],
   "gaps": [
@@ -9919,14 +9971,17 @@
       "id": "refund-outcomes-that-cannot-be-known-have-no-recovery",
       "severity": "high",
       "description": "claim_refund_request moves a refund to 'processing' and adds an attempt; only 'pending' and 'failed' rows can be claimed again, and admin_retry_refund_request refuses 'processing'. If process-refund dies, or complete_refund_request fails (refunds.ts throws), after Tap accepted the refund, the row stays 'processing' for ever: the console shows 'The gateway is processing this refund' with no action, money has left and the ledger is unchanged. Reproduced locally: after one claim a second claim returns claimed=false and the operator retry fails with 'A processing refund cannot be retried'. Separately refunds.ts records any thrown fetch error (timeout, connection reset) as a definite refusal, sets the row to 'failed' and lets the scheduler and the operator retry, so a refund Tap executed can be sent again; the shared idempotency key protects that only while Tap honours it (not verifiable from this machine). The dashboard counts processing refunds but never flags a stale one.",
-      "status": "open",
+      "status": "fixed",
       "rationale": "RECONCILED architect-reconcile-claude (2026-10-09): STILL OPEN, re-read and unchanged. supabase/functions/_shared/refunds.ts has had no commit since the audit (git log 26c0ef8..HEAD lists none for refunds.ts, process-refund or reconcile-psp); a fetch error is still recorded as a definite refusal (the catch block sets failure and the request is completed as failed), there is no 'unknown' outcome and nothing looks the refund up at Tap. The partial fix (claim time, 15-minute stuck flag, audited admin_reopen_stuck_refund) stands. OWNER/PROVIDER QUESTION: does Tap honour the refund idempotency key for a repeated request, for how long, and does Tap expose a refund lookup by idempotency key or metadata.refund_request_id? Retry-after-timeout cannot be made safe until that is confirmed with Tap. BUILD WORK after the answer: an 'unknown' refund state that is never auto-retried, a gateway lookup command, and a dashboard flag for unknown refunds. QA-RELEASE (qa-release-claude, 2026-10-17): re-read; still open. supabase/functions/_shared/refunds.ts line 53 still records any thrown fetch error as a definite refusal, so refund.retry stays contested. Engineering after Tap confirms idempotency-key behaviour and a refund lookup.",
       "evidence": [
-        "supabase/functions/_shared/refunds.ts#L48",
-        "supabase/functions/_shared/refunds.ts#L12",
-        "supabase/migrations/20261005150000_security_review_hardening.sql#L208",
-        "supabase/tests/db/security_hardening.test.mjs#L140"
-      ]
+        "supabase/migrations/20261018100000_paywave2_refund_outcome_unknown.sql",
+        "supabase/functions/_shared/refunds.ts",
+        "supabase/functions/check-refund-status/index.ts",
+        "supabase/tests/db/paywave2_refund_unknown.test.mjs",
+        "supabase/tests/tap-refund-status.test.mjs",
+        "web_platform/src/app/admin/refunds/page.tsx"
+      ],
+      "resolution": "pay-wave2 (2026-10-19): an indeterminate Tap answer (timeout, dropped connection, 5xx/408/409/425, 2xx without a refund id or with an unknown status) is recorded as refund status unknown (record_refund_outcome_unknown); claim_refund_request, the scheduler queue and admin_retry_refund_request never send it again; admin_reopen_stuck_refund marks a stuck refund unknown instead of failed; Check with Tap (apply_tap_refund_lookup) or a refund_outcome approval by a different money.refund holder citing the Tap refund id settles it; unknown refunds count as open money and are listed in /admin/refunds. Tap sandbox confirmation of the list lookup and idempotency is tracked in tap-refund-lookup-and-idempotency-unverified."
     },
     {
       "id": "payout-iban-can-be-rewritten-by-an-admin-before-release",
@@ -12456,6 +12511,38 @@
       "evidence": [
         ".admin-console/evidence/ux-round2/cust-track-ar-375.png"
       ]
+    },
+    {
+      "id": "tap-refund-lookup-and-idempotency-unverified",
+      "severity": "medium",
+      "description": "Check with Tap for an unknown refund without a Tap refund id searches POST /v2/refunds/list (envelope refunds/has_more/starting_after) for the refund carrying metadata.refund_request_id; whether Tap returns that metadata, the list contract, and whether Tap honours the refund Idempotency-Key were not verified (no sandbox key on this machine). Until confirmed, an unknown refund that Tap cannot find is settled by the approved decision path.",
+      "status": "blocked",
+      "rationale": "FOUND BY pay-wave2. Needs a Tap test key (owner item) to exercise the timeout, the list lookup and a repeated Idempotency-Key.",
+      "evidence": [
+        "supabase/functions/check-refund-status/index.ts",
+        "supabase/functions/_shared/tap-refund-status.ts"
+      ]
+    },
+    {
+      "id": "mobile-app-has-no-purchase-dispute-path",
+      "severity": "low",
+      "description": "The customer dispute path for memberships and packages (open_purchase_dispute) is on the web customer screens only; the Expo app lists packages read-only and offers no report or refund status.",
+      "status": "open",
+      "rationale": "FOUND BY pay-wave2. Add the same command and copy to mobile_app/src/app/profile.tsx.",
+      "evidence": [
+        "mobile_app/src/app/profile.tsx",
+        "web_platform/src/lib/purchase-disputes.ts"
+      ]
+    },
+    {
+      "id": "provider-wallet-balance-computed-in-browser",
+      "severity": "low",
+      "description": "/provider/wallet adds up pending booking ledger rows in the browser, so its available balance ignores the earned-share rule (future deposits, prepaid sales) that provider_available_balance and request_provider_payout enforce; the server refuses an over-request, the screen just shows too much.",
+      "status": "open",
+      "rationale": "FOUND BY pay-wave2. Serve the balance from a provider-owner command that calls provider_available_balance.",
+      "evidence": [
+        "web_platform/src/app/provider/wallet/page.tsx"
+      ]
     }
   ],
   "declaredStatic": [
@@ -13849,6 +13936,14 @@
       "ownsScreens": [],
       "status": "done",
       "notes": "Release-gate QA pass 2026-10-17 over every domain (money, governance, privacy first; then catalogue, bookings, settings, screens). No claim taken; no application, migration or function file edited. Worklog .admin-console/worklog/qa-release-claude.md; report docs/reviews/2026-10-17-qa-release-gate.md."
+    },
+    {
+      "id": "pay-wave2",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "Payments wave 2 (2026-10-18/19): RT-H2 membership cancellation refunds, prepaid value payable only as earned, purchase disputes; RT-M3 package terms snapshot and seller status; QA item 4 unknown refund outcome; P-13 and the money part of P-14. Migrations 20261018100000-150000. No capability review state changed (implementer). Worklog .admin-console/worklog/pay-wave2.md."
     }
   ]
 }
