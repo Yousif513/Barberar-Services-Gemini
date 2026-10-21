@@ -35,7 +35,7 @@
       "Leave an audit record of who changed what and why, and review it"
     ],
     "stack": {
-      "frontend": "Next.js 16.2.9 (React 19.2.4, App Router, Tailwind 4, all-client 'use client')",
+      "frontend": "Next.js 16.3.8 (React 19.2.4, App Router, Tailwind 4); versions verified from the reconciled package/lock and installed build",
       "backend": "none — no Next.js route handlers, no server actions, no middleware; Supabase Edge Functions (Deno) only",
       "database": "Supabase Postgres 15, SQL migrations in supabase/migrations",
       "auth": "Supabase Auth (@supabase/supabase-js 2.108.1) browser client only; no @supabase/ssr, no middleware",
@@ -94,6 +94,50 @@
         "url": "https://supabase.com/docs/guides/local-development/cli/config",
         "checkedOn": "2026-10-10",
         "topic": "config.toml keys: auth.mfa.totp, auth.sessions timebox/inactivity_timeout, auth.hook.mfa_verification_attempt"
+      },
+      {
+        "url": "https://supabase.com/docs/guides/database/functions",
+        "checkedOn": "2026-10-22",
+        "topic": "Function privileges and security-definer RPC boundaries",
+        "appliedTo": [
+          "booking.transition",
+          "refund.execute"
+        ]
+      },
+      {
+        "url": "https://www.postgresql.org/docs/15/sql-createfunction.html",
+        "checkedOn": "2026-10-22",
+        "topic": "CREATE OR REPLACE preserves function ownership and grants",
+        "appliedTo": [
+          "booking.transition",
+          "refund.execute"
+        ]
+      },
+      {
+        "url": "https://www.postgresql.org/docs/15/explicit-locking.html",
+        "checkedOn": "2026-10-22",
+        "topic": "Booking row serialization for captured-payment conflict handling",
+        "appliedTo": [
+          "booking.transition",
+          "refund.execute"
+        ]
+      },
+      {
+        "url": "https://developers.tap.company/reference/create-a-charge",
+        "checkedOn": "2026-10-22",
+        "topic": "Existing hosted checkout charge contract; durable attempts remain a tracked gap",
+        "appliedTo": [
+          "booking.transition",
+          "refund.execute"
+        ]
+      },
+      {
+        "url": "https://nodejs.org/download/release/v22.14.0/docs/api/module.html",
+        "checkedOn": "2026-10-22",
+        "topic": "stripTypeScriptTypes is available since Node22.13 for executing the actual Edge handler in isolated tests; CI uses Node22",
+        "appliedTo": [
+          "booking.transition"
+        ]
       }
     ],
     "volumes": {
@@ -1205,14 +1249,19 @@
             "supabase/tests/db/qa_adversarial.test.mjs",
             "supabase/tests/db/qa_defect_fixes.test.mjs",
             "supabase/tests/db/secfix2_console_cancellations.test.mjs",
-            "web_platform/tests/booking-cancel-thresholds.test.mjs"
+            "web_platform/tests/booking-cancel-thresholds.test.mjs",
+            "supabase/tests/payment-checkout.test.mjs",
+            "supabase/tests/db/checkout_schema_contract.test.mjs",
+            "e2e/specs/provider-calendar.spec.ts"
           ],
           "evidence": [
             "supabase/migrations/20261011110000_secfix2_h2_console_cancellations.sql",
             "supabase/tests/db/qa_defect_fixes.test.mjs#L248",
             "supabase/tests/db/qa_defect_fixes.test.mjs#L47",
             "supabase/tests/db/secfix2_console_cancellations.test.mjs",
-            ".admin-console/evidence/qa-release/capability-review.txt"
+            ".admin-console/evidence/qa-release/capability-review.txt",
+            "docs/booking-payment-reconciliation.md",
+            ".admin-console/worklog/security-checkout-reconciliation.md"
           ],
           "owner": "",
           "reviewStatus": "reviewed",
@@ -2011,7 +2060,8 @@
           "serverOperations": [
             "supabase/functions/process-refund/index.ts",
             "supabase/migrations/20261005010000_review_fix_money.sql#L599",
-            "supabase/migrations/20261011110000_secfix2_h2_console_cancellations.sql"
+            "supabase/migrations/20261011110000_secfix2_h2_console_cancellations.sql",
+            "supabase/migrations/20261021090000_booking_capture_refund_binding.sql"
           ],
           "authorizationPolicies": [
             "supabase/functions/process-refund/index.ts#L18"
@@ -2028,12 +2078,15 @@
           "recovery": "A refused refund is recorded as failed with the gateway's message and retried by the scheduler up to five attempts, then by an operator through refund.retry.",
           "tests": [
             "supabase/tests/db/money.test.mjs",
-            "supabase/tests/db/secfix2_console_cancellations.test.mjs"
+            "supabase/tests/db/secfix2_console_cancellations.test.mjs",
+            "supabase/tests/db/booking_capture_refunds.test.mjs"
           ],
           "evidence": [
             "supabase/functions/_shared/refunds.ts",
             "supabase/migrations/20261011110000_secfix2_h2_console_cancellations.sql",
-            "supabase/tests/db/secfix2_console_cancellations.test.mjs"
+            "supabase/tests/db/secfix2_console_cancellations.test.mjs",
+            "docs/booking-payment-reconciliation.md",
+            ".admin-console/worklog/security-reconciliation.md"
           ],
           "owner": "",
           "reviewStatus": "contested",
@@ -9552,6 +9605,19 @@
       ],
       "status": "assumed",
       "appliesTo": []
+    },
+    {
+      "id": "reconciliation-approved-repair-scope",
+      "decision": "The CEO approved branch and schema reconciliation followed by booking and payment repairs. Preserve the dirty Gemini checkout and build on origin/codex-booking-foundation (01a37b6), which contains master da932eb plus two reviewed booking/account commits. All 210 migration files on master, foundation and Claude match; do not replay the two identical uncommitted P3 migrations. Repair the lost/unconnected second-shift save, exact captured-charge refund binding, and checkout fail-closed guards. Production deployment, business-agent activation and financial transactions remain held for explicit CEO approval.",
+      "reason": "Direct user approval on 2026-10-21; stale Gemini audit findings are already fixed on the selected foundation. Existing branch codex prevents creating codex/ prefixed refs, so use codex-booking-payment-reconciliation without renaming any existing branch. No pricing, commission, VAT, retention or authority policy changes.",
+      "evidence": [
+        "docs/booking-payment-reconciliation.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "booking.transition",
+        "refund.execute"
+      ]
     }
   ],
   "gaps": [
@@ -12843,6 +12909,28 @@
       "evidence": [
         "supabase/migrations/20261018220000_dbsec2_whatsapp_and_code_squatting.sql"
       ]
+    },
+    {
+      "id": "checkout-durable-attempt-recovery",
+      "severity": "high",
+      "description": "Checkout creates a Tap charge without persisting and claiming a durable attempt or gateway receipt. Concurrent requests and submission timeouts can create or conceal multiple attempts. The new exact-capture refund repair contains rejected captures after verified capture, but does not prevent duplicate charge creation.",
+      "status": "open",
+      "rationale": "Confirmed on the reconciled master/foundation source and independently reviewed. Next payment slice needs immutable server-owned operation identity, request/result persistence, explicit unknown outcomes and provider-supported reconciliation. No live retry contract or financial acceptance is claimed.",
+      "evidence": [
+        "supabase/functions/payment-checkout/index.ts",
+        ".admin-console/worklog/security-checkout-reconciliation.md"
+      ]
+    },
+    {
+      "id": "historical-capture-refund-reconciliation",
+      "severity": "high",
+      "description": "Existing incorrectly bound booking-conflict refund requests may link the original charge rather than a rejected duplicate. The new migration repairs future commands only; historical rows are not remapped.",
+      "status": "blocked",
+      "rationale": "Hosted schema, actual affected rows and gateway outcomes were not inspected. Correcting financial evidence requires verified environment/outcomes and explicit authorization for any consequential financial operation; no blind historical rewrite is safe.",
+      "evidence": [
+        "supabase/migrations/20261021090000_booking_capture_refund_binding.sql",
+        "docs/booking-payment-reconciliation.md"
+      ]
     }
   ],
   "declaredStatic": [
@@ -13459,7 +13547,7 @@
       "category": "tooling",
       "proposedChange": "",
       "evidence": [],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "script-cannot-delete-an-item",
@@ -13467,7 +13555,7 @@
       "category": "tooling",
       "proposedChange": "",
       "evidence": [],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "evidence-content-scan-rejects-ordinary-source-files",
@@ -13475,7 +13563,7 @@
       "category": "friction",
       "proposedChange": "",
       "evidence": [],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "reconciliation-vs-architect-boundary",
@@ -13483,7 +13571,7 @@
       "category": "incorrect-guidance",
       "proposedChange": "",
       "evidence": [],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "manifest-went-stale-after-parallel-work-packages",
@@ -13491,7 +13579,7 @@
       "category": "gap",
       "proposedChange": "",
       "evidence": [],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "harness-claims-default-to-aal2",
@@ -13501,7 +13589,7 @@
       "evidence": [
         "supabase/tests/db/harness.mjs"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "manifest-set-takes-raw-strings",
@@ -13509,7 +13597,7 @@
       "category": "tooling",
       "proposedChange": "Document in SKILL.md that set --value parses JSON for objects/arrays but stores a quoted JSON string literally (status '\"in-progress\"' is refused).",
       "evidence": [],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "maker-checker-as-gate-in-existing-command",
@@ -13519,7 +13607,7 @@
       "evidence": [
         "supabase/migrations/20261010110000_gov1_maker_checker_approvals.sql#L281"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "supabase-restart-needed-for-auth-config",
@@ -13529,7 +13617,7 @@
       "evidence": [
         "supabase/config.toml"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "dev-server-down-at-dispatch",
@@ -13537,7 +13625,7 @@
       "category": "friction",
       "proposedChange": "",
       "evidence": [],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "restrictive-select-policy-closes-helper-paths",
@@ -13547,7 +13635,7 @@
       "evidence": [
         "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#L194"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "money-append-only-trigger-needs-system-path-marker",
@@ -13557,7 +13645,7 @@
       "evidence": [
         "supabase/migrations/20261010300000_money_append_only_and_corrections.sql"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "manifest-set-strings-raw",
@@ -13567,7 +13655,7 @@
       "evidence": [
         ".admin-console/manifest.json"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "python-text-mode-crlf-on-windows",
@@ -13577,7 +13665,7 @@
       "evidence": [
         "supabase/migrations/20261010320000_money_reward_programs.sql"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "fix-readme-missing-in-checkout",
@@ -13587,7 +13675,7 @@
       "evidence": [
         "docs/reviews/2026-10-10-security-gov1.md"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "raise-rolls-back-the-alert",
@@ -13597,7 +13685,7 @@
       "evidence": [
         "docs/reviews/2026-10-10-security-gov1.md"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "upsert-needs-select-on-set-columns",
@@ -13607,7 +13695,7 @@
       "evidence": [
         "docs/reviews/2026-10-10-security-gov1.md"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "session-check-needs-harness-session",
@@ -13617,7 +13705,7 @@
       "evidence": [
         "docs/reviews/2026-10-10-security-gov1.md"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "restrictive-read-breaks-security-invoker-views",
@@ -13627,7 +13715,7 @@
       "evidence": [
         "docs/reviews/2026-10-10-security-gov1.md"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "admin-branch-in-provider-helpers-defeats-text-policy-scan",
@@ -13637,7 +13725,7 @@
       "evidence": [
         "supabase/tests/db/secfix2_console_read_policies.test.mjs"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "null-setting-comparison-opened-a-foreign-booking",
@@ -13648,7 +13736,7 @@
         "supabase/migrations/20261011110000_secfix2_h2_console_cancellations.sql",
         "supabase/tests/db/qa_round3_verification.test.mjs"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "real-stack-smoke-needs-aal2-console-owner",
@@ -13658,7 +13746,7 @@
       "evidence": [
         "scripts/smoke-local-supabase.mjs"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "pending-approval-changes-setting-commands-contract",
@@ -13669,7 +13757,7 @@
         "supabase/tests/db/gov1_fixtures.mjs",
         "web_platform/src/app/admin/sponsored/page.tsx"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "priv-rename-table-ripples-into-tests",
@@ -13680,7 +13768,7 @@
         "supabase/tests/db/qa_adversarial.test.mjs",
         "supabase/migrations/20261011200000_priv_privacy_requests.sql"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "priv-edge-runtime-differs-from-node",
@@ -13691,7 +13779,7 @@
         "supabase/functions/_shared/privacy-export-document.ts",
         "scripts/verify-privacy-local.mjs"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "priv-guard-catalogue-tests-need-helper-names",
@@ -13701,7 +13789,7 @@
       "evidence": [
         "supabase/tests/db/qa_adversarial.test.mjs"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "priv-retention-needs-off-database-ledger",
@@ -13711,7 +13799,7 @@
       "evidence": [
         "supabase/migrations/20261011220000_priv_deletion_engine.sql"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "manifest-set-cannot-write-objects",
@@ -13721,7 +13809,7 @@
       "evidence": [
         ".admin-console/manifest.json"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "ux1-no-add-kind-for-quality-gates",
@@ -13731,7 +13819,7 @@
       "evidence": [
         "docs/reviews/2026-10-11-ux-review.md"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "ux1-reused-storage-state-revokes-supabase-sessions",
@@ -13741,7 +13829,7 @@
       "evidence": [
         ".admin-console/evidence/ux-round1/session-log.txt"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "ux1-role-scoped-review-needs-second-role-crawl",
@@ -13752,7 +13840,7 @@
         ".admin-console/evidence/ux-round1/crawl-finance-en-1440.json",
         ".admin-console/evidence/ux-round1/crawl-owner-en-1440.json"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "privfix-erasure-needs-whole-schema-search",
@@ -13762,7 +13850,7 @@
       "evidence": [
         "supabase/tests/db/priv_privacy.test.mjs"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "privfix-money-guards-block-fk-set-null",
@@ -13773,7 +13861,7 @@
         "supabase/migrations/20261011340000_privfix_money_cascade_and_grants.sql",
         "supabase/tests/db/money_append_only.test.mjs"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "privfix-pseudonym-per-row",
@@ -13783,7 +13871,7 @@
       "evidence": [
         "supabase/migrations/20261011300000_privfix_deletion_engine.sql"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "uxfix-msys-path-conversion",
@@ -13793,7 +13881,7 @@
       "evidence": [
         ".admin-console/worklog/impl-uxfix-claude.md"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "uxfix-mfa-next-param-matches-admin",
@@ -13803,7 +13891,7 @@
       "evidence": [
         ".admin-console/worklog/impl-uxfix-claude.md"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "uxfix-role-trimming-belongs-in-the-shell",
@@ -13813,7 +13901,7 @@
       "evidence": [
         "web_platform/src/lib/console-session.tsx"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "uxfix-in-place-dialog-inerts-itself",
@@ -13823,7 +13911,7 @@
       "evidence": [
         "web_platform/src/components/modal.tsx"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "final-python-text-mode-writes-crlf",
@@ -13833,7 +13921,7 @@
       "evidence": [
         "supabase/migrations/20261016110000_final_erasure_unlinking_and_staff_notes.sql"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "final-row-audit-can-recreate-links-erasure-removed",
@@ -13843,7 +13931,7 @@
       "evidence": [
         "supabase/migrations/20261016110000_final_erasure_unlinking_and_staff_notes.sql"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "final-date-dependent-tests",
@@ -13853,7 +13941,7 @@
       "evidence": [
         "supabase/tests/db/money.test.mjs"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "f123-followup-migration-version-order",
@@ -13863,7 +13951,7 @@
       "evidence": [
         "supabase/migrations/20261016230000_f2_lookup_key_service_role.sql"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "f123-secret-table-service-role-convention",
@@ -13873,7 +13961,7 @@
       "evidence": [
         "supabase/tests/db/data_api_grants.test.mjs"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "f123-rate-limit-refusal-must-return",
@@ -13883,7 +13971,7 @@
       "evidence": [
         "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "f123-contested-review-status-ambiguous",
@@ -13893,7 +13981,7 @@
       "evidence": [
         ".admin-console/manifest.json"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "f123-placeholder-scan-flags-gen-random-bytes",
@@ -13903,7 +13991,7 @@
       "evidence": [
         "supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "qa-release-content-scan-ignores-line-anchors",
@@ -13913,7 +14001,7 @@
       "evidence": [
         ".admin-console/evidence/qa-release/scan-excerpts/index.json"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "qa-release-token-match-blocks-honest-flips",
@@ -13923,7 +14011,7 @@
       "evidence": [
         ".admin-console/evidence/qa-release/capability-record-deficits.txt"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "qa-release-cdp-harness-pattern",
@@ -13934,7 +14022,7 @@
         ".admin-console/evidence/qa-release/harness/qa-browser-harness.mjs",
         ".admin-console/evidence/qa-release/browser-summary.txt"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "qa-release-false-success-probe",
@@ -13945,7 +14033,7 @@
         ".admin-console/evidence/qa-release/browser-falsesuccess.json",
         ".admin-console/evidence/qa-release/direct-table-writes.txt"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "qa-release-dev-server-shared-hazard",
@@ -13955,7 +14043,7 @@
       "evidence": [
         ".admin-console/evidence/qa-release/harness/qa-browser-harness.mjs"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "ux2-parallel-build-breaks-shared-dev-server",
@@ -13966,7 +14054,7 @@
         ".admin-console/evidence/ux-round2/dev-server-500-during-run-en-1440.png",
         ".admin-console/evidence/ux-round2/run-log.txt"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "ux2-harness-navigation-fakes-console-errors",
@@ -13977,7 +14065,7 @@
         ".admin-console/evidence/ux-round2/flow-mfa.json",
         ".admin-console/evidence/ux-round2/flow-mfa-ux2-owner-g.json"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "ux2-dialog-measurement-caught-missing-utility",
@@ -13987,7 +14075,7 @@
       "evidence": [
         ".admin-console/evidence/ux-round2/probe-dialog-en.json"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "browser-stale-role-probe-proves-refusal-ui",
@@ -13995,7 +14083,7 @@
       "category": "new-pattern",
       "proposedChange": "In the qa and implementer prompts: after gating controls by role, verify the refused-write UI with a role changed mid-session.",
       "evidence": [],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "msys-path-conversion-eats-double-slash-args",
@@ -14003,7 +14091,7 @@
       "category": "tooling",
       "proposedChange": "In multi-agent.md tooling notes: never pass code fragments as shell arguments on Windows Git Bash; write them to a file.",
       "evidence": [],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "browser-run-must-target-its-own-approval-rows",
@@ -14011,7 +14099,7 @@
       "category": "friction",
       "proposedChange": "In multi-agent.md: browser probes on a shared stack act only on records they created, identified by id.",
       "evidence": [],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "idempotent-replay-answers-are-a-false-success-source",
@@ -14019,7 +14107,7 @@
       "category": "gap",
       "proposedChange": "In admin-data-model.md command contract: the UI must branch on changed/unchanged in the answer, not only on error.",
       "evidence": [],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "compiled-css-missing-max-h-full",
@@ -14027,7 +14115,38 @@
       "category": "tooling",
       "proposedChange": "Recommend measuring computed max-height of dialogs rather than reading class names.",
       "evidence": [],
-      "status": "open"
+      "status": "promoted"
+    },
+    {
+      "id": "reconcile-branch-before-replaying-audit-fixes",
+      "observation": "The dirty Gemini checkout was 343 commits behind master. Every one of 210 original migrations matched across master, foundation and Claude, and two untracked P3 migrations were already integrated byte-for-byte. Most old audit defects were already fixed.",
+      "category": "new-pattern",
+      "proposedChange": "Pin branch topology and compare migration filenames/content before proposing or replaying audit repairs. Treat an old audit as a hypothesis against the selected current foundation.",
+      "evidence": [
+        "docs/booking-payment-reconciliation.md"
+      ],
+      "status": "promoted"
+    },
+    {
+      "id": "checkout-stub-needs-migrated-query-contract",
+      "observation": "The first checkout guard selected a nonexistent bookings.provider_id. Injected fixtures supplied that invented field and two narrow reviews accepted the stub shape. Fresh root schema review caught it before release; the corrected handler follows bookings.branch_id to branches.provider_id.",
+      "category": "gap",
+      "proposedChange": "For changed financial handler queries, execute actual handler selections against the migrated schema alongside isolated failure tests. Do not infer real column/relationship existence from injected fixtures.",
+      "evidence": [
+        "supabase/tests/db/checkout_schema_contract.test.mjs",
+        ".admin-console/worklog/security-checkout-reconciliation.md"
+      ],
+      "status": "promoted"
+    },
+    {
+      "id": "calendar-save-handler-needs-reachable-state-proof",
+      "observation": "A calendar handler silently reduced a failed two-shift write, but the initial review also found no Save caller and no rendered feedback. Browser tests then exposed the need to lock draft and selection context during save.",
+      "category": "gap",
+      "proposedChange": "Review an operation from its actual control through a complete write receipt and reload; test a held request, failure, retained input and explicit retry in both supported languages.",
+      "evidence": [
+        "e2e/specs/provider-calendar.spec.ts"
+      ],
+      "status": "promoted"
     }
   ],
   "agents": [
@@ -14300,6 +14419,46 @@
       "ownsScreens": [],
       "status": "done",
       "notes": "Database and authorization wave 2 (2026-10-18/19): RT-H1 chat server commands and immutability (P-03 closed), RT-M1 hold limits and promo consumption at payment, RT-M2 safe redirects, P-05 WhatsApp verified-only claims, RT-L1 reserved promo names, operations grant needs a second owner, console session-state retry. Migrations 20261018200000-230000. No capability review state changed (implementer). Worklog .admin-console/worklog/dbsec-wave2.md."
+    },
+    {
+      "id": "architect-reconciliation",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": ".admin-console/worklog/architect-reconciliation.md"
+    },
+    {
+      "id": "impl-capture-reconciliation",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": ".admin-console/worklog/impl-capture-reconciliation.md; owns the append-only capture refund migration and executing DB regressions. No external payment calls."
+    },
+    {
+      "id": "impl-checkout-reconciliation",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": ".admin-console/worklog/impl-checkout-reconciliation.md; owns payment-checkout guards and isolated handler tests. No external payment calls."
+    },
+    {
+      "id": "security-reconciliation",
+      "role": "security",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": ".admin-console/worklog/security-reconciliation.md"
+    },
+    {
+      "id": "qa-reconciliation",
+      "role": "qa",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": ".admin-console/worklog/qa-reconciliation.md"
     }
   ]
 }

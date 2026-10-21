@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useMemo, useState, useEffect } from "react";
+import React, { useCallback, useMemo, useState, useEffect, useLayoutEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { usePrayerTimes } from "@/lib/use-prayer-times";
 import { errorMessage } from "@/lib/error-message";
@@ -42,6 +42,10 @@ const translations = {
     unlockedOverride: "Unlocked Buffer (Manual Override)",
     blockoutReason: "Roster Blockout",
     save: "Save",
+    saving: "Saving...",
+    loadingHours: "Loading working hours...",
+    reloadHours: "Reload working hours",
+    savedRefreshFailed: "Working hours were saved, but the calendar could not refresh. Reload working hours.",
     cancel: "Cancel",
     clientName: "Client Name",
     assignedStylist: "Assigned Stylist",
@@ -103,6 +107,10 @@ const translations = {
     unlockedOverride: "تم فتح القفل (تجاوز يدوي)",
     blockoutReason: "فترة مغلقة للموظف",
     save: "حفظ التعديلات",
+    saving: "جارٍ الحفظ...",
+    loadingHours: "جارٍ تحميل ساعات العمل...",
+    reloadHours: "إعادة تحميل ساعات العمل",
+    savedRefreshFailed: "تم حفظ ساعات العمل، لكن تعذر تحديث الجدول. أعد تحميل ساعات العمل.",
     cancel: "إلغاء",
     clientName: "اسم العميل",
     assignedStylist: "الأخصائي المعين",
@@ -328,6 +336,10 @@ export default function ProviderCalendarPage() {
 
   // --- 1. DB & CORE SCHEDULER STATES ---
   const [loading, setLoading] = useState(false);
+  const [savingShift, setSavingShift] = useState(false);
+  const [loadingSchedule, setLoadingSchedule] = useState(false);
+  const [loadedScheduleKey, setLoadedScheduleKey] = useState("");
+  const scheduleRequest = useRef(0);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [providerId, setProviderId] = useState("");
@@ -354,6 +366,15 @@ export default function ProviderCalendarPage() {
     second_end_time?: string | null;
   }>>([]);
   const [selectedDayToEdit, setSelectedDayToEdit] = useState<number>(new Date().getDay());
+  const scheduleKey = `${selectedEmployeeId}:${selectedDayToEdit}:${riyadhDateKey(selectedDate)}:${lang}`;
+  const scheduleContext = useRef(scheduleKey);
+  const scheduleLoaded = Boolean(selectedEmployeeId) && loadedScheduleKey === scheduleKey;
+
+  useLayoutEffect(() => {
+    scheduleContext.current = scheduleKey;
+    scheduleRequest.current += 1;
+    return () => { scheduleRequest.current += 1; };
+  }, [scheduleKey]);
 
   // --- 2. CONTROL PANEL STATES ---
   const [draggedOverSlot, setDraggedOverSlot] = useState<number | null>(null);
@@ -667,9 +688,14 @@ export default function ProviderCalendarPage() {
 
   // Fetch shifts & bookings for the selected employee
   const loadEmployeeSchedule = useCallback(async () => {
-    if (!selectedEmployeeId) return;
+    if (!selectedEmployeeId || scheduleContext.current !== scheduleKey) return false;
+    const requestId = ++scheduleRequest.current;
+    const isCurrent = () => scheduleRequest.current === requestId && scheduleContext.current === scheduleKey;
+    setLoadingSchedule(true);
+    setLoadedScheduleKey("");
     try {
       setError("");
+      setSuccess("");
       
       // 1. Fetch weekly availability shifts
       const { data: shiftsData, error: shiftsError } = await supabase
@@ -677,6 +703,7 @@ export default function ProviderCalendarPage() {
         .select("*")
         .eq("employee_id", selectedEmployeeId);
       
+      if (!isCurrent()) return false;
       if (shiftsError) throw shiftsError;
       
       const fullWeekShifts = Array.from({ length: 7 }, (_, index) => {
@@ -691,17 +718,6 @@ export default function ProviderCalendarPage() {
           second_end_time: null
         };
       });
-      setAvailabilityShifts(fullWeekShifts);
-      
-      const currentDayShift = fullWeekShifts.find(s => s.day_of_week === selectedDayToEdit);
-      if (currentDayShift) {
-        setShiftStart(timeTo12Hour(currentDayShift.start_time));
-        setShiftEnd(timeTo12Hour(currentDayShift.end_time));
-        setHasSecondShift(Boolean(currentDayShift.has_second_shift));
-        setSecondShiftStart(timeTo12Hour(currentDayShift.second_start_time || "14:00:00"));
-        setSecondShiftEnd(timeTo12Hour(currentDayShift.second_end_time || "22:00:00"));
-      }
-      
       // 2. Fetch bookings
       const startOfDay = new Date(selectedDate);
       startOfDay.setHours(0, 0, 0, 0);
@@ -728,6 +744,7 @@ export default function ProviderCalendarPage() {
         .lte("scheduled_at", endOfDay.toISOString())
         .order("scheduled_at", { ascending: true });
         
+      if (!isCurrent()) return false;
       if (bookingsError) throw bookingsError;
       
       const mapped: Appointment[] = (bookingsData || []).map((bk: any) => {
@@ -756,12 +773,29 @@ export default function ProviderCalendarPage() {
         };
       });
       
+      setAvailabilityShifts(fullWeekShifts);
+
+      const currentDayShift = fullWeekShifts.find(s => s.day_of_week === selectedDayToEdit);
+      if (currentDayShift) {
+        setShiftStart(timeTo12Hour(currentDayShift.start_time));
+        setShiftEnd(timeTo12Hour(currentDayShift.end_time));
+        setHasSecondShift(Boolean(currentDayShift.has_second_shift));
+        setSecondShiftStart(timeTo12Hour(currentDayShift.second_start_time || "14:00:00"));
+        setSecondShiftEnd(timeTo12Hour(currentDayShift.second_end_time || "22:00:00"));
+      }
+
       setAppointments(mapped);
-    } catch (err: any) {
+      setLoadedScheduleKey(scheduleKey);
+      return true;
+    } catch (err: unknown) {
+      if (!isCurrent()) return false;
       console.error("Error loading employee shifts/bookings:", err);
       setError(lang === "ar" ? "فشل تحميل جدول مناوبات الموظف" : "Failed to load employee schedule and shifts.");
+      return false;
+    } finally {
+      if (isCurrent()) setLoadingSchedule(false);
     }
-  }, [selectedEmployeeId, selectedDate, selectedDayToEdit, employees, lang]);
+  }, [selectedEmployeeId, selectedDate, selectedDayToEdit, employees, lang, scheduleKey]);
 
   useEffect(() => {
     void loadCalendarData();
@@ -771,6 +805,7 @@ export default function ProviderCalendarPage() {
     if (selectedEmployeeId) {
       void loadEmployeeSchedule();
     }
+    return () => { scheduleRequest.current += 1; };
   }, [selectedEmployeeId, selectedDate, selectedDayToEdit, loadEmployeeSchedule]);
 
   useEffect(() => {
@@ -893,9 +928,9 @@ export default function ProviderCalendarPage() {
 
   // Save employee working shifts Roster
   const handleSaveShift = async () => {
-    if (!selectedEmployeeId) return;
+    if (!selectedEmployeeId || !scheduleLoaded || loadingSchedule || loading || savingShift) return;
     try {
-      setLoading(true);
+      setSavingShift(true);
       setSuccess("");
       setError("");
 
@@ -911,31 +946,31 @@ export default function ProviderCalendarPage() {
         second_end_time: hasSecondShift ? timeTo24Hour(secondShiftEnd) : null
       };
 
-      const { error: saveError } = await supabase
+      const { data: savedShift, error: saveError } = await supabase
         .from("employee_availability")
-        .upsert(payload, { onConflict: "employee_id,day_of_week" });
+        .upsert(payload, { onConflict: "employee_id,day_of_week" })
+        .select("employee_id,day_of_week")
+        .single();
 
-      if (saveError) {
-        const legacyPayload = {
-          employee_id: payload.employee_id,
-          day_of_week: payload.day_of_week,
-          start_time: payload.start_time,
-          end_time: payload.end_time,
-          is_working_day: payload.is_working_day
-        };
-        const { error: legacySaveError } = await supabase
-          .from("employee_availability")
-          .upsert(legacyPayload, { onConflict: "employee_id,day_of_week" });
-        if (legacySaveError) throw legacySaveError;
+      if (saveError) throw saveError;
+      if (!savedShift || savedShift.employee_id !== payload.employee_id || savedShift.day_of_week !== payload.day_of_week) {
+        throw new Error("The working-hours write was not confirmed.");
       }
 
-      setSuccess(lang === "ar" ? "تم حفظ ساعات العمل بنجاح" : "Working hours updated successfully.");
-      await loadEmployeeSchedule();
-    } catch (err: any) {
+      if (scheduleContext.current !== scheduleKey) return;
+      const refreshed = await loadEmployeeSchedule();
+      if (scheduleContext.current !== scheduleKey) return;
+      if (refreshed) {
+        setSuccess(lang === "ar" ? "تم حفظ ساعات العمل بنجاح" : "Working hours updated successfully.");
+      } else {
+        setError(t.savedRefreshFailed);
+      }
+    } catch (err: unknown) {
+      if (scheduleContext.current !== scheduleKey) return;
       console.error("Error saving shift:", err);
       setError(lang === "ar" ? "فشل حفظ ساعات العمل" : "Failed to save working hours.");
     } finally {
-      setLoading(false);
+      setSavingShift(false);
     }
   };
 
@@ -1089,6 +1124,7 @@ export default function ProviderCalendarPage() {
             <div className="relative">
               <select
                 value={selectedEmployeeId}
+                disabled={savingShift}
                 onChange={(e) => setSelectedEmployeeId(e.target.value)}
                 className="pl-4 pr-10 py-2.5 bg-[#F9FAFB] border border-[#ECECEC] text-xs font-bold rounded-2xl text-[#101828] outline-none focus:border-[#D1AF47]/40 focus:shadow-[0_0_12px_rgba(209,175,71,0.1)] transition-all duration-300 appearance-none cursor-pointer"
               >
@@ -1111,6 +1147,7 @@ export default function ProviderCalendarPage() {
             type="date"
             // The Riyadh day, the same day the planner loads (a UTC date showed yesterday between 00:00 and 03:00 Riyadh).
             aria-label={t.pickDate}
+            disabled={savingShift}
             value={riyadhDateKey(selectedDate)}
             onChange={(e) => { if (e.target.value) setSelectedDate(new Date(`${e.target.value}T12:00:00+03:00`)); }}
             className="px-4 py-2.5 bg-[#F9FAFB] border border-[#ECECEC] text-xs font-bold rounded-2xl text-[#101828] outline-none focus:border-[#D1AF47]/40 transition-all duration-300 cursor-pointer"
@@ -1118,6 +1155,7 @@ export default function ProviderCalendarPage() {
 
           <button 
             onClick={() => setSelectedDate(new Date())}
+            disabled={savingShift}
             className="px-5 py-2.5 bg-white border border-[#ECECEC] text-xs font-bold uppercase tracking-wider rounded-2xl text-[#667085] hover:border-[#D1AF47]/30 hover:text-[#101828] transition-all duration-300"
           >
             {t.today}
@@ -1391,6 +1429,7 @@ export default function ProviderCalendarPage() {
                           <button
                             key={i}
                             onClick={() => setSelectedDate(new Date(d))}
+                            disabled={savingShift}
                             className={`flex-1 px-2 py-3 text-center transition-all duration-200 border-e border-[#ECECEC] last:border-0 ${
                               isSelected ? "bg-[#D1AF47]/10" : "hover:bg-[#F3F4F6]"
                             }`}
@@ -1667,7 +1706,7 @@ export default function ProviderCalendarPage() {
           </div>
 
           {/* C. ROSTER WORKING HOURS */}
-          <div className="bg-white border border-[#ECECEC] rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] space-y-5">
+          <fieldset disabled={savingShift} className="min-w-0 bg-white border border-[#ECECEC] rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] space-y-5">
             <div className={`flex items-center gap-2.5 pb-4 border-b border-[#ECECEC] flex-row`}>
               <div className="w-8 h-8 rounded-xl bg-[#D1AF47]/10 flex items-center justify-center">
                 <svg className="w-4 h-4 text-[#D1AF47]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1697,6 +1736,7 @@ export default function ProviderCalendarPage() {
               </select>
             </div>
 
+            <fieldset disabled={loadingSchedule || !scheduleLoaded} className="min-w-0 space-y-5">
             {/* Working Day Toggle */}
             <div className={`flex items-center justify-between text-xs py-1 flex-row`}>
               <span className="font-semibold text-[#667085]">
@@ -1800,7 +1840,32 @@ export default function ProviderCalendarPage() {
                 </select>
               </div>
             </div>
-          </div>
+
+            </fieldset>
+
+            <button
+              type="button"
+              onClick={() => void handleSaveShift()}
+              disabled={loading || loadingSchedule || savingShift || !scheduleLoaded}
+              aria-busy={savingShift}
+              className="w-full rounded-2xl bg-gradient-to-r from-[#D1AF47] to-[#E0C46A] px-6 py-2.5 text-xs font-bold text-[#070B12] transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {savingShift ? t.saving : t.save}
+            </button>
+            {loadingSchedule && <p role="status" className="text-xs font-semibold text-[#667085]">{t.loadingHours}</p>}
+            {!loadingSchedule && !scheduleLoaded && selectedEmployeeId && (
+              <button
+                type="button"
+                onClick={() => void loadEmployeeSchedule()}
+                disabled={loading || savingShift}
+                className="w-full rounded-2xl border border-[#ECECEC] bg-white px-4 py-2.5 text-xs font-bold text-[#667085] disabled:opacity-50"
+              >
+                {t.reloadHours}
+              </button>
+            )}
+            {error && <p role="alert" className="text-xs font-semibold text-[#B42318]">{error}</p>}
+            {success && <p role="status" className="text-xs font-semibold text-[#027A48]">{success}</p>}
+          </fieldset>
 
         </div>
 

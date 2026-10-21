@@ -21,12 +21,19 @@ const count = async (table, where = "true", params = []) =>
 
 // A confirmed, upcoming booking for the given customer: the anchor of a series. Each call uses its own date and slot so
 // scenarios never collide with each other.
-async function makeAnchor(customer, { employee = SEED.employee1 } = {}) {
+async function makeAnchor(customer, { employee = SEED.employee1, weeklyOccurrences = 1 } = {}) {
   scenario += 1;
   const svc = await serviceFor(db, employee);
   const date = await nextWorkingDate(db, employee, 2 + (scenario % 6));
-  const slots = await as(db, customer, `select slot_start from get_available_slots($1, $2::date, $3) order by 1 limit 1`,
-    [employee, date, svc.duration]);
+  const slots = await as(db, customer, `
+    select anchor.slot_start from get_available_slots($1, $2::date, $3) anchor
+    where not exists (
+      select 1 from generate_series(1, $4::int - 1) occurrence(week)
+      where not exists (
+        select 1 from get_available_slots($1, $2::date + occurrence.week * 7, $3) future
+        where future.slot_start = anchor.slot_start + make_interval(weeks => occurrence.week)
+      )
+    ) order by 1 limit 1`, [employee, date, svc.duration, weeklyOccurrences]);
   assert.ok(slots[0], "the fixture needs a free slot");
   const [b] = await as(db, customer, `select * from create_booking($1, $2, $3)`, [employee, svc.id, slots[0].slot_start]);
   if (b.status === "pending_payment") {
@@ -407,7 +414,7 @@ describe("cancelling the rest", () => {
 describe("who can see a series", () => {
   it("shows it to its customer, the provider's owner, a delegate with bookings, the professional and an administrator", async () => {
     const customer = await newCustomer();
-    const anchor = await makeAnchor(customer);
+    const anchor = await makeAnchor(customer, { weeklyOccurrences: 3 });
     const result = await createSeries(customer, anchor.id, 1, 3);
     const visible = (user) => as(db, user, `select (select count(*)::int from booking_series where id = $1) s,
                                                   (select count(*)::int from booking_series_occurrences where series_id = $1) o`, [result.series_id]).then((r) => r[0]);

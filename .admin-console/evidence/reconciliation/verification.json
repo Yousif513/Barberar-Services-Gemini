@@ -1,0 +1,126 @@
+{
+  "date": "2026-10-22",
+  "branch": "codex-booking-payment-reconciliation",
+  "base": "01a37b6d9fafbbc7fb697f73b88a12b3b2ba0cca",
+  "profile": "regulated",
+  "scope": "Branch/schema reconciliation and bounded booking/payment repairs",
+  "checks": {
+    "full_database_chain": {
+      "exit": 0,
+      "tests": 1531,
+      "pass": 1531,
+      "fail": 0,
+      "command": "node --test --test-concurrency=4 supabase/tests/db/**/*.test.mjs",
+      "environment": "Disposable PGlite; all211 migrations"
+    },
+    "web_tests": {
+      "exit": 0,
+      "tests": 871,
+      "pass": 871,
+      "fail": 0
+    },
+    "edge_tests": {
+      "exit": 0,
+      "tests": 67,
+      "new_checkout_cases": 13
+    },
+    "checkout_schema_contract": {
+      "exit": 0,
+      "tests": 3,
+      "included_in_final_aggregate": true,
+      "note": "Also independently executed; actual handler selects execute against the complete migrated schema"
+    },
+    "new_capture_regressions": {
+      "exit": 0,
+      "tests": 12
+    },
+    "calendar_browser": {
+      "exit": 0,
+      "tests": 7,
+      "environment": "Local preview3112, existing local Supabase, disposable fixtures; no reset"
+    },
+    "inventory_tests": {
+      "exit": 0,
+      "tests": 10
+    },
+    "mobile_unit_tests": {
+      "exit": 0,
+      "tests": 29
+    },
+    "ui_schema": {
+      "exit": 0,
+      "mismatches": 0,
+      "rpc_calls": 312,
+      "select_strings": 197,
+      "dynamic_calls_unchecked": 34
+    },
+    "p3_compatibility": {
+      "exit": 0,
+      "ref": "HEAD before repair commit; selected210-migration foundation and P3 compatibility probes"
+    },
+    "security_core": {
+      "exit": 0
+    },
+    "admin_controls": {
+      "exit": 0
+    },
+    "mobile_typecheck": {
+      "exit": 0
+    },
+    "e2e_typecheck": {
+      "exit": 0
+    },
+    "web_build": {
+      "exit": 0,
+      "next_version": "16.3.8"
+    },
+    "web_lint": {
+      "exit": 0,
+      "errors": 0,
+      "warnings": 300
+    },
+    "diff_check": {
+      "exit": 0
+    }
+  },
+  "independent_review": {
+    "checkout": ".admin-console/worklog/security-checkout-reconciliation.md",
+    "capture_and_calendar": ".admin-console/worklog/security-reconciliation.md",
+    "scope_limits": "No complete hosted gateway/RLS/Deno/simultaneous multi-session acceptance claim; broad capability statuses retained"
+  },
+  "release": {
+    "production_approved": false,
+    "full_console_cleared": false,
+    "validation_and_coverage": "See qa-reconciliation.md for final measured exit codes and counts",
+    "gates": {
+      "plan": {
+        "exit": 0,
+        "errors": 0,
+        "warnings": 23
+      },
+      "release": {
+        "exit": 1,
+        "errors": 232,
+        "warnings": 19
+      },
+      "coverage": {
+        "exit": 1,
+        "errors": 4,
+        "warnings": 0
+      }
+    }
+  },
+  "held_actions": [
+    "production deployment",
+    "company-agent activation",
+    "financial transactions"
+  ],
+  "remaining": [
+    "durable checkout attempt and unknown-outcome recovery",
+    "historical capture/refund evidence reconciliation",
+    "configured licensed-provider allocation and sandbox acceptance",
+    "first-acquisition lifecycle specification",
+    "broader regulated-console release gaps"
+  ],
+  "lessons": "Harvested 62 observation(s) from project 'PRIMORA'\nStore: C:\\Users\\Yousif's PC\\.adminwright"
+}

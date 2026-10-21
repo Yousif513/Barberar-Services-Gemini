@@ -25,14 +25,21 @@ serve(async (req) => {
     let payable: Payable | null = null
 
     if (body?.bookingId) {
-      const { data: booking } = await db
+      const { data: booking, error: bookingError } = await db
         .from("bookings")
-        .select("id, customer_id, deposit_required, status")
+        .select("id, customer_id, branch_id, deposit_required, status")
         .eq("id", body.bookingId)
         .eq("customer_id", userId)
         .maybeSingle()
+      if (bookingError) return json(req, { error: "Unable to verify this booking. Please try again." }, 503)
       if (!booking) return json(req, { error: "Booking not found." }, 404)
       if (booking.status !== "pending_payment") return json(req, { error: "Booking is not awaiting payment." }, 409)
+      const { data: branch, error: branchError } = await db.from("branches")
+        .select("provider_id").eq("id", booking.branch_id).maybeSingle()
+      if (branchError) return json(req, { error: "Unable to verify this salon. Please try again." }, 503)
+      if (!(await providerIsSelling(db, branch?.provider_id))) {
+        return json(req, { error: "This salon is not taking payments right now, so nothing was charged." }, 409)
+      }
       if (!(Number(booking.deposit_required) > 0)) return json(req, { error: "Nothing to pay online for this booking." }, 409)
       payable = {
         amount: Number(booking.deposit_required),
@@ -104,7 +111,7 @@ serve(async (req) => {
       return json(req, { error: "Missing bookingId or purchaseType/purchaseId." }, 400)
     }
 
-    if (!(payable.amount > 0)) return json(req, { error: "Nothing to pay." }, 409)
+    if (!Number.isFinite(payable.amount) || !(payable.amount > 0)) return json(req, { error: "Nothing to pay." }, 409)
 
     const { data: profile } = await db.from("profiles")
       .select("email, phone_number, first_name, last_name").eq("id", userId).single()
@@ -115,9 +122,12 @@ serve(async (req) => {
 
     // payments_marketplace_split stays OFF until the owner confirms the legal opinion on fund custody;
     // no split destinations are sent while it is off.
-    const { data: flag } = await db.from("platform_feature_flags").select("is_enabled")
+    const { data: flag, error: flagError } = await db.from("platform_feature_flags").select("is_enabled")
       .eq("flag_key", "payments_marketplace_split").maybeSingle()
-    if (flag?.is_enabled) {
+    if (flagError || typeof flag?.is_enabled !== "boolean") {
+      return json(req, { error: "Payment routing configuration is unavailable. Please try again." }, 503)
+    }
+    if (flag.is_enabled) {
       return json(req, { error: "Marketplace split is enabled but sub-merchant destinations are not configured yet." }, 503)
     }
 
