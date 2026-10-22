@@ -179,3 +179,10 @@ validation and coverage results.
 ---
 
 *By proceeding with any action in this repository, you agree to follow these guidelines.*
+
+
+## Current CEO reporting and voice preferences —2026-10-22
+
+- End each final or substantive status report with the concrete next step and a ready-to-send prompt for it. Preserve existing authorization; a suggested prompt is not new approval.
+- Before selecting, producing or evaluating management-persona voices, read `planning/volabi/VOICE_ACCENT_REQUIREMENTS.json`: male presentations require Saudi accents; female presentations require Lebanese accents. Existing US English previews have not been replaced or accepted for these regional accents. Keep current user requirements distinct from historical source direction.
+- All existing production, business activation, permission, external-write, financial and paid-service holds remain in force.

@@ -1,5 +1,7 @@
 # Volabi local delivery —22 October 2026
 
+**Latest voice direction:** all six male personas require Saudi accents; all nine female personas require Lebanese accents. See planning/volabi/VOICE_ACCENT_REQUIREMENTS.json. This is the approved selection requirement; the existing US English previews remain unchanged and regional compliance is not yet established.
+
 You can now open the local Volabi workspace, inspect the original 15 management identities, see their characters/portraits/sound auditions and role-specific skill gaps, create a persistent request, prepare or author an exact source-linked recommendation, record your decision and retain an auditable follow-up. This is an isolated development workflow. Your business employees remain inactive and no local approval dispatches company or financial work.
 
 Open http://127.0.0.1:3113/hq after `npm run hq:dev`. [Operator guide](volabi-local-operations.md) covers the complete flow and local data limits. Branch: `codex-booking-payment-reconciliation`. Core implementation commit: `8584003886f4d4fcd6ba37a9be0a2f17ef95058b`, based on pushed durable-checkout commit `9377ab4`. The original dirty Gemini checkout is preserved. Source and evidence are committed only on this isolated repair branch.

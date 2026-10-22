@@ -120,7 +120,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "6869f7e2ff46a0373867299e64b638e6e60b8077f827c1be469db4e0f68319ae"
+      "sha256": "a9f1a5136f1c5c18312c76d4c3ade9917580c81a3cc4fcd0b1093e54853abf02"
     },
     {
       "path": "REQUIREMENTS_VALIDATION.json",
@@ -137,6 +137,10 @@
     {
       "path": "THEME_CONTRAST.json",
       "sha256": "c4171476f8526c2af946a3146d4fe8875f4814a49b64e0eace1fb9c563735abc"
+    },
+    {
+      "path": "VOICE_ACCENT_REQUIREMENTS.json",
+      "sha256": "d54fb490edcf0adcd4a7d0165e0c99e2cc3f42a24560c3890d97f0a2555f805b"
     },
     {
       "path": "docs/front-end-spec.md",

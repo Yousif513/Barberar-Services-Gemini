@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "recorded_on": "2026-10-22",
+  "authority": "current_explicit_CEO_voice_direction",
+  "source_quote": "For the vocal sounds I need the males to have a Saudi Accent and the females to have a Lebanese accent.",
+  "scope": "Fictional management-persona vocal presentation; applies to future voice selection, audition generation and evaluation.",
+  "rules": {
+    "male": {
+      "accent": "Saudi",
+      "arabic_locale_hint": "ar-SA"
+    },
+    "female": {
+      "accent": "Lebanese",
+      "arabic_locale_hint": "ar-LB"
+    }
+  },
+  "agents": [
+    {
+      "agent_id": "nora",
+      "name": "Nora",
+      "current_fictional_presentation": "female",
+      "requested_accent": "Lebanese",
+      "accent_status": "requested_not_implemented_or_evaluated"
+    },
+    {
+      "agent_id": "adam",
+      "name": "Adam",
+      "current_fictional_presentation": "male",
+      "requested_accent": "Saudi",
+      "accent_status": "requested_not_implemented_or_evaluated"
+    },
+    {
+      "agent_id": "alexander",
+      "name": "Alexander",
+      "current_fictional_presentation": "male",
+      "requested_accent": "Saudi",
+      "accent_status": "requested_not_implemented_or_evaluated"
+    },
+    {
+      "agent_id": "sarah",
+      "name": "Sarah",
+      "current_fictional_presentation": "female",
+      "requested_accent": "Lebanese",
+      "accent_status": "requested_not_implemented_or_evaluated"
+    },
+    {
+      "agent_id": "victoria",
+      "name": "Victoria",
+      "current_fictional_presentation": "female",
+      "requested_accent": "Lebanese",
+      "accent_status": "requested_not_implemented_or_evaluated"
+    },
+    {
+      "agent_id": "emma",
+      "name": "Emma",
+      "current_fictional_presentation": "female",
+      "requested_accent": "Lebanese",
+      "accent_status": "requested_not_implemented_or_evaluated"
+    },
+    {
+      "agent_id": "maya",
+      "name": "Maya",
+      "current_fictional_presentation": "female",
+      "requested_accent": "Lebanese",
+      "accent_status": "requested_not_implemented_or_evaluated"
+    },
+    {
+      "agent_id": "ethan",
+      "name": "Ethan",
+      "current_fictional_presentation": "male",
+      "requested_accent": "Saudi",
+      "accent_status": "requested_not_implemented_or_evaluated"
+    },
+    {
+      "agent_id": "daniel",
+      "name": "Daniel",
+      "current_fictional_presentation": "male",
+      "requested_accent": "Saudi",
+      "accent_status": "requested_not_implemented_or_evaluated"
+    },
+    {
+      "agent_id": "sophia",
+      "name": "Sophia",
+      "current_fictional_presentation": "female",
+      "requested_accent": "Lebanese",
+      "accent_status": "requested_not_implemented_or_evaluated"
+    },
+    {
+      "agent_id": "layla",
+      "name": "Layla",
+      "current_fictional_presentation": "female",
+      "requested_accent": "Lebanese",
+      "accent_status": "requested_not_implemented_or_evaluated"
+    },
+    {
+      "agent_id": "omar",
+      "name": "Omar",
+      "current_fictional_presentation": "male",
+      "requested_accent": "Saudi",
+      "accent_status": "requested_not_implemented_or_evaluated"
+    },
+    {
+      "agent_id": "olivia",
+      "name": "Olivia",
+      "current_fictional_presentation": "female",
+      "requested_accent": "Lebanese",
+      "accent_status": "requested_not_implemented_or_evaluated"
+    },
+    {
+      "agent_id": "lina",
+      "name": "Lina",
+      "current_fictional_presentation": "female",
+      "requested_accent": "Lebanese",
+      "accent_status": "requested_not_implemented_or_evaluated"
+    },
+    {
+      "agent_id": "rayan",
+      "name": "Rayan",
+      "current_fictional_presentation": "male",
+      "requested_accent": "Saudi",
+      "accent_status": "requested_not_implemented_or_evaluated"
+    }
+  ],
+  "existing_assets": {
+    "english_preview_files": 15,
+    "base_engines": 2,
+    "language": "en-US",
+    "matches_requested_regional_accents": false,
+    "classification": "legacy_English_delivery_previews",
+    "files_replaced": false
+  },
+  "acceptance": [
+    "Audition every named persona using its requested regional accent and retain a distinct vocal identity.",
+    "Evaluate natural regional pronunciation, intelligibility, Arabic/English switching, names, SAR amounts, dates, interruption and identity continuity.",
+    "A locale tag, written direction or localService flag alone does not establish accent compliance.",
+    "Keep recovered historical source direction separate from this newer explicit requirement.",
+    "Use synthetic or appropriately licensed voices; imitation of a particular real person is not requested."
+  ],
+  "boundaries": {
+    "business_employees_activated": false,
+    "permissions_granted": false,
+    "live_meetings_or_recording_enabled": false,
+    "new_paid_service_authorized": false,
+    "production_or_financial_holds": "unchanged"
+  }
+}
