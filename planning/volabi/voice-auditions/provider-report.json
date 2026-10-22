@@ -1,0 +1,185 @@
+{
+  "prepared_on": "2026-10-22",
+  "status": "provider_researched_synthesis_awaits_named_account_and_budget_approval",
+  "scope": "Fictional management persona auditions; no business employee activation or live conversation",
+  "requested": {
+    "agents": 15,
+    "male": {
+      "count": 6,
+      "accent": "Saudi",
+      "locale_hint": "ar-SA"
+    },
+    "female": {
+      "count": 9,
+      "accent": "Lebanese",
+      "locale_hint": "ar-LB"
+    }
+  },
+  "observed_runtime": {
+    "offline_sapi_voices": [
+      "Microsoft David Desktop - English (United States)",
+      "Microsoft Zira Desktop - English (United States)"
+    ],
+    "offline_requested_arabic_voice_installed": false,
+    "hermes_active_provider": "edge",
+    "hermes_active_voice": "en-US-AriaNeural",
+    "hermes_model_voice_override_supported": false,
+    "metadata_method": "Selective reads of tts provider/voice only; no configuration dump or secret values",
+    "root_environment_presence_only": {
+      "AZURE_SPEECH_KEY": false,
+      "AZURE_SPEECH_REGION": false,
+      "SPEECH_KEY": false,
+      "SPEECH_REGION": false,
+      "OPENAI_API_KEY": false,
+      "ELEVENLABS_API_KEY": false
+    },
+    "credential_scope_note": "This checks named root environment variables only. It does not establish absence of accounts, other key stores or inactive provider credentials."
+  },
+  "proposed_first_provider": {
+    "name": "Microsoft Azure Speech official prebuilt paid-tier API",
+    "selected_for_generation": false,
+    "candidates": [
+      {
+        "voice_id": "ar-SA-HamedNeural",
+        "gender": "male",
+        "locale": "ar-SA"
+      },
+      {
+        "voice_id": "ar-LB-LaylaNeural",
+        "gender": "female",
+        "locale": "ar-LB"
+      }
+    ],
+    "regional_candidate_base_timbres": 2,
+    "fifteen_distinct_timbres_verified": false,
+    "code_switch_limit": "These exact voices are not listed as multilingual; lang elements are not supported for non-multilingual voices. Mixed literal Arabic/English is an audition probe, not guaranteed language switching.",
+    "region_capacity_and_account_eligibility_verified": false,
+    "custom_or_cloned_voices_requested": false,
+    "stock_output_rights": "Current Product Terms expressly grant prebuilt TTS output-use rights to paid-tier customers; confirm terms applying to the actual account and intended distribution.",
+    "free_tier_not_a_commercial_licence_receipt": true
+  },
+  "pricing_observation": {
+    "source_type": "anonymous_official_Azure_Retail_Prices_API",
+    "serviceName": "Foundry Tools",
+    "productName": "Azure Speech",
+    "skuName": "S1",
+    "meterName": "S1 Neural Text To Speech Characters",
+    "currencyCode": "USD",
+    "retailPrice": 15.0,
+    "unitOfMeasure": "1M",
+    "type": "Consumption",
+    "armRegionName": [
+      "eastus",
+      "uaenorth"
+    ],
+    "effectiveStartDate": "2024-02-01T00:00:00Z",
+    "meterId": "0f98e708-a16c-407b-8089-a0ed9e14ab49",
+    "isPrimaryMeterRegion": false,
+    "evidence": "../../../.admin-console/evidence/volabi-first-loop/voice-provider-research/receipt.json",
+    "status": "observed_retail_estimate_not_account_quote_or_authorization",
+    "exclusions": [
+      "tax",
+      "bank or currency conversion charges",
+      "native review",
+      "translation",
+      "meetings or live recognition",
+      "hosting and storage",
+      "custom voices",
+      "other subscriptions"
+    ],
+    "price_page_numeric_paid_values": "Rendered as $-; numerical rate is from official API response instead.",
+    "planning_USD_to_SAR": 3.75,
+    "SAR_per_1M_before_exclusions": 56.25,
+    "exchange_source": "https://www.sama.gov.sa/ar-SA/Currency/FinExc/Pages/Currency.aspx"
+  },
+  "generation_readiness": {
+    "ready_without_new_business_decision": [
+      "15-role script preparation",
+      "per-agent proposed prosody",
+      "source/provenance preservation",
+      "static SSML inspection",
+      "blank native and blind evaluation sheets",
+      "usage estimate"
+    ],
+    "needed_before_synthesis": [
+      "Named authorized Speech account and environment/region",
+      "Current applicable usage/output terms",
+      "Explicit capped one-time paid audition authorization",
+      "Secure account-specific credential setup outside chat"
+    ],
+    "needed_before_acceptance": [
+      "Actual generated audio and provider/voice/model/request receipts",
+      "Native Saudi and Lebanese listening scores",
+      "Blind distinct-identity results",
+      "Pronunciation and same-speaker Arabic/English switching evidence",
+      "CEO selection"
+    ],
+    "fallback_if_identity_or_switching_fails": "Keep result failed or provisional and prepare a separately costed licensed voice/talent shortlist; no automatic subscription, cloning or accent substitution."
+  },
+  "sources": [
+    {
+      "title": "Azure language and voice support",
+      "url": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts"
+    },
+    {
+      "title": "SSML voice and sound; language limits",
+      "url": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/speech-synthesis-markup-voice"
+    },
+    {
+      "title": "Microsoft Azure Product Terms",
+      "url": "https://www.microsoft.com/licensing/terms/en-US/product/MicrosoftAzure/all"
+    },
+    {
+      "title": "Speech pricing; tier definitions",
+      "url": "https://azure.microsoft.com/en-us/pricing/details/speech/"
+    },
+    {
+      "title": "Official Retail Prices API",
+      "url": "https://learn.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices"
+    },
+    {
+      "title": "Hermes user-configured TTS",
+      "url": "https://hermes-agent.nousresearch.com/docs/user-guide/features/tts"
+    }
+  ],
+  "actions_performed": {
+    "synthesis_requests": 0,
+    "new_paid_accounts": 0,
+    "credential_values_exposed": false,
+    "management_employees_activated": 0,
+    "legacy_audio_replaced": false
+  },
+  "holds": [
+    "production deployment",
+    "production merges",
+    "business employee activation",
+    "business permission grants",
+    "external business writes",
+    "financial transactions",
+    "new paid services"
+  ],
+  "proposed_bounded_generation": {
+    "authorized": false,
+    "purpose": "Auditions only; fictional public scripts, no company/customer personal data",
+    "maximum_characters": 100000,
+    "character_ceiling_scope": "Aggregate across every round, role sample, blind trial, anchor, failed request and retry; not per round or per agent.",
+    "maximum_rounds": 3,
+    "maximum_total_speech_spend_SAR": 10,
+    "cap_note": "Proposed allowance only. Confirm actual account meter and all applicable charges first; stop if predicted total including applicable tax/fees could exceed SAR10. No monthly subscription, custom voice, avatar, hosting or other service is included.",
+    "retail_synthesis_at_character_cap_USD": 1.5,
+    "retail_synthesis_at_character_cap_SAR_before_exclusions": 5.625,
+    "not_included": [
+      "native-speaker reviewer fees",
+      "translation",
+      "customer research incentives"
+    ],
+    "proof_required": [
+      "account/resource environment and region",
+      "applicable paid-tier usage terms",
+      "provider request and voice IDs",
+      "actual metered character usage",
+      "audio hashes",
+      "budget receipt"
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+# Complete pilot journey and native-speaker acceptance
+
+Scope: customer text bn-BD/ur-PK/hi-IN, AR/EN baseline; voice is separately gated. This document specifies behavior, not translated production copy or working screens. All promised actions must resolve through the existing booking/payment/support flow; later UI work must update the surface inventory before rendering.
+
+| Journey | Required localized content and adverse recovery |
+|---|---|
+| Choose language | Own-language labels, explicit choice and persistence; change without losing form/cart/booking identity. Unsupported locale has an honest supported-language fallback. Separate text, STT and TTS preferences. |
+| Discover/search | City/location permission explanation, categories, search/transliteration and real empty/error/filtered-empty states. Original salon/staff names stay identifiable; translated descriptions carry source/version and review status. Do not invent staff language proficiency. |
+| Shop/service | Service scope, duration, provider/branch, real price, available staff and actual policies; unavailable/retired services cannot become bookable through a translation. Clearly identify untranslated provider-authored content. |
+| Availability/cart | Whole-cart services, professional choice, date/time, capacity and stale-slot recovery; language changes preserve the actual cart. No invented availability. |
+| Sign-in/profile | Guest continuation, phone/email validation, OTP errors, account/permission and customer-profile labels; no new sensitive nationality collection to choose a language. |
+| Quote/confirmation | Name/provider/branch/services/time, SAR totals/deposit/balance, tax/fees and current cancellation terms from authoritative snapshots. Customer must understand and confirm material details; no rate/policy mutation through translation. |
+| Payment handoff | Explain the actual licensed checkout language before navigation. Hosted PSP locale support is unverified for these3 languages; never claim full localization if it falls back to AR/EN. If comprehension cannot be established, hold that locale's paid-booking release rather than conceal the gap. No real gateway call in proposal/QA fixtures. |
+| Return/recovery | Same booking/purchase/attempt retained across reload; distinguish captured, submitting, unknown and failed. No “not charged” claim after timeout and no automatic replacement purchase. Read actual booking/payment status, not redirect text. |
+| Receipt/appointment | Accurate confirmed/pending state, reference, SAR breakdown, Riyadh time, location and reminders in the selected language; provider/bank statements may have external language limitations, disclosed honestly. |
+| Change/cancel | Current policy and consequence preview, explicit confirmation, reason/input retention, conflict/refusal/unknown receipt and same-object recovery; no translated instruction changes authority. |
+| Disruption | Customer-approved alternative, declined alternative and actual refund/case status; explain what is pending and next step. Never invent successful contact or a remedy. |
+| Completion/no-show/dispute | Preserve actual scheduled/observed timestamps, source events and completion/no-show evidence. Explain disputed completion and its appeal separately from payment status; a translation cannot mark service complete or change refund/settlement rules. |
+| Review/rebook | Authentic review eligibility/moderation and repeat booking; language change preserves the same customer-salon relationship/history. Repeat acquisition commission stays zero; no new relationship or reset from a locale switch. |
+| Support intake | Preferred language/channel, authenticated own booking, case severity, explicit source evidence, draft retention and safe fallback when that language has no qualified coverage. |
+| Support resolution/appeal | Separate inquiry, remedy recommendation, applicable approval, submitted/unknown/verified outcome and appeal. Use current adopted policy/control versions; isolate tenants/private HQ data. No invented agent availability or human review. |
+| Follow-up | Source-linked case receipt/history, genuine notification delivery states, consent/channel preferences and correction requests. Marketing consent stays separate; no unsolicited outreach in this task. |
+
+Common acceptance: loading/empty/filtered-empty/error/forbidden/conflict/stale/unknown/success are understandable; all actions retain drafts and existing ids; amounts remain server-authoritative. Urdu is RTL; Bangla/Hindi are LTR. Mixed names, phone numbers, SAR, references and URLs need bidirectional isolation. Language does not set direction by itself; use explicit markup and logical layout properties ([W3C](https://www.w3.org/International/questions/qa-html-dir)). Revisit mobile's existing manual mirroring before introducing Urdu; avoid double mirroring.
+
+## Native-speaker QA proposal
+
+For each locale use a qualified translator plus a different native reviewer for booking/payment/policy/support content. Provider-owned terms and canonical names remain traceable to source. Establish a glossary covering salon services, deposit, balance, captured/unknown/refund, cancellation, tax and appointment time; legal/financial policy is reviewed by the actual responsible owner. Machine translation can draft only with source classification and authorized data handling; it is not sign-off.
+
+Proposed formative panel:12 consenting participants per language (36 total), varied literacy, dialect, device familiarity and English comfort, recruited only after separate authorization. Do not claim this small panel estimates population demand. No sensitive attribute inferred from nationality. Use isolated synthetic booking/payment cases; no real money, hosted writes or production PII.
+
+Each participant attempts discovery -> service/staff -> slot -> account continuation -> final quote/confirmation -> controlled payment return -> unknown recovery -> cancellation/support -> case/appeal. Cover narrow phone/desktop, keyboard/screen-reader/text scaling and native platform separately when in scope. Urdu mixed text, Bengali/Devanagari shaping, line breaks and font fallback must be visually checked. AR/EN regression must preserve existing behavior.
+
+Critical gate:100% of critical published strings reviewed and versioned; zero unresolved material mistranslation, amount/date/provider mismatch, tenant disclosure, false payment status or unauthorized action. Proposed usability gate:at least11/12 participants per locale complete the core task sequence without moderator takeover; all must correctly confirm the material booking details after clarification. Record first-pass comprehension separately. Failure holds that locale, not a silent switch of policy or unsupported service.
+
+Voice benchmark later:40 critical utterances ×12 speakers ×3 locales =1440 utterances (working scenario, not collected data). Test accents/noise/code-switching, names, SAR amounts, dates, interruption, correction, refusal, provider outage and text fallback. Score semantic slot accuracy separately from word error rate and rate audio naturalness separately from task success. Low-confidence material recognition requires clarification; a spoken “yes” never substitutes for the actual required financial authorization. TTS support is not proof of STT support or local accent quality. No voice integration or participant contact occurs here.
+
+All QA findings record locale/script/platform, content/source revision, case id, severity, actual result and reviewer. Re-run affected flows after copy/model/voice/fee-policy changes. Pilot launch needs independent QA and the actual named support coverage/response process; no fabricated24/7 language-support promise.
+
+Refund/settlement translations preserve existing conditionally adopted Q5/Q8/Q9/D3 controls and their prerequisites; language adaptation does not redefine financial authority, fee rules, earning triggers or evidence precedence.
+
+Repeat-booking acceptance: compare the same customer-salon relationship on its qualifying first acquisition and on a later booking, including a locale change and a prior refund. Preserve first-acquisition-only commission and **zero repeat acquisition commission**; salon-paid repeat payment-processing fees are a separate item, never a repeat acquisition commission. Do not reset acquisition history or invent the unresolved earning/reversal rule. Compare the authoritative fee snapshot and explain pending or unknown money status accurately in every locale.

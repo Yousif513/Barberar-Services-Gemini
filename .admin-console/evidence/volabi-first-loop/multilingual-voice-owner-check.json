@@ -1,0 +1,27 @@
+{
+  "scope": "Static preparation only, not provider acceptance or listening QA",
+  "agents": 15,
+  "Saudi_male": 6,
+  "Lebanese_female": 9,
+  "XML_parse_pass": 45,
+  "sources_and_script_hashes_pass": true,
+  "new_audio_files": 0,
+  "native_scores": 0,
+  "text_usage": {
+    "role_samples_codepoints": 11403,
+    "five_common_blind_passages_all_agents_codepoints": 13587,
+    "one_round_text_codepoints": 24990,
+    "three_round_text_codepoints": 74970,
+    "estimated_three_round_TTS_USD": 1.12455,
+    "estimated_three_round_TTS_SAR_before_exclusions": 4.217062,
+    "assumption": "Spoken text codepoints are an estimate, not metered billable characters; excludes extra anchors, revisions beyond rounds, tax/fees and human review."
+  },
+  "multilingual_checks": {
+    "portable_file_receipts_pass": 5,
+    "simulated_CRLF_checkout_pass": 5,
+    "cost_CSV_width": 8,
+    "cost_CSV_data_rows": 16,
+    "captured_current_code_source_hashes": "all_match",
+    "no_translation_or_native_quality_claimed": true
+  }
+}

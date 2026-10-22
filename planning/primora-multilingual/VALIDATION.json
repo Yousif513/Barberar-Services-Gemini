@@ -1,0 +1,54 @@
+{
+  "checked_on": "2026-10-22",
+  "files": [
+    {
+      "path": "COSTS_AND_ASSUMPTIONS.csv",
+      "sha256": "9131635efe2311258f02bd4e008f893da021282c212baf5d950395f1cb05cd11",
+      "bytes": 2620
+    },
+    {
+      "path": "DELIVERY_AND_METRICS.md",
+      "sha256": "a2edb3e3e72d9a4c1c1ddc2601678d1557ad3211a45d7a6d17a25d248d0f8e1a",
+      "bytes": 6635
+    },
+    {
+      "path": "JOURNEY_AND_QA.md",
+      "sha256": "8dcdf2b432f59f091b2384741cbe3190a024c0fada63322805fad10bc4744d31",
+      "bytes": 8534
+    },
+    {
+      "path": "PROPOSAL.md",
+      "sha256": "8a7995262f23b6acfd2f828199aea49ba46d043465eca8ae0e19f70e719feaf8",
+      "bytes": 4936
+    },
+    {
+      "path": "SOURCES_AND_CURRENT_STATE.json",
+      "sha256": "81ca7eab35f200f608cb8550b2df2f3843297ae8e9a275851127b81e72e7ec44",
+      "bytes": 7029
+    }
+  ],
+  "checks": {
+    "required_deliverables_present": true,
+    "current_code_evidence_files_and_hashes": true,
+    "cost_CSV_rows": 16,
+    "illustrative_TTS_and_planning_FX_arithmetic": "pass",
+    "unknown_rates": "UNQUOTED; full cost not calculated as zero",
+    "journey": "discovery through service completion/no-show/dispute/review/rebook and support/appeal included",
+    "metrics": "denominators/time/cohort/exclusions/proposed gates explicit",
+    "activation_or_product_changes": false
+  },
+  "independent_review": "Separate reviewer evidence: ../../.admin-console/evidence/volabi-first-loop/multilingual-voice-independent-review.json; author checks alone do not establish review.",
+  "build_or_runtime_tests": "not run for proposal-only files; root owns aggregate required checks",
+  "bounds": [
+    "No UI generation or implementation",
+    "No agents activated or permissions granted",
+    "No paid service or real provider/financial call",
+    "No external business write or contact",
+    "No commit by this worker"
+  ],
+  "hash_basis": {
+    "files[].sha256": "Strict UTF-8 text with CRLF pairs replaced by LF only; no trimming, BOM removal or Unicode normalization",
+    "files[].bytes": "Captured local byte size; may differ after Git line-ending conversion",
+    "source_evidence": "Captured raw-byte source hashes are separately labelled in SOURCES_AND_CURRENT_STATE.json"
+  }
+}

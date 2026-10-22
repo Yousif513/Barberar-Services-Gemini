@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<speak xmlns="http://www.w3.org/2001/10/synthesis" version="1.0" xml:lang="ar-LB">
+  <voice name="ar-LB-LaylaNeural">
+    <prosody rate="+5%">
+      <p>خلّينا نراجع الفكرة بهدوء. عنا خيار واضح، بس بعد في سؤال بدّه دليل. شو المعلومة اللي لو تغيّرت بتغيّر القرار؟ منذكر شو منعرف وشو ما منعرف، ومنخلّي الخطوة الجاية محدّدة، من دون ما نفترض إن شي تنفّذ.</p>
+    </prosody>
+  </voice>
+</speak>

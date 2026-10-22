@@ -1,0 +1,24 @@
+# PRIMORA customer-language rollout proposal
+
+**Recommendation: prepare the foundation now; pilot Bangla (bn-BD), Urdu (ur-PK) and Hindi (hi-IN) next; add German/French after demonstrated demand.** Keep Arabic/English complete throughout. This is a proposal, not authorization to enable services, spend, contact customers or activate employees.
+
+A useful advantage is easier booking and service recovery in the customer's chosen language, connecting discovery, salon details, confirmation and support. Population composition makes this worth testing; nationality does not determine language, English proficiency, grooming demand or willingness to pay. “Indian” and “Pakistani” are not languages. Hindi/Urdu do not cover every Indian/Pakistani customer. Let people choose; do not infer language from name, nationality or location. The [official DataSaudi dashboard](https://datasaudi.sa/en) is demographic context, not an addressable-market or revenue forecast.
+
+| Phase | Deliverable and decision |
+|---|---|
+| Foundation now | Inventory the entire customer journey and source content; separate text locale, recognition locale and spoken voice; preserve AR/EN, SAR and Riyadh time. Collect opt-in preference in a future authorized pilot. No language is advertised merely because a translation file exists. |
+| Text pilot next | Prepare all3 target locales, then release each independently when its complete booking/support path passes native-speaker QA. Start with website critical journeys; native parity is a separate explicit gate. No forced simultaneous3-language release. |
+| Voice after text quality | Test each locale's STT and TTS independently with speakers and real critical terms. Start with read-aloud/clarification, preserve text fallback and customer confirmation before booking/payment. No provider availability claim from a language table alone. |
+| Expand on evidence | Add provider/staff languages only when requested. German (proposed de-DE) / French (proposed fr-FR) website journeys precede voices if visitor/search/partner demand and measured economics justify them. No current German/French implementation. |
+
+**Keep HQ voices separate.** Existing15 management personas retain the CEO's Saudi-accent male / Lebanese-accent female Arabic direction. Customer text language and concierge listening/speaking choices are separate settings on existing identities, not new national agents or an implicit change to HQ voices.
+
+The repository currently assumes exactly AR/EN in web/mobile locale types, storage and content. Mobile manually mirrors Arabic while disabling native automatic mirroring. Marketplace data uses paired name_en/name_ar fields; root font declares Arabic/Latin subsets. Urdu direction, Bengali/Devanagari font coverage, content translation/versioning, search and receipt/support continuity therefore require actual engineering/QA—not a selector-only change. See SOURCES_AND_CURRENT_STATE.json for exact files/hashes. [Next guidance](https://nextjs.org/docs/app/guides/internationalization) describes locale-specific dictionaries/routing; [Expo guidance](https://docs.expo.dev/guides/localization/) covers app locale integration. Neither is implemented by this proposal.
+
+**Budget decision:** approve a bounded discovery/text-QA budget only after source-word inventory and human quotes. COSTS_AND_ASSUMPTIONS.csv leaves missing quotes UNQUOTED. Its example1000 voiced sessions ×3000 billed characters is3M characters: **USD45 base TTS only** at the verified Azure public-retail reference meter; USD56.25 with an assumed25% usage/retry reserve. Using3.75SAR/USD purely as a planning conversion gives SAR168.75 / SAR210.94 respectively, with additional costs still unquoted. STT, model, translation, independent QA, engineering, storage, tax and network remain additional/unquoted. This is not a complete pilot cost, negotiated quote or paid-service approval.
+
+Scale only when users complete the journey accurately, support can maintain it and measured cost fits an explicitly approved budget. Do not assume multilingual users will pay more. Review conversion, completed services, misunderstanding complaints and cost per completed booking; track denominator and uncertainty.
+
+Next step: review this phased scope and obtain the missing translation/native-QA quotes before implementation or service activation.
+
+Ready-to-send prompt: “Prepare the bounded Bangla/Urdu/Hindi text-pilot implementation plan from planning/primora-multilingual. First inventory source strings/content, prepare a quote-request brief and retrieve any existing native-speaker QA/translation quotes. Request scoped outreach approval only if obtaining missing quotes actually requires external contact; do not contact or spend under this instruction. Keep AR/EN complete, HQ Saudi-male/Lebanese-female voices unchanged, and all activation, paid-service, financial and external-write holds.”

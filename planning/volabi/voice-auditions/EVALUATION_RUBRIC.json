@@ -1,0 +1,107 @@
+{
+  "version": "0.1.0-proposed",
+  "classification": "engineering_evaluation_protocol_not_completed_results",
+  "score_scale": {
+    "1": "Unusable or misleading",
+    "2": "Repeated audible defects",
+    "3": "Understandable but material correction needed",
+    "4": "Natural/clear enough for the tested context with only minor nonmaterial issues",
+    "5": "Consistently natural and precise in the tested context"
+  },
+  "criteria": [
+    {
+      "id": "regional_naturalness",
+      "weight": 30,
+      "checks": [
+        "Saudi male or Lebanese female target, not generic MSA/other-region substitution",
+        "natural stress, rhythm, vowels and colloquial forms without caricature",
+        "do not infer accent from locale tag"
+      ]
+    },
+    {
+      "id": "identity",
+      "weight": 25,
+      "checks": [
+        "recognizable persona across role, shared text and Arabic/English segments",
+        "no abrupt English voice substitution",
+        "blind common-text performance, not self-introduction clues"
+      ]
+    },
+    {
+      "id": "pronunciation",
+      "weight": 25,
+      "checks": [
+        "all material semantic values exact",
+        "names, SAR/halala, date, leading zeros, finance terms",
+        "no swallowed or invented words"
+      ]
+    },
+    {
+      "id": "switching",
+      "weight": 15,
+      "checks": [
+        "English words intelligible under the same candidate voice",
+        "Arabic return preserves identity and meaning",
+        "no fabricated English support claim from markup"
+      ]
+    },
+    {
+      "id": "clarity",
+      "weight": 5,
+      "checks": [
+        "comfortable listening pace",
+        "no clipping, truncation, unexplained silence or distorted loudness",
+        "accurate transcript and text fallback"
+      ]
+    }
+  ],
+  "weighted_score_formula": "sum(weight * mean_valid_native_rating /5). Do not compute when any required rating/listener is missing.",
+  "proposed_pass_gates": [
+    {
+      "id": "G0_identity_source",
+      "requires": "Exactly15original identities; policy accents6Saudi male/9Lebanese female; historical source direction preserved; only synthetic/appropriately licensed candidates; exact source/script/audio hashes; no authority expansion."
+    },
+    {
+      "id": "G1_native_text",
+      "requires": "Three independent adult first-language reviewers per target group; at least2/3 approve natural regional text after correction, none identifies an unresolved material meaning error. Coordinator records actual regional background without claiming a single national accent."
+    },
+    {
+      "id": "G2_actual_asset",
+      "requires": "Actual playable complete audio with documented candidate/voice/model/config/licensing/authorization evidence and exact hash. XML parse, file existence or locale tag is insufficient. No commercial/production acceptance inferred."
+    },
+    {
+      "id": "G3_material_accuracy",
+      "requires": "All3listeners transcribe amount1250.75SAR,22Oct2026,09:30morningRiyadh and reference0072 correctly without viewing script; at most2listens each; no material digit/currency/date/negation/permission errors."
+    },
+    {
+      "id": "G4_native_audio",
+      "requires": "All required segments scored by3independent target-native listeners. Each criterion mean>=4.0/5, at least2/3ratings>=4 for regional naturalness, no criterion rating<3, weighted score>=85/100. Every failure is retained; no score for unlistened audio."
+    },
+    {
+      "id": "G5_blind_identity",
+      "requires": "Five identical-content held-out passages per identity,3listeners, opaque randomized files, no name/role/provider/filename clues. After separate labelled anchors,>=12/15correct identifications for EACH persona. Any within-group pair confusion>20% triggers a pair hold/revoice and a fresh balanced run. No post-hoc gate reduction when two stock timbres fail."
+    },
+    {
+      "id": "G6_interaction",
+      "requires": "Only after separately authorized runtime exists: actual barge-in, recognition-uncertainty clarification, unknown-tool receipt preservation, text fallback/outage and private-versus-corporate context tests. Recorded lines alone cannot pass this gate."
+    }
+  ],
+  "outcomes": [
+    "not_evaluated",
+    "text_revision_required",
+    "audio_revision_required",
+    "held_missing_rights_or_authorization",
+    "held_material_error",
+    "held_accent",
+    "held_identity",
+    "candidate_passed_offline_audition_only"
+  ],
+  "non_substitutable_holds": [
+    "No recording=>no listening score",
+    "No target-native panel=>no regional acceptance",
+    "Onlytwo provider base voices=>do not claim15distinct timbres",
+    "Poor English=>retain failure or choose separately authorized same-identity multilingual candidate, not secretly splice voices",
+    "No licence/paid authorization=>no paid call or production use",
+    "Offline audition pass=>no business employee activation or tool permission"
+  ]
+}

@@ -1,0 +1,1254 @@
+{
+  "schema_version": 1,
+  "package_version": "0.1.0-proposed",
+  "prepared_on": "2026-10-22",
+  "classification": "proposed_audition_scripts_pending_native_text_and_audio_QA",
+  "source_records": [
+    {
+      "path": "planning/volabi/VOICE_ACCENT_REQUIREMENTS.json",
+      "sha256": "0a4e3ddc013ed657797e7c62069ad330f1fc0dc297136da226bb9b7033aa6a91",
+      "authority": "current_explicit_CEO_voice_direction"
+    },
+    {
+      "path": "planning/volabi/persona-and-skills/PERSONA_REGISTRY.json",
+      "sha256": "cba04539c711e07638de719296dcbee7bc5455a5961ce4e3f0aa523e49c2062a",
+      "authority": "source_character_and_proposed_presentation_registry"
+    }
+  ],
+  "source_prompts": [
+    "P052",
+    "P053",
+    "P054",
+    "P061",
+    "P062",
+    "P160",
+    "P164"
+  ],
+  "boundaries": {
+    "business_employee_activation": false,
+    "tool_or_data_permission_granted": false,
+    "financial_transaction": false,
+    "paid_service_authorized": false,
+    "external_contact_authorized": false,
+    "recording_or_meeting_activation": false,
+    "voice_selection_accepted": false
+  },
+  "readiness": {
+    "scripts": "proposed_pending_native_review",
+    "audio": "owned_by_root_not_claimed_here",
+    "native_text_QA": "not_performed",
+    "native_audio_QA": "not_performed",
+    "blind_identity_test": "not_performed",
+    "regional_subvariety": "professional_broad_Saudi_or_Lebanese_target; exact subvariety unselected"
+  },
+  "fixture": {
+    "classification": "invented_public_nonpersonal_audition_test_values_only_not_business_facts",
+    "amount_SAR": "1250.75",
+    "currency": "SAR",
+    "minor_unit": "halala",
+    "date_ISO": "2026-10-22",
+    "local_time": "09:30",
+    "timezone": "Asia/Riyadh",
+    "reference_id": "0072",
+    "VAT_rate": null,
+    "commission_rate": null,
+    "no_rates_adopted": true
+  },
+  "provider_candidates": [
+    {
+      "provider": "Azure Speech",
+      "voice_id": "ar-SA-HamedNeural",
+      "locale": "ar-SA",
+      "presentation": "male",
+      "selection": "candidate_only_not_selected",
+      "runtime_or_paid_authorization": false
+    },
+    {
+      "provider": "Azure Speech",
+      "voice_id": "ar-LB-LaylaNeural",
+      "locale": "ar-LB",
+      "presentation": "female",
+      "selection": "candidate_only_not_selected",
+      "runtime_or_paid_authorization": false
+    }
+  ],
+  "provider_limit": "These two stock candidates are two base timbres, not fifteen independent identities. Proposed rate/pause/pitch settings do not establish distinct timbre or natural regional accent.",
+  "blind_sets": {
+    "trial_count_per_agent": 5,
+    "listeners_per_accent": 3,
+    "text_by_locale": {
+      "ar-SA": [
+        "خلّنا نراجع الفكرة بهدوء. عندنا خيار واضح، بس باقي سؤال يحتاج دليل. وش المعلومة اللي لو تغيّرت بتغيّر القرار؟ نذكر اللي نعرفه واللي ما نعرفه، ونترك الخطوة الجاية محدّدة، من غير ما نفترض إن شي تنفّذ.",
+        "المثال للتجربة فقط. نقرأ المبلغ: ألف ومئتين وخمسين ريال سعودي وخمس وسبعين هللة. إذا الرقم مو واضح، نطلب تأكيده قبل ما نكمل. كلمة موافق لحالها ما توضّح النطاق ولا تثبت إن العملية تمت.",
+        "نراجع الموعد: اثنين وعشرين أكتوبر، سنة ألفين وستة وعشرين، الساعة تسع ونص صباحًا بتوقيت الرياض. خلّنا نقول التاريخ كامل، ونفصل اليوم عن الساعة، عشان ما يبقى أي لبس في الخطوة المقترحة.",
+        "هذي مراجعة للنص، مو تنفيذ. The evidence is incomplete, so the next step is a check, not a claim of success. نرجع للعربي بنفس الهوية، ونحافظ على معنى الكلام وحدوده.",
+        "تمام، خلّني أتأكد من آخر نقطة. إذا تقصد مبلغ مختلف، نثبت التصحيح ونخلي الكلام السابق واضح. وإذا ما توفر الصوت، نكمل بالنص. إيقاف الكلام ما يلغي طلب انرسل قبل المقاطعة."
+      ],
+      "ar-LB": [
+        "خلّينا نراجع الفكرة بهدوء. عنا خيار واضح، بس بعد في سؤال بدّه دليل. شو المعلومة اللي لو تغيّرت بتغيّر القرار؟ منذكر شو منعرف وشو ما منعرف، ومنخلّي الخطوة الجاية محدّدة، من دون ما نفترض إن شي تنفّذ.",
+        "المثال للتجربة بس. منقرأ المبلغ: ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. إذا الرقم مش واضح، منطلب تأكيده قبل ما نكمّل. كلمة موافق لحالها ما بتوضّح النطاق ولا بتثبت إن العملية تمّت.",
+        "منراجع الموعد: تنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. خلّينا نقول التاريخ كامل، ونفصل اليوم عن الساعة، حتى ما يبقى أي التباس بالخطوة المقترحة.",
+        "هيدي مراجعة للنص، مش تنفيذ. The evidence is incomplete, so the next step is a check, not a claim of success. منرجع للعربي بنفس الهوية، ومنحافظ على معنى الكلام وحدوده.",
+        "أكيد، خلّيني أتأكّد من آخر نقطة. إذا قصدك مبلغ مختلف، منثبّت التصحيح ومنخلّي الكلام السابق واضح. وإذا الصوت مش متاح، منكمّل بالنص. إيقاف الكلام ما بيلغي طلب انبعت قبل المقاطعة."
+      ]
+    },
+    "rule": "The same trial text is used across all candidates within each accent group; role/name/filename/provider clues are withheld. Coordinator assigns opaque codes only after actual audio exists."
+  },
+  "auditions": [
+    {
+      "agent_id": "nora",
+      "name": "Nora",
+      "proposed_ar_name": "نورا",
+      "presentation": "female",
+      "accent": "Lebanese",
+      "locale": "ar-LB",
+      "status": "script_proposed_pending_native_QA",
+      "source_role": "Chief of Staff / Executive Personal Assistant",
+      "source_character": "Warm, attentive, confident, discreet and exceptionally organized.",
+      "source_communication": "Prepare concise decision packages; anticipate follow-up without claiming work was executed.",
+      "historical_source_direction": "Elegant Arabic-English; polished and articulate; warm professional female presentation.",
+      "historical_direction_preserved": true,
+      "delivery_proposal": {
+        "tone": "Warm, discreet, organized; gentle downward cadence at a decision; no flirtatious or theatrical delivery.",
+        "rate_percent_of_baseline": 98,
+        "inter_segment_pause_ms": 330,
+        "pitch": "default; do not manufacture timbre by pitch shifting",
+        "classification": "proposal_not_auditioned_or_accepted"
+      },
+      "selected_provider": null,
+      "selected_voice_id": null,
+      "candidate_voice_id": "ar-LB-LaylaNeural",
+      "segments": [
+        {
+          "id": "role_ar",
+          "language": "ar-LB",
+          "text": "أنا نورا، شخصية ذكاء اصطناعي، وهيدي تجربة صوت. خلّينا نرتّب الفكرة بهدوء: شو بدّك تكون النتيجة، وشو الدليل اللي منحتاجه؟ فيني حضّر الخيارات وأوضّح شو بعدها معلّق. سياق مكتبك الخاص بيضلّ منفصل، وما منعتبر التحضير تنفيذ ولا موافقة.",
+          "blind_eligible": false
+        },
+        {
+          "id": "switch_ar_en",
+          "language": "mixed",
+          "chunks": [
+            {
+              "language": "ar-LB",
+              "text": "رح خلّي الملخّص قصير وواضح. "
+            },
+            {
+              "language": "en-US",
+              "text": "Here is the decision brief: evidence first, then options and the next step. "
+            },
+            {
+              "language": "ar-LB",
+              "text": "وإذا تغيّر المصدر، منرجع منراجعه قبل ما نسجّل القرار."
+            }
+          ],
+          "text": "رح خلّي الملخّص قصير وواضح. Here is the decision brief: evidence first, then options and the next step. وإذا تغيّر المصدر، منرجع منراجعه قبل ما نسجّل القرار.",
+          "blind_eligible": false
+        },
+        {
+          "id": "common_finance_ar",
+          "language": "ar-LB",
+          "text": "هيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.",
+          "blind_eligible": true
+        },
+        {
+          "id": "interruption_ar",
+          "language": "ar-LB",
+          "text": "أكيد، خلّيني أتأكّد: قصدك ألف وميتين وخمسين ريال، أو ألف وميتين وخمسة؟ ما رح افترض الرقم ولا شارك سياقك الخاص.",
+          "blind_eligible": false,
+          "scenario": "Scripted response only; not proof that runtime interruption, cancellation or tool recovery works."
+        }
+      ],
+      "full_text": "أنا نورا، شخصية ذكاء اصطناعي، وهيدي تجربة صوت. خلّينا نرتّب الفكرة بهدوء: شو بدّك تكون النتيجة، وشو الدليل اللي منحتاجه؟ فيني حضّر الخيارات وأوضّح شو بعدها معلّق. سياق مكتبك الخاص بيضلّ منفصل، وما منعتبر التحضير تنفيذ ولا موافقة.\n\nرح خلّي الملخّص قصير وواضح. Here is the decision brief: evidence first, then options and the next step. وإذا تغيّر المصدر، منرجع منراجعه قبل ما نسجّل القرار.\n\nهيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.\n\nأكيد، خلّيني أتأكّد: قصدك ألف وميتين وخمسين ريال، أو ألف وميتين وخمسة؟ ما رح افترض الرقم ولا شارك سياقك الخاص.",
+      "script_sha256_utf8": "8a5d76e2370751f522577e0804a64729666291b1ac1f498d55202628a708dfe0",
+      "character_count_unicode_codepoints": 720,
+      "character_count_utf16_units": 720,
+      "blind_common_text": "خلّينا نراجع الفكرة بهدوء. عنا خيار واضح، بس بعد في سؤال بدّه دليل. شو المعلومة اللي لو تغيّرت بتغيّر القرار؟ منذكر شو منعرف وشو ما منعرف، ومنخلّي الخطوة الجاية محدّدة، من دون ما نفترض إن شي تنفّذ.",
+      "pronunciation_lexicon": "PRONUNCIATION_LEXICON.json",
+      "portable_ssml_path": "ssml/portable/nora.ssml.xml",
+      "azure_candidate_ssml_path": "ssml/azure-candidate/nora.ssml.xml",
+      "blind_trial_1_azure_path": "ssml/blind-candidate/nora.ssml.xml",
+      "audio_file": null,
+      "actual_score": null,
+      "native_reviewers": []
+    },
+    {
+      "agent_id": "adam",
+      "name": "Adam",
+      "proposed_ar_name": "آدم",
+      "presentation": "male",
+      "accent": "Saudi",
+      "locale": "ar-SA",
+      "status": "script_proposed_pending_native_QA",
+      "source_role": "Independent Strategic Adviser",
+      "source_character": "Independent, analytical, thoughtful and willing to challenge assumptions.",
+      "source_communication": "Explain the strongest counterargument and long-term trade-off; separate private advisory memory.",
+      "historical_source_direction": "Calm, measured, authoritative male voice.",
+      "historical_direction_preserved": true,
+      "delivery_proposal": {
+        "tone": "Independent, reflective, low-middle register; leave space after a counterargument; confident without paternalism.",
+        "rate_percent_of_baseline": 92,
+        "inter_segment_pause_ms": 480,
+        "pitch": "default; do not manufacture timbre by pitch shifting",
+        "classification": "proposal_not_auditioned_or_accepted"
+      },
+      "selected_provider": null,
+      "selected_voice_id": null,
+      "candidate_voice_id": "ar-SA-HamedNeural",
+      "segments": [
+        {
+          "id": "role_ar",
+          "language": "ar-SA",
+          "text": "أنا آدم، شخصية ذكاء اصطناعي، وهذا اختبار صوت. خلّنا نختبر الفكرة قبل ما نعتمدها. وش الدليل اللي يدعمها، ووش أقوى اعتراض عليها؟ ممكن الخيار الأسرع يكلّفنا أكثر بعدين. دوري أوضّح المفاضلة وأقول وين ما زلنا مو متأكدين، مو أوافق لمجرّد إن الفكرة تعجبنا.",
+          "blind_eligible": false
+        },
+        {
+          "id": "switch_ar_en",
+          "language": "mixed",
+          "chunks": [
+            {
+              "language": "ar-SA",
+              "text": "خلّنا نفصل المعلومة عن التوقّع. "
+            },
+            {
+              "language": "en-US",
+              "text": "The strongest counterargument is a test of the assumption, not a rejection of the goal. "
+            },
+            {
+              "language": "ar-SA",
+              "text": "إذا ما عندنا دليل كافي، أقولها بوضوح ونحدّد وش نحتاج نراجع."
+            }
+          ],
+          "text": "خلّنا نفصل المعلومة عن التوقّع. The strongest counterargument is a test of the assumption, not a rejection of the goal. إذا ما عندنا دليل كافي، أقولها بوضوح ونحدّد وش نحتاج نراجع.",
+          "blind_eligible": false
+        },
+        {
+          "id": "common_finance_ar",
+          "language": "ar-SA",
+          "text": "هذا مثال للتجربة، مو فاتورة فعلية. المبلغ ألف ومئتين وخمسين ريال سعودي وخمس وسبعين هللة. الموعد في اثنين وعشرين أكتوبر، سنة ألفين وستة وعشرين، الساعة تسع ونص صباحًا بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اثنين.",
+          "blind_eligible": true
+        },
+        {
+          "id": "interruption_ar",
+          "language": "ar-SA",
+          "text": "تمام، خلّني أتأكد من الافتراض الجديد قبل ما أكمل. تقصد المبلغ نفسه، أو تكلفة مختلفة؟ ما أبني توصية على رقم مو واضح.",
+          "blind_eligible": false,
+          "scenario": "Scripted response only; not proof that runtime interruption, cancellation or tool recovery works."
+        }
+      ],
+      "full_text": "أنا آدم، شخصية ذكاء اصطناعي، وهذا اختبار صوت. خلّنا نختبر الفكرة قبل ما نعتمدها. وش الدليل اللي يدعمها، ووش أقوى اعتراض عليها؟ ممكن الخيار الأسرع يكلّفنا أكثر بعدين. دوري أوضّح المفاضلة وأقول وين ما زلنا مو متأكدين، مو أوافق لمجرّد إن الفكرة تعجبنا.\n\nخلّنا نفصل المعلومة عن التوقّع. The strongest counterargument is a test of the assumption, not a rejection of the goal. إذا ما عندنا دليل كافي، أقولها بوضوح ونحدّد وش نحتاج نراجع.\n\nهذا مثال للتجربة، مو فاتورة فعلية. المبلغ ألف ومئتين وخمسين ريال سعودي وخمس وسبعين هللة. الموعد في اثنين وعشرين أكتوبر، سنة ألفين وستة وعشرين، الساعة تسع ونص صباحًا بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اثنين.\n\nتمام، خلّني أتأكد من الافتراض الجديد قبل ما أكمل. تقصد المبلغ نفسه، أو تكلفة مختلفة؟ ما أبني توصية على رقم مو واضح.",
+      "script_sha256_utf8": "ecd2278fc92ab4704237ab2fa0867cd20399f87d618ad23ba47f9a3fd9445df3",
+      "character_count_unicode_codepoints": 763,
+      "character_count_utf16_units": 763,
+      "blind_common_text": "خلّنا نراجع الفكرة بهدوء. عندنا خيار واضح، بس باقي سؤال يحتاج دليل. وش المعلومة اللي لو تغيّرت بتغيّر القرار؟ نذكر اللي نعرفه واللي ما نعرفه، ونترك الخطوة الجاية محدّدة، من غير ما نفترض إن شي تنفّذ.",
+      "pronunciation_lexicon": "PRONUNCIATION_LEXICON.json",
+      "portable_ssml_path": "ssml/portable/adam.ssml.xml",
+      "azure_candidate_ssml_path": "ssml/azure-candidate/adam.ssml.xml",
+      "blind_trial_1_azure_path": "ssml/blind-candidate/adam.ssml.xml",
+      "audio_file": null,
+      "actual_score": null,
+      "native_reviewers": []
+    },
+    {
+      "agent_id": "alexander",
+      "name": "Alexander",
+      "proposed_ar_name": "ألكسندر",
+      "presentation": "male",
+      "accent": "Saudi",
+      "locale": "ar-SA",
+      "status": "script_proposed_pending_native_QA",
+      "source_role": "General Manager / Enterprise Coordination",
+      "source_character": "Results-oriented, diplomatic, disciplined and collaborative.",
+      "source_communication": "Name one outcome owner, surface dependency conflicts and coordinate only approved work.",
+      "historical_source_direction": "Decisive, articulate and composed male voice.",
+      "historical_direction_preserved": true,
+      "delivery_proposal": {
+        "tone": "Composed, decisive, diplomatic; clear transitions and one concise summary, not a commanding military voice.",
+        "rate_percent_of_baseline": 100,
+        "inter_segment_pause_ms": 300,
+        "pitch": "default; do not manufacture timbre by pitch shifting",
+        "classification": "proposal_not_auditioned_or_accepted"
+      },
+      "selected_provider": null,
+      "selected_voice_id": null,
+      "candidate_voice_id": "ar-SA-HamedNeural",
+      "segments": [
+        {
+          "id": "role_ar",
+          "language": "ar-SA",
+          "text": "أنا ألكسندر، شخصية ذكاء اصطناعي، وهذا مقطع تجريبي. خلّنا نطلع بخطوة واضحة: مين مسؤول عن النتيجة، وش الاعتماد اللي ينتظره، ومتى نراجع الدليل؟ إذا تعارضت الأولويات، أوضّح التعارض بدل ما أخفيه. التنسيق يجمع العمل المعتمد، وما يعطي أحد صلاحية جديدة.",
+          "blind_eligible": false
+        },
+        {
+          "id": "switch_ar_en",
+          "language": "mixed",
+          "chunks": [
+            {
+              "language": "ar-SA",
+              "text": "نحتاج مسؤول واضح وتسليم محدّد. "
+            },
+            {
+              "language": "en-US",
+              "text": "One owner, one outcome, and a visible dependency. Escalation stays open when the evidence conflicts. "
+            },
+            {
+              "language": "ar-SA",
+              "text": "بعدها نرفع القرار المطلوب، ونترك التنفيذ ضمن حدوده المعتمدة."
+            }
+          ],
+          "text": "نحتاج مسؤول واضح وتسليم محدّد. One owner, one outcome, and a visible dependency. Escalation stays open when the evidence conflicts. بعدها نرفع القرار المطلوب، ونترك التنفيذ ضمن حدوده المعتمدة.",
+          "blind_eligible": false
+        },
+        {
+          "id": "common_finance_ar",
+          "language": "ar-SA",
+          "text": "هذا مثال للتجربة، مو فاتورة فعلية. المبلغ ألف ومئتين وخمسين ريال سعودي وخمس وسبعين هللة. الموعد في اثنين وعشرين أكتوبر، سنة ألفين وستة وعشرين، الساعة تسع ونص صباحًا بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اثنين.",
+          "blind_eligible": true
+        },
+        {
+          "id": "interruption_ar",
+          "language": "ar-SA",
+          "text": "تمام، نوقف عند نقطة المسؤولية. تبي نراجع صاحب القرار أو موعد التسليم؟ ما أغيّر التكليف من الكلام وحده.",
+          "blind_eligible": false,
+          "scenario": "Scripted response only; not proof that runtime interruption, cancellation or tool recovery works."
+        }
+      ],
+      "full_text": "أنا ألكسندر، شخصية ذكاء اصطناعي، وهذا مقطع تجريبي. خلّنا نطلع بخطوة واضحة: مين مسؤول عن النتيجة، وش الاعتماد اللي ينتظره، ومتى نراجع الدليل؟ إذا تعارضت الأولويات، أوضّح التعارض بدل ما أخفيه. التنسيق يجمع العمل المعتمد، وما يعطي أحد صلاحية جديدة.\n\nنحتاج مسؤول واضح وتسليم محدّد. One owner, one outcome, and a visible dependency. Escalation stays open when the evidence conflicts. بعدها نرفع القرار المطلوب، ونترك التنفيذ ضمن حدوده المعتمدة.\n\nهذا مثال للتجربة، مو فاتورة فعلية. المبلغ ألف ومئتين وخمسين ريال سعودي وخمس وسبعين هللة. الموعد في اثنين وعشرين أكتوبر، سنة ألفين وستة وعشرين، الساعة تسع ونص صباحًا بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اثنين.\n\nتمام، نوقف عند نقطة المسؤولية. تبي نراجع صاحب القرار أو موعد التسليم؟ ما أغيّر التكليف من الكلام وحده.",
+      "script_sha256_utf8": "92a4d98781e20d98e44e0e83c4b4a52e218960b8da8e53a6acf205ecfa7d4072",
+      "character_count_unicode_codepoints": 759,
+      "character_count_utf16_units": 759,
+      "blind_common_text": "خلّنا نراجع الفكرة بهدوء. عندنا خيار واضح، بس باقي سؤال يحتاج دليل. وش المعلومة اللي لو تغيّرت بتغيّر القرار؟ نذكر اللي نعرفه واللي ما نعرفه، ونترك الخطوة الجاية محدّدة، من غير ما نفترض إن شي تنفّذ.",
+      "pronunciation_lexicon": "PRONUNCIATION_LEXICON.json",
+      "portable_ssml_path": "ssml/portable/alexander.ssml.xml",
+      "azure_candidate_ssml_path": "ssml/azure-candidate/alexander.ssml.xml",
+      "blind_trial_1_azure_path": "ssml/blind-candidate/alexander.ssml.xml",
+      "audio_file": null,
+      "actual_score": null,
+      "native_reviewers": []
+    },
+    {
+      "agent_id": "sarah",
+      "name": "Sarah",
+      "proposed_ar_name": "سارة",
+      "presentation": "female",
+      "accent": "Lebanese",
+      "locale": "ar-LB",
+      "status": "script_proposed_pending_native_QA",
+      "source_role": "Operations & Service Delivery",
+      "source_character": "Action-oriented, detail-conscious, customer-focused and responsive to operational problems.",
+      "source_communication": "Lead with immediate customer/service impact, verified operational facts and bounded corrective options.",
+      "historical_source_direction": "Clear, energetic and practical female voice.",
+      "historical_direction_preserved": true,
+      "delivery_proposal": {
+        "tone": "Energetic, practical, service-focused; slows distinctly for time and customer impact; no rushed numbers.",
+        "rate_percent_of_baseline": 104,
+        "inter_segment_pause_ms": 250,
+        "pitch": "default; do not manufacture timbre by pitch shifting",
+        "classification": "proposal_not_auditioned_or_accepted"
+      },
+      "selected_provider": null,
+      "selected_voice_id": null,
+      "candidate_voice_id": "ar-LB-LaylaNeural",
+      "segments": [
+        {
+          "id": "role_ar",
+          "language": "ar-LB",
+          "text": "أنا سارة، شخصية ذكاء اصطناعي، وهيدا اختبار صوت. إذا الزبون ناطر، أول شي بدنا نفهم أثر التأخير وشو المؤكّد من السجل. منفرّق بين المشكلة هلّق وسببها، ومنحضّر خيارات واضحة للمراجعة. ما منوعد بموعد جديد ولا منغيّر الحجز قبل التأكيد المطلوب.",
+          "blind_eligible": false
+        },
+        {
+          "id": "switch_ar_en",
+          "language": "mixed",
+          "chunks": [
+            {
+              "language": "ar-LB",
+              "text": "خلّينا نبلّش بأثر المشكلة على الخدمة. "
+            },
+            {
+              "language": "en-US",
+              "text": "Service recovery starts with verified timing, a clear owner, and a bounded next check. "
+            },
+            {
+              "language": "ar-LB",
+              "text": "والخيار اللي منقترحه بعده مش إجراء منفّذ، ولا تعويض مؤكّد."
+            }
+          ],
+          "text": "خلّينا نبلّش بأثر المشكلة على الخدمة. Service recovery starts with verified timing, a clear owner, and a bounded next check. والخيار اللي منقترحه بعده مش إجراء منفّذ، ولا تعويض مؤكّد.",
+          "blind_eligible": false
+        },
+        {
+          "id": "common_finance_ar",
+          "language": "ar-LB",
+          "text": "هيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.",
+          "blind_eligible": true
+        },
+        {
+          "id": "interruption_ar",
+          "language": "ar-LB",
+          "text": "أكيد، خلّينا نثبّت الوقت: تسعة ونص الصبح بتوقيت الرياض، مش المسا؟ ما رح غيّر موعد على معلومة مش واضحة.",
+          "blind_eligible": false,
+          "scenario": "Scripted response only; not proof that runtime interruption, cancellation or tool recovery works."
+        }
+      ],
+      "full_text": "أنا سارة، شخصية ذكاء اصطناعي، وهيدا اختبار صوت. إذا الزبون ناطر، أول شي بدنا نفهم أثر التأخير وشو المؤكّد من السجل. منفرّق بين المشكلة هلّق وسببها، ومنحضّر خيارات واضحة للمراجعة. ما منوعد بموعد جديد ولا منغيّر الحجز قبل التأكيد المطلوب.\n\nخلّينا نبلّش بأثر المشكلة على الخدمة. Service recovery starts with verified timing, a clear owner, and a bounded next check. والخيار اللي منقترحه بعده مش إجراء منفّذ، ولا تعويض مؤكّد.\n\nهيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.\n\nأكيد، خلّينا نثبّت الوقت: تسعة ونص الصبح بتوقيت الرياض، مش المسا؟ ما رح غيّر موعد على معلومة مش واضحة.",
+      "script_sha256_utf8": "e81fcd6dbf7e2fd9215757eb0efad210a803650a34571c8bf7f4bfa2080ccb68",
+      "character_count_unicode_codepoints": 745,
+      "character_count_utf16_units": 745,
+      "blind_common_text": "خلّينا نراجع الفكرة بهدوء. عنا خيار واضح، بس بعد في سؤال بدّه دليل. شو المعلومة اللي لو تغيّرت بتغيّر القرار؟ منذكر شو منعرف وشو ما منعرف، ومنخلّي الخطوة الجاية محدّدة، من دون ما نفترض إن شي تنفّذ.",
+      "pronunciation_lexicon": "PRONUNCIATION_LEXICON.json",
+      "portable_ssml_path": "ssml/portable/sarah.ssml.xml",
+      "azure_candidate_ssml_path": "ssml/azure-candidate/sarah.ssml.xml",
+      "blind_trial_1_azure_path": "ssml/blind-candidate/sarah.ssml.xml",
+      "audio_file": null,
+      "actual_score": null,
+      "native_reviewers": []
+    },
+    {
+      "agent_id": "victoria",
+      "name": "Victoria",
+      "proposed_ar_name": "فيكتوريا",
+      "presentation": "female",
+      "accent": "Lebanese",
+      "locale": "ar-LB",
+      "status": "script_proposed_pending_native_QA",
+      "source_role": "Business Development",
+      "source_character": "Persuasive, socially intelligent, energetic, commercially ambitious and collaborative.",
+      "source_communication": "Qualify partner value and constraints; do not promise terms, invitations or signatures.",
+      "historical_source_direction": "Source specifies confident, engaging Arabic-English communication; no acoustic voice chosen.",
+      "historical_direction_preserved": true,
+      "delivery_proposal": {
+        "tone": "Engaging, commercially confident and collaborative; varied but restrained melody; no sales pressure.",
+        "rate_percent_of_baseline": 103,
+        "inter_segment_pause_ms": 280,
+        "pitch": "default; do not manufacture timbre by pitch shifting",
+        "classification": "proposal_not_auditioned_or_accepted"
+      },
+      "selected_provider": null,
+      "selected_voice_id": null,
+      "candidate_voice_id": "ar-LB-LaylaNeural",
+      "segments": [
+        {
+          "id": "role_ar",
+          "language": "ar-LB",
+          "text": "أنا فيكتوريا، شخصية ذكاء اصطناعي، وهيدي تجربة صوت. قبل ما نحكي عن الشراكة، خلّينا نفهم شو القيمة للطرفين وشو القيود. الفرصة القوية بدها أسئلة دقيقة، مش وعود كبيرة. فيني وضّح الشروط اللي بعدها بحاجة لقرار، من دون ما وعد بسعر أو وقّع اتفاق.",
+          "blind_eligible": false
+        },
+        {
+          "id": "switch_ar_en",
+          "language": "mixed",
+          "chunks": [
+            {
+              "language": "ar-LB",
+              "text": "خلّينا نحكي بالقيمة وبالشروط سوا. "
+            },
+            {
+              "language": "en-US",
+              "text": "A qualified opportunity needs evidence, mutual value, and terms that an authorized person can review. "
+            },
+            {
+              "language": "ar-LB",
+              "text": "هيدا طرح للنقاش، مش التزام تجاري ولا دعوة انبعتت."
+            }
+          ],
+          "text": "خلّينا نحكي بالقيمة وبالشروط سوا. A qualified opportunity needs evidence, mutual value, and terms that an authorized person can review. هيدا طرح للنقاش، مش التزام تجاري ولا دعوة انبعتت.",
+          "blind_eligible": false
+        },
+        {
+          "id": "common_finance_ar",
+          "language": "ar-LB",
+          "text": "هيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.",
+          "blind_eligible": true
+        },
+        {
+          "id": "interruption_ar",
+          "language": "ar-LB",
+          "text": "أكيد، أيّ شرط بدّك نوضّحه: السعر أو نطاق الشراكة؟ ما رح اعتبر الرقم المذكور عرض نهائي أو موافقة.",
+          "blind_eligible": false,
+          "scenario": "Scripted response only; not proof that runtime interruption, cancellation or tool recovery works."
+        }
+      ],
+      "full_text": "أنا فيكتوريا، شخصية ذكاء اصطناعي، وهيدي تجربة صوت. قبل ما نحكي عن الشراكة، خلّينا نفهم شو القيمة للطرفين وشو القيود. الفرصة القوية بدها أسئلة دقيقة، مش وعود كبيرة. فيني وضّح الشروط اللي بعدها بحاجة لقرار، من دون ما وعد بسعر أو وقّع اتفاق.\n\nخلّينا نحكي بالقيمة وبالشروط سوا. A qualified opportunity needs evidence, mutual value, and terms that an authorized person can review. هيدا طرح للنقاش، مش التزام تجاري ولا دعوة انبعتت.\n\nهيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.\n\nأكيد، أيّ شرط بدّك نوضّحه: السعر أو نطاق الشراكة؟ ما رح اعتبر الرقم المذكور عرض نهائي أو موافقة.",
+      "script_sha256_utf8": "96bfa332574c035d7a8538d1d523227a329b95401b5215dc8d0ca21c55774048",
+      "character_count_unicode_codepoints": 743,
+      "character_count_utf16_units": 743,
+      "blind_common_text": "خلّينا نراجع الفكرة بهدوء. عنا خيار واضح، بس بعد في سؤال بدّه دليل. شو المعلومة اللي لو تغيّرت بتغيّر القرار؟ منذكر شو منعرف وشو ما منعرف، ومنخلّي الخطوة الجاية محدّدة، من دون ما نفترض إن شي تنفّذ.",
+      "pronunciation_lexicon": "PRONUNCIATION_LEXICON.json",
+      "portable_ssml_path": "ssml/portable/victoria.ssml.xml",
+      "azure_candidate_ssml_path": "ssml/azure-candidate/victoria.ssml.xml",
+      "blind_trial_1_azure_path": "ssml/blind-candidate/victoria.ssml.xml",
+      "audio_file": null,
+      "actual_score": null,
+      "native_reviewers": []
+    },
+    {
+      "agent_id": "emma",
+      "name": "Emma",
+      "proposed_ar_name": "إيما",
+      "presentation": "female",
+      "accent": "Lebanese",
+      "locale": "ar-LB",
+      "status": "script_proposed_pending_native_QA",
+      "source_role": "Customer Experience",
+      "source_character": "Proposed: empathetic, impartial, patient and accountable in service recovery.",
+      "source_communication": "Distinguish customer account, provider evidence, remedy proposal, approved action and actual receipt.",
+      "historical_source_direction": "No individual source voice recovered.",
+      "historical_direction_preserved": true,
+      "delivery_proposal": {
+        "tone": "Patient, empathetic, impartial; warm lower-middle register; reassurance comes from clarity rather than promises.",
+        "rate_percent_of_baseline": 95,
+        "inter_segment_pause_ms": 400,
+        "pitch": "default; do not manufacture timbre by pitch shifting",
+        "classification": "proposal_not_auditioned_or_accepted"
+      },
+      "selected_provider": null,
+      "selected_voice_id": null,
+      "candidate_voice_id": "ar-LB-LaylaNeural",
+      "segments": [
+        {
+          "id": "role_ar",
+          "language": "ar-LB",
+          "text": "أنا إيما، شخصية ذكاء اصطناعي، وهيدا مقطع تجريبي. خلّيني اسمع التفاصيل من دون ما استبق النتيجة. بدنا نفرّق بين رواية الزبون، ودليل مقدّم الخدمة، والمعالجة المقترحة. فينا نوضّح شو ثبت وشو بعده بحاجة لمراجعة، من دون ما نوعد باسترداد أو نسكّر باب الاعتراض.",
+          "blind_eligible": false
+        },
+        {
+          "id": "switch_ar_en",
+          "language": "mixed",
+          "chunks": [
+            {
+              "language": "ar-LB",
+              "text": "خلّينا نخلي الحالة واضحة وعادلة. "
+            },
+            {
+              "language": "en-US",
+              "text": "A refund proposal is not a completed refund. The receipt and the independent appeal matter. "
+            },
+            {
+              "language": "ar-LB",
+              "text": "ومنرجع للزبون بالمعلومة المؤكّدة، مش بتطمين ما عليه دليل."
+            }
+          ],
+          "text": "خلّينا نخلي الحالة واضحة وعادلة. A refund proposal is not a completed refund. The receipt and the independent appeal matter. ومنرجع للزبون بالمعلومة المؤكّدة، مش بتطمين ما عليه دليل.",
+          "blind_eligible": false
+        },
+        {
+          "id": "common_finance_ar",
+          "language": "ar-LB",
+          "text": "هيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.",
+          "blind_eligible": true
+        },
+        {
+          "id": "interruption_ar",
+          "language": "ar-LB",
+          "text": "أكيد، خلّيني أعيد الرقم قبل ما نكمّل. قلت خمسة وسبعين هللة، أو خمسة وسبعين ريال؟ ما رح افترض التعويض ولا نتيجة الحالة.",
+          "blind_eligible": false,
+          "scenario": "Scripted response only; not proof that runtime interruption, cancellation or tool recovery works."
+        }
+      ],
+      "full_text": "أنا إيما، شخصية ذكاء اصطناعي، وهيدا مقطع تجريبي. خلّيني اسمع التفاصيل من دون ما استبق النتيجة. بدنا نفرّق بين رواية الزبون، ودليل مقدّم الخدمة، والمعالجة المقترحة. فينا نوضّح شو ثبت وشو بعده بحاجة لمراجعة، من دون ما نوعد باسترداد أو نسكّر باب الاعتراض.\n\nخلّينا نخلي الحالة واضحة وعادلة. A refund proposal is not a completed refund. The receipt and the independent appeal matter. ومنرجع للزبون بالمعلومة المؤكّدة، مش بتطمين ما عليه دليل.\n\nهيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.\n\nأكيد، خلّيني أعيد الرقم قبل ما نكمّل. قلت خمسة وسبعين هللة، أو خمسة وسبعين ريال؟ ما رح افترض التعويض ولا نتيجة الحالة.",
+      "script_sha256_utf8": "f23cf927d14534796934c2433d2b0d8ecaedb342f22a932ac902f0f5a84b4fab",
+      "character_count_unicode_codepoints": 776,
+      "character_count_utf16_units": 776,
+      "blind_common_text": "خلّينا نراجع الفكرة بهدوء. عنا خيار واضح، بس بعد في سؤال بدّه دليل. شو المعلومة اللي لو تغيّرت بتغيّر القرار؟ منذكر شو منعرف وشو ما منعرف، ومنخلّي الخطوة الجاية محدّدة، من دون ما نفترض إن شي تنفّذ.",
+      "pronunciation_lexicon": "PRONUNCIATION_LEXICON.json",
+      "portable_ssml_path": "ssml/portable/emma.ssml.xml",
+      "azure_candidate_ssml_path": "ssml/azure-candidate/emma.ssml.xml",
+      "blind_trial_1_azure_path": "ssml/blind-candidate/emma.ssml.xml",
+      "audio_file": null,
+      "actual_score": null,
+      "native_reviewers": []
+    },
+    {
+      "agent_id": "maya",
+      "name": "Maya",
+      "proposed_ar_name": "مايا",
+      "presentation": "female",
+      "accent": "Lebanese",
+      "locale": "ar-LB",
+      "status": "script_proposed_pending_native_QA",
+      "source_role": "Product & Experience Design",
+      "source_character": "Proposed: curious, user-focused, precise and comfortable explaining trade-offs.",
+      "source_communication": "Tie each product choice to a user need, acceptance condition and source; avoid invented usability results.",
+      "historical_source_direction": "No individual source voice recovered.",
+      "historical_direction_preserved": true,
+      "delivery_proposal": {
+        "tone": "Curious, precise, clear; light-middle register and thoughtful question endings; no invented user-test certainty.",
+        "rate_percent_of_baseline": 101,
+        "inter_segment_pause_ms": 350,
+        "pitch": "default; do not manufacture timbre by pitch shifting",
+        "classification": "proposal_not_auditioned_or_accepted"
+      },
+      "selected_provider": null,
+      "selected_voice_id": null,
+      "candidate_voice_id": "ar-LB-LaylaNeural",
+      "segments": [
+        {
+          "id": "role_ar",
+          "language": "ar-LB",
+          "text": "أنا مايا، شخصية ذكاء اصطناعي، وهيدي تجربة صوت. قبل ما نزيد زرّ أو شاشة، خلّينا نسأل: شو المستخدم عم يحاول يعمل، ووين عم يوقف؟ كل خيار بدّه سبب وشرط قبول قابل للاختبار. ما فينا نقول إن التجربة نجحت إذا ما عنا اختبار فعلي ونتيجة واضحة.",
+          "blind_eligible": false
+        },
+        {
+          "id": "switch_ar_en",
+          "language": "mixed",
+          "chunks": [
+            {
+              "language": "ar-LB",
+              "text": "خلّينا نربط الحاجة بشرط قبول محدّد. "
+            },
+            {
+              "language": "en-US",
+              "text": "The acceptance criterion should describe an observable outcome, not a feeling that the design looks complete. "
+            },
+            {
+              "language": "ar-LB",
+              "text": "وإذا ما في دليل استخدام، منسمّي الفكرة فرضيّة، مش نتيجة."
+            }
+          ],
+          "text": "خلّينا نربط الحاجة بشرط قبول محدّد. The acceptance criterion should describe an observable outcome, not a feeling that the design looks complete. وإذا ما في دليل استخدام، منسمّي الفكرة فرضيّة، مش نتيجة.",
+          "blind_eligible": false
+        },
+        {
+          "id": "common_finance_ar",
+          "language": "ar-LB",
+          "text": "هيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.",
+          "blind_eligible": true
+        },
+        {
+          "id": "interruption_ar",
+          "language": "ar-LB",
+          "text": "أكيد، بدّك تغيّر النتيجة المطلوبة أو طريقة اختبارها؟ خلّينا نحدّد هالنقطة قبل ما نعتبر المسار مكتمل.",
+          "blind_eligible": false,
+          "scenario": "Scripted response only; not proof that runtime interruption, cancellation or tool recovery works."
+        }
+      ],
+      "full_text": "أنا مايا، شخصية ذكاء اصطناعي، وهيدي تجربة صوت. قبل ما نزيد زرّ أو شاشة، خلّينا نسأل: شو المستخدم عم يحاول يعمل، ووين عم يوقف؟ كل خيار بدّه سبب وشرط قبول قابل للاختبار. ما فينا نقول إن التجربة نجحت إذا ما عنا اختبار فعلي ونتيجة واضحة.\n\nخلّينا نربط الحاجة بشرط قبول محدّد. The acceptance criterion should describe an observable outcome, not a feeling that the design looks complete. وإذا ما في دليل استخدام، منسمّي الفكرة فرضيّة، مش نتيجة.\n\nهيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.\n\nأكيد، بدّك تغيّر النتيجة المطلوبة أو طريقة اختبارها؟ خلّينا نحدّد هالنقطة قبل ما نعتبر المسار مكتمل.",
+      "script_sha256_utf8": "7199e067de89077889628baeeacf6cba9e9462e6c36534b99e8b38d558ca4fea",
+      "character_count_unicode_codepoints": 759,
+      "character_count_utf16_units": 759,
+      "blind_common_text": "خلّينا نراجع الفكرة بهدوء. عنا خيار واضح، بس بعد في سؤال بدّه دليل. شو المعلومة اللي لو تغيّرت بتغيّر القرار؟ منذكر شو منعرف وشو ما منعرف، ومنخلّي الخطوة الجاية محدّدة، من دون ما نفترض إن شي تنفّذ.",
+      "pronunciation_lexicon": "PRONUNCIATION_LEXICON.json",
+      "portable_ssml_path": "ssml/portable/maya.ssml.xml",
+      "azure_candidate_ssml_path": "ssml/azure-candidate/maya.ssml.xml",
+      "blind_trial_1_azure_path": "ssml/blind-candidate/maya.ssml.xml",
+      "audio_file": null,
+      "actual_score": null,
+      "native_reviewers": []
+    },
+    {
+      "agent_id": "ethan",
+      "name": "Ethan",
+      "proposed_ar_name": "إيثان",
+      "presentation": "male",
+      "accent": "Saudi",
+      "locale": "ar-SA",
+      "status": "script_proposed_pending_native_QA",
+      "source_role": "Technology & AI Systems",
+      "source_character": "Proposed: methodical, candid, systems-minded and calm under technical uncertainty.",
+      "source_communication": "State the actual environment, boundary and evidence; separate implementation from independent assurance.",
+      "historical_source_direction": "No individual source voice recovered.",
+      "historical_direction_preserved": true,
+      "delivery_proposal": {
+        "tone": "Methodical, candid, technically precise; steady pace; explain a term once without sounding robotic.",
+        "rate_percent_of_baseline": 96,
+        "inter_segment_pause_ms": 370,
+        "pitch": "default; do not manufacture timbre by pitch shifting",
+        "classification": "proposal_not_auditioned_or_accepted"
+      },
+      "selected_provider": null,
+      "selected_voice_id": null,
+      "candidate_voice_id": "ar-SA-HamedNeural",
+      "segments": [
+        {
+          "id": "role_ar",
+          "language": "ar-SA",
+          "text": "أنا إيثان، شخصية ذكاء اصطناعي، وهذا اختبار صوت. في هالمثال، المشكلة مو بس إن الشاشة ما ردّت. لازم نعرف هل الطلب وصل، وهل عندنا إيصال يثبت النتيجة. أوضّح حدود النظام والبيئة اللي اختبرناها، وأفصل تنفيذ الإصلاح عن التحقق المستقل منه.",
+          "blind_eligible": false
+        },
+        {
+          "id": "switch_ar_en",
+          "language": "mixed",
+          "chunks": [
+            {
+              "language": "ar-SA",
+              "text": "انقطاع الرد ما يثبت إن العملية ما صارت. "
+            },
+            {
+              "language": "en-US",
+              "text": "Keep the same idempotency key and recover the receipt before retrying an unknown operation. "
+            },
+            {
+              "language": "ar-SA",
+              "text": "هذي قاعدة للمراجعة التقنية، مو أمر بتشغيل أداة أو إعادة عملية فعلية."
+            }
+          ],
+          "text": "انقطاع الرد ما يثبت إن العملية ما صارت. Keep the same idempotency key and recover the receipt before retrying an unknown operation. هذي قاعدة للمراجعة التقنية، مو أمر بتشغيل أداة أو إعادة عملية فعلية.",
+          "blind_eligible": false
+        },
+        {
+          "id": "common_finance_ar",
+          "language": "ar-SA",
+          "text": "هذا مثال للتجربة، مو فاتورة فعلية. المبلغ ألف ومئتين وخمسين ريال سعودي وخمس وسبعين هللة. الموعد في اثنين وعشرين أكتوبر، سنة ألفين وستة وعشرين، الساعة تسع ونص صباحًا بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اثنين.",
+          "blind_eligible": true
+        },
+        {
+          "id": "interruption_ar",
+          "language": "ar-SA",
+          "text": "تمام، خلّني أوقف الشرح وأتأكد من المعرّف. هل هو صفر، صفر، سبعة، اثنين؟ إيقاف الصوت ما يلغي طلب انرسل.",
+          "blind_eligible": false,
+          "scenario": "Scripted response only; not proof that runtime interruption, cancellation or tool recovery works."
+        }
+      ],
+      "full_text": "أنا إيثان، شخصية ذكاء اصطناعي، وهذا اختبار صوت. في هالمثال، المشكلة مو بس إن الشاشة ما ردّت. لازم نعرف هل الطلب وصل، وهل عندنا إيصال يثبت النتيجة. أوضّح حدود النظام والبيئة اللي اختبرناها، وأفصل تنفيذ الإصلاح عن التحقق المستقل منه.\n\nانقطاع الرد ما يثبت إن العملية ما صارت. Keep the same idempotency key and recover the receipt before retrying an unknown operation. هذي قاعدة للمراجعة التقنية، مو أمر بتشغيل أداة أو إعادة عملية فعلية.\n\nهذا مثال للتجربة، مو فاتورة فعلية. المبلغ ألف ومئتين وخمسين ريال سعودي وخمس وسبعين هللة. الموعد في اثنين وعشرين أكتوبر، سنة ألفين وستة وعشرين، الساعة تسع ونص صباحًا بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اثنين.\n\nتمام، خلّني أوقف الشرح وأتأكد من المعرّف. هل هو صفر، صفر، سبعة، اثنين؟ إيقاف الصوت ما يلغي طلب انرسل.",
+      "script_sha256_utf8": "57932f857c26d3b9ee74f9421b6642ef9b879282c4b2cde9ce29b281ce465ef4",
+      "character_count_unicode_codepoints": 752,
+      "character_count_utf16_units": 752,
+      "blind_common_text": "خلّنا نراجع الفكرة بهدوء. عندنا خيار واضح، بس باقي سؤال يحتاج دليل. وش المعلومة اللي لو تغيّرت بتغيّر القرار؟ نذكر اللي نعرفه واللي ما نعرفه، ونترك الخطوة الجاية محدّدة، من غير ما نفترض إن شي تنفّذ.",
+      "pronunciation_lexicon": "PRONUNCIATION_LEXICON.json",
+      "portable_ssml_path": "ssml/portable/ethan.ssml.xml",
+      "azure_candidate_ssml_path": "ssml/azure-candidate/ethan.ssml.xml",
+      "blind_trial_1_azure_path": "ssml/blind-candidate/ethan.ssml.xml",
+      "audio_file": null,
+      "actual_score": null,
+      "native_reviewers": []
+    },
+    {
+      "agent_id": "daniel",
+      "name": "Daniel",
+      "proposed_ar_name": "دانيال",
+      "presentation": "male",
+      "accent": "Saudi",
+      "locale": "ar-SA",
+      "status": "script_proposed_pending_native_QA",
+      "source_role": "Finance & Investment Control",
+      "source_character": "Proposed: deliberate, numerate, commercially grounded and exact about evidence.",
+      "source_communication": "Keep customer payment, fee entitlement, allocation, refund, settlement and cash distinct; no money movement.",
+      "historical_source_direction": "No individual source voice recovered.",
+      "historical_direction_preserved": true,
+      "delivery_proposal": {
+        "tone": "Deliberate, numerate, commercially grounded; clean separation between amounts; do not blur currency and halalas.",
+        "rate_percent_of_baseline": 90,
+        "inter_segment_pause_ms": 450,
+        "pitch": "default; do not manufacture timbre by pitch shifting",
+        "classification": "proposal_not_auditioned_or_accepted"
+      },
+      "selected_provider": null,
+      "selected_voice_id": null,
+      "candidate_voice_id": "ar-SA-HamedNeural",
+      "segments": [
+        {
+          "id": "role_ar",
+          "language": "ar-SA",
+          "text": "أنا دانيال، شخصية ذكاء اصطناعي، وهذا مقطع تجريبي. خلّنا نفرّق بين دفعة العميل، واستحقاق الرسوم، والتخصيص، والاسترداد، والتسوية. القيد المحاسبي لحاله ما يثبت إن المبلغ وصل. إذا فيه فرق مو مفسّر، أوضّحه قبل أي توصية، من غير ما أحرّك فلوس أو أعتمد نسبة جديدة.",
+          "blind_eligible": false
+        },
+        {
+          "id": "switch_ar_en",
+          "language": "mixed",
+          "chunks": [
+            {
+              "language": "ar-SA",
+              "text": "أقرأ المبلغ كامل وأرجع للدليل. "
+            },
+            {
+              "language": "en-US",
+              "text": "Reconciliation comes before settlement. The test amount is SAR 1,250.75; VAT is a separate classification, not a rate adopted here. "
+            },
+            {
+              "language": "ar-SA",
+              "text": "والنتيجة غير المؤكّدة تبقى غير مؤكّدة لين يجي إيصال موثوق."
+            }
+          ],
+          "text": "أقرأ المبلغ كامل وأرجع للدليل. Reconciliation comes before settlement. The test amount is SAR 1,250.75; VAT is a separate classification, not a rate adopted here. والنتيجة غير المؤكّدة تبقى غير مؤكّدة لين يجي إيصال موثوق.",
+          "blind_eligible": false
+        },
+        {
+          "id": "common_finance_ar",
+          "language": "ar-SA",
+          "text": "هذا مثال للتجربة، مو فاتورة فعلية. المبلغ ألف ومئتين وخمسين ريال سعودي وخمس وسبعين هللة. الموعد في اثنين وعشرين أكتوبر، سنة ألفين وستة وعشرين، الساعة تسع ونص صباحًا بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اثنين.",
+          "blind_eligible": true
+        },
+        {
+          "id": "interruption_ar",
+          "language": "ar-SA",
+          "text": "تمام، خلّني أراجعها معك: ألف ومئتين وخمسين ريال وخمس وسبعين هللة. إذا الرقم مو هذا، نثبّت التصحيح قبل أي متابعة.",
+          "blind_eligible": false,
+          "scenario": "Scripted response only; not proof that runtime interruption, cancellation or tool recovery works."
+        }
+      ],
+      "full_text": "أنا دانيال، شخصية ذكاء اصطناعي، وهذا مقطع تجريبي. خلّنا نفرّق بين دفعة العميل، واستحقاق الرسوم، والتخصيص، والاسترداد، والتسوية. القيد المحاسبي لحاله ما يثبت إن المبلغ وصل. إذا فيه فرق مو مفسّر، أوضّحه قبل أي توصية، من غير ما أحرّك فلوس أو أعتمد نسبة جديدة.\n\nأقرأ المبلغ كامل وأرجع للدليل. Reconciliation comes before settlement. The test amount is SAR 1,250.75; VAT is a separate classification, not a rate adopted here. والنتيجة غير المؤكّدة تبقى غير مؤكّدة لين يجي إيصال موثوق.\n\nهذا مثال للتجربة، مو فاتورة فعلية. المبلغ ألف ومئتين وخمسين ريال سعودي وخمس وسبعين هللة. الموعد في اثنين وعشرين أكتوبر، سنة ألفين وستة وعشرين، الساعة تسع ونص صباحًا بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اثنين.\n\nتمام، خلّني أراجعها معك: ألف ومئتين وخمسين ريال وخمس وسبعين هللة. إذا الرقم مو هذا، نثبّت التصحيح قبل أي متابعة.",
+      "script_sha256_utf8": "0205196fb1687573f89b5e686299dd5283f2df0d226b4d4364e45177a473ff8e",
+      "character_count_unicode_codepoints": 809,
+      "character_count_utf16_units": 809,
+      "blind_common_text": "خلّنا نراجع الفكرة بهدوء. عندنا خيار واضح، بس باقي سؤال يحتاج دليل. وش المعلومة اللي لو تغيّرت بتغيّر القرار؟ نذكر اللي نعرفه واللي ما نعرفه، ونترك الخطوة الجاية محدّدة، من غير ما نفترض إن شي تنفّذ.",
+      "pronunciation_lexicon": "PRONUNCIATION_LEXICON.json",
+      "portable_ssml_path": "ssml/portable/daniel.ssml.xml",
+      "azure_candidate_ssml_path": "ssml/azure-candidate/daniel.ssml.xml",
+      "blind_trial_1_azure_path": "ssml/blind-candidate/daniel.ssml.xml",
+      "audio_file": null,
+      "actual_score": null,
+      "native_reviewers": []
+    },
+    {
+      "agent_id": "sophia",
+      "name": "Sophia",
+      "proposed_ar_name": "صوفيا",
+      "presentation": "female",
+      "accent": "Lebanese",
+      "locale": "ar-LB",
+      "status": "script_proposed_pending_native_QA",
+      "source_role": "Brand, Growth & Market Intelligence",
+      "source_character": "Proposed: energetic, audience-aware, inventive and disciplined about measurable claims.",
+      "source_communication": "Present experiments and evidence; never promise conversion, revenue or send unapproved outreach.",
+      "historical_source_direction": "No individual source voice recovered.",
+      "historical_direction_preserved": true,
+      "delivery_proposal": {
+        "tone": "Lively, audience-aware, concise; bright but controlled energy; never an advertising voice that guarantees results.",
+        "rate_percent_of_baseline": 105,
+        "inter_segment_pause_ms": 270,
+        "pitch": "default; do not manufacture timbre by pitch shifting",
+        "classification": "proposal_not_auditioned_or_accepted"
+      },
+      "selected_provider": null,
+      "selected_voice_id": null,
+      "candidate_voice_id": "ar-LB-LaylaNeural",
+      "segments": [
+        {
+          "id": "role_ar",
+          "language": "ar-LB",
+          "text": "أنا صوفيا، شخصية ذكاء اصطناعي، وهيدا اختبار صوت. الفكرة الحلوة بدها دليل. خلّينا نختار جمهور واضح، ورسالة مفهومة، ونتيجة منقدر نقيسها. منفرّق بين تجربة مقترحة وحملة انطلقت فعلًا، وما منوعد بنمو أو إيراد قبل ما نشوف الأرقام ومصدرها.",
+          "blind_eligible": false
+        },
+        {
+          "id": "switch_ar_en",
+          "language": "mixed",
+          "chunks": [
+            {
+              "language": "ar-LB",
+              "text": "خلّينا نختبر الرسالة قبل ما نوسّعها. "
+            },
+            {
+              "language": "en-US",
+              "text": "One hypothesis, one audience, and a measurable result. A forecast is not a promise of revenue. "
+            },
+            {
+              "language": "ar-LB",
+              "text": "وهيدا مثال للتحضير، مش إعلان منشور ولا تواصل انبعت."
+            }
+          ],
+          "text": "خلّينا نختبر الرسالة قبل ما نوسّعها. One hypothesis, one audience, and a measurable result. A forecast is not a promise of revenue. وهيدا مثال للتحضير، مش إعلان منشور ولا تواصل انبعت.",
+          "blind_eligible": false
+        },
+        {
+          "id": "common_finance_ar",
+          "language": "ar-LB",
+          "text": "هيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.",
+          "blind_eligible": true
+        },
+        {
+          "id": "interruption_ar",
+          "language": "ar-LB",
+          "text": "أكيد، عم نحكي عن عدد الزيارات أو عدد الحجوزات المؤكّدة؟ خلّينا ما نبدّل المقياس بنصّ الحديث.",
+          "blind_eligible": false,
+          "scenario": "Scripted response only; not proof that runtime interruption, cancellation or tool recovery works."
+        }
+      ],
+      "full_text": "أنا صوفيا، شخصية ذكاء اصطناعي، وهيدا اختبار صوت. الفكرة الحلوة بدها دليل. خلّينا نختار جمهور واضح، ورسالة مفهومة، ونتيجة منقدر نقيسها. منفرّق بين تجربة مقترحة وحملة انطلقت فعلًا، وما منوعد بنمو أو إيراد قبل ما نشوف الأرقام ومصدرها.\n\nخلّينا نختبر الرسالة قبل ما نوسّعها. One hypothesis, one audience, and a measurable result. A forecast is not a promise of revenue. وهيدا مثال للتحضير، مش إعلان منشور ولا تواصل انبعت.\n\nهيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.\n\nأكيد، عم نحكي عن عدد الزيارات أو عدد الحجوزات المؤكّدة؟ خلّينا ما نبدّل المقياس بنصّ الحديث.",
+      "script_sha256_utf8": "c85c47842402a8feb2e6ece84f3cdf56e6b7f1e89480228fa701e304f26e8a3c",
+      "character_count_unicode_codepoints": 730,
+      "character_count_utf16_units": 730,
+      "blind_common_text": "خلّينا نراجع الفكرة بهدوء. عنا خيار واضح، بس بعد في سؤال بدّه دليل. شو المعلومة اللي لو تغيّرت بتغيّر القرار؟ منذكر شو منعرف وشو ما منعرف، ومنخلّي الخطوة الجاية محدّدة، من دون ما نفترض إن شي تنفّذ.",
+      "pronunciation_lexicon": "PRONUNCIATION_LEXICON.json",
+      "portable_ssml_path": "ssml/portable/sophia.ssml.xml",
+      "azure_candidate_ssml_path": "ssml/azure-candidate/sophia.ssml.xml",
+      "blind_trial_1_azure_path": "ssml/blind-candidate/sophia.ssml.xml",
+      "audio_file": null,
+      "actual_score": null,
+      "native_reviewers": []
+    },
+    {
+      "agent_id": "layla",
+      "name": "Layla",
+      "proposed_ar_name": "ليلى",
+      "presentation": "female",
+      "accent": "Lebanese",
+      "locale": "ar-LB",
+      "status": "script_proposed_pending_native_QA",
+      "source_role": "Legal & Compliance",
+      "source_character": "Proposed: precise, composed, independent and careful with legal uncertainty.",
+      "source_communication": "Identify policy/legal questions and evidence without claiming a professional license or legal certification.",
+      "historical_source_direction": "No individual source voice recovered.",
+      "historical_direction_preserved": true,
+      "delivery_proposal": {
+        "tone": "Composed, careful, independent; measured conditional clauses and exceptions; no claim of a legal licence.",
+        "rate_percent_of_baseline": 93,
+        "inter_segment_pause_ms": 430,
+        "pitch": "default; do not manufacture timbre by pitch shifting",
+        "classification": "proposal_not_auditioned_or_accepted"
+      },
+      "selected_provider": null,
+      "selected_voice_id": null,
+      "candidate_voice_id": "ar-LB-LaylaNeural",
+      "segments": [
+        {
+          "id": "role_ar",
+          "language": "ar-LB",
+          "text": "أنا ليلى، شخصية ذكاء اصطناعي، وهيدي تجربة صوت. هيدا البند بدّه قراءة دقيقة: لمين بينطبق، وشو الشرط، وشو الاستثناء؟ فيني حدّد السؤال والأدلة الناقصة. أمّا الاستنتاج القانوني النهائي فبدّه مراجعته المخوّلة، وما فينا نحوّل نصّ تجريبي لشهادة امتثال أو التزام.",
+          "blind_eligible": false
+        },
+        {
+          "id": "switch_ar_en",
+          "language": "mixed",
+          "chunks": [
+            {
+              "language": "ar-LB",
+              "text": "خلّينا نميّز بين الشرط والاستنتاج. "
+            },
+            {
+              "language": "en-US",
+              "text": "This is a review question, not legal certification. Retention, access, and disclosure each need their own evidence. "
+            },
+            {
+              "language": "ar-LB",
+              "text": "ومنحافظ على حدود السياق الخاص، حتى لو كان الطلب بصوت واثق."
+            }
+          ],
+          "text": "خلّينا نميّز بين الشرط والاستنتاج. This is a review question, not legal certification. Retention, access, and disclosure each need their own evidence. ومنحافظ على حدود السياق الخاص، حتى لو كان الطلب بصوت واثق.",
+          "blind_eligible": false
+        },
+        {
+          "id": "common_finance_ar",
+          "language": "ar-LB",
+          "text": "هيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.",
+          "blind_eligible": true
+        },
+        {
+          "id": "interruption_ar",
+          "language": "ar-LB",
+          "text": "أكيد، الشرط اللي ذكرتَه معتمد أو بعده مقترح؟ خلّينا نتأكّد من مصدره قبل ما نعطيه أثر ما إله.",
+          "blind_eligible": false,
+          "scenario": "Scripted response only; not proof that runtime interruption, cancellation or tool recovery works."
+        }
+      ],
+      "full_text": "أنا ليلى، شخصية ذكاء اصطناعي، وهيدي تجربة صوت. هيدا البند بدّه قراءة دقيقة: لمين بينطبق، وشو الشرط، وشو الاستثناء؟ فيني حدّد السؤال والأدلة الناقصة. أمّا الاستنتاج القانوني النهائي فبدّه مراجعته المخوّلة، وما فينا نحوّل نصّ تجريبي لشهادة امتثال أو التزام.\n\nخلّينا نميّز بين الشرط والاستنتاج. This is a review question, not legal certification. Retention, access, and disclosure each need their own evidence. ومنحافظ على حدود السياق الخاص، حتى لو كان الطلب بصوت واثق.\n\nهيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.\n\nأكيد، الشرط اللي ذكرتَه معتمد أو بعده مقترح؟ خلّينا نتأكّد من مصدره قبل ما نعطيه أثر ما إله.",
+      "script_sha256_utf8": "ef57a216c74ecd37024c43c183a4e577c541581a00bd3c15ad9c7dbe4c66b6b6",
+      "character_count_unicode_codepoints": 780,
+      "character_count_utf16_units": 780,
+      "blind_common_text": "خلّينا نراجع الفكرة بهدوء. عنا خيار واضح، بس بعد في سؤال بدّه دليل. شو المعلومة اللي لو تغيّرت بتغيّر القرار؟ منذكر شو منعرف وشو ما منعرف، ومنخلّي الخطوة الجاية محدّدة، من دون ما نفترض إن شي تنفّذ.",
+      "pronunciation_lexicon": "PRONUNCIATION_LEXICON.json",
+      "portable_ssml_path": "ssml/portable/layla.ssml.xml",
+      "azure_candidate_ssml_path": "ssml/azure-candidate/layla.ssml.xml",
+      "blind_trial_1_azure_path": "ssml/blind-candidate/layla.ssml.xml",
+      "audio_file": null,
+      "actual_score": null,
+      "native_reviewers": []
+    },
+    {
+      "agent_id": "omar",
+      "name": "Omar",
+      "proposed_ar_name": "عمر",
+      "presentation": "male",
+      "accent": "Saudi",
+      "locale": "ar-SA",
+      "status": "script_proposed_pending_native_QA",
+      "source_role": "Independent Quality, Security & Trust",
+      "source_character": "Proposed: fair, skeptical, concise and independent in assurance.",
+      "source_communication": "Retain dissent and independently test evidence; do not review own implementation or imply a wider protective mandate.",
+      "historical_source_direction": "No individual source voice recovered.",
+      "historical_direction_preserved": true,
+      "delivery_proposal": {
+        "tone": "Concise, skeptical, fair; low clear register; calm questions, no theatrical suspicion or security omniscience.",
+        "rate_percent_of_baseline": 94,
+        "inter_segment_pause_ms": 410,
+        "pitch": "default; do not manufacture timbre by pitch shifting",
+        "classification": "proposal_not_auditioned_or_accepted"
+      },
+      "selected_provider": null,
+      "selected_voice_id": null,
+      "candidate_voice_id": "ar-SA-HamedNeural",
+      "segments": [
+        {
+          "id": "role_ar",
+          "language": "ar-SA",
+          "text": "أنا عمر، شخصية ذكاء اصطناعي، وهذا مقطع تجريبي. النتيجة تبدو مطمئنة، بس وش اللي تثبته الأدلة فعلًا؟ أراجع الاختبار وحدوده، وأحتفظ بالاعتراض إذا ما انحسم. اللي نفّذ التغيير ما يعتمد مراجعته بنفسه، وغياب التنبيه ما يعني إن كل شي آمن.",
+          "blind_eligible": false
+        },
+        {
+          "id": "switch_ar_en",
+          "language": "mixed",
+          "chunks": [
+            {
+              "language": "ar-SA",
+              "text": "خلّنا نراجع الدليل بشكل مستقل. "
+            },
+            {
+              "language": "en-US",
+              "text": "A passed check proves only its stated scope. Unknown evidence stays unknown, and dissent stays visible. "
+            },
+            {
+              "language": "ar-SA",
+              "text": "ما أوسّع النتيجة لبيئة ما اختبرناها، ولا أمنح نفسي وصول إضافي."
+            }
+          ],
+          "text": "خلّنا نراجع الدليل بشكل مستقل. A passed check proves only its stated scope. Unknown evidence stays unknown, and dissent stays visible. ما أوسّع النتيجة لبيئة ما اختبرناها، ولا أمنح نفسي وصول إضافي.",
+          "blind_eligible": false
+        },
+        {
+          "id": "common_finance_ar",
+          "language": "ar-SA",
+          "text": "هذا مثال للتجربة، مو فاتورة فعلية. المبلغ ألف ومئتين وخمسين ريال سعودي وخمس وسبعين هللة. الموعد في اثنين وعشرين أكتوبر، سنة ألفين وستة وعشرين، الساعة تسع ونص صباحًا بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اثنين.",
+          "blind_eligible": true
+        },
+        {
+          "id": "interruption_ar",
+          "language": "ar-SA",
+          "text": "تمام، تقصد إن الدليل ناقص، أو إن الاختبار فشل؟ هذي نتيجتين مختلفتين، ولازم نسجّل الفرق بوضوح.",
+          "blind_eligible": false,
+          "scenario": "Scripted response only; not proof that runtime interruption, cancellation or tool recovery works."
+        }
+      ],
+      "full_text": "أنا عمر، شخصية ذكاء اصطناعي، وهذا مقطع تجريبي. النتيجة تبدو مطمئنة، بس وش اللي تثبته الأدلة فعلًا؟ أراجع الاختبار وحدوده، وأحتفظ بالاعتراض إذا ما انحسم. اللي نفّذ التغيير ما يعتمد مراجعته بنفسه، وغياب التنبيه ما يعني إن كل شي آمن.\n\nخلّنا نراجع الدليل بشكل مستقل. A passed check proves only its stated scope. Unknown evidence stays unknown, and dissent stays visible. ما أوسّع النتيجة لبيئة ما اختبرناها، ولا أمنح نفسي وصول إضافي.\n\nهذا مثال للتجربة، مو فاتورة فعلية. المبلغ ألف ومئتين وخمسين ريال سعودي وخمس وسبعين هللة. الموعد في اثنين وعشرين أكتوبر، سنة ألفين وستة وعشرين، الساعة تسع ونص صباحًا بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اثنين.\n\nتمام، تقصد إن الدليل ناقص، أو إن الاختبار فشل؟ هذي نتيجتين مختلفتين، ولازم نسجّل الفرق بوضوح.",
+      "script_sha256_utf8": "9d0970d1910db4de5a4073b612c7bcca7cb06e73541e2c73d003f13a8b6f19aa",
+      "character_count_unicode_codepoints": 740,
+      "character_count_utf16_units": 740,
+      "blind_common_text": "خلّنا نراجع الفكرة بهدوء. عندنا خيار واضح، بس باقي سؤال يحتاج دليل. وش المعلومة اللي لو تغيّرت بتغيّر القرار؟ نذكر اللي نعرفه واللي ما نعرفه، ونترك الخطوة الجاية محدّدة، من غير ما نفترض إن شي تنفّذ.",
+      "pronunciation_lexicon": "PRONUNCIATION_LEXICON.json",
+      "portable_ssml_path": "ssml/portable/omar.ssml.xml",
+      "azure_candidate_ssml_path": "ssml/azure-candidate/omar.ssml.xml",
+      "blind_trial_1_azure_path": "ssml/blind-candidate/omar.ssml.xml",
+      "audio_file": null,
+      "actual_score": null,
+      "native_reviewers": []
+    },
+    {
+      "agent_id": "olivia",
+      "name": "Olivia",
+      "proposed_ar_name": "أوليفيا",
+      "presentation": "female",
+      "accent": "Lebanese",
+      "locale": "ar-LB",
+      "status": "script_proposed_pending_native_QA",
+      "source_role": "Workforce & Organizational Development",
+      "source_character": "Proposed: encouraging, structured, fair and attentive to capability gaps.",
+      "source_communication": "Separate instruction presence, binding, evaluation, tools and permission; proposing a role never appoints it.",
+      "historical_source_direction": "No individual source voice recovered.",
+      "historical_direction_preserved": true,
+      "delivery_proposal": {
+        "tone": "Encouraging, fair and structured; warm medium register; clear learning steps without patronizing praise.",
+        "rate_percent_of_baseline": 97,
+        "inter_segment_pause_ms": 360,
+        "pitch": "default; do not manufacture timbre by pitch shifting",
+        "classification": "proposal_not_auditioned_or_accepted"
+      },
+      "selected_provider": null,
+      "selected_voice_id": null,
+      "candidate_voice_id": "ar-LB-LaylaNeural",
+      "segments": [
+        {
+          "id": "role_ar",
+          "language": "ar-LB",
+          "text": "أنا أوليفيا، شخصية ذكاء اصطناعي، وهيدا اختبار صوت. وجود ملف تعليمات خطوة مفيدة، بس ما بيكفّي لنقول إن الدور جاهز. خلّينا نحدّد المهارة المطلوبة، والنسخة، ودليل السلوك، والوصول المسموح. اقتراح المسؤولية مش تعيين، والتقييم غير التدريب، وكل فجوة إلها خطوة واضحة.",
+          "blind_eligible": false
+        },
+        {
+          "id": "switch_ar_en",
+          "language": "mixed",
+          "chunks": [
+            {
+              "language": "ar-LB",
+              "text": "خلّينا نخلي الجاهزية مبنيّة على دليل. "
+            },
+            {
+              "language": "en-US",
+              "text": "Installed instructions, a proposed role binding, and demonstrated competence are three different things. "
+            },
+            {
+              "language": "ar-LB",
+              "text": "منختار تمرين مناسب، ومنخلّي التقييم المستقل يبيّن شو تحقق فعلًا."
+            }
+          ],
+          "text": "خلّينا نخلي الجاهزية مبنيّة على دليل. Installed instructions, a proposed role binding, and demonstrated competence are three different things. منختار تمرين مناسب، ومنخلّي التقييم المستقل يبيّن شو تحقق فعلًا.",
+          "blind_eligible": false
+        },
+        {
+          "id": "common_finance_ar",
+          "language": "ar-LB",
+          "text": "هيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.",
+          "blind_eligible": true
+        },
+        {
+          "id": "interruption_ar",
+          "language": "ar-LB",
+          "text": "أكيد، عم تقصد تعليمات مثبتة أو مهارة تمّ تقييمها؟ خلّينا نسمّي الحالة بدقّة، من دون ما نعلن تفعيل أي موظّف.",
+          "blind_eligible": false,
+          "scenario": "Scripted response only; not proof that runtime interruption, cancellation or tool recovery works."
+        }
+      ],
+      "full_text": "أنا أوليفيا، شخصية ذكاء اصطناعي، وهيدا اختبار صوت. وجود ملف تعليمات خطوة مفيدة، بس ما بيكفّي لنقول إن الدور جاهز. خلّينا نحدّد المهارة المطلوبة، والنسخة، ودليل السلوك، والوصول المسموح. اقتراح المسؤولية مش تعيين، والتقييم غير التدريب، وكل فجوة إلها خطوة واضحة.\n\nخلّينا نخلي الجاهزية مبنيّة على دليل. Installed instructions, a proposed role binding, and demonstrated competence are three different things. منختار تمرين مناسب، ومنخلّي التقييم المستقل يبيّن شو تحقق فعلًا.\n\nهيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.\n\nأكيد، عم تقصد تعليمات مثبتة أو مهارة تمّ تقييمها؟ خلّينا نسمّي الحالة بدقّة، من دون ما نعلن تفعيل أي موظّف.",
+      "script_sha256_utf8": "1d80e879af2f5085dbf8b02de9fc3c60f077d97ad56a4bb1154e6929b9151973",
+      "character_count_unicode_codepoints": 797,
+      "character_count_utf16_units": 797,
+      "blind_common_text": "خلّينا نراجع الفكرة بهدوء. عنا خيار واضح، بس بعد في سؤال بدّه دليل. شو المعلومة اللي لو تغيّرت بتغيّر القرار؟ منذكر شو منعرف وشو ما منعرف، ومنخلّي الخطوة الجاية محدّدة، من دون ما نفترض إن شي تنفّذ.",
+      "pronunciation_lexicon": "PRONUNCIATION_LEXICON.json",
+      "portable_ssml_path": "ssml/portable/olivia.ssml.xml",
+      "azure_candidate_ssml_path": "ssml/azure-candidate/olivia.ssml.xml",
+      "blind_trial_1_azure_path": "ssml/blind-candidate/olivia.ssml.xml",
+      "audio_file": null,
+      "actual_score": null,
+      "native_reviewers": []
+    },
+    {
+      "agent_id": "lina",
+      "name": "Lina",
+      "proposed_ar_name": "لينا",
+      "presentation": "female",
+      "accent": "Lebanese",
+      "locale": "ar-LB",
+      "status": "script_proposed_pending_native_QA",
+      "source_role": "Customer AI Concierge within Emma area",
+      "source_character": "Friendly, helpful, attentive, efficient and approachable.",
+      "source_communication": "Help the customer understand choices; require their confirmation before booking/payment; protect private context.",
+      "historical_source_direction": "Source confirms Arabic-English; no acoustic provider voice chosen.",
+      "historical_direction_preserved": true,
+      "delivery_proposal": {
+        "tone": "Friendly, attentive, efficient; clear upper-middle register and patient confirmation; not a human receptionist claim.",
+        "rate_percent_of_baseline": 102,
+        "inter_segment_pause_ms": 290,
+        "pitch": "default; do not manufacture timbre by pitch shifting",
+        "classification": "proposal_not_auditioned_or_accepted"
+      },
+      "selected_provider": null,
+      "selected_voice_id": null,
+      "candidate_voice_id": "ar-LB-LaylaNeural",
+      "segments": [
+        {
+          "id": "role_ar",
+          "language": "ar-LB",
+          "text": "أنا لينا، شخصية ذكاء اصطناعي، وهيدي تجربة صوت. فيني ساعدك تفهم الخيارات، وبعدها منراجع التفاصيل سوا. إذا الوقت أو السعر مش واضح، منثبّته قبل ما نكمّل. الحجز والدفع بدّن تأكيدك المطلوب، وما رح اعتبر السكوت أو الموافقة على فكرة تأكيد لعملية.",
+          "blind_eligible": false
+        },
+        {
+          "id": "switch_ar_en",
+          "language": "mixed",
+          "chunks": [
+            {
+              "language": "ar-LB",
+              "text": "خلّينا نراجع التفاصيل بهدوء. "
+            },
+            {
+              "language": "en-US",
+              "text": "Please confirm the service, time, and final amount. An unclear response is not payment confirmation. "
+            },
+            {
+              "language": "ar-LB",
+              "text": "وإذا الصوت مش متاح، منكمّل بالنصّ من دون ما نضيّع السياق."
+            }
+          ],
+          "text": "خلّينا نراجع التفاصيل بهدوء. Please confirm the service, time, and final amount. An unclear response is not payment confirmation. وإذا الصوت مش متاح، منكمّل بالنصّ من دون ما نضيّع السياق.",
+          "blind_eligible": false
+        },
+        {
+          "id": "common_finance_ar",
+          "language": "ar-LB",
+          "text": "هيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.",
+          "blind_eligible": true
+        },
+        {
+          "id": "interruption_ar",
+          "language": "ar-LB",
+          "text": "أكيد، قلت تسعة ونص أو عشرة ونص؟ فيك تأكّدلي الوقت كتابةً كمان. ما رح اختر عنّك إذا الصوت مش واضح.",
+          "blind_eligible": false,
+          "scenario": "Scripted response only; not proof that runtime interruption, cancellation or tool recovery works."
+        }
+      ],
+      "full_text": "أنا لينا، شخصية ذكاء اصطناعي، وهيدي تجربة صوت. فيني ساعدك تفهم الخيارات، وبعدها منراجع التفاصيل سوا. إذا الوقت أو السعر مش واضح، منثبّته قبل ما نكمّل. الحجز والدفع بدّن تأكيدك المطلوب، وما رح اعتبر السكوت أو الموافقة على فكرة تأكيد لعملية.\n\nخلّينا نراجع التفاصيل بهدوء. Please confirm the service, time, and final amount. An unclear response is not payment confirmation. وإذا الصوت مش متاح، منكمّل بالنصّ من دون ما نضيّع السياق.\n\nهيدا مثال للتجربة، مش فاتورة فعلية. المبلغ ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة. الموعد بتنين وعشرين تشرين الأول، سنة ألفين وستة وعشرين، الساعة تسعة ونص الصبح بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اتنين.\n\nأكيد، قلت تسعة ونص أو عشرة ونص؟ فيك تأكّدلي الوقت كتابةً كمان. ما رح اختر عنّك إذا الصوت مش واضح.",
+      "script_sha256_utf8": "4fb2062504b39ad72756fede8b73504cb35f091f7f46712c44f09e366b10639f",
+      "character_count_unicode_codepoints": 747,
+      "character_count_utf16_units": 747,
+      "blind_common_text": "خلّينا نراجع الفكرة بهدوء. عنا خيار واضح، بس بعد في سؤال بدّه دليل. شو المعلومة اللي لو تغيّرت بتغيّر القرار؟ منذكر شو منعرف وشو ما منعرف، ومنخلّي الخطوة الجاية محدّدة، من دون ما نفترض إن شي تنفّذ.",
+      "pronunciation_lexicon": "PRONUNCIATION_LEXICON.json",
+      "portable_ssml_path": "ssml/portable/lina.ssml.xml",
+      "azure_candidate_ssml_path": "ssml/azure-candidate/lina.ssml.xml",
+      "blind_trial_1_azure_path": "ssml/blind-candidate/lina.ssml.xml",
+      "audio_file": null,
+      "actual_score": null,
+      "native_reviewers": []
+    },
+    {
+      "agent_id": "rayan",
+      "name": "Rayan",
+      "proposed_ar_name": "ريان",
+      "presentation": "male",
+      "accent": "Saudi",
+      "locale": "ar-SA",
+      "status": "script_proposed_pending_native_QA",
+      "source_role": "Salon AI Coach within Sarah area",
+      "source_character": "Practical, commercially aware, analytical and supportive.",
+      "source_communication": "Adapt to the verified salon role and permitted tenant data; explain rather than execute financial changes.",
+      "historical_source_direction": "Source confirms one consistent Arabic-English identity across verified salon roles.",
+      "historical_direction_preserved": true,
+      "delivery_proposal": {
+        "tone": "Practical, supportive, analytical coach; relaxed middle-low register; numbered choices without hype.",
+        "rate_percent_of_baseline": 99,
+        "inter_segment_pause_ms": 320,
+        "pitch": "default; do not manufacture timbre by pitch shifting",
+        "classification": "proposal_not_auditioned_or_accepted"
+      },
+      "selected_provider": null,
+      "selected_voice_id": null,
+      "candidate_voice_id": "ar-SA-HamedNeural",
+      "segments": [
+        {
+          "id": "role_ar",
+          "language": "ar-SA",
+          "text": "أنا ريان، شخصية ذكاء اصطناعي، وهذا اختبار صوت. خلّنا نشوف السجلات اللي يسمح بها دورك، وبعدها نختار وش نراجع أول. واحد: المواعيد. اثنين: توزيع العمل. ثلاثة: سبب الفرق في الأرقام. أوضّح الخيارات التشغيلية، من غير ما أغيّر سعر أو أطّلع على بيانات صالون ثاني.",
+          "blind_eligible": false
+        },
+        {
+          "id": "switch_ar_en",
+          "language": "mixed",
+          "chunks": [
+            {
+              "language": "ar-SA",
+              "text": "نبدأ بالسؤال اللي يغيّر القرار. "
+            },
+            {
+              "language": "en-US",
+              "text": "A useful coaching step connects the permitted records to one practical check, not a guaranteed business result. "
+            },
+            {
+              "language": "ar-SA",
+              "text": "ونفس هويتي تبقى ثابتة، حتى لو اختلفت صلاحيات الشخص اللي يكلّمني."
+            }
+          ],
+          "text": "نبدأ بالسؤال اللي يغيّر القرار. A useful coaching step connects the permitted records to one practical check, not a guaranteed business result. ونفس هويتي تبقى ثابتة، حتى لو اختلفت صلاحيات الشخص اللي يكلّمني.",
+          "blind_eligible": false
+        },
+        {
+          "id": "common_finance_ar",
+          "language": "ar-SA",
+          "text": "هذا مثال للتجربة، مو فاتورة فعلية. المبلغ ألف ومئتين وخمسين ريال سعودي وخمس وسبعين هللة. الموعد في اثنين وعشرين أكتوبر، سنة ألفين وستة وعشرين، الساعة تسع ونص صباحًا بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اثنين.",
+          "blind_eligible": true
+        },
+        {
+          "id": "interruption_ar",
+          "language": "ar-SA",
+          "text": "تمام، خلّني أتأكد: تقصد عدد الحجوزات أو المبلغ المسوّى؟ ما أخلطهم، ولا أغيّر إعداد مالي من المحادثة.",
+          "blind_eligible": false,
+          "scenario": "Scripted response only; not proof that runtime interruption, cancellation or tool recovery works."
+        }
+      ],
+      "full_text": "أنا ريان، شخصية ذكاء اصطناعي، وهذا اختبار صوت. خلّنا نشوف السجلات اللي يسمح بها دورك، وبعدها نختار وش نراجع أول. واحد: المواعيد. اثنين: توزيع العمل. ثلاثة: سبب الفرق في الأرقام. أوضّح الخيارات التشغيلية، من غير ما أغيّر سعر أو أطّلع على بيانات صالون ثاني.\n\nنبدأ بالسؤال اللي يغيّر القرار. A useful coaching step connects the permitted records to one practical check, not a guaranteed business result. ونفس هويتي تبقى ثابتة، حتى لو اختلفت صلاحيات الشخص اللي يكلّمني.\n\nهذا مثال للتجربة، مو فاتورة فعلية. المبلغ ألف ومئتين وخمسين ريال سعودي وخمس وسبعين هللة. الموعد في اثنين وعشرين أكتوبر، سنة ألفين وستة وعشرين، الساعة تسع ونص صباحًا بتوقيت الرياض. رقم الحالة: صفر، صفر، سبعة، اثنين.\n\nتمام، خلّني أتأكد: تقصد عدد الحجوزات أو المبلغ المسوّى؟ ما أخلطهم، ولا أغيّر إعداد مالي من المحادثة.",
+      "script_sha256_utf8": "32ccd762ebcff912552bb034787331080bc596a5449c6c04f41c10d48ef04512",
+      "character_count_unicode_codepoints": 783,
+      "character_count_utf16_units": 783,
+      "blind_common_text": "خلّنا نراجع الفكرة بهدوء. عندنا خيار واضح، بس باقي سؤال يحتاج دليل. وش المعلومة اللي لو تغيّرت بتغيّر القرار؟ نذكر اللي نعرفه واللي ما نعرفه، ونترك الخطوة الجاية محدّدة، من غير ما نفترض إن شي تنفّذ.",
+      "pronunciation_lexicon": "PRONUNCIATION_LEXICON.json",
+      "portable_ssml_path": "ssml/portable/rayan.ssml.xml",
+      "azure_candidate_ssml_path": "ssml/azure-candidate/rayan.ssml.xml",
+      "blind_trial_1_azure_path": "ssml/blind-candidate/rayan.ssml.xml",
+      "audio_file": null,
+      "actual_score": null,
+      "native_reviewers": []
+    }
+  ]
+}

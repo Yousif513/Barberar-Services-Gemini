@@ -1,0 +1,17 @@
+﻿item,assumed_quantity,quantity_unit,unit_rate,rate_unit,formula_or_basis,illustrative_cost,notes
+source_translation,12000,source-word-target pairs,UNQUOTED,SAR/word,,,3locales×4000assumed source words; count inventory first; translator quote missing
+independent_content_review,12000,source-word-target pairs,UNQUOTED,SAR/word,,,Different native reviewer; do not substitute MT validation
+formative_participants,36,participant-hours,UNQUOTED,SAR/hour,,,3×12participants×1hour; recruitment/incentives quote missing; no outreach authorized
+moderation,36,moderator-hours,UNQUOTED,SAR/hour,,,1moderator per proposed participant hour; quote missing
+engineering_foundation,120,engineering-hours,UNQUOTED,SAR/hour,,,Working effort scenario only; not a delivery promise or quoted estimate
+regression_QA,48,QA-hours,UNQUOTED,SAR/hour,,,Working scenario; native/web scope and device matrix must be priced
+TTS_audition_scenario,12000,billed characters,15,USD/1Mchars,quantity/1000000*rate,0.18,Customer-language voice benchmark only; separate from the15management-agent allowance;3locales×40utterances×100assumed billed chars; actual vendor counting must be checked
+TTS_monthly_base_scenario,3000000,billed characters,15,USD/1Mchars,1000total voiced sessions*3000billed chars/1000000*rate,45,Public-retail reference only; no account/region availability or full cost guarantee
+TTS_monthly_with_reserve,3750000,billed characters,15,USD/1Mchars,base_usage*1.25/1000000*rate,56.25,"25%assumed usage/retry reserve; replaces base line in scenario, do not add both"
+STT_audition_scenario,2,audio-hours,UNQUOTED,USD/hour,,,1440utterances×5assumed seconds/3600; exact product/locale/region meter quote missing
+STT_monthly_scenario,33.333333,audio-hours,UNQUOTED,USD/hour,,,1000total sessions×2assumed minutes/60; do not assume TTS price covers STT
+LLM_input_monthly,1500000,input tokens,UNQUOTED,USD/1Mtokens,,,1000sessions×1500assumed input tokens; model/context/cache/retries quote missing
+LLM_output_monthly,500000,output tokens,UNQUOTED,USD/1Mtokens,,,1000sessions×500assumed output tokens; separate output rate required
+translation_maintenance,1200,source-word-target pairs/month,UNQUOTED,SAR/word,,,400assumed changed source words×3locales; review/retest additional
+storage_network_support_taxes,UNMEASURED,various,UNQUOTED,various,,,"No zero-cost assumption; retention,region,egress,service support and applicable tax quotes missing"
+planning_FX_only,3.75,SAR per USD,ASSUMPTION,SAR/USD,45*3.75;56.25*3.75,168.75;210.9375,"Budget conversion assumption, not exchange transaction or quoted total; display reserve SAR210.94"

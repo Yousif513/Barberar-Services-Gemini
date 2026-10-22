@@ -1,0 +1,163 @@
+{
+  "version": "0.1.0-proposed",
+  "status": "pronunciation_targets_pending_native_review_not_approved_IPA",
+  "rule": "These are test readings, not automatic replacement rules. No accent-specific IPA is claimed. Native reviewers confirm names, vowels, stress, pauses and natural regional forms; record accepted variants and the actual audio hash.",
+  "names": [
+    {
+      "agent_id": "nora",
+      "written_name": "Nora",
+      "proposed_arabic_reading": "نورا",
+      "status": "proposed_no_native_acceptance"
+    },
+    {
+      "agent_id": "adam",
+      "written_name": "Adam",
+      "proposed_arabic_reading": "آدم",
+      "status": "proposed_no_native_acceptance"
+    },
+    {
+      "agent_id": "alexander",
+      "written_name": "Alexander",
+      "proposed_arabic_reading": "ألكسندر",
+      "status": "proposed_no_native_acceptance"
+    },
+    {
+      "agent_id": "sarah",
+      "written_name": "Sarah",
+      "proposed_arabic_reading": "سارة",
+      "status": "proposed_no_native_acceptance"
+    },
+    {
+      "agent_id": "victoria",
+      "written_name": "Victoria",
+      "proposed_arabic_reading": "فيكتوريا",
+      "status": "proposed_no_native_acceptance"
+    },
+    {
+      "agent_id": "emma",
+      "written_name": "Emma",
+      "proposed_arabic_reading": "إيما",
+      "status": "proposed_no_native_acceptance"
+    },
+    {
+      "agent_id": "maya",
+      "written_name": "Maya",
+      "proposed_arabic_reading": "مايا",
+      "status": "proposed_no_native_acceptance"
+    },
+    {
+      "agent_id": "ethan",
+      "written_name": "Ethan",
+      "proposed_arabic_reading": "إيثان",
+      "status": "proposed_no_native_acceptance"
+    },
+    {
+      "agent_id": "daniel",
+      "written_name": "Daniel",
+      "proposed_arabic_reading": "دانيال",
+      "status": "proposed_no_native_acceptance"
+    },
+    {
+      "agent_id": "sophia",
+      "written_name": "Sophia",
+      "proposed_arabic_reading": "صوفيا",
+      "status": "proposed_no_native_acceptance"
+    },
+    {
+      "agent_id": "layla",
+      "written_name": "Layla",
+      "proposed_arabic_reading": "ليلى",
+      "status": "proposed_no_native_acceptance"
+    },
+    {
+      "agent_id": "omar",
+      "written_name": "Omar",
+      "proposed_arabic_reading": "عمر",
+      "status": "proposed_no_native_acceptance"
+    },
+    {
+      "agent_id": "olivia",
+      "written_name": "Olivia",
+      "proposed_arabic_reading": "أوليفيا",
+      "status": "proposed_no_native_acceptance"
+    },
+    {
+      "agent_id": "lina",
+      "written_name": "Lina",
+      "proposed_arabic_reading": "لينا",
+      "status": "proposed_no_native_acceptance"
+    },
+    {
+      "agent_id": "rayan",
+      "written_name": "Rayan",
+      "proposed_arabic_reading": "ريان",
+      "status": "proposed_no_native_acceptance"
+    }
+  ],
+  "material_targets": [
+    {
+      "written": "SAR 1,250.75",
+      "semantic_value": {
+        "currency": "SAR",
+        "amount": "1250.75"
+      },
+      "Saudi_candidate": "ألف ومئتين وخمسين ريال سعودي وخمس وسبعين هللة",
+      "Lebanese_candidate": "ألف وميتين وخمسين ريال سعودي وخمسة وسبعين هللة",
+      "English_candidate": "one thousand two hundred and fifty Saudi riyals and seventy-five halalas",
+      "fatal_errors": [
+        "wrong currency",
+        "wrong amount",
+        "75 riyals instead of75 halalas",
+        "negative or refunded amount inferred"
+      ]
+    },
+    {
+      "written": "2026-10-22",
+      "semantic_value": "22 October 2026 Gregorian",
+      "Saudi_candidate": "اثنين وعشرين أكتوبر سنة ألفين وستة وعشرين",
+      "Lebanese_candidate": "تنين وعشرين تشرين الأول سنة ألفين وستة وعشرين",
+      "reject": "day/month swap, Hijri conversion or wrong year"
+    },
+    {
+      "written": "09:30 Asia/Riyadh",
+      "semantic_value": "09:30 morning, Riyadh local time",
+      "Saudi_candidate": "تسع ونص صباحًا بتوقيت الرياض",
+      "Lebanese_candidate": "تسعة ونص الصبح بتوقيت الرياض",
+      "reject": "21:30, omitted morning that leaves ambiguity, time-zone substitution"
+    },
+    {
+      "written": "0072",
+      "semantic_value": "identifier string0072, not cardinal72",
+      "Saudi_candidate": "صفر، صفر، سبعة، اثنين",
+      "Lebanese_candidate": "صفر، صفر، سبعة، اتنين",
+      "reject": "dropped leading zeros or altered digit order"
+    },
+    {
+      "written": "SAR",
+      "English_candidate": "ess ay ar, or Saudi riyals when naturally expanding the currency label; retain semantic value",
+      "Arabic_candidate": "ريال سعودي",
+      "status": "native/provider rendering must be listened to"
+    },
+    {
+      "written": "VAT",
+      "English_candidate": "vee ay tee; value added tax is an acceptable explanatory expansion",
+      "Arabic_candidate": "ضريبة القيمة المضافة",
+      "rate_adopted": false
+    },
+    {
+      "written": "reconciliation / refund / settlement / idempotency key",
+      "Arabic_meaning": "مطابقة السجلات / الاسترداد / التسوية / معرّف يمنع تكرار أثر الطلب",
+      "instruction": "Keep each concept distinct. Test intelligible English without switching to another base voice; pronunciation quality remains unverified."
+    }
+  ],
+  "native_revision_fields": [
+    "reviewer_id",
+    "accent_background_self_description",
+    "target_text_revision",
+    "accepted_variant",
+    "reason",
+    "audio_sha256",
+    "observed_at",
+    "independent_reviewer_id"
+  ]
+}

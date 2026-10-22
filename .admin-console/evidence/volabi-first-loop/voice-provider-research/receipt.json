@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0.0",
+  "researcher": "server_hq_audit",
+  "classification": "Read-only provider-feasibility and published retail-rate research; not audition implementation or spending approval.",
+  "recorded_utc": "2026-10-22T10:43:02.950433+00:00",
+  "api_documentation": "https://learn.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices",
+  "requests": [
+    {
+      "region": "eastus",
+      "request_method": "GET",
+      "request_url": "https://prices.azure.com/api/retail/prices?currencyCode=%27USD%27&%24filter=productName+eq+%27Azure+Speech%27+and+armRegionName+eq+%27eastus%27+and+%28skuName+eq+%27S1%27+or+skuName+eq+%27Free%27+or+skuName+eq+%27Neural+HD%27%29",
+      "fetch_started_utc": "2026-10-22T10:42:59.189312+00:00",
+      "fetched_utc": "2026-10-22T10:43:02.950115+00:00",
+      "response_http_status": 200,
+      "response_content_type": "application/json; charset=utf-8",
+      "response_path": ".admin-console/evidence/volabi-first-loop/voice-provider-research/eastus.json",
+      "response_bytes": 19498,
+      "response_sha256": "68e04ac38a950c39f93f350ebf4ad17b1189d2067e653890b066bf35bcca17ff",
+      "response_items": 35,
+      "next_page_link": null,
+      "selected_meter": {
+        "currencyCode": "USD",
+        "serviceName": "Foundry Tools",
+        "productName": "Azure Speech",
+        "skuName": "S1",
+        "meterName": "S1 Neural Text To Speech Characters",
+        "retailPrice": 15.0,
+        "unitPrice": 15.0,
+        "unitOfMeasure": "1M",
+        "armRegionName": "eastus",
+        "effectiveStartDate": "2024-02-01T00:00:00Z",
+        "meterId": "0f98e708-a16c-407b-8089-a0ed9e14ab49",
+        "type": "Consumption",
+        "isPrimaryMeterRegion": false
+      }
+    },
+    {
+      "region": "uaenorth",
+      "request_method": "GET",
+      "request_url": "https://prices.azure.com/api/retail/prices?currencyCode=%27USD%27&%24filter=productName+eq+%27Azure+Speech%27+and+armRegionName+eq+%27uaenorth%27+and+%28skuName+eq+%27S1%27+or+skuName+eq+%27Free%27+or+skuName+eq+%27Neural+HD%27%29",
+      "fetch_started_utc": "2026-10-22T10:42:59.189610+00:00",
+      "fetched_utc": "2026-10-22T10:43:02.482882+00:00",
+      "response_http_status": 200,
+      "response_content_type": "application/json; charset=utf-8",
+      "response_path": ".admin-console/evidence/volabi-first-loop/voice-provider-research/uaenorth.json",
+      "response_bytes": 4562,
+      "response_sha256": "dee4f399faceca2d70167465bb033aff47fc57bf36c7b70825dbb0c8045edca7",
+      "response_items": 8,
+      "next_page_link": null,
+      "selected_meter": {
+        "currencyCode": "USD",
+        "serviceName": "Foundry Tools",
+        "productName": "Azure Speech",
+        "skuName": "S1",
+        "meterName": "S1 Neural Text To Speech Characters",
+        "retailPrice": 15.0,
+        "unitPrice": 15.0,
+        "unitOfMeasure": "1M",
+        "armRegionName": "uaenorth",
+        "effectiveStartDate": "2024-02-01T00:00:00Z",
+        "meterId": "0f98e708-a16c-407b-8089-a0ed9e14ab49",
+        "type": "Consumption",
+        "isPrimaryMeterRegion": false
+      }
+    }
+  ],
+  "authorization": "Anonymous public GET only; no account, credential, TTS generation, installation or remote write.",
+  "local_runtime_metadata": {
+    "active_provider": "edge",
+    "active_voice": "en-US-AriaNeural",
+    "method": "Selected only public tts provider/voice/model YAML metadata from the configured Hermes home; no credential values, environment dump, configuration content or configuration path recorded.",
+    "voice_selection": "Tool provider and voice are user-configured, not model-selected.",
+    "generation_executed": false
+  },
+  "primary_sources": {
+    "azure_language_and_voice_support": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts",
+    "azure_ssml_voice_and_language": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/speech-synthesis-markup-voice",
+    "azure_current_product_terms": "https://www.microsoft.com/licensing/terms/en-US/product/MicrosoftAzure/all",
+    "azure_pricing_and_free_quota": "https://azure.microsoft.com/en-us/pricing/details/speech/",
+    "azure_signup_requirements": "https://azure.microsoft.com/en-us/pricing/purchase-options/azure-account?icid=azurefaq",
+    "azure_tts_prerequisites": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/get-started-text-to-speech",
+    "hermes_tts_configuration": "https://hermes-agent.nousresearch.com/docs/user-guide/features/tts",
+    "elevenlabs_language_models": "https://elevenlabs.io/docs/overview/models/",
+    "elevenlabs_output_license": "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+    "elevenlabs_pricing": "https://elevenlabs.io/pricing"
+  },
+  "verified_findings": [
+    "Azure lists ar-SA-HamedNeural male and ar-LB-LaylaNeural female as standard stock voices. These are two voice identities, not fifteen distinct voices.",
+    "The Azure SSML language documentation states that non-multilingual voices do not support lang. Same-persona code-switching is not established for the two requested standard voices.",
+    "Azure F0 lists 0.5 million neural characters monthly; current Microsoft Product Terms scope prebuilt-output use rights to paid-tier TTS customers. Free quota alone is not a commercial-output license.",
+    "Azure documentation lists Bangla bn-BD, Urdu ur-PK, Hindi hi-IN, German de-DE and French fr-FR voices; actual target region availability and accent/naturalness require authorized auditions.",
+    "Existing installed SAPI receipt and direct inventory show only David/Zira en-US. The selected Hermes Edge voice is en-US, and no exact-locale licensed generation was executed.",
+    "ElevenLabs currently lists Starter USD6 monthly with30k credits, while its free plan excludes commercial use. Model language support is not a guarantee of each required Saudi/Lebanese accent."
+  ],
+  "limits": [
+    "Retail rates are observed public USD consumption estimates, not a tenant quote, approved budget, charge, voice-capacity guarantee, residency determination or tax calculation.",
+    "The selected S1 meter has isPrimaryMeterRegion=false for both returned regional records; this field is preserved rather than rewritten.",
+    "No eligibility or licensing conclusion is inferred for paying via trial credits. The current contractual paid-tier condition still requires confirmation for the intended account.",
+    "No fifteen-persona audition, listener evaluation, custom-voice consent or runtime multilingual integration is claimed.",
+    "Production, business activation, permissions, financial execution and new paid-service holds remain unchanged."
+  ]
+}

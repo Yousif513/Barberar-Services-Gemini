@@ -1,0 +1,291 @@
+{
+  "classification": "this_worker_owned_script_package_only",
+  "hash_basis": {
+    "algorithm": "SHA-256",
+    "scope": "files[].sha256 for the69listed worker-owned package files",
+    "encoding": "strict UTF-8 decode, then UTF-8 encode",
+    "line_ending_normalization": "replace CRLF pairs with LF only",
+    "other_transformations": "none: preserve BOM, lone CR, Unicode codepoints, whitespace and final newline",
+    "verifier_note": "README.md#hash-verification-basis"
+  },
+  "captured_source_records_hash_basis": "AUDITION_INPUT.json.source_records[].sha256 records exact captured original source-file bytes, without line-ending normalization; values unchanged.",
+  "audition_script_hash_basis": "AUDITION_INPUT.json.auditions[].script_sha256_utf8 hashes the exact full_text UTF-8 string, without line-ending normalization.",
+  "files": [
+    {
+      "path": "AUDITION_INPUT.json",
+      "sha256": "cec8018f08fd414753d74a0195c9976cdc01c7d4d1fc9665ca442a61cbed2900"
+    },
+    {
+      "path": "BLIND_TRIAL_SHEET.csv",
+      "sha256": "36c51274d0698ea57e0933d6bf75cee26d00ec2a284330a2af7c5283cc860f92"
+    },
+    {
+      "path": "EVALUATION_RUBRIC.json",
+      "sha256": "1470c8325c8244065eae625d5a0647ddcaf79071eb026eb0bdbbee3c440a4cbd"
+    },
+    {
+      "path": "EVALUATOR_SHEET.csv",
+      "sha256": "3b1ac8e9e0d6632c458671d8d632c711c500057144fb843e23c208240f59926e"
+    },
+    {
+      "path": "NATIVE_REVIEW_PROTOCOL.md",
+      "sha256": "f3d74ab8747ce8e3ff2ddaa80527180c0854d46187cab6cafec70fa9b2846c80"
+    },
+    {
+      "path": "PRONUNCIATION_LEXICON.json",
+      "sha256": "ff4bd2064e2a41ecfd6f011c6f832de6bb68ecca65fba5b8d6f761d1c98fc314"
+    },
+    {
+      "path": "README.md",
+      "sha256": "412bc2580e3fcbfc163981892a297a8ece45016015bb9907bb432061fc12357c"
+    },
+    {
+      "path": "scripts/adam.md",
+      "sha256": "852d54a56ec85b64b5c21bd0f3aa8932afd1a9c80573bff005c778725b605aa8"
+    },
+    {
+      "path": "scripts/alexander.md",
+      "sha256": "ed60fab3cf2e3ccb6097d87b591d7cfddfbd54e5c32da2b76460a9bba552dc4d"
+    },
+    {
+      "path": "scripts/daniel.md",
+      "sha256": "df39863946aaa31d76df33aed0b32b73f2d0ac3da432fe9d024a9f83086027c1"
+    },
+    {
+      "path": "scripts/emma.md",
+      "sha256": "0df0a9d49acaf822d1fb0a98039c48a0871c1d5ff1f40344df28effe0db13c70"
+    },
+    {
+      "path": "scripts/ethan.md",
+      "sha256": "c9a881ddc2bee7306116d098e5afc1dbaac5d43e83eb9c2fba2fa7003dd52305"
+    },
+    {
+      "path": "scripts/layla.md",
+      "sha256": "a3caa9fce107276e9f68601ce1ee1bfcecac50d22cc11fb36e88046204917c07"
+    },
+    {
+      "path": "scripts/lina.md",
+      "sha256": "feafa9daae6851743a485c0a452808d2357ae94bda4a96dad20a05d40c5adffa"
+    },
+    {
+      "path": "scripts/maya.md",
+      "sha256": "215f4c3c6a685195cd374f88a945a35bacea04a6563ab3f05de5b8b1c545c3ad"
+    },
+    {
+      "path": "scripts/nora.md",
+      "sha256": "5d29858a8be9fb493bf280647f1c67dba0c8db6a822b60966a64865143896761"
+    },
+    {
+      "path": "scripts/olivia.md",
+      "sha256": "3d791af9bdf51a40e289b23809768f23d044e0562c61b95eca752d5f40fe229e"
+    },
+    {
+      "path": "scripts/omar.md",
+      "sha256": "5e0d9b4f95e4705e204aa64af9dc619fb9f8f860647fe02545a9c8caf655a6f1"
+    },
+    {
+      "path": "scripts/rayan.md",
+      "sha256": "4189dcfa3c3832667300afd127597e8c581ffa43ec1c7cd47636075bef09f6d0"
+    },
+    {
+      "path": "scripts/sarah.md",
+      "sha256": "f76a57c4124117121a00d8b000df0fb1cf5944a758c4bbf32082efe985c58eff"
+    },
+    {
+      "path": "scripts/sophia.md",
+      "sha256": "83928771b96c3a9f71c87675f430a7590cd93256465f951a68df3ab6c77a89f8"
+    },
+    {
+      "path": "scripts/victoria.md",
+      "sha256": "8c93fbd782353aa862d214aa346e2dc7c23f520e605708ca0bb702a1c5e9f89b"
+    },
+    {
+      "path": "ssml/azure-candidate/adam.ssml.xml",
+      "sha256": "29ecfa983501a61dd8b17e05c7304d7c1aa9757847a02682f4b6697de23a082c"
+    },
+    {
+      "path": "ssml/azure-candidate/alexander.ssml.xml",
+      "sha256": "44ba010eb5a5f0d1606419a17efaef1d148ae9ecc76f9c43e85cae024136de48"
+    },
+    {
+      "path": "ssml/azure-candidate/daniel.ssml.xml",
+      "sha256": "5b7a2d6e2efcf617d1fc91d5dfee153f833de5de0a5a7e7888f458ea385efc7c"
+    },
+    {
+      "path": "ssml/azure-candidate/emma.ssml.xml",
+      "sha256": "c7622f750ae93b1dbdd617f328a690b323deec46580f01b874b537fe54691432"
+    },
+    {
+      "path": "ssml/azure-candidate/ethan.ssml.xml",
+      "sha256": "93fc0abbfcd5ca1719013f50b4d6c9883e12bc6942e4be09634cb704af30e832"
+    },
+    {
+      "path": "ssml/azure-candidate/layla.ssml.xml",
+      "sha256": "6ab428017254c4e06f20122f59ee820a0f73b9139a780fe4c74dca636e90dab2"
+    },
+    {
+      "path": "ssml/azure-candidate/lina.ssml.xml",
+      "sha256": "732762c2b050af9b173e98e54b63856bcf3b468de0ef419f6954598baf007817"
+    },
+    {
+      "path": "ssml/azure-candidate/maya.ssml.xml",
+      "sha256": "344c614d6dc13a98892c21dd521df27410f05a5d59bfef776842f536abe7de46"
+    },
+    {
+      "path": "ssml/azure-candidate/nora.ssml.xml",
+      "sha256": "bd0d03f7b5718aa211ce7fc1d0fc2c7905c1993c83d5ecde01428802184418ff"
+    },
+    {
+      "path": "ssml/azure-candidate/olivia.ssml.xml",
+      "sha256": "2f51664912534827297d1578eb290e73284cb4c5127e78af9b0396ddd70e396c"
+    },
+    {
+      "path": "ssml/azure-candidate/omar.ssml.xml",
+      "sha256": "3e472c1f7017388712a2a5fba35cde0544c1f9f01d98a409421b3e08e5e5c0fa"
+    },
+    {
+      "path": "ssml/azure-candidate/rayan.ssml.xml",
+      "sha256": "defc7505110064cea433b9b4b7a7fbcf16b9658036c34625bb619dd6ef2a688d"
+    },
+    {
+      "path": "ssml/azure-candidate/sarah.ssml.xml",
+      "sha256": "2cd503de911be7ebbfe5bc75e5006edb8150e14f081aef216d43ace7e19f0d14"
+    },
+    {
+      "path": "ssml/azure-candidate/sophia.ssml.xml",
+      "sha256": "1a1b0d54f4879e0240a0d4ce57edac85fdac955c5bca979eb87cf0344a729f2b"
+    },
+    {
+      "path": "ssml/azure-candidate/victoria.ssml.xml",
+      "sha256": "0f2607ab5aeecf3af475f754e2213fcb03f83838f457093719c4a7c1c2736fb6"
+    },
+    {
+      "path": "ssml/blind-candidate/adam.ssml.xml",
+      "sha256": "917d7fcb13ad86cdd12cca5f11acbde5ed9ed32c4a9c57263a03f3e65d69b86e"
+    },
+    {
+      "path": "ssml/blind-candidate/alexander.ssml.xml",
+      "sha256": "81f410cf8f848dd8a3d2fea58acb27ae25c021fb1b85e90f14865417fb90c847"
+    },
+    {
+      "path": "ssml/blind-candidate/daniel.ssml.xml",
+      "sha256": "2b2b70ae74721cc53e26d1145c51ee91edd0886b37280155923ebab5cdbc251c"
+    },
+    {
+      "path": "ssml/blind-candidate/emma.ssml.xml",
+      "sha256": "1c8aca36325f1a6558e5fa4a917f11deb07f248c6b07050d9919a831731ddf9e"
+    },
+    {
+      "path": "ssml/blind-candidate/ethan.ssml.xml",
+      "sha256": "fefeb2f088cdc0836e4652d26ec112b3cb253fd5b9cb616aaed76643fbd1d869"
+    },
+    {
+      "path": "ssml/blind-candidate/layla.ssml.xml",
+      "sha256": "87c9bedf36828e5938d76dafe42d44760333d06499b00021a0cf5e305e5876c1"
+    },
+    {
+      "path": "ssml/blind-candidate/lina.ssml.xml",
+      "sha256": "827827d14c3180c619f55408adcc56afd4d6db3f3b06642da481ade8c3ec4f6d"
+    },
+    {
+      "path": "ssml/blind-candidate/maya.ssml.xml",
+      "sha256": "97dd12049e7abe397c3493a27cb16c27b74f2cded5644ac057103c3f6cf9e424"
+    },
+    {
+      "path": "ssml/blind-candidate/nora.ssml.xml",
+      "sha256": "a9fcf5d9ec7a796251e97b85a37b208f6c2a4ba44aad1c5b0411fd575e083419"
+    },
+    {
+      "path": "ssml/blind-candidate/olivia.ssml.xml",
+      "sha256": "2a7e4196581e21dc724a730fad10117899f071bf5beff98dd8ab43591a2e9d1f"
+    },
+    {
+      "path": "ssml/blind-candidate/omar.ssml.xml",
+      "sha256": "44d85674f73fbaa9d29ebf0f4c3226a09a23efe8a72cbd69e5b445fe11d205f0"
+    },
+    {
+      "path": "ssml/blind-candidate/rayan.ssml.xml",
+      "sha256": "0535322394ccad7cb54d68ee0c7e9c7ca1d64b4eed68a6e26adfe6cf26f26a6c"
+    },
+    {
+      "path": "ssml/blind-candidate/sarah.ssml.xml",
+      "sha256": "7e120c1c95a6a09f7c3eceed98bdd0308f7a8a62947beac46507a2c89fc3d1cd"
+    },
+    {
+      "path": "ssml/blind-candidate/sophia.ssml.xml",
+      "sha256": "5b4991a91a70ca301bfd60b982528706458a2ac5e26495b22bed1946ca73b250"
+    },
+    {
+      "path": "ssml/blind-candidate/victoria.ssml.xml",
+      "sha256": "665599fa86dad886b2b77f57b9044e423963904dec6683f3337523a5873b3a5a"
+    },
+    {
+      "path": "ssml/portable/adam.ssml.xml",
+      "sha256": "5d182d05b1de418ac3b81f5d1febb18cbfa9e0289e3efa0cad4aa2ea0475bc42"
+    },
+    {
+      "path": "ssml/portable/alexander.ssml.xml",
+      "sha256": "9cc72a939c8d68a3fec7ea5b1a5c72ba7f7f37ca4d5e62fbdd7df93d3ae528b4"
+    },
+    {
+      "path": "ssml/portable/daniel.ssml.xml",
+      "sha256": "e50779329c7f810b17f48da737cb6e971c5427e55d46fdcc392d180d6771625a"
+    },
+    {
+      "path": "ssml/portable/emma.ssml.xml",
+      "sha256": "6eec9543c6670f69f0f31a4944aab969e4fc81708a37a745ae34bf9cb67defbc"
+    },
+    {
+      "path": "ssml/portable/ethan.ssml.xml",
+      "sha256": "a41ce71a78f924c89619b4528fa715bf3ed3aed966259f5008213e4044007771"
+    },
+    {
+      "path": "ssml/portable/layla.ssml.xml",
+      "sha256": "644fc9e5a845ef08446397c21b47e85f5b970aac8a59e81e6633f7263f861b15"
+    },
+    {
+      "path": "ssml/portable/lina.ssml.xml",
+      "sha256": "7a8164430795a1e358d23bd0609ec541bf2b117bcba5d2f631562789d967cec0"
+    },
+    {
+      "path": "ssml/portable/maya.ssml.xml",
+      "sha256": "00554b56bd928f436f5bdd37c98fd4dac8568c622640ebd8d49c59c5ffd13238"
+    },
+    {
+      "path": "ssml/portable/nora.ssml.xml",
+      "sha256": "5fdaeb5fdbe2d4a7310bcd86eee4a1dc6b445b85e29e961af6fb09c07208fcd7"
+    },
+    {
+      "path": "ssml/portable/olivia.ssml.xml",
+      "sha256": "c61814c65d987a629fb435d3498e6791d0f2343a7a94bebd2b4492a123aa1682"
+    },
+    {
+      "path": "ssml/portable/omar.ssml.xml",
+      "sha256": "52798f832b0f5ec69524c9d557e584081b6f75954da4007a31c89f01b6157414"
+    },
+    {
+      "path": "ssml/portable/rayan.ssml.xml",
+      "sha256": "61cb78eced94b5261a87046e78b0c6ad78664cfbfd94cc100adeb8693f670664"
+    },
+    {
+      "path": "ssml/portable/sarah.ssml.xml",
+      "sha256": "97707ec6190b9fb24b1fb64a1e279764c30b631391992ae2437a3fa6819b1f44"
+    },
+    {
+      "path": "ssml/portable/sophia.ssml.xml",
+      "sha256": "1c4d8ad4e256b3ee91b36c3de299bddb77ec2ffba403c873abfaddaf648ac574"
+    },
+    {
+      "path": "ssml/portable/victoria.ssml.xml",
+      "sha256": "e51ddd02074c32901dadf4a14340ec3985b77ea1c36e3563a5698e81b9222f42"
+    },
+    {
+      "path": "SSML_NOTES.md",
+      "sha256": "9d0a099b8a2f6469e36bd540ea67ebd7b3255749d8a17060119547da26d88979"
+    },
+    {
+      "path": "VALIDATION.json",
+      "sha256": "2e11c415d31d69fa51fc994eee45eb20807456fba5525f59a31ccfad3cb2f76f"
+    }
+  ]
+}

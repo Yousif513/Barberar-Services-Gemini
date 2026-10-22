@@ -1,0 +1,11 @@
+# SSML plans and provider boundary
+
+The portable plans use W3C SSML1.1: the synthesis namespace, speak version1.1, root xml:lang, paragraphs, break time and unsigned rate percentages. These are structurally parsed XML plans. They are not a claim of a provider accepting SSML1.1, supporting the requested dialect, or preserving a distinctive voice. The voice is deliberately not selected in the portable form.
+
+Sources: [W3C SSML1.1 structure](https://www.w3.org/TR/speech-synthesis11/#S3.1.1), [prosody](https://www.w3.org/TR/speech-synthesis11/#S3.2.4). Different synthesis processors can render the same markup differently; a rate percentage does not establish timbre or accent.
+
+The Azure candidate adaptations use speak version1.0 and one fixed voice element per file: ar-SA-HamedNeural or ar-LB-LaylaNeural. They remain unselected provider candidates. Relative rate in the Azure file is the proposed percentage delta from its baseline; the portable W3C file uses the corresponding absolute percentage. The text chunks remain literal under the same fixed candidate voice. No lang element, automatic language/voice swap, expressive role/style, IPA phoneme, voice cloning or external lexicon/audio URI is inserted. English pronunciation is deliberately a measured challenge, not assumed multilingual support.
+
+Sources: [Microsoft document structure](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/speech-synthesis-markup-structure), [voice/language/prosody](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/speech-synthesis-markup-voice#adjust-speaking-languages). Microsoft documents restrictions on language adjustment for nonmultilingual voices; a valid locale tag alone is not an accent test. Candidate availability, account/region, licensing, billing, actual provider parsing and audio quality belong to the separate provider preflight. This worker performed no synthesis request or provider account operation.
+
+Native Arabic is written as a proposed professional Saudi/Lebanese rendition, not a certified dialect transcript. Neither a successfully parsed XML file nor any spelling/prosody setting can pass the native speaker or blind identity gates. All input scripts, schemas, roles, historical directions and hashes remain inspectable in AUDITION_INPUT.json.

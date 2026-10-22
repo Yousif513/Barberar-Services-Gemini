@@ -1,0 +1,159 @@
+{
+  "prepared_on": "2026-10-22",
+  "status": "proposal_only_no_runtime_changes",
+  "sources": [
+    {
+      "id": "S1",
+      "url": "https://nextjs.org/docs/app/guides/internationalization",
+      "publisher": "Next.js official documentation",
+      "checked": "2026-10-22 by this planning pass",
+      "supports": "Locale dictionaries and locale-aware routing are architecture mechanisms; proposal does not implement or pick a routing migration."
+    },
+    {
+      "id": "S2",
+      "url": "https://docs.expo.dev/guides/localization/",
+      "publisher": "Expo official documentation",
+      "checked": "2026-10-22 by this planning pass",
+      "supports": "Device/app locale integration, supported locales and translation architecture; actual pinned implementation needs separate dependency review."
+    },
+    {
+      "id": "S3",
+      "url": "https://www.w3.org/International/questions/qa-html-dir",
+      "publisher": "W3C Internationalization",
+      "checked": "2026-10-22 by this planning pass",
+      "supports": "Urdu RTL, explicit direction separate from language, logical layout and mixed-text handling."
+    },
+    {
+      "id": "S4",
+      "url": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts",
+      "publisher": "Microsoft official Speech catalog",
+      "checked": "2026-10-22 upstream primary-source provider investigation; candidate list supplied to this pass",
+      "supports": "Named TTS locale/voice candidates; not accent quality, STT parity, terms acceptance or active integration."
+    },
+    {
+      "id": "S5",
+      "url": "https://learn.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices",
+      "publisher": "Microsoft official Retail Prices API documentation",
+      "checked": "2026-10-22 upstream read-only official API verification",
+      "meter": {
+        "serviceName": "Foundry Tools",
+        "productName": "Azure Speech",
+        "meterName": "S1 Neural Text To Speech Characters",
+        "armRegions": [
+          "eastus",
+          "uaenorth"
+        ],
+        "currency": "USD",
+        "retail_unit_rate": 15.0,
+        "unit": "1M billed characters",
+        "effectiveStartDate": "2024-02-01",
+        "meterId": "0f98e708-a16c-407b-8089-a0ed9e14ab49",
+        "type": "Consumption",
+        "isPrimaryMeterRegion": false
+      },
+      "receipt_locator": ".admin-console/evidence/volabi-first-loop/voice-provider-research/ (root owns exact raw response/URL/hash)",
+      "limits": "Public-retail estimate only, not account quote, product/locale/region availability or complete architecture cost. STT/model/human/other rates remain unquoted."
+    },
+    {
+      "id": "S6",
+      "url": "https://datasaudi.sa/en",
+      "publisher": "Official DataSaudi dashboard",
+      "checked": "Upstream historical2022 demographic investigation; no fresh demographic claim quantified in this proposal",
+      "supports": "Demographic context only; nationality is not language preference, English inability, demand or WTP."
+    }
+  ],
+  "current_code_evidence": [
+    {
+      "path": "web_platform/src/lib/use-page-locale.ts",
+      "sha256": "fb4643458149ce657a03515f164021d5865cf476e5540d7cc357821e5066755d",
+      "observation": "PageLocale is en/ar; storage primora_lang accepts two values; direction is Arabic-only.",
+      "inspection": "read_only"
+    },
+    {
+      "path": "web_platform/src/app/layout.tsx",
+      "sha256": "41b63add614f38106c976f48194cbbd46d903b995666acf6a658f9721e06aa8d",
+      "observation": "AR/EN bootstrap; IBM_Plex_Sans_Arabic declares Arabic/Latin subsets; other glyph coverage unverified.",
+      "inspection": "read_only"
+    },
+    {
+      "path": "mobile_app/src/lib/locale-core.ts",
+      "sha256": "ec0e654aa5019da1bf56ba8c3db1173c332ae9578883595b3e3f1c978195bcdd",
+      "observation": "Lang/parser/tab dictionaries support en/ar only; default ar.",
+      "inspection": "read_only"
+    },
+    {
+      "path": "mobile_app/src/lib/locale.tsx",
+      "sha256": "7e884ba69df9263f8a061deb3ad53039847184630d703d713f3f6c7e47efbf88",
+      "observation": "Explicit manual Arabic mirroring; native automatic mirroring disabled to prevent double mirroring.",
+      "inspection": "read_only"
+    },
+    {
+      "path": "mobile_app/src/lib/marketplace.ts",
+      "sha256": "7d01ecb102fefb27e93571f7d754407c00ca362b65aa74ac434e00a24efab6f6",
+      "observation": "Bilingual paired en/ar content; canonical provider/service ids; locale formatters branch only Arabic/English.",
+      "inspection": "read_only"
+    },
+    {
+      "path": "web_platform/src/lib/hq/voice.ts",
+      "sha256": "2150bfde9211a9aad6fb917032b2f814d74b55aa298a9003978f5d2f447477e4",
+      "observation": "Current local voice/recognizer helpers accept ar/en and are not a new customer-language runtime.",
+      "inspection": "read_only"
+    },
+    {
+      "path": "web_platform/package.json",
+      "sha256": "7147dcea6549139ba24eb7b51683d73a242a450162a1b976e137b4b429d5981e",
+      "observation": "Current declared Next16.3.8/React19.2.4; no package installed by this plan.",
+      "inspection": "read_only"
+    },
+    {
+      "path": "mobile_app/package.json",
+      "sha256": "f315c1595a2bc031c1fae0c78ee3c9957098c8cc55247067406534aff99f1069",
+      "observation": "Current declared Expo56/RN0.85.3; expo-localization is not listed as a current dependency.",
+      "inspection": "read_only"
+    },
+    {
+      "path": "planning/volabi/VOICE_ACCENT_REQUIREMENTS.json",
+      "sha256": "0a4e3ddc013ed657797e7c62069ad330f1fc0dc297136da226bb9b7033aa6a91",
+      "observation": "Current CEO management accent requirements preserved, separate from customer language.",
+      "inspection": "read_only"
+    },
+    {
+      "path": "docs/legal/2026-10-10-adopted-decisions.md",
+      "sha256": "a7636e1d851d7943209f624f3e5e2817c287396142631cabd47a801acfcefa44",
+      "observation": "Conditional adopted financial controls remain unchanged by translation.",
+      "inspection": "read_only"
+    }
+  ],
+  "technical_defaults_proposed": {
+    "baseline": [
+      "ar",
+      "en"
+    ],
+    "customer_text_pilot": [
+      "bn-BD",
+      "ur-PK",
+      "hi-IN"
+    ],
+    "later": [
+      "de-DE",
+      "fr-FR"
+    ],
+    "direction": {
+      "ur-PK": "rtl",
+      "bn-BD": "ltr",
+      "hi-IN": "ltr"
+    },
+    "customer_text_STT_TTS": "separate preferences and independent support/evaluation",
+    "HQ_voice_direction": "Saudi male / Lebanese female unchanged"
+  },
+  "not_established": [
+    "native translation/QA quotes",
+    "actual preferred language demand",
+    "English proficiency or premium willingness to pay",
+    "target-locale hosted-payment language support/comprehension",
+    "STT accent quality and TTS naturalness",
+    "licensed provider/paid tier/account region activation",
+    "instrumentation and complete per-booking costs"
+  ],
+  "current_code_evidence_hash_basis": "SHA-256 of captured raw source bytes in this checkout; historical inspection provenance, not a portable checkout checksum."
+}

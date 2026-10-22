@@ -1,0 +1,690 @@
+{
+  "schema_version": "1.0.0",
+  "reviewer": "server_hq_audit",
+  "reviewed_at_utc": "2026-10-22T10:58:54.278504+00:00",
+  "status": "accepted_as_static_proposal_and_audition_preparation_only",
+  "scope": "Independent review of the six-file customer-language proposal, fifteen-persona audition script package, root provider/results/hub claims and published price provenance. No audio-generation or runtime acceptance.",
+  "implementation_authors": [
+    "skills_and_delivery: customer-language proposal",
+    "hq_repo_inventory: audition scripts/forms/SSML",
+    "root: hub, provider/results report and bounded-budget clarifications"
+  ],
+  "independence": "Reviewer authored only provider research evidence and this review receipt for this task; did not implement the reviewed proposals/scripts, product UI, voice runtime, synthesis or persona capabilities. Earlier fact collection is research evidence, not audition implementation.",
+  "verification_method": "Read-only Python assertions over real local files, JSON/CSV/XML and cryptographic hashes, plus current primary-source browsing and anonymous Microsoft Retail Prices GET. No application/provider test execution was implied.",
+  "checks": {
+    "original_profiles_and_current_accent_policy": 15,
+    "Saudi_male": 6,
+    "Lebanese_female": 9,
+    "registry_role_character_communication_historical_direction_exact": true,
+    "captured_audition_source_byte_hashes_verified": 2,
+    "exact_script_string_hashes_and_UTF16_counts": 15,
+    "XML_parse_and_exact_script_content": {
+      "portable": 15,
+      "azure-candidate": 15,
+      "blind-candidate": 15
+    },
+    "provider_voice_fixed_and_no_external_audio_lexicon_or_unsupported_lang_markup": true,
+    "weighted_rubric_total": 100,
+    "offline_and_runtime_gates_separate": true,
+    "native_evaluator_rows_blank": 45,
+    "blind_trial_rows": 0,
+    "legacy_English_WAV_hashes_unchanged": 15,
+    "audition_portable_hashes": 69,
+    "audition_simulated_CRLF_hashes": 69,
+    "multilingual_portable_hashes": 5,
+    "multilingual_simulated_CRLF_hashes": 5,
+    "captured_code_evidence_raw_hashes": 10,
+    "cost_CSV_rows": 16,
+    "cost_CSV_columns_each": 8,
+    "example_arithmetic": "passed; missing prices remain UNQUOTED, total complete pilot cost remains unknown",
+    "local_Markdown_link_targets_verified": 6,
+    "repeated_acquisition_zero_processing_separate_no_history_reset": true,
+    "aggregate_character_rounds_and_total_SAR_cap_are_proposed_only": true,
+    "real_provider_synthesis_or_TTS_calls": 0,
+    "generated_regional_audio_files": 0,
+    "native_listening_scores": 0
+  },
+  "measured_text_estimate": {
+    "role_codepoints": 11403,
+    "five_blind_passages_all_agents_codepoints": 13587,
+    "one_round": 24990,
+    "three_rounds": 74970,
+    "USD_at_observed_retail_rate": 1.12455,
+    "SAR_at_3_75_reference_before_exclusions": 4.2170625,
+    "meaning": "Text-count estimate, not vendor-metered characters or an incurred charge. Extra anchors/corrections, tax/fees and human review remain separately bounded or unquoted."
+  },
+  "provider_research": {
+    "receipt_path": ".admin-console/evidence/volabi-first-loop/voice-provider-research/receipt.json",
+    "receipt_sha256_raw": "ea978a86dff072f2e73603de710277216569fbb815e4ceb82290b4f53a88a510",
+    "active_Hermes_provider": "edge",
+    "active_Hermes_voice": "en-US-AriaNeural",
+    "configuration_method": "Selected only public tts provider/voice/model YAML nodes; no credential/environment dump or config path recorded. No TTS call.",
+    "exact_requested_catalog_candidates": [
+      "ar-SA-HamedNeural",
+      "ar-LB-LaylaNeural"
+    ],
+    "base_timbres": 2,
+    "same_identity_multilingual_switching_guaranteed": false,
+    "observed_public_neural_rate_USD_per_1M": 15,
+    "regions": [
+      "eastus",
+      "uaenorth"
+    ],
+    "free_tier_does_not_establish_output_rights": true,
+    "usage_terms": "Current Microsoft terms scope prebuilt TTS output-use rights to paid-tier customers; actual account agreement and intended distribution still require confirmation."
+  },
+  "reviewed_journey": [
+    "explicit language preference and persisted canonical identity",
+    "discovery/search/content provenance and empty/error cases",
+    "services/staff/time/cart/stale availability",
+    "account continuation and material quote confirmation",
+    "licensed PSP language/comprehension gap",
+    "same-attempt captured/submitting/unknown/failed recovery",
+    "receipt/reminder/delivery status",
+    "change/cancellation/disruption/no-show",
+    "remedy proposal/approval/submitted/unknown/verified result and independent appeal",
+    "completion/review/rebook and unchanged zero repeat acquisition rules",
+    "text/STT/TTS separation, Urdu bidi, Bangla/Hindi shaping, font/device/native and AR/EN regression gates"
+  ],
+  "findings": [
+    {
+      "id": "V-REVIEW-1",
+      "severity": "low",
+      "status": "corrected_and_independently_verified",
+      "file": "planning/volabi/voice-auditions/provider-report.json",
+      "issue": "Initial selected meterName omitted its S1 prefix.",
+      "final": "Exact S1 Neural Text To Speech Characters now matches both anonymous raw responses and receipt."
+    },
+    {
+      "id": "V-REVIEW-2",
+      "severity": "low",
+      "status": "clarified_and_independently_verified",
+      "file": "planning/primora-multilingual/JOURNEY_AND_QA.md",
+      "issue": "Initial localized acceptance plan left the precise repeat-acquisition invariant implicit.",
+      "final": "Explicit first-only/zero-repeat acquisition, distinct salon-paid processing fees, relationship/history preservation across locale/refund, and unresolved earning/reversal rule are now retained."
+    },
+    {
+      "id": "V-REVIEW-3",
+      "severity": "low",
+      "status": "clarified_and_independently_verified",
+      "file": "planning/volabi/voice-auditions/RESULTS.md",
+      "issue": "Initial 100,000-character proposal could be read without a cross-round aggregate statement.",
+      "final": "Final result and approval prompt explicitly aggregate all role/blind/anchor/retry characters across at most three rounds, with separately proposed SAR10 total speech cap."
+    }
+  ],
+  "remaining_dependencies": [
+    "No actual Saudi/Lebanese audio generated or listened to; all fifteen still need versioned native and blind identity evidence.",
+    "Named official Speech account/environment/region, applicable paid-tier output terms, secure setup and explicit new-paid-service capped authorization remain missing.",
+    "Two stock identities may fail fifteen-way distinctness or English pronunciation; do not relabel weak candidates or silently splice voices.",
+    "Bangla/Urdu/Hindi text, native parity, qualified support coverage, hosted PSP locale comprehension, translation/review quotes and native-device acceptance are unimplemented/unverified.",
+    "STT target locales, recognition semantics, privacy/retention/access and runtime interruption/recovery need separate authorized integration and testing.",
+    "German/French remain later proposed expansion; demographics are not demand, language preference or premium willingness-to-pay evidence."
+  ],
+  "primary_source_review": {
+    "verified": [
+      "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts",
+      "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/speech-synthesis-markup-voice",
+      "https://www.microsoft.com/licensing/terms/en-US/product/MicrosoftAzure/all",
+      "https://azure.microsoft.com/en-us/pricing/details/speech/",
+      "https://learn.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices",
+      "https://hermes-agent.nousresearch.com/docs/user-guide/features/tts",
+      "https://www.w3.org/International/questions/qa-html-dir",
+      "https://nextjs.org/docs/app/guides/internationalization",
+      "https://docs.expo.dev/guides/localization/",
+      "https://datasaudi.sa/en"
+    ],
+    "SAMA_conversion_evidence": "Official SAMA search-index homepage result reports USD3.7500 with Oct10,2026 update; full requested exchange page timed out and official homepage/peg opens returned502 in this review. Conversion is a planning reference, not a bank/execution quote.",
+    "SAMA_official_indexed_source": "https://sama.gov.sa/en-US/pages/default.aspx?simple=true",
+    "copyright": "Provider licence claims are paraphrases; no licence passage longer than25words is quoted by the reviewed report."
+  },
+  "reviewed_files": [
+    {
+      "path": "docs/primora-multilingual-and-voice-proposal.md",
+      "sha256_utf8_lf": "a4c21cf2cfd95b5a3dc061d7a7c479221eb5f7e5afea037625dfab40421c73e0",
+      "captured_raw_sha256": "a4c21cf2cfd95b5a3dc061d7a7c479221eb5f7e5afea037625dfab40421c73e0",
+      "captured_bytes": 7417
+    },
+    {
+      "path": "planning/primora-multilingual/COSTS_AND_ASSUMPTIONS.csv",
+      "sha256_utf8_lf": "9131635efe2311258f02bd4e008f893da021282c212baf5d950395f1cb05cd11",
+      "captured_raw_sha256": "9131635efe2311258f02bd4e008f893da021282c212baf5d950395f1cb05cd11",
+      "captured_bytes": 2620
+    },
+    {
+      "path": "planning/primora-multilingual/DELIVERY_AND_METRICS.md",
+      "sha256_utf8_lf": "a2edb3e3e72d9a4c1c1ddc2601678d1557ad3211a45d7a6d17a25d248d0f8e1a",
+      "captured_raw_sha256": "cb7c04a0580249aef5582a861586859e28d8a199e2cdfcff3fa1ffc71d17c17f",
+      "captured_bytes": 6635
+    },
+    {
+      "path": "planning/primora-multilingual/JOURNEY_AND_QA.md",
+      "sha256_utf8_lf": "8dcdf2b432f59f091b2384741cbe3190a024c0fada63322805fad10bc4744d31",
+      "captured_raw_sha256": "8dcdf2b432f59f091b2384741cbe3190a024c0fada63322805fad10bc4744d31",
+      "captured_bytes": 8534
+    },
+    {
+      "path": "planning/primora-multilingual/PROPOSAL.md",
+      "sha256_utf8_lf": "8a7995262f23b6acfd2f828199aea49ba46d043465eca8ae0e19f70e719feaf8",
+      "captured_raw_sha256": "c7c758e938d7753c4cfd7271b5aa6244b96d33d5979a94da52aeb79c45971e30",
+      "captured_bytes": 4936
+    },
+    {
+      "path": "planning/primora-multilingual/SOURCES_AND_CURRENT_STATE.json",
+      "sha256_utf8_lf": "81ca7eab35f200f608cb8550b2df2f3843297ae8e9a275851127b81e72e7ec44",
+      "captured_raw_sha256": "81ca7eab35f200f608cb8550b2df2f3843297ae8e9a275851127b81e72e7ec44",
+      "captured_bytes": 7029
+    },
+    {
+      "path": "planning/primora-multilingual/VALIDATION.json",
+      "sha256_utf8_lf": "9c9f7407a9b6b04d46e2c83630b3034a75e7e6ae5740b0b64031f7ed89ed5dcb",
+      "captured_raw_sha256": "9c9f7407a9b6b04d46e2c83630b3034a75e7e6ae5740b0b64031f7ed89ed5dcb",
+      "captured_bytes": 2226
+    },
+    {
+      "path": "planning/volabi/voice-auditions/AUDITION_INPUT.json",
+      "sha256_utf8_lf": "cec8018f08fd414753d74a0195c9976cdc01c7d4d1fc9665ca442a61cbed2900",
+      "captured_raw_sha256": "cec8018f08fd414753d74a0195c9976cdc01c7d4d1fc9665ca442a61cbed2900",
+      "captured_bytes": 95972
+    },
+    {
+      "path": "planning/volabi/voice-auditions/BLIND_TRIAL_SHEET.csv",
+      "sha256_utf8_lf": "36c51274d0698ea57e0933d6bf75cee26d00ec2a284330a2af7c5283cc860f92",
+      "captured_raw_sha256": "36c51274d0698ea57e0933d6bf75cee26d00ec2a284330a2af7c5283cc860f92",
+      "captured_bytes": 134
+    },
+    {
+      "path": "planning/volabi/voice-auditions/EVALUATION_RUBRIC.json",
+      "sha256_utf8_lf": "1470c8325c8244065eae625d5a0647ddcaf79071eb026eb0bdbbee3c440a4cbd",
+      "captured_raw_sha256": "1470c8325c8244065eae625d5a0647ddcaf79071eb026eb0bdbbee3c440a4cbd",
+      "captured_bytes": 4935
+    },
+    {
+      "path": "planning/volabi/voice-auditions/EVALUATOR_SHEET.csv",
+      "sha256_utf8_lf": "3b1ac8e9e0d6632c458671d8d632c711c500057144fb843e23c208240f59926e",
+      "captured_raw_sha256": "befab55e9551d260fbbd11b9d0f11a675bc58d8737acb06605d8c2bd70cc3594",
+      "captured_bytes": 5275
+    },
+    {
+      "path": "planning/volabi/voice-auditions/NATIVE_REVIEW_PROTOCOL.md",
+      "sha256_utf8_lf": "f3d74ab8747ce8e3ff2ddaa80527180c0854d46187cab6cafec70fa9b2846c80",
+      "captured_raw_sha256": "f3d74ab8747ce8e3ff2ddaa80527180c0854d46187cab6cafec70fa9b2846c80",
+      "captured_bytes": 5546
+    },
+    {
+      "path": "planning/volabi/voice-auditions/PACKAGE_HASHES.json",
+      "sha256_utf8_lf": "14263696939557cdea4d00c564f2358d6ca67d4cd838112fe6cb5bc317c34391",
+      "captured_raw_sha256": "14263696939557cdea4d00c564f2358d6ca67d4cd838112fe6cb5bc317c34391",
+      "captured_bytes": 10613
+    },
+    {
+      "path": "planning/volabi/voice-auditions/PRONUNCIATION_LEXICON.json",
+      "sha256_utf8_lf": "ff4bd2064e2a41ecfd6f011c6f832de6bb68ecca65fba5b8d6f761d1c98fc314",
+      "captured_raw_sha256": "ff4bd2064e2a41ecfd6f011c6f832de6bb68ecca65fba5b8d6f761d1c98fc314",
+      "captured_bytes": 5704
+    },
+    {
+      "path": "planning/volabi/voice-auditions/provider-report.json",
+      "sha256_utf8_lf": "f0d952358b0c734241a530442cd941539df895a2abd42be5ff00351dce677bbd",
+      "captured_raw_sha256": "f0d952358b0c734241a530442cd941539df895a2abd42be5ff00351dce677bbd",
+      "captured_bytes": 7339
+    },
+    {
+      "path": "planning/volabi/voice-auditions/README.md",
+      "sha256_utf8_lf": "412bc2580e3fcbfc163981892a297a8ece45016015bb9907bb432061fc12357c",
+      "captured_raw_sha256": "412bc2580e3fcbfc163981892a297a8ece45016015bb9907bb432061fc12357c",
+      "captured_bytes": 4385
+    },
+    {
+      "path": "planning/volabi/voice-auditions/RESULTS.md",
+      "sha256_utf8_lf": "4749f212d6da59a6e5fb3db43c2080d7c4bd4ceebf699d99d063d66e6eee3d02",
+      "captured_raw_sha256": "4749f212d6da59a6e5fb3db43c2080d7c4bd4ceebf699d99d063d66e6eee3d02",
+      "captured_bytes": 6722
+    },
+    {
+      "path": "planning/volabi/voice-auditions/scripts/adam.md",
+      "sha256_utf8_lf": "852d54a56ec85b64b5c21bd0f3aa8932afd1a9c80573bff005c778725b605aa8",
+      "captured_raw_sha256": "852d54a56ec85b64b5c21bd0f3aa8932afd1a9c80573bff005c778725b605aa8",
+      "captured_bytes": 2665
+    },
+    {
+      "path": "planning/volabi/voice-auditions/scripts/alexander.md",
+      "sha256_utf8_lf": "ed60fab3cf2e3ccb6097d87b591d7cfddfbd54e5c32da2b76460a9bba552dc4d",
+      "captured_raw_sha256": "ed60fab3cf2e3ccb6097d87b591d7cfddfbd54e5c32da2b76460a9bba552dc4d",
+      "captured_bytes": 2656
+    },
+    {
+      "path": "planning/volabi/voice-auditions/scripts/daniel.md",
+      "sha256_utf8_lf": "df39863946aaa31d76df33aed0b32b73f2d0ac3da432fe9d024a9f83086027c1",
+      "captured_raw_sha256": "df39863946aaa31d76df33aed0b32b73f2d0ac3da432fe9d024a9f83086027c1",
+      "captured_bytes": 2716
+    },
+    {
+      "path": "planning/volabi/voice-auditions/scripts/emma.md",
+      "sha256_utf8_lf": "0df0a9d49acaf822d1fb0a98039c48a0871c1d5ff1f40344df28effe0db13c70",
+      "captured_raw_sha256": "0df0a9d49acaf822d1fb0a98039c48a0871c1d5ff1f40344df28effe0db13c70",
+      "captured_bytes": 2680
+    },
+    {
+      "path": "planning/volabi/voice-auditions/scripts/ethan.md",
+      "sha256_utf8_lf": "c9a881ddc2bee7306116d098e5afc1dbaac5d43e83eb9c2fba2fa7003dd52305",
+      "captured_raw_sha256": "c9a881ddc2bee7306116d098e5afc1dbaac5d43e83eb9c2fba2fa7003dd52305",
+      "captured_bytes": 2627
+    },
+    {
+      "path": "planning/volabi/voice-auditions/scripts/layla.md",
+      "sha256_utf8_lf": "a3caa9fce107276e9f68601ce1ee1bfcecac50d22cc11fb36e88046204917c07",
+      "captured_raw_sha256": "a3caa9fce107276e9f68601ce1ee1bfcecac50d22cc11fb36e88046204917c07",
+      "captured_bytes": 2662
+    },
+    {
+      "path": "planning/volabi/voice-auditions/scripts/lina.md",
+      "sha256_utf8_lf": "feafa9daae6851743a485c0a452808d2357ae94bda4a96dad20a05d40c5adffa",
+      "captured_raw_sha256": "feafa9daae6851743a485c0a452808d2357ae94bda4a96dad20a05d40c5adffa",
+      "captured_bytes": 2650
+    },
+    {
+      "path": "planning/volabi/voice-auditions/scripts/maya.md",
+      "sha256_utf8_lf": "215f4c3c6a685195cd374f88a945a35bacea04a6563ab3f05de5b8b1c545c3ad",
+      "captured_raw_sha256": "215f4c3c6a685195cd374f88a945a35bacea04a6563ab3f05de5b8b1c545c3ad",
+      "captured_bytes": 2642
+    },
+    {
+      "path": "planning/volabi/voice-auditions/scripts/nora.md",
+      "sha256_utf8_lf": "5d29858a8be9fb493bf280647f1c67dba0c8db6a822b60966a64865143896761",
+      "captured_raw_sha256": "5d29858a8be9fb493bf280647f1c67dba0c8db6a822b60966a64865143896761",
+      "captured_bytes": 2647
+    },
+    {
+      "path": "planning/volabi/voice-auditions/scripts/olivia.md",
+      "sha256_utf8_lf": "3d791af9bdf51a40e289b23809768f23d044e0562c61b95eca752d5f40fe229e",
+      "captured_raw_sha256": "3d791af9bdf51a40e289b23809768f23d044e0562c61b95eca752d5f40fe229e",
+      "captured_bytes": 2721
+    },
+    {
+      "path": "planning/volabi/voice-auditions/scripts/omar.md",
+      "sha256_utf8_lf": "5e0d9b4f95e4705e204aa64af9dc619fb9f8f860647fe02545a9c8caf655a6f1",
+      "captured_raw_sha256": "5e0d9b4f95e4705e204aa64af9dc619fb9f8f860647fe02545a9c8caf655a6f1",
+      "captured_bytes": 2606
+    },
+    {
+      "path": "planning/volabi/voice-auditions/scripts/rayan.md",
+      "sha256_utf8_lf": "4189dcfa3c3832667300afd127597e8c581ffa43ec1c7cd47636075bef09f6d0",
+      "captured_raw_sha256": "4189dcfa3c3832667300afd127597e8c581ffa43ec1c7cd47636075bef09f6d0",
+      "captured_bytes": 2697
+    },
+    {
+      "path": "planning/volabi/voice-auditions/scripts/sarah.md",
+      "sha256_utf8_lf": "f76a57c4124117121a00d8b000df0fb1cf5944a758c4bbf32082efe985c58eff",
+      "captured_raw_sha256": "f76a57c4124117121a00d8b000df0fb1cf5944a758c4bbf32082efe985c58eff",
+      "captured_bytes": 2652
+    },
+    {
+      "path": "planning/volabi/voice-auditions/scripts/sophia.md",
+      "sha256_utf8_lf": "83928771b96c3a9f71c87675f430a7590cd93256465f951a68df3ab6c77a89f8",
+      "captured_raw_sha256": "83928771b96c3a9f71c87675f430a7590cd93256465f951a68df3ab6c77a89f8",
+      "captured_bytes": 2627
+    },
+    {
+      "path": "planning/volabi/voice-auditions/scripts/victoria.md",
+      "sha256_utf8_lf": "8c93fbd782353aa862d214aa346e2dc7c23f520e605708ca0bb702a1c5e9f89b",
+      "captured_raw_sha256": "8c93fbd782353aa862d214aa346e2dc7c23f520e605708ca0bb702a1c5e9f89b",
+      "captured_bytes": 2666
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/azure-candidate/adam.ssml.xml",
+      "sha256_utf8_lf": "29ecfa983501a61dd8b17e05c7304d7c1aa9757847a02682f4b6697de23a082c",
+      "captured_raw_sha256": "29ecfa983501a61dd8b17e05c7304d7c1aa9757847a02682f4b6697de23a082c",
+      "captured_bytes": 1660
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/azure-candidate/alexander.ssml.xml",
+      "sha256_utf8_lf": "44ba010eb5a5f0d1606419a17efaef1d148ae9ecc76f9c43e85cae024136de48",
+      "captured_raw_sha256": "44ba010eb5a5f0d1606419a17efaef1d148ae9ecc76f9c43e85cae024136de48",
+      "captured_bytes": 1648
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/azure-candidate/daniel.ssml.xml",
+      "sha256_utf8_lf": "5b7a2d6e2efcf617d1fc91d5dfee153f833de5de0a5a7e7888f458ea385efc7c",
+      "captured_raw_sha256": "5b7a2d6e2efcf617d1fc91d5dfee153f833de5de0a5a7e7888f458ea385efc7c",
+      "captured_bytes": 1710
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/azure-candidate/emma.ssml.xml",
+      "sha256_utf8_lf": "c7622f750ae93b1dbdd617f328a690b323deec46580f01b874b537fe54691432",
+      "captured_raw_sha256": "c7622f750ae93b1dbdd617f328a690b323deec46580f01b874b537fe54691432",
+      "captured_bytes": 1684
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/azure-candidate/ethan.ssml.xml",
+      "sha256_utf8_lf": "93fc0abbfcd5ca1719013f50b4d6c9883e12bc6942e4be09634cb704af30e832",
+      "captured_raw_sha256": "93fc0abbfcd5ca1719013f50b4d6c9883e12bc6942e4be09634cb704af30e832",
+      "captured_bytes": 1636
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/azure-candidate/layla.ssml.xml",
+      "sha256_utf8_lf": "6ab428017254c4e06f20122f59ee820a0f73b9139a780fe4c74dca636e90dab2",
+      "captured_raw_sha256": "6ab428017254c4e06f20122f59ee820a0f73b9139a780fe4c74dca636e90dab2",
+      "captured_bytes": 1674
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/azure-candidate/lina.ssml.xml",
+      "sha256_utf8_lf": "732762c2b050af9b173e98e54b63856bcf3b468de0ef419f6954598baf007817",
+      "captured_raw_sha256": "732762c2b050af9b173e98e54b63856bcf3b468de0ef419f6954598baf007817",
+      "captured_bytes": 1620
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/azure-candidate/maya.ssml.xml",
+      "sha256_utf8_lf": "344c614d6dc13a98892c21dd521df27410f05a5d59bfef776842f536abe7de46",
+      "captured_raw_sha256": "344c614d6dc13a98892c21dd521df27410f05a5d59bfef776842f536abe7de46",
+      "captured_bytes": 1635
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/azure-candidate/nora.ssml.xml",
+      "sha256_utf8_lf": "bd0d03f7b5718aa211ce7fc1d0fc2c7905c1993c83d5ecde01428802184418ff",
+      "captured_raw_sha256": "bd0d03f7b5718aa211ce7fc1d0fc2c7905c1993c83d5ecde01428802184418ff",
+      "captured_bytes": 1595
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/azure-candidate/olivia.ssml.xml",
+      "sha256_utf8_lf": "2f51664912534827297d1578eb290e73284cb4c5127e78af9b0396ddd70e396c",
+      "captured_raw_sha256": "2f51664912534827297d1578eb290e73284cb4c5127e78af9b0396ddd70e396c",
+      "captured_bytes": 1716
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/azure-candidate/omar.ssml.xml",
+      "sha256_utf8_lf": "3e472c1f7017388712a2a5fba35cde0544c1f9f01d98a409421b3e08e5e5c0fa",
+      "captured_raw_sha256": "3e472c1f7017388712a2a5fba35cde0544c1f9f01d98a409421b3e08e5e5c0fa",
+      "captured_bytes": 1609
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/azure-candidate/rayan.ssml.xml",
+      "sha256_utf8_lf": "defc7505110064cea433b9b4b7a7fbcf16b9658036c34625bb619dd6ef2a688d",
+      "captured_raw_sha256": "defc7505110064cea433b9b4b7a7fbcf16b9658036c34625bb619dd6ef2a688d",
+      "captured_bytes": 1675
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/azure-candidate/sarah.ssml.xml",
+      "sha256_utf8_lf": "2cd503de911be7ebbfe5bc75e5006edb8150e14f081aef216d43ace7e19f0d14",
+      "captured_raw_sha256": "2cd503de911be7ebbfe5bc75e5006edb8150e14f081aef216d43ace7e19f0d14",
+      "captured_bytes": 1631
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/azure-candidate/sophia.ssml.xml",
+      "sha256_utf8_lf": "1a1b0d54f4879e0240a0d4ce57edac85fdac955c5bca979eb87cf0344a729f2b",
+      "captured_raw_sha256": "1a1b0d54f4879e0240a0d4ce57edac85fdac955c5bca979eb87cf0344a729f2b",
+      "captured_bytes": 1600
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/azure-candidate/victoria.ssml.xml",
+      "sha256_utf8_lf": "0f2607ab5aeecf3af475f754e2213fcb03f83838f457093719c4a7c1c2736fb6",
+      "captured_raw_sha256": "0f2607ab5aeecf3af475f754e2213fcb03f83838f457093719c4a7c1c2736fb6",
+      "captured_bytes": 1612
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/blind-candidate/adam.ssml.xml",
+      "sha256_utf8_lf": "917d7fcb13ad86cdd12cca5f11acbde5ed9ed32c4a9c57263a03f3e65d69b86e",
+      "captured_raw_sha256": "917d7fcb13ad86cdd12cca5f11acbde5ed9ed32c4a9c57263a03f3e65d69b86e",
+      "captured_bytes": 589
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/blind-candidate/alexander.ssml.xml",
+      "sha256_utf8_lf": "81f410cf8f848dd8a3d2fea58acb27ae25c021fb1b85e90f14865417fb90c847",
+      "captured_raw_sha256": "81f410cf8f848dd8a3d2fea58acb27ae25c021fb1b85e90f14865417fb90c847",
+      "captured_bytes": 589
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/blind-candidate/daniel.ssml.xml",
+      "sha256_utf8_lf": "2b2b70ae74721cc53e26d1145c51ee91edd0886b37280155923ebab5cdbc251c",
+      "captured_raw_sha256": "2b2b70ae74721cc53e26d1145c51ee91edd0886b37280155923ebab5cdbc251c",
+      "captured_bytes": 590
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/blind-candidate/emma.ssml.xml",
+      "sha256_utf8_lf": "1c8aca36325f1a6558e5fa4a917f11deb07f248c6b07050d9919a831731ddf9e",
+      "captured_raw_sha256": "1c8aca36325f1a6558e5fa4a917f11deb07f248c6b07050d9919a831731ddf9e",
+      "captured_bytes": 586
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/blind-candidate/ethan.ssml.xml",
+      "sha256_utf8_lf": "fefeb2f088cdc0836e4652d26ec112b3cb253fd5b9cb616aaed76643fbd1d869",
+      "captured_raw_sha256": "fefeb2f088cdc0836e4652d26ec112b3cb253fd5b9cb616aaed76643fbd1d869",
+      "captured_bytes": 589
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/blind-candidate/layla.ssml.xml",
+      "sha256_utf8_lf": "87c9bedf36828e5938d76dafe42d44760333d06499b00021a0cf5e305e5876c1",
+      "captured_raw_sha256": "87c9bedf36828e5938d76dafe42d44760333d06499b00021a0cf5e305e5876c1",
+      "captured_bytes": 586
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/blind-candidate/lina.ssml.xml",
+      "sha256_utf8_lf": "827827d14c3180c619f55408adcc56afd4d6db3f3b06642da481ade8c3ec4f6d",
+      "captured_raw_sha256": "827827d14c3180c619f55408adcc56afd4d6db3f3b06642da481ade8c3ec4f6d",
+      "captured_bytes": 586
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/blind-candidate/maya.ssml.xml",
+      "sha256_utf8_lf": "97dd12049e7abe397c3493a27cb16c27b74f2cded5644ac057103c3f6cf9e424",
+      "captured_raw_sha256": "97dd12049e7abe397c3493a27cb16c27b74f2cded5644ac057103c3f6cf9e424",
+      "captured_bytes": 586
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/blind-candidate/nora.ssml.xml",
+      "sha256_utf8_lf": "a9fcf5d9ec7a796251e97b85a37b208f6c2a4ba44aad1c5b0411fd575e083419",
+      "captured_raw_sha256": "a9fcf5d9ec7a796251e97b85a37b208f6c2a4ba44aad1c5b0411fd575e083419",
+      "captured_bytes": 586
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/blind-candidate/olivia.ssml.xml",
+      "sha256_utf8_lf": "2a7e4196581e21dc724a730fad10117899f071bf5beff98dd8ab43591a2e9d1f",
+      "captured_raw_sha256": "2a7e4196581e21dc724a730fad10117899f071bf5beff98dd8ab43591a2e9d1f",
+      "captured_bytes": 586
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/blind-candidate/omar.ssml.xml",
+      "sha256_utf8_lf": "44d85674f73fbaa9d29ebf0f4c3226a09a23efe8a72cbd69e5b445fe11d205f0",
+      "captured_raw_sha256": "44d85674f73fbaa9d29ebf0f4c3226a09a23efe8a72cbd69e5b445fe11d205f0",
+      "captured_bytes": 589
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/blind-candidate/rayan.ssml.xml",
+      "sha256_utf8_lf": "0535322394ccad7cb54d68ee0c7e9c7ca1d64b4eed68a6e26adfe6cf26f26a6c",
+      "captured_raw_sha256": "0535322394ccad7cb54d68ee0c7e9c7ca1d64b4eed68a6e26adfe6cf26f26a6c",
+      "captured_bytes": 589
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/blind-candidate/sarah.ssml.xml",
+      "sha256_utf8_lf": "7e120c1c95a6a09f7c3eceed98bdd0308f7a8a62947beac46507a2c89fc3d1cd",
+      "captured_raw_sha256": "7e120c1c95a6a09f7c3eceed98bdd0308f7a8a62947beac46507a2c89fc3d1cd",
+      "captured_bytes": 586
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/blind-candidate/sophia.ssml.xml",
+      "sha256_utf8_lf": "5b4991a91a70ca301bfd60b982528706458a2ac5e26495b22bed1946ca73b250",
+      "captured_raw_sha256": "5b4991a91a70ca301bfd60b982528706458a2ac5e26495b22bed1946ca73b250",
+      "captured_bytes": 586
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/blind-candidate/victoria.ssml.xml",
+      "sha256_utf8_lf": "665599fa86dad886b2b77f57b9044e423963904dec6683f3337523a5873b3a5a",
+      "captured_raw_sha256": "665599fa86dad886b2b77f57b9044e423963904dec6683f3337523a5873b3a5a",
+      "captured_bytes": 586
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/portable/adam.ssml.xml",
+      "sha256_utf8_lf": "5d182d05b1de418ac3b81f5d1febb18cbfa9e0289e3efa0cad4aa2ea0475bc42",
+      "captured_raw_sha256": "5d182d05b1de418ac3b81f5d1febb18cbfa9e0289e3efa0cad4aa2ea0475bc42",
+      "captured_bytes": 1596
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/portable/alexander.ssml.xml",
+      "sha256_utf8_lf": "9cc72a939c8d68a3fec7ea5b1a5c72ba7f7f37ca4d5e62fbdd7df93d3ae528b4",
+      "captured_raw_sha256": "9cc72a939c8d68a3fec7ea5b1a5c72ba7f7f37ca4d5e62fbdd7df93d3ae528b4",
+      "captured_bytes": 1585
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/portable/daniel.ssml.xml",
+      "sha256_utf8_lf": "e50779329c7f810b17f48da737cb6e971c5427e55d46fdcc392d180d6771625a",
+      "captured_raw_sha256": "e50779329c7f810b17f48da737cb6e971c5427e55d46fdcc392d180d6771625a",
+      "captured_bytes": 1645
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/portable/emma.ssml.xml",
+      "sha256_utf8_lf": "6eec9543c6670f69f0f31a4944aab969e4fc81708a37a745ae34bf9cb67defbc",
+      "captured_raw_sha256": "6eec9543c6670f69f0f31a4944aab969e4fc81708a37a745ae34bf9cb67defbc",
+      "captured_bytes": 1620
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/portable/ethan.ssml.xml",
+      "sha256_utf8_lf": "a41ce71a78f924c89619b4528fa715bf3ed3aed966259f5008213e4044007771",
+      "captured_raw_sha256": "a41ce71a78f924c89619b4528fa715bf3ed3aed966259f5008213e4044007771",
+      "captured_bytes": 1572
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/portable/layla.ssml.xml",
+      "sha256_utf8_lf": "644fc9e5a845ef08446397c21b47e85f5b970aac8a59e81e6633f7263f861b15",
+      "captured_raw_sha256": "644fc9e5a845ef08446397c21b47e85f5b970aac8a59e81e6633f7263f861b15",
+      "captured_bytes": 1610
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/portable/lina.ssml.xml",
+      "sha256_utf8_lf": "7a8164430795a1e358d23bd0609ec541bf2b117bcba5d2f631562789d967cec0",
+      "captured_raw_sha256": "7a8164430795a1e358d23bd0609ec541bf2b117bcba5d2f631562789d967cec0",
+      "captured_bytes": 1557
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/portable/maya.ssml.xml",
+      "sha256_utf8_lf": "00554b56bd928f436f5bdd37c98fd4dac8568c622640ebd8d49c59c5ffd13238",
+      "captured_raw_sha256": "00554b56bd928f436f5bdd37c98fd4dac8568c622640ebd8d49c59c5ffd13238",
+      "captured_bytes": 1572
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/portable/nora.ssml.xml",
+      "sha256_utf8_lf": "5fdaeb5fdbe2d4a7310bcd86eee4a1dc6b445b85e29e961af6fb09c07208fcd7",
+      "captured_raw_sha256": "5fdaeb5fdbe2d4a7310bcd86eee4a1dc6b445b85e29e961af6fb09c07208fcd7",
+      "captured_bytes": 1531
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/portable/olivia.ssml.xml",
+      "sha256_utf8_lf": "c61814c65d987a629fb435d3498e6791d0f2343a7a94bebd2b4492a123aa1682",
+      "captured_raw_sha256": "c61814c65d987a629fb435d3498e6791d0f2343a7a94bebd2b4492a123aa1682",
+      "captured_bytes": 1652
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/portable/omar.ssml.xml",
+      "sha256_utf8_lf": "52798f832b0f5ec69524c9d557e584081b6f75954da4007a31c89f01b6157414",
+      "captured_raw_sha256": "52798f832b0f5ec69524c9d557e584081b6f75954da4007a31c89f01b6157414",
+      "captured_bytes": 1545
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/portable/rayan.ssml.xml",
+      "sha256_utf8_lf": "61cb78eced94b5261a87046e78b0c6ad78664cfbfd94cc100adeb8693f670664",
+      "captured_raw_sha256": "61cb78eced94b5261a87046e78b0c6ad78664cfbfd94cc100adeb8693f670664",
+      "captured_bytes": 1611
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/portable/sarah.ssml.xml",
+      "sha256_utf8_lf": "97707ec6190b9fb24b1fb64a1e279764c30b631391992ae2437a3fa6819b1f44",
+      "captured_raw_sha256": "97707ec6190b9fb24b1fb64a1e279764c30b631391992ae2437a3fa6819b1f44",
+      "captured_bytes": 1568
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/portable/sophia.ssml.xml",
+      "sha256_utf8_lf": "1c4d8ad4e256b3ee91b36c3de299bddb77ec2ffba403c873abfaddaf648ac574",
+      "captured_raw_sha256": "1c4d8ad4e256b3ee91b36c3de299bddb77ec2ffba403c873abfaddaf648ac574",
+      "captured_bytes": 1537
+    },
+    {
+      "path": "planning/volabi/voice-auditions/ssml/portable/victoria.ssml.xml",
+      "sha256_utf8_lf": "e51ddd02074c32901dadf4a14340ec3985b77ea1c36e3563a5698e81b9222f42",
+      "captured_raw_sha256": "e51ddd02074c32901dadf4a14340ec3985b77ea1c36e3563a5698e81b9222f42",
+      "captured_bytes": 1549
+    },
+    {
+      "path": "planning/volabi/voice-auditions/SSML_NOTES.md",
+      "sha256_utf8_lf": "9d0a099b8a2f6469e36bd540ea67ebd7b3255749d8a17060119547da26d88979",
+      "captured_raw_sha256": "9d0a099b8a2f6469e36bd540ea67ebd7b3255749d8a17060119547da26d88979",
+      "captured_bytes": 2307
+    },
+    {
+      "path": "planning/volabi/voice-auditions/VALIDATION.json",
+      "sha256_utf8_lf": "2e11c415d31d69fa51fc994eee45eb20807456fba5525f59a31ccfad3cb2f76f",
+      "captured_raw_sha256": "2e11c415d31d69fa51fc994eee45eb20807456fba5525f59a31ccfad3cb2f76f",
+      "captured_bytes": 791
+    }
+  ],
+  "hash_basis": {
+    "sha256_utf8_lf": "Strict UTF8 decode then replace CRLF pairs with LF only and encode UTF8; preserve BOM/lone CR/codepoints/whitespace/final newline.",
+    "captured_raw_sha256": "Exact current local file bytes, recorded as review-time provenance; future Git line endings can change it.",
+    "legacy_WAV": "Raw binary bytes; never normalize."
+  },
+  "legacy_audio": [
+    {
+      "path": "web_platform/public/volabi/voices/nora-en.wav",
+      "sha256_raw": "dc55ade27fbb8eaef14025446583e1d0ef40bb8e34f1178e505a304987913a6d"
+    },
+    {
+      "path": "web_platform/public/volabi/voices/adam-en.wav",
+      "sha256_raw": "78b3889c88978b1ab13dfb62be4481758fc1e6852af89c68f2a7510fa0a6163a"
+    },
+    {
+      "path": "web_platform/public/volabi/voices/alexander-en.wav",
+      "sha256_raw": "16b729bfd9c9de55d950a880d9d1292a141dd015ba55f85355b24b5512e30b91"
+    },
+    {
+      "path": "web_platform/public/volabi/voices/sarah-en.wav",
+      "sha256_raw": "0f13cf732794c1fd265dc78f63d40da7e88a9d57d517630a8b627757da9ff12d"
+    },
+    {
+      "path": "web_platform/public/volabi/voices/victoria-en.wav",
+      "sha256_raw": "2929b3da72654e02a403723c2c9608b71dac5de93191e04ed5bb4aee585552d2"
+    },
+    {
+      "path": "web_platform/public/volabi/voices/emma-en.wav",
+      "sha256_raw": "2968f0287c3bfe807f0369e025a6f38fd8b343c516016f3e0425fba6bbaab2fa"
+    },
+    {
+      "path": "web_platform/public/volabi/voices/maya-en.wav",
+      "sha256_raw": "1b6f93fe8a0a857db93448724e2dc35492899cd886ea64513f5491d079f1c57f"
+    },
+    {
+      "path": "web_platform/public/volabi/voices/ethan-en.wav",
+      "sha256_raw": "661476ecc9c93fae74eba9ba96d134e0892fb3ba9cccf742ef6947efa908ef1f"
+    },
+    {
+      "path": "web_platform/public/volabi/voices/daniel-en.wav",
+      "sha256_raw": "661281f4c09992e76f4caa414358cbf2ba8fa5672f595460c6911bf2cd53d353"
+    },
+    {
+      "path": "web_platform/public/volabi/voices/sophia-en.wav",
+      "sha256_raw": "f681245c694218bbdcede704ba14b41457219b9914e7e6209dd353f233c7f9c1"
+    },
+    {
+      "path": "web_platform/public/volabi/voices/layla-en.wav",
+      "sha256_raw": "d6be83c4cd0cc083ee6b99a733b9a9b3e708def174ab49b5b7ac1f33dc95709c"
+    },
+    {
+      "path": "web_platform/public/volabi/voices/omar-en.wav",
+      "sha256_raw": "a179848982b92fd50828fb2b4b6c85e34f11c35888b123255a5329ec18fabf4b"
+    },
+    {
+      "path": "web_platform/public/volabi/voices/olivia-en.wav",
+      "sha256_raw": "d04b7018712766c0a72f9eba182927f180819d91f4aa146c338be220f4e16994"
+    },
+    {
+      "path": "web_platform/public/volabi/voices/lina-en.wav",
+      "sha256_raw": "36bcb06f5cd9a3ba0477a360932adf804b27a6a2abbddf1d5269c85962236292"
+    },
+    {
+      "path": "web_platform/public/volabi/voices/rayan-en.wav",
+      "sha256_raw": "235d4ade56c484eba28f4e22cf524a4d4036c52ff1570ae91dc526207baeb4f2"
+    }
+  ],
+  "limitations": [
+    "Static proposal/script acceptance only. No meaningful application code changed in this reviewed slice, and no application tests/build were rerun by this reviewer. Root owns aggregate repository gates.",
+    "XML parsing proves well-formed structure and preserved text; not XSD/provider parsing, perceived accent, pronunciation, distinct identity or live dialogue.",
+    "Scores/forms/proposed panel sizes and thresholds are plans, never fabricated human acceptance.",
+    "No credential values, paid account creation, installs, audio/provider operations, participant contact, production deployment, business activation, business permission grant or financial transaction occurred.",
+    "No full regulated production release or company-employee competency is accepted by this receipt."
+  ]
+}
