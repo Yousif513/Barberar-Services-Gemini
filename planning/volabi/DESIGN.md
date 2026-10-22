@@ -1,6 +1,6 @@
-# HQ visual direction - PROPOSED, pending CEO approval
+# HQ visual direction - CEO approved2026-10-22
 
-Source: current marketplace globals.css and admin/layout.tsx; exact excerpts/hashes are in source/BRAND_PROVENANCE.json. The original three design skills were not recovered. This is a new source-backed proposal, not an approved HQ theme. No stored Stitch theme_id is configured in this isolated root.
+Source: current marketplace globals.css and admin/layout.tsx; exact excerpts/hashes are in source/BRAND_PROVENANCE.json. The original three design skills were not recovered. This source-backed replacement direction is approved by the current CEO instruction; it is not a recovered historical original. No stored Stitch theme_id is configured in this isolated root.
 
 Primary: Gold (#D1AF47)
 Secondary: Soft Gold (#F4E7B6)
@@ -22,6 +22,6 @@ Buttons rounded 10 px. Cards rounded 16 px. 4 px spacing grid and 44 px primary 
 
 Obsidian navigation, warm ivory workbench and white evidence panels; restrained gold marks location and priority. Narrative task/evidence/decision content leads; charts support a defined decision. Gold is not body text on ivory. Use soft gold/white on obsidian and ink/slate on light surfaces. A quieter workbench with reduced particles/glows is a new refinement proposed for approval, while retaining current marketplace brand tokens.
 
-Mobile uses a task-first single column, contextual drawers and bounded modals. Mirror Arabic navigation and direction icons; isolate numbers/IDs/URLs. Tables and matrices offer text values, clear units and keyboard access. Colors never carry state alone. Spatial offices and photoreal avatars belong to later scope.
+Mobile uses a task-first single column, contextual drawers and bounded modals. Mirror Arabic navigation and direction icons; isolate numbers/IDs/URLs. Tables and matrices offer text values, clear units and keyboard access. Colors never carry state alone. Individual fictional professional portraits and local voice previews are authorized by the current CEO instruction. Spatial offices and live conference integration remain later scope.
 
 Contrast values are computed token pairs in THEME_CONTRAST.json, not a rendered accessibility audit. No HQ usability or screen-reader validation has occurred.

@@ -1,0 +1,26 @@
+[
+  {
+    "name": "primora-design-system",
+    "global_path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-design-system",
+    "version": "1.0.0",
+    "original_recovered": false,
+    "sha256": "9f3fda722bb37bcaf816a8cc6a6bc0989913d95468187e0b70aae3e1dd1fb189",
+    "approval": "APPROVAL_20261022.md"
+  },
+  {
+    "name": "primora-dashboard-layout",
+    "global_path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-dashboard-layout",
+    "version": "1.0.0",
+    "original_recovered": false,
+    "sha256": "f64a786b3134ef32a7a157cce4011a3937c62e229ae0d7609d4c0263a88c3c5b",
+    "approval": "APPROVAL_20261022.md"
+  },
+  {
+    "name": "primora-data-visualization",
+    "global_path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-data-visualization",
+    "version": "1.0.0",
+    "original_recovered": false,
+    "sha256": "472dd0e14b04a1049976ab1d2a41484e0846364a72167ee06df80414aac99b04",
+    "approval": "APPROVAL_20261022.md"
+  }
+]

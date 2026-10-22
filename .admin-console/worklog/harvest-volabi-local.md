@@ -1,0 +1,3 @@
+# Harvester — development-only local pass
+
+Four evidence-linked project lessons were recorded through the manifest CLI: current source checks at follow-up (F-HQ1), associated versus global skills, and browser-normalized source selection offsets, and context-blind test/document evidence scanning. Independent review proved repaired behaviors. No shared/global skill instructions, lessons store or promotion rules were changed automatically. Feedback remains open project evidence for later reuse; regulated release, live media, commercial/provider and business activation holds remain explicit. This pass implements no capability and supplies no self-review verdict.

@@ -1,0 +1,77 @@
+[
+  {
+    "agent": "Olivia",
+    "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Olivia, Primora Workforce & Organizational Development. long straight dark hair, beige blazer and ivory top, approachable focused expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nDistinct facial design: long straight dark hair, almond-shaped dark eyes, broad cheekbones, narrower chin and warm light-medium complexion, natural friendly closed-lip smile. Distinctive facial geometry unlike Nora, Maya, Sarah or Emma.\nExactly one square portrait. No text, watermark or other people. Original fictional face; no earlier images supplied as likeness/edit inputs.",
+    "tool": "image_gen.imagegen (built-in)",
+    "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-cdc4794d-eb06-4da5-9ee8-3c3a1854fc35.png",
+    "referenced_image_inputs": [],
+    "transparent_background": false,
+    "generated_on": "2026-10-22",
+    "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+    "visual_inspection": {
+      "performed": true,
+      "method": "actual returned tool image inspected before copy",
+      "checks": [
+        "one adult professional",
+        "clear distinct fictional face",
+        "square image with crop-safe headroom",
+        "warm ivory/slate series",
+        "no visible text/logo/watermark/collage",
+        "no visible facial or clothing defect requiring further refinement"
+      ],
+      "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+    },
+    "refinement_reason": null,
+    "discarded_initial_variant": null
+  },
+  {
+    "agent": "Lina",
+    "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Lina, Primora Customer AI Concierge within Emma area. long dark wavy hair, navy blazer and ivory top, friendly concierge expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nDistinct facial design: softly round face with full cheeks, a short small nose, smaller hazel-brown eyes, warm medium-deep complexion, long loose dark waves, open welcoming smile; clearly distinct from Nora's oval face and Maya's short bob.\nExactly one square portrait. No text, watermark or other people. Original fictional face; no earlier images supplied as likeness/edit inputs.",
+    "tool": "image_gen.imagegen (built-in)",
+    "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-b359ced0-631c-449e-ae97-4cc3887096d5.png",
+    "referenced_image_inputs": [],
+    "transparent_background": false,
+    "generated_on": "2026-10-22",
+    "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+    "visual_inspection": {
+      "performed": true,
+      "method": "actual returned tool image inspected before copy",
+      "checks": [
+        "one adult professional",
+        "clear distinct fictional face",
+        "square image with crop-safe headroom",
+        "warm ivory/slate series",
+        "no visible text/logo/watermark/collage",
+        "no visible facial or clothing defect requiring further refinement"
+      ],
+      "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+    },
+    "refinement_reason": null,
+    "discarded_initial_variant": null
+  },
+  {
+    "agent": "Rayan",
+    "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Rayan, Primora Salon AI Coach within Sarah area. short textured dark hair, trim beard, navy smart-casual jacket and open white shirt, supportive expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nDistinct facial design: broad square face, warm medium olive complexion, thick slightly curly short dark hair, wide-set dark eyes, full eyebrows, trim short beard, broad easy smile; distinctly younger-looking than Adam or Daniel and unlike Alexander's long face.\nExactly one square portrait. No text, watermark or other people. Original fictional face; no earlier images supplied as likeness/edit inputs.",
+    "tool": "image_gen.imagegen (built-in)",
+    "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-1e569bba-f749-46af-b351-3d34a24d3a80.png",
+    "referenced_image_inputs": [],
+    "transparent_background": false,
+    "generated_on": "2026-10-22",
+    "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+    "visual_inspection": {
+      "performed": true,
+      "method": "actual returned tool image inspected before copy",
+      "checks": [
+        "one adult professional",
+        "clear distinct fictional face",
+        "square image with crop-safe headroom",
+        "warm ivory/slate series",
+        "no visible text/logo/watermark/collage",
+        "no visible facial or clothing defect requiring further refinement"
+      ],
+      "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+    },
+    "refinement_reason": null,
+    "discarded_initial_variant": null
+  }
+]

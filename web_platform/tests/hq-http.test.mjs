@@ -1,0 +1,24 @@
+import { test, after } from "node:test";
+import assert from "node:assert/strict";
+import { mkdtempSync, rmSync } from "node:fs";
+import path from "node:path";
+import { tmpdir } from "node:os";
+import { randomUUID } from "node:crypto";
+import { handleHq } from "../src/lib/hq/server/handler.mjs";
+import { HqStore } from "../src/lib/hq/server/local-store.mjs";
+import { loadCatalog } from "../src/lib/hq/server/catalog.mjs";
+let network=0;globalThis.fetch=async()=>{network++;throw new Error("HTTP tests forbid network");};after(()=>assert.equal(network,0));
+const dirs=[];after(()=>dirs.forEach(p=>rmSync(p,{recursive:true,force:true})));
+function setup(){const dir=mkdtempSync(path.join(tmpdir(),"volabi-http-"));dirs.push(dir);const store=new HqStore({filePath:path.join(dir,"hq.sqlite")});return{store,env:{VOLABI_LOCAL_MODE:"enabled"}};}
+const base="http://127.0.0.1:3113";
+function req(url="/api/hq/session",method="POST",body={},extra={}){return new Request(base+url,{method,headers:{host:"127.0.0.1:3113",origin:base,"content-type":"application/json",...extra},...(method==="POST"?{body:JSON.stringify(body)}:{})});}
+async function session(options){const r=await handleHq(req(),options);assert.equal(r.status,200);const b=await r.json();return{...b.session,cookie:r.headers.get("set-cookie").split(";")[0]};}
+test("HTTP session is HttpOnly, strict, scoped, reused and does not expose the bearer in JSON",async()=>{const o=setup();const r=await handleHq(req(),o),cookie=r.headers.get("set-cookie"),b=await r.json();assert.match(cookie,/HttpOnly; SameSite=Strict/);assert.match(cookie,/Path=\/api\/hq/);assert.equal(b.session.token,undefined);assert.equal(b.session.employeesActive,false);const reused=await handleHq(req(undefined,"POST",{},{cookie:cookie.split(";")[0]}),o);assert.equal(reused.headers.get("set-cookie"),null);assert.equal((await reused.json()).session.workspaceId,b.session.workspaceId);o.store.close();});
+test("HTTP denies cloud mode, cross origin and unauthenticated marketplace bearer before querying",async()=>{const o=setup();for(const [r,env,status] of [[req(),{VOLABI_LOCAL_MODE:"enabled",VERCEL:"1"},403],[req(undefined,"POST",{},{origin:"https://evil.test"}),o.env,403],[req("/api/hq/state","GET",{}, {authorization:"Bearer marketplace-publishable-key"}),o.env,401]]){assert.equal((await handleHq(r,{...o,env})).status,status);}o.store.close();});
+test("HTTP state-changing commands require the real seat CSRF and recover exact receipts",async()=>{const o=setup(),s=await session(o);const c={commandId:randomUUID(),type:"source.add",payload:{title:"Exact evidence",body:"  Arabic \u0645\u0635\u062f\u0631\n",provenance:{uri:"current-session:test",locator:"test paragraph",authorKind:"human",status:"approved-policy"}}};
+ const denied=await handleHq(req("/api/hq/commands","POST",c,{cookie:s.cookie}),o);assert.equal(denied.status,403);
+ const send=()=>handleHq(req("/api/hq/commands","POST",c,{cookie:s.cookie,"x-hq-csrf":s.csrfToken}),o);const first=await send();assert.equal(first.status,200);const receipt=(await first.json()).receipt;assert.deepEqual((await(await send()).json()).receipt,receipt);
+ const recovered=await handleHq(req(`/api/hq/commands/${c.commandId}`,"GET",{},{cookie:s.cookie}),o);assert.deepEqual((await recovered.json()).receipt,receipt);
+ const source=o.store.query(o.store.getSession(s.cookie.split("=")[1]),"source",{id:receipt.entityId}).source;assert.equal(source.body,c.payload.body);assert.equal(source.provenance.status,"proposed");assert.equal(source.provenance.authorKind,"current-session");o.store.close();});
+test("HTTP rejects caller-defined role/scope and oversized or malformed body without mutation",async()=>{const o=setup(),s=await session(o);const h={cookie:s.cookie,"x-hq-csrf":s.csrfToken};for(const c of [{commandId:randomUUID(),type:"employee.activate",payload:{}},{commandId:randomUUID(),type:"task.create",payload:{role:"admin"}}])assert.equal((await handleHq(req("/api/hq/commands","POST",c,h),o)).status,400);const large=await handleHq(req("/api/hq/commands","POST",{data:"x".repeat(33000)},h),o);assert.equal(large.status,413);const spoof=await handleHq(req(undefined,"POST",{actorId:"CEO"}),o);assert.equal(spoof.status,400);assert.equal(o.store.db.prepare("SELECT count(*) n FROM commands").get().n,0);o.store.close();});
+test("real repository catalog loads all15 inactive identities and authentic sources without remote requests",()=>{const root=path.resolve(import.meta.dirname,"../..");const c=loadCatalog(root);assert.equal(c.agents.length,15);assert.ok(c.initialSources.length>=35);assert.ok(c.agents.every(a=>a.activationStatus==="inactive"&&a.skills.every(s=>s.permissions.length===0)));const o=setup();o.store.close();const store=new HqStore({filePath:path.join(dirs.at(-1),"catalog.sqlite"),...c});const s=store.createSession();assert.equal(store.query(s,"sources").total,c.initialSources.length);store.close();});

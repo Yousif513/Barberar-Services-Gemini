@@ -1,0 +1,5 @@
+# Source and evaluation situations
+
+Source anchors: P052 requests all-agent names, character, sound and meetings; P053 separates presentation from intelligence; P054 fixes Nora Corporate Prestige / Elegant Arabic-English / Automatic with stable identity; P061 chooses distinct professional personalities; P062 chooses adaptive communication; P063-P065 discuss continuity and controlled channels; P090 retains customer confirmation before routine booking/payment. Original archive source: https://chatgpt.com/share/6ad8b1d4-c390-83ed-b21e-f26f1fcb6811 . These historical concepts do not grant runtime business permissions.
+
+Evaluate with: interrupted mixed-language conversation containing a SAR amount; low-confidence recognition of a booking id; portrait/voice switch with an existing task; external guest asking for private CEO memory; provider outage requiring text; a claim that stopping speech cancels a submitted refund. Record actual observed output and limits separately from this proposed case list.

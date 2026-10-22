@@ -1,0 +1,231 @@
+{
+  "schema_version": "1.0.0",
+  "reviewer": "server_hq_audit",
+  "implementation_author": "root",
+  "mode": "independent scoped security/QA; local development only",
+  "recorded_at": "2026-10-22T07:39:10.220910+00:00",
+  "files": [
+    {
+      "path": "web_platform/src/lib/hq/server/local-boundary.mjs",
+      "sha256": "3a1498b9e14f343d86e1954ded141edde2b4c16cd2c616f5d4483a9610bf5883"
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/local-store.mjs",
+      "sha256": "ddf4058059957207985489c1b6212f1fa17b893cd2a0740ce01fd6c9023f6e35"
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/catalog.mjs",
+      "sha256": "08cdc05609224dda0189859a0ed30f60805fa3a2013884e34b14c8859c58303c"
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/handler.mjs",
+      "sha256": "57d2bd9cb1e5265a6edf7576fef911b805ab681b74630fec0b1e9d3b2e962dc4"
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/handler.d.mts",
+      "sha256": "2d62197cbb6d816a915a842203f1ec731405d2f0fb38a54523c596aca2458b24"
+    },
+    {
+      "path": "web_platform/src/app/api/hq/[...path]/route.ts",
+      "sha256": "9424fe9c16302e414dce1ae03cecf3c5c6423d8720a8c52b8d6136c847cf5991"
+    },
+    {
+      "path": "docs/volabi-local-api-contract.md",
+      "sha256": "4d2b8b76e88f453c15e95c1b8f19744dc2bb0eb922999870cbc55ad4c39abece"
+    },
+    {
+      "path": "web_platform/tests/hq-independent-review.test.mjs",
+      "sha256": "cddb4ee40cf7f94175fee30496c3b95eaf998832377fb957daf41f296cac9b9c"
+    }
+  ],
+  "commands": [
+    {
+      "command": "node --test --test-name-pattern=F-HQ1 web_platform/tests/hq-independent-review.test.mjs",
+      "exit_code": 1,
+      "passed": 0,
+      "failed": 1,
+      "purpose": "RED reproduction: source correction after approval was accepted by followup.record instead of stale_source."
+    },
+    {
+      "command": "node --test web_platform/tests/hq-independent-review.test.mjs",
+      "exit_code": 0,
+      "passed": 18,
+      "failed": 0,
+      "purpose": "Independent HTTP/SQLite verification after owner fix and test-fixture baseline correction."
+    },
+    {
+      "command": "node --test web_platform/tests/hq-independent-review.test.mjs web_platform/tests/hq-store.test.mjs web_platform/tests/hq-local-boundary.test.mjs",
+      "exit_code": 0,
+      "passed": 33,
+      "failed": 0,
+      "skipped": 0,
+      "duration_ms": 797.5057,
+      "independent_cases": 19,
+      "owner_cases": 14,
+      "purpose": "Final combined local-server acceptance including held-executor HTTP refusal."
+    },
+    {
+      "command": "node --test web_platform/tests/hq-independent-review.test.mjs web_platform/tests/hq-store.test.mjs web_platform/tests/hq-local-boundary.test.mjs",
+      "exit_code": 0,
+      "passed": 35,
+      "failed": 0,
+      "skipped": 0,
+      "duration_ms": 789.5039,
+      "independent_cases": 21,
+      "owner_cases": 14,
+      "purpose": "Final verification after narrow Next internal localhost/browser127 alias normalization. Includes actual HTTP acceptance and hostile Origin/Host/port/path/query/hash/userinfo rejection."
+    }
+  ],
+  "network": {
+    "http": "Temporary real HTTP server bound to127.0.0.1; requests use node:http only to that listener.",
+    "external_fetch": "Hard-blocked by independent tests; zero calls asserted per case.",
+    "provider_or_hosted_operations": false
+  },
+  "database": {
+    "engine": "Actual Node24.15 built-in SQLite",
+    "files": "Unique temporary test folders; close/reopen and forced SQLite trigger failure tested; cleanup validates absolute parent/prefix.",
+    "production_data": false
+  },
+  "coverage": [
+    "HTTP session and real CSRF wiring",
+    "missing/foreign CSRF",
+    "forged actor/business bearer refusal",
+    "Host/Origin/rebinding/cloud-disabled",
+    "oversized/malformed body and redacted storage errors",
+    "foreign workspace task/source/command receipt reads and writes",
+    "expired/ambiguous cookie",
+    "idempotent receipt replay and changed-payload conflict",
+    "store restart and parallel same-command replay",
+    "held financial/employee/permission/contact executor refusal",
+    "UTF8 source whitespace/CRLF hash preservation and author-status downgrade",
+    "unattached/foreign citations",
+    "stale sources before approval and after approval before followup",
+    "request-changes replacement recommendation lineage",
+    "composite-command and receipt/audit transaction rollback",
+    "immutable versions/receipts/events and minimized logs",
+    "pagination/scoped search/SQL injection refusal",
+    "15 inactive catalog identities and exact source provenance",
+    "Next internal localhost Request URL with actual127 browser Host/Origin; exact actual-origin and loopback/port restrictions retained"
+  ],
+  "findings": [
+    {
+      "id": "F-HQ1",
+      "severity": "medium",
+      "status": "fixed_and_independently_verified",
+      "path": "web_platform/src/lib/hq/server/local-store.mjs",
+      "lines_before": "190-194",
+      "lines_after": "190-197",
+      "problem": "followup.record did not revalidate cited source currentness after an approval.",
+      "reproduction": "prepare -> approve -> source.correct -> followup.record formerly succeeded.",
+      "fix_owner": "root",
+      "fix": "Reload exact recommendation, compare decision hash, compare every current source version/hash before recording followup.",
+      "regression": "F-HQ1 source corrected after approval blocks follow-up against invalidated cited material"
+    },
+    {
+      "id": "S-HQ-SK1",
+      "severity": "medium",
+      "status": "fixed_and_independently_reread",
+      "problem": "Financial package references combined P075 human processing/zero-repeat choice with assistant completed-service/contested-refund recommendations.",
+      "fix_owner": "skills_and_delivery",
+      "fix": "Separated author/status, explicitly kept qualifying/earning event unadopted without an adopted current source.",
+      "affected_packages": [
+        "primora-payment-reconciliation",
+        "primora-refund-case-review"
+      ]
+    }
+  ],
+  "owner_pre_review_corrections": [
+    "HTTP CSRF call argument wiring",
+    "Preserve exact source body and correction reason; directly tested by independent suite.",
+    "Owner browser-discovered Next internal URL normalization fixed; independently tested through HTTP adapter and negative alias boundaries."
+  ],
+  "test_fixture_correction": "Rollback test originally counted its helper's legitimate source-read audit after the baseline. Payload is now prepared before the snapshot; mutation/version/audit/receipt rollback assertions remain exact.",
+  "skill_packages": [
+    {
+      "name": "primora-bilingual-conversation",
+      "skill_path": "planning/volabi/persona-and-skills/staged-skills/primora-bilingual-conversation/SKILL.md",
+      "skill_sha256": "c44b0b37135c886987e652012e6d00b516e64f2347ff6d517927c14bffeae917",
+      "references": [
+        {
+          "path": "planning/volabi/persona-and-skills/staged-skills/primora-bilingual-conversation/references/source-and-cases.md",
+          "sha256": "e970957f0e79b1de270a3c8d842a719e2433621047b2c9b8736df95304e79fc0"
+        }
+      ],
+      "review": "Instruction/source/security-boundary review only; no behavioral competence evaluation or runtime integration inferred."
+    },
+    {
+      "name": "primora-meeting-facilitation",
+      "skill_path": "planning/volabi/persona-and-skills/staged-skills/primora-meeting-facilitation/SKILL.md",
+      "skill_sha256": "8373e8399679f195834a252de9270b9b4fa9fac728c31d04d76036246daf1366",
+      "references": [
+        {
+          "path": "planning/volabi/persona-and-skills/staged-skills/primora-meeting-facilitation/references/source-and-cases.md",
+          "sha256": "6dcd012b3fa8f9a260249a2fc094bbe35d7217e007a41fb78380fb96a6dcba58"
+        }
+      ],
+      "review": "Instruction/source/security-boundary review only; no behavioral competence evaluation or runtime integration inferred."
+    },
+    {
+      "name": "primora-payment-reconciliation",
+      "skill_path": "planning/volabi/persona-and-skills/staged-skills/primora-payment-reconciliation/SKILL.md",
+      "skill_sha256": "0825efd047f22aabd6f215e5c0b3f37fdbe6f749b02ea83b4c9b05d30a72db4b",
+      "references": [
+        {
+          "path": "planning/volabi/persona-and-skills/staged-skills/primora-payment-reconciliation/references/source-and-cases.md",
+          "sha256": "730d5108cc157e6c2bde49955fa0806b45e9410940dab8e596d6f9d9375295a7"
+        }
+      ],
+      "review": "Instruction/source/security-boundary review only; no behavioral competence evaluation or runtime integration inferred."
+    },
+    {
+      "name": "primora-refund-case-review",
+      "skill_path": "planning/volabi/persona-and-skills/staged-skills/primora-refund-case-review/SKILL.md",
+      "skill_sha256": "c536f486afafda0ad672f57f97cb3a8115dadb9f2d149ae4f101b74409c235b0",
+      "references": [
+        {
+          "path": "planning/volabi/persona-and-skills/staged-skills/primora-refund-case-review/references/source-and-cases.md",
+          "sha256": "2a5262a039ebb4030cde889ff374c1b1e6c1ccf28f67b1eafd4766aec9f37d26"
+        }
+      ],
+      "review": "Instruction/source/security-boundary review only; no behavioral competence evaluation or runtime integration inferred."
+    }
+  ],
+  "remaining_prerequisites": [
+    "Behavioral persona/task/version evidence remains separate from file validation.",
+    "Arabic/local voice availability and interruption/transcription behavior require runtime/device acceptance.",
+    "Meeting proposals do not supply live attendance/invitation/recording infrastructure or permission.",
+    "Reconciliation/refund packets require actual policy/provider/merchant evidence and separately authorized business execution.",
+    "Enabled preview must bind loopback; Host/Origin checks are not peer authentication."
+  ],
+  "verdict": {
+    "local_record_only_backend": "No unresolved actionable critical/high issue found in the reviewed bounded backend after fixes.",
+    "production_release": "Not assessed or cleared. Root retains manifest/release/build/browser/full regression gates.",
+    "business_activation_or_financial_permission": false
+  },
+  "limits": [
+    "HTTP tests exercise the real handler through node:http; they do not boot the Next route server. Route wrapper was read.",
+    "No production/hosted migration, real provider/credential, financial transaction, session-library advisory scan, paid API or company-agent activation.",
+    "Application history is immutable through the app/SQLite triggers; trusted local OS administrators can access or change files. No claim of forensic protection against OS compromise.",
+    "Four package review is source/instruction review, not an executed LLM/voice/payment competency benchmark."
+  ]
+,
+  "post_test_eof_normalization": {
+    "recorded_at": "2026-10-22T08:06:16.611437+00:00",
+    "file": "web_platform/tests/hq-independent-review.test.mjs",
+    "change": "Removed only the extra final blank line; exactly one terminal newline remains. Every assertion and non-EOF byte is unchanged.",
+    "tested_sha256": "6c3709dacd01cc4db50cf4f9e4590678e5ed0f3707b1e9e2890e01af45a8a06c",
+    "final_sha256": "cddb4ee40cf7f94175fee30496c3b95eaf998832377fb957daf41f296cac9b9c",
+    "browser_rerun_after_normalization": false,
+    "prior_execution_results": "Retained unchanged. This is explicitly a post-test formatting-only normalization, not a new browser execution."
+  }
+,
+  "post_normalization_node_verification": {
+    "command": "node --test web_platform/tests/hq-independent-review.test.mjs web_platform/tests/hq-store.test.mjs web_platform/tests/hq-local-boundary.test.mjs",
+    "exit_code": 0,
+    "passed": 35,
+    "failed": 0,
+    "skipped": 0,
+    "duration_ms": 823.5123,
+    "scope": "Fresh bounded real local HTTP/SQLite run after EOF-only normalization; no external provider or hosted operations."
+  }
+}

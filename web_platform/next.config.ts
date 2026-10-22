@@ -16,7 +16,7 @@ const adminRedirects = [
 ];
 
 // Browser protections that need no per-page tuning: no MIME sniffing, no framing of any page (clickjacking on the
-// admin console), a trimmed Referer, HTTPS only, and no camera or microphone (the app uses neither). A
+// admin console), a trimmed Referer, HTTPS only, and no camera. The local HQ overrides microphone for explicit on-device input. A
 // Content-Security-Policy is deliberately not set here: it needs a tested list of every script, style and
 // payment origin the pages load, and an untested one would break checkout.
 const securityHeaders = [
@@ -35,7 +35,10 @@ const nextConfig: NextConfig = {
     return adminRedirects;
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      { source: "/hq/:path*", headers: [{ key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=(), payment=()" }] },
+    ];
   },
 };
 

@@ -1,0 +1,576 @@
+{
+  "reviewer": "server_hq_audit",
+  "base": "http://127.0.0.1:3113",
+  "tag": "Independent 5ac81766",
+  "startedAt": "2026-10-22T07:53:20.162Z",
+  "checks": [
+    {
+      "name": "Actual HTTP policy scopes microphone self toHQ and denies microphone/camera on marketplace",
+      "status": "passed",
+      "hqPolicy": "camera=(), microphone=(self), geolocation=(), payment=()",
+      "loginPolicy": "camera=(), microphone=(), geolocation=(self), payment=(self)"
+    },
+    {
+      "name": "Task composer has focus containment and Escape restores its trigger",
+      "status": "passed"
+    },
+    {
+      "name": "Source intake persists exact authored text and proposed provenance",
+      "status": "passed"
+    },
+    {
+      "name": "Request creates persistent task, proposed owner and independent reviewer; survives reload",
+      "status": "passed"
+    },
+    {
+      "name": "AUTHORED recommendation rejects false quote and binds exact source range/hash",
+      "status": "passed"
+    },
+    {
+      "name": "CEO record-only approval and factual follow-up persist with immutable audit event",
+      "status": "passed"
+    },
+    {
+      "name": "F-UI1 primary action link has readable computed contrast",
+      "status": "passed",
+      "text": "Decisions",
+      "color": "rgb(255, 255, 255)",
+      "background": "rgb(21, 26, 20)",
+      "contrast": 17.65084047643912
+    },
+    {
+      "name": "Lost command response survives reload and recovers SAME receipt without duplicate effect",
+      "status": "passed",
+      "commandId": "40e5086a-56df-4809-a16d-6ef47fbfc899"
+    },
+    {
+      "name": "Correction retains original source bytes/provenance while labelling proposed v2",
+      "status": "passed"
+    },
+    {
+      "name": "Stale source after approval refuses follow-up and preserves both input drafts",
+      "status": "passed"
+    },
+    {
+      "name": "Actual authored selection preserves second repeated occurrence and original CRLF UTF16 offsets",
+      "status": "passed",
+      "start": 28,
+      "end": 46,
+      "decisionId": "07fbc90d-d2ad-4d24-8c90-16ce1e83751b"
+    },
+    {
+      "name": "Registers distinguish filtered-empty and retain15 inactive original identities",
+      "status": "passed"
+    },
+    {
+      "name": "Nora/Daniel expose only their own skills/functions and load actual original portrait/local audio files",
+      "status": "passed"
+    },
+    {
+      "name": "All9 route families render Arabic RTL at375 without horizontal overflow; Arabic voice gap is truthful",
+      "status": "passed"
+    },
+    {
+      "name": "Actual foreign and missing records refuse; controlled forbidden response displays error, not invented data",
+      "status": "passed"
+    },
+    {
+      "name": "All15 approved overlay destinations exercised with keyboard closure; no microphone, remote speech, invitations or money",
+      "status": "passed"
+    }
+  ],
+  "overlays": [
+    "task-composer",
+    "source-intake",
+    "source-picker",
+    "readiness-comparison",
+    "recommendation",
+    "skill-change-review",
+    "request-changes",
+    "decision-confirmation",
+    "audit-event",
+    "source-correction",
+    "filters",
+    "skill-evidence",
+    "evaluation-evidence",
+    "skill-change",
+    "evaluation-request",
+    "mobile-navigation"
+  ],
+  "routes": [
+    "/hq",
+    "/hq/knowledge",
+    "/hq/tasks",
+    "/hq/tasks/7ef06600-153d-4617-9bbd-f542f1809fe5",
+    "/hq/knowledge/c84b7428-9805-4736-9dba-96eb9ca9b697",
+    "/hq/tasks/7ef06600-153d-4617-9bbd-f542f1809fe5",
+    "/hq/tasks/6c5a9632-bed5-4ad1-9313-d7d59d42bb07",
+    "/hq/tasks",
+    "/hq/decisions",
+    "/hq/agents",
+    "/hq/agents/nora",
+    "/hq/agents/daniel",
+    "/hq",
+    "/hq",
+    "/hq/tasks",
+    "/hq/tasks/7ef06600-153d-4617-9bbd-f542f1809fe5",
+    "/hq/decisions",
+    "/hq/decisions/be23aa42-13a6-49b4-b323-5e2fc90d70e6",
+    "/hq/knowledge",
+    "/hq/knowledge/c84b7428-9805-4736-9dba-96eb9ca9b697",
+    "/hq/agents",
+    "/hq/agents/nora"
+  ],
+  "blockedExternal": [],
+  "browserErrors": [
+    {
+      "kind": "console",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/eda85299-2b3d-4279-a1ca-3d7384728aa8"
+    },
+    {
+      "kind": "console",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/d66faf4f-f32d-4a57-bdc0-ec28838cd42d"
+    },
+    {
+      "kind": "console",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/ce91fc49-2cc1-41a3-8d57-eeee8f0b1084"
+    },
+    {
+      "kind": "console",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/7e706fc4-0e02-4780-832b-6365e0a17624"
+    },
+    {
+      "kind": "console",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/a5a6a767-056f-428b-9c8d-972631963fd8"
+    },
+    {
+      "kind": "console",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/40e5086a-56df-4809-a16d-6ef47fbfc899"
+    },
+    {
+      "kind": "console",
+      "message": "Failed to load resource: net::ERR_CONNECTION_CLOSED",
+      "url": "http://127.0.0.1:3113/api/hq/commands"
+    },
+    {
+      "kind": "console",
+      "message": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/40e5086a-56df-4809-a16d-6ef47fbfc899"
+    },
+    {
+      "kind": "console",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/6b50c4e1-9d3b-41a9-ba3e-3b85e6597d94"
+    },
+    {
+      "kind": "console",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/d3520d59-c3a7-4cb6-afd4-ce1248bf29c8"
+    },
+    {
+      "kind": "console",
+      "message": "Failed to load resource: the server responded with a status of 409 (Conflict)",
+      "url": "http://127.0.0.1:3113/api/hq/commands"
+    },
+    {
+      "kind": "console",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/dd55152b-b06e-4ef1-95ca-a0ff1c130b13"
+    },
+    {
+      "kind": "console",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/state?view=task&id=7ef06600-153d-4617-9bbd-f542f1809fe5"
+    },
+    {
+      "kind": "console",
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/state?view=task&id=099b41fe-48ef-4024-8b2d-4516bf328210"
+    },
+    {
+      "kind": "console",
+      "message": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+      "url": "http://127.0.0.1:3113/api/hq/state?view=overview"
+    }
+  ],
+  "commandRequests": [
+    {
+      "commandId": "eda85299-2b3d-4279-a1ca-3d7384728aa8",
+      "type": "source.add"
+    },
+    {
+      "commandId": "d66faf4f-f32d-4a57-bdc0-ec28838cd42d",
+      "type": "task.create"
+    },
+    {
+      "commandId": "ce91fc49-2cc1-41a3-8d57-eeee8f0b1084",
+      "type": "recommendation.publish"
+    },
+    {
+      "commandId": "7e706fc4-0e02-4780-832b-6365e0a17624",
+      "type": "decision.record"
+    },
+    {
+      "commandId": "a5a6a767-056f-428b-9c8d-972631963fd8",
+      "type": "followup.record"
+    },
+    {
+      "commandId": "40e5086a-56df-4809-a16d-6ef47fbfc899",
+      "type": "followup.record"
+    },
+    {
+      "commandId": "6b50c4e1-9d3b-41a9-ba3e-3b85e6597d94",
+      "type": "source.correct"
+    },
+    {
+      "commandId": "d3520d59-c3a7-4cb6-afd4-ce1248bf29c8",
+      "type": "followup.record"
+    },
+    {
+      "commandId": "319ddfc5-6cdd-4095-b45e-7f5f8fb3d733",
+      "type": "source.add"
+    },
+    {
+      "commandId": "87eda915-fc7b-43ff-b959-c214f7a140c1",
+      "type": "task.create"
+    },
+    {
+      "commandId": "dd55152b-b06e-4ef1-95ca-a0ff1c130b13",
+      "type": "recommendation.publish"
+    }
+  ],
+  "receiptReads": [
+    "eda85299-2b3d-4279-a1ca-3d7384728aa8",
+    "d66faf4f-f32d-4a57-bdc0-ec28838cd42d",
+    "ce91fc49-2cc1-41a3-8d57-eeee8f0b1084",
+    "7e706fc4-0e02-4780-832b-6365e0a17624",
+    "a5a6a767-056f-428b-9c8d-972631963fd8",
+    "40e5086a-56df-4809-a16d-6ef47fbfc899",
+    "40e5086a-56df-4809-a16d-6ef47fbfc899",
+    "40e5086a-56df-4809-a16d-6ef47fbfc899",
+    "6b50c4e1-9d3b-41a9-ba3e-3b85e6597d94",
+    "d3520d59-c3a7-4cb6-afd4-ce1248bf29c8",
+    "dd55152b-b06e-4ef1-95ca-a0ff1c130b13"
+  ],
+  "expectedHttp": [
+    {
+      "status": 404,
+      "url": "http://127.0.0.1:3113/api/hq/commands/eda85299-2b3d-4279-a1ca-3d7384728aa8"
+    },
+    {
+      "status": 404,
+      "url": "http://127.0.0.1:3113/api/hq/commands/d66faf4f-f32d-4a57-bdc0-ec28838cd42d"
+    },
+    {
+      "status": 404,
+      "url": "http://127.0.0.1:3113/api/hq/commands/ce91fc49-2cc1-41a3-8d57-eeee8f0b1084"
+    },
+    {
+      "status": 404,
+      "url": "http://127.0.0.1:3113/api/hq/commands/7e706fc4-0e02-4780-832b-6365e0a17624"
+    },
+    {
+      "status": 404,
+      "url": "http://127.0.0.1:3113/api/hq/commands/a5a6a767-056f-428b-9c8d-972631963fd8"
+    },
+    {
+      "status": 404,
+      "url": "http://127.0.0.1:3113/api/hq/commands/40e5086a-56df-4809-a16d-6ef47fbfc899"
+    },
+    {
+      "status": 403,
+      "url": "http://127.0.0.1:3113/api/hq/commands/40e5086a-56df-4809-a16d-6ef47fbfc899"
+    },
+    {
+      "status": 404,
+      "url": "http://127.0.0.1:3113/api/hq/commands/6b50c4e1-9d3b-41a9-ba3e-3b85e6597d94"
+    },
+    {
+      "status": 404,
+      "url": "http://127.0.0.1:3113/api/hq/commands/d3520d59-c3a7-4cb6-afd4-ce1248bf29c8"
+    },
+    {
+      "status": 409,
+      "url": "http://127.0.0.1:3113/api/hq/commands"
+    },
+    {
+      "status": 404,
+      "url": "http://127.0.0.1:3113/api/hq/commands/dd55152b-b06e-4ef1-95ca-a0ff1c130b13"
+    },
+    {
+      "status": 404,
+      "url": "http://127.0.0.1:3113/api/hq/state?view=task&id=7ef06600-153d-4617-9bbd-f542f1809fe5"
+    },
+    {
+      "status": 404,
+      "url": "http://127.0.0.1:3113/api/hq/state?view=task&id=099b41fe-48ef-4024-8b2d-4516bf328210"
+    },
+    {
+      "status": 403,
+      "url": "http://127.0.0.1:3113/api/hq/state?view=overview"
+    }
+  ],
+  "commands": [
+    {
+      "type": "source.add",
+      "status": 200,
+      "commandId": "eda85299-2b3d-4279-a1ca-3d7384728aa8",
+      "receipt": {
+        "commandId": "eda85299-2b3d-4279-a1ca-3d7384728aa8",
+        "type": "source.add",
+        "entityType": "source",
+        "entityId": "c84b7428-9805-4736-9dba-96eb9ca9b697",
+        "revision": 1,
+        "recordIds": {
+          "sourceId": "c84b7428-9805-4736-9dba-96eb9ca9b697"
+        },
+        "effect": "record-only",
+        "recordedAt": "2026-10-22T07:53:22.135Z"
+      }
+    },
+    {
+      "type": "task.create",
+      "status": 200,
+      "commandId": "d66faf4f-f32d-4a57-bdc0-ec28838cd42d",
+      "receipt": {
+        "commandId": "d66faf4f-f32d-4a57-bdc0-ec28838cd42d",
+        "type": "task.create",
+        "entityType": "task",
+        "entityId": "7ef06600-153d-4617-9bbd-f542f1809fe5",
+        "revision": 1,
+        "recordIds": {
+          "taskId": "7ef06600-153d-4617-9bbd-f542f1809fe5"
+        },
+        "effect": "record-only",
+        "recordedAt": "2026-10-22T07:53:23.142Z"
+      }
+    },
+    {
+      "type": "recommendation.publish",
+      "status": 200,
+      "commandId": "ce91fc49-2cc1-41a3-8d57-eeee8f0b1084",
+      "receipt": {
+        "commandId": "ce91fc49-2cc1-41a3-8d57-eeee8f0b1084",
+        "type": "recommendation.publish",
+        "entityType": "recommendation",
+        "entityId": "8601cd4b-0724-4131-b6d5-028fe270e482",
+        "revision": 1,
+        "recordIds": {
+          "taskId": "7ef06600-153d-4617-9bbd-f542f1809fe5",
+          "recommendationId": "8601cd4b-0724-4131-b6d5-028fe270e482",
+          "decisionId": "be23aa42-13a6-49b4-b323-5e2fc90d70e6"
+        },
+        "effect": "record-only",
+        "recordedAt": "2026-10-22T07:53:24.578Z"
+      }
+    },
+    {
+      "type": "decision.record",
+      "status": 200,
+      "commandId": "7e706fc4-0e02-4780-832b-6365e0a17624",
+      "receipt": {
+        "commandId": "7e706fc4-0e02-4780-832b-6365e0a17624",
+        "type": "decision.record",
+        "entityType": "decision",
+        "entityId": "be23aa42-13a6-49b4-b323-5e2fc90d70e6",
+        "revision": 1,
+        "recordIds": {
+          "taskId": "7ef06600-153d-4617-9bbd-f542f1809fe5",
+          "decisionId": "be23aa42-13a6-49b4-b323-5e2fc90d70e6"
+        },
+        "effect": "record-only",
+        "recordedAt": "2026-10-22T07:53:25.379Z"
+      }
+    },
+    {
+      "type": "followup.record",
+      "status": 200,
+      "commandId": "a5a6a767-056f-428b-9c8d-972631963fd8",
+      "receipt": {
+        "commandId": "a5a6a767-056f-428b-9c8d-972631963fd8",
+        "type": "followup.record",
+        "entityType": "followup",
+        "entityId": "b09dc804-b725-4b33-877a-3f3252c4de08",
+        "revision": 1,
+        "recordIds": {
+          "taskId": "7ef06600-153d-4617-9bbd-f542f1809fe5",
+          "followupId": "b09dc804-b725-4b33-877a-3f3252c4de08",
+          "decisionId": "be23aa42-13a6-49b4-b323-5e2fc90d70e6"
+        },
+        "effect": "record-only",
+        "recordedAt": "2026-10-22T07:53:25.991Z"
+      }
+    },
+    {
+      "type": "source.correct",
+      "status": 200,
+      "commandId": "6b50c4e1-9d3b-41a9-ba3e-3b85e6597d94",
+      "receipt": {
+        "commandId": "6b50c4e1-9d3b-41a9-ba3e-3b85e6597d94",
+        "type": "source.correct",
+        "entityType": "source",
+        "entityId": "c84b7428-9805-4736-9dba-96eb9ca9b697",
+        "revision": 2,
+        "recordIds": {
+          "sourceId": "c84b7428-9805-4736-9dba-96eb9ca9b697"
+        },
+        "effect": "record-only",
+        "recordedAt": "2026-10-22T07:53:28.199Z"
+      }
+    },
+    {
+      "type": "recommendation.publish",
+      "status": 200,
+      "commandId": "dd55152b-b06e-4ef1-95ca-a0ff1c130b13",
+      "receipt": {
+        "commandId": "dd55152b-b06e-4ef1-95ca-a0ff1c130b13",
+        "type": "recommendation.publish",
+        "entityType": "recommendation",
+        "entityId": "b9533c51-8ff0-4e63-a98d-a50e62a4c879",
+        "revision": 1,
+        "recordIds": {
+          "taskId": "6c5a9632-bed5-4ad1-9313-d7d59d42bb07",
+          "recommendationId": "b9533c51-8ff0-4e63-a98d-a50e62a4c879",
+          "decisionId": "07fbc90d-d2ad-4d24-8c90-16ce1e83751b"
+        },
+        "effect": "record-only",
+        "recordedAt": "2026-10-22T07:53:29.799Z"
+      }
+    }
+  ],
+  "deviceAttempts": [],
+  "screenshots": [
+    "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\.admin-console\\evidence\\volabi-first-loop\\independent-en-task.png",
+    "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\.admin-console\\evidence\\volabi-first-loop\\independent-en-daniel.png",
+    "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\.admin-console\\evidence\\volabi-first-loop\\independent-ar-nora-375.png"
+  ],
+  "media": [
+    {
+      "person": "nora",
+      "portrait": "/volabi/agents/nora.png",
+      "audio": {
+        "src": "http://127.0.0.1:3113/volabi/voices/nora-en.wav",
+        "duration": 9.697868
+      }
+    },
+    {
+      "person": "daniel",
+      "portrait": "/volabi/agents/daniel.png",
+      "audio": {
+        "src": "http://127.0.0.1:3113/volabi/voices/daniel-en.wav",
+        "duration": 10.978005
+      }
+    }
+  ],
+  "findings": [
+    {
+      "id": "F-UI1",
+      "severity": "medium",
+      "status": "fixed_and_independently_verified",
+      "file": "web_platform/src/app/hq/hq.css",
+      "line": 2,
+      "problem": "The .hq a reset outranked the primary class, producing dark text on dark primary action anchors.",
+      "proof_before": ".admin-console/evidence/volabi-first-loop/independent-en-task-before-link-contrast.png",
+      "owner": "hq_repo_inventory",
+      "verification": "Actual final Decisions anchor computed white rgb255,255,255 on rgb21,26,20, contrast17.65084047643912; screenshot and >=4.5 assertion pass."
+    },
+    {
+      "id": "F-UI2",
+      "severity": "low",
+      "status": "fixed_and_independently_verified",
+      "file": "web_platform/src/components/hq/hq-workspace.tsx",
+      "problem": "Manual wrapping Version label included option text for exact label lookup; stable localized accessible name was missing.",
+      "owner": "hq_repo_inventory",
+      "verification": "Explicit localized aria-label added; actual final combobox accessible name is exactly Version, v1/v2 selection and original provenance pass."
+    }
+  ],
+  "ids": {
+    "taskId": "7ef06600-153d-4617-9bbd-f542f1809fe5",
+    "sourceId": "c84b7428-9805-4736-9dba-96eb9ca9b697",
+    "decisionId": "be23aa42-13a6-49b4-b323-5e2fc90d70e6"
+  },
+  "sourceOriginal": "First acquisition only. Repeat acquisition commission is zero.\nA local development decision does not move funds.",
+  "unexpectedBrowserErrors": [],
+  "status": "passed",
+  "finishedAt": "2026-10-22T07:53:37.396Z",
+  "fileHashes": {
+    "web_platform/src/components/hq/hq-workspace.tsx": "df30a932139c4387f3101287871fc23ebf4b4715300d453f711b505f50f5bdf9",
+    "web_platform/src/components/hq/hq-overlays.tsx": "6732cfdd24da1f0fb88c881312acf0ad3ce9b84b968e37e21c97b95ce8e55b9f",
+    "web_platform/src/components/hq/hq-agent-profile.tsx": "4f4ec83fde5c5c14d4a5649e911facaafe98d16ea0a8c94fd8e71e57beebd0d2",
+    "web_platform/src/components/hq/hq-common.tsx": "7b2cba84fe70b6e9d266072c300546a309ebe0e15c612eb9dcead51103e9ca12",
+    "web_platform/src/components/hq/hq-shell.tsx": "bdc4c9ac231336f37600fa5b118d3b79d0d4f5e2a043ffbca30d4798b232f10f",
+    "web_platform/src/components/hq/hq-context.tsx": "9495c62453d035fb8ed2862bbee23308d8e13c988898b472a0a4df4c796c1651",
+    "web_platform/src/lib/hq/client.ts": "22e3c789c329b489e25aff0f616894dea0546ed696adfee746c1c931ee6f69b6",
+    "web_platform/src/lib/hq/copy.ts": "0ee97e997abe7858b847d320e6b934c533dbcdfed947f4513d1bcfbe8fde350c",
+    "web_platform/src/lib/hq/voice.ts": "2150bfde9211a9aad6fb917032b2f814d74b55aa298a9003978f5d2f447477e4",
+    "web_platform/src/app/hq/hq.css": "d3f383677340ee05c792476da3c91339576196df79e80c9b42322be2d3576f58",
+    "web_platform/src/lib/hq/contracts.ts": "5611151b0988787ed88124888fea8e770161db0bd65732561d5e4aeaa25873ab",
+    "web_platform/tests-browser/hq-local-acceptance.mjs": "8324eed9016d4471f2e43cd1efb4be599469ef988c3b73a2bfdb3b139d29cd9a",
+    "web_platform/src/app/hq/error.tsx": "9a8edf82dcaf3ac6b327ffd967c81bd11684e498855613a4e5b52ae854ce45cf",
+    "web_platform/src/app/hq/layout.tsx": "98f32d94bfdc157538730f323ee4257de453c2aff5b4bfb3ddea56428d06cd7d",
+    "web_platform/src/app/hq/loading.tsx": "85397cec8ebb11910efe2e0ce8189f2f07dca7a76842958264043b52f1a3aae3",
+    "web_platform/src/app/hq/not-found.tsx": "19fc7957f0f37aa0289d07ce0ee39069e5997a2b3647c7aebde23e9525c56f4c",
+    "web_platform/src/app/hq/page.tsx": "630a4e7850316ab48387f9b1b1e1e233b9aba0cb4b44c269185d86a0ad7c55dd",
+    "web_platform/src/app/hq/agents/page.tsx": "4b841c5bb20f3320cf68ac5bf8d35d6fa7152a465ed9b0d27d8354625275f22e",
+    "web_platform/src/app/hq/decisions/page.tsx": "2bdd20a06762c32555c66d6595b32130e388b4db7f78113a4e06dcf235e925de",
+    "web_platform/src/app/hq/knowledge/page.tsx": "68c5f9e359de379f3eb24f6cd81c048207022df516f0d52470c23e21bbd3e53f",
+    "web_platform/src/app/hq/tasks/page.tsx": "af435e4a9b1c718f39f15dad9f2b1f852346239fb30f8516f3773ed8aadfb551",
+    "web_platform/src/app/hq/tasks/[id]/page.tsx": "699a6c8ba331268ca3a5b185daf9194d650202306fe891fb5d4e19f543261c04",
+    "web_platform/src/app/hq/knowledge/[id]/page.tsx": "99bab328840d6c151bd84fb0963990c940b481ae4123ec31c0cce7fa5fe225ef",
+    "web_platform/src/app/hq/decisions/[id]/page.tsx": "d5e570be0de2f82ea7edeef7291551775eb325c4d4ef7be59d2c8902a54aaa79",
+    "web_platform/src/app/hq/agents/[id]/page.tsx": "cb7a151f52c9066a86af807a71167644aca862e1938b6c0af88fe6d05d7419eb"
+  },
+  "routePatterns": [
+    "/hq",
+    "/hq/tasks",
+    "/hq/tasks/[id]",
+    "/hq/decisions",
+    "/hq/decisions/[id]",
+    "/hq/knowledge",
+    "/hq/knowledge/[id]",
+    "/hq/agents",
+    "/hq/agents/[id]"
+  ],
+  "approvedOverlayCount": 15,
+  "extraOverlay": "mobile-navigation",
+  "implementationAuthors": [
+    "hq_repo_inventory (frontend)",
+    "root (backend/media/policy)"
+  ],
+  "independence": "Reviewer wrote only tests-browser/hq-local-acceptance.mjs, review worklog and evidence; did not implement or modify frontend/server/manifest.",
+  "ownerCorrectionsIndependentlyVerified": [
+    "HqField stable explicit labels/description",
+    "Role-specific agent.skills instead of global catalog",
+    "CRLF-normalized textarea selection maps to original UTF16 offsets and preserves second repeated occurrence",
+    "Receipt GET403 retains original command and allows later same-receipt recovery"
+  ],
+  "limits": [
+    "Single real local Next development server and Chromium; no production/mobile-device/assistive-technology certification.",
+    "All fifteen overlay destinations opened and keyboard-closed; this is not a claim that every possible lifecycle/state combination was submitted.",
+    "The unknown outcome is a deliberate local commit-then-abort fixture; the temporary403 overview and receipt refusals are controlled error-state fixtures. Foreign/missing scope404 and source-stale409 are actual server decisions.",
+    "Local record-only fixture arrangement was used for the extra CRLF source/task; authored selection and final publication were actual UI actions.",
+    "Native media metadata/playback proves local WAV availability, not Arabic speech, fifteen distinct engines, live agent reasoning, employee activation or recording permission.",
+    "HTTP and WebSocket browser origins are hard-blocked except the exact loopback app; local header requests use that fixed origin with redirects disabled.",
+    "No getUserMedia/speech synthesis/invitations/provider calls/financial operations. Full regulated release/build/manifest gates remain root-owned."
+  ],
+  "preFixScreenshotSha256": "d7a21f5b155189e6c4133128a410572ffca7eda356f098bd71bb768d026bf39a",
+  "visualInspection": [
+    "Viewed actual pre-fix English task screenshot, final English task screenshot and Arabic375 Nora screenshot; source text remains original-language where quoted."
+  ]
+,
+  "post_test_eof_normalization": {
+    "recorded_at": "2026-10-22T08:06:16.610027+00:00",
+    "file": "web_platform/tests-browser/hq-local-acceptance.mjs",
+    "change": "Removed only the extra final blank line; exactly one terminal newline remains. Every assertion and non-EOF byte is unchanged.",
+    "tested_sha256": "04bd6cbca9dfd66080271dff1289a87dae8ca6a253cfb0d799047634f01f5326",
+    "final_sha256": "8324eed9016d4471f2e43cd1efb4be599469ef988c3b73a2bfdb3b139d29cd9a",
+    "browser_rerun_after_normalization": false,
+    "prior_execution_results": "Retained unchanged. This is explicitly a post-test formatting-only normalization, not a new browser execution."
+  }
+}

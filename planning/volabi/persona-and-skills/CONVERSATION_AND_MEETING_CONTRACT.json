@@ -1,0 +1,139 @@
+{
+  "status": "proposed inspectable profile/inline-state contract; no runtime or new route implemented",
+  "placement": {
+    "agent_directory": "/hq/agents shows all15 canonical names, portrait production/reference state, character label, voice availability and inactive company status",
+    "agent_profile": "/hq/agents/[id] contains source/proposal character, portrait provenance, voice profile, scoped conversation entry, meeting contribution preferences and existing skills/readiness/history sections",
+    "conversation": "Inline profile panel; task/evidence/decision handoffs use already approved task/decision/evidence destinations. Unconfigured voice control explains the prerequisite and retains text/draft.",
+    "meeting_preparation": "Source-linked task/decision record plus existing composer/approval/evidence contracts; full live boardroom remains later scope unless separately implemented. No new /hq/council route implied."
+  },
+  "records": {
+    "PersonaPresentationVersion": {
+      "fields": [
+        "agent_id",
+        "charter_revision",
+        "source_claims_with_prompt/path/hash",
+        "character_source_or_proposed",
+        "style_and_context_rules",
+        "portrait_asset_id/path/hash/source/rights/review",
+        "voice_profile_revision",
+        "appearance_mode/preset",
+        "changed_by_actor/decision/history"
+      ],
+      "invariant": "Presentation cannot mutate identity, charter, reasoning capability, memory or authority."
+    },
+    "VoiceProfile": {
+      "fields": [
+        "logical_profile_id",
+        "persona_version",
+        "source_direction",
+        "proposed_acoustic_direction",
+        "languages/pronunciation_lexicon_revision",
+        "provider/environment/voice_id_or_unconfigured",
+        "voice_rights/consent_evidence",
+        "actual_audio_sample_path/hash_or_missing",
+        "audition_and_bilingual_evaluation",
+        "latency/interruption/accessibility_observations",
+        "permission_and_data_processing_status"
+      ],
+      "invariant": "A written distinct voice brief is not a configured or evaluated voice; no cloned human identity is assumed."
+    },
+    "ConversationSession": {
+      "fields": [
+        "session_id/revision",
+        "actor_and_private_or_corporate_workspace",
+        "selected_persona/version",
+        "audience_and_language",
+        "permitted_source_ids/versions",
+        "text_or_voice_mode/dependency_state",
+        "actual_attributed_turns_and_grounding",
+        "transcript_corrections",
+        "recording/transcription_permissions",
+        "task/decision/evidence_handoff_ids",
+        "retention/access_policy_reference",
+        "actual_model/tool_observation_or_unconfigured"
+      ],
+      "invariant": "Store actual interaction and labelled drafts; no invented employee activity. Consequential utterance is a proposal until exact authorization is verified."
+    },
+    "MeetingPreparation": {
+      "fields": [
+        "meeting_id/revision",
+        "purpose/agenda/proposed_time/Asia_Riyadh_display",
+        "internal_or_external",
+        "proposed_attendees_and_role_contribution",
+        "required_skill/version/evidence/permission_gaps",
+        "approved_material_scope",
+        "CEO_confirmation_of_agenda/attendees/time/purpose",
+        "invitation_delivery_receipts_or_not_sent",
+        "AI_disclosure",
+        "record/transcribe/share_permission",
+        "dissent/actual_minutes",
+        "proposed_decision/task_ids",
+        "attendance_actual_or_unknown"
+      ],
+      "invariant": "No external invitation, recording, stakeholder send or company action from a draft meeting."
+    }
+  },
+  "states": {
+    "conversation": [
+      "draft",
+      "unconfigured_dependency",
+      "ready_for_authorized_text",
+      "listening",
+      "recognition_uncertain",
+      "grounding",
+      "responding",
+      "speaking",
+      "interrupted",
+      "needs_clarification",
+      "forbidden",
+      "stale_context",
+      "failed_preserve_draft",
+      "closed"
+    ],
+    "meeting": [
+      "draft",
+      "readiness_gaps",
+      "awaiting_CEO_confirmation",
+      "confirmed_scope_no_invitations_sent",
+      "invitation_pending_or_failed_with_receipt",
+      "in_meeting_only_if_actual",
+      "minutes_draft",
+      "decision_needs_confirmation",
+      "follow_up_recorded_execution_blocked",
+      "cancelled"
+    ],
+    "voice": [
+      "brief_only",
+      "sample_missing",
+      "dependency_unconfigured",
+      "audition_proposed",
+      "evaluated_with_evidence",
+      "available_for_authorized_context",
+      "unavailable_text_fallback"
+    ]
+  },
+  "authority": "Current approval covers the local persistent HQ software loop/theme/three design skills and this persona preparation. All company identities and business tool permissions remain inactive/ungranted. Local software acceptance uses development-preparer identity and isolated labelled fixtures.",
+  "mandatory_separation": [
+    "global skill package path/install/hash",
+    "agent-specific proposed or assigned binding",
+    "task/version-bound evaluated evidence and freshness",
+    "runtime tools/data/voice dependencies and permissions"
+  ],
+  "freshness": "Invalidate readiness when task requirements, source/charter, skill/model/voice version, evaluation context or permissions change. No invented competence percentage or universal validity duration.",
+  "privacy_default": "Do not record audio or export/share transcripts by default. Do not transfer private CEO context into corporate/external material. A documented applicable policy/permission is required when enabling those actual operations.",
+  "later_media_acceptance": [
+    "actual licensed distinct voice audition across all15",
+    "AR/EN code-switching and names/SAR pronunciation",
+    "barge-in and clarification",
+    "network/provider outage and text fallback",
+    "lipsync/avatar if implemented",
+    "external disclosure/material isolation and scoped recording controls"
+  ],
+  "UI_rules": [
+    "No fake voice Play button with missing audio. Show brief/not configured and exact prerequisite.",
+    "No external-send/Invite success without an actual authorized operation receipt.",
+    "No renamed or fabricated original identities; render the15 source roster.",
+    "Character aesthetics are labelled source concept or new proposal; portrait generation record is separate.",
+    "All user-visible labels/copy AR/EN; Arabic inline panels mirror direction."
+  ]
+}

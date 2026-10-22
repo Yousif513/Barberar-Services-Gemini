@@ -1,0 +1,1750 @@
+{
+  "checked_on": "2026-10-22",
+  "scope": "Original recovery assets plus bounded project public/mobile asset name inspection; not whole-disk/cloud recovery",
+  "reference_image_count": 61,
+  "visual_brief_count": 65,
+  "visually_inspected_role_linked_refs": 11,
+  "reference_images": [
+    {
+      "id": "REF-001",
+      "url": "https://images.openai.com/static-rsc-4/10Ee-23EmmbtvaKnsnk6jLQL-p62G-k8tWtGDq3-x2pdCd1s2Jsqi3pq8tupzouJGWwIUFj5SbxgQ4fR49REPk7EU4nzsSg1MkKahgau38PltXgHSz4VEoaUNKtTnCYqxYDZUMcv8R4ENzI3gNsUWbUHbLPgBWZugW_KEyKO76UgmJMWr4MY-j5yRHPncbi7?purpose=fullsize",
+      "source_prompts": [
+        66
+      ],
+      "visual_briefs": [
+        "VIS-033"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-001.jpg",
+      "bytes": 503061,
+      "mime": "image/jpeg",
+      "sha256": "228a7d5e6fab5ac54270fc354138191ed71f1dfeb792184b188bf000694f7762",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-001.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "228a7d5e6fab5ac54270fc354138191ed71f1dfeb792184b188bf000694f7762",
+      "inspection": {
+        "view_image": "inspected",
+        "observation": "Copper wavy hair, burgundy blazer; confident and engaging portrait."
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": "Victoria"
+    },
+    {
+      "id": "REF-002",
+      "url": "https://images.openai.com/static-rsc-4/1k1-iiz7gX89FJG3EEHs99hdo7hJWnDqK2TOPWsv2ETWW0rRptfNn7Yi2omnYp2dMMgodM2vfhzUYioMEUE6DgUWn90kjUHdg3PNYBSu2xAeldVYAPOsBhRRWLcIy19rVXX_BxKHwWGjK9x0mjEGEWqy0cWuYj2pPHf3Q9EipADgqx3B2FjXDCsWrRbEkBgv?purpose=fullsize",
+      "source_prompts": [
+        75
+      ],
+      "visual_briefs": [
+        "VIS-052"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-002.jpg",
+      "bytes": 67111,
+      "mime": "image/jpeg",
+      "sha256": "6c530209c8414697fc61f3e53301bddb41ec85c7f50775839b43ddb7b1a5d903",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-002.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "6c530209c8414697fc61f3e53301bddb41ec85c7f50775839b43ddb7b1a5d903",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-003",
+      "url": "https://images.openai.com/static-rsc-4/434dJ3FCos5lJmWMLq9wZQQvxa3MVOadv-fTr4lH0DnkAmSpTFhMVOnQPF6so5YOBN0qE9C6AXLxozV82CMRSUSwESy7OWeQ4Z5mvWCNfMKqLWcV6pJgqMOdcwnjpPFVYy4OAUqiDTyZAN8CRTKoRKOhng_b-y5imZNH3567kS4cwtsuyEWBAsVrfPYue4Zh?purpose=fullsize",
+      "source_prompts": [
+        56
+      ],
+      "visual_briefs": [
+        "VIS-010"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-003.jpg",
+      "bytes": 160690,
+      "mime": "image/jpeg",
+      "sha256": "688d2e60e9a45e4b5dd2d5655caf2ed294808cac3073821217f8e57550c21d0e",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-003.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "688d2e60e9a45e4b5dd2d5655caf2ed294808cac3073821217f8e57550c21d0e",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-004",
+      "url": "https://images.openai.com/static-rsc-4/4Gi1yI6Utwt251is9qGHj9e0aUNbmL7ylpbaeyGsBfrJxJlmHQ2bsq7F-0l58LX3z5HkpzfInV7KvWnB4GJ3XyBFBhtLyBx4m1J_ZydJVMs4Kj76dv_IMveCj8zqnKtRxLI9N49vmsv3gweOGrq38mYAlfoTpjcZMlF2E0ibgxV53_2Ji3Kw_6z_hPyW7zXD?purpose=fullsize",
+      "source_prompts": [
+        60
+      ],
+      "visual_briefs": [
+        "VIS-015"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-004.jpg",
+      "bytes": 132315,
+      "mime": "image/jpeg",
+      "sha256": "391d4d181ce5aed425f5d6628597149ab6a954258f4bd57bd28f681fcf22a318",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-004.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "391d4d181ce5aed425f5d6628597149ab6a954258f4bd57bd28f681fcf22a318",
+      "inspection": {
+        "view_image": "inspected",
+        "observation": "Long dark hair, beige tailored suit; friendly HR portrait explicitly captioned Olivia Morgan in same source."
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": "Olivia"
+    },
+    {
+      "id": "REF-005",
+      "url": "https://images.openai.com/static-rsc-4/4wYN4DZpBOUxM7sCxxJ6GLo6FOs3a6V-S93idWnbYHRU672wfm0VEYWjRA-ei6cxGvGBaG0FqT_qXLLHPPOpj0-0zYTG9m_PpkKXFd8NY5Xd3K6ALtRoH-hGzKHtE9db06NOQvjfciHbaAnJeUJTVlIKZP9I7UaEUgUSe20vDJ1n_47UvA7cySb397e_PcTy?purpose=fullsize",
+      "source_prompts": [
+        208
+      ],
+      "visual_briefs": [
+        "VIS-064"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-005.jpg",
+      "bytes": 39732,
+      "mime": "image/jpeg",
+      "sha256": "91899d073ecbbe28c1c63ecad2a069cc0a4db97c4466f7254fb45f65a1b531bc",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-005.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "91899d073ecbbe28c1c63ecad2a069cc0a4db97c4466f7254fb45f65a1b531bc",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-006",
+      "url": "https://images.openai.com/static-rsc-4/6IWGehl0QjBEVFIAIjv3PEcYgP8N5BOhlt5cu-k2-5xQSGzgfFUfV6DbB_WRzvXZ84mzDwNax1gs1ri2IugfoBNRL5UDcMtxZ5Mbp9Xb67bGqaR3Da-AUYuKykguIeF6_eG7VtvaYY1ztE1Vq33xztWvU1vkutz5Usm67AB7hQBZskcsnOx7ccRyh70b-58y?purpose=fullsize",
+      "source_prompts": [
+        59
+      ],
+      "visual_briefs": [
+        "VIS-014"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-006.jpg",
+      "bytes": 82513,
+      "mime": "image/jpeg",
+      "sha256": "00fd87a752805ba7fec752c470b96b482f739164d49bce63bb8bdff9e5d87aad",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-006.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "00fd87a752805ba7fec752c470b96b482f739164d49bce63bb8bdff9e5d87aad",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-007",
+      "url": "https://images.openai.com/static-rsc-4/6gFtFGsRjUN_T6ZKl3HYJLscgwnq_STyBr2D3ZZrkZL_yUqiecS2cU4XT0m7BAA4rFAPAi3a-sU9PXCP3zT_cSNpqVIq05k5a9B2LhT23zXITs77qQNqoDGkZHQgofZfr3FC_LV-LOoqpog7XTi76qMi16aRYOM_R4ZaISrMOEL7989r_fl5MPkRqmYqrTgT?purpose=fullsize",
+      "source_prompts": [
+        68
+      ],
+      "visual_briefs": [
+        "VIS-037"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-007.jpg",
+      "bytes": 137984,
+      "mime": "image/jpeg",
+      "sha256": "54c8d4c604da416229ecbc2799428f0ea9083dafc06d367ffb34161d19505e50",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-007.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "54c8d4c604da416229ecbc2799428f0ea9083dafc06d367ffb34161d19505e50",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-008",
+      "url": "https://images.openai.com/static-rsc-4/7D0XH67y1G5SJHczVo2WWyHVA170KKoX749yZFc6rEeVdA1w4GWpuU-9Ifhh_DDj42V_DNAOqU458nS8kMvldM83K3He1dgIG9FxfNqPBeB80OxnXVsjsuOmPykf4J1tXzsWv-ow4wmz5IAaUmfp2z7XcHxQ6ZhsyRT4Puwqqba2SZiHTSAdxyfhBiaUE5q5?purpose=fullsize",
+      "source_prompts": [
+        71
+      ],
+      "visual_briefs": [
+        "VIS-050"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-008.jpg",
+      "bytes": 180390,
+      "mime": "image/jpeg",
+      "sha256": "bb7c201997b5cd381b0e96d96f26fb28ba36c61a3e4405e4c858528c3023056f",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-008.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "bb7c201997b5cd381b0e96d96f26fb28ba36c61a3e4405e4c858528c3023056f",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-009",
+      "url": "https://images.openai.com/static-rsc-4/7uIrGGHXEfAcAd2nm2QTjJj5wst3d6_7lax3SswhkrmYfV-076dnQq4-ooDfTV_IlgqLFFvjQB7OXSy7VZMbxQlcfyu_NGlc-uTtfo3VHD97iyu5efz2a7DUjDKA1ivHLK12i_3uShqQUQS9MHNxLfopC31OIQat6dc-1O__l4RZddYhRHYH3dbmwUqY0N4X?purpose=fullsize",
+      "source_prompts": [
+        61,
+        62
+      ],
+      "visual_briefs": [
+        "VIS-017",
+        "VIS-025"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-009.jpg",
+      "bytes": 105469,
+      "mime": "image/jpeg",
+      "sha256": "25dbb71caa9add62596575f1672d6257fba368a997af1a9beaf1c0b6abf5b37f",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-009.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "25dbb71caa9add62596575f1672d6257fba368a997af1a9beaf1c0b6abf5b37f",
+      "inspection": {
+        "view_image": "inspected",
+        "observation": "Salt-and-pepper hair, glasses, charcoal suit, measured expression."
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": "Adam"
+    },
+    {
+      "id": "REF-010",
+      "url": "https://images.openai.com/static-rsc-4/9EEKrVlThOhds6ZYYDY1QvdXbOAStrVvLfngb-zgV094q8Jih8AhMqZVP5z18z_AemeLbK5fLf1WVfw7gztQJo_9JYDNeeWJFQV8jq3B2I-h9rCJPqVAhoR1xRDbjn5NYpfP5gopLOQsayOsoznZUJhXciv0GHd1J0Ir9_cyzfRnugls7e4l1POaCnKLoRyt?purpose=fullsize",
+      "source_prompts": [
+        67
+      ],
+      "visual_briefs": [
+        "VIS-034"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-010.jpg",
+      "bytes": 538239,
+      "mime": "image/jpeg",
+      "sha256": "b1d834ddb3fc754a2aee7a5c5c0a0aa05d15fae74cdcb24a999bcd3f387d42e8",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-010.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "b1d834ddb3fc754a2aee7a5c5c0a0aa05d15fae74cdcb24a999bcd3f387d42e8",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-011",
+      "url": "https://images.openai.com/static-rsc-4/ATc23WbjCkiHFWjD7kqQmF-x5UB7m1a6lSNNzcrg6vun9NadUZh5JtS0fz6ckNGymjjiiMuuEHeHd-dJ4s-UwoOwe7tShJfaGDgR6Jkz_4gtloxSDaIjmKY1T46dTLwFt6yUfzuBUGCS_aFoart-tTQ3PWPSbXhO6fpVnbksV6kqczWtWYBH4G0nLDhrHU9z?purpose=fullsize",
+      "source_prompts": [
+        70
+      ],
+      "visual_briefs": [
+        "VIS-046"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-011.jpg",
+      "bytes": 84192,
+      "mime": "image/jpeg",
+      "sha256": "8823e08177b7e61351319ef59e287e5f00e1aeb2856cf43fc1e10c29c5166b39",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-011.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "8823e08177b7e61351319ef59e287e5f00e1aeb2856cf43fc1e10c29c5166b39",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-012",
+      "url": "https://images.openai.com/static-rsc-4/BGSy-KlGvGalB-Nv4alg6lJO4WZwBdYxQlLUFl48LjC79RRRCkDROCp2zUiXCQ9CBnGls8-W5eIVlsYGGlFdOAiqodMtNCAdS05xX_wzcyIvZpMDjwjgS80zTr5yWyWNvWH-eVsCJfMlMdI_5qsQwIzCPF79na0v6MIrjdw0w7Lmq4YCF65di21pdlCZK7uX?purpose=fullsize",
+      "source_prompts": [
+        63
+      ],
+      "visual_briefs": [
+        "VIS-027"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-012.jpg",
+      "bytes": 67519,
+      "mime": "image/jpeg",
+      "sha256": "bf3af25b70c0fbe676b282d755fa17053a21a3c041853d5ac59ee5b6499bb1ae",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-012.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "bf3af25b70c0fbe676b282d755fa17053a21a3c041853d5ac59ee5b6499bb1ae",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-013",
+      "url": "https://images.openai.com/static-rsc-4/BUsEfLNKNmvIp99yR9BkqNK3VZ5831NeOPeR-dJFpZVNo4qqUmthA0kbgeRVtR5YFGtbnfNn2J0kXLVowFqOEiaZfnWHWvxLKVv7EZBwaw7HZrIv_SdoXazJ8gfRlCz7ldfuULFeygGfzYMVyJKUU9Yl6QRiPi8vXMvmYQ5PpXn_VfMJpxvdSor_UEcgUVFk?purpose=fullsize",
+      "source_prompts": [
+        87
+      ],
+      "visual_briefs": [
+        "VIS-054"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-013.jpg",
+      "bytes": 93427,
+      "mime": "image/jpeg",
+      "sha256": "287ff709d5f551e8694a999aa92a3a0128a56a3b7ac0629e352c58758c9a7374",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-013.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "287ff709d5f551e8694a999aa92a3a0128a56a3b7ac0629e352c58758c9a7374",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-014",
+      "url": "https://images.openai.com/static-rsc-4/CLGO1xEKu_zDXF1dKSc6ENWSFUrjoDinxlcKGHoznEf0RSp74NBTVVIFvIZa-5Da1Jg3SPl1ASvrXIKxBQKHrZd222r1G8HNgzrP1HDH5HHuSt_Lh_a6WrryYQoQgN8uj_W0U5YRkiHTaTF5mb5tfGD63CcXqcmaEzBmddpJ2xON_CdPkS8Hdv8lmZErd1-B?purpose=fullsize",
+      "source_prompts": [
+        205
+      ],
+      "visual_briefs": [
+        "VIS-059"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-014.jpg",
+      "bytes": 75009,
+      "mime": "image/jpeg",
+      "sha256": "afcaf39df208049b6761512db9b781b0689c9f541cf286cdfe5ee029f91af246",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-014.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "afcaf39df208049b6761512db9b781b0689c9f541cf286cdfe5ee029f91af246",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-015",
+      "url": "https://images.openai.com/static-rsc-4/DIKOtWjfMiTgUERqiCO0eeVp-OO8THP2D4rA2RtL2nqXl6LChMZJtU9vk6JJJmDwN4HSlMunipsK3ifsDfKEhczzGGCpDIrCKnjkFJvaWymlcyLMybZF_K-t4TFakogMtypGB_DFnO31tZN39ns_9dxWnRQiViSEjcF6bya6h-V0tUhMVspbZdfvYR3r28WY?purpose=fullsize",
+      "source_prompts": [
+        71
+      ],
+      "visual_briefs": [
+        "VIS-048"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-015.jpg",
+      "bytes": 230320,
+      "mime": "image/jpeg",
+      "sha256": "51ae4327ed8ce31401b1a3f61d0d9786b86be2ede251fff33ecfe1d057511558",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-015.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "51ae4327ed8ce31401b1a3f61d0d9786b86be2ede251fff33ecfe1d057511558",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-016",
+      "url": "https://images.openai.com/static-rsc-4/E-8lMZ6DUe1vMuUuhvD4oLiBkmy6ii1RZ7Nom5pB2yKe8kt6sRDKYCHlZCCjvU_vHShJX5ByqLcsFywDRIaxPYYkPz2eJPwoDz1DyIBsT2P45oDKWCuaSQ31rWZBdA-pPOqt0TL8jqgN0gKj9PUfUtGtV2UXKqFBbDCM5se82HfcO8VWxg4LT9M32AX8CXdP?purpose=fullsize",
+      "source_prompts": [
+        207
+      ],
+      "visual_briefs": [
+        "VIS-061"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-016.jpg",
+      "bytes": 68378,
+      "mime": "image/jpeg",
+      "sha256": "da2f123779c43a1426319584a624b542a0a12a25ed58cd4446c32042c9de2b5a",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-016.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "da2f123779c43a1426319584a624b542a0a12a25ed58cd4446c32042c9de2b5a",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-017",
+      "url": "https://images.openai.com/static-rsc-4/EXRa980eJMPUMZ4ipYx9IODE8KlygY-ol7O-e0JkXFgnzazZkwtxEtQffmJrpV1BJ70rDLHo7vVp8ybBx_XZ1X4M3rZm9-DSa2xhl7v7dcDmLd7NfrzKwTZqm96EBXtNF0t--LBVoZOH3SfZr9aMNXuAj5gGncdcS9KoEHw2fqqiGozJG9tSe9rkfRioWPh1?purpose=fullsize",
+      "source_prompts": [
+        52
+      ],
+      "visual_briefs": [
+        "VIS-001"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-017.jpg",
+      "bytes": 36313,
+      "mime": "image/jpeg",
+      "sha256": "39aff3989fa853b8dc186b4df32a8a4792137cc25037ee26fe082794e100fcc3",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-017.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "39aff3989fa853b8dc186b4df32a8a4792137cc25037ee26fe082794e100fcc3",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-018",
+      "url": "https://images.openai.com/static-rsc-4/Edj8cB2GA89leuR3qoLAhUFMVMPNnuJ6aU-Q49ys93xieioTnEhIjM0h12ObwpIFD3KYyyfmsZM0WGCVmBr_yIKVDlNdYQ-0x2kZUyT00YWQYez369CIsQBPPyej7Jqz_5Rl-zLkQiq-DuNPbycTbV1C5lFRHcQ2L9W5gev8x6hhdkZHbqKUwAAvxmOFFtse?purpose=fullsize",
+      "source_prompts": [
+        61
+      ],
+      "visual_briefs": [
+        "VIS-018"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-018.jpg",
+      "bytes": 145644,
+      "mime": "image/jpeg",
+      "sha256": "15b64742ee00ca7be0331a660c7e4ef38b2fbbdb838f22e63154e30f23b6e103",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-018.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "15b64742ee00ca7be0331a660c7e4ef38b2fbbdb838f22e63154e30f23b6e103",
+      "inspection": {
+        "view_image": "inspected",
+        "observation": "Dark side-parted hair, short neat beard, dark suit; approachable composure."
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": "Alexander"
+    },
+    {
+      "id": "REF-019",
+      "url": "https://images.openai.com/static-rsc-4/FxCbHiUW1WzgbJM-lok1-VAEzSiJfTah_s2DAbvR4zlhI1xMiRMDdqFDCorYDxvHcut5JEfeNqBVqL18F4swqLVdtZ9vwWH9EpZslB2LvwcOQjrciFZLlEwkVuv7NQT5YI4BgYErBZ987tBrD8nUUP-wCBcysM-oY3A42KB9GgWUo9Md2x9w6v0TJBdwu2s9?purpose=fullsize",
+      "source_prompts": [
+        62
+      ],
+      "visual_briefs": [
+        "VIS-020"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-019.jpg",
+      "bytes": 114794,
+      "mime": "image/jpeg",
+      "sha256": "46db35ecd5a23a546268853b8f7b04cfb5017e58bb9785337171e6ed427023f1",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-019.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "46db35ecd5a23a546268853b8f7b04cfb5017e58bb9785337171e6ed427023f1",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-020",
+      "url": "https://images.openai.com/static-rsc-4/G6j0osEfGvc27NbOFAx_Y0S7x-ltqyt7TBPDD5Ktu_eTb5PD6UnpqKpVbae8lkSsFDV829srI0GPsFOIViW8jw0va0ZJYCzRdntkFGKDxfn955GEyZ9wPOkvKa5YBfmWkYYiXEdtRXp2Ti9VilKkKz3VJTKZYZ3-RsaQ5rmOCrX86-FH46oixGu106X-A6sF?purpose=fullsize",
+      "source_prompts": [
+        65
+      ],
+      "visual_briefs": [
+        "VIS-031"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-020.jpg",
+      "bytes": 43828,
+      "mime": "image/jpeg",
+      "sha256": "ec77698afa044a08a64a0a1b97cdf87bddd2f2355c3bbba173246ad14be998ce",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-020.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "ec77698afa044a08a64a0a1b97cdf87bddd2f2355c3bbba173246ad14be998ce",
+      "inspection": {
+        "view_image": "inspected",
+        "observation": "Short dark hair, glasses and neat beard, charcoal suit; clear technology-office reference."
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": "Ethan"
+    },
+    {
+      "id": "REF-021",
+      "url": "https://images.openai.com/static-rsc-4/GwMAnRWFNl7X8gGVu5r82RXHDK-FVrt0MYluPMOI3SFcIuVt37YKd5IAIkpR01vofk9no6-EAVxfrGHgv3Ew46go9DltnKS3hC_ZKt4GH8OxzOTcFsSb6_5_OY4DvBZx2exNNJS2y5xRw7JCOiCUuR7QBAiakjm3RisbkLPJysPYLb2bY5xNmndr6_DPcNS6?purpose=fullsize",
+      "source_prompts": [
+        62
+      ],
+      "visual_briefs": [
+        "VIS-021"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-021.jpg",
+      "bytes": 166992,
+      "mime": "image/jpeg",
+      "sha256": "ab768dcb40ac6eaaa6b638b40f5abe65897254298bf5564a4f15fb6e4863ad86",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-021.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "ab768dcb40ac6eaaa6b638b40f5abe65897254298bf5564a4f15fb6e4863ad86",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-022",
+      "url": "https://images.openai.com/static-rsc-4/KFk_L_npxUTXo3pDKums1rGztARfPqugIaSqB9n9oywLD8VenRhSdKLjNj1fTrqEwh5goB82JBbZCHou-VOgTXSnOAjey1lzF6sdvfK_zJkG8aUGCAAzFrTHWh2prRd4I4WezvvWZvtBdCtU9aHBvz600u1qBcmevNRHAsDsy8fS0p72Nk-hskH107sj6LRn?purpose=fullsize",
+      "source_prompts": [
+        62
+      ],
+      "visual_briefs": [
+        "VIS-024"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-022.jpg",
+      "bytes": 69141,
+      "mime": "image/jpeg",
+      "sha256": "28c926589a45c079e712e6d0f6e9d7f75f954a1ee9ea4080b5a34f757730a8e9",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-022.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "28c926589a45c079e712e6d0f6e9d7f75f954a1ee9ea4080b5a34f757730a8e9",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-023",
+      "url": "https://images.openai.com/static-rsc-4/KYwSd31RjvbgQWWDl70BKJouJ3V7_8UnoBGVjhFxfHFGDz-ohqxtXkAAt8xgsxvYSTA8jzFY2qUC-4LTXuVhK06r6AwUlTKZNzsmVF-slLKyNSonOS7ULZgIlGzC9VXTEfHuUQSizQWZ6WxR2LxysybL0PZGwc9FTRSfj_08O_BlSCL8TtCYMGciepP6tCdj?purpose=fullsize",
+      "source_prompts": [
+        70
+      ],
+      "visual_briefs": [
+        "VIS-043"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-023.jpg",
+      "bytes": 278996,
+      "mime": "image/jpeg",
+      "sha256": "466537ffbd432a72e19a1f31433afad3d91f213db28a49955a86be099d5552d6",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-023.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "466537ffbd432a72e19a1f31433afad3d91f213db28a49955a86be099d5552d6",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-024",
+      "url": "https://images.openai.com/static-rsc-4/KurNGLznUawjEKhlnXDgmrHtukL5bk9sA5FNM2WUU1UVf7hHPiTRWzXNP_w7JKygBqoCmNlJtG_e0KwhkGpFb9BfUL9XcHSac2oIB2a1G4fcoLul7i1hBjdpyEcMIa-738cpnCoqX9ZfKgJIO0vFNMMpIJqypt0bgFEJoX0Qo0ZCGLCM2K5YboPTY9TujFGJ?purpose=fullsize",
+      "source_prompts": [
+        70
+      ],
+      "visual_briefs": [
+        "VIS-045"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-024.jpg",
+      "bytes": 41414,
+      "mime": "image/jpeg",
+      "sha256": "dcee0b0b6446603e2490d16ff5b76bf1f2f908152de00addd3a58e2dfe09f720",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-024.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "dcee0b0b6446603e2490d16ff5b76bf1f2f908152de00addd3a58e2dfe09f720",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-025",
+      "url": "https://images.openai.com/static-rsc-4/L-YQP0H6zC86wKdDkYo_BoxJwbA2K9dewHL9zSfYahrMUOol-JT4q0CzywJrsyFojX_jgxEQO8HIThU-D1LaCsNiQRgQofvSMit2xdp5gRfiVLxae1uBlQwmbTsx9xsrhNqBXxLVr6zvWQMxAc_ZxYcdNKfnDsUMiEBpdTn0u4evWf8KiFTLWWfpeTVUSNNs?purpose=fullsize",
+      "source_prompts": [
+        71
+      ],
+      "visual_briefs": [
+        "VIS-049"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-025.jpg",
+      "bytes": 75716,
+      "mime": "image/jpeg",
+      "sha256": "25ca081ec086ecf61f53bd1c737365292fcdc0a7703ad5bc4d97ffa30f7ae86a",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-025.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "25ca081ec086ecf61f53bd1c737365292fcdc0a7703ad5bc4d97ffa30f7ae86a",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-026",
+      "url": "https://images.openai.com/static-rsc-4/LEyMWKDRz6YEqtwzdRDSlpvxOmY5bANDj_Hka_VJSRXe0U5Vad-tUgLsF0wS5l-8TYPcWBKMAuX-hfVqm4wHQtr-te4Bqi5hlte9VXj4aGTG7dPLnOwEOI8mZetrdvjIg6OcOVkGtCsFcuTo-PzFaeEX7WSf6H42fRF73EbPG70UnMbF8nNyHiTIfm6J1FEd?purpose=fullsize",
+      "source_prompts": [
+        208
+      ],
+      "visual_briefs": [
+        "VIS-063"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-026.jpg",
+      "bytes": 160012,
+      "mime": "image/jpeg",
+      "sha256": "e77eaa1cbf5b517fee33597f88149e5af2ecbe3af3cb81631f74a6cc97f1da7e",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-026.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "e77eaa1cbf5b517fee33597f88149e5af2ecbe3af3cb81631f74a6cc97f1da7e",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-027",
+      "url": "https://images.openai.com/static-rsc-4/LnASz0WbCJB2AThx06x2_MmBKkIztk-kB_UA5eI9s_flB6ZIAcJQNxAKidT_lplhDU3POidT5K6yuiQTcwpZbgk4OLVKY4wSPgwIguBraZ7XmP0Tv1nj1c4NocqKBrfxox8mLmlqZ1CppjBbt6MfWRVjQKXvxCIOm8tdBqwVRw-Nw7Xh5G3sIjqdLktfrhMe?purpose=fullsize",
+      "source_prompts": [
+        53
+      ],
+      "visual_briefs": [
+        "VIS-005"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-027.jpg",
+      "bytes": 75516,
+      "mime": "image/jpeg",
+      "sha256": "e4b7ee8407baa7a6ba686c70aea8e649f7bc6718362bbe8ac5540abb09bbc0ea",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-027.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "e4b7ee8407baa7a6ba686c70aea8e649f7bc6718362bbe8ac5540abb09bbc0ea",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-028",
+      "url": "https://images.openai.com/static-rsc-4/OHCrWbDL5l7yBI87gUX08gVNBfPi1wM6RmoPKTf5h95F4AQpQzQG6sS4eUJomagHOAix2QQtQZYIyfaixwLtIDS9FLa1-O7rBjCyODn71RCPj6gyS5k-UQwLZOdOKI0LNWKzs6fxObLVOIH09BT5A78aUHQF68skHOqyZuLtr8ztoQIzi5WNngmfJ15sMus7?purpose=fullsize",
+      "source_prompts": [
+        70
+      ],
+      "visual_briefs": [
+        "VIS-042"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-028.jpg",
+      "bytes": 111460,
+      "mime": "image/jpeg",
+      "sha256": "23d14d54e94cdff9a3b87d9b1ac55bd20d581e5fce25ffcda367f35eed6b7973",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-028.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "23d14d54e94cdff9a3b87d9b1ac55bd20d581e5fce25ffcda367f35eed6b7973",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-029",
+      "url": "https://images.openai.com/static-rsc-4/OVsqlx4ErjWGwKaaaUpn_ipdNWP02sRyqBevsjhtpzqCJhuO5lqLvfCsyIYGEoEkLP0EJpNjM5c8DoOioBkC1lLYcwa_jV2JTJxZ8omZ4qCQIybRhed33vDWN_OMJDmgsA9G-3YVY0nx1nRa3kagEmcVS_SHtdMqPudDPGNdT6SgRFCS7MSAr1Xjx2YuPo2p?purpose=fullsize",
+      "source_prompts": [
+        53
+      ],
+      "visual_briefs": [
+        "VIS-006"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-029.jpg",
+      "bytes": 78667,
+      "mime": "image/jpeg",
+      "sha256": "36b4eb7ee2a36d3875c3d02946bf4dc395079a65a97a5d125564378148d497f7",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-029.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "36b4eb7ee2a36d3875c3d02946bf4dc395079a65a97a5d125564378148d497f7",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-030",
+      "url": "https://images.openai.com/static-rsc-4/THDm3yH1-KGDm0L6ctHUWSaQqCpjz6pzeYrdwDHUMt4Oicoq7ps-x4osLWNGlS-hBaUHNVl9NmBd4YPd3vkvDhSQ8OVf7nwDfk9nd1RBFURj620sfqqn2fcVO5HZ5en633fGvlTvvtGG9LpRY_9CRbgUw1PUScttsmgwXFM-G0gme2IgqTCV1ipu9pnvOwny?purpose=fullsize",
+      "source_prompts": [
+        52
+      ],
+      "visual_briefs": [
+        "VIS-002"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-030.jpg",
+      "bytes": 67085,
+      "mime": "image/jpeg",
+      "sha256": "e8127be07ed50f62dd970956b28446cbbd224da106fbb4041ef5513aa34393a2",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-030.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "e8127be07ed50f62dd970956b28446cbbd224da106fbb4041ef5513aa34393a2",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-031",
+      "url": "https://images.openai.com/static-rsc-4/UDvujSLKI90y56ljhXb9uapH_8Fa9XC0O96K16TBzpPHlgzZmXvnVFM_Eq2bMgChnhqUcMYepMlW223YNJeRO69MrTbEI2WJIeDQ80rX2vch94loXKvaLH9qqBNXSt7wUnqqY-cy91WDJ63UwdOX3MDEgav5NwDwrVRKc00xgnWFTpmnJjdTzkGjuUv4QNiY?purpose=fullsize",
+      "source_prompts": [
+        65
+      ],
+      "visual_briefs": [
+        "VIS-028"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-031.jpg",
+      "bytes": 78824,
+      "mime": "image/jpeg",
+      "sha256": "aef8b10ed3c17a5c84f1b0ce668ec954fdc403335b4b3e66e0dc8990377a2a01",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-031.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "aef8b10ed3c17a5c84f1b0ce668ec954fdc403335b4b3e66e0dc8990377a2a01",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-032",
+      "url": "https://images.openai.com/static-rsc-4/UJ4PqZZsRlEJhwcDFkGhQFJixOJk8TbwJoaqu0mpq5DgybNwTyQQQvggAJWkhF_onzSj_G5fqcxYsIcu_MFCYcNKAO4cMdsCR4-YHPhih-wZeB9ojQ_ZEOznY-uV-pirh4ShTbJg5v_5VowubcCp0bp5v7HD8KoTQykhbGRSdpYu2xV79E1EcipnTSKVuH3k?purpose=fullsize",
+      "source_prompts": [
+        65
+      ],
+      "visual_briefs": [
+        "VIS-029"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-032.jpg",
+      "bytes": 129586,
+      "mime": "image/jpeg",
+      "sha256": "384df74eeca4f043dfb9dce0d08816657124473bf809e93915ffa5bdc689636c",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-032.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "384df74eeca4f043dfb9dce0d08816657124473bf809e93915ffa5bdc689636c",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-033",
+      "url": "https://images.openai.com/static-rsc-4/VL4oDaYg_t_rO8iBDElPPqVyfXErJkddBYlspyp4-4aRC-rOJ7xwMLo4HiJnE6dbYFNv2PxmIqJmYky6lg5yF0R3_jM2OISXlpHLZ80uZxNrWuRz2R1vji1mbooHJ0u4tOpmMS4FEfSZnx1SQ7J09l3ZRZDSC9_dfari8K6ufCEEhv6KFltmmvMAM5fg4Vc1?purpose=fullsize",
+      "source_prompts": [
+        59
+      ],
+      "visual_briefs": [
+        "VIS-012"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-033.jpg",
+      "bytes": 1354772,
+      "mime": "image/jpeg",
+      "sha256": "dfc6f05b4e9308727ad6fffbd90350d1999a960a8af4ae32c267c201edaf18fb",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-033.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "dfc6f05b4e9308727ad6fffbd90350d1999a960a8af4ae32c267c201edaf18fb",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-034",
+      "url": "https://images.openai.com/static-rsc-4/VVfuk53n0IYYthNnm0IiLmUmHqeNsejBMAt7kx-1_SHiuu_ob-h6h8OgT02TRbVnPPSNWywvzE-5Y9YjwzLJgqckVaxzyEYMf1bDWfj23R_6w9PXKN6UZUpr3K-DXmVxQiLtclqdAbjw5PiTCJHWMzjNyY86yO6RJwBjJlBN6qQOintRex8VB1Pi0dTXX7mV?purpose=fullsize",
+      "source_prompts": [
+        62
+      ],
+      "visual_briefs": [
+        "VIS-026"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-034.jpg",
+      "bytes": 139781,
+      "mime": "image/jpeg",
+      "sha256": "575880a4a30cf3aa73ece025c0941f62f4a82b4d4bbe972573f8b8e980547120",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-034.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "575880a4a30cf3aa73ece025c0941f62f4a82b4d4bbe972573f8b8e980547120",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-035",
+      "url": "https://images.openai.com/static-rsc-4/WPti1dQuXYu-x7HpblZmMt6Ohno47ZiLvypQb4-uNpryCo2SvzbknrVEKR89Cn5Odk_N9ZiRmfQeG1qvreZu6FyVqTFl8i1C8_UtgaM_Au7vE-dqtcVOIFm5gZsqjdeH87FJjhAvpn69gYe74N4yErWhdhk3lNKRZE0wMw-5Bxmhc3O0IIxkA34elwWIhfyB?purpose=fullsize",
+      "source_prompts": [
+        62
+      ],
+      "visual_briefs": [
+        "VIS-022"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-035.jpg",
+      "bytes": 297213,
+      "mime": "image/jpeg",
+      "sha256": "cdd250e6a622444327260d181d1b7ba5f8593203c07aec2eca974008e0ce5cf4",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-035.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "cdd250e6a622444327260d181d1b7ba5f8593203c07aec2eca974008e0ce5cf4",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-036",
+      "url": "https://images.openai.com/static-rsc-4/Ykh8yDRS-BAclO6nhuz69JXTiUvv2i1zIbL5nqTn2ux6R5e8-HnvYTEC7kLsgGWvn-2Cr4SXzEwfa5nMVQKRNRy9ODPaQNfc2gx2QJaxRZDp4TaE5Yc03aAkEyifVnC5W3vQNFaDb6d8ZpJUOlaXegc1LOlzcdqGp_NU1rvE7vc42c-a-hcf0RpBkRj-femo?purpose=fullsize",
+      "source_prompts": [
+        53,
+        54,
+        61
+      ],
+      "visual_briefs": [
+        "VIS-007",
+        "VIS-008",
+        "VIS-016"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-036.jpg",
+      "bytes": 633993,
+      "mime": "image/jpeg",
+      "sha256": "d9b6c86ce304ca59dbb45e383663f11decb1fc783cb53858c41859b6b4426d5a",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-036.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "d9b6c86ce304ca59dbb45e383663f11decb1fc783cb53858c41859b6b4426d5a",
+      "inspection": {
+        "view_image": "inspected",
+        "observation": "Dark sleek hair, tailored navy blazer; composed direct gaze; Corporate Prestige selected in source."
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": "Nora"
+    },
+    {
+      "id": "REF-037",
+      "url": "https://images.openai.com/static-rsc-4/YlSkRAEv2Ve55AEjbSknFqiBLEuY0AiC8aXRpEk4rqmxBbwGM7k2Bwl8rrK0KZ4Z0GEA44rrd1IcZnlrVJqH-OcbOSoLf6cUgbz7DMe5rKEHoFd-zmkBN8JwQF6rqzPao4GfKcPfq0rw4axUY8ua_Fg9YYzZsvr91kJJjFTEwfOncLf_Cj5H2oWGSIAaE6Vd?purpose=fullsize",
+      "source_prompts": [
+        68
+      ],
+      "visual_briefs": [
+        "VIS-038"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-037.jpg",
+      "bytes": 190009,
+      "mime": "image/jpeg",
+      "sha256": "9d9cbfcda8c362a8e7b01a771ec93ba27938859498b42e465adf0a9c46dc5888",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-037.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "9d9cbfcda8c362a8e7b01a771ec93ba27938859498b42e465adf0a9c46dc5888",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-038",
+      "url": "https://images.openai.com/static-rsc-4/_cQLK7T9jR_MSUQn8lr7PJhzAJFdpOlIO1XfeNodJfErMfbyGuS8xFu0lxHo1sW7gtpvBjBy-DGJki1EuNmPSax4oGc9B-rZPx8bpcGFod6PXhAo-gv9UOpj3-TfXMwCRbA5MU8Pz0pgcVgYpSnU9CDq4ppPrwwSNZ43BhE_nRt91d1uKQuu64LKF0mEEyJg?purpose=fullsize",
+      "source_prompts": [
+        207
+      ],
+      "visual_briefs": [
+        "VIS-062"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-038.jpg",
+      "bytes": 97604,
+      "mime": "image/jpeg",
+      "sha256": "02664bf76d4eb7c1d17f85c09c5a9ecd3dbc74b6216fa1866d9605ccc162e4d1",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-038.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "02664bf76d4eb7c1d17f85c09c5a9ecd3dbc74b6216fa1866d9605ccc162e4d1",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-039",
+      "url": "https://images.openai.com/static-rsc-4/aAMNb-1noEQrJG6d0EjRjhQiQKznGbh3DsCiEBaFysj3eOILr61DpA1vHcj9XWUwN3LDN20sxSG8SEKVshQB8goR094YWAAv5WY83QtRfrVzv4swaD0nowM8dOJGgpDB3YrGsfstGIBMpo6ns_garFEoB7VoCmRMLbu-JyDjWkPl7ZcG6fpm-9M6B4xXANy9?purpose=fullsize",
+      "source_prompts": [
+        67
+      ],
+      "visual_briefs": [
+        "VIS-035"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-039.jpg",
+      "bytes": 945493,
+      "mime": "image/jpeg",
+      "sha256": "0fa728a7a8460a5489af75870a2af84ed9fcb08ec52a833c589a8565af785b57",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-039.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "0fa728a7a8460a5489af75870a2af84ed9fcb08ec52a833c589a8565af785b57",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-040",
+      "url": "https://images.openai.com/static-rsc-4/buE-bzjgvDS5ihTAd73b2olv4belOMNxRgynSInMByrP685LrDOO38yMHMiU2_xM_QORvSBpCdIdcQf-RaQPBAuD7uMuEtcgzTrOQq36bWRsT2rD9rjGpO3YBR3lE4keLLF_BFS3lMCOc1uBfDOtV_KvXHOizaKht6X9kyLTCrWNvY5KjPVdiEAApxnGsfRm?purpose=fullsize",
+      "source_prompts": [
+        67
+      ],
+      "visual_briefs": [
+        "VIS-036"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-040.jpg",
+      "bytes": 254082,
+      "mime": "image/jpeg",
+      "sha256": "c05272e0e1c5baf866d27a6f592b8173c49e4506264c133e24d42f78972c8a7d",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-040.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "c05272e0e1c5baf866d27a6f592b8173c49e4506264c133e24d42f78972c8a7d",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-041",
+      "url": "https://images.openai.com/static-rsc-4/cJ1iL2LCVjdMTc9LMQtAEkeh2EtxR1rLvtNDBlrlSfrBxUTFdPHWEnUj1phW4p1wqi2YUbmyO-DzoAOQ1Vv-IrPpEDSFWXJnNnT_GEXaZSYpOmJfYstBlzRZAK8aFZ3bYxj6RW4OZJvrxhADU7AnavFuXew7eEaXnxywVZxt-WIDrCF8y0cYKAR1JpCS061E?purpose=fullsize",
+      "source_prompts": [
+        91
+      ],
+      "visual_briefs": [
+        "VIS-058"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-041.jpg",
+      "bytes": 115073,
+      "mime": "image/jpeg",
+      "sha256": "a4fc583dc2e052a50c531b541b6fd7da87abffb7447f95bd2865bcdc27949165",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-041.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "a4fc583dc2e052a50c531b541b6fd7da87abffb7447f95bd2865bcdc27949165",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-042",
+      "url": "https://images.openai.com/static-rsc-4/fNjhHnr5HH3ZdgZk4bNkMEFnBeQQVEERw002yA8uobo5R-zz6pvoU-4GN8MiUGU_B0gqAHXzICM9lmk2uKh-NVwKAzWqmUdzaPsCNP7K886WcPTTTbNcsehypVSHK6KFaY5vGbwk2jIt_E31vFIfofSeOfel5KkIq6piCspGi9tvk1-qXhOoFuKyB566cndv?purpose=fullsize",
+      "source_prompts": [
+        205
+      ],
+      "visual_briefs": [
+        "VIS-060"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-042.jpg",
+      "bytes": 111792,
+      "mime": "image/jpeg",
+      "sha256": "4d416b5f35d8da2c1508e54c13c801622070a7827121ada9d69b96dc69818887",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-042.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "4d416b5f35d8da2c1508e54c13c801622070a7827121ada9d69b96dc69818887",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-043",
+      "url": "https://images.openai.com/static-rsc-4/gT3JPmrhJ7KDqbvSKIGOrp0F15oTzRupsqm0kKVzAW47GQpe9eYaSPBgMyyvmpV0YNRrCfo3RlwkDDLKr6tO-iQ8vz0ByFyLjnjUgfCWGs-Yv3Mp1h5AXYDHktwvQjAuknbtwC97lcXLBpZXyVrtwyLglgIex1e4Pbgp33WPZbRaE1afEcuoqwVg9e4SnYx-?purpose=fullsize",
+      "source_prompts": [
+        65
+      ],
+      "visual_briefs": [
+        "VIS-032"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-043.jpg",
+      "bytes": 70207,
+      "mime": "image/jpeg",
+      "sha256": "1be769f7affd1974b753d2ebc1be383807d28f7350cec47a6953b7daed38f83d",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-043.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "1be769f7affd1974b753d2ebc1be383807d28f7350cec47a6953b7daed38f83d",
+      "inspection": {
+        "view_image": "inspected",
+        "observation": "Shoulder-length chestnut hair, dark tailored suit; calm and precise presence."
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": "Layla"
+    },
+    {
+      "id": "REF-044",
+      "url": "https://images.openai.com/static-rsc-4/gbPjq3exqR-l8xLIcHf2CYhwbasfpOYFhrNaPNhkp_JmQDVoWCHBBSD_M_Dgv10KCFCGjyaW_2yaGXfU-wl1dqluqaZe-cFgyelLhKIjN_VKpftLKnnYWSBgNtQDI_jAoV1-Lnr-7w2VWClPEAOCbsPpwWJ7Zto5GRnXFeftYja97RM4i8FING6_gCR3Wfe6?purpose=fullsize",
+      "source_prompts": [
+        83,
+        88
+      ],
+      "visual_briefs": [
+        "VIS-053",
+        "VIS-055"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-044.jpg",
+      "bytes": 70475,
+      "mime": "image/jpeg",
+      "sha256": "9b809d012c0b21f295151531a8587da6d27390e7d1b1396dc7ed6a0f2e97612a",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-044.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "9b809d012c0b21f295151531a8587da6d27390e7d1b1396dc7ed6a0f2e97612a",
+      "inspection": {
+        "view_image": "inspected",
+        "observation": "Long dark wavy hair, navy blazer over ivory, warm concierge portrait."
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": "Lina"
+    },
+    {
+      "id": "REF-045",
+      "url": "https://images.openai.com/static-rsc-4/hexh3WyL8eH8Xbsm2usL0C9H-812axp_fbl_-FWfrw-blRH6vqXcJ9Xaf1cqEtJc7fJ5vDdfVBw82ab4mHZie0Xau6gl1BCXH3LX-zZNqGzBzKXvEM_sOBueSNMRrHao5ymwRBOU7VryR03Evc_cRSxT2zWAgyW4haH8atA_nDinFrUJg9vzvwOK84CXl3Fs?purpose=fullsize",
+      "source_prompts": [
+        69
+      ],
+      "visual_briefs": [
+        "VIS-040"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-045.jpg",
+      "bytes": 27236,
+      "mime": "image/jpeg",
+      "sha256": "b4daf1c171839fc8fb2a407ddcefc86329abdc5082362bcf9170561d8691b6af",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-045.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "b4daf1c171839fc8fb2a407ddcefc86329abdc5082362bcf9170561d8691b6af",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-046",
+      "url": "https://images.openai.com/static-rsc-4/hkWo6Wye-6XAn9SooFOAwEKIR0PFw3WLpKvogJQMnOttMvxGdDsG1n8Vf5NOpruX7X-8k8Vi-WqgNeGCkE_metYds2w7UheFsPR2LWn90rFl3laIlSvyP1rAveCt_oCiBjubYyOC701tC7DpGuwcEU0Y1Uo54kiOHIJPtMJrTWl2MEcwBOKqfHIbanPZ2F75?purpose=fullsize",
+      "source_prompts": [
+        71
+      ],
+      "visual_briefs": [
+        "VIS-051"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-046.jpg",
+      "bytes": 65493,
+      "mime": "image/jpeg",
+      "sha256": "2b24344a8e21c0c9579faa1f06b8e684c308a95b018d0810677ec5707d70e532",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-046.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "2b24344a8e21c0c9579faa1f06b8e684c308a95b018d0810677ec5707d70e532",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-047",
+      "url": "https://images.openai.com/static-rsc-4/k3gN4H93U7evOS1QLbAXNV3S1nG0OJ1F-T-cbYXd-Qnoan7KpMuGm9RIkHgTY7Gccl_oMYKA3On1rFynTO3AY0uWRCn1cnEMqf5Pa-BuSvc80XKZqaJNt_wk7DHCbZ4CF6a-P7EhQ87x1k9QKsB9Z7SSivupU8MiBxYH1QjaESgWvo_SCU2KsklP1QbHzO6r?purpose=fullsize",
+      "source_prompts": [
+        53
+      ],
+      "visual_briefs": [
+        "VIS-004"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-047.jpg",
+      "bytes": 38719,
+      "mime": "image/jpeg",
+      "sha256": "47d05b6900a006c27538c040bafa00f631e9116a66af2809079f53814e121f2d",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-047.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "47d05b6900a006c27538c040bafa00f631e9116a66af2809079f53814e121f2d",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-048",
+      "url": "https://images.openai.com/static-rsc-4/lb4GNGx2nC8MTXsBuICge8AKo9oNWdimkD_EDGowkGi49zvXej0edq0BsmV4gadpZi7MgBy6iXOElrclqBhVrCW8D_NlROvbPrjF4jeYpf-3KT6H58q4YgE7aBBmbOR0Q26u4RlT4845BUD5wWRO5eR8P0vSGO8V2njjfCQD7qKRQQSECUwYkukc2Pf5S-4s?purpose=fullsize",
+      "source_prompts": [
+        208
+      ],
+      "visual_briefs": [
+        "VIS-065"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-048.jpg",
+      "bytes": 111158,
+      "mime": "image/jpeg",
+      "sha256": "2ebb3e1266705b6d8661303ccc85e409134fab440772fcec8f5f93f9d5d2ee25",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-048.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "2ebb3e1266705b6d8661303ccc85e409134fab440772fcec8f5f93f9d5d2ee25",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-049",
+      "url": "https://images.openai.com/static-rsc-4/p9Be0Y8OTmiYEU7NRbNRfZyGqgMdFEOEfgpRnRKod_Lgcl2TjZ5JcxNRfxKsverTsMpbejlP4tznWJi3rpmTJbXumAfRwdONer2nDgU6161fmtWfouK7Z76N5NSqEu-vGTRXNE4MHnOxgX5Suyz6QRT5O3CEMiIwiJ4ewmp_JqD6x96G2qmSf6CWCOTp_zVi?purpose=fullsize",
+      "source_prompts": [
+        70
+      ],
+      "visual_briefs": [
+        "VIS-044"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-049.jpg",
+      "bytes": 173867,
+      "mime": "image/jpeg",
+      "sha256": "33f2b88cb66602f7c12d7755b7b56e7e856d9bf20bf51bb94a7ecf34df030c8e",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-049.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "33f2b88cb66602f7c12d7755b7b56e7e856d9bf20bf51bb94a7ecf34df030c8e",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-050",
+      "url": "https://images.openai.com/static-rsc-4/qgpR3b0_I2ecIHaC3ofxGOvScq0yFf9x7hkvTfJkHlhZCXVbmBmoiUjYVD2BjBOCwA5rFP2qccRZAl78jdOj2xpBLzMui3ZsUXfankB-6v0yXR_R8VZ0duVuJlUCTTGoRDDC5KxeUp8kCJIx_QXrR3zuwz49vm7PS-kDtXD3617ed47p6W0Bp5g9ZlAwCIb5?purpose=fullsize",
+      "source_prompts": [
+        65
+      ],
+      "visual_briefs": [
+        "VIS-030"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-050.jpg",
+      "bytes": 110398,
+      "mime": "image/jpeg",
+      "sha256": "b4297ae490e84c2dc4c4c827be64e135cc769d459fedd4c39b812ec276b817e0",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-050.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "b4297ae490e84c2dc4c4c827be64e135cc769d459fedd4c39b812ec276b817e0",
+      "inspection": {
+        "view_image": "inspected",
+        "observation": "Short greying hair, rectangular glasses, dark suit; deliberate neutral expression."
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": "Daniel"
+    },
+    {
+      "id": "REF-051",
+      "url": "https://images.openai.com/static-rsc-4/quE1zkPvAYOvxlnUlvq8kVNot39n5NI_ZkJnc77sLLJMA8nVSnYh2l85aVBrJLQO4SIWCw6-CX4bgoNbTUQQC78bo1yzCjKDBLpK9KP88siT6yk57wyGI6ppP0mQ3Iq5s-unKDvsFJu0Fg78eDnL6-Su7E3M-gxaPunso0qJh84dpEYkrNTHNxkVbHqx37dD?purpose=fullsize",
+      "source_prompts": [
+        62
+      ],
+      "visual_briefs": [
+        "VIS-023"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-051.jpg",
+      "bytes": 465024,
+      "mime": "image/jpeg",
+      "sha256": "bbbbcaaf0ac5b66e82f5f6a0af863ec7b4a478a69a84469db9c5b97ae33303cb",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-051.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "bbbbcaaf0ac5b66e82f5f6a0af863ec7b4a478a69a84469db9c5b97ae33303cb",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-052",
+      "url": "https://images.openai.com/static-rsc-4/sL-ck8kd1eh4nHHvnis9T1Oe_afbdELS1OOB81tQ4QC0WxYVEMY0SbwSrbvSfAOtwOwygc7w9q1nrMaitvq3Eh1yAPSTijBVTt3kQiRcZYbAyXFDFhqMUk6cWyyWRdlSkh9QiAODdKTbYsR-GrQQlEGN4kFz60DfL1E8RD0ke-jPFk5wDd4p-ajcepD64qrB?purpose=fullsize",
+      "source_prompts": [
+        71
+      ],
+      "visual_briefs": [
+        "VIS-047"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-052.jpg",
+      "bytes": 93004,
+      "mime": "image/jpeg",
+      "sha256": "b74ad3599a938b9c091ff9b7a11ba75019613eb74b45260f89a77d7107b5a2e6",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-052.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "b74ad3599a938b9c091ff9b7a11ba75019613eb74b45260f89a77d7107b5a2e6",
+      "inspection": {
+        "view_image": "inspected",
+        "observation": "Short dark hair, neat beard, navy smart-casual jacket; approachable partner coach."
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": "Rayan"
+    },
+    {
+      "id": "REF-053",
+      "url": "https://images.openai.com/static-rsc-4/sXev25F58Ftaaj_KIhvnbvtijJE55aWr3tnCnmZ3QTE4-bMIwF8czF771xOGWIABa5JyEsSdAq8WmQm6eVuzR5HPYF7GqCNK6XK2fg7D4yMyIQiyxMXTbiK-g2HsXmFadpPfTUSuYqJuQRDvOnA5DtttUqRfc7uQ-EERLnzUzKGE1RAAYhiRdxBZ-csdtGij?purpose=fullsize",
+      "source_prompts": [
+        52
+      ],
+      "visual_briefs": [
+        "VIS-003"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-053.jpg",
+      "bytes": 169952,
+      "mime": "image/jpeg",
+      "sha256": "4616f31b0b13673d719f351134915f11eb6dca093c8db4e5cee3e49b07513a4c",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-053.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "4616f31b0b13673d719f351134915f11eb6dca093c8db4e5cee3e49b07513a4c",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-054",
+      "url": "https://images.openai.com/static-rsc-4/suJoy5A0o9wzkVeaIHa-2WtHRBmsAKrwgkeROYCFd4dV5rHXaQg1yWxEjHJgOckNCzPwt9GR2Ug-moa_KznaHaH1eH1tcBmeZp_t4i85-h2MY0afpOOEmsJadvb5IfdJ1CXrB_wJHs24kPxz0tP8oPnWOhuyN7DApTAlcJWs7ECBb08HdYz5FxEXOKfY9tZ1?purpose=fullsize",
+      "source_prompts": [
+        56
+      ],
+      "visual_briefs": [
+        "VIS-009"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-054.jpg",
+      "bytes": 192070,
+      "mime": "image/jpeg",
+      "sha256": "c7cfd511e00069a615c2b0803bedd15bf4b73b360be48e0d968db7087c64509b",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-054.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "c7cfd511e00069a615c2b0803bedd15bf4b73b360be48e0d968db7087c64509b",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-055",
+      "url": "https://images.openai.com/static-rsc-4/tfXD8GlwJa8EA30uxPlSuvEa8mdVpo4uKMQKJETuv6-rrS1o5bB63BanzKhHVZtoo1QVqpPqKjh5-A4yhAMqQtqlFluVbZsKlzvoG2mpy1nNzr4mv7G00JLAjYLYnKLmv6DLS4sU804y_zoMle-c4FJ-Hw9QlkDx1DvUYCvSZWp2Nf1CyV0SezT_r3MSvM8n?purpose=fullsize",
+      "source_prompts": [
+        68
+      ],
+      "visual_briefs": [
+        "VIS-039"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-055.jpg",
+      "bytes": 151808,
+      "mime": "image/jpeg",
+      "sha256": "3c679507e9d1d098ad6abf60bf9b159c15538fea2506b3712ce44a397e7a4eb3",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-055.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "3c679507e9d1d098ad6abf60bf9b159c15538fea2506b3712ce44a397e7a4eb3",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-056",
+      "url": "https://images.openai.com/static-rsc-4/u-nV_nq8JwMrp2AjPp_-jmYHvbT5ku9zRRoyUggL4YM20pGXJqn166Knpa2N-bHc_PkWYWUSbG8PjiLbAnK4nZfd9hF24Gz4dCMk8O5XgvM4lAKjKS6OhOR0mx9tuwaQ_Ce6xRsIcdBCdDUqkA4foNsFm2mBC4p2gQ47FvS5ctBg5BiTSmpmagon_yhPiZMh?purpose=fullsize",
+      "source_prompts": [
+        61
+      ],
+      "visual_briefs": [
+        "VIS-019"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-056.jpg",
+      "bytes": 85571,
+      "mime": "image/jpeg",
+      "sha256": "dafe2b2706a38d468b2adeb636f85b4f051ac64b767e76bf307c34bafa78e9ae",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-056.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "dafe2b2706a38d468b2adeb636f85b4f051ac64b767e76bf307c34bafa78e9ae",
+      "inspection": {
+        "view_image": "inspected",
+        "observation": "Dark wavy shoulder-length hair, navy blazer and ivory blouse, open practical presence."
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": "Sarah"
+    },
+    {
+      "id": "REF-057",
+      "url": "https://images.openai.com/static-rsc-4/vOW2GCcKtuLtJEVfdJJFf1-sTCSfjsAzZTbjpQuPGf2FP3Q9MoSvs0e5LwzCjpuFsQZO2I_1smya7YuHHz6D0GzpVeG4uGCZLxm5hSYtm5B2l8Ebb1EOxMIRmskkjdnkGlu7iZ6LqaB84u8_ygKtI8y3X6kqlUYlkVb0JdOPXmS58SvooVL8Xp8BIPmb2jaK?purpose=fullsize",
+      "source_prompts": [
+        59
+      ],
+      "visual_briefs": [
+        "VIS-011"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-057.jpg",
+      "bytes": 167919,
+      "mime": "image/jpeg",
+      "sha256": "4a6268bac5e6a6ffe4b83be553e042175b26adac0ee2b5d718ce4fb4390d620a",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-057.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "4a6268bac5e6a6ffe4b83be553e042175b26adac0ee2b5d718ce4fb4390d620a",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-058",
+      "url": "https://images.openai.com/static-rsc-4/w5P3W0X1SYPUjgjmbtAqAiBkhYtS0nwN9MLPlIVE07T64Ph_FKTs5sCxHuPUmRvl7BL3Ft9j5TJeU8qWrylfumL9Na17jO9Njt21vJb5UrqHwNAkNAz7nnBPubN5PH4hbv1loPCQ1AEmGhnzM4fazDRnU-4mgjsa8FLLEt9NTWALPb-V4MGGtuyX0GJu3mmu?purpose=fullsize",
+      "source_prompts": [
+        91
+      ],
+      "visual_briefs": [
+        "VIS-057"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-058.jpg",
+      "bytes": 133893,
+      "mime": "image/jpeg",
+      "sha256": "0d821e3525aad6fc12f419cf53a4a5bcef8ce63c949a5074a59264fe31a3ee7c",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-058.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "0d821e3525aad6fc12f419cf53a4a5bcef8ce63c949a5074a59264fe31a3ee7c",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-059",
+      "url": "https://images.openai.com/static-rsc-4/xhCucQVwTNXEOiy46ysGeByP3hkLCOZXwWeMULsYL96YXsVq2D9BiPaFJlCaZxoXeUg-AA5TWsrsBa_ruApLuKcwu_sUO0n4Rc7jUblAiSGbqeDP-ZkfjHpwlM4KWukZ13bUe9oqmzRgOGHQdgLRwGRTMKskm6k2HBoprWIPEJe5hJBs7oL5t85y9smj7MgA?purpose=fullsize",
+      "source_prompts": [
+        59
+      ],
+      "visual_briefs": [
+        "VIS-013"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-059.jpg",
+      "bytes": 237377,
+      "mime": "image/jpeg",
+      "sha256": "f56e4f9e255c204bc3ef0d2b942cc223ad31e783dcb19acce6e172c1c55d1ab2",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-059.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "f56e4f9e255c204bc3ef0d2b942cc223ad31e783dcb19acce6e172c1c55d1ab2",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-060",
+      "url": "https://images.openai.com/static-rsc-4/zDN0OzRCwYQjC5kvan9t_hXcf3fKFnowZG2Vtmrv9GK0mkqoXXNmkbAuSnEaxIuNtZskmeUcemcycHLgQsSRdInrRHThZFhkjGCjHoceEhHuLXtII9DWw1XJ2hVX1BzGo2Cigpvz-IJj4bsX-8MEXblYpuwR2QM4XxPZ6ZuHMSvzgTiLRgq2VNljK6oSWja3?purpose=fullsize",
+      "source_prompts": [
+        91
+      ],
+      "visual_briefs": [
+        "VIS-056"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-060.jpg",
+      "bytes": 803882,
+      "mime": "image/jpeg",
+      "sha256": "8cd9f560b4b5fe6c1227171ebf342fbda183265c8986827fb9b77b03d60c0322",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-060.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "8cd9f560b4b5fe6c1227171ebf342fbda183265c8986827fb9b77b03d60c0322",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    },
+    {
+      "id": "REF-061",
+      "url": "https://images.openai.com/static-rsc-4/znGZIQ9mLEeeXThQQsPS2aPQRlYowE6sk3Pq1_pP0EO01aJeYGG04P2mv0BW2r76jMHwhO52IBnQGIyAaBU_5_8Card1H5hTCC1U1Vcp3JGeEzjN7yl0PZ6EQVRLhbsOWYjR6aVUnfSeP0RV860ld86QQtAJtOP-g0hmECaiQ4zbiflzJbZdyvLfxi32IxKf?purpose=fullsize",
+      "source_prompts": [
+        69
+      ],
+      "visual_briefs": [
+        "VIS-041"
+      ],
+      "status": "downloaded",
+      "classification": "third-party source reference, not a finished Primora employee asset",
+      "path": "assets/reference_images/REF-061.jpg",
+      "bytes": 200333,
+      "mime": "image/jpeg",
+      "sha256": "124b37a9fdacf5c44c90c2a1829949f6d0c502e8fe95b8c44cd39472bb6377f4",
+      "absolute_path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_images\\REF-061.jpg",
+      "hash_verified_on": "2026-10-22",
+      "actual_sha256": "124b37a9fdacf5c44c90c2a1829949f6d0c502e8fe95b8c44cd39472bb6377f4",
+      "inspection": {
+        "view_image": "not_visually_inspected_this_pass",
+        "observation": null
+      },
+      "production_reuse": "unapproved_reference_only_rights_not_established",
+      "assigned_character": null
+    }
+  ],
+  "actual_voice_audio_provider_ids_animation_rigs": {
+    "recovered_files": [],
+    "status": "not_recovered",
+    "voice_provider_ids": [],
+    "production_ready": false
+  },
+  "missing_named_original_portrait_briefs": [
+    "Emma",
+    "Maya",
+    "Sophia",
+    "Omar"
+  ],
+  "reference_to_production_rule": "Use broad styling as source evidence; do not treat third-party faces as licensed production likenesses. New synthetic production portraits must have their own path/hash/generation provenance and review.",
+  "source_manifest": {
+    "path": "C:\\Users\\Yousif's PC\\.codex\\visualizations\\2026\\10\\21\\01a15fd4-1061-7012-83d4-de2af22d120b\\AI_Headquarters_Recovery\\assets\\reference_image_manifest.json",
+    "sha256": "d9d3ed3642e33d98faa564ab0d90d6858ec1fb1ee05183b975f35c9672088642"
+  },
+  "new_generated_portraits": [
+    {
+      "agent": "Nora",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\nora.png",
+      "public_url": "/volabi/agents/nora.png",
+      "sha256": "b2d4a06ed48a898a2202720546704307f4d69d5758b3d8287fd98b26c4ac9bd9",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "classification": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "inspected": true
+    },
+    {
+      "agent": "Adam",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\adam.png",
+      "public_url": "/volabi/agents/adam.png",
+      "sha256": "87f39121bb0ab40f0e40ba61b14a2c12da2b9e3d6c2c799549d3434f30d84f6a",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "classification": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "inspected": true
+    },
+    {
+      "agent": "Alexander",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\alexander.png",
+      "public_url": "/volabi/agents/alexander.png",
+      "sha256": "bba318cd9b8faaf9a00a2294a94878d9d399a8a271deb85cb8d68ae8f716620b",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "classification": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "inspected": true
+    },
+    {
+      "agent": "Sarah",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\sarah.png",
+      "public_url": "/volabi/agents/sarah.png",
+      "sha256": "df918abdd2004157a2532cbd2fca6f0e0eabfa8f16959e459ae56ca81971a8e6",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "classification": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "inspected": true
+    },
+    {
+      "agent": "Victoria",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\victoria.png",
+      "public_url": "/volabi/agents/victoria.png",
+      "sha256": "ca9d9274c0bc49e568876a020e46188c6f7f78fc11a74fa907080d19b03763ce",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "classification": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "inspected": true
+    },
+    {
+      "agent": "Emma",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\emma.png",
+      "public_url": "/volabi/agents/emma.png",
+      "sha256": "fd1381b412b997c936b07e5c72e3ee503fac7d34ba7a372f3a3d7ed9a04299b1",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "classification": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "inspected": true
+    },
+    {
+      "agent": "Maya",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\maya.png",
+      "public_url": "/volabi/agents/maya.png",
+      "sha256": "908cbdabe4218585bea67b42dc0d4e3fb6a07927a22d671cab5949ca00eefb29",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "classification": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "inspected": true
+    },
+    {
+      "agent": "Ethan",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\ethan.png",
+      "public_url": "/volabi/agents/ethan.png",
+      "sha256": "c9f7cd980f82bcb99dbdeb0bb42b6850864da90df005a2e4cae761a484af7ba2",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "classification": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "inspected": true
+    },
+    {
+      "agent": "Daniel",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\daniel.png",
+      "public_url": "/volabi/agents/daniel.png",
+      "sha256": "1e5148693e0efe1d9032adbac48a4d84f14b17f9990c92773b5472e657f2e8ab",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "classification": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "inspected": true
+    },
+    {
+      "agent": "Sophia",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\sophia.png",
+      "public_url": "/volabi/agents/sophia.png",
+      "sha256": "246e01c5a1d0e7141d902335ee86ac89829260f40f86aac2394a42d8bc9257ca",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "classification": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "inspected": true
+    },
+    {
+      "agent": "Layla",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\layla.png",
+      "public_url": "/volabi/agents/layla.png",
+      "sha256": "4cc7b8ce93a386972296900ced9a5976f1f68147ff9e373fd9c557166bab5834",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "classification": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "inspected": true
+    },
+    {
+      "agent": "Omar",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\omar.png",
+      "public_url": "/volabi/agents/omar.png",
+      "sha256": "8b261b2ce2342823a5d4ef5e5f572ec7bfccf039224eb758c5e2bfc689e5d38f",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "classification": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "inspected": true
+    },
+    {
+      "agent": "Olivia",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\olivia.png",
+      "public_url": "/volabi/agents/olivia.png",
+      "sha256": "2f92a96daef3cf1f37979eaf318c2d25eaf4a8a08019155ca7e1c2fc7d70b46c",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "classification": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "inspected": true
+    },
+    {
+      "agent": "Lina",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\lina.png",
+      "public_url": "/volabi/agents/lina.png",
+      "sha256": "825954f0237998c9597accb01ba8ce765110847c5448e1ec49f7cd06cdf2d5b0",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "classification": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "inspected": true
+    },
+    {
+      "agent": "Rayan",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\rayan.png",
+      "public_url": "/volabi/agents/rayan.png",
+      "sha256": "e26617bfb914e64fb0919f786a9056673930fb4656353ffe5267d6bd8703b3a1",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "classification": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "inspected": true
+    }
+  ],
+  "new_voice_previews": {
+    "files": 15,
+    "base_engines": 2,
+    "language": "English",
+    "classification": "offline SAPI prosody previews, not15 distinct licensed production voices",
+    "receipt": "VOICE_PREVIEW_RECEIPTS.json",
+    "Arabic": "unavailable",
+    "live_production_voice": "unconfigured"
+  }
+}

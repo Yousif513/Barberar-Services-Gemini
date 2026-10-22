@@ -4,15 +4,15 @@ description: Define or apply Primora HQ visual tokens and shared components afte
   scope/theme approval, preserving source provenance, bilingual typography and accessible
   states.
 metadata:
-  version: 0.1.0-proposed
-  status: staged-unapproved
+  version: 1.0.0
+  status: approved-replacement
   original_recovered: 'false'
-  installed: 'false'
+  installed: 'true'
 ---
 
-# primora-design-system - PROPOSED
+# primora-design-system - approved replacement
 
-This is version 0.1.0-proposed, a staged replacement for an unrecovered original. It does not establish approval. Read [proposal provenance](references/proposal-source.md).
+This is an approved1.0.0 replacement for an unrecovered original, adopted by the CEO on2026-10-22. It is not the historical original. Read [proposal provenance](references/proposal-source.md).
 
 Use the approved current project theme when available. Distinguish inherited brand tokens from new choices; keep one approved theme across tasks, decisions, profiles and evidence. Gold is an accent; prefer ink on ivory and soft gold on obsidian for readable text. Recompute contrast when changing a pair. Preserve existing English fallback fonts and IBM Plex Sans Arabic behavior; verify actual font delivery before acceptance.
 

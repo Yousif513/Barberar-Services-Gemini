@@ -1,0 +1,98 @@
+{
+  "installed_on": "2026-10-22",
+  "authorization": "CEO requested all function/persona/refund skills; global installation requested earlier in this chat",
+  "packages": [
+    {
+      "name": "primora-bilingual-conversation",
+      "global_path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-bilingual-conversation",
+      "version": "0.1.0-proposed",
+      "state": "globally_installed_instruction_package",
+      "source": "planning/volabi/persona-and-skills/staged-skills/primora-bilingual-conversation",
+      "files": [
+        {
+          "path": "references/source-and-cases.md",
+          "sha256": "e970957f0e79b1de270a3c8d842a719e2433621047b2c9b8736df95304e79fc0"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "c44b0b37135c886987e652012e6d00b516e64f2347ff6d517927c14bffeae917"
+        }
+      ],
+      "review": ".admin-console/worklog/review-volabi-local-server.md",
+      "business_employee_binding": "proposed_not_assigned",
+      "employee_activation": false,
+      "permissions_granted": [],
+      "behavioral_evaluation": "not_established_for_agent_task_version",
+      "note": "Staging wording in immutable source provenance describes preparation time; actual current installation is verified by this receipt."
+    },
+    {
+      "name": "primora-meeting-facilitation",
+      "global_path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-meeting-facilitation",
+      "version": "0.1.0-proposed",
+      "state": "globally_installed_instruction_package",
+      "source": "planning/volabi/persona-and-skills/staged-skills/primora-meeting-facilitation",
+      "files": [
+        {
+          "path": "references/source-and-cases.md",
+          "sha256": "6dcd012b3fa8f9a260249a2fc094bbe35d7217e007a41fb78380fb96a6dcba58"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "8373e8399679f195834a252de9270b9b4fa9fac728c31d04d76036246daf1366"
+        }
+      ],
+      "review": ".admin-console/worklog/review-volabi-local-server.md",
+      "business_employee_binding": "proposed_not_assigned",
+      "employee_activation": false,
+      "permissions_granted": [],
+      "behavioral_evaluation": "not_established_for_agent_task_version",
+      "note": "Staging wording in immutable source provenance describes preparation time; actual current installation is verified by this receipt."
+    },
+    {
+      "name": "primora-payment-reconciliation",
+      "global_path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-payment-reconciliation",
+      "version": "0.1.0-proposed",
+      "state": "globally_installed_instruction_package",
+      "source": "planning/volabi/persona-and-skills/staged-skills/primora-payment-reconciliation",
+      "files": [
+        {
+          "path": "references/source-and-cases.md",
+          "sha256": "730d5108cc157e6c2bde49955fa0806b45e9410940dab8e596d6f9d9375295a7"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "0825efd047f22aabd6f215e5c0b3f37fdbe6f749b02ea83b4c9b05d30a72db4b"
+        }
+      ],
+      "review": ".admin-console/worklog/review-volabi-local-server.md",
+      "business_employee_binding": "proposed_not_assigned",
+      "employee_activation": false,
+      "permissions_granted": [],
+      "behavioral_evaluation": "not_established_for_agent_task_version",
+      "note": "Staging wording in immutable source provenance describes preparation time; actual current installation is verified by this receipt."
+    },
+    {
+      "name": "primora-refund-case-review",
+      "global_path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-refund-case-review",
+      "version": "0.1.0-proposed",
+      "state": "globally_installed_instruction_package",
+      "source": "planning/volabi/persona-and-skills/staged-skills/primora-refund-case-review",
+      "files": [
+        {
+          "path": "references/source-and-cases.md",
+          "sha256": "2a5262a039ebb4030cde889ff374c1b1e6c1ccf28f67b1eafd4766aec9f37d26"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "c536f486afafda0ad672f57f97cb3a8115dadb9f2d149ae4f101b74409c235b0"
+        }
+      ],
+      "review": ".admin-console/worklog/review-volabi-local-server.md",
+      "business_employee_binding": "proposed_not_assigned",
+      "employee_activation": false,
+      "permissions_granted": [],
+      "behavioral_evaluation": "not_established_for_agent_task_version",
+      "note": "Staging wording in immutable source provenance describes preparation time; actual current installation is verified by this receipt."
+    }
+  ]
+}

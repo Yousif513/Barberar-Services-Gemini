@@ -1,5 +1,7 @@
 # HQ scope and visual direction — CEO approval package
 
+**Historical gate: the six-family first loop, theme and three replacement design skills were explicitly approved on2026-10-22. See [current approval](APPROVAL_20261022.md) and [local operator guide](../../docs/volabi-local-operations.md). The larger future scope remains proposed. The current persona request additionally authorizes original portraits and offline voice previews; historical exclusions below describe the earlier gate package.**
+
 **Recommended first preview: 6 template families, 9 route patterns and 15 reusable overlay contracts. No screens generated.**
 **Generic planner diagnostic: 159 generations; rejected as a rendering queue.** The source-faithful full MVP retains 20 templates, with 16 later page proposals. Company identities remain inactive.
 

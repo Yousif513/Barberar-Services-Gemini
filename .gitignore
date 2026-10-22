@@ -56,3 +56,6 @@ ios/Pods/
 ios/build/
 android/app/build/
 android/local.properties
+
+# Local Volabi founder development workspace (requests and session secrets)
+.local-volabi/

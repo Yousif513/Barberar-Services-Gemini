@@ -36,7 +36,7 @@
     ],
     "stack": {
       "frontend": "Next.js 16.3.8 (React 19.2.4, App Router, Tailwind 4); versions verified from the reconciled package/lock and installed build",
-      "backend": "none — no Next.js route handlers, no server actions, no middleware; Supabase Edge Functions (Deno) only",
+      "backend": "Supabase Edge Functions (Deno) for marketplace; local-only Volabi Next.js Node route at /api/hq with Node SQLite, explicitly disabled on Vercel/cloud and without marketplace business authority",
       "database": "Supabase Postgres 15, SQL migrations in supabase/migrations",
       "auth": "Supabase Auth (@supabase/supabase-js 2.108.1) browser client only; no @supabase/ssr, no middleware",
       "jobs": "none — no queue, no scheduler, no pg_cron",
@@ -192,6 +192,22 @@
           "checkout-attempt.start",
           "checkout-attempt.observe"
         ]
+      },
+      {
+        "appliedTo": [
+          "headquarters-local"
+        ],
+        "url": "https://nextjs.org/docs/app/getting-started/route-handlers",
+        "checkedOn": "2026-10-22",
+        "topic": "Installed Next16.3.8 bundled route-handlers.md and next-config headers.md; Node native Web Request handlers, no caching, last matching header override"
+      },
+      {
+        "appliedTo": [
+          "headquarters-local"
+        ],
+        "url": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ms723597(v=vs.85)",
+        "checkedOn": "2026-10-22",
+        "topic": "Offline SAPI file-stream voice synthesis; no playback or remote upload"
       }
     ],
     "volumes": {
@@ -261,6 +277,21 @@
       "mfaRequired": false,
       "authenticationStrength": "email+password or phone OTP",
       "separationOfDuties": "Not applicable. Verified by test: a customer cannot write any table the console or the money flows use and is refused by every administrator command."
+    },
+    {
+      "id": "local-development-reviewer",
+      "name": "Local Headquarters development reviewer (no business authority)",
+      "responsibilities": [
+        "Prepare and decide isolated management records",
+        "Inspect original inactive personas, package/evaluation/access gaps",
+        "Record auditable local follow-up without execution"
+      ],
+      "scopes": [
+        "Current opaque local session workspace only; no Supabase/business role or external writes"
+      ],
+      "mfaRequired": false,
+      "authenticationStrength": "Explicit local-mode process, loopback Host/Origin, persisted random HttpOnly SameSite local capability cookie and session-bound CSRF; blocked on Vercel. Negative boundary tests pass6/6 before role model registration.",
+      "separationOfDuties": "Software development acceptance only; actual business employees inactive, no financial approvals, tools, invitations or deployments. This local seat is not a business-admin/CEO identity grant."
     }
   ],
   "entities": [
@@ -7054,6 +7085,321 @@
           "reviewStatus": "unreviewed"
         }
       ]
+    },
+    {
+      "id": "headquarters-local",
+      "name": "Volabi isolated local Headquarters",
+      "sourceOfTruth": "sqlite:local-development-workspace",
+      "sensitivity": "confidential",
+      "tenantScoped": true,
+      "lifecycleStates": [
+        "requested",
+        "awaiting_decision",
+        "changes_requested",
+        "approved_for_followup",
+        "declined",
+        "followup_recorded"
+      ],
+      "lifecycleTransitions": [
+        {
+          "from": "requested",
+          "to": "awaiting_decision",
+          "command": "hq-local.request-review-loop",
+          "capability": "hq-local.request-review-loop",
+          "reasonRequired": true,
+          "operation": "recommendation.prepare / recommendation.publish"
+        },
+        {
+          "from": "changes_requested",
+          "to": "awaiting_decision",
+          "command": "hq-local.request-review-loop",
+          "capability": "hq-local.request-review-loop",
+          "reasonRequired": true,
+          "operation": "recommendation.prepare / recommendation.publish"
+        },
+        {
+          "from": "awaiting_decision",
+          "to": "approved_for_followup",
+          "command": "hq-local.request-review-loop",
+          "capability": "hq-local.request-review-loop",
+          "reasonRequired": true,
+          "operation": "decision.record approve exact current source-linked material"
+        },
+        {
+          "from": "awaiting_decision",
+          "to": "declined",
+          "command": "hq-local.request-review-loop",
+          "capability": "hq-local.request-review-loop",
+          "reasonRequired": true,
+          "operation": "decision.record decline"
+        },
+        {
+          "from": "awaiting_decision",
+          "to": "changes_requested",
+          "command": "hq-local.request-review-loop",
+          "capability": "hq-local.request-review-loop",
+          "reasonRequired": true,
+          "operation": "decision.record request_changes"
+        },
+        {
+          "from": "approved_for_followup",
+          "to": "followup_recorded",
+          "command": "hq-local.request-review-loop",
+          "capability": "hq-local.request-review-loop",
+          "reasonRequired": true,
+          "operation": "followup.record exact current decided evidence"
+        },
+        {
+          "from": "declined",
+          "to": "followup_recorded",
+          "command": "hq-local.request-review-loop",
+          "capability": "hq-local.request-review-loop",
+          "reasonRequired": true,
+          "operation": "followup.record declined disposition"
+        },
+        {
+          "from": "changes_requested",
+          "to": "followup_recorded",
+          "command": "hq-local.request-review-loop",
+          "capability": "hq-local.request-review-loop",
+          "reasonRequired": true,
+          "operation": "followup.record revision request"
+        },
+        {
+          "from": "followup_recorded",
+          "to": "requested",
+          "command": "hq-local.request-review-loop",
+          "capability": "hq-local.request-review-loop",
+          "reasonRequired": true,
+          "operation": "task.revise material revision"
+        }
+      ],
+      "retention": "Isolated local workspace in ignored .local-volabi directory, no production data importer or deployment. Source versions and application audit append-only; no business retention policy inferred.",
+      "capabilities": [
+        {
+          "id": "hq-local.request-review-loop",
+          "outcome": "Persist request, source-linked recommendation, exact local decision and auditable follow-up",
+          "kind": "command",
+          "roles": [
+            "local-development-reviewer"
+          ],
+          "risk": "moderate",
+          "status": "implemented",
+          "rationale": "Explicit CEO six-family firstloop/theme/media approval2026-10-22. Development records only; no company activation/business permissions/execution. Independent server35-case and actual frontend16-checkpoint reviews passed; exact final hashes match. Acceptance is local record-only, not regulated release.",
+          "entityStates": {
+            "from": [
+              "requested",
+              "awaiting_decision",
+              "changes_requested",
+              "approved_for_followup",
+              "declined",
+              "followup_recorded"
+            ],
+            "to": [
+              "requested",
+              "awaiting_decision",
+              "changes_requested",
+              "approved_for_followup",
+              "declined",
+              "followup_recorded"
+            ]
+          },
+          "uiRoutes": [
+            "/hq",
+            "/hq/tasks",
+            "/hq/tasks/[id]",
+            "/hq/decisions",
+            "/hq/decisions/[id]"
+          ],
+          "serverOperations": [
+            "web_platform/src/lib/hq/server/handler.mjs",
+            "web_platform/src/lib/hq/server/local-store.mjs"
+          ],
+          "authorizationPolicies": [
+            "web_platform/src/lib/hq/server/local-boundary.mjs"
+          ],
+          "auditEvents": [
+            "workspace.read",
+            "task.requested",
+            "recommendation.prepared",
+            "decision.recorded",
+            "followup.recorded",
+            "source.recorded",
+            "source.correction_proposed"
+          ],
+          "safeguards": [
+            "Loopback-only enabled process; no hosted runtime",
+            "Actual workspace session scope; deny business bearer roles",
+            "No money, external invitations, recording or model provider calls"
+          ],
+          "dataBinding": "sqlite:local-development-workspace",
+          "idempotency": "Command UUID+canonical payload hash, same-receipt replay; changed payload conflicts.",
+          "concurrency": "SQLite transactional revisions and stale source/recommendation checks.",
+          "recovery": "Read stored command receipt before retry; preserve draft and identity after unknown response.",
+          "tests": [
+            "web_platform/tests/hq-local-boundary.test.mjs",
+            "web_platform/tests/hq-store.test.mjs",
+            "web_platform/tests/hq-http.test.mjs",
+            "web_platform/tests/hq-client.test.mjs",
+            "web_platform/tests/hq-voice.test.mjs",
+            "web_platform/tests/hq-independent-review.test.mjs",
+            "web_platform/tests-browser/hq-local-acceptance.mjs"
+          ],
+          "evidence": [
+            "planning/volabi/APPROVAL_20261022.md",
+            "docs/volabi-local-api-contract.md",
+            ".admin-console/worklog/review-volabi-local-server.md",
+            ".admin-console/evidence/volabi-local/server-independent-review.json",
+            ".admin-console/worklog/review-volabi-frontend.md",
+            ".admin-console/evidence/volabi-first-loop/independent-frontend.json"
+          ],
+          "owner": "",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "security-volabi-local-server"
+        },
+        {
+          "id": "hq-local.knowledge-sources",
+          "outcome": "Inspect local source provenance and preserve versioned corrections",
+          "kind": "query",
+          "roles": [
+            "local-development-reviewer"
+          ],
+          "risk": "moderate",
+          "status": "implemented",
+          "rationale": "Explicit CEO six-family firstloop/theme/media approval2026-10-22. Development records only; no company activation/business permissions/execution. Independent server35-case and actual frontend16-checkpoint reviews passed; exact final hashes match. Acceptance is local record-only, not regulated release.",
+          "entityStates": {
+            "from": [
+              "requested",
+              "awaiting_decision",
+              "changes_requested",
+              "approved_for_followup",
+              "declined",
+              "followup_recorded"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/hq/knowledge",
+            "/hq/knowledge/[id]"
+          ],
+          "serverOperations": [
+            "web_platform/src/lib/hq/server/handler.mjs",
+            "web_platform/src/lib/hq/server/local-store.mjs"
+          ],
+          "authorizationPolicies": [
+            "web_platform/src/lib/hq/server/local-boundary.mjs"
+          ],
+          "auditEvents": [
+            "workspace.read",
+            "task.requested",
+            "recommendation.prepared",
+            "decision.recorded",
+            "followup.recorded",
+            "source.recorded",
+            "source.correction_proposed"
+          ],
+          "safeguards": [
+            "Loopback-only enabled process; no hosted runtime",
+            "Actual workspace session scope; deny business bearer roles",
+            "No money, external invitations, recording or model provider calls"
+          ],
+          "dataBinding": "sqlite:local-development-workspace",
+          "idempotency": "Command UUID+canonical payload hash, same-receipt replay; changed payload conflicts.",
+          "concurrency": "SQLite transactional revisions and stale source/recommendation checks.",
+          "recovery": "Read stored command receipt before retry; preserve draft and identity after unknown response.",
+          "tests": [
+            "web_platform/tests/hq-local-boundary.test.mjs",
+            "web_platform/tests/hq-store.test.mjs",
+            "web_platform/tests/hq-http.test.mjs",
+            "web_platform/tests/hq-client.test.mjs",
+            "web_platform/tests/hq-voice.test.mjs",
+            "web_platform/tests/hq-independent-review.test.mjs",
+            "web_platform/tests-browser/hq-local-acceptance.mjs"
+          ],
+          "evidence": [
+            "planning/volabi/APPROVAL_20261022.md",
+            "docs/volabi-local-api-contract.md",
+            ".admin-console/worklog/review-volabi-local-server.md",
+            ".admin-console/evidence/volabi-local/server-independent-review.json",
+            ".admin-console/worklog/review-volabi-frontend.md",
+            ".admin-console/evidence/volabi-first-loop/independent-frontend.json"
+          ],
+          "owner": "",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "security-volabi-local-server"
+        },
+        {
+          "id": "hq-local.agent-capability-inspect",
+          "outcome": "Inspect original character, media previews, proposed skills and task gaps for inactive identities",
+          "kind": "query",
+          "roles": [
+            "local-development-reviewer"
+          ],
+          "risk": "moderate",
+          "status": "implemented",
+          "rationale": "Explicit CEO six-family firstloop/theme/media approval2026-10-22. Development records only; no company activation/business permissions/execution. Independent server35-case and actual frontend16-checkpoint reviews passed; exact final hashes match. Acceptance is local record-only, not regulated release.",
+          "entityStates": {
+            "from": [
+              "requested",
+              "awaiting_decision",
+              "changes_requested",
+              "approved_for_followup",
+              "declined",
+              "followup_recorded"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/hq/agents",
+            "/hq/agents/[id]"
+          ],
+          "serverOperations": [
+            "web_platform/src/lib/hq/server/handler.mjs",
+            "web_platform/src/lib/hq/server/local-store.mjs"
+          ],
+          "authorizationPolicies": [
+            "web_platform/src/lib/hq/server/local-boundary.mjs"
+          ],
+          "auditEvents": [
+            "workspace.read",
+            "task.requested",
+            "recommendation.prepared",
+            "decision.recorded",
+            "followup.recorded",
+            "source.recorded",
+            "source.correction_proposed"
+          ],
+          "safeguards": [
+            "Loopback-only enabled process; no hosted runtime",
+            "Actual workspace session scope; deny business bearer roles",
+            "No money, external invitations, recording or model provider calls"
+          ],
+          "dataBinding": "sqlite:local-development-workspace",
+          "idempotency": "Command UUID+canonical payload hash, same-receipt replay; changed payload conflicts.",
+          "concurrency": "SQLite transactional revisions and stale source/recommendation checks.",
+          "recovery": "Read stored command receipt before retry; preserve draft and identity after unknown response.",
+          "tests": [
+            "web_platform/tests/hq-local-boundary.test.mjs",
+            "web_platform/tests/hq-store.test.mjs",
+            "web_platform/tests/hq-http.test.mjs",
+            "web_platform/tests/hq-client.test.mjs",
+            "web_platform/tests/hq-voice.test.mjs",
+            "web_platform/tests/hq-independent-review.test.mjs",
+            "web_platform/tests-browser/hq-local-acceptance.mjs"
+          ],
+          "evidence": [
+            "planning/volabi/APPROVAL_20261022.md",
+            "docs/volabi-local-api-contract.md",
+            ".admin-console/worklog/review-volabi-local-server.md",
+            ".admin-console/evidence/volabi-local/server-independent-review.json",
+            ".admin-console/worklog/review-volabi-frontend.md",
+            ".admin-console/evidence/volabi-first-loop/independent-frontend.json"
+          ],
+          "owner": "",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "security-volabi-local-server"
+        }
+      ]
     }
   ],
   "workQueues": [
@@ -8682,6 +9028,303 @@
       "status": "in-progress",
       "rationale": "Existing route verified from source and successful web build. Inventory correction only: accessibility and durable checkout feedback have not been independently verified in this pass. Checkout recovery remains planned and blocked at the required development audit-registration gate.",
       "tests": []
+    },
+    {
+      "id": "hq-command",
+      "route": "/hq",
+      "purpose": "CEO command center",
+      "roles": [
+        "local-development-reviewer"
+      ],
+      "dataSources": [
+        "sqlite:local-development-workspace"
+      ],
+      "capabilities": [
+        "hq-local.request-review-loop"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale",
+        "conflict",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "implemented",
+      "status": "implemented",
+      "rationale": "Independent EN1440/AR375, RTL/no overflow, keyboard/focus labels and9route/15overlay closure passed with actual local data, no unexpected console/external/device access. No screen-reader/WCAG certification or production clearance. Evidence: .admin-console/worklog/review-volabi-frontend.md",
+      "tests": [
+        "web_platform/tests-browser/hq-local-acceptance.mjs"
+      ]
+    },
+    {
+      "id": "hq-tasks",
+      "route": "/hq/tasks",
+      "purpose": "Persistent work register",
+      "roles": [
+        "local-development-reviewer"
+      ],
+      "dataSources": [
+        "sqlite:local-development-workspace"
+      ],
+      "capabilities": [
+        "hq-local.request-review-loop"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale",
+        "conflict",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "implemented",
+      "status": "implemented",
+      "rationale": "Independent EN1440/AR375, RTL/no overflow, keyboard/focus labels and9route/15overlay closure passed with actual local data, no unexpected console/external/device access. No screen-reader/WCAG certification or production clearance. Evidence: .admin-console/worklog/review-volabi-frontend.md",
+      "tests": [
+        "web_platform/tests-browser/hq-local-acceptance.mjs"
+      ]
+    },
+    {
+      "id": "hq-task",
+      "route": "/hq/tasks/[id]",
+      "purpose": "Source-linked task and auditable follow-up",
+      "roles": [
+        "local-development-reviewer"
+      ],
+      "dataSources": [
+        "sqlite:local-development-workspace"
+      ],
+      "capabilities": [
+        "hq-local.request-review-loop"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale",
+        "conflict",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "implemented",
+      "status": "implemented",
+      "rationale": "Independent EN1440/AR375, RTL/no overflow, keyboard/focus labels and9route/15overlay closure passed with actual local data, no unexpected console/external/device access. No screen-reader/WCAG certification or production clearance. Evidence: .admin-console/worklog/review-volabi-frontend.md",
+      "tests": [
+        "web_platform/tests-browser/hq-local-acceptance.mjs"
+      ]
+    },
+    {
+      "id": "hq-decisions",
+      "route": "/hq/decisions",
+      "purpose": "Local decision queue",
+      "roles": [
+        "local-development-reviewer"
+      ],
+      "dataSources": [
+        "sqlite:local-development-workspace"
+      ],
+      "capabilities": [
+        "hq-local.request-review-loop"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale",
+        "conflict",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "implemented",
+      "status": "implemented",
+      "rationale": "Independent EN1440/AR375, RTL/no overflow, keyboard/focus labels and9route/15overlay closure passed with actual local data, no unexpected console/external/device access. No screen-reader/WCAG certification or production clearance. Evidence: .admin-console/worklog/review-volabi-frontend.md",
+      "tests": [
+        "web_platform/tests-browser/hq-local-acceptance.mjs"
+      ]
+    },
+    {
+      "id": "hq-decision",
+      "route": "/hq/decisions/[id]",
+      "purpose": "Exact scoped decision and evidence",
+      "roles": [
+        "local-development-reviewer"
+      ],
+      "dataSources": [
+        "sqlite:local-development-workspace"
+      ],
+      "capabilities": [
+        "hq-local.request-review-loop"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale",
+        "conflict",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "implemented",
+      "status": "implemented",
+      "rationale": "Independent EN1440/AR375, RTL/no overflow, keyboard/focus labels and9route/15overlay closure passed with actual local data, no unexpected console/external/device access. No screen-reader/WCAG certification or production clearance. Evidence: .admin-console/worklog/review-volabi-frontend.md",
+      "tests": [
+        "web_platform/tests-browser/hq-local-acceptance.mjs"
+      ]
+    },
+    {
+      "id": "hq-knowledge",
+      "route": "/hq/knowledge",
+      "purpose": "Searchable real source register",
+      "roles": [
+        "local-development-reviewer"
+      ],
+      "dataSources": [
+        "sqlite:local-development-workspace"
+      ],
+      "capabilities": [
+        "hq-local.knowledge-sources"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale",
+        "conflict",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "implemented",
+      "status": "implemented",
+      "rationale": "Independent EN1440/AR375, RTL/no overflow, keyboard/focus labels and9route/15overlay closure passed with actual local data, no unexpected console/external/device access. No screen-reader/WCAG certification or production clearance. Evidence: .admin-console/worklog/review-volabi-frontend.md",
+      "tests": [
+        "web_platform/tests-browser/hq-local-acceptance.mjs"
+      ]
+    },
+    {
+      "id": "hq-source",
+      "route": "/hq/knowledge/[id]",
+      "purpose": "Source provenance, versions and corrections",
+      "roles": [
+        "local-development-reviewer"
+      ],
+      "dataSources": [
+        "sqlite:local-development-workspace"
+      ],
+      "capabilities": [
+        "hq-local.knowledge-sources"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale",
+        "conflict",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "implemented",
+      "status": "implemented",
+      "rationale": "Independent EN1440/AR375, RTL/no overflow, keyboard/focus labels and9route/15overlay closure passed with actual local data, no unexpected console/external/device access. No screen-reader/WCAG certification or production clearance. Evidence: .admin-console/worklog/review-volabi-frontend.md",
+      "tests": [
+        "web_platform/tests-browser/hq-local-acceptance.mjs"
+      ]
+    },
+    {
+      "id": "hq-agents",
+      "route": "/hq/agents",
+      "purpose": "Original inactive identity directory",
+      "roles": [
+        "local-development-reviewer"
+      ],
+      "dataSources": [
+        "sqlite:local-development-workspace"
+      ],
+      "capabilities": [
+        "hq-local.agent-capability-inspect"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale",
+        "conflict",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "implemented",
+      "status": "implemented",
+      "rationale": "Independent EN1440/AR375, RTL/no overflow, keyboard/focus labels and9route/15overlay closure passed with actual local data, no unexpected console/external/device access. No screen-reader/WCAG certification or production clearance. Evidence: .admin-console/worklog/review-volabi-frontend.md",
+      "tests": [
+        "web_platform/tests-browser/hq-local-acceptance.mjs"
+      ]
+    },
+    {
+      "id": "hq-agent",
+      "route": "/hq/agents/[id]",
+      "purpose": "Character, media, associated skills and capability gaps",
+      "roles": [
+        "local-development-reviewer"
+      ],
+      "dataSources": [
+        "sqlite:local-development-workspace"
+      ],
+      "capabilities": [
+        "hq-local.agent-capability-inspect"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale",
+        "conflict",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "implemented",
+      "status": "implemented",
+      "rationale": "Independent EN1440/AR375, RTL/no overflow, keyboard/focus labels and9route/15overlay closure passed with actual local data, no unexpected console/external/device access. No screen-reader/WCAG certification or production clearance. Evidence: .admin-console/worklog/review-volabi-frontend.md",
+      "tests": [
+        "web_platform/tests-browser/hq-local-acceptance.mjs"
+      ]
     }
   ],
   "integrations": [
@@ -10121,6 +10764,19 @@
         "checkout-attempt.start",
         "checkout-attempt.observe"
       ]
+    },
+    {
+      "id": "ceo-volabi-first-loop-20261022",
+      "decision": "CEO approved six-area Volabi local first-loop scope, proposed visual direction and three replacement design skills; requested all15 persona portraits/voice and function/refund/finance skill coverage.",
+      "reason": "Explicit current human approval, preserving production, activation, permission and financial holds. Local decisions and proposals record review only.",
+      "evidence": [
+        "planning/volabi/APPROVAL_20261022.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "headquarters-local"
+      ],
+      "confirmedBy": "CEO current chat,2026-10-22"
     }
   ],
   "gaps": [
@@ -13458,6 +14114,78 @@
         "supabase/functions/_shared/checkout-attempts.ts",
         "supabase/migrations/20261022062147_durable_checkout_attempts.sql"
       ]
+    },
+    {
+      "id": "volabi-finance-commercial-terms",
+      "severity": "high",
+      "description": "First-acquisition numeric rate/floor/cap/base and discount/tax/merchant agreement terms are not adopted by the recovered human source. Existing code examples and fallback are not approval.",
+      "status": "blocked",
+      "rationale": "FIN-COMMERCIAL-TERMS; preserve zero repeat acquisition; CEO commercial decision needed before its business operation.",
+      "evidence": [
+        "docs/volabi-finance-refund-gaps.md",
+        "planning/volabi/persona-and-skills/BUSINESS_DECISIONS.md",
+        "docs/volabi-local-operations.md"
+      ]
+    },
+    {
+      "id": "volabi-acquisition-event-and-continuity",
+      "severity": "high",
+      "description": "Qualifying earning event, customer-salon/branch/chain identity and once-per-relationship concurrency/privacy/reversal continuity need an explicit contract; current booking history is not a durable acquisition ledger.",
+      "status": "blocked",
+      "rationale": "FIN-ACQUISITION-EVENT; prepare candidate contract, do not silently select business identity or earning event.",
+      "evidence": [
+        "docs/volabi-finance-refund-gaps.md",
+        "planning/volabi/persona-and-skills/BUSINESS_DECISIONS.md",
+        "docs/volabi-local-operations.md"
+      ]
+    },
+    {
+      "id": "volabi-refund-allocation-contract",
+      "severity": "high",
+      "description": "Performed-service full/partial refund commission reversal, processing cost and chargeback funding treatment needs applicable commercial/provider terms. Existing conditional human maker/checker thresholds remain.",
+      "status": "blocked",
+      "rationale": "FIN-REFUND-ALLOCATION; no financial dispatch; no reapproval request for already conditionally adopted Q5/Q8/Q9/D3.",
+      "evidence": [
+        "docs/volabi-finance-refund-gaps.md",
+        "planning/volabi/persona-and-skills/BUSINESS_DECISIONS.md",
+        "docs/volabi-local-operations.md"
+      ]
+    },
+    {
+      "id": "volabi-provider-allocation-acceptance",
+      "severity": "high",
+      "description": "Licensed-provider non-custodial destination allocation/reversal and actual merchant-method fee acceptance have not been demonstrated; internal ledger share is not provider settlement.",
+      "status": "blocked",
+      "rationale": "FIN-PSP-ACCEPTANCE; written eligibility/agreements and named sandbox acceptance evidence required. Split flag stays fail closed.",
+      "evidence": [
+        "docs/volabi-finance-refund-gaps.md",
+        "planning/volabi/persona-and-skills/BUSINESS_DECISIONS.md",
+        "docs/volabi-local-operations.md"
+      ]
+    },
+    {
+      "id": "volabi-live-bilingual-persona-runtime",
+      "severity": "medium",
+      "description": "All15 fictional portraits and English offline auditions exist; live grounded bilingual model dialogue, distinct licensed production voices, participant media and external meeting integrations are not configured or evaluated.",
+      "status": "blocked",
+      "rationale": "Keep employees inactive and recording/invitation off. Two English preview engines do not establish15production voices; Arabic/device/interruptions need actual integration tests.",
+      "evidence": [
+        "docs/volabi-finance-refund-gaps.md",
+        "planning/volabi/persona-and-skills/BUSINESS_DECISIONS.md",
+        "docs/volabi-local-operations.md"
+      ]
+    },
+    {
+      "id": "volabi-role-task-behavior-evidence",
+      "severity": "medium",
+      "description": "Package installation and proposed associations do not establish task/version/environment competence for the15inactive personas or42proposed functions.",
+      "status": "blocked",
+      "rationale": "Prepare bounded evaluations before assigning task-specific bindings/access; no competence scores or permission inference.",
+      "evidence": [
+        "docs/volabi-finance-refund-gaps.md",
+        "planning/volabi/persona-and-skills/BUSINESS_DECISIONS.md",
+        "docs/volabi-local-operations.md"
+      ]
     }
   ],
   "declaredStatic": [
@@ -13680,6 +14408,48 @@
       "evidence": [
         "web_platform/tests/vercel-ignore-build.test.mjs",
         "docs/durable-checkout-recovery-and-volabi.md"
+      ]
+    },
+    {
+      "id": "volabi-local-protocol",
+      "path": "web_platform/src/lib/hq/server",
+      "value": "Local-only development identity, record-only scope and workflow/receipt vocabulary",
+      "reason": "Protocol and denied authority, not operational business data or simulated outcomes.",
+      "approvedBy": "CEO approved local development scope2026-10-22",
+      "evidence": [
+        "docs/volabi-local-api-contract.md",
+        "web_platform/tests/hq-local-boundary.test.mjs"
+      ]
+    },
+    {
+      "id": "volabi-original-agent-roster",
+      "path": "planning/volabi/persona-and-skills/PERSONA_REGISTRY.json",
+      "value": "15 original inactive identities with source character/role directions and proposed presentation",
+      "reason": "Recovered source-design identities; directory does not imply employee activation or competency.",
+      "approvedBy": "CEO required reuse original management roles and15persona presentation2026-10-22",
+      "evidence": [
+        "planning/volabi/APPROVAL_20261022.md",
+        "planning/volabi/AGENT_PROFILE_CONTRACTS.json"
+      ]
+    },
+    {
+      "id": "volabi-preview-voice-prosody",
+      "path": "scripts/render-volabi-voice-previews.ps1",
+      "value": "15 proposed English audition texts/prosody settings; two installed speech engines",
+      "reason": "Clearly labelled authored offline sound auditions; no actual dialogue or validated production voice claim.",
+      "approvedBy": "CEO requested each management persona picture and sound2026-10-22",
+      "evidence": [
+        "planning/volabi/persona-and-skills/VOICE_PREVIEW_RECEIPTS.json"
+      ]
+    },
+    {
+      "id": "volabi-bilingual-labels",
+      "path": "web_platform/src/lib/hq",
+      "value": "AR/EN interface and role translations; source status display; route and UI vocabulary",
+      "reason": "Static language labels and approved presentation tokens, never invented business records.",
+      "approvedBy": "CEO bilingual approved visual direction2026-10-22",
+      "evidence": [
+        "planning/volabi/DESIGN.md"
       ]
     }
   ],
@@ -14707,6 +15477,50 @@
         "e2e/specs/provider-calendar.spec.ts"
       ],
       "status": "promoted"
+    },
+    {
+      "id": "fb-volabi-source-currentness-followup",
+      "observation": "Exact approval checks must also run at follow-up, because source correction after approval otherwise permits stale material. Independent F-HQ1 reproduced and fixed.",
+      "category": "gap",
+      "proposedChange": "Preserve current-material assertions across consequential handoffs, with before/after-approval negative regressions.",
+      "evidence": [
+        "web_platform/tests/hq-independent-review.test.mjs",
+        ".admin-console/worklog/review-volabi-local-server.md"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "fb-volabi-associated-vs-global-skills",
+      "observation": "Conflating own agent associations and the available global catalog falsely attaches every package to every agent.",
+      "category": "gap",
+      "proposedChange": "Render agent.skills for associations; available catalog only for change proposals; compare distinct roles in browser acceptance.",
+      "evidence": [
+        "web_platform/src/components/hq/hq-agent-profile.tsx",
+        ".admin-console/worklog/review-volabi-frontend.md"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "fb-volabi-citation-textarea-offsets",
+      "observation": "Browser textareas normalize CRLF and repeated quote text is ambiguous.",
+      "category": "gap",
+      "proposedChange": "Map DOM selection to original UTF16 offsets; test CRLF/CR, Unicode and repeated occurrences without changing stored source bytes.",
+      "evidence": [
+        "web_platform/tests/hq-client.test.mjs"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "fb-volabi-evidence-scanner-context",
+      "observation": "The installed release scanner scans entire test/document heads and splits identifiers, so cryptographic randomUUID and legitimate negative-test descriptions are classified as unfinished delivery. This yields45HQ evidence/resolution findings despite independent execution and matching final source hashes.",
+      "category": "gap",
+      "proposedChange": "Propose separately tested context-aware evidence classification that retains denial tests and cryptographic identities while continuing to reject unfinished release implementations. Do not weaken or bypass the current gate.",
+      "evidence": [
+        ".admin-console/evidence/volabi-first-loop/manifest-release.txt",
+        ".admin-console/evidence/volabi-first-loop/independent-frontend.json",
+        ".admin-console/evidence/volabi-local/server-independent-review.json"
+      ],
+      "status": "open"
     }
   ],
   "agents": [
@@ -15107,6 +15921,51 @@
       "ownsScreens": [],
       "status": "done",
       "notes": "DEVELOPMENT-ONLY independent CI/build hold review;19/19 cases; .admin-console/worklog/security-checkout-preview-hold.md. No remote settings or deployment."
+    },
+    {
+      "id": "impl-volabi-local-loop",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "Explicit CEO2026-10-22 development-worker approval and firstloop/theme approval; local-only auth/persistence/UI development; no business employee activation or permissions. docs/volabi-local-api-contract.md",
+      "worklog": ".admin-console/worklog/impl-volabi-local-loop.md"
+    },
+    {
+      "id": "impl-volabi-frontend",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT ONLY: owns nine approved HQ route surfaces and local client/voice UI; no employee activation or business permissions",
+      "worklog": ".admin-console/worklog/impl-volabi-frontend.md"
+    },
+    {
+      "id": "impl-volabi-persona-skills",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT ONLY: owns persona/source maps, new instruction packages and original synthetic portrait production; no employee activation",
+      "worklog": ".admin-console/worklog/impl-volabi-persona-skills.md"
+    },
+    {
+      "id": "security-volabi-local-server",
+      "role": "security",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT ONLY: independent review; did not implement SQLite/HTTP server; no business authority",
+      "worklog": ".admin-console/worklog/review-volabi-local-server.md"
+    },
+    {
+      "id": "harvest-volabi-local",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT ONLY: final harvester pass under schema architect role;4 project lessons banked including context-blind release evidence scanner; no global promotion or business authority.",
+      "worklog": ".admin-console/worklog/harvest-volabi-local.md"
     }
   ]
 }

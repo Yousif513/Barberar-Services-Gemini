@@ -1,0 +1,1 @@
+export default function Loading(){return <div className="hq-loading" role="status"><span className="hq-spinner"/><span lang="en">Loading workspace</span><span lang="ar">جارٍ تحميل المساحة</span></div>;}

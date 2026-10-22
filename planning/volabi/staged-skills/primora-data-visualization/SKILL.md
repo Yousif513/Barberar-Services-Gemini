@@ -3,15 +3,15 @@ name: primora-data-visualization
 description: Specify or review Primora HQ metrics and readiness matrices with authoritative
   sources, units, freshness and drill-down; forbids fabricated competence scores.
 metadata:
-  version: 0.1.0-proposed
-  status: staged-unapproved
+  version: 1.0.0
+  status: approved-replacement
   original_recovered: 'false'
-  installed: 'false'
+  installed: 'true'
 ---
 
-# primora-data-visualization - PROPOSED
+# primora-data-visualization - approved replacement
 
-This staged 0.1.0-proposed replacement is not recovered original guidance or an approval. Read [proposal provenance](references/proposal-source.md).
+This1.0.0 replacement was approved by the CEO on2026-10-22. It is not recovered original guidance. Read [proposal provenance](references/proposal-source.md).
 
 For every metric declare the supported decision, definition/formula, authoritative source and permission scope, unit, timezone, interval, observation time, completeness/lag, owner, denominator, uncertainty and drill-down. Use SAR and Asia/Riyadh business dates. Preserve accounting meanings; charts must not alter pricing, commission, VAT or legal retention.
 

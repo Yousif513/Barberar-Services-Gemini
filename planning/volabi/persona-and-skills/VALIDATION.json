@@ -1,0 +1,233 @@
+{
+  "checked_on": "2026-10-22",
+  "structural_counts": {
+    "profiles": 15,
+    "original_functions": 42,
+    "original_source_reference_images_hash_verified": 61,
+    "original_visual_briefs": 65,
+    "role_linked_reference_images_viewed": 11,
+    "missing_named_original_portrait_briefs": 4,
+    "original_voice_audio_ids_recovered": 0,
+    "new_original_portraits_generated_and_inspected": 15,
+    "builtin_image_generation_calls": 17,
+    "offline_English_WAV_previews": 15,
+    "SAPI_base_engines": 2,
+    "Arabic_voice_runtime": 0,
+    "new_instruction_packages_globally_installed": 4,
+    "approved_design_packages_globally_installed": 3
+  },
+  "package_validation": [
+    {
+      "name": "primora-bilingual-conversation",
+      "staged_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\planning\\volabi\\persona-and-skills\\staged-skills\\primora-bilingual-conversation",
+      "global_path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-bilingual-conversation",
+      "version": "0.1.0-proposed",
+      "global_install": "installed_file_verified_by_root_receipt_and_this_pass",
+      "files": [
+        {
+          "path": "references/source-and-cases.md",
+          "sha256": "e970957f0e79b1de270a3c8d842a719e2433621047b2c9b8736df95304e79fc0"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "c44b0b37135c886987e652012e6d00b516e64f2347ff6d517927c14bffeae917"
+        }
+      ],
+      "quick_validate_exit": 0,
+      "quick_validate_output": "Skill is valid!",
+      "references_present": true,
+      "independent_review": "source_and_instruction_review; S-HQ-SK1 corrected and independently reread",
+      "agent_binding": "proposed_not_assigned",
+      "agent_task_behavioral_evidence": "not_established"
+    },
+    {
+      "name": "primora-meeting-facilitation",
+      "staged_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\planning\\volabi\\persona-and-skills\\staged-skills\\primora-meeting-facilitation",
+      "global_path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-meeting-facilitation",
+      "version": "0.1.0-proposed",
+      "global_install": "installed_file_verified_by_root_receipt_and_this_pass",
+      "files": [
+        {
+          "path": "references/source-and-cases.md",
+          "sha256": "6dcd012b3fa8f9a260249a2fc094bbe35d7217e007a41fb78380fb96a6dcba58"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "8373e8399679f195834a252de9270b9b4fa9fac728c31d04d76036246daf1366"
+        }
+      ],
+      "quick_validate_exit": 0,
+      "quick_validate_output": "Skill is valid!",
+      "references_present": true,
+      "independent_review": "source_and_instruction_review; S-HQ-SK1 corrected and independently reread",
+      "agent_binding": "proposed_not_assigned",
+      "agent_task_behavioral_evidence": "not_established"
+    },
+    {
+      "name": "primora-payment-reconciliation",
+      "staged_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\planning\\volabi\\persona-and-skills\\staged-skills\\primora-payment-reconciliation",
+      "global_path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-payment-reconciliation",
+      "version": "0.1.0-proposed",
+      "global_install": "installed_file_verified_by_root_receipt_and_this_pass",
+      "files": [
+        {
+          "path": "references/source-and-cases.md",
+          "sha256": "730d5108cc157e6c2bde49955fa0806b45e9410940dab8e596d6f9d9375295a7"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "0825efd047f22aabd6f215e5c0b3f37fdbe6f749b02ea83b4c9b05d30a72db4b"
+        }
+      ],
+      "quick_validate_exit": 0,
+      "quick_validate_output": "Skill is valid!",
+      "references_present": true,
+      "independent_review": "source_and_instruction_review; S-HQ-SK1 corrected and independently reread",
+      "agent_binding": "proposed_not_assigned",
+      "agent_task_behavioral_evidence": "not_established"
+    },
+    {
+      "name": "primora-refund-case-review",
+      "staged_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\planning\\volabi\\persona-and-skills\\staged-skills\\primora-refund-case-review",
+      "global_path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-refund-case-review",
+      "version": "0.1.0-proposed",
+      "global_install": "installed_file_verified_by_root_receipt_and_this_pass",
+      "files": [
+        {
+          "path": "references/source-and-cases.md",
+          "sha256": "2a5262a039ebb4030cde889ff374c1b1e6c1ccf28f67b1eafd4766aec9f37d26"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "c536f486afafda0ad672f57f97cb3a8115dadb9f2d149ae4f101b74409c235b0"
+        }
+      ],
+      "quick_validate_exit": 0,
+      "quick_validate_output": "Skill is valid!",
+      "references_present": true,
+      "independent_review": "source_and_instruction_review; S-HQ-SK1 corrected and independently reread",
+      "agent_binding": "proposed_not_assigned",
+      "agent_task_behavioral_evidence": "not_established"
+    }
+  ],
+  "profile_source_skill_asset_hash_checks": "pass",
+  "all_company_identities": "inactive",
+  "business_permissions_granted": [],
+  "runtime_media": "offline English WAV samples available; live conversation/production voice/Arabic/lipsync not configured or accepted",
+  "behavioral_evaluation": "agent-task-version competence not established; source/structure/media file validation are separate",
+  "financial_controls": "Conditional adopted Q5/Q8/Q9/D3 preserved; qualifying/earning event and other actual acquisition commercial gaps not fabricated as adopted",
+  "scope_limits": [
+    "No employee activation or business permissions",
+    "No microphone recording or stakeholder contact",
+    "No live provider/financial operation",
+    "No APIkey/CLI fallback or new paid provider",
+    "Original third-party reference faces not published",
+    "No whole-disk/cloud recovery claim"
+  ],
+  "files": [
+    {
+      "path": "ASSET_REGISTER.json",
+      "sha256": "216eaacfd4a12e264e7a87e559fd5ebafa814f60f73edc617050019dc48d0b78"
+    },
+    {
+      "path": "BUSINESS_DECISIONS.md",
+      "sha256": "1a2f4e3e3436064daef5f805a04f16a7f9c284130b87dbcd5a3264e909086f26"
+    },
+    {
+      "path": "CONVERSATION_AND_MEETING_CONTRACT.json",
+      "sha256": "18f4ba156458e61cf141b32fa898d98f6f14f63de39ae91adb842305ee0a01ba"
+    },
+    {
+      "path": "FINANCE_CONTROL_SOURCE_EXCERPTS.json",
+      "sha256": "aaf010e8fd6e5fbaa6dd87f15155e74618fce30068faa760b19cd4d2c92aba3b"
+    },
+    {
+      "path": "generation-receipts\\raw-batch-01.json",
+      "sha256": "3d29d47b612c0bb2593e3626bc29314483efcedd96fe9bc384f3850f81a744f4"
+    },
+    {
+      "path": "generation-receipts\\raw-batch-02.json",
+      "sha256": "d93e4df72f24bbd816f62ec519006d615f221baf55c00561fc62d22f40f59c47"
+    },
+    {
+      "path": "generation-receipts\\raw-batch-03.json",
+      "sha256": "c3f8ecfb755d4e5809b321a60542b82cc8053b00a4d5248179337e5cd37886fe"
+    },
+    {
+      "path": "generation-receipts\\raw-batch-04.json",
+      "sha256": "46c496be373aade73c131eb54f2393f0587f2e19f48a55dbad7de036c0aa7042"
+    },
+    {
+      "path": "generation-receipts\\raw-batch-05.json",
+      "sha256": "0ea1434803cf1ada0be91c3683e497bd71a749069a600c01108a3022e3311275"
+    },
+    {
+      "path": "GLOBAL_SKILL_INSTALLATION.json",
+      "sha256": "3ffdc9f07c37a57b5b6268686ad47cb1225989ac297011d91e4ca51e1f594fe8"
+    },
+    {
+      "path": "PERSONA_AND_VOICE_MATRIX.md",
+      "sha256": "3aa63436b56156b6bfbd72be6cc975640f3fe6240442e8ee43b0a1ff47d70c23"
+    },
+    {
+      "path": "PERSONA_REGISTRY.json",
+      "sha256": "cba04539c711e07638de719296dcbee7bc5455a5961ce4e3f0aa523e49c2062a"
+    },
+    {
+      "path": "PORTRAIT_GENERATION_RECEIPTS.json",
+      "sha256": "ee42ae262be65e7c1a2d92720fda2e8f1725f68e35d07ded4752249085b57e83"
+    },
+    {
+      "path": "PORTRAIT_PRODUCTION_BRIEFS.json",
+      "sha256": "5d4e555a104f13f0eb504cf4cb213fa2f51890a7b7465517bc916576b067c0f5"
+    },
+    {
+      "path": "README.md",
+      "sha256": "76d0d73c3d396021e2432313c921464cf715b305925d12a8dca34156d8712ca5"
+    },
+    {
+      "path": "ROLE_AND_FUNCTION_SKILL_MAP.json",
+      "sha256": "c9a345775285da2e13d69dbf4a3c7498fe2b776da4e323bc2da630c26113823b"
+    },
+    {
+      "path": "SKILL_GAPS_AND_REUSE.md",
+      "sha256": "437969ffbf8082a5e032258954d073a104ad7c95cab66a76be02043f3bf8b805"
+    },
+    {
+      "path": "staged-skills\\primora-bilingual-conversation\\references\\source-and-cases.md",
+      "sha256": "e970957f0e79b1de270a3c8d842a719e2433621047b2c9b8736df95304e79fc0"
+    },
+    {
+      "path": "staged-skills\\primora-bilingual-conversation\\SKILL.md",
+      "sha256": "c44b0b37135c886987e652012e6d00b516e64f2347ff6d517927c14bffeae917"
+    },
+    {
+      "path": "staged-skills\\primora-meeting-facilitation\\references\\source-and-cases.md",
+      "sha256": "6dcd012b3fa8f9a260249a2fc094bbe35d7217e007a41fb78380fb96a6dcba58"
+    },
+    {
+      "path": "staged-skills\\primora-meeting-facilitation\\SKILL.md",
+      "sha256": "8373e8399679f195834a252de9270b9b4fa9fac728c31d04d76036246daf1366"
+    },
+    {
+      "path": "staged-skills\\primora-payment-reconciliation\\references\\source-and-cases.md",
+      "sha256": "730d5108cc157e6c2bde49955fa0806b45e9410940dab8e596d6f9d9375295a7"
+    },
+    {
+      "path": "staged-skills\\primora-payment-reconciliation\\SKILL.md",
+      "sha256": "0825efd047f22aabd6f215e5c0b3f37fdbe6f749b02ea83b4c9b05d30a72db4b"
+    },
+    {
+      "path": "staged-skills\\primora-refund-case-review\\references\\source-and-cases.md",
+      "sha256": "2a5262a039ebb4030cde889ff374c1b1e6c1ccf28f67b1eafd4766aec9f37d26"
+    },
+    {
+      "path": "staged-skills\\primora-refund-case-review\\SKILL.md",
+      "sha256": "c536f486afafda0ad672f57f97cb3a8115dadb9f2d149ae4f101b74409c235b0"
+    },
+    {
+      "path": "VOICE_PREVIEW_RECEIPTS.json",
+      "sha256": "92c000f1a7eec1e641fcc62dc351a69adbc1b8616974741f62b1dcab39d4aaab"
+    }
+  ]
+}

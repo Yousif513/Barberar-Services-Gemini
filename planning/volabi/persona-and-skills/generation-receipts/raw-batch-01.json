@@ -1,0 +1,77 @@
+[
+  {
+    "agent": "Nora",
+    "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Nora, Primora Chief of Staff / Executive Personal Assistant. sleek dark hair, navy tailored blazer, refined professional styling. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nOutput exactly one square portrait image. No words, no text, no watermark. Do not use any earlier conversation reference image as an edit or likeness input.",
+    "tool": "image_gen.imagegen (built-in)",
+    "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-c9beab02-9158-4d8f-be68-e1e6a44c0d5b.png",
+    "referenced_image_inputs": [],
+    "transparent_background": false,
+    "generated_on": "2026-10-22",
+    "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+    "visual_inspection": {
+      "performed": true,
+      "method": "actual returned tool image inspected before copy",
+      "checks": [
+        "one adult professional",
+        "clear distinct fictional face",
+        "square image with crop-safe headroom",
+        "warm ivory/slate series",
+        "no visible text/logo/watermark/collage",
+        "no visible facial or clothing defect requiring further refinement"
+      ],
+      "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+    },
+    "refinement_reason": null,
+    "discarded_initial_variant": null
+  },
+  {
+    "agent": "Adam",
+    "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Adam, Primora Independent Strategic Adviser. salt-and-pepper hair, rectangular dark glasses, charcoal suit, restrained expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nOutput exactly one square portrait image. No words, no text, no watermark. Do not use any earlier conversation reference image as an edit or likeness input.",
+    "tool": "image_gen.imagegen (built-in)",
+    "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-d997b824-ee1e-49c6-8c32-ffa7fdfdc20a.png",
+    "referenced_image_inputs": [],
+    "transparent_background": false,
+    "generated_on": "2026-10-22",
+    "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+    "visual_inspection": {
+      "performed": true,
+      "method": "actual returned tool image inspected before copy",
+      "checks": [
+        "one adult professional",
+        "clear distinct fictional face",
+        "square image with crop-safe headroom",
+        "warm ivory/slate series",
+        "no visible text/logo/watermark/collage",
+        "no visible facial or clothing defect requiring further refinement"
+      ],
+      "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+    },
+    "refinement_reason": null,
+    "discarded_initial_variant": null
+  },
+  {
+    "agent": "Alexander",
+    "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Alexander, Primora General Manager / Enterprise Coordination. dark side-parted hair, short neat beard, dark slate suit, composed approachable expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nOutput exactly one square portrait image. No words, no text, no watermark. Do not use any earlier conversation reference image as an edit or likeness input.",
+    "tool": "image_gen.imagegen (built-in)",
+    "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-89a0c64e-50ce-43b8-9d76-f6e501e95439.png",
+    "referenced_image_inputs": [],
+    "transparent_background": false,
+    "generated_on": "2026-10-22",
+    "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+    "visual_inspection": {
+      "performed": true,
+      "method": "actual returned tool image inspected before copy",
+      "checks": [
+        "one adult professional",
+        "clear distinct fictional face",
+        "square image with crop-safe headroom",
+        "warm ivory/slate series",
+        "no visible text/logo/watermark/collage",
+        "no visible facial or clothing defect requiring further refinement"
+      ],
+      "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+    },
+    "refinement_reason": null,
+    "discarded_initial_variant": null
+  }
+]

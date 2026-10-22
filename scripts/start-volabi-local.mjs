@@ -1,0 +1,11 @@
+import { spawn } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+import { createRequire } from "node:module";
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
+await import("node:sqlite");
+if(process.env.VERCEL)throw new Error("Volabi local development cannot run on Vercel");
+const require=createRequire(import.meta.url),next=require.resolve("next/dist/bin/next");
+const child=spawn(process.execPath,[next,"dev","--hostname","127.0.0.1","--port","3113"],{cwd:path.join(root,"web_platform"),stdio:"inherit",windowsHide:true,env:{...process.env,VOLABI_PROJECT_ROOT:root,VOLABI_LOCAL_MODE:"enabled"}});
+for(const signal of ["SIGINT","SIGTERM"])process.on(signal,()=>child.kill(signal));
+child.on("exit",code=>process.exit(code??1));

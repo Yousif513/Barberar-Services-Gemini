@@ -1,0 +1,512 @@
+{
+  "generation_calls": 17,
+  "accepted_assets": [
+    {
+      "agent": "Nora",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Nora, Primora Chief of Staff / Executive Personal Assistant. sleek dark hair, navy tailored blazer, refined professional styling. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nOutput exactly one square portrait image. No words, no text, no watermark. Do not use any earlier conversation reference image as an edit or likeness input.",
+      "tool": "image_gen.imagegen (built-in)",
+      "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-c9beab02-9158-4d8f-be68-e1e6a44c0d5b.png",
+      "referenced_image_inputs": [],
+      "transparent_background": false,
+      "generated_on": "2026-10-22",
+      "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "visual_inspection": {
+        "performed": true,
+        "method": "actual returned tool image inspected before copy",
+        "checks": [
+          "one adult professional",
+          "clear distinct fictional face",
+          "square image with crop-safe headroom",
+          "warm ivory/slate series",
+          "no visible text/logo/watermark/collage",
+          "no visible facial or clothing defect requiring further refinement"
+        ],
+        "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+      },
+      "refinement_reason": null,
+      "discarded_initial_variant": null,
+      "sha256": "b2d4a06ed48a898a2202720546704307f4d69d5758b3d8287fd98b26c4ac9bd9",
+      "bytes": 2213997,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "output_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\nora.png",
+      "public_url": "/volabi/agents/nora.png"
+    },
+    {
+      "agent": "Adam",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Adam, Primora Independent Strategic Adviser. salt-and-pepper hair, rectangular dark glasses, charcoal suit, restrained expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nOutput exactly one square portrait image. No words, no text, no watermark. Do not use any earlier conversation reference image as an edit or likeness input.",
+      "tool": "image_gen.imagegen (built-in)",
+      "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-d997b824-ee1e-49c6-8c32-ffa7fdfdc20a.png",
+      "referenced_image_inputs": [],
+      "transparent_background": false,
+      "generated_on": "2026-10-22",
+      "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "visual_inspection": {
+        "performed": true,
+        "method": "actual returned tool image inspected before copy",
+        "checks": [
+          "one adult professional",
+          "clear distinct fictional face",
+          "square image with crop-safe headroom",
+          "warm ivory/slate series",
+          "no visible text/logo/watermark/collage",
+          "no visible facial or clothing defect requiring further refinement"
+        ],
+        "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+      },
+      "refinement_reason": null,
+      "discarded_initial_variant": null,
+      "sha256": "87f39121bb0ab40f0e40ba61b14a2c12da2b9e3d6c2c799549d3434f30d84f6a",
+      "bytes": 2341233,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "output_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\adam.png",
+      "public_url": "/volabi/agents/adam.png"
+    },
+    {
+      "agent": "Alexander",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Alexander, Primora General Manager / Enterprise Coordination. dark side-parted hair, short neat beard, dark slate suit, composed approachable expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nOutput exactly one square portrait image. No words, no text, no watermark. Do not use any earlier conversation reference image as an edit or likeness input.",
+      "tool": "image_gen.imagegen (built-in)",
+      "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-89a0c64e-50ce-43b8-9d76-f6e501e95439.png",
+      "referenced_image_inputs": [],
+      "transparent_background": false,
+      "generated_on": "2026-10-22",
+      "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "visual_inspection": {
+        "performed": true,
+        "method": "actual returned tool image inspected before copy",
+        "checks": [
+          "one adult professional",
+          "clear distinct fictional face",
+          "square image with crop-safe headroom",
+          "warm ivory/slate series",
+          "no visible text/logo/watermark/collage",
+          "no visible facial or clothing defect requiring further refinement"
+        ],
+        "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+      },
+      "refinement_reason": null,
+      "discarded_initial_variant": null,
+      "sha256": "bba318cd9b8faaf9a00a2294a94878d9d399a8a271deb85cb8d68ae8f716620b",
+      "bytes": 2200643,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "output_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\alexander.png",
+      "public_url": "/volabi/agents/alexander.png"
+    },
+    {
+      "agent": "Sarah",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee head-and-shoulders portrait, 1024x1024 composition.\nGenerate a NEW original fictional face for Sarah: deep brown skin, broad strong cheekbones, a broad rounded nose, wide warm dark-brown eyes, full natural lips, dark shoulder-length wavy hair, energetic open smile. Navy blazer and ivory blouse. Keep the professional operations-director character and warm ivory/slate photographic series. Her face must be visibly distinct from Nora's narrower oval face; do not reproduce any earlier face.\nSoft natural window lighting, realistic skin, eye-level close portrait, one adult only, crop-safe headroom. No words, logo, watermark, collage or other people. New proposed aesthetic for a fictional AI employee; no actual human identity, authority or licence implied. No previous images are edit/likeness inputs.",
+      "tool": "image_gen.imagegen (built-in)",
+      "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-d9656078-d12a-4663-9685-0867263474ca.png",
+      "referenced_image_inputs": [],
+      "transparent_background": false,
+      "generated_on": "2026-10-22",
+      "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "visual_inspection": {
+        "performed": true,
+        "method": "actual returned tool image inspected before copy",
+        "checks": [
+          "one adult professional",
+          "clear distinct fictional face",
+          "square image with crop-safe headroom",
+          "warm ivory/slate series",
+          "no visible text/logo/watermark/collage",
+          "no visible facial or clothing defect requiring further refinement"
+        ],
+        "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+      },
+      "refinement_reason": "One targeted regeneration: initial face converged too closely with Nora; distinct identity requirement.",
+      "discarded_initial_variant": {
+        "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-f787f671-82af-4664-b261-d9e132a31ee3.png",
+        "reason": "One targeted regeneration: initial face converged too closely with Nora; distinct identity requirement.",
+        "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Sarah, Primora Operations & Service Delivery. dark wavy shoulder-length hair, navy blazer and ivory blouse, alert practical expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nOutput exactly one square portrait image. No words, no text, no watermark. Do not use any earlier conversation reference image as an edit or likeness input.",
+        "not_copied_to_release_asset": true
+      },
+      "sha256": "df918abdd2004157a2532cbd2fca6f0e0eabfa8f16959e459ae56ca81971a8e6",
+      "bytes": 2241466,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "output_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\sarah.png",
+      "public_url": "/volabi/agents/sarah.png"
+    },
+    {
+      "agent": "Victoria",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Victoria, Primora Business Development. copper wavy hair, tailored burgundy blazer, confident welcoming expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nOutput exactly one square portrait image. No words, no text, no watermark. Do not use any earlier conversation reference image as an edit or likeness input.",
+      "tool": "image_gen.imagegen (built-in)",
+      "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-d2c58b3b-3b80-4059-ab16-8e5f2e08479c.png",
+      "referenced_image_inputs": [],
+      "transparent_background": false,
+      "generated_on": "2026-10-22",
+      "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "visual_inspection": {
+        "performed": true,
+        "method": "actual returned tool image inspected before copy",
+        "checks": [
+          "one adult professional",
+          "clear distinct fictional face",
+          "square image with crop-safe headroom",
+          "warm ivory/slate series",
+          "no visible text/logo/watermark/collage",
+          "no visible facial or clothing defect requiring further refinement"
+        ],
+        "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+      },
+      "refinement_reason": null,
+      "discarded_initial_variant": null,
+      "sha256": "ca9d9274c0bc49e568876a020e46188c6f7f78fc11a74fa907080d19b03763ce",
+      "bytes": 2222457,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "output_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\victoria.png",
+      "public_url": "/volabi/agents/victoria.png"
+    },
+    {
+      "agent": "Emma",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee head-and-shoulders portrait, 1024x1024 composition.\nGenerate a NEW original fictional face for Emma: mature adult woman with pale softly freckled skin, light grey-blue eyes, round face and soft full cheeks, a short rounded nose, naturally curly chestnut/auburn shoulder-length hair, patient reassuring smile. Taupe blazer and ivory top. Keep the warm ivory/slate professional photographic series. Her face must be visibly distinct from Nora, Sarah, Lina and Maya; do not reproduce any earlier face.\nSoft natural window lighting, realistic skin, eye-level close portrait, one adult only, crop-safe headroom. No words, logo, watermark, collage or other people. New proposed aesthetic for a fictional AI employee; no actual human identity, authority or licence implied. No previous images are edit/likeness inputs.",
+      "tool": "image_gen.imagegen (built-in)",
+      "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-c3980416-a3a6-4131-a301-b9f6b0bd9a2a.png",
+      "referenced_image_inputs": [],
+      "transparent_background": false,
+      "generated_on": "2026-10-22",
+      "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "visual_inspection": {
+        "performed": true,
+        "method": "actual returned tool image inspected before copy",
+        "checks": [
+          "one adult professional",
+          "clear distinct fictional face",
+          "square image with crop-safe headroom",
+          "warm ivory/slate series",
+          "no visible text/logo/watermark/collage",
+          "no visible facial or clothing defect requiring further refinement"
+        ],
+        "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+      },
+      "refinement_reason": "One targeted regeneration: initial face converged too closely with Nora; distinct identity requirement.",
+      "discarded_initial_variant": {
+        "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-003de4e0-a94a-419c-b066-8f4aa87dfcc4.png",
+        "reason": "One targeted regeneration: initial face converged too closely with Nora; distinct identity requirement.",
+        "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Emma, Primora Customer Experience. dark loose curls, warm taupe blazer and ivory top, attentive steady expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nOutput exactly one square portrait image. No words, no text, no watermark. Do not use any earlier conversation reference image as an edit or likeness input.",
+        "not_copied_to_release_asset": true
+      },
+      "sha256": "fd1381b412b997c936b07e5c72e3ee503fac7d34ba7a372f3a3d7ed9a04299b1",
+      "bytes": 2443470,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "output_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\emma.png",
+      "public_url": "/volabi/agents/emma.png"
+    },
+    {
+      "agent": "Maya",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Maya, Primora Product & Experience Design. short dark bob, muted slate blazer and cream shirt, curious composed expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nDistinct facial design: angular heart-shaped face, sharp cheekbones, short sleek black bob, deep-set dark eyes, straight short nose, subtle closed smile. Do not reuse Nora/Sarah/Emma facial geometry.\nExactly one square portrait. No text, watermark or other people. Original fictional face; no earlier images supplied as likeness/edit inputs.",
+      "tool": "image_gen.imagegen (built-in)",
+      "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-7315d519-42b6-41d8-bde0-ea6332aa78f1.png",
+      "referenced_image_inputs": [],
+      "transparent_background": false,
+      "generated_on": "2026-10-22",
+      "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "visual_inspection": {
+        "performed": true,
+        "method": "actual returned tool image inspected before copy",
+        "checks": [
+          "one adult professional",
+          "clear distinct fictional face",
+          "square image with crop-safe headroom",
+          "warm ivory/slate series",
+          "no visible text/logo/watermark/collage",
+          "no visible facial or clothing defect requiring further refinement"
+        ],
+        "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+      },
+      "refinement_reason": null,
+      "discarded_initial_variant": null,
+      "sha256": "908cbdabe4218585bea67b42dc0d4e3fb6a07927a22d671cab5949ca00eefb29",
+      "bytes": 2197748,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "output_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\maya.png",
+      "public_url": "/volabi/agents/maya.png"
+    },
+    {
+      "agent": "Ethan",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Ethan, Primora Technology & AI Systems. short dark hair, glasses and neat beard, charcoal jacket, open practical expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nDistinct facial design: medium-deep warm brown complexion, compact rounded face, closely cropped black hair, round metal glasses, full neatly clipped black beard; warm candid smile.\nExactly one square portrait. No text, watermark or other people. Original fictional face; no earlier images supplied as likeness/edit inputs.",
+      "tool": "image_gen.imagegen (built-in)",
+      "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-eea86e11-487e-42e9-b3d7-45da1a4127a3.png",
+      "referenced_image_inputs": [],
+      "transparent_background": false,
+      "generated_on": "2026-10-22",
+      "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "visual_inspection": {
+        "performed": true,
+        "method": "actual returned tool image inspected before copy",
+        "checks": [
+          "one adult professional",
+          "clear distinct fictional face",
+          "square image with crop-safe headroom",
+          "warm ivory/slate series",
+          "no visible text/logo/watermark/collage",
+          "no visible facial or clothing defect requiring further refinement"
+        ],
+        "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+      },
+      "refinement_reason": null,
+      "discarded_initial_variant": null,
+      "sha256": "c9f7cd980f82bcb99dbdeb0bb42b6850864da90df005a2e4cae761a484af7ba2",
+      "bytes": 2216947,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "output_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\ethan.png",
+      "public_url": "/volabi/agents/ethan.png"
+    },
+    {
+      "agent": "Daniel",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Daniel, Primora Finance & Investment Control. short greying hair, rectangular glasses, dark suit, composed neutral expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nDistinct facial design: mature long rectangular face, receding silver-grey hair, narrow black rectangular glasses, clean-shaven jaw, thin lips, calm reserved expression; visually unlike Adam's beard and Alexander's dark hair.\nExactly one square portrait. No text, watermark or other people. Original fictional face; no earlier images supplied as likeness/edit inputs.",
+      "tool": "image_gen.imagegen (built-in)",
+      "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-b1fb6ea9-fff2-4dad-9328-2ed3ea14ac45.png",
+      "referenced_image_inputs": [],
+      "transparent_background": false,
+      "generated_on": "2026-10-22",
+      "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "visual_inspection": {
+        "performed": true,
+        "method": "actual returned tool image inspected before copy",
+        "checks": [
+          "one adult professional",
+          "clear distinct fictional face",
+          "square image with crop-safe headroom",
+          "warm ivory/slate series",
+          "no visible text/logo/watermark/collage",
+          "no visible facial or clothing defect requiring further refinement"
+        ],
+        "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+      },
+      "refinement_reason": null,
+      "discarded_initial_variant": null,
+      "sha256": "1e5148693e0efe1d9032adbac48a4d84f14b17f9990c92773b5472e657f2e8ab",
+      "bytes": 2093542,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "output_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\daniel.png",
+      "public_url": "/volabi/agents/daniel.png"
+    },
+    {
+      "agent": "Sophia",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Sophia, Primora Brand, Growth & Market Intelligence. shoulder-length soft dark-blonde waves, muted olive blazer, ivory shirt, lively professional expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nDistinct facial design: softly rounded face, grey-green eyes, broad genuine smile, shoulder-length dark-blonde waves; a lively but composed professional who looks clearly unlike dark-haired Nora or Maya.\nExactly one square portrait. No text, watermark or other people. Original fictional face; no earlier images supplied as likeness/edit inputs.",
+      "tool": "image_gen.imagegen (built-in)",
+      "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-076b694e-001f-45c1-9f6e-2e281896048c.png",
+      "referenced_image_inputs": [],
+      "transparent_background": false,
+      "generated_on": "2026-10-22",
+      "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "visual_inspection": {
+        "performed": true,
+        "method": "actual returned tool image inspected before copy",
+        "checks": [
+          "one adult professional",
+          "clear distinct fictional face",
+          "square image with crop-safe headroom",
+          "warm ivory/slate series",
+          "no visible text/logo/watermark/collage",
+          "no visible facial or clothing defect requiring further refinement"
+        ],
+        "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+      },
+      "refinement_reason": null,
+      "discarded_initial_variant": null,
+      "sha256": "246e01c5a1d0e7141d902335ee86ac89829260f40f86aac2394a42d8bc9257ca",
+      "bytes": 2423059,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "output_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\sophia.png",
+      "public_url": "/volabi/agents/sophia.png"
+    },
+    {
+      "agent": "Layla",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Layla, Primora Legal & Compliance. shoulder-length chestnut hair, charcoal tailored suit, composed direct expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nDistinct facial design: mature oval-to-square face, deep brown eyes, pronounced straight nose, shoulder-length smooth chestnut hair, quiet close-lipped expression; understated makeup and precise professional presence.\nExactly one square portrait. No text, watermark or other people. Original fictional face; no earlier images supplied as likeness/edit inputs.",
+      "tool": "image_gen.imagegen (built-in)",
+      "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-45a7873e-9eb5-4af1-b52b-030af55061f6.png",
+      "referenced_image_inputs": [],
+      "transparent_background": false,
+      "generated_on": "2026-10-22",
+      "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "visual_inspection": {
+        "performed": true,
+        "method": "actual returned tool image inspected before copy",
+        "checks": [
+          "one adult professional",
+          "clear distinct fictional face",
+          "square image with crop-safe headroom",
+          "warm ivory/slate series",
+          "no visible text/logo/watermark/collage",
+          "no visible facial or clothing defect requiring further refinement"
+        ],
+        "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+      },
+      "refinement_reason": null,
+      "discarded_initial_variant": null,
+      "sha256": "4cc7b8ce93a386972296900ced9a5976f1f68147ff9e373fd9c557166bab5834",
+      "bytes": 2342314,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "output_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\layla.png",
+      "public_url": "/volabi/agents/layla.png"
+    },
+    {
+      "agent": "Omar",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Omar, Primora Independent Quality, Security & Trust. short dark hair, clean-shaven face, subtle rectangular glasses, deep navy jacket, neutral steady expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nDistinct facial design: long angular face, close-cropped dark hair with slight grey at temples, clean-shaven, slim rectangular glasses, warm medium olive complexion, serious fair-minded expression, no tie; visibly unlike Adam, Daniel and Ethan.\nExactly one square portrait. No text, watermark or other people. Original fictional face; no earlier images supplied as likeness/edit inputs.",
+      "tool": "image_gen.imagegen (built-in)",
+      "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-e2c83f16-22a3-476c-bf81-129d694d61f8.png",
+      "referenced_image_inputs": [],
+      "transparent_background": false,
+      "generated_on": "2026-10-22",
+      "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "visual_inspection": {
+        "performed": true,
+        "method": "actual returned tool image inspected before copy",
+        "checks": [
+          "one adult professional",
+          "clear distinct fictional face",
+          "square image with crop-safe headroom",
+          "warm ivory/slate series",
+          "no visible text/logo/watermark/collage",
+          "no visible facial or clothing defect requiring further refinement"
+        ],
+        "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+      },
+      "refinement_reason": null,
+      "discarded_initial_variant": null,
+      "sha256": "8b261b2ce2342823a5d4ef5e5f572ec7bfccf039224eb758c5e2bfc689e5d38f",
+      "bytes": 2087231,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "output_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\omar.png",
+      "public_url": "/volabi/agents/omar.png"
+    },
+    {
+      "agent": "Olivia",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Olivia, Primora Workforce & Organizational Development. long straight dark hair, beige blazer and ivory top, approachable focused expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nDistinct facial design: long straight dark hair, almond-shaped dark eyes, broad cheekbones, narrower chin and warm light-medium complexion, natural friendly closed-lip smile. Distinctive facial geometry unlike Nora, Maya, Sarah or Emma.\nExactly one square portrait. No text, watermark or other people. Original fictional face; no earlier images supplied as likeness/edit inputs.",
+      "tool": "image_gen.imagegen (built-in)",
+      "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-cdc4794d-eb06-4da5-9ee8-3c3a1854fc35.png",
+      "referenced_image_inputs": [],
+      "transparent_background": false,
+      "generated_on": "2026-10-22",
+      "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "visual_inspection": {
+        "performed": true,
+        "method": "actual returned tool image inspected before copy",
+        "checks": [
+          "one adult professional",
+          "clear distinct fictional face",
+          "square image with crop-safe headroom",
+          "warm ivory/slate series",
+          "no visible text/logo/watermark/collage",
+          "no visible facial or clothing defect requiring further refinement"
+        ],
+        "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+      },
+      "refinement_reason": null,
+      "discarded_initial_variant": null,
+      "sha256": "2f92a96daef3cf1f37979eaf318c2d25eaf4a8a08019155ca7e1c2fc7d70b46c",
+      "bytes": 2286598,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "output_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\olivia.png",
+      "public_url": "/volabi/agents/olivia.png"
+    },
+    {
+      "agent": "Lina",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Lina, Primora Customer AI Concierge within Emma area. long dark wavy hair, navy blazer and ivory top, friendly concierge expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nDistinct facial design: softly round face with full cheeks, a short small nose, smaller hazel-brown eyes, warm medium-deep complexion, long loose dark waves, open welcoming smile; clearly distinct from Nora's oval face and Maya's short bob.\nExactly one square portrait. No text, watermark or other people. Original fictional face; no earlier images supplied as likeness/edit inputs.",
+      "tool": "image_gen.imagegen (built-in)",
+      "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-b359ced0-631c-449e-ae97-4cc3887096d5.png",
+      "referenced_image_inputs": [],
+      "transparent_background": false,
+      "generated_on": "2026-10-22",
+      "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "visual_inspection": {
+        "performed": true,
+        "method": "actual returned tool image inspected before copy",
+        "checks": [
+          "one adult professional",
+          "clear distinct fictional face",
+          "square image with crop-safe headroom",
+          "warm ivory/slate series",
+          "no visible text/logo/watermark/collage",
+          "no visible facial or clothing defect requiring further refinement"
+        ],
+        "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+      },
+      "refinement_reason": null,
+      "discarded_initial_variant": null,
+      "sha256": "825954f0237998c9597accb01ba8ce765110847c5448e1ec49f7cd06cdf2d5b0",
+      "bytes": 2212809,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "output_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\lina.png",
+      "public_url": "/volabi/agents/lina.png"
+    },
+    {
+      "agent": "Rayan",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Rayan, Primora Salon AI Coach within Sarah area. short textured dark hair, trim beard, navy smart-casual jacket and open white shirt, supportive expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nDistinct facial design: broad square face, warm medium olive complexion, thick slightly curly short dark hair, wide-set dark eyes, full eyebrows, trim short beard, broad easy smile; distinctly younger-looking than Adam or Daniel and unlike Alexander's long face.\nExactly one square portrait. No text, watermark or other people. Original fictional face; no earlier images supplied as likeness/edit inputs.",
+      "tool": "image_gen.imagegen (built-in)",
+      "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-1e569bba-f749-46af-b351-3d34a24d3a80.png",
+      "referenced_image_inputs": [],
+      "transparent_background": false,
+      "generated_on": "2026-10-22",
+      "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+      "visual_inspection": {
+        "performed": true,
+        "method": "actual returned tool image inspected before copy",
+        "checks": [
+          "one adult professional",
+          "clear distinct fictional face",
+          "square image with crop-safe headroom",
+          "warm ivory/slate series",
+          "no visible text/logo/watermark/collage",
+          "no visible facial or clothing defect requiring further refinement"
+        ],
+        "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+      },
+      "refinement_reason": null,
+      "discarded_initial_variant": null,
+      "sha256": "e26617bfb914e64fb0919f786a9056673930fb4656353ffe5267d6bd8703b3a1",
+      "bytes": 2180766,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "output_path": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\public\\volabi\\agents\\rayan.png",
+      "public_url": "/volabi/agents/rayan.png"
+    }
+  ],
+  "copied_without_image_editing": true,
+  "third_party_reference_files_published": false
+}

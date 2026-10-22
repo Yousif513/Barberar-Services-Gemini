@@ -3,15 +3,15 @@ name: primora-dashboard-layout
 description: Plan Primora HQ navigation, persistent task/decision workflows and agent
   skill/readiness profiles using complete bounded surface/action/state contracts.
 metadata:
-  version: 0.1.0-proposed
-  status: staged-unapproved
+  version: 1.0.0
+  status: approved-replacement
   original_recovered: 'false'
-  installed: 'false'
+  installed: 'true'
 ---
 
-# primora-dashboard-layout - PROPOSED
+# primora-dashboard-layout - approved replacement
 
-This staged 0.1.0-proposed package is not the recovered original or an installed skill. Read [proposal provenance](references/proposal-source.md). Pending scope/theme approval blocks screen generation, not source recovery.
+This1.0.0 replacement was approved and installed by the CEO2026-10-22 instruction. It is not the recovered original. Read [proposal provenance](references/proposal-source.md). Pending scope/theme approval blocks screen generation, not source recovery.
 
 Center the first loop on CEO request -> persistent task -> source-linked recommendation -> exact decision -> auditable follow-up. Preserve all 15 original identities and 42 proposed functions; one profile template serves all original identities. Keep company activation and business authority distinct from development workers and installed instructions.
 

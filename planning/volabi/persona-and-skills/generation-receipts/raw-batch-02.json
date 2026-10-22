@@ -1,0 +1,87 @@
+[
+  {
+    "agent": "Sarah",
+    "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee head-and-shoulders portrait, 1024x1024 composition.\nGenerate a NEW original fictional face for Sarah: deep brown skin, broad strong cheekbones, a broad rounded nose, wide warm dark-brown eyes, full natural lips, dark shoulder-length wavy hair, energetic open smile. Navy blazer and ivory blouse. Keep the professional operations-director character and warm ivory/slate photographic series. Her face must be visibly distinct from Nora's narrower oval face; do not reproduce any earlier face.\nSoft natural window lighting, realistic skin, eye-level close portrait, one adult only, crop-safe headroom. No words, logo, watermark, collage or other people. New proposed aesthetic for a fictional AI employee; no actual human identity, authority or licence implied. No previous images are edit/likeness inputs.",
+    "tool": "image_gen.imagegen (built-in)",
+    "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-d9656078-d12a-4663-9685-0867263474ca.png",
+    "referenced_image_inputs": [],
+    "transparent_background": false,
+    "generated_on": "2026-10-22",
+    "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+    "visual_inspection": {
+      "performed": true,
+      "method": "actual returned tool image inspected before copy",
+      "checks": [
+        "one adult professional",
+        "clear distinct fictional face",
+        "square image with crop-safe headroom",
+        "warm ivory/slate series",
+        "no visible text/logo/watermark/collage",
+        "no visible facial or clothing defect requiring further refinement"
+      ],
+      "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+    },
+    "refinement_reason": "One targeted regeneration: initial face converged too closely with Nora; distinct identity requirement.",
+    "discarded_initial_variant": {
+      "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-f787f671-82af-4664-b261-d9e132a31ee3.png",
+      "reason": "One targeted regeneration: initial face converged too closely with Nora; distinct identity requirement.",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Sarah, Primora Operations & Service Delivery. dark wavy shoulder-length hair, navy blazer and ivory blouse, alert practical expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nOutput exactly one square portrait image. No words, no text, no watermark. Do not use any earlier conversation reference image as an edit or likeness input.",
+      "not_copied_to_release_asset": true
+    }
+  },
+  {
+    "agent": "Victoria",
+    "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Victoria, Primora Business Development. copper wavy hair, tailored burgundy blazer, confident welcoming expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nOutput exactly one square portrait image. No words, no text, no watermark. Do not use any earlier conversation reference image as an edit or likeness input.",
+    "tool": "image_gen.imagegen (built-in)",
+    "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-d2c58b3b-3b80-4059-ab16-8e5f2e08479c.png",
+    "referenced_image_inputs": [],
+    "transparent_background": false,
+    "generated_on": "2026-10-22",
+    "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+    "visual_inspection": {
+      "performed": true,
+      "method": "actual returned tool image inspected before copy",
+      "checks": [
+        "one adult professional",
+        "clear distinct fictional face",
+        "square image with crop-safe headroom",
+        "warm ivory/slate series",
+        "no visible text/logo/watermark/collage",
+        "no visible facial or clothing defect requiring further refinement"
+      ],
+      "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+    },
+    "refinement_reason": null,
+    "discarded_initial_variant": null
+  },
+  {
+    "agent": "Emma",
+    "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee head-and-shoulders portrait, 1024x1024 composition.\nGenerate a NEW original fictional face for Emma: mature adult woman with pale softly freckled skin, light grey-blue eyes, round face and soft full cheeks, a short rounded nose, naturally curly chestnut/auburn shoulder-length hair, patient reassuring smile. Taupe blazer and ivory top. Keep the warm ivory/slate professional photographic series. Her face must be visibly distinct from Nora, Sarah, Lina and Maya; do not reproduce any earlier face.\nSoft natural window lighting, realistic skin, eye-level close portrait, one adult only, crop-safe headroom. No words, logo, watermark, collage or other people. New proposed aesthetic for a fictional AI employee; no actual human identity, authority or licence implied. No previous images are edit/likeness inputs.",
+    "tool": "image_gen.imagegen (built-in)",
+    "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-c3980416-a3a6-4131-a301-b9f6b0bd9a2a.png",
+    "referenced_image_inputs": [],
+    "transparent_background": false,
+    "generated_on": "2026-10-22",
+    "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+    "visual_inspection": {
+      "performed": true,
+      "method": "actual returned tool image inspected before copy",
+      "checks": [
+        "one adult professional",
+        "clear distinct fictional face",
+        "square image with crop-safe headroom",
+        "warm ivory/slate series",
+        "no visible text/logo/watermark/collage",
+        "no visible facial or clothing defect requiring further refinement"
+      ],
+      "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+    },
+    "refinement_reason": "One targeted regeneration: initial face converged too closely with Nora; distinct identity requirement.",
+    "discarded_initial_variant": {
+      "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-003de4e0-a94a-419c-b066-8f4aa87dfcc4.png",
+      "reason": "One targeted regeneration: initial face converged too closely with Nora; distinct identity requirement.",
+      "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Emma, Primora Customer Experience. dark loose curls, warm taupe blazer and ivory top, attentive steady expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nOutput exactly one square portrait image. No words, no text, no watermark. Do not use any earlier conversation reference image as an edit or likeness input.",
+      "not_copied_to_release_asset": true
+    }
+  }
+]

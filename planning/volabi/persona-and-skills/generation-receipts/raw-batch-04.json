@@ -1,0 +1,77 @@
+[
+  {
+    "agent": "Sophia",
+    "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Sophia, Primora Brand, Growth & Market Intelligence. shoulder-length soft dark-blonde waves, muted olive blazer, ivory shirt, lively professional expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nDistinct facial design: softly rounded face, grey-green eyes, broad genuine smile, shoulder-length dark-blonde waves; a lively but composed professional who looks clearly unlike dark-haired Nora or Maya.\nExactly one square portrait. No text, watermark or other people. Original fictional face; no earlier images supplied as likeness/edit inputs.",
+    "tool": "image_gen.imagegen (built-in)",
+    "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-076b694e-001f-45c1-9f6e-2e281896048c.png",
+    "referenced_image_inputs": [],
+    "transparent_background": false,
+    "generated_on": "2026-10-22",
+    "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+    "visual_inspection": {
+      "performed": true,
+      "method": "actual returned tool image inspected before copy",
+      "checks": [
+        "one adult professional",
+        "clear distinct fictional face",
+        "square image with crop-safe headroom",
+        "warm ivory/slate series",
+        "no visible text/logo/watermark/collage",
+        "no visible facial or clothing defect requiring further refinement"
+      ],
+      "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+    },
+    "refinement_reason": null,
+    "discarded_initial_variant": null
+  },
+  {
+    "agent": "Layla",
+    "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Layla, Primora Legal & Compliance. shoulder-length chestnut hair, charcoal tailored suit, composed direct expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nDistinct facial design: mature oval-to-square face, deep brown eyes, pronounced straight nose, shoulder-length smooth chestnut hair, quiet close-lipped expression; understated makeup and precise professional presence.\nExactly one square portrait. No text, watermark or other people. Original fictional face; no earlier images supplied as likeness/edit inputs.",
+    "tool": "image_gen.imagegen (built-in)",
+    "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-45a7873e-9eb5-4af1-b52b-030af55061f6.png",
+    "referenced_image_inputs": [],
+    "transparent_background": false,
+    "generated_on": "2026-10-22",
+    "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+    "visual_inspection": {
+      "performed": true,
+      "method": "actual returned tool image inspected before copy",
+      "checks": [
+        "one adult professional",
+        "clear distinct fictional face",
+        "square image with crop-safe headroom",
+        "warm ivory/slate series",
+        "no visible text/logo/watermark/collage",
+        "no visible facial or clothing defect requiring further refinement"
+      ],
+      "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+    },
+    "refinement_reason": null,
+    "discarded_initial_variant": null
+  },
+  {
+    "agent": "Omar",
+    "prompt": "Use case: photorealistic-natural\nAsset type: square AI employee profile portrait, 1024x1024 composition\nCreate an original fictional adult AI professional portrait for Omar, Primora Independent Quality, Security & Trust. short dark hair, clean-shaven face, subtle rectangular glasses, deep navy jacket, neutral steady expression. Distinct fictional facial identity; use broad source styling only, do not replicate a specific real person or reference face. Cohesive premium corporate series: warm ivory/soft slate background, natural skin texture, soft window light, eye-level head-and-shoulders crop, subtle obsidian tailoring and restrained gold accent if appropriate, no logos, no text, no collage. Calm professional expression appropriate to this role. Produce one person only with clear face and comfortable headroom. The portrait is a fictional AI persona, no human employment or professional licence implied.\nDistinct facial design: long angular face, close-cropped dark hair with slight grey at temples, clean-shaven, slim rectangular glasses, warm medium olive complexion, serious fair-minded expression, no tie; visibly unlike Adam, Daniel and Ethan.\nExactly one square portrait. No text, watermark or other people. Original fictional face; no earlier images supplied as likeness/edit inputs.",
+    "tool": "image_gen.imagegen (built-in)",
+    "original_path": "C:\\Users\\Yousif's PC\\.codex\\generated_images\\01a15ff0-17a5-71c0-bc7c-16a0c389b04c\\exec-e2c83f16-22a3-476c-bf81-129d694d61f8.png",
+    "referenced_image_inputs": [],
+    "transparent_background": false,
+    "generated_on": "2026-10-22",
+    "presentation_status": "new_original_synthetic_proposal_not_historical_recovered_asset",
+    "visual_inspection": {
+      "performed": true,
+      "method": "actual returned tool image inspected before copy",
+      "checks": [
+        "one adult professional",
+        "clear distinct fictional face",
+        "square image with crop-safe headroom",
+        "warm ivory/slate series",
+        "no visible text/logo/watermark/collage",
+        "no visible facial or clothing defect requiring further refinement"
+      ],
+      "disposition": "accepted_for_local_presentation_preview_not_final_CEO_identity_adoption"
+    },
+    "refinement_reason": null,
+    "discarded_initial_variant": null
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "command": "manifest-plan",
+    "exit_code": 0,
+    "last_line": "Validation complete: 0 error(s), 26 warning(s)"
+  },
+  {
+    "command": "manifest-coverage",
+    "exit_code": 0,
+    "last_line": "No unresolved structural gaps."
+  },
+  {
+    "command": "manifest-release",
+    "exit_code": 1,
+    "last_line": "Validation complete: 298 error(s), 26 warning(s)"
+  }
+]

@@ -5,26 +5,29 @@
       "skill": "primora-design-system",
       "exit_code": 0,
       "stdout": "Skill is valid!",
-      "stderr": "",
-      "kind": "structural only"
+      "kind": "structural_only",
+      "global_bytes_verified": true
     },
     {
       "skill": "primora-dashboard-layout",
       "exit_code": 0,
       "stdout": "Skill is valid!",
-      "stderr": "",
-      "kind": "structural only"
+      "kind": "structural_only",
+      "global_bytes_verified": true
     },
     {
       "skill": "primora-data-visualization",
       "exit_code": 0,
       "stdout": "Skill is valid!",
-      "stderr": "",
-      "kind": "structural only"
+      "kind": "structural_only",
+      "global_bytes_verified": true
     }
   ],
-  "installed": false,
-  "approved": false,
-  "behavioral_forward_test": "not_performed",
-  "references_checked": "all three linked proposal-source.md files exist"
+  "installed": true,
+  "approved": true,
+  "behavioral_forward_test": "structural instructions plus independent dashboard acceptance; no per-agent task/version evaluation claimed",
+  "references_checked": "all three linked proposal-source.md files exist",
+  "approval": "APPROVAL_20261022.md",
+  "installation_receipt": "APPROVED_DESIGN_SKILL_INSTALLATION.json",
+  "originals_recovered": false
 }
