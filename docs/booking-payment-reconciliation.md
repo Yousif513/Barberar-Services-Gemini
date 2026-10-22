@@ -58,6 +58,6 @@ Next development slice: durable checkout-attempt and unknown-outcome reconciliat
 | Adminwright plan |exit0;0 errors |
 | Adminwright release validation / coverage |exit1 /1;232 /4 errors |
 
-The first aggregate run had one pre-existing recurring-fixture conflict, corrected without changing production availability or authorization assertions before the final complete rerun. The initial checkout draft's nonexistent direct provider column was also caught and corrected before publication. Updated independent review and the new migrated-query cases supersede the first stub-based assessment.
+The first aggregate run had one pre-existing recurring-fixture conflict, corrected without changing production availability or authorization assertions before the final complete rerun. The initial checkout draft's nonexistent direct provider column was also caught and corrected before publication. Updated independent review and the new migrated-query cases supersede the first injected-query assessment.
 
 Implementation commit: `304e02e6c33aebac7cd6dc805faab024075af561`. This report and the coworking changelog record that immutable implementation in a subsequent documentation commit.

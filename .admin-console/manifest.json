@@ -138,6 +138,60 @@
         "appliedTo": [
           "booking.transition"
         ]
+      },
+      {
+        "url": "https://developers.tap.company/docs/idempotency",
+        "checkedOn": "2026-10-22",
+        "topic": "Charge replay window24 hours; no perpetual idempotency assumption",
+        "appliedTo": [
+          "checkout-attempt.start",
+          "checkout-attempt.observe"
+        ]
+      },
+      {
+        "url": "https://developers.tap.company/reference/list-all-charges.md",
+        "checkedOn": "2026-10-22",
+        "topic": "Read-only merchant-reference lookup schema and pagination; absence is inconclusive",
+        "appliedTo": [
+          "checkout-attempt.start",
+          "checkout-attempt.observe"
+        ]
+      },
+      {
+        "url": "https://developers.tap.company/reference/retrieve-a-charges",
+        "checkedOn": "2026-10-22",
+        "topic": "Authenticated retrieval of an identified charge",
+        "appliedTo": [
+          "checkout-attempt.start",
+          "checkout-attempt.observe"
+        ]
+      },
+      {
+        "url": "https://developers.tap.company/reference/charges",
+        "checkedOn": "2026-10-22",
+        "topic": "Charge states; uncertain states held for reconciliation",
+        "appliedTo": [
+          "checkout-attempt.start",
+          "checkout-attempt.observe"
+        ]
+      },
+      {
+        "url": "https://developers.tap.company/docs/webhook",
+        "checkedOn": "2026-10-22",
+        "topic": "Webhook verification and retained authenticated charge refetch",
+        "appliedTo": [
+          "checkout-attempt.start",
+          "checkout-attempt.observe"
+        ]
+      },
+      {
+        "url": "https://supabase.com/changelog.md",
+        "checkedOn": "2026-10-22",
+        "topic": "Current Supabase changes reviewed before drafting database recovery contract",
+        "appliedTo": [
+          "checkout-attempt.start",
+          "checkout-attempt.observe"
+        ]
       }
     ],
     "volumes": {
@@ -5771,7 +5825,7 @@
     {
       "id": "reconciliation",
       "name": "Tap reconciliation (events, settlement imports, breaks)",
-      "sourceOfTruth": "postgres:public.tap_reconciliation_breaks",
+      "sourceOfTruth": "postgres:public.reconciliation_breaks",
       "sensitivity": "confidential",
       "tenantScoped": false,
       "lifecycleStates": [
@@ -5899,6 +5953,53 @@
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "reconciliation.overview",
+          "outcome": "Read scoped reconciliation breaks, imports, runs and refund timelines",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "in-progress",
+          "rationale": "Existing server query and existing UI were missing from the capability inventory. Recorded from current source; no functionality or authority changed and no new independent review or privileged-read audit evidence is claimed.",
+          "entityStates": {
+            "from": [
+              "open",
+              "escalated",
+              "resolved",
+              "auto_matched"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/reconciliation"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql"
+          ],
+          "auditEvents": [],
+          "safeguards": [
+            "supabase/tests/db/money_reconciliation.test.mjs"
+          ],
+          "dataBinding": "postgres:public.reconciliation_breaks",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "Reload the existing query; query errors remain visible.",
+          "tests": [
+            "supabase/tests/db/money_reconciliation.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261010330000_money_tap_reconciliation.sql",
+            "supabase/tests/db/money_reconciliation.test.mjs",
+            "web_platform/src/app/admin/reconciliation/page.tsx"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
         }
       ]
     },
@@ -5979,6 +6080,51 @@
             "supabase/tests/db/secfix2_mediums_lows.test.mjs",
             "web_platform/src/app/admin/settings/reward-programmes.tsx",
             "web_platform/src/components/reward-terms.tsx"
+          ],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "reward-program.overview",
+          "outcome": "Read current programme settings, terms and approval status",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "moderate",
+          "status": "in-progress",
+          "rationale": "Existing server query and existing UI were missing from the capability inventory. Recorded from current source; no functionality or authority changed and no new independent review or privileged-read audit evidence is claimed.",
+          "entityStates": {
+            "from": [
+              "disabled",
+              "enabled"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/settings"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261010320000_money_reward_programs.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261010320000_money_reward_programs.sql"
+          ],
+          "auditEvents": [],
+          "safeguards": [
+            "supabase/tests/db/money_rewards.test.mjs"
+          ],
+          "dataBinding": "postgres:public.reward_programs",
+          "idempotency": "",
+          "concurrency": "",
+          "recovery": "Reload the existing query; query errors remain visible.",
+          "tests": [
+            "supabase/tests/db/money_rewards.test.mjs"
+          ],
+          "evidence": [
+            "supabase/migrations/20261010320000_money_reward_programs.sql",
+            "supabase/tests/db/money_rewards.test.mjs",
+            "web_platform/src/app/admin/settings/reward-programmes.tsx"
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
@@ -6726,6 +6872,112 @@
           "reviewedBy": "qa-release-claude"
         }
       ]
+    },
+    {
+      "id": "checkout-attempt",
+      "name": "Durable payment checkout attempts",
+      "sourceOfTruth": "postgres:public.payment_checkout_attempts",
+      "sensitivity": "confidential",
+      "tenantScoped": true,
+      "lifecycleStates": [
+        "submitting",
+        "ready",
+        "unknown",
+        "captured",
+        "failed"
+      ],
+      "lifecycleTransitions": [],
+      "retention": "Immutable command evidence; no destructive cleanup or new retention policy in this repair.",
+      "capabilities": [
+        {
+          "id": "checkout-attempt.observe",
+          "outcome": "Recover the existing checkout result and receipt for its authenticated payer",
+          "kind": "query",
+          "roles": [
+            "customer",
+            "provider-owner"
+          ],
+          "risk": "moderate",
+          "status": "planned",
+          "rationale": "Approved durable recovery repair. Existing ownership and authoritative amounts remain. Unknown submissions are never automatically retried.",
+          "entityStates": {
+            "from": [
+              "submitting",
+              "ready",
+              "unknown",
+              "captured",
+              "failed"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/customer/bookings",
+            "/customer/wallet",
+            "/customer/packages",
+            "/customer/memberships",
+            "/provider/pricing"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.payment_checkout_attempts",
+          "idempotency": "One unresolved target; insertion alone owns dispatch; immutable original Tap reference and payload.",
+          "concurrency": "Target lock and unique unresolved index; no dispatch reclaim.",
+          "recovery": "Read-only provider lookup and exact fetched receipt; absent/conflicting evidence stays unknown.",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "checkout-attempt.start",
+          "outcome": "Persist and claim one immutable checkout request before gateway submission",
+          "kind": "command",
+          "roles": [
+            "customer",
+            "provider-owner"
+          ],
+          "risk": "critical",
+          "status": "planned",
+          "rationale": "Approved durable recovery repair. Existing ownership and authoritative amounts remain. Unknown submissions are never automatically retried.",
+          "entityStates": {
+            "from": [
+              "submitting",
+              "ready",
+              "unknown",
+              "captured",
+              "failed"
+            ],
+            "to": [
+              "submitting",
+              "ready",
+              "unknown",
+              "captured",
+              "failed"
+            ]
+          },
+          "uiRoutes": [
+            "/customer/bookings",
+            "/customer/wallet",
+            "/customer/packages",
+            "/customer/memberships",
+            "/provider/pricing"
+          ],
+          "serverOperations": [],
+          "authorizationPolicies": [],
+          "auditEvents": [],
+          "safeguards": [],
+          "dataBinding": "postgres:public.payment_checkout_attempts",
+          "idempotency": "One unresolved target; insertion alone owns dispatch; immutable original Tap reference and payload.",
+          "concurrency": "Target lock and unique unresolved index; no dispatch reclaim.",
+          "recovery": "Read-only provider lookup and exact fetched receipt; absent/conflicting evidence stays unknown.",
+          "tests": [],
+          "evidence": [],
+          "owner": "",
+          "reviewStatus": "unreviewed"
+        }
+      ]
     }
   ],
   "workQueues": [
@@ -7371,7 +7623,8 @@
       ],
       "capabilities": [
         "settings.platform",
-        "settings.list"
+        "settings.list",
+        "reward-program.overview"
       ],
       "actions": [],
       "states": [
@@ -8118,7 +8371,8 @@
       ],
       "capabilities": [
         "reconciliation.daily",
-        "reconciliation.resolve-break"
+        "reconciliation.resolve-break",
+        "reconciliation.overview"
       ],
       "actions": [],
       "states": [
@@ -8152,7 +8406,9 @@
       ],
       "capabilities": [
         "fee.effective-display",
-        "provider.vat-status"
+        "provider.vat-status",
+        "checkout-attempt.start",
+        "checkout-attempt.observe"
       ],
       "actions": [],
       "states": [
@@ -8202,6 +8458,154 @@
       "tests": [
         "web_platform/tests/money-screens.test.mjs"
       ]
+    },
+    {
+      "id": "provider-wallet",
+      "route": "/provider/wallet",
+      "purpose": "Observe and manage the existing provider wallet workflow",
+      "roles": [
+        "provider-owner"
+      ],
+      "dataSources": [
+        "postgres:public.provider_payout_destination_summary()",
+        "postgres:public.payout_requests"
+      ],
+      "capabilities": [
+        "gov.iban-change"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "forbidden",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "discovered",
+      "status": "in-progress",
+      "rationale": "Existing route verified from source and successful web build. Inventory correction only: accessibility and durable checkout feedback have not been independently verified in this pass. Checkout recovery remains planned and blocked at the required development audit-registration gate.",
+      "tests": []
+    },
+    {
+      "id": "customer-wallet",
+      "route": "/customer/wallet",
+      "purpose": "Observe and manage the existing customer wallet workflow",
+      "roles": [
+        "customer"
+      ],
+      "dataSources": [
+        "postgres:public.gift_cards",
+        "postgres:public.wallet_credits",
+        "postgres:public.customer_loyalty"
+      ],
+      "capabilities": [
+        "reward-program.enable",
+        "checkout-attempt.start",
+        "checkout-attempt.observe"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "forbidden",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "discovered",
+      "status": "in-progress",
+      "rationale": "Existing route verified from source and successful web build. Inventory correction only: accessibility and durable checkout feedback have not been independently verified in this pass. Checkout recovery remains planned and blocked at the required development audit-registration gate.",
+      "tests": []
+    },
+    {
+      "id": "customer-bookings",
+      "route": "/customer/bookings",
+      "purpose": "Observe and manage the existing customer bookings workflow",
+      "roles": [
+        "customer"
+      ],
+      "dataSources": [
+        "postgres:public.bookings"
+      ],
+      "capabilities": [
+        "checkout-attempt.start",
+        "checkout-attempt.observe"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "forbidden",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "discovered",
+      "status": "in-progress",
+      "rationale": "Existing route verified from source and successful web build. Inventory correction only: accessibility and durable checkout feedback have not been independently verified in this pass. Checkout recovery remains planned and blocked at the required development audit-registration gate.",
+      "tests": []
+    },
+    {
+      "id": "customer-packages",
+      "route": "/customer/packages",
+      "purpose": "Observe and manage the existing customer packages workflow",
+      "roles": [
+        "customer"
+      ],
+      "dataSources": [
+        "postgres:public.user_packages"
+      ],
+      "capabilities": [
+        "checkout-attempt.start",
+        "checkout-attempt.observe"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "forbidden",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "discovered",
+      "status": "in-progress",
+      "rationale": "Existing route verified from source and successful web build. Inventory correction only: accessibility and durable checkout feedback have not been independently verified in this pass. Checkout recovery remains planned and blocked at the required development audit-registration gate.",
+      "tests": []
+    },
+    {
+      "id": "customer-memberships",
+      "route": "/customer/memberships",
+      "purpose": "Observe and manage the existing customer memberships workflow",
+      "roles": [
+        "customer"
+      ],
+      "dataSources": [
+        "postgres:public.memberships"
+      ],
+      "capabilities": [
+        "checkout-attempt.start",
+        "checkout-attempt.observe"
+      ],
+      "actions": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "error",
+        "forbidden",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "discovered",
+      "status": "in-progress",
+      "rationale": "Existing route verified from source and successful web build. Inventory correction only: accessibility and durable checkout feedback have not been independently verified in this pass. Checkout recovery remains planned and blocked at the required development audit-registration gate.",
+      "tests": []
     }
   ],
   "integrations": [
@@ -9618,6 +10022,16 @@
         "booking.transition",
         "refund.execute"
       ]
+    },
+    {
+      "id": "durable-checkout-approved-continuation",
+      "decision": "Continue approved durable checkout recovery, then remaining release gaps. Preserve production deployment, company-agent activation and financial transaction holds. Serialize the service-only checkout identity/claim/receipt contract before Edge and client changes; independently review before publication.",
+      "reason": "Direct CEO instruction2026-10-22. Reuse existing authorization, confirmation commands and split-routing refusal; no pricing, legal interpretation or organizational authority changes.",
+      "evidence": [
+        ".admin-console/worklog/architect-durable-checkout.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": []
     }
   ],
   "gaps": [
@@ -14459,6 +14873,14 @@
       "ownsScreens": [],
       "status": "done",
       "notes": ".admin-console/worklog/qa-reconciliation.md"
+    },
+    {
+      "id": "architect-durable-checkout",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": ".admin-console/worklog/architect-durable-checkout.md"
     }
   ]
 }
