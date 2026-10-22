@@ -1,0 +1,11 @@
+# Independent Volabi planning review
+
+Reviewer: qa-volabi-planning (root, independent of skills_and_delivery planning author). Date:2026-10-22. No HQ screens rendered or built; all company identities remain inactive.
+
+Read the scope/theme gate, source provenance, staged design skills, original15-profile mapping,42-function inventory, first-loop and full-MVP action graphs. Verified73 installed-skill file references across45 unique packages against their recorded local SHA256, proposed-only bindings and empty business permission grants. Added a readable15-role association/gap appendix from those existing records. Missing evidence is not converted into competence or readiness.
+
+Finding H1: the first-loop follow-up and locale inline action destinations had no explicit contracts, while the original closure check accepted arbitrary inline:* targets. Reported to the planning author. The corrected graphs explicitly include inline action/effect/state/receipt/authority contracts (not extra screens), and validation now requires every origin and target to exist. Independently checked first-loop27 nodes/37actions and full-MVP39nodes/73actions with zero unresolved endpoints. Six template families/nine route patterns/15 overlays remain the first-preview proposal. The20-template broader MVP and16 inventory-only later templates are preserved, not silently approved.
+
+All three staged skills passed quick_validate independently. Their provenance states0.1.0-proposed, unrecovered original, staged and uninstalled. Package receipt hashes matched before this review evidence was appended. Token contrast was inspected: gold on ivory is accent-only, never normal body text. The generic159-generation machine queue remains rejected and is not approved for rendering.
+
+Evidence: planning/volabi/INDEPENDENT_PLANNING_REVIEW.json and PACKAGE_RECEIPT.json. This is source/requirements consistency review, not runtime, usability, rendered accessibility or agent behavioral evaluation. Function-level requirement contracts, evidence validity/equivalence and later workflow closure remain incomplete. The first working persistence loop is not built. Present concrete scope/theme to the CEO before any HQ screen generation. No employee activation or business permission change is authorized by this review.

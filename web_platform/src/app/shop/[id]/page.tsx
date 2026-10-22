@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { requestCheckout, preparePurchase, browserCheckoutStorage } from "@/lib/payment-checkout.mjs";
 import { trackEvent } from "@/lib/analytics";
 import { ToastContainer } from "@/components/toast";
 import { Coordinates, CalculationMethod, PrayerTimes, Madhab } from "adhan";
@@ -741,6 +742,7 @@ export default function ShopDetailsPage() {
   };
 
   const handlePurchasePackage = async (pkg: PackageItem) => {
+    if (isLoading) return;
     setIsLoading(true);
     setMessage("");
     setIsSuccess(false);
@@ -750,17 +752,17 @@ export default function ShopDetailsPage() {
         setShowAuthModal(true);
         return;
       }
-      const { data, error } = await supabase.rpc("purchase_service_package", { p_package_id: pkg.id, p_payment_method: "card" });
-      if (error) throw error;
-      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
-        body: { purchaseType: "package", purchaseId: data.purchase_id },
+      const purchase = await preparePurchase(supabase, {
+        type: "package", actorId: user.id, scope: `package.${pkg.id}`, material: { package_id: pkg.id }, locale, storage: browserCheckoutStorage,
+        create: async () => {
+          const { data, error } = await supabase.rpc("purchase_service_package", { p_package_id: pkg.id, p_payment_method: "card" });
+          if (error) throw error;
+          return data?.purchase_id;
+        },
+        onSettled: () => { router.push("/customer/packages"); },
       });
-      if (checkoutError || !checkout?.checkoutUrl) {
-        throw new Error(locale === "ar"
-          ? "تعذر فتح صفحة الدفع. لم يتم تفعيل الباقة ولم يُخصم أي مبلغ."
-          : "Could not open the payment page. The package was not activated and nothing was charged.");
-      }
-      window.location.assign(checkout.checkoutUrl);
+      const receipt = await requestCheckout(supabase, { purchaseType: "package", purchaseId: purchase.id }, locale, { onCaptured: () => { router.push("/customer/packages"); } });
+      window.location.assign(receipt.checkoutUrl);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Package purchase could not be completed.";
       setMessage(errorMessage);
@@ -1172,11 +1174,11 @@ export default function ShopDetailsPage() {
 
       let redirectUrl = `/customer/bookings/${bookedBookingId}/confirmation?status=pending_payment`;
       trackEvent("payment_started", { method: "card", amount: calculateEscrowSplit().deposit, booking_id: bookedBookingId });
-      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
-        body: { bookingId: bookedBookingId },
-      });
-      if (!checkoutError && checkout?.checkoutUrl) {
-        redirectUrl = checkout.checkoutUrl;
+      try {
+        const receipt = await requestCheckout(supabase, { bookingId: bookedBookingId }, locale);
+        redirectUrl = receipt.checkoutUrl;
+      } catch {
+        // The existing booking is the recovery destination when checkout is uncertain or already captured.
       }
 
       if (redirectUrl.startsWith("/")) {

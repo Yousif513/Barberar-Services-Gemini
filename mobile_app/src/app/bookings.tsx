@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { AppPressable } from "@/components/app-pressable";
 import { useLocale } from "@/lib/locale";
 import {
@@ -7,14 +7,15 @@ import {
   Text,
   ScrollView,
   Modal,
-  Linking,
   ActivityIndicator,
   Alert
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../lib/supabase";
+import { requestCheckout } from "@/lib/payment-checkout.js";
+import { loadPendingPackagePayments, resumePendingPackagePayment, PENDING_PACKAGE_PAGE_SIZE, type PendingPackagePayment } from "@/lib/pending-package-payments.js";
 import { errorMessage } from "@/lib/error-message";
-import { subscribeBookingsChanged } from "@/lib/payment-return";
+import { subscribeBookingsChanged, openCheckout, PAYMENT_RETURN_URL } from "@/lib/payment-return";
 
 type BookingStatus = "pending_payment" | "confirmed" | "completed" | "cancelled" | "no_show";
 
@@ -40,6 +41,14 @@ export default function BookingsScreen() {
   const [loadError, setLoadError] = useState("");
   const [signedIn, setSignedIn] = useState(true);
   const [busy, setBusy] = useState(false);
+  const checkoutInFlight = useRef(false);
+  const packageRead = useRef(0);
+  const [packagePage, setPackagePage] = useState(0);
+  const [pendingPackages, setPendingPackages] = useState<PendingPackagePayment[]>([]);
+  const [packageTotal, setPackageTotal] = useState(0);
+  const [packagesLoading, setPackagesLoading] = useState(true);
+  const [packagesError, setPackagesError] = useState("");
+  const [packagesSignedIn, setPackagesSignedIn] = useState(false);
 
   const isRTL = lang === "ar";
 
@@ -56,6 +65,21 @@ export default function BookingsScreen() {
       details: "View Info",
       cancel: "Cancel Booking",
       payNow: "Complete Payment",
+      packagePayments: "Unfinished package payments",
+      packagePaymentsHelp: "These are your recorded purchases, including offers no longer on sale. Payment confirmation is required before sessions can be used.",
+      packagesLoading: "Loading your package payments…",
+      packagesFailed: "Could not load your package payments",
+      packagesEmpty: "No unfinished package payments.",
+      packagesPageEmpty: "No unfinished payments on this page. Check the previous page.",
+      packageReference: "Purchase reference",
+      recordedPrice: "Recorded purchase price",
+      packageSessions: "Sessions in this purchase",
+      packageRecorded: "Purchase recorded",
+      packageContinue: "Continue existing payment",
+      packageAwaiting: "AWAITING CONFIRMATION",
+      previousPage: "Previous",
+      nextPage: "Next",
+      refreshPackages: "Refresh package status",
       close: "Close",
       confirmCancelTitle: "Cancel Booking?",
       confirmCancelDesc: "The shop's cancellation policy applies. Any refund due is sent back to your card.",
@@ -89,6 +113,21 @@ export default function BookingsScreen() {
       details: "التفاصيل",
       cancel: "إلغاء الحجز",
       payNow: "إكمال الدفع",
+      packagePayments: "مدفوعات الباقات غير المكتملة",
+      packagePaymentsHelp: "هذه عمليات الشراء المسجلة لحسابك، بما فيها العروض التي لم تعد معروضة للبيع. يلزم تأكيد الدفع قبل استخدام الجلسات.",
+      packagesLoading: "جارٍ تحميل مدفوعات الباقات…",
+      packagesFailed: "تعذر تحميل مدفوعات الباقات",
+      packagesEmpty: "لا توجد مدفوعات باقات غير مكتملة.",
+      packagesPageEmpty: "لا توجد مدفوعات غير مكتملة في هذه الصفحة. تحقق من الصفحة السابقة.",
+      packageReference: "مرجع عملية الشراء",
+      recordedPrice: "سعر الشراء المسجل",
+      packageSessions: "جلسات عملية الشراء",
+      packageRecorded: "تاريخ تسجيل الشراء",
+      packageContinue: "متابعة الدفع الحالي",
+      packageAwaiting: "بانتظار تأكيد الدفع",
+      previousPage: "السابق",
+      nextPage: "التالي",
+      refreshPackages: "تحديث حالة الباقات",
       close: "إغلاق",
       confirmCancelTitle: "إلغاء الحجز؟",
       confirmCancelDesc: "تُطبق سياسة الإلغاء الخاصة بالمركز. أي مبلغ مستحق للاسترداد يُعاد إلى بطاقتك.",
@@ -164,6 +203,48 @@ export default function BookingsScreen() {
     };
   }, [loadBookings]);
 
+  const loadPackagePayments = useCallback(async () => {
+    const requestId = ++packageRead.current;
+    setPackagesLoading(true);
+    setPackagesError("");
+    setPendingPackages([]);
+    try {
+      const result = await loadPendingPackagePayments(supabase, packagePage, lang);
+      if (requestId !== packageRead.current) return;
+      setPackagesSignedIn(Boolean(result.actorId));
+      setPendingPackages(result.items);
+      setPackageTotal(result.total);
+    } catch (failure) {
+      if (requestId === packageRead.current) setPackagesError(errorMessage(failure));
+    } finally {
+      if (requestId === packageRead.current) setPackagesLoading(false);
+    }
+  }, [packagePage, lang]);
+
+  const invalidatePackageRead = useCallback(() => { packageRead.current++; }, []);
+  useEffect(() => {
+    const initialLoad = setTimeout(() => { void loadPackagePayments(); }, 0);
+    const { data: auth } = supabase.auth.onAuthStateChange(() => { setPackagePage(0); void loadPackagePayments(); });
+    const stopWatching = subscribeBookingsChanged(() => { void loadPackagePayments(); });
+    return () => { clearTimeout(initialLoad); invalidatePackageRead(); auth.subscription.unsubscribe(); stopWatching(); };
+  }, [loadPackagePayments, invalidatePackageRead]);
+
+  const handlePackagePayment = async (purchaseId: string) => {
+    if (checkoutInFlight.current) return;
+    checkoutInFlight.current = true;
+    setBusy(true);
+    try {
+      await resumePendingPackagePayment(supabase, purchaseId, {
+        locale: lang, returnUrl: PAYMENT_RETURN_URL, openCheckout, refresh: loadPackagePayments,
+      });
+    } catch (failure) {
+      Alert.alert(t.packagePayments, errorMessage(failure));
+    } finally {
+      checkoutInFlight.current = false;
+      setBusy(false);
+    }
+  };
+
   const handleCancelBooking = async (id: string) => {
     setBusy(true);
     try {
@@ -181,14 +262,16 @@ export default function BookingsScreen() {
   };
 
   const handlePayNow = async (id: string) => {
+    if (checkoutInFlight.current || busy) return;
+    checkoutInFlight.current = true;
     setBusy(true);
     try {
-      const { data, error } = await supabase.functions.invoke("payment-checkout", { body: { bookingId: id } });
-      if (error || !data?.checkoutUrl) throw new Error(t.paymentFailed);
-      await Linking.openURL(data.checkoutUrl);
+      const receipt = await requestCheckout(supabase, { bookingId: id, returnUrl: PAYMENT_RETURN_URL }, isRTL ? "ar" : "en", { onCaptured: loadBookings });
+      await openCheckout(receipt.checkoutUrl);
     } catch (err) {
       Alert.alert(t.payNow, errorMessage(err));
     } finally {
+      checkoutInFlight.current = false;
       setBusy(false);
     }
   };
@@ -238,6 +321,38 @@ export default function BookingsScreen() {
 
       {/* LIST */}
       <ScrollView contentContainerStyle={styles.listContainer} showsVerticalScrollIndicator={false}>
+        <View accessibilityLabel={t.packagePayments} style={styles.packageSection}>
+          <Text accessibilityRole="header" style={[styles.cardService, isRTL && styles.rtlText]}>{t.packagePayments}</Text>
+          <Text style={[styles.subtitleText, isRTL && styles.rtlText]}>{t.packagePaymentsHelp}</Text>
+          {packagesLoading ? <ActivityIndicator accessibilityLabel={t.packagesLoading} />
+            : packagesError ? <View style={styles.card}>
+              <Text accessibilityRole="alert" style={[styles.detailVal, isRTL && styles.rtlText]}>{t.packagesFailed}: {packagesError}</Text>
+              <AppPressable style={styles.btnSecondary} onPress={() => void loadPackagePayments()}><Text style={styles.btnSecondaryLabel}>{t.retry}</Text></AppPressable>
+            </View>
+            : !packagesSignedIn ? <Text style={[styles.emptyText, isRTL && styles.rtlText]}>{t.signIn}</Text>
+            : <>
+              {pendingPackages.length === 0 && <Text style={[styles.emptyText, isRTL && styles.rtlText]}>{packageTotal > 0 ? t.packagesPageEmpty : t.packagesEmpty}</Text>}
+              {pendingPackages.map((purchase) => <View key={purchase.id} style={styles.card}>
+                <Text style={[styles.cardProvider, isRTL && styles.rtlText]}>{t.packageAwaiting}</Text>
+                <Text style={[styles.cardService, isRTL && styles.rtlText]}>{purchase.name[lang]}</Text>
+                <Text selectable style={[styles.subtitleText, isRTL && styles.rtlText]}>{t.packageReference}: {purchase.id}</Text>
+                <View style={styles.cardDivider} />
+                <View style={[styles.cardDetailsRow, isRTL && styles.rtlRow]}>
+                  <View><Text style={[styles.detailTitle, isRTL && styles.rtlText]}>{t.recordedPrice}</Text><Text style={[styles.detailVal, isRTL && styles.rtlText]}>{new Intl.NumberFormat(locale, { style: "currency", currency: "SAR" }).format(purchase.amount)}</Text></View>
+                  <View><Text style={[styles.detailTitle, isRTL && styles.rtlText]}>{t.packageSessions}</Text><Text style={[styles.detailVal, isRTL && styles.rtlText]}>{purchase.sessions}</Text></View>
+                </View>
+                <Text style={[styles.subtitleText, isRTL && styles.rtlText]}>{t.packageRecorded}: {new Date(purchase.createdAt).toLocaleDateString(locale, { timeZone: "Asia/Riyadh" })}</Text>
+                <View style={[styles.cardActions, isRTL && styles.rtlRow]}>
+                  <AppPressable disabled={busy} busy={busy} style={styles.btnDark} onPress={() => void handlePackagePayment(purchase.id)}><Text style={styles.btnDarkLabel}>{t.packageContinue}</Text></AppPressable>
+                </View>
+              </View>)}
+              <View style={[styles.cardActions, isRTL && styles.rtlRow]}>
+                <AppPressable disabled={busy} style={styles.btnSecondary} onPress={() => void loadPackagePayments()}><Text style={styles.btnSecondaryLabel}>{t.refreshPackages}</Text></AppPressable>
+                {packagePage > 0 && <AppPressable disabled={busy} style={styles.btnSecondary} onPress={() => setPackagePage(page => page - 1)}><Text style={styles.btnSecondaryLabel}>{t.previousPage}</Text></AppPressable>}
+                {(packagePage + 1) * PENDING_PACKAGE_PAGE_SIZE < packageTotal && <AppPressable disabled={busy} style={styles.btnSecondary} onPress={() => setPackagePage(page => page + 1)}><Text style={styles.btnSecondaryLabel}>{t.nextPage}</Text></AppPressable>}
+              </View>
+            </>}
+        </View>
         {loading ? (
           <ActivityIndicator style={{ marginTop: 40 }} />
         ) : !signedIn ? (
@@ -401,6 +516,8 @@ const styles = StyleSheet.create({
   rtlRow: {
     flexDirection: "row-reverse",
   },
+  rtlText: { textAlign: "right", writingDirection: "rtl" },
+  packageSection: { gap: 12 },
   titleText: {
     fontFamily: "System",
     fontWeight: "bold",

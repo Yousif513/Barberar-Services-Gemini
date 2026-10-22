@@ -1,0 +1,58 @@
+{
+  "kind": "Deterministic checks of human-authored requirements, not independent render/runtime verification",
+  "full_MVP": {
+    "page_templates": 20,
+    "overlay_contracts": 14,
+    "actions": 73,
+    "unresolved_destinations": 0,
+    "ambiguous": 0
+  },
+  "first_loop": {
+    "template_families": 6,
+    "route_patterns": 9,
+    "overlay_contracts": 15,
+    "actions": 37,
+    "unresolved_destinations": 0,
+    "ambiguous": 0
+  },
+  "later": {
+    "page_inventory": 16,
+    "workflow_closure": "not_established"
+  },
+  "remaining_full_scope_holes": [
+    "Later16 workflow/overlay/state contracts are inventory-only, not domain-closed.",
+    "The42 function-level required skill/authority contracts are not adopted.",
+    "Readiness evidence freshness validity rules and alternate-skill equivalence need explicit approval/evaluation.",
+    "Runtime, persistent storage policies, scoped connectors and permission enforcement are not implemented by this plan.",
+    "Voice/avatar assets, providers, consent and operating schedules are not recovered/configured.",
+    "All company identities are inactive; autonomous execution permissions remain held.",
+    "Scope/theme and three replacement design skills are proposed, unapproved; independent review still required."
+  ],
+  "explicit_endpoint_check": {
+    "FIRST_LOOP_DOMAIN_GRAPH.json": {
+      "explicit_nodes": 27,
+      "actions": 37,
+      "inline_component_contracts": 2,
+      "missing_endpoint_nodes": [],
+      "inline_contract_fields_checked": [
+        "context",
+        "contract",
+        "states"
+      ],
+      "authority": "Author structural correction only; independent root review still required"
+    },
+    "HQ_DOMAIN_GRAPH.json": {
+      "explicit_nodes": 39,
+      "actions": 73,
+      "inline_component_contracts": 4,
+      "missing_endpoint_nodes": [],
+      "inline_contract_fields_checked": [
+        "context",
+        "contract",
+        "states"
+      ],
+      "authority": "Author structural correction only; independent root review still required"
+    }
+  },
+  "scope_rule": "Action counts include the explicit shared shell; component states are not generation templates."
+}

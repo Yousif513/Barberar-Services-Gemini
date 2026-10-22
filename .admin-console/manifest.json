@@ -6877,7 +6877,7 @@
       "id": "checkout-attempt",
       "name": "Durable payment checkout attempts",
       "sourceOfTruth": "postgres:public.payment_checkout_attempts",
-      "sensitivity": "confidential",
+      "sensitivity": "restricted",
       "tenantScoped": true,
       "lifecycleStates": [
         "submitting",
@@ -6887,7 +6887,7 @@
         "failed"
       ],
       "lifecycleTransitions": [],
-      "retention": "Immutable command evidence; no destructive cleanup or new retention policy in this repair.",
+      "retention": "Unresolved release dependency: immutable exact request bytes contain payment contact data and are not integrated into existing privacy export/erasure/retention/holds. No new retention rule or erasure exception is approved; do not deploy this table until lifecycle controls are reconciled.",
       "capabilities": [
         {
           "id": "checkout-attempt.observe",
@@ -6898,8 +6898,8 @@
             "provider-owner"
           ],
           "risk": "moderate",
-          "status": "planned",
-          "rationale": "Approved durable recovery repair. Existing ownership and authoritative amounts remain. Unknown submissions are never automatically retried.",
+          "status": "in-progress",
+          "rationale": "Implemented source with durable immutable claims, owner-bound recovery, exact receipt verification, unknown quarantine and bilingual existing-client continuations. Independent SQL, Edge and client passes are recorded separately. Full regulated release, hosted concurrency/provider sandbox acceptance, private-wire lifecycle and operator unknown queue remain incomplete; no production or actual financial operation approved.",
           "entityStates": {
             "from": [
               "submitting",
@@ -6917,16 +6917,54 @@
             "/customer/memberships",
             "/provider/pricing"
           ],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
+          "serverOperations": [
+            "supabase/functions/payment-checkout/index.ts",
+            "supabase/functions/_shared/checkout-attempts.ts",
+            "supabase/migrations/20261022062147_durable_checkout_attempts.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261022062147_durable_checkout_attempts.sql#REVOKE",
+            "supabase/functions/payment-checkout/index.ts#resolveCaller"
+          ],
+          "auditEvents": [
+            "checkout.claimed",
+            "checkout.read",
+            "checkout.unknown",
+            "checkout.recorded",
+            "checkout.target_quarantined",
+            "payment_checkout_attempts.update"
+          ],
+          "safeguards": [
+            "Service-only command access; no raw table grants for anon/authenticated/service_role",
+            "Immutable payer, payable, exact request bytes/hash, amount, SAR and gateway context",
+            "Only insertion owns dispatch; no expired-lease reclaim",
+            "Terminal provider GET binding before another attempt; empty/ambiguous lookup stays unknown",
+            "Captured replay retries existing idempotent confirmation; no recovery refund dispatch",
+            "Sanitized audit events; no wire/contact bytes"
+          ],
           "dataBinding": "postgres:public.payment_checkout_attempts",
           "idempotency": "One unresolved target; insertion alone owns dispatch; immutable original Tap reference and payload.",
           "concurrency": "Target lock and unique unresolved index; no dispatch reclaim.",
           "recovery": "Read-only provider lookup and exact fetched receipt; absent/conflicting evidence stays unknown.",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "supabase/tests/db/checkout_attempts.test.mjs",
+            "supabase/tests/db/checkout_schema_contract.test.mjs",
+            "supabase/tests/payment-checkout.test.mjs",
+            "supabase/tests/checkout-attempt-recovery.test.mjs",
+            "supabase/tests/payment-webhook.test.mjs",
+            "web_platform/tests/payment-checkout-client.test.mjs",
+            "mobile_app/tests/payment-checkout-client.test.mjs",
+            "e2e/specs/checkout-recovery.spec.ts"
+          ],
+          "evidence": [
+            ".admin-console/worklog/impl-checkout-schema.md",
+            ".admin-console/worklog/security-checkout-durable.md",
+            ".admin-console/worklog/impl-checkout-clients.md",
+            ".admin-console/worklog/qa-checkout-clients.md",
+            ".admin-console/worklog/security-checkout-schema.md",
+            ".admin-console/worklog/qa-checkout-browser.md",
+            ".admin-console/worklog/qa-volabi-planning.md"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         },
@@ -6939,8 +6977,8 @@
             "provider-owner"
           ],
           "risk": "critical",
-          "status": "planned",
-          "rationale": "Approved durable recovery repair. Existing ownership and authoritative amounts remain. Unknown submissions are never automatically retried.",
+          "status": "in-progress",
+          "rationale": "Implemented source with durable immutable claims, owner-bound recovery, exact receipt verification, unknown quarantine and bilingual existing-client continuations. Independent SQL, Edge and client passes are recorded separately. Full regulated release, hosted concurrency/provider sandbox acceptance, private-wire lifecycle and operator unknown queue remain incomplete; no production or actual financial operation approved.",
           "entityStates": {
             "from": [
               "submitting",
@@ -6964,16 +7002,54 @@
             "/customer/memberships",
             "/provider/pricing"
           ],
-          "serverOperations": [],
-          "authorizationPolicies": [],
-          "auditEvents": [],
-          "safeguards": [],
+          "serverOperations": [
+            "supabase/functions/payment-checkout/index.ts",
+            "supabase/functions/_shared/checkout-attempts.ts",
+            "supabase/migrations/20261022062147_durable_checkout_attempts.sql"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261022062147_durable_checkout_attempts.sql#REVOKE",
+            "supabase/functions/payment-checkout/index.ts#resolveCaller"
+          ],
+          "auditEvents": [
+            "checkout.claimed",
+            "checkout.read",
+            "checkout.unknown",
+            "checkout.recorded",
+            "checkout.target_quarantined",
+            "payment_checkout_attempts.update"
+          ],
+          "safeguards": [
+            "Service-only command access; no raw table grants for anon/authenticated/service_role",
+            "Immutable payer, payable, exact request bytes/hash, amount, SAR and gateway context",
+            "Only insertion owns dispatch; no expired-lease reclaim",
+            "Terminal provider GET binding before another attempt; empty/ambiguous lookup stays unknown",
+            "Captured replay retries existing idempotent confirmation; no recovery refund dispatch",
+            "Sanitized audit events; no wire/contact bytes"
+          ],
           "dataBinding": "postgres:public.payment_checkout_attempts",
           "idempotency": "One unresolved target; insertion alone owns dispatch; immutable original Tap reference and payload.",
           "concurrency": "Target lock and unique unresolved index; no dispatch reclaim.",
           "recovery": "Read-only provider lookup and exact fetched receipt; absent/conflicting evidence stays unknown.",
-          "tests": [],
-          "evidence": [],
+          "tests": [
+            "supabase/tests/db/checkout_attempts.test.mjs",
+            "supabase/tests/db/checkout_schema_contract.test.mjs",
+            "supabase/tests/payment-checkout.test.mjs",
+            "supabase/tests/checkout-attempt-recovery.test.mjs",
+            "supabase/tests/payment-webhook.test.mjs",
+            "web_platform/tests/payment-checkout-client.test.mjs",
+            "mobile_app/tests/payment-checkout-client.test.mjs",
+            "e2e/specs/checkout-recovery.spec.ts"
+          ],
+          "evidence": [
+            ".admin-console/worklog/impl-checkout-schema.md",
+            ".admin-console/worklog/security-checkout-durable.md",
+            ".admin-console/worklog/impl-checkout-clients.md",
+            ".admin-console/worklog/qa-checkout-clients.md",
+            ".admin-console/worklog/security-checkout-schema.md",
+            ".admin-console/worklog/qa-checkout-browser.md",
+            ".admin-console/worklog/qa-volabi-planning.md"
+          ],
           "owner": "",
           "reviewStatus": "unreviewed"
         }
@@ -10032,6 +10108,19 @@
       ],
       "status": "confirmed",
       "appliesTo": []
+    },
+    {
+      "id": "ceo-development-workers-authorized-20261022",
+      "decision": "CEO explicitly authorizes temporary coding, design, testing and independent-review workers, their active DEVELOPMENT-ONLY manifest records and capability claims, isolated reversible code changes, local checks and repair-branch commits/pushes. Continue durable checkout and advance Volabi scope/theme planning. Headquarters employee activation, business permissions, external business writes, production merges/deployment, actual financial transactions and new paid services remain held.",
+      "reason": "Direct human approval in this chat on2026-10-22 resolves the prior audit-registration rejection. New requirement:each company-agent profile must expose associated skills, missing capabilities, evidence and task-readiness assessment so the CEO can evaluate additions. Dashboard screens require separate scope/theme approval before rendering or building.",
+      "evidence": [
+        ".admin-console/worklog/architect-durable-checkout.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "checkout-attempt.start",
+        "checkout-attempt.observe"
+      ]
     }
   ],
   "gaps": [
@@ -13327,12 +13416,14 @@
     {
       "id": "checkout-durable-attempt-recovery",
       "severity": "high",
-      "description": "Checkout creates a Tap charge without persisting and claiming a durable attempt or gateway receipt. Concurrent requests and submission timeouts can create or conceal multiple attempts. The new exact-capture refund repair contains rejected captures after verified capture, but does not prevent duplicate charge creation.",
+      "description": "Durable per-payable checkout and existing-client recovery are implemented locally. Hosted multi-session, real Deno/PostgREST and provider sandbox acceptance are not yet established; operator unknown-outcome resolution and privacy lifecycle remain distinct open gaps.",
       "status": "open",
-      "rationale": "Confirmed on the reconciled master/foundation source and independently reviewed. Next payment slice needs immutable server-owned operation identity, request/result persistence, explicit unknown outcomes and provider-supported reconciliation. No live retry contract or financial acceptance is claimed.",
+      "rationale": "2026-10-22 continuation closes source dispatch duplication/reload defects with immutable persisted request, sole claimant, owner-scoped read-only provider lookup and capture replay. Status stays open until the named integration/release evidence exists; no indefinite provider idempotency assumption or production clearance.",
       "evidence": [
-        "supabase/functions/payment-checkout/index.ts",
-        ".admin-console/worklog/security-checkout-reconciliation.md"
+        "supabase/migrations/20261022062147_durable_checkout_attempts.sql",
+        "supabase/functions/_shared/checkout-attempts.ts",
+        ".admin-console/worklog/security-checkout-durable.md",
+        ".admin-console/worklog/qa-checkout-clients.md"
       ]
     },
     {
@@ -13344,6 +13435,28 @@
       "evidence": [
         "supabase/migrations/20261021090000_booking_capture_refund_binding.sql",
         "docs/booking-payment-reconciliation.md"
+      ]
+    },
+    {
+      "id": "checkout-private-wire-lifecycle",
+      "severity": "high",
+      "description": "Durable checkout exact wire text contains customer payment contact data, but the existing privacy export, erasure, retention and legal-hold engine does not yet include the new table. Immutable evidence and lawful personal-data lifecycle require a compatible design before deployment.",
+      "status": "blocked",
+      "rationale": "Independent SQL review: reuse adopted privacy decisions and reconcile applicable classification/holds with the authorized owner before designing an exception or destructive cleanup. No legal interpretation or retention duration was invented. Production deployment is held.",
+      "evidence": [
+        "supabase/migrations/20261022062147_durable_checkout_attempts.sql",
+        ".admin-console/worklog/impl-checkout-schema.md"
+      ]
+    },
+    {
+      "id": "checkout-unknown-operator-recovery",
+      "severity": "high",
+      "description": "Payers can safely recheck existing unknown checkouts, but operators lack a scoped, audited checkout-attempt exception queue and evidence/reconciliation workflow. An inconclusive provider lookup stays held indefinitely.",
+      "status": "open",
+      "rationale": "Build a least-privilege, minimized operator recovery view and bounded read-only checks under existing role controls. Any actual retry, refund, financial correction or new business permission remains separately approved; do not silently release unknown attempts.",
+      "evidence": [
+        "supabase/functions/_shared/checkout-attempts.ts",
+        "supabase/migrations/20261022062147_durable_checkout_attempts.sql"
       ]
     }
   ],
@@ -13534,6 +13647,28 @@
       "approvedBy": "Coordinator instruction for the F1-F3 fix pass, 2026-10-16 (owner to confirm)",
       "evidence": [
         "docs/reviews/2026-10-16-security-final-recheck.md"
+      ]
+    },
+    {
+      "id": "checkout-recovery-technical-bounds",
+      "path": "supabase/functions/_shared/checkout-attempts.ts",
+      "value": "Initial submit timeout12000ms; recovery deadline10000ms; recent submitting hold30000ms; at most5 lookup pages of50 charges.",
+      "reason": "Bound server work and avoid submission reclaim. Page size is provider documented; exhausted or negative lookup remains held. Reversible engineering limits, not business rates or authority.",
+      "approvedBy": "CEO2026-10-22 delegated routine reversible development choices",
+      "evidence": [
+        "https://developers.tap.company/reference/list-all-charges",
+        ".admin-console/worklog/security-checkout-durable.md"
+      ]
+    },
+    {
+      "id": "native-pending-package-page-bound",
+      "path": "mobile_app/src/lib/pending-package-payments.js#PENDING_PACKAGE_PAGE_SIZE",
+      "value": "25 owned pending purchases per exact-count page, ordered by created_at and id.",
+      "reason": "Routine reversible pagination bound for existing native purchase recovery; financial values remain authoritative snapshot fields.",
+      "approvedBy": "CEO2026-10-22 delegated reversible engineering decisions",
+      "evidence": [
+        "mobile_app/tests/pending-package-payments.test.mjs",
+        ".admin-console/worklog/qa-checkout-clients.md"
       ]
     }
   ],
@@ -14881,6 +15016,78 @@
       "ownsScreens": [],
       "status": "done",
       "notes": ".admin-console/worklog/architect-durable-checkout.md"
+    },
+    {
+      "id": "impl-durable-checkout",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": ".admin-console/worklog/impl-durable-checkout.md"
+    },
+    {
+      "id": "impl-checkout-schema",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY delegated pass under CEO2026-10-22 approval; no HQ employee/business activation. .admin-console/worklog/impl-checkout-schema.md"
+    },
+    {
+      "id": "impl-checkout-clients",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY delegated pass under CEO2026-10-22 approval; no HQ employee/business activation. .admin-console/worklog/impl-checkout-clients.md"
+    },
+    {
+      "id": "security-checkout-schema",
+      "role": "security",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY delegated pass under CEO2026-10-22 approval; no HQ employee/business activation. .admin-console/worklog/security-checkout-schema.md"
+    },
+    {
+      "id": "security-checkout-durable",
+      "role": "security",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY delegated pass under CEO2026-10-22 approval; no HQ employee/business activation. .admin-console/worklog/security-checkout-durable.md"
+    },
+    {
+      "id": "qa-checkout-clients",
+      "role": "qa",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY delegated pass under CEO2026-10-22 approval; no HQ employee/business activation. .admin-console/worklog/qa-checkout-clients.md"
+    },
+    {
+      "id": "architect-volabi-scope",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY delegated pass under CEO2026-10-22 approval; no HQ employee/business activation. .admin-console/worklog/architect-volabi-scope.md"
+    },
+    {
+      "id": "qa-volabi-planning",
+      "role": "qa",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY delegated pass under CEO2026-10-22 approval; no HQ employee/business activation. .admin-console/worklog/qa-volabi-planning.md"
+    },
+    {
+      "id": "qa-checkout-browser",
+      "role": "qa",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY independent browser QA;4/4 isolated local checks; .admin-console/worklog/qa-checkout-browser.md. No business employee activation."
     }
   ]
 }

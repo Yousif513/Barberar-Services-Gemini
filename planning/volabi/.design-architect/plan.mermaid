@@ -1,0 +1,42 @@
+```mermaid
+flowchart LR
+    %% Stitch Architect — Pages overview
+
+    subgraph [""]
+    profile["Profile<br/><i>/profile</i>"]
+    settings["Settings<br/><i>/settings</i>"]
+    settings_notifications["Notifications<br/><i>/settings/notifications</i>"]
+    end
+    subgraph hq["HQ"]
+    hq_agent_profile["Agent Profile<br/><i>/hq/agents/(id)</i>"]
+    hq_audit_event_detail["Audit Event Detail<br/><i>/hq/audit/(id)</i>"]
+    hq_ceo_command_center["CEO Command Center<br/><i>/hq</i>"]
+    hq_ceo_decision_detail["CEO Decision Detail<br/><i>/hq/decisions/(id)</i>"]
+    hq_ceo_decision_queue["CEO Decision Queue<br/><i>/hq/decisions</i>"]
+    hq_capability_gap_matrix["Capability Gap Matrix<br/><i>/hq/capabilities</i>"]
+    hq_evaluation_detail["Evaluation Detail<br/><i>/hq/evaluations/(id)</i>"]
+    hq_evaluation_history["Evaluation History<br/><i>/hq/evaluations</i>"]
+    hq_hq_workspace_settings["HQ Workspace Settings<br/><i>/hq/settings</i>"]
+    hq_immutable_audit_timeline["Immutable Audit Timeline<br/><i>/hq/audit</i>"]
+    hq_knowledge_source_library["Knowledge Source Library<br/><i>/hq/knowledge</i>"]
+    hq_original_agent_directory["Original Agent Directory<br/><i>/hq/agents</i>"]
+    hq_persistent_task_queue["Persistent Task Queue<br/><i>/hq/tasks</i>"]
+    hq_skill_catalog["Skill Catalog<br/><i>/hq/skills</i>"]
+    hq_skill_change_review["Skill Change Review<br/><i>/hq/skill-changes/(id)</i>"]
+    hq_skill_detail["Skill Detail<br/><i>/hq/skills/(id)</i>"]
+    hq_source_evidence_detail["Source Evidence Detail<br/><i>/hq/knowledge/(id)</i>"]
+    hq_task_composer["Task Composer<br/><i>/hq/tasks/new</i>"]
+    hq_task_workspace["Task Workspace<br/><i>/hq/tasks/(id)</i>"]
+    hq_tools_and_connection_readiness["Tools and Connection Readiness<br/><i>/hq/connections</i>"]
+    end
+
+
+    classDef page fill:#1e293b,stroke:#06b6d4,color:#fff,stroke-width:2px
+    classDef modal fill:#f1f5f9,stroke:#64748b,color:#1e293b
+    classDef drawer fill:#fef3c7,stroke:#f59e0b,color:#78350f
+    classDef popover fill:#e0e7ff,stroke:#6366f1,color:#312e81
+    classDef state fill:#ecfccb,stroke:#65a30d,color:#365314,stroke-dasharray:3 3
+    classDef role fill:#fecaca,stroke:#dc2626,color:#7f1d1d
+    classDef story fill:#e9d5ff,stroke:#9333ea,color:#581c87,font-style:italic
+    class hq_agent_profile,hq_audit_event_detail,hq_ceo_command_center,hq_ceo_decision_detail,hq_ceo_decision_queue,hq_capability_gap_matrix,hq_evaluation_detail,hq_evaluation_history,hq_hq_workspace_settings,hq_immutable_audit_timeline,hq_knowledge_source_library,hq_original_agent_directory,hq_persistent_task_queue,hq_skill_catalog,hq_skill_change_review,hq_skill_detail,hq_source_evidence_detail,hq_task_composer,hq_task_workspace,hq_tools_and_connection_readiness,profile,settings,settings_notifications page
+```

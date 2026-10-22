@@ -1,0 +1,38 @@
+{
+  "checked_on": "2026-10-22",
+  "kind": "Authored requirements consistency only, not independent product or behavioral validation",
+  "page_templates": 36,
+  "mvp_templates": 20,
+  "later_templates": 16,
+  "action_targets_checked": 90,
+  "unknown_authored_targets": [],
+  "profiles": 15,
+  "original_functions": 42,
+  "all_company_definitions_inactive": true,
+  "staged_skill_reference_checks": [
+    {
+      "skill": "primora-dashboard-layout",
+      "reference": "references/proposal-source.md",
+      "exists": true
+    },
+    {
+      "skill": "primora-data-visualization",
+      "reference": "references/proposal-source.md",
+      "exists": true
+    },
+    {
+      "skill": "primora-design-system",
+      "reference": "references/proposal-source.md",
+      "exists": true
+    }
+  ],
+  "quick_validate": {
+    "primora-design-system": "exit0 Skill is valid",
+    "primora-dashboard-layout": "exit0 Skill is valid",
+    "primora-data-visualization": "exit0 Skill is valid"
+  },
+  "limitations": [
+    "Structural metadata/reference/target checks do not prove HQ runtime, authorization or usability.",
+    "Core parser and templates do not faithfully map all HQ action types; inspect raw diagnostics."
+  ]
+}

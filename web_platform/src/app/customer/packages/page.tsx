@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { requestCheckout, preparePurchase, browserCheckoutStorage } from "@/lib/payment-checkout.mjs";
 import { CommandDialog } from "@/components/modal";
 import { sar } from "@/components/operations-ui";
 import { disputeLabel, loadPurchaseMoney, openPurchaseDispute, purchaseDisputeError, purchaseMoneyCopy, type PurchaseDispute, type PurchaseRefund } from "@/lib/purchase-disputes";
@@ -10,6 +11,7 @@ import { disputeLabel, loadPurchaseMoney, openPurchaseDispute, purchaseDisputeEr
 // RT-M3: the name, sessions and price shown are those the customer bought (user_packages snapshot), not the package's live row.
 interface UserPackage {
   id: string;
+  status: "active" | "pending_payment";
   remaining_sessions: number;
   expires_at: string;
   amount_paid: number;
@@ -156,7 +158,7 @@ export default function CustomerPackagesPage() {
               )
             )
           `)
-          .eq("status", "active")
+          .in("status", ["active", "pending_payment"])
           .eq("customer_id", user.id)
           .order("created_at", { ascending: false });
 
@@ -209,7 +211,22 @@ export default function CustomerPackagesPage() {
     return null;
   }
 
+  async function resumePackagePayment(purchaseId: string) {
+    if (purchasingId) return;
+    setPurchasingId(purchaseId);
+    setError("");
+    try {
+      const receipt = await requestCheckout(supabase, { purchaseType: "package", purchaseId }, locale, { onCaptured: loadAllPackages });
+      window.location.assign(receipt.checkoutUrl);
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : t.loadError);
+    } finally {
+      setPurchasingId(null);
+    }
+  }
+
   async function handlePurchase(packageId: string) {
+    if (purchasingId) return;
     try {
       setPurchasingId(packageId);
       setError("");
@@ -221,21 +238,17 @@ export default function CustomerPackagesPage() {
         return;
       }
 
-      const { data, error: purchaseErr } = await supabase.rpc("purchase_service_package", {
-        p_package_id: packageId,
-        p_payment_method: "card"
+      const purchase = await preparePurchase(supabase, {
+        type: "package", actorId: user.id, scope: `package.${packageId}`, material: { package_id: packageId },
+        locale, storage: browserCheckoutStorage, onSettled: loadAllPackages,
+        create: async () => {
+          const { data, error } = await supabase.rpc("purchase_service_package", { p_package_id: packageId, p_payment_method: "card" });
+          if (error) throw error;
+          return data?.purchase_id;
+        },
       });
-
-      if (purchaseErr) throw purchaseErr;
-
-      // The package activates only after Tap confirms the payment (payment webhook).
-      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
-        body: { purchaseType: "package", purchaseId: data.purchase_id }
-      });
-      if (checkoutError || !checkout?.checkoutUrl) {
-        throw new Error(isRTL ? "تعذر فتح صفحة الدفع، لم يتم تفعيل الباقة." : "Could not open the payment page; the package was not activated.");
-      }
-      window.location.assign(checkout.checkoutUrl);
+      const receipt = await requestCheckout(supabase, { purchaseType: "package", purchaseId: purchase.id }, locale, { onCaptured: loadAllPackages });
+      window.location.assign(receipt.checkoutUrl);
     } catch (err: any) {
       console.error("Purchase failed:", err.message);
       setError(err.message || "Failed to purchase package.");
@@ -351,7 +364,9 @@ export default function CustomerPackagesPage() {
                     ))}
 
                     {/* SESSIONS BALANCE PROGRESS BAR */}
-                    <div className="space-y-2 mb-6">
+                    {item.status === "pending_payment" ? (
+                      <p role="status" className="mb-6 text-xs font-semibold text-gray-700">{locale === "ar" ? "بانتظار تأكيد الدفع. الجلسات غير متاحة للاستخدام بعد." : "Awaiting payment confirmation. Sessions are not available to use yet."}</p>
+                    ) : <div className="space-y-2 mb-6">
                       <div className="flex justify-between text-xs font-bold text-gray-700">
                         <span>{t.sessionsRemaining}</span>
                         <span className="text-[#B3933B] font-black">{item.remaining_sessions} / {totalSessions}</span>
@@ -362,7 +377,7 @@ export default function CustomerPackagesPage() {
                           style={{ width: `${Math.max(0, Math.min(100, pctRemaining))}%` }}
                         />
                       </div>
-                    </div>
+                    </div>}
                   </div>
 
                   <div className="flex justify-between items-center border-t border-gray-100 pt-4">
@@ -373,7 +388,7 @@ export default function CustomerPackagesPage() {
                       </span>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
-                      {!openReport && (
+                      {item.status === "active" && !openReport && (
                         <button
                           type="button"
                           onClick={() => setReportFor(item)}
@@ -382,12 +397,16 @@ export default function CustomerPackagesPage() {
                           {m$.report}
                         </button>
                       )}
-                      <Link
+                      {item.status === "pending_payment" ? (
+                        <button type="button" disabled={Boolean(purchasingId)} onClick={() => void resumePackagePayment(item.id)} className="px-4 py-2 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl transition duration-150 shadow-sm disabled:opacity-50">
+                          {locale === "ar" ? "متابعة الدفع الحالي" : "Continue existing payment"}
+                        </button>
+                      ) : <Link
                         href="/customer/book"
                         className="px-4 py-2 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl transition duration-150 shadow-sm"
                       >
                         {t.bookSession}
-                      </Link>
+                      </Link>}
                     </div>
                   </div>
                 </div>
@@ -434,7 +453,7 @@ export default function CustomerPackagesPage() {
 
                     <button
                       onClick={() => handlePurchase(pkg.id)}
-                      disabled={purchasingId === pkg.id}
+                      disabled={Boolean(purchasingId)}
                       className="px-5 py-2.5 bg-black hover:bg-gray-800 disabled:opacity-50 text-white font-bold text-xs rounded-xl transition duration-150 shadow-sm"
                     >
                       {purchasingId === pkg.id ? t.purchasing : t.purchaseBtn}

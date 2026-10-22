@@ -1,0 +1,37 @@
+{
+  "checked_on": "2026-10-22",
+  "scope": "Six bounded local roots, not whole disk/cloud",
+  "results": [
+    {
+      "root": "C:\\Users\\Yousif's PC\\.codex\\skills",
+      "exists": true,
+      "matches": []
+    },
+    {
+      "root": "C:\\Users\\Yousif's PC\\.agents\\skills",
+      "exists": true,
+      "matches": []
+    },
+    {
+      "root": "C:\\Users\\Yousif's PC\\.claude\\skills",
+      "exists": true,
+      "matches": []
+    },
+    {
+      "root": "C:\\Users\\Yousif's PC\\.design-architect",
+      "exists": true,
+      "matches": []
+    },
+    {
+      "root": "C:\\Users\\Yousif's PC\\Desktop\\Ai Projects\\Barberar Services-Gemini\\.agents\\skills",
+      "exists": true,
+      "matches": []
+    },
+    {
+      "root": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\.agents\\skills",
+      "exists": true,
+      "matches": []
+    }
+  ],
+  "conclusion": "Original definitions not found; replacements are new unapproved proposals."
+}

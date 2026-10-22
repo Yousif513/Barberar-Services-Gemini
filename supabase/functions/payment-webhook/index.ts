@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.108.1"
 import { processRefundRequest } from "../_shared/refunds.ts"
+import { checkoutGatewayContext } from "../_shared/checkout-attempts.ts"
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } })
@@ -24,18 +25,31 @@ serve(async (req) => {
       headers: { Authorization: `Bearer ${tapSecretKey}` },
     })
     if (!chargeResponse.ok) {
-      console.error("[payment-webhook] unable to verify charge", await chargeResponse.text())
+      console.error("[payment-webhook] unable to verify charge", chargeResponse.status)
       return json({ error: "Unable to verify charge." }, 502)
     }
     const charge = await chargeResponse.json()
     const status = String(charge.status || "").toUpperCase()
     const currency = String(charge.currency || "").toUpperCase()
     const amount = Number(charge.amount)
-    if (charge.id !== chargeId || status !== "CAPTURED" || currency !== "SAR" || !Number.isFinite(amount)) {
+    if (charge.id !== chargeId || currency !== "SAR" || !Number.isFinite(amount) || amount <= 0) {
       return json({ received: true, status: "skipped" })
     }
 
     const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } })
+    const attemptId = charge.metadata?.checkout_attempt_id
+    if (attemptId !== undefined) {
+      if (typeof attemptId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(attemptId)) {
+        return json({ error: "Invalid checkout receipt." }, 409)
+      }
+      const context = await checkoutGatewayContext(tapSecretKey, supabaseUrl)
+      const { error: receiptError } = await db.rpc("record_checkout_attempt", {
+        p_attempt_id: attemptId, p_gateway_context: context, p_charge: charge,
+      })
+      if (receiptError) return json({ error: "Checkout receipt requires reconciliation." }, 409)
+    }
+    // Non-captured attempt outcomes are observed, but never invoke a money confirmation command.
+    if (status !== "CAPTURED") return json({ received: true, status: attemptId ? "observed" : "skipped" })
     const purchaseType = String(charge.metadata?.purchase_type || "booking")
 
     if (purchaseType !== "booking") {
@@ -80,7 +94,7 @@ serve(async (req) => {
     }
     return json({ success: true, result })
   } catch (error) {
-    console.error("[payment-webhook] failure", error)
-    return json({ error: error instanceof Error ? error.message : "Unexpected webhook error." }, 500)
+    console.error("[payment-webhook] confirmation failed")
+    return json({ error: "Unable to record payment confirmation." }, 500)
   }
 })

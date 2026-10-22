@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { requestCheckout, preparePurchase, browserCheckoutStorage } from "@/lib/payment-checkout.mjs";
 import { errorMessage } from "@/lib/error-message";
 import { sar, useOperationsLocale } from "@/components/operations-ui";
 import { CommandDialog, ModalOverlay, ModalPortal } from "@/components/modal";
@@ -250,11 +251,38 @@ export default function CustomerBookingsPage() {
   const [tipLoading, setTipLoading] = useState(false);
   const [tipError, setTipError] = useState("");
   const [tipSuccess, setTipSuccess] = useState("");
+  const [tipReadFor, setTipReadFor] = useState<string | null>(null);
+  const [pendingTip, setPendingTip] = useState<{ id: string; amount: number } | null>(null);
+  const tipTargetId = tipTarget?.id as string | undefined;
+  useEffect(() => {
+    if (!tipTargetId) return;
+    let active = true;
+    void (async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error(locale === "ar" ? "سجّل الدخول مجدداً للتحقق من الإكرامية." : "Sign in again to check the tip.");
+        const { data, error } = await supabase.from("booking_tips").select("id,amount,status")
+          .eq("customer_id", user.id).eq("booking_id", tipTargetId).maybeSingle();
+        if (error) throw error;
+        if (!active) return;
+        if (data && data.status !== "pending") {
+          setTipError(locale === "ar" ? "توجد إكرامية مسجلة لهذا الحجز. حدّث الحجوزات للتحقق من حالتها." : "A tip is already recorded for this booking. Refresh bookings to check its status.");
+          return;
+        }
+        setPendingTip(data ? { id: data.id, amount: Number(data.amount) } : null);
+        if (data) { setCustomTip(String(data.amount)); setTipAmount(Number(data.amount)); }
+        setTipReadFor(tipTargetId);
+      } catch (failure) {
+        if (active) setTipError(errorMessage(failure));
+      }
+    })();
+    return () => { active = false; };
+  }, [tipTargetId, locale]);
 
   const t = translations[locale];
 
   const handleSendTip = async () => {
-    if (!tipTarget) return;
+    if (!tipTarget || tipLoading || tipReadFor !== tipTarget.id) return;
     const finalAmount = customTip ? Number(customTip) : tipAmount;
     if (!finalAmount || finalAmount < 5) {
       setTipError(t.minTipNotice);
@@ -263,21 +291,18 @@ export default function CustomerBookingsPage() {
     try {
       setTipLoading(true);
       setTipError("");
-      const { data, error: rpcErr } = await supabase.rpc("add_booking_tip", {
-        p_booking_id: tipTarget.id,
-        p_amount: finalAmount,
-        p_payment_method: "card"
+      const purchase = await preparePurchase(supabase, {
+        type: "tip", scope: `tip.${tipTarget.id}`, locale, storage: browserCheckoutStorage,
+        material: { booking_id: tipTarget.id, amount: finalAmount }, onSettled: loadBookings,
+        create: async () => {
+          const { data, error } = await supabase.rpc("add_booking_tip", { p_booking_id: tipTarget.id, p_amount: finalAmount, p_payment_method: "card" });
+          if (error) throw error;
+          return data?.purchase_id;
+        },
       });
-      if (rpcErr) throw rpcErr;
-      // The tip is credited to the professional only after Tap confirms the payment.
-      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
-        body: { purchaseType: "tip", purchaseId: data.purchase_id }
-      });
-      if (checkoutError || !checkout?.checkoutUrl) {
-        throw new Error(locale === "ar" ? "تعذر فتح صفحة الدفع، لم يُخصم أي مبلغ." : "Could not open the payment page; nothing was charged.");
-      }
-      setTipSuccess(t.tipSuccess);
-      window.location.assign(checkout.checkoutUrl);
+      setPendingTip({ id: purchase.id, amount: finalAmount });
+      const receipt = await requestCheckout(supabase, { purchaseType: "tip", purchaseId: purchase.id }, locale, { onCaptured: loadBookings });
+      window.location.assign(receipt.checkoutUrl);
     } catch (err: any) {
       console.error("Tip error:", err);
       setTipError(errorMessage(err));
@@ -705,6 +730,11 @@ export default function CustomerBookingsPage() {
                 >
                   {t.details}
                 </button>
+                {bk.status === "pending_payment" && (
+                  <Link href={`/customer/bookings/${bk.id}/confirmation`} className="flex-1 lg:flex-initial px-4 py-2 bg-black text-white text-xs font-bold rounded-xl hover:bg-gray-800 transition duration-150">
+                    {locale === "ar" ? "متابعة الدفع" : "Continue payment"}
+                  </Link>
+                )}
                 {activeTab === "upcoming" && (
                   <>
                     <button
@@ -736,6 +766,8 @@ export default function CustomerBookingsPage() {
                     {bk.status === "completed" && (
                       <button
                         onClick={() => {
+                          setTipReadFor(null);
+                          setPendingTip(null);
                           setTipTarget(bk);
                           setTipAmount(20);
                           setCustomTip("");
@@ -829,6 +861,8 @@ export default function CustomerBookingsPage() {
               {selectedBooking.status === "completed" && (
                 <button
                   onClick={() => {
+                    setTipReadFor(null);
+                    setPendingTip(null);
                     setTipTarget(selectedBooking);
                     setTipAmount(20);
                     setCustomTip("");
@@ -866,6 +900,11 @@ export default function CustomerBookingsPage() {
               >
                 {t.close}
               </button>
+              {selectedBooking.status === "pending_payment" && (
+                <Link href={`/customer/bookings/${selectedBooking.id}/confirmation`} className="flex-1 py-2.5 bg-black hover:bg-gray-800 text-white text-center font-bold text-xs rounded-xl transition">
+                  {locale === "ar" ? "متابعة الدفع" : "Continue payment"}
+                </Link>
+              )}
               {(selectedBooking.status === "confirmed" || selectedBooking.status === "pending_payment") && (
                 <button
                   type="button"
@@ -1202,6 +1241,7 @@ export default function CustomerBookingsPage() {
               <button
                 type="button"
                 aria-label={t.closeDialog}
+                disabled={tipLoading}
                 onClick={() => setTipTarget(null)}
                 className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 font-bold text-sm"
               >
@@ -1227,8 +1267,9 @@ export default function CustomerBookingsPage() {
               </div>
             )}
 
+            {pendingTip && <p role="status" className="text-xs font-semibold text-gray-700">{locale === "ar" ? "متابعة دفع الإكرامية الحالية بالمبلغ المسجل." : "Continue the existing tip payment for its recorded amount."}</p>}
             {/* Tip Amount Chips */}
-            <div className="space-y-3">
+            <fieldset disabled={tipLoading || tipReadFor !== tipTarget.id || Boolean(pendingTip)} className="space-y-3">
               <span id="tip-amounts" className="block text-xs font-bold text-gray-700">{t.tipSelectAmount}</span>
               <div role="group" aria-labelledby="tip-amounts" className="grid grid-cols-4 gap-2">
                 {[10, 20, 30, 50].map((amt) => (
@@ -1268,11 +1309,12 @@ export default function CustomerBookingsPage() {
                   className="w-full text-xs p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D1AF47] font-bold"
                 />
               </div>
-            </div>
+            </fieldset>
 
             <div className="flex gap-3 pt-2">
               <button
                 type="button"
+                disabled={tipLoading}
                 onClick={() => setTipTarget(null)}
                 className="flex-1 py-2.5 border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold text-xs rounded-xl transition"
               >
@@ -1280,7 +1322,7 @@ export default function CustomerBookingsPage() {
               </button>
               <button
                 type="button"
-                disabled={tipLoading || Boolean(tipSuccess)}
+                disabled={tipLoading || tipReadFor !== tipTarget.id || Boolean(tipSuccess)}
                 onClick={handleSendTip}
                 className="flex-1 py-2.5 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl transition shadow-sm disabled:opacity-50"
               >

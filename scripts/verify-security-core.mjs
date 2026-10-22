@@ -12,14 +12,19 @@ const checks = [
   },
   {
     file: "web_platform/src/app/shop/[id]/page.tsx",
-    require: ['rpc("create_booking"', 'functions.invoke("payment-checkout"'],
+    require: ['rpc("create_booking"', 'from "@/lib/payment-checkout.mjs"', 'requestCheckout(supabase, { bookingId: bookedBookingId }'],
     reject: ['from("bookings").insert', 'from("user_packages").insert', "mock-booking-id", "Fail-safe mock redirection"],
   },
   {
     file: "mobile_app/src/components/shop-details-modal.tsx",
-    require: ['rpc("create_booking"', 'functions.invoke("payment-checkout"'],
+    require: ['rpc("create_booking"', 'from "@/lib/payment-checkout.js"', 'requestCheckout(supabase, { bookingId: booking.id, returnUrl: PAYMENT_RETURN_URL }'],
     reject: ['from("bookings").insert', 'from("user_packages").insert', "running offline update"],
   },
+  ...["web_platform/src/lib/payment-checkout.mjs", "mobile_app/src/lib/payment-checkout.js"].map((file) => ({
+    file,
+    require: ['client.functions.invoke("payment-checkout", { body })', 'action: "recover"', 'response.status === 404', 'response.status === 409', '"checkout_not_found"', '"checkout_failed"', 'p?.state === "captured"', 'p?.state === "unknown" || p?.state === "submitting"', 'validCheckoutUrl(p.checkoutUrl)'],
+    reject: ["nothing was charged", 'from("bookings").insert'],
+  })),
   {
     file: "supabase/functions/payment-checkout/index.ts",
     require: [

@@ -1,0 +1,880 @@
+{
+  "status": "PROPOSED_MANUAL_DOMAIN_CLOSURE_FOR_REVIEW",
+  "families": [
+    {
+      "name": "CEO command",
+      "routes": [
+        "/hq"
+      ]
+    },
+    {
+      "name": "Agent directory",
+      "routes": [
+        "/hq/agents"
+      ]
+    },
+    {
+      "name": "Agent profile and task readiness",
+      "routes": [
+        "/hq/agents/[id]"
+      ]
+    },
+    {
+      "name": "Work register and detail",
+      "routes": [
+        "/hq/tasks",
+        "/hq/tasks/[id]"
+      ]
+    },
+    {
+      "name": "Decisions and approval detail",
+      "routes": [
+        "/hq/decisions",
+        "/hq/decisions/[id]"
+      ]
+    },
+    {
+      "name": "Knowledge and evidence",
+      "routes": [
+        "/hq/knowledge",
+        "/hq/knowledge/[id]"
+      ]
+    }
+  ],
+  "template_family_count": 6,
+  "route_pattern_count": 9,
+  "reusable_overlay_count": 15,
+  "nodes": [
+    {
+      "id": "route:/hq",
+      "kind": "page_variant",
+      "name": "CEO Command Center",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ]
+    },
+    {
+      "id": "route:/hq/tasks",
+      "kind": "page_variant",
+      "name": "Persistent Task Queue",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ]
+    },
+    {
+      "id": "route:/hq/tasks/[id]",
+      "kind": "page_variant",
+      "name": "Task Workspace",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ]
+    },
+    {
+      "id": "route:/hq/decisions",
+      "kind": "page_variant",
+      "name": "CEO Decision Queue",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ]
+    },
+    {
+      "id": "route:/hq/decisions/[id]",
+      "kind": "page_variant",
+      "name": "CEO Decision Detail",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ]
+    },
+    {
+      "id": "route:/hq/agents",
+      "kind": "page_variant",
+      "name": "Original Agent Directory",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ]
+    },
+    {
+      "id": "route:/hq/agents/[id]",
+      "kind": "page_variant",
+      "name": "Agent Profile",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ]
+    },
+    {
+      "id": "route:/hq/knowledge",
+      "kind": "page_variant",
+      "name": "Knowledge Source Library",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ]
+    },
+    {
+      "id": "route:/hq/knowledge/[id]",
+      "kind": "page_variant",
+      "name": "Source Evidence Detail",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ]
+    },
+    {
+      "id": "overlay:audit-event",
+      "kind": "overlay",
+      "contract": {
+        "submit": "Read immutable event embedded in task/decision; no create/edit/delete history"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:decision-confirmation",
+      "kind": "overlay",
+      "contract": {
+        "inputs": [
+          "decision revision/hash",
+          "exact proposed action/targets/environment/limits",
+          "CEO identity"
+        ],
+        "submit": "Record approve/decline after server checks and checked receipt; approval is not task execution",
+        "cancel": "Leave decision pending",
+        "failure": "Retain reason; expired/revoked/changed proposal refused",
+        "permission": "CEO decision authority for exactly displayed scope"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:evaluation-evidence",
+      "kind": "overlay",
+      "contract": {
+        "submit": "Read category, cases, versions, actual result, evidence date/reviewer/limits; missing stays unknown"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:evaluation-request",
+      "kind": "overlay",
+      "contract": {
+        "inputs": [
+          "agent/skill/version",
+          "cases",
+          "environment",
+          "resources/cost",
+          "independent reviewer"
+        ],
+        "submit": "Create evaluation proposal in CEO queue; does not start evaluation",
+        "cancel": "Preserve current binding",
+        "failure": "Show missing prerequisites",
+        "permission": "Separate bounded evaluation approval required"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:filters",
+      "kind": "overlay",
+      "contract": {
+        "inputs": [
+          "current scope",
+          "allowed fields",
+          "filter draft"
+        ],
+        "submit": "Apply changes parent query only; filtered-empty is explicit",
+        "cancel": "Preserve original query",
+        "failure": "Preserve draft; error distinct from empty",
+        "permission": "Same row/field scope as parent"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:readiness-comparison",
+      "kind": "overlay",
+      "contract": {
+        "inputs": [
+          "task revision",
+          "requirements",
+          "candidate skill binding/evidence versions"
+        ],
+        "submit": "Read-only comparison; proposed owner selection updates draft only",
+        "cancel": "Retain draft",
+        "failure": "Unknown/missing evidence stays unknown",
+        "permission": "No tool or employee activation"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:recommendation",
+      "kind": "overlay",
+      "contract": {
+        "inputs": [
+          "task",
+          "source-linked recommendation",
+          "author identity and actual evidence"
+        ],
+        "submit": "Open /hq/decisions/[id] for a persisted proposal; no business execution",
+        "cancel": "Return to task context",
+        "failure": "Missing evidence labelled; unsupported claims cannot become facts",
+        "permission": "No inferred company employee operation"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:request-changes",
+      "kind": "overlay",
+      "contract": {
+        "inputs": [
+          "proposal revision",
+          "CEO reason"
+        ],
+        "submit": "Record changes-requested and preserve prior proposal",
+        "cancel": "Keep current pending state",
+        "failure": "Preserve reason",
+        "permission": "Named decision authority"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:skill-change",
+      "kind": "overlay",
+      "contract": {
+        "inputs": [
+          "agent",
+          "add/remove/pin/evaluate",
+          "source/version/hash diff",
+          "affected tasks",
+          "rationale/evidence"
+        ],
+        "submit": "Create persisted CEO decision proposal; no package install/binding application until exact approval and authorized command",
+        "cancel": "No binding change",
+        "failure": "Preserve draft; no false applied state",
+        "permission": "Does not activate employee or grant tools/data"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:skill-change-review",
+      "kind": "overlay",
+      "contract": {
+        "submit": "Read exact before/after binding, evidence/evaluation plan, affected tasks and permission boundary; only CEO confirmation records a decision"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:skill-evidence",
+      "kind": "overlay",
+      "contract": {
+        "submit": "Read global package availability/source/hash separately from proposed agent binding, version-bound evidence and tool/data permissions"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:source-correction",
+      "kind": "overlay",
+      "contract": {
+        "inputs": [
+          "source revision",
+          "proposed correction",
+          "evidence"
+        ],
+        "submit": "Record correction proposal and affected tasks; preserve original evidence",
+        "cancel": "No source change",
+        "failure": "Preserve correction draft",
+        "permission": "No destructive deletion or retention interpretation"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:source-intake",
+      "kind": "overlay",
+      "contract": {
+        "inputs": [
+          "authorized source location",
+          "classification",
+          "provenance",
+          "version"
+        ],
+        "submit": "Save source draft/metadata in isolated workspace; no external ingestion assumed",
+        "cancel": "No source publication",
+        "failure": "Retain safe input; no invented extract",
+        "permission": "Source import scope and rights checked separately"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:source-picker",
+      "kind": "overlay",
+      "contract": {
+        "inputs": [
+          "task/decision revision",
+          "authorized source ids"
+        ],
+        "submit": "Attach checked source references to draft, with version/hash",
+        "cancel": "Retain original attachments",
+        "failure": "Unreadable/wrong-scope source cannot be attached",
+        "permission": "Source read plus draft edit authorization"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:task-composer",
+      "kind": "overlay",
+      "contract": {
+        "inputs": [
+          "outcome/acceptance",
+          "source references",
+          "required skill/version and explicit alternatives",
+          "proposed owner/reviewer",
+          "scope/limits"
+        ],
+        "submit": "Save durable task draft and open /hq/tasks/[id] after receipt; runtime execution blocked for inactive company identities",
+        "failure": "Keep draft; distinguish unavailable/forbidden/conflict; never imply Nora performed work"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "inline:follow-up-record",
+      "kind": "component_action_state",
+      "name": "Record task follow-up",
+      "context": {
+        "origins": [
+          "route:/hq/tasks/[id]"
+        ],
+        "required": [
+          "existing authorized task id and current revision",
+          "linked decision/source revisions when the follow-up relies on them",
+          "development-preparer actor for isolated software acceptance"
+        ],
+        "missing_or_stale": "Do not dispatch; retain draft and offer authorized task reload/parent recovery."
+      },
+      "contract": {
+        "inputs": [
+          "follow-up text and explicit next action",
+          "existing task and applicable decision/source revision references",
+          "command identity for replay-safe record creation"
+        ],
+        "effect": "Persist a follow-up management record linked to the current task and return its checked receipt; append the corresponding task audit timeline event. This records the next step, it does not execute it.",
+        "success": "Show the persisted follow-up id, actor, timestamp and linked revisions within the same task detail and its embedded audit timeline.",
+        "cancel": "Keep the prior task/decision unchanged; discard or preserve the safe local draft only through an explicit control.",
+        "failure": "Preserve draft; distinguish forbidden, conflict, stale and unreadable/unknown write receipt. Never show recorded until the authoritative receipt/readback confirms it; retry observes the same command identity.",
+        "permission": "Require task-record edit scope and audit attribution. CEO decision linkage cannot grant execution, company activation or tools/data access. Inactive company identities remain blocked."
+      },
+      "states": [
+        "idle",
+        "draft",
+        "validation-error",
+        "saving",
+        "recorded",
+        "forbidden",
+        "conflict",
+        "stale",
+        "error-or-unknown-receipt"
+      ],
+      "generation": "embedded task component only; no new screen, overlay or route",
+      "provenance": "SCOPE_AND_THEME_APPROVAL.md local software acceptance follow-up loop and task-preview-5 edge"
+    },
+{
+      "id": "inline:locale-switch",
+      "kind": "component_action_state",
+      "name": "AR/EN locale switch",
+      "context": {
+        "origins": [
+          "shell:hq"
+        ],
+        "identity": "Current local viewer preference; does not assume an active company employee",
+        "required": "A supported EN or AR locale value; preserve current route, authorized object id and safe unsaved draft"
+      },
+      "contract": {
+        "inputs": [
+          "requested supported locale EN or AR",
+          "current route and safe local draft context"
+        ],
+        "effect": "Change display language and direction in the existing shell/component: EN LTR or AR RTL. Do not navigate to a new page or dispatch business work.",
+        "success": "The same authorized record remains open with translated labels and mirrored direction; record only a viewer preference if its scoped persistence contract is authorized.",
+        "failure": "Retain the previous working locale and draft; show localized retry guidance without claiming the preference was saved.",
+        "permission": "UI locale is separate from company activation, skill assignment and tool/data permission."
+      },
+      "states": [
+        "EN-LTR",
+        "AR-RTL",
+        "changing",
+        "error-retained-previous-locale"
+      ],
+      "generation": "component state only; no screen, overlay or route added",
+      "provenance": "CEO bilingual/RTL requirement and existing shell-locale edge"
+    },
+    {
+      "id": "shell:hq",
+      "kind": "shared_navigation",
+      "scope": "Only explicitly included routes; no generic calendar/widget/account links",
+      "states": [
+        "expanded",
+        "mobile-collapsed",
+        "keyboard-focus",
+        "locale-EN",
+        "locale-AR-RTL"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "command-preview-1",
+      "from": "route:/hq",
+      "label": "New task",
+      "target": "overlay:task-composer",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "command-preview-2",
+      "from": "route:/hq",
+      "label": "Work register",
+      "target": "route:/hq/tasks",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "command-preview-3",
+      "from": "route:/hq",
+      "label": "Decision queue",
+      "target": "route:/hq/decisions",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "command-preview-4",
+      "from": "route:/hq",
+      "label": "Agent directory",
+      "target": "route:/hq/agents",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "command-preview-5",
+      "from": "route:/hq",
+      "label": "Knowledge",
+      "target": "route:/hq/knowledge",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "tasks-preview-1",
+      "from": "route:/hq/tasks",
+      "label": "New task",
+      "target": "overlay:task-composer",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "tasks-preview-2",
+      "from": "route:/hq/tasks",
+      "label": "Task detail",
+      "target": "route:/hq/tasks/[id]",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "tasks-preview-3",
+      "from": "route:/hq/tasks",
+      "label": "Filter",
+      "target": "overlay:filters",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "task-preview-1",
+      "from": "route:/hq/tasks/[id]",
+      "label": "Sources",
+      "target": "overlay:source-picker",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "task-preview-2",
+      "from": "route:/hq/tasks/[id]",
+      "label": "Recommendation",
+      "target": "overlay:recommendation",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "task-preview-3",
+      "from": "route:/hq/tasks/[id]",
+      "label": "Decision",
+      "target": "route:/hq/decisions/[id]",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "task-preview-4",
+      "from": "route:/hq/tasks/[id]",
+      "label": "Embedded audit event",
+      "target": "overlay:audit-event",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "task-preview-5",
+      "from": "route:/hq/tasks/[id]",
+      "label": "Record follow-up",
+      "target": "inline:follow-up-record",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "decisions-preview-1",
+      "from": "route:/hq/decisions",
+      "label": "Decision detail",
+      "target": "route:/hq/decisions/[id]",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "decisions-preview-2",
+      "from": "route:/hq/decisions",
+      "label": "Filter",
+      "target": "overlay:filters",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "decision-preview-1",
+      "from": "route:/hq/decisions/[id]",
+      "label": "Confirm decision",
+      "target": "overlay:decision-confirmation",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "decision-preview-2",
+      "from": "route:/hq/decisions/[id]",
+      "label": "Request changes",
+      "target": "overlay:request-changes",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "decision-preview-3",
+      "from": "route:/hq/decisions/[id]",
+      "label": "Embedded audit event",
+      "target": "overlay:audit-event",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "decision-preview-4",
+      "from": "route:/hq/decisions/[id]",
+      "label": "Skill change evidence",
+      "target": "overlay:skill-change-review",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "agents-preview-1",
+      "from": "route:/hq/agents",
+      "label": "Profile",
+      "target": "route:/hq/agents/[id]",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "agents-preview-2",
+      "from": "route:/hq/agents",
+      "label": "Filter",
+      "target": "overlay:filters",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "agent-preview-1",
+      "from": "route:/hq/agents/[id]",
+      "label": "Skill and version evidence",
+      "target": "overlay:skill-evidence",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "agent-preview-2",
+      "from": "route:/hq/agents/[id]",
+      "label": "Task readiness",
+      "target": "overlay:readiness-comparison",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "agent-preview-3",
+      "from": "route:/hq/agents/[id]",
+      "label": "Propose add/remove/pin",
+      "target": "overlay:skill-change",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "agent-preview-4",
+      "from": "route:/hq/agents/[id]",
+      "label": "Propose evaluation",
+      "target": "overlay:evaluation-request",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "agent-preview-5",
+      "from": "route:/hq/agents/[id]",
+      "label": "Evaluation history",
+      "target": "overlay:evaluation-evidence",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "knowledge-preview-1",
+      "from": "route:/hq/knowledge",
+      "label": "Source detail",
+      "target": "route:/hq/knowledge/[id]",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "knowledge-preview-2",
+      "from": "route:/hq/knowledge",
+      "label": "Source draft",
+      "target": "overlay:source-intake",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "knowledge-preview-3",
+      "from": "route:/hq/knowledge",
+      "label": "Filter",
+      "target": "overlay:filters",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "source-preview-1",
+      "from": "route:/hq/knowledge/[id]",
+      "label": "Correction proposal",
+      "target": "overlay:source-correction",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "source-preview-2",
+      "from": "route:/hq/knowledge/[id]",
+      "label": "Affected work",
+      "target": "route:/hq/tasks",
+      "context_rule": "Existing persisted id only; missing context shows error/recovery, never guessed",
+      "provenance": "First-loop subset of HQ requirements; explicit proposed adapter"
+    },
+    {
+      "id": "shell-nav-0",
+      "from": "shell:hq",
+      "label": "Navigate /hq",
+      "target": "route:/hq",
+      "kind": "navigation",
+      "provenance": "Explicit HQ scope navigation only"
+    },
+    {
+      "id": "shell-nav-1",
+      "from": "shell:hq",
+      "label": "Navigate /hq/agents",
+      "target": "route:/hq/agents",
+      "kind": "navigation",
+      "provenance": "Explicit HQ scope navigation only"
+    },
+    {
+      "id": "shell-nav-2",
+      "from": "shell:hq",
+      "label": "Navigate /hq/tasks",
+      "target": "route:/hq/tasks",
+      "kind": "navigation",
+      "provenance": "Explicit HQ scope navigation only"
+    },
+    {
+      "id": "shell-nav-3",
+      "from": "shell:hq",
+      "label": "Navigate /hq/decisions",
+      "target": "route:/hq/decisions",
+      "kind": "navigation",
+      "provenance": "Explicit HQ scope navigation only"
+    },
+    {
+      "id": "shell-nav-4",
+      "from": "shell:hq",
+      "label": "Navigate /hq/knowledge",
+      "target": "route:/hq/knowledge",
+      "kind": "navigation",
+      "provenance": "Explicit HQ scope navigation only"
+    },
+    {
+      "id": "shell-locale",
+      "from": "shell:hq",
+      "label": "AR/EN language",
+      "target": "inline:locale-switch",
+      "kind": "component_action",
+      "provenance": "CEO bilingual requirement; no extra page"
+    }
+  ],
+  "unresolved_destinations": [],
+  "ambiguous_destinations": [],
+  "out_of_scope_controls": "Other MVP/later features are roadmap text, not clickable controls. No inherited generic profile/settings/calendar/widget/report navigation.",
+  "dynamic_context": "All dynamic routes receive a persisted, authorized id. Missing/stale context has no action dispatch and exposes parent/retry recovery.",
+  "embedded_audit": "Task and decision timelines plus read-only audit-event overlay; no separate audit screen in first preview.",
+  "acceptance_identity": "Isolated software fixtures use development-preparer actor; proposed owner Nora/etc remains inactive. No claim that a company employee operated or business access was granted.",
+  "execution_boundary": "Create/inspect management records and CEO decisions under scoped software authorization; autonomous task execution remains blocked until separate activation and permission approval.",
+  "no_render": "No HQ screen or runtime was generated."
+}

@@ -145,7 +145,9 @@ describe("group booking screens", () => {
   });
 
   it("send money to the existing per-booking payment flow and never collect card details", () => {
-    assert.match(files.customer, /functions\.invoke\("payment-checkout", \{ body: \{ bookingId \} \}\)/);
+    assert.match(files.customer, /import \{ requestCheckout \} from "@\/lib\/payment-checkout\.mjs"/);
+    assert.match(files.customer, /requestCheckout\(supabase, \{ bookingId \}, locale,/);
+    assert.match(src("lib", "payment-checkout.mjs"), /client\.functions\.invoke\("payment-checkout", \{ body \}\)/);
     for (const text of Object.values(files)) assert.ok(!/card ?number|cvv|cvc/i.test(text));
   });
 

@@ -1,0 +1,82 @@
+{
+  "source": "root_design_md",
+  "source_path": "DESIGN.md",
+  "stitch_theme_id": null,
+  "design_md_content": "# HQ visual direction - PROPOSED, pending CEO approval\n\nSource: current marketplace globals.css and admin/layout.tsx; exact excerpts/hashes are in source/BRAND_PROVENANCE.json. The original three design skills were not recovered. This is a new source-backed proposal, not an approved HQ theme. No stored Stitch theme_id is configured in this isolated root.\n\nPrimary: Gold (#D1AF47)\nSecondary: Soft Gold (#F4E7B6)\nBackground: Warm Ivory (#F7F3EA)\nSurface: White (#FFFFFF)\nText Primary: Ink (#15120D)\nText Secondary: Slate (#475467)\nBorder: Warm Gray (#D8D1C4)\nAccent: Obsidian (#10120F)\nDanger: Deep Red (#B42318)\nSuccess: Deep Green (#067647)\nWarning: Deep Amber (#93370D)\nInfo: Deep Blue (#175CD3)\n\nBody font: Inter.\nHeading font: Georgia.\nArabic body/headings: existing IBM Plex Sans Arabic configuration; verify delivery later.\nButtons rounded10px. Cards rounded16px. 4px spacing grid and44px primary controls.\n\nObsidian navigation, warm ivory workbench and white evidence panels; restrained gold marks location and priority. Narrative task/evidence/decision content leads; charts support a defined decision. Gold is not body text on ivory. Use soft gold/white on obsidian and ink/slate on light surfaces. A quieter workbench with reduced particles/glows is a new refinement proposed for approval, while retaining current marketplace brand tokens.\n\nMobile uses a task-first single column, contextual drawers and bounded modals. Mirror Arabic navigation and direction icons; isolate numbers/IDs/URLs. Tables and matrices offer text values, clear units and keyboard access. Colors never carry state alone. Spatial offices and photoreal avatars belong to later scope.\n\nContrast values are computed token pairs in THEME_CONTRAST.json, not a rendered accessibility audit. No HQ usability or screen-reader validation has occurred.\n",
+  "palette": [
+    {
+      "role": "Primary",
+      "name": "Gold",
+      "hex": "#d1af47"
+    },
+    {
+      "role": "Secondary",
+      "name": "Soft Gold",
+      "hex": "#f4e7b6"
+    },
+    {
+      "role": "Background",
+      "name": "Warm Ivory",
+      "hex": "#f7f3ea"
+    },
+    {
+      "role": "Surface",
+      "name": "White",
+      "hex": "#ffffff"
+    },
+    {
+      "role": "Text Primary",
+      "name": "Ink",
+      "hex": "#15120d"
+    },
+    {
+      "role": "Text Secondary",
+      "name": "Slate",
+      "hex": "#475467"
+    },
+    {
+      "role": "Border",
+      "name": "Warm Gray",
+      "hex": "#d8d1c4"
+    },
+    {
+      "role": "Accent",
+      "name": "Obsidian",
+      "hex": "#10120f"
+    },
+    {
+      "role": "Danger",
+      "name": "Deep Red",
+      "hex": "#b42318"
+    },
+    {
+      "role": "Success",
+      "name": "Deep Green",
+      "hex": "#067647"
+    },
+    {
+      "role": "Warning",
+      "name": "Deep Amber",
+      "hex": "#93370d"
+    },
+    {
+      "role": "Info",
+      "name": "Deep Blue",
+      "hex": "#175cd3"
+    }
+  ],
+  "typography": {
+    "body": "Inter",
+    "heading": "Georgia"
+  },
+  "shape": {
+    "buttons": "10px",
+    "cards": "16px"
+  },
+  "elevation": "soft",
+  "vibe": [
+    "warm"
+  ],
+  "conflicts": [],
+  "warnings": []
+}

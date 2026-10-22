@@ -1,0 +1,135 @@
+{
+  "name": "AgentSkillProfile",
+  "status": "PROPOSED_UNAPPROVED",
+  "separate_records": {
+    "GlobalSkillPackage": {
+      "required": [
+        "skill_id",
+        "package_path",
+        "install_state",
+        "source_url_or_local_source",
+        "declared_version_or_absence",
+        "commit_if_known",
+        "sha256",
+        "license_if_known",
+        "checked_at"
+      ],
+      "meaning": "Reusable instructions present on disk; no assignment, competence or access inferred"
+    },
+    "AgentSkillBinding": {
+      "required": [
+        "agent_id",
+        "skill_id",
+        "version_or_hash",
+        "proposed_or_assigned_state",
+        "required_by_functions",
+        "decision_id_if_adopted",
+        "history"
+      ],
+      "meaning": "A proposed association is not an assigned or evaluated capability"
+    },
+    "SkillEvaluationEvidence": {
+      "required": [
+        "agent_id_if_role_specific",
+        "skill_id",
+        "skill_version_and_hash",
+        "case_id",
+        "category",
+        "task_and_tool_context",
+        "environment",
+        "inputs_source",
+        "actual_outcome",
+        "evidence_locator_and_hash",
+        "observed_at",
+        "reviewer",
+        "limits",
+        "freshness_and_supersession"
+      ],
+      "meaning": "Structural file validation, static review, synthetic behavior, integration and live acceptance are different evidence categories"
+    },
+    "ToolDataPermission": {
+      "required": [
+        "tool_id",
+        "dependency_status",
+        "environment",
+        "resource_and_data_scope",
+        "permission_state",
+        "approval_id",
+        "expiry_if_adopted"
+      ],
+      "meaning": "Installed skill does not configure tool, credential or data permission"
+    },
+    "TaskReadinessAssessment": {
+      "required": [
+        "task_revision",
+        "requirement_source",
+        "required_skill_versions",
+        "explicit_alternative_equivalence",
+        "missing_instructions",
+        "missing_dependencies",
+        "missing_permissions",
+        "missing_evidence",
+        "failed_evidence",
+        "unknowns",
+        "status",
+        "assessed_at",
+        "invalidate_on_changes"
+      ],
+      "states": [
+        "ready_for_CEO_review",
+        "needs_evidence",
+        "blocked_prerequisite",
+        "inactive_for_execution"
+      ],
+      "forbidden_inference": "No invented competence percentage; unknown is neither zero nor pass"
+    },
+    "SkillChangeProposal": {
+      "required": [
+        "agent_id",
+        "change_type",
+        "from_binding",
+        "to_binding",
+        "reason_sources",
+        "affected_tasks",
+        "evaluation_plan",
+        "prerequisites_and_cost",
+        "CEO_decision",
+        "checked_binding_receipt"
+      ],
+      "types": [
+        "add",
+        "remove",
+        "pin",
+        "evaluate"
+      ],
+      "states": [
+        "draft",
+        "proposed",
+        "awaiting_evaluation_approval",
+        "awaiting_CEO",
+        "approved",
+        "declined",
+        "changes_requested",
+        "expired",
+        "revoked",
+        "applied_with_receipt"
+      ],
+      "boundary": "Evaluation approval or skill adoption does not activate employees or grant tools"
+    }
+  },
+  "ui_contract": {
+    "agent_profile_tabs": [
+      "Charter",
+      "Skills and gaps",
+      "Evidence and freshness",
+      "Tools and permissions",
+      "Task readiness",
+      "Change and evaluation history"
+    ],
+    "directory": "All 15 original named identities, inactive status explicit",
+    "gap_matrix": "All 15 identities and 42 original functions; required-skill contract unresolved where not adopted; no forced skill/function equivalence",
+    "catalog": "Global package record and proposed association separated",
+    "composer": "Requirements-linked, source-backed readiness with explicit alternatives and missing prerequisites"
+  },
+  "source": "Current CEO profile requirement, original roster/function source and current installed-file inspection; proposed data model, no runtime implementation"
+}

@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { AppPressable } from "@/components/app-pressable";
 import { supabase } from "../lib/supabase";
+import { requestCheckout, preparePurchase, CheckoutStateError } from "@/lib/payment-checkout.js";
 import { openCheckout, PAYMENT_RETURN_URL, notifyBookingsChanged } from "@/lib/payment-return";
 import {
   MarketplaceProvider,
@@ -26,6 +27,7 @@ import {
   riyadhDate
 } from "../lib/marketplace";
 import { errorMessage } from "@/lib/error-message";
+import { checkoutStorage } from "@/lib/checkout-storage";
 
 const { height } = Dimensions.get("window");
 
@@ -94,6 +96,7 @@ export function ShopDetailsModal({
       myself: "Myself",
       signIn: "Please sign in from the Profile tab before booking.",
       bookingFailed: "Booking failed",
+      paymentStatus: "Payment status",
       bookingConfirmed: "Booking confirmed",
       bookingConfirmedText: "Nothing is due online. Details are in your bookings.",
       okLabel: "OK",
@@ -108,7 +111,7 @@ export function ShopDetailsModal({
       days: "days",
       buy: "Buy",
       noPackages: "No packages currently available for this shop.",
-      packageFailed: "Could not open the payment page. The package was not activated and nothing was charged.",
+      packageFailed: "Could not confirm the payment outcome. Check the existing purchase before another payment.",
       reviewsHeading: "Customer Reviews",
       noReviews: "No written reviews for this shop yet.",
       ownerReply: "Reply from the shop",
@@ -146,6 +149,7 @@ export function ShopDetailsModal({
       myself: "نفسي",
       signIn: "يرجى تسجيل الدخول من تبويب الملف الشخصي قبل الحجز.",
       bookingFailed: "تعذر إتمام الحجز",
+      paymentStatus: "حالة الدفع",
       bookingConfirmed: "تم تأكيد الحجز",
       bookingConfirmedText: "لا يوجد مبلغ مستحق عبر الإنترنت. التفاصيل في حجوزاتك.",
       okLabel: "حسناً",
@@ -160,7 +164,7 @@ export function ShopDetailsModal({
       days: "يوم",
       buy: "شراء",
       noPackages: "لا توجد باقات متاحة حالياً لهذا المركز",
-      packageFailed: "تعذر فتح صفحة الدفع. لم يتم تفعيل الباقة ولم يُخصم أي مبلغ.",
+      packageFailed: "تعذر تأكيد نتيجة الدفع. تحقق من عملية الشراء الحالية قبل محاولة دفع أخرى.",
       reviewsHeading: "تقييمات وآراء العملاء",
       noReviews: "لا توجد تقييمات مكتوبة لهذا المركز بعد.",
       ownerReply: "رد المركز",
@@ -252,6 +256,7 @@ export function ShopDetailsModal({
   const handleBookingConfirm = async () => {
     if (!selectedService || !selectedSpecialist || !selectedSlot || submitting) return;
     setSubmitting(true);
+    let reservedBookingId: string | null = null;
     try {
       if (!(await requireUser())) return;
 
@@ -267,23 +272,22 @@ export function ShopDetailsModal({
         throw bookingError ?? new Error("Unable to reserve the selected time.");
       }
 
+      reservedBookingId = booking.id;
       if (booking.status === "confirmed") {
         notifyBookingsChanged();
         Alert.alert(t.bookingConfirmed, t.bookingConfirmedText, [{ text: t.okLabel, onPress: onClose }]);
         return;
       }
 
-      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
-        body: { bookingId: booking.id, returnUrl: PAYMENT_RETURN_URL },
-      });
-      if (checkoutError || !checkout?.checkoutUrl) {
-        Alert.alert(t.bookingFailed, t.paymentFailed);
-        return;
-      }
-      await openCheckout(checkout.checkoutUrl);
+      const receipt = await requestCheckout(supabase, { bookingId: booking.id, returnUrl: PAYMENT_RETURN_URL }, locale, { onCaptured: notifyBookingsChanged });
+      await openCheckout(receipt.checkoutUrl);
       onClose();
     } catch (err) {
-      Alert.alert(t.bookingFailed, errorMessage(err));
+      if (reservedBookingId) {
+        notifyBookingsChanged();
+        onClose();
+      }
+      Alert.alert(err instanceof CheckoutStateError ? t.paymentStatus : t.bookingFailed, errorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -293,17 +297,21 @@ export function ShopDetailsModal({
     if (submitting) return;
     setSubmitting(true);
     try {
-      if (!(await requireUser())) return;
-      const { data, error } = await supabase.rpc("purchase_service_package", { p_package_id: pkg.id, p_payment_method: "card" });
-      if (error) throw error;
-      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
-        body: { purchaseType: "package", purchaseId: data.purchase_id, returnUrl: PAYMENT_RETURN_URL },
+      const user = await requireUser();
+      if (!user) return;
+      const purchase = await preparePurchase(supabase, {
+        type: "package", actorId: user.id, scope: `package.${pkg.id}`, material: { package_id: pkg.id }, locale, storage: checkoutStorage, onSettled: notifyBookingsChanged,
+        create: async () => {
+          const { data, error } = await supabase.rpc("purchase_service_package", { p_package_id: pkg.id, p_payment_method: "card" });
+          if (error) throw error;
+          return data?.purchase_id;
+        },
       });
-      if (checkoutError || !checkout?.checkoutUrl) throw new Error(t.packageFailed);
-      await openCheckout(checkout.checkoutUrl);
+      const receipt = await requestCheckout(supabase, { purchaseType: "package", purchaseId: purchase.id, returnUrl: PAYMENT_RETURN_URL }, locale, { onCaptured: notifyBookingsChanged });
+      await openCheckout(receipt.checkoutUrl);
       onClose();
     } catch (err) {
-      Alert.alert(t.bookingFailed, errorMessage(err));
+      Alert.alert(err instanceof CheckoutStateError ? t.paymentStatus : t.packagesHeading, errorMessage(err));
     } finally {
       setSubmitting(false);
     }

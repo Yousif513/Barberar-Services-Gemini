@@ -2,7 +2,7 @@
 // times taken from the database clock. A slot is found by asking get_available_slots for the Riyadh dates around the wanted
 // time, so a test never depends on the weekday, the hour or the calendar date it runs on.
 
-import { randomBytes } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import { expect, type Page, type Route } from "@playwright/test";
 import { rpc, serviceRpc } from "./api";
 import { dbNow, one } from "./db";
@@ -71,10 +71,14 @@ export async function stubTap(page: Page): Promise<TapStub> {
     if (route.request().method() === "OPTIONS") return route.fulfill({ status: 204, headers: cors });
     const body = (route.request().postDataJSON() ?? {}) as Record<string, unknown>;
     stub.checkoutRequests.push(body);
+    if (body.action === "recover") {
+      return route.fulfill({ status: 404, headers: { ...cors, "content-type": "application/json" },
+        body: JSON.stringify({ success: false, code: "checkout_not_found" }) });
+    }
     const chargeId = `chg_e2e_${randomBytes(8).toString("hex")}`;
     stub.chargeIds.push(chargeId);
     await route.fulfill({ status: 200, headers: { ...cors, "content-type": "application/json" },
-      body: JSON.stringify({ success: true, checkoutUrl: `https://tap-checkout.e2e.invalid/pay/${chargeId}?booking=${String(body.bookingId)}`, chargeId }) });
+      body: JSON.stringify({ success: true, state: "ready", attemptId: randomUUID(), checkoutUrl: `https://tap-checkout.e2e.invalid/pay/${chargeId}?booking=${String(body.bookingId)}`, chargeId }) });
   });
   await page.route("https://tap-checkout.e2e.invalid/**", async (route: Route) => {
     const url = new URL(route.request().url());

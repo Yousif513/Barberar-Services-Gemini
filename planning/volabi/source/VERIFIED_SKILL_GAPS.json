@@ -1,0 +1,158 @@
+{
+  "prepared_date": "2026-10-22",
+  "scope": "Skill/readiness assessment only",
+  "available_primora_skills": 32,
+  "third_party_installed_skills": 134,
+  "requested_capabilities_with_instruction_coverage": 49,
+  "new_installs_this_turn": 0,
+  "missing_project_skills": [
+    "primora-dashboard-layout",
+    "primora-data-visualization",
+    "primora-design-system"
+  ],
+  "searched_roots": [
+    "C:\\Users\\Yousif's PC\\.codex\\skills",
+    "C:\\Users\\Yousif's PC\\.agents\\skills",
+    "C:\\Users\\Yousif's PC\\Desktop\\Ai Projects\\Barberar Services-Gemini\\.agents\\skills",
+    "C:\\Users\\Yousif's PC\\.claude\\skills"
+  ],
+  "gaps": [
+    {
+      "id": "DESIGN-01",
+      "kind": "missing_project_skill",
+      "items": [
+        "primora-design-system"
+      ],
+      "owners": [
+        "Maya",
+        "Sophia"
+      ],
+      "priority": "Before dashboard layout",
+      "action": "Recover original, else propose a source-backed brand/token/component contract for review.",
+      "proof_needed": "Approved source-to-token trace and component/state examples."
+    },
+    {
+      "id": "DESIGN-02",
+      "kind": "missing_project_skill",
+      "items": [
+        "primora-dashboard-layout"
+      ],
+      "owners": [
+        "Maya",
+        "Nora",
+        "Alexander"
+      ],
+      "priority": "Before dashboard layout",
+      "action": "Codify complete navigation, queues, panels, overlays, responsive and AR/EN/RTL behavior.",
+      "proof_needed": "Approved scope/theme; no ambiguous links; closed destination graph."
+    },
+    {
+      "id": "DESIGN-03",
+      "kind": "missing_project_skill",
+      "items": [
+        "primora-data-visualization"
+      ],
+      "owners": [
+        "Daniel",
+        "Maya"
+      ],
+      "priority": "Before live metrics",
+      "action": "Define metrics, permissions, SAR, Riyadh time, freshness, charts and drill-down using real sources.",
+      "proof_needed": "Metric dictionary, source-total checks and truthful empty/error/stale states."
+    },
+    {
+      "id": "BINDING-01",
+      "kind": "definition_and_runtime_binding",
+      "items": [
+        "role/skill/workflow/tool/memory/evaluation mapping"
+      ],
+      "owners": [
+        "Olivia",
+        "Ethan",
+        "Omar"
+      ],
+      "priority": "First management loop",
+      "action": "Build versioned inactive definitions and bounded handoff contracts; runtime and activation stay separate.",
+      "proof_needed": "Each workflow has owner, scoped inputs/tools/memory, output and independent cases."
+    },
+    {
+      "id": "RUNTIME-01",
+      "kind": "unimplemented_runtime",
+      "items": [
+        "persistent tasks",
+        "approval enforcement",
+        "scoped memory/retrieval",
+        "bounded tool execution"
+      ],
+      "owners": [
+        "Ethan",
+        "Alexander",
+        "Nora"
+      ],
+      "priority": "First management loop",
+      "action": "Implement request-to-task-to-decision-to-follow-up in an isolated environment.",
+      "proof_needed": "Restart, duplicate, revoked approval, unknown result and wrong-scope tests."
+    },
+    {
+      "id": "EVAL-01",
+      "kind": "missing_execution_evidence",
+      "items": [
+        "AR/EN/RTL and accessibility",
+        "agent handoff evaluation",
+        "cost/usage limits"
+      ],
+      "owners": [
+        "Maya",
+        "Omar",
+        "Olivia",
+        "Daniel"
+      ],
+      "priority": "Before operational pilot",
+      "action": "Reuse installed instructions; execute representative independent behavioral checks.",
+      "proof_needed": "Named versions/environments and measured failures, recovery, grounding, permission and cost results."
+    },
+    {
+      "id": "INTEGRATION-01",
+      "kind": "external_dependency",
+      "items": [
+        "named service credentials",
+        "gateway sandbox acceptance",
+        "voice/avatar providers",
+        "approved budgets"
+      ],
+      "owners": [
+        "Ethan",
+        "Daniel",
+        "Layla",
+        "Nora"
+      ],
+      "priority": "When required by a bounded slice",
+      "action": "Prepare exact environment, access and cost requests; retain financial/activation/deployment holds.",
+      "proof_needed": "Secure configured environment and bounded acceptance evidence; no grant inferred from a skill."
+    }
+  ],
+  "first_hq_acceptance_loop": [
+    "CEO request",
+    "persistent task with owner",
+    "source-linked recommendation",
+    "recorded CEO decision",
+    "auditable follow-up surviving restart"
+  ],
+  "ceo_actions_now": [
+    "Submit or adjust COPY_TO_PROCEED.txt."
+  ],
+  "ceo_actions_later": [
+    "Approve dashboard scope and visual direction.",
+    "Approve secure named integration setup and budget when a concrete slice requires it.",
+    "Separately approve business-agent activation, business access, production or financial actions."
+  ],
+  "sources": [
+    "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+    "https://github.com/Leonxlnx/taste-skill",
+    "https://github.com/anthropics/skills"
+  ],
+  "limits": [
+    "All original capability headings have instruction coverage; the HQ runtime and executed behavior remain unfinished.",
+    "Older audit findings must be reconciled to the repair branch, rather than imported from the stale Gemini checkout."
+  ]
+}

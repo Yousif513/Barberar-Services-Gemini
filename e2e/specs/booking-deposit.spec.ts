@@ -34,10 +34,12 @@ test("a customer books on the shop page, pays the deposit through Tap (stubbed),
 
   // Back from the (stubbed) hosted payment page on the app's own return address.
   await expect(page).toHaveURL(/\/customer\/bookings\?payment=/);
-  expect(tap.checkoutRequests).toHaveLength(1);
-  // The browser names only the booking; the amount comes from the database record, never from the page.
-  expect(Object.keys(tap.checkoutRequests[0])).toEqual(["bookingId"]);
-  const bookingId = String(tap.checkoutRequests[0].bookingId);
+  expect(tap.checkoutRequests).toHaveLength(2);
+  // Recovery is read-only; a new attempt is allowed only after the explicit not-found receipt.
+  expect(tap.checkoutRequests[0]).toMatchObject({ action: "recover" });
+  expect(Object.keys(tap.checkoutRequests[1])).toEqual(["bookingId"]);
+  const bookingId = String(tap.checkoutRequests[1].bookingId);
+  expect(tap.checkoutRequests[0].bookingId).toBe(bookingId);
 
   const booked = bookingRow(bookingId);
   expect(booked.status).toBe("confirmed");
@@ -47,7 +49,7 @@ test("a customer books on the shop page, pays the deposit through Tap (stubbed),
   expect(money(ledger.captured)).toBe(money(booked.deposit_required));
   expect(ledger.intent).toBe(tap.chargeIds[0]);
   await expect(page.getByText(provider.serviceName).first()).toBeVisible();
-  expect(errors.unexpected()).toEqual([]);
+  expect(errors.unexpected([/status of 404.*\/functions\/v1\/payment-checkout/])).toEqual([]);
 });
 
 test("free window: cancelling a paid booking more than 24 h ahead refunds the whole deposit (EN, 1440 px)", async ({ factory, openAs }) => {

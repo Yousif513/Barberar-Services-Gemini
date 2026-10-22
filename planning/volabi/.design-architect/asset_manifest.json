@@ -1,0 +1,28 @@
+{
+  "assets": [
+    {
+      "id": "logo-main",
+      "needed_by": [
+        "shell"
+      ],
+      "kind": "logo",
+      "dimensions": "any",
+      "format": "svg",
+      "transparency": true,
+      "status": "produce",
+      "qa_status": "pending"
+    },
+    {
+      "id": "empty-state",
+      "needed_by": [
+        "empty-state"
+      ],
+      "kind": "illustration",
+      "dimensions": "400x300",
+      "format": "svg",
+      "transparency": true,
+      "status": "produce",
+      "qa_status": "pending"
+    }
+  ]
+}

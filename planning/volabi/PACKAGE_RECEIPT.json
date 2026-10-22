@@ -1,0 +1,204 @@
+{
+  "checked_on": "2026-10-22",
+  "status": "planning_only_unapproved",
+  "files": [
+    {
+      "path": "AGENT_PROFILE_CONTRACTS.json",
+      "sha256": "493f4a2830ec75fb970b11c9d137d20f068c8e89fbdd693f8ee7ed34405508d2"
+    },
+    {
+      "path": "AGENT_SKILLS_AND_READINESS.md",
+      "sha256": "a845ac2aa0a32faddcde3a8f9d21ebc450f90efce7bb2134df664d312a99236f"
+    },
+    {
+      "path": "AGENT_SKILL_PROFILE_CONTRACT.json",
+      "sha256": "cb089957ee70efe7759d9a6534aa0cdfcd7574f178a39fc942445e066c6cfdc3"
+    },
+    {
+      "path": "CAPABILITY_GAP_MATRIX.json",
+      "sha256": "1ee0c24a0db6d6dd8590b2e710c159a4dbfa2942897181b45daa9333e448d185"
+    },
+    {
+      "path": "DESIGN.md",
+      "sha256": "021353ecf76a1cc1b0798ccd283d64e4937da639ca291d89bee4171e31ed8d21"
+    },
+    {
+      "path": "DOMAIN_CLOSURE_CHECK.json",
+      "sha256": "cd5da77af2f9d4b61babc21077751b3eb5ac6d68ec81038d01c5f1b532eb45dc"
+    },
+    {
+      "path": "FIRST_LOOP_DOMAIN_GRAPH.json",
+      "sha256": "e3b51ea373e58a211ae4ca92aa1482e7efbe5505978d8023c57902abaeaa038b"
+    },
+    {
+      "path": "HQ_DOMAIN_GRAPH.json",
+      "sha256": "0f8c783931cb68d10562b7c573c03f66e0aa20f6f0e77605f635711a017b7fe4"
+    },
+    {
+      "path": "HQ_SURFACE_INVENTORY.json",
+      "sha256": "ec5f40ff5f88dc1624f3d381f5ce4960aede0eadb0a68fea11bde9194cbeb1f1"
+    },
+    {
+      "path": "LATER_SCOPE.md",
+      "sha256": "b330161686b8f1b63aa780a354aae364f163a563af3cc1eca3ba187c35b5eae1"
+    },
+    {
+      "path": "README.md",
+      "sha256": "ec93e8594f29b2e58469f618b8ffaaedb67c4eadca8a36783ab792e77319303d"
+    },
+    {
+      "path": "REQUIREMENTS_VALIDATION.json",
+      "sha256": "cbba75e16af869eda40e84d50286ba5388ee20ca3419403f9e5a7cab7017a735"
+    },
+    {
+      "path": "run_planning_phases.py",
+      "sha256": "ec811bf542b6dcbecb15449e024765e9a67ead79cc7b5a387c1aaaaddee7d744"
+    },
+    {
+      "path": "SCOPE_AND_THEME_APPROVAL.md",
+      "sha256": "958b1562ef65188f2f4d0925bb8e41bba3a35cb7bacea2a864db71d6eb91edae"
+    },
+    {
+      "path": "STAGED_SKILL_VALIDATION.json",
+      "sha256": "97298ad7293962dbfafab0572654b100992f7fd34669811f48dcff898acb98e4"
+    },
+    {
+      "path": "THEME_CONTRAST.json",
+      "sha256": "69b81010431d20215f38681cf6a66a1bf183c882ca14468f5b9b2702ba82cb63"
+    },
+    {
+      "path": ".design-architect\\asset_manifest.json",
+      "sha256": "00d9f70ad33d61ff69d24aae7469776b02de017f5f27805bcd2c5e712e42c9b3"
+    },
+    {
+      "path": ".design-architect\\bmad_context.json",
+      "sha256": "c462262af9328f320c60a20113bf9404f81fe859a6d9f3a69618835f06187fb0"
+    },
+    {
+      "path": ".design-architect\\closure.md",
+      "sha256": "498bd95ace725ead63bbdac17b7bd15d29a8e401ac48dfea55a66b204ae54695"
+    },
+    {
+      "path": ".design-architect\\component_census.json",
+      "sha256": "fc113e3874007cb12aca44bde4f6e3f91e56992cfdeff14720ca13ed005eb5ee"
+    },
+    {
+      "path": ".design-architect\\graph.json",
+      "sha256": "6b29763114170886a3f3ab7cefbeb908ae26bafb2b7f26fa86dc4a11d4733652"
+    },
+    {
+      "path": ".design-architect\\holes.json",
+      "sha256": "f58485d76ba84c357d5a7231399d3ca5b815c4657142ba24d5cfdf29230815d4"
+    },
+    {
+      "path": ".design-architect\\pages.json",
+      "sha256": "bfc200e67f6d63f1b20a75a90ee6150d2673f170df37797eba35936a9a02ff73"
+    },
+    {
+      "path": ".design-architect\\page_graph.json",
+      "sha256": "6c1b767d354782409608622eb08291a30163d29cd0e8deec3695a2628ee8e0b8"
+    },
+    {
+      "path": ".design-architect\\PHASE_EXECUTION.json",
+      "sha256": "1c476239147952b0f90ce7462bffda28671fc7fe8b3173d01cdb3f7cfa64a61b"
+    },
+    {
+      "path": ".design-architect\\plan.html",
+      "sha256": "43f157bf6fefeeecb9d98883d8f5d9af5e39b0cf01f680e46066464cb38582b9"
+    },
+    {
+      "path": ".design-architect\\plan.json",
+      "sha256": "c27efc18efad630420031c26bae8429b906d1380ddfde12d13ba7effff2f69db"
+    },
+    {
+      "path": ".design-architect\\plan.md",
+      "sha256": "849c753b41a9412680e4398fdb3150958819b00927aa16d82e545e4abf3d00ac"
+    },
+    {
+      "path": ".design-architect\\plan.mermaid",
+      "sha256": "53b7f71c11ac6198d1d46b0f094d38b63be48c1427a4d9dc25d3542eaf59dbc3"
+    },
+    {
+      "path": ".design-architect\\theme.json",
+      "sha256": "1d9117fc42b99a3124c6def5665c16fbc9b81baa36559fbfdc42a8c704333ac2"
+    },
+    {
+      "path": ".design-architect\\viewgraph.json",
+      "sha256": "3b8cccdd43cdc428b07f3a5ef922f9ed9a008e7208c468fb1394046776768302"
+    },
+    {
+      "path": "docs\\front-end-spec.md",
+      "sha256": "a0f4e813133e3bee3173506f514701ca35e675deca62f28c2993ec313931cd98"
+    },
+    {
+      "path": "docs\\prd.md",
+      "sha256": "cee3d57aad41de0793be64e682e60ccf3635759d7bf6b3adb89f7195ef99d8ff"
+    },
+    {
+      "path": "source\\AGENT_SKILL_MAP.json",
+      "sha256": "31c02070b3ba1850a05253ca5497b652fac6eb0ab3a203040d74b464c6a67da2"
+    },
+    {
+      "path": "source\\BRAND_PROVENANCE.json",
+      "sha256": "775acdf395cbb8d40f7e2ed5a07fbcbae8efc3858eee09427e4ba59a90194bee"
+    },
+    {
+      "path": "source\\MISSING_DESIGN_SKILL_SEARCH.json",
+      "sha256": "52f8ac3ec5ff5bee9ecb7c3a062f2a0dcfcf4ce0dca25b436a204675fc118252"
+    },
+    {
+      "path": "source\\ORIGINAL_42_FUNCTIONS.json",
+      "sha256": "f277412dfa0bcfa775434e09772ed5105e42934c7798000199d1ea139273d7b8"
+    },
+    {
+      "path": "source\\VERIFIED_SKILL_GAPS.json",
+      "sha256": "f4a6cda6c9cc90862b4c6ac529ac8ddfdc12bea9389644ff24acf9be16e61819"
+    },
+    {
+      "path": "staged-skills\\primora-dashboard-layout\\SKILL.md",
+      "sha256": "a28cf7a893e93b033c38d7d6344a47078aa94c14abb1c044092a1adbe36aa0aa"
+    },
+    {
+      "path": "staged-skills\\primora-data-visualization\\SKILL.md",
+      "sha256": "f7b6e4338122a857604ed3e7912552c51361e06d2b24e6671b8fff9ce128ff98"
+    },
+    {
+      "path": "staged-skills\\primora-design-system\\SKILL.md",
+      "sha256": "e76a3df36c73d072c04ea10cfe0370fd5158e9b530962be4c014e0b419e4a60a"
+    },
+    {
+      "path": "staged-skills\\primora-design-system\\references\\proposal-source.md",
+      "sha256": "fb7b03bbe0d57b030b73b8610f62efd2accf9930fecdb3500fbef24cd18cc4e1"
+    },
+    {
+      "path": "staged-skills\\primora-data-visualization\\references\\proposal-source.md",
+      "sha256": "fb7b03bbe0d57b030b73b8610f62efd2accf9930fecdb3500fbef24cd18cc4e1"
+    },
+    {
+      "path": "staged-skills\\primora-dashboard-layout\\references\\proposal-source.md",
+      "sha256": "fb7b03bbe0d57b030b73b8610f62efd2accf9930fecdb3500fbef24cd18cc4e1"
+    },
+    {
+      "path": ".design-architect\\handoff\\component-map.md",
+      "sha256": "ccab00c49fbd251039e48333163103b957f7a71d3b8641c8e3a16dac3486290c"
+    },
+    {
+      "path": "INDEPENDENT_PLANNING_REVIEW.json",
+      "sha256": "d4c75072f419f41dd7c3f81d9e515d175c1d255550edb1f1696de15d5789070f"
+    }
+  ],
+  "all_company_identities_inactive": true,
+  "global_skill_install": false,
+  "HQ_screen_renderer_run": false,
+  "independent_review": "pending; these are author structural checks",
+  "exact_remaining_full_scope_holes": [
+    "Later16 workflow/overlay/state contracts are inventory-only, not domain-closed.",
+    "The42 function-level required skill/authority contracts are not adopted.",
+    "Readiness evidence freshness validity rules and alternate-skill equivalence need explicit approval/evaluation.",
+    "Runtime, persistent storage policies, scoped connectors and permission enforcement are not implemented by this plan.",
+    "Voice/avatar assets, providers, consent and operating schedules are not recovered/configured.",
+    "All company identities are inactive; autonomous execution permissions remain held.",
+    "Scope/theme and three replacement design skills are proposed, unapproved; independent review still required."
+  ],
+  "owned_worklog_sha256": "383255708c87dd1b35a7c657bfe848d019eb00adb3604f0b9fdd2a9cc63a44eb"
+}

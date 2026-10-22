@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { requestCheckout, preparePurchase, browserCheckoutStorage } from "@/lib/payment-checkout.mjs";
 import { EffectiveFeeTerms } from "@/components/effective-fee-terms";
 import { sar, useOperationsLocale } from "@/components/operations-ui";
 
@@ -210,6 +211,7 @@ export default function PricingPage() {
   const [providerId, setProviderId] = useState<string | null>(null);
   const [currentSubscription, setCurrentSubscription] = useState<any | null>(null);
   const [checkoutError, setCheckoutError] = useState("");
+  const [pendingPayment, setPendingPayment] = useState<{ id: string; plan_id: string; billing_interval: string; amount: number } | null>(null);
   // The price comes from the database (quote_provider_plan), the same function that sets the amount charged.
   const [quote, setQuote] = useState<{ total_sar: number; monthly_rate_sar: number; months: number } | null>(null);
   const [quoteError, setQuoteError] = useState(false);
@@ -256,6 +258,9 @@ export default function PricingPage() {
             .maybeSingle();
 
           if (sub) setCurrentSubscription(sub);
+          const { data: pending, error: pendingError } = await supabase.from("subscription_payments")
+            .select("id,plan_id,billing_interval,amount").eq("provider_id", prov.id).eq("status", "pending_payment").limit(2);
+          if (!pendingError && pending?.length === 1) setPendingPayment(pending[0]);
         }
       } catch (err) {
         console.warn("Subscription fetch warning:", err);
@@ -281,6 +286,7 @@ export default function PricingPage() {
   }, [activePlanId, billingCycle]);
 
   const handleSelectPlan = (plan: string) => {
+    if (checkoutStep === "processing") return;
     setSelectedPlan(plan);
     setCheckoutStep("idle");
     setCheckoutError("");
@@ -289,13 +295,40 @@ export default function PricingPage() {
     }, 100);
   };
 
+  const refreshSubscription = async (targetProviderId: string) => {
+    const { data: sub, error } = await supabase.from("provider_subscriptions")
+      .select("plan_id,billing_interval,status").eq("provider_id", targetProviderId).maybeSingle();
+    if (error) throw error;
+    setCurrentSubscription(sub);
+    const { data: pending, error: pendingError } = await supabase.from("subscription_payments")
+      .select("id,plan_id,billing_interval,amount").eq("provider_id", targetProviderId).eq("status", "pending_payment").limit(2);
+    if (pendingError) throw pendingError;
+    setPendingPayment(pending?.length === 1 ? pending[0] : null);
+  };
+
+  const resumeSubscriptionPayment = async () => {
+    if (!pendingPayment || !providerId || checkoutStep === "processing") return;
+    setCheckoutStep("processing");
+    setCheckoutError("");
+    try {
+      const receipt = await requestCheckout(supabase, { purchaseType: "subscription", purchaseId: pendingPayment.id }, locale, {
+        onCaptured: () => refreshSubscription(providerId),
+      });
+      window.location.assign(receipt.checkoutUrl);
+    } catch (failure) {
+      setCheckoutError(failure instanceof Error ? failure.message : t.subscribeFailed);
+      setCheckoutStep("idle");
+    }
+  };
+
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (checkoutStep === "processing") return;
     setCheckoutStep("processing");
     setCheckoutError("");
 
     const targetPlanId = activePlanId;
-    if (!targetPlanId) return;
+    if (!targetPlanId) { setCheckoutStep("idle"); return; }
     const targetInterval = billingCycle === "annual" ? "yearly" : "monthly";
 
     try {
@@ -321,27 +354,31 @@ export default function PricingPage() {
         setProviderId(prov.id);
       }
 
-      const { data, error: rpcErr } = await supabase.rpc("subscribe_provider_plan", {
-        p_provider_id: activeProviderId,
-        p_plan_id: targetPlanId,
-        p_billing_interval: targetInterval
+      const targetProviderId = activeProviderId;
+      if (!targetProviderId) throw new Error(t.noProvider);
+      const refreshCurrent = () => refreshSubscription(targetProviderId);
+      const purchase = await preparePurchase(supabase, {
+        type: "subscription", ownerId: activeProviderId, scope: `subscription.${activeProviderId}`,
+        material: { plan_id: targetPlanId, billing_interval: targetInterval }, locale, storage: browserCheckoutStorage,
+        onSettled: refreshCurrent,
+        create: async () => {
+          const { data, error } = await supabase.rpc("subscribe_provider_plan", {
+            p_provider_id: activeProviderId, p_plan_id: targetPlanId, p_billing_interval: targetInterval,
+          });
+          if (error) throw error;
+          return data?.purchase_id;
+        },
       });
-
-      if (rpcErr) throw rpcErr;
-
-      // Free plans activate immediately; paid plans activate only after Tap confirms the payment.
-      if (data?.status === "paid") {
-        setCurrentSubscription({ plan_id: targetPlanId, billing_interval: targetInterval, status: "active" });
+      const { data: payment, error: paymentError } = await supabase.from("subscription_payments")
+        .select("status").eq("id", purchase.id).eq("provider_id", activeProviderId).single();
+      if (paymentError) throw paymentError;
+      if (payment.status === "paid") {
+        await refreshCurrent();
         setCheckoutStep("success");
         return;
       }
-      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
-        body: { purchaseType: "subscription", purchaseId: data.purchase_id }
-      });
-      if (checkoutError || !checkout?.checkoutUrl) {
-        throw new Error(t.checkoutFailed);
-      }
-      window.location.assign(checkout.checkoutUrl);
+      const receipt = await requestCheckout(supabase, { purchaseType: "subscription", purchaseId: purchase.id }, locale, { onCaptured: refreshCurrent });
+      window.location.assign(receipt.checkoutUrl);
     } catch (err: any) {
       console.error("Subscription error:", err);
       setCheckoutError(err?.message || t.subscribeFailed);
@@ -431,6 +468,7 @@ export default function PricingPage() {
             role="switch"
             aria-checked={billingCycle === "annual"}
             aria-label={t.billingSwitch}
+            disabled={checkoutStep === "processing"}
             onClick={() => setBillingCycle(billingCycle === "monthly" ? "annual" : "monthly")}
             className="w-14 h-8 bg-white border border-[#D0D5DD] rounded-full p-1 relative cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928]"
           >
@@ -497,6 +535,7 @@ export default function PricingPage() {
                   </div>
                   <button
                     type="button"
+                    disabled={checkoutStep === "processing"}
                     onClick={() => handleSelectPlan(plan.id)}
                     aria-pressed={isSelected}
                     className={`w-full py-2.5 mt-8 rounded-xl text-xs font-bold tracking-wider focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B7928] ${isSelected ? "bg-[#D1AF47] text-[#070B12]" : "bg-[#FBFAF7] text-[#344054] border border-[#ECECEC] hover:border-[#D1AF47]/40"}`}
@@ -657,6 +696,11 @@ export default function PricingPage() {
               
               {/* Form Input fields */}
               <form onSubmit={handleCheckoutSubmit} className="lg:col-span-7 space-y-6">
+                {pendingPayment && (
+                  <button type="button" disabled={checkoutStep === "processing"} onClick={() => void resumeSubscriptionPayment()} className="rounded-xl border border-[#ECECEC] bg-white px-4 py-3 text-xs font-bold text-[#101828] disabled:opacity-50">
+                    {locale === "ar" ? "متابعة الدفع الحالي" : "Continue existing payment"}: {planName(plans?.find((plan) => plan.id === pendingPayment.plan_id))} · {pendingPayment.billing_interval === "yearly" ? t.billingAnnual : t.billingMonthly} · {money(pendingPayment.amount)}
+                  </button>
+                )}
                 {checkoutError && (
                   <div role="alert" className="bg-[#FEF3F2] border border-[#EF4444]/20 text-[#B42318] text-xs rounded-xl p-4 font-semibold">
                     {checkoutError}

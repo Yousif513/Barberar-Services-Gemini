@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { requestCheckout, preparePurchase, browserCheckoutStorage } from "@/lib/payment-checkout.mjs";
 import { errorMessage } from "@/lib/error-message";
 import { sar, useOperationsLocale } from "@/components/operations-ui";
 import { ModalOverlay, ModalPortal } from "@/components/modal";
@@ -352,6 +353,7 @@ export default function CustomerWalletPage() {
 
   const handlePurchaseGift = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (giftSubmitting) return;
     setGiftSubmitting(true);
     setGiftError("");
     try {
@@ -365,24 +367,20 @@ export default function CustomerWalletPage() {
         throw new Error(t.giftMin);
       }
 
-      const { data, error: purchaseErr } = await supabase.rpc("purchase_gift_card", {
-        p_recipient_name: giftForm.recipientName.trim(),
-        p_recipient_phone: phone,
-        p_recipient_email: giftForm.recipientEmail.trim() || null,
-        p_amount: amt,
-        p_message: giftForm.message.trim() || null
+      const purchase = await preparePurchase(supabase, {
+        type: "gift_card", scope: "gift-card", locale, storage: browserCheckoutStorage, onSettled: loadWalletData,
+        material: { recipient_name: giftForm.recipientName.trim(), recipient_phone: phone, recipient_email: giftForm.recipientEmail.trim() || null, original_amount: amt, message: giftForm.message.trim() || null },
+        create: async () => {
+          const { data, error } = await supabase.rpc("purchase_gift_card", {
+            p_recipient_name: giftForm.recipientName.trim(), p_recipient_phone: phone,
+            p_recipient_email: giftForm.recipientEmail.trim() || null, p_amount: amt, p_message: giftForm.message.trim() || null,
+          });
+          if (error) throw error;
+          return data?.purchase_id;
+        },
       });
-
-      if (purchaseErr) throw purchaseErr;
-
-      // The card becomes usable (and its code is shown) only after Tap confirms the payment.
-      const { data: checkout, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
-        body: { purchaseType: "gift_card", purchaseId: data.purchase_id }
-      });
-      if (checkoutError || !checkout?.checkoutUrl) {
-        throw new Error(t.giftCheckoutFailed);
-      }
-      window.location.assign(checkout.checkoutUrl);
+      const receipt = await requestCheckout(supabase, { purchaseType: "gift_card", purchaseId: purchase.id }, locale, { onCaptured: loadWalletData });
+      window.location.assign(receipt.checkoutUrl);
 
       setGiftForm({
         recipientName: "",
@@ -395,6 +393,20 @@ export default function CustomerWalletPage() {
       await loadWalletData();
     } catch (err) {
       setGiftError(errorMessage(err));
+    } finally {
+      setGiftSubmitting(false);
+    }
+  };
+
+  const resumeGiftPayment = async (purchaseId: string) => {
+    if (giftSubmitting) return;
+    setGiftSubmitting(true);
+    setError("");
+    try {
+      const receipt = await requestCheckout(supabase, { purchaseType: "gift_card", purchaseId }, locale, { onCaptured: loadWalletData });
+      window.location.assign(receipt.checkoutUrl);
+    } catch (failure) {
+      setError(errorMessage(failure));
     } finally {
       setGiftSubmitting(false);
     }
@@ -628,6 +640,11 @@ export default function CustomerWalletPage() {
                     {giftStatusLabels[card.status] ?? t.statusPending}
                   </span>
                 </div>
+                {card.status === "pending_payment" && (
+                  <button type="button" disabled={giftSubmitting} onClick={() => void resumeGiftPayment(card.id)} className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs font-bold text-stone-900 disabled:opacity-50">
+                    {locale === "ar" ? "متابعة الدفع الحالي" : "Continue existing payment"}
+                  </button>
+                )}
                 {card.message && (
                   <p className="text-[10px] text-stone-600 italic bg-white p-2 rounded-lg border border-stone-150">
                     &ldquo;{card.message}&rdquo;
@@ -713,6 +730,7 @@ export default function CustomerWalletPage() {
               <button
                 type="button"
                 aria-label={t.closeDialog}
+                disabled={giftSubmitting}
                 onClick={() => setShowGiftModal(false)}
                 className="text-gray-400 hover:text-gray-600 text-lg leading-none"
               >
@@ -722,7 +740,8 @@ export default function CustomerWalletPage() {
 
             {giftError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-700">{giftError}</p>}
             {(
-              <form onSubmit={handlePurchaseGift} className="space-y-3 text-xs">
+              <form onSubmit={handlePurchaseGift} className="text-xs">
+                <fieldset disabled={giftSubmitting} className="space-y-3">
                 <div>
                   <label htmlFor="gift-recipient" className="block text-[10px] font-bold uppercase text-gray-500 mb-1">
                     {t.giftRecipient} *
@@ -818,6 +837,7 @@ export default function CustomerWalletPage() {
                     {giftSubmitting ? "..." : t.giftSend}
                   </button>
                 </div>
+                </fieldset>
               </form>
             )}
           </div>

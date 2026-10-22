@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { requestCheckout } from "@/lib/payment-checkout.mjs";
 import { CommandDialog } from "@/components/modal";
 import { CommandResult, operationsButton, operationsDate, useOperationsLocale } from "@/components/operations-ui";
 import {
@@ -75,14 +76,13 @@ export default function CustomerSeriesPage() {
   const pay = useCallback(async (bookingId: string) => {
     setPayingId(bookingId);
     try {
-      const { data, error } = await supabase.functions.invoke("payment-checkout", { body: { bookingId } });
-      if (error || !data?.checkoutUrl) throw new Error("no checkout url");
-      window.location.assign(data.checkoutUrl);
-    } catch {
-      setResult({ error: t.payFailed });
+      const receipt = await requestCheckout(supabase, { bookingId }, locale, { onCaptured: () => setReload((n) => n + 1) });
+      window.location.assign(receipt.checkoutUrl);
+    } catch (failure) {
+      setResult({ error: failure instanceof Error ? failure.message : t.payFailed });
       setPayingId("");
     }
-  }, [t.payFailed]);
+  }, [locale, t.payFailed]);
 
   const cancel = async (reason: string): Promise<string | null> => {
     if (!cancelTarget) return null;

@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { requestCheckout, preparePurchase, browserCheckoutStorage, CheckoutStateError } from "@/lib/payment-checkout.mjs";
 import { CommandResult, operationsButton, operationsDate, sar, useOperationsLocale } from "@/components/operations-ui";
 import { CommandDialog } from "@/components/modal";
 import { membershipError, membershipStatusLabel, newRequestKey, type MembershipStatus } from "@/lib/membership-copy";
@@ -79,7 +80,7 @@ const copy = {
     working: "Working...",
     book: "Book a visit",
     paymentReturn: "We are confirming your payment. Your membership becomes active as soon as the payment is confirmed; this can take a moment.",
-    checkoutFailed: "The payment page could not be opened, so nothing was charged and the membership is not active yet.",
+    checkoutFailed: "Could not confirm the payment outcome. Check the existing membership before another payment.",
     signIn: "Sign in to buy a membership.",
     expiresSoon: "Ends soon",
     plan: "Plan",
@@ -121,7 +122,7 @@ const copy = {
     working: "جارٍ التنفيذ...",
     book: "احجز زيارة",
     paymentReturn: "نتحقق من دفعتك. تُفعَّل العضوية فور تأكيد الدفع وقد يستغرق ذلك لحظات.",
-    checkoutFailed: "تعذر فتح صفحة الدفع، لذلك لم يتم أي خصم ولم تُفعَّل العضوية بعد.",
+    checkoutFailed: "تعذر تأكيد نتيجة الدفع. تحقق من العضوية الحالية قبل محاولة دفع أخرى.",
     signIn: "سجّل الدخول لشراء عضوية.",
     expiresSoon: "تنتهي قريباً",
     plan: "الخطة",
@@ -158,7 +159,6 @@ export default function CustomerMembershipsPage() {
   const [refunds, setRefunds] = useState<PurchaseRefund[]>([]);
   const m$ = purchaseMoneyCopy[locale];
   // One request key per intended purchase or renewal, kept until the command succeeds so a double tap cannot buy twice.
-  const keys = useRef<Map<string, string>>(new Map());
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -215,46 +215,48 @@ export default function CustomerMembershipsPage() {
   }, [load]);
 
   const openCheckout = async (membershipId: string) => {
-    const { data, error: checkoutError } = await supabase.functions.invoke("payment-checkout", {
-      body: { purchaseType: "membership", purchaseId: membershipId },
-    });
-    if (checkoutError || !data?.checkoutUrl) throw new Error(t.checkoutFailed);
-    window.location.assign(data.checkoutUrl as string);
-  };
-
-  const keyFor = (scope: string) => {
-    const existing = keys.current.get(scope);
-    if (existing) return existing;
-    const created = newRequestKey("membership");
-    keys.current.set(scope, created);
-    return created;
+    const receipt = await requestCheckout(supabase, { purchaseType: "membership", purchaseId: membershipId }, locale, { onCaptured: load });
+    window.location.assign(receipt.checkoutUrl);
   };
 
   const run = async (busyKey: string, work: () => Promise<void>) => {
+    if (busyId) return;
     setBusyId(busyKey);
     setError("");
     setSuccess("");
     try {
       await work();
     } catch (failure) {
-      setError(failure instanceof Error && failure.message === t.checkoutFailed ? t.checkoutFailed : membershipError(failure, locale));
+      setError(failure instanceof CheckoutStateError ? failure.message : membershipError(failure, locale));
     } finally {
       setBusyId(null);
     }
   };
 
   const buy = (plan: Plan) => run(`plan:${plan.id}`, async () => {
-    const { data, error: rpcError } = await supabase.rpc("purchase_membership", { p_plan_id: plan.id, p_idempotency_key: keyFor(`buy:${plan.id}`) });
-    if (rpcError) throw rpcError;
-    keys.current.delete(`buy:${plan.id}`);
-    await openCheckout((data as { membership_id: string }).membership_id);
+    const purchase = await preparePurchase(supabase, {
+      type: "membership", scope: `membership.buy.${plan.id}`, material: { plan_id: plan.id, renewal_of: null },
+      locale, storage: browserCheckoutStorage, idempotent: true, makeKey: () => newRequestKey("membership"), onSettled: load,
+      create: async (key: string) => {
+        const { data, error } = await supabase.rpc("purchase_membership", { p_plan_id: plan.id, p_idempotency_key: key });
+        if (error) throw error;
+        return (data as { membership_id: string }).membership_id;
+      },
+    });
+    await openCheckout(purchase.id);
   });
 
   const renew = (membership: Membership) => run(`renew:${membership.id}`, async () => {
-    const { data, error: rpcError } = await supabase.rpc("renew_membership", { p_membership_id: membership.id, p_idempotency_key: keyFor(`renew:${membership.id}`) });
-    if (rpcError) throw rpcError;
-    keys.current.delete(`renew:${membership.id}`);
-    await openCheckout((data as { membership_id: string }).membership_id);
+    const purchase = await preparePurchase(supabase, {
+      type: "membership", scope: `membership.renew.${membership.id}`, material: { plan_id: membership.plan_id, renewal_of: membership.id },
+      locale, storage: browserCheckoutStorage, idempotent: true, makeKey: () => newRequestKey("membership"), onSettled: load,
+      create: async (key: string) => {
+        const { data, error } = await supabase.rpc("renew_membership", { p_membership_id: membership.id, p_idempotency_key: key });
+        if (error) throw error;
+        return (data as { membership_id: string }).membership_id;
+      },
+    });
+    await openCheckout(purchase.id);
   });
 
   const pay = (membership: Membership) => run(`pay:${membership.id}`, () => openCheckout(membership.id));

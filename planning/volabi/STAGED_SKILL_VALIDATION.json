@@ -1,0 +1,30 @@
+{
+  "checked_on": "2026-10-22",
+  "checks": [
+    {
+      "skill": "primora-design-system",
+      "exit_code": 0,
+      "stdout": "Skill is valid!",
+      "stderr": "",
+      "kind": "structural only"
+    },
+    {
+      "skill": "primora-dashboard-layout",
+      "exit_code": 0,
+      "stdout": "Skill is valid!",
+      "stderr": "",
+      "kind": "structural only"
+    },
+    {
+      "skill": "primora-data-visualization",
+      "exit_code": 0,
+      "stdout": "Skill is valid!",
+      "stderr": "",
+      "kind": "structural only"
+    }
+  ],
+  "installed": false,
+  "approved": false,
+  "behavioral_forward_test": "not_performed",
+  "references_checked": "all three linked proposal-source.md files exist"
+}

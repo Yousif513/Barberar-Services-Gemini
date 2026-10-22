@@ -1,0 +1,606 @@
+{
+  "bmad_present": true,
+  "project_root": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\planning\\volabi",
+  "config_path": null,
+  "docs_dir": "docs",
+  "project_name": "Volabi / Primora AI Headquarters - proposed requirements",
+  "project_description": null,
+  "prd_path": "docs\\prd.md",
+  "architecture_path": null,
+  "front_end_spec_path": "docs\\front-end-spec.md",
+  "epic_paths": [],
+  "story_paths": [],
+  "qa_paths": [],
+  "spec_paths": [],
+  "actors": [],
+  "entities": [],
+  "epics": [],
+  "explicit_screens": [
+    {
+      "name": "CEO Command Center",
+      "route": "/hq",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 7,
+      "raw": "/hq — CEO Command Center"
+    },
+    {
+      "name": "Persistent Task Queue",
+      "route": "/hq/tasks",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 8,
+      "raw": "/hq/tasks — Persistent Task Queue"
+    },
+    {
+      "name": "Task Composer",
+      "route": "/hq/tasks/new",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 9,
+      "raw": "/hq/tasks/new — Task Composer"
+    },
+    {
+      "name": "Task Workspace",
+      "route": "/hq/tasks/[id]",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 10,
+      "raw": "/hq/tasks/[id] — Task Workspace"
+    },
+    {
+      "name": "CEO Decision Queue",
+      "route": "/hq/decisions",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 11,
+      "raw": "/hq/decisions — CEO Decision Queue"
+    },
+    {
+      "name": "CEO Decision Detail",
+      "route": "/hq/decisions/[id]",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 12,
+      "raw": "/hq/decisions/[id] — CEO Decision Detail"
+    },
+    {
+      "name": "Original Agent Directory",
+      "route": "/hq/agents",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 13,
+      "raw": "/hq/agents — Original Agent Directory"
+    },
+    {
+      "name": "Agent Profile",
+      "route": "/hq/agents/[id]",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 14,
+      "raw": "/hq/agents/[id] — Agent Profile"
+    },
+    {
+      "name": "Skill Catalog",
+      "route": "/hq/skills",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 15,
+      "raw": "/hq/skills — Skill Catalog"
+    },
+    {
+      "name": "Skill Detail",
+      "route": "/hq/skills/[id]",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 16,
+      "raw": "/hq/skills/[id] — Skill Detail"
+    },
+    {
+      "name": "Capability Gap Matrix",
+      "route": "/hq/capabilities",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 17,
+      "raw": "/hq/capabilities — Capability Gap Matrix"
+    },
+    {
+      "name": "Evaluation History",
+      "route": "/hq/evaluations",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 18,
+      "raw": "/hq/evaluations — Evaluation History"
+    },
+    {
+      "name": "Evaluation Detail",
+      "route": "/hq/evaluations/[id]",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 19,
+      "raw": "/hq/evaluations/[id] — Evaluation Detail"
+    },
+    {
+      "name": "Skill Change Review",
+      "route": "/hq/skill-changes/[id]",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 20,
+      "raw": "/hq/skill-changes/[id] — Skill Change Review"
+    },
+    {
+      "name": "Knowledge Source Library",
+      "route": "/hq/knowledge",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 21,
+      "raw": "/hq/knowledge — Knowledge Source Library"
+    },
+    {
+      "name": "Source Evidence Detail",
+      "route": "/hq/knowledge/[id]",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 22,
+      "raw": "/hq/knowledge/[id] — Source Evidence Detail"
+    },
+    {
+      "name": "Immutable Audit Timeline",
+      "route": "/hq/audit",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 23,
+      "raw": "/hq/audit — Immutable Audit Timeline"
+    },
+    {
+      "name": "Audit Event Detail",
+      "route": "/hq/audit/[id]",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 24,
+      "raw": "/hq/audit/[id] — Audit Event Detail"
+    },
+    {
+      "name": "Tools and Connection Readiness",
+      "route": "/hq/connections",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 25,
+      "raw": "/hq/connections — Tools and Connection Readiness"
+    },
+    {
+      "name": "HQ Workspace Settings",
+      "route": "/hq/settings",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 26,
+      "raw": "/hq/settings — HQ Workspace Settings"
+    }
+  ],
+  "story_triggers": [],
+  "spec_snippets": [
+    {
+      "quote": "Clicking Compose task opens /hq/tasks/new.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 32,
+      "section": "CEO Command Center"
+    },
+    {
+      "quote": "Clicking Inspect task opens /hq/tasks/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 33,
+      "section": "CEO Command Center"
+    },
+    {
+      "quote": "Clicking Review decisions opens /hq/decisions.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 34,
+      "section": "CEO Command Center"
+    },
+    {
+      "quote": "Clicking Agent directory opens /hq/agents.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 35,
+      "section": "CEO Command Center"
+    },
+    {
+      "quote": "Clicking New task opens /hq/tasks/new.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 38,
+      "section": "Persistent Task Queue"
+    },
+    {
+      "quote": "Clicking Open task opens /hq/tasks/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 39,
+      "section": "Persistent Task Queue"
+    },
+    {
+      "quote": "Clicking Filter opens overlay:filters.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 40,
+      "section": "Persistent Task Queue"
+    },
+    {
+      "quote": "Clicking Assess readiness opens inline:readiness.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 43,
+      "section": "Task Composer"
+    },
+    {
+      "quote": "Clicking Compare candidates opens overlay:readiness-comparison.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 44,
+      "section": "Task Composer"
+    },
+    {
+      "quote": "Clicking Submit draft opens /hq/tasks/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 45,
+      "section": "Task Composer"
+    },
+    {
+      "quote": "Clicking Attach sources opens overlay:source-picker.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 46,
+      "section": "Task Composer"
+    },
+    {
+      "quote": "Clicking Review recommendation opens overlay:recommendation.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 49,
+      "section": "Task Workspace"
+    },
+    {
+      "quote": "Clicking Request decision opens /hq/decisions/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 50,
+      "section": "Task Workspace"
+    },
+    {
+      "quote": "Clicking Add source opens overlay:source-picker.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 51,
+      "section": "Task Workspace"
+    },
+    {
+      "quote": "Clicking Inspect agent opens /hq/agents/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 52,
+      "section": "Task Workspace"
+    },
+    {
+      "quote": "Clicking Open receipt opens /hq/audit/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 53,
+      "section": "Task Workspace"
+    },
+    {
+      "quote": "Clicking Open decision opens /hq/decisions/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 56,
+      "section": "CEO Decision Queue"
+    },
+    {
+      "quote": "Clicking Open skill change opens /hq/skill-changes/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 57,
+      "section": "CEO Decision Queue"
+    },
+    {
+      "quote": "Clicking Filter opens overlay:filters.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 58,
+      "section": "CEO Decision Queue"
+    },
+    {
+      "quote": "Clicking Approve or decline opens overlay:decision-confirmation.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 61,
+      "section": "CEO Decision Detail"
+    },
+    {
+      "quote": "Clicking Request changes opens overlay:request-changes.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 62,
+      "section": "CEO Decision Detail"
+    },
+    {
+      "quote": "Clicking Audit receipt opens /hq/audit/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 63,
+      "section": "CEO Decision Detail"
+    },
+    {
+      "quote": "Clicking Open profile opens /hq/agents/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 66,
+      "section": "Original Agent Directory"
+    },
+    {
+      "quote": "Clicking View gaps opens /hq/capabilities.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 67,
+      "section": "Original Agent Directory"
+    },
+    {
+      "quote": "Clicking Filter opens overlay:filters.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 68,
+      "section": "Original Agent Directory"
+    },
+    {
+      "quote": "Clicking Inspect skill opens /hq/skills/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 71,
+      "section": "Agent Profile"
+    },
+    {
+      "quote": "Clicking Request evaluation opens overlay:evaluation-request.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 72,
+      "section": "Agent Profile"
+    },
+    {
+      "quote": "Clicking Propose skill add/remove opens overlay:skill-change.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 73,
+      "section": "Agent Profile"
+    },
+    {
+      "quote": "Clicking Task readiness opens inline:readiness.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 74,
+      "section": "Agent Profile"
+    },
+    {
+      "quote": "Clicking Evidence opens /hq/evaluations/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 75,
+      "section": "Agent Profile"
+    },
+    {
+      "quote": "Clicking Inspect skill opens /hq/skills/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 78,
+      "section": "Skill Catalog"
+    },
+    {
+      "quote": "Clicking Propose addition opens overlay:skill-change.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 79,
+      "section": "Skill Catalog"
+    },
+    {
+      "quote": "Clicking Filter opens overlay:filters.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 80,
+      "section": "Skill Catalog"
+    },
+    {
+      "quote": "Clicking Evaluation opens /hq/evaluations/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 83,
+      "section": "Skill Detail"
+    },
+    {
+      "quote": "Clicking Binding proposal opens overlay:skill-change.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 84,
+      "section": "Skill Detail"
+    },
+    {
+      "quote": "Clicking Source opens /hq/knowledge/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 85,
+      "section": "Skill Detail"
+    },
+    {
+      "quote": "Clicking Compare versions opens overlay:version-diff.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 86,
+      "section": "Skill Detail"
+    },
+    {
+      "quote": "Clicking Open agent opens /hq/agents/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 89,
+      "section": "Capability Gap Matrix"
+    },
+    {
+      "quote": "Clicking Open skill opens /hq/skills/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 90,
+      "section": "Capability Gap Matrix"
+    },
+    {
+      "quote": "Clicking Propose resolution opens overlay:skill-change.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 91,
+      "section": "Capability Gap Matrix"
+    },
+    {
+      "quote": "Clicking Open evaluation opens /hq/evaluations/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 94,
+      "section": "Evaluation History"
+    },
+    {
+      "quote": "Clicking Request evaluation opens overlay:evaluation-request.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 95,
+      "section": "Evaluation History"
+    },
+    {
+      "quote": "Clicking Source evidence opens /hq/knowledge/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 98,
+      "section": "Evaluation Detail"
+    },
+    {
+      "quote": "Clicking Propose correction opens overlay:skill-change.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 99,
+      "section": "Evaluation Detail"
+    },
+    {
+      "quote": "Clicking CEO decision opens /hq/decisions/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 102,
+      "section": "Skill Change Review"
+    },
+    {
+      "quote": "Clicking Compare versions opens overlay:version-diff.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 103,
+      "section": "Skill Change Review"
+    },
+    {
+      "quote": "Clicking Checked binding receipt opens inline:approved-change-receipt.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 104,
+      "section": "Skill Change Review"
+    },
+    {
+      "quote": "Clicking Source detail opens /hq/knowledge/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 107,
+      "section": "Knowledge Source Library"
+    },
+    {
+      "quote": "Clicking Attach source draft opens overlay:source-intake.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 108,
+      "section": "Knowledge Source Library"
+    },
+    {
+      "quote": "Clicking Filter opens overlay:filters.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 109,
+      "section": "Knowledge Source Library"
+    },
+    {
+      "quote": "Clicking Correction proposal opens overlay:source-correction.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 112,
+      "section": "Source Evidence Detail"
+    },
+    {
+      "quote": "Clicking Affected tasks opens /hq/tasks.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 113,
+      "section": "Source Evidence Detail"
+    },
+    {
+      "quote": "Clicking Event detail opens /hq/audit/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 116,
+      "section": "Immutable Audit Timeline"
+    },
+    {
+      "quote": "Clicking Filter opens overlay:filters.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 117,
+      "section": "Immutable Audit Timeline"
+    },
+    {
+      "quote": "Clicking Task opens /hq/tasks/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 120,
+      "section": "Audit Event Detail"
+    },
+    {
+      "quote": "Clicking Decision opens /hq/decisions/[id].",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 121,
+      "section": "Audit Event Detail"
+    },
+    {
+      "quote": "Clicking Prerequisites opens overlay:connection-prerequisites.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 124,
+      "section": "Tools and Connection Readiness"
+    },
+    {
+      "quote": "Clicking Request named setup opens overlay:connection-request.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 125,
+      "section": "Tools and Connection Readiness"
+    },
+    {
+      "quote": "Clicking Locale and preferences opens inline:preferences.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 128,
+      "section": "HQ Workspace Settings"
+    },
+    {
+      "quote": "Clicking Permission request opens overlay:connection-request.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 129,
+      "section": "HQ Workspace Settings"
+    }
+  ],
+  "design_md_path": "DESIGN.md",
+  "stitch_metadata_path": null,
+  "site_md_path": null,
+  "brand_hints": {
+    "colors": [
+      "#D1AF47",
+      "#F4E7B6",
+      "#F7F3EA",
+      "#FFFFFF",
+      "#15120D",
+      "#475467",
+      "#D8D1C4",
+      "#10120F",
+      "#B42318",
+      "#067647",
+      "#93370D",
+      "#175CD3"
+    ],
+    "vibe": [
+      "warm"
+    ]
+  },
+  "warnings": []
+}

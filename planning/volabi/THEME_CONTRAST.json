@@ -1,0 +1,35 @@
+{
+  "method": "WCAG sRGB relative luminance; token pairs only",
+  "pairs": [
+    {
+      "use": "Ink on Ivory",
+      "foreground": "#15120D",
+      "background": "#F7F3EA",
+      "ratio": 16.87
+    },
+    {
+      "use": "Slate on White",
+      "foreground": "#475467",
+      "background": "#FFFFFF",
+      "ratio": 7.69
+    },
+    {
+      "use": "Soft Gold on Obsidian",
+      "foreground": "#F4E7B6",
+      "background": "#10120F",
+      "ratio": 15.2
+    },
+    {
+      "use": "Gold on Obsidian",
+      "foreground": "#D1AF47",
+      "background": "#10120F",
+      "ratio": 8.91
+    },
+    {
+      "use": "Gold on Ivory - accent only",
+      "foreground": "#D1AF47",
+      "background": "#F7F3EA",
+      "ratio": 1.91
+    }
+  ]
+}

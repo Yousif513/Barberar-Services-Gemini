@@ -1,0 +1,2525 @@
+{
+  "plan_version": 1,
+  "project": {
+    "name": "Volabi / Primora AI Headquarters - proposed requirements",
+    "root": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\planning\\volabi",
+    "bmad_present": true
+  },
+  "areas": [
+    "hq"
+  ],
+  "nodes": [
+    {
+      "id": "hq-agent-profile",
+      "kind": "page",
+      "name": "Agent Profile",
+      "route": "/hq/agents/[id]",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:14"
+      ]
+    },
+    {
+      "id": "hq-agent-profile-modal-overlay",
+      "kind": "modal",
+      "name": "Request evaluation",
+      "parent": "hq-agent-profile",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-agent-profile::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-agent-profile-modal-inline",
+      "kind": "modal",
+      "name": "Task readiness",
+      "parent": "hq-agent-profile",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-agent-profile::declared-inline"
+      ]
+    },
+    {
+      "id": "hq-agent-profile-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-agent-profile",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-agent-profile::date-range"
+      ]
+    },
+    {
+      "id": "hq-agent-profile-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-agent-profile",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-agent-profile::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-agent-profile-state-loading",
+      "kind": "state",
+      "name": "Agent Profile — loading",
+      "parent": "hq-agent-profile",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-agent-profile-state-error",
+      "kind": "state",
+      "name": "Agent Profile — error",
+      "parent": "hq-agent-profile",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-agent-profile-state-empty",
+      "kind": "state",
+      "name": "Agent Profile — empty",
+      "parent": "hq-agent-profile",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-audit-event-detail",
+      "kind": "page",
+      "name": "Audit Event Detail",
+      "route": "/hq/audit/[id]",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:24"
+      ]
+    },
+    {
+      "id": "hq-audit-event-detail-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-audit-event-detail",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-audit-event-detail::date-range"
+      ]
+    },
+    {
+      "id": "hq-audit-event-detail-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-audit-event-detail",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-audit-event-detail::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-audit-event-detail-state-loading",
+      "kind": "state",
+      "name": "Audit Event Detail — loading",
+      "parent": "hq-audit-event-detail",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-audit-event-detail-state-error",
+      "kind": "state",
+      "name": "Audit Event Detail — error",
+      "parent": "hq-audit-event-detail",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-audit-event-detail-state-empty",
+      "kind": "state",
+      "name": "Audit Event Detail — empty",
+      "parent": "hq-audit-event-detail",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-ceo-command-center",
+      "kind": "page",
+      "name": "CEO Command Center",
+      "route": "/hq",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:7"
+      ]
+    },
+    {
+      "id": "hq-ceo-command-center-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-ceo-command-center",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-ceo-command-center::date-range"
+      ]
+    },
+    {
+      "id": "hq-ceo-command-center-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-ceo-command-center",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-ceo-command-center::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-ceo-command-center-state-loading",
+      "kind": "state",
+      "name": "CEO Command Center — loading",
+      "parent": "hq-ceo-command-center",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-ceo-command-center-state-error",
+      "kind": "state",
+      "name": "CEO Command Center — error",
+      "parent": "hq-ceo-command-center",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-ceo-command-center-state-empty",
+      "kind": "state",
+      "name": "CEO Command Center — empty",
+      "parent": "hq-ceo-command-center",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-ceo-decision-detail",
+      "kind": "page",
+      "name": "CEO Decision Detail",
+      "route": "/hq/decisions/[id]",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:12"
+      ]
+    },
+    {
+      "id": "hq-ceo-decision-detail-modal-overlay",
+      "kind": "modal",
+      "name": "Request changes",
+      "parent": "hq-ceo-decision-detail",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-ceo-decision-detail::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-ceo-decision-detail-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-ceo-decision-detail",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-ceo-decision-detail::date-range"
+      ]
+    },
+    {
+      "id": "hq-ceo-decision-detail-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-ceo-decision-detail",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-ceo-decision-detail::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-ceo-decision-detail-state-loading",
+      "kind": "state",
+      "name": "CEO Decision Detail — loading",
+      "parent": "hq-ceo-decision-detail",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-ceo-decision-detail-state-error",
+      "kind": "state",
+      "name": "CEO Decision Detail — error",
+      "parent": "hq-ceo-decision-detail",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-ceo-decision-detail-state-empty",
+      "kind": "state",
+      "name": "CEO Decision Detail — empty",
+      "parent": "hq-ceo-decision-detail",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-ceo-decision-queue",
+      "kind": "page",
+      "name": "CEO Decision Queue",
+      "route": "/hq/decisions",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:11"
+      ]
+    },
+    {
+      "id": "hq-ceo-decision-queue-modal-overlay",
+      "kind": "modal",
+      "name": "Filter",
+      "parent": "hq-ceo-decision-queue",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-ceo-decision-queue::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-ceo-decision-queue-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-ceo-decision-queue",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-ceo-decision-queue::date-range"
+      ]
+    },
+    {
+      "id": "hq-ceo-decision-queue-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-ceo-decision-queue",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-ceo-decision-queue::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-ceo-decision-queue-state-loading",
+      "kind": "state",
+      "name": "CEO Decision Queue — loading",
+      "parent": "hq-ceo-decision-queue",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-ceo-decision-queue-state-error",
+      "kind": "state",
+      "name": "CEO Decision Queue — error",
+      "parent": "hq-ceo-decision-queue",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-ceo-decision-queue-state-empty",
+      "kind": "state",
+      "name": "CEO Decision Queue — empty",
+      "parent": "hq-ceo-decision-queue",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-capability-gap-matrix",
+      "kind": "page",
+      "name": "Capability Gap Matrix",
+      "route": "/hq/capabilities",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:17"
+      ]
+    },
+    {
+      "id": "hq-capability-gap-matrix-modal-overlay",
+      "kind": "modal",
+      "name": "Propose resolution",
+      "parent": "hq-capability-gap-matrix",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-capability-gap-matrix::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-capability-gap-matrix-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-capability-gap-matrix",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-capability-gap-matrix::date-range"
+      ]
+    },
+    {
+      "id": "hq-capability-gap-matrix-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-capability-gap-matrix",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-capability-gap-matrix::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-capability-gap-matrix-state-loading",
+      "kind": "state",
+      "name": "Capability Gap Matrix — loading",
+      "parent": "hq-capability-gap-matrix",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-capability-gap-matrix-state-error",
+      "kind": "state",
+      "name": "Capability Gap Matrix — error",
+      "parent": "hq-capability-gap-matrix",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-capability-gap-matrix-state-empty",
+      "kind": "state",
+      "name": "Capability Gap Matrix — empty",
+      "parent": "hq-capability-gap-matrix",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-evaluation-detail",
+      "kind": "page",
+      "name": "Evaluation Detail",
+      "route": "/hq/evaluations/[id]",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:19"
+      ]
+    },
+    {
+      "id": "hq-evaluation-detail-modal-overlay",
+      "kind": "modal",
+      "name": "Propose correction",
+      "parent": "hq-evaluation-detail",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-evaluation-detail::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-evaluation-detail-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-evaluation-detail",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-evaluation-detail::date-range"
+      ]
+    },
+    {
+      "id": "hq-evaluation-detail-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-evaluation-detail",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-evaluation-detail::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-evaluation-detail-state-loading",
+      "kind": "state",
+      "name": "Evaluation Detail — loading",
+      "parent": "hq-evaluation-detail",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-evaluation-detail-state-error",
+      "kind": "state",
+      "name": "Evaluation Detail — error",
+      "parent": "hq-evaluation-detail",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-evaluation-detail-state-empty",
+      "kind": "state",
+      "name": "Evaluation Detail — empty",
+      "parent": "hq-evaluation-detail",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-evaluation-history",
+      "kind": "page",
+      "name": "Evaluation History",
+      "route": "/hq/evaluations",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:18"
+      ]
+    },
+    {
+      "id": "hq-evaluation-history-modal-overlay",
+      "kind": "modal",
+      "name": "Request evaluation",
+      "parent": "hq-evaluation-history",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-evaluation-history::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-evaluation-history-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-evaluation-history",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-evaluation-history::date-range"
+      ]
+    },
+    {
+      "id": "hq-evaluation-history-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-evaluation-history",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-evaluation-history::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-evaluation-history-state-loading",
+      "kind": "state",
+      "name": "Evaluation History — loading",
+      "parent": "hq-evaluation-history",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-evaluation-history-state-error",
+      "kind": "state",
+      "name": "Evaluation History — error",
+      "parent": "hq-evaluation-history",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-evaluation-history-state-empty",
+      "kind": "state",
+      "name": "Evaluation History — empty",
+      "parent": "hq-evaluation-history",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-hq-workspace-settings",
+      "kind": "page",
+      "name": "HQ Workspace Settings",
+      "route": "/hq/settings",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:26"
+      ]
+    },
+    {
+      "id": "hq-hq-workspace-settings-modal-inline",
+      "kind": "modal",
+      "name": "Locale and preferences",
+      "parent": "hq-hq-workspace-settings",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-hq-workspace-settings::declared-inline"
+      ]
+    },
+    {
+      "id": "hq-hq-workspace-settings-modal-overlay",
+      "kind": "modal",
+      "name": "Permission request",
+      "parent": "hq-hq-workspace-settings",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-hq-workspace-settings::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-hq-workspace-settings-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-hq-workspace-settings",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-hq-workspace-settings::date-range"
+      ]
+    },
+    {
+      "id": "hq-hq-workspace-settings-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-hq-workspace-settings",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-hq-workspace-settings::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-hq-workspace-settings-state-loading",
+      "kind": "state",
+      "name": "HQ Workspace Settings — loading",
+      "parent": "hq-hq-workspace-settings",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-hq-workspace-settings-state-error",
+      "kind": "state",
+      "name": "HQ Workspace Settings — error",
+      "parent": "hq-hq-workspace-settings",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-hq-workspace-settings-state-empty",
+      "kind": "state",
+      "name": "HQ Workspace Settings — empty",
+      "parent": "hq-hq-workspace-settings",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-immutable-audit-timeline",
+      "kind": "page",
+      "name": "Immutable Audit Timeline",
+      "route": "/hq/audit",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:23"
+      ]
+    },
+    {
+      "id": "hq-immutable-audit-timeline-modal-overlay",
+      "kind": "modal",
+      "name": "Filter",
+      "parent": "hq-immutable-audit-timeline",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-immutable-audit-timeline::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-immutable-audit-timeline-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-immutable-audit-timeline",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-immutable-audit-timeline::date-range"
+      ]
+    },
+    {
+      "id": "hq-immutable-audit-timeline-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-immutable-audit-timeline",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-immutable-audit-timeline::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-immutable-audit-timeline-state-loading",
+      "kind": "state",
+      "name": "Immutable Audit Timeline — loading",
+      "parent": "hq-immutable-audit-timeline",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-immutable-audit-timeline-state-error",
+      "kind": "state",
+      "name": "Immutable Audit Timeline — error",
+      "parent": "hq-immutable-audit-timeline",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-immutable-audit-timeline-state-empty",
+      "kind": "state",
+      "name": "Immutable Audit Timeline — empty",
+      "parent": "hq-immutable-audit-timeline",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-knowledge-source-library",
+      "kind": "page",
+      "name": "Knowledge Source Library",
+      "route": "/hq/knowledge",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:21"
+      ]
+    },
+    {
+      "id": "hq-knowledge-source-library-modal-overlay",
+      "kind": "modal",
+      "name": "Filter",
+      "parent": "hq-knowledge-source-library",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-knowledge-source-library::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-knowledge-source-library-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-knowledge-source-library",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-knowledge-source-library::date-range"
+      ]
+    },
+    {
+      "id": "hq-knowledge-source-library-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-knowledge-source-library",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-knowledge-source-library::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-knowledge-source-library-state-loading",
+      "kind": "state",
+      "name": "Knowledge Source Library — loading",
+      "parent": "hq-knowledge-source-library",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-knowledge-source-library-state-error",
+      "kind": "state",
+      "name": "Knowledge Source Library — error",
+      "parent": "hq-knowledge-source-library",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-knowledge-source-library-state-empty",
+      "kind": "state",
+      "name": "Knowledge Source Library — empty",
+      "parent": "hq-knowledge-source-library",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-original-agent-directory",
+      "kind": "page",
+      "name": "Original Agent Directory",
+      "route": "/hq/agents",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:13"
+      ]
+    },
+    {
+      "id": "hq-original-agent-directory-modal-overlay",
+      "kind": "modal",
+      "name": "Filter",
+      "parent": "hq-original-agent-directory",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-original-agent-directory::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-original-agent-directory-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-original-agent-directory",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-original-agent-directory::date-range"
+      ]
+    },
+    {
+      "id": "hq-original-agent-directory-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-original-agent-directory",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-original-agent-directory::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-original-agent-directory-state-loading",
+      "kind": "state",
+      "name": "Original Agent Directory — loading",
+      "parent": "hq-original-agent-directory",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-original-agent-directory-state-error",
+      "kind": "state",
+      "name": "Original Agent Directory — error",
+      "parent": "hq-original-agent-directory",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-original-agent-directory-state-empty",
+      "kind": "state",
+      "name": "Original Agent Directory — empty",
+      "parent": "hq-original-agent-directory",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-persistent-task-queue",
+      "kind": "page",
+      "name": "Persistent Task Queue",
+      "route": "/hq/tasks",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:8"
+      ]
+    },
+    {
+      "id": "hq-persistent-task-queue-modal-overlay",
+      "kind": "modal",
+      "name": "Filter",
+      "parent": "hq-persistent-task-queue",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-persistent-task-queue::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-persistent-task-queue-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-persistent-task-queue",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-persistent-task-queue::date-range"
+      ]
+    },
+    {
+      "id": "hq-persistent-task-queue-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-persistent-task-queue",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-persistent-task-queue::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-persistent-task-queue-state-loading",
+      "kind": "state",
+      "name": "Persistent Task Queue — loading",
+      "parent": "hq-persistent-task-queue",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-persistent-task-queue-state-error",
+      "kind": "state",
+      "name": "Persistent Task Queue — error",
+      "parent": "hq-persistent-task-queue",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-persistent-task-queue-state-empty",
+      "kind": "state",
+      "name": "Persistent Task Queue — empty",
+      "parent": "hq-persistent-task-queue",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-skill-catalog",
+      "kind": "page",
+      "name": "Skill Catalog",
+      "route": "/hq/skills",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:15"
+      ]
+    },
+    {
+      "id": "hq-skill-catalog-modal-overlay",
+      "kind": "modal",
+      "name": "Filter",
+      "parent": "hq-skill-catalog",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-skill-catalog::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-skill-catalog-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-skill-catalog",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-skill-catalog::date-range"
+      ]
+    },
+    {
+      "id": "hq-skill-catalog-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-skill-catalog",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-skill-catalog::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-skill-catalog-state-loading",
+      "kind": "state",
+      "name": "Skill Catalog — loading",
+      "parent": "hq-skill-catalog",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-skill-catalog-state-error",
+      "kind": "state",
+      "name": "Skill Catalog — error",
+      "parent": "hq-skill-catalog",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-skill-catalog-state-empty",
+      "kind": "state",
+      "name": "Skill Catalog — empty",
+      "parent": "hq-skill-catalog",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-skill-change-review",
+      "kind": "page",
+      "name": "Skill Change Review",
+      "route": "/hq/skill-changes/[id]",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:20"
+      ]
+    },
+    {
+      "id": "hq-skill-change-review-modal-overlay",
+      "kind": "modal",
+      "name": "Compare versions",
+      "parent": "hq-skill-change-review",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-skill-change-review::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-skill-change-review-modal-inline",
+      "kind": "modal",
+      "name": "Checked binding receipt",
+      "parent": "hq-skill-change-review",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-skill-change-review::declared-inline"
+      ]
+    },
+    {
+      "id": "hq-skill-change-review-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-skill-change-review",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-skill-change-review::date-range"
+      ]
+    },
+    {
+      "id": "hq-skill-change-review-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-skill-change-review",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-skill-change-review::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-skill-change-review-state-loading",
+      "kind": "state",
+      "name": "Skill Change Review — loading",
+      "parent": "hq-skill-change-review",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-skill-change-review-state-error",
+      "kind": "state",
+      "name": "Skill Change Review — error",
+      "parent": "hq-skill-change-review",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-skill-change-review-state-empty",
+      "kind": "state",
+      "name": "Skill Change Review — empty",
+      "parent": "hq-skill-change-review",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-skill-detail",
+      "kind": "page",
+      "name": "Skill Detail",
+      "route": "/hq/skills/[id]",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:16"
+      ]
+    },
+    {
+      "id": "hq-skill-detail-modal-overlay",
+      "kind": "modal",
+      "name": "Compare versions",
+      "parent": "hq-skill-detail",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-skill-detail::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-skill-detail-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-skill-detail",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-skill-detail::date-range"
+      ]
+    },
+    {
+      "id": "hq-skill-detail-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-skill-detail",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-skill-detail::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-skill-detail-state-loading",
+      "kind": "state",
+      "name": "Skill Detail — loading",
+      "parent": "hq-skill-detail",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-skill-detail-state-error",
+      "kind": "state",
+      "name": "Skill Detail — error",
+      "parent": "hq-skill-detail",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-skill-detail-state-empty",
+      "kind": "state",
+      "name": "Skill Detail — empty",
+      "parent": "hq-skill-detail",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-source-evidence-detail",
+      "kind": "page",
+      "name": "Source Evidence Detail",
+      "route": "/hq/knowledge/[id]",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:22"
+      ]
+    },
+    {
+      "id": "hq-source-evidence-detail-modal-overlay",
+      "kind": "modal",
+      "name": "Correction proposal",
+      "parent": "hq-source-evidence-detail",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-source-evidence-detail::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-source-evidence-detail-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-source-evidence-detail",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-source-evidence-detail::date-range"
+      ]
+    },
+    {
+      "id": "hq-source-evidence-detail-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-source-evidence-detail",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-source-evidence-detail::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-source-evidence-detail-state-loading",
+      "kind": "state",
+      "name": "Source Evidence Detail — loading",
+      "parent": "hq-source-evidence-detail",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-source-evidence-detail-state-error",
+      "kind": "state",
+      "name": "Source Evidence Detail — error",
+      "parent": "hq-source-evidence-detail",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-source-evidence-detail-state-empty",
+      "kind": "state",
+      "name": "Source Evidence Detail — empty",
+      "parent": "hq-source-evidence-detail",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-task-composer",
+      "kind": "page",
+      "name": "Task Composer",
+      "route": "/hq/tasks/new",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:9"
+      ]
+    },
+    {
+      "id": "hq-task-composer-modal-inline",
+      "kind": "modal",
+      "name": "Assess readiness",
+      "parent": "hq-task-composer",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-task-composer::declared-inline"
+      ]
+    },
+    {
+      "id": "hq-task-composer-modal-overlay",
+      "kind": "modal",
+      "name": "Attach sources",
+      "parent": "hq-task-composer",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-task-composer::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-task-composer-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-task-composer",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-task-composer::date-range"
+      ]
+    },
+    {
+      "id": "hq-task-composer-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-task-composer",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-task-composer::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-task-composer-state-loading",
+      "kind": "state",
+      "name": "Task Composer — loading",
+      "parent": "hq-task-composer",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-task-composer-state-error",
+      "kind": "state",
+      "name": "Task Composer — error",
+      "parent": "hq-task-composer",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-task-composer-state-empty",
+      "kind": "state",
+      "name": "Task Composer — empty",
+      "parent": "hq-task-composer",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-task-workspace",
+      "kind": "page",
+      "name": "Task Workspace",
+      "route": "/hq/tasks/[id]",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:10"
+      ]
+    },
+    {
+      "id": "hq-task-workspace-modal-overlay",
+      "kind": "modal",
+      "name": "Add source",
+      "parent": "hq-task-workspace",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-task-workspace::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-task-workspace-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-task-workspace",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-task-workspace::date-range"
+      ]
+    },
+    {
+      "id": "hq-task-workspace-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-task-workspace",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-task-workspace::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-task-workspace-state-loading",
+      "kind": "state",
+      "name": "Task Workspace — loading",
+      "parent": "hq-task-workspace",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-task-workspace-state-error",
+      "kind": "state",
+      "name": "Task Workspace — error",
+      "parent": "hq-task-workspace",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-task-workspace-state-empty",
+      "kind": "state",
+      "name": "Task Workspace — empty",
+      "parent": "hq-task-workspace",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "hq-tools-and-connection-readiness",
+      "kind": "page",
+      "name": "Tools and Connection Readiness",
+      "route": "/hq/connections",
+      "area": "hq",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:25"
+      ]
+    },
+    {
+      "id": "hq-tools-and-connection-readiness-modal-overlay",
+      "kind": "modal",
+      "name": "Request named setup",
+      "parent": "hq-tools-and-connection-readiness",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-tools-and-connection-readiness::declared-overlay"
+      ]
+    },
+    {
+      "id": "hq-tools-and-connection-readiness-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "hq-tools-and-connection-readiness",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-tools-and-connection-readiness::date-range"
+      ]
+    },
+    {
+      "id": "hq-tools-and-connection-readiness-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "hq-tools-and-connection-readiness",
+      "area": "hq",
+      "provenance": [
+        "closure:depth-1:from:hq-tools-and-connection-readiness::widget-menu"
+      ]
+    },
+    {
+      "id": "hq-tools-and-connection-readiness-state-loading",
+      "kind": "state",
+      "name": "Tools and Connection Readiness — loading",
+      "parent": "hq-tools-and-connection-readiness",
+      "state_variant": "loading",
+      "area": "hq"
+    },
+    {
+      "id": "hq-tools-and-connection-readiness-state-error",
+      "kind": "state",
+      "name": "Tools and Connection Readiness — error",
+      "parent": "hq-tools-and-connection-readiness",
+      "state_variant": "error",
+      "area": "hq"
+    },
+    {
+      "id": "hq-tools-and-connection-readiness-state-empty",
+      "kind": "state",
+      "name": "Tools and Connection Readiness — empty",
+      "parent": "hq-tools-and-connection-readiness",
+      "state_variant": "empty",
+      "area": "hq"
+    },
+    {
+      "id": "profile",
+      "kind": "page",
+      "name": "Profile",
+      "route": "/profile",
+      "area": "",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "Reached from Profile on shared-popover-user-menu",
+      "provenance": [
+        "closure:depth-2:from:shared-popover-user-menu::um-profile"
+      ]
+    },
+    {
+      "id": "profile-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "profile",
+      "area": "",
+      "provenance": [
+        "closure:depth-3:from:profile::date-range"
+      ]
+    },
+    {
+      "id": "profile-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "profile",
+      "area": "",
+      "provenance": [
+        "closure:depth-3:from:profile::widget-menu"
+      ]
+    },
+    {
+      "id": "settings",
+      "kind": "page",
+      "name": "Settings",
+      "route": "/settings",
+      "area": "",
+      "page_kind": "setting",
+      "role_gated": null,
+      "purpose": "Reached from Settings on shared-popover-user-menu",
+      "provenance": [
+        "closure:depth-2:from:shared-popover-user-menu::um-settings"
+      ]
+    },
+    {
+      "id": "settings-modal-destructive-confirm",
+      "kind": "modal",
+      "name": "Danger zone action",
+      "parent": "settings",
+      "area": "",
+      "provenance": [
+        "closure:depth-3:from:settings::danger-zone"
+      ]
+    },
+    {
+      "id": "settings-notifications",
+      "kind": "page",
+      "name": "Notifications",
+      "route": "/settings/notifications",
+      "area": "",
+      "page_kind": "setting",
+      "role_gated": null,
+      "purpose": "Reached from Notification settings on shared-drawer-notifications",
+      "provenance": [
+        "closure:depth-2:from:shared-drawer-notifications::nt-settings"
+      ]
+    },
+    {
+      "id": "settings-notifications-modal-destructive-confirm",
+      "kind": "modal",
+      "name": "Danger zone action",
+      "parent": "settings-notifications",
+      "area": "",
+      "provenance": [
+        "closure:depth-3:from:settings-notifications::danger-zone"
+      ]
+    },
+    {
+      "id": "shared-popover-user-menu",
+      "kind": "popover",
+      "name": "User menu",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-1:from:shell::user-menu"
+      ]
+    },
+    {
+      "id": "shared-drawer-notifications",
+      "kind": "drawer",
+      "name": "Notifications",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-1:from:shell::notifications-bell"
+      ]
+    },
+    {
+      "id": "shared-drawer-notifications-state-empty",
+      "kind": "state",
+      "name": "Notifications — empty",
+      "parent": "shared-drawer-notifications",
+      "state_variant": "empty",
+      "area": ""
+    },
+    {
+      "id": "shared-drawer-notifications-state-loading",
+      "kind": "state",
+      "name": "Notifications — loading",
+      "parent": "shared-drawer-notifications",
+      "state_variant": "loading",
+      "area": ""
+    },
+    {
+      "id": "shared-command-palette-global-search",
+      "kind": "command-palette",
+      "name": "Search",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-1:from:shell::global-search"
+      ]
+    },
+    {
+      "id": "shared-command-palette-global-search-state-no-results",
+      "kind": "state",
+      "name": "Search — no-results",
+      "parent": "shared-command-palette-global-search",
+      "state_variant": "no-results",
+      "area": ""
+    },
+    {
+      "id": "shared-toast-success",
+      "kind": "toast",
+      "name": "Confirm",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-2:from:hq-agent-profile-modal-overlay::primary"
+      ]
+    },
+    {
+      "id": "shared-toast-error",
+      "kind": "toast",
+      "name": "Action failed",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-2:from:hq-agent-profile-modal-overlay::fail"
+      ]
+    },
+    {
+      "id": "shared-modal-reauthenticate",
+      "kind": "modal",
+      "name": "Confirm password",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-3:from:settings::reauth"
+      ]
+    },
+    {
+      "id": "shared-toast-info",
+      "kind": "toast",
+      "name": "Undo",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-3:from:shared-toast-success::undo"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "hq-agent-profile",
+      "target": "hq-agent-profile-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-agent-profile",
+      "target": "hq-agent-profile-modal-inline",
+      "type": "contains"
+    },
+    {
+      "source": "hq-agent-profile",
+      "target": "hq-agent-profile-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-agent-profile",
+      "target": "hq-agent-profile-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-agent-profile",
+      "target": "hq-agent-profile-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-agent-profile",
+      "target": "hq-agent-profile-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-agent-profile",
+      "target": "hq-agent-profile-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-audit-event-detail",
+      "target": "hq-audit-event-detail-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-audit-event-detail",
+      "target": "hq-audit-event-detail-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-audit-event-detail",
+      "target": "hq-audit-event-detail-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-audit-event-detail",
+      "target": "hq-audit-event-detail-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-audit-event-detail",
+      "target": "hq-audit-event-detail-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-ceo-command-center",
+      "target": "hq-ceo-command-center-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-ceo-command-center",
+      "target": "hq-ceo-command-center-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-ceo-command-center",
+      "target": "hq-ceo-command-center-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-ceo-command-center",
+      "target": "hq-ceo-command-center-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-ceo-command-center",
+      "target": "hq-ceo-command-center-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-ceo-decision-detail",
+      "target": "hq-ceo-decision-detail-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-ceo-decision-detail",
+      "target": "hq-ceo-decision-detail-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-ceo-decision-detail",
+      "target": "hq-ceo-decision-detail-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-ceo-decision-detail",
+      "target": "hq-ceo-decision-detail-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-ceo-decision-detail",
+      "target": "hq-ceo-decision-detail-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-ceo-decision-detail",
+      "target": "hq-ceo-decision-detail-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-ceo-decision-queue",
+      "target": "hq-ceo-decision-queue-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-ceo-decision-queue",
+      "target": "hq-ceo-decision-queue-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-ceo-decision-queue",
+      "target": "hq-ceo-decision-queue-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-ceo-decision-queue",
+      "target": "hq-ceo-decision-queue-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-ceo-decision-queue",
+      "target": "hq-ceo-decision-queue-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-ceo-decision-queue",
+      "target": "hq-ceo-decision-queue-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-capability-gap-matrix",
+      "target": "hq-capability-gap-matrix-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-capability-gap-matrix",
+      "target": "hq-capability-gap-matrix-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-capability-gap-matrix",
+      "target": "hq-capability-gap-matrix-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-capability-gap-matrix",
+      "target": "hq-capability-gap-matrix-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-capability-gap-matrix",
+      "target": "hq-capability-gap-matrix-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-capability-gap-matrix",
+      "target": "hq-capability-gap-matrix-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-evaluation-detail",
+      "target": "hq-evaluation-detail-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-evaluation-detail",
+      "target": "hq-evaluation-detail-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-evaluation-detail",
+      "target": "hq-evaluation-detail-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-evaluation-detail",
+      "target": "hq-evaluation-detail-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-evaluation-detail",
+      "target": "hq-evaluation-detail-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-evaluation-detail",
+      "target": "hq-evaluation-detail-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-evaluation-history",
+      "target": "hq-evaluation-history-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-evaluation-history",
+      "target": "hq-evaluation-history-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-evaluation-history",
+      "target": "hq-evaluation-history-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-evaluation-history",
+      "target": "hq-evaluation-history-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-evaluation-history",
+      "target": "hq-evaluation-history-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-evaluation-history",
+      "target": "hq-evaluation-history-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-hq-workspace-settings",
+      "target": "hq-hq-workspace-settings-modal-inline",
+      "type": "contains"
+    },
+    {
+      "source": "hq-hq-workspace-settings",
+      "target": "hq-hq-workspace-settings-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-hq-workspace-settings",
+      "target": "hq-hq-workspace-settings-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-hq-workspace-settings",
+      "target": "hq-hq-workspace-settings-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-hq-workspace-settings",
+      "target": "hq-hq-workspace-settings-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-hq-workspace-settings",
+      "target": "hq-hq-workspace-settings-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-hq-workspace-settings",
+      "target": "hq-hq-workspace-settings-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-immutable-audit-timeline",
+      "target": "hq-immutable-audit-timeline-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-immutable-audit-timeline",
+      "target": "hq-immutable-audit-timeline-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-immutable-audit-timeline",
+      "target": "hq-immutable-audit-timeline-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-immutable-audit-timeline",
+      "target": "hq-immutable-audit-timeline-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-immutable-audit-timeline",
+      "target": "hq-immutable-audit-timeline-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-immutable-audit-timeline",
+      "target": "hq-immutable-audit-timeline-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-knowledge-source-library",
+      "target": "hq-knowledge-source-library-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-knowledge-source-library",
+      "target": "hq-knowledge-source-library-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-knowledge-source-library",
+      "target": "hq-knowledge-source-library-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-knowledge-source-library",
+      "target": "hq-knowledge-source-library-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-knowledge-source-library",
+      "target": "hq-knowledge-source-library-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-knowledge-source-library",
+      "target": "hq-knowledge-source-library-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-original-agent-directory",
+      "target": "hq-original-agent-directory-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-original-agent-directory",
+      "target": "hq-original-agent-directory-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-original-agent-directory",
+      "target": "hq-original-agent-directory-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-original-agent-directory",
+      "target": "hq-original-agent-directory-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-original-agent-directory",
+      "target": "hq-original-agent-directory-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-original-agent-directory",
+      "target": "hq-original-agent-directory-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-persistent-task-queue",
+      "target": "hq-persistent-task-queue-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-persistent-task-queue",
+      "target": "hq-persistent-task-queue-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-persistent-task-queue",
+      "target": "hq-persistent-task-queue-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-persistent-task-queue",
+      "target": "hq-persistent-task-queue-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-persistent-task-queue",
+      "target": "hq-persistent-task-queue-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-persistent-task-queue",
+      "target": "hq-persistent-task-queue-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-catalog",
+      "target": "hq-skill-catalog-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-catalog",
+      "target": "hq-skill-catalog-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-catalog",
+      "target": "hq-skill-catalog-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-catalog",
+      "target": "hq-skill-catalog-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-catalog",
+      "target": "hq-skill-catalog-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-catalog",
+      "target": "hq-skill-catalog-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-change-review",
+      "target": "hq-skill-change-review-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-change-review",
+      "target": "hq-skill-change-review-modal-inline",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-change-review",
+      "target": "hq-skill-change-review-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-change-review",
+      "target": "hq-skill-change-review-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-change-review",
+      "target": "hq-skill-change-review-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-change-review",
+      "target": "hq-skill-change-review-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-change-review",
+      "target": "hq-skill-change-review-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-detail",
+      "target": "hq-skill-detail-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-detail",
+      "target": "hq-skill-detail-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-detail",
+      "target": "hq-skill-detail-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-detail",
+      "target": "hq-skill-detail-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-detail",
+      "target": "hq-skill-detail-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-skill-detail",
+      "target": "hq-skill-detail-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-source-evidence-detail",
+      "target": "hq-source-evidence-detail-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-source-evidence-detail",
+      "target": "hq-source-evidence-detail-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-source-evidence-detail",
+      "target": "hq-source-evidence-detail-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-source-evidence-detail",
+      "target": "hq-source-evidence-detail-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-source-evidence-detail",
+      "target": "hq-source-evidence-detail-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-source-evidence-detail",
+      "target": "hq-source-evidence-detail-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-task-composer",
+      "target": "hq-task-composer-modal-inline",
+      "type": "contains"
+    },
+    {
+      "source": "hq-task-composer",
+      "target": "hq-task-composer-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-task-composer",
+      "target": "hq-task-composer-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-task-composer",
+      "target": "hq-task-composer-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-task-composer",
+      "target": "hq-task-composer-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-task-composer",
+      "target": "hq-task-composer-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-task-composer",
+      "target": "hq-task-composer-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-task-workspace",
+      "target": "hq-task-workspace-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-task-workspace",
+      "target": "hq-task-workspace-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-task-workspace",
+      "target": "hq-task-workspace-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-task-workspace",
+      "target": "hq-task-workspace-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-task-workspace",
+      "target": "hq-task-workspace-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-task-workspace",
+      "target": "hq-task-workspace-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "hq-tools-and-connection-readiness",
+      "target": "hq-tools-and-connection-readiness-modal-overlay",
+      "type": "contains"
+    },
+    {
+      "source": "hq-tools-and-connection-readiness",
+      "target": "hq-tools-and-connection-readiness-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "hq-tools-and-connection-readiness",
+      "target": "hq-tools-and-connection-readiness-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "hq-tools-and-connection-readiness",
+      "target": "hq-tools-and-connection-readiness-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "hq-tools-and-connection-readiness",
+      "target": "hq-tools-and-connection-readiness-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "hq-tools-and-connection-readiness",
+      "target": "hq-tools-and-connection-readiness-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "profile",
+      "target": "profile-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "profile",
+      "target": "profile-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "settings",
+      "target": "settings-modal-destructive-confirm",
+      "type": "contains"
+    },
+    {
+      "source": "settings-notifications",
+      "target": "settings-notifications-modal-destructive-confirm",
+      "type": "contains"
+    },
+    {
+      "source": "hq-agent-profile-modal-overlay",
+      "target": "hq-agent-profile",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-agent-profile-modal-inline",
+      "target": "hq-agent-profile",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-agent-profile-popover-date-range",
+      "target": "hq-agent-profile",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-agent-profile-popover-widget-actions",
+      "target": "hq-agent-profile",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-audit-event-detail-popover-date-range",
+      "target": "hq-audit-event-detail",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-audit-event-detail-popover-widget-actions",
+      "target": "hq-audit-event-detail",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-ceo-command-center-popover-date-range",
+      "target": "hq-ceo-command-center",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-ceo-command-center-popover-widget-actions",
+      "target": "hq-ceo-command-center",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-ceo-decision-detail-modal-overlay",
+      "target": "hq-ceo-decision-detail",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-ceo-decision-detail-popover-date-range",
+      "target": "hq-ceo-decision-detail",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-ceo-decision-detail-popover-widget-actions",
+      "target": "hq-ceo-decision-detail",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-ceo-decision-queue-modal-overlay",
+      "target": "hq-ceo-decision-queue",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-ceo-decision-queue-popover-date-range",
+      "target": "hq-ceo-decision-queue",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-ceo-decision-queue-popover-widget-actions",
+      "target": "hq-ceo-decision-queue",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-capability-gap-matrix-modal-overlay",
+      "target": "hq-capability-gap-matrix",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-capability-gap-matrix-popover-date-range",
+      "target": "hq-capability-gap-matrix",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-capability-gap-matrix-popover-widget-actions",
+      "target": "hq-capability-gap-matrix",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-evaluation-detail-modal-overlay",
+      "target": "hq-evaluation-detail",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-evaluation-detail-popover-date-range",
+      "target": "hq-evaluation-detail",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-evaluation-detail-popover-widget-actions",
+      "target": "hq-evaluation-detail",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-evaluation-history-modal-overlay",
+      "target": "hq-evaluation-history",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-evaluation-history-popover-date-range",
+      "target": "hq-evaluation-history",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-evaluation-history-popover-widget-actions",
+      "target": "hq-evaluation-history",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-hq-workspace-settings-modal-inline",
+      "target": "hq-hq-workspace-settings",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-hq-workspace-settings-modal-overlay",
+      "target": "hq-hq-workspace-settings",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-hq-workspace-settings-popover-date-range",
+      "target": "hq-hq-workspace-settings",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-hq-workspace-settings-popover-widget-actions",
+      "target": "hq-hq-workspace-settings",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-immutable-audit-timeline-modal-overlay",
+      "target": "hq-immutable-audit-timeline",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-immutable-audit-timeline-popover-date-range",
+      "target": "hq-immutable-audit-timeline",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-immutable-audit-timeline-popover-widget-actions",
+      "target": "hq-immutable-audit-timeline",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-knowledge-source-library-modal-overlay",
+      "target": "hq-knowledge-source-library",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-knowledge-source-library-popover-date-range",
+      "target": "hq-knowledge-source-library",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-knowledge-source-library-popover-widget-actions",
+      "target": "hq-knowledge-source-library",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-original-agent-directory-modal-overlay",
+      "target": "hq-original-agent-directory",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-original-agent-directory-popover-date-range",
+      "target": "hq-original-agent-directory",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-original-agent-directory-popover-widget-actions",
+      "target": "hq-original-agent-directory",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-persistent-task-queue-modal-overlay",
+      "target": "hq-persistent-task-queue",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-persistent-task-queue-popover-date-range",
+      "target": "hq-persistent-task-queue",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-persistent-task-queue-popover-widget-actions",
+      "target": "hq-persistent-task-queue",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-skill-catalog-modal-overlay",
+      "target": "hq-skill-catalog",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-skill-catalog-popover-date-range",
+      "target": "hq-skill-catalog",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-skill-catalog-popover-widget-actions",
+      "target": "hq-skill-catalog",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-skill-change-review-modal-overlay",
+      "target": "hq-skill-change-review",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-skill-change-review-modal-inline",
+      "target": "hq-skill-change-review",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-skill-change-review-popover-date-range",
+      "target": "hq-skill-change-review",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-skill-change-review-popover-widget-actions",
+      "target": "hq-skill-change-review",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-skill-detail-modal-overlay",
+      "target": "hq-skill-detail",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-skill-detail-popover-date-range",
+      "target": "hq-skill-detail",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-skill-detail-popover-widget-actions",
+      "target": "hq-skill-detail",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-source-evidence-detail-modal-overlay",
+      "target": "hq-source-evidence-detail",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-source-evidence-detail-popover-date-range",
+      "target": "hq-source-evidence-detail",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-source-evidence-detail-popover-widget-actions",
+      "target": "hq-source-evidence-detail",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-task-composer-modal-inline",
+      "target": "hq-task-composer",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-task-composer-modal-overlay",
+      "target": "hq-task-composer",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-task-composer-popover-date-range",
+      "target": "hq-task-composer",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-task-composer-popover-widget-actions",
+      "target": "hq-task-composer",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-task-workspace-modal-overlay",
+      "target": "hq-task-workspace",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-task-workspace-popover-date-range",
+      "target": "hq-task-workspace",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-task-workspace-popover-widget-actions",
+      "target": "hq-task-workspace",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-tools-and-connection-readiness-modal-overlay",
+      "target": "hq-tools-and-connection-readiness",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-tools-and-connection-readiness-popover-date-range",
+      "target": "hq-tools-and-connection-readiness",
+      "type": "opens_from"
+    },
+    {
+      "source": "hq-tools-and-connection-readiness-popover-widget-actions",
+      "target": "hq-tools-and-connection-readiness",
+      "type": "opens_from"
+    },
+    {
+      "source": "profile-popover-date-range",
+      "target": "profile",
+      "type": "opens_from"
+    },
+    {
+      "source": "profile-popover-widget-actions",
+      "target": "profile",
+      "type": "opens_from"
+    },
+    {
+      "source": "settings-modal-destructive-confirm",
+      "target": "settings",
+      "type": "opens_from"
+    },
+    {
+      "source": "settings-notifications-modal-destructive-confirm",
+      "target": "settings-notifications",
+      "type": "opens_from"
+    }
+  ],
+  "totals": {
+    "nodes": 159,
+    "edges": 192,
+    "by_node_kind": {
+      "page": 23,
+      "modal": 25,
+      "popover": 43,
+      "state": 63,
+      "drawer": 1,
+      "command-palette": 1,
+      "toast": 3
+    },
+    "by_edge_type": {
+      "contains": 126,
+      "opens_from": 66
+    }
+  }
+}

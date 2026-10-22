@@ -116,8 +116,18 @@ describe("client roles hold no more than they need", () => {
         and not has_table_privilege('service_role', c.oid, 'DELETE') and c.relname <> 'admin_audit_logs'`);
     const appendOnlyNames = appendOnly.map((r) => r.relname).sort();
     for (const table of money) assert.ok(appendOnlyNames.includes(table), `${table} is append-only for the service role`);
-    assert.deepEqual(rows.map((r) => r.relname).filter((name) => !appendOnlyNames.includes(name)), ["admin_audit_logs"],
-      "the service role works on every other table except the append-only audit log");
+    // Durable checkout dispatch is RPC-only: even the service role cannot bypass its claim, immutable wire or receipt binding.
+    assert.deepEqual(rows.map((r) => r.relname).filter((name) => !appendOnlyNames.includes(name)).sort(), ["admin_audit_logs", "payment_checkout_attempts"],
+      "the service role keeps the append-only audit restriction and the explicit RPC-only checkout boundary");
+    const checkoutPrivileges = await sys(db, `select priv, has_table_privilege('service_role','public.payment_checkout_attempts',priv) allowed
+      from unnest(array['SELECT','INSERT','UPDATE','DELETE']) access(priv)`);
+    assert.ok(checkoutPrivileges.every((row) => row.allowed === false), "checkout records cannot be read or mutated outside audited service commands");
+    for (const signature of ["claim_checkout_attempt(uuid,text,uuid,uuid,text,text)", "read_checkout_attempt(uuid,text,uuid,text)",
+      "record_checkout_attempt(uuid,text,jsonb)", "mark_checkout_attempt_unknown(uuid,text)"]) {
+      const privilege = (await sys(db, `select has_function_privilege('service_role',$1,'EXECUTE') service,
+        has_function_privilege('anon',$1,'EXECUTE') anon, has_function_privilege('authenticated',$1,'EXECUTE') authenticated`, [signature]))[0];
+      assert.deepEqual(privilege, { service: true, anon: false, authenticated: false }, signature);
+    }
     assert.equal((await sys(db, `select has_table_privilege('service_role', 'public.admin_audit_logs', 'INSERT') and has_table_privilege('service_role', 'public.admin_audit_logs', 'SELECT') ok`))[0].ok, true);
   });
 });

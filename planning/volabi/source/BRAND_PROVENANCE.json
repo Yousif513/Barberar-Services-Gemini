@@ -1,0 +1,32 @@
+{
+  "status": "Current marketplace code; not HQ theme approval",
+  "sources": [
+    {
+      "path": "web_platform/src/app/globals.css",
+      "lines": [
+        1,
+        66
+      ],
+      "sha256": "5ab3bfae2224989de11eb65f7db9e8ec05e161c0461f2ef275ce3e44840816a9",
+      "excerpt": "1: @import \"tailwindcss\";\n2: \n3: :root {\n4:   --background: #fafaf9; /* stone-50 */\n5:   --foreground: #1c1917; /* stone-900 */\n6:   --font-playfair: Georgia, \"Times New Roman\", serif;\n7:   --font-outfit: Inter, Arial, sans-serif;\n8: }\n9: \n10: @theme inline {\n11:   --color-background: var(--background);\n12:   --color-foreground: var(--foreground);\n13:   --font-serif: var(--font-playfair);\n14:   --font-sans: var(--font-outfit);\n15: }\n16: \n17: /* UX round 2 (ux2-command-dialog-height-uncapped-confirm-unreachable): no modal dialog grows past the screen; its content\n18:    scrolls inside it. A base-layer default, so a dialog's own max-height or overflow utility still wins; drawers (aside) keep\n19:    their full height. */\n20: @layer base {\n21:   [role=\"dialog\"][aria-modal=\"true\"]:not(aside) {\n22:     max-height: calc(100dvh - 2rem);\n23:     overflow-y: auto;\n24:   }\n25: }\n26: \n27: body {\n28:   background: var(--background);\n29:   color: var(--foreground);\n30:   font-family: var(--font-outfit);\n31: }\n32: \n33: /* Arabic pages use IBM Plex Sans Arabic for body and display text (loaded via next/font). */\n34: html[lang=\"ar\"] {\n35:   --font-outfit: var(--font-arabic), Inter, Arial, sans-serif;\n36:   --font-playfair: var(--font-arabic), Georgia, serif;\n37: }\n38: \n39: /* PRIMORA dashboard-wide luxury skin: shared by admin and provider workspaces. */\n40: .primora-dashboard-skin {\n41:   --primora-gold: #D1AF47;\n42:   --primora-gold-soft: #F4E7B6;\n43:   --primora-gold-bright: #F7E6A6;\n44:   --primora-obsidian: #10120F;\n45:   --primora-ink: #15120D;\n46:   --primora-sand: #F7F3EA;\n47:   --primora-panel: rgba(255, 255, 255, 0.88);\n48:   position: relative;\n49:   isolation: isolate;\n50:   background:\n51:     radial-gradient(circle at 22% 8%, rgba(209, 175, 71, 0.16), transparent 26%),\n52:     radial-gradient(circle at 84% 22%, rgba(244, 231, 182, 0.42), transparent 24%),\n53:     linear-gradient(135deg, #F7F3EA 0%, #FBF8F1 48%, #EFE6D1 100%);\n54: }\n55: \n56: .primora-dashboard-skin::before,\n57: .primora-dashboard-skin::after {\n58:   content: \"\";\n59:   pointer-events: none;\n60:   position: absolute;\n61:   inset: 0;\n62:   z-index: 0;\n63: }\n64: \n65: .primora-dashboard-skin::before {\n66:   opacity: 0.42;"
+    },
+    {
+      "path": "web_platform/src/app/layout.tsx",
+      "lines": [
+        1,
+        35
+      ],
+      "sha256": "41b63add614f38106c976f48194cbbd46d903b995666acf6a658f9721e06aa8d",
+      "excerpt": "1: import type { Metadata } from \"next\";\n2: import { IBM_Plex_Sans_Arabic } from \"next/font/google\";\n3: import \"./globals.css\";\n4: import { GlobalDevTools } from \"@/components/global-dev-tools\";\n5: \n6: const arabicFont = IBM_Plex_Sans_Arabic({\n7:   subsets: [\"arabic\", \"latin\"],\n8:   weight: [\"400\", \"500\", \"600\", \"700\"],\n9:   variable: \"--font-arabic\",\n10:   display: \"swap\",\n11: });\n12: \n13: // Applies the visitor's saved language before first paint so Arabic pages never flash LTR.\n14: // Pages keep reading document.documentElement.lang / dir, and their toggles keep writing primora_lang.\n15: const languageBootstrap = `try{var l=localStorage.getItem(\"primora_lang\");if(l===\"ar\"||l===\"en\"){var d=document.documentElement;d.lang=l;d.dir=l===\"ar\"?\"rtl\":\"ltr\";}}catch(e){}`;\n16: \n17: export const metadata: Metadata = {\n18:   title: \"PRIMORA - Beauty & Grooming Marketplace\",\n19:   description: \"Book beauty salons, barber shops, spas and wellness professionals across Saudi Arabia.\",\n20: };\n21: \n22: export default function RootLayout({\n23:   children,\n24: }: Readonly<{\n25:   children: React.ReactNode;\n26: }>) {\n27:   return (\n28:     <html lang=\"en\" dir=\"ltr\" className={`h-full antialiased ${arabicFont.variable}`} suppressHydrationWarning>\n29:       <head>\n30:         <script dangerouslySetInnerHTML={{ __html: languageBootstrap }} />\n31:       </head>\n32:       <body className=\"min-h-full flex flex-col font-sans bg-stone-50 text-stone-900\">\n33:         {children}\n34:         <GlobalDevTools />\n35:       </body>"
+    },
+    {
+      "path": "web_platform/src/app/admin/layout.tsx",
+      "lines": [
+        618,
+        640
+      ],
+      "sha256": "bb1304e23b0385341a26e8a85e4a2a1315d09fd82d16e65e4784cecb26a0fc0b",
+      "excerpt": "618:       <div className=\"primora-dashboard-skin flex flex-col md:flex-row bg-[#F7F6F3] text-black font-sans selection:bg-[#D1AF47] selection:text-white md:h-screen md:overflow-hidden\">\n619:         \n620:         <a\n621:           href=\"#admin-main\"\n622:           className=\"sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[10000] focus:rounded-xl focus:bg-[#10120F] focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-[#F4E7B6] focus:outline-none focus:ring-2 focus:ring-[#D1AF47]\"\n623:         >\n624:           {t.skipToContent}\n625:         </a>\n626: \n627:         {/* ═══════════════════════════════════════════════════════ */}\n628:         {/* MOBILE TOP BAR (visible on screens < md)                */}\n629:         {/* ═══════════════════════════════════════════════════════ */}\n630:         <header inert={mobileMenuOpen} className=\"md:hidden flex items-center justify-between px-4 py-3 bg-[#10120F] text-white border-b border-[#E0C46A]/30 flex-shrink-0 z-30 shadow-md\">\n631:           <div className={`flex items-center gap-2.5 ${isRTL ? \"flex-row-reverse\" : \"flex-row\"}`}>\n632:             <Link \n633:               href=\"/\" \n634:               className={`flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D1AF47] rounded-lg ${isRTL ? \"flex-row-reverse\" : \"flex-row\"}`}\n635:             >\n636:               <svg className=\"w-5 h-5 text-[#D1AF47]\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" strokeWidth=\"2.5\">\n637:                 <path strokeLinecap=\"round\" strokeLinejoin=\"round\" d=\"M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5\" />\n638:               </svg>\n639:               <span className=\"text-lg font-serif font-black tracking-[0.18em] text-[#D1AF47]\">\n640:                 PRIMORA"
+    }
+  ]
+}

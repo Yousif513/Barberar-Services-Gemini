@@ -1,0 +1,1631 @@
+{
+  "status": "PROPOSED_HUMAN_AUTHORED_NOT_INDEPENDENTLY_REVIEWED",
+  "source_of_truth": "This HQ domain graph, not generic .design-architect/graph.json",
+  "pages": 20,
+  "nodes": [
+    {
+      "id": "route:/hq",
+      "kind": "page_template",
+      "name": "CEO Command Center",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Briefing, blocked work, decisions, last verified update"
+    },
+    {
+      "id": "route:/hq/tasks",
+      "kind": "page_template",
+      "name": "Persistent Task Queue",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Owner, stage, dependencies, source and durable receipt"
+    },
+    {
+      "id": "route:/hq/tasks/new",
+      "kind": "page_template",
+      "name": "Task Composer",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Required skills/versions, alternatives, sources, owner/reviewer and readiness"
+    },
+    {
+      "id": "route:/hq/tasks/[id]",
+      "kind": "page_template",
+      "name": "Task Workspace",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Plan, evidence, recommendations, decisions, handoffs and restart-safe follow-up"
+    },
+    {
+      "id": "route:/hq/decisions",
+      "kind": "page_template",
+      "name": "CEO Decision Queue",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Recommendations and skill changes awaiting exact CEO decision"
+    },
+    {
+      "id": "route:/hq/decisions/[id]",
+      "kind": "page_template",
+      "name": "CEO Decision Detail",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Scope, target, limits, expiry, costs, prerequisites, evidence and consequences"
+    },
+    {
+      "id": "route:/hq/agents",
+      "kind": "page_template",
+      "name": "Original Agent Directory",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "All15 original inactive identities and charter/skill gaps"
+    },
+    {
+      "id": "route:/hq/agents/[id]",
+      "kind": "page_template",
+      "name": "Agent Profile",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Skills/gaps, version/source, validation/evidence/freshness, tools/permissions and readiness"
+    },
+    {
+      "id": "route:/hq/skills",
+      "kind": "page_template",
+      "name": "Skill Catalog",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Installed instructions and staged proposals with versions, provenance and evidence"
+    },
+    {
+      "id": "route:/hq/skills/[id]",
+      "kind": "page_template",
+      "name": "Skill Detail",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Version history, source/commit/hash, dependencies, bindings and validation scope"
+    },
+    {
+      "id": "route:/hq/capabilities",
+      "kind": "page_template",
+      "name": "Capability Gap Matrix",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Required versus available skills, behavioral evidence and prerequisites"
+    },
+    {
+      "id": "route:/hq/evaluations",
+      "kind": "page_template",
+      "name": "Evaluation History",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Structural validation, behavioral cases, environment and independent review separately"
+    },
+    {
+      "id": "route:/hq/evaluations/[id]",
+      "kind": "page_template",
+      "name": "Evaluation Detail",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Skill/version/case, inputs, observed result, evidence, reviewer and freshness"
+    },
+    {
+      "id": "route:/hq/skill-changes/[id]",
+      "kind": "page_template",
+      "name": "Skill Change Review",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Add/remove/pin/evaluate proposal, version diff and CEO receipt"
+    },
+    {
+      "id": "route:/hq/knowledge",
+      "kind": "page_template",
+      "name": "Knowledge Source Library",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Scoped sources, provenance, corrections, lifecycle and freshness"
+    },
+    {
+      "id": "route:/hq/knowledge/[id]",
+      "kind": "page_template",
+      "name": "Source Evidence Detail",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Origin, excerpt, scope, version, observation time, correction and hold"
+    },
+    {
+      "id": "route:/hq/audit",
+      "kind": "page_template",
+      "name": "Immutable Audit Timeline",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Actor, action, target, decision binding and observed result"
+    },
+    {
+      "id": "route:/hq/audit/[id]",
+      "kind": "page_template",
+      "name": "Audit Event Detail",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Linked task/decision/source; no edit or deletion of history"
+    },
+    {
+      "id": "route:/hq/connections",
+      "kind": "page_template",
+      "name": "Tools and Connection Readiness",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "Instructions, actual tools, environment, prerequisites and permissions separately"
+    },
+    {
+      "id": "route:/hq/settings",
+      "kind": "page_template",
+      "name": "HQ Workspace Settings",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "record_contract": "AR/EN, Riyadh time, notifications and account/access state"
+    },
+    {
+      "id": "overlay:connection-prerequisites",
+      "kind": "overlay",
+      "name": "connection-prerequisites",
+      "contract": {
+        "inputs": [
+          "tool",
+          "environment",
+          "prerequisite checks",
+          "permission state"
+        ],
+        "submit": "Read-only prerequisite assessment",
+        "cancel": "Return to tools view",
+        "failure": "Unknown remains unconfigured",
+        "permission": "No credential value shown"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:connection-request",
+      "kind": "overlay",
+      "name": "connection-request",
+      "contract": {
+        "inputs": [
+          "named service/environment",
+          "resource/data scope",
+          "cost",
+          "reason"
+        ],
+        "submit": "Create setup/permission proposal for CEO; no credential/MCP grant or external service call",
+        "cancel": "No changes",
+        "failure": "Retain request",
+        "permission": "Separate approved environment/configuration step"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:decision-confirmation",
+      "kind": "overlay",
+      "name": "decision-confirmation",
+      "contract": {
+        "inputs": [
+          "decision revision/hash",
+          "exact proposed action/targets/environment/limits",
+          "CEO identity"
+        ],
+        "submit": "Record approve/decline after server checks and checked receipt; approval is not task execution",
+        "cancel": "Leave decision pending",
+        "failure": "Retain reason; expired/revoked/changed proposal refused",
+        "permission": "CEO decision authority for exactly displayed scope"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:evaluation-request",
+      "kind": "overlay",
+      "name": "evaluation-request",
+      "contract": {
+        "inputs": [
+          "agent/skill/version",
+          "cases",
+          "environment",
+          "resources/cost",
+          "independent reviewer"
+        ],
+        "submit": "Create evaluation proposal in CEO queue; does not start evaluation",
+        "cancel": "Preserve current binding",
+        "failure": "Show missing prerequisites",
+        "permission": "Separate bounded evaluation approval required"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:filters",
+      "kind": "overlay",
+      "name": "filters",
+      "contract": {
+        "inputs": [
+          "current scope",
+          "allowed fields",
+          "filter draft"
+        ],
+        "submit": "Apply changes parent query only; filtered-empty is explicit",
+        "cancel": "Preserve original query",
+        "failure": "Preserve draft; error distinct from empty",
+        "permission": "Same row/field scope as parent"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:notifications",
+      "kind": "overlay",
+      "name": "notifications",
+      "contract": {
+        "inputs": [
+          "authorized persisted notifications"
+        ],
+        "submit": "Open exact linked task or decision; mark-read only after receipt",
+        "cancel": "Close drawer preserving location",
+        "failure": "Loading/empty/error/forbidden distinct",
+        "permission": "No fabricated alerts or company presence"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:readiness-comparison",
+      "kind": "overlay",
+      "name": "readiness-comparison",
+      "contract": {
+        "inputs": [
+          "task revision",
+          "requirements",
+          "candidate skill binding/evidence versions"
+        ],
+        "submit": "Read-only comparison; proposed owner selection updates draft only",
+        "cancel": "Retain draft",
+        "failure": "Unknown/missing evidence stays unknown",
+        "permission": "No tool or employee activation"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:recommendation",
+      "kind": "overlay",
+      "name": "recommendation",
+      "contract": {
+        "inputs": [
+          "task",
+          "source-linked recommendation",
+          "author identity and actual evidence"
+        ],
+        "submit": "Open /hq/decisions/[id] for a persisted proposal; no business execution",
+        "cancel": "Return to task context",
+        "failure": "Missing evidence labelled; unsupported claims cannot become facts",
+        "permission": "No inferred company employee operation"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:request-changes",
+      "kind": "overlay",
+      "name": "request-changes",
+      "contract": {
+        "inputs": [
+          "proposal revision",
+          "CEO reason"
+        ],
+        "submit": "Record changes-requested and preserve prior proposal",
+        "cancel": "Keep current pending state",
+        "failure": "Preserve reason",
+        "permission": "Named decision authority"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:skill-change",
+      "kind": "overlay",
+      "name": "skill-change",
+      "contract": {
+        "inputs": [
+          "agent",
+          "add/remove/pin/evaluate",
+          "source/version/hash diff",
+          "affected tasks",
+          "rationale/evidence"
+        ],
+        "submit": "Create persisted CEO decision proposal; no package install/binding application until exact approval and authorized command",
+        "cancel": "No binding change",
+        "failure": "Preserve draft; no false applied state",
+        "permission": "Does not activate employee or grant tools/data"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:source-correction",
+      "kind": "overlay",
+      "name": "source-correction",
+      "contract": {
+        "inputs": [
+          "source revision",
+          "proposed correction",
+          "evidence"
+        ],
+        "submit": "Record correction proposal and affected tasks; preserve original evidence",
+        "cancel": "No source change",
+        "failure": "Preserve correction draft",
+        "permission": "No destructive deletion or retention interpretation"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:source-intake",
+      "kind": "overlay",
+      "name": "source-intake",
+      "contract": {
+        "inputs": [
+          "authorized source location",
+          "classification",
+          "provenance",
+          "version"
+        ],
+        "submit": "Save source draft/metadata in isolated workspace; no external ingestion assumed",
+        "cancel": "No source publication",
+        "failure": "Retain safe input; no invented extract",
+        "permission": "Source import scope and rights checked separately"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:source-picker",
+      "kind": "overlay",
+      "name": "source-picker",
+      "contract": {
+        "inputs": [
+          "task/decision revision",
+          "authorized source ids"
+        ],
+        "submit": "Attach checked source references to draft, with version/hash",
+        "cancel": "Retain original attachments",
+        "failure": "Unreadable/wrong-scope source cannot be attached",
+        "permission": "Source read plus draft edit authorization"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "overlay:version-diff",
+      "kind": "overlay",
+      "name": "version-diff",
+      "contract": {
+        "inputs": [
+          "two exact source versions/hashes"
+        ],
+        "submit": "Read-only diff and dependent task impact",
+        "cancel": "Return to origin",
+        "failure": "Unavailable version remains unknown",
+        "permission": "Same source scope"
+      },
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ]
+    },
+    {
+      "id": "inline:readiness",
+      "kind": "component_action_state",
+      "name": "Task-specific readiness assessment",
+      "context": {
+        "origins": [
+          "route:/hq/tasks/new",
+          "route:/hq/agents/[id]"
+        ],
+        "required": [
+          "current proposed task requirements or task revision",
+          "exact proposed candidate identity and binding revision",
+          "source/version/hash and evaluation freshness references"
+        ],
+        "missing_or_stale": "Return unknown or blocked with the named missing requirements; no competence score or implied capability."
+      },
+      "contract": {
+        "inputs": [
+          "required skills/versions and explicitly approved alternatives",
+          "proposed or assigned bindings",
+          "version/task/environment-bound evaluation evidence",
+          "dependency, tool/data permission and company activation states"
+        ],
+        "effect": "Compute an inspectable comparison within the current component using AGENT_SKILL_PROFILE_CONTRACT.json. Separate globally available packages from bindings, evidence and access.",
+        "success": "Show matched requirements and individually missing instructions, dependencies, permissions and evidence with provenance/freshness; no invented competence percentage.",
+        "failure": "Retain the task draft and show unknown/stale/forbidden inputs explicitly. Do not silently treat missing evidence as zero or equivalent skill packages.",
+        "permission": "Read only authorized metadata. Assessment cannot assign a skill, activate an employee, grant a tool or start a task."
+      },
+      "states": [
+        "not-assessed",
+        "assessing",
+        "ready-for-proposed-scope",
+        "blocked",
+        "unknown",
+        "stale",
+        "forbidden",
+        "error"
+      ],
+      "generation": "inline profile/composer component only; no new generation",
+      "provenance": "HQ_SURFACE_INVENTORY.json#compose,#agent and AGENT_SKILL_PROFILE_CONTRACT.json"
+    },
+{
+      "id": "inline:approved-change-receipt",
+      "kind": "component_action_state",
+      "name": "Inspect checked skill-binding change receipt",
+      "context": {
+        "origins": [
+          "route:/hq/skill-changes/[id]"
+        ],
+        "required": [
+          "existing authorized skill-change id and revision",
+          "exact CEO decision revision",
+          "checked application receipt if one exists"
+        ],
+        "missing_or_stale": "Show pending, unavailable or superseded decision/receipt; never imply applied."
+      },
+      "contract": {
+        "inputs": [
+          "skill-change proposal and source/version/hash diff",
+          "CEO approval/rejection revision",
+          "authorized application command receipt and resulting binding revision when present"
+        ],
+        "effect": "Inspect the exact decision and receipt in the existing detail component; compare proposal/approval/material binding versions. No command is executed by opening this component.",
+        "success": "Distinguish proposed, awaiting decision, rejected, approved-not-applied, applied-with-verified-receipt and superseded/conflict. Applied is shown only for a matching authoritative receipt/readback.",
+        "failure": "Keep the original proposal visible; unreadable or missing receipt remains unknown, with retry. No false applied state.",
+        "permission": "Read scope is checked independently. Approval of an association never activates a company identity or grants tool/data access. Applying a binding remains a separately authorized command."
+      },
+      "states": [
+        "loading",
+        "proposed",
+        "awaiting-CEO-decision",
+        "rejected",
+        "approved-not-applied",
+        "applied-verified",
+        "conflict-or-superseded",
+        "forbidden",
+        "error-or-unknown"
+      ],
+      "generation": "inline receipt component only; no new page, overlay or route",
+      "provenance": "HQ_SURFACE_INVENTORY.json#change, existing change-3 edge and governed skill-change contract"
+    },
+{
+      "id": "inline:preferences",
+      "kind": "component_action_state",
+      "name": "Edit scoped viewer UI preferences",
+      "context": {
+        "origins": [
+          "route:/hq/settings"
+        ],
+        "required": [
+          "authenticated viewer preference scope and current preference revision",
+          "explicit supported preference schema"
+        ],
+        "missing_or_stale": "Retain current view; do not guess preference fields, business permissions or an account scope."
+      },
+      "contract": {
+        "inputs": [
+          "AR/EN display locale and explicitly supported non-business UI preference fields",
+          "current viewer preference revision"
+        ],
+        "effect": "Validate and save only supported viewer UI preferences through its scoped command, then display authoritative readback in the same settings component. Locale uses inline:locale-switch behavior.",
+        "success": "Show saved fields/revision only after a checked receipt; preserve draft and active locale until confirmation.",
+        "cancel": "Restore last authoritative preferences without business mutation.",
+        "failure": "Keep draft and prior applied preferences; distinguish validation, forbidden, conflict and unknown receipt.",
+        "permission": "No pricing, organizational authority, credentials, tool/data permissions or company activation fields belong to this component."
+      },
+      "states": [
+        "loading",
+        "editing",
+        "validation-error",
+        "saving",
+        "saved",
+        "forbidden",
+        "conflict",
+        "stale",
+        "error-or-unknown-receipt"
+      ],
+      "generation": "existing settings component only; no new route or overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#settings existing locale/preferences action; unsupported preference fields remain outside this contract"
+    },
+{
+      "id": "inline:locale-switch",
+      "kind": "component_action_state",
+      "name": "AR/EN locale switch",
+      "context": {
+        "origins": [
+          "shell:hq"
+        ],
+        "identity": "Current local viewer preference; does not assume an active company employee",
+        "required": "A supported EN or AR locale value; preserve current route, authorized object id and safe unsaved draft"
+      },
+      "contract": {
+        "inputs": [
+          "requested supported locale EN or AR",
+          "current route and safe local draft context"
+        ],
+        "effect": "Change display language and direction in the existing shell/component: EN LTR or AR RTL. Do not navigate to a new page or dispatch business work.",
+        "success": "The same authorized record remains open with translated labels and mirrored direction; record only a viewer preference if its scoped persistence contract is authorized.",
+        "failure": "Retain the previous working locale and draft; show localized retry guidance without claiming the preference was saved.",
+        "permission": "UI locale is separate from company activation, skill assignment and tool/data permission."
+      },
+      "states": [
+        "EN-LTR",
+        "AR-RTL",
+        "changing",
+        "error-retained-previous-locale"
+      ],
+      "generation": "component state only; no screen, overlay or route added",
+      "provenance": "CEO bilingual/RTL requirement and existing shell-locale edge"
+    },
+    {
+      "id": "shell:hq",
+      "kind": "shared_navigation",
+      "scope": "Only explicitly included routes; no generic calendar/widget/account links",
+      "states": [
+        "expanded",
+        "mobile-collapsed",
+        "keyboard-focus",
+        "locale-EN",
+        "locale-AR-RTL"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "command-1",
+      "from": "route:/hq",
+      "label": "Compose task",
+      "target": "route:/hq/tasks/new",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#command",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "command-2",
+      "from": "route:/hq",
+      "label": "Inspect task",
+      "target": "route:/hq/tasks/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#command",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "command-3",
+      "from": "route:/hq",
+      "label": "Review decisions",
+      "target": "route:/hq/decisions",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#command",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "command-4",
+      "from": "route:/hq",
+      "label": "Agent directory",
+      "target": "route:/hq/agents",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#command",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "tasks-1",
+      "from": "route:/hq/tasks",
+      "label": "New task",
+      "target": "route:/hq/tasks/new",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#tasks",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "tasks-2",
+      "from": "route:/hq/tasks",
+      "label": "Open task",
+      "target": "route:/hq/tasks/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#tasks",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "tasks-3",
+      "from": "route:/hq/tasks",
+      "label": "Filter",
+      "target": "overlay:filters",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#tasks",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "compose-1",
+      "from": "route:/hq/tasks/new",
+      "label": "Assess readiness",
+      "target": "inline:readiness",
+      "kind": "component_action",
+      "provenance": "HQ_SURFACE_INVENTORY.json#compose",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "compose-2",
+      "from": "route:/hq/tasks/new",
+      "label": "Compare candidates",
+      "target": "overlay:readiness-comparison",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#compose",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "compose-3",
+      "from": "route:/hq/tasks/new",
+      "label": "Submit draft",
+      "target": "route:/hq/tasks/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#compose",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "compose-4",
+      "from": "route:/hq/tasks/new",
+      "label": "Attach sources",
+      "target": "overlay:source-picker",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#compose",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "task-1",
+      "from": "route:/hq/tasks/[id]",
+      "label": "Review recommendation",
+      "target": "overlay:recommendation",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#task",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "task-2",
+      "from": "route:/hq/tasks/[id]",
+      "label": "Request decision",
+      "target": "route:/hq/decisions/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#task",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "task-3",
+      "from": "route:/hq/tasks/[id]",
+      "label": "Add source",
+      "target": "overlay:source-picker",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#task",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "task-4",
+      "from": "route:/hq/tasks/[id]",
+      "label": "Inspect agent",
+      "target": "route:/hq/agents/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#task",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "task-5",
+      "from": "route:/hq/tasks/[id]",
+      "label": "Open receipt",
+      "target": "route:/hq/audit/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#task",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "decisions-1",
+      "from": "route:/hq/decisions",
+      "label": "Open decision",
+      "target": "route:/hq/decisions/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#decisions",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "decisions-2",
+      "from": "route:/hq/decisions",
+      "label": "Open skill change",
+      "target": "route:/hq/skill-changes/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#decisions",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "decisions-3",
+      "from": "route:/hq/decisions",
+      "label": "Filter",
+      "target": "overlay:filters",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#decisions",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "decision-1",
+      "from": "route:/hq/decisions/[id]",
+      "label": "Approve or decline",
+      "target": "overlay:decision-confirmation",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#decision",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "decision-2",
+      "from": "route:/hq/decisions/[id]",
+      "label": "Request changes",
+      "target": "overlay:request-changes",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#decision",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "decision-3",
+      "from": "route:/hq/decisions/[id]",
+      "label": "Audit receipt",
+      "target": "route:/hq/audit/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#decision",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "agents-1",
+      "from": "route:/hq/agents",
+      "label": "Open profile",
+      "target": "route:/hq/agents/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#agents",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "agents-2",
+      "from": "route:/hq/agents",
+      "label": "View gaps",
+      "target": "route:/hq/capabilities",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#agents",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "agents-3",
+      "from": "route:/hq/agents",
+      "label": "Filter",
+      "target": "overlay:filters",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#agents",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "agent-1",
+      "from": "route:/hq/agents/[id]",
+      "label": "Inspect skill",
+      "target": "route:/hq/skills/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#agent",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "agent-2",
+      "from": "route:/hq/agents/[id]",
+      "label": "Request evaluation",
+      "target": "overlay:evaluation-request",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#agent",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "agent-3",
+      "from": "route:/hq/agents/[id]",
+      "label": "Propose skill add/remove",
+      "target": "overlay:skill-change",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#agent",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "agent-4",
+      "from": "route:/hq/agents/[id]",
+      "label": "Task readiness",
+      "target": "inline:readiness",
+      "kind": "component_action",
+      "provenance": "HQ_SURFACE_INVENTORY.json#agent",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "agent-5",
+      "from": "route:/hq/agents/[id]",
+      "label": "Evidence",
+      "target": "route:/hq/evaluations/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#agent",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "skills-1",
+      "from": "route:/hq/skills",
+      "label": "Inspect skill",
+      "target": "route:/hq/skills/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#skills",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "skills-2",
+      "from": "route:/hq/skills",
+      "label": "Propose addition",
+      "target": "overlay:skill-change",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#skills",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "skills-3",
+      "from": "route:/hq/skills",
+      "label": "Filter",
+      "target": "overlay:filters",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#skills",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "skill-1",
+      "from": "route:/hq/skills/[id]",
+      "label": "Evaluation",
+      "target": "route:/hq/evaluations/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#skill",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "skill-2",
+      "from": "route:/hq/skills/[id]",
+      "label": "Binding proposal",
+      "target": "overlay:skill-change",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#skill",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "skill-3",
+      "from": "route:/hq/skills/[id]",
+      "label": "Source",
+      "target": "route:/hq/knowledge/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#skill",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "skill-4",
+      "from": "route:/hq/skills/[id]",
+      "label": "Compare versions",
+      "target": "overlay:version-diff",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#skill",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "gaps-1",
+      "from": "route:/hq/capabilities",
+      "label": "Open agent",
+      "target": "route:/hq/agents/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#gaps",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "gaps-2",
+      "from": "route:/hq/capabilities",
+      "label": "Open skill",
+      "target": "route:/hq/skills/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#gaps",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "gaps-3",
+      "from": "route:/hq/capabilities",
+      "label": "Propose resolution",
+      "target": "overlay:skill-change",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#gaps",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "evaluations-1",
+      "from": "route:/hq/evaluations",
+      "label": "Open evaluation",
+      "target": "route:/hq/evaluations/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#evaluations",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "evaluations-2",
+      "from": "route:/hq/evaluations",
+      "label": "Request evaluation",
+      "target": "overlay:evaluation-request",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#evaluations",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "evaluation-1",
+      "from": "route:/hq/evaluations/[id]",
+      "label": "Source evidence",
+      "target": "route:/hq/knowledge/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#evaluation",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "evaluation-2",
+      "from": "route:/hq/evaluations/[id]",
+      "label": "Propose correction",
+      "target": "overlay:skill-change",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#evaluation",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "change-1",
+      "from": "route:/hq/skill-changes/[id]",
+      "label": "CEO decision",
+      "target": "route:/hq/decisions/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#change",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "change-2",
+      "from": "route:/hq/skill-changes/[id]",
+      "label": "Compare versions",
+      "target": "overlay:version-diff",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#change",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "change-3",
+      "from": "route:/hq/skill-changes/[id]",
+      "label": "Checked binding receipt",
+      "target": "inline:approved-change-receipt",
+      "kind": "component_action",
+      "provenance": "HQ_SURFACE_INVENTORY.json#change",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "knowledge-1",
+      "from": "route:/hq/knowledge",
+      "label": "Source detail",
+      "target": "route:/hq/knowledge/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#knowledge",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "knowledge-2",
+      "from": "route:/hq/knowledge",
+      "label": "Attach source draft",
+      "target": "overlay:source-intake",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#knowledge",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "knowledge-3",
+      "from": "route:/hq/knowledge",
+      "label": "Filter",
+      "target": "overlay:filters",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#knowledge",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "source-1",
+      "from": "route:/hq/knowledge/[id]",
+      "label": "Correction proposal",
+      "target": "overlay:source-correction",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#source",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "source-2",
+      "from": "route:/hq/knowledge/[id]",
+      "label": "Affected tasks",
+      "target": "route:/hq/tasks",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#source",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "audit-1",
+      "from": "route:/hq/audit",
+      "label": "Event detail",
+      "target": "route:/hq/audit/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#audit",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "audit-2",
+      "from": "route:/hq/audit",
+      "label": "Filter",
+      "target": "overlay:filters",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#audit",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "event-1",
+      "from": "route:/hq/audit/[id]",
+      "label": "Task",
+      "target": "route:/hq/tasks/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#event",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "event-2",
+      "from": "route:/hq/audit/[id]",
+      "label": "Decision",
+      "target": "route:/hq/decisions/[id]",
+      "kind": "navigate",
+      "provenance": "HQ_SURFACE_INVENTORY.json#event",
+      "requires_existing_context_id": true,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "connections-1",
+      "from": "route:/hq/connections",
+      "label": "Prerequisites",
+      "target": "overlay:connection-prerequisites",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#connections",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "connections-2",
+      "from": "route:/hq/connections",
+      "label": "Request named setup",
+      "target": "overlay:connection-request",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#connections",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "settings-1",
+      "from": "route:/hq/settings",
+      "label": "Locale and preferences",
+      "target": "inline:preferences",
+      "kind": "component_action",
+      "provenance": "HQ_SURFACE_INVENTORY.json#settings",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "settings-2",
+      "from": "route:/hq/settings",
+      "label": "Permission request",
+      "target": "overlay:connection-request",
+      "kind": "overlay",
+      "provenance": "HQ_SURFACE_INVENTORY.json#settings",
+      "requires_existing_context_id": false,
+      "no_context_behavior": "No guessed id; show missing/stale context and offer parent list or retry"
+    },
+    {
+      "id": "shell-nav-0",
+      "from": "shell:hq",
+      "label": "Navigate /hq",
+      "target": "route:/hq",
+      "kind": "navigation",
+      "provenance": "Explicit HQ scope navigation only"
+    },
+    {
+      "id": "shell-nav-1",
+      "from": "shell:hq",
+      "label": "Navigate /hq/tasks",
+      "target": "route:/hq/tasks",
+      "kind": "navigation",
+      "provenance": "Explicit HQ scope navigation only"
+    },
+    {
+      "id": "shell-nav-2",
+      "from": "shell:hq",
+      "label": "Navigate /hq/decisions",
+      "target": "route:/hq/decisions",
+      "kind": "navigation",
+      "provenance": "Explicit HQ scope navigation only"
+    },
+    {
+      "id": "shell-nav-3",
+      "from": "shell:hq",
+      "label": "Navigate /hq/agents",
+      "target": "route:/hq/agents",
+      "kind": "navigation",
+      "provenance": "Explicit HQ scope navigation only"
+    },
+    {
+      "id": "shell-nav-4",
+      "from": "shell:hq",
+      "label": "Navigate /hq/skills",
+      "target": "route:/hq/skills",
+      "kind": "navigation",
+      "provenance": "Explicit HQ scope navigation only"
+    },
+    {
+      "id": "shell-nav-5",
+      "from": "shell:hq",
+      "label": "Navigate /hq/capabilities",
+      "target": "route:/hq/capabilities",
+      "kind": "navigation",
+      "provenance": "Explicit HQ scope navigation only"
+    },
+    {
+      "id": "shell-nav-6",
+      "from": "shell:hq",
+      "label": "Navigate /hq/evaluations",
+      "target": "route:/hq/evaluations",
+      "kind": "navigation",
+      "provenance": "Explicit HQ scope navigation only"
+    },
+    {
+      "id": "shell-nav-7",
+      "from": "shell:hq",
+      "label": "Navigate /hq/knowledge",
+      "target": "route:/hq/knowledge",
+      "kind": "navigation",
+      "provenance": "Explicit HQ scope navigation only"
+    },
+    {
+      "id": "shell-nav-8",
+      "from": "shell:hq",
+      "label": "Navigate /hq/audit",
+      "target": "route:/hq/audit",
+      "kind": "navigation",
+      "provenance": "Explicit HQ scope navigation only"
+    },
+    {
+      "id": "shell-nav-9",
+      "from": "shell:hq",
+      "label": "Navigate /hq/connections",
+      "target": "route:/hq/connections",
+      "kind": "navigation",
+      "provenance": "Explicit HQ scope navigation only"
+    },
+    {
+      "id": "shell-nav-10",
+      "from": "shell:hq",
+      "label": "Navigate /hq/settings",
+      "target": "route:/hq/settings",
+      "kind": "navigation",
+      "provenance": "Explicit HQ scope navigation only"
+    },
+    {
+      "id": "shell-locale",
+      "from": "shell:hq",
+      "label": "AR/EN language",
+      "target": "inline:locale-switch",
+      "kind": "component_action",
+      "provenance": "CEO bilingual requirement; no extra page"
+    },
+    {
+      "id": "shell-notifications",
+      "from": "shell:hq",
+      "label": "Notifications",
+      "target": "overlay:notifications",
+      "kind": "overlay",
+      "provenance": "Explicit global action in HQ_SURFACE_INVENTORY.json"
+    }
+  ],
+  "navigation_holes": [],
+  "ambiguous_targets": [],
+  "later_scope": [
+    {
+      "id": "office",
+      "name": "Virtual Headquarters",
+      "route_proposal": "/hq/office",
+      "interaction_in_MVP": "nonclickable roadmap entry; no active navigation",
+      "status": "inventory_only_not_closed"
+    },
+    {
+      "id": "office-detail",
+      "name": "Agent Office",
+      "route_proposal": "/hq/office/[id]",
+      "interaction_in_MVP": "nonclickable roadmap entry; no active navigation",
+      "status": "inventory_only_not_closed"
+    },
+    {
+      "id": "council",
+      "name": "Executive Council Meetings",
+      "route_proposal": "/hq/council",
+      "interaction_in_MVP": "nonclickable roadmap entry; no active navigation",
+      "status": "inventory_only_not_closed"
+    },
+    {
+      "id": "meeting",
+      "name": "Council Meeting Record",
+      "route_proposal": "/hq/council/[id]",
+      "interaction_in_MVP": "nonclickable roadmap entry; no active navigation",
+      "status": "inventory_only_not_closed"
+    },
+    {
+      "id": "projects",
+      "name": "Projects and Initiatives",
+      "route_proposal": "/hq/projects",
+      "interaction_in_MVP": "nonclickable roadmap entry; no active navigation",
+      "status": "inventory_only_not_closed"
+    },
+    {
+      "id": "project",
+      "name": "Project Workspace",
+      "route_proposal": "/hq/projects/[id]",
+      "interaction_in_MVP": "nonclickable roadmap entry; no active navigation",
+      "status": "inventory_only_not_closed"
+    },
+    {
+      "id": "strategy",
+      "name": "Strategy and Venture Studio",
+      "route_proposal": "/hq/strategy",
+      "interaction_in_MVP": "nonclickable roadmap entry; no active navigation",
+      "status": "inventory_only_not_closed"
+    },
+    {
+      "id": "scenario",
+      "name": "Strategic Scenario",
+      "route_proposal": "/hq/strategy/[id]",
+      "interaction_in_MVP": "nonclickable roadmap entry; no active navigation",
+      "status": "inventory_only_not_closed"
+    },
+    {
+      "id": "operations",
+      "name": "Marketplace Operations Overview",
+      "route_proposal": "/hq/operations",
+      "interaction_in_MVP": "nonclickable roadmap entry; no active navigation",
+      "status": "inventory_only_not_closed"
+    },
+    {
+      "id": "finance",
+      "name": "Finance and Reconciliation Overview",
+      "route_proposal": "/hq/finance",
+      "interaction_in_MVP": "nonclickable roadmap entry; no active navigation",
+      "status": "inventory_only_not_closed"
+    },
+    {
+      "id": "growth",
+      "name": "Brand and Growth Portfolio",
+      "route_proposal": "/hq/growth",
+      "interaction_in_MVP": "nonclickable roadmap entry; no active navigation",
+      "status": "inventory_only_not_closed"
+    },
+    {
+      "id": "partnerships",
+      "name": "Partnership Pipeline",
+      "route_proposal": "/hq/partnerships",
+      "interaction_in_MVP": "nonclickable roadmap entry; no active navigation",
+      "status": "inventory_only_not_closed"
+    },
+    {
+      "id": "customer",
+      "name": "Customer Experience Overview",
+      "route_proposal": "/hq/customer-experience",
+      "interaction_in_MVP": "nonclickable roadmap entry; no active navigation",
+      "status": "inventory_only_not_closed"
+    },
+    {
+      "id": "risk",
+      "name": "Risk and Compliance Register",
+      "route_proposal": "/hq/risk",
+      "interaction_in_MVP": "nonclickable roadmap entry; no active navigation",
+      "status": "inventory_only_not_closed"
+    },
+    {
+      "id": "functions",
+      "name": "Original Function Directory",
+      "route_proposal": "/hq/functions",
+      "interaction_in_MVP": "nonclickable roadmap entry; no active navigation",
+      "status": "inventory_only_not_closed"
+    },
+    {
+      "id": "function",
+      "name": "Original Function Detail",
+      "route_proposal": "/hq/functions/[id]",
+      "interaction_in_MVP": "nonclickable roadmap entry; no active navigation",
+      "status": "inventory_only_not_closed"
+    }
+  ],
+  "component_state_rule": "Submission/loading states reuse component; not independent generations",
+  "render_status": "not_rendered",
+  "runtime_status": "not_implemented"
+}

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { requestCheckout } from "@/lib/payment-checkout.mjs";
 import { errorMessage } from "@/lib/error-message";
 import { sar } from "@/components/operations-ui";
 import MakeRegularButton from "@/components/make-regular";
@@ -142,7 +143,7 @@ const translations = {
     policyUnavailable: "The provider's cancellation terms could not be loaded.",
     payNow: "Pay deposit now",
     paying: "Opening payment...",
-    payFailed: "Could not open the payment page. Nothing was charged; try again.",
+    payFailed: "Could not confirm the payment outcome. Check this booking again before another payment.",
     waiting: "Checking for your payment...",
     stillWaiting: "We have not received the payment confirmation yet. If you already paid it can take a minute.",
     refresh: "Refresh status",
@@ -206,7 +207,7 @@ const translations = {
     policyUnavailable: "تعذر تحميل سياسة الإلغاء الخاصة بمقدم الخدمة.",
     payNow: "ادفع العربون الآن",
     paying: "جارٍ فتح صفحة الدفع...",
-    payFailed: "تعذر فتح صفحة الدفع. لم يُخصم أي مبلغ؛ حاول مرة أخرى.",
+    payFailed: "تعذر تأكيد نتيجة الدفع. تحقق من هذا الحجز مجدداً قبل محاولة دفع أخرى.",
     waiting: "جارٍ التحقق من دفعتك...",
     stillWaiting: "لم يصلنا تأكيد الدفع بعد. إذا كنت قد دفعت فقد يستغرق ذلك دقيقة.",
     refresh: "تحديث الحالة",
@@ -306,11 +307,10 @@ export default function BookingConfirmationPage() {
     setPayError("");
     setPaying(true);
     try {
-      const { data, error } = await supabase.functions.invoke("payment-checkout", { body: { bookingId } });
-      if (error || !data?.checkoutUrl) throw new Error("no checkout url");
-      window.location.assign(data.checkoutUrl);
-    } catch {
-      setPayError(t.payFailed);
+      const receipt = await requestCheckout(supabase, { bookingId }, locale, { onCaptured: refreshQuietly });
+      window.location.assign(receipt.checkoutUrl);
+    } catch (failure) {
+      setPayError(failure instanceof Error ? failure.message : t.payFailed);
       setPaying(false);
     }
   };

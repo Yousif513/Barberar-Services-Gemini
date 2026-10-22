@@ -1,0 +1,893 @@
+{
+  "prepared_date": "2026-10-22",
+  "purpose": "Reviewable proposed mapping, not a runtime registry or permission grant",
+  "source": "Original recovered conversation: P160 governance, P186 departmental architecture, P164-P182 original named identities",
+  "company_roles": [
+    {
+      "name": "Nora",
+      "source_role": "Chief of Staff / Executive Personal Assistant",
+      "source_prompt": "P164",
+      "recommended_skills": [
+        "primora-source-continuity",
+        "primora-project-delivery",
+        "primora-authority-and-approvals",
+        "primora-memory-and-knowledge"
+      ],
+      "dashboard_responsibilities": [
+        "CEO command center",
+        "decisions",
+        "briefings",
+        "meeting follow-up"
+      ],
+      "mapping_status": "proposed_skill_assignment",
+      "activation_status": "inactive",
+      "granted_tools": [],
+      "granted_data_scopes": [],
+      "permissions_granted": []
+    },
+    {
+      "name": "Adam",
+      "source_role": "Independent Strategic Adviser",
+      "source_prompt": "P165",
+      "recommended_skills": [
+        "primora-business-strategy",
+        "primora-evidence-research",
+        "primora-business-analytics",
+        "primora-retrieval-grounding"
+      ],
+      "dashboard_responsibilities": [
+        "Strategy",
+        "scenarios",
+        "independent challenge"
+      ],
+      "mapping_status": "proposed_skill_assignment",
+      "activation_status": "inactive",
+      "granted_tools": [],
+      "granted_data_scopes": [],
+      "permissions_granted": []
+    },
+    {
+      "name": "Alexander",
+      "source_role": "General Manager / Enterprise Coordination",
+      "source_prompt": "P166",
+      "recommended_skills": [
+        "primora-project-delivery",
+        "primora-durable-workflows",
+        "primora-agent-charters",
+        "primora-observability"
+      ],
+      "dashboard_responsibilities": [
+        "Projects",
+        "ownership",
+        "dependencies",
+        "handoffs"
+      ],
+      "mapping_status": "proposed_skill_assignment",
+      "activation_status": "inactive",
+      "granted_tools": [],
+      "granted_data_scopes": [],
+      "permissions_granted": []
+    },
+    {
+      "name": "Sarah",
+      "source_role": "Operations & Service Delivery",
+      "source_prompt": "P167",
+      "recommended_skills": [
+        "primora-booking-operations",
+        "primora-partnerships-onboarding",
+        "primora-quality-control",
+        "primora-incident-management"
+      ],
+      "dashboard_responsibilities": [
+        "Booking and salon exceptions",
+        "readiness",
+        "service quality"
+      ],
+      "mapping_status": "proposed_skill_assignment",
+      "activation_status": "inactive",
+      "granted_tools": [],
+      "granted_data_scopes": [],
+      "permissions_granted": []
+    },
+    {
+      "name": "Victoria",
+      "source_role": "Business Development",
+      "source_prompt": "P168",
+      "recommended_skills": [
+        "primora-partnerships-onboarding",
+        "primora-business-strategy",
+        "primora-evidence-research"
+      ],
+      "dashboard_responsibilities": [
+        "Salon acquisition",
+        "partnerships",
+        "onboarding handoffs"
+      ],
+      "mapping_status": "proposed_skill_assignment",
+      "activation_status": "inactive",
+      "granted_tools": [],
+      "granted_data_scopes": [],
+      "permissions_granted": []
+    },
+    {
+      "name": "Emma",
+      "source_role": "Customer Experience",
+      "source_prompt": "P169",
+      "recommended_skills": [
+        "primora-customer-support",
+        "primora-quality-control",
+        "primora-incident-management"
+      ],
+      "dashboard_responsibilities": [
+        "Support",
+        "complaints",
+        "service recovery"
+      ],
+      "mapping_status": "proposed_skill_assignment",
+      "activation_status": "inactive",
+      "granted_tools": [],
+      "granted_data_scopes": [],
+      "permissions_granted": []
+    },
+    {
+      "name": "Maya",
+      "source_role": "Product & Experience Design",
+      "source_prompt": "P170",
+      "recommended_skills": [
+        "primora-product-requirements",
+        "product-designer",
+        "design-architect",
+        "impeccable",
+        "ui-ux-pro-max",
+        "primora-design-system",
+        "primora-dashboard-layout",
+        "surface-closure",
+        "accessibility"
+      ],
+      "dashboard_responsibilities": [
+        "Dashboard requirements",
+        "complete surfaces",
+        "UX acceptance"
+      ],
+      "mapping_status": "proposed_skill_assignment",
+      "activation_status": "inactive",
+      "granted_tools": [],
+      "granted_data_scopes": [],
+      "permissions_granted": []
+    },
+    {
+      "name": "Ethan",
+      "source_role": "Technology & AI Systems",
+      "source_prompt": "P171",
+      "recommended_skills": [
+        "primora-solution-architecture",
+        "primora-backend-api",
+        "primora-tool-contracts",
+        "primora-durable-workflows",
+        "primora-memory-and-knowledge",
+        "primora-retrieval-grounding",
+        "primora-devops-cicd",
+        "supabase",
+        "supabase-postgres-best-practices",
+        "frontend-design",
+        "vercel-react-best-practices",
+        "primora-observability"
+      ],
+      "dashboard_responsibilities": [
+        "Secure application",
+        "scoped runtime",
+        "integrations",
+        "reliability"
+      ],
+      "mapping_status": "proposed_skill_assignment",
+      "activation_status": "inactive",
+      "granted_tools": [],
+      "granted_data_scopes": [],
+      "permissions_granted": []
+    },
+    {
+      "name": "Daniel",
+      "source_role": "Finance & Investment Control",
+      "source_prompt": "P172",
+      "recommended_skills": [
+        "primora-finance-accounting",
+        "primora-pricing-revenue",
+        "primora-business-analytics",
+        "primora-marketplace-payments",
+        "primora-data-visualization"
+      ],
+      "dashboard_responsibilities": [
+        "Financial reporting",
+        "reconciliation preparation",
+        "metric definitions"
+      ],
+      "mapping_status": "proposed_skill_assignment",
+      "activation_status": "inactive",
+      "granted_tools": [],
+      "granted_data_scopes": [],
+      "permissions_granted": []
+    },
+    {
+      "name": "Sophia",
+      "source_role": "Brand, Growth & Market Intelligence",
+      "source_prompt": "P173",
+      "recommended_skills": [
+        "primora-growth-marketing",
+        "primora-evidence-research",
+        "primora-business-analytics",
+        "brand",
+        "design-taste-frontend"
+      ],
+      "dashboard_responsibilities": [
+        "Brand consistency",
+        "growth",
+        "content"
+      ],
+      "mapping_status": "proposed_skill_assignment",
+      "activation_status": "inactive",
+      "granted_tools": [],
+      "granted_data_scopes": [],
+      "permissions_granted": []
+    },
+    {
+      "name": "Layla",
+      "source_role": "Legal & Compliance",
+      "source_prompt": "P174",
+      "recommended_skills": [
+        "primora-risk-compliance",
+        "primora-saudi-pdpl",
+        "primora-authority-and-approvals",
+        "primora-memory-and-knowledge"
+      ],
+      "dashboard_responsibilities": [
+        "Privacy",
+        "access requirements",
+        "compliance dependencies",
+        "protected escalation"
+      ],
+      "mapping_status": "proposed_skill_assignment",
+      "activation_status": "inactive",
+      "granted_tools": [],
+      "granted_data_scopes": [],
+      "permissions_granted": []
+    },
+    {
+      "name": "Omar",
+      "source_role": "Independent Quality, Security & Trust",
+      "source_prompt": "P177",
+      "recommended_skills": [
+        "primora-quality-control",
+        "primora-quality-engineering",
+        "primora-agent-evaluations",
+        "security-threat-model",
+        "security-best-practices",
+        "accessibility",
+        "ux-audit"
+      ],
+      "dashboard_responsibilities": [
+        "Independent assurance",
+        "authorization and recovery tests",
+        "release evidence"
+      ],
+      "mapping_status": "proposed_skill_assignment",
+      "activation_status": "inactive",
+      "granted_tools": [],
+      "granted_data_scopes": [],
+      "permissions_granted": []
+    },
+    {
+      "name": "Olivia",
+      "source_role": "Workforce & Organizational Development",
+      "source_prompt": "P178",
+      "recommended_skills": [
+        "primora-agent-charters",
+        "primora-skill-registry",
+        "primora-agent-evaluations",
+        "primora-quality-control"
+      ],
+      "dashboard_responsibilities": [
+        "Inactive role/skill directory",
+        "capability gaps",
+        "evaluations"
+      ],
+      "mapping_status": "proposed_skill_assignment",
+      "activation_status": "inactive",
+      "granted_tools": [],
+      "granted_data_scopes": [],
+      "permissions_granted": []
+    },
+    {
+      "name": "Lina",
+      "source_role": "Customer AI Concierge within Emma area",
+      "source_prompt": "P181",
+      "recommended_skills": [
+        "primora-customer-support",
+        "primora-booking-operations",
+        "primora-tool-contracts",
+        "primora-retrieval-grounding"
+      ],
+      "dashboard_responsibilities": [
+        "Booking guidance",
+        "customer support intake",
+        "confirmed handoff"
+      ],
+      "mapping_status": "proposed_skill_assignment",
+      "activation_status": "inactive",
+      "granted_tools": [],
+      "granted_data_scopes": [],
+      "permissions_granted": []
+    },
+    {
+      "name": "Rayan",
+      "source_role": "Salon AI Coach within Sarah area",
+      "source_prompt": "P182",
+      "recommended_skills": [
+        "primora-partnerships-onboarding",
+        "primora-booking-operations",
+        "primora-customer-support",
+        "primora-tool-contracts"
+      ],
+      "dashboard_responsibilities": [
+        "Salon setup",
+        "schedule readiness",
+        "operational handoff"
+      ],
+      "mapping_status": "proposed_skill_assignment",
+      "activation_status": "inactive",
+      "granted_tools": [],
+      "granted_data_scopes": [],
+      "permissions_granted": []
+    }
+  ],
+  "departmental_function_count": 42,
+  "function_note": "Functions are preserved; they do not imply 42 continuously running models.",
+  "development_delivery_functions": [
+    {
+      "role": "Delivery coordinator",
+      "company_counterparts": [
+        "Nora",
+        "Alexander"
+      ],
+      "recommended_skills": [
+        "primora-project-delivery",
+        "primora-source-continuity",
+        "primora-solution-architecture"
+      ],
+      "function": "Coordinate approved backlog, ownership, dependencies and evidence",
+      "status": "proposed_reference_only",
+      "activated": false
+    },
+    {
+      "role": "Product/UI architect",
+      "company_counterparts": [
+        "Maya",
+        "Nora"
+      ],
+      "recommended_skills": [
+        "primora-product-requirements",
+        "product-designer",
+        "design-architect",
+        "adminwright"
+      ],
+      "function": "Map CEO jobs to all screens, actions, states and data",
+      "status": "proposed_reference_only",
+      "activated": false
+    },
+    {
+      "role": "Design steward",
+      "company_counterparts": [
+        "Maya",
+        "Sophia"
+      ],
+      "recommended_skills": [
+        "impeccable",
+        "ui-ux-pro-max",
+        "design-taste-frontend",
+        "primora-design-system",
+        "primora-dashboard-layout"
+      ],
+      "function": "Keep one source-backed visual system under the approved theme",
+      "status": "proposed_reference_only",
+      "activated": false
+    },
+    {
+      "role": "Frontend builder",
+      "company_counterparts": [
+        "Ethan",
+        "Maya"
+      ],
+      "recommended_skills": [
+        "frontend-design",
+        "vercel-react-best-practices",
+        "accessibility",
+        "surface-closure"
+      ],
+      "function": "Build approved AR/EN, RTL and responsive interface",
+      "status": "proposed_reference_only",
+      "activated": false
+    },
+    {
+      "role": "Backend/workflow builder",
+      "company_counterparts": [
+        "Ethan",
+        "Alexander"
+      ],
+      "recommended_skills": [
+        "primora-backend-api",
+        "primora-durable-workflows",
+        "primora-authority-and-approvals",
+        "supabase",
+        "supabase-postgres-best-practices"
+      ],
+      "function": "Implement authorization, audit, persistence and recovery",
+      "status": "proposed_reference_only",
+      "activated": false
+    },
+    {
+      "role": "AI/knowledge builder",
+      "company_counterparts": [
+        "Ethan",
+        "Olivia"
+      ],
+      "recommended_skills": [
+        "primora-agent-charters",
+        "primora-tool-contracts",
+        "primora-memory-and-knowledge",
+        "primora-retrieval-grounding",
+        "primora-observability"
+      ],
+      "function": "Implement scoped retrieval, tool contracts, handoffs and usage limits",
+      "status": "proposed_reference_only",
+      "activated": false
+    },
+    {
+      "role": "Metrics/data reviewer",
+      "company_counterparts": [
+        "Daniel",
+        "Sarah",
+        "Sophia"
+      ],
+      "recommended_skills": [
+        "primora-business-analytics",
+        "primora-finance-accounting",
+        "primora-data-visualization"
+      ],
+      "function": "Bind metrics to actual sources, units, freshness and drill-down",
+      "status": "proposed_reference_only",
+      "activated": false
+    },
+    {
+      "role": "Independent QA/security/UX review",
+      "company_counterparts": [
+        "Omar",
+        "Layla"
+      ],
+      "recommended_skills": [
+        "primora-quality-engineering",
+        "primora-agent-evaluations",
+        "security-threat-model",
+        "security-best-practices",
+        "playwright",
+        "ux-audit"
+      ],
+      "function": "Review another implementer work, failure recovery and forbidden actions",
+      "status": "proposed_reference_only",
+      "activated": false
+    }
+  ],
+  "skills": {
+    "accessibility": {
+      "name": "accessibility",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.agents\\skills\\accessibility\\SKILL.md",
+      "sha256": "eb6a144f208f169820cb5500da57273e9c0109e9f319b506c66ece912d1ee509",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "adminwright": {
+      "name": "adminwright",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\adminwright\\SKILL.md",
+      "sha256": "55e3bf614f6cbd1bcc52cf0f1a505405babe4ee403357ec72c4549c5f5def07f",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "brand": {
+      "name": "brand",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\brand\\SKILL.md",
+      "sha256": "1c24139633e2ebf11da4f97eaeb1c0564f8658a40b3ad779387a5b8c6cb76dbc",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "design-architect": {
+      "name": "design-architect",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\design-architect\\SKILL.md",
+      "sha256": "8e54693d5760d022ebc10a6fd43cf9a31c13bcb2418a6efd090952d72f956cfe",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "design-taste-frontend": {
+      "name": "design-taste-frontend",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\design-taste-frontend\\SKILL.md",
+      "sha256": "d955dae4ba8ab2d994f4bb06b4bf412a1d9875433a8597939c391f4bae91dd7a",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "frontend-design": {
+      "name": "frontend-design",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.agents\\skills\\frontend-design\\SKILL.md",
+      "sha256": "70044bbc8e4c21d23b8c8b864956aa1515c1c6cb2f9df14148dbb8c4af6187e5",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "impeccable": {
+      "name": "impeccable",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.agents\\skills\\impeccable\\SKILL.md",
+      "sha256": "26a2d7097b7bd29d8f0b1a3574cd940b05080167710fa6ef5f141d01d87ea29a",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "playwright": {
+      "name": "playwright",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\playwright\\SKILL.md",
+      "sha256": "0ffaabcc8e0990627c4725f18bf1c7955534a796c1c199e872909de2013ce6a8",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-agent-charters": {
+      "name": "primora-agent-charters",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-agent-charters\\SKILL.md",
+      "sha256": "2d9e18dc3c2c7e8a8a3f87d8a9c5c5cbcc9667bb21fe83ad6945341f2d1f7a56",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-agent-evaluations": {
+      "name": "primora-agent-evaluations",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-agent-evaluations\\SKILL.md",
+      "sha256": "c048153aa084a8c69370bc42ba087abb5e611db5211cefdddd619f8d482e1967",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-authority-and-approvals": {
+      "name": "primora-authority-and-approvals",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-authority-and-approvals\\SKILL.md",
+      "sha256": "e1e05d9ba0895d45732f9371b986972b3533a17239d93cfc207e97180fd9e413",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-backend-api": {
+      "name": "primora-backend-api",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-backend-api\\SKILL.md",
+      "sha256": "f42a41d8ef225f9bcad211adb9d0ec22759ab2ccddb642c07514e7438b217a07",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-booking-operations": {
+      "name": "primora-booking-operations",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-booking-operations\\SKILL.md",
+      "sha256": "ed192a989fd8f7e467e0cf09dacc0ed904153dd0873ab06050a47de8c3f76eee",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-business-analytics": {
+      "name": "primora-business-analytics",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-business-analytics\\SKILL.md",
+      "sha256": "cb3fc0607c605b6f3d6971e147826fa8256a521eefa454a6a28654b18ce441d9",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-business-strategy": {
+      "name": "primora-business-strategy",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-business-strategy\\SKILL.md",
+      "sha256": "7915435682141da3ebc4841038b9111da6aa2ad69822f1efbc6ed8eeb2446b09",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-customer-support": {
+      "name": "primora-customer-support",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-customer-support\\SKILL.md",
+      "sha256": "227aa61e3c3758f31c3f9295fc5f6b4619d6ecece69b2c7ffe0bc7f5412a68ab",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-dashboard-layout": {
+      "name": "primora-dashboard-layout",
+      "status": "canonical_definition_not_located",
+      "path": null,
+      "sha256": null,
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-data-visualization": {
+      "name": "primora-data-visualization",
+      "status": "canonical_definition_not_located",
+      "path": null,
+      "sha256": null,
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-design-system": {
+      "name": "primora-design-system",
+      "status": "canonical_definition_not_located",
+      "path": null,
+      "sha256": null,
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-devops-cicd": {
+      "name": "primora-devops-cicd",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-devops-cicd\\SKILL.md",
+      "sha256": "95f800931ff006c8756d6aa5dcfc3d25c6b4ba0f7b478dde615dc5560e7cd4e9",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-durable-workflows": {
+      "name": "primora-durable-workflows",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-durable-workflows\\SKILL.md",
+      "sha256": "38272926532ad235f67419b05fef070c925fe188e4ff168ff59ab885f72132d2",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-evidence-research": {
+      "name": "primora-evidence-research",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-evidence-research\\SKILL.md",
+      "sha256": "28d64ce72fd0b981f0a64661e4db92a276b8c05093ed4dcba77dc3f6ae8ec5ea",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-finance-accounting": {
+      "name": "primora-finance-accounting",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-finance-accounting\\SKILL.md",
+      "sha256": "9ec542d406bec9569181de635270c6a6f33d8448b69ac8517ff37ded27124d10",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-growth-marketing": {
+      "name": "primora-growth-marketing",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-growth-marketing\\SKILL.md",
+      "sha256": "7a9cfc022140f802a469c51153ebfdd81f6f0a3e9b323f24992b02cec9ae6796",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-incident-management": {
+      "name": "primora-incident-management",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-incident-management\\SKILL.md",
+      "sha256": "0c9823cd122c09f383cc536d836a1794ce6deb67d1dca82a945107ccf2a8d306",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-marketplace-payments": {
+      "name": "primora-marketplace-payments",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-marketplace-payments\\SKILL.md",
+      "sha256": "b6512e3480abd67a216456e17c8d023e46923ad145bfeb65f029bb0bade25130",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-memory-and-knowledge": {
+      "name": "primora-memory-and-knowledge",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-memory-and-knowledge\\SKILL.md",
+      "sha256": "34f8efda2ba9dde0e547e89bd4dac7afed996c09387a575abf14637021206d19",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-observability": {
+      "name": "primora-observability",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-observability\\SKILL.md",
+      "sha256": "b6f6486212dfd6152d8b84a19f8af192468b048f5e1cba3ab90caf2e31900edb",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-partnerships-onboarding": {
+      "name": "primora-partnerships-onboarding",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-partnerships-onboarding\\SKILL.md",
+      "sha256": "14ed70d9f54510c34bfb7354266b8a50360f10e4c5dad69e48feadb3b61a4e53",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-pricing-revenue": {
+      "name": "primora-pricing-revenue",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-pricing-revenue\\SKILL.md",
+      "sha256": "bf6adda3d53acd5e895857767c86b4ca92d71cedfbcb2017f446d7e80b36ff69",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-product-requirements": {
+      "name": "primora-product-requirements",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-product-requirements\\SKILL.md",
+      "sha256": "4bc2197ea818008e2c83940654adc71ad2857dc481a33aa0ea46e96d1502f8e7",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-project-delivery": {
+      "name": "primora-project-delivery",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-project-delivery\\SKILL.md",
+      "sha256": "12817ef58fcae615143c4a08eb66d6b194e73a6c6b78f5b9b5618a70e5174993",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-quality-control": {
+      "name": "primora-quality-control",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-quality-control\\SKILL.md",
+      "sha256": "2411067f0d088111c930e31874883d437f9329ff5af6f8c359901ab0e164d9c1",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-quality-engineering": {
+      "name": "primora-quality-engineering",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-quality-engineering\\SKILL.md",
+      "sha256": "acef6869639733a734aa72840f32bd96b09692b0c038cfea53141aa933d70f82",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-retrieval-grounding": {
+      "name": "primora-retrieval-grounding",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-retrieval-grounding\\SKILL.md",
+      "sha256": "34ffd697378ba16e2e620d54c770e10cd518da2220ca9ad563687c5ca494ce4f",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-risk-compliance": {
+      "name": "primora-risk-compliance",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-risk-compliance\\SKILL.md",
+      "sha256": "f54aa8945d93d52c95c3d04c147d8cb125748b862fe474ed238f83aabc8c9a1c",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-saudi-pdpl": {
+      "name": "primora-saudi-pdpl",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-saudi-pdpl\\SKILL.md",
+      "sha256": "36f22dd8ae844bcd21d10e0568ff1c770cc240e3562371ca1601ff05c04e7057",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-skill-registry": {
+      "name": "primora-skill-registry",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-skill-registry\\SKILL.md",
+      "sha256": "5d41562424eb48b87280ff113315bfb874d3c923ca7add46a926f6921d6a95a5",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-solution-architecture": {
+      "name": "primora-solution-architecture",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-solution-architecture\\SKILL.md",
+      "sha256": "6947094daeeee47805e0c2a8e20e2f02320ec6681eda94b0d6afa7f61c9142cb",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-source-continuity": {
+      "name": "primora-source-continuity",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-source-continuity\\SKILL.md",
+      "sha256": "697b095f01a2d37e707e8b7a453d180f4bbbbd4603a8e2beb19bae5782025d82",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "primora-tool-contracts": {
+      "name": "primora-tool-contracts",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\primora-tool-contracts\\SKILL.md",
+      "sha256": "8846e91e2d4611d83a6200bb8d87cc8a0c0ab9a3ddb821beac944da030fa9984",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "product-designer": {
+      "name": "product-designer",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.agents\\skills\\product-designer\\SKILL.md",
+      "sha256": "5a3b8e0dd92fd33910a99aae9e7105c846b1ac9a2c7c205aecf9a56a05d56b02",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "security-best-practices": {
+      "name": "security-best-practices",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\security-best-practices\\SKILL.md",
+      "sha256": "7b3dae1ffc5434d890f3c65c8f552af52d0307fab3b35dec13013c9ca3844c4f",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "security-threat-model": {
+      "name": "security-threat-model",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\security-threat-model\\SKILL.md",
+      "sha256": "1283c0dd62a8104d9edda4583569b5d8510b4ddaa45120687c999250fd96bad2",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "supabase": {
+      "name": "supabase",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.agents\\skills\\supabase\\SKILL.md",
+      "sha256": "df6748d6360a2cfda72d2d607a6f2d2fde730a03247eafb457421089b93e2d78",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "supabase-postgres-best-practices": {
+      "name": "supabase-postgres-best-practices",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.agents\\skills\\supabase-postgres-best-practices\\SKILL.md",
+      "sha256": "4d7d1bd60f2ad7fd0d510269279519059dcc630d832f4c241d90735244c70525",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "surface-closure": {
+      "name": "surface-closure",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\surface-closure\\SKILL.md",
+      "sha256": "550da936385f3e58042e026e1466abfab717f5d034ab8462ec76efd96198e714",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "ui-ux-pro-max": {
+      "name": "ui-ux-pro-max",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.codex\\skills\\ui-ux-pro-max\\SKILL.md",
+      "sha256": "6ca2c2f93c8d2bb8281bd596ccb0d81aae46cf7c3a14ed76d5465b65fbbce79d",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "ux-audit": {
+      "name": "ux-audit",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.agents\\skills\\ux-audit\\SKILL.md",
+      "sha256": "6f9e93a0823203a4ee3a57f07584dcd1489ce9945e82b2e5ddcc620d173bf2e3",
+      "behavior_certified": false,
+      "permission_grant": false
+    },
+    "vercel-react-best-practices": {
+      "name": "vercel-react-best-practices",
+      "status": "installed_instructions",
+      "path": "C:\\Users\\Yousif's PC\\.agents\\skills\\vercel-react-best-practices\\SKILL.md",
+      "sha256": "71ed7794962fa6e803ee83030517b5b93a9f70fbfeb431ec4535c5480a8d8355",
+      "behavior_certified": false,
+      "permission_grant": false
+    }
+  },
+  "policy": {
+    "company_agents_activated": false,
+    "development_workers_resumed": false,
+    "permissions_granted": false,
+    "production_deployed": false,
+    "financial_transactions_executed": false,
+    "approval_text_is_draft_until_submitted": true
+  },
+  "limits": [
+    "File/hash verification establishes instruction presence, not integration configuration or behavioral competence.",
+    "Later reduced-team studies do not supersede the original roster.",
+    "Delivery functions may be combined or executed serially."
+  ]
+}

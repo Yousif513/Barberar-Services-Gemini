@@ -1,0 +1,1462 @@
+{
+  "status": "PROPOSED_UNAPPROVED",
+  "company_activation": "inactive",
+  "pages": [
+    {
+      "id": "command",
+      "route": "/hq",
+      "name": "CEO Command Center",
+      "phase": "MVP",
+      "proposed_accountable_area": "Nora",
+      "purpose": "Briefing, blocked work, decisions, last verified update",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Compose task",
+          "target": "/hq/tasks/new",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Inspect task",
+          "target": "/hq/tasks/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Review decisions",
+          "target": "/hq/decisions",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Agent directory",
+          "target": "/hq/agents",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "tasks",
+      "route": "/hq/tasks",
+      "name": "Persistent Task Queue",
+      "phase": "MVP",
+      "proposed_accountable_area": "Alexander",
+      "purpose": "Owner, stage, dependencies, source and durable receipt",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "New task",
+          "target": "/hq/tasks/new",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Open task",
+          "target": "/hq/tasks/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Filter",
+          "target": "overlay:filters",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "compose",
+      "route": "/hq/tasks/new",
+      "name": "Task Composer",
+      "phase": "MVP",
+      "proposed_accountable_area": "Nora",
+      "purpose": "Required skills/versions, alternatives, sources, owner/reviewer and readiness",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Assess readiness",
+          "target": "inline:readiness",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Compare candidates",
+          "target": "overlay:readiness-comparison",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Submit draft",
+          "target": "/hq/tasks/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Attach sources",
+          "target": "overlay:source-picker",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "task",
+      "route": "/hq/tasks/[id]",
+      "name": "Task Workspace",
+      "phase": "MVP",
+      "proposed_accountable_area": "Alexander",
+      "purpose": "Plan, evidence, recommendations, decisions, handoffs and restart-safe follow-up",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Review recommendation",
+          "target": "overlay:recommendation",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Request decision",
+          "target": "/hq/decisions/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Add source",
+          "target": "overlay:source-picker",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Inspect agent",
+          "target": "/hq/agents/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Open receipt",
+          "target": "/hq/audit/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "decisions",
+      "route": "/hq/decisions",
+      "name": "CEO Decision Queue",
+      "phase": "MVP",
+      "proposed_accountable_area": "Nora",
+      "purpose": "Recommendations and skill changes awaiting exact CEO decision",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Open decision",
+          "target": "/hq/decisions/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Open skill change",
+          "target": "/hq/skill-changes/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Filter",
+          "target": "overlay:filters",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "decision",
+      "route": "/hq/decisions/[id]",
+      "name": "CEO Decision Detail",
+      "phase": "MVP",
+      "proposed_accountable_area": "Nora",
+      "purpose": "Scope, target, limits, expiry, costs, prerequisites, evidence and consequences",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Approve or decline",
+          "target": "overlay:decision-confirmation",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Request changes",
+          "target": "overlay:request-changes",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Audit receipt",
+          "target": "/hq/audit/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "agents",
+      "route": "/hq/agents",
+      "name": "Original Agent Directory",
+      "phase": "MVP",
+      "proposed_accountable_area": "Olivia",
+      "purpose": "All15 original inactive identities and charter/skill gaps",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Open profile",
+          "target": "/hq/agents/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "View gaps",
+          "target": "/hq/capabilities",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Filter",
+          "target": "overlay:filters",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "agent",
+      "route": "/hq/agents/[id]",
+      "name": "Agent Profile",
+      "phase": "MVP",
+      "proposed_accountable_area": "Olivia",
+      "purpose": "Skills/gaps, version/source, validation/evidence/freshness, tools/permissions and readiness",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Inspect skill",
+          "target": "/hq/skills/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Request evaluation",
+          "target": "overlay:evaluation-request",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Propose skill add/remove",
+          "target": "overlay:skill-change",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Task readiness",
+          "target": "inline:readiness",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Evidence",
+          "target": "/hq/evaluations/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "skills",
+      "route": "/hq/skills",
+      "name": "Skill Catalog",
+      "phase": "MVP",
+      "proposed_accountable_area": "Olivia",
+      "purpose": "Installed instructions and staged proposals with versions, provenance and evidence",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Inspect skill",
+          "target": "/hq/skills/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Propose addition",
+          "target": "overlay:skill-change",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Filter",
+          "target": "overlay:filters",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "skill",
+      "route": "/hq/skills/[id]",
+      "name": "Skill Detail",
+      "phase": "MVP",
+      "proposed_accountable_area": "Olivia",
+      "purpose": "Version history, source/commit/hash, dependencies, bindings and validation scope",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Evaluation",
+          "target": "/hq/evaluations/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Binding proposal",
+          "target": "overlay:skill-change",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Source",
+          "target": "/hq/knowledge/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Compare versions",
+          "target": "overlay:version-diff",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "gaps",
+      "route": "/hq/capabilities",
+      "name": "Capability Gap Matrix",
+      "phase": "MVP",
+      "proposed_accountable_area": "Olivia",
+      "purpose": "Required versus available skills, behavioral evidence and prerequisites",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Open agent",
+          "target": "/hq/agents/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Open skill",
+          "target": "/hq/skills/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Propose resolution",
+          "target": "overlay:skill-change",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "evaluations",
+      "route": "/hq/evaluations",
+      "name": "Evaluation History",
+      "phase": "MVP",
+      "proposed_accountable_area": "Omar",
+      "purpose": "Structural validation, behavioral cases, environment and independent review separately",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Open evaluation",
+          "target": "/hq/evaluations/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Request evaluation",
+          "target": "overlay:evaluation-request",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "evaluation",
+      "route": "/hq/evaluations/[id]",
+      "name": "Evaluation Detail",
+      "phase": "MVP",
+      "proposed_accountable_area": "Omar",
+      "purpose": "Skill/version/case, inputs, observed result, evidence, reviewer and freshness",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Source evidence",
+          "target": "/hq/knowledge/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Propose correction",
+          "target": "overlay:skill-change",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "change",
+      "route": "/hq/skill-changes/[id]",
+      "name": "Skill Change Review",
+      "phase": "MVP",
+      "proposed_accountable_area": "Olivia",
+      "purpose": "Add/remove/pin/evaluate proposal, version diff and CEO receipt",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "CEO decision",
+          "target": "/hq/decisions/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Compare versions",
+          "target": "overlay:version-diff",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Checked binding receipt",
+          "target": "inline:approved-change-receipt",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "knowledge",
+      "route": "/hq/knowledge",
+      "name": "Knowledge Source Library",
+      "phase": "MVP",
+      "proposed_accountable_area": "Ethan",
+      "purpose": "Scoped sources, provenance, corrections, lifecycle and freshness",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Source detail",
+          "target": "/hq/knowledge/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Attach source draft",
+          "target": "overlay:source-intake",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Filter",
+          "target": "overlay:filters",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "source",
+      "route": "/hq/knowledge/[id]",
+      "name": "Source Evidence Detail",
+      "phase": "MVP",
+      "proposed_accountable_area": "Ethan",
+      "purpose": "Origin, excerpt, scope, version, observation time, correction and hold",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Correction proposal",
+          "target": "overlay:source-correction",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Affected tasks",
+          "target": "/hq/tasks",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "audit",
+      "route": "/hq/audit",
+      "name": "Immutable Audit Timeline",
+      "phase": "MVP",
+      "proposed_accountable_area": "Omar",
+      "purpose": "Actor, action, target, decision binding and observed result",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Event detail",
+          "target": "/hq/audit/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Filter",
+          "target": "overlay:filters",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "event",
+      "route": "/hq/audit/[id]",
+      "name": "Audit Event Detail",
+      "phase": "MVP",
+      "proposed_accountable_area": "Omar",
+      "purpose": "Linked task/decision/source; no edit or deletion of history",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Task",
+          "target": "/hq/tasks/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Decision",
+          "target": "/hq/decisions/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "connections",
+      "route": "/hq/connections",
+      "name": "Tools and Connection Readiness",
+      "phase": "MVP",
+      "proposed_accountable_area": "Ethan",
+      "purpose": "Instructions, actual tools, environment, prerequisites and permissions separately",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Prerequisites",
+          "target": "overlay:connection-prerequisites",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Request named setup",
+          "target": "overlay:connection-request",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "settings",
+      "route": "/hq/settings",
+      "name": "HQ Workspace Settings",
+      "phase": "MVP",
+      "proposed_accountable_area": "Nora",
+      "purpose": "AR/EN, Riyadh time, notifications and account/access state",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Locale and preferences",
+          "target": "inline:preferences",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Permission request",
+          "target": "overlay:connection-request",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "office",
+      "route": "/hq/office",
+      "name": "Virtual Headquarters",
+      "phase": "Later",
+      "proposed_accountable_area": "Alexander",
+      "purpose": "Real record-linked presence, explicitly labelled simulated/inactive",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Agent office",
+          "target": "/hq/office/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Council",
+          "target": "/hq/council",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "office-detail",
+      "route": "/hq/office/[id]",
+      "name": "Agent Office",
+      "phase": "Later",
+      "proposed_accountable_area": "Olivia",
+      "purpose": "Spatial view of the same profile/task records",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Agent profile",
+          "target": "/hq/agents/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Task",
+          "target": "/hq/tasks/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "council",
+      "route": "/hq/council",
+      "name": "Executive Council Meetings",
+      "phase": "Later",
+      "proposed_accountable_area": "Alexander",
+      "purpose": "Agenda, source-linked deliberation, preserved dissent and follow-up",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Meeting",
+          "target": "/hq/council/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Schedule proposal",
+          "target": "overlay:meeting-proposal",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "meeting",
+      "route": "/hq/council/[id]",
+      "name": "Council Meeting Record",
+      "phase": "Later",
+      "proposed_accountable_area": "Nora",
+      "purpose": "Participants, consent, transcript, evidence and decisions",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Decision",
+          "target": "/hq/decisions/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Transcript",
+          "target": "overlay:transcript",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Voice consent",
+          "target": "overlay:voice-consent",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "projects",
+      "route": "/hq/projects",
+      "name": "Projects and Initiatives",
+      "phase": "Later",
+      "proposed_accountable_area": "Alexander",
+      "purpose": "Accountable owner, contributors, dependencies and evidence",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Project",
+          "target": "/hq/projects/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "New task",
+          "target": "/hq/tasks/new",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "project",
+      "route": "/hq/projects/[id]",
+      "name": "Project Workspace",
+      "phase": "Later",
+      "proposed_accountable_area": "Alexander",
+      "purpose": "Milestones, costs, risks, decisions and outcomes",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Task",
+          "target": "/hq/tasks/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Decision",
+          "target": "/hq/decisions/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "strategy",
+      "route": "/hq/strategy",
+      "name": "Strategy and Venture Studio",
+      "phase": "Later",
+      "proposed_accountable_area": "Adam",
+      "purpose": "Options, innovation stages and expansion hypotheses",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Scenario",
+          "target": "/hq/strategy/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "scenario",
+      "route": "/hq/strategy/[id]",
+      "name": "Strategic Scenario",
+      "phase": "Later",
+      "proposed_accountable_area": "Adam",
+      "purpose": "Assumptions, alternatives, source evidence and dissent",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Recommendation",
+          "target": "overlay:recommendation",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Decision",
+          "target": "/hq/decisions/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "operations",
+      "route": "/hq/operations",
+      "name": "Marketplace Operations Overview",
+      "phase": "Later",
+      "proposed_accountable_area": "Sarah",
+      "purpose": "Read-only booking/service exceptions from separately scoped connectors",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Source",
+          "target": "/hq/knowledge/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "New task",
+          "target": "/hq/tasks/new",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "finance",
+      "route": "/hq/finance",
+      "name": "Finance and Reconciliation Overview",
+      "phase": "Later",
+      "proposed_accountable_area": "Daniel",
+      "purpose": "Source-linked SAR metrics and uncertainty; no financial dispatch",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Metric definition",
+          "target": "overlay:metric-definition",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "New task",
+          "target": "/hq/tasks/new",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "growth",
+      "route": "/hq/growth",
+      "name": "Brand and Growth Portfolio",
+      "phase": "Later",
+      "proposed_accountable_area": "Sophia",
+      "purpose": "Brand, experiments, evidence and budget proposals",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "New task",
+          "target": "/hq/tasks/new",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Source",
+          "target": "/hq/knowledge/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "partnerships",
+      "route": "/hq/partnerships",
+      "name": "Partnership Pipeline",
+      "phase": "Later",
+      "proposed_accountable_area": "Victoria",
+      "purpose": "Qualification/onboarding evidence without outreach permission",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "New task",
+          "target": "/hq/tasks/new",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Source",
+          "target": "/hq/knowledge/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "customer",
+      "route": "/hq/customer-experience",
+      "name": "Customer Experience Overview",
+      "phase": "Later",
+      "proposed_accountable_area": "Emma",
+      "purpose": "Scoped support, complaints and independent appeals",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Task",
+          "target": "/hq/tasks/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "risk",
+      "route": "/hq/risk",
+      "name": "Risk and Compliance Register",
+      "phase": "Later",
+      "proposed_accountable_area": "Layla",
+      "purpose": "Controls, privacy/retention dependencies and protected escalation",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Source",
+          "target": "/hq/knowledge/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "New task",
+          "target": "/hq/tasks/new",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "functions",
+      "route": "/hq/functions",
+      "name": "Original Function Directory",
+      "phase": "Later",
+      "proposed_accountable_area": "Olivia",
+      "purpose": "All42 original proposed functions, phases and delivery forms",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Function",
+          "target": "/hq/functions/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    },
+    {
+      "id": "function",
+      "route": "/hq/functions/[id]",
+      "name": "Original Function Detail",
+      "phase": "Later",
+      "proposed_accountable_area": "Olivia",
+      "purpose": "Original specification and proposed role/skill/workflow realization",
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "stale"
+      ],
+      "actions": [
+        {
+          "label": "Agent",
+          "target": "/hq/agents/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        },
+        {
+          "label": "Skill",
+          "target": "/hq/skills/[id]",
+          "authority": "navigation/draft only; command execution needs exact applicable approval and server authorization"
+        }
+      ],
+      "status": "proposed_unapproved"
+    }
+  ],
+  "identity_count": 15,
+  "function_count": 42,
+  "identity_template_rule": "One profile template, not15 separate layouts",
+  "overlays": [
+    {
+      "id": "connection-prerequisites",
+      "kind": "drawer",
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ],
+      "state_rule": "Component states, not separate page templates",
+      "outcomes": "cancel preserves parent context; failed write preserves draft; success requires checked receipt"
+    },
+    {
+      "id": "connection-request",
+      "kind": "modal",
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ],
+      "state_rule": "Component states, not separate page templates",
+      "outcomes": "cancel preserves parent context; failed write preserves draft; success requires checked receipt"
+    },
+    {
+      "id": "decision-confirmation",
+      "kind": "modal",
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ],
+      "state_rule": "Component states, not separate page templates",
+      "outcomes": "cancel preserves parent context; failed write preserves draft; success requires checked receipt"
+    },
+    {
+      "id": "evaluation-request",
+      "kind": "modal",
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ],
+      "state_rule": "Component states, not separate page templates",
+      "outcomes": "cancel preserves parent context; failed write preserves draft; success requires checked receipt"
+    },
+    {
+      "id": "filters",
+      "kind": "modal",
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ],
+      "state_rule": "Component states, not separate page templates",
+      "outcomes": "cancel preserves parent context; failed write preserves draft; success requires checked receipt"
+    },
+    {
+      "id": "meeting-proposal",
+      "kind": "modal",
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ],
+      "state_rule": "Component states, not separate page templates",
+      "outcomes": "cancel preserves parent context; failed write preserves draft; success requires checked receipt"
+    },
+    {
+      "id": "metric-definition",
+      "kind": "modal",
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ],
+      "state_rule": "Component states, not separate page templates",
+      "outcomes": "cancel preserves parent context; failed write preserves draft; success requires checked receipt"
+    },
+    {
+      "id": "readiness-comparison",
+      "kind": "drawer",
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ],
+      "state_rule": "Component states, not separate page templates",
+      "outcomes": "cancel preserves parent context; failed write preserves draft; success requires checked receipt"
+    },
+    {
+      "id": "recommendation",
+      "kind": "drawer",
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ],
+      "state_rule": "Component states, not separate page templates",
+      "outcomes": "cancel preserves parent context; failed write preserves draft; success requires checked receipt"
+    },
+    {
+      "id": "request-changes",
+      "kind": "modal",
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ],
+      "state_rule": "Component states, not separate page templates",
+      "outcomes": "cancel preserves parent context; failed write preserves draft; success requires checked receipt"
+    },
+    {
+      "id": "skill-change",
+      "kind": "modal",
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ],
+      "state_rule": "Component states, not separate page templates",
+      "outcomes": "cancel preserves parent context; failed write preserves draft; success requires checked receipt"
+    },
+    {
+      "id": "source-correction",
+      "kind": "modal",
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ],
+      "state_rule": "Component states, not separate page templates",
+      "outcomes": "cancel preserves parent context; failed write preserves draft; success requires checked receipt"
+    },
+    {
+      "id": "source-intake",
+      "kind": "modal",
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ],
+      "state_rule": "Component states, not separate page templates",
+      "outcomes": "cancel preserves parent context; failed write preserves draft; success requires checked receipt"
+    },
+    {
+      "id": "source-picker",
+      "kind": "modal",
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ],
+      "state_rule": "Component states, not separate page templates",
+      "outcomes": "cancel preserves parent context; failed write preserves draft; success requires checked receipt"
+    },
+    {
+      "id": "transcript",
+      "kind": "drawer",
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ],
+      "state_rule": "Component states, not separate page templates",
+      "outcomes": "cancel preserves parent context; failed write preserves draft; success requires checked receipt"
+    },
+    {
+      "id": "version-diff",
+      "kind": "drawer",
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ],
+      "state_rule": "Component states, not separate page templates",
+      "outcomes": "cancel preserves parent context; failed write preserves draft; success requires checked receipt"
+    },
+    {
+      "id": "voice-consent",
+      "kind": "modal",
+      "states": [
+        "idle",
+        "validation-error",
+        "submitting",
+        "failed",
+        "conflict",
+        "success"
+      ],
+      "state_rule": "Component states, not separate page templates",
+      "outcomes": "cancel preserves parent context; failed write preserves draft; success requires checked receipt"
+    },
+    {
+      "id": "notifications",
+      "kind": "drawer",
+      "states": [
+        "loading",
+        "empty",
+        "populated",
+        "error",
+        "forbidden"
+      ],
+      "outcomes": "Open linked task/decision; no invented alerts"
+    }
+  ],
+  "shared": [
+    "responsive navigation shell",
+    "permission-scoped search",
+    "notification drawer",
+    "source citation/evidence card",
+    "approval receipt",
+    "failure/recovery notice",
+    "inactive/unknown status vocabulary"
+  ],
+  "global_actions": [
+    {
+      "label": "Navigation",
+      "target": "MVP routes only; later items displayed only in roadmap, not dead links"
+    },
+    {
+      "label": "Search",
+      "target": "inline:permission-scoped-results"
+    },
+    {
+      "label": "Notifications",
+      "target": "overlay:notifications"
+    },
+    {
+      "label": "Account/settings",
+      "target": "/hq/settings"
+    },
+    {
+      "label": "Sign out",
+      "target": "existing authenticated session command, separate from employee activation"
+    }
+  ]
+}

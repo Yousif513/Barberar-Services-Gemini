@@ -1,0 +1,597 @@
+{
+  "areas": [
+    "hq"
+  ],
+  "mode": "minimal",
+  "platform": "web",
+  "pages": [
+    {
+      "id": "hq-agent-profile",
+      "name": "Agent Profile",
+      "route": "/hq/agents/[id]",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:14"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 14,
+          "quote": "/hq/agents/[id] — Agent Profile"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-audit-event-detail",
+      "name": "Audit Event Detail",
+      "route": "/hq/audit/[id]",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:24"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 24,
+          "quote": "/hq/audit/[id] — Audit Event Detail"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-ceo-command-center",
+      "name": "CEO Command Center",
+      "route": "/hq",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:7"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 7,
+          "quote": "/hq — CEO Command Center"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-ceo-decision-detail",
+      "name": "CEO Decision Detail",
+      "route": "/hq/decisions/[id]",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:12"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 12,
+          "quote": "/hq/decisions/[id] — CEO Decision Detail"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-ceo-decision-queue",
+      "name": "CEO Decision Queue",
+      "route": "/hq/decisions",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:11"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 11,
+          "quote": "/hq/decisions — CEO Decision Queue"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-capability-gap-matrix",
+      "name": "Capability Gap Matrix",
+      "route": "/hq/capabilities",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:17"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 17,
+          "quote": "/hq/capabilities — Capability Gap Matrix"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-evaluation-detail",
+      "name": "Evaluation Detail",
+      "route": "/hq/evaluations/[id]",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:19"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 19,
+          "quote": "/hq/evaluations/[id] — Evaluation Detail"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-evaluation-history",
+      "name": "Evaluation History",
+      "route": "/hq/evaluations",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:18"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 18,
+          "quote": "/hq/evaluations — Evaluation History"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-hq-workspace-settings",
+      "name": "HQ Workspace Settings",
+      "route": "/hq/settings",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:26"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 26,
+          "quote": "/hq/settings — HQ Workspace Settings"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-immutable-audit-timeline",
+      "name": "Immutable Audit Timeline",
+      "route": "/hq/audit",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:23"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 23,
+          "quote": "/hq/audit — Immutable Audit Timeline"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-knowledge-source-library",
+      "name": "Knowledge Source Library",
+      "route": "/hq/knowledge",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:21"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 21,
+          "quote": "/hq/knowledge — Knowledge Source Library"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-original-agent-directory",
+      "name": "Original Agent Directory",
+      "route": "/hq/agents",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:13"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 13,
+          "quote": "/hq/agents — Original Agent Directory"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-persistent-task-queue",
+      "name": "Persistent Task Queue",
+      "route": "/hq/tasks",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:8"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 8,
+          "quote": "/hq/tasks — Persistent Task Queue"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-skill-catalog",
+      "name": "Skill Catalog",
+      "route": "/hq/skills",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:15"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 15,
+          "quote": "/hq/skills — Skill Catalog"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-skill-change-review",
+      "name": "Skill Change Review",
+      "route": "/hq/skill-changes/[id]",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:20"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 20,
+          "quote": "/hq/skill-changes/[id] — Skill Change Review"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-skill-detail",
+      "name": "Skill Detail",
+      "route": "/hq/skills/[id]",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:16"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 16,
+          "quote": "/hq/skills/[id] — Skill Detail"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-source-evidence-detail",
+      "name": "Source Evidence Detail",
+      "route": "/hq/knowledge/[id]",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:22"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 22,
+          "quote": "/hq/knowledge/[id] — Source Evidence Detail"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-task-composer",
+      "name": "Task Composer",
+      "route": "/hq/tasks/new",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:9"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 9,
+          "quote": "/hq/tasks/new — Task Composer"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-task-workspace",
+      "name": "Task Workspace",
+      "route": "/hq/tasks/[id]",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:10"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 10,
+          "quote": "/hq/tasks/[id] — Task Workspace"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    },
+    {
+      "id": "hq-tools-and-connection-readiness",
+      "name": "Tools and Connection Readiness",
+      "route": "/hq/connections",
+      "purpose": "",
+      "area": "hq",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:25"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 25,
+          "quote": "/hq/connections — Tools and Connection Readiness"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    }
+  ],
+  "totals": {
+    "pages": 20,
+    "modals": 0,
+    "drawers": 0,
+    "popovers": 0,
+    "screen_states": 60,
+    "total_generations": 80
+  }
+}

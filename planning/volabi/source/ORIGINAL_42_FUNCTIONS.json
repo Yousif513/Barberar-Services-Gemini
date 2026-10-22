@@ -1,0 +1,380 @@
+[
+  {
+    "id": "OF01",
+    "proposed_area": "Sarah",
+    "original_function": "Rayan — Salon AI Coach",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF02",
+    "proposed_area": "Sarah",
+    "original_function": "Booking Operations Officer",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF03",
+    "proposed_area": "Sarah",
+    "original_function": "Salon Onboarding Specialist",
+    "source_phase": "P2",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF04",
+    "proposed_area": "Sarah",
+    "original_function": "Service Quality Coordinator",
+    "source_phase": "P3",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF05",
+    "proposed_area": "Victoria",
+    "original_function": "Salon Acquisition Specialist",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF06",
+    "proposed_area": "Victoria",
+    "original_function": "Partnership Development Specialist",
+    "source_phase": "P2",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF07",
+    "proposed_area": "Victoria",
+    "original_function": "Commercial Research Analyst",
+    "source_phase": "P3",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF08",
+    "proposed_area": "Emma",
+    "original_function": "Lina — Customer AI Concierge",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF09",
+    "proposed_area": "Emma",
+    "original_function": "Customer Support Specialist",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF10",
+    "proposed_area": "Emma",
+    "original_function": "Complaint Resolution Specialist",
+    "source_phase": "P2",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF11",
+    "proposed_area": "Maya",
+    "original_function": "Product Management Specialist",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF12",
+    "proposed_area": "Maya",
+    "original_function": "UX/UI Design Specialist",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF13",
+    "proposed_area": "Maya",
+    "original_function": "Product Research Analyst",
+    "source_phase": "P2",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF14",
+    "proposed_area": "Maya",
+    "original_function": "Product Quality Specialist",
+    "source_phase": "P3",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF15",
+    "proposed_area": "Ethan",
+    "original_function": "Software Engineering Specialist",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF16",
+    "proposed_area": "Ethan",
+    "original_function": "AI Systems Engineer",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF17",
+    "proposed_area": "Ethan",
+    "original_function": "DevOps & Reliability Specialist",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF18",
+    "proposed_area": "Ethan",
+    "original_function": "Cybersecurity Engineer",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF19",
+    "proposed_area": "Ethan",
+    "original_function": "QA Automation Engineer",
+    "source_phase": "P2",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF20",
+    "proposed_area": "Daniel",
+    "original_function": "Financial Planning Analyst",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF21",
+    "proposed_area": "Daniel",
+    "original_function": "Payment Reconciliation Specialist",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF22",
+    "proposed_area": "Daniel",
+    "original_function": "Revenue Assurance Specialist",
+    "source_phase": "P2",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF23",
+    "proposed_area": "Sophia",
+    "original_function": "Growth Marketing Specialist",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF24",
+    "proposed_area": "Sophia",
+    "original_function": "Content & Brand Specialist",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF25",
+    "proposed_area": "Sophia",
+    "original_function": "Marketing Performance Analyst",
+    "source_phase": "P2",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF26",
+    "proposed_area": "Sophia",
+    "original_function": "SEO & Discovery Specialist",
+    "source_phase": "P3",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF27",
+    "proposed_area": "Layla",
+    "original_function": "Regulatory Compliance Analyst",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF28",
+    "proposed_area": "Layla",
+    "original_function": "Privacy & Data Governance Specialist",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF29",
+    "proposed_area": "Layla",
+    "original_function": "Contract Review Specialist",
+    "source_phase": "P2",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF30",
+    "proposed_area": "Omar",
+    "original_function": "Independent Security Auditor",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF31",
+    "proposed_area": "Omar",
+    "original_function": "AI Governance Auditor",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF32",
+    "proposed_area": "Omar",
+    "original_function": "Fraud & Trust Analyst",
+    "source_phase": "P2",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF33",
+    "proposed_area": "Omar",
+    "original_function": "Independent Quality Assurance Analyst",
+    "source_phase": "P3",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF34",
+    "proposed_area": "Olivia",
+    "original_function": "Workforce Administration Coordinator",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF35",
+    "proposed_area": "Olivia",
+    "original_function": "Performance & Capability Analyst",
+    "source_phase": "P2",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF36",
+    "proposed_area": "Olivia",
+    "original_function": "Training & Development Specialist",
+    "source_phase": "P3",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF37",
+    "proposed_area": "Alexander",
+    "original_function": "Executive Operations Analyst",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF38",
+    "proposed_area": "Alexander",
+    "original_function": "Project Coordination Specialist",
+    "source_phase": "P2",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF39",
+    "proposed_area": "Nora",
+    "original_function": "Decision Register Coordinator",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF40",
+    "proposed_area": "Nora",
+    "original_function": "Executive Briefing Specialist",
+    "source_phase": "P2",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF41",
+    "proposed_area": "Adam",
+    "original_function": "Strategic Research Specialist",
+    "source_phase": "P1",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  },
+  {
+    "id": "OF42",
+    "proposed_area": "Adam",
+    "original_function": "Scenario & Decision Analyst",
+    "source_phase": "P2",
+    "source_prompt": "P186",
+    "status": "proposed_inactive",
+    "delivery_form": "unresolved"
+  }
+]

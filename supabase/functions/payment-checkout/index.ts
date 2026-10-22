@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders, json, MissingConfigError, resolveCaller, serviceClient } from "../_shared/http.ts"
 import { buildRedirectUrl } from "../_shared/return-url.ts"
+import { checkoutGatewayContext, dispatchCheckoutAttempt, recoverCheckoutAttempt, type CheckoutAttempt } from "../_shared/checkout-attempts.ts"
 
 // Creates a Tap charge for something the signed-in user owes. The amount always comes from the
 // database record, never from the browser.
@@ -22,6 +23,29 @@ serve(async (req) => {
 
     const body = await req.json().catch(() => ({}))
     const db = serviceClient()
+    const purchaseType = body?.bookingId ? "booking" : String(body?.purchaseType || "")
+    const targetId = body?.bookingId || body?.purchaseId
+    if (typeof targetId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(targetId)
+      || !["booking", "gift_card", "package", "membership", "tip", "subscription"].includes(purchaseType)
+      || (body?.bookingId && (body?.purchaseId || body?.purchaseType))
+      || (body?.action !== undefined && body.action !== "recover")) {
+      return json(req, { error: "Choose one valid payable target.", code: "invalid_checkout_target" }, 400)
+    }
+    const gatewayContext = await checkoutGatewayContext(apiKey, Deno.env.get("SUPABASE_URL") || "")
+    const { data: previous, error: readError } = await db.rpc("read_checkout_attempt", {
+      p_actor_id: userId, p_purchase_type: purchaseType, p_target_id: targetId, p_gateway_context: gatewayContext,
+    })
+    if (readError) return readError.code === "P0002"
+      ? json(req, { error: "Payable not found.", code: "checkout_not_found" }, 404)
+      : json(req, { error: "Unable to check the existing payment attempt.", code: "checkout_recovery_unavailable" }, 503)
+    let recovered: CheckoutAttempt | null = null
+    if (previous && (previous.status !== "failed" || body?.action === "recover")) {
+      recovered = await recoverCheckoutAttempt({ db, apiKey, gatewayContext, attempt: previous as CheckoutAttempt, fetchImpl: fetch })
+      if (recovered.status !== "ready") return checkoutResult(req, recovered)
+      // An existing checkout URL is offered only while this payable and seller remain eligible below.
+    } else if (body?.action === "recover") {
+      return json(req, { error: "No checkout attempt was found.", code: "checkout_not_found" }, 404)
+    }
     let payable: Payable | null = null
 
     if (body?.bookingId) {
@@ -131,35 +155,52 @@ serve(async (req) => {
       return json(req, { error: "Marketplace split is enabled but sub-merchant destinations are not configured yet." }, 503)
     }
 
-    const response = await fetch("https://api.tap.company/v2/charges", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amount: payable.amount,
-        currency: "SAR",
-        threeDSecure: true,
-        save_card: false,
-        description: payable.description,
-        metadata: payable.metadata,
-        customer: {
-          first_name: profile?.first_name || "PRIMORA",
-          last_name: profile?.last_name || "Customer",
-          ...(profile?.email ? { email: profile.email } : {}),
-          ...(profile?.phone_number
-            ? { phone: { country_code: "966", number: String(profile.phone_number).replace(/^\+966/, "") } }
-            : {}),
-        },
-        source: { id: "src_all" },
-        post: { url: webhookUrl },
-        redirect: { url: buildRedirectUrl(appUrl, payable.redirectPath, body?.returnUrl) },
-      }),
-    })
-    const charge = await response.json().catch(() => ({}))
-    if (!response.ok || !charge?.id || !charge?.transaction?.url) {
-      console.error("[payment-checkout] Tap rejected the charge", response.status, JSON.stringify(charge).slice(0, 500))
-      return json(req, { error: "Unable to initialize payment." }, 502)
+    if (recovered) {
+      // Resume only after the canonical locked command rechecks the frozen amount/provider and current eligibility.
+      // Reusing this exact persisted identity can never acquire a new dispatch claim.
+      const { data: checked, error: checkError } = await db.rpc("claim_checkout_attempt", {
+        p_actor_id: userId, p_purchase_type: purchaseType, p_target_id: targetId,
+        p_attempt_id: recovered.id, p_request: recovered.request_text, p_gateway_context: gatewayContext,
+      })
+      if (checkError || !checked || checked.dispatch !== false) return checkoutResult(req, { ...recovered, status: "unknown" })
+      const latest = checked.status === "captured"
+        ? await recoverCheckoutAttempt({ db, apiKey, gatewayContext, attempt: checked as CheckoutAttempt, fetchImpl: fetch })
+        : checked as CheckoutAttempt
+      return checkoutResult(req, latest)
     }
-    return json(req, { success: true, checkoutUrl: charge.transaction.url, chargeId: charge.id })
+
+    const attemptId = crypto.randomUUID()
+    const requestText = JSON.stringify({
+      amount: payable.amount,
+      currency: "SAR",
+      threeDSecure: true,
+      save_card: false,
+      description: payable.description,
+      reference: { transaction: attemptId, order: targetId, idempotent: attemptId },
+      metadata: { ...payable.metadata, checkout_attempt_id: attemptId },
+      customer: {
+        first_name: profile?.first_name || "PRIMORA",
+        last_name: profile?.last_name || "Customer",
+        ...(profile?.email ? { email: profile.email } : {}),
+        ...(profile?.phone_number
+          ? { phone: { country_code: "966", number: String(profile.phone_number).replace(/^\+966/, "") } }
+          : {}),
+      },
+      source: { id: "src_all" },
+      post: { url: webhookUrl },
+      redirect: { url: buildRedirectUrl(appUrl, payable.redirectPath, body?.returnUrl) },
+    })
+    const { data: claimed, error: claimError } = await db.rpc("claim_checkout_attempt", {
+      p_actor_id: userId, p_purchase_type: purchaseType, p_target_id: targetId,
+      p_attempt_id: attemptId, p_request: requestText, p_gateway_context: gatewayContext,
+    })
+    if (claimError || !claimed) {
+      return json(req, { error: "Payment could not be safely started. Check its status before trying again.", code: "checkout_claim_unavailable" }, 503)
+    }
+    const outcome = claimed.dispatch === true
+      ? await dispatchCheckoutAttempt({ db, apiKey, gatewayContext, attempt: claimed as CheckoutAttempt, fetchImpl: fetch })
+      : await recoverCheckoutAttempt({ db, apiKey, gatewayContext, attempt: claimed as CheckoutAttempt, fetchImpl: fetch })
+    return checkoutResult(req, outcome)
   } catch (error) {
     if (error instanceof MissingConfigError) return json(req, { error: error.message }, 503)
     console.error("[payment-checkout] failure", error)
@@ -173,4 +214,17 @@ async function providerIsSelling(db: ReturnType<typeof serviceClient>, providerI
   const { data, error } = await db.rpc("provider_is_selling", { p_provider_id: providerId })
   if (error) throw error
   return data === true
+}
+
+
+function checkoutResult(req: Request, attempt: CheckoutAttempt): Response {
+  if (attempt.status === "ready" && attempt.checkout_url && !attempt.reconciliation_required) {
+    return json(req, { success: true, state: "ready", attemptId: attempt.id, checkoutUrl: attempt.checkout_url, chargeId: attempt.charge_id })
+  }
+  if (attempt.status === "failed" && !attempt.reconciliation_required) {
+    return json(req, { success: false, state: "failed", attemptId: attempt.id, code: "checkout_failed", error: "The payment provider verified that this attempt failed. You may explicitly try again." }, 409)
+  }
+  const state = attempt.status === "captured" ? "captured" : attempt.status === "submitting" ? "submitting" : "unknown"
+  return json(req, { success: false, state, attemptId: attempt.id, recoverable: true,
+    code: state === "captured" ? "payment_received" : state === "submitting" ? "checkout_pending" : "checkout_unknown" }, 202)
 }

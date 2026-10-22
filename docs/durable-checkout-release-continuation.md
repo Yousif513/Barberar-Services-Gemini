@@ -1,5 +1,7 @@
 # Durable checkout recovery and release-gap continuation
 
+> Historical design-only checkpoint. The CEO subsequently explicitly authorized development workers on2026-10-22; that registration blocker is resolved. See [the implementation and Headquarters handoff](durable-checkout-recovery-and-volabi.md) for current source, verification and remaining release dependencies. The older results below are retained as history.
+
 Date:22 October2026. Branch:codex-booking-payment-reconciliation. Profile:regulated. Repair mode follows the CEO-approved plan. Production deployment, company-agent activation and financial transactions remain held.
 
 ## Current outcome

@@ -1,0 +1,178 @@
+{
+  "date": "2026-10-22",
+  "branch": "codex-booking-payment-reconciliation",
+  "profile": "regulated",
+  "state": "reviewed local development repair; full release blocked",
+  "tests": {
+    "database": {
+      "exit_code": 0,
+      "tests": 1565,
+      "pass": 1565,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "todo": 0
+    },
+    "web": {
+      "exit_code": 0,
+      "tests": 894,
+      "pass": 894,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "todo": 0
+    },
+    "edge": {
+      "exit_code": 0,
+      "tests": 113,
+      "pass": 113,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "todo": 0
+    },
+    "mobile": {
+      "exit_code": 0,
+      "tests": 67,
+      "pass": 67,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "todo": 0
+    },
+    "independent_sql": {
+      "exit_code": 0,
+      "tests": 81,
+      "pass": 81,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "todo": 0
+    },
+    "inventory": {
+      "exit_code": 0,
+      "tests": 10,
+      "pass": 10
+    },
+    "browser": {
+      "exit_code": 0,
+      "tests": 4,
+      "pass": 4,
+      "independent_rerun": {
+        "tests": 4,
+        "pass": 4
+      },
+      "environment": "preview3112 + existing local Supabase; payment routes intercepted; original preview stopped"
+    }
+  },
+  "checks": {
+    "web_build": {
+      "exit_code": 0,
+      "next": "16.3.8",
+      "config": "local-only API/public key in memory; no values logged"
+    },
+    "mobile_typecheck": {
+      "exit_code": 0
+    },
+    "e2e_typecheck": {
+      "exit_code": 0
+    },
+    "web_eslint": {
+      "exit_code": 0,
+      "errors": 0,
+      "warnings": 300
+    },
+    "ui_schema": {
+      "exit_code": 0,
+      "rpc_calls": 312,
+      "select_strings": 202,
+      "dynamic_calls_unchecked": 34,
+      "mismatches": 0,
+      "new_native_snapshot_query": "Separate actual migrated authenticated/RLS proof in client review,6 cases"
+    },
+    "security_core": {
+      "exit_code": 0
+    },
+    "admin_controls": {
+      "exit_code": 0
+    },
+    "foundation_p3_compatibility": {
+      "exit_code": 0
+    },
+    "diff_check": {
+      "exit_code": 0
+    }
+  },
+  "adminwright": {
+    "plan": {
+      "exit_code": 0,
+      "errors": 0,
+      "warnings": 21
+    },
+    "coverage": {
+      "exit_code": 0,
+      "unresolved_structural_gaps": 0
+    },
+    "release": {
+      "exit_code": 1,
+      "errors": 249,
+      "warnings": 21,
+      "errors_by_rule": {
+        "crosscutting-flag": 12,
+        "crosscutting-evidence": 1,
+        "decision-assumed": 16,
+        "release-status-unresolved": 147,
+        "capability-unreviewed": 14,
+        "gap-unresolved": 10,
+        "gate-not-passed": 6,
+        "nonfunctional-gate-required": 2,
+        "screen-state-missing": 9,
+        "required-field-empty": 8,
+        "screen-responsive": 2,
+        "screen-accessibility": 22
+      }
+    }
+  },
+  "independent_reviews": [
+    ".admin-console/worklog/security-checkout-schema.md",
+    ".admin-console/worklog/security-checkout-durable.md",
+    ".admin-console/worklog/qa-checkout-clients.md",
+    ".admin-console/worklog/qa-checkout-browser.md",
+    ".admin-console/worklog/qa-volabi-planning.md"
+  ],
+  "headquarters": {
+    "status": "scope/theme proposal; no screens built",
+    "original_identities": 15,
+    "original_functions": 42,
+    "all_company_employees_inactive": true,
+    "first_loop_template_families": 6,
+    "first_loop_route_patterns": 9,
+    "first_loop_actions": 37,
+    "first_loop_overlays": 15,
+    "full_mvp_templates": 20,
+    "later_inventory_only": 16,
+    "installed_skill_references_rechecked": 73,
+    "unique_installed_skills_rechecked": 45,
+    "replacement_design_skills_staged": 3,
+    "replacement_skills_globally_installed": false,
+    "original_design_skill_recovery": "Six bounded roots and all available local Git history path search found no canonical originals"
+  },
+  "limits": [
+    "Actual hosted multi-session concurrency, Deno/PostgREST/provider sandbox and native device/Expo acceptance remain unverified.",
+    "PGlite serializes its connection; injected receipts are not live provider acceptance.",
+    "Cross-device business purchase creation is not universally atomic; server checkout dispatch guarantee is per existing payable.",
+    "Private-wire privacy lifecycle and minimized unknown-outcome operator recovery are open high release dependencies.",
+    "Initial full DB1561/1563 failed2 integration invariants; fixed and final1565/1565 passed.",
+    "Earlier uninjected test helper attempted actual provider endpoint with dummy fixture key. It was rejected as isolation evidence; accepted reruns hard-block/inject transport. No real credentials loaded or real financial transaction."
+  ],
+  "holds": {
+    "production_deployment": true,
+    "production_merge": true,
+    "hq_employee_activation": true,
+    "business_permission_grants": true,
+    "external_business_writes": true,
+    "actual_financial_transactions": true,
+    "new_paid_services": true
+  },
+  "original_dirty_checkout": "Preserved seven tracked changes and untracked work; no original working-tree edits or reset."
+}

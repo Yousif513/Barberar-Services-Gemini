@@ -1,0 +1,462 @@
+{
+  "unresolved": [],
+  "ambiguous": [],
+  "external": [
+    {
+      "affordance_id": "shared-popover-user-menu::um-logout",
+      "parent": "shared-popover-user-menu",
+      "label": "Sign out",
+      "type": "menu-item",
+      "location": "body",
+      "target_ref": "external:auth-logout",
+      "reason": "external",
+      "candidates": [],
+      "source": "by_overlay:popover"
+    }
+  ],
+  "out_of_area": [
+    {
+      "affordance_id": "hq-agent-profile::kpi-drill",
+      "parent": "hq-agent-profile",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-audit-event-detail::kpi-drill",
+      "parent": "hq-audit-event-detail",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-ceo-command-center::kpi-drill",
+      "parent": "hq-ceo-command-center",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-ceo-decision-detail::kpi-drill",
+      "parent": "hq-ceo-decision-detail",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-ceo-decision-queue::kpi-drill",
+      "parent": "hq-ceo-decision-queue",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-capability-gap-matrix::kpi-drill",
+      "parent": "hq-capability-gap-matrix",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-evaluation-detail::kpi-drill",
+      "parent": "hq-evaluation-detail",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-evaluation-history::kpi-drill",
+      "parent": "hq-evaluation-history",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-hq-workspace-settings::kpi-drill",
+      "parent": "hq-hq-workspace-settings",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-immutable-audit-timeline::kpi-drill",
+      "parent": "hq-immutable-audit-timeline",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-knowledge-source-library::kpi-drill",
+      "parent": "hq-knowledge-source-library",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-original-agent-directory::kpi-drill",
+      "parent": "hq-original-agent-directory",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-persistent-task-queue::kpi-drill",
+      "parent": "hq-persistent-task-queue",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-skill-catalog::kpi-drill",
+      "parent": "hq-skill-catalog",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-skill-change-review::kpi-drill",
+      "parent": "hq-skill-change-review",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-skill-detail::kpi-drill",
+      "parent": "hq-skill-detail",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-source-evidence-detail::kpi-drill",
+      "parent": "hq-source-evidence-detail",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-task-composer::kpi-drill",
+      "parent": "hq-task-composer",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-task-workspace::kpi-drill",
+      "parent": "hq-task-workspace",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "hq-tools-and-connection-readiness::kpi-drill",
+      "parent": "hq-tools-and-connection-readiness",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "shared-drawer-notifications::open-full",
+      "parent": "shared-drawer-notifications",
+      "label": "Open full page",
+      "type": "link",
+      "location": "header",
+      "target_ref": "route:/[id]",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_overlay:drawer"
+    },
+    {
+      "affordance_id": "profile::kpi-drill",
+      "parent": "profile",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    }
+  ],
+  "blocked": [
+    {
+      "affordance_id": "profile::refresh",
+      "parent": "profile",
+      "label": "Refresh",
+      "type": "icon-button",
+      "location": "toolbar",
+      "target_ref": "state:loading",
+      "reason": "blocked",
+      "candidates": [],
+      "source": "by_kind:page"
+    }
+  ],
+  "unmatched_spec": [
+    {
+      "quote": "Clicking Compose task opens /hq/tasks/new.",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 32,
+      "reason": "no declared_trigger pattern matched (would sit on hq-ceo-command-center)"
+    },
+    {
+      "quote": "Clicking Inspect task opens /hq/tasks/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 33,
+      "reason": "no declared_trigger pattern matched (would sit on hq-ceo-command-center)"
+    },
+    {
+      "quote": "Clicking Review decisions opens /hq/decisions.",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 34,
+      "reason": "no declared_trigger pattern matched (would sit on hq-ceo-command-center)"
+    },
+    {
+      "quote": "Clicking Agent directory opens /hq/agents.",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 35,
+      "reason": "no declared_trigger pattern matched (would sit on hq-ceo-command-center)"
+    },
+    {
+      "quote": "Clicking New task opens /hq/tasks/new.",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 38,
+      "reason": "no declared_trigger pattern matched (would sit on hq-persistent-task-queue)"
+    },
+    {
+      "quote": "Clicking Open task opens /hq/tasks/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 39,
+      "reason": "no declared_trigger pattern matched (would sit on hq-persistent-task-queue)"
+    },
+    {
+      "quote": "Clicking Submit draft opens /hq/tasks/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 45,
+      "reason": "no declared_trigger pattern matched (would sit on hq-task-composer)"
+    },
+    {
+      "quote": "Clicking Request decision opens /hq/decisions/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 50,
+      "reason": "no declared_trigger pattern matched (would sit on hq-task-workspace)"
+    },
+    {
+      "quote": "Clicking Inspect agent opens /hq/agents/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 52,
+      "reason": "no declared_trigger pattern matched (would sit on hq-task-workspace)"
+    },
+    {
+      "quote": "Clicking Open receipt opens /hq/audit/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 53,
+      "reason": "no declared_trigger pattern matched (would sit on hq-task-workspace)"
+    },
+    {
+      "quote": "Clicking Open decision opens /hq/decisions/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 56,
+      "reason": "no declared_trigger pattern matched (would sit on hq-ceo-decision-queue)"
+    },
+    {
+      "quote": "Clicking Open skill change opens /hq/skill-changes/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 57,
+      "reason": "no declared_trigger pattern matched (would sit on hq-ceo-decision-queue)"
+    },
+    {
+      "quote": "Clicking Audit receipt opens /hq/audit/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 63,
+      "reason": "no declared_trigger pattern matched (would sit on hq-ceo-decision-detail)"
+    },
+    {
+      "quote": "Clicking Open profile opens /hq/agents/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 66,
+      "reason": "no declared_trigger pattern matched (would sit on hq-original-agent-directory)"
+    },
+    {
+      "quote": "Clicking View gaps opens /hq/capabilities.",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 67,
+      "reason": "no declared_trigger pattern matched (would sit on hq-original-agent-directory)"
+    },
+    {
+      "quote": "Clicking Inspect skill opens /hq/skills/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 71,
+      "reason": "no declared_trigger pattern matched (would sit on hq-agent-profile)"
+    },
+    {
+      "quote": "Clicking Propose skill add/remove opens overlay:skill-change.",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 73,
+      "reason": "no declared_trigger pattern matched (would sit on hq-agent-profile)"
+    },
+    {
+      "quote": "Clicking Evidence opens /hq/evaluations/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 75,
+      "reason": "no declared_trigger pattern matched (would sit on hq-agent-profile)"
+    },
+    {
+      "quote": "Clicking Inspect skill opens /hq/skills/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 78,
+      "reason": "no declared_trigger pattern matched (would sit on hq-skill-catalog)"
+    },
+    {
+      "quote": "Clicking Evaluation opens /hq/evaluations/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 83,
+      "reason": "no declared_trigger pattern matched (would sit on hq-skill-detail)"
+    },
+    {
+      "quote": "Clicking Source opens /hq/knowledge/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 85,
+      "reason": "no declared_trigger pattern matched (would sit on hq-skill-detail)"
+    },
+    {
+      "quote": "Clicking Open agent opens /hq/agents/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 89,
+      "reason": "no declared_trigger pattern matched (would sit on hq-capability-gap-matrix)"
+    },
+    {
+      "quote": "Clicking Open skill opens /hq/skills/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 90,
+      "reason": "no declared_trigger pattern matched (would sit on hq-capability-gap-matrix)"
+    },
+    {
+      "quote": "Clicking Open evaluation opens /hq/evaluations/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 94,
+      "reason": "no declared_trigger pattern matched (would sit on hq-evaluation-history)"
+    },
+    {
+      "quote": "Clicking Source evidence opens /hq/knowledge/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 98,
+      "reason": "no declared_trigger pattern matched (would sit on hq-evaluation-detail)"
+    },
+    {
+      "quote": "Clicking CEO decision opens /hq/decisions/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 102,
+      "reason": "no declared_trigger pattern matched (would sit on hq-skill-change-review)"
+    },
+    {
+      "quote": "Clicking Source detail opens /hq/knowledge/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 107,
+      "reason": "no declared_trigger pattern matched (would sit on hq-knowledge-source-library)"
+    },
+    {
+      "quote": "Clicking Affected tasks opens /hq/tasks.",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 113,
+      "reason": "no declared_trigger pattern matched (would sit on hq-source-evidence-detail)"
+    },
+    {
+      "quote": "Clicking Event detail opens /hq/audit/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 116,
+      "reason": "no declared_trigger pattern matched (would sit on hq-immutable-audit-timeline)"
+    },
+    {
+      "quote": "Clicking Task opens /hq/tasks/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 120,
+      "reason": "no declared_trigger pattern matched (would sit on hq-audit-event-detail)"
+    },
+    {
+      "quote": "Clicking Decision opens /hq/decisions/[id].",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 121,
+      "reason": "no declared_trigger pattern matched (would sit on hq-audit-event-detail)"
+    }
+  ]
+}
