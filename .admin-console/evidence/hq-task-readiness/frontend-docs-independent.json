@@ -1,0 +1,642 @@
+{
+  "schema_version": 1,
+  "reviewer": "server_hq_audit",
+  "captured_at_utc": "2026-10-22T12:14:11.296221+00:00",
+  "independence": "Reviewer implemented none of the three UI files or root documentation. Reviewer read actual final source and contracts afresh. Browser execution belongs to a separate reviewer.",
+  "classification": "Independent frontend/documentation SOURCE REVIEW and package-hash verification; not reviewer-executed browser acceptance.",
+  "verdict": "ACCEPTED_FOR_SCOPED_LOCAL_DEVELOPMENT_SOURCE_AND_DOCUMENTATION",
+  "files": [
+    {
+      "path": "web_platform/src/components/hq/hq-overlays.tsx",
+      "sha256_raw_bytes": "a6f6e729d5832652bb03dc220fc1b5483009bad34e9b09809a2c5d8c7a2f48c9",
+      "sha256_utf8_crlf_to_lf": "f67358cda7683b789dac4a97a2e6cf64ef1e5d692c66edf1a28355f43feffc5e"
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-skill-requirements.tsx",
+      "sha256_raw_bytes": "4cb9938295b751ab1e851c5d05090c34aff50e8de7d7208f0434c396f2fe3ca3",
+      "sha256_utf8_crlf_to_lf": "a241b8fbbf2db41e06aaad25c8d0977d0dc0394acdd2328e9a6186daccc909ff"
+    },
+    {
+      "path": "web_platform/src/lib/hq/copy.ts",
+      "sha256_raw_bytes": "88c8829e2f27561200e13b31b6db0f1b644927675b0956cbefc4eaf43565db7c",
+      "sha256_utf8_crlf_to_lf": "b22a0842001c88e140978696feabf060be7eb0097fcc62a5e41a951397dd7383"
+    },
+    {
+      "path": "docs/volabi-local-api-contract.md",
+      "sha256_raw_bytes": "2190fd137b4c63452321a36b102a113a3a77783a70b1d9d3a2101bd46c4370c8",
+      "sha256_utf8_crlf_to_lf": "a30fafb229ff1347c13b267467e759e321c844428729565fc1aa3ec52c6bf089"
+    },
+    {
+      "path": "docs/volabi-local-operations.md",
+      "sha256_raw_bytes": "6e2978befc2e318e010e43d2fb68425a7e8d462c33652c0be335a8d950579e88",
+      "sha256_utf8_crlf_to_lf": "37f290203bb289b423142655451e7871d65f06aeccff7805d03960677198bf31"
+    },
+    {
+      "path": "docs/volabi-task-readiness-repair.md",
+      "sha256_raw_bytes": "f89d9dd92de879a5f829051c0a5c3cf15e1c859fdfd1bd1665c0d88c6d77d66e",
+      "sha256_utf8_crlf_to_lf": "ab448314978809472f6b88d384e40d78d989989edd4f653856a54cda3b8a8881"
+    },
+    {
+      "path": "planning/volabi/TASK_READINESS_REPAIR_20261022.md",
+      "sha256_raw_bytes": "54995dfa2e27095363574e2948ffb2ef3a2df4c8a7c00e306d1ab93868c98d2a",
+      "sha256_utf8_crlf_to_lf": "a5c5cad39c6a830b4757bcecd778d868568e7b5266298d7913ab0e5469867829"
+    },
+    {
+      "path": "planning/volabi/README.md",
+      "sha256_raw_bytes": "59865e077f5005a9df9dce1e37913916d40957fd039e7dc20508d4c7990e4dbf",
+      "sha256_utf8_crlf_to_lf": "843692f965a3b71c843e74a298c11d2c121f168b7cf85772f5ee893dac548a8e"
+    },
+    {
+      "path": "planning/volabi/PACKAGE_RECEIPT.json",
+      "sha256_raw_bytes": "a9f3d70ba51ffffc85994cb1c1b8fd44ddf9679dcb39f70f35cfa6c5cba405f4",
+      "sha256_utf8_crlf_to_lf": "4e33555ab1eafe3dada3f7e06ec61167801ef24ab5fa4e8f066553ba43881d30"
+    }
+  ],
+  "source_reviews": [
+    {
+      "area": "Pending editor intent",
+      "evidence": "Selected catalog or typed manual id/version/hash synchronously reports pending state to parent ref and render state. Normal/conversation create and task revision both disable Save and refuse onSubmit while pending, including programmatic/Enter submission path. Add catalog/manual clears only its own input group, retaining the other pending group; explicit clear resets all pending inputs.",
+      "level": "source inspection, not browser execution by this reviewer"
+    },
+    {
+      "area": "Requirement editing and persistence",
+      "evidence": "Composer sends explicit skillRequirements for normal/conversation requests. Revision copies loaded pins and passes them with captured revision. Max20, duplicate checks, id/version/hash field validation, explicit remove and missing-ID declaration match backend contract. Meeting proposal contract unchanged.",
+      "level": "source inspection plus separately recorded reviewer backend18/18 tests"
+    },
+    {
+      "area": "Metadata versus authority",
+      "evidence": "Editor catalog anchor reads full shared catalog without changing proposed owner. Readiness uses only explicit task rows from shared assessTaskSkills, authoritative current catalog and separate role associations; installed/required/observed version/hash match/mismatch/unknown are distinct. Binding unadopted, behavior unknown, permissions not granted, execution inactive.",
+      "level": "source inspection"
+    },
+    {
+      "area": "Error/empty/legacy handling",
+      "evidence": "No task, no owner and undeclared/legacy requirement lists have explicit prompts. Catalog reads use loading/error/retry rather than pretending a failed read means missing package. Existing receipt-first command notice/disabled unknown-command paths are retained.",
+      "level": "source inspection"
+    },
+    {
+      "area": "Accessibility/localization source affordances",
+      "evidence": "New visible copy has English and Arabic values. Machine identifiers/versions/hashes use LTR/bdi; controls use shared explicit HqField labels; comparison table adds caption and row/column scopes. Existing dialog/focus tokens and approved surfaces reused without new route/theme.",
+      "level": "source review only; keyboard/375px/RTL browser acceptance belongs to separate reviewer, not a native-language certification"
+    },
+    {
+      "area": "Contracts and holds",
+      "evidence": "API/operations/repair scope document exact optional requirement validation, revision/history/idempotency behavior and current metadata comparison. Azure onboarding/regional audio explicitly deferred at CEO request, preserved SAR10all-in/100kaggregate/<=3round allowance unchanged. No account/key/provider, package install, business activation/permission, production or financial effect is introduced.",
+      "level": "documentation and implementation consistency review"
+    },
+    {
+      "area": "Historical package provenance",
+      "evidence": "Current README status distinguishes delivered local loop from historical pre-implementation plan. Historical package receipt flags are not promoted to current runtime facts. Every76 current portable file hash independently matched.",
+      "level": "actual read/hash computation"
+    },
+    {
+      "area": "Final narrow-table presentation source refresh",
+      "evidence": "Read final useId-linked bilingual scroll hint, labelled tabIndex0 region,960pxmin table width,12pxbody/11pxhashes and existing native horizontal scrolling container. Editor and pending-submit logic unchanged. No new route/theme/authority.",
+      "level": "Fresh source re-read after initial snapshot; actual EN/AR375 keyboard scrolling belongs to separate presentation browser receipt."
+    },
+    {
+      "area": "Final delivery wording and preview restart note",
+      "evidence": "Final report separates14functional browser groups from later3presentation groups;18backend/pure tests and1014total web claims match separately owned verification receipt.302legacywarnings/build warnings retained; first failed stale HqStore observation and verified owned-preview restart are disclosed without resetting database or relabelling failure as pass. Operations note instructs restart after backend storage code changes. Azure deferred/notrevoked andSAR10/100k/3rounds preserved; fullregulatedrelease notrecertified.",
+      "level": "Read final docs and separately owned receipts; no root/browser command execution credit taken by this reviewer."
+    }
+  ],
+  "known_prior_finding": {
+    "id": "PENDING_REQUIREMENT_INTENT",
+    "origin": "Root/browser reviewer, not discovered or RED-executed by this source reviewer",
+    "status": "FINAL_SOURCE_RECHECKED_FIXED; runtime assertion belongs to separate browser receipt",
+    "detail": "Prior pending requirement could leave Save enabled; current synchronous ref plus disabled-state/onSubmit guard prevents silent omission while retaining other pending intent."
+  },
+  "findings": [],
+  "unresolved_critical_or_high_findings_in_scoped_source_review": 0,
+  "executed_checks": {
+    "final_three_ui_hashes_match_owner_freeze": true,
+    "all76_package_receipt_entries": [
+      {
+        "path": ".design-architect/PHASE_EXECUTION.json",
+        "sha256": "c051c2a144a1deab4ec085fd11ed4a41d55d155ff34be9b8269aed69a201291f",
+        "status": "matched"
+      },
+      {
+        "path": ".design-architect/asset_manifest.json",
+        "sha256": "a50c572ce98792f03b590350e9d989e4c87e59dc4a1abc0c226b9565b72ccc24",
+        "status": "matched"
+      },
+      {
+        "path": ".design-architect/bmad_context.json",
+        "sha256": "23a4ad66361864a1548abb8ae9a15804a1536dc0c9bcf0c460ce082b81a4e497",
+        "status": "matched"
+      },
+      {
+        "path": ".design-architect/closure.md",
+        "sha256": "a980d605896642b934d5e7b80af53bcc7e60696bfe1a202dd2193f4ca61cecb1",
+        "status": "matched"
+      },
+      {
+        "path": ".design-architect/component_census.json",
+        "sha256": "1d2fd0b31ea29b381be020c8009f35abc5d4ced88b8cf27b5aedb738e92b788c",
+        "status": "matched"
+      },
+      {
+        "path": ".design-architect/graph.json",
+        "sha256": "f1a70efb7ec45b0681015f5de9246a7f3a3d53bedf48fd23d017504151190add",
+        "status": "matched"
+      },
+      {
+        "path": ".design-architect/handoff/component-map.md",
+        "sha256": "2d1a4ea6cc6e1d769d1c595c53f43184a8241940c55ff397cb84f38bd2f097e7",
+        "status": "matched"
+      },
+      {
+        "path": ".design-architect/holes.json",
+        "sha256": "7d0d631f6c6c530b37ad56da0273c824882ea90e52fc185874af0a824c3cc30b",
+        "status": "matched"
+      },
+      {
+        "path": ".design-architect/page_graph.json",
+        "sha256": "b37457d88fedab0ad37c27cadbfd32c83ac257ce9c43b2b145ea9b6b9e250f8f",
+        "status": "matched"
+      },
+      {
+        "path": ".design-architect/pages.json",
+        "sha256": "26f64c8f510ba0519bc0ab861760917be3a229d25e42c518d1638b2abb9f9ff2",
+        "status": "matched"
+      },
+      {
+        "path": ".design-architect/plan.html",
+        "sha256": "23e756074a87b9c33bc1d3584cb0dfbf0febb8e6e9cff3d789ff323ac25d946b",
+        "status": "matched"
+      },
+      {
+        "path": ".design-architect/plan.json",
+        "sha256": "d2c7d9e37d78328ea8223ecb1a44a47ed7784cbbc2f559674b68bf1d0c520ff5",
+        "status": "matched"
+      },
+      {
+        "path": ".design-architect/plan.md",
+        "sha256": "66dad9c1eb1faa42f20bda73cdddf4daffb57035160715b5083bc8fe8e225f88",
+        "status": "matched"
+      },
+      {
+        "path": ".design-architect/plan.mermaid",
+        "sha256": "4928b466796e833594bdd9022d34849ae303f2a2f22acf72fb5846a46ee9e1d4",
+        "status": "matched"
+      },
+      {
+        "path": ".design-architect/theme.json",
+        "sha256": "c6c954af4cc76811648e700c88a77ec55098c0b769c1d436ac93a6ff46bd0acc",
+        "status": "matched"
+      },
+      {
+        "path": ".design-architect/viewgraph.json",
+        "sha256": "adcfbcd5c59c32c6b6eaaaa59fbb14617232f4e08ea099b96239491ced97e47d",
+        "status": "matched"
+      },
+      {
+        "path": "AGENT_PROFILE_CONTRACTS.json",
+        "sha256": "60c51f581c4d5724f54d020dabafe35e25a4bdb71763363dcf0d59ff57e9aa34",
+        "status": "matched"
+      },
+      {
+        "path": "AGENT_SKILLS_AND_READINESS.md",
+        "sha256": "98fa95a73544b6d3598718a5ec1dd7cca2581af6453b5c668fe76fe9a5516936",
+        "status": "matched"
+      },
+      {
+        "path": "AGENT_SKILL_PROFILE_CONTRACT.json",
+        "sha256": "95224663837056d5ed74b41329b5cc652e784f5d21fab0fdccdb26e4b446e86d",
+        "status": "matched"
+      },
+      {
+        "path": "APPROVAL_20261022.md",
+        "sha256": "c5b70dc6e1bb7a309bb6b4a80519b57ca894a55e14e09e9fea74ac21859926de",
+        "status": "matched"
+      },
+      {
+        "path": "APPROVED_DESIGN_SKILL_INSTALLATION.json",
+        "sha256": "02735a78319ff60955d9593aa8c1e85bf01dc3105c9c6c1d7a3a3f7e91fa9d1b",
+        "status": "matched"
+      },
+      {
+        "path": "CAPABILITY_GAP_MATRIX.json",
+        "sha256": "ea4e0c4b78230824fd888051f967fa8b7d1181ddeea4820ff6c3af0ea51afeb4",
+        "status": "matched"
+      },
+      {
+        "path": "DESIGN.md",
+        "sha256": "94c60ef30df85614adba528553d983323cb36c953392b9dca2e9e5e8d0d7c205",
+        "status": "matched"
+      },
+      {
+        "path": "DOMAIN_CLOSURE_CHECK.json",
+        "sha256": "cd5da77af2f9d4b61babc21077751b3eb5ac6d68ec81038d01c5f1b532eb45dc",
+        "status": "matched"
+      },
+      {
+        "path": "FIRST_LOOP_DOMAIN_GRAPH.json",
+        "sha256": "9b5b7fefd75c57c04347762035c60d8a6b8e4790978e28a964c23a6867174e31",
+        "status": "matched"
+      },
+      {
+        "path": "HQ_DOMAIN_GRAPH.json",
+        "sha256": "0f8c783931cb68d10562b7c573c03f66e0aa20f6f0e77605f635711a017b7fe4",
+        "status": "matched"
+      },
+      {
+        "path": "HQ_SURFACE_INVENTORY.json",
+        "sha256": "fb5eb2b133ebebc01d9cf4136529ddb504d73bbe26c1929fec0111b4effa8b37",
+        "status": "matched"
+      },
+      {
+        "path": "INDEPENDENT_PLANNING_REVIEW.json",
+        "sha256": "ee48bbe8dd55f45461b94a35513d768a3689cf1abe8621c6b48a1df4b7e36a3a",
+        "status": "matched"
+      },
+      {
+        "path": "LATER_SCOPE.md",
+        "sha256": "b87b7e41bed9daf588a20f353c474fb1482072cb26ec3befc81ead012b1f0446",
+        "status": "matched"
+      },
+      {
+        "path": "README.md",
+        "sha256": "843692f965a3b71c843e74a298c11d2c121f168b7cf85772f5ee893dac548a8e",
+        "status": "matched"
+      },
+      {
+        "path": "REQUIREMENTS_VALIDATION.json",
+        "sha256": "45a7d96c70b159e96e580744ea3e605465f3b6dcff3fd7f83541cfeacb5be235",
+        "status": "matched"
+      },
+      {
+        "path": "SCOPE_AND_THEME_APPROVAL.md",
+        "sha256": "d61cbb9b5e0666b6af15ce116e4004e01fb70791af394baf4f32219533df8b73",
+        "status": "matched"
+      },
+      {
+        "path": "STAGED_SKILL_VALIDATION.json",
+        "sha256": "7ae3b18678e159ce96270f11204b0d0ca269310375675edc5713cc6b98c8aa2b",
+        "status": "matched"
+      },
+      {
+        "path": "THEME_CONTRAST.json",
+        "sha256": "c4171476f8526c2af946a3146d4fe8875f4814a49b64e0eace1fb9c563735abc",
+        "status": "matched"
+      },
+      {
+        "path": "VOICE_ACCENT_REQUIREMENTS.json",
+        "sha256": "d54fb490edcf0adcd4a7d0165e0c99e2cc3f42a24560c3890d97f0a2555f805b",
+        "status": "matched"
+      },
+      {
+        "path": "docs/front-end-spec.md",
+        "sha256": "f76a51b6a87532057c8efb8e5c8fd429bed7406ea9bd97f40e8ed5cd68a023c6",
+        "status": "matched"
+      },
+      {
+        "path": "docs/prd.md",
+        "sha256": "6c95d5e8f553bd01307a2270bd8a6f7d83caba24934606ba677db24528b85352",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/ASSET_REGISTER.json",
+        "sha256": "e2a4f900eb962d731cd0cda13cc5be49ef4d263ff783f85aa2aeaf4e4ae6e356",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/BUSINESS_DECISIONS.md",
+        "sha256": "1f8e1b7a3dcbc25aec9601da2e92ff48e79cf36a9f5ba5fc2a343cd5ac1b2162",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/CONVERSATION_AND_MEETING_CONTRACT.json",
+        "sha256": "2f983337d0ce96c28d73dd23ddc2b6450c0855e7ef7a0af33631a79a907aa3fd",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/FINANCE_CONTROL_SOURCE_EXCERPTS.json",
+        "sha256": "aaf010e8fd6e5fbaa6dd87f15155e74618fce30068faa760b19cd4d2c92aba3b",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/GLOBAL_SKILL_INSTALLATION.json",
+        "sha256": "0769e5326e49fab90f6aa0f7c076291f17372c5a3eee0038001afeef3064a79f",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/PERSONA_AND_VOICE_MATRIX.md",
+        "sha256": "df4ae1a1dc28bdf58b2305eb0a9a36852c8dd6efab4a152d7aff27cbe260729e",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/PERSONA_REGISTRY.json",
+        "sha256": "7bdd8e081a2527f989aedfc668317ead714cdb298c63d6055e201d50f642caf3",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/PORTRAIT_GENERATION_RECEIPTS.json",
+        "sha256": "0584a4bd1d69710671458eceabceaae782369ea4bd320dbc051a0b2f24c3b267",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/PORTRAIT_PRODUCTION_BRIEFS.json",
+        "sha256": "d998d0dc233ee0cfdd96b56e60f424fb7620c079db9bb147a021c6f6d6f13755",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/README.md",
+        "sha256": "6af3db8b92d6b222c8249c836727e20a7f480a04b7bdba9e7d0ba0df7e8f875e",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/ROLE_AND_FUNCTION_SKILL_MAP.json",
+        "sha256": "eec80d9ec19acb9ae0c0be03e039a18fa9d252efc8e4f77cb42309a7c3632405",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/SKILL_GAPS_AND_REUSE.md",
+        "sha256": "cd5e0a4cdda551ef10ebe9154e5dab9dd5cd5e7aea61345efa6b09f2674f903f",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/VALIDATION.json",
+        "sha256": "ba8368127b584fa6417e5dc35e96a71b51a349e5f17005d6003fc0e80d09d6a6",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/VOICE_PREVIEW_RECEIPTS.json",
+        "sha256": "ad5d689368f347d8f0a9569a0d121b7b8cbf0fc494e03f6754dd2835b96a2e65",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/generation-receipts/raw-batch-01.json",
+        "sha256": "34f6b934a42505e8d82f40a3cbe06e10a3beae764384893263aa183e2e76a35a",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/generation-receipts/raw-batch-02.json",
+        "sha256": "ea46a7a39cf083c0f60132679e2acbed0c4514b38829d94b607294473c9fff53",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/generation-receipts/raw-batch-03.json",
+        "sha256": "531fd8a9c8005149a10cc7dffdaef01d7cf775351627c5da144281e799dab565",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/generation-receipts/raw-batch-04.json",
+        "sha256": "dca772fff9dd1c7b3fca938cb7942421cae5207b90a278fc240595f99d216896",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/generation-receipts/raw-batch-05.json",
+        "sha256": "1406b19b4c82d535fa2735435605bcfb129af6843f5a5fbe77594b498a5b3ff7",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/staged-skills/primora-bilingual-conversation/SKILL.md",
+        "sha256": "71b7379d32a8bd27c5d005a88addb13e22c83d858142bf291eb216dcc3fbd1b9",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/staged-skills/primora-bilingual-conversation/references/source-and-cases.md",
+        "sha256": "04b13d586bab4297bb39710618c5880b4b15d4105cc9b4b138d74806d67a64dd",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/staged-skills/primora-meeting-facilitation/SKILL.md",
+        "sha256": "aeca3bb6eaa45445917a40206bbebda1ed101f877031cafa10b8ff5faf97d3bd",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/staged-skills/primora-meeting-facilitation/references/source-and-cases.md",
+        "sha256": "fb6aab790ec08be6a5cb780f90f5044b8e6a77fe2c40a55a286ec73c73f3cf20",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/staged-skills/primora-payment-reconciliation/SKILL.md",
+        "sha256": "f78d689844025bd9494871719ffa6db811473dc8fb8b6a64b6d0c4c56930bbea",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/staged-skills/primora-payment-reconciliation/references/source-and-cases.md",
+        "sha256": "39bb15cf2d619b78748d80117fee8e720eee3803fe7933d14eafcd436f65bd26",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/staged-skills/primora-refund-case-review/SKILL.md",
+        "sha256": "a6816cc2304cc627b397f258b5308252c1ebb3f25f8d07f4d8fe357b3833598c",
+        "status": "matched"
+      },
+      {
+        "path": "persona-and-skills/staged-skills/primora-refund-case-review/references/source-and-cases.md",
+        "sha256": "ae7a6c46d999bdd59f3281073dad16d3348e35532ba1ef3daa6fd331cf8e2b6b",
+        "status": "matched"
+      },
+      {
+        "path": "run_planning_phases.py",
+        "sha256": "245c89e463058ee332958f6c1522eeeb149f8a06a95b434f5c9dd07cc595776a",
+        "status": "matched"
+      },
+      {
+        "path": "source/AGENT_SKILL_MAP.json",
+        "sha256": "a3ffea7cfd7ca644f225a9bd00a13f98eea3ec0b80df34e31ed5306603a09498",
+        "status": "matched"
+      },
+      {
+        "path": "source/BRAND_PROVENANCE.json",
+        "sha256": "7f6f46c31d292a5d6e4e69ca7ab5d51fbd826a05529717e86a8a49dff63a0bae",
+        "status": "matched"
+      },
+      {
+        "path": "source/MISSING_DESIGN_SKILL_SEARCH.json",
+        "sha256": "b8d5a7808864de1897024466076dc4b8c83407690c6f894cacad12444dedac52",
+        "status": "matched"
+      },
+      {
+        "path": "source/ORIGINAL_42_FUNCTIONS.json",
+        "sha256": "afe218cfbfbc54c88373eedd90c451b8abf17b34d0ba50696aad2e5838f7e783",
+        "status": "matched"
+      },
+      {
+        "path": "source/VERIFIED_SKILL_GAPS.json",
+        "sha256": "8c8f9e73a4e4df97ab3b65dba58ef0267ea76b2132f4c634e340ce6244fafa65",
+        "status": "matched"
+      },
+      {
+        "path": "staged-skills/primora-dashboard-layout/SKILL.md",
+        "sha256": "4afd8ea9339ebfa008f299bf3747100e3b9de202e6544a0fbfd7dcd143c308f1",
+        "status": "matched"
+      },
+      {
+        "path": "staged-skills/primora-dashboard-layout/references/proposal-source.md",
+        "sha256": "df9ebb8ac1e2cc6015ddaa37f204563b142f693b95f4b9f8c74099e1ead64eca",
+        "status": "matched"
+      },
+      {
+        "path": "staged-skills/primora-data-visualization/SKILL.md",
+        "sha256": "3dfce7b99fc1412244cab7daa877b2c093dfe52e474130e4a8627768e46c2a7b",
+        "status": "matched"
+      },
+      {
+        "path": "staged-skills/primora-data-visualization/references/proposal-source.md",
+        "sha256": "df9ebb8ac1e2cc6015ddaa37f204563b142f693b95f4b9f8c74099e1ead64eca",
+        "status": "matched"
+      },
+      {
+        "path": "staged-skills/primora-design-system/SKILL.md",
+        "sha256": "b6a7c8cfe411d6b43a63a4befedb96be9b2ec9de2623315d4515847feaaa4f96",
+        "status": "matched"
+      },
+      {
+        "path": "staged-skills/primora-design-system/references/proposal-source.md",
+        "sha256": "df9ebb8ac1e2cc6015ddaa37f204563b142f693b95f4b9f8c74099e1ead64eca",
+        "status": "matched"
+      }
+    ],
+    "all76_matched": true,
+    "backend_frozen_source_and_test_hashes_still_match_review_receipt": true,
+    "new_implementation_mirroring_tests_added": 0,
+    "application_browser_runs_by_this_source_pass": 0,
+    "final_refresh_application_or_browser_retests": 0
+  },
+  "backend_evidence": {
+    "path": ".admin-console/evidence/hq-task-readiness/backend-independent.json",
+    "sha256_raw_bytes": "39bc531b6b5a46269ef931b6d8ff380b86db7e2fb482e0ec41ca16aa66c1aee8",
+    "reviewer_executed_tests": 18,
+    "independent_cases": 8,
+    "exit_code": 0
+  },
+  "separate_browser_evidence": {
+    "owner": "pilot_browser_review",
+    "functional": {
+      "path": ".admin-console/evidence/hq-task-readiness/browser-independent.json",
+      "status": "accepted_local_task_readiness_only",
+      "passed_groups": 14,
+      "source_snapshot": "Original functional snapshot retained; not rerun after later presentation-only edits."
+    },
+    "presentation_followup": {
+      "path": ".admin-console/evidence/hq-task-readiness/browser-presentation-followup.json",
+      "status": "accepted_local_readiness_presentation_followup_only",
+      "passed_groups": 3,
+      "observed_viewport_width": 375,
+      "keyboard_scroll_delta_en": 320,
+      "keyboard_scroll_delta_ar": -320,
+      "native_acceptance": "not_evaluated"
+    },
+    "attribution": "Receipts read for documentation consistency only; actual browser tests executed by separate reviewer, never by this source pass."
+  },
+  "remaining_limits": [
+    "Current files represent the final presentation/doc refresh; initial source-review timestamps and hashes remain in review_history.",
+    "Actual14functional groups and later3presentation groups are distinct separately owned browser runs with their original source hashes; no application retest was performed by this wording/style refresh.",
+    "No device/native-language/audio/voice-quality acceptance is claimed.",
+    "No competency score, adopted assignment, installed dependency execution or business authority is established by task pins.",
+    "No full regulated-console release/production-readiness claim or authority waiver.",
+    "Root owns aggregate integration/manifest/final Git bookkeeping; original dirty checkout preserved."
+  ],
+  "operations": {
+    "product_edits_by_reviewer": 0,
+    "external_fetch_or_provider_calls": 0,
+    "real_credentials_read": 0,
+    "account_or_resource_creation": 0,
+    "financial_or_hosted_actions": 0,
+    "azure_audio_resumed": false
+  },
+  "review_history": [
+    {
+      "phase": "initial_independent_source_docs_review",
+      "captured_at_utc": "2026-10-22T12:14:11.296221+00:00",
+      "receipt_sha256_at_that_time": "d95274b4d30b7b8ee3154c7864e46f280f3be3a01d81ae560d7099624b96e6f8",
+      "files": [
+        {
+          "path": "web_platform/src/components/hq/hq-overlays.tsx",
+          "sha256_raw_bytes": "a6f6e729d5832652bb03dc220fc1b5483009bad34e9b09809a2c5d8c7a2f48c9",
+          "sha256_utf8_crlf_to_lf": "f67358cda7683b789dac4a97a2e6cf64ef1e5d692c66edf1a28355f43feffc5e"
+        },
+        {
+          "path": "web_platform/src/components/hq/hq-skill-requirements.tsx",
+          "sha256_raw_bytes": "4cb9938295b751ab1e851c5d05090c34aff50e8de7d7208f0434c396f2fe3ca3",
+          "sha256_utf8_crlf_to_lf": "a241b8fbbf2db41e06aaad25c8d0977d0dc0394acdd2328e9a6186daccc909ff"
+        },
+        {
+          "path": "web_platform/src/lib/hq/copy.ts",
+          "sha256_raw_bytes": "88c8829e2f27561200e13b31b6db0f1b644927675b0956cbefc4eaf43565db7c",
+          "sha256_utf8_crlf_to_lf": "b22a0842001c88e140978696feabf060be7eb0097fcc62a5e41a951397dd7383"
+        },
+        {
+          "path": "docs/volabi-local-api-contract.md",
+          "sha256_raw_bytes": "2190fd137b4c63452321a36b102a113a3a77783a70b1d9d3a2101bd46c4370c8",
+          "sha256_utf8_crlf_to_lf": "a30fafb229ff1347c13b267467e759e321c844428729565fc1aa3ec52c6bf089"
+        },
+        {
+          "path": "docs/volabi-local-operations.md",
+          "sha256_raw_bytes": "6e2978befc2e318e010e43d2fb68425a7e8d462c33652c0be335a8d950579e88",
+          "sha256_utf8_crlf_to_lf": "37f290203bb289b423142655451e7871d65f06aeccff7805d03960677198bf31"
+        },
+        {
+          "path": "docs/volabi-task-readiness-repair.md",
+          "sha256_raw_bytes": "f89d9dd92de879a5f829051c0a5c3cf15e1c859fdfd1bd1665c0d88c6d77d66e",
+          "sha256_utf8_crlf_to_lf": "ab448314978809472f6b88d384e40d78d989989edd4f653856a54cda3b8a8881"
+        },
+        {
+          "path": "planning/volabi/TASK_READINESS_REPAIR_20261022.md",
+          "sha256_raw_bytes": "54995dfa2e27095363574e2948ffb2ef3a2df4c8a7c00e306d1ab93868c98d2a",
+          "sha256_utf8_crlf_to_lf": "a5c5cad39c6a830b4757bcecd778d868568e7b5266298d7913ab0e5469867829"
+        },
+        {
+          "path": "planning/volabi/README.md",
+          "sha256_raw_bytes": "59865e077f5005a9df9dce1e37913916d40957fd039e7dc20508d4c7990e4dbf",
+          "sha256_utf8_crlf_to_lf": "843692f965a3b71c843e74a298c11d2c121f168b7cf85772f5ee893dac548a8e"
+        },
+        {
+          "path": "planning/volabi/PACKAGE_RECEIPT.json",
+          "sha256_raw_bytes": "a9f3d70ba51ffffc85994cb1c1b8fd44ddf9679dcb39f70f35cfa6c5cba405f4",
+          "sha256_utf8_crlf_to_lf": "4e33555ab1eafe3dada3f7e06ec61167801ef24ab5fa4e8f066553ba43881d30"
+        }
+      ],
+      "remaining_limits_at_that_time": [
+        "This receipt covers the exact hashed source/docs snapshot. The delivery status document currently honestly says integration/verification in progress; final result wording must reflect actual separately completed gates.",
+        "No browser/device/native-language/audio/voice-quality acceptance is claimed by this source-only pass.",
+        "No competency score, adopted assignment, installed dependency execution or business authority is established by task pins.",
+        "No full regulated-console release/production-readiness claim or authority waiver.",
+        "Root owns aggregate tests/build/mobile/lint/manifest and final delivery bookkeeping; original dirty checkout preserved."
+      ],
+      "note": "Preserved original snapshot; it did not cover later narrow-table presentation edits or final delivery wording."
+    }
+  ],
+  "refreshed_at_utc": "2026-10-22T12:21:50.065414+00:00",
+  "refresh_scope": "Final presentation-only source and final delivery/operations wording re-read; no application or browser retest by this reviewer. Original first-review timestamp and file hashes retained in review_history.",
+  "known_prior_findings": [
+    {
+      "id": "PENDING_REQUIREMENT_INTENT",
+      "origin": "Root/browser reviewer, not discovered or RED-executed by this source reviewer",
+      "status": "FINAL_SOURCE_RECHECKED_FIXED; runtime assertion belongs to separate browser receipt",
+      "detail": "Prior pending requirement could leave Save enabled; current synchronous ref plus disabled-state/onSubmit guard prevents silent omission while retaining other pending intent."
+    },
+    {
+      "id": "NARROW_READINESS_TABLE",
+      "origin": "Root visual review, not discovered by this source reviewer",
+      "status": "FINAL_SOURCE_RECHECKED_FIXED; separate3group presentation browser receipt",
+      "detail": "Former6column compression corrected with960pxscrollable table,12pxtext/11pxhashes and labelled keyboard-focusable region. Browser separately recordsEN375movement+320/AR375-320 and no page overflow."
+    }
+  ],
+  "aggregate_claims_review": {
+    "path": ".admin-console/evidence/hq-task-readiness/verification.json",
+    "attribution": "Root-run commands recorded in separate receipt; this source refresh did not rerun them.",
+    "web_tests": {
+      "passed": 1014,
+      "failed": 0,
+      "skipped": 0,
+      "exit_code": 0
+    },
+    "mobile_typecheck_exit_code": 0,
+    "lint": {
+      "errors": 0,
+      "legacy_warnings": 302,
+      "final_focused_warnings": 0,
+      "exit_code": 0
+    },
+    "build": {
+      "exit_code": 0,
+      "retained_warnings": "4existing tracing warnings plus provider sitemap fetch warning"
+    },
+    "regulated_release": "not_recertified"
+  }
+}

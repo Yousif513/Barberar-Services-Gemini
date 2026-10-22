@@ -1,0 +1,283 @@
+{
+  "classification": "Independent local development browser QA; controlled test task records only, actual recovered sources/catalog; no company work inferred",
+  "startedAt": "2026-10-22T12:14:22.534Z",
+  "checks": [
+    {
+      "name": "Fresh workspace uses actual recovered sources and catalog; all15 company identities inactive",
+      "status": "passed"
+    },
+    {
+      "name": "Pending catalog selection blocks Save, requestSubmit and Enter until explicitly cleared",
+      "status": "passed"
+    },
+    {
+      "name": "Manual invalid identifier/hash and duplicate rejected; identifier-only/version-only/hash-only intent cannot be silently saved",
+      "status": "passed",
+      "pendingFields": [
+        "Skill identifier",
+        "Required version",
+        "Required content hash"
+      ]
+    },
+    {
+      "name": "20-row bound disables additions; removal restores editor; composer keyboard focus remains contained",
+      "status": "passed"
+    },
+    {
+      "name": "Normal composer persists exact catalog pins and explicit missing requirement across reload",
+      "status": "passed"
+    },
+    {
+      "name": "Readiness compares only2task requirements: global finance present but not Nora-associated, missing skill, exact pins and execution holds",
+      "status": "passed"
+    },
+    {
+      "name": "Revision parent also blocks pending catalog and hash-only intent from Save/Enter/requestSubmit",
+      "status": "passed"
+    },
+    {
+      "name": "Unrelated task revision preserves explicit requirements",
+      "status": "passed"
+    },
+    {
+      "name": "Changing required pins supersedes old source-linked recommendation decision; installed package with wrong version/hash shows2mismatches",
+      "status": "passed"
+    },
+    {
+      "name": "Removing a requirement persists through revision and reload",
+      "status": "passed"
+    },
+    {
+      "name": "Selected empty/legacy-compatible requirements stay unknown; choosing another task replaces rows instead of showing profile skill union",
+      "status": "passed"
+    },
+    {
+      "name": "Arabic375px RTL comparison labels, requirement identifiers, keyboard containment and page overflow",
+      "status": "passed",
+      "width": 375,
+      "scroll": 375
+    },
+    {
+      "name": "Arabic invalid-field and pending-intent feedback is labelled and blocks submission at375px without discarding task pins",
+      "status": "passed"
+    },
+    {
+      "name": "No external/business/device/speech calls, activation or unexpected browser errors; expected receipt404s recorded separately",
+      "status": "passed"
+    }
+  ],
+  "findings": [
+    {
+      "id": "narrow-readiness-table",
+      "severity": "moderate",
+      "reportedBy": "root visual review",
+      "finding": "Six-column comparison compressed at375px with small hashes; requested min-width, readable font and labelled focusable scroll region.",
+      "status": "resolved_in_separate_presentation_followup",
+      "recordedAt": "2026-10-22T12:16:34.425155+00:00",
+      "resolutionEvidence": "browser-presentation-followup.json",
+      "resolvedAt": "2026-10-22T12:19:02.940333+00:00"
+    }
+  ],
+  "commands": [
+    {
+      "commandId": "f801d755-8835-4a0e-a9f6-88ad51e2112b",
+      "type": "task.create",
+      "skillRequirements": [
+        {
+          "skillId": "primora-finance-accounting",
+          "version": "1.0.0",
+          "sha256": "9ec542d406bec9569181de635270c6a6f33d8448b69ac8517ff37ded27124d10"
+        },
+        {
+          "skillId": "qa-missing-readiness-skill",
+          "version": null,
+          "sha256": null
+        }
+      ]
+    },
+    {
+      "commandId": "ce56b9fd-7e29-4d64-9c65-a5287337ace7",
+      "type": "task.revise",
+      "skillRequirements": [
+        {
+          "sha256": "9ec542d406bec9569181de635270c6a6f33d8448b69ac8517ff37ded27124d10",
+          "skillId": "primora-finance-accounting",
+          "version": "1.0.0"
+        },
+        {
+          "sha256": null,
+          "skillId": "qa-missing-readiness-skill",
+          "version": null
+        }
+      ],
+      "taskId": "fad6c8b3-fbe9-4298-8baa-143a4a40344f"
+    },
+    {
+      "commandId": "12d6b422-e0c6-412e-9712-9ce4a817cc99",
+      "type": "recommendation.prepare",
+      "taskId": "fad6c8b3-fbe9-4298-8baa-143a4a40344f"
+    },
+    {
+      "commandId": "a9d3b950-ba98-49c8-aee7-f4a8758c34f7",
+      "type": "task.revise",
+      "skillRequirements": [
+        {
+          "sha256": null,
+          "skillId": "qa-missing-readiness-skill",
+          "version": null
+        },
+        {
+          "skillId": "primora-finance-accounting",
+          "version": "qa-mismatched-version",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "taskId": "fad6c8b3-fbe9-4298-8baa-143a4a40344f"
+    },
+    {
+      "commandId": "2cf1b44c-970a-4798-91c1-8d2f23a3fef8",
+      "type": "task.revise",
+      "skillRequirements": [
+        {
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "skillId": "primora-finance-accounting",
+          "version": "qa-mismatched-version"
+        }
+      ],
+      "taskId": "fad6c8b3-fbe9-4298-8baa-143a4a40344f"
+    },
+    {
+      "commandId": "34fa31f8-09b8-4267-98b2-b929f22f5eb9",
+      "type": "task.create",
+      "skillRequirements": []
+    }
+  ],
+  "blockedExternal": [],
+  "blockedBusiness": [],
+  "deviceCalls": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "expectedHttp": [
+    {
+      "status": 404,
+      "path": "/api/hq/commands/f801d755-8835-4a0e-a9f6-88ad51e2112b",
+      "method": "GET"
+    },
+    {
+      "status": 404,
+      "path": "/api/hq/commands/ce56b9fd-7e29-4d64-9c65-a5287337ace7",
+      "method": "GET"
+    },
+    {
+      "status": 404,
+      "path": "/api/hq/commands/12d6b422-e0c6-412e-9712-9ce4a817cc99",
+      "method": "GET"
+    },
+    {
+      "status": 404,
+      "path": "/api/hq/commands/a9d3b950-ba98-49c8-aee7-f4a8758c34f7",
+      "method": "GET"
+    },
+    {
+      "status": 404,
+      "path": "/api/hq/commands/2cf1b44c-970a-4798-91c1-8d2f23a3fef8",
+      "method": "GET"
+    },
+    {
+      "status": 404,
+      "path": "/api/hq/commands/34fa31f8-09b8-4267-98b2-b929f22f5eb9",
+      "method": "GET"
+    }
+  ],
+  "unexpectedHttp": [],
+  "captures": [
+    "browser-composer-en.html",
+    "browser-composer-en.png",
+    "browser-task-en.html",
+    "browser-comparison-en.html",
+    "browser-comparison-en.png",
+    "browser-revision-en.html",
+    "browser-brief-en.html",
+    "browser-nora-en.html",
+    "browser-comparison-ar-375.html",
+    "browser-comparison-ar-375.png",
+    "browser-revision-ar-375.html",
+    "browser-revision-ar-375.png"
+  ],
+  "nativeAcceptance": "not_evaluated",
+  "fullRegulatedRelease": "not_evaluated",
+  "azure": "explicitly_deferred",
+  "source": {
+    "id": "d63e9b96-1c3c-4514-89e7-e0b36501c1cd",
+    "title": "ADOPTED-conditions: Memo final text governs; preserve counsel/external prerequisites; no current dispatch grant.",
+    "sha256": "e04fcdb6284ba2fe55a87ad68756fb05b79136bf30344be46c8ff3e0a1d70165",
+    "version": 1
+  },
+  "catalogFinance": {
+    "id": "primora-finance-accounting",
+    "version": "1.0.0",
+    "sha256": "9ec542d406bec9569181de635270c6a6f33d8448b69ac8517ff37ded27124d10"
+  },
+  "taskId": "fad6c8b3-fbe9-4298-8baa-143a4a40344f",
+  "initialStoredRequirements": [
+    {
+      "sha256": "9ec542d406bec9569181de635270c6a6f33d8448b69ac8517ff37ded27124d10",
+      "skillId": "primora-finance-accounting",
+      "version": "1.0.0"
+    },
+    {
+      "sha256": null,
+      "skillId": "qa-missing-readiness-skill",
+      "version": null
+    }
+  ],
+  "expectedConsole": [
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/f801d755-8835-4a0e-a9f6-88ad51e2112b"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/ce56b9fd-7e29-4d64-9c65-a5287337ace7"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/12d6b422-e0c6-412e-9712-9ce4a817cc99"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/a9d3b950-ba98-49c8-aee7-f4a8758c34f7"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/2cf1b44c-970a-4798-91c1-8d2f23a3fef8"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "url": "http://127.0.0.1:3113/api/hq/commands/34fa31f8-09b8-4267-98b2-b929f22f5eb9"
+    }
+  ],
+  "status": "accepted_local_task_readiness_only",
+  "finishedAt": "2026-10-22T12:14:38.267Z",
+  "reviewedSourceHashes": {
+    "web_platform/src/components/hq/hq-overlays.tsx": "67d9960450ce60d914b5b34c18cbd330b0b6b8760c170bf8f2b43a175109fdaf",
+    "web_platform/src/components/hq/hq-skill-requirements.tsx": "4cb9938295b751ab1e851c5d05090c34aff50e8de7d7208f0434c396f2fe3ca3",
+    "web_platform/src/lib/hq/copy.ts": "69a3427e9f7effcd39b06f3f76f5024c409f9ddfcefce4302c3b3c15019d008f",
+    "web_platform/src/lib/hq/readiness.mjs": "1b5dae69f123f283b86969678591f7d901227f7954aa6db8d4d74d3c3ddfab39",
+    "web_platform/src/lib/hq/readiness.d.mts": "e0c33cb3121f97f023b06424323c0d737241005aa1046f9ad0373b53671af1d3",
+    "web_platform/src/lib/hq/contracts.ts": "31a53f0583c3f2c02313cc6deb66bfb68999bf30f564c9b157e427a50eabc018",
+    "web_platform/src/lib/hq/server/local-store.mjs": "6c8dc556691d5cd9f22262d89e5a68d56a3ced54401b54c0095916fbd28d9da6"
+  },
+  "independentEvidenceReview": {
+    "testSourceSha256": "2276f0726457555464ae5b07c1b0c5d7bd7c5b6b96a077eea5379dcd138bf651",
+    "visualInspection": "Functional EN desktop/AR375 checks passed. Root visual review subsequently identified compressed six-column table and tiny hashes at375px; presentation-only correction and follow-up are pending. No final narrow-table readability acceptance claimed by this functional run.",
+    "priorRuntimeObservation": "browser-first-runtime-observation.json retained with confirmed development-server restart resolution.",
+    "sourceReviewOnlyLimits": [
+      "Production authorization, hosted deployment and full regulated release not assessed.",
+      "No live employee, native-language, voice, microphone, speech provider or financial execution acceptance.",
+      "No test claims a globally present package is bound to an agent or proves competence."
+    ],
+    "scope": "Existing HQ task composer, revision and readiness comparison; no new route or overlay created by this work.",
+    "presentationFollowUp": "Resolved by separate3-group browser-presentation-followup.json and final EN/AR375 captures; retain this14-group functional result and original source hashes."
+  }
+}

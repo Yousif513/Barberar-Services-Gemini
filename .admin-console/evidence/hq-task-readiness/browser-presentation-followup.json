@@ -1,0 +1,95 @@
+{
+  "classification": "Independent local development browser QA; controlled test task records only, actual recovered sources/catalog; no company work inferred",
+  "startedAt": "2026-10-22T12:17:54.763Z",
+  "checks": [
+    {
+      "name": "EN375 comparison has readable fonts, labelled focusable horizontal region, native keyboard scrolling and no page overflow",
+      "status": "passed",
+      "size": {
+        "client": 307,
+        "scroll": 960,
+        "tableWidth": 960,
+        "font": 12,
+        "hashFont": 11
+      },
+      "pageSize": {
+        "width": 375,
+        "scroll": 375
+      },
+      "before": 0,
+      "after": 320
+    },
+    {
+      "name": "AR375 comparison has readable fonts, labelled focusable horizontal region, native keyboard scrolling and no page overflow",
+      "status": "passed",
+      "size": {
+        "client": 307,
+        "scroll": 960,
+        "tableWidth": 960,
+        "font": 12,
+        "hashFont": 11
+      },
+      "pageSize": {
+        "width": 375,
+        "scroll": 375
+      },
+      "before": 0,
+      "after": -320
+    },
+    {
+      "name": "Presentation follow-up used actual catalog in unsaved private drafts; zero commands/external/business/device/speech calls or unexpected errors",
+      "status": "passed"
+    }
+  ],
+  "findings": [],
+  "commands": [],
+  "blockedExternal": [],
+  "blockedBusiness": [],
+  "deviceCalls": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "expectedHttp": [],
+  "unexpectedHttp": [],
+  "captures": [
+    "browser-presentation-en-desktop.html",
+    "browser-presentation-en-desktop.png",
+    "browser-presentation-en-375.html",
+    "browser-presentation-en-375.png",
+    "browser-presentation-en-375-keyboard-scrolled.html",
+    "browser-presentation-en-375-keyboard-scrolled.png",
+    "browser-presentation-ar-375.html",
+    "browser-presentation-ar-375.png",
+    "browser-presentation-ar-375-keyboard-scrolled.html",
+    "browser-presentation-ar-375-keyboard-scrolled.png"
+  ],
+  "nativeAcceptance": "not_evaluated",
+  "fullRegulatedRelease": "not_evaluated",
+  "azure": "explicitly_deferred",
+  "status": "accepted_local_readiness_presentation_followup_only",
+  "finishedAt": "2026-10-22T12:17:59.138Z",
+  "reviewedSourceHashes": {
+    "web_platform/src/components/hq/hq-overlays.tsx": "a6f6e729d5832652bb03dc220fc1b5483009bad34e9b09809a2c5d8c7a2f48c9",
+    "web_platform/src/components/hq/hq-skill-requirements.tsx": "4cb9938295b751ab1e851c5d05090c34aff50e8de7d7208f0434c396f2fe3ca3",
+    "web_platform/src/lib/hq/copy.ts": "88c8829e2f27561200e13b31b6db0f1b644927675b0956cbefc4eaf43565db7c",
+    "web_platform/src/lib/hq/readiness.mjs": "1b5dae69f123f283b86969678591f7d901227f7954aa6db8d4d74d3c3ddfab39",
+    "web_platform/src/lib/hq/readiness.d.mts": "e0c33cb3121f97f023b06424323c0d737241005aa1046f9ad0373b53671af1d3",
+    "web_platform/src/lib/hq/contracts.ts": "31a53f0583c3f2c02313cc6deb66bfb68999bf30f564c9b157e427a50eabc018",
+    "web_platform/src/lib/hq/server/local-store.mjs": "6c8dc556691d5cd9f22262d89e5a68d56a3ced54401b54c0095916fbd28d9da6"
+  },
+  "canonicalUTF8LFHashes": {
+    "web_platform/src/components/hq/hq-overlays.tsx": "f67358cda7683b789dac4a97a2e6cf64ef1e5d692c66edf1a28355f43feffc5e",
+    "web_platform/src/components/hq/hq-skill-requirements.tsx": "a241b8fbbf2db41e06aaad25c8d0977d0dc0394acdd2328e9a6186daccc909ff",
+    "web_platform/src/lib/hq/copy.ts": "b22a0842001c88e140978696feabf060be7eb0097fcc62a5e41a951397dd7383"
+  },
+  "sourceHashBasis": "reviewedSourceHashes are exact file bytes. canonicalUTF8LFHashes use strictUTF8 decode, CRLF pairs toLF only, UTF8 encode.",
+  "independentVisualReview": {
+    "inspected": [
+      "browser-presentation-ar-375.png",
+      "browser-presentation-ar-375-keyboard-scrolled.png"
+    ],
+    "outcome": "Former six-column compression corrected. Readable requirement identifier/full hash and installed/version comparison seen in separate native keyboard-scroll positions; explicit hint, focus ring and execution hold visible.",
+    "functionalScope": "Presentation-only follow-up; prior14functional browser groups were not rerun and remain in browser-independent.json with their original source hashes.",
+    "testSourceSha256": "17b09edb81ac7bd097d23d34913f9352ad85deb831cf73ca6dffd9fa456b96a8",
+    "approvalHolds": "Azure deferred; company identities inactive; no business permissions, deployment or financial execution assessed or performed."
+  }
+}

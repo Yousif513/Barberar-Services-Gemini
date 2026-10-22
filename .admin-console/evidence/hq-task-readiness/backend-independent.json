@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "reviewer": "server_hq_audit",
+  "captured_at_utc": "2026-10-22T12:09:07.506028+00:00",
+  "independence": "Reviewer did not implement HqStore, shared readiness or task contracts. Reviewer owns only independent tests and this evidence.",
+  "scope": "Persistent explicit per-task skill requirements and source-derived planning readiness; local development record-only authority. Frontend review is separate.",
+  "verdict": "ACCEPTED_FOR_SCOPED_LOCAL_DEVELOPMENT_BACKEND_AND_PURE_READINESS",
+  "files": [
+    {
+      "path": "web_platform/src/lib/hq/server/local-store.mjs",
+      "sha256_raw_bytes": "6c8dc556691d5cd9f22262d89e5a68d56a3ced54401b54c0095916fbd28d9da6",
+      "sha256_utf8_crlf_to_lf": "ef19cb8661c3b88e049d8b1c66bc06fbd8efe181f0f242606e4fa6106a6c7609"
+    },
+    {
+      "path": "web_platform/src/lib/hq/readiness.mjs",
+      "sha256_raw_bytes": "1b5dae69f123f283b86969678591f7d901227f7954aa6db8d4d74d3c3ddfab39",
+      "sha256_utf8_crlf_to_lf": "fa168d8773a34ccde76bc101281bc059ff3b15ec271f0faa39bb0ec8e576721b"
+    },
+    {
+      "path": "web_platform/src/lib/hq/readiness.d.mts",
+      "sha256_raw_bytes": "e0c33cb3121f97f023b06424323c0d737241005aa1046f9ad0373b53671af1d3",
+      "sha256_utf8_crlf_to_lf": "2c67bc5f15b97018a1db71fa8f04c63b1939d3f72ca79e561b15da2fc89d4f45"
+    },
+    {
+      "path": "web_platform/src/lib/hq/contracts.ts",
+      "sha256_raw_bytes": "31a53f0583c3f2c02313cc6deb66bfb68999bf30f564c9b157e427a50eabc018",
+      "sha256_utf8_crlf_to_lf": "619c9ae37e22f93687056fcb31ec4ed2a086f0557d1817108940816833ed1924"
+    },
+    {
+      "path": "web_platform/tests/hq-task-readiness.test.mjs",
+      "sha256_raw_bytes": "b1f8b6f0c7deed01bd2dd5d9a6a33c47c0a8d37056baf45d85b28534b4e2b890",
+      "sha256_utf8_crlf_to_lf": "4ac1eba1d29f8f9c046bee51fbed81f564059bce6259a5e3d49c3a1b61bb7105"
+    },
+    {
+      "path": "web_platform/tests/hq-readiness-independent.test.mjs",
+      "sha256_raw_bytes": "81d0c36c69715cfe6326aed2e60d3a9c56d96fa67df2a0ad140d483210507d37",
+      "sha256_utf8_crlf_to_lf": "81d0c36c69715cfe6326aed2e60d3a9c56d96fa67df2a0ad140d483210507d37"
+    }
+  ],
+  "executed_checks": [
+    {
+      "command": "node --test web_platform/tests/hq-readiness-independent.test.mjs",
+      "total": 8,
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "duration_ms": 259.111
+    },
+    {
+      "command": "node --test web_platform/tests/hq-task-readiness.test.mjs web_platform/tests/hq-readiness-independent.test.mjs",
+      "owner_cases": 10,
+      "independent_cases": 8,
+      "total": 18,
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "duration_ms": 310.8427
+    },
+    {
+      "command": "npx eslint tests/hq-readiness-independent.test.mjs",
+      "cwd": "web_platform",
+      "exit_code": 0,
+      "diagnostics": 0
+    }
+  ],
+  "independent_evidence": [
+    "18 malformed revision shapes/bounds prove exact unchanged records, record_versions, commands and events; pending decision and requirement pins preserved; no receipt for rejected command.",
+    "Forced failure at receipt INSERT after task and decision writes proves whole transaction rollback; same command succeeds after removing only fixture trigger.",
+    "Previously approved recommendation remains immutable after a material requirement revision; old approved packet cannot authorize followup; new revision requires new recommendation hash/pending decision.",
+    "Requirement revision receipt replays identically after SQLite restart without new rows/events; changed pin conflicts; foreign workspace cannot revise or recover receipt.",
+    "Legacy stored task without skillRequirements remains absent/undeclared through unrelated revision; exact20rows with120character id,100character version,64hex hash accepted; explicit clearing remains undeclared.",
+    "Required rows only; extra global packages absent from assessment; globally installed but not role-associated stays distinct; role-only mapping cannot turn missing global package into installed. Version/hash axes independent and unavailable/unpinned metadata unknown.",
+    "Even synthetic catalog/role claims of active/adopted/passed/finance permissions leave output binding not-adopted, evidence unknown, permission not-granted and execution inactive. Frozen inputs are not mutated.",
+    "Actual node:http listener bound127.0.0.1 uses real handler, normalized localhost internal URL, cookie+CSRF; exact pins persist, malformed authority-bearing row returns400 without task change, omittedCSRF403."
+  ],
+  "findings": [],
+  "unresolved_critical_or_high_findings_in_scope": 0,
+  "red_green_claim": "All reviewer cases were written against frozen implemented source and passed on first product execution. No independent RED phase is claimed. Owner-reported TDD history is separate.",
+  "authorities": {
+    "employee_activation": false,
+    "business_permissions": false,
+    "financial_execution": false,
+    "automatic_package_install_or_tool_call": false,
+    "decision_effect": "record-only"
+  },
+  "operations": {
+    "external_fetch_calls": 0,
+    "provider_or_paid_calls": 0,
+    "hosted_database_writes": 0,
+    "real_credentials_read": 0,
+    "actual_audio_or_native_quality_checked": false
+  },
+  "limitations": [
+    "No frontend/browser acceptance is asserted by this backend/pure pass.",
+    "Tests use isolated deterministic fixture records, local SQLite and loopback HTTP; no production or actual employee competence is established.",
+    "Installed package/version/hash checks describe instruction metadata, not adopted assignment, behavioral evidence, dependency execution or authority.",
+    "Current catalog metadata remains authoritative for comparison; historical task requirement expectations remain immutable records.",
+    "No repository-wide regulated release or production readiness claim is made; root owns integration build/typecheck/lint/manifest gates.",
+    "Azure account/audio work is explicitly deferred by the user and was not resumed."
+  ]
+}

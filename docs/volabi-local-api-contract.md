@@ -1,6 +1,6 @@
 # Volabi local API contract - approved development slice
 
-Root owns API/server storage. UI worker owns client contracts and interfaces. All company identities remain inactive. Existing financial/admin approvals and Supabase roles are never reused. Runtime uses Node24.15 built-in SQLite, a loopback-only enabled preview process, persistent local sessions/workspaces and record-only commands. No model/provider/financial executor exists in this mode.
+Root owns API/server storage and shared task contracts. The UI worker owns frontend interfaces. All company identities remain inactive. Existing financial/admin approvals and Supabase roles are never reused. Runtime uses Node24.15 built-in SQLite, a loopback-only enabled preview process, persistent local sessions/workspaces and record-only commands. No model/provider/financial executor exists in this mode.
 
 ## HTTP
 
@@ -14,7 +14,11 @@ Errors {ok:false,error:{code,message}} with HTTP400invalid_input,401session_requ
 
 ## Records
 
-Task: {id,revision,title,request,outcome,acceptance,ownerId,reviewerId,limits,status,sourceIds,currentRecommendationId,createdAt,updatedAt}. Status requested,awaiting_decision,changes_requested,approved_for_followup,declined,followup_recorded. Owners are proposed inactive agent slugs or development-preparer; ownership does not dispatch an employee.
+Task: {id,revision,title,request,outcome,acceptance,skillRequirements?,ownerId,reviewerId,limits,status,sourceIds,currentRecommendationId,createdAt,updatedAt}. Status requested,awaiting_decision,changes_requested,approved_for_followup,declined,followup_recorded. Owners are proposed inactive agent slugs or development-preparer; ownership does not dispatch an employee.
+
+Skill requirements: optional skillRequirements:[{skillId,version,sha256}], maximum20unique rows. Canonical lowercase skillId max120; version null or nonempty max100; sha256 null or64lowercase hexadecimal. Invalid/duplicate/unknown nested fields fail atomically. A missing/empty legacy requirement list means undeclared, not all proposed role packages. New task omission stores[]; revision omission preserves prior requirements, explicit[] clears them. Required IDs are metadata lookups only, never filesystem paths. Exact idempotency material and task revisions include supplied requirements; changing requirements supersedes pending decisions and blocks follow-up from an older approved revision.
+
+Readiness is a current read-only comparison, not a stored score or permission. Shared assessTaskSkills compares only required rows against the current catalog and role associations. Installation, expected/current version/hash, proposed association, unadopted binding, unknown behavioral evidence and ungranted permissions remain separate. Missing metadata is unknown; failed catalog reads render errors. All results remain inactive-for-execution. Changes in catalog metadata are observed on a fresh read and do not silently repin the task. A record-only CEO decision is not an employee activation or a skill evaluation.
 
 Recommendation: {id,taskId,taskRevision,hash,title,summary,nextStep,author:{id,label},mode:"evidence-preparation"|"authored-development",citations:[{sourceId,version,sha256,start,end,quote}],createdAt,decisionId}. Automatically prepared output is labelled local source brief by development preparer, never generative employee reasoning. Authored development recommendations can be submitted with validated exact source quotes.
 
@@ -30,8 +34,8 @@ Agent: {id,name,role,roleAr?,sourcePrompt,activationStatus:"inactive",skills:[sk
 
 ## Commands
 
-- task.create: {title,request,outcome,acceptance,ownerId,reviewerId,limits,sourceIds}. Returns taskId.
-- task.revise: {taskId,title?,request?,outcome?,acceptance?,ownerId?,reviewerId?,limits?,sourceIds?}; expectedRevision=task.revision. Retains old revisions, supersedes old pending recommendation decision, requires new recommendation.
+- task.create: {title,request,outcome,acceptance,ownerId,reviewerId,limits,sourceIds,skillRequirements?}. Returns taskId.
+- task.revise: {taskId,title?,request?,outcome?,acceptance?,ownerId?,reviewerId?,limits?,sourceIds?,skillRequirements?}; expectedRevision=task.revision. Retains old revisions, supersedes old pending recommendation decision, requires new recommendation.
 - recommendation.prepare: {taskId}; expectedRevision=task.revision. Uses attached local source snapshots and creates source-linked development brief + pending decision. No external model/employee call.
 - recommendation.publish: {taskId,title,summary,nextStep,citations}; expectedRevision=task.revision. Exact source ranges/hashes validated; creates pending decision with immutable hash.
 - decision.record: {decisionId,recommendationHash,choice:"approve"|"decline"|"request_changes",reason}; expectedRevision=decision.taskRevision. Returns decisionId/taskId. Blocks stale task, recommendation or source; reason retained after refusal.

@@ -1,0 +1,161 @@
+{
+  "capturedAt": "2026-10-22T12:20:09.590253+00:00",
+  "classification": "local HQ task-specific readiness repair; no business employee activation or regulated production release",
+  "branch": "codex-booking-payment-reconciliation",
+  "baseCommit": "8f3e197acb5057774a903c3c571789fe07719bb0",
+  "checks": [
+    {
+      "command": "node --test web_platform/tests/hq-task-readiness.test.mjs",
+      "exitCode": 0,
+      "passed": 10,
+      "failed": 0,
+      "redGreen": "5pure comparison cases failed before module existed. With valid source fixtures,5store cases failed with only persistence hooks removed; restoring hooks made all10pass. Initial fixture URI/recovery-date errors were corrected before the successful persistence RED/GREEN proof."
+    },
+    {
+      "command": "independent backend+pure review",
+      "exitCode": 0,
+      "passedIndependent": 8,
+      "passedCombined": 18,
+      "evidence": "backend-independent.json"
+    },
+    {
+      "command": "npm run test --workspace=web_platform",
+      "exitCode": 0,
+      "passed": 1014,
+      "failed": 0,
+      "skipped": 0,
+      "note": "996prior+18new backend/pure cases; includes all prior repairs and pilot regressions"
+    },
+    {
+      "command": "npm run typecheck:mobile",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run lint --workspace=web_platform -- --format json --output-file ../.admin-console/evidence/hq-task-readiness/eslint-results.json",
+      "exitCode": 0,
+      "errors": 0,
+      "warnings": 302,
+      "changedApplicationFilesWarnings": 0,
+      "evidence": "eslint-results.json"
+    },
+    {
+      "command": "final focused ESLint across changed application/test files",
+      "exitCode": 0,
+      "warnings": 0,
+      "note": "After final presentation changes"
+    }
+  ],
+  "browser": {
+    "functional": {
+      "exitCode": 0,
+      "passedGroups": 14,
+      "evidence": "browser-independent.json"
+    },
+    "finalPresentationFollowup": {
+      "exitCode": 0,
+      "passedGroups": 3,
+      "evidence": "browser-presentation-followup.json",
+      "tableWidth": 960,
+      "textPx": 12,
+      "hashPx": 11,
+      "keyboardMovement": {
+        "en": 320,
+        "ar": -320
+      }
+    },
+    "runtimeObservation": "browser-first-runtime-observation.json; stale development store resolved by verified owned preview restart, original SQLite preserved",
+    "limitation": "Functional and later presentation observations are separate runs/source snapshots, not relabelled as one final full flow."
+  },
+  "build": {
+    "command": "npm run build --workspace=web_platform",
+    "exitCode": 0,
+    "warnings": [
+      "4existing HQ dynamic-filesystem tracing warnings",
+      "provider sitemap fetch failed; build completed"
+    ]
+  },
+  "scope": {
+    "families": 6,
+    "routes": 9,
+    "overlays": 15,
+    "newRoutes": 0,
+    "newBusinessCommands": 0,
+    "schemaMigrations": 0,
+    "effects": "record-only",
+    "requiredSkillRowsMax": 20
+  },
+  "authority": {
+    "employeesActive": false,
+    "permissionsGranted": false,
+    "financialExecution": false,
+    "externalBusinessWrites": false,
+    "productionMerge": false,
+    "productionDeploy": false
+  },
+  "azure": {
+    "state": "explicitly_deferred_by_CEO",
+    "approvalRevoked": false,
+    "allInSarCap": 10,
+    "aggregateCharactersCap": 100000,
+    "maximumRounds": 3,
+    "providerCalls": 0,
+    "accountCreated": false,
+    "realCredentialsAccessed": false,
+    "audioGenerated": 0,
+    "resumeRequires": "fresh named account/terms/all-in fees evidence then masked setup; do not reset prior approval ledger"
+  },
+  "regulatedAdminRelease": {
+    "profile": "regulated",
+    "releaseValidation": "not recertified in this local repair; earlier unresolved gates remain",
+    "coverage": "not recertified by this repair",
+    "productionReady": false
+  },
+  "nextCheckoutItem": "Existing high/open held-checkout exception visibility: minimized read-only audited queue under existing money.ledger permission. Provider-backed resolutions and financial mutations stay held.",
+  "reviewIndependence": {
+    "backendImplementer": "root",
+    "frontendImplementer": "hq_readiness_ui",
+    "backendSourceDocsReviewer": "server_hq_audit",
+    "browserReviewer": "pilot_browser_review"
+  },
+  "delivery": "Verification captured before commit; exact implementation commit is recorded in .coworking_changelog.md and final response.",
+  "finalReviewIntegration": {
+    "checkedAt": "2026-10-22T12:24:56.610549+00:00",
+    "hashBasis": "Strict UTF8 decode, CRLF pairs to LF only, UTF8 encode; historical browser functional source snapshot not compared to final presentation files.",
+    "receipts": [
+      {
+        "receipt": "backend-independent.json",
+        "sha256_raw_bytes": "39bc531b6b5a46269ef931b6d8ff380b86db7e2fb482e0ec41ca16aa66c1aee8",
+        "matchingSourceFiles": 6
+      },
+      {
+        "receipt": "frontend-docs-independent.json",
+        "sha256_raw_bytes": "c718166d7bc01af35d6c668a17872849eb2fb866ade82d1dca6e388be090a262",
+        "matchingSourceFiles": 9
+      },
+      {
+        "receipt": "browser-presentation-followup.json",
+        "sha256_raw_bytes": "e9b3851a9814401757818682dba353bbea1894c92c840ddd590744aa7c2250ad",
+        "matchingFinalUiFiles": 3,
+        "historicalFunctionalReceipt": "browser-independent.json remains a separate earlier functional snapshot"
+      }
+    ],
+    "sourceChangesAfterFinalChecks": false
+  },
+  "provenanceRecheck": [
+    {
+      "path": "planning/volabi/PACKAGE_RECEIPT.json",
+      "matched": 76,
+      "mismatches": 0
+    },
+    {
+      "path": "planning/volabi/voice-auditions/PACKAGE_HASHES.json",
+      "matched": 69,
+      "mismatches": 0
+    },
+    {
+      "path": "scripts/volabi-auditions/VALIDATION.json",
+      "matched": 9,
+      "mismatches": 0
+    }
+  ]
+}

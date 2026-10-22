@@ -14,6 +14,21 @@ const sourceBody = value => {
   if (typeof value !== "string" || !value.trim() || value.length > 200000) throw new HqError("invalid_input");
   return value;
 };
+const skillRequirements = value => {
+  if(value===undefined)return [];
+  if(!Array.isArray(value)||value.length>20)throw new HqError("invalid_input");
+  const seen=new Set();
+  return Array.from(value,row=>{
+    if(!row||typeof row!=="object"||Array.isArray(row)||Object.keys(row).some(k=>!["skillId","version","sha256"].includes(k)))throw new HqError("invalid_input");
+    const skillId=text(row.skillId,120);
+    if(!/^[a-z0-9][a-z0-9-]*$/.test(skillId)||seen.has(skillId))throw new HqError("invalid_input");
+    seen.add(skillId);
+    const version=row.version===null||row.version===undefined?null:text(row.version,100);
+    const sha256=row.sha256===null||row.sha256===undefined?null:text(row.sha256,64);
+    if(sha256!==null&&!/^[a-f0-9]{64}$/.test(sha256))throw new HqError("invalid_input");
+    return {skillId,version,sha256};
+  });
+};
 const ensureRevision = (actual, expected) => { if (!Number.isInteger(expected) || actual !== expected) throw new HqError("stale_revision", 409); };
 const scope = () => ({ environment:"local", effects:["record-only"], employeeActivation:false, businessPermissions:false, financialExecution:false });
 const allowedKinds = new Set(["task", "source", "recommendation", "decision", "followup"]);
@@ -107,7 +122,7 @@ export class HqStore {
   validateOwner(id) { if (id!=="development-preparer" && !this.agents.some(a=>a.id===id)) throw new HqError("invalid_input"); return id; }
   createTask(session,p,commandId) {
     const sources=this.validateSources(session,p.sourceIds||[]), at=now();
-    const task=this.put(session,"task",{id:randomUUID(),revision:1,title:text(p.title,180),request:text(p.request),outcome:text(p.outcome,2000),acceptance:text(p.acceptance,2000),ownerId:this.validateOwner(p.ownerId||"development-preparer"),reviewerId:this.validateOwner(p.reviewerId||"development-preparer"),limits:text(p.limits,2000),status:"requested",sourceIds:sources.map(s=>s.id),currentRecommendationId:null,createdAt:at,updatedAt:at});
+    const task=this.put(session,"task",{id:randomUUID(),revision:1,title:text(p.title,180),request:text(p.request),outcome:text(p.outcome,2000),acceptance:text(p.acceptance,2000),skillRequirements:skillRequirements(p.skillRequirements),ownerId:this.validateOwner(p.ownerId||"development-preparer"),reviewerId:this.validateOwner(p.reviewerId||"development-preparer"),limits:text(p.limits,2000),status:"requested",sourceIds:sources.map(s=>s.id),currentRecommendationId:null,createdAt:at,updatedAt:at});
     this.audit(session,"task.requested","task",task.id,commandId,{revision:task.revision,sourceIds:task.sourceIds,ownerId:task.ownerId});return task;
   }
   validateCitations(session,citations) {
@@ -172,6 +187,9 @@ export class HqStore {
         for(const field of ["title","request","outcome","acceptance","limits"])if(Object.hasOwn(p,field))next[field]=text(p[field],field==="title"?180:4000);
         for(const field of ["ownerId","reviewerId"])if(Object.hasOwn(p,field))next[field]=this.validateOwner(p[field]);
         if(Object.hasOwn(p,"sourceIds"))next.sourceIds=this.validateSources(session,p.sourceIds).map(s=>s.id);
+
+
+        if(Object.hasOwn(p,"skillRequirements"))next.skillRequirements=skillRequirements(p.skillRequirements);
         for(const d of this.related(session,"decision",task.id))if(d.status==="pending")this.put(session,"decision",{...d,status:"superseded"});
         this.put(session,"task",next);this.audit(session,"task.revised","task",task.id,commandId,{revision:next.revision});result={entityType:"task",entityId:task.id,revision:next.revision,recordIds:{taskId:task.id}};
       } else if(type==="recommendation.prepare"||type==="recommendation.publish"){
