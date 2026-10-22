@@ -1,0 +1,47 @@
+{
+  "areas": [
+    "ecommerce",
+    "support"
+  ],
+  "mode": "minimal",
+  "platform": "web",
+  "pages": [
+    {
+      "id": "local-booking-and-support-pilot",
+      "name": "Local booking and support pilot",
+      "route": "/pilot/booking",
+      "purpose": "",
+      "area": "uncategorized",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:3"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 3,
+          "quote": "/pilot/booking — Local booking and support pilot"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [
+        "loading",
+        "error",
+        "empty"
+      ]
+    }
+  ],
+  "totals": {
+    "pages": 1,
+    "modals": 0,
+    "drawers": 0,
+    "popovers": 0,
+    "screen_states": 3,
+    "total_generations": 4
+  }
+}

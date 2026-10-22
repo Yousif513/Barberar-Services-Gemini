@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "reviewer": "server_hq_audit",
+  "independence": "Reviewer did not implement the customer pilot store/handler/UI. Reviewer owns only independent tests and this evidence.",
+  "captured_at_utc": "2026-10-22T11:32:54.154983+00:00",
+  "verdict": "ACCEPTED_FOR_BOUNDED_LOCAL_DEVELOPMENT_BACKEND_SCOPE",
+  "scope": "Empty-by-default manually imported PUBLIC UNVERIFIED catalog; isolated local request/support drafts; no actual bookings, availability, payments, refunds or employee activation.",
+  "files": [
+    {
+      "path": "web_platform/src/lib/customer-pilot/server/store.mjs",
+      "sha256_raw_bytes": "81dbce78d9c66d63758ce3e040090a9116fb8c15d01a1152d9203c4bf3e09ee7"
+    },
+    {
+      "path": "web_platform/src/lib/customer-pilot/server/handler.mjs",
+      "sha256_raw_bytes": "d8bddf07306152fd8d7d9ef2b568eb1cadd899c07e342cd83de1a9148c76f48c"
+    },
+    {
+      "path": "web_platform/src/lib/customer-pilot/server/handler.d.mts",
+      "sha256_raw_bytes": "3b1914918d772c76ee5453fcf48b8939603ccc6f052a28ab4802db022b814611"
+    },
+    {
+      "path": "web_platform/src/app/api/pilot/[...path]/route.ts",
+      "sha256_raw_bytes": "5d6f312675b2a5b0a7018e764f174d178000596bd754acde5cf162ca429ae727"
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/local-boundary.mjs",
+      "sha256_raw_bytes": "3a1498b9e14f343d86e1954ded141edde2b4c16cd2c616f5d4483a9610bf5883"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/APPROVAL.md",
+      "sha256_raw_bytes": "de31461fc8a84ed1f45c0e49797d397a6c3396e33209811be4469bfd437ec81d"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/API_CONTRACT.md",
+      "sha256_raw_bytes": "87dc79f676300f7b26155d6ae6a6e1d23be6dd6e20acde60a356a035380f15bf"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/DESIGN.md",
+      "sha256_raw_bytes": "aafddcd9f7c5595161c597eecfb0e851b2079e7fc3e4a3af576cfe30e35c1172"
+    },
+    {
+      "path": "web_platform/tests/customer-pilot-independent.test.mjs",
+      "sha256_raw_bytes": "50fe88ac2625e912fe66b41baf91561249c11d25f31e6154242bfa9f23ff9a8a"
+    },
+    {
+      "path": "web_platform/tests/customer-pilot-store.test.mjs",
+      "sha256_raw_bytes": "1451711542ec069e359caf110748589445529505528d7d11c7160e24f605c731"
+    },
+    {
+      "path": "web_platform/tests/customer-pilot-api.test.mjs",
+      "sha256_raw_bytes": "9be83056f9eceb788c346393ab6833ce5f2f637bd3dd7fd1df9ad82bc2b2d4be"
+    }
+  ],
+  "executed_verification": [
+    {
+      "command": "node --test web_platform/tests/customer-pilot-independent.test.mjs",
+      "independent_tests": 11,
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "duration_ms": 560.2533,
+      "description": "Independent actual loopback HTTP and temporary SQLite, hard-blocked global fetch."
+    },
+    {
+      "command": "node --test web_platform/tests/customer-pilot-store.test.mjs web_platform/tests/customer-pilot-api.test.mjs web_platform/tests/customer-pilot-independent.test.mjs",
+      "total_tests": 24,
+      "passed": 24,
+      "failed": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "duration_ms": 540.3672,
+      "description": "Fresh joint owner and independent backend run against current hashed implementation."
+    }
+  ],
+  "adversarial_checks": [
+    "Actual node:http streaming adapter on 127.0.0.1 ephemeral port, not only direct Request invocation.",
+    "Next normalized localhost URL with actual127 Host/Origin accepted only with same port; foreign/host-path/query/hash/userinfo/cross-site/missing-origin denied.",
+    "Pilot-specific HttpOnly SameSite Strict path-scoped cookie, seat-bound CSRF, expired/wrong/duplicate/HQ/bearer denial.",
+    "Foreign workspace source/request/case/receipt denied and unsupported financial/employee/message commands produce no side effects.",
+    "Actual database restart and material/key-order/locale idempotent receipt; changed command material conflict.",
+    "Metadata-only source correction invalidates old review and preserves historical immutable price/provider/source snapshot.",
+    "Impossible dates, out-of-window future/past times, foreign staff, forged money/status and import URI credentials/query denied.",
+    "Actual chunked body larger than131072bytes without declared content length rejected without command effects.",
+    "Case revision race and appeal history, minimized audit excludes private fixture notes.",
+    "Forced SQLite command-receipt failure rolls back source currentness/entity/event atomically.",
+    "Two actual independent SQLite worker connections compete for one remaining workspace quota: exactly one succeeds."
+  ],
+  "findings": [
+    {
+      "id": "P-ID1",
+      "severity": "medium",
+      "status": "FIXED_AND_EXECUTING_REGRESSION_GREEN",
+      "location": "web_platform/src/lib/customer-pilot/server/store.mjs open-case canonical requestId",
+      "problem": "Authorized uppercase UUID was looked up canonically but persisted with original casing, causing equality joins to orphan an otherwise valid local case.",
+      "fix_owner": "root",
+      "evidence": "Independent actual HTTP test asserts canonical stored linkage. Root fixed before reviewer execution; reviewer does not claim an executed RED phase."
+    }
+  ],
+  "unresolved_critical_or_high_findings_in_scope": 0,
+  "holds": {
+    "provider_calls": 0,
+    "actual_credentials_read": 0,
+    "actual_bookings_or_money_actions": 0,
+    "hosted_database_writes": 0,
+    "business_agents_activated": 0,
+    "native_language_or_voice_acceptance": false
+  },
+  "limitations": [
+    "This is a local trusted-OS single-process development workspace, not production identity/tenancy/security certification.",
+    "Browser UI, translation correctness, native-language usability, actual voice quality, and DPAPI interoperability are separate verification scopes.",
+    "The audit hash linkage is not a forensic or hostile-OS tamper-proof claim.",
+    "No actual salon availability, provider identity, imported source authenticity or live checkout is verified by the pilot.",
+    "Repository-wide regulated release completion is not asserted by this scoped pass."
+  ]
+}

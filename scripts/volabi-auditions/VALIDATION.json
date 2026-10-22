@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "prepared_utc": "2026-10-22T11:38:59.961940+00:00",
+  "classification": "implementation_self_verification_not_independent_review_or_live_acceptance",
+  "hash_basis": {
+    "files_sha256": "strict UTF-8 decoding; replace CRLF pairs with LF only; UTF-8 re-encode; preserve every other character including BOM, lone CR, whitespace and final newline",
+    "captured_local_bytes": "actual bytes in this worktree at capture; can change with Windows line-ending checkout"
+  },
+  "files": [
+    {
+      "path": "scripts/volabi-auditions/runner.mjs",
+      "sha256": "e250c4bc2684e1100af77b85ed063427cd5448dc851b10ab87e0e1d6b93f9bfd",
+      "captured_local_bytes": 29864
+    },
+    {
+      "path": "scripts/volabi-auditions/runner.test.mjs",
+      "sha256": "d7d9c12902b520e4079418f36c1f4a8e574b8cb5d1ba43e41c468b8b5560f634",
+      "captured_local_bytes": 23317
+    },
+    {
+      "path": "scripts/volabi-auditions/credential.ps1",
+      "sha256": "15009f93f7cdc46a99b85e6a607c7d8d473290929019c6a45c8c6cb57bd5307c",
+      "captured_local_bytes": 6384
+    },
+    {
+      "path": "scripts/volabi-auditions/credential-binding.ps1",
+      "sha256": "e9ed02eef59f6e674b2e31798fb4d39d2e4dc45168339b4632cb708685505976",
+      "captured_local_bytes": 1082
+    },
+    {
+      "path": "scripts/volabi-auditions/credential-binding.test.ps1",
+      "sha256": "5eb301d53a9dbb2412325e083af4b4eef1a6e6bf610108e4f6f3391ce4049d66",
+      "captured_local_bytes": 1342
+    },
+    {
+      "path": "scripts/volabi-auditions/local-path.ps1",
+      "sha256": "61ec24c39bd88cef947b077a3b5755ca9991ab552e8f61316faa8099b2bc2b62",
+      "captured_local_bytes": 2785
+    },
+    {
+      "path": "scripts/volabi-auditions/concurrent-worker.mjs",
+      "sha256": "5e396c5da6700ce755a2ac7aa997a44bd91076412366eb7ba946b7135dadc377",
+      "captured_local_bytes": 930
+    },
+    {
+      "path": "scripts/volabi-auditions/README.md",
+      "sha256": "6393172a3cd28ef3944215c9ebad0d1883811a2719f8629448d4506aae5ed95a",
+      "captured_local_bytes": 14472
+    },
+    {
+      "path": "planning/volabi/voice-auditions/EXECUTION_APPROVAL_20261022.md",
+      "sha256": "69c0057d215ca513c08539739598ecd4c53a51c083342fe4b0e4fd4c460b4b1d",
+      "captured_local_bytes": 4622
+    }
+  ],
+  "offline_plan": {
+    "approval_id": "20261022-azure-development-15",
+    "plan_sha256": "fdcc595b0eae105f9af85bae207f97911119477881d4bfecc50c128e26c5f41d",
+    "job_count": 92,
+    "role_jobs": 15,
+    "blind_jobs": 75,
+    "anchor_jobs": 2,
+    "first_pass_full_utf8_units": 66818,
+    "aggregate_unit_cap": 100000,
+    "aggregate_all_in_SAR_cap": 10,
+    "maximum_rounds": 3
+  },
+  "checks": [
+    {
+      "command": "node --test scripts/volabi-auditions/runner.test.mjs",
+      "exit_code": 0,
+      "passed": 31,
+      "failed": 0,
+      "execution": "actual local Node tests; live global fetch hard-blocked; includes separate processes/killed-process recovery, real local Windows metadata helpers and local junctions, mutable input regressions and pure resource-envelope validation; no real key/DPAPI/provider calls"
+    },
+    {
+      "command": "node --check scripts/volabi-auditions/runner.mjs",
+      "exit_code": 0
+    },
+    {
+      "command": "PowerShell Language.Parser.ParseFile all scripts/volabi-auditions/*.ps1",
+      "exit_code": 0,
+      "execution": "syntax parse only; pure resource-binding helper tests separately executed without key file or DPAPI access"
+    },
+    {
+      "command": "node scripts/volabi-auditions/runner.mjs",
+      "exit_code": 0,
+      "execution": "actual no-argument offline default; JSON parsed and counts verified"
+    },
+    {
+      "command": "strict UTF-8 decode plus trailing-whitespace scan of owned files",
+      "exit_code": 0
+    }
+  ],
+  "actual_paid_synthesis_requests": 0,
+  "real_credentials_read_or_entered": false,
+  "credential_helper_executed": false,
+  "historical_source_inputs_modified": false,
+  "runtime_output_location": "fixed %LOCALAPPDATA%/Primora/VolabiAuditions/20261022-azure-development-15; outside repository and release path",
+  "independent_review": {
+    "status": "independent_offline_review_passed",
+    "independent_cases": 7,
+    "combined_cases": 38,
+    "combined_passed": 38,
+    "combined_exit_code": 0,
+    "skipped": 0,
+    "platform": "Windows",
+    "reviewer": "server_hq_audit",
+    "evidence_path": ".admin-console/evidence/primora-multilingual-pilot/review-audition-runner.json",
+    "basis": "reviewer reported actual independent7/7 and combined38/38 executions; receipt owned by reviewer"
+  },
+  "remaining_acceptance": [
+    "Actual named development account, resource/region, terms and maximum all-in charges including fees/tax/FX",
+    "Fresh account/region candidate availability and evidence hashes",
+    "Masked human DPAPI Store and same-user captured-pipe interoperability",
+    "Actual Azure REST response/accounting verification after gates",
+    "Native Saudi/Lebanese listening, bilingual pronunciation and blind identity acceptance; scores remain blank",
+    "Local cap only under verified bounds and exclusive use; not an exact provider invoice stop"
+  ],
+  "repo_wide_checks": "Root coordinates aggregate web build/mobile typecheck and changelog; no frontend/product code in this slice",
+  "committed": false,
+  "actual_dpapi_protect_or_unprotect_calls": 0,
+  "pure_binding_validator_executed": true,
+  "local_fixed_volume_metadata_helper_executed": true,
+  "fixed_review_findings": [
+    "Local-only account/evidence/state/credential paths before bytes or mkdir; reject UNC/device/URL/relative/ADS, non-fixed/mapped/SUBST drives and reparse ancestors",
+    "Synchronous cloned/frozen plan/account/dispatch snapshots before awaits; original reserved payload and price retained",
+    "Versioned DPAPI envelope resource SHA256 checked before decoding/decrypting; expected immutable resource passed to private reader; resource entropy and explicit human source confirmation",
+    "Paid-tier actual resource SKU distinct from public S1 meter; no invented account quote supplied"
+  ],
+  "red_to_green": {
+    "owner": [
+      "mutable callback changed dispatched SSML before fix; now original body/hash/units retained",
+      "UNC reached intercepted read before fix; now rejected before filesystem"
+    ],
+    "independent": [
+      "three initial path/junction/snapshot regressions failed before fixes and passed afterward",
+      "state intercepted mkdir/read regression failed before directory guard and passed afterward"
+    ]
+  }
+}

@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "reviewer": "server_hq_audit",
+  "independence": "Reviewer did not implement the audition runner, credential helpers, account gate, ledger or approval addendum. Reviewer authored only separate adversarial tests and this evidence.",
+  "captured_at_utc": "2026-10-22T11:40:02.976623+00:00",
+  "verdict": "ACCEPTED_FOR_BOUNDED_OFFLINE_DEVELOPMENT_PREPARATION; ACTUAL_ACCOUNT_KEY_AND_AUDIO_ACCEPTANCE_HELD",
+  "files": [
+    {
+      "path": "scripts/volabi-auditions/runner.mjs",
+      "sha256_raw_bytes": "2030a8968377ab58fcc31fd7203925a66770d64284484f888e5332a558e2f025",
+      "sha256_utf8_crlf_to_lf": "e250c4bc2684e1100af77b85ed063427cd5448dc851b10ab87e0e1d6b93f9bfd",
+      "bytes": 29864
+    },
+    {
+      "path": "scripts/volabi-auditions/credential.ps1",
+      "sha256_raw_bytes": "1dec3fe8b36fa4da3f517f4e8c9bca268fa94c5b83680846a0d6628d24dd026f",
+      "sha256_utf8_crlf_to_lf": "15009f93f7cdc46a99b85e6a607c7d8d473290929019c6a45c8c6cb57bd5307c",
+      "bytes": 6384
+    },
+    {
+      "path": "scripts/volabi-auditions/credential-binding.ps1",
+      "sha256_raw_bytes": "268daf9d09a49b4462d1ce06faaa66d2e5fddd9f30b1613b8bdf8fbd80b6a39c",
+      "sha256_utf8_crlf_to_lf": "e9ed02eef59f6e674b2e31798fb4d39d2e4dc45168339b4632cb708685505976",
+      "bytes": 1082
+    },
+    {
+      "path": "scripts/volabi-auditions/local-path.ps1",
+      "sha256_raw_bytes": "ca7c3c996d1639f7a894da34b32af01724f1aa6c05880c88185f570de09f62ec",
+      "sha256_utf8_crlf_to_lf": "61ec24c39bd88cef947b077a3b5755ca9991ab552e8f61316faa8099b2bc2b62",
+      "bytes": 2785
+    },
+    {
+      "path": "scripts/volabi-auditions/runner.test.mjs",
+      "sha256_raw_bytes": "810dfd769fc860d4677a6e2f7f3848c0ac21047592de9d78e4e11dc2386a0af3",
+      "sha256_utf8_crlf_to_lf": "d7d9c12902b520e4079418f36c1f4a8e574b8cb5d1ba43e41c468b8b5560f634",
+      "bytes": 23317
+    },
+    {
+      "path": "scripts/volabi-auditions/credential-binding.test.ps1",
+      "sha256_raw_bytes": "fec4ca58f5dada6060ac1b5d924622c4476866eec74375654f20cc0e4ad68ec5",
+      "sha256_utf8_crlf_to_lf": "5eb301d53a9dbb2412325e083af4b4eef1a6e6bf610108e4f6f3391ce4049d66",
+      "bytes": 1342
+    },
+    {
+      "path": "scripts/volabi-auditions/concurrent-worker.mjs",
+      "sha256_raw_bytes": "c73f8712c5e4db55a07fd1de0eb8643b2a75fb62266110dff0e8c80ff69a7685",
+      "sha256_utf8_crlf_to_lf": "5e396c5da6700ce755a2ac7aa997a44bd91076412366eb7ba946b7135dadc377",
+      "bytes": 930
+    },
+    {
+      "path": "scripts/volabi-auditions/README.md",
+      "sha256_raw_bytes": "0c49e84d0a2d6298c7c0b47e97ad84e69b06f223bfeae0eb2bc4c05d2ebef166",
+      "sha256_utf8_crlf_to_lf": "6393172a3cd28ef3944215c9ebad0d1883811a2719f8629448d4506aae5ed95a",
+      "bytes": 14472
+    },
+    {
+      "path": "planning/volabi/voice-auditions/EXECUTION_APPROVAL_20261022.md",
+      "sha256_raw_bytes": "ff0a632aa13561aaabf88be63994c0ad3c805aa61578ba1eca17546fd4792883",
+      "sha256_utf8_crlf_to_lf": "69c0057d215ca513c08539739598ecd4c53a51c083342fe4b0e4fd4c460b4b1d",
+      "bytes": 4622
+    },
+    {
+      "path": "web_platform/tests/customer-pilot-independent-auditions.test.mjs",
+      "sha256_raw_bytes": "84a48faf47bdc653724a90153cee286f00a248576b09694f6688416e09112be8",
+      "sha256_utf8_crlf_to_lf": "84a48faf47bdc653724a90153cee286f00a248576b09694f6688416e09112be8",
+      "bytes": 11085
+    }
+  ],
+  "hash_basis": "Raw worktree byte hash plus strict UTF-8 CRLF-pairs-to-LF-only portable hash. Preserve BOM, lone CR, whitespace and terminal newline. No normalization of evidence/source full-text provenance.",
+  "approved_boundary": {
+    "approval_id": "20261022-azure-development-15",
+    "aggregate_units": 100000,
+    "maximum_rounds": 3,
+    "aggregate_all_in_SAR": 10,
+    "all_actual_attempts_including_unknown_and_retries_count": true,
+    "existing_stock_base_timbres": 2,
+    "original_agent_role_jobs": 15,
+    "blind_jobs": 75,
+    "neutral_anchor_jobs": 2,
+    "first_pass_full_wire_utf8_byte_units": 66818,
+    "no_business_activation_or_production_permission": true
+  },
+  "executed_verification": [
+    {
+      "command": "node --test web_platform/tests/customer-pilot-independent-auditions.test.mjs",
+      "phase": "Initial independent RED before owner fixes",
+      "total": 3,
+      "pass": 0,
+      "fail": 3,
+      "skip": 0,
+      "exit_code": 1,
+      "duration_ms": 147.7049,
+      "detail": "UNC evidence fs.readFile intercepted without network; actual local junction evidence wrongly accepted; fake transport received caller-mutated payload after credential await."
+    },
+    {
+      "command": "node --test --test-name-pattern=A-STATE web_platform/tests/customer-pilot-independent-auditions.test.mjs",
+      "phase": "Additional state-path RED",
+      "total": 2,
+      "pass": 1,
+      "fail": 1,
+      "skip": 0,
+      "exit_code": 1,
+      "duration_ms": 1054.3654,
+      "detail": "Remote state reached intercepted mkdir before syntax guard; no remote operation occurred. Local junction assertion was already green. Resource-binding finding was source review, not an executed RED claim."
+    },
+    {
+      "command": "node --test web_platform/tests/customer-pilot-independent-auditions.test.mjs",
+      "phase": "Final independent GREEN",
+      "total": 7,
+      "pass": 7,
+      "fail": 0,
+      "skip": 0,
+      "exit_code": 0,
+      "duration_ms": 4916.2863
+    },
+    {
+      "command": "node --test scripts/volabi-auditions/runner.test.mjs web_platform/tests/customer-pilot-independent-auditions.test.mjs",
+      "phase": "Final joint verification independently executed by reviewer",
+      "owner_tests": 31,
+      "independent_tests": 7,
+      "total": 38,
+      "pass": 38,
+      "fail": 0,
+      "skip": 0,
+      "exit_code": 0,
+      "duration_ms": 44191.2949
+    }
+  ],
+  "independent_cases": [
+    "Unsafe UNC/device/URL/relative evidence rejected before any bytes; unsafe filesystem reads intercepted so no network probe.",
+    "Actual temporary local junction evidence rejected.",
+    "Credential callback mutates original caller SSML; real runner still reserves and sends exact original source bytes/hash/units and supplies expected immutable resource hash to reader.",
+    "Actual pure PowerShell envelope validation: wrong resource beats invalid-base64 decoding, matching invented ciphertext bytes preserved, unknown envelope field rejected. No DPAPI invoked.",
+    "Actual Windows directory metadata helper rejects local parent junction before creating missing credential directory.",
+    "Private-state remote syntax rejected before intercepted mkdir/status journal read.",
+    "Actual state ancestor junction rejected before missing child directory creation."
+  ],
+  "findings": [
+    {
+      "id": "A-PATH",
+      "severity": "medium",
+      "status": "FIXED_AND_EXECUTING_REGRESSIONS_GREEN",
+      "problem": "Claimed offline account/evidence reads allowed UNC and junction ancestry, creating potential network/authentication side effects. Credential ancestry needed the same guard.",
+      "fix": "Fully qualified local syntax before filesystem, fixed-drive/QueryDosDevice local-volume metadata before path traversal, root-to-leaf reparse rejection for evidence/account/credential operations."
+    },
+    {
+      "id": "A-SNAPSHOT",
+      "severity": "medium",
+      "status": "FIXED_AND_EXECUTING_REGRESSION_GREEN",
+      "problem": "A caller could mutate SSML after entry validation during getCredential await, producing dispatched text different from reserved units/hash. Trusted local API integrity issue; not a remote web exploit.",
+      "fix": "Synchronous deep clone/freeze of plan/account before awaits; frozen exact dispatch payload and immutable price/endpoint/resource proof."
+    },
+    {
+      "id": "A-RESOURCE",
+      "severity": "medium",
+      "status": "FIXED_SOURCE_REVIEW_AND_PURE_ENVELOPE_GREEN",
+      "problem": "A global unbound DPAPI key record could accidentally refer to another same-region Azure resource while the ledger attested a different one.",
+      "fix": "Setup revalidates nonsecret account; exact ARM identity shown and confirmed by operator; versioned resource hash envelope plus DPAPI resource entropy; expected immutable resource hash compared before decode/Unprotect.",
+      "limit": "No remote proof that an actual pasted key belongs to the named Azure resource. Human provenance assertion remains necessary and unexecuted."
+    },
+    {
+      "id": "A-STATE",
+      "severity": "medium",
+      "status": "FIXED_AND_EXECUTING_REGRESSIONS_GREEN",
+      "problem": "Configured private state/status paths could reach remote filesystem operations before local syntax validation.",
+      "fix": "Default syntax guard and local fixed-volume/non-reparse directory checks before mkdir/status journal read."
+    },
+    {
+      "id": "A-DOC-SKU",
+      "severity": "low",
+      "status": "FIXED_IN_FROZEN_README",
+      "problem": "S1 retail meter SKU had been described as a resource tier.",
+      "fix": "Actual paid resource SKU must be verified separately; S1 explicitly labelled public billing meter."
+    }
+  ],
+  "other_reviewed_controls": [
+    "Account-specific fresh <=24h evidence and all-in variable/fixed/nonrequest fee bounds precede credential access. Public reference is not treated as account quote.",
+    "100k full immutable Arabic/Latin SSML UTF-8 bytes conservatively reserve provider billable input including markup/whitespace; unplanned weighted Han rejected.",
+    "BigInt micro-SAR upward rounding and all unknown/failed/retried attempts retain full reservations; no automatic retries or provider fallback.",
+    "Cross-process exclusive lock, fsynced hash-linked reservation before dispatch, no stale-lock takeover; crashed reservation retained and no automatic resubmission.",
+    "Fixed CLI private state outside repository, missing-ledger/orphaned-artifact refusal, plan/account binding, corrupt journal and changed saved audio fail closed.",
+    "Only reviewed official HTTPS EastUS/UAE North endpoint, manual redirects, bound complete PCM WAV validation, no raw provider exception/body/header logging.",
+    "setup-key route source reviewed; actual Store/InternalRead and DPAPI encryption/decryption never executed. Pure metadata/envelope helpers only were invoked."
+  ],
+  "unresolved_critical_or_high_findings_in_scoped_offline_review": 0,
+  "test_harness_correction": {
+    "status": "resolved_not_product_defect",
+    "detail": "First independent pure-helper run succeeded logically but PowerShell first-use progress CLIXML appeared on stderr. Test harness suppresses progress; final exact output assertion and all security assertions pass. Three Windows helper cases are explicitly platform scoped for Ubuntu CI; all seven executed with zero skips on target Windows."
+  },
+  "external_research_receipt": {
+    "path": ".admin-console/evidence/primora-multilingual-pilot/review-provider-readiness.json",
+    "sha256_raw_bytes": "9586f573767ee1c24277f22bf55ca99e64bb3d476b02b05d25da81e509da06c0"
+  },
+  "actual_operations": {
+    "real_credentials_read": 0,
+    "credential_setup_or_DPAPI_calls": 0,
+    "actual_provider_or_TTS_requests": 0,
+    "regional_audition_audio_generated": 0,
+    "native_listening_scores": 0,
+    "accounts_resources_created_or_upgraded": 0,
+    "business_employees_activated": 0,
+    "production_or_hosted_changes": 0
+  },
+  "remaining_prerequisites": [
+    "Named existing development paid-tier resource/account/SKU/region and actual applicable terms unverified. Azure CLI absent; no account secrets or token/config cache read.",
+    "Actual maximum all-in SAR variable/fixed/nonrequest fee/tax/FX/exclusive-use assumptions require operator evidence; public USD15/1M is not an account quote.",
+    "Regional voice availability on actual account, masked resource-bound key setup and real Windows DPAPI interoperability still unexecuted.",
+    "Approved Azure pass not yet generated; Saudi/Lebanese/code-switch pronunciation, fifteen identity distinction and native panel remain untested.",
+    "Local counters cannot guarantee an Azure invoice hard stop against unrelated account use, tariff change, malicious same-user/path races, deleted/restored entire state, or charges outside attested bounds.",
+    "No repository-wide regulated release completion or production readiness is asserted by this scoped review."
+  ]
+}

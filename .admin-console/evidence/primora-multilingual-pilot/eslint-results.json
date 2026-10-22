@@ -1,0 +1,4619 @@
+{
+  "command": "npm run lint --workspace=web_platform -- --format json --output-file ../.admin-console/evidence/primora-multilingual-pilot/eslint-results.json",
+  "exitCode": 0,
+  "filesChecked": 308,
+  "errorCount": 0,
+  "warningCount": 302,
+  "note": "ESLint source bodies removed from this receipt; messages retained with project-relative file paths. Existing warnings remain; all customer-pilot and pilot-route files have0errors/0warnings. Only generated.next-pilot/** was added to ignores; no rules weakened.",
+  "files": [
+    {
+      "path": "web_platform/eslint.config.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/next.config.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/postcss.config.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/scripts/vercel-ignore-build.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/about/page.tsx",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "@next/next/no-img-element",
+          "severity": 1,
+          "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+          "line": 95,
+          "column": 11,
+          "endLine": 99,
+          "endColumn": 13
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/admin/activity/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/approvals/governance-notices.tsx",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useCallback has a missing dependency: 'locale'. Either include it or remove the dependency array. If 'setError' needs the current value of 'locale', you can also switch to useReducer instead of useState and read 'locale' in the reducer.",
+          "line": 96,
+          "column": 6,
+          "endLine": 96,
+          "endColumn": 8
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/admin/approvals/page.tsx",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'lang'. Either include it or remove the dependency array.",
+          "line": 413,
+          "column": 6,
+          "endLine": 413,
+          "endColumn": 31
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/admin/audit-logs/page.tsx",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\admin\\audit-logs\\page.tsx:187:10\n  185 |\n  186 |   useEffect(() => {\n> 187 |     void load(page, filters);\n      |          ^^^^ Avoid calling setState() directly within an effect\n  188 |   }, [load, page, filters]);\n  189 |\n  190 |   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));",
+          "line": 187,
+          "column": 10,
+          "endLine": 187,
+          "endColumn": 14
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/admin/bookings/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/branches/page.tsx",
+      "errorCount": 0,
+      "warningCount": 6,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 63,
+          "column": 44,
+          "endLine": 63,
+          "endColumn": 47
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 68,
+          "column": 54,
+          "endLine": 68,
+          "endColumn": 57
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unused-vars",
+          "severity": 1,
+          "message": "'flip' is assigned a value but never used.",
+          "line": 76,
+          "column": 9,
+          "endLine": 76,
+          "endColumn": 13
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 104,
+          "column": 45,
+          "endLine": 104,
+          "endColumn": 48
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\admin\\branches\\page.tsx:127:10\n  125 |\n  126 |   useEffect(() => {\n> 127 |     void loadBranches();\n      |          ^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  128 |   }, [lang]);\n  129 |\n  130 |   // admin_set_branch_active checks operations.write, needs a reason, refuses a missing branch and answers the stored state;",
+          "line": 127,
+          "column": 10,
+          "endLine": 127,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 132,
+          "column": 36,
+          "endLine": 132,
+          "endColumn": 39
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/admin/coupons/page.tsx",
+      "errorCount": 0,
+      "warningCount": 8,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 150,
+          "column": 42,
+          "endLine": 150,
+          "endColumn": 45
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 158,
+          "column": 64,
+          "endLine": 158,
+          "endColumn": 67
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 181,
+          "column": 33,
+          "endLine": 181,
+          "endColumn": 36
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\admin\\coupons\\page.tsx:221:10\n  219 |\n  220 |   useEffect(() => {\n> 221 |     void loadCoupons();\n      |          ^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  222 |   }, [lang]);\n  223 |\n  224 |   const openAddCoupon = () => {",
+          "line": 221,
+          "column": 10,
+          "endLine": 221,
+          "endColumn": 21
+        },
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'loadCoupons'. Either include it or remove the dependency array.",
+          "line": 222,
+          "column": 6,
+          "endLine": 222,
+          "endColumn": 12
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 232,
+          "column": 35,
+          "endLine": 232,
+          "endColumn": 38
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 290,
+          "column": 33,
+          "endLine": 290,
+          "endColumn": 36
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 291,
+          "column": 33,
+          "endLine": 291,
+          "endColumn": 36
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/admin/customers/page.tsx",
+      "errorCount": 0,
+      "warningCount": 2,
+      "messages": [
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'lang'. Either include it or remove the dependency array.",
+          "line": 335,
+          "column": 6,
+          "endLine": 335,
+          "endColumn": 31
+        },
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'lang'. Either include it or remove the dependency array.",
+          "line": 371,
+          "column": 6,
+          "endLine": 371,
+          "endColumn": 17
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/admin/disputes/page.tsx",
+      "errorCount": 0,
+      "warningCount": 9,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 58,
+          "column": 44,
+          "endLine": 58,
+          "endColumn": 47
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 93,
+          "column": 62,
+          "endLine": 93,
+          "endColumn": 65
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 98,
+          "column": 38,
+          "endLine": 98,
+          "endColumn": 41
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 99,
+          "column": 35,
+          "endLine": 99,
+          "endColumn": 38
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 118,
+          "column": 19,
+          "endLine": 118,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\admin\\disputes\\page.tsx:128:5\n  126 |\n  127 |   useEffect(() => {\n> 128 |     loadDisputes();\n      |     ^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  129 |   }, [lang]);\n  130 |\n  131 |   // A decision moves money, so it opens a dialog that names the dispute and captures a recorded reason; the server",
+          "line": 128,
+          "column": 5,
+          "endLine": 128,
+          "endColumn": 17
+        },
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'loadDisputes'. Either include it or remove the dependency array.",
+          "line": 129,
+          "column": 6,
+          "endLine": 129,
+          "endColumn": 12
+        },
+        {
+          "ruleId": "react/no-unescaped-entities",
+          "severity": 1,
+          "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.",
+          "line": 311,
+          "column": 17
+        },
+        {
+          "ruleId": "react/no-unescaped-entities",
+          "severity": 1,
+          "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.",
+          "line": 311,
+          "column": 28
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/admin/employees/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/help/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/incidents/page.tsx",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useCallback has a missing dependency: 'lang'. Either include it or remove the dependency array.",
+          "line": 105,
+          "column": 6,
+          "endLine": 105,
+          "endColumn": 8
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/admin/integrations/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/layout.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/ledger/page.tsx",
+      "errorCount": 0,
+      "warningCount": 31,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-unused-vars",
+          "severity": 1,
+          "message": "'useMemo' is defined but never used.",
+          "line": 3,
+          "column": 38,
+          "endLine": 3,
+          "endColumn": 45
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 589,
+          "column": 32,
+          "endLine": 589,
+          "endColumn": 35
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 590,
+          "column": 30,
+          "endLine": 590,
+          "endColumn": 33
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 591,
+          "column": 32,
+          "endLine": 591,
+          "endColumn": 35
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 592,
+          "column": 29,
+          "endLine": 592,
+          "endColumn": 32
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 599,
+          "column": 40,
+          "endLine": 599,
+          "endColumn": 43
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 604,
+          "column": 56,
+          "endLine": 604,
+          "endColumn": 59
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unused-vars",
+          "severity": 1,
+          "message": "'setProcessingRequestId' is assigned a value but never used.",
+          "line": 611,
+          "column": 31,
+          "endLine": 611,
+          "endColumn": 53
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 633,
+          "column": 48,
+          "endLine": 633,
+          "endColumn": 51
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 634,
+          "column": 62,
+          "endLine": 634,
+          "endColumn": 65
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 635,
+          "column": 58,
+          "endLine": 635,
+          "endColumn": 61
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 643,
+          "column": 66,
+          "endLine": 643,
+          "endColumn": 69
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unused-vars",
+          "severity": 1,
+          "message": "'formatMoney' is assigned a value but never used.",
+          "line": 666,
+          "column": 9,
+          "endLine": 666,
+          "endColumn": 20
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 712,
+          "column": 123,
+          "endLine": 712,
+          "endColumn": 126
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 733,
+          "column": 51,
+          "endLine": 733,
+          "endColumn": 54
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 759,
+          "column": 50,
+          "endLine": 759,
+          "endColumn": 53
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 766,
+          "column": 64,
+          "endLine": 766,
+          "endColumn": 67
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 773,
+          "column": 60,
+          "endLine": 773,
+          "endColumn": 63
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 808,
+          "column": 51,
+          "endLine": 808,
+          "endColumn": 54
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\admin\\ledger\\page.tsx:820:5\n  818 |\n  819 |   useEffect(() => {\n> 820 |     loadLedger();\n      |     ^^^^^^^^^^ Avoid calling setState() directly within an effect\n  821 |     loadPayoutRequests();\n  822 |     loadReports();\n  823 |     loadReconciliationRuns();",
+          "line": 820,
+          "column": 5,
+          "endLine": 820,
+          "endColumn": 15
+        },
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has missing dependencies: 'loadLedger' and 'loadReconciliationRuns'. Either include them or remove the dependency array.",
+          "line": 825,
+          "column": 6,
+          "endLine": 825,
+          "endColumn": 12
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 829,
+          "column": 38,
+          "endLine": 829,
+          "endColumn": 41
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 830,
+          "column": 47,
+          "endLine": 830,
+          "endColumn": 50
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 831,
+          "column": 43,
+          "endLine": 831,
+          "endColumn": 46
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 833,
+          "column": 39,
+          "endLine": 833,
+          "endColumn": 42
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 850,
+          "column": 44,
+          "endLine": 850,
+          "endColumn": 47
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 863,
+          "column": 41,
+          "endLine": 863,
+          "endColumn": 44
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 879,
+          "column": 37,
+          "endLine": 879,
+          "endColumn": 40
+        },
+        {
+          "ruleId": "react-hooks/purity",
+          "severity": 1,
+          "message": "Error: Cannot call impure function during render\n\n`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\admin\\ledger\\page.tsx:885:97\n  883 |     // GOV-FIX L-2: past the 24-hour ceiling nothing is revealed (the server records the refusal and raises an alert).\n  884 |     if (shown.refused) return commandCopy[lang].revealLimit.replace(\"{n}\", count(shown.ceiling ?? 0));\n> 885 |     setRevealed({ name: providerName, expiresAt: Math.min(new Date(shown.expires_at).getTime(), Date.now() + 60000), active: shown.active, pending: shown.pending });\n      |                                                                                                 ^^^^^^^^^^ Cannot call impure function\n  886 |     setRevealClock(Date.now());\n  887 |     return null;\n  888 |   };",
+          "line": 885,
+          "column": 97,
+          "endLine": 885,
+          "endColumn": 107
+        },
+        {
+          "ruleId": "react-hooks/purity",
+          "severity": 1,
+          "message": "Error: Cannot call impure function during render\n\n`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\admin\\ledger\\page.tsx:886:20\n  884 |     if (shown.refused) return commandCopy[lang].revealLimit.replace(\"{n}\", count(shown.ceiling ?? 0));\n  885 |     setRevealed({ name: providerName, expiresAt: Math.min(new Date(shown.expires_at).getTime(), Date.now() + 60000), active: shown.active, pending: shown.pending });\n> 886 |     setRevealClock(Date.now());\n      |                    ^^^^^^^^^^ Cannot call impure function\n  887 |     return null;\n  888 |   };\n  889 |",
+          "line": 886,
+          "column": 20,
+          "endLine": 886,
+          "endColumn": 30
+        },
+        {
+          "ruleId": "react-hooks/purity",
+          "severity": 1,
+          "message": "Error: Cannot call impure function during render\n\n`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\admin\\ledger\\page.tsx:893:68\n  891 |     if (!revealed) return null;\n  892 |     const c = commandCopy[lang];\n> 893 |     const seconds = secondsLeft(revealed.expiresAt, revealClock || Date.now());\n      |                                                                    ^^^^^^^^^^ Cannot call impure function\n  894 |     const outcome = revealOutcome(revealed);\n  895 |     const account = (label: string, value: RevealedAccount | null) => value && (\n  896 |       <div className=\"rounded-xl border border-[#ECECEC] bg-[#F9F7F1] p-3\">",
+          "line": 893,
+          "column": 68,
+          "endLine": 893,
+          "endColumn": 78
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/admin/notifications/page.tsx",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\admin\\notifications\\page.tsx:197:5\n  195 |\n  196 |   useEffect(() => {\n> 197 |     loadData();\n      |     ^^^^^^^^ Avoid calling setState() directly within an effect\n  198 |   }, [loadData]);\n  199 |\n  200 |   const t = translations[lang];",
+          "line": 197,
+          "column": 5,
+          "endLine": 197,
+          "endColumn": 13
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/admin/packages/page.tsx",
+      "errorCount": 0,
+      "warningCount": 3,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 79,
+          "column": 44,
+          "endLine": 79,
+          "endColumn": 47
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 87,
+          "column": 42,
+          "endLine": 87,
+          "endColumn": 45
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 149,
+          "column": 33,
+          "endLine": 149,
+          "endColumn": 36
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/admin/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/platform-rules/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/privacy/customer-picker.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/privacy/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/privacy/retention-purge.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/providers/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/providers/provider-management.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/reconciliation/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/refunds/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/reports/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/reviews/page.tsx",
+      "errorCount": 0,
+      "warningCount": 5,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 56,
+          "column": 42,
+          "endLine": 56,
+          "endColumn": 45
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 89,
+          "column": 60,
+          "endLine": 89,
+          "endColumn": 63
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 101,
+          "column": 72,
+          "endLine": 101,
+          "endColumn": 75
+        },
+        {
+          "ruleId": "react/no-unescaped-entities",
+          "severity": 1,
+          "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.",
+          "line": 249,
+          "column": 84
+        },
+        {
+          "ruleId": "react/no-unescaped-entities",
+          "severity": 1,
+          "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.",
+          "line": 249,
+          "column": 152
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/admin/roles/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/ropa/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/services/page.tsx",
+      "errorCount": 0,
+      "warningCount": 5,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 229,
+          "column": 29,
+          "endLine": 229,
+          "endColumn": 32
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 236,
+          "column": 45,
+          "endLine": 236,
+          "endColumn": 48
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 236,
+          "column": 79,
+          "endLine": 236,
+          "endColumn": 82
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\admin\\services\\page.tsx:253:5\n  251 |\n  252 |   useEffect(() => {\n> 253 |     loadServices();\n      |     ^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  254 |   }, [lang]);\n  255 |\n  256 |   // Load categories + providers for the create/edit form dropdowns.",
+          "line": 253,
+          "column": 5,
+          "endLine": 253,
+          "endColumn": 17
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 265,
+          "column": 59,
+          "endLine": 265,
+          "endColumn": 62
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/admin/settings/page.tsx",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\admin\\settings\\page.tsx:102:10\n  100 |\n  101 |   useEffect(() => {\n> 102 |     void load();\n      |          ^^^^ Avoid calling setState() directly within an effect\n  103 |   }, [load]);\n  104 |\n  105 |   const setMessage = (key: SectionKey, message: { error?: string; success?: string }) =>",
+          "line": 102,
+          "column": 10,
+          "endLine": 102,
+          "endColumn": 14
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/admin/settings/reward-programmes.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/sponsored/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/supply/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/taxes/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/admin/whatsapp/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/api/hq/[...path]/route.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/api/pilot/[...path]/route.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/become-provider/page.tsx",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "@next/next/no-img-element",
+          "severity": 1,
+          "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+          "line": 516,
+          "column": 11,
+          "endLine": 520,
+          "endColumn": 13
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/categories/barber/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/categories/hair/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/categories/makeup/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/categories/spa/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/customer/book/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/customer/bookings/[id]/confirmation/page.tsx",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\customer\\bookings\\[id]\\confirmation\\page.tsx:241:7\n  239 |     const savedLang = localStorage.getItem(\"primora_lang\") as \"en\" | \"ar\";\n  240 |     if (savedLang === \"en\" || savedLang === \"ar\") {\n> 241 |       setLocale(savedLang);\n      |       ^^^^^^^^^ Avoid calling setState() directly within an effect\n  242 |     }\n  243 |\n  244 |     const sync = () => setLocale(document.documentElement.lang === \"ar\" ? \"ar\" : \"en\");",
+          "line": 241,
+          "column": 7,
+          "endLine": 241,
+          "endColumn": 16
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/customer/bookings/[id]/intake/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/customer/bookings/page.tsx",
+      "errorCount": 0,
+      "warningCount": 21,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 218,
+          "column": 44,
+          "endLine": 218,
+          "endColumn": 47
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 222,
+          "column": 58,
+          "endLine": 222,
+          "endColumn": 61
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 224,
+          "column": 74,
+          "endLine": 224,
+          "endColumn": 77
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 238,
+          "column": 64,
+          "endLine": 238,
+          "endColumn": 67
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unused-vars",
+          "severity": 1,
+          "message": "'invoiceLoading' is assigned a value but never used.",
+          "line": 239,
+          "column": 10,
+          "endLine": 239,
+          "endColumn": 24
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 240,
+          "column": 50,
+          "endLine": 240,
+          "endColumn": 53
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 241,
+          "column": 68,
+          "endLine": 241,
+          "endColumn": 71
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 248,
+          "column": 46,
+          "endLine": 248,
+          "endColumn": 49
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 306,
+          "column": 19,
+          "endLine": 306,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 314,
+          "column": 43,
+          "endLine": 314,
+          "endColumn": 46
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 323,
+          "column": 19,
+          "endLine": 323,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unused-vars",
+          "severity": 1,
+          "message": "'data' is assigned a value but never used.",
+          "line": 340,
+          "column": 15,
+          "endLine": 340,
+          "endColumn": 19
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 351,
+          "column": 19,
+          "endLine": 351,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 't.attendanceConfirmed'. Either include it or remove the dependency array.",
+          "line": 384,
+          "column": 6,
+          "endLine": 384,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 421,
+          "column": 19,
+          "endLine": 421,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 451,
+          "column": 27,
+          "endLine": 451,
+          "endColumn": 30
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 463,
+          "column": 31,
+          "endLine": 463,
+          "endColumn": 34
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unused-vars",
+          "severity": 1,
+          "message": "'data' is assigned a value but never used.",
+          "line": 534,
+          "column": 15,
+          "endLine": 534,
+          "endColumn": 19
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 668,
+          "column": 32,
+          "endLine": 668,
+          "endColumn": 35
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 668,
+          "column": 85,
+          "endLine": 668,
+          "endColumn": 88
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 669,
+          "column": 32,
+          "endLine": 669,
+          "endColumn": 35
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/customer/dashboard/page.tsx",
+      "errorCount": 0,
+      "warningCount": 8,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 204,
+          "column": 53,
+          "endLine": 204,
+          "endColumn": 56
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 214,
+          "column": 55,
+          "endLine": 214,
+          "endColumn": 58
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 228,
+          "column": 21,
+          "endLine": 228,
+          "endColumn": 24
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 229,
+          "column": 34,
+          "endLine": 229,
+          "endColumn": 37
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 231,
+          "column": 46,
+          "endLine": 231,
+          "endColumn": 49
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 232,
+          "column": 21,
+          "endLine": 232,
+          "endColumn": 24
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 233,
+          "column": 18,
+          "endLine": 233,
+          "endColumn": 21
+        },
+        {
+          "ruleId": "react-hooks/immutability",
+          "severity": 1,
+          "message": "Error: Cannot reassign variable after render completes\n\nReassigning `acc` after render has completed can cause inconsistent behavior on subsequent renders. Consider using state instead.\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\customer\\dashboard\\page.tsx:291:7\n  289 |       const dash = frac * dC;\n  290 |       const offset = -acc * dC;\n> 291 |       acc += frac;\n      |       ^^^ Cannot reassign `acc` after render completes\n  292 |       return { color: SEGMENT_COLORS[i % SEGMENT_COLORS.length], dash, gap: dC - dash, offset };\n  293 |     });\n  294 |   }, [spending, dC]);",
+          "line": 291,
+          "column": 7,
+          "endLine": 291,
+          "endColumn": 10
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/customer/dependents/page.tsx",
+      "errorCount": 0,
+      "warningCount": 6,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 123,
+          "column": 19,
+          "endLine": 123,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\customer\\dependents\\page.tsx:132:5\n  130 |\n  131 |   useEffect(() => {\n> 132 |     loadProfiles();\n      |     ^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  133 |   }, [locale]);\n  134 |\n  135 |   const handleSaveProfile = async (e: React.FormEvent) => {",
+          "line": 132,
+          "column": 5,
+          "endLine": 132,
+          "endColumn": 17
+        },
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'loadProfiles'. Either include it or remove the dependency array.",
+          "line": 133,
+          "column": 6,
+          "endLine": 133,
+          "endColumn": 14
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 168,
+          "column": 19,
+          "endLine": 168,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 192,
+          "column": 19,
+          "endLine": 192,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 323,
+          "column": 60,
+          "endLine": 323,
+          "endColumn": 63
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/customer/favorites/page.tsx",
+      "errorCount": 0,
+      "warningCount": 7,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-unused-vars",
+          "severity": 1,
+          "message": "'error' is assigned a value but never used.",
+          "line": 58,
+          "column": 10,
+          "endLine": 58,
+          "endColumn": 15
+        },
+        {
+          "ruleId": "react-hooks/immutability",
+          "severity": 1,
+          "message": "Error: Cannot access variable before it is declared\n\n`loadFavorites` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\customer\\favorites\\page.tsx:78:5\n  76 |\n  77 |   useEffect(() => {\n> 78 |     loadFavorites();\n     |     ^^^^^^^^^^^^^ `loadFavorites` accessed before it is declared\n  79 |   }, []);\n  80 |\n  81 |   async function loadFavorites() {\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\customer\\favorites\\page.tsx:81:3\n   79 |   }, []);\n   80 |\n>  81 |   async function loadFavorites() {\n      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n>  82 |     try {\n      | ^^^^^^^^^\n>  83 |       setLoading(true);\n      …\n      | ^^^^^^^^^\n> 159 |     }\n      | ^^^^^^^^^\n> 160 |   }\n      | ^^^^ `loadFavorites` is declared here\n  161 |\n  162 |   const handleRemove = async (providerId: string) => {\n  163 |     // Optimistic UI update",
+          "line": 78,
+          "column": 5,
+          "endLine": 78,
+          "endColumn": 18
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 126,
+          "column": 38,
+          "endLine": 126,
+          "endColumn": 41
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 131,
+          "column": 42,
+          "endLine": 131,
+          "endColumn": 45
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 136,
+          "column": 53,
+          "endLine": 136,
+          "endColumn": 56
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 154,
+          "column": 19,
+          "endLine": 154,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@next/next/no-img-element",
+          "severity": 1,
+          "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+          "line": 213,
+          "column": 19,
+          "endLine": 217,
+          "endColumn": 21
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/customer/following/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/customer/group/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/customer/jobs/page.tsx",
+      "errorCount": 0,
+      "warningCount": 2,
+      "messages": [
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\customer\\jobs\\page.tsx:148:7\n  146 |     loadCategories();\n  147 |     if (typeof document !== \"undefined\") {\n> 148 |       setIsRTL(document.documentElement.dir === \"rtl\");\n      |       ^^^^^^^^ Avoid calling setState() directly within an effect\n  149 |       const observer = new MutationObserver(() => setIsRTL(document.documentElement.dir === \"rtl\"));\n  150 |       observer.observe(document.documentElement, { attributes: true, attributeFilter: [\"dir\"] });\n  151 |       return () => observer.disconnect();",
+          "line": 148,
+          "column": 7,
+          "endLine": 148,
+          "endColumn": 15
+        },
+        {
+          "ruleId": "@next/next/no-img-element",
+          "severity": 1,
+          "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+          "line": 492,
+          "column": 57,
+          "endLine": 492,
+          "endColumn": 169
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/customer/layout.tsx",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\customer\\layout.tsx:223:7\n  221 |     const savedLang = localStorage.getItem(\"primora_lang\") as \"en\" | \"ar\";\n  222 |     if (savedLang === \"en\" || savedLang === \"ar\") {\n> 223 |       setLocale(savedLang);\n      |       ^^^^^^^^^ Avoid calling setState() directly within an effect\n  224 |     }\n  225 |     setLangReady(true);\n  226 |     // Keep the sidebar in sync when language is toggled elsewhere (e.g. dashboard header)",
+          "line": 223,
+          "column": 7,
+          "endLine": 223,
+          "endColumn": 16
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/customer/memberships/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/customer/messages/page.tsx",
+      "errorCount": 0,
+      "warningCount": 6,
+      "messages": [
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\customer\\messages\\page.tsx:29:5\n  27 |   const [isRTL, setIsRTL] = useState(false);\n  28 |   useEffect(() => {\n> 29 |     setIsRTL(document.documentElement.dir === \"rtl\");\n     |     ^^^^^^^^ Avoid calling setState() directly within an effect\n  30 |     const observer = new MutationObserver(() => setIsRTL(document.documentElement.dir === \"rtl\"));\n  31 |     observer.observe(document.documentElement, { attributes: true, attributeFilter: [\"dir\"] });\n  32 |     return () => observer.disconnect();",
+          "line": 29,
+          "column": 5,
+          "endLine": 29,
+          "endColumn": 13
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 108,
+          "column": 60,
+          "endLine": 108,
+          "endColumn": 63
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 137,
+          "column": 38,
+          "endLine": 137,
+          "endColumn": 41
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\customer\\messages\\page.tsx:141:5\n  139 |\n  140 |   useEffect(() => {\n> 141 |     loadThreads();\n      |     ^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  142 |   }, [loadThreads]);\n  143 |\n  144 |   useEffect(() => {",
+          "line": 141,
+          "column": 5,
+          "endLine": 141,
+          "endColumn": 16
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\customer\\messages\\page.tsx:146:7\n  144 |   useEffect(() => {\n  145 |     if (!selectedId) {\n> 146 |       setMessages([]);\n      |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  147 |       return;\n  148 |     }\n  149 |     loadMessages(selectedId);",
+          "line": 146,
+          "column": 7,
+          "endLine": 146,
+          "endColumn": 18
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 166,
+          "column": 99,
+          "endLine": 166,
+          "endColumn": 102
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/customer/notifications/page.tsx",
+      "errorCount": 0,
+      "warningCount": 4,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 41,
+          "column": 54,
+          "endLine": 41,
+          "endColumn": 57
+        },
+        {
+          "ruleId": "react-hooks/immutability",
+          "severity": 1,
+          "message": "Error: Cannot access variable before it is declared\n\n`loadNotifications` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\customer\\notifications\\page.tsx:62:5\n  60 |\n  61 |   useEffect(() => {\n> 62 |     loadNotifications();\n     |     ^^^^^^^^^^^^^^^^^ `loadNotifications` accessed before it is declared\n  63 |   }, []);\n  64 |\n  65 |   async function loadNotifications() {\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\customer\\notifications\\page.tsx:65:3\n   63 |   }, []);\n   64 |\n>  65 |   async function loadNotifications() {\n      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n>  66 |     try {\n      | ^^^^^^^^^\n>  67 |       setLoading(true);\n      …\n      | ^^^^^^^^^\n>  96 |     }\n      | ^^^^^^^^^\n>  97 |   }\n      | ^^^^ `loadNotifications` is declared here\n   98 |\n   99 |   const markAllAsRead = async () => {\n  100 |     setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));",
+          "line": 62,
+          "column": 5,
+          "endLine": 62,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 79,
+          "column": 43,
+          "endLine": 79,
+          "endColumn": 46
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 90,
+          "column": 19,
+          "endLine": 90,
+          "endColumn": 22
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/customer/packages/page.tsx",
+      "errorCount": 0,
+      "warningCount": 6,
+      "messages": [
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'loadAllPackages'. Either include it or remove the dependency array.",
+          "line": 125,
+          "column": 6,
+          "endLine": 125,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 166,
+          "column": 34,
+          "endLine": 166,
+          "endColumn": 37
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 194,
+          "column": 43,
+          "endLine": 194,
+          "endColumn": 46
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 195,
+          "column": 19,
+          "endLine": 195,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@next/next/no-location-assign-relative-destination",
+          "severity": 1,
+          "message": "Do not use `window.location.href` to navigate to internal Next.js pages. Use `redirect()` in the render phase, or `useRouter().push()` in Client Components' event handlers instead. See: https://nextjs.org/docs/messages/no-location-assign-relative-destination",
+          "line": 237,
+          "column": 9,
+          "endLine": 237,
+          "endColumn": 69
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 252,
+          "column": 19,
+          "endLine": 252,
+          "endColumn": 22
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/customer/privacy/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/customer/reviews/page.tsx",
+      "errorCount": 0,
+      "warningCount": 9,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 80,
+          "column": 46,
+          "endLine": 80,
+          "endColumn": 49
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 81,
+          "column": 56,
+          "endLine": 81,
+          "endColumn": 59
+        },
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'loadData'. Either include it or remove the dependency array.",
+          "line": 95,
+          "column": 6,
+          "endLine": 95,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 193,
+          "column": 73,
+          "endLine": 193,
+          "endColumn": 76
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 350,
+          "column": 44,
+          "endLine": 350,
+          "endColumn": 47
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 350,
+          "column": 108,
+          "endLine": 350,
+          "endColumn": 111
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 351,
+          "column": 44,
+          "endLine": 351,
+          "endColumn": 47
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 354,
+          "column": 59,
+          "endLine": 354,
+          "endColumn": 62
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 354,
+          "column": 102,
+          "endLine": 354,
+          "endColumn": 105
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/customer/search/page.tsx",
+      "errorCount": 0,
+      "warningCount": 5,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 61,
+          "column": 46,
+          "endLine": 61,
+          "endColumn": 49
+        },
+        {
+          "ruleId": "react-hooks/immutability",
+          "severity": 1,
+          "message": "Error: Cannot access variable before it is declared\n\n`fetchProviders` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\customer\\search\\page.tsx:99:7\n   97 |   useEffect(() => {\n   98 |     const timer = setTimeout(() => {\n>  99 |       fetchProviders();\n      |       ^^^^^^^^^^^^^^ `fetchProviders` accessed before it is declared\n  100 |     }, 300);\n  101 |     return () => clearTimeout(timer);\n  102 |   }, [searchQuery, selectedCategory, selectedLocation]);\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\customer\\search\\page.tsx:104:3\n  102 |   }, [searchQuery, selectedCategory, selectedLocation]);\n  103 |\n> 104 |   const fetchProviders = async () => {\n      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 105 |     try {\n      | ^^^^^^^^^\n> 106 |       setLoading(true);\n      …\n      | ^^^^^^^^^\n> 126 |     }\n      | ^^^^^^^^^\n> 127 |   };\n      | ^^^^^ `fetchProviders` is declared here\n  128 |\n  129 |   const isRTL = locale === \"ar\";\n  130 |",
+          "line": 99,
+          "column": 7,
+          "endLine": 99,
+          "endColumn": 21
+        },
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'fetchProviders'. Either include it or remove the dependency array.",
+          "line": 102,
+          "column": 6,
+          "endLine": 102,
+          "endColumn": 55
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 121,
+          "column": 19,
+          "endLine": 121,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 244,
+          "column": 50,
+          "endLine": 244,
+          "endColumn": 53
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/customer/series/page.tsx",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "react-hooks/purity",
+          "severity": 1,
+          "message": "Error: Cannot call impure function during render\n\n`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\customer\\series\\page.tsx:100:185\n   98 |\n   99 |   const pages = Math.max(1, Math.ceil(total / SERIES_PAGE_SIZE));\n> 100 |   const upcoming = (series: SeriesRow, o: OccurrenceRow) => o.bookings && [\"pending_payment\", \"confirmed\"].includes(o.bookings.status) && new Date(o.bookings.scheduled_at).getTime() > Date.now() && series.status === \"active\";\n      |                                                                                                                                                                                         ^^^^^^^^^^ Cannot call impure function\n  101 |\n  102 |   return (\n  103 |     <div dir={locale === \"ar\" ? \"rtl\" : \"ltr\"} className=\"space-y-6 text-[#101828]\">",
+          "line": 100,
+          "column": 185,
+          "endLine": 100,
+          "endColumn": 195
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/customer/settings/page.tsx",
+      "errorCount": 0,
+      "warningCount": 3,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-unused-vars",
+          "severity": 1,
+          "message": "'loading' is assigned a value but never used.",
+          "line": 85,
+          "column": 10,
+          "endLine": 85,
+          "endColumn": 17
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 160,
+          "column": 19,
+          "endLine": 160,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 217,
+          "column": 19,
+          "endLine": 217,
+          "endColumn": 22
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/customer/wallet/page.tsx",
+      "errorCount": 0,
+      "warningCount": 9,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 176,
+          "column": 52,
+          "endLine": 176,
+          "endColumn": 55
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 177,
+          "column": 42,
+          "endLine": 177,
+          "endColumn": 45
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 178,
+          "column": 46,
+          "endLine": 178,
+          "endColumn": 49
+        },
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'loadWalletData'. Either include it or remove the dependency array.",
+          "line": 217,
+          "column": 6,
+          "endLine": 217,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 256,
+          "column": 47,
+          "endLine": 256,
+          "endColumn": 50
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 260,
+          "column": 55,
+          "endLine": 260,
+          "endColumn": 58
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 278,
+          "column": 39,
+          "endLine": 278,
+          "endColumn": 42
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 293,
+          "column": 66,
+          "endLine": 293,
+          "endColumn": 69
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 327,
+          "column": 71,
+          "endLine": 327,
+          "endColumn": 74
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/developer/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/discover/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/hq/agents/[id]/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/hq/agents/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/hq/decisions/[id]/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/hq/decisions/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/hq/error.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/hq/knowledge/[id]/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/hq/knowledge/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/hq/layout.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/hq/loading.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/hq/not-found.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/hq/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/hq/tasks/[id]/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/hq/tasks/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/layout.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/login/mfa/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/login/page.tsx",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\login\\page.tsx:217:5\n  215 |\n  216 |   useEffect(() => {\n> 217 |     setDevAccessEnabled(isLocalDevAccessEnabled());\n      |     ^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  218 |   }, []);\n  219 |\n  220 |   useEffect(() => {",
+          "line": 217,
+          "column": 5,
+          "endLine": 217,
+          "endColumn": 24
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/page.tsx",
+      "errorCount": 0,
+      "warningCount": 6,
+      "messages": [
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\page.tsx:156:7\n  154 |     const savedLang = localStorage.getItem(\"primora_lang\") as \"en\" | \"ar\";\n  155 |     if (savedLang === \"en\" || savedLang === \"ar\") {\n> 156 |       setLocale(savedLang);\n      |       ^^^^^^^^^ Avoid calling setState() directly within an effect\n  157 |     }\n  158 |     setLangReady(true);\n  159 |   }, []);",
+          "line": 156,
+          "column": 7,
+          "endLine": 156,
+          "endColumn": 16
+        },
+        {
+          "ruleId": "@next/next/no-img-element",
+          "severity": 1,
+          "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+          "line": 310,
+          "column": 11,
+          "endLine": 314,
+          "endColumn": 13
+        },
+        {
+          "ruleId": "@next/next/no-img-element",
+          "severity": 1,
+          "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+          "line": 367,
+          "column": 17,
+          "endLine": 371,
+          "endColumn": 19
+        },
+        {
+          "ruleId": "@next/next/no-img-element",
+          "severity": 1,
+          "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+          "line": 450,
+          "column": 19,
+          "endLine": 454,
+          "endColumn": 21
+        },
+        {
+          "ruleId": "@next/next/no-img-element",
+          "severity": 1,
+          "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+          "line": 509,
+          "column": 19,
+          "endLine": 513,
+          "endColumn": 21
+        },
+        {
+          "ruleId": "@next/next/no-img-element",
+          "severity": 1,
+          "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+          "line": 605,
+          "column": 13,
+          "endLine": 609,
+          "endColumn": 15
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/pilot/booking/layout.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/pilot/booking/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/privacy/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/pro/[handle]/layout.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/pro/[handle]/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/_components/booking-policy-card.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/_components/dialog.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/_components/employee-extras.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/_components/hours-apply.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/_components/my-leave.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/_components/professional-link.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/_components/provider-context.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/_components/server-errors.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/_components/time-off-sections.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/become/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/bookings/page.tsx",
+      "errorCount": 0,
+      "warningCount": 4,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 76,
+          "column": 44,
+          "endLine": 76,
+          "endColumn": 47
+        },
+        {
+          "ruleId": "react-hooks/immutability",
+          "severity": 1,
+          "message": "Error: Cannot access variable before it is declared\n\n`loadBookings` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\bookings\\page.tsx:99:5\n   97 |\n   98 |   useEffect(() => {\n>  99 |     loadBookings();\n      |     ^^^^^^^^^^^^ `loadBookings` accessed before it is declared\n  100 |   }, []);\n  101 |\n  102 |   async function loadBookings() {\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\bookings\\page.tsx:102:3\n  100 |   }, []);\n  101 |\n> 102 |   async function loadBookings() {\n      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 103 |     try {\n      | ^^^^^^^^^\n> 104 |       setLoading(true);\n      …\n      | ^^^^^^^^^\n> 151 |     }\n      | ^^^^^^^^^\n> 152 |   }\n      | ^^^^ `loadBookings` is declared here\n  153 |\n  154 |   async function updateStatus(id: string, newStatus: string) {\n  155 |     try {",
+          "line": 99,
+          "column": 5,
+          "endLine": 99,
+          "endColumn": 17
+        },
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'loadBookings'. Either include it or remove the dependency array.",
+          "line": 100,
+          "column": 6,
+          "endLine": 100,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 145,
+          "column": 19,
+          "endLine": 145,
+          "endColumn": 22
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/provider/calendar/page.tsx",
+      "errorCount": 0,
+      "warningCount": 17,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-unused-vars",
+          "severity": 1,
+          "message": "'providerId' is assigned a value but never used.",
+          "line": 345,
+          "column": 10,
+          "endLine": 345,
+          "endColumn": 20
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unused-vars",
+          "severity": 1,
+          "message": "'branches' is assigned a value but never used.",
+          "line": 346,
+          "column": 10,
+          "endLine": 346,
+          "endColumn": 18
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 346,
+          "column": 44,
+          "endLine": 346,
+          "endColumn": 47
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 348,
+          "column": 44,
+          "endLine": 348,
+          "endColumn": 47
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 349,
+          "column": 46,
+          "endLine": 349,
+          "endColumn": 49
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 351,
+          "column": 46,
+          "endLine": 351,
+          "endColumn": 49
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unused-vars",
+          "severity": 1,
+          "message": "'bookDuration' is assigned a value but never used.",
+          "line": 422,
+          "column": 10,
+          "endLine": 422,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 750,
+          "column": 67,
+          "endLine": 750,
+          "endColumn": 70
+        },
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useCallback has a missing dependency: 'getSlotIndexForTime'. Either include it or remove the dependency array.",
+          "line": 798,
+          "column": 6,
+          "endLine": 798,
+          "endColumn": 89
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\calendar\\page.tsx:801:10\n  799 |\n  800 |   useEffect(() => {\n> 801 |     void loadCalendarData();\n      |          ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  802 |   }, [loadCalendarData]);\n  803 |\n  804 |   useEffect(() => {",
+          "line": 801,
+          "column": 10,
+          "endLine": 801,
+          "endColumn": 26
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\calendar\\page.tsx:806:12\n  804 |   useEffect(() => {\n  805 |     if (selectedEmployeeId) {\n> 806 |       void loadEmployeeSchedule();\n      |            ^^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  807 |     }\n  808 |     return () => { scheduleRequest.current += 1; };\n  809 |   }, [selectedEmployeeId, selectedDate, selectedDayToEdit, loadEmployeeSchedule]);",
+          "line": 806,
+          "column": 12,
+          "endLine": 806,
+          "endColumn": 32
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\calendar\\page.tsx:813:7\n  811 |   useEffect(() => {\n  812 |     if (services.length > 0) {\n> 813 |       setBookService(services[0].id);\n      |       ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  814 |       setBookPrice(String(services[0].base_price || 0));\n  815 |       setBookDuration(`${services[0].base_duration_minutes || 60} mins`);\n  816 |     }",
+          "line": 813,
+          "column": 7,
+          "endLine": 813,
+          "endColumn": 21
+        },
+        {
+          "ruleId": "react-hooks/static-components",
+          "severity": 1,
+          "message": "Error: Cannot create components during render\n\nComponents created during render will reset their state each time they are created. Declare components outside of render.\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\calendar\\page.tsx:1745:16\n  1743 |                 {lang === \"ar\" ? \"يوم عمل نشط\" : \"Active Work Day\"}\n  1744 |               </span>\n> 1745 |               <ToggleSwitch\n       |                ^^^^^^^^^^^^ This component is created during render\n  1746 |                 checked={availabilityShifts.find(s => s.day_of_week === selectedDayToEdit)?.is_working_day ?? true}\n  1747 |                 onChange={(val) => {\n  1748 |                   setAvailabilityShifts(prev => prev.map(s =>\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\calendar\\page.tsx:1003:24\n  1001 |\n  1002 |   // Premium Toggle Switch component\n> 1003 |   const ToggleSwitch = ({ checked, onChange }: { checked: boolean; onChange: (val: boolean) => void }) => (\n       |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 1004 |     <button\n       | ^^^^^^^^^^^\n> 1005 |       type=\"button\"\n       …\n       | ^^^^^^^^^^^\n> 1018 |     </button>\n       | ^^^^^^^^^^^\n> 1019 |   );\n       | ^^^^ The component is created during render here\n  1020 |\n  1021 |   const TimeWheelPicker = ({\n  1022 |     pickerId,",
+          "line": 1745,
+          "column": 16,
+          "endLine": 1745,
+          "endColumn": 28
+        },
+        {
+          "ruleId": "react-hooks/static-components",
+          "severity": 1,
+          "message": "Error: Cannot create components during render\n\nComponents created during render will reset their state each time they are created. Declare components outside of render.\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\calendar\\page.tsx:1756:16\n  1754 |\n  1755 |             <div className=\"grid grid-cols-1 gap-4 sm:grid-cols-2\">\n> 1756 |               <TimeWheelPicker\n       |                ^^^^^^^^^^^^^^^ This component is created during render\n  1757 |                 pickerId=\"first-opening\"\n  1758 |                 label={`${t.firstShiftLabel} · ${t.openingLabel}`}\n  1759 |                 value={shiftStart}\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\calendar\\page.tsx:1021:27\n  1019 |   );\n  1020 |\n> 1021 |   const TimeWheelPicker = ({\n       |                           ^^\n> 1022 |     pickerId,\n       | ^^^^^^^^^^^^^\n> 1023 |     label,\n       …\n       | ^^^^^^^^^^^^^\n> 1107 |     );\n       | ^^^^^^^^^^^^^\n> 1108 |   };\n       | ^^^^ The component is created during render here\n  1109 |\n  1110 |   return (\n  1111 |     <div className=\"space-y-8 text-[#344054]\">",
+          "line": 1756,
+          "column": 16,
+          "endLine": 1756,
+          "endColumn": 31
+        },
+        {
+          "ruleId": "react-hooks/static-components",
+          "severity": 1,
+          "message": "Error: Cannot create components during render\n\nComponents created during render will reset their state each time they are created. Declare components outside of render.\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\calendar\\page.tsx:1762:16\n  1760 |                 onChange={setShiftStart}\n  1761 |               />\n> 1762 |               <TimeWheelPicker\n       |                ^^^^^^^^^^^^^^^ This component is created during render\n  1763 |                 pickerId=\"first-closing\"\n  1764 |                 label={`${t.firstShiftLabel} · ${t.closingLabel}`}\n  1765 |                 value={shiftEnd}\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\calendar\\page.tsx:1021:27\n  1019 |   );\n  1020 |\n> 1021 |   const TimeWheelPicker = ({\n       |                           ^^\n> 1022 |     pickerId,\n       | ^^^^^^^^^^^^^\n> 1023 |     label,\n       …\n       | ^^^^^^^^^^^^^\n> 1107 |     );\n       | ^^^^^^^^^^^^^\n> 1108 |   };\n       | ^^^^ The component is created during render here\n  1109 |\n  1110 |   return (\n  1111 |     <div className=\"space-y-8 text-[#344054]\">",
+          "line": 1762,
+          "column": 16,
+          "endLine": 1762,
+          "endColumn": 31
+        },
+        {
+          "ruleId": "react-hooks/static-components",
+          "severity": 1,
+          "message": "Error: Cannot create components during render\n\nComponents created during render will reset their state each time they are created. Declare components outside of render.\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\calendar\\page.tsx:1790:18\n  1788 |             {hasSecondShift && (\n  1789 |               <div className=\"grid grid-cols-1 gap-4 sm:grid-cols-2\">\n> 1790 |                 <TimeWheelPicker\n       |                  ^^^^^^^^^^^^^^^ This component is created during render\n  1791 |                   pickerId=\"second-opening\"\n  1792 |                   label={`${t.secondShiftLabel} · ${t.openingLabel}`}\n  1793 |                   value={secondShiftStart}\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\calendar\\page.tsx:1021:27\n  1019 |   );\n  1020 |\n> 1021 |   const TimeWheelPicker = ({\n       |                           ^^\n> 1022 |     pickerId,\n       | ^^^^^^^^^^^^^\n> 1023 |     label,\n       …\n       | ^^^^^^^^^^^^^\n> 1107 |     );\n       | ^^^^^^^^^^^^^\n> 1108 |   };\n       | ^^^^ The component is created during render here\n  1109 |\n  1110 |   return (\n  1111 |     <div className=\"space-y-8 text-[#344054]\">",
+          "line": 1790,
+          "column": 18,
+          "endLine": 1790,
+          "endColumn": 33
+        },
+        {
+          "ruleId": "react-hooks/static-components",
+          "severity": 1,
+          "message": "Error: Cannot create components during render\n\nComponents created during render will reset their state each time they are created. Declare components outside of render.\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\calendar\\page.tsx:1796:18\n  1794 |                   onChange={setSecondShiftStart}\n  1795 |                 />\n> 1796 |                 <TimeWheelPicker\n       |                  ^^^^^^^^^^^^^^^ This component is created during render\n  1797 |                   pickerId=\"second-closing\"\n  1798 |                   label={`${t.secondShiftLabel} · ${t.closingLabel}`}\n  1799 |                   value={secondShiftEnd}\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\calendar\\page.tsx:1021:27\n  1019 |   );\n  1020 |\n> 1021 |   const TimeWheelPicker = ({\n       |                           ^^\n> 1022 |     pickerId,\n       | ^^^^^^^^^^^^^\n> 1023 |     label,\n       …\n       | ^^^^^^^^^^^^^\n> 1107 |     );\n       | ^^^^^^^^^^^^^\n> 1108 |   };\n       | ^^^^ The component is created during render here\n  1109 |\n  1110 |   return (\n  1111 |     <div className=\"space-y-8 text-[#344054]\">",
+          "line": 1796,
+          "column": 18,
+          "endLine": 1796,
+          "endColumn": 33
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/provider/chain/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/customers/page.tsx",
+      "errorCount": 0,
+      "warningCount": 13,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 161,
+          "column": 42,
+          "endLine": 161,
+          "endColumn": 45
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 167,
+          "column": 54,
+          "endLine": 167,
+          "endColumn": 57
+        },
+        {
+          "ruleId": "react-hooks/immutability",
+          "severity": 1,
+          "message": "Error: Cannot access variable before it is declared\n\n`loadClients` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\customers\\page.tsx:262:12\n  260 |       setImportText(\"\");\n  261 |       setConsentConfirmed(false);\n> 262 |       void loadClients();\n      |            ^^^^^^^^^^^ `loadClients` accessed before it is declared\n  263 |     } catch (err: unknown) {\n  264 |       console.error(\"Client import error:\", err);\n  265 |       setImportError(errorMessage(err));\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\customers\\page.tsx:288:3\n  286 |   }, []);\n  287 |\n> 288 |   async function loadClients() {\n      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 289 |     try {\n      | ^^^^^^^^^\n> 290 |       setLoading(true);\n      …\n      | ^^^^^^^^^\n> 419 |     }\n      | ^^^^^^^^^\n> 420 |   }\n      | ^^^^ `loadClients` is declared here\n  421 |\n  422 |   async function saveNotes() {\n  423 |     if (!editingClient) return;",
+          "line": 262,
+          "column": 12,
+          "endLine": 262,
+          "endColumn": 23
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 311,
+          "column": 58,
+          "endLine": 311,
+          "endColumn": 61
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 338,
+          "column": 45,
+          "endLine": 338,
+          "endColumn": 48
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 340,
+          "column": 43,
+          "endLine": 340,
+          "endColumn": 46
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 382,
+          "column": 48,
+          "endLine": 382,
+          "endColumn": 51
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 383,
+          "column": 33,
+          "endLine": 383,
+          "endColumn": 36
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 383,
+          "column": 41,
+          "endLine": 383,
+          "endColumn": 44
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 392,
+          "column": 33,
+          "endLine": 392,
+          "endColumn": 36
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 412,
+          "column": 19,
+          "endLine": 412,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 455,
+          "column": 19,
+          "endLine": 455,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 784,
+          "column": 61,
+          "endLine": 784,
+          "endColumn": 64
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/provider/dashboard/page.tsx",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\dashboard\\page.tsx:202:7\n  200 |   useEffect(() => {\n  201 |     if (typeof window !== \"undefined\") {\n> 202 |       setOrigin(window.location.origin);\n      |       ^^^^^^^^^ Avoid calling setState() directly within an effect\n  203 |     }\n  204 |     const sync = () => setLocale(document.documentElement.lang === \"ar\" ? \"ar\" : \"en\");\n  205 |     sync();",
+          "line": 202,
+          "column": 7,
+          "endLine": 202,
+          "endColumn": 16
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/provider/developer/copy.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/developer/keys-tab.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/developer/limits-tab.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/developer/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/developer/reference-tab.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/developer/shared.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/developer/webhooks-tab.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/employees/page.tsx",
+      "errorCount": 0,
+      "warningCount": 6,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 387,
+          "column": 55,
+          "endLine": 387,
+          "endColumn": 58
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 389,
+          "column": 18,
+          "endLine": 389,
+          "endColumn": 21
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 393,
+          "column": 54,
+          "endLine": 393,
+          "endColumn": 57
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 500,
+          "column": 91,
+          "endLine": 500,
+          "endColumn": 94
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 504,
+          "column": 93,
+          "endLine": 504,
+          "endColumn": 96
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\employees\\page.tsx:584:10\n  582 |\n  583 |   useEffect(() => {\n> 584 |     void loadTeamData();\n      |          ^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  585 |   }, [loadTeamData]);\n  586 |\n  587 |   const openAddStaff = () => {",
+          "line": 584,
+          "column": 10,
+          "endLine": 584,
+          "endColumn": 22
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/provider/groups/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/identity/_components/portfolio-panel.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/identity/_components/profile-form.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/identity/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/intake/_components/dialogs.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/intake/_components/template-dialog.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/intake/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/inventory/inventory-controls.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/inventory/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/jobs/page.tsx",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\jobs\\page.tsx:124:7\n  122 |     // Detect RTL from document element\n  123 |     if (typeof document !== \"undefined\") {\n> 124 |       setIsRTL(document.documentElement.dir === \"rtl\");\n      |       ^^^^^^^^ Avoid calling setState() directly within an effect\n  125 |       const observer = new MutationObserver(() => {\n  126 |         setIsRTL(document.documentElement.dir === \"rtl\");\n  127 |       });",
+          "line": 124,
+          "column": 7,
+          "endLine": 124,
+          "endColumn": 15
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/provider/layout.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/memberships/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/messages/page.tsx",
+      "errorCount": 0,
+      "warningCount": 6,
+      "messages": [
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\messages\\page.tsx:29:5\n  27 |   const [isRTL, setIsRTL] = useState(false);\n  28 |   useEffect(() => {\n> 29 |     setIsRTL(document.documentElement.dir === \"rtl\");\n     |     ^^^^^^^^ Avoid calling setState() directly within an effect\n  30 |     const observer = new MutationObserver(() => setIsRTL(document.documentElement.dir === \"rtl\"));\n  31 |     observer.observe(document.documentElement, { attributes: true, attributeFilter: [\"dir\"] });\n  32 |     return () => observer.disconnect();",
+          "line": 29,
+          "column": 5,
+          "endLine": 29,
+          "endColumn": 13
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 124,
+          "column": 60,
+          "endLine": 124,
+          "endColumn": 63
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 152,
+          "column": 38,
+          "endLine": 152,
+          "endColumn": 41
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\messages\\page.tsx:156:5\n  154 |\n  155 |   useEffect(() => {\n> 156 |     loadThreads();\n      |     ^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  157 |   }, [loadThreads]);\n  158 |\n  159 |   useEffect(() => {",
+          "line": 156,
+          "column": 5,
+          "endLine": 156,
+          "endColumn": 16
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\messages\\page.tsx:161:7\n  159 |   useEffect(() => {\n  160 |     if (!selectedId) {\n> 161 |       setMessages([]);\n      |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  162 |       return;\n  163 |     }\n  164 |     loadMessages(selectedId);",
+          "line": 161,
+          "column": 7,
+          "endLine": 161,
+          "endColumn": 18
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 181,
+          "column": 99,
+          "endLine": 181,
+          "endColumn": 102
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/provider/my-day/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/packages/page.tsx",
+      "errorCount": 0,
+      "warningCount": 8,
+      "messages": [
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'loadPackages'. Either include it or remove the dependency array.",
+          "line": 61,
+          "column": 6,
+          "endLine": 61,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 88,
+          "column": 63,
+          "endLine": 88,
+          "endColumn": 66
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 101,
+          "column": 19,
+          "endLine": 101,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 125,
+          "column": 19,
+          "endLine": 125,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 157,
+          "column": 19,
+          "endLine": 157,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unused-vars",
+          "severity": 1,
+          "message": "'data' is assigned a value but never used.",
+          "line": 182,
+          "column": 15,
+          "endLine": 182,
+          "endColumn": 19
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 210,
+          "column": 19,
+          "endLine": 210,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 226,
+          "column": 19,
+          "endLine": 226,
+          "endColumn": 22
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/provider/pricing/page.tsx",
+      "errorCount": 0,
+      "warningCount": 3,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 212,
+          "column": 66,
+          "endLine": 212,
+          "endColumn": 69
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\pricing\\page.tsx:276:5\n  274 |     const planId = activePlanId;\n  275 |     if (!planId) return;\n> 276 |     setQuote(null);\n      |     ^^^^^^^^ Avoid calling setState() directly within an effect\n  277 |     setQuoteError(false);\n  278 |     supabase\n  279 |       .rpc(\"quote_provider_plan\", { p_plan_id: planId, p_billing_interval: billingCycle === \"annual\" ? \"yearly\" : \"monthly\" })",
+          "line": 276,
+          "column": 5,
+          "endLine": 276,
+          "endColumn": 13
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 382,
+          "column": 19,
+          "endLine": 382,
+          "endColumn": 22
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/provider/promote/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/promotions/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/recurring/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/reports/page.tsx",
+      "errorCount": 0,
+      "warningCount": 2,
+      "messages": [
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has missing dependencies: 'endDate', 'loadReportData', and 'startDate'. Either include them or remove the dependency array.",
+          "line": 235,
+          "column": 6,
+          "endLine": 235,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 293,
+          "column": 19,
+          "endLine": 293,
+          "endColumn": 22
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/provider/resources/page.tsx",
+      "errorCount": 0,
+      "warningCount": 5,
+      "messages": [
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'loadResources'. Either include it or remove the dependency array.",
+          "line": 96,
+          "column": 6,
+          "endLine": 96,
+          "endColumn": 14
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 133,
+          "column": 19,
+          "endLine": 133,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unused-vars",
+          "severity": 1,
+          "message": "'data' is assigned a value but never used.",
+          "line": 158,
+          "column": 15,
+          "endLine": 158,
+          "endColumn": 19
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 177,
+          "column": 19,
+          "endLine": 177,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 193,
+          "column": 19,
+          "endLine": 193,
+          "endColumn": 22
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/provider/reviews/page.tsx",
+      "errorCount": 0,
+      "warningCount": 8,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 45,
+          "column": 42,
+          "endLine": 45,
+          "endColumn": 45
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 46,
+          "column": 46,
+          "endLine": 46,
+          "endColumn": 49
+        },
+        {
+          "ruleId": "react-hooks/immutability",
+          "severity": 1,
+          "message": "Error: Cannot access variable before it is declared\n\n`loadData` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\reviews\\page.tsx:71:5\n  69 |\n  70 |   useEffect(() => {\n> 71 |     loadData();\n     |     ^^^^^^^^ `loadData` accessed before it is declared\n  72 |   }, []);\n  73 |\n  74 |   async function loadData() {\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\reviews\\page.tsx:74:3\n   72 |   }, []);\n   73 |\n>  74 |   async function loadData() {\n      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n>  75 |     try {\n      | ^^^^^^^^^\n>  76 |       setLoading(true);\n      …\n      | ^^^^^^^^^\n> 139 |     }\n      | ^^^^^^^^^\n> 140 |   }\n      | ^^^^ `loadData` is declared here\n  141 |\n  142 |   async function postReply(reviewId: string) {\n  143 |     if (!replyText.trim()) return;",
+          "line": 71,
+          "column": 5,
+          "endLine": 71,
+          "endColumn": 13
+        },
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'loadData'. Either include it or remove the dependency array.",
+          "line": 72,
+          "column": 6,
+          "endLine": 72,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 132,
+          "column": 19,
+          "endLine": 132,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 156,
+          "column": 19,
+          "endLine": 156,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "react/no-unescaped-entities",
+          "severity": 1,
+          "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.",
+          "line": 321,
+          "column": 17
+        },
+        {
+          "ruleId": "react/no-unescaped-entities",
+          "severity": 1,
+          "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.",
+          "line": 321,
+          "column": 31
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/provider/services/page.tsx",
+      "errorCount": 0,
+      "warningCount": 2,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 201,
+          "column": 47,
+          "endLine": 201,
+          "endColumn": 50
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\services\\page.tsx:302:10\n  300 |\n  301 |   useEffect(() => {\n> 302 |     void loadServicesData();\n      |          ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  303 |   }, [loadServicesData]);\n  304 |\n  305 |   const openAddService = () => {",
+          "line": 302,
+          "column": 10,
+          "endLine": 302,
+          "endColumn": 26
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/provider/settings/page.tsx",
+      "errorCount": 0,
+      "warningCount": 8,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-unused-vars",
+          "severity": 1,
+          "message": "'geofenceAutosaving' is assigned a value but never used.",
+          "line": 163,
+          "column": 10,
+          "endLine": 163,
+          "endColumn": 28
+        },
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'loadSettings'. Either include it or remove the dependency array.",
+          "line": 215,
+          "column": 6,
+          "endLine": 215,
+          "endColumn": 8
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 250,
+          "column": 48,
+          "endLine": 250,
+          "endColumn": 51
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 260,
+          "column": 69,
+          "endLine": 260,
+          "endColumn": 72
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 291,
+          "column": 19,
+          "endLine": 291,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 323,
+          "column": 19,
+          "endLine": 323,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 414,
+          "column": 19,
+          "endLine": 414,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 449,
+          "column": 19,
+          "endLine": 449,
+          "endColumn": 22
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/provider/share/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/staff-management/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/team/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/time-off/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/provider/wallet/page.tsx",
+      "errorCount": 0,
+      "warningCount": 9,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-unused-vars",
+          "severity": 1,
+          "message": "'success' is assigned a value but never used.",
+          "line": 170,
+          "column": 10,
+          "endLine": 170,
+          "endColumn": 17
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 337,
+          "column": 76,
+          "endLine": 337,
+          "endColumn": 79
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 356,
+          "column": 81,
+          "endLine": 356,
+          "endColumn": 84
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 385,
+          "column": 24,
+          "endLine": 385,
+          "endColumn": 27
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 386,
+          "column": 37,
+          "endLine": 386,
+          "endColumn": 40
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 389,
+          "column": 24,
+          "endLine": 389,
+          "endColumn": 27
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 390,
+          "column": 37,
+          "endLine": 390,
+          "endColumn": 40
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\provider\\wallet\\page.tsx:411:5\n  409 |\n  410 |   useEffect(() => {\n> 411 |     loadWalletData();\n      |     ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  412 |   }, [lang]);\n  413 |\n  414 |   const handleRequestPayout = async (e: React.FormEvent) => {",
+          "line": 411,
+          "column": 5,
+          "endLine": 411,
+          "endColumn": 19
+        },
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'loadWalletData'. Either include it or remove the dependency array.",
+          "line": 412,
+          "column": 6,
+          "endLine": 412,
+          "endColumn": 12
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/provider/whatsapp/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/robots.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/security/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/service-board/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/services/page.tsx",
+      "errorCount": 0,
+      "warningCount": 3,
+      "messages": [
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\services\\page.tsx:372:7\n  370 |     const tabParam = searchParams.get(\"tab\");\n  371 |     if (tabParam === \"shops\" || tabParam === \"services\" || tabParam === \"all\") {\n> 372 |       setActiveResultTab(tabParam);\n      |       ^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  373 |     }\n  374 |     const catParam = searchParams.get(\"category\");\n  375 |     if (catParam) {",
+          "line": 372,
+          "column": 7,
+          "endLine": 372,
+          "endColumn": 25
+        },
+        {
+          "ruleId": "@next/next/no-img-element",
+          "severity": 1,
+          "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+          "line": 732,
+          "column": 25,
+          "endLine": 739,
+          "endColumn": 27
+        },
+        {
+          "ruleId": "@next/next/no-img-element",
+          "severity": 1,
+          "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+          "line": 805,
+          "column": 19,
+          "endLine": 812,
+          "endColumn": 21
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/shop/[id]/attribution-capture.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/shop/[id]/layout.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/shop/[id]/page.tsx",
+      "errorCount": 0,
+      "warningCount": 25,
+      "messages": [
+        {
+          "ruleId": "react-hooks/purity",
+          "severity": 1,
+          "message": "Error: Cannot call impure function during render\n\n`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\shop\\[id]\\page.tsx:256:16\n  254 |   const [toasts, setToasts] = useState<Array<{ id: string; message: string; type: \"success\" | \"info\" | \"error\" }>>([]);\n  255 |   const addToast = (message: string, type: \"success\" | \"info\" | \"error\") => {\n> 256 |     const id = Math.random().toString(36).substring(7);\n      |                ^^^^^^^^^^^^^ Cannot call impure function\n  257 |     setToasts(prev => [...prev, { id, message, type }]);\n  258 |   };\n  259 |   const removeToast = (id: string) => {",
+          "line": 256,
+          "column": 16,
+          "endLine": 256,
+          "endColumn": 29
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 350,
+          "column": 56,
+          "endLine": 350,
+          "endColumn": 59
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 408,
+          "column": 60,
+          "endLine": 408,
+          "endColumn": 63
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 422,
+          "column": 61,
+          "endLine": 422,
+          "endColumn": 64
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 423,
+          "column": 28,
+          "endLine": 423,
+          "endColumn": 31
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 442,
+          "column": 50,
+          "endLine": 442,
+          "endColumn": 53
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 446,
+          "column": 46,
+          "endLine": 446,
+          "endColumn": 49
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 455,
+          "column": 79,
+          "endLine": 455,
+          "endColumn": 82
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 473,
+          "column": 79,
+          "endLine": 473,
+          "endColumn": 82
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 483,
+          "column": 61,
+          "endLine": 483,
+          "endColumn": 64
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 496,
+          "column": 51,
+          "endLine": 496,
+          "endColumn": 54
+        },
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'searchParams'. Either include it or remove the dependency array.",
+          "line": 529,
+          "column": 6,
+          "endLine": 529,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 633,
+          "column": 19,
+          "endLine": 633,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 687,
+          "column": 19,
+          "endLine": 687,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 715,
+          "column": 19,
+          "endLine": 715,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 804,
+          "column": 19,
+          "endLine": 804,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\shop\\[id]\\page.tsx:842:16\n  840 |     preselectedFor.current = serviceId;\n  841 |     const match = filteredServices.find((s) => s.id === serviceId);\n> 842 |     if (match) setSelectedService(match);\n      |                ^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  843 |     else addToast(t.bookAgainMissing, \"info\");\n  844 |   }, [serviceId, shopLoadState, filteredServices, t.bookAgainMissing]);\n  845 |",
+          "line": 842,
+          "column": 16,
+          "endLine": 842,
+          "endColumn": 34
+        },
+        {
+          "ruleId": "react-hooks/purity",
+          "severity": 1,
+          "message": "Error: Cannot call impure function during render\n\n`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\shop\\[id]\\page.tsx:855:43\n  853 |       if (!raw) return;\n  854 |       const saved = JSON.parse(raw);\n> 855 |       if (saved.providerId === shop.id && Date.now() - (saved.savedAt || 0) < 7200000) {\n      |                                           ^^^^^^^^^^ Cannot call impure function\n  856 |         const savedIds = Array.isArray(saved.serviceIds) ? saved.serviceIds : [saved.serviceId];\n  857 |         const restoredServices = savedIds\n  858 |           .map((id: unknown) => filteredServices.find((service) => service.id === id))",
+          "line": 855,
+          "column": 43,
+          "endLine": 855,
+          "endColumn": 53
+        },
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\shop\\[id]\\page.tsx:861:11\n  859 |           .filter((service: ServiceItem | undefined): service is ServiceItem => !!service);\n  860 |         if (restoredServices.length > 0) {\n> 861 |           setSelectedServices(restoredServices);\n      |           ^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  862 |         }\n  863 |         if (saved.specialistId === \"any\") {\n  864 |           setSelectedSpecialist({ id: \"any\", name: { en: \"Any Available Professional\", ar: \"أي أخصائي متاح\" }, role: { en: \"First Available Staff\", ar: \"الأسرع توفراً من الفريق\" }, rating: null, avatar: \"\" });",
+          "line": 861,
+          "column": 11,
+          "endLine": 861,
+          "endColumn": 30
+        },
+        {
+          "ruleId": "react-hooks/exhaustive-deps",
+          "severity": 1,
+          "message": "React Hook useEffect has a missing dependency: 'getPrayerWindowsForDate'. Either include it or remove the dependency array.",
+          "line": 969,
+          "column": 6,
+          "endLine": 969,
+          "endColumn": 116
+        },
+        {
+          "ruleId": "react-hooks/purity",
+          "severity": 1,
+          "message": "Error: Cannot call impure function during render\n\n`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\app\\shop\\[id]\\page.tsx:1106:20\n  1104 |           isHomeService,\n  1105 |           source: bookingSource,\n> 1106 |           savedAt: Date.now()\n       |                    ^^^^^^^^^^ Cannot call impure function\n  1107 |         }));\n  1108 |         setShowAuthModal(true);\n  1109 |         return;",
+          "line": 1106,
+          "column": 20,
+          "endLine": 1106,
+          "endColumn": 30
+        },
+        {
+          "ruleId": "@next/next/no-img-element",
+          "severity": 1,
+          "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+          "line": 1274,
+          "column": 11,
+          "endLine": 1278,
+          "endColumn": 13
+        },
+        {
+          "ruleId": "@next/next/no-img-element",
+          "severity": 1,
+          "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+          "line": 1438,
+          "column": 33,
+          "endLine": 1438,
+          "endColumn": 102
+        },
+        {
+          "ruleId": "@next/next/no-img-element",
+          "severity": 1,
+          "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+          "line": 1544,
+          "column": 31,
+          "endLine": 1544,
+          "endColumn": 102
+        },
+        {
+          "ruleId": "@typescript-eslint/no-explicit-any",
+          "severity": 1,
+          "message": "Unexpected any. Specify a different type.",
+          "line": 1777,
+          "column": 40,
+          "endLine": 1777,
+          "endColumn": 43
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/app/sitemap.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/store/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/app/terms/page.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/auth-guard.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/category-providers.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/control-center.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/customer-pilot/booking-pilot.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/customer-pilot/pilot-context.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/customer-pilot/pilot-controls.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/dev-role-switcher.tsx",
+      "errorCount": 0,
+      "warningCount": 4,
+      "messages": [
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\components\\dev-role-switcher.tsx:31:5\n  29 |\n  30 |   useEffect(() => {\n> 31 |     setMounted(true);\n     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect\n  32 |     setCurrent(getDevRole());\n  33 |   }, []);\n  34 |",
+          "line": 31,
+          "column": 5,
+          "endLine": 31,
+          "endColumn": 15
+        },
+        {
+          "ruleId": "react-hooks/immutability",
+          "severity": 1,
+          "message": "Error: This value cannot be modified\n\nModifying a variable defined outside a component or hook is not allowed. Consider using an effect.\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\components\\dev-role-switcher.tsx:98:7\n   96 |       // The console is authorized by the database, so it opens through the real sign-in, not a local preview.\n   97 |       clearDevRole();\n>  98 |       window.location.href = \"/login\";\n      |       ^^^^^^^^^^^^^^^ value cannot be modified\n   99 |       return;\n  100 |     }\n  101 |     if (!setDevRole(role)) return;",
+          "line": 98,
+          "column": 7,
+          "endLine": 98,
+          "endColumn": 22
+        },
+        {
+          "ruleId": "@next/next/no-location-assign-relative-destination",
+          "severity": 1,
+          "message": "Do not use `window.location.href` to navigate to internal Next.js pages. Use `redirect()` in the render phase, or `useRouter().push()` in Client Components' event handlers instead. See: https://nextjs.org/docs/messages/no-location-assign-relative-destination",
+          "line": 98,
+          "column": 7,
+          "endLine": 98,
+          "endColumn": 38
+        },
+        {
+          "ruleId": "react-hooks/immutability",
+          "severity": 1,
+          "message": "Error: This value cannot be modified\n\nModifying a variable defined outside a component or hook is not allowed. Consider using an effect.\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\components\\dev-role-switcher.tsx:103:5\n  101 |     if (!setDevRole(role)) return;\n  102 |     setCurrent(role);\n> 103 |     window.location.href = devRoleHome[role];\n      |     ^^^^^^^^^^^^^^^ value cannot be modified\n  104 |   };\n  105 |\n  106 |   const toggleCollapse = () => {",
+          "line": 103,
+          "column": 5,
+          "endLine": 103,
+          "endColumn": 20
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/components/effective-fee-terms.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/global-dev-tools.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/group-booking-form.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-agent-profile.tsx",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "@next/next/no-img-element",
+          "severity": 1,
+          "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+          "line": 23,
+          "column": 873,
+          "endLine": 23,
+          "endColumn": 985
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-common.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-context.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-overlays.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-shell.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/hq/hq-workspace.tsx",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "@next/next/no-img-element",
+          "severity": 1,
+          "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+          "line": 24,
+          "column": 1158,
+          "endLine": 24,
+          "endColumn": 1313
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/components/intake-form.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/intake-link.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/make-regular.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/modal.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/operations-ui.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/public-dialog.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/read-failure.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/reward-terms.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/sponsored-placements.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/step-up-dialog.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/components/toast.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/account-flow.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/analytics.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/attribution.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/auth-errors.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/booking-availability.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/booking-display.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/calendar-slots.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/category-tree.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/client-import.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/console-errors.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/console-session.tsx",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/country.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/csv.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/customer-pilot/client.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/customer-pilot/contracts.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/customer-pilot/copy.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/customer-pilot/server/handler.d.mts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/customer-pilot/server/handler.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/customer-pilot/server/store.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/dev-access.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/developer-api.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/distribution.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/error-message.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/group-booking.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/hq/client.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/hq/contracts.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/hq/copy.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/catalog.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/handler.d.mts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/handler.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/local-boundary.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/local-store.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/hq/voice.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/intake.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/membership-copy.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/money-display.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/operations-data.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/payment-checkout.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/payout-display.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/payroll-summary.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/phone.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/prayer-windows.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/professional-identity.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/published-agreement.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/purchase-disputes.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/qr-svg.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/recurring.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/ropa-document.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/safe-redirect.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/schedule-exceptions.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/session-state-retry.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/sponsored.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/step-up.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/supabase.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/url-state.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/use-page-locale.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/use-prayer-times.ts",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "react-hooks/set-state-in-effect",
+          "severity": 1,
+          "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\src\\lib\\use-prayer-times.ts:39:5\n  37 |   useEffect(() => {\n  38 |     // Run on client only\n> 39 |     setCurrentTime(new Date());\n     |     ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  40 |     const timer = setInterval(() => {\n  41 |       setCurrentTime(new Date());\n  42 |     }, 1000);",
+          "line": 39,
+          "column": 5,
+          "endLine": 39,
+          "endColumn": 19
+        }
+      ]
+    },
+    {
+      "path": "web_platform/src/lib/whatsapp-receptionist.ts",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/src/lib/write-result.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests-browser/customer-pilot-independent.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests-browser/hq-local-acceptance.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/account-flow.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/adm1-admin-wiring.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/admin-console-guards.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/api-params-pagination.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/api-router.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/booking-availability.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/booking-cancel-thresholds.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/booking-display.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/client-import.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/console-errors.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/country.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/csv-export.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/customer-pilot-api.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/customer-pilot-independent-auditions.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/customer-pilot-independent.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/customer-pilot-store.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/customer-pilot-ui-client.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/customer-pilot-ui-copy.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/customer-portal-guards.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/dbsec2-chat-screens.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/developer-console.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/distribution.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/f123-recheck-ui.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/final-approval-kinds.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/gov1-governance-screens.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/group-screens.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/hq-client.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/hq-http.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/hq-independent-review.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/hq-local-boundary.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/hq-store.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/hq-voice.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/intake-screens.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/memberships-screens.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/money-screens.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/negative-authorization.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/no-mock-data.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/payment-checkout-client.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/payout-display.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/payroll-summary.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/paywave2-screens.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/phone-and-slots.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/prayer-windows.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/professional-identity-screens.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/provider-portal-guards.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/qafix-accessibility.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/qafix-console-writes.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/qafix-ux-round2.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/qr.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/recurring-screens.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/ropa-document.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/safe-redirect.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/schedule-exceptions.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/server-errors.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/session-state-retry.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/sponsored-screens.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/vercel-ignore-build.test.mjs",
+      "errorCount": 0,
+      "warningCount": 1,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/no-unused-vars",
+          "severity": 1,
+          "message": "'PRIMORA_PRODUCTION_RELEASE' is assigned a value but never used.",
+          "line": 85,
+          "column": 13,
+          "endLine": 85,
+          "endColumn": 39
+        }
+      ]
+    },
+    {
+      "path": "web_platform/tests/webhook-signature.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/webhook-url.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/whatsapp-intent.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/whatsapp-receptionist.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/whatsapp-screens.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    },
+    {
+      "path": "web_platform/tests/write-result.test.mjs",
+      "errorCount": 0,
+      "warningCount": 0,
+      "messages": []
+    }
+  ]
+}

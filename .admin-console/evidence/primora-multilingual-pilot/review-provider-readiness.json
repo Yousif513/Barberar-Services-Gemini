@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "reviewer": "server_hq_audit",
+  "scope": "Read-only public provider/account readiness research; not audio execution or account quotation",
+  "captured_at_utc": "2026-10-22T11:31:19.946955+00:00",
+  "anonymous_retail_prices": [
+    {
+      "region": "eastus",
+      "url": "https://prices.azure.com/api/retail/prices?currencyCode=USD&%24filter=productName+eq+%27Azure+Speech%27+and+skuName+eq+%27S1%27+and+meterName+eq+%27S1+Neural+Text+To+Speech+Characters%27+and+armRegionName+eq+%27eastus%27+and+priceType+eq+%27Consumption%27",
+      "http_status": 200,
+      "captured_at_utc": "2026-10-22T11:31:19.162782+00:00",
+      "file": "review-provider-eastus.json",
+      "sha256_raw_bytes": "4a064534f295b59871e9a34d2f9a2198451337a35185d5b223b5256b4a93748d",
+      "count": 1,
+      "next_page_link": null,
+      "meters": [
+        {
+          "currencyCode": "USD",
+          "retailPrice": 15.0,
+          "unitPrice": 15.0,
+          "armRegionName": "eastus",
+          "meterId": "0f98e708-a16c-407b-8089-a0ed9e14ab49",
+          "meterName": "S1 Neural Text To Speech Characters",
+          "productName": "Azure Speech",
+          "skuName": "S1",
+          "serviceName": "Foundry Tools",
+          "unitOfMeasure": "1M",
+          "effectiveStartDate": "2024-02-01T00:00:00Z",
+          "type": "Consumption",
+          "isPrimaryMeterRegion": false
+        }
+      ]
+    },
+    {
+      "region": "uaenorth",
+      "url": "https://prices.azure.com/api/retail/prices?currencyCode=USD&%24filter=productName+eq+%27Azure+Speech%27+and+skuName+eq+%27S1%27+and+meterName+eq+%27S1+Neural+Text+To+Speech+Characters%27+and+armRegionName+eq+%27uaenorth%27+and+priceType+eq+%27Consumption%27",
+      "http_status": 200,
+      "captured_at_utc": "2026-10-22T11:31:19.946912+00:00",
+      "file": "review-provider-uaenorth.json",
+      "sha256_raw_bytes": "3bd9ebba9185556c4c6fbf865b32986f916cab132073c140c9f88fbdfb257d12",
+      "count": 1,
+      "next_page_link": null,
+      "meters": [
+        {
+          "currencyCode": "USD",
+          "retailPrice": 15.0,
+          "unitPrice": 15.0,
+          "armRegionName": "uaenorth",
+          "meterId": "0f98e708-a16c-407b-8089-a0ed9e14ab49",
+          "meterName": "S1 Neural Text To Speech Characters",
+          "productName": "Azure Speech",
+          "skuName": "S1",
+          "serviceName": "Foundry Tools",
+          "unitOfMeasure": "1M",
+          "effectiveStartDate": "2024-02-01T00:00:00Z",
+          "type": "Consumption",
+          "isPrimaryMeterRegion": false
+        }
+      ]
+    }
+  ],
+  "public_sources": [
+    {
+      "url": "https://www.microsoft.com/licensing/terms/en-US/product/MicrosoftAzure/all",
+      "verified_via": "official web page read 2026-10-22",
+      "finding": "Paid-tier prebuilt/neural audio output rights are described; applicability to the actual customer account/contract must still be confirmed. No general free-tier commercial-output right asserted."
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/text-to-speech#billable-characters",
+      "verified_via": "official web page read 2026-10-22",
+      "finding": "Successful requests may bill even without audio; Unicode input, whitespace and most SSML markup are billable; Chinese characters have a weight of two. Full approved Arabic/Latin wire UTF-8 bytes are a conservative local reservation."
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/azure/cost-management-billing/costs/tutorial-acm-create-budgets",
+      "verified_via": "official web page read 2026-10-22",
+      "finding": "Budget alerts do not stop resource consumption; cost data and evaluation lag. Local counter is not an invoice hard stop."
+    }
+  ],
+  "account_readiness": {
+    "azure_cli_found_on_path": false,
+    "environment_presence_only": {
+      "AZURE_SPEECH_KEY": false,
+      "AZURE_SPEECH_REGION": false,
+      "AZURE_SPEECH_ENDPOINT": false,
+      "SPEECH_KEY": false,
+      "SPEECH_REGION": false,
+      "SPEECH_ENDPOINT": false,
+      "AZURE_SUBSCRIPTION_ID": false,
+      "AZURE_TENANT_ID": false,
+      "AZURE_CLIENT_ID": false,
+      "AZURE_CLIENT_SECRET": false
+    },
+    "account_or_resource_metadata_read": false,
+    "reason": "Azure CLI absent; no account login, token cache, keys, env values or credential files inspected",
+    "actual_account_terms_pricing_tax_fx_and_fee_bound": "unverified",
+    "native_regional_voice_availability_on_actual_resource": "unverified",
+    "secure_integration_route": "Only after named account/all-in fee confirmation, masked Windows DPAPI setup bound to immutable approved resource identity; never chat/argv/env/log/Git. Runner independent security review pending."
+  },
+  "holds": {
+    "provider_calls": 0,
+    "real_credentials_read": 0,
+    "audio_generated": 0,
+    "native_listening_scores": 0,
+    "new_accounts_or_resources": 0,
+    "paid_service_upgrade": 0
+  },
+  "limitations": [
+    "Anonymous USD retail meter is not the actual account quotation and excludes unknown account-specific tax/FX/fees.",
+    "Enforcing SAR10 requires a verified current maximum all-in variable price plus fixed/nonrequest fee bounds and exclusive-use/concurrency assumptions.",
+    "No actual Azure authentication or native voice quality was tested."
+  ]
+}

@@ -1,0 +1,178 @@
+{
+  "classification": "Independent controlled browser QA; synthetic fixtures exist only in test/browser state, not app source",
+  "startedAt": "2026-10-22T11:31:41.573Z",
+  "checks": [
+    {
+      "name": "fresh workspace, honest empty states, five locales and permission hold",
+      "status": "passed"
+    },
+    {
+      "name": "purpose-scoped HttpOnly Strict session cookie",
+      "status": "passed"
+    },
+    {
+      "name": "malformed import retained; explicit source preview and fixture import",
+      "status": "passed"
+    },
+    {
+      "name": "all five locale directions and draft/identity continuity",
+      "status": "passed",
+      "headings": {
+        "bn-BD": "আপনার স্থানীয় বুকিং অনুরোধ",
+        "ur-PK": "آپ کی مقامی بکنگ درخواست",
+        "hi-IN": "आपका स्थानीय बुकिंग अनुरोध",
+        "ar": "طلب حجزك المحلي",
+        "en": "Your local booking request"
+      }
+    },
+    {
+      "name": "request review, keyboard focus, immutable source amount and local-only receipt",
+      "status": "passed"
+    },
+    {
+      "name": "reload preserves same request and source snapshot",
+      "status": "passed"
+    },
+    {
+      "name": "lost response recovery confirms exactly one local refund case; no resubmit",
+      "status": "passed"
+    },
+    {
+      "name": "appeal appends versioned local history without refund execution",
+      "status": "passed"
+    },
+    {
+      "name": "source update blocks stale draft while historical amount remains immutable",
+      "status": "passed"
+    },
+    {
+      "name": "Urdu375px RTL/bidi layout has no horizontal page overflow",
+      "status": "passed",
+      "scroll": 375,
+      "width": 375
+    },
+    {
+      "name": "missing CSRF is denied; fresh workspace cannot read or mutate another request",
+      "status": "passed"
+    },
+    {
+      "name": "no external requests, marketplace business calls or unexpected browser errors",
+      "status": "passed"
+    }
+  ],
+  "nativeQuality": "not_evaluated",
+  "regionalVoiceQuality": "not_evaluated",
+  "externalRequests": [],
+  "unexpectedLocalBusinessRequests": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "expectedNetworkErrors": [
+    "Failed to load resource: net::ERR_FAILED",
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "location": {
+        "url": "http://127.0.0.1:3114/api/pilot/commands/8425cded-f773-4b73-b158-be10dc5437e2",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      },
+      "reason": "Explicit not_found preflight response before first submission; required recovery protocol"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "location": {
+        "url": "http://127.0.0.1:3114/api/pilot/commands/e32320bb-f3d0-450e-808e-a26b97b5d8e9",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      },
+      "reason": "Explicit not_found preflight response before first submission; required recovery protocol"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "location": {
+        "url": "http://127.0.0.1:3114/api/pilot/commands/9428e0b9-efe7-4ea3-a73d-51726343e3bb",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      },
+      "reason": "Explicit not_found preflight response before first submission; required recovery protocol"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "location": {
+        "url": "http://127.0.0.1:3114/api/pilot/commands/53372beb-7a18-486f-a742-de160a684b9c",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      },
+      "reason": "Explicit not_found preflight response before first submission; required recovery protocol"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "location": {
+        "url": "http://127.0.0.1:3114/api/pilot/commands/0c41feb3-064b-4761-beb9-20d4eea81df0",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      },
+      "reason": "Explicit not_found preflight response before first submission; required recovery protocol"
+    }
+  ],
+  "expectedCommandMisses": [
+    {
+      "status": 404,
+      "path": "/api/pilot/commands/8425cded-f773-4b73-b158-be10dc5437e2",
+      "method": "GET"
+    },
+    {
+      "status": 404,
+      "path": "/api/pilot/commands/e32320bb-f3d0-450e-808e-a26b97b5d8e9",
+      "method": "GET"
+    },
+    {
+      "status": 404,
+      "path": "/api/pilot/commands/9428e0b9-efe7-4ea3-a73d-51726343e3bb",
+      "method": "GET"
+    },
+    {
+      "status": 404,
+      "path": "/api/pilot/commands/53372beb-7a18-486f-a742-de160a684b9c",
+      "method": "GET"
+    },
+    {
+      "status": 404,
+      "path": "/api/pilot/commands/0c41feb3-064b-4761-beb9-20d4eea81df0",
+      "method": "GET"
+    }
+  ],
+  "commandPosts": [
+    "8425cded-f773-4b73-b158-be10dc5437e2",
+    "e32320bb-f3d0-450e-808e-a26b97b5d8e9",
+    "9428e0b9-efe7-4ea3-a73d-51726343e3bb",
+    "53372beb-7a18-486f-a742-de160a684b9c",
+    "0c41feb3-064b-4761-beb9-20d4eea81df0"
+  ],
+  "httpErrors": [],
+  "artifacts": [
+    "browser-artifacts/import-source.html",
+    "browser-artifacts/pilot-booking.html",
+    "browser-artifacts/confirm-request.html",
+    "browser-artifacts/confirm-case.html",
+    "browser-artifacts/browser-urdu-375.png",
+    "browser-artifacts/browser-urdu-375-viewport.png"
+  ],
+  "cookie": {
+    "name": "primora_pilot_session",
+    "httpOnly": true,
+    "sameSite": "Strict",
+    "path": "/api/pilot"
+  },
+  "status": "passed_local_browser_acceptance_only",
+  "finishedAt": "2026-10-22T11:31:46.406Z"
+}

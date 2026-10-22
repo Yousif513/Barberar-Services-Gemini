@@ -1,0 +1,1084 @@
+{
+  "classification": "Independent action/label reconciliation; NOT a static-audit waiver or official CLI pass",
+  "reviewedAt": "2026-10-22T11:36:19.248404+00:00",
+  "scope": {
+    "route": "/pilot/booking",
+    "pages": 1,
+    "sections": 5,
+    "overlays": 3,
+    "approvedActions": 13
+  },
+  "officialStaticAudit": {
+    "exitCode": 1,
+    "status": "FAIL retained",
+    "surfacesPresent": 4,
+    "surfacesMissing": 0,
+    "flaggedLabels": 37,
+    "rawReport": ".admin-console/evidence/primora-multilingual-pilot/surface-audit/audit.md",
+    "interpretation": "Raw audit is authoritative for its own offline requirements. Live browser acceptance does not replace or relabel it."
+  },
+  "actionReconciliation": [
+    {
+      "actionId": "choose-language",
+      "renderedLabels": [
+        "Language"
+      ],
+      "actualDestination": "pilot-booking",
+      "behavior": "Presentation locale changes only; underlying draft identities remain exact.",
+      "scenarioVerified": true,
+      "source": "web_platform/src/components/customer-pilot/booking-pilot.tsx:23"
+    },
+    {
+      "actionId": "open-import",
+      "renderedLabels": [
+        "Import a public source catalog"
+      ],
+      "actualDestination": "import-source",
+      "behavior": "Opens import overlay.",
+      "scenarioVerified": true,
+      "source": "web_platform/src/components/customer-pilot/booking-pilot.tsx:24"
+    },
+    {
+      "actionId": "confirm-import",
+      "renderedLabels": [
+        "Catalog data (JSON)",
+        "I copied these details from the stated public source.",
+        "Confirm public-source import"
+      ],
+      "actualDestination": "pilot-catalog",
+      "behavior": "Validates user-supplied public-source JSON and attestation; records unverified catalog, closes dialog, scrolls catalog.",
+      "scenarioVerified": true,
+      "source": "web_platform/src/components/customer-pilot/booking-pilot.tsx:16"
+    },
+    {
+      "actionId": "search-source",
+      "renderedLabels": [
+        "Search source names and services"
+      ],
+      "actualDestination": "pilot-catalog",
+      "behavior": "Filters local catalog and resets page; filtered-empty does not invent rows.",
+      "scenarioVerified": true,
+      "source": "web_platform/src/components/customer-pilot/booking-pilot.tsx:24"
+    },
+    {
+      "actionId": "select-details",
+      "renderedLabels": [
+        "Select",
+        "Selected",
+        "Requested staff",
+        "Requested date (Riyadh)",
+        "Requested time (Riyadh)",
+        "Your note"
+      ],
+      "actualDestination": "pilot-choose",
+      "behavior": "Selects exact source/hash/service and requested details in durable workspace-bound draft.",
+      "scenarioVerified": true,
+      "source": "web_platform/src/components/customer-pilot/booking-pilot.tsx:22"
+    },
+    {
+      "actionId": "review-request",
+      "renderedLabels": [
+        "Review details",
+        "Record this local request"
+      ],
+      "actualDestination": "confirm-request",
+      "behavior": "Two-step route within same page: selection form scrolls pilot-review; its record button opens confirmation overlay.",
+      "scenarioVerified": true,
+      "source": "web_platform/src/components/customer-pilot/booking-pilot.tsx:25"
+    },
+    {
+      "actionId": "record-request",
+      "renderedLabels": [
+        "Record this local request"
+      ],
+      "actualDestination": "pilot-requests",
+      "behavior": "Acknowledged overlay executes record-request once; local receipt and source snapshot persist without reservation/payment.",
+      "scenarioVerified": true,
+      "source": "web_platform/src/components/customer-pilot/booking-pilot.tsx:18"
+    },
+    {
+      "actionId": "open-request",
+      "renderedLabels": [
+        "{service name} {provider name} · {SAR amount} {request UUID} Local request recorded",
+        "Choose a recorded request"
+      ],
+      "actualDestination": "selected request detail within pilot-requests",
+      "behavior": "Dynamic row selects exact request ID; full immutable detail is inline. Explicit row-click not exercised; selector and selected detail exercised.",
+      "scenarioVerified": false,
+      "source": "web_platform/src/components/customer-pilot/booking-pilot.tsx:27"
+    },
+    {
+      "actionId": "open-case",
+      "renderedLabels": [
+        "Record a support case",
+        "Choose a recorded request",
+        "Case type",
+        "Reason and facts",
+        "Source evidence and additional facts"
+      ],
+      "actualDestination": "confirm-case",
+      "behavior": "Request-detail shortcut scrolls case form; case-form submit opens shared case confirmation overlay with request-linked facts.",
+      "scenarioVerified": true,
+      "source": "web_platform/src/components/customer-pilot/booking-pilot.tsx:28"
+    },
+    {
+      "actionId": "record-case",
+      "renderedLabels": [
+        "Save local record"
+      ],
+      "actualDestination": "pilot-cases",
+      "behavior": "Acknowledged shared overlay executes open-case once. Tested refund case remains local_case_recorded.",
+      "scenarioVerified": true,
+      "source": "web_platform/src/components/customer-pilot/booking-pilot.tsx:18"
+    },
+    {
+      "actionId": "append-followup",
+      "renderedLabels": [
+        "Requested next step",
+        "Append a follow-up",
+        "Append an appeal request",
+        "Your note",
+        "Append record",
+        "Save local record"
+      ],
+      "actualDestination": "pilot-cases",
+      "behavior": "Shared confirm-case overlay previews append-case-note and expectedRevision; appends immutable follow-up/appeal, preserves prior history.",
+      "scenarioVerified": true,
+      "source": "web_platform/src/components/customer-pilot/booking-pilot.tsx:28"
+    },
+    {
+      "actionId": "recover-unknown",
+      "renderedLabels": [
+        "Check the same command",
+        "Details"
+      ],
+      "actualDestination": "same local command receipt",
+      "behavior": "Pending command is shown both in page and open overlay; GET checks receipt before retry, same-ID event and one POST verified after lost response.",
+      "scenarioVerified": true,
+      "source": "web_platform/src/components/customer-pilot/pilot-controls.tsx:13"
+    },
+    {
+      "actionId": "retry-read",
+      "renderedLabels": [
+        "Try again",
+        "Refresh records"
+      ],
+      "actualDestination": "fresh current workspace state",
+      "behavior": "Try again invokes start() for session failure or refresh() for read failure; Refresh records invokes refresh(). Present/source-reviewed; failure/retry click not independently injected in this browser run.",
+      "scenarioVerified": false,
+      "source": "web_platform/src/components/customer-pilot/booking-pilot.tsx:23"
+    }
+  ],
+  "supportingControls": [
+    {
+      "labels": [
+        "Source catalog",
+        "Choose request details",
+        "Review the local request",
+        "Your request records",
+        "Support and case records"
+      ],
+      "behavior": "Five native fragment anchors resolve to existing IDs pilot-catalog/pilot-choose/pilot-review/pilot-requests/pilot-cases. Same-page navigation, no new screens."
+    },
+    {
+      "labels": [
+        "Close",
+        "Keep editing",
+        "Escape",
+        "backdrop dismissal"
+      ],
+      "behavior": "Close current overlay while retaining draft; disabled during saving. Keyboard containment tested all three overlays; Escape/restored trigger tested import and request. Keep editing source-reviewed."
+    },
+    {
+      "labels": [
+        "Previous",
+        "Next"
+      ],
+      "behavior": "Bounded local list pagination for sources, requests and cases; disabled at boundaries. Single-page disabled state observed, multi-page navigation source-reviewed."
+    },
+    {
+      "labels": [
+        "Edit draft"
+      ],
+      "behavior": "Scrolls to pilot-choose using existing draft; same request-review action refinement."
+    },
+    {
+      "labels": [
+        "Search your local requests"
+      ],
+      "behavior": "Filters own bounded local request records and resets page; no external search or new entity."
+    },
+    {
+      "labels": [
+        "Source provenance",
+        "Required data structure",
+        "Details"
+      ],
+      "behavior": "Native details/summary expands provenance, JSON schema guidance or audit/command facts; content is inline, not promised missing screens."
+    },
+    {
+      "labels": [
+        "{case kind} {case UUID} Local case recorded"
+      ],
+      "behavior": "Dynamic case row selects existing case detail for follow-up/history; no external dispatch. Label must vary with source records and locale."
+    },
+    {
+      "labels": [
+        "Refresh records"
+      ],
+      "behavior": "Existing retry-read action; authoritative refresh, not a new business command."
+    }
+  ],
+  "graphModelingDifferences": [
+    "review-request edge compresses selection→inline review→confirmation into one planned action; UI exposes both steps.",
+    "open-case edge compresses request-detail shortcut→case form→confirmation into one planned action.",
+    "open-request planned target review is semantic detail; actual recorded-request detail renders inline in pilot-requests, while pilot-review remains the new draft review section.",
+    "append-followup uses existing confirm-case overlay for preview before returning to support-cases; compressed graph edge does not name that intermediate overlay."
+  ],
+  "realMissingActions": [],
+  "verificationLimits": [
+    "No independent injected read-failure/retry UI click in this browser run; source handler and error boundary reviewed.",
+    "No independent explicit request-row click or multi-page pagination run; selected-request form/detail and disabled boundaries verified, handlers reviewed.",
+    "Native language and accent acceptance not performed.",
+    "Official offline artifact/reference/image requirements remain unmet; raw FAIL retained."
+  ],
+  "actualControlInventory": [
+    {
+      "capture": "pilot-booking",
+      "tag": "select",
+      "label": "Language",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "a",
+      "label": "1 Source catalog",
+      "type": null,
+      "href": "#pilot-catalog",
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "a",
+      "label": "2 Choose request details",
+      "type": null,
+      "href": "#pilot-choose",
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "a",
+      "label": "3 Review the local request",
+      "type": null,
+      "href": "#pilot-review",
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "a",
+      "label": "4 Your request records",
+      "type": null,
+      "href": "#pilot-requests",
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "a",
+      "label": "5 Support and case records",
+      "type": null,
+      "href": "#pilot-cases",
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "button",
+      "label": "Refresh records",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "button",
+      "label": "Import a public source catalog",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "input",
+      "label": "Search source names and services",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "summary",
+      "label": "Source provenance",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "button",
+      "label": "Selected",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "button",
+      "label": "Previous",
+      "type": "button",
+      "href": null,
+      "disabled": true
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "button",
+      "label": "Next",
+      "type": "button",
+      "href": null,
+      "disabled": true
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "select",
+      "label": "Requested staff",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "input",
+      "label": "Requested date (Riyadh)",
+      "type": "date",
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "input",
+      "label": "Requested time (Riyadh)",
+      "type": "time",
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "textarea",
+      "label": "Your note",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "button",
+      "label": "Review details",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "button",
+      "label": "Edit draft",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "button",
+      "label": "Record this local request",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "input",
+      "label": "Search your local requests",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "pilot-booking",
+      "tag": "select",
+      "label": "Choose a recorded request",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "import-source",
+      "tag": "select",
+      "label": "Language",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "import-source",
+      "tag": "a",
+      "label": "1 Source catalog",
+      "type": null,
+      "href": "#pilot-catalog",
+      "disabled": false
+    },
+    {
+      "capture": "import-source",
+      "tag": "a",
+      "label": "2 Choose request details",
+      "type": null,
+      "href": "#pilot-choose",
+      "disabled": false
+    },
+    {
+      "capture": "import-source",
+      "tag": "a",
+      "label": "3 Review the local request",
+      "type": null,
+      "href": "#pilot-review",
+      "disabled": false
+    },
+    {
+      "capture": "import-source",
+      "tag": "a",
+      "label": "4 Your request records",
+      "type": null,
+      "href": "#pilot-requests",
+      "disabled": false
+    },
+    {
+      "capture": "import-source",
+      "tag": "a",
+      "label": "5 Support and case records",
+      "type": null,
+      "href": "#pilot-cases",
+      "disabled": false
+    },
+    {
+      "capture": "import-source",
+      "tag": "button",
+      "label": "Refresh records",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "import-source",
+      "tag": "button",
+      "label": "Import a public source catalog",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "import-source",
+      "tag": "input",
+      "label": "Search source names and services",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "import-source",
+      "tag": "input",
+      "label": "Search your local requests",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "import-source",
+      "tag": "select",
+      "label": "Choose a recorded request",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "import-source",
+      "tag": "button",
+      "label": "Close",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "import-source",
+      "tag": "textarea",
+      "label": "Catalog data (JSON)",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "import-source",
+      "tag": "summary",
+      "label": "Required data structure",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "import-source",
+      "tag": "input",
+      "label": "I copied these details from the stated public source.",
+      "type": "checkbox",
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "import-source",
+      "tag": "button",
+      "label": "Close",
+      "type": "button",
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "import-source",
+      "tag": "button",
+      "label": "Confirm public-source import",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "select",
+      "label": "Language",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "a",
+      "label": "1 Source catalog",
+      "type": null,
+      "href": "#pilot-catalog",
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "a",
+      "label": "2 Choose request details",
+      "type": null,
+      "href": "#pilot-choose",
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "a",
+      "label": "3 Review the local request",
+      "type": null,
+      "href": "#pilot-review",
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "a",
+      "label": "4 Your request records",
+      "type": null,
+      "href": "#pilot-requests",
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "a",
+      "label": "5 Support and case records",
+      "type": null,
+      "href": "#pilot-cases",
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "button",
+      "label": "Refresh records",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "button",
+      "label": "Import a public source catalog",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "input",
+      "label": "Search source names and services",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "summary",
+      "label": "Source provenance",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "button",
+      "label": "Selected",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "button",
+      "label": "Previous",
+      "type": "button",
+      "href": null,
+      "disabled": true
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "button",
+      "label": "Next",
+      "type": "button",
+      "href": null,
+      "disabled": true
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "select",
+      "label": "Requested staff",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "input",
+      "label": "Requested date (Riyadh)",
+      "type": "date",
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "input",
+      "label": "Requested time (Riyadh)",
+      "type": "time",
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "textarea",
+      "label": "Your note",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "button",
+      "label": "Review details",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "button",
+      "label": "Edit draft",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "button",
+      "label": "Record this local request",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "input",
+      "label": "Search your local requests",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "select",
+      "label": "Choose a recorded request",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "button",
+      "label": "Close",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "input",
+      "label": "I understand this records a local request only; no appointment or payment is confirmed.",
+      "type": "checkbox",
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "button",
+      "label": "Keep editing",
+      "type": "button",
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-request",
+      "tag": "button",
+      "label": "Record this local request",
+      "type": null,
+      "href": null,
+      "disabled": true
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "select",
+      "label": "Language",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "a",
+      "label": "1 Source catalog",
+      "type": null,
+      "href": "#pilot-catalog",
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "a",
+      "label": "2 Choose request details",
+      "type": null,
+      "href": "#pilot-choose",
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "a",
+      "label": "3 Review the local request",
+      "type": null,
+      "href": "#pilot-review",
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "a",
+      "label": "4 Your request records",
+      "type": null,
+      "href": "#pilot-requests",
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "a",
+      "label": "5 Support and case records",
+      "type": null,
+      "href": "#pilot-cases",
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "button",
+      "label": "Refresh records",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "button",
+      "label": "Import a public source catalog",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "input",
+      "label": "Search source names and services",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "summary",
+      "label": "Source provenance",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "button",
+      "label": "Selected",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "button",
+      "label": "Previous",
+      "type": "button",
+      "href": null,
+      "disabled": true
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "button",
+      "label": "Next",
+      "type": "button",
+      "href": null,
+      "disabled": true
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "select",
+      "label": "Requested staff",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "input",
+      "label": "Requested date (Riyadh)",
+      "type": "date",
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "input",
+      "label": "Requested time (Riyadh)",
+      "type": "time",
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "textarea",
+      "label": "Your note",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "button",
+      "label": "Review details",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "button",
+      "label": "Edit draft",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "button",
+      "label": "Record this local request",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "input",
+      "label": "Search your local requests",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "button",
+      "label": "QA fixture service QA fixture provider · SAR 1,250.75 39fd0128-9cd4-422f-ae19-dd4fbeaf9bcd Recorded locally",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "button",
+      "label": "Previous",
+      "type": "button",
+      "href": null,
+      "disabled": true
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "button",
+      "label": "Next",
+      "type": "button",
+      "href": null,
+      "disabled": true
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "button",
+      "label": "Record a support case",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "summary",
+      "label": "Details",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "select",
+      "label": "Choose a recorded request",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "select",
+      "label": "Case type",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "textarea",
+      "label": "Reason and facts",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "textarea",
+      "label": "Source evidence and additional facts",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "button",
+      "label": "Record a support case",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "button",
+      "label": "Close",
+      "type": null,
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "input",
+      "label": "This records your request for review. No human coverage, remedy, refund or external action is promised.",
+      "type": "checkbox",
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "button",
+      "label": "Keep editing",
+      "type": "button",
+      "href": null,
+      "disabled": false
+    },
+    {
+      "capture": "confirm-case",
+      "tag": "button",
+      "label": "Save local record",
+      "type": null,
+      "href": null,
+      "disabled": true
+    }
+  ],
+  "reportReview": {
+    "deliveryReport": "docs/primora-local-multilingual-pilot-report.md",
+    "operatorGuide": "docs/primora-local-pilot-operations.md",
+    "runnerReadme": "scripts/volabi-auditions/README.md",
+    "holdsAndDraftQualityAccuratelyDisclosed": true,
+    "historicalReceiptHashes": [
+      {
+        "region": "eastus",
+        "exactBytesMatch": true,
+        "exactSha256Match": true,
+        "sha256": "68e04ac38a950c39f93f350ebf4ad17b1189d2067e653890b066bf35bcca17ff"
+      },
+      {
+        "region": "uaenorth",
+        "exactBytesMatch": true,
+        "exactSha256Match": true,
+        "sha256": "dee4f399faceca2d70167465bb033aff47fc57bf36c7b70825dbb0c8045edca7"
+      }
+    ],
+    "findingsAtReview": [
+      "Delivery report verification.json link not yet present at review time; parent notified.",
+      "Runner README calls actual resource S1 while delivery report correctly distinguishes S1 meter from actual paid SKU; parent notified to align wording.",
+      "Runner README final next-step still asks independent utility review after completed review; parent notified for status alignment."
+    ],
+    "followUp": {
+      "checkedAt": "2026-10-22T11:38:28.160738+00:00",
+      "verificationJsonNowPresent": true,
+      "canonicalVolabiFileCount": 76,
+      "canonicalVolabiMismatches": [],
+      "historicalAuditionFileCount": 69,
+      "historicalAuditionMismatches": 0,
+      "currentHubReadmeAccuratelyDisclosesApprovedPilotAndPendingRegionalAudio": true,
+      "notes": "Canonical hash match confirms bytes/normalization only; historical structural receipt fields are not a new runtime/native certification.",
+      "canonicalVolabiHashPathBasis": "Every files[].path relative to planning/volabi (receipt directory), never repository-root first."
+    }
+  },
+  "decision": "Local pilot operational/browser acceptance supported; official static audit and native acceptance remain explicitly unpassed. No implementation changes or approval expansion."
+}

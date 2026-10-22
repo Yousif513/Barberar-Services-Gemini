@@ -1,0 +1,19 @@
+# Local multilingual pilot — operator guide
+
+This development pilot records requests and support cases on this computer. It starts empty. Bangla, Urdu and Hindi copy is draft pending independent native review; English and Arabic remain available. It does not reserve an appointment, validate availability, collect payment, issue a refund or contact a provider.
+
+Run `npm run pilot:dev` from the isolated repair checkout, then open http://127.0.0.1:3114/pilot/booking. The launcher binds loopback only. The page/API require the explicit local development flag and refuse Vercel. Camera, microphone, location and payment browser permissions are denied here. This pilot does not enable HQ employees or change the existing customer portal language preference.
+
+1. Choose a language. Arabic and Urdu mirror the layout. Selections, request IDs, case IDs and source amounts survive language changes.
+2. Import a catalog copied from a real public source. The import dialog explains the JSON fields; the exact contract is [API_CONTRACT.md](../planning/primora-multilingual/local-pilot/API_CONTRACT.md). Supply the source title/reference and observation time, actual provider/service/staff identifiers and names, duration and integer halalas. No source is fetched automatically. Do not enter private/customer records. Imported details remain labelled unverified.
+3. Select the source service and staff, then request a future Riyadh date/time. Review its source, hash and SAR amount, acknowledge the local boundary and record the request. It is a request record, not a confirmed appointment.
+4. Open that request under request records. Record an inquiry, change, cancellation, refund request or complaint with a reason and optional evidence. Add a note or appeal; each append retains previous history and increments the case revision. Refund decisions and financial execution remain held.
+5. If a reply is lost, keep the pending command and use recovery. The client checks the original receipt before any retry and retains the same command ID. A changed/expired workspace prevents automatic replay. A failed refresh blocks mutations until an authoritative read succeeds. Do not clear browser data to fix an unknown result.
+
+The server persists to ignored `.local-primora-pilot/pilot.sqlite`; browser locale/draft/pending-command state is local to this pilot. The purpose-scoped HttpOnly cookie expires after30days. Losing it opens a new workspace and does not recover the old one; old local records are retained. This is local development isolation, not production identity, account recovery, retention compliance or protection from someone controlling this computer.
+
+Each workspace has bounded quotas of100catalogs,100requests,100cases and500events. Source imports create immutable versions; a newer version blocks stale drafts while recorded request snapshots retain the original amount. Case updates require the current revision. Commands, entity changes and audit receipts are one SQLite transaction; local hash-linked events are not a production audit certification.
+
+Use only public catalog information and development notes. Do not use the controlled QA fixtures shown in test captures as business data. Production booking, hosted persistence, OTP, notifications, licensed-provider checkout, localized customer communications, voice support and native acceptance are later integration/release gates from the approved rollout proposal.
+
+For management auditions, use [the gated runner guide](../scripts/volabi-auditions/README.md). First confirm the actual development Azure resource, its account terms and an all-inclusive fee upper bound. The already approved allowance remains SAR10total,100,000aggregate characters and at most3rounds. Never send a key in chat. A masked, resource-bound local credential step follows those account checks. Additional services or paid native reviewers require separate approval.

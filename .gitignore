@@ -59,3 +59,9 @@ android/local.properties
 
 # Local Volabi founder development workspace (requests and session secrets)
 .local-volabi/
+
+# Local multilingual pilot workspace: source imports, requests and session secrets
+.local-primora-pilot/
+
+# Separate local multilingual dev server output
+.next-pilot/

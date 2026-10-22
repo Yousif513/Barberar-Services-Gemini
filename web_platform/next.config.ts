@@ -28,6 +28,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  distDir: process.env.PRIMORA_PILOT_LOCAL_MODE === "enabled" ? ".next-pilot" : ".next",
   turbopack: {
     root: path.resolve(__dirname, ".."),
   },
@@ -38,6 +39,7 @@ const nextConfig: NextConfig = {
     return [
       { source: "/:path*", headers: securityHeaders },
       { source: "/hq/:path*", headers: [{ key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=(), payment=()" }] },
+      { source: "/pilot/:path*", headers: [{ key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" }] },
     ];
   },
 };

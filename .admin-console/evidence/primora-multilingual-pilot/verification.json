@@ -1,0 +1,185 @@
+{
+  "checkedAt": "2026-10-22T11:40:22.929003+00:00",
+  "classification": "local_development_pilot_only; no_production_release_or_native_voice_acceptance",
+  "branch": "codex-booking-payment-reconciliation",
+  "baseCommit": "83e4d54667b0edfbed903121673d2f1a0fb58216",
+  "workingCheckout": "isolated recovered repair worktree; original dirty gemini checkout untouched",
+  "scope": {
+    "route": "/pilot/booking",
+    "languages": [
+      "en",
+      "ar",
+      "bn-BD",
+      "ur-PK",
+      "hi-IN"
+    ],
+    "connectedSections": 5,
+    "overlays": 3,
+    "defaultData": "empty; explicit public source import only",
+    "database": "ignored .local-primora-pilot/pilot.sqlite"
+  },
+  "checks": [
+    {
+      "command": "npm run test --workspace=web_platform",
+      "exitCode": 0,
+      "passed": 996,
+      "failed": 0,
+      "skipped": 0,
+      "note": "Final aggregate run after frozen runner implementation;953baseline+36pilot+7independent audition regressions"
+    },
+    {
+      "command": "npm run typecheck:mobile",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build --workspace=web_platform",
+      "exitCode": 0,
+      "warnings": [
+        "4existing HQ dynamic-filesystem tracing warnings",
+        "provider-sitemap fetch failed; build still completed"
+      ]
+    },
+    {
+      "command": "npm run lint --workspace=web_platform -- --format json --output-file ../.admin-console/evidence/primora-multilingual-pilot/eslint-results.json",
+      "exitCode": 0,
+      "errors": 0,
+      "warnings": 302,
+      "allNewPilotFilesWarnings": 0,
+      "receipt": "eslint-results.json"
+    },
+    {
+      "command": "npm run test:security-core",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run test:admin-controls",
+      "exitCode": 0
+    },
+    {
+      "command": "independent backend actual loopback HTTP/SQLite acceptance",
+      "exitCode": 0,
+      "passed": 11,
+      "evidence": "review-backend.json"
+    },
+    {
+      "command": "node web_platform/tests-browser/customer-pilot-independent.mjs",
+      "exitCode": 0,
+      "passedCheckGroups": 12,
+      "evidence": "browser-independent.json"
+    },
+    {
+      "command": "official audit_surfaces.py against actual frozen browser captures",
+      "exitCode": 1,
+      "verdict": "FAIL",
+      "planned": 4,
+      "completed": 4,
+      "missing": 0,
+      "renderedAffordances": 40,
+      "unmappedStaticLabels": 37,
+      "note": "Unwaived raw findings retained. Browser captures depend on served Next assets; variable labels not mapped by graph actions schema. Separate independent reconciliation required; no clean static/release claim.",
+      "evidence": "surface-audit/audit.json"
+    },
+    {
+      "command": "canonical original source receipts",
+      "exitCode": 0,
+      "volabiPackageFiles": 76,
+      "historicalAuditionFiles": 69,
+      "mismatches": 0,
+      "note": "README current-status hash updated; original historical audition source hashes preserved"
+    },
+    {
+      "command": "npx eslint tests/customer-pilot-independent-auditions.test.mjs (web_platform)",
+      "exitCode": 0,
+      "note": "Final source added after full lint;0warnings"
+    },
+    {
+      "command": "independent action/label reconciliation",
+      "status": "13actions mapped; no missing functional destination found",
+      "evidence": "browser-action-reconciliation.json",
+      "limitation": "Request-row activation, read-failure retry and multi-page navigation source-reviewed only; raw static audit still FAIL"
+    },
+    {
+      "command": "node --test scripts/volabi-auditions/runner.test.mjs",
+      "exitCode": 0,
+      "passed": 31,
+      "failed": 0,
+      "skipped": 0,
+      "note": "Root rerun against frozen code; mocked fetch only;0real keys/paid synthesis"
+    },
+    {
+      "command": "node scripts/volabi-auditions/runner.mjs plan",
+      "exitCode": 0,
+      "approvalId": "20261022-azure-development-15",
+      "planSha256": "fdcc595b0eae105f9af85bae207f97911119477881d4bfecc50c128e26c5f41d",
+      "requests": 92,
+      "conservativeUnits": 66818,
+      "network": "none"
+    },
+    {
+      "command": "final runner self-verification canonical receipt",
+      "exitCode": 0,
+      "files": 9,
+      "mismatches": 0
+    },
+    {
+      "command": "independent audition regressions",
+      "exitCode": 0,
+      "passed": 7,
+      "note": "Included in996web tests; separate reviewer combined38case run also reported; actualDPAPI/key/provider call remains untested",
+      "evidence": "review-audition-runner.json"
+    }
+  ],
+  "independentImplementationSeparation": {
+    "backendImplementer": "root",
+    "backendReviewer": "server_hq_audit",
+    "uiImplementer": "hq_repo_inventory",
+    "browserReviewer": "pilot_browser_review",
+    "auditionImplementer": "skills_and_delivery",
+    "auditionReviewer": "server_hq_audit"
+  },
+  "voiceApproval": {
+    "approvalId": "20261022-azure-development-15",
+    "allInSarCap": 10,
+    "aggregateCharacterCap": 100000,
+    "maximumRounds": 3,
+    "firstRoundRequests": 92,
+    "firstRoundConservativeUnits": 66818,
+    "maleDirection": "Saudi6",
+    "femaleDirection": "Lebanese9",
+    "actualPaidRequests": 0,
+    "actualRegionalAudioFiles": 0,
+    "realCredentialsReadOrEntered": false,
+    "actualAccountVerified": false,
+    "nativeAcceptance": "pending; no scores claimed",
+    "runnerIndependentReview": "passed offline scope,38/38owner+independent; actual DPAPI/account/audio/native untested"
+  },
+  "approvalHolds": [
+    "production deployment/merges",
+    "HQ business employee activation",
+    "business permission grants",
+    "external business writes",
+    "financial transactions",
+    "paid native reviewers/additional services outside exact approved Speech pass"
+  ],
+  "fullRegulatedAdminConsoleRelease": {
+    "profile": "regulated",
+    "releaseValidation": "not re-certified by local pilot; previously blocked gaps remain",
+    "coverage": "not re-certified by local pilot",
+    "productionReady": false
+  },
+  "pending": [
+    "Named development Azure account/resource/region, actual agreement and all-inclusive upper fee bound",
+    "Masked resource-bound credential enrollment and live response interoperability",
+    "All15regional audio outcomes and native/blind voice evaluation",
+    "Independent native translation acceptance before real customer rollout",
+    "Hosted customer journey integrations and unresolved static-capture audit compatibility"
+  ],
+  "commitAndPush": "This receipt captures verification before commit. Exact delivered implementation commit and branch handoff are recorded in .coworking_changelog.md and the final response.",
+  "independentReviewReceiptsHashBasis": "exact captured local bytes at integration; cross-checkout canonical hashes are in DELIVERY_HASHES.json",
+  "independentReviewReceipts": {
+    "review-backend.json": "2e8c351a8b5ee1255c265d53f21d1d191d599048c52efe6825b54f636e8aa9d0",
+    "review-audition-runner.json": "629914a6368172e6b2902fc1e72cc61013b567837afde7ed14594c38cd08597b",
+    "browser-independent.json": "a35999b378d07c4aaab3a70f18bac3933b78b8992403fb428fff604f1f0f52a1",
+    "browser-action-reconciliation.json": "1a220e29816dcc1b8ffdae2d74afc33c61db89210d30038b73c2cd654e5497a6"
+  }
+}

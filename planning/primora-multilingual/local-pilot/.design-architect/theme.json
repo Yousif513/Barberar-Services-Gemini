@@ -1,0 +1,31 @@
+{
+  "source": "root_design_md",
+  "source_path": "DESIGN.md",
+  "stitch_theme_id": null,
+  "design_md_content": "# PRIMORA local customer pilot\n\nInherit the existing marketplace visual direction from web_platform/src/app/shop/[id]/page.tsx: warm ivory#F2EEE6, dark ink#171C1C, restrained gold#C29A4C, readable cards and existing public controls. Keep source provenance, local-only status and native-review-pending visible. Use installed/system script-capable fallback fonts; do not add paid font services. Explicit locale rather than document direction selects copy. Arabic/Urdu RTL; Bangla/Hindi/English LTR. All values and canonical identifiers use bidi isolation. Five connected sections and three accessible overlays; states are not extra pages. No fabricated services, availability, completed transactions, support agents or scores.\n",
+  "palette": [
+    {
+      "role": "Unspecified",
+      "name": "",
+      "hex": "#f2eee6"
+    },
+    {
+      "role": "Unspecified",
+      "name": "",
+      "hex": "#171c1c"
+    },
+    {
+      "role": "Unspecified",
+      "name": "",
+      "hex": "#c29a4c"
+    }
+  ],
+  "typography": {},
+  "shape": {},
+  "elevation": null,
+  "vibe": [
+    "warm"
+  ],
+  "conflicts": [],
+  "warnings": []
+}

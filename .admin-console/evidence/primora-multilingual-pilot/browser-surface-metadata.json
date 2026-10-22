@@ -1,0 +1,62 @@
+{
+  "classification": "Independent controlled local browser acceptance. Synthetic fixture only in test/browser/evidence.",
+  "completed": [
+    "pilot-booking",
+    "import-source",
+    "confirm-request",
+    "confirm-case"
+  ],
+  "capturedAt": "2026-10-22T11:32:19.940770+00:00",
+  "captureMethod": "Actual page.content() from headless Chromium through approved local route and each opened overlay",
+  "url": "http://127.0.0.1:3114/pilot/booking",
+  "locale": "en",
+  "artifactDirectory": ".admin-console/evidence/primora-multilingual-pilot/browser-artifacts",
+  "html": [
+    {
+      "surface": "pilot-booking",
+      "file": "browser-artifacts/pilot-booking.html",
+      "sha256": "77c6040c92e7599ea215374fbf50c107c1ab6c71672bc4eaf127a77a882f2409"
+    },
+    {
+      "surface": "import-source",
+      "file": "browser-artifacts/import-source.html",
+      "sha256": "9497a20c7de1331ae095488a7dbea22df23e58c983abea38b8875854a36dd202"
+    },
+    {
+      "surface": "confirm-request",
+      "file": "browser-artifacts/confirm-request.html",
+      "sha256": "43dc2803e81a102378b648f60e836bc049f06fe6e09a26bdcbfc883915ca8eba"
+    },
+    {
+      "surface": "confirm-case",
+      "file": "browser-artifacts/confirm-case.html",
+      "sha256": "ec7152c2ae031604027f0d29f827613aba31e987d8ede50e8358016f0fe8e241"
+    }
+  ],
+  "review": {
+    "browserGroupsPassed": 12,
+    "implementationChangedByReviewer": false,
+    "nativeLanguageQuality": "not_evaluated",
+    "accentQuality": "not_evaluated",
+    "blockingFindings": [],
+    "expectedNetworkErrors": "Five explicit not_found preflight GETs before first command POST; one deliberately lost committed response, recovered with GET and no resubmit.",
+    "visualInspection": "375px Urdu screenshot inspected for clipping, RTL/bidi and basic legibility; not linguistic certification.",
+    "holds": "No production, employee activation, financial action, external business writes or paid services performed."
+  },
+  "sourceHashes": {
+    "web_platform/src/app/api/pilot/[...path]/route.ts": "5d6f312675b2a5b0a7018e764f174d178000596bd754acde5cf162ca429ae727",
+    "web_platform/src/app/pilot/booking/layout.tsx": "f6450aa29b8de3e4533e9a9688de409c100a4d511895c040802ec69731eebf22",
+    "web_platform/src/app/pilot/booking/page.tsx": "20a728789c7dfb7cdc7b6c74168919bb5917adc1f40f1a65b5545b3cf91112ec",
+    "web_platform/src/lib/customer-pilot/client.ts": "e3128f7d4aa4643ea915d8a7efda1a5055287254b9066f1111562366c905ce89",
+    "web_platform/src/lib/customer-pilot/contracts.ts": "47ba057c8588c6ca277a5d187abbd5fd265f9f9c193c124ba679c7b4bd4aef31",
+    "web_platform/src/lib/customer-pilot/copy.ts": "626d3b28db9d02ebea20095c2f4cbda0a3f2056b25aed1e83cae8e18d103217c",
+    "web_platform/src/lib/customer-pilot/server/handler.d.mts": "3b1914918d772c76ee5453fcf48b8939603ccc6f052a28ab4802db022b814611",
+    "web_platform/src/lib/customer-pilot/server/handler.mjs": "d8bddf07306152fd8d7d9ef2b568eb1cadd899c07e342cd83de1a9148c76f48c",
+    "web_platform/src/lib/customer-pilot/server/store.mjs": "81dbce78d9c66d63758ce3e040090a9116fb8c15d01a1152d9203c4bf3e09ee7",
+    "web_platform/tests-browser/customer-pilot-independent.mjs": "464d876a80830f525540ce484ef96c2966f577e90426ceb835431985afc92380",
+    "web_platform/src/components/customer-pilot/booking-pilot.tsx": "a93cc96d617315e84ff9199777d51f3296d10a08c8bdbd630e7d0beac06496cd",
+    "web_platform/src/components/customer-pilot/pilot-context.tsx": "1f20156e5c7ad32ea47c539080f5a4cef20e3df4673951d350b51247ad01daa8",
+    "web_platform/src/components/customer-pilot/pilot-controls.tsx": "de9ebe766f72aa17fd50f3cace06f48e7407defaaddee00a3b3b53d6c8269339",
+    "web_platform/src/components/customer-pilot/pilot.css": "974dcebef77acae376f8dc0f26dceaf45f63e5b7605443785782b95e291dd8f4"
+  }
+}

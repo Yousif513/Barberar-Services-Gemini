@@ -1,0 +1,79 @@
+{
+  "bmad_present": true,
+  "project_root": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\planning\\primora-multilingual\\local-pilot",
+  "config_path": null,
+  "docs_dir": "docs",
+  "project_name": "Approved local Bangla/Urdu/Hindi booking/support pilot",
+  "project_description": null,
+  "prd_path": "docs\\prd.md",
+  "architecture_path": null,
+  "front_end_spec_path": "docs\\front-end-spec.md",
+  "epic_paths": [],
+  "story_paths": [],
+  "qa_paths": [],
+  "spec_paths": [],
+  "actors": [],
+  "entities": [],
+  "epics": [],
+  "explicit_screens": [
+    {
+      "name": "Local booking and support pilot",
+      "route": "/pilot/booking",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 3,
+      "raw": "/pilot/booking — Local booking and support pilot"
+    }
+  ],
+  "story_triggers": [],
+  "spec_snippets": [
+    {
+      "quote": "Select a language without losing selections or local identifiers.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 7,
+      "section": "Local booking and support pilot behavior"
+    },
+    {
+      "quote": "Search the imported sources; show an empty result or source error honestly.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 9,
+      "section": "Local booking and support pilot behavior"
+    },
+    {
+      "quote": "Select source service, staff and requested Riyadh date/time.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 10,
+      "section": "Local booking and support pilot behavior"
+    },
+    {
+      "quote": "Review an immutable source snapshot and confirm a local request.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 11,
+      "section": "Local booking and support pilot behavior"
+    },
+    {
+      "quote": "Open an existing local request and its append-only history.",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 12,
+      "section": "Local booking and support pilot behavior"
+    }
+  ],
+  "design_md_path": "DESIGN.md",
+  "stitch_metadata_path": null,
+  "site_md_path": null,
+  "brand_hints": {
+    "colors": [
+      "#F2EEE6",
+      "#171C1C",
+      "#C29A4C"
+    ],
+    "vibe": [
+      "warm"
+    ]
+  },
+  "warnings": []
+}

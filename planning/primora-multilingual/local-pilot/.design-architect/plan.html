@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Stitch Architect — Plan Map</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js">}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/layout-base/layout-base.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cose-base/cose-base.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape-cose-bilkent@4.1.0/cytoscape-cose-bilkent.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  body { display: flex; background: #0f172a; color: #e2e8f0; }
+  #sidebar { width: 320px; background: #1e293b; padding: 16px; overflow-y: auto; border-right: 1px solid #334155; }
+  #sidebar h1 { font-size: 14px; margin: 0 0 4px 0; color: #06b6d4; letter-spacing: 0.5px; text-transform: uppercase; }
+  #sidebar .subtitle { font-size: 12px; color: #64748b; margin-bottom: 16px; }
+  #sidebar h2 { font-size: 11px; margin: 16px 0 8px 0; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+  #search { width: 100%; padding: 8px 12px; background: #0f172a; color: #e2e8f0; border: 1px solid #334155; border-radius: 6px; font-size: 13px; }
+  #search:focus { outline: none; border-color: #06b6d4; }
+  .toggle-group { margin-bottom: 12px; }
+  .toggle { display: flex; align-items: center; padding: 4px 0; font-size: 12px; cursor: pointer; user-select: none; }
+  .toggle input { margin-right: 8px; accent-color: #06b6d4; }
+  .toggle .count { color: #64748b; margin-left: auto; font-size: 11px; }
+  .toggle .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; border: 1px solid rgba(255,255,255,0.2); }
+  #cy { flex: 1; background: #0f172a; position: relative; }
+  #detail-panel { position: absolute; top: 0; right: 0; width: 360px; height: 100%; background: #1e293b; border-left: 1px solid #334155; padding: 16px; overflow-y: auto; transform: translateX(100%); transition: transform 0.2s; }
+  #detail-panel.open { transform: translateX(0); }
+  #detail-panel h3 { margin: 0 0 8px 0; font-size: 14px; color: #06b6d4; }
+  #detail-panel .route { font-family: monospace; color: #94a3b8; font-size: 12px; margin-bottom: 16px; }
+  #detail-panel .section { margin-bottom: 16px; }
+  #detail-panel .label { font-size: 10px; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px; margin-bottom: 4px; }
+  #detail-panel .value { font-size: 13px; color: #e2e8f0; }
+  #detail-panel .tag { display: inline-block; padding: 2px 8px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; font-size: 11px; margin-right: 4px; margin-bottom: 4px; font-family: monospace; }
+  #detail-panel .neighbor { display: block; padding: 6px 8px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; font-size: 12px; margin-bottom: 4px; cursor: pointer; }
+  #detail-panel .neighbor:hover { border-color: #06b6d4; }
+  #detail-close { position: absolute; top: 12px; right: 12px; background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; padding: 4px 8px; }
+  #toolbar { position: absolute; top: 12px; left: 12px; display: flex; gap: 8px; z-index: 5; }
+  #toolbar button { padding: 6px 12px; background: #1e293b; color: #e2e8f0; border: 1px solid #334155; border-radius: 6px; font-size: 12px; cursor: pointer; }
+  #toolbar button:hover { border-color: #06b6d4; }
+  #stats { position: absolute; bottom: 12px; left: 12px; background: #1e293b; padding: 6px 12px; border: 1px solid #334155; border-radius: 6px; font-size: 11px; color: #94a3b8; font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="sidebar">
+  <h1>Stitch Architect</h1>
+  <div class="subtitle">Approved local Bangla/Urdu/Hindi booking/support pilot</div>
+  <input id="search" placeholder="Search nodes…" />
+
+  <h2>Areas</h2>
+  <div class="toggle-group" id="area-filters"></div>
+
+  <h2>Node kinds</h2>
+  <div class="toggle-group" id="kind-filters"></div>
+
+  <h2>Edge types</h2>
+  <div class="toggle-group" id="edge-filters"></div>
+
+  <h2>Totals</h2>
+  <div id="totals-display" style="font-size:12px;color:#94a3b8;line-height:1.6"></div>
+</div>
+
+<div id="cy">
+  <div id="toolbar">
+    <button onclick="fitAll()">Fit</button>
+    <button onclick="setLayout('cose-bilkent')">Cluster</button>
+    <button onclick="setLayout('grid')">Grid</button>
+    <button onclick="setLayout('concentric')">Concentric</button>
+    <button onclick="setLayout('breadthfirst')">Hierarchy</button>
+  </div>
+  <div id="stats"></div>
+  <div id="detail-panel">
+    <button id="detail-close" onclick="closeDetail()">&times;</button>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<script>
+const GRAPH_DATA = {"plan_version": 1, "project": {"name": "Approved local Bangla/Urdu/Hindi booking/support pilot", "root": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\planning\\primora-multilingual\\local-pilot", "bmad_present": true}, "areas": ["ecommerce", "support"], "nodes": [{"id": "local-booking-and-support-pilot", "kind": "page", "name": "Local booking and support pilot", "route": "/pilot/booking", "area": "uncategorized", "page_kind": "page", "role_gated": null, "purpose": "", "provenance": ["bmad:docs\\front-end-spec.md:3"]}, {"id": "local-booking-and-support-pilot-popover-date-range", "kind": "popover", "name": "Date range", "parent": "local-booking-and-support-pilot", "area": "uncategorized", "provenance": ["closure:depth-1:from:local-booking-and-support-pilot::date-range"]}, {"id": "local-booking-and-support-pilot-popover-widget-actions", "kind": "popover", "name": "Widget menu", "parent": "local-booking-and-support-pilot", "area": "uncategorized", "provenance": ["closure:depth-1:from:local-booking-and-support-pilot::widget-menu"]}, {"id": "local-booking-and-support-pilot-state-loading", "kind": "state", "name": "Local booking and support pilot — loading", "parent": "local-booking-and-support-pilot", "state_variant": "loading", "area": "uncategorized"}, {"id": "local-booking-and-support-pilot-state-error", "kind": "state", "name": "Local booking and support pilot — error", "parent": "local-booking-and-support-pilot", "state_variant": "error", "area": "uncategorized"}, {"id": "local-booking-and-support-pilot-state-empty", "kind": "state", "name": "Local booking and support pilot — empty", "parent": "local-booking-and-support-pilot", "state_variant": "empty", "area": "uncategorized"}, {"id": "profile", "kind": "page", "name": "Profile", "route": "/profile", "area": "", "page_kind": "page", "role_gated": null, "purpose": "Reached from Profile on shared-popover-user-menu", "provenance": ["closure:depth-2:from:shared-popover-user-menu::um-profile"]}, {"id": "profile-popover-date-range", "kind": "popover", "name": "Date range", "parent": "profile", "area": "", "provenance": ["closure:depth-3:from:profile::date-range"]}, {"id": "profile-popover-widget-actions", "kind": "popover", "name": "Widget menu", "parent": "profile", "area": "", "provenance": ["closure:depth-3:from:profile::widget-menu"]}, {"id": "settings", "kind": "page", "name": "Settings", "route": "/settings", "area": "", "page_kind": "setting", "role_gated": null, "purpose": "Reached from Settings on shared-popover-user-menu", "provenance": ["closure:depth-2:from:shared-popover-user-menu::um-settings"]}, {"id": "settings-modal-destructive-confirm", "kind": "modal", "name": "Danger zone action", "parent": "settings", "area": "", "provenance": ["closure:depth-3:from:settings::danger-zone"]}, {"id": "settings-notifications", "kind": "page", "name": "Notifications", "route": "/settings/notifications", "area": "", "page_kind": "setting", "role_gated": null, "purpose": "Reached from Notification settings on shared-drawer-notifications", "provenance": ["closure:depth-2:from:shared-drawer-notifications::nt-settings"]}, {"id": "settings-notifications-modal-destructive-confirm", "kind": "modal", "name": "Danger zone action", "parent": "settings-notifications", "area": "", "provenance": ["closure:depth-3:from:settings-notifications::danger-zone"]}, {"id": "shared-popover-user-menu", "kind": "popover", "name": "User menu", "area": "", "shared": true, "provenance": ["closure:depth-1:from:shell::user-menu"]}, {"id": "shared-drawer-notifications", "kind": "drawer", "name": "Notifications", "area": "", "shared": true, "provenance": ["closure:depth-1:from:shell::notifications-bell"]}, {"id": "shared-drawer-notifications-state-empty", "kind": "state", "name": "Notifications — empty", "parent": "shared-drawer-notifications", "state_variant": "empty", "area": ""}, {"id": "shared-drawer-notifications-state-loading", "kind": "state", "name": "Notifications — loading", "parent": "shared-drawer-notifications", "state_variant": "loading", "area": ""}, {"id": "shared-command-palette-global-search", "kind": "command-palette", "name": "Search", "area": "", "shared": true, "provenance": ["closure:depth-1:from:shell::global-search"]}, {"id": "shared-command-palette-global-search-state-no-results", "kind": "state", "name": "Search — no-results", "parent": "shared-command-palette-global-search", "state_variant": "no-results", "area": ""}, {"id": "shared-toast-success", "kind": "toast", "name": "Mark all read", "area": "", "shared": true, "provenance": ["closure:depth-2:from:shared-drawer-notifications::nt-markall"]}, {"id": "shared-toast-error", "kind": "toast", "name": "Error", "area": "", "shared": true, "provenance": ["closure:depth-3:from:settings::toast:error"]}, {"id": "shared-modal-reauthenticate", "kind": "modal", "name": "Confirm password", "area": "", "shared": true, "provenance": ["closure:depth-3:from:settings::reauth"]}, {"id": "shared-toast-info", "kind": "toast", "name": "Undo", "area": "", "shared": true, "provenance": ["closure:depth-3:from:shared-toast-success::undo"]}], "edges": [{"source": "local-booking-and-support-pilot", "target": "local-booking-and-support-pilot-popover-date-range", "type": "contains"}, {"source": "local-booking-and-support-pilot", "target": "local-booking-and-support-pilot-popover-widget-actions", "type": "contains"}, {"source": "local-booking-and-support-pilot", "target": "local-booking-and-support-pilot-state-loading", "type": "contains"}, {"source": "local-booking-and-support-pilot", "target": "local-booking-and-support-pilot-state-error", "type": "contains"}, {"source": "local-booking-and-support-pilot", "target": "local-booking-and-support-pilot-state-empty", "type": "contains"}, {"source": "profile", "target": "profile-popover-date-range", "type": "contains"}, {"source": "profile", "target": "profile-popover-widget-actions", "type": "contains"}, {"source": "settings", "target": "settings-modal-destructive-confirm", "type": "contains"}, {"source": "settings-notifications", "target": "settings-notifications-modal-destructive-confirm", "type": "contains"}, {"source": "local-booking-and-support-pilot-popover-date-range", "target": "local-booking-and-support-pilot", "type": "opens_from"}, {"source": "local-booking-and-support-pilot-popover-widget-actions", "target": "local-booking-and-support-pilot", "type": "opens_from"}, {"source": "profile-popover-date-range", "target": "profile", "type": "opens_from"}, {"source": "profile-popover-widget-actions", "target": "profile", "type": "opens_from"}, {"source": "settings-modal-destructive-confirm", "target": "settings", "type": "opens_from"}, {"source": "settings-notifications-modal-destructive-confirm", "target": "settings-notifications", "type": "opens_from"}], "totals": {"nodes": 23, "edges": 15, "by_node_kind": {"page": 4, "popover": 5, "state": 6, "modal": 3, "drawer": 1, "command-palette": 1, "toast": 3}, "by_edge_type": {"contains": 9, "opens_from": 6}}};
+
+// Node styling per kind
+const KIND_STYLE = {
+  page:    { color: '#06b6d4', shape: 'round-rectangle', width: 120, height: 40 },
+  modal:   { color: '#f59e0b', shape: 'rectangle',       width:  90, height: 30 },
+  drawer:  { color: '#eab308', shape: 'round-rectangle', width:  90, height: 30 },
+  popover: { color: '#a855f7', shape: 'round-rectangle', width:  80, height: 28 },
+  state:   { color: '#22c55e', shape: 'diamond',         width:  70, height: 40 },
+  role:    { color: '#ef4444', shape: 'ellipse',         width:  80, height: 30 },
+  story:   { color: '#8b5cf6', shape: 'tag',             width: 100, height: 30 },
+};
+
+// Edge styling per type
+const EDGE_STYLE = {
+  contains:             { color: '#475569', width: 1, style: 'dashed',  arrow: 'triangle' },
+  opens_from:           { color: '#64748b', width: 1, style: 'dotted',  arrow: 'triangle' },
+  navigates_to:         { color: '#06b6d4', width: 2, style: 'solid',   arrow: 'triangle' },
+  flow_next:            { color: '#f59e0b', width: 3, style: 'solid',   arrow: 'triangle' },
+  role_gate:            { color: '#ef4444', width: 1, style: 'dashed',  arrow: 'none' },
+  referenced_in_story:  { color: '#8b5cf6', width: 1, style: 'dotted',  arrow: 'none' },
+  shares_state_with:    { color: '#64748b', width: 1, style: 'dashed',  arrow: 'none' },
+};
+
+// Build Cytoscape elements
+const elements = [];
+GRAPH_DATA.nodes.forEach(n => {
+  elements.push({
+    data: { ...n, label: n.name || n.id },
+    classes: `kind-${n.kind} area-${(n.area || 'none')}`,
+  });
+});
+GRAPH_DATA.edges.forEach((e, i) => {
+  elements.push({
+    data: { id: `e${i}`, source: e.source, target: e.target, type: e.type, annotation: e.annotation || '' },
+    classes: `edge-type-${e.type}`,
+  });
+});
+
+// Offline guard: planning works offline; the interactive layout needs the
+// Cytoscape CDN. Degrade to a complete static inventory instead of a blank page.
+if (typeof cytoscape === 'undefined') {
+  const host = document.getElementById('cy');
+  const note = document.createElement('div');
+  note.style.cssText = 'padding:12px 16px;color:#fbbf24;font-size:12px;border-bottom:1px solid #334155';
+  note.textContent = 'Offline — the interactive map needs the Cytoscape CDN. Full inventory below; the diagram also ships as plan.mermaid.';
+  const list = document.createElement('div');
+  list.style.cssText = 'overflow-y:auto;position:absolute;top:41px;bottom:0;left:0;right:0;padding:12px';
+  const byArea = {};
+  GRAPH_DATA.nodes.forEach(n => { const a = n.area || '—'; (byArea[a] = byArea[a] || []).push(n); });
+  Object.keys(byArea).sort().forEach(area => {
+    const h = document.createElement('div');
+    h.style.cssText = 'margin:12px 0 4px;font-size:11px;text-transform:uppercase;color:#94a3b8';
+    h.textContent = area;
+    list.appendChild(h);
+    byArea[area].forEach(n => {
+      const row = document.createElement('div');
+      row.style.cssText = 'padding:3px 0;font-size:12px;color:#e2e8f0';
+      row.textContent = '[' + n.kind + '] ' + (n.name || n.id) + (n.route ? ' — ' + n.route : '');
+      list.appendChild(row);
+    });
+  });
+  host.appendChild(note);
+  host.appendChild(list);
+} else {
+
+// Initialize Cytoscape
+const cy = cytoscape({
+  container: document.getElementById('cy'),
+  elements,
+  style: [
+    { selector: 'node', style: {
+        'background-color': n => KIND_STYLE[n.data('kind')]?.color || '#64748b',
+        'shape': n => KIND_STYLE[n.data('kind')]?.shape || 'ellipse',
+        'width': n => KIND_STYLE[n.data('kind')]?.width || 80,
+        'height': n => KIND_STYLE[n.data('kind')]?.height || 30,
+        'label': 'data(label)',
+        'text-valign': 'center',
+        'text-halign': 'center',
+        'font-size': '9px',
+        'color': '#fff',
+        'text-outline-color': '#0f172a',
+        'text-outline-width': 2,
+        'text-wrap': 'ellipsis',
+        'text-max-width': n => (KIND_STYLE[n.data('kind')]?.width || 80) - 10,
+        'border-width': 1,
+        'border-color': '#0f172a',
+      } },
+    { selector: 'node:selected', style: {
+        'border-width': 3,
+        'border-color': '#fbbf24',
+      } },
+    { selector: 'node.highlighted', style: {
+        'border-width': 3,
+        'border-color': '#fbbf24',
+      } },
+    { selector: 'node.dimmed', style: {
+        'opacity': 0.2,
+      } },
+    { selector: 'edge', style: {
+        'width': e => EDGE_STYLE[e.data('type')]?.width || 1,
+        'line-color': e => EDGE_STYLE[e.data('type')]?.color || '#475569',
+        'line-style': e => EDGE_STYLE[e.data('type')]?.style || 'solid',
+        'target-arrow-color': e => EDGE_STYLE[e.data('type')]?.color || '#475569',
+        'target-arrow-shape': e => EDGE_STYLE[e.data('type')]?.arrow || 'triangle',
+        'curve-style': 'bezier',
+        'opacity': 0.7,
+        'label': 'data(annotation)',
+        'font-size': '8px',
+        'color': '#94a3b8',
+        'text-background-color': '#0f172a',
+        'text-background-opacity': 1,
+        'text-background-padding': 2,
+      } },
+    { selector: 'edge.dimmed', style: {
+        'opacity': 0.1,
+      } },
+    { selector: 'edge.highlighted', style: {
+        'opacity': 1,
+        'width': e => (EDGE_STYLE[e.data('type')]?.width || 1) + 1,
+      } },
+  ],
+  layout: { name: 'cose-bilkent', nodeDimensionsIncludeLabels: true, idealEdgeLength: 80, nodeRepulsion: 8000, animate: false },
+  minZoom: 0.1,
+  maxZoom: 3,
+  wheelSensitivity: 0.2,
+});
+
+// Stats bar
+const stats = document.getElementById('stats');
+function updateStats() {
+  const visible = cy.elements(':visible').length;
+  const total = cy.elements().length;
+  stats.textContent = `${visible} / ${total} elements visible`;
+}
+updateStats();
+
+// Totals in sidebar
+const totalsDisplay = document.getElementById('totals-display');
+const t = GRAPH_DATA.totals;
+totalsDisplay.innerHTML = `
+  Nodes: ${t.nodes}<br>
+  Edges: ${t.edges}<br>
+  <br>
+  <span style="color:#64748b">Areas:</span> ${GRAPH_DATA.areas.join(', ') || '—'}
+`;
+
+// Build filter UI
+function buildFilters() {
+  // Area filters
+  const areas = [...new Set(GRAPH_DATA.nodes.map(n => n.area).filter(a => a))].sort();
+  const areaContainer = document.getElementById('area-filters');
+  areas.forEach(area => {
+    const count = GRAPH_DATA.nodes.filter(n => n.area === area).length;
+    const label = document.createElement('label');
+    label.className = 'toggle';
+    label.innerHTML = `<input type="checkbox" checked data-area="${area}"> ${area} <span class="count">${count}</span>`;
+    label.querySelector('input').addEventListener('change', applyFilters);
+    areaContainer.appendChild(label);
+  });
+
+  // Kind filters
+  const kindContainer = document.getElementById('kind-filters');
+  const kinds = Object.keys(t.by_node_kind);
+  kinds.forEach(kind => {
+    const count = t.by_node_kind[kind];
+    const color = KIND_STYLE[kind]?.color || '#64748b';
+    const label = document.createElement('label');
+    label.className = 'toggle';
+    label.innerHTML = `<input type="checkbox" checked data-kind="${kind}"><span class="swatch" style="background:${color}"></span> ${kind} <span class="count">${count}</span>`;
+    label.querySelector('input').addEventListener('change', applyFilters);
+    kindContainer.appendChild(label);
+  });
+
+  // Edge type filters
+  const edgeContainer = document.getElementById('edge-filters');
+  const edgeTypes = Object.keys(t.by_edge_type);
+  edgeTypes.forEach(et => {
+    const count = t.by_edge_type[et];
+    const color = EDGE_STYLE[et]?.color || '#64748b';
+    const label = document.createElement('label');
+    label.className = 'toggle';
+    // Default: hide opens_from (always redundant with contains)
+    const defaultChecked = (et !== 'opens_from') ? 'checked' : '';
+    label.innerHTML = `<input type="checkbox" ${defaultChecked} data-edge="${et}"><span class="swatch" style="background:${color}"></span> ${et.replace(/_/g, ' ')} <span class="count">${count}</span>`;
+    label.querySelector('input').addEventListener('change', applyFilters);
+    edgeContainer.appendChild(label);
+  });
+
+  applyFilters();
+}
+
+function applyFilters() {
+  const activeAreas = [...document.querySelectorAll('[data-area]:checked')].map(i => i.dataset.area);
+  const activeKinds = [...document.querySelectorAll('[data-kind]:checked')].map(i => i.dataset.kind);
+  const activeEdges = [...document.querySelectorAll('[data-edge]:checked')].map(i => i.dataset.edge);
+
+  cy.batch(() => {
+    cy.nodes().forEach(n => {
+      const d = n.data();
+      const areaOk = !d.area || activeAreas.includes(d.area);
+      const kindOk = activeKinds.includes(d.kind);
+      n.style('display', (areaOk && kindOk) ? 'element' : 'none');
+    });
+    cy.edges().forEach(e => {
+      const typeOk = activeEdges.includes(e.data('type'));
+      const endpointsVisible = e.source().style('display') !== 'none' && e.target().style('display') !== 'none';
+      e.style('display', (typeOk && endpointsVisible) ? 'element' : 'none');
+    });
+  });
+  updateStats();
+}
+
+// Search
+const search = document.getElementById('search');
+search.addEventListener('input', () => {
+  const q = search.value.trim().toLowerCase();
+  if (!q) {
+    cy.elements().removeClass('dimmed highlighted');
+    return;
+  }
+  const matched = cy.nodes().filter(n => {
+    const d = n.data();
+    return (d.label || '').toLowerCase().includes(q)
+        || (d.id || '').toLowerCase().includes(q)
+        || (d.route || '').toLowerCase().includes(q);
+  });
+  cy.elements().addClass('dimmed').removeClass('highlighted');
+  matched.removeClass('dimmed').addClass('highlighted');
+  matched.connectedEdges().removeClass('dimmed');
+  matched.neighborhood().removeClass('dimmed');
+  if (matched.length === 1) {
+    cy.animate({ center: { eles: matched }, zoom: 1.5 }, { duration: 300 });
+  } else if (matched.length > 1) {
+    cy.fit(matched, 50);
+  }
+});
+
+// Detail panel
+const detailPanel = document.getElementById('detail-panel');
+const detailContent = document.getElementById('detail-content');
+function showDetail(node) {
+  const d = node.data();
+  const neighbors = node.neighborhood('node');
+  const incoming = node.incomers('edge');
+  const outgoing = node.outgoers('edge');
+
+  let html = `<h3>${d.label || d.id}</h3>`;
+  if (d.route) html += `<div class="route">${d.route}</div>`;
+
+  if (d.purpose) html += `<div class="section"><div class="label">Purpose</div><div class="value">${d.purpose}</div></div>`;
+  if (d.kind) html += `<div class="section"><div class="label">Kind</div><div class="value">${d.kind}${d.page_kind ? ` (${d.page_kind})` : ''}</div></div>`;
+  if (d.area) html += `<div class="section"><div class="label">Area</div><div class="value">${d.area}</div></div>`;
+  if (d.role_gated?.length) html += `<div class="section"><div class="label">Role-gated</div><div class="value">${d.role_gated.map(r => `<span class="tag">${r}</span>`).join('')}</div></div>`;
+  if (d.provenance?.length) html += `<div class="section"><div class="label">Provenance</div><div class="value">${d.provenance.map(p => `<span class="tag">${p}</span>`).join('')}</div></div>`;
+
+  if (outgoing.length) {
+    html += `<div class="section"><div class="label">Outgoing (${outgoing.length})</div>`;
+    outgoing.forEach(e => {
+      const target = e.target();
+      html += `<a class="neighbor" onclick="focusNode('${target.id()}')"><strong>${e.data('type')}</strong> → ${target.data('label') || target.id()}</a>`;
+    });
+    html += `</div>`;
+  }
+  if (incoming.length) {
+    html += `<div class="section"><div class="label">Incoming (${incoming.length})</div>`;
+    incoming.forEach(e => {
+      const source = e.source();
+      html += `<a class="neighbor" onclick="focusNode('${source.id()}')"><strong>${e.data('type')}</strong> ← ${source.data('label') || source.id()}</a>`;
+    });
+    html += `</div>`;
+  }
+
+  detailContent.innerHTML = html;
+  detailPanel.classList.add('open');
+}
+
+function closeDetail() { detailPanel.classList.remove('open'); }
+
+function focusNode(id) {
+  const n = cy.$id(id);
+  if (n.length) {
+    cy.animate({ center: { eles: n }, zoom: 1.5 }, { duration: 300 });
+    showDetail(n);
+  }
+}
+
+cy.on('tap', 'node', evt => showDetail(evt.target));
+cy.on('tap', evt => { if (evt.target === cy) closeDetail(); });
+
+function setLayout(name) {
+  const opts = { name, animate: true, animationDuration: 500 };
+  if (name === 'cose-bilkent') {
+    opts.nodeDimensionsIncludeLabels = true;
+    opts.idealEdgeLength = 80;
+    opts.nodeRepulsion = 8000;
+  }
+  if (name === 'concentric') {
+    opts.concentric = n => n.data('kind') === 'page' ? 3 : (n.data('kind') === 'role' ? 1 : 2);
+    opts.levelWidth = () => 1;
+  }
+  cy.layout(opts).run();
+}
+
+function fitAll() { cy.fit(undefined, 50); }
+
+buildFilters();
+window.focusNode = focusNode;
+window.closeDetail = closeDetail;
+window.setLayout = setLayout;
+window.fitAll = fitAll;
+</script>
+</body>
+</html>

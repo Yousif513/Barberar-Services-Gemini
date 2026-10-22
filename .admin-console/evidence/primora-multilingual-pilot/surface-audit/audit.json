@@ -1,0 +1,820 @@
+{
+  "schema": 2,
+  "verdict": "FAIL",
+  "coverage": {
+    "planned": 4,
+    "completed": 4,
+    "missing": 0,
+    "failed": 0,
+    "unexpected": 2,
+    "percent": 100.0,
+    "by_kind": {
+      "page": {
+        "planned": 1,
+        "completed": 1
+      },
+      "modal": {
+        "planned": 3,
+        "completed": 3
+      }
+    }
+  },
+  "closure_in_output": {
+    "rendered_affordances": 40,
+    "invented": 37,
+    "scaffold": 0,
+    "checked": true
+  },
+  "completeness": {
+    "checked": true,
+    "passed": true,
+    "incomplete_nodes": [],
+    "controls_missing": 0,
+    "reason": ""
+  },
+  "references": {
+    "checked": true,
+    "passed": false,
+    "broken_references": [
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/web_platform_src_components_customer-pilot_pilot_20bdeop.css"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/web_platform_11nvzzh._.js"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/web_platform_src_1f1bokw._.js"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "confirm-case.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/web_platform_src_components_customer-pilot_pilot_20bdeop.css"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/web_platform_11nvzzh._.js"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/web_platform_src_1f1bokw._.js"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "confirm-request.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/web_platform_src_components_customer-pilot_pilot_20bdeop.css"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/web_platform_11nvzzh._.js"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/web_platform_src_1f1bokw._.js"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "import-source.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/web_platform_src_components_customer-pilot_pilot_20bdeop.css"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/web_platform_11nvzzh._.js"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/web_platform_src_1f1bokw._.js"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "pilot-booking.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      }
+    ],
+    "reason": ""
+  },
+  "consistency": {
+    "checked": false,
+    "passed": true,
+    "mismatches": []
+  },
+  "components": {
+    "checked": false,
+    "passed": true,
+    "missing_components": [],
+    "misplaced_components": [],
+    "reason": "no component_census.json in out-dir"
+  },
+  "assets": {
+    "checked": false,
+    "passed": true,
+    "missing_assets": [],
+    "reason": "no asset_manifest.json in out-dir"
+  },
+  "image_evidence": {
+    "checked": true,
+    "passed": false,
+    "missing_images": [
+      "pilot-booking",
+      "import-source",
+      "confirm-request",
+      "confirm-case"
+    ],
+    "reason": ""
+  },
+  "quality": {
+    "checked": true,
+    "passed": true,
+    "findings": [],
+    "reason": ""
+  },
+  "missing_nodes": [],
+  "unexpected_artifacts": [
+    "browser-urdu-375",
+    "browser-urdu-375-viewport"
+  ],
+  "invented_affordances": [
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Refresh records",
+      "source": "confirm-case.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Import a public source catalog",
+      "source": "confirm-case.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Selected",
+      "source": "confirm-case.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Previous",
+      "source": "confirm-case.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Next",
+      "source": "confirm-case.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Review details",
+      "source": "confirm-case.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Edit draft",
+      "source": "confirm-case.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Record this local request",
+      "source": "confirm-case.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "QA fixture service QA fixture provider · SAR 1,250.75 39fd01",
+      "source": "confirm-case.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Previous",
+      "source": "confirm-case.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Next",
+      "source": "confirm-case.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Record a support case",
+      "source": "confirm-case.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Record a support case",
+      "source": "confirm-case.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Keep editing",
+      "source": "confirm-case.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Save local record",
+      "source": "confirm-case.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Refresh records",
+      "source": "confirm-request.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Import a public source catalog",
+      "source": "confirm-request.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Selected",
+      "source": "confirm-request.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Previous",
+      "source": "confirm-request.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Next",
+      "source": "confirm-request.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Review details",
+      "source": "confirm-request.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Edit draft",
+      "source": "confirm-request.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Record this local request",
+      "source": "confirm-request.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Keep editing",
+      "source": "confirm-request.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Record this local request",
+      "source": "confirm-request.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Refresh records",
+      "source": "import-source.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Import a public source catalog",
+      "source": "import-source.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Close",
+      "source": "import-source.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Confirm public-source import",
+      "source": "import-source.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Refresh records",
+      "source": "pilot-booking.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Import a public source catalog",
+      "source": "pilot-booking.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Selected",
+      "source": "pilot-booking.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Previous",
+      "source": "pilot-booking.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Next",
+      "source": "pilot-booking.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Review details",
+      "source": "pilot-booking.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Edit draft",
+      "source": "pilot-booking.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Record this local request",
+      "source": "pilot-booking.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    }
+  ],
+  "waived": {
+    "nodes": 0,
+    "artifacts": 0,
+    "controls": 0,
+    "quality_findings": 0
+  },
+  "plan_holes_carried_over": 0,
+  "generation_failures": 0
+}

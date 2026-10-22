@@ -1,0 +1,143 @@
+{
+  "pages": [
+    {
+      "id": "pilot-booking",
+      "name": "Local booking and support pilot",
+      "route": "/pilot/booking",
+      "purpose": "Source-linked local booking requests and support-case follow-up in five locales",
+      "modals": [
+        {
+          "id": "import-source",
+          "name": "Import source preview"
+        },
+        {
+          "id": "confirm-request",
+          "name": "Review local request"
+        },
+        {
+          "id": "confirm-case",
+          "name": "Review local case"
+        }
+      ],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": [],
+      "sections": [
+        "source-catalog",
+        "selection",
+        "review",
+        "requests",
+        "support-cases"
+      ],
+      "provenance": [
+        "current explicit CEO local-pilot approval",
+        "docs/front-end-spec.md",
+        "API_CONTRACT.md"
+      ]
+    }
+  ],
+  "shared_overlays": [],
+  "actions": [
+    {
+      "id": "choose-language",
+      "source": "pilot-booking",
+      "target": "pilot-booking",
+      "type": "presentation"
+    },
+    {
+      "id": "open-import",
+      "source": "pilot-booking",
+      "target": "import-source",
+      "type": "open"
+    },
+    {
+      "id": "confirm-import",
+      "source": "import-source",
+      "target": "pilot-booking",
+      "type": "import-source"
+    },
+    {
+      "id": "search-source",
+      "source": "pilot-booking",
+      "target": "source-catalog",
+      "type": "filter"
+    },
+    {
+      "id": "select-details",
+      "source": "pilot-booking",
+      "target": "selection",
+      "type": "form"
+    },
+    {
+      "id": "review-request",
+      "source": "selection",
+      "target": "confirm-request",
+      "type": "open"
+    },
+    {
+      "id": "record-request",
+      "source": "confirm-request",
+      "target": "requests",
+      "type": "record-request"
+    },
+    {
+      "id": "open-request",
+      "source": "requests",
+      "target": "review",
+      "type": "detail"
+    },
+    {
+      "id": "open-case",
+      "source": "review",
+      "target": "confirm-case",
+      "type": "open"
+    },
+    {
+      "id": "record-case",
+      "source": "confirm-case",
+      "target": "support-cases",
+      "type": "open-case"
+    },
+    {
+      "id": "append-followup",
+      "source": "support-cases",
+      "target": "support-cases",
+      "type": "append-case-note"
+    },
+    {
+      "id": "recover-unknown",
+      "source": "pilot-booking",
+      "target": "pilot-booking",
+      "type": "receipt-recovery"
+    },
+    {
+      "id": "retry-read",
+      "source": "pilot-booking",
+      "target": "pilot-booking",
+      "type": "read"
+    }
+  ],
+  "component_states": [
+    "loading",
+    "empty",
+    "filtered-empty",
+    "error",
+    "forbidden",
+    "stale",
+    "conflict",
+    "unknown",
+    "success"
+  ],
+  "external_terminal_states": [
+    "reservation held",
+    "payment not dispatched",
+    "business support dispatch held"
+  ],
+  "ambiguous_destinations": [],
+  "unresolved_action_targets": [],
+  "theme": "DESIGN.md",
+  "budget": {
+    "paid_UI_generations": 0
+  },
+  "approval": "APPROVAL.md"
+}

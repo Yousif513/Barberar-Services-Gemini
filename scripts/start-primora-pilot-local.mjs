@@ -1,0 +1,11 @@
+import {spawn} from "node:child_process";
+import {fileURLToPath} from "node:url";
+import {createRequire} from "node:module";
+import path from "node:path";
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
+await import("node:sqlite");
+if(process.env.VERCEL)throw Error("Local customer pilot cannot run on Vercel");
+const next=createRequire(import.meta.url).resolve("next/dist/bin/next");
+const child=spawn(process.execPath,[next,"dev","--hostname","127.0.0.1","--port","3114"],{cwd:path.join(root,"web_platform"),stdio:"inherit",windowsHide:true,env:{...process.env,PRIMORA_PILOT_LOCAL_MODE:"enabled",PRIMORA_PILOT_PROJECT_ROOT:root}});
+for(const signal of ["SIGINT","SIGTERM"])process.on(signal,()=>child.kill(signal));
+child.on("exit",code=>process.exit(code??1));

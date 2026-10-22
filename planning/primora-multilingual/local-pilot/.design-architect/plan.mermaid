@@ -1,0 +1,60 @@
+```mermaid
+flowchart LR
+    %% Stitch Architect — Full graph
+
+    subgraph [""]
+    profile["Profile<br/><i>/profile</i>"]
+    profile_popover_date_range(["Date range"])
+    profile_popover_widget_actions(["Widget menu"])
+    settings["Settings<br/><i>/settings</i>"]
+    settings_modal_destructive_confirm("Danger zone action")
+    settings_notifications["Notifications<br/><i>/settings/notifications</i>"]
+    settings_notifications_modal_destructive_confirm("Danger zone action")
+    end
+    subgraph uncategorized["UNCATEGORIZED"]
+    local_booking_and_support_pilot["Local booking and support pilot<br/><i>/pilot/booking</i>"]
+    local_booking_and_support_pilot_popover_date_range(["Date range"])
+    local_booking_and_support_pilot_popover_widget_actions(["Widget menu"])
+    local_booking_and_support_pilot_state_loading{{"Local booking and support pilot — loading"}}
+    local_booking_and_support_pilot_state_error{{"Local booking and support pilot — error"}}
+    local_booking_and_support_pilot_state_empty{{"Local booking and support pilot — empty"}}
+    end
+    shared_popover_user_menu(["User menu"])
+    shared_drawer_notifications[/"Notifications"/]
+    shared_command_palette_global_search["Search"]
+    shared_toast_success["Mark all read"]
+    shared_toast_error["Error"]
+    shared_modal_reauthenticate("Confirm password")
+    shared_toast_info["Undo"]
+
+    local_booking_and_support_pilot -.-> local_booking_and_support_pilot_popover_date_range
+    local_booking_and_support_pilot -.-> local_booking_and_support_pilot_popover_widget_actions
+    local_booking_and_support_pilot -.-> local_booking_and_support_pilot_state_loading
+    local_booking_and_support_pilot -.-> local_booking_and_support_pilot_state_error
+    local_booking_and_support_pilot -.-> local_booking_and_support_pilot_state_empty
+    profile -.-> profile_popover_date_range
+    profile -.-> profile_popover_widget_actions
+    settings -.-> settings_modal_destructive_confirm
+    settings_notifications -.-> settings_notifications_modal_destructive_confirm
+    local_booking_and_support_pilot_popover_date_range -.-> local_booking_and_support_pilot
+    local_booking_and_support_pilot_popover_widget_actions -.-> local_booking_and_support_pilot
+    profile_popover_date_range -.-> profile
+    profile_popover_widget_actions -.-> profile
+    settings_modal_destructive_confirm -.-> settings
+    settings_notifications_modal_destructive_confirm -.-> settings_notifications
+
+    classDef page fill:#1e293b,stroke:#06b6d4,color:#fff,stroke-width:2px
+    classDef modal fill:#f1f5f9,stroke:#64748b,color:#1e293b
+    classDef drawer fill:#fef3c7,stroke:#f59e0b,color:#78350f
+    classDef popover fill:#e0e7ff,stroke:#6366f1,color:#312e81
+    classDef state fill:#ecfccb,stroke:#65a30d,color:#365314,stroke-dasharray:3 3
+    classDef role fill:#fecaca,stroke:#dc2626,color:#7f1d1d
+    classDef story fill:#e9d5ff,stroke:#9333ea,color:#581c87,font-style:italic
+    class local_booking_and_support_pilot,profile,settings,settings_notifications page
+    class local_booking_and_support_pilot_popover_date_range,local_booking_and_support_pilot_popover_widget_actions,profile_popover_date_range,profile_popover_widget_actions,shared_popover_user_menu popover
+    class local_booking_and_support_pilot_state_loading,local_booking_and_support_pilot_state_error,local_booking_and_support_pilot_state_empty,shared_drawer_notifications_state_empty,shared_drawer_notifications_state_loading,shared_command_palette_global_search_state_no_results state
+    class settings_modal_destructive_confirm,settings_notifications_modal_destructive_confirm,shared_modal_reauthenticate modal
+    class shared_drawer_notifications drawer
+    class shared_command_palette_global_search command-palette
+    class shared_toast_success,shared_toast_error,shared_toast_info toast
+```

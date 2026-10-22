@@ -1,0 +1,381 @@
+{
+  "classification": "root integration snapshot; independent reviews have separate authors and receipts",
+  "scope": "listed new pilot sources/docs/planning/evidence; targeted existing-file diff reviewed separately",
+  "files": [
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/browser-action-reconciliation.json",
+      "sha256": "1a220e29816dcc1b8ffdae2d74afc33c61db89210d30038b73c2cd654e5497a6",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/browser-artifacts/browser-urdu-375-viewport.png",
+      "sha256": "5095835fc67545ed0456f3500b75d23efb9aae51837f5f783435854a43e9d543",
+      "basis": "exact bytes"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/browser-artifacts/browser-urdu-375.png",
+      "sha256": "583517ced389a5bbe256664ab6fb7998468fa4e14127ceadf02d1fe5e209f6b4",
+      "basis": "exact bytes"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/browser-artifacts/confirm-case.html",
+      "sha256": "ec7152c2ae031604027f0d29f827613aba31e987d8ede50e8358016f0fe8e241",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/browser-artifacts/confirm-request.html",
+      "sha256": "43dc2803e81a102378b648f60e836bc049f06fe6e09a26bdcbfc883915ca8eba",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/browser-artifacts/import-source.html",
+      "sha256": "9497a20c7de1331ae095488a7dbea22df23e58c983abea38b8875854a36dd202",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/browser-artifacts/pilot-booking.html",
+      "sha256": "77c6040c92e7599ea215374fbf50c107c1ab6c71672bc4eaf127a77a882f2409",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/browser-independent.json",
+      "sha256": "a35999b378d07c4aaab3a70f18bac3933b78b8992403fb428fff604f1f0f52a1",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/browser-surface-metadata.json",
+      "sha256": "2093bb222f1bb22d5fd0aa886d00ff34158604a5748c2df769040f0fb4d2e352",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/eslint-results.json",
+      "sha256": "50e5e4157b5c3593fc9dbcb9322ca2b69c3b0128d3a197250da1fc311bce97e1",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/review-audition-runner.json",
+      "sha256": "629914a6368172e6b2902fc1e72cc61013b567837afde7ed14594c38cd08597b",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/review-backend.json",
+      "sha256": "2e8c351a8b5ee1255c265d53f21d1d191d599048c52efe6825b54f636e8aa9d0",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/review-provider-eastus.json",
+      "sha256": "4a064534f295b59871e9a34d2f9a2198451337a35185d5b223b5256b4a93748d",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/review-provider-readiness.json",
+      "sha256": "9586f573767ee1c24277f22bf55ca99e64bb3d476b02b05d25da81e509da06c0",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/review-provider-uaenorth.json",
+      "sha256": "3bd9ebba9185556c4c6fbf865b32986f916cab132073c140c9f88fbdfb257d12",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/surface-audit/audit.json",
+      "sha256": "5a63a3672d8344140fb57d6e4e80678e4e75abdd850d8515c34aca292bd3e29e",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/surface-audit/audit.md",
+      "sha256": "e1659bfec95b636306f586ca3d1f7b494df443bfb1703eea371cde4dea3d3aa7",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/surface-audit/audit_ignores.yaml",
+      "sha256": "4e82f6b647dc2fa265f22e18632f7ee1d193289f0d5c696a035a503748901c46",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": ".admin-console/evidence/primora-multilingual-pilot/verification.json",
+      "sha256": "dba645e85ba99637ef557ad66d3650ff765430e10abff5801df8bf3120ee24e4",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "docs/primora-local-multilingual-pilot-report.md",
+      "sha256": "1c9f4219a8f95f1a4269c2948f45564ebc6eb472da7313cc401ddb3ee9cace3b",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "docs/primora-local-pilot-operations.md",
+      "sha256": "3dd2e0f1c8938552e549aa104a33ef96fbfbb70ad02dd547fcb43b537dab5b59",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/.design-architect/asset_manifest.json",
+      "sha256": "a50c572ce98792f03b590350e9d989e4c87e59dc4a1abc0c226b9565b72ccc24",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/.design-architect/bmad_context.json",
+      "sha256": "fb13ef40b783c312188945d7fd0ba2be84760568725c2d33e38d53481102ff8a",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/.design-architect/closure.md",
+      "sha256": "0fed6aa9b093b56040bdf25f84367af7ededd05c1527b368b8472b803a754191",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/.design-architect/component_census.json",
+      "sha256": "32565812e932649a1e21cca04017b8d80447705ac74938ebde3e166442ffb87e",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/.design-architect/graph.json",
+      "sha256": "7d245f7a73d3f52fab4b2480a0b4cfc4bb16d77df2a10ba92e57b4e2e107ffaa",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/.design-architect/handoff/component-map.md",
+      "sha256": "dac56276dd420079b44b32bba03afbcb914c4353c8880f0d0677dff139aaf7fd",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/.design-architect/holes.json",
+      "sha256": "89bfd5167f36bfff38a68c9b0f8155a14f1c15952c52f2d90414c21ca7eb6122",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/.design-architect/page_graph.json",
+      "sha256": "89870f4fe03ddb5d41bda980b05470a568b5636c9f05e83c51ad219143d14d58",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/.design-architect/pages.json",
+      "sha256": "e5290170faf8501b84ffa99a019fbc6e8e4b9dde5dc34f87ca442eaa6ff163bb",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/.design-architect/plan.html",
+      "sha256": "75718181bfb170f0171285252772ea85cd5688e865499383fdeed5df1d23bd07",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/.design-architect/plan.json",
+      "sha256": "bc804eb44e36bfb034b0ea919510f21b60e37884e827ea910db16b117e935a25",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/.design-architect/plan.md",
+      "sha256": "272945a3d52d539a0fb1f317d79e5fc3f33af38807d7ce488b6932cfd308cc78",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/.design-architect/plan.mermaid",
+      "sha256": "9fe8a0ba7b1e6a53f621cf417d50f82456b81f5b13de62ea0e91d262957c4f16",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/.design-architect/run.json",
+      "sha256": "dc6d3a36f94e2ad19e59345b903abce1bef31b2e0146217043c9436083c92ef3",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/.design-architect/theme.json",
+      "sha256": "52a855bf744c994b21d060e5e1de61172799ee48081fdc9827d3f54ad7c58e04",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/.design-architect/viewgraph.json",
+      "sha256": "70c9cb46ce0219cd76240af72cdacda9ca3f998e5d58f9df9c99927a89d2933e",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/API_CONTRACT.md",
+      "sha256": "c0f13011a1e79d426a28436277f0178fe48633dd10658b58bb04a90c909f3653",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/APPROVAL.md",
+      "sha256": "dbbeec42fc071062fa6b9d6cd9961b6972e5e45a157419afe20d99c602f293bb",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/DESIGN.md",
+      "sha256": "fc4cc39e23a88f851a0e00e8016adcb14133882f86c874eb168f380f79d5db8f",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/docs/front-end-spec.md",
+      "sha256": "2e3c187c297ee485f5649c584218f54cbe35adf1dcdd82de6bf04bf7e305e2c9",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/docs/prd.md",
+      "sha256": "2f92d4f976e724432ecbe9b99dd57ddba5eaf209cef7b46525d9e920c2394292",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/DOMAIN_GRAPH.json",
+      "sha256": "a28b99e2b23318561ab7b246e18492ea99b1d685d6536b172346fde45d5e8c86",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/primora-multilingual/local-pilot/PLANNING_RECONCILIATION.md",
+      "sha256": "ac7dad18dcb66e6450f950123cf2d6dba045967ad4050069cfb8e0c23f59e312",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "planning/volabi/voice-auditions/EXECUTION_APPROVAL_20261022.md",
+      "sha256": "69c0057d215ca513c08539739598ecd4c53a51c083342fe4b0e4fd4c460b4b1d",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "scripts/start-primora-pilot-local.mjs",
+      "sha256": "2f49e94410d3f6a4066751f0940b023d236c52aa78e5dd8b9d0cfeb85ddd808b",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "scripts/volabi-auditions/concurrent-worker.mjs",
+      "sha256": "5e396c5da6700ce755a2ac7aa997a44bd91076412366eb7ba946b7135dadc377",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "scripts/volabi-auditions/credential-binding.ps1",
+      "sha256": "e9ed02eef59f6e674b2e31798fb4d39d2e4dc45168339b4632cb708685505976",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "scripts/volabi-auditions/credential-binding.test.ps1",
+      "sha256": "5eb301d53a9dbb2412325e083af4b4eef1a6e6bf610108e4f6f3391ce4049d66",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "scripts/volabi-auditions/credential.ps1",
+      "sha256": "15009f93f7cdc46a99b85e6a607c7d8d473290929019c6a45c8c6cb57bd5307c",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "scripts/volabi-auditions/local-path.ps1",
+      "sha256": "61ec24c39bd88cef947b077a3b5755ca9991ab552e8f61316faa8099b2bc2b62",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "scripts/volabi-auditions/README.md",
+      "sha256": "6393172a3cd28ef3944215c9ebad0d1883811a2719f8629448d4506aae5ed95a",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "scripts/volabi-auditions/runner.mjs",
+      "sha256": "e250c4bc2684e1100af77b85ed063427cd5448dc851b10ab87e0e1d6b93f9bfd",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "scripts/volabi-auditions/runner.test.mjs",
+      "sha256": "d7d9c12902b520e4079418f36c1f4a8e574b8cb5d1ba43e41c468b8b5560f634",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "scripts/volabi-auditions/VALIDATION.json",
+      "sha256": "862d21a59e66f9eafacd60f004aac2dbb9510cea2e0715f245173e2ce8bd1d7c",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/src/app/api/pilot/[...path]/route.ts",
+      "sha256": "6f489fbfcaabda4226a66cdba7c39300a9da5f5eab5e028833af0b6826ae5b5c",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/src/app/pilot/booking/layout.tsx",
+      "sha256": "180376f943f177cab5a59aa5ef7da3fa4414a38042e9139bdec0ac779e41c5a0",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/src/app/pilot/booking/page.tsx",
+      "sha256": "e2339404c97c06e4ee18a1645a930a02930974cc098151cf19a7c307493632be",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/src/components/customer-pilot/booking-pilot.tsx",
+      "sha256": "0c8b4f9fd6cd39466edf3166ad7aac6afb41a8f1664e4e4278ed91eb1575ef66",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/src/components/customer-pilot/pilot-context.tsx",
+      "sha256": "496c0a03dea97b60211167f93b1d829f94b2f6f38eaafd9550e6494c0f88c31a",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/src/components/customer-pilot/pilot-controls.tsx",
+      "sha256": "31d6283e84771837ec1b537ed8c745d1bd55152071eebd41fcc113b7fe830cef",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/src/components/customer-pilot/pilot.css",
+      "sha256": "de282e34dcac8ac84de466b6ed78953fe9ce2d9600902f612e180405940f0506",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/src/lib/customer-pilot/client.ts",
+      "sha256": "1ea397201516a4040784bcd4d5935e37b46f8345bdf274dbb85f75dd840514c7",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/src/lib/customer-pilot/contracts.ts",
+      "sha256": "b6c743491dfd2cbd6ea6806dd01a2f3ec0dc48f0c0474592cf017e7a5a15196d",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/src/lib/customer-pilot/copy.ts",
+      "sha256": "8a10e3d62c8cac00f47846afdef815734cc225d032fbcdccf5c7121ff53c9140",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/src/lib/customer-pilot/server/handler.d.mts",
+      "sha256": "9ac3bc34a9c8d9bf28d694c98a3e705da2246de7abd278e1eabec04335d5cbaf",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/src/lib/customer-pilot/server/handler.mjs",
+      "sha256": "a2b2216070c172ea74288195a63539dda5e6899143092270b8a8850f5a52c4c2",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/src/lib/customer-pilot/server/store.mjs",
+      "sha256": "2a45904b964bf6825b52e2c9277f1dd431ae3f91ad1fdf081e9f3c26af2860e0",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/tests/customer-pilot-api.test.mjs",
+      "sha256": "a42e8998209ba68f06b79aa7db2d3c1f4d100f7872a127bea756cc81d6320e13",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/tests/customer-pilot-independent-auditions.test.mjs",
+      "sha256": "84a48faf47bdc653724a90153cee286f00a248576b09694f6688416e09112be8",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/tests/customer-pilot-independent.test.mjs",
+      "sha256": "50fe88ac2625e912fe66b41baf91561249c11d25f31e6154242bfa9f23ff9a8a",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/tests/customer-pilot-store.test.mjs",
+      "sha256": "9616646f00049f4dfb3c24e37c961969ee0323c0e5af31d0d5d01c37e93cac08",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/tests/customer-pilot-ui-client.test.mjs",
+      "sha256": "a164d15d65bc363c6f567030dc8feba9bbf26b3c8e9f1f98bcc582f056c724e2",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/tests/customer-pilot-ui-copy.test.mjs",
+      "sha256": "8da3da527355c5223d49a536734eb05ea988a8724f1a0014ca071d62dbc78917",
+      "basis": "strictUTF8; CRLFtoLF only"
+    },
+    {
+      "path": "web_platform/tests-browser/customer-pilot-independent.mjs",
+      "sha256": "464d876a80830f525540ce484ef96c2966f577e90426ceb835431985afc92380",
+      "basis": "strictUTF8; CRLFtoLF only"
+    }
+  ]
+}

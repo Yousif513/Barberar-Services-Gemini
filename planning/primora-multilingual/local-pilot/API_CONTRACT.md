@@ -1,0 +1,21 @@
+# Local pilot API contract —1.0
+
+Base /api/pilot; Node SQLite local persistence, empty default. No outbound requests. Local flag PRIMORA_PILOT_LOCAL_MODE=enabled; PRIMORA_PILOT_PROJECT_ROOT gives project root; reject Vercel/non-loopback/foreign Origin. JSON errors {ok:false,error:{code,message:code}}. HTTP400invalid_input,403local_disabled/origin_forbidden/csrf_failed,401session_required,404not_found,409command_conflict/stale_source/stale_revision/workspace_limit,413request_too_large,503storage_unavailable. Responses no-store.
+
+POST /session body{} -> {ok:true,session:{workspaceId,csrf,expiresAt}}; opaque HttpOnly SameSiteStrict primora_pilot_session cookie Path=/api/pilot. GET /state -> {ok:true,data:{session:{workspaceId,csrf,expiresAt},catalogs:Catalog[],requests:LocalRequest[],cases:LocalCase[],events:Audit[],limits:{catalogs:100,requests:100,cases:100,events:500}}}. Lists have server-enforced workspace quotas, not silently truncated rows; client may search/page this bounded local set. Workspace/cookie expires after30days; clearing it opens a different local workspace, not account recovery.
+
+POST /commands with x-pilot-csrf and {commandId:UUID,type,payload,locale}. Allowed locale en/ar/bn-BD/ur-PK/hi-IN. -> {ok:true,receipt:{commandId,type,entityId,recordedAt,status:'recorded_local'}}. GET /commands/:commandId -> same receipt or404; recover unknown before retry. commandId+same type/payload returns same receipt exactly; changed material409. Locale is presentation metadata, excluded from material hash; switching locale cannot create a new request. Pending commands must be bound to workspaceId; do not retry under a different workspace.
+
+Commands:
+- import-source payload {sourceTitle,sourceReference,observedAt:ISO,providerId,providerName,services:[{id,name,durationMinutes,priceCents,staff:[{id,name}]}]}. Public source data only; no automatic URL fetch. IDs are nonempty canonical strings max100, prices integer halalas0..100000000, duration1..1440, <=30services each<=30staff. Observed time valid and not future beyond clock allowance. SourceTitle<=200, reference<=500, name<=200. Import is explicit user-supplied UNVERIFIED evidence; never certified. A new version for same provider makes prior versions noncurrent; historical request snapshots remain immutable.
+- record-request payload {sourceId:UUID,catalogHash:string64,serviceId,staffId,requestedDate:'YYYY-MM-DD',requestedTime:'HH:mm',notes:string<=2000}. Date/time valid and not past in Asia/Riyadh, horizon<=366days. Source must still current with exact hash; service/staff must belong to source. All source/provider/price fields are copied by server, never accepted from request payload. Locale does not alter any relationship/history/amount.
+- open-case payload {requestId:UUID,kind:'inquiry'|'change'|'cancellation'|'refund'|'complaint',reason:string1..2000,evidence:string0..4000}. Own workspace request only. Records local case, no business dispatch or outcome.
+- append-case-note payload {caseId:UUID,expectedRevision:integer>=1,kind:'note'|'appeal',text:string1..4000}. Own workspace and exact revision; append-only source-linked history. Revision increases once.
+
+DTOs:
+Catalog {id,versionHash,sourceTitle,sourceReference,observedAt,importedAt,providerId,providerName,services:[...],current:boolean}.
+LocalRequest {id,sourceId,catalogHash,providerId,providerName,service:{id,name,durationMinutes,priceCents},staff:{id,name},requestedDate,requestedTime,timeZone:'Asia/Riyadh',notes,status:'local_request',paymentStatus:'not_dispatched',createdAt,createdLocale,source:{title,reference,observedAt}}.
+LocalCase {id,requestId,kind,reason,evidence,status:'local_case_recorded',createdAt,revision,followUps:[{id,kind,text,createdAt}]}.
+Audit {id:integer,entityType:'catalog'|'request'|'case',entityId,action,createdAt,previousHash,eventHash}. Audit is local append-only evidence, not authenticated production/customer activity. No command grants authority or settles money.
+
+No fixtures, availability, contacts or financial policy defaults in the release path. UI displays source amount only; tax/deposit/commission/refund outcome unknown unless independently sourced, never calculated here. Use booking-display.mjs pure helpers where their semantics fit; no settlementKey/policyFromProvider or real checkout client.

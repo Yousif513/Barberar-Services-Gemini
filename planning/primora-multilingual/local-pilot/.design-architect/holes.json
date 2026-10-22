@@ -1,0 +1,97 @@
+{
+  "unresolved": [],
+  "ambiguous": [],
+  "external": [
+    {
+      "affordance_id": "shared-popover-user-menu::um-logout",
+      "parent": "shared-popover-user-menu",
+      "label": "Sign out",
+      "type": "menu-item",
+      "location": "body",
+      "target_ref": "external:auth-logout",
+      "reason": "external",
+      "candidates": [],
+      "source": "by_overlay:popover"
+    }
+  ],
+  "out_of_area": [
+    {
+      "affordance_id": "local-booking-and-support-pilot::kpi-drill",
+      "parent": "local-booking-and-support-pilot",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "shared-drawer-notifications::open-full",
+      "parent": "shared-drawer-notifications",
+      "label": "Open full page",
+      "type": "link",
+      "location": "header",
+      "target_ref": "route:/[id]",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_overlay:drawer"
+    },
+    {
+      "affordance_id": "profile::kpi-drill",
+      "parent": "profile",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    }
+  ],
+  "blocked": [
+    {
+      "affordance_id": "profile::refresh",
+      "parent": "profile",
+      "label": "Refresh",
+      "type": "icon-button",
+      "location": "toolbar",
+      "target_ref": "state:loading",
+      "reason": "blocked",
+      "candidates": [],
+      "source": "by_kind:page"
+    }
+  ],
+  "unmatched_spec": [
+    {
+      "quote": "Select a language without losing selections or local identifiers.",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 7,
+      "reason": "no declared_trigger pattern matched (would sit on local-booking-and-support-pilot)"
+    },
+    {
+      "quote": "Search the imported sources; show an empty result or source error honestly.",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 9,
+      "reason": "no declared_trigger pattern matched (would sit on local-booking-and-support-pilot)"
+    },
+    {
+      "quote": "Select source service, staff and requested Riyadh date/time.",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 10,
+      "reason": "no declared_trigger pattern matched (would sit on local-booking-and-support-pilot)"
+    },
+    {
+      "quote": "Review an immutable source snapshot and confirm a local request.",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 11,
+      "reason": "no declared_trigger pattern matched (would sit on local-booking-and-support-pilot)"
+    },
+    {
+      "quote": "Open an existing local request and its append-only history.",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 12,
+      "reason": "no declared_trigger pattern matched (would sit on local-booking-and-support-pilot)"
+    }
+  ]
+}

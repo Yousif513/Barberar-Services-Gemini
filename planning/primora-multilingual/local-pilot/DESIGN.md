@@ -1,0 +1,3 @@
+# PRIMORA local customer pilot
+
+Inherit the existing marketplace visual direction from web_platform/src/app/shop/[id]/page.tsx: warm ivory#F2EEE6, dark ink#171C1C, restrained gold#C29A4C, readable cards and existing public controls. Keep source provenance, local-only status and native-review-pending visible. Use installed/system script-capable fallback fonts; do not add paid font services. Explicit locale rather than document direction selects copy. Arabic/Urdu RTL; Bangla/Hindi/English LTR. All values and canonical identifiers use bidi isolation. Five connected sections and three accessible overlays; states are not extra pages. No fabricated services, availability, completed transactions, support agents or scores.

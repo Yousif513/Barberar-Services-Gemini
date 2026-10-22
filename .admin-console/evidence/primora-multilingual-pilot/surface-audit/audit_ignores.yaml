@@ -1,0 +1,27 @@
+# .design-architect/audit_ignores.yaml — audit waivers, narrowest-wins.
+#
+# Read by audit_surfaces.py (ignore_* lists) and design_lint.py
+# (per-filename rule lists). Inline marker in any artifact:
+#   design-architect-disable <rule-id>
+# Waived-but-recurring findings become a harvest signal.
+
+# Waive specific missing nodes (ids, as slugified)
+ignore_nodes: []
+#  - "marketing-privacy"
+
+# Waive unexpected artifact stems
+ignore_artifacts: []
+#  - "README"
+
+# Waive unplanned controls by slugified label or href
+ignore_controls: []
+#  - "advanced-settings"
+#  - "/unplanned-route"
+
+# Waive design-lint rule ids in the quality check
+ignore_rules: []
+#  - "line-length"
+
+# Per-file lint ignores: filename -> rule ids
+# page1.html:
+#   - "body-font-size"

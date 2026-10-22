@@ -1,0 +1,338 @@
+{
+  "plan_version": 1,
+  "project": {
+    "name": "Approved local Bangla/Urdu/Hindi booking/support pilot",
+    "root": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\planning\\primora-multilingual\\local-pilot",
+    "bmad_present": true
+  },
+  "areas": [
+    "ecommerce",
+    "support"
+  ],
+  "nodes": [
+    {
+      "id": "local-booking-and-support-pilot",
+      "kind": "page",
+      "name": "Local booking and support pilot",
+      "route": "/pilot/booking",
+      "area": "uncategorized",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:3"
+      ]
+    },
+    {
+      "id": "local-booking-and-support-pilot-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "local-booking-and-support-pilot",
+      "area": "uncategorized",
+      "provenance": [
+        "closure:depth-1:from:local-booking-and-support-pilot::date-range"
+      ]
+    },
+    {
+      "id": "local-booking-and-support-pilot-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "local-booking-and-support-pilot",
+      "area": "uncategorized",
+      "provenance": [
+        "closure:depth-1:from:local-booking-and-support-pilot::widget-menu"
+      ]
+    },
+    {
+      "id": "local-booking-and-support-pilot-state-loading",
+      "kind": "state",
+      "name": "Local booking and support pilot — loading",
+      "parent": "local-booking-and-support-pilot",
+      "state_variant": "loading",
+      "area": "uncategorized"
+    },
+    {
+      "id": "local-booking-and-support-pilot-state-error",
+      "kind": "state",
+      "name": "Local booking and support pilot — error",
+      "parent": "local-booking-and-support-pilot",
+      "state_variant": "error",
+      "area": "uncategorized"
+    },
+    {
+      "id": "local-booking-and-support-pilot-state-empty",
+      "kind": "state",
+      "name": "Local booking and support pilot — empty",
+      "parent": "local-booking-and-support-pilot",
+      "state_variant": "empty",
+      "area": "uncategorized"
+    },
+    {
+      "id": "profile",
+      "kind": "page",
+      "name": "Profile",
+      "route": "/profile",
+      "area": "",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "Reached from Profile on shared-popover-user-menu",
+      "provenance": [
+        "closure:depth-2:from:shared-popover-user-menu::um-profile"
+      ]
+    },
+    {
+      "id": "profile-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "profile",
+      "area": "",
+      "provenance": [
+        "closure:depth-3:from:profile::date-range"
+      ]
+    },
+    {
+      "id": "profile-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "profile",
+      "area": "",
+      "provenance": [
+        "closure:depth-3:from:profile::widget-menu"
+      ]
+    },
+    {
+      "id": "settings",
+      "kind": "page",
+      "name": "Settings",
+      "route": "/settings",
+      "area": "",
+      "page_kind": "setting",
+      "role_gated": null,
+      "purpose": "Reached from Settings on shared-popover-user-menu",
+      "provenance": [
+        "closure:depth-2:from:shared-popover-user-menu::um-settings"
+      ]
+    },
+    {
+      "id": "settings-modal-destructive-confirm",
+      "kind": "modal",
+      "name": "Danger zone action",
+      "parent": "settings",
+      "area": "",
+      "provenance": [
+        "closure:depth-3:from:settings::danger-zone"
+      ]
+    },
+    {
+      "id": "settings-notifications",
+      "kind": "page",
+      "name": "Notifications",
+      "route": "/settings/notifications",
+      "area": "",
+      "page_kind": "setting",
+      "role_gated": null,
+      "purpose": "Reached from Notification settings on shared-drawer-notifications",
+      "provenance": [
+        "closure:depth-2:from:shared-drawer-notifications::nt-settings"
+      ]
+    },
+    {
+      "id": "settings-notifications-modal-destructive-confirm",
+      "kind": "modal",
+      "name": "Danger zone action",
+      "parent": "settings-notifications",
+      "area": "",
+      "provenance": [
+        "closure:depth-3:from:settings-notifications::danger-zone"
+      ]
+    },
+    {
+      "id": "shared-popover-user-menu",
+      "kind": "popover",
+      "name": "User menu",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-1:from:shell::user-menu"
+      ]
+    },
+    {
+      "id": "shared-drawer-notifications",
+      "kind": "drawer",
+      "name": "Notifications",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-1:from:shell::notifications-bell"
+      ]
+    },
+    {
+      "id": "shared-drawer-notifications-state-empty",
+      "kind": "state",
+      "name": "Notifications — empty",
+      "parent": "shared-drawer-notifications",
+      "state_variant": "empty",
+      "area": ""
+    },
+    {
+      "id": "shared-drawer-notifications-state-loading",
+      "kind": "state",
+      "name": "Notifications — loading",
+      "parent": "shared-drawer-notifications",
+      "state_variant": "loading",
+      "area": ""
+    },
+    {
+      "id": "shared-command-palette-global-search",
+      "kind": "command-palette",
+      "name": "Search",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-1:from:shell::global-search"
+      ]
+    },
+    {
+      "id": "shared-command-palette-global-search-state-no-results",
+      "kind": "state",
+      "name": "Search — no-results",
+      "parent": "shared-command-palette-global-search",
+      "state_variant": "no-results",
+      "area": ""
+    },
+    {
+      "id": "shared-toast-success",
+      "kind": "toast",
+      "name": "Mark all read",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-2:from:shared-drawer-notifications::nt-markall"
+      ]
+    },
+    {
+      "id": "shared-toast-error",
+      "kind": "toast",
+      "name": "Error",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-3:from:settings::toast:error"
+      ]
+    },
+    {
+      "id": "shared-modal-reauthenticate",
+      "kind": "modal",
+      "name": "Confirm password",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-3:from:settings::reauth"
+      ]
+    },
+    {
+      "id": "shared-toast-info",
+      "kind": "toast",
+      "name": "Undo",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-3:from:shared-toast-success::undo"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "local-booking-and-support-pilot",
+      "target": "local-booking-and-support-pilot-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "local-booking-and-support-pilot",
+      "target": "local-booking-and-support-pilot-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "local-booking-and-support-pilot",
+      "target": "local-booking-and-support-pilot-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "local-booking-and-support-pilot",
+      "target": "local-booking-and-support-pilot-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "local-booking-and-support-pilot",
+      "target": "local-booking-and-support-pilot-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "profile",
+      "target": "profile-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "profile",
+      "target": "profile-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "settings",
+      "target": "settings-modal-destructive-confirm",
+      "type": "contains"
+    },
+    {
+      "source": "settings-notifications",
+      "target": "settings-notifications-modal-destructive-confirm",
+      "type": "contains"
+    },
+    {
+      "source": "local-booking-and-support-pilot-popover-date-range",
+      "target": "local-booking-and-support-pilot",
+      "type": "opens_from"
+    },
+    {
+      "source": "local-booking-and-support-pilot-popover-widget-actions",
+      "target": "local-booking-and-support-pilot",
+      "type": "opens_from"
+    },
+    {
+      "source": "profile-popover-date-range",
+      "target": "profile",
+      "type": "opens_from"
+    },
+    {
+      "source": "profile-popover-widget-actions",
+      "target": "profile",
+      "type": "opens_from"
+    },
+    {
+      "source": "settings-modal-destructive-confirm",
+      "target": "settings",
+      "type": "opens_from"
+    },
+    {
+      "source": "settings-notifications-modal-destructive-confirm",
+      "target": "settings-notifications",
+      "type": "opens_from"
+    }
+  ],
+  "totals": {
+    "nodes": 23,
+    "edges": 15,
+    "by_node_kind": {
+      "page": 4,
+      "popover": 5,
+      "state": 6,
+      "modal": 3,
+      "drawer": 1,
+      "command-palette": 1,
+      "toast": 3
+    },
+    "by_edge_type": {
+      "contains": 9,
+      "opens_from": 6
+    }
+  }
+}
