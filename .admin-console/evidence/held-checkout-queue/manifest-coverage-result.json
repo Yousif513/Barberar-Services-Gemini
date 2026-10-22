@@ -1,0 +1,1 @@
+{"command": ["python", "C:/Users/Yousif's PC/.claude/skills/adminwright/scripts/admin_console_manifest.py", "coverage", "--manifest", ".admin-console/manifest.json", "--project-root", "."], "exitCode": 0, "output": "manifest-coverage.txt", "summary": "No unresolved structural gaps."}

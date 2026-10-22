@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "captured_at_utc": "2026-10-22T12:52:07.651296+00:00",
+  "reviewer": "sec-held-checkout",
+  "classification": "Independent scoped local-development backend security and data-exposure review; not full regulated release",
+  "verdict": "ACCEPTED_FOR_SCOPED_LOCAL_READ_ONLY_QUEUE_BACKEND",
+  "independence": "Reviewer did not implement SQL, UI or owner tests; independent tests were written after a fresh read of frozen SQL. No reviewer RED phase is claimed.",
+  "files": [
+    {
+      "path": "supabase/migrations/20261022124446_held_checkout_read_queue.sql",
+      "sha256_raw_bytes": "e0e9113414d2d512921138302b3ae8d49fb10aa972a75a00db214c0063f419b4",
+      "sha256_utf8_crlf_to_lf": "e0e9113414d2d512921138302b3ae8d49fb10aa972a75a00db214c0063f419b4"
+    },
+    {
+      "path": "supabase/migrations/20261022062147_durable_checkout_attempts.sql",
+      "sha256_raw_bytes": "95dde2aa125e9084c56e00780862c286403f6823bf15a103e95f1e8daa459310",
+      "sha256_utf8_crlf_to_lf": "39361416effdb9f7445f5da1dab2ad8ef206eaed19a3393733403f40dd69007d"
+    },
+    {
+      "path": "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql",
+      "sha256_raw_bytes": "f529879337709ed1e47410737725c77a094d2ccbd24d1dc0fad6f56c9ef2c6ed",
+      "sha256_utf8_crlf_to_lf": "f529879337709ed1e47410737725c77a094d2ccbd24d1dc0fad6f56c9ef2c6ed"
+    },
+    {
+      "path": "supabase/migrations/20261010430000_govfix_sessions_step_up_and_lows.sql",
+      "sha256_raw_bytes": "74c8c377838813013e5b393a54554ade7b53c3a021e8ce37c257161c909ed359",
+      "sha256_utf8_crlf_to_lf": "74c8c377838813013e5b393a54554ade7b53c3a021e8ce37c257161c909ed359"
+    },
+    {
+      "path": "supabase/tests/db/held_checkout_queue.test.mjs",
+      "sha256_raw_bytes": "8a32b1dffcd56a288de24f0a84099a03ef4bba239215e3a844ff818c3990f9a7",
+      "sha256_utf8_crlf_to_lf": "8a32b1dffcd56a288de24f0a84099a03ef4bba239215e3a844ff818c3990f9a7"
+    },
+    {
+      "path": "supabase/tests/db/held_checkout_queue_independent.test.mjs",
+      "sha256_raw_bytes": "8ed879e431033696afc644deda776397566d955d51881e7937dfe0b5888cf1b2",
+      "sha256_utf8_crlf_to_lf": "8ed879e431033696afc644deda776397566d955d51881e7937dfe0b5888cf1b2"
+    }
+  ],
+  "executed_checks": [
+    {
+      "command": "node --test supabase/tests/db/held_checkout_queue_independent.test.mjs",
+      "total": 10,
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "duration_ms": 3262.7392
+    },
+    {
+      "command": "node --test supabase/tests/db/held_checkout_queue.test.mjs supabase/tests/db/held_checkout_queue_independent.test.mjs",
+      "owner_cases": 7,
+      "independent_cases": 10,
+      "total": 17,
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "duration_ms": 3570.7405
+    },
+    {
+      "command": "npx eslint ../supabase/tests/db/held_checkout_queue_independent.test.mjs",
+      "cwd": "web_platform",
+      "exit_code": 0,
+      "warnings": 1,
+      "result": "NOT LINTED: outside configured base path; not claimed as lint acceptance"
+    }
+  ],
+  "threat_model": [
+    {
+      "threat": "Unauthenticated/non-console or service-token confused deputy",
+      "mitigation": "Only authenticated EXECUTE grant; actual uid+authenticated claim and gov2_require_read money.ledger; anon/service/non-console roles denied."
+    },
+    {
+      "threat": "Stolen weak/revoked/locked/stale-authority operator session",
+      "mitigation": "Existing live-session ownership/expiry and AAL2/MFA-lock checks, current console role and permission lookup on every RPC; all exercised in SQL tests."
+    },
+    {
+      "threat": "Finance insider extracts contacts, wire or provider credentials/context",
+      "mitigation": "Explicit eleven-field allowlist in both list/detail; no actor/provider/charge identifiers, contact values, gateway context, request/hash or URL. Search exact typed identifiers only; no export."
+    },
+    {
+      "threat": "Cross-tenant mistaken visibility",
+      "mitigation": "Existing owner/finance money.ledger platformwide reconciliation scope explicitly approved; customers/provider owners/operations/analyst denied. No new tenant grant is inferred."
+    },
+    {
+      "threat": "Guessed IDs/SQL injection/temp relation shadowing",
+      "mitigation": "Same eligibility/projection on detail and list; nonheld detail indistinguishable from absent; UUID types/strict enum/paging bounds; fixed empty search_path plus schema-qualified sensitive relations/helpers."
+    },
+    {
+      "threat": "Unlogged exfiltration/audit outage or audit tampering",
+      "mitigation": "Audit in same transaction after projection; failed populated/empty audit aborts return; actor/role/purpose/fields/returned IDs/filters/count metadata checked; console edit/delete/private-audit-helper denied."
+    },
+    {
+      "threat": "Observation silently dispatches payment or changes financial/reconciliation state",
+      "mitigation": "Independent RPCs never use legacy overview escalation. Six full state table snapshots identical after both successful and failed reads; only privileged-read audit inserts permitted."
+    }
+  ],
+  "independent_assertions": [
+    "Exact migration reapplies idempotently, preserving row bytes and grants. Both RPCs remain volatile security definer with fixed empty search path.",
+    "Owner/finance authorized; operations/analyst/customer/provider owner/anon/service/missing uid/AAL1 denied with42501 and no successful-read audit.",
+    "Actual session expiry/deletion/wrong-account session/malformed session denied. Actual MFA lock/console downgrade/permission revocation applies immediately.",
+    "Direct table/column SELECT, UPDATE, DELETE denied to all tested client roles including service_role; private audit/payable helpers and audit tampering denied.",
+    "Captured noncurrent quarantine remains visible. Ready/captured/failed without reconciliation flag and guessed IDs return audited null/empty; no metadata leak.",
+    "List/detail exact field equality, amount/SAR correctness and synthetic private sentinel absence in response/audit.",
+    "Strict nullable/bounds/unknown filters/invalid UUID rejection produces no successful-read receipt.",
+    "Stable created_at/id ordering, per-page counts and one audit row per successful list/detail including empty, with exact returned target IDs and fixed reconciliation purpose.",
+    "Forced audit trigger failure on populated/empty list/detail returns error without audit, checkout or financial/reconciliation state changes.",
+    "Caller temp-schema shadows cannot substitute sensitive source or permission relations."
+  ],
+  "findings": [],
+  "unresolved_critical_or_high_in_reviewed_backend_scope": 0,
+  "authorization_holds": {
+    "azure": "deferred",
+    "company_employee_activation": false,
+    "new_business_permissions": false,
+    "financial_execution": false,
+    "external_business_writes": false,
+    "production_merge": false,
+    "production_deploy": false,
+    "new_paid_service": false
+  },
+  "limits": [
+    "Uses isolated PGlite with full migration chain and Supabase-shaped roles/JWT claims, not hosted Auth/PostgREST, real financial provider or actual production data.",
+    "No browser/UI source acceptance asserted here; final UI source check is separately recorded after freeze.",
+    "No load/concurrent-hosted acceptance or overall regulated release validation/coverage claim; root owns integration gates.",
+    "Existing full unknown-payment resolution and private checkout-wire lifecycle gaps remain open; queue visibility does not resolve them."
+  ],
+  "metadata_errata": [
+    {
+      "captured_at_utc": "2026-10-22T12:55:44.012294+00:00",
+      "previous_receipt_sha256": "605916225b0db4e0b28a7888b6ef4b19af34bd134326163072ded8e56268c49d",
+      "correction": "Prose field count twelve corrected to eleven. Existing exact field arrays, source hashes and executed assertions were eleven throughout. No implementation or test change; no test rerun claimed."
+    }
+  ]
+}

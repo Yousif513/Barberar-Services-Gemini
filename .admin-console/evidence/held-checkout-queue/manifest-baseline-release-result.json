@@ -1,0 +1,1 @@
+{"exitCode": 1, "baselineGitCommit": "7a38a20678518203cfa20165abac1128a8fe9e77", "manifestSource": "git show HEAD:.admin-console/manifest.json", "projectRoot": "Current repair checkout, so this is source-equivalent validation, not a historical application rerun", "summary": "Validation complete: 298 error(s), 26 warning(s)"}

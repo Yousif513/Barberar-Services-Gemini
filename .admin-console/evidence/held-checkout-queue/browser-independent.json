@@ -1,0 +1,719 @@
+{
+  "classification": "Independent controlled browser QA and separate UX pass against actual Next UI and isolated fully migrated PGlite. Auth/profile responses are explicit fixtures; real Supabase Auth, PostgREST transport and hosted deployment are not certified.",
+  "startedAt": "2026-10-22T12:58:35.623Z",
+  "checks": [
+    {
+      "name": "Honest empty queue loads through actual isolated SQL and audited RPC; direct route invokes no parent overview",
+      "status": "passed"
+    },
+    {
+      "name": "Desktop navigation marks only the new held-checkout route as current; direct entry is separate from parent overview",
+      "status": "passed"
+    },
+    {
+      "name": "Actual server pagination renders25of32 held attempts with oldest-first ordering",
+      "status": "passed"
+    },
+    {
+      "name": "Next/previous pages preserve filters and cover the remaining7rows without duplication",
+      "status": "passed"
+    },
+    {
+      "name": "All6purchase types remain discoverable and a noncurrent unknown attempt stays visible in minimized detail",
+      "status": "passed"
+    },
+    {
+      "name": "Actual SQL page shrink distinguishes empty page from empty queue and First page recovers without dropping filters",
+      "status": "passed"
+    },
+    {
+      "name": "Invalid UUID is labelled and never dispatched; exact missing ID shows filtered-empty with draft preserved",
+      "status": "passed"
+    },
+    {
+      "name": "Status and purchase type combine with AND against actual quarantined captured records",
+      "status": "passed"
+    },
+    {
+      "name": "Exact payable search and audited detail use minimized projection; opening/closing details moves and restores keyboard focus",
+      "status": "passed"
+    },
+    {
+      "name": "Refreshed detail truthfully becomes unavailable when the record leaves held eligibility",
+      "status": "passed"
+    },
+    {
+      "name": "Read failure clears stale records, preserves filter input and retry recovers through SQL",
+      "status": "passed"
+    },
+    {
+      "name": "Malformed response with an extra private field is rejected and never rendered as a record",
+      "status": "passed"
+    },
+    {
+      "name": "An older delayed list response cannot replace a newer exact-filter result",
+      "status": "passed"
+    },
+    {
+      "name": "Server refusal produces forbidden state and removes previous financial records",
+      "status": "passed"
+    },
+    {
+      "name": "Closing detail invalidates an older delayed response so it cannot reopen stale content",
+      "status": "passed"
+    },
+    {
+      "name": "Detail read failure is truthful and retry recovers without discarding the current queue snapshot",
+      "status": "passed"
+    },
+    {
+      "name": "A forbidden detail response clears both previous queue records and detail content",
+      "status": "passed"
+    },
+    {
+      "name": "EN375px has keyboard-scrollable readable table, bidirectional IDs and no page overflow",
+      "status": "passed",
+      "sizes": {
+        "drawerLeft": -288,
+        "drawerRight": 0,
+        "width": 375,
+        "scroll": 375,
+        "font": "12px",
+        "table": 1100,
+        "dir": "ltr"
+      },
+      "initial": 0,
+      "final": 69
+    },
+    {
+      "name": "AR375px has keyboard-scrollable readable table, bidirectional IDs and no page overflow",
+      "status": "passed",
+      "sizes": {
+        "drawerLeft": 375,
+        "drawerRight": 663,
+        "width": 375,
+        "scroll": 375,
+        "font": "12px",
+        "table": 1100,
+        "dir": "rtl"
+      },
+      "initial": 0,
+      "final": -70
+    },
+    {
+      "name": "Every successful queue/detail SQL read is audited; no parent overview, financial, external or speech/device call occurred",
+      "status": "passed",
+      "audits": [
+        {
+          "action": "checkout.operator.detail",
+          "n": 6
+        },
+        {
+          "action": "checkout.operator.list",
+          "n": 28
+        }
+      ],
+      "readCount": 34
+    }
+  ],
+  "findings": [],
+  "rpc": [
+    {
+      "name": "admin_session_state",
+      "args": {},
+      "returnedRows": 0,
+      "auditExpected": false
+    },
+    {
+      "name": "admin_session_state",
+      "args": {},
+      "returnedRows": 0,
+      "auditExpected": false
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 0,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 25,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 25
+      },
+      "returnedRows": 7,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 25,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": "booking",
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 6,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": "gift_card",
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 6,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": "package",
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 5,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": "membership",
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 5,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": "tip",
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 5,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": "subscription",
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 5,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 25,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_get_held_checkout_attempt",
+      "args": {
+        "p_attempt_id": "c20ad138-cb2b-43df-95b3-ac631796ef72"
+      },
+      "returnedRows": 1,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 25
+      },
+      "returnedRows": 7,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 25
+      },
+      "returnedRows": 0,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 25,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 25,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": "ce31c280-5d28-4c50-a236-a4c47f2144cc",
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 0,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 25,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": "captured",
+        "p_purchase_type": "package",
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 3,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": "captured",
+        "p_purchase_type": "package",
+        "p_attempt_id": null,
+        "p_target_id": "6da8a804-d19d-49ca-97a0-ed3b99bbbe75",
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 1,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_get_held_checkout_attempt",
+      "args": {
+        "p_attempt_id": "83cde174-6a11-464c-ab38-b223df021497"
+      },
+      "returnedRows": 1,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_get_held_checkout_attempt",
+      "args": {
+        "p_attempt_id": "83cde174-6a11-464c-ab38-b223df021497"
+      },
+      "returnedRows": 1,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_get_held_checkout_attempt",
+      "args": {
+        "p_attempt_id": "83cde174-6a11-464c-ab38-b223df021497"
+      },
+      "returnedRows": 0,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": "captured",
+        "p_purchase_type": "package",
+        "p_attempt_id": null,
+        "p_target_id": "6da8a804-d19d-49ca-97a0-ed3b99bbbe75",
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "injectedFailure": 503
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": "captured",
+        "p_purchase_type": "package",
+        "p_attempt_id": null,
+        "p_target_id": "6da8a804-d19d-49ca-97a0-ed3b99bbbe75",
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 0,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 25,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 25,
+      "auditExpected": true,
+      "malformed": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 25,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 25,
+      "auditExpected": true,
+      "delayed": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": "28f1067c-540d-41bb-9721-e15988840c3f",
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 1,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 25,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "injectedFailure": 403
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 25,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_get_held_checkout_attempt",
+      "args": {
+        "p_attempt_id": "c20ad138-cb2b-43df-95b3-ac631796ef72"
+      },
+      "returnedRows": 1,
+      "auditExpected": true,
+      "delayed": true
+    },
+    {
+      "name": "admin_get_held_checkout_attempt",
+      "args": {
+        "p_attempt_id": "c20ad138-cb2b-43df-95b3-ac631796ef72"
+      },
+      "injectedFailure": 503
+    },
+    {
+      "name": "admin_get_held_checkout_attempt",
+      "args": {
+        "p_attempt_id": "c20ad138-cb2b-43df-95b3-ac631796ef72"
+      },
+      "returnedRows": 1,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_get_held_checkout_attempt",
+      "args": {
+        "p_attempt_id": "c20ad138-cb2b-43df-95b3-ac631796ef72"
+      },
+      "injectedFailure": 403
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 25,
+      "auditExpected": true
+    }
+  ],
+  "blocked": [],
+  "consoleErrors": [],
+  "expectedConsoleErrors": [
+    {
+      "classification": "Known unconfigured local preview diagnostic; actual hosted transport not evaluated",
+      "message": "[supabase] NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY is missing. Set both in the Vercel project (Production + Preview) and redeploy — sign in and every data screen will fail until then."
+    },
+    {
+      "classification": "Deliberate unavailable/forbidden fixture response",
+      "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)",
+      "path": "/rest/v1/rpc/admin_list_held_checkout_attempts"
+    },
+    {
+      "classification": "Deliberate unavailable/forbidden fixture response",
+      "message": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+      "path": "/rest/v1/rpc/admin_list_held_checkout_attempts"
+    },
+    {
+      "classification": "Deliberate unavailable/forbidden fixture response",
+      "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)",
+      "path": "/rest/v1/rpc/admin_get_held_checkout_attempt"
+    },
+    {
+      "classification": "Deliberate unavailable/forbidden fixture response",
+      "message": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+      "path": "/rest/v1/rpc/admin_get_held_checkout_attempt"
+    }
+  ],
+  "pageErrors": [],
+  "captures": [
+    "browser-empty-en.html",
+    "browser-empty-en.png",
+    "browser-populated-en.html",
+    "browser-populated-en.png",
+    "browser-shrinking-page-en.html",
+    "browser-filtered-empty-en.html",
+    "browser-detail-en.html",
+    "browser-detail-en.png",
+    "browser-detail-no-longer-held-en.html",
+    "browser-forbidden-en.html",
+    "browser-mobile-en-header.html",
+    "browser-mobile-en-header.png",
+    "browser-mobile-en-scrolled.html",
+    "browser-mobile-en-scrolled.png",
+    "browser-mobile-ar-header.html",
+    "browser-mobile-ar-header.png",
+    "browser-mobile-ar-scrolled.html",
+    "browser-mobile-ar-scrolled.png",
+    "browser-final-en.html",
+    "browser-final-en.png"
+  ],
+  "deviceCalls": [],
+  "azure": "deferred",
+  "employeeActivation": false,
+  "businessPermissions": false,
+  "financialExecution": false,
+  "auditCounts": [
+    {
+      "action": "checkout.operator.detail",
+      "n": 6
+    },
+    {
+      "action": "checkout.operator.list",
+      "n": 28
+    }
+  ],
+  "status": "accepted_scoped_local_browser_qa",
+  "finishedAt": "2026-10-22T12:58:46.697Z",
+  "sourceHashes": {
+    "web_platform/src/app/admin/reconciliation/checkouts/page.tsx": {
+      "sha256_bytes": "1578ea5fae758a11a3553eeb29e4196997c5614fb02519e7363562f71cfa316c",
+      "sha256_utf8_crlf_to_lf": "3f483b560227faf40b1b5724e5b306d5c003c284748e631209083f508487a442"
+    },
+    "web_platform/src/lib/held-checkout-client.mjs": {
+      "sha256_bytes": "bad30a5d940c6c5eed997c2d33a83418ee74d3aefc66e79e21a90e949d3ffc1e",
+      "sha256_utf8_crlf_to_lf": "9424086559f1f04f1617187b68178632181a9e458738209ca55a7fc7827e14b1"
+    },
+    "web_platform/src/lib/held-checkout-client.d.mts": {
+      "sha256_bytes": "60d1a809ff5c1cc2f5e87c7a8f22dcf587894e73f3c9ffcd940dcb7458916107",
+      "sha256_utf8_crlf_to_lf": "5d0e400b0972bc14fc66751180ed6df204c9ca9d6f18402a4da3990ff8a7bc4f"
+    },
+    "web_platform/src/app/admin/layout.tsx": {
+      "sha256_bytes": "a37931a67cc68336e375ddd5ccfb0081398176953df514a97bceda97fd967108",
+      "sha256_utf8_crlf_to_lf": "8ae982fa2129cea9198acb538a37c86607836a65e84c60efe204e6fd3e65ab9a"
+    },
+    "web_platform/src/app/admin/reconciliation/page.tsx": {
+      "sha256_bytes": "2c4e6f2a6f7576333e2a05533d2aed0ead02e5dea46fd8e4698c35f07168fc9d",
+      "sha256_utf8_crlf_to_lf": "d58a780e0646b8f67cff99cedc51ada71bd530bd6607a08a7b7b36c48d9a1a42"
+    },
+    "supabase/migrations/20261022124446_held_checkout_read_queue.sql": {
+      "sha256_bytes": "e0e9113414d2d512921138302b3ae8d49fb10aa972a75a00db214c0063f419b4",
+      "sha256_utf8_crlf_to_lf": "e0e9113414d2d512921138302b3ae8d49fb10aa972a75a00db214c0063f419b4"
+    }
+  },
+  "testSourceSha256": "acc7fd1b27977ddcde0da7b71d6b614db6efbbcd71fcb9bb43e5b126f315819e",
+  "harnessHistory": [
+    {
+      "observation": "browser-first-harness-observation.json",
+      "classification": "First test run stopped on an overly exact wrapping-select label selector despite the actual control being present. Test-only selector corrected; no product edit."
+    },
+    {
+      "classification": "Next route announcer created a second empty role=alert node; test assertions narrowed to actual admin-main alerts. No product edit."
+    },
+    {
+      "classification": "Deliberately injected503/403 resource diagnostics were originally classified as unexpected. Final test retains exact queue-RPC URL/status diagnostics separately; existing missing-public-config diagnostic also retained. No console event suppressed."
+    }
+  ],
+  "visualReview": {
+    "reviewer": "ux-held-checkout-browser",
+    "freshSourceRead": true,
+    "inspected": [
+      "browser-mobile-ar-header.png",
+      "browser-mobile-ar-scrolled.png",
+      "browser-mobile-en-scrolled.png"
+    ],
+    "observed": "Bilingual inherited theme, labelled controls, complete UUID isolation,12px table, visible native scroll focus and mobile closed drawer outside viewport after transition. Initial transition-time capture was not a stable-layout finding.",
+    "nativeLinguisticAcceptance": "not evaluated",
+    "fullWCAGCertification": "not claimed",
+    "sourceReview": "Exact safe projection, request sequence guards, no mutation/export/provider action; original parent overview deliberately not mounted by newroute. Optional parentlink is source-reviewed, not clicked into legacy overview."
+  },
+  "testCommand": {
+    "command": "node web_platform/tests-browser/held-checkout-queue-independent.mjs",
+    "exitCode": 0,
+    "passedGroups": 20
+  },
+  "lintCommand": {
+    "command": "npx eslint tests-browser/held-checkout-queue-independent.mjs",
+    "cwd": "web_platform",
+    "exitCode": 0,
+    "warnings": 0
+  },
+  "independentScope": "Does not implement application code. Fixture identity/profile adapter plus actual PGlite query enforcement; no realAuth/PostgREST/hosted acceptance. Parentlegacyreconciliationoverview and fullregulatedrelease remain outside acceptance."
+}

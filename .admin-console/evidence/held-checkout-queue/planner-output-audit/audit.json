@@ -1,0 +1,3408 @@
+{
+  "schema": 2,
+  "verdict": "FAIL",
+  "coverage": {
+    "planned": 41,
+    "completed": 0,
+    "missing": 41,
+    "failed": 0,
+    "unexpected": 15,
+    "percent": 0.0,
+    "by_kind": {
+      "page": {
+        "planned": 7,
+        "completed": 0
+      },
+      "popover": {
+        "planned": 11,
+        "completed": 0
+      },
+      "state": {
+        "planned": 15,
+        "completed": 0
+      },
+      "modal": {
+        "planned": 3,
+        "completed": 0
+      },
+      "drawer": {
+        "planned": 1,
+        "completed": 0
+      },
+      "command-palette": {
+        "planned": 1,
+        "completed": 0
+      },
+      "toast": {
+        "planned": 3,
+        "completed": 0
+      }
+    }
+  },
+  "closure_in_output": {
+    "rendered_affordances": 1068,
+    "invented": 1067,
+    "scaffold": 0,
+    "checked": true
+  },
+  "completeness": {
+    "checked": true,
+    "passed": true,
+    "incomplete_nodes": [],
+    "controls_missing": 0,
+    "reason": ""
+  },
+  "references": {
+    "checked": true,
+    "passed": false,
+    "broken_references": [
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/web_platform_1vp25kt._.js"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/web_platform_src_1rcgfzk._.js"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/node_modules_1hxqwvo._.js"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/web_platform_src_0cxk0w8._.js"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "browser-detail-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/web_platform_1vp25kt._.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/web_platform_src_1rcgfzk._.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/node_modules_1hxqwvo._.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/web_platform_src_0cxk0w8._.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "browser-detail-no-longer-held-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/web_platform_1vp25kt._.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/web_platform_src_1rcgfzk._.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_1hxqwvo._.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/web_platform_src_0cxk0w8._.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "browser-empty-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/web_platform_1vp25kt._.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/web_platform_src_1rcgfzk._.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_1hxqwvo._.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/web_platform_src_0cxk0w8._.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "browser-filtered-empty-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/web_platform_1vp25kt._.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/web_platform_src_1rcgfzk._.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/node_modules_1hxqwvo._.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/web_platform_src_0cxk0w8._.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "browser-final-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/web_platform_1vp25kt._.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/web_platform_src_1rcgfzk._.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/node_modules_1hxqwvo._.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/web_platform_src_0cxk0w8._.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "browser-forbidden-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/web_platform_1vp25kt._.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/web_platform_src_1rcgfzk._.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/node_modules_1hxqwvo._.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/web_platform_src_0cxk0w8._.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "browser-harness-console-classification-observation.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/web_platform_1vp25kt._.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/web_platform_src_1rcgfzk._.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/node_modules_1hxqwvo._.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/web_platform_src_0cxk0w8._.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "browser-harness-label-selector-failure.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/web_platform_1vp25kt._.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/web_platform_src_1rcgfzk._.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/node_modules_1hxqwvo._.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/web_platform_src_0cxk0w8._.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "browser-mobile-ar-header.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/web_platform_1vp25kt._.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/web_platform_src_1rcgfzk._.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_1hxqwvo._.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/web_platform_src_0cxk0w8._.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "browser-mobile-ar-scrolled.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/web_platform_1vp25kt._.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/web_platform_src_1rcgfzk._.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/node_modules_1hxqwvo._.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/web_platform_src_0cxk0w8._.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "browser-mobile-en-header.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/web_platform_1vp25kt._.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/web_platform_src_1rcgfzk._.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_1hxqwvo._.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/web_platform_src_0cxk0w8._.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "browser-mobile-en-scrolled.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/web_platform_1vp25kt._.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/web_platform_src_1rcgfzk._.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/node_modules_1hxqwvo._.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/web_platform_src_0cxk0w8._.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "browser-populated-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/%5Broot-of-the-server%5D__1e7rvoz._.css"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jm.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-dom_096_9a-._.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_compiled_1amofcm._.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_client_0_90u2t._.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_1e8vcs8._.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqw._.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/web_platform_1anvha4._.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/turbopack-web_platform_08bm286._.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/web_platform_1vp25kt._.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/_18csebl._.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/web_platform_src_1rcgfzk._.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/node_modules_1hxqwvo._.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/web_platform_src_0cxk0w8._.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/favicon.ico?favicon.2vob68tjqpejf.ico"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/node_modules_next_dist_build_polyfills_polyfill-nomodule.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/media/280fac012b00b901-s.p.3ihiqn4pviisd.woff2"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/media/3347fc7792f0b5ea-s.p.0c7ha31nuacbu.woff2"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/media/441492499fc86682-s.p.1fbvi_fot8u4l.woff2"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/media/5ad8fdb5805e9b4a-s.p.0-uv4l43gdmt7.woff2"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/media/5d6231e6818a3930-s.p.2vs72h_x6qrve.woff2"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/media/84cd8d504984ae62-s.p.0iritm8hg8q1a.woff2"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/media/c9a0d344f313d307-s.p.3ik2qu-u9tgho.woff2"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/media/ceec3e50f42c26e3-s.p.0da8nscnv1nkd.woff2"
+      },
+      {
+        "file": "browser-shrinking-page-en.html",
+        "ref": "/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1di75ot._.js"
+      }
+    ],
+    "reason": ""
+  },
+  "consistency": {
+    "checked": false,
+    "passed": true,
+    "mismatches": []
+  },
+  "components": {
+    "checked": false,
+    "passed": true,
+    "missing_components": [],
+    "misplaced_components": [],
+    "reason": "no component_census.json in out-dir"
+  },
+  "assets": {
+    "checked": false,
+    "passed": true,
+    "missing_assets": [],
+    "reason": "no asset_manifest.json in out-dir"
+  },
+  "image_evidence": {
+    "checked": true,
+    "passed": true,
+    "missing_images": [],
+    "reason": ""
+  },
+  "quality": {
+    "checked": true,
+    "passed": false,
+    "findings": [
+      {
+        "rule_id": "viewport-meta",
+        "severity": "error",
+        "message": "missing viewport meta tag",
+        "file": ".admin-console\\evidence\\held-checkout-queue\\planner\\plan.html",
+        "line": 0,
+        "source": "design-lint"
+      },
+      {
+        "rule_id": "landmarks",
+        "severity": "warning",
+        "message": "no <main> landmark — screen readers get no way past the chrome",
+        "file": ".admin-console\\evidence\\held-checkout-queue\\planner\\plan.html",
+        "line": 0,
+        "source": "design-lint"
+      },
+      {
+        "rule_id": "input-label",
+        "severity": "error",
+        "message": "<input> has no label, aria-label, or aria-labelledby",
+        "file": ".admin-console\\evidence\\held-checkout-queue\\planner\\plan.html",
+        "line": 48,
+        "source": "design-lint"
+      },
+      {
+        "rule_id": "body-font-size",
+        "severity": "warning",
+        "message": "font-size 10px is below the 11px legibility floor",
+        "file": ".admin-console\\evidence\\held-checkout-queue\\planner\\plan.html",
+        "line": 27,
+        "source": "design-lint"
+      },
+      {
+        "rule_id": "outline-none",
+        "severity": "error",
+        "message": "outline:none with no :focus-visible replacement removes the focus ring",
+        "file": ".admin-console\\evidence\\held-checkout-queue\\planner\\plan.html",
+        "line": 16,
+        "source": "design-lint"
+      }
+    ],
+    "reason": ""
+  },
+  "missing_nodes": [
+    {
+      "id": "account-sign-in",
+      "kind": "page",
+      "name": "Account sign-in",
+      "route": "/login"
+    },
+    {
+      "id": "account-sign-in-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "route": "/login"
+    },
+    {
+      "id": "account-sign-in-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "route": "/login"
+    },
+    {
+      "id": "account-sign-in-state-loading",
+      "kind": "state",
+      "name": "Account sign-in — loading",
+      "route": "/login"
+    },
+    {
+      "id": "account-sign-in-state-error",
+      "kind": "state",
+      "name": "Account sign-in — error",
+      "route": "/login"
+    },
+    {
+      "id": "account-sign-in-state-empty",
+      "kind": "state",
+      "name": "Account sign-in — empty",
+      "route": "/login"
+    },
+    {
+      "id": "customer-profile",
+      "kind": "page",
+      "name": "Customer profile",
+      "route": "/customer/settings"
+    },
+    {
+      "id": "customer-profile-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "route": "/customer/settings"
+    },
+    {
+      "id": "customer-profile-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "route": "/customer/settings"
+    },
+    {
+      "id": "customer-profile-state-loading",
+      "kind": "state",
+      "name": "Customer profile — loading",
+      "route": "/customer/settings"
+    },
+    {
+      "id": "customer-profile-state-error",
+      "kind": "state",
+      "name": "Customer profile — error",
+      "route": "/customer/settings"
+    },
+    {
+      "id": "customer-profile-state-empty",
+      "kind": "state",
+      "name": "Customer profile — empty",
+      "route": "/customer/settings"
+    },
+    {
+      "id": "salon-application",
+      "kind": "page",
+      "name": "Salon application",
+      "route": "/become-provider"
+    },
+    {
+      "id": "salon-application-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "route": "/become-provider"
+    },
+    {
+      "id": "salon-application-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "route": "/become-provider"
+    },
+    {
+      "id": "salon-application-state-loading",
+      "kind": "state",
+      "name": "Salon application — loading",
+      "route": "/become-provider"
+    },
+    {
+      "id": "salon-application-state-error",
+      "kind": "state",
+      "name": "Salon application — error",
+      "route": "/become-provider"
+    },
+    {
+      "id": "salon-application-state-empty",
+      "kind": "state",
+      "name": "Salon application — empty",
+      "route": "/become-provider"
+    },
+    {
+      "id": "salon-booking",
+      "kind": "page",
+      "name": "Salon booking",
+      "route": "/shop/[id]"
+    },
+    {
+      "id": "salon-booking-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "route": "/shop/[id]"
+    },
+    {
+      "id": "salon-booking-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "route": "/shop/[id]"
+    },
+    {
+      "id": "salon-booking-state-loading",
+      "kind": "state",
+      "name": "Salon booking — loading",
+      "route": "/shop/[id]"
+    },
+    {
+      "id": "salon-booking-state-error",
+      "kind": "state",
+      "name": "Salon booking — error",
+      "route": "/shop/[id]"
+    },
+    {
+      "id": "salon-booking-state-empty",
+      "kind": "state",
+      "name": "Salon booking — empty",
+      "route": "/shop/[id]"
+    },
+    {
+      "id": "profile",
+      "kind": "page",
+      "name": "Profile",
+      "route": "/profile"
+    },
+    {
+      "id": "profile-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "route": "/profile"
+    },
+    {
+      "id": "profile-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "route": "/profile"
+    },
+    {
+      "id": "settings",
+      "kind": "page",
+      "name": "Settings",
+      "route": "/settings"
+    },
+    {
+      "id": "settings-modal-destructive-confirm",
+      "kind": "modal",
+      "name": "Danger zone action",
+      "route": "/settings"
+    },
+    {
+      "id": "settings-notifications",
+      "kind": "page",
+      "name": "Notifications",
+      "route": "/settings/notifications"
+    },
+    {
+      "id": "settings-notifications-modal-destructive-confirm",
+      "kind": "modal",
+      "name": "Danger zone action",
+      "route": "/settings/notifications"
+    },
+    {
+      "id": "shared-popover-user-menu",
+      "kind": "popover",
+      "name": "User menu",
+      "route": ""
+    },
+    {
+      "id": "shared-drawer-notifications",
+      "kind": "drawer",
+      "name": "Notifications",
+      "route": ""
+    },
+    {
+      "id": "shared-drawer-notifications-state-empty",
+      "kind": "state",
+      "name": "Notifications — empty",
+      "route": ""
+    },
+    {
+      "id": "shared-drawer-notifications-state-loading",
+      "kind": "state",
+      "name": "Notifications — loading",
+      "route": ""
+    },
+    {
+      "id": "shared-command-palette-global-search",
+      "kind": "command-palette",
+      "name": "Search",
+      "route": ""
+    },
+    {
+      "id": "shared-command-palette-global-search-state-no-results",
+      "kind": "state",
+      "name": "Search — no-results",
+      "route": ""
+    },
+    {
+      "id": "shared-toast-success",
+      "kind": "toast",
+      "name": "Mark all read",
+      "route": ""
+    },
+    {
+      "id": "shared-toast-error",
+      "kind": "toast",
+      "name": "Error",
+      "route": ""
+    },
+    {
+      "id": "shared-modal-reauthenticate",
+      "kind": "modal",
+      "name": "Confirm password",
+      "route": ""
+    },
+    {
+      "id": "shared-toast-info",
+      "kind": "toast",
+      "name": "Undo",
+      "route": ""
+    }
+  ],
+  "unexpected_artifacts": [
+    "browser-detail-en",
+    "browser-detail-no-longer-held-en",
+    "browser-empty-en",
+    "browser-filtered-empty-en",
+    "browser-final-en",
+    "browser-forbidden-en",
+    "browser-harness-console-classification-observation",
+    "browser-harness-label-selector-failure",
+    "browser-mobile-ar-header",
+    "browser-mobile-ar-scrolled",
+    "browser-mobile-en-header",
+    "browser-mobile-en-scrolled",
+    "browser-populated-en",
+    "browser-shrinking-page-en",
+    "plan"
+  ],
+  "invented_affordances": [
+    {
+      "kind": "link",
+      "href": "/",
+      "label": "PRIMORA",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/",
+      "label": "PRIMORA",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin",
+      "label": "Dashboard",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/bookings",
+      "label": "Bookings",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/services",
+      "label": "Services",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/packages",
+      "label": "Packages",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/disputes",
+      "label": "Disputes",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/approvals",
+      "label": "Approvals",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/ledger",
+      "label": "Ledger & Splits",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/refunds",
+      "label": "Refunds",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reconciliation",
+      "label": "Tap Reconciliation",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reconciliation/checkouts",
+      "label": "Held checkouts",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reports",
+      "label": "Reports",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/employees",
+      "label": "Staff & Teams",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/branches",
+      "label": "Venues & Rooms",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/supply",
+      "label": "Supply Oversight",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/whatsapp",
+      "label": "WhatsApp Receptionist",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/sponsored",
+      "label": "Sponsored placement",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/taxes",
+      "label": "Taxes & Fees",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/coupons",
+      "label": "Coupons & Offers",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/roles",
+      "label": "Roles & Permissions",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/platform-rules",
+      "label": "Platform Rules",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/ropa",
+      "label": "Processing Register",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/activity",
+      "label": "Activity Feed",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/integrations",
+      "label": "API & Integrations",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/settings",
+      "label": "Settings",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/help",
+      "label": "Need Help? Help Center",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/",
+      "label": "PRIMORA",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin",
+      "label": "Dashboard",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/bookings",
+      "label": "Bookings",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/services",
+      "label": "Services",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/packages",
+      "label": "Packages",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/disputes",
+      "label": "Disputes",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/approvals",
+      "label": "Approvals",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/ledger",
+      "label": "Ledger & Splits",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/refunds",
+      "label": "Refunds",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reconciliation",
+      "label": "Tap Reconciliation",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reconciliation/checkouts",
+      "label": "Held checkouts",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reports",
+      "label": "Reports",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/employees",
+      "label": "Staff & Teams",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/branches",
+      "label": "Venues & Rooms",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/supply",
+      "label": "Supply Oversight",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/whatsapp",
+      "label": "WhatsApp Receptionist",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/sponsored",
+      "label": "Sponsored placement",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/taxes",
+      "label": "Taxes & Fees",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/coupons",
+      "label": "Coupons & Offers",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/roles",
+      "label": "Roles & Permissions",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/platform-rules",
+      "label": "Platform Rules",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/ropa",
+      "label": "Processing Register",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/activity",
+      "label": "Activity Feed",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/integrations",
+      "label": "API & Integrations",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/settings",
+      "label": "Settings",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/help",
+      "label": "Need Help? Help Center",
+      "source": "browser-detail-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "العربية",
+      "source": "browser-detail-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "العربية",
+      "source": "browser-detail-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "العربية",
+      "source": "browser-detail-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Apply filters",
+      "source": "browser-detail-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Clear filters",
+      "source": "browser-detail-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Refresh queue",
+      "source": "browser-detail-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Details",
+      "source": "browser-detail-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Previous page",
+      "source": "browser-detail-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Next page",
+      "source": "browser-detail-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Close details",
+      "source": "browser-detail-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Refresh details",
+      "source": "browser-detail-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Refresh queue",
+      "source": "browser-detail-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/",
+      "label": "PRIMORA",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/",
+      "label": "PRIMORA",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin",
+      "label": "Dashboard",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/bookings",
+      "label": "Bookings",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/services",
+      "label": "Services",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/packages",
+      "label": "Packages",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/disputes",
+      "label": "Disputes",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/approvals",
+      "label": "Approvals",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/ledger",
+      "label": "Ledger & Splits",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/refunds",
+      "label": "Refunds",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reconciliation",
+      "label": "Tap Reconciliation",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reconciliation/checkouts",
+      "label": "Held checkouts",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reports",
+      "label": "Reports",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/employees",
+      "label": "Staff & Teams",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/branches",
+      "label": "Venues & Rooms",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/supply",
+      "label": "Supply Oversight",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/whatsapp",
+      "label": "WhatsApp Receptionist",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/sponsored",
+      "label": "Sponsored placement",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/taxes",
+      "label": "Taxes & Fees",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/coupons",
+      "label": "Coupons & Offers",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/roles",
+      "label": "Roles & Permissions",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/platform-rules",
+      "label": "Platform Rules",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/ropa",
+      "label": "Processing Register",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/activity",
+      "label": "Activity Feed",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/integrations",
+      "label": "API & Integrations",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/settings",
+      "label": "Settings",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/help",
+      "label": "Need Help? Help Center",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/",
+      "label": "PRIMORA",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin",
+      "label": "Dashboard",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/bookings",
+      "label": "Bookings",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/services",
+      "label": "Services",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/packages",
+      "label": "Packages",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/disputes",
+      "label": "Disputes",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/approvals",
+      "label": "Approvals",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/ledger",
+      "label": "Ledger & Splits",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/refunds",
+      "label": "Refunds",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reconciliation",
+      "label": "Tap Reconciliation",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reconciliation/checkouts",
+      "label": "Held checkouts",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reports",
+      "label": "Reports",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/employees",
+      "label": "Staff & Teams",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/branches",
+      "label": "Venues & Rooms",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/supply",
+      "label": "Supply Oversight",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/whatsapp",
+      "label": "WhatsApp Receptionist",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/sponsored",
+      "label": "Sponsored placement",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/taxes",
+      "label": "Taxes & Fees",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/coupons",
+      "label": "Coupons & Offers",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/roles",
+      "label": "Roles & Permissions",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/platform-rules",
+      "label": "Platform Rules",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/ropa",
+      "label": "Processing Register",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/activity",
+      "label": "Activity Feed",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/integrations",
+      "label": "API & Integrations",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/settings",
+      "label": "Settings",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/help",
+      "label": "Need Help? Help Center",
+      "source": "browser-detail-no-longer-held-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "العربية",
+      "source": "browser-detail-no-longer-held-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "العربية",
+      "source": "browser-detail-no-longer-held-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "العربية",
+      "source": "browser-detail-no-longer-held-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Apply filters",
+      "source": "browser-detail-no-longer-held-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Clear filters",
+      "source": "browser-detail-no-longer-held-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Refresh queue",
+      "source": "browser-detail-no-longer-held-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Details",
+      "source": "browser-detail-no-longer-held-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Previous page",
+      "source": "browser-detail-no-longer-held-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Next page",
+      "source": "browser-detail-no-longer-held-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Close details",
+      "source": "browser-detail-no-longer-held-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Refresh details",
+      "source": "browser-detail-no-longer-held-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Refresh queue",
+      "source": "browser-detail-no-longer-held-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/",
+      "label": "PRIMORA",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/",
+      "label": "PRIMORA",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin",
+      "label": "Dashboard",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/bookings",
+      "label": "Bookings",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/services",
+      "label": "Services",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/packages",
+      "label": "Packages",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/disputes",
+      "label": "Disputes",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/approvals",
+      "label": "Approvals",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/ledger",
+      "label": "Ledger & Splits",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/refunds",
+      "label": "Refunds",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reconciliation",
+      "label": "Tap Reconciliation",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reconciliation/checkouts",
+      "label": "Held checkouts",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reports",
+      "label": "Reports",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/employees",
+      "label": "Staff & Teams",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/branches",
+      "label": "Venues & Rooms",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/supply",
+      "label": "Supply Oversight",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/whatsapp",
+      "label": "WhatsApp Receptionist",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/sponsored",
+      "label": "Sponsored placement",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/taxes",
+      "label": "Taxes & Fees",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/coupons",
+      "label": "Coupons & Offers",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/roles",
+      "label": "Roles & Permissions",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/platform-rules",
+      "label": "Platform Rules",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/ropa",
+      "label": "Processing Register",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/activity",
+      "label": "Activity Feed",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/integrations",
+      "label": "API & Integrations",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/settings",
+      "label": "Settings",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/help",
+      "label": "Need Help? Help Center",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/",
+      "label": "PRIMORA",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin",
+      "label": "Dashboard",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/bookings",
+      "label": "Bookings",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/services",
+      "label": "Services",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/packages",
+      "label": "Packages",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/disputes",
+      "label": "Disputes",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/approvals",
+      "label": "Approvals",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/ledger",
+      "label": "Ledger & Splits",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/refunds",
+      "label": "Refunds",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reconciliation",
+      "label": "Tap Reconciliation",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reconciliation/checkouts",
+      "label": "Held checkouts",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/reports",
+      "label": "Reports",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/employees",
+      "label": "Staff & Teams",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/branches",
+      "label": "Venues & Rooms",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/supply",
+      "label": "Supply Oversight",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/whatsapp",
+      "label": "WhatsApp Receptionist",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/sponsored",
+      "label": "Sponsored placement",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/taxes",
+      "label": "Taxes & Fees",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/coupons",
+      "label": "Coupons & Offers",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/roles",
+      "label": "Roles & Permissions",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/platform-rules",
+      "label": "Platform Rules",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/ropa",
+      "label": "Processing Register",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/activity",
+      "label": "Activity Feed",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/integrations",
+      "label": "API & Integrations",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/settings",
+      "label": "Settings",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/help",
+      "label": "Need Help? Help Center",
+      "source": "browser-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "العربية",
+      "source": "browser-empty-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "العربية",
+      "source": "browser-empty-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "العربية",
+      "source": "browser-empty-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Apply filters",
+      "source": "browser-empty-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Clear filters",
+      "source": "browser-empty-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Refresh queue",
+      "source": "browser-empty-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Previous page",
+      "source": "browser-empty-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "button",
+      "href": null,
+      "label": "Next page",
+      "source": "browser-empty-en.html",
+      "scaffold": false,
+      "reason": "control-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/",
+      "label": "PRIMORA",
+      "source": "browser-filtered-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/",
+      "label": "PRIMORA",
+      "source": "browser-filtered-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin",
+      "label": "Dashboard",
+      "source": "browser-filtered-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/bookings",
+      "label": "Bookings",
+      "source": "browser-filtered-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/services",
+      "label": "Services",
+      "source": "browser-filtered-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/packages",
+      "label": "Packages",
+      "source": "browser-filtered-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/disputes",
+      "label": "Disputes",
+      "source": "browser-filtered-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/approvals",
+      "label": "Approvals",
+      "source": "browser-filtered-empty-en.html",
+      "reason": "href-not-in-plan"
+    },
+    {
+      "kind": "link",
+      "href": "/admin/ledger",
+      "label": "Ledger & Splits",
+      "source": "browser-filtered-empty-en.html",
+      "reason": "href-not-in-plan"
+    }
+  ],
+  "waived": {
+    "nodes": 0,
+    "artifacts": 0,
+    "controls": 0,
+    "quality_findings": 0
+  },
+  "plan_holes_carried_over": 0,
+  "generation_failures": 0
+}

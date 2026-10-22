@@ -1,0 +1,613 @@
+{
+  "plan_version": 1,
+  "project": {
+    "name": null,
+    "root": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini",
+    "bmad_present": true
+  },
+  "areas": [
+    "admin"
+  ],
+  "nodes": [
+    {
+      "id": "account-sign-in",
+      "kind": "page",
+      "name": "Account sign-in",
+      "route": "/login",
+      "area": "uncategorized",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:10"
+      ]
+    },
+    {
+      "id": "account-sign-in-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "account-sign-in",
+      "area": "uncategorized",
+      "provenance": [
+        "closure:depth-1:from:account-sign-in::date-range"
+      ]
+    },
+    {
+      "id": "account-sign-in-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "account-sign-in",
+      "area": "uncategorized",
+      "provenance": [
+        "closure:depth-1:from:account-sign-in::widget-menu"
+      ]
+    },
+    {
+      "id": "account-sign-in-state-loading",
+      "kind": "state",
+      "name": "Account sign-in — loading",
+      "parent": "account-sign-in",
+      "state_variant": "loading",
+      "area": "uncategorized"
+    },
+    {
+      "id": "account-sign-in-state-error",
+      "kind": "state",
+      "name": "Account sign-in — error",
+      "parent": "account-sign-in",
+      "state_variant": "error",
+      "area": "uncategorized"
+    },
+    {
+      "id": "account-sign-in-state-empty",
+      "kind": "state",
+      "name": "Account sign-in — empty",
+      "parent": "account-sign-in",
+      "state_variant": "empty",
+      "area": "uncategorized"
+    },
+    {
+      "id": "customer-profile",
+      "kind": "page",
+      "name": "Customer profile",
+      "route": "/customer/settings",
+      "area": "uncategorized",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:12"
+      ]
+    },
+    {
+      "id": "customer-profile-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "customer-profile",
+      "area": "uncategorized",
+      "provenance": [
+        "closure:depth-1:from:customer-profile::date-range"
+      ]
+    },
+    {
+      "id": "customer-profile-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "customer-profile",
+      "area": "uncategorized",
+      "provenance": [
+        "closure:depth-1:from:customer-profile::widget-menu"
+      ]
+    },
+    {
+      "id": "customer-profile-state-loading",
+      "kind": "state",
+      "name": "Customer profile — loading",
+      "parent": "customer-profile",
+      "state_variant": "loading",
+      "area": "uncategorized"
+    },
+    {
+      "id": "customer-profile-state-error",
+      "kind": "state",
+      "name": "Customer profile — error",
+      "parent": "customer-profile",
+      "state_variant": "error",
+      "area": "uncategorized"
+    },
+    {
+      "id": "customer-profile-state-empty",
+      "kind": "state",
+      "name": "Customer profile — empty",
+      "parent": "customer-profile",
+      "state_variant": "empty",
+      "area": "uncategorized"
+    },
+    {
+      "id": "salon-application",
+      "kind": "page",
+      "name": "Salon application",
+      "route": "/become-provider",
+      "area": "uncategorized",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:11"
+      ]
+    },
+    {
+      "id": "salon-application-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "salon-application",
+      "area": "uncategorized",
+      "provenance": [
+        "closure:depth-1:from:salon-application::date-range"
+      ]
+    },
+    {
+      "id": "salon-application-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "salon-application",
+      "area": "uncategorized",
+      "provenance": [
+        "closure:depth-1:from:salon-application::widget-menu"
+      ]
+    },
+    {
+      "id": "salon-application-state-loading",
+      "kind": "state",
+      "name": "Salon application — loading",
+      "parent": "salon-application",
+      "state_variant": "loading",
+      "area": "uncategorized"
+    },
+    {
+      "id": "salon-application-state-error",
+      "kind": "state",
+      "name": "Salon application — error",
+      "parent": "salon-application",
+      "state_variant": "error",
+      "area": "uncategorized"
+    },
+    {
+      "id": "salon-application-state-empty",
+      "kind": "state",
+      "name": "Salon application — empty",
+      "parent": "salon-application",
+      "state_variant": "empty",
+      "area": "uncategorized"
+    },
+    {
+      "id": "salon-booking",
+      "kind": "page",
+      "name": "Salon booking",
+      "route": "/shop/[id]",
+      "area": "uncategorized",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "",
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:9"
+      ]
+    },
+    {
+      "id": "salon-booking-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "salon-booking",
+      "area": "uncategorized",
+      "provenance": [
+        "closure:depth-1:from:salon-booking::date-range"
+      ]
+    },
+    {
+      "id": "salon-booking-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "salon-booking",
+      "area": "uncategorized",
+      "provenance": [
+        "closure:depth-1:from:salon-booking::widget-menu"
+      ]
+    },
+    {
+      "id": "salon-booking-state-loading",
+      "kind": "state",
+      "name": "Salon booking — loading",
+      "parent": "salon-booking",
+      "state_variant": "loading",
+      "area": "uncategorized"
+    },
+    {
+      "id": "salon-booking-state-error",
+      "kind": "state",
+      "name": "Salon booking — error",
+      "parent": "salon-booking",
+      "state_variant": "error",
+      "area": "uncategorized"
+    },
+    {
+      "id": "salon-booking-state-empty",
+      "kind": "state",
+      "name": "Salon booking — empty",
+      "parent": "salon-booking",
+      "state_variant": "empty",
+      "area": "uncategorized"
+    },
+    {
+      "id": "profile",
+      "kind": "page",
+      "name": "Profile",
+      "route": "/profile",
+      "area": "",
+      "page_kind": "page",
+      "role_gated": null,
+      "purpose": "Reached from Profile on shared-popover-user-menu",
+      "provenance": [
+        "closure:depth-2:from:shared-popover-user-menu::um-profile"
+      ]
+    },
+    {
+      "id": "profile-popover-date-range",
+      "kind": "popover",
+      "name": "Date range",
+      "parent": "profile",
+      "area": "",
+      "provenance": [
+        "closure:depth-3:from:profile::date-range"
+      ]
+    },
+    {
+      "id": "profile-popover-widget-actions",
+      "kind": "popover",
+      "name": "Widget menu",
+      "parent": "profile",
+      "area": "",
+      "provenance": [
+        "closure:depth-3:from:profile::widget-menu"
+      ]
+    },
+    {
+      "id": "settings",
+      "kind": "page",
+      "name": "Settings",
+      "route": "/settings",
+      "area": "",
+      "page_kind": "setting",
+      "role_gated": null,
+      "purpose": "Reached from Settings on shared-popover-user-menu",
+      "provenance": [
+        "closure:depth-2:from:shared-popover-user-menu::um-settings"
+      ]
+    },
+    {
+      "id": "settings-modal-destructive-confirm",
+      "kind": "modal",
+      "name": "Danger zone action",
+      "parent": "settings",
+      "area": "",
+      "provenance": [
+        "closure:depth-3:from:settings::danger-zone"
+      ]
+    },
+    {
+      "id": "settings-notifications",
+      "kind": "page",
+      "name": "Notifications",
+      "route": "/settings/notifications",
+      "area": "",
+      "page_kind": "setting",
+      "role_gated": null,
+      "purpose": "Reached from Notification settings on shared-drawer-notifications",
+      "provenance": [
+        "closure:depth-2:from:shared-drawer-notifications::nt-settings"
+      ]
+    },
+    {
+      "id": "settings-notifications-modal-destructive-confirm",
+      "kind": "modal",
+      "name": "Danger zone action",
+      "parent": "settings-notifications",
+      "area": "",
+      "provenance": [
+        "closure:depth-3:from:settings-notifications::danger-zone"
+      ]
+    },
+    {
+      "id": "shared-popover-user-menu",
+      "kind": "popover",
+      "name": "User menu",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-1:from:shell::user-menu"
+      ]
+    },
+    {
+      "id": "shared-drawer-notifications",
+      "kind": "drawer",
+      "name": "Notifications",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-1:from:shell::notifications-bell"
+      ]
+    },
+    {
+      "id": "shared-drawer-notifications-state-empty",
+      "kind": "state",
+      "name": "Notifications — empty",
+      "parent": "shared-drawer-notifications",
+      "state_variant": "empty",
+      "area": ""
+    },
+    {
+      "id": "shared-drawer-notifications-state-loading",
+      "kind": "state",
+      "name": "Notifications — loading",
+      "parent": "shared-drawer-notifications",
+      "state_variant": "loading",
+      "area": ""
+    },
+    {
+      "id": "shared-command-palette-global-search",
+      "kind": "command-palette",
+      "name": "Search",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-1:from:shell::global-search"
+      ]
+    },
+    {
+      "id": "shared-command-palette-global-search-state-no-results",
+      "kind": "state",
+      "name": "Search — no-results",
+      "parent": "shared-command-palette-global-search",
+      "state_variant": "no-results",
+      "area": ""
+    },
+    {
+      "id": "shared-toast-success",
+      "kind": "toast",
+      "name": "Mark all read",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-2:from:shared-drawer-notifications::nt-markall"
+      ]
+    },
+    {
+      "id": "shared-toast-error",
+      "kind": "toast",
+      "name": "Error",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-3:from:settings::toast:error"
+      ]
+    },
+    {
+      "id": "shared-modal-reauthenticate",
+      "kind": "modal",
+      "name": "Confirm password",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-3:from:settings::reauth"
+      ]
+    },
+    {
+      "id": "shared-toast-info",
+      "kind": "toast",
+      "name": "Undo",
+      "area": "",
+      "shared": true,
+      "provenance": [
+        "closure:depth-3:from:shared-toast-success::undo"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "account-sign-in",
+      "target": "account-sign-in-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "account-sign-in",
+      "target": "account-sign-in-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "account-sign-in",
+      "target": "account-sign-in-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "account-sign-in",
+      "target": "account-sign-in-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "account-sign-in",
+      "target": "account-sign-in-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "customer-profile",
+      "target": "customer-profile-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "customer-profile",
+      "target": "customer-profile-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "customer-profile",
+      "target": "customer-profile-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "customer-profile",
+      "target": "customer-profile-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "customer-profile",
+      "target": "customer-profile-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "salon-application",
+      "target": "salon-application-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "salon-application",
+      "target": "salon-application-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "salon-application",
+      "target": "salon-application-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "salon-application",
+      "target": "salon-application-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "salon-application",
+      "target": "salon-application-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "salon-booking",
+      "target": "salon-booking-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "salon-booking",
+      "target": "salon-booking-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "salon-booking",
+      "target": "salon-booking-state-loading",
+      "type": "contains"
+    },
+    {
+      "source": "salon-booking",
+      "target": "salon-booking-state-error",
+      "type": "contains"
+    },
+    {
+      "source": "salon-booking",
+      "target": "salon-booking-state-empty",
+      "type": "contains"
+    },
+    {
+      "source": "profile",
+      "target": "profile-popover-date-range",
+      "type": "contains"
+    },
+    {
+      "source": "profile",
+      "target": "profile-popover-widget-actions",
+      "type": "contains"
+    },
+    {
+      "source": "settings",
+      "target": "settings-modal-destructive-confirm",
+      "type": "contains"
+    },
+    {
+      "source": "settings-notifications",
+      "target": "settings-notifications-modal-destructive-confirm",
+      "type": "contains"
+    },
+    {
+      "source": "account-sign-in-popover-date-range",
+      "target": "account-sign-in",
+      "type": "opens_from"
+    },
+    {
+      "source": "account-sign-in-popover-widget-actions",
+      "target": "account-sign-in",
+      "type": "opens_from"
+    },
+    {
+      "source": "customer-profile-popover-date-range",
+      "target": "customer-profile",
+      "type": "opens_from"
+    },
+    {
+      "source": "customer-profile-popover-widget-actions",
+      "target": "customer-profile",
+      "type": "opens_from"
+    },
+    {
+      "source": "salon-application-popover-date-range",
+      "target": "salon-application",
+      "type": "opens_from"
+    },
+    {
+      "source": "salon-application-popover-widget-actions",
+      "target": "salon-application",
+      "type": "opens_from"
+    },
+    {
+      "source": "salon-booking-popover-date-range",
+      "target": "salon-booking",
+      "type": "opens_from"
+    },
+    {
+      "source": "salon-booking-popover-widget-actions",
+      "target": "salon-booking",
+      "type": "opens_from"
+    },
+    {
+      "source": "profile-popover-date-range",
+      "target": "profile",
+      "type": "opens_from"
+    },
+    {
+      "source": "profile-popover-widget-actions",
+      "target": "profile",
+      "type": "opens_from"
+    },
+    {
+      "source": "settings-modal-destructive-confirm",
+      "target": "settings",
+      "type": "opens_from"
+    },
+    {
+      "source": "settings-notifications-modal-destructive-confirm",
+      "target": "settings-notifications",
+      "type": "opens_from"
+    }
+  ],
+  "totals": {
+    "nodes": 41,
+    "edges": 36,
+    "by_node_kind": {
+      "page": 7,
+      "popover": 11,
+      "state": 15,
+      "modal": 3,
+      "drawer": 1,
+      "command-palette": 1,
+      "toast": 3
+    },
+    "by_edge_type": {
+      "contains": 24,
+      "opens_from": 12
+    }
+  }
+}

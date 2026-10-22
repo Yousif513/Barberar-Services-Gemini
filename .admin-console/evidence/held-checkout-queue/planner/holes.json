@@ -1,0 +1,106 @@
+{
+  "unresolved": [],
+  "ambiguous": [],
+  "external": [
+    {
+      "affordance_id": "shared-popover-user-menu::um-logout",
+      "parent": "shared-popover-user-menu",
+      "label": "Sign out",
+      "type": "menu-item",
+      "location": "body",
+      "target_ref": "external:auth-logout",
+      "reason": "external",
+      "candidates": [],
+      "source": "by_overlay:popover"
+    }
+  ],
+  "out_of_area": [
+    {
+      "affordance_id": "account-sign-in::kpi-drill",
+      "parent": "account-sign-in",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "customer-profile::kpi-drill",
+      "parent": "customer-profile",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "salon-application::kpi-drill",
+      "parent": "salon-application",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "salon-booking::kpi-drill",
+      "parent": "salon-booking",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    },
+    {
+      "affordance_id": "shared-drawer-notifications::open-full",
+      "parent": "shared-drawer-notifications",
+      "label": "Open full page",
+      "type": "link",
+      "location": "header",
+      "target_ref": "route:/[id]",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_overlay:drawer"
+    },
+    {
+      "affordance_id": "profile::kpi-drill",
+      "parent": "profile",
+      "label": "KPI card",
+      "type": "link",
+      "location": "card",
+      "target_ref": "route:/reports",
+      "reason": "out_of_area",
+      "candidates": [],
+      "source": "by_kind:page"
+    }
+  ],
+  "blocked": [
+    {
+      "affordance_id": "profile::refresh",
+      "parent": "profile",
+      "label": "Refresh",
+      "type": "icon-button",
+      "location": "toolbar",
+      "target_ref": "state:loading",
+      "reason": "blocked",
+      "candidates": [],
+      "source": "by_kind:page"
+    }
+  ],
+  "unmatched_spec": [
+    {
+      "quote": "Loading, empty and failed queries remain distinct. Guest authentication retains",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 21,
+      "reason": "no declared_trigger pattern matched (would sit on salon-booking)"
+    }
+  ]
+}

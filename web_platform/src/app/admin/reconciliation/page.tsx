@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { errorMessage } from "@/lib/error-message";
 import { parseReconciliationRows, type ImportSource } from "@/lib/money-display";
@@ -37,6 +38,7 @@ const STATUSES = ["open", "resolved", "auto_matched"] as const;
 const copy = {
   en: {
     title: "Tap Reconciliation",
+    heldCheckouts: "View held checkout attempts (read-only)",
     subtitle: "Tap is the record of money movement and the ledger the record of what is owed. Every difference is a break, resolved only by a correction a second administrator approves.",
     runTitle: "Run a day",
     day: "Business day (Riyadh)",
@@ -129,6 +131,7 @@ const copy = {
   },
   ar: {
     title: "التسوية مع Tap",
+    heldCheckouts: "عرض محاولات الدفع المعلّقة (للقراءة فقط)",
     subtitle: "Tap هو سجل حركة الأموال ودفتر الحسابات هو سجل المستحقات. كل فرق يُسجَّل كفرق تسوية ولا يُغلق إلا بتصحيح يعتمده مسؤول آخر.",
     runTitle: "تسوية يوم",
     day: "يوم العمل (بتوقيت الرياض)",
@@ -401,6 +404,7 @@ export default function AdminReconciliation() {
       <div>
         <h1 className="font-serif text-2xl font-black text-gray-900">{t.title}</h1>
         <p className="mt-1 max-w-4xl text-xs font-semibold text-gray-500">{t.subtitle}</p>
+        <Link href="/admin/reconciliation/checkouts" prefetch={false} className={`mt-3 inline-block ${button}`}>{t.heldCheckouts}</Link>
       </div>
 
       {forbidden ? <ForbiddenNotice locale={lang} /> : (

@@ -1,0 +1,8 @@
+{
+  "role": "qa-held-checkout-browser",
+  "command": "admin_console_manifest.py coverage --manifest .admin-console/manifest.json --project-root .",
+  "exitCode": 0,
+  "classification": "Repository-wide coverage observation; not a scoped local browser acceptance verdict or production-ready claim. Root owns final release gates.",
+  "stdout": "# Structural coverage audit\n\nProfile: regulated (manifest)\n\nNo unresolved structural gaps.\n",
+  "stderr": ""
+}

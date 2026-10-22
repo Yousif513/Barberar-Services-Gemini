@@ -1,0 +1,99 @@
+```mermaid
+flowchart LR
+    %% Stitch Architect — Full graph
+
+    subgraph [""]
+    profile["Profile<br/><i>/profile</i>"]
+    profile_popover_date_range(["Date range"])
+    profile_popover_widget_actions(["Widget menu"])
+    settings["Settings<br/><i>/settings</i>"]
+    settings_modal_destructive_confirm("Danger zone action")
+    settings_notifications["Notifications<br/><i>/settings/notifications</i>"]
+    settings_notifications_modal_destructive_confirm("Danger zone action")
+    end
+    subgraph uncategorized["UNCATEGORIZED"]
+    account_sign_in["Account sign-in<br/><i>/login</i>"]
+    account_sign_in_popover_date_range(["Date range"])
+    account_sign_in_popover_widget_actions(["Widget menu"])
+    account_sign_in_state_loading{{"Account sign-in — loading"}}
+    account_sign_in_state_error{{"Account sign-in — error"}}
+    account_sign_in_state_empty{{"Account sign-in — empty"}}
+    customer_profile["Customer profile<br/><i>/customer/settings</i>"]
+    customer_profile_popover_date_range(["Date range"])
+    customer_profile_popover_widget_actions(["Widget menu"])
+    customer_profile_state_loading{{"Customer profile — loading"}}
+    customer_profile_state_error{{"Customer profile — error"}}
+    customer_profile_state_empty{{"Customer profile — empty"}}
+    salon_application["Salon application<br/><i>/become-provider</i>"]
+    salon_application_popover_date_range(["Date range"])
+    salon_application_popover_widget_actions(["Widget menu"])
+    salon_application_state_loading{{"Salon application — loading"}}
+    salon_application_state_error{{"Salon application — error"}}
+    salon_application_state_empty{{"Salon application — empty"}}
+    salon_booking["Salon booking<br/><i>/shop/(id)</i>"]
+    salon_booking_popover_date_range(["Date range"])
+    salon_booking_popover_widget_actions(["Widget menu"])
+    salon_booking_state_loading{{"Salon booking — loading"}}
+    salon_booking_state_error{{"Salon booking — error"}}
+    salon_booking_state_empty{{"Salon booking — empty"}}
+    end
+    shared_popover_user_menu(["User menu"])
+    shared_drawer_notifications[/"Notifications"/]
+    shared_command_palette_global_search["Search"]
+    shared_toast_success["Mark all read"]
+    shared_toast_error["Error"]
+    shared_modal_reauthenticate("Confirm password")
+    shared_toast_info["Undo"]
+
+    account_sign_in -.-> account_sign_in_popover_date_range
+    account_sign_in -.-> account_sign_in_popover_widget_actions
+    account_sign_in -.-> account_sign_in_state_loading
+    account_sign_in -.-> account_sign_in_state_error
+    account_sign_in -.-> account_sign_in_state_empty
+    customer_profile -.-> customer_profile_popover_date_range
+    customer_profile -.-> customer_profile_popover_widget_actions
+    customer_profile -.-> customer_profile_state_loading
+    customer_profile -.-> customer_profile_state_error
+    customer_profile -.-> customer_profile_state_empty
+    salon_application -.-> salon_application_popover_date_range
+    salon_application -.-> salon_application_popover_widget_actions
+    salon_application -.-> salon_application_state_loading
+    salon_application -.-> salon_application_state_error
+    salon_application -.-> salon_application_state_empty
+    salon_booking -.-> salon_booking_popover_date_range
+    salon_booking -.-> salon_booking_popover_widget_actions
+    salon_booking -.-> salon_booking_state_loading
+    salon_booking -.-> salon_booking_state_error
+    salon_booking -.-> salon_booking_state_empty
+    profile -.-> profile_popover_date_range
+    profile -.-> profile_popover_widget_actions
+    settings -.-> settings_modal_destructive_confirm
+    settings_notifications -.-> settings_notifications_modal_destructive_confirm
+    account_sign_in_popover_date_range -.-> account_sign_in
+    account_sign_in_popover_widget_actions -.-> account_sign_in
+    customer_profile_popover_date_range -.-> customer_profile
+    customer_profile_popover_widget_actions -.-> customer_profile
+    salon_application_popover_date_range -.-> salon_application
+    salon_application_popover_widget_actions -.-> salon_application
+    salon_booking_popover_date_range -.-> salon_booking
+    salon_booking_popover_widget_actions -.-> salon_booking
+    profile_popover_date_range -.-> profile
+    profile_popover_widget_actions -.-> profile
+    settings_modal_destructive_confirm -.-> settings
+    settings_notifications_modal_destructive_confirm -.-> settings_notifications
+
+    classDef page fill:#1e293b,stroke:#06b6d4,color:#fff,stroke-width:2px
+    classDef modal fill:#f1f5f9,stroke:#64748b,color:#1e293b
+    classDef drawer fill:#fef3c7,stroke:#f59e0b,color:#78350f
+    classDef popover fill:#e0e7ff,stroke:#6366f1,color:#312e81
+    classDef state fill:#ecfccb,stroke:#65a30d,color:#365314,stroke-dasharray:3 3
+    classDef role fill:#fecaca,stroke:#dc2626,color:#7f1d1d
+    classDef story fill:#e9d5ff,stroke:#9333ea,color:#581c87,font-style:italic
+    class account_sign_in,customer_profile,salon_application,salon_booking,profile,settings,settings_notifications page
+    class account_sign_in_popover_date_range,account_sign_in_popover_widget_actions,customer_profile_popover_date_range,customer_profile_popover_widget_actions,salon_application_popover_date_range,salon_application_popover_widget_actions,salon_booking_popover_date_range,salon_booking_popover_widget_actions,profile_popover_date_range,profile_popover_widget_actions,shared_popover_user_menu popover
+    class account_sign_in_state_loading,account_sign_in_state_error,account_sign_in_state_empty,customer_profile_state_loading,customer_profile_state_error,customer_profile_state_empty,salon_application_state_loading,salon_application_state_error,salon_application_state_empty,salon_booking_state_loading,salon_booking_state_error,salon_booking_state_empty,shared_drawer_notifications_state_empty,shared_drawer_notifications_state_loading,shared_command_palette_global_search_state_no_results state
+    class settings_modal_destructive_confirm,settings_notifications_modal_destructive_confirm,shared_modal_reauthenticate modal
+    class shared_drawer_notifications drawer
+    class shared_command_palette_global_search command-palette
+    class shared_toast_success,shared_toast_error,shared_toast_info toast
+```

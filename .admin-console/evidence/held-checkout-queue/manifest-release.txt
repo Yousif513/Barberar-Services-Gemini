@@ -1,0 +1,345 @@
+Profile: regulated (manifest)
+Phase: release
+ERROR: [crosscutting-flag] crossCutting.audit.capturesActorTargetReasonResult: must be true for release
+ERROR: [placeholder-scan] crossCutting.audit.evidence[9]: evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json
+ERROR: [crosscutting-flag] crossCutting.audit.privilegedMutations: must be true for release
+ERROR: [placeholder-scan] crossCutting.authentication.evidence[8]: evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json
+ERROR: [placeholder-scan] crossCutting.authorization.evidence[13]: evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json
+ERROR: [placeholder-scan] crossCutting.data.evidence[7]: evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json
+ERROR: [crosscutting-flag] crossCutting.data.releaseUsesRealSources: must be true for release
+ERROR: [crosscutting-flag] crossCutting.data.retentionDefined: must be true for release
+ERROR: [crosscutting-flag] crossCutting.experience.keyboardCriticalFlowsTested: must be true for release
+ERROR: [crosscutting-flag] crossCutting.experience.localizationRequirementsHandled: must be true for release
+ERROR: [crosscutting-flag] crossCutting.experience.responsiveCriticalFlowsTested: must be true for release
+ERROR: [crosscutting-flag] crossCutting.observability.adminApiInstrumented: must be true for release
+ERROR: [crosscutting-flag] crossCutting.observability.correlationIdsExposedSafely: must be true for release
+ERROR: [crosscutting-evidence] crossCutting.observability.evidence: a boolean is not evidence; record at least one artifact that proves this section
+ERROR: [crosscutting-flag] crossCutting.observability.highRiskActionsDetectable: must be true for release
+ERROR: [crosscutting-flag] crossCutting.observability.jobsAndIntegrationsMonitored: must be true for release
+ERROR: [crosscutting-flag] crossCutting.safety.recoveryDefined: must be true for release
+ERROR: [decision-assumed] decisions[dbsec2-booking-hold-limits].status: is still assumed at release; confirm it with the owner or record it as a gap
+ERROR: [decision-assumed] decisions[dbsec2-chat-server-commands].status: is still assumed at release; confirm it with the owner or record it as a gap
+ERROR: [decision-assumed] decisions[dbsec2-operations-grant-second-owner].status: is still assumed at release; confirm it with the owner or record it as a gap
+ERROR: [decision-assumed] decisions[dbsec2-promo-consumed-at-payment].status: is still assumed at release; confirm it with the owner or record it as a gap
+ERROR: [decision-assumed] decisions[dbsec2-reserved-promo-names].status: is still assumed at release; confirm it with the owner or record it as a gap
+ERROR: [decision-assumed] decisions[dbsec2-session-state-retry].status: is still assumed at release; confirm it with the owner or record it as a gap
+ERROR: [decision-assumed] decisions[dbsec2-whatsapp-verified-claims].status: is still assumed at release; confirm it with the owner or record it as a gap
+ERROR: [decision-assumed] decisions[paywave2-membership-member-list-staff].status: is still assumed at release; confirm it with the owner or record it as a gap
+ERROR: [decision-assumed] decisions[paywave2-membership-refund-rule].status: is still assumed at release; confirm it with the owner or record it as a gap
+ERROR: [decision-assumed] decisions[paywave2-prepaid-earned-as-delivered].status: is still assumed at release; confirm it with the owner or record it as a gap
+ERROR: [decision-assumed] decisions[paywave2-unknown-refund-resolution].status: is still assumed at release; confirm it with the owner or record it as a gap
+ERROR: [decision-assumed] decisions[qafix-console-commands-raise-and-name-the-permission].status: is still assumed at release; confirm it with the owner or record it as a gap
+ERROR: [decision-assumed] decisions[qafix-console-main-panel-focusable].status: is still assumed at release; confirm it with the owner or record it as a gap
+ERROR: [decision-assumed] decisions[qafix-integration-key-fixed].status: is still assumed at release; confirm it with the owner or record it as a gap
+ERROR: [decision-assumed] decisions[qafix-one-default-payment-method-per-audience].status: is still assumed at release; confirm it with the owner or record it as a gap
+ERROR: [decision-assumed] decisions[qafix-reasons-and-step-up-by-risk].status: is still assumed at release; confirm it with the owner or record it as a gap
+ERROR: [release-status-unresolved] entities[admin-governance].capabilities[gov.approvals].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[admin-governance].capabilities[gov.audited-reads].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[admin-governance].capabilities[gov.break-glass].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[admin-governance].capabilities[gov.console-roles].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[admin-governance].capabilities[gov.iban-change].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[admin-governance].capabilities[gov.iban-reveal].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[admin-governance].capabilities[gov.mfa].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[audit-event].capabilities[audit.emit].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[booking].capabilities[booking.detail].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[booking].capabilities[booking.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[booking].capabilities[booking.release-holds].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[branch].capabilities[branch.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [capability-unreviewed] entities[branch].capabilities[branch.toggle-active].reviewStatus: an implemented capability must be reviewed by an agent other than its implementer
+ERROR: [release-status-unresolved] entities[checkout-attempt].capabilities[checkout-attempt.observe].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [placeholder-scan] entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].evidence[3]: evidence file contains placeholder text: .admin-console/evidence/held-checkout-queue/security-ui-source.json
+ERROR: [evidence-token-match] entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].tests: no listed test file mentions the capability id, a server operation, or a UI route; the link between manifest and test is unproven
+ERROR: [placeholder-scan] entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].tests[0]: evidence file contains placeholder text: supabase/tests/db/held_checkout_queue.test.mjs
+ERROR: [placeholder-scan] entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].tests[1]: evidence file contains placeholder text: supabase/tests/db/held_checkout_queue_independent.test.mjs
+ERROR: [placeholder-scan] entities[checkout-attempt].capabilities[checkout-attempt.operator-queue].tests[3]: evidence file contains placeholder text: web_platform/tests-browser/held-checkout-queue-independent.mjs
+ERROR: [release-status-unresolved] entities[checkout-attempt].capabilities[checkout-attempt.start].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[country].capabilities[country.configure].status: is 'planned'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[country].capabilities[country.list].status: is 'planned'; release requires implemented or not-applicable
+ERROR: [capability-unreviewed] entities[customer].capabilities[customer.clear-profile].reviewStatus: an implemented capability must be reviewed by an agent other than its implementer
+ERROR: [release-status-unresolved] entities[customer].capabilities[customer.data-request].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[customer].capabilities[customer.detail].status: is 'deferred'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[customer].capabilities[customer.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[customer].capabilities[customer.submit-data-request].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[customer].capabilities[customer.suspend].status: is 'deferred'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[customer].capabilities[customer.verify-phone].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[dispute].capabilities[dispute.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[dispute].capabilities[dispute.resolve].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[employee].capabilities[employee.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[feature-flag].capabilities[feature-flag.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[fee-rule].capabilities[fee-rule.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[fee-rule].capabilities[fee-rule.save].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[fee-rule].capabilities[fee.effective-display].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[fee-rule].capabilities[money.pending-change].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].evidence[1]: evidence file contains placeholder text: docs/volabi-local-api-contract.md
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].evidence[2]: evidence file contains placeholder text: .admin-console/worklog/review-volabi-local-server.md
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].evidence[4]: evidence file contains placeholder text: .admin-console/worklog/review-volabi-frontend.md
+ERROR: [evidence-token-match] entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].tests: no listed test file mentions the capability id, a server operation, or a UI route; the link between manifest and test is unproven
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].tests[1]: evidence file contains placeholder text: web_platform/tests/hq-store.test.mjs
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].tests[2]: evidence file contains placeholder text: web_platform/tests/hq-http.test.mjs
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].tests[3]: evidence file contains placeholder text: web_platform/tests/hq-client.test.mjs
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].tests[5]: evidence file contains placeholder text: web_platform/tests/hq-independent-review.test.mjs
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.agent-capability-inspect].tests[6]: evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.knowledge-sources].evidence[1]: evidence file contains placeholder text: docs/volabi-local-api-contract.md
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.knowledge-sources].evidence[2]: evidence file contains placeholder text: .admin-console/worklog/review-volabi-local-server.md
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.knowledge-sources].evidence[4]: evidence file contains placeholder text: .admin-console/worklog/review-volabi-frontend.md
+ERROR: [evidence-token-match] entities[headquarters-local].capabilities[hq-local.knowledge-sources].tests: no listed test file mentions the capability id, a server operation, or a UI route; the link between manifest and test is unproven
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.knowledge-sources].tests[1]: evidence file contains placeholder text: web_platform/tests/hq-store.test.mjs
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.knowledge-sources].tests[2]: evidence file contains placeholder text: web_platform/tests/hq-http.test.mjs
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.knowledge-sources].tests[3]: evidence file contains placeholder text: web_platform/tests/hq-client.test.mjs
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.knowledge-sources].tests[5]: evidence file contains placeholder text: web_platform/tests/hq-independent-review.test.mjs
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.knowledge-sources].tests[6]: evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.request-review-loop].evidence[1]: evidence file contains placeholder text: docs/volabi-local-api-contract.md
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.request-review-loop].evidence[2]: evidence file contains placeholder text: .admin-console/worklog/review-volabi-local-server.md
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.request-review-loop].evidence[4]: evidence file contains placeholder text: .admin-console/worklog/review-volabi-frontend.md
+ERROR: [evidence-token-match] entities[headquarters-local].capabilities[hq-local.request-review-loop].tests: no listed test file mentions the capability id, a server operation, or a UI route; the link between manifest and test is unproven
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.request-review-loop].tests[1]: evidence file contains placeholder text: web_platform/tests/hq-store.test.mjs
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.request-review-loop].tests[2]: evidence file contains placeholder text: web_platform/tests/hq-http.test.mjs
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.request-review-loop].tests[3]: evidence file contains placeholder text: web_platform/tests/hq-client.test.mjs
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.request-review-loop].tests[5]: evidence file contains placeholder text: web_platform/tests/hq-independent-review.test.mjs
+ERROR: [placeholder-scan] entities[headquarters-local].capabilities[hq-local.request-review-loop].tests[6]: evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs
+ERROR: [capability-unreviewed] entities[integration].capabilities[integration.delete].reviewStatus: an implemented capability must be reviewed by an agent other than its implementer
+ERROR: [release-status-unresolved] entities[integration].capabilities[integration.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [capability-unreviewed] entities[integration].capabilities[integration.toggle].reviewStatus: an implemented capability must be reviewed by an agent other than its implementer
+ERROR: [capability-unreviewed] entities[integration].capabilities[integration.upsert].reviewStatus: an implemented capability must be reviewed by an agent other than its implementer
+ERROR: [release-status-unresolved] entities[inventory-operations].capabilities[inventory.adjust].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[inventory-operations].capabilities[inventory.catalog].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[inventory-operations].capabilities[inventory.chain-read].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[inventory-operations].capabilities[inventory.delegation].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[inventory-operations].capabilities[inventory.supply-read].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[inventory-operations].capabilities[inventory.transfer].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[ledger-entry].capabilities[ledger.adjustment].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[ledger-entry].capabilities[ledger.export].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[ledger-entry].capabilities[ledger.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[ledger-entry].capabilities[ledger.release-payout].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[ledger-entry].capabilities[ledger.vat-report].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[ledger-entry].capabilities[money.append-only].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[notification-broadcast].capabilities[notification.broadcast].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[notification-broadcast].capabilities[notification.dispatch].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[notification-broadcast].capabilities[notification.log].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[operations-dashboard].capabilities[activity.feed].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [capability-unreviewed] entities[package].capabilities[package.list].reviewStatus: an implemented capability must be reviewed by an agent other than its implementer
+ERROR: [capability-unreviewed] entities[package].capabilities[package.toggle].reviewStatus: an implemented capability must be reviewed by an agent other than its implementer
+ERROR: [release-status-unresolved] entities[payment-method].capabilities[payment-method.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [capability-unreviewed] entities[payment-method].capabilities[payment-method.set-default].reviewStatus: an implemented capability must be reviewed by an agent other than its implementer
+ERROR: [capability-unreviewed] entities[payment-method].capabilities[payment-method.toggle].reviewStatus: an implemented capability must be reviewed by an agent other than its implementer
+ERROR: [release-status-unresolved] entities[payout-request].capabilities[payout.approve].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[payout-request].capabilities[payout.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[payout-request].capabilities[payout.reject].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[platform-settings].capabilities[settings.api-limits].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[platform-settings].capabilities[settings.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[platform-settings].capabilities[settings.platform].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[platform-settings].capabilities[settings.vat-rate].status: is 'deferred'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-incident].capabilities[incident.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-incident].capabilities[incident.register].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[intake.health-retention-and-gate].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[privacy.copy-export].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[privacy.correction].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[privacy.deadline-and-refusal].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[privacy.deletion-ledger].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[privacy.deletion].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[privacy.legal-hold].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[privacy.queue].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[privacy-request].capabilities[privacy.request-intake].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[processing-register].capabilities[ropa.view].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[promotional-code].capabilities[coupon.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[promotional-code].capabilities[coupon.toggle].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[promotional-code].capabilities[coupon.upsert].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[provider].capabilities[provider.approve].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[provider].capabilities[provider.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[provider].capabilities[provider.notes].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[provider].capabilities[provider.reject].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[provider].capabilities[provider.suspend].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[provider].capabilities[provider.vat-status].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[reconciliation].capabilities[reconciliation.daily].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[reconciliation].capabilities[reconciliation.overview].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[reconciliation].capabilities[reconciliation.resolve-break].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[refund-request].capabilities[refund.check-with-tap].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[refund-request].capabilities[refund.execute].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[refund-request].capabilities[refund.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[refund-request].capabilities[refund.retry].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[review].capabilities[review.hide].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[review].capabilities[review.moderate-queue].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[reward-program].capabilities[reward-program.enable].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[reward-program].capabilities[reward-program.overview].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[role-assignment].capabilities[role.directory].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[role-assignment].capabilities[role.set-administrator].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [capability-unreviewed] entities[service].capabilities[service.delete].reviewStatus: an implemented capability must be reviewed by an agent other than its implementer
+ERROR: [release-status-unresolved] entities[service].capabilities[service.list].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [capability-unreviewed] entities[service].capabilities[service.set-featured].reviewStatus: an implemented capability must be reviewed by an agent other than its implementer
+ERROR: [capability-unreviewed] entities[service].capabilities[service.set-price].reviewStatus: an implemented capability must be reviewed by an agent other than its implementer
+ERROR: [capability-unreviewed] entities[service].capabilities[service.toggle-active].reviewStatus: an implemented capability must be reviewed by an agent other than its implementer
+ERROR: [capability-unreviewed] entities[service].capabilities[service.upsert].reviewStatus: an implemented capability must be reviewed by an agent other than its implementer
+ERROR: [release-status-unresolved] entities[sponsored-placement].capabilities[sponsored.configure].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[sponsored-placement].capabilities[sponsored.overview].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[sponsored-placement].capabilities[sponsored.void-attribution].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[support-contact].capabilities[support.contact].status: is 'blocked'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[whatsapp-channel].capabilities[whatsapp.overview].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] entities[whatsapp-channel].capabilities[whatsapp.verify-channel].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [gap-unresolved] gaps[checkout-durable-attempt-recovery].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[checkout-private-wire-lifecycle].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[checkout-unknown-operator-recovery].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[deletion-ledger-needs-off-database-archive].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[governance-notice-sender-not-chosen].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[historical-capture-refund-reconciliation].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[hosted-auth-settings-must-match-gov1].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[rewards-counsel-and-tax-before-enablement].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[sole-owner-cannot-grant-approver-roles].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[volabi-acquisition-event-and-continuity].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[volabi-finance-commercial-terms].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[volabi-provider-allocation-acceptance].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[volabi-refund-allocation-contract].status: unresolved high gap blocks release
+ERROR: [gap-unresolved] gaps[zatca-vat-number-verification-not-integrated].status: unresolved high gap blocks release
+ERROR: [release-status-unresolved] integrations[expo-push].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] integrations[sms-otp].status: is 'discovered'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] integrations[tap-payments].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [gate-not-passed] qualityGates[accessibility].status: is 'failed', not passed
+ERROR: [nonfunctional-gate-required] qualityGates[accessibility].status: the accessibility gate must pass at this profile; not-applicable is only allowed at profile internal
+ERROR: [gate-not-passed] qualityGates[browser].status: is 'failed', not passed
+ERROR: [gate-not-passed] qualityGates[component-health].status: is 'failed', not passed
+ERROR: [gate-not-passed] qualityGates[experience].status: is 'failed', not passed
+ERROR: [gate-not-passed] qualityGates[performance].status: is 'failed', not passed
+ERROR: [nonfunctional-gate-required] qualityGates[performance].status: the performance gate must pass at this profile; not-applicable is only allowed at profile internal
+ERROR: [gate-not-passed] qualityGates[security].status: is 'failed', not passed
+ERROR: [screen-state-missing] screens[admin-activity].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[admin-activity].status: must be implemented for release
+ERROR: [required-field-empty] screens[admin-activity].tests: must not be empty for release
+ERROR: [screen-responsive] screens[admin-approvals].responsive: must be true for release
+ERROR: [release-status-unresolved] screens[admin-approvals].status: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-audit-logs].status: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-bookings].status: must be implemented for release
+ERROR: [screen-state-missing] screens[admin-branches].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[admin-branches].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-coupons].accessibilityStatus: must be implemented for release
+ERROR: [screen-state-missing] screens[admin-coupons].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[admin-coupons].status: must be implemented for release
+ERROR: [screen-responsive] screens[admin-customers].responsive: must be true for release
+ERROR: [release-status-unresolved] screens[admin-customers].status: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-dashboard].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-disputes].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-disputes].status: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-employees].status: must be implemented for release
+ERROR: [evidence-token-match] screens[admin-held-checkouts].tests: no listed test file mentions the screen id or its route; the link between manifest and test is unproven
+ERROR: [placeholder-scan] screens[admin-held-checkouts].tests[0]: evidence file contains placeholder text: web_platform/tests-browser/held-checkout-queue-independent.mjs
+ERROR: [screen-state-missing] screens[admin-help].states: is missing: loading, error, forbidden
+ERROR: [release-status-unresolved] screens[admin-help].status: must be implemented for release
+ERROR: [required-field-empty] screens[admin-help].tests: must not be empty for release
+ERROR: [release-status-unresolved] screens[admin-incidents].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-integrations].accessibilityStatus: must be implemented for release
+ERROR: [screen-state-missing] screens[admin-integrations].states: is missing: loading, forbidden
+ERROR: [release-status-unresolved] screens[admin-integrations].status: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-ledger].status: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-notifications].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-packages].accessibilityStatus: must be implemented for release
+ERROR: [screen-state-missing] screens[admin-packages].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[admin-packages].status: must be implemented for release
+ERROR: [required-field-empty] screens[admin-packages].tests: must not be empty for release
+ERROR: [release-status-unresolved] screens[admin-platform-rules].status: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-privacy].status: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-providers].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-reconciliation].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-reconciliation].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-refunds].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-refunds].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-reports].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-reports].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-reviews].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-reviews].status: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-roles].status: must be implemented for release
+ERROR: [screen-state-missing] screens[admin-ropa].states: is missing: loading, error, forbidden
+ERROR: [release-status-unresolved] screens[admin-ropa].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-services].accessibilityStatus: must be implemented for release
+ERROR: [screen-state-missing] screens[admin-services].states: is missing: forbidden
+ERROR: [release-status-unresolved] screens[admin-services].status: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-settings].status: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-sponsored].status: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-supply].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-taxes].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-taxes].status: must be implemented for release
+ERROR: [screen-accessibility] screens[admin-whatsapp].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[admin-whatsapp].status: must be implemented for release
+ERROR: [screen-accessibility] screens[become-provider].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[become-provider].status: must be implemented for release
+ERROR: [screen-accessibility] screens[customer-bookings].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[customer-bookings].status: must be implemented for release
+ERROR: [required-field-empty] screens[customer-bookings].tests: must not be empty for release
+ERROR: [screen-accessibility] screens[customer-memberships].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[customer-memberships].status: must be implemented for release
+ERROR: [required-field-empty] screens[customer-memberships].tests: must not be empty for release
+ERROR: [screen-accessibility] screens[customer-packages].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[customer-packages].status: must be implemented for release
+ERROR: [required-field-empty] screens[customer-packages].tests: must not be empty for release
+ERROR: [screen-accessibility] screens[customer-privacy-account].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[customer-privacy-account].status: must be implemented for release
+ERROR: [screen-accessibility] screens[customer-privacy].accessibilityStatus: must be implemented for release
+ERROR: [screen-state-missing] screens[customer-privacy].states: is missing: loading, forbidden
+ERROR: [release-status-unresolved] screens[customer-privacy].status: must be implemented for release
+ERROR: [screen-accessibility] screens[customer-wallet].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[customer-wallet].status: must be implemented for release
+ERROR: [required-field-empty] screens[customer-wallet].tests: must not be empty for release
+ERROR: [evidence-not-resolvable] screens[hq-agent].tests: no entry resolves to a non-empty local path; URL and manual entries are supplemental only
+ERROR: [placeholder-scan] screens[hq-agent].tests[0]: evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs
+ERROR: [evidence-not-resolvable] screens[hq-agents].tests: no entry resolves to a non-empty local path; URL and manual entries are supplemental only
+ERROR: [placeholder-scan] screens[hq-agents].tests[0]: evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs
+ERROR: [evidence-not-resolvable] screens[hq-command].tests: no entry resolves to a non-empty local path; URL and manual entries are supplemental only
+ERROR: [placeholder-scan] screens[hq-command].tests[0]: evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs
+ERROR: [evidence-not-resolvable] screens[hq-decision].tests: no entry resolves to a non-empty local path; URL and manual entries are supplemental only
+ERROR: [placeholder-scan] screens[hq-decision].tests[0]: evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs
+ERROR: [evidence-not-resolvable] screens[hq-decisions].tests: no entry resolves to a non-empty local path; URL and manual entries are supplemental only
+ERROR: [placeholder-scan] screens[hq-decisions].tests[0]: evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs
+ERROR: [evidence-not-resolvable] screens[hq-knowledge].tests: no entry resolves to a non-empty local path; URL and manual entries are supplemental only
+ERROR: [placeholder-scan] screens[hq-knowledge].tests[0]: evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs
+ERROR: [evidence-not-resolvable] screens[hq-source].tests: no entry resolves to a non-empty local path; URL and manual entries are supplemental only
+ERROR: [placeholder-scan] screens[hq-source].tests[0]: evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs
+ERROR: [evidence-not-resolvable] screens[hq-task].tests: no entry resolves to a non-empty local path; URL and manual entries are supplemental only
+ERROR: [placeholder-scan] screens[hq-task].tests[0]: evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs
+ERROR: [evidence-not-resolvable] screens[hq-tasks].tests: no entry resolves to a non-empty local path; URL and manual entries are supplemental only
+ERROR: [placeholder-scan] screens[hq-tasks].tests[0]: evidence file contains placeholder text: web_platform/tests-browser/hq-local-acceptance.mjs
+ERROR: [screen-accessibility] screens[login-mfa].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[login-mfa].status: must be implemented for release
+ERROR: [screen-accessibility] screens[provider-chain].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[provider-chain].status: must be implemented for release
+ERROR: [screen-accessibility] screens[provider-inventory].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[provider-inventory].status: must be implemented for release
+ERROR: [release-status-unresolved] screens[provider-pricing].status: must be implemented for release
+ERROR: [screen-accessibility] screens[provider-wallet].accessibilityStatus: must be implemented for release
+ERROR: [release-status-unresolved] screens[provider-wallet].status: must be implemented for release
+ERROR: [required-field-empty] screens[provider-wallet].tests: must not be empty for release
+ERROR: [release-status-unresolved] workQueues[failed-payment].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [evidence-not-resolvable] workQueues[held-checkout-exceptions].tests: no entry resolves to a non-empty local path; URL and manual entries are supplemental only
+ERROR: [placeholder-scan] workQueues[held-checkout-exceptions].tests[0]: evidence file contains placeholder text: supabase/tests/db/held_checkout_queue.test.mjs
+ERROR: [placeholder-scan] workQueues[held-checkout-exceptions].tests[1]: evidence file contains placeholder text: supabase/tests/db/held_checkout_queue_independent.test.mjs
+ERROR: [placeholder-scan] workQueues[held-checkout-exceptions].tests[2]: evidence file contains placeholder text: web_platform/tests-browser/held-checkout-queue-independent.mjs
+ERROR: [release-status-unresolved] workQueues[payout-approval].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] workQueues[provider-onboarding].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] workQueues[refund-arbitration].status: is 'in-progress'; release requires implemented or not-applicable
+ERROR: [release-status-unresolved] workQueues[webhook-failure].status: is 'discovered'; release requires implemented or not-applicable
+WARN: [declared-static-unused] declaredStatic: path 'entities[inventory-operations].lifecycleStates' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'mobile_app/src/lib/pending-package-payments.js#PENDING_PACKAGE_PAGE_SIZE' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'planning/volabi/persona-and-skills/PERSONA_REGISTRY.json' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'scripts/render-volabi-voice-previews.ps1' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/functions/_shared/checkout-attempts.ts' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261010200000_gov2_audited_admin_reads.sql#d4_small_cell_threshold' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#gov_exec_role_change' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#governance_break_glass_blocked_until' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261010410000_govfix_h2_role_grants_need_second_owner.sql#governance_decider_refusal' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql#gov_request_payout_destination' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261010420000_govfix_h3_verified_contacts_m6_factor_alerts.sql#queue_governance_notice' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261010440000_govfix_wps_iban_and_reveal_limits.sql#iban_reveal_ceiling' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_deadline_days' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_escalate_requests' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011200000_priv_privacy_requests.sql#privacy_require_contact_otp' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011210000_priv_copy_export.sql#privacy_export_record_built' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011220000_priv_deletion_engine.sql#admin_privacy_review_legal_hold' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011220000_priv_deletion_engine.sql#privacy_retention_until' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011230000_priv_health_intake.sql#health_answer_retention_days' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011230000_priv_health_intake.sql#health_reuse_consent_months' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011240000_priv_incident_register.sql#privacy_incident_json' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261011310000_privfix_identity_and_copy.sql#privacy_export_download_limit' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql#privacy_lookup_limit' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'supabase/migrations/20261022124446_held_checkout_read_queue.sql' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'web_platform/scripts/vercel-ignore-build.mjs#decide' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'web_platform/src/app/admin/reconciliation/checkouts' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'web_platform/src/lib/held-checkout-client.mjs' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'web_platform/src/lib/hq' does not match any scanned manifest field
+WARN: [declared-static-unused] declaredStatic: path 'web_platform/src/lib/hq/server' does not match any scanned manifest field
+Validation complete: 313 error(s), 29 warning(s)

@@ -1,0 +1,500 @@
+{
+  "scope": "Final frozen source/test/manifest/docs/evidence before implementation commit; excludes this receipt and later append-only changelog bookkeeping. Historical snapshots retain their own original hashes.",
+  "files": [
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/baseline-manifest.json",
+      "sha256": "c7763bee0ed077f6bd14f7f1a72bd49ed589bbd0dc1f12998facd843c5d72053",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-coverage-observation.json",
+      "sha256": "b02bc56cc7b7d17979365b7d10185ad0cbab025ea11d50e12da290fd3fdad363",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-detail-en.html",
+      "sha256": "a77c82a11e2386b80ccfab0068082b4bb675625dc9ac05ecfe116d24f45e6822",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-detail-en.png",
+      "sha256": "039097e5178c978e99b8db3f3c8546a522869b272adc4260f2c910d16d696a95",
+      "basis": "exact bytes"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-detail-no-longer-held-en.html",
+      "sha256": "d53486973327c4ed107fc875ccaefd3f84c66da1c4563857ba99dfda85a6bf38",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-empty-en.html",
+      "sha256": "936d19c4e4be1dcdcdc1d4a8ec4add35e4388480334c9b2873dae35a4de0da16",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-empty-en.png",
+      "sha256": "56b638a68a395eaa165f4224e3ebe8ac19b1ecaa4f26b99a5882b20ca9f987a6",
+      "basis": "exact bytes"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-filtered-empty-en.html",
+      "sha256": "9b3478c6f3c6df0068795ad141b462aa03760fefed114fbf584bd1ea7dd523f5",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-final-en.html",
+      "sha256": "5983b3aee2b73859626e072142f8d07aa5511cf6afd85c0a071ca793cf2526ff",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-final-en.png",
+      "sha256": "b9bf382326543604ab903bf73d074d8c175e8e456a4e4605e7776f2a24ac112f",
+      "basis": "exact bytes"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-first-harness-observation.json",
+      "sha256": "2276c30ce1a04dab9c47efb9020beda15b74e2b50044ce65677100d6a2dd48c3",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-forbidden-en.html",
+      "sha256": "45f1ce7d49834288d31772c8a64a3631394cde7c5ffca08fc0d96516189e56dc",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-harness-console-classification-observation.html",
+      "sha256": "314aacdde52089a26df5c9e67898c8971b2126cd738a73f710eed7d3b1311afb",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-harness-console-classification-observation.png",
+      "sha256": "af41984ca6d144414367dbeb00999d3a8ca2c4da238eac4cf20af38e46c97e58",
+      "basis": "exact bytes"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-harness-label-selector-failure.html",
+      "sha256": "89f733e9ad1280acba2f2c29ff3372cdc8e8808fb96538128882fc2a91297a4f",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-harness-label-selector-failure.png",
+      "sha256": "b5ddb8cc6f830f3c854b99c328dcccbf16f259b509bf60d9d00812076e38577f",
+      "basis": "exact bytes"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-independent.json",
+      "sha256": "ddf7197c63465ddea0e390aff9c60465ade775088d9c894de9eedbc570951fc4",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-mobile-ar-header.html",
+      "sha256": "454498391b64273a6c34bafac5677b7100206226e7c6e97aa8ff2f895422ede3",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-mobile-ar-header.png",
+      "sha256": "e95175501140b5c6a794d0660c6fb774f41faa70117c7b3e782cbd3b1a5d5c46",
+      "basis": "exact bytes"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-mobile-ar-scrolled.html",
+      "sha256": "454498391b64273a6c34bafac5677b7100206226e7c6e97aa8ff2f895422ede3",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-mobile-ar-scrolled.png",
+      "sha256": "708c1758c0bd5987123ebbf9a2af0c6da9f50bc52c9e35352452a1b5d9fa6225",
+      "basis": "exact bytes"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-mobile-en-header.html",
+      "sha256": "d053ff81aedb5112564416479aa9c88cd2f414bfa1e962e618420245db93343f",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-mobile-en-header.png",
+      "sha256": "d681a64bf2cab5ef14f08af89dd9c79e1d6c77ab2be0ead329b6507747770b90",
+      "basis": "exact bytes"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-mobile-en-scrolled.html",
+      "sha256": "5983b3aee2b73859626e072142f8d07aa5511cf6afd85c0a071ca793cf2526ff",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-mobile-en-scrolled.png",
+      "sha256": "3b9b33fbb5183d37092faebd9e4ede8464c2907e6bdd927a27109387a47e4414",
+      "basis": "exact bytes"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-populated-en.html",
+      "sha256": "c5de570d92d1d24535a5a9f20c02eb57dc9b8462527fa0d6411375d35882218f",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-populated-en.png",
+      "sha256": "883c9efcb57fbbab4111e1cfd4a0e27d5748900c8096c327b07856c5e7aae572",
+      "basis": "exact bytes"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-shrinking-page-en.html",
+      "sha256": "2705016939ac091c37555003e916a9f0e62155d998d47056e2e9fa5e8e3f8f5c",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-smoke.json",
+      "sha256": "e9c192da884ddddc148f481be070e491b47c0d0bc528661c70adc5415242d409",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/browser-ux-review.json",
+      "sha256": "f2559a5e49cafa016fee448a38ad6c44d69ffcda97c6d287fd64de07c4f42f9a",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/build-result.json",
+      "sha256": "be2675974522edc5351177768e3577202c1d1f7518cc97ff8be5b048702392e2",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/db-regression-result.json",
+      "sha256": "40a1c586da1be5b2fccc433efc17f1c912d96183d3ae0035bfdae293f20e2a4a",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/db-regression.txt",
+      "sha256": "12373498126b4c0792d26c57acd98736a342ef0d061788f213d362adaece5a00",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/eslint-results.json",
+      "sha256": "ab6daa5772d6e55e9b3107878da1c1a96bb98650b5254f21b768a83693b90cc8",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/focused-lint.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/focusedLint-result.json",
+      "sha256": "44e06d642cb00a5514cc78633c76e9428d4330cc69422791a7c8e78001a2fb00",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/lint-result.json",
+      "sha256": "b8bfcea3f84994da0b974444258a1846e38ec8621e621a8b2d4ec7f0bd179506",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/lint.txt",
+      "sha256": "62331e6891ca6450be2c961184b129a1e408ea8cf618496f2d857630b85111d9",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/manifest-baseline-release-result.json",
+      "sha256": "ae916549410f640fb2875a58c4afdc0b04ea297a1a97ab9f050addf2909bab25",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/manifest-baseline-release.txt",
+      "sha256": "a1348a05adf22137ccc8f715490fdc13378b9043a0068b7774f8a43529c79723",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/manifest-coverage-first-observation.txt",
+      "sha256": "b3c61bed0a94051febc16f948a40474b1c273303054fa806d1a4d93aad72d504",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/manifest-coverage-result.json",
+      "sha256": "7afab4f5ce6ac577f086c66633c4a6c4a4d02e2a5df885fd357a6d3f56b93a7b",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/manifest-coverage.txt",
+      "sha256": "b3c61bed0a94051febc16f948a40474b1c273303054fa806d1a4d93aad72d504",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/manifest-plan-result.json",
+      "sha256": "1f833f2a165eaffacc1736b5a7f07158bc550c70a578380faf92e4d6fe9f69e1",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/manifest-plan.txt",
+      "sha256": "caf76c7a2fbba38e0f530313e56fcd1ec7fd87cccb22223040a09cb4453f1a77",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/manifest-release-first-observation.txt",
+      "sha256": "a7bdb5b5e76592f4778b2dfebf03048191b3056e8910a7fe9908e015b2298170",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/manifest-release-result.json",
+      "sha256": "cf48da1b49cc055c7ca17b99b61116ef2f3d1c8df87827d988f9b269c84ccc08",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/manifest-release.txt",
+      "sha256": "e08f721a5c2568530e6512f58ca46acc978af31059e98a3a4ad0027debb5a1a4",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/mobile-result.json",
+      "sha256": "16bcb3a51963d31812cdce853ead0ca6b1634a4a281b97fc9801c108aab9fdd7",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/mobile-typecheck.txt",
+      "sha256": "499f27fa9365399aa25fba1f1948513982a46787c996e292ea462f7aed90c559",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner-output-audit/audit.json",
+      "sha256": "134c1b186add5e486e26748943850ccbc21072a4f479437af79581aed985d217",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner-output-audit/audit.md",
+      "sha256": "45c3cf00ae58e8a09f6372dadcc91d2121dd01d3a934712d0c945f4f77a10b15",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner-output-audit/audit_ignores.yaml",
+      "sha256": "4e82f6b647dc2fa265f22e18632f7ee1d193289f0d5c696a035a503748901c46",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner/asset_manifest.json",
+      "sha256": "a50c572ce98792f03b590350e9d989e4c87e59dc4a1abc0c226b9565b72ccc24",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner/bmad_context.json",
+      "sha256": "00f9795d574e2462ebf43ebdabda2a264695e2bfe3c210ebf8e727554becd666",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner/closure.md",
+      "sha256": "6a7716634fab8643eea6248717655233a54df78aef2d62d2202db5e498634494",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner/component_census.json",
+      "sha256": "a6764c1199ede683cca176c6c07575c246bf8f4c6bc76e32c0aefc22855d36e0",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner/graph.json",
+      "sha256": "cc391730b455e1b3ed7449a7cc592ba63754e9c507bd1d7f209651fb4d5fa515",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner/handoff/component-map.md",
+      "sha256": "96004c71dec8b89c73c8690f7cef2274daad22094ea254a16ad9e4e8a3104478",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner/holes.json",
+      "sha256": "2281709cb13d8f4b324c3827a56abe48702423008b725f9d5414f41a7e3f7956",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner/page_graph.json",
+      "sha256": "951237c67a64ac9d5b7ae97311a979ec6b3a9f5f83de9236531e339d39d91d97",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner/pages.json",
+      "sha256": "60bf1fa2338064937a0007aaecc1228ac9950ab7f2c7177aae34a0899e92ecb8",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner/plan.html",
+      "sha256": "f3c4c7ac1044b01b2d6accb312681854f73bc2d0a840503935e550525dc8df08",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner/plan.json",
+      "sha256": "66bcbd642f834cc3a440576ed8a83653b58ef42f17525f0a736c91d9520b4c5e",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner/plan.md",
+      "sha256": "5a3762f35fce26d24fd69f06eb1416e3978aca90b91289af976b6b3bc355b583",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner/plan.mermaid",
+      "sha256": "a51e3fddfb64c971025a92a659f692cc7a5094775c557f859faba1bba1df3644",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner/run.json",
+      "sha256": "dc6d3a36f94e2ad19e59345b903abce1bef31b2e0146217043c9436083c92ef3",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner/theme.json",
+      "sha256": "279ce52fd49afeab460a9f278d76acdd617a4890ab0594bf1f5cd584061d57da",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/planner/viewgraph.json",
+      "sha256": "d468bf82eee43285635e2bc819096ce20405f7197141951f677f1e4b3e0ba068",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/raw-command-output.json",
+      "sha256": "8b464296433840fae526d8b2c1592d90ea0d79df1c71f67f3e418cb7d1bb113e",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/regulated-gap-report.md",
+      "sha256": "12bcc8cbe2e7e424e1ce55f5cb1cb7692c21871558ab6f08882ebd56be158049",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/security-advisory-check.json",
+      "sha256": "0014b52b05afd4b5b1aa53e932bf34ee7517a42054a7137222b215ae4ca82b1f",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/security-authz-matrix.md",
+      "sha256": "9b7d8afd71bac84d3e6b4cdabf118035dbb99cfca782df2afffb1f684687888e",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/security-backend-independent.json",
+      "sha256": "beb34d4dbe1c805b54c2512aa64f2843aa9da7bc6057f2bbb038528060875993",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/security-ui-source.json",
+      "sha256": "f93f0c0e35a9beb8ac9249012ca97f2067748147ee8fbb2b2efa92bcbdffa70e",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/verification.json",
+      "sha256": "9f8aedacbec92749414607b0e71daba7bee79684fea6369aa7ae578980d00ada",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/web-build.txt",
+      "sha256": "ead643f0bfe092775e8b75942b225e4f248e67d9f0ad51d4a53f7eec5034de4d",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/web-tests.txt",
+      "sha256": "bc979bb2e60114c5d7e5d4ecc7839d7251a983ecb532ba27aa7abc5ba7f8cb4b",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/evidence/held-checkout-queue/webTests-result.json",
+      "sha256": "44d03e61d40da584951b97ba99120f9ffa79bfee03607c1816ace842b4390f08",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/manifest.json",
+      "sha256": "03448f11168ddaa1c71cc30f0106933bb524e4b779e676d6f4033f973fc0c958",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/worklog/architect-held-checkout.md",
+      "sha256": "49682ac8a1d4041663af0a853aa590f1ed71a9bd0122e946b29569750407ac20",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/worklog/harvest-held-checkout.md",
+      "sha256": "e4fe5c972e4c71896908d19a448ce1f83e541445a283ce11636db1c3727b1f4b",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/worklog/impl-held-checkout-ui.md",
+      "sha256": "fe3b885d59ba3a824ed709c1f1baf01cc17544f41f1dbff13ddd87eb944320f1",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/worklog/impl-held-checkout.md",
+      "sha256": "13b1165c45a9bb5234e12df5df97abf3b3b3364c40f814357a760b4d7dda7163",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/worklog/qa-held-checkout-browser.md",
+      "sha256": "2bf54f631c2ba23875905f668ba3baa031e594af2f676527354f8ec00bcdaf53",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/worklog/sec-held-checkout.md",
+      "sha256": "01974618cdc4876c90cb8cc72b06dd11f51a52dc4f865b4dab58c403741a0f2a",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": ".admin-console/worklog/ux-held-checkout-browser.md",
+      "sha256": "bc17ef80f4d3ab7868403e538a743d6c144d66147f6649c4b95e09aca5845f77",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": "docs/held-checkout-queue-contract.md",
+      "sha256": "1902bdd9826a8d2c29792947e1e73ff96cc7db62e10f28054ad1895e68ccdc9f",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": "docs/held-checkout-queue-delivery.md",
+      "sha256": "d0f64d93dadf2e053dc1a956cb47e504e32bf2cb9e643f6d0c6b8240c24e8c07",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": "supabase/migrations/20261022124446_held_checkout_read_queue.sql",
+      "sha256": "e0e9113414d2d512921138302b3ae8d49fb10aa972a75a00db214c0063f419b4",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": "supabase/tests/db/held_checkout_queue.test.mjs",
+      "sha256": "8a32b1dffcd56a288de24f0a84099a03ef4bba239215e3a844ff818c3990f9a7",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": "supabase/tests/db/held_checkout_queue_independent.test.mjs",
+      "sha256": "8ed879e431033696afc644deda776397566d955d51881e7937dfe0b5888cf1b2",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": "web_platform/src/app/admin/layout.tsx",
+      "sha256": "8ae982fa2129cea9198acb538a37c86607836a65e84c60efe204e6fd3e65ab9a",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": "web_platform/src/app/admin/reconciliation/checkouts/page.tsx",
+      "sha256": "3f483b560227faf40b1b5724e5b306d5c003c284748e631209083f508487a442",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": "web_platform/src/app/admin/reconciliation/page.tsx",
+      "sha256": "d58a780e0646b8f67cff99cedc51ada71bd530bd6607a08a7b7b36c48d9a1a42",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": "web_platform/src/lib/held-checkout-client.d.mts",
+      "sha256": "5d0e400b0972bc14fc66751180ed6df204c9ca9d6f18402a4da3990ff8a7bc4f",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": "web_platform/src/lib/held-checkout-client.mjs",
+      "sha256": "9424086559f1f04f1617187b68178632181a9e458738209ca55a7fc7827e14b1",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": "web_platform/tests-browser/held-checkout-queue-independent.mjs",
+      "sha256": "acc7fd1b27977ddcde0da7b71d6b614db6efbbcd71fcb9bb43e5b126f315819e",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    },
+    {
+      "path": "web_platform/tests/held-checkout-client.test.mjs",
+      "sha256": "d779b70ccdfd025cd57bb89474a126965fc23e8babcd1ef77f42d0eab915eac3",
+      "basis": "strict UTF8; CRLF pairs to LF only"
+    }
+  ]
+}

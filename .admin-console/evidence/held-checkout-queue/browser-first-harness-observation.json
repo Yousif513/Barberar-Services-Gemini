@@ -1,0 +1,141 @@
+{
+  "classification": "Independent controlled browser QA and separate UX pass against actual Next UI and isolated fully migrated PGlite. Auth/profile responses are explicit fixtures; real Supabase Auth, PostgREST transport and hosted deployment are not certified.",
+  "startedAt": "2026-10-22T12:53:50.967Z",
+  "checks": [
+    {
+      "name": "Honest empty queue loads through actual isolated SQL and audited RPC; direct route invokes no parent overview",
+      "status": "passed"
+    },
+    {
+      "name": "Actual server pagination renders25of32 held attempts with oldest-first ordering",
+      "status": "passed"
+    },
+    {
+      "name": "Next/previous pages preserve filters and cover the remaining7rows without duplication",
+      "status": "passed"
+    }
+  ],
+  "findings": [
+    {
+      "message": "locator.selectOption: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel('Purchase type', { exact: true })\u001b[22m\n",
+      "stack": "locator.selectOption: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel('Purchase type', { exact: true })\u001b[22m\n\n    at C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\web_platform\\tests-browser\\held-checkout-queue-independent.mjs:91:142"
+    }
+  ],
+  "rpc": [
+    {
+      "name": "admin_session_state",
+      "args": {},
+      "returnedRows": 0,
+      "auditExpected": false
+    },
+    {
+      "name": "admin_session_state",
+      "args": {},
+      "returnedRows": 0,
+      "auditExpected": false
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 0,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 25,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 25
+      },
+      "returnedRows": 7,
+      "auditExpected": true
+    },
+    {
+      "name": "admin_list_held_checkout_attempts",
+      "args": {
+        "p_status": null,
+        "p_purchase_type": null,
+        "p_attempt_id": null,
+        "p_target_id": null,
+        "p_limit": 25,
+        "p_offset": 0
+      },
+      "returnedRows": 25,
+      "auditExpected": true
+    }
+  ],
+  "blocked": [],
+  "consoleErrors": [],
+  "expectedConsoleErrors": [
+    {
+      "classification": "Known unconfigured local preview diagnostic; actual hosted transport not evaluated",
+      "message": "[supabase] NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY is missing. Set both in the Vercel project (Production + Preview) and redeploy — sign in and every data screen will fail until then."
+    }
+  ],
+  "pageErrors": [],
+  "captures": [
+    "browser-empty-en.html",
+    "browser-empty-en.png",
+    "browser-populated-en.html",
+    "browser-populated-en.png",
+    "browser-failure.html",
+    "browser-failure.png"
+  ],
+  "deviceCalls": [],
+  "azure": "deferred",
+  "employeeActivation": false,
+  "businessPermissions": false,
+  "financialExecution": false,
+  "status": "failed",
+  "finishedAt": "2026-10-22T12:54:07.891Z",
+  "sourceHashes": {
+    "web_platform/src/app/admin/reconciliation/checkouts/page.tsx": {
+      "sha256_bytes": "1578ea5fae758a11a3553eeb29e4196997c5614fb02519e7363562f71cfa316c",
+      "sha256_utf8_crlf_to_lf": "3f483b560227faf40b1b5724e5b306d5c003c284748e631209083f508487a442"
+    },
+    "web_platform/src/lib/held-checkout-client.mjs": {
+      "sha256_bytes": "bad30a5d940c6c5eed997c2d33a83418ee74d3aefc66e79e21a90e949d3ffc1e",
+      "sha256_utf8_crlf_to_lf": "9424086559f1f04f1617187b68178632181a9e458738209ca55a7fc7827e14b1"
+    },
+    "web_platform/src/lib/held-checkout-client.d.mts": {
+      "sha256_bytes": "60d1a809ff5c1cc2f5e87c7a8f22dcf587894e73f3c9ffcd940dcb7458916107",
+      "sha256_utf8_crlf_to_lf": "5d0e400b0972bc14fc66751180ed6df204c9ca9d6f18402a4da3990ff8a7bc4f"
+    },
+    "web_platform/src/app/admin/layout.tsx": {
+      "sha256_bytes": "62b31040268f20311b90b5f5c660b499ac8b1559645ba6ac6b4511574769cd86",
+      "sha256_utf8_crlf_to_lf": "19980cd844758902952dcec6428bd2ad65acd9b65ad808d1e1895459d17843ca"
+    },
+    "web_platform/src/app/admin/reconciliation/page.tsx": {
+      "sha256_bytes": "2c4e6f2a6f7576333e2a05533d2aed0ead02e5dea46fd8e4698c35f07168fc9d",
+      "sha256_utf8_crlf_to_lf": "d58a780e0646b8f67cff99cedc51ada71bd530bd6607a08a7b7b36c48d9a1a42"
+    },
+    "supabase/migrations/20261022124446_held_checkout_read_queue.sql": {
+      "sha256_bytes": "e0e9113414d2d512921138302b3ae8d49fb10aa972a75a00db214c0063f419b4",
+      "sha256_utf8_crlf_to_lf": "e0e9113414d2d512921138302b3ae8d49fb10aa972a75a00db214c0063f419b4"
+    }
+  },
+  "testSourceSha256": "7b39524313b89a177cf01f0cdccc6e16948f8b4253934af6fb56e9ffe28e41d1"
+}

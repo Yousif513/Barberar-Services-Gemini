@@ -1,0 +1,131 @@
+{
+  "captured_at_utc": "2026-10-22T12:54:58.081394+00:00",
+  "reviewer": "sec-held-checkout",
+  "classification": "Independent final frontend/data-exposure and contract SOURCE REVIEW; browser runtime belongs to separate QA",
+  "verdict": "ACCEPTED_FOR_SCOPED_LOCAL_QUEUE_UI_SECURITY_SOURCE",
+  "files": [
+    {
+      "path": "web_platform/src/app/admin/reconciliation/checkouts/page.tsx",
+      "sha256_raw_bytes": "1578ea5fae758a11a3553eeb29e4196997c5614fb02519e7363562f71cfa316c",
+      "sha256_utf8_crlf_to_lf": "3f483b560227faf40b1b5724e5b306d5c003c284748e631209083f508487a442"
+    },
+    {
+      "path": "web_platform/src/app/admin/layout.tsx",
+      "sha256_raw_bytes": "a37931a67cc68336e375ddd5ccfb0081398176953df514a97bceda97fd967108",
+      "sha256_utf8_crlf_to_lf": "8ae982fa2129cea9198acb538a37c86607836a65e84c60efe204e6fd3e65ab9a"
+    },
+    {
+      "path": "web_platform/src/app/admin/reconciliation/page.tsx",
+      "sha256_raw_bytes": "2c4e6f2a6f7576333e2a05533d2aed0ead02e5dea46fd8e4698c35f07168fc9d",
+      "sha256_utf8_crlf_to_lf": "d58a780e0646b8f67cff99cedc51ada71bd530bd6607a08a7b7b36c48d9a1a42"
+    },
+    {
+      "path": "web_platform/src/lib/held-checkout-client.mjs",
+      "sha256_raw_bytes": "bad30a5d940c6c5eed997c2d33a83418ee74d3aefc66e79e21a90e949d3ffc1e",
+      "sha256_utf8_crlf_to_lf": "9424086559f1f04f1617187b68178632181a9e458738209ca55a7fc7827e14b1"
+    },
+    {
+      "path": "web_platform/src/lib/held-checkout-client.d.mts",
+      "sha256_raw_bytes": "60d1a809ff5c1cc2f5e87c7a8f22dcf587894e73f3c9ffcd940dcb7458916107",
+      "sha256_utf8_crlf_to_lf": "5d0e400b0972bc14fc66751180ed6df204c9ca9d6f18402a4da3990ff8a7bc4f"
+    },
+    {
+      "path": "web_platform/tests/held-checkout-client.test.mjs",
+      "sha256_raw_bytes": "a89a12411406fa707569f07600f502c64468b5776a8c0c26f20d1b9d9e2d4ac5",
+      "sha256_utf8_crlf_to_lf": "d779b70ccdfd025cd57bb89474a126965fc23e8babcd1ef77f42d0eab915eac3"
+    },
+    {
+      "path": "docs/held-checkout-queue-contract.md",
+      "sha256_raw_bytes": "1902bdd9826a8d2c29792947e1e73ff96cc7db62e10f28054ad1895e68ccdc9f",
+      "sha256_utf8_crlf_to_lf": "1902bdd9826a8d2c29792947e1e73ff96cc7db62e10f28054ad1895e68ccdc9f"
+    }
+  ],
+  "independence": "Reviewer implemented none of these seven files; fresh disk read after root UI freeze. Root-reported prior empty-page finding is separately attributed and not reviewer-discovered.",
+  "source_assertions": [
+    "Standalone queue page calls only admin_list_held_checkout_attempts and admin_get_held_checkout_attempt. No functions.invoke, direct table query, financial mutation, provider-contact, export or parent overview call exists.",
+    "Direct sidebar entry and additive parent link point to the queue; inherited parent money.ledger mapping governs navigation only. Server remains authoritative. Opening queue does not import/mount the parent reconciliation page.",
+    "Client request builds only exact UUID/status/type/bounded paging arguments. Machine identifiers are rendered as text/bdi, never links to raw provider URLs or contact views.",
+    "Client parser allows exactly eleven safe attempt keys, expected types/SAR and held predicate; unexpected sensitive row fields cause an explicit error, not widening or sample fallback. List/detail use same parser. Unexpected top-level fields are discarded.",
+    "Failed load clears old list data; new request generations and cleanup invalidate old list/detail responses. Denied detail clears prior list data and supersedes pending list replies. No error path reports financial success.",
+    "Every UI operation is list/detail/filter/page/refresh/close. Loading/error/forbidden/empty/filtered-empty/missing-detail/empty-page-with-existing-matches are explicit; empty-page first-page recovery preserves applied filters. Snapshot time and elapsed age do not certify outcome, settlement or SLA.",
+    "Bilingual copy, RTL and bdi identifiers, SAR/Riyadh use existing components. Keyboard/mobile runtime acceptance is not asserted by this source-only pass.",
+    "Contract matches frozen SQL eligibility, projection, permission/grants, audit, bounds and same-statement snapshot limits. No production/shared migration/provider/native acceptance claim. Azure and all business approval holds are retained."
+  ],
+  "executed_checks": [
+    {
+      "command": "node --test tests/held-checkout-client.test.mjs",
+      "cwd": "web_platform",
+      "total": 6,
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "exit_code": 0
+    }
+  ],
+  "findings": [],
+  "unresolved_critical_or_high_in_scoped_ui_security_review": 0,
+  "prior_root_finding": {
+    "empty_page_with_total_greater_than_zero": "Source rechecked fixed with distinct emptyPage copy and First page action preserving filters; not independently RED-tested by this reviewer."
+  },
+  "limitations": [
+    "Actual browser behavior and isolated fixture transport are reviewed separately; source review cannot certify runtime focus/RTL or real hosted Auth/PostgREST.",
+    "Full regulated release validation/coverage and existing broader recovery/private-wire lifecycle gaps remain outside this acceptance."
+  ],
+  "review_history": [
+    {
+      "receipt_sha256_raw_bytes": "beaf08248f63cea7d3cb10b6ae6a7ad7e9df6465d6f0b77e701a2704a94fb174",
+      "captured_at_utc": "2026-10-22T12:54:58.081394+00:00",
+      "files": [
+        {
+          "path": "web_platform/src/app/admin/reconciliation/checkouts/page.tsx",
+          "sha256_raw_bytes": "1578ea5fae758a11a3553eeb29e4196997c5614fb02519e7363562f71cfa316c",
+          "sha256_utf8_crlf_to_lf": "3f483b560227faf40b1b5724e5b306d5c003c284748e631209083f508487a442"
+        },
+        {
+          "path": "web_platform/src/app/admin/layout.tsx",
+          "sha256_raw_bytes": "a37931a67cc68336e375ddd5ccfb0081398176953df514a97bceda97fd967108",
+          "sha256_utf8_crlf_to_lf": "8ae982fa2129cea9198acb538a37c86607836a65e84c60efe204e6fd3e65ab9a"
+        },
+        {
+          "path": "web_platform/src/app/admin/reconciliation/page.tsx",
+          "sha256_raw_bytes": "2c4e6f2a6f7576333e2a05533d2aed0ead02e5dea46fd8e4698c35f07168fc9d",
+          "sha256_utf8_crlf_to_lf": "d58a780e0646b8f67cff99cedc51ada71bd530bd6607a08a7b7b36c48d9a1a42"
+        },
+        {
+          "path": "web_platform/src/lib/held-checkout-client.mjs",
+          "sha256_raw_bytes": "bad30a5d940c6c5eed997c2d33a83418ee74d3aefc66e79e21a90e949d3ffc1e",
+          "sha256_utf8_crlf_to_lf": "9424086559f1f04f1617187b68178632181a9e458738209ca55a7fc7827e14b1"
+        },
+        {
+          "path": "web_platform/src/lib/held-checkout-client.d.mts",
+          "sha256_raw_bytes": "60d1a809ff5c1cc2f5e87c7a8f22dcf587894e73f3c9ffcd940dcb7458916107",
+          "sha256_utf8_crlf_to_lf": "5d0e400b0972bc14fc66751180ed6df204c9ca9d6f18402a4da3990ff8a7bc4f"
+        },
+        {
+          "path": "web_platform/tests/held-checkout-client.test.mjs",
+          "sha256_raw_bytes": "a89a12411406fa707569f07600f502c64468b5776a8c0c26f20d1b9d9e2d4ac5",
+          "sha256_utf8_crlf_to_lf": "d779b70ccdfd025cd57bb89474a126965fc23e8babcd1ef77f42d0eab915eac3"
+        },
+        {
+          "path": "docs/held-checkout-queue-contract.md",
+          "sha256_raw_bytes": "1902bdd9826a8d2c29792947e1e73ff96cc7db62e10f28054ad1895e68ccdc9f",
+          "sha256_utf8_crlf_to_lf": "1902bdd9826a8d2c29792947e1e73ff96cc7db62e10f28054ad1895e68ccdc9f"
+        }
+      ],
+      "note": "Initial source-only review before later layout-only active navigation fix. Functional/browser and SQL checks remain separately attributed."
+    }
+  ],
+  "metadata_errata": [
+    {
+      "previous_receipt_sha256": "beaf08248f63cea7d3cb10b6ae6a7ad7e9df6465d6f0b77e701a2704a94fb174",
+      "correction": "Prose count twelve corrected to eleven. Exact parser and executed backend field-key assertions always used eleven keys; no implementation/test change."
+    }
+  ],
+  "final_layout_source_refresh": {
+    "captured_at_utc": "2026-10-22T12:56:40.405248+00:00",
+    "scope": "Layout-only fresh source read; page/helper/SQL unchanged and prior snapshot retained.",
+    "assertion": "Navigation isActive now uses currentItem?.path===item.path, reusing existing longest matching route calculation. Parent reconciliation and child queue cannot both receive aria-current=page for child route. No authorization, data fetch, business command or permission change.",
+    "test_credit": "No SQL rerun for layout-only source correction. Browser navigation acceptance belongs to separate QA.",
+    "origin": "Root finding, UI worker repair, security source refresh."
+  }
+}

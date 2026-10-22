@@ -1,0 +1,275 @@
+{
+  "capturedAt": "2026-10-22T13:05:48.070657+00:00",
+  "classification": "Bounded local development implementation and independent review; full regulated release remains failed and production held",
+  "branch": "codex-booking-payment-reconciliation",
+  "baseCommit": "7a38a20678518203cfa20165abac1128a8fe9e77",
+  "scope": {
+    "profile": "regulated",
+    "capability": "checkout-attempt.operator-queue",
+    "route": "/admin/reconciliation/checkouts",
+    "readRPCs": 2,
+    "projectedFields": 11,
+    "newBusinessPermissions": 0,
+    "financialCommands": 0,
+    "hostedMigrationsApplied": 0,
+    "migrationCountInIsolatedHarness": 213
+  },
+  "checks": {
+    "ownerSql": {
+      "passed": 7,
+      "redGreen": "After correcting a fixture audit-table name, seven valid cases failed with RPCs absent; implementing migration made all seven pass."
+    },
+    "independentSql": {
+      "passed": 10,
+      "joint": 17,
+      "evidence": "security-backend-independent.json"
+    },
+    "fullDatabase": {
+      "command": "node --test --test-concurrency=4 supabase/tests/db/**/*.test.mjs",
+      "exitCode": 0,
+      "output": "db-regression.txt",
+      "captureNote": "Actual owned node process exit captured through read-only Windows process handle before original Python display wrapper encodes console output. No test rerun.",
+      "passed": 1582,
+      "failed": 0,
+      "skipped": 0
+    },
+    "web": {
+      "command": [
+        "C:\\Program Files\\nodejs\\npm.CMD",
+        "run",
+        "test",
+        "--workspace=web_platform"
+      ],
+      "exitCode": 0,
+      "output": "web-tests.txt",
+      "passed": 1020,
+      "failed": 0,
+      "skipped": 0
+    },
+    "mobileTypecheck": {
+      "command": [
+        "C:\\Program Files\\nodejs\\npm.CMD",
+        "run",
+        "typecheck:mobile"
+      ],
+      "exitCode": 0,
+      "output": "mobile-typecheck.txt"
+    },
+    "webBuild": {
+      "command": [
+        "C:\\Program Files\\nodejs\\npm.CMD",
+        "run",
+        "build",
+        "--workspace=web_platform"
+      ],
+      "exitCode": 0,
+      "output": "web-build.txt"
+    },
+    "fullWebLint": {
+      "exitCode": 0,
+      "files": 319,
+      "errors": 0,
+      "warnings": 302,
+      "note": "Existing302warnings; final changed files focused lint also passed after layout-only repair. Source bodies removed from JSON without changing messages."
+    },
+    "focusedLint": {
+      "command": [
+        "C:\\Program Files\\nodejs\\npx.CMD",
+        "eslint",
+        "src/app/admin/layout.tsx",
+        "src/app/admin/reconciliation/page.tsx",
+        "src/app/admin/reconciliation/checkouts/page.tsx",
+        "src/lib/held-checkout-client.mjs",
+        "src/lib/held-checkout-client.d.mts",
+        "tests/held-checkout-client.test.mjs"
+      ],
+      "exitCode": 0,
+      "output": "focused-lint.txt"
+    },
+    "securityCore": {
+      "exitCode": 0
+    },
+    "adminControls": {
+      "exitCode": 0
+    },
+    "uiSchema": {
+      "exitCode": 0,
+      "rpcCallsChecked": 314,
+      "selectStringsChecked": 202,
+      "dynamicCallsNotChecked": 35,
+      "mismatches": 0
+    },
+    "edge": {
+      "exitCode": 0,
+      "passed": 113
+    },
+    "inventory": {
+      "exitCode": 0,
+      "passed": 10
+    }
+  },
+  "browser": {
+    "exitCode": 0,
+    "passedGroups": 20,
+    "auditReads": [
+      {
+        "action": "checkout.operator.detail",
+        "n": 6
+      },
+      {
+        "action": "checkout.operator.list",
+        "n": 28
+      }
+    ],
+    "unexpectedConsoleErrors": 0,
+    "pageErrors": 0,
+    "expectedDiagnostics": [
+      {
+        "classification": "Known unconfigured local preview diagnostic; actual hosted transport not evaluated",
+        "message": "[supabase] NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY is missing. Set both in the Vercel project (Production + Preview) and redeploy — sign in and every data screen will fail until then."
+      },
+      {
+        "classification": "Deliberate unavailable/forbidden fixture response",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)",
+        "path": "/rest/v1/rpc/admin_list_held_checkout_attempts"
+      },
+      {
+        "classification": "Deliberate unavailable/forbidden fixture response",
+        "message": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+        "path": "/rest/v1/rpc/admin_list_held_checkout_attempts"
+      },
+      {
+        "classification": "Deliberate unavailable/forbidden fixture response",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)",
+        "path": "/rest/v1/rpc/admin_get_held_checkout_attempt"
+      },
+      {
+        "classification": "Deliberate unavailable/forbidden fixture response",
+        "message": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+        "path": "/rest/v1/rpc/admin_get_held_checkout_attempt"
+      }
+    ],
+    "boundary": "Actual UI and isolated fully migrated PGlite; synthetic Auth/profile/session transport fixtures, not real Supabase Auth/PostgREST/provider acceptance. No credentials or shared Docker DB writes.",
+    "fixtureFailures": "browser-first-harness-observation.json preserves selector/route-announcer harness assumptions; not product failures."
+  },
+  "reviewHashVerification": [
+    {
+      "path": "security-backend-independent.json",
+      "sha256_raw_bytes": "beb34d4dbe1c805b54c2512aa64f2843aa9da7bc6057f2bbb038528060875993",
+      "sourceFilesMatched": 6
+    },
+    {
+      "path": "security-ui-source.json",
+      "sha256_raw_bytes": "f93f0c0e35a9beb8ac9249012ca97f2067748147ee8fbb2b2efa92bcbdffa70e",
+      "sourceFilesMatched": 7
+    },
+    {
+      "path": "browser-independent.json",
+      "sha256_raw_bytes": "ddf7197c63465ddea0e390aff9c60465ade775088d9c894de9eedbc570951fc4",
+      "sourceFilesMatched": 6
+    }
+  ],
+  "regulatedGates": {
+    "plan": {
+      "command": [
+        "python",
+        "C:/Users/Yousif's PC/.claude/skills/adminwright/scripts/admin_console_manifest.py",
+        "validate",
+        "--manifest",
+        ".admin-console/manifest.json",
+        "--project-root",
+        ".",
+        "--phase",
+        "plan"
+      ],
+      "exitCode": 0,
+      "output": "manifest-plan.txt",
+      "summary": "Validation complete: 0 error(s), 29 warning(s)"
+    },
+    "release": {
+      "command": [
+        "python",
+        "C:/Users/Yousif's PC/.claude/skills/adminwright/scripts/admin_console_manifest.py",
+        "validate",
+        "--manifest",
+        ".admin-console/manifest.json",
+        "--project-root",
+        ".",
+        "--phase",
+        "release"
+      ],
+      "exitCode": 1,
+      "output": "manifest-release.txt",
+      "summary": "Validation complete: 313 error(s), 29 warning(s)"
+    },
+    "coverage": {
+      "command": [
+        "python",
+        "C:/Users/Yousif's PC/.claude/skills/adminwright/scripts/admin_console_manifest.py",
+        "coverage",
+        "--manifest",
+        ".admin-console/manifest.json",
+        "--project-root",
+        "."
+      ],
+      "exitCode": 0,
+      "output": "manifest-coverage.txt",
+      "summary": "No unresolved structural gaps."
+    },
+    "baselineComparison": {
+      "exitCode": 1,
+      "baselineGitCommit": "7a38a20678518203cfa20165abac1128a8fe9e77",
+      "manifestSource": "git show HEAD:.admin-console/manifest.json",
+      "projectRoot": "Current repair checkout, so this is source-equivalent validation, not a historical application rerun",
+      "summary": "Validation complete: 298 error(s), 26 warning(s)"
+    },
+    "contextDiagnostics": {
+      "currentErrors": 313,
+      "baselineErrors": 298,
+      "additionalEvidenceDiagnostics": 15,
+      "gap": "held-checkout-evidence-validator-context",
+      "assessment": "Content scanner classifies UUID-generating isolated fixtures and defensive evidence prose as release-path invented data; downstream token/path checks then fail. All raw failures retained. No tests obscured, no waiver, validator change or production-ready claim."
+    }
+  },
+  "designDiagnostics": {
+    "plannerExitCode": 0,
+    "generations": 41,
+    "disposition": "Rejected broad auto-plan and synthesized theme; supplied bounded CEO plan and existing admin theme govern.",
+    "outputAuditExitCode": 1,
+    "reportedCoverage": "0/41",
+    "missingBroadPlanSurfaces": 41,
+    "unplannedCapturedControls": 1067,
+    "meaning": "Audit is against rejected generic scope and whole-shell captures; not adopted acceptance for bounded queue. Separate actual20-group UI/SQL review retained; no machine closure acceptance claimed."
+  },
+  "captureNotes": [
+    "First web/build Python display wrappers failed after underlying outputs completed due cp1252 stdout. Actual commands rerun after a real layout repair with UTF8 capture; final stored exits0.",
+    "Original fullDB display wrapper likewise failed after all tests finished; actual owned node process exit0 independently captured with a read-only Windows process handle before exit, avoiding a redundant full suite rerun."
+  ],
+  "remainingGaps": [
+    "checkout-private-wire-lifecycle",
+    "checkout-durable-attempt-recovery",
+    "checkout-unknown-operator-recovery",
+    "held-checkout-evidence-validator-context"
+  ],
+  "holds": {
+    "azureSetupAudio": "deferred by CEO; existing single SAR10 all-in/100000aggregate-character/3round allowance preserved, Saudi male/Lebanese female preferences retained",
+    "businessEmployeeActivation": false,
+    "businessPermissionsGranted": false,
+    "externalBusinessWrites": false,
+    "financialTransactions": false,
+    "newPaidServices": false,
+    "productionMerge": false,
+    "productionDeployment": false
+  },
+  "lessons": "7newobservations banked plus4earlier; no skill guidance globally changed or promoted",
+  "delivery": "Pre-commit source/evidence verification; implementation commit recorded later in append-only coworking changelog and final response.",
+  "outputWhitespaceNormalization": {
+    "rawPreserved": "raw-command-output.json",
+    "readableTextTrimmed": [
+      "lint.txt",
+      "mobile-typecheck.txt",
+      "web-build.txt"
+    ],
+    "effect": "Only terminal trailing whitespace and extra blank EOF lines removed for git diff --check; exact original bytes retained separately."
+  }
+}

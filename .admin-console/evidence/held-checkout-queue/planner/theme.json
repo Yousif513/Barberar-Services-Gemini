@@ -1,0 +1,71 @@
+{
+  "source": "synthesized",
+  "source_path": null,
+  "stitch_theme_id": null,
+  "design_md_content": "# Design System\n\n## Palette\n\n- **Background**: Clean White (#ffffff)\n- **Surface**: Soft Gray (#f9fafb)\n- **Primary**: Deep Slate (#1e293b)\n- **Accent**: Electric Cerulean (#06b6d4)\n- **Text Primary**: Near Black (#111827)\n- **Text Secondary**: Medium Gray (#5b6472)\n- **Border**: Light Gray (#e5e7eb)\n- **Danger**: Signal Red (#ef4444)\n- **Success**: Fresh Green (#10b981)\n\n## Typography\n\n- **Heading**: Inter\n- **Body**: Inter\n\n## Shape\n\n- **Buttons**: rounded (8px)\n- **Cards**: rounded (12px)\n\n## Elevation\n\n- soft shadows\n\n## Vibe\n\nClean, Modern, Professional",
+  "palette": [
+    {
+      "role": "Background",
+      "name": "Clean White",
+      "hex": "#ffffff"
+    },
+    {
+      "role": "Surface",
+      "name": "Soft Gray",
+      "hex": "#f9fafb"
+    },
+    {
+      "role": "Primary",
+      "name": "Deep Slate",
+      "hex": "#1e293b"
+    },
+    {
+      "role": "Accent",
+      "name": "Electric Cerulean",
+      "hex": "#06b6d4"
+    },
+    {
+      "role": "Text Primary",
+      "name": "Near Black",
+      "hex": "#111827"
+    },
+    {
+      "role": "Text Secondary",
+      "name": "Medium Gray",
+      "hex": "#5b6472"
+    },
+    {
+      "role": "Border",
+      "name": "Light Gray",
+      "hex": "#e5e7eb"
+    },
+    {
+      "role": "Danger",
+      "name": "Signal Red",
+      "hex": "#ef4444"
+    },
+    {
+      "role": "Success",
+      "name": "Fresh Green",
+      "hex": "#10b981"
+    }
+  ],
+  "typography": {
+    "heading": "Inter",
+    "body": "Inter"
+  },
+  "shape": {
+    "buttons": "8px",
+    "cards": "12px"
+  },
+  "elevation": "soft",
+  "vibe": [
+    "clean",
+    "modern",
+    "professional"
+  ],
+  "conflicts": [],
+  "warnings": [
+    "No existing theme found. Synthesized from BMAD brand hints. Review and adjust before generation."
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "areas": [
+    "admin"
+  ],
+  "mode": "minimal",
+  "platform": "web",
+  "pages": [
+    {
+      "id": "account-sign-in",
+      "name": "Account sign-in",
+      "route": "/login",
+      "purpose": "",
+      "area": "uncategorized",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:10"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 10,
+          "quote": "/login — Account sign-in"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": []
+    },
+    {
+      "id": "customer-profile",
+      "name": "Customer profile",
+      "route": "/customer/settings",
+      "purpose": "",
+      "area": "uncategorized",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:12"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 12,
+          "quote": "/customer/settings — Customer profile"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": []
+    },
+    {
+      "id": "salon-application",
+      "name": "Salon application",
+      "route": "/become-provider",
+      "purpose": "",
+      "area": "uncategorized",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:11"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 11,
+          "quote": "/become-provider — Salon application"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": []
+    },
+    {
+      "id": "salon-booking",
+      "name": "Salon booking",
+      "route": "/shop/[id]",
+      "purpose": "",
+      "area": "uncategorized",
+      "platform": "web",
+      "kind": "page",
+      "design_mode": "operate",
+      "role_gated": null,
+      "provenance": [
+        "bmad:docs\\front-end-spec.md:9"
+      ],
+      "source_refs": [
+        {
+          "file": "docs\\front-end-spec.md",
+          "line": 9,
+          "quote": "/shop/[id] — Salon booking"
+        }
+      ],
+      "modals": [],
+      "drawers": [],
+      "popovers": [],
+      "screen_states": []
+    }
+  ]
+}

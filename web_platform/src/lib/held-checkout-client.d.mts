@@ -1,0 +1,12 @@
+export type HeldCheckoutFilters = { status: string; purchaseType: string; attemptId: string; targetId: string };
+export type HeldCheckoutAttempt = { id: string; purchase_type: string; target_id: string; amount_sar: number; currency: "SAR"; status: string; is_current: boolean; reconciliation_required: boolean; created_at: string; updated_at: string; unknown_at: string | null };
+export type HeldCheckoutList = { items: HeldCheckoutAttempt[]; total: number; as_of: string; limit: number; offset: number };
+export type HeldCheckoutDetail = { attempt: HeldCheckoutAttempt | null; as_of: string };
+export const HELD_CHECKOUT_PAGE_SIZE: number;
+export const HELD_CHECKOUT_MAX_OFFSET: number;
+export const HELD_CHECKOUT_STATUSES: readonly string[];
+export const HELD_CHECKOUT_PURCHASE_TYPES: readonly string[];
+export function heldCheckoutArgs(filters: HeldCheckoutFilters, offset: number): { p_status: string | null; p_purchase_type: string | null; p_attempt_id: string | null; p_target_id: string | null; p_limit: number; p_offset: number };
+export function parseHeldCheckoutList(value: unknown, expectedOffset: number): HeldCheckoutList;
+export function parseHeldCheckoutDetail(value: unknown, expectedId: string): HeldCheckoutDetail;
+export function elapsedCheckoutMinutes(value: Pick<HeldCheckoutAttempt, "created_at">, asOf: string): number | null;

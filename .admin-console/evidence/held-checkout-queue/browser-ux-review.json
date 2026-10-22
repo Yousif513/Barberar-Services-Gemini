@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "reviewer": "ux-held-checkout-browser",
+  "capturedAt": "2026-10-22T13:00:08.400587+00:00",
+  "verdict": "ACCEPTED_FOR_SCOPED_LOCAL_READ_ONLY_QUEUE_UX",
+  "independence": "Reviewer edited no page, layout, helper, migration or owner test. Fresh complete source read and actual browser exercise after final source freeze.",
+  "sourceHashes": {
+    "web_platform/src/app/admin/reconciliation/checkouts/page.tsx": {
+      "sha256_bytes": "1578ea5fae758a11a3553eeb29e4196997c5614fb02519e7363562f71cfa316c",
+      "sha256_utf8_crlf_to_lf": "3f483b560227faf40b1b5724e5b306d5c003c284748e631209083f508487a442"
+    },
+    "web_platform/src/lib/held-checkout-client.mjs": {
+      "sha256_bytes": "bad30a5d940c6c5eed997c2d33a83418ee74d3aefc66e79e21a90e949d3ffc1e",
+      "sha256_utf8_crlf_to_lf": "9424086559f1f04f1617187b68178632181a9e458738209ca55a7fc7827e14b1"
+    },
+    "web_platform/src/lib/held-checkout-client.d.mts": {
+      "sha256_bytes": "60d1a809ff5c1cc2f5e87c7a8f22dcf587894e73f3c9ffcd940dcb7458916107",
+      "sha256_utf8_crlf_to_lf": "5d0e400b0972bc14fc66751180ed6df204c9ca9d6f18402a4da3990ff8a7bc4f"
+    },
+    "web_platform/src/app/admin/layout.tsx": {
+      "sha256_bytes": "a37931a67cc68336e375ddd5ccfb0081398176953df514a97bceda97fd967108",
+      "sha256_utf8_crlf_to_lf": "8ae982fa2129cea9198acb538a37c86607836a65e84c60efe204e6fd3e65ab9a"
+    },
+    "web_platform/src/app/admin/reconciliation/page.tsx": {
+      "sha256_bytes": "2c4e6f2a6f7576333e2a05533d2aed0ead02e5dea46fd8e4698c35f07168fc9d",
+      "sha256_utf8_crlf_to_lf": "d58a780e0646b8f67cff99cedc51ada71bd530bd6607a08a7b7b36c48d9a1a42"
+    },
+    "supabase/migrations/20261022124446_held_checkout_read_queue.sql": {
+      "sha256_bytes": "e0e9113414d2d512921138302b3ae8d49fb10aa972a75a00db214c0063f419b4",
+      "sha256_utf8_crlf_to_lf": "e0e9113414d2d512921138302b3ae8d49fb10aa972a75a00db214c0063f419b4"
+    }
+  },
+  "browserEvidence": "browser-independent.json",
+  "observations": {
+    "reviewer": "ux-held-checkout-browser",
+    "freshSourceRead": true,
+    "inspected": [
+      "browser-mobile-ar-header.png",
+      "browser-mobile-ar-scrolled.png",
+      "browser-mobile-en-scrolled.png"
+    ],
+    "observed": "Bilingual inherited theme, labelled controls, complete UUID isolation,12px table, visible native scroll focus and mobile closed drawer outside viewport after transition. Initial transition-time capture was not a stable-layout finding.",
+    "nativeLinguisticAcceptance": "not evaluated",
+    "fullWCAGCertification": "not claimed",
+    "sourceReview": "Exact safe projection, request sequence guards, no mutation/export/provider action; original parent overview deliberately not mounted by newroute. Optional parentlink is source-reviewed, not clicked into legacy overview."
+  },
+  "checks": [
+    {
+      "name": "Honest empty queue loads through actual isolated SQL and audited RPC; direct route invokes no parent overview",
+      "status": "passed"
+    },
+    {
+      "name": "Desktop navigation marks only the new held-checkout route as current; direct entry is separate from parent overview",
+      "status": "passed"
+    },
+    {
+      "name": "Next/previous pages preserve filters and cover the remaining7rows without duplication",
+      "status": "passed"
+    },
+    {
+      "name": "All6purchase types remain discoverable and a noncurrent unknown attempt stays visible in minimized detail",
+      "status": "passed"
+    },
+    {
+      "name": "Actual SQL page shrink distinguishes empty page from empty queue and First page recovers without dropping filters",
+      "status": "passed"
+    },
+    {
+      "name": "Invalid UUID is labelled and never dispatched; exact missing ID shows filtered-empty with draft preserved",
+      "status": "passed"
+    },
+    {
+      "name": "Status and purchase type combine with AND against actual quarantined captured records",
+      "status": "passed"
+    },
+    {
+      "name": "Exact payable search and audited detail use minimized projection; opening/closing details moves and restores keyboard focus",
+      "status": "passed"
+    },
+    {
+      "name": "Refreshed detail truthfully becomes unavailable when the record leaves held eligibility",
+      "status": "passed"
+    },
+    {
+      "name": "Malformed response with an extra private field is rejected and never rendered as a record",
+      "status": "passed"
+    },
+    {
+      "name": "An older delayed list response cannot replace a newer exact-filter result",
+      "status": "passed"
+    },
+    {
+      "name": "Closing detail invalidates an older delayed response so it cannot reopen stale content",
+      "status": "passed"
+    },
+    {
+      "name": "Detail read failure is truthful and retry recovers without discarding the current queue snapshot",
+      "status": "passed"
+    },
+    {
+      "name": "A forbidden detail response clears both previous queue records and detail content",
+      "status": "passed"
+    },
+    {
+      "name": "EN375px has keyboard-scrollable readable table, bidirectional IDs and no page overflow",
+      "status": "passed",
+      "sizes": {
+        "drawerLeft": -288,
+        "drawerRight": 0,
+        "width": 375,
+        "scroll": 375,
+        "font": "12px",
+        "table": 1100,
+        "dir": "ltr"
+      },
+      "initial": 0,
+      "final": 69
+    },
+    {
+      "name": "AR375px has keyboard-scrollable readable table, bidirectional IDs and no page overflow",
+      "status": "passed",
+      "sizes": {
+        "drawerLeft": 375,
+        "drawerRight": 663,
+        "width": 375,
+        "scroll": 375,
+        "font": "12px",
+        "table": 1100,
+        "dir": "rtl"
+      },
+      "initial": 0,
+      "final": -70
+    },
+    {
+      "name": "Every successful queue/detail SQL read is audited; no parent overview, financial, external or speech/device call occurred",
+      "status": "passed",
+      "audits": [
+        {
+          "action": "checkout.operator.detail",
+          "n": 6
+        },
+        {
+          "action": "checkout.operator.list",
+          "n": 28
+        }
+      ],
+      "readCount": 34
+    }
+  ],
+  "findings": [],
+  "unresolvedHighOrCriticalInScope": 0,
+  "knownLimitations": [
+    "Existing preview public Supabase configuration missing: diagnostic preserved. Authentication/profile transport is fixture-adapted.",
+    "Real hosted Supabase/Auth/PostgREST acceptance is not certified.",
+    "Native Arabic linguistic acceptance, screen-reader product certification and full contrast audit not performed.",
+    "Full unknown checkout resolution, production deployment, business authority and financial execution remain held."
+  ],
+  "mutatedApplicationFiles": []
+}

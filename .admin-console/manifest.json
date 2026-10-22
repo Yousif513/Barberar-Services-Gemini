@@ -208,6 +208,22 @@
         "url": "https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ms723597(v=vs.85)",
         "checkedOn": "2026-10-22",
         "topic": "Offline SAPI file-stream voice synthesis; no playback or remote upload"
+      },
+      {
+        "topic": "Supabase function privilege and security-definer boundaries; opened by root in this coordinated architect pass",
+        "url": "https://supabase.com/docs/guides/database/functions",
+        "checkedOn": "2026-10-22",
+        "appliedTo": [
+          "checkout-attempt.operator-queue"
+        ]
+      },
+      {
+        "topic": "PostgreSQL15 function attributes and security-definer safety; opened by root in this coordinated architect pass",
+        "url": "https://www.postgresql.org/docs/15/sql-createfunction.html",
+        "checkedOn": "2026-10-22",
+        "appliedTo": [
+          "checkout-attempt.operator-queue"
+        ]
       }
     ],
     "volumes": {
@@ -7083,6 +7099,73 @@
           ],
           "owner": "",
           "reviewStatus": "unreviewed"
+        },
+        {
+          "id": "checkout-attempt.operator-queue",
+          "outcome": "Find and inspect held checkout attempts using minimized references and recorded status without dispatching payment operations",
+          "kind": "query",
+          "roles": [
+            "admin"
+          ],
+          "risk": "high",
+          "status": "implemented",
+          "rationale": "CEO-approved read-only queue continuation on2026-10-22. Existing money.ledger holders owner/finance retain platformwide minimized reconciliation visibility; no role, permission grant or financial authority is added. Customer/provider direct table access stays denied. Held means submitting or unknown, or reconciliation_required; observed age is descriptive and adopts no SLA. Full provider resolution remains a separate open recovery gap.",
+          "entityStates": {
+            "from": [
+              "submitting",
+              "unknown",
+              "captured",
+              "failed"
+            ],
+            "to": []
+          },
+          "uiRoutes": [
+            "/admin/reconciliation/checkouts"
+          ],
+          "serverOperations": [
+            "supabase/migrations/20261022124446_held_checkout_read_queue.sql#admin_list_held_checkout_attempts",
+            "supabase/migrations/20261022124446_held_checkout_read_queue.sql#admin_get_held_checkout_attempt"
+          ],
+          "authorizationPolicies": [
+            "supabase/migrations/20261022124446_held_checkout_read_queue.sql#gov2_require_read",
+            "supabase/migrations/20261010430000_govfix_sessions_step_up_and_lows.sql#admin_role",
+            "supabase/migrations/20261022062147_durable_checkout_attempts.sql#REVOKE"
+          ],
+          "auditEvents": [
+            "checkout.operator.list",
+            "checkout.operator.detail"
+          ],
+          "safeguards": [
+            "Authenticated actual console session and existing money.ledger permission; no new role grants",
+            "Same allowlisted fields and held predicate on list and detail; no contact/wire/provider context/URL disclosure",
+            "Atomic privileged read audit including empty results; audit errors fail closed",
+            "Bounded exact filters and server pagination; page/count one SQL snapshot; explicit error and empty states",
+            "Standalone read-only route avoids legacy overview escalation; no checkout/financial mutation control",
+            "Legacy unknown recovery gap remains open; no hosted migration or provider execution"
+          ],
+          "dataBinding": "postgres:public.payment_checkout_attempts via minimized audited RPC projection only",
+          "idempotency": "Read operations repeat with a new privileged-read audit record; never dispatch or modify checkout state.",
+          "concurrency": "List count and page must derive from one SQL snapshot, ordered created_at ASC,id ASC; no record locks or state changes.",
+          "recovery": "Refresh an audited read; missing or no-longer-held detail stays absent, errors stay visible; financial/provider resolution remains held.",
+          "tests": [
+            "supabase/tests/db/held_checkout_queue.test.mjs",
+            "supabase/tests/db/held_checkout_queue_independent.test.mjs",
+            "web_platform/tests/held-checkout-client.test.mjs",
+            "web_platform/tests-browser/held-checkout-queue-independent.mjs"
+          ],
+          "evidence": [
+            "docs/held-checkout-queue-contract.md",
+            ".admin-console/worklog/architect-held-checkout.md",
+            ".admin-console/evidence/held-checkout-queue/security-backend-independent.json",
+            ".admin-console/evidence/held-checkout-queue/security-ui-source.json",
+            ".admin-console/evidence/held-checkout-queue/browser-independent.json",
+            ".admin-console/evidence/held-checkout-queue/db-regression-result.json",
+            ".admin-console/evidence/held-checkout-queue/webTests-result.json",
+            ".admin-console/evidence/held-checkout-queue/build-result.json"
+          ],
+          "owner": "",
+          "reviewStatus": "reviewed",
+          "reviewedBy": "sec-held-checkout"
         }
       ]
     },
@@ -7500,6 +7583,26 @@
       "status": "discovered",
       "rationale": "Unchanged: payment-webhook still answers 500 on failure and records nothing (payment-webhook/index.ts), and /admin/webhooks redirects to the audit log (next.config.ts). Outbound provider webhooks have a delivery log for providers, not for operators. Reconciled by architect-reconcile-claude on 2026-10-09 from the code and tests named in this record.",
       "tests": []
+    },
+    {
+      "id": "held-checkout-exceptions",
+      "purpose": "Find unknown/submitting or reconciliation-required checkout attempts for read-only investigation",
+      "roles": [
+        "admin"
+      ],
+      "source": "postgres:public.payment_checkout_attempts via scoped audited functions",
+      "priorityRule": "Oldest created_at first, then id; age is descriptive and defines no SLA",
+      "sla": "No business SLA adopted by this visibility slice",
+      "actions": [
+        "checkout-attempt.operator-queue"
+      ],
+      "status": "implemented",
+      "rationale": "Read-only local queue with exact minimized source projection, bounded filters/pages and atomic audited reads. Full provider recovery and hosted acceptance remain held; no financial operation is exposed.",
+      "tests": [
+        "supabase/tests/db/held_checkout_queue.test.mjs",
+        "supabase/tests/db/held_checkout_queue_independent.test.mjs",
+        "web_platform/tests-browser/held-checkout-queue-independent.mjs"
+      ]
     }
   ],
   "screens": [
@@ -9325,6 +9428,52 @@
       "tests": [
         "web_platform/tests-browser/hq-local-acceptance.mjs"
       ]
+    },
+    {
+      "id": "admin-held-checkouts",
+      "route": "/admin/reconciliation/checkouts",
+      "purpose": "Read minimized held checkout attempts and their recorded detail without submitting financial actions",
+      "roles": [
+        "admin"
+      ],
+      "dataSources": [
+        "postgres:public.admin_list_held_checkout_attempts()",
+        "postgres:public.admin_get_held_checkout_attempt()"
+      ],
+      "capabilities": [
+        "checkout-attempt.operator-queue"
+      ],
+      "actions": [
+        "Apply exact filters",
+        "Clear filters",
+        "Refresh queue",
+        "Previous page",
+        "Next page",
+        "First page after membership shrinks",
+        "Inspect attempt",
+        "Close details",
+        "Refresh details",
+        "Retry failed read"
+      ],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "filtered-empty",
+        "error",
+        "forbidden",
+        "validation",
+        "stale",
+        "success"
+      ],
+      "responsive": true,
+      "accessibilityStatus": "implemented",
+      "status": "implemented",
+      "rationale": "Independently exercised actual frozen queue UI with isolated migrated SQL:20browser groups including EN/AR375, keyboard-scrollable12px table, explicit labels/UUID validation, detail focus/return, single-current direct navigation, exact search/pagination, truthful errors/empty-page recovery and stale-response protection. Evidence .admin-console/evidence/held-checkout-queue/browser-independent.json and browser-ux-review.json. Existing missing-public-config diagnostic retained; Auth/profile transport uses fixtures, so hosted Auth/PostgREST, native linguistic acceptance and fullWCAG certification are not claimed.",
+      "tests": [
+        "web_platform/tests-browser/held-checkout-queue-independent.mjs",
+        "web_platform/tests/held-checkout-client.test.mjs"
+      ]
     }
   ],
   "integrations": [
@@ -9404,7 +9553,9 @@
         "web_platform/src/lib/supabase.ts#L67",
         "supabase/config.toml#L21",
         ".admin-console/evidence/qa-release/role-matrix-summary.txt",
-        ".admin-console/evidence/qa-release/session-and-step-up-live.txt"
+        ".admin-console/evidence/qa-release/session-and-step-up-live.txt",
+        ".admin-console/evidence/held-checkout-queue/security-backend-independent.json",
+        ".admin-console/evidence/held-checkout-queue/security-ui-source.json"
       ]
     },
     "authorization": {
@@ -9430,7 +9581,9 @@
         "supabase/functions/process-refund/index.ts#L18",
         ".admin-console/evidence/qa-release/role-matrix-summary.txt",
         ".admin-console/evidence/qa-release/permission-gates.txt",
-        ".admin-console/evidence/qa-release/direct-table-writes.txt"
+        ".admin-console/evidence/qa-release/direct-table-writes.txt",
+        ".admin-console/evidence/held-checkout-queue/security-backend-independent.json",
+        ".admin-console/evidence/held-checkout-queue/security-ui-source.json"
       ]
     },
     "audit": {
@@ -9447,7 +9600,9 @@
         "supabase/tests/db/release_controls.test.mjs#L16",
         ".admin-console/evidence/qa-release/maker-checker-live.txt",
         ".admin-console/evidence/qa-release/privileged-reads-live.txt",
-        ".admin-console/evidence/qa-release/audit-before-after-rows.txt"
+        ".admin-console/evidence/qa-release/audit-before-after-rows.txt",
+        ".admin-console/evidence/held-checkout-queue/security-backend-independent.json",
+        ".admin-console/evidence/held-checkout-queue/security-ui-source.json"
       ]
     },
     "safety": {
@@ -9471,7 +9626,9 @@
         "supabase/tests/db/customer_directory.test.mjs#L1",
         "supabase/tests/db/admin_dashboard.test.mjs#L36",
         ".admin-console/evidence/qa-release/privileged-reads-live.txt",
-        ".admin-console/evidence/qa-release/permission-gates.txt"
+        ".admin-console/evidence/qa-release/permission-gates.txt",
+        ".admin-console/evidence/held-checkout-queue/security-backend-independent.json",
+        ".admin-console/evidence/held-checkout-queue/security-ui-source.json"
       ]
     },
     "experience": {
@@ -10777,6 +10934,83 @@
         "headquarters-local"
       ],
       "confirmedBy": "CEO current chat,2026-10-22"
+    },
+    {
+      "id": "held-checkout-read-only-plan-of-record",
+      "decision": "Implement the CEO-approved minimized read-only held-checkout queue in the reconciliation domain on the isolated repair branch.",
+      "reason": "The user explicitly said: Continue with the read-only held-checkout exception queue and its independent tests. Keep Azure setup/audio deferred and preserve all production, activation, permission, external-write and financial approval holds. This is the supplied plan of record, not a new proposal. Existing design/theme and routine reversible technical decisions are authorized; no new paid service or account is needed.",
+      "evidence": [
+        "docs/volabi-task-readiness-repair.md",
+        ".coworking_changelog.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "checkout-attempt.operator-queue"
+      ]
+    },
+    {
+      "id": "held-checkout-isolated-read-entry",
+      "decision": "Use a direct sidebar entry at /admin/reconciliation/checkouts and separate minimized list/detail RPCs; never call admin_reconciliation_overview from the queue.",
+      "reason": "Existing admin_reconciliation_overview calls escalate_reconciliation_breaks on read, so reuse would violate this read-only slice. Retain existing console components and money.ledger parent permission, with no new theme, provider calls, retry, refund or status controls. Parent reconciliation mutations remain outside this slice.",
+      "evidence": [
+        "supabase/migrations/20261010330000_money_tap_reconciliation.sql#L688",
+        "web_platform/src/lib/console-session.tsx#L55"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "checkout-attempt.operator-queue"
+      ]
+    },
+    {
+      "id": "held-checkout-query-contract",
+      "decision": "Expose admin_list_held_checkout_attempts(p_status TEXT DEFAULT NULL,p_purchase_type TEXT DEFAULT NULL,p_attempt_id UUID DEFAULT NULL,p_target_id UUID DEFAULT NULL,p_limit INTEGER DEFAULT25,p_offset INTEGER DEFAULT0) and admin_get_held_checkout_attempt(p_attempt_id UUID), both returning JSONB.",
+      "reason": "List response {items,total,as_of,limit,offset}; detail response {attempt:null or projection,as_of}. Projection only id,purchase_type,target_id,amount_sar,currency,status,is_current,reconciliation_required,created_at,updated_at,unknown_at. Held predicate status IN submitting,unknown OR reconciliation_required. Optional status filter submitting,unknown,captured,failed; purchase_type one of six existing values; attempt/target exact UUID only. Strict page limit1..50,offset0..100000; oldest created_at then id ascending; count/page share one SQL snapshot. Detail repeats same predicate. Require authenticated JWT role, nonnull auth.uid and gov2_require_read money.ledger on every call, immutable fixed empty search_path and fully qualified objects, authenticated execute only, no table grants; gov2_log_read must persist atomically before return or the read fails. No actor/provider/charge IDs, contact/request/hash/context/URL/raw gateway values enter return or audit.",
+      "evidence": [
+        "supabase/migrations/20261022062147_durable_checkout_attempts.sql",
+        "supabase/migrations/20261010200000_gov2_audited_admin_reads.sql"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "checkout-attempt.operator-queue"
+      ]
+    },
+    {
+      "id": "held-checkout-entity-capability-review",
+      "decision": "The checkout-attempt operator slice requires list/search, bounded filters/stable sorting/paging, minimized current detail and audited reads; it intentionally has no lifecycle command.",
+      "reason": "Exact attempt/target IDs locate a known case; status/type filters support investigation. Display source/as-of/Riyadh time/SAR and truthful loading,empty,filtered-empty,error,forbidden,stale/refreshed,missing detail states. Creation/edit/transitions/assignment/bulk/import/export/archive/delete/restore and raw history are not required in this read-only slice because dispatch identity and financial evidence are immutable and no business execution is authorized. Saved views and detailed provider-backed evidence workflow are deferred to the still-open full recovery gap. Audit history remains governed by existing audit controls; new read events add no unapproved raw disclosures.",
+      "evidence": [
+        "supabase/migrations/20261022062147_durable_checkout_attempts.sql",
+        "docs/durable-checkout-recovery-and-volabi.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "checkout-attempt.operator-queue"
+      ]
+    },
+    {
+      "id": "held-checkout-build-order",
+      "decision": "Reuse existing auth/session/MFA and append-only audit spine; serialize additive query migration and actual SQL negative tests, then frontend consuming the frozen contract, then independent security/UX/QA, then full local gates and authorized branch commit/push.",
+      "reason": "No admin framework or paid service is needed for one bounded domain queue. Existing Next.js/Supabase components and helpers preserve established authorization. Reviewers must not implement their reviewed capability. Hosted deployment, production merge, employee activation, new permissions, external writes and financial transactions stay held; Azure remains explicitly deferred.",
+      "evidence": [
+        "web_platform/package.json",
+        ".admin-console/worklog/architect-held-checkout.md"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "checkout-attempt.operator-queue"
+      ]
+    },
+    {
+      "id": "held-checkout-generated-planner-diagnostics",
+      "decision": "Keep the generic admin planner output as rejected diagnostics; bounded user-approved queue scope and existing ivory/gold operations theme remain the plan of record.",
+      "reason": "Root executed the mandatory Design Architect pipeline with minimal admin mode and isolated evidence output; it exited0 but expanded41generations and invented a cerulean theme. Those outputs contradict the supplied read-only queue plan, so no generation/render follows them and no paid renderer is called. The authored bounded inventory must cover only this queue list/detail/filter/pagination and truthful states. Current explicit queue instruction and retained approved theme provide authorization without a repeated business approval gate.",
+      "evidence": [
+        ".admin-console/evidence/held-checkout-queue/planner"
+      ],
+      "status": "confirmed",
+      "appliesTo": [
+        "checkout-attempt.operator-queue"
+      ]
     }
   ],
   "gaps": [
@@ -14107,7 +14341,7 @@
     {
       "id": "checkout-unknown-operator-recovery",
       "severity": "high",
-      "description": "Payers can safely recheck existing unknown checkouts, but operators lack a scoped, audited checkout-attempt exception queue and evidence/reconciliation workflow. An inconclusive provider lookup stays held indefinitely.",
+      "description": "Minimized local operator visibility is now implemented and independently tested through checkout-attempt.operator-queue. Full unknown-provider outcome resolution, evidence/reconciliation handoff and hosted acceptance remain unresolved; an inconclusive lookup stays held. Visibility alone does not close this gap.",
       "status": "open",
       "rationale": "Build a least-privilege, minimized operator recovery view and bounded read-only checks under existing role controls. Any actual retry, refund, financial correction or new business permission remains separately approved; do not silently release unknown attempts.",
       "evidence": [
@@ -14185,6 +14419,17 @@
         "docs/volabi-finance-refund-gaps.md",
         "planning/volabi/persona-and-skills/BUSINESS_DECISIONS.md",
         "docs/volabi-local-operations.md"
+      ]
+    },
+    {
+      "id": "held-checkout-evidence-validator-context",
+      "severity": "medium",
+      "description": "Regulated evidence-content scanner treats UUID generation in isolated test setup and defensive review prose as release-path invented data, then excludes those files from token matching. Scope is preserved in independent receipts. Gate remains failed; no exemption, test obfuscation or global validator modification was applied.",
+      "status": "open",
+      "rationale": "Resolve the validator evidence/fixture-context model in a separately reviewed tooling repair; retain full raw failing gate and baseline comparison. Do not lower production requirements or remove valid independent tests.",
+      "evidence": [
+        ".admin-console/evidence/held-checkout-queue/manifest-release.txt",
+        "supabase/tests/db/held_checkout_queue_independent.test.mjs"
       ]
     }
   ],
@@ -14450,6 +14695,36 @@
       "approvedBy": "CEO bilingual approved visual direction2026-10-22",
       "evidence": [
         "planning/volabi/DESIGN.md"
+      ]
+    },
+    {
+      "id": "held-checkout-query-bounds",
+      "path": "supabase/migrations/20261022124446_held_checkout_read_queue.sql",
+      "value": "Default25/max50 rows,offset0..100000; schema-bound status/type allowlists; read field allowlist and fixed audit purposes",
+      "reason": "Bounded technical query limits and minimum disclosure for the CEO-authorized read-only queue; no business deadline, rate, invented data or permission change.",
+      "approvedBy": "CEO approved bounded read-only queue and routine reversible technical choices on2026-10-22; root selected limits.",
+      "evidence": [
+        "docs/held-checkout-queue-contract.md"
+      ]
+    },
+    {
+      "id": "held-checkout-ui-contract",
+      "path": "web_platform/src/app/admin/reconciliation/checkouts",
+      "value": "AR/EN interface labels, fixed schema filter options, default page25, offset cap100000, inherited ivory/white/gold operations presentation",
+      "reason": "Static UI vocabulary and technical pagination for approved scope; all records remain authoritative server reads.",
+      "approvedBy": "CEO read-only queue continuation2026-10-22 with existing design direction; root routine technical choices.",
+      "evidence": [
+        "docs/held-checkout-queue-contract.md"
+      ]
+    },
+    {
+      "id": "held-checkout-client-bounds",
+      "path": "web_platform/src/lib/held-checkout-client.mjs",
+      "value": "Schema-bound status/type/field allowlists; SAR, UUID and snapshot validators; page25 and offset100000 technical limits",
+      "reason": "Defensive read-only response contract and technical paging; no invented data or inferred business rule.",
+      "approvedBy": "CEO authorized bounded queue and routine technical choices2026-10-22.",
+      "evidence": [
+        "docs/held-checkout-queue-contract.md"
       ]
     }
   ],
@@ -15487,7 +15762,7 @@
         "web_platform/tests/hq-independent-review.test.mjs",
         ".admin-console/worklog/review-volabi-local-server.md"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "fb-volabi-associated-vs-global-skills",
@@ -15498,7 +15773,7 @@
         "web_platform/src/components/hq/hq-agent-profile.tsx",
         ".admin-console/worklog/review-volabi-frontend.md"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "fb-volabi-citation-textarea-offsets",
@@ -15508,7 +15783,7 @@
       "evidence": [
         "web_platform/tests/hq-client.test.mjs"
       ],
-      "status": "open"
+      "status": "promoted"
     },
     {
       "id": "fb-volabi-evidence-scanner-context",
@@ -15520,7 +15795,91 @@
         ".admin-console/evidence/volabi-first-loop/independent-frontend.json",
         ".admin-console/evidence/volabi-local/server-independent-review.json"
       ],
-      "status": "open"
+      "status": "promoted"
+    },
+    {
+      "id": "fb-held-checkout-read-entry-side-effects",
+      "observation": "During read-only recovery discovery, the inherited reconciliation overview was found to escalate financial breaks on read. Reusing the parent overview would have violated the supplied read-only boundary; discovery changed the queue entry to a separate query route before implementation.",
+      "category": "friction",
+      "proposedChange": "For scoped read-only extensions, trace inherited query helpers and entry routes for side effects before reuse. This observation refines discovery routing and does not authorize changing unrelated legacy workflows.",
+      "evidence": [
+        ".admin-console/worklog/architect-held-checkout.md",
+        "docs/held-checkout-queue-contract.md"
+      ],
+      "status": "promoted",
+      "scope": "references/discovery.md"
+    },
+    {
+      "id": "fb-held-checkout-projection-membership-parity",
+      "observation": "The queue requires matching minimized fields and held-record membership in list and direct detail. Independent migrated-SQL tests checked guessed/nonheld identifiers and private sentinel absence, preventing a detail query from becoming a broader disclosure path.",
+      "category": "new-pattern",
+      "proposedChange": "Keep list/detail eligibility and projection explicit in one capability contract, then test excluded direct identifiers and fields through actual migrated queries. Observation only; existing policy guidance remains in force.",
+      "evidence": [
+        "supabase/tests/db/held_checkout_queue_independent.test.mjs",
+        ".admin-console/evidence/held-checkout-queue/security-backend-independent.json"
+      ],
+      "status": "promoted",
+      "scope": "references/security-governance.md"
+    },
+    {
+      "id": "fb-held-checkout-empty-read-audit-atomicity",
+      "observation": "Privileged empty list and missing detail are successful observations too. Independent tests forced audit persistence errors for populated and empty reads and verified the entire query failed without revealing response rows or changing checkout/financial state.",
+      "category": "new-pattern",
+      "proposedChange": "Include empty and guessed-reference reads in fail-closed privileged-read audit tests, not only populated happy-path reads. Retain the existing audit policy and independent test ownership.",
+      "evidence": [
+        "supabase/tests/db/held_checkout_queue_independent.test.mjs",
+        ".admin-console/worklog/sec-held-checkout.md"
+      ],
+      "status": "promoted",
+      "scope": "references/verification.md"
+    },
+    {
+      "id": "fb-held-checkout-membership-shrink-and-nav",
+      "observation": "Root review found that a shrinking later page could be described as an empty queue, and nested sidebar prefixes could mark both parent and child current. Distinct empty-page recovery and most-specific current navigation were implemented and exercised by independent browser QA.",
+      "category": "friction",
+      "proposedChange": "For mutable paged queues, distinguish no matching records from an empty later page and preserve filters when returning to the first page. For nested navigation, verify exactly one most-specific aria-current item through the actual route.",
+      "evidence": [
+        ".admin-console/worklog/impl-held-checkout-ui.md",
+        ".admin-console/evidence/held-checkout-queue/browser-independent.json"
+      ],
+      "status": "promoted",
+      "scope": "references/experience-design.md"
+    },
+    {
+      "id": "fb-held-checkout-generated-scope-conflict",
+      "observation": "The mandatory generic admin planner exited zero but expanded one approved read-only queue into41 unrelated generations and a different theme. Its output was preserved as rejected diagnostics; the architect retained the supplied bounded scope and inherited approved theme instead of replacing the user plan.",
+      "category": "friction",
+      "proposedChange": "When generic planning output conflicts with a supplied plan, preserve the diagnostic output and record the exact mismatch; author only the bounded approved inventory. Machine closure does not approve new scope or a new theme.",
+      "evidence": [
+        ".admin-console/evidence/held-checkout-queue/planner",
+        ".admin-console/worklog/architect-held-checkout.md"
+      ],
+      "status": "promoted",
+      "scope": "agents/adminwright-architect.md"
+    },
+    {
+      "id": "fb-held-checkout-negated-token-guard",
+      "observation": "A truthful negated delivery description was rejected by the manifest keyword guard because it matched an unfinished-delivery token without sentence context. The implementer used plain factual wording; no invalid-write override or weakened gate was used.",
+      "category": "tooling",
+      "proposedChange": "Consider a separately tested context-aware wording classifier that preserves unfinished-delivery detection while accepting truthful denial and test-evidence descriptions. This is tooling feedback only, with no script change or waiver.",
+      "evidence": [
+        ".admin-console/worklog/impl-held-checkout-ui.md"
+      ],
+      "status": "promoted",
+      "scope": "scripts/admin_console_manifest.py"
+    },
+    {
+      "id": "fb-held-checkout-process-exit-vs-display",
+      "observation": "A Python output wrapper failed encoding its console print under the Windows default code page after the underlying web tests/build exited zero. Actual result logs were preserved; subsequent source changes justified fresh UTF8 web verification. The long database run exit was captured from its owned process handle without repeating that database run.",
+      "category": "tooling",
+      "proposedChange": "Keep child process exit, captured log and display-wrapper status separate. Configure UTF8 before launching verification; when display fails, verify the owned command result from retained evidence before deciding whether a rerun is necessary. This is local harness feedback, not a new release gate.",
+      "evidence": [
+        ".admin-console/evidence/held-checkout-queue/webTests-result.json",
+        ".admin-console/evidence/held-checkout-queue/build-result.json",
+        ".admin-console/evidence/held-checkout-queue/db-regression-result.json"
+      ],
+      "status": "promoted",
+      "scope": "references/verification.md"
     }
   ],
   "agents": [
@@ -15966,6 +16325,69 @@
       "status": "done",
       "notes": "DEVELOPMENT ONLY: final harvester pass under schema architect role;4 project lessons banked including context-blind release evidence scanner; no global promotion or business authority.",
       "worklog": ".admin-console/worklog/harvest-volabi-local.md"
+    },
+    {
+      "id": "architect-held-checkout",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY narrow approved read-only held-checkout architecture; no company employee activation, permission grants or financial execution.",
+      "worklog": ".admin-console/worklog/architect-held-checkout.md"
+    },
+    {
+      "id": "impl-held-checkout",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY root backend/integration; bounded authorized read-only checkout queue; no business activation, new permission, money or deployment.",
+      "worklog": ".admin-console/worklog/impl-held-checkout.md"
+    },
+    {
+      "id": "impl-held-checkout-ui",
+      "role": "implementer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY UI worker under root serialized queue claim; owns new queue page/helpers/tests and direct navigation only; no business authority.",
+      "worklog": ".admin-console/worklog/impl-held-checkout-ui.md"
+    },
+    {
+      "id": "sec-held-checkout",
+      "role": "security",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY independent held-checkout queue authorization, minimization and audit review; no implementation ownership or business activation.",
+      "worklog": ".admin-console/worklog/sec-held-checkout.md"
+    },
+    {
+      "id": "qa-held-checkout-browser",
+      "role": "qa",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY independent scoped local UI/SQL review:20browser groups pass;0unexpectedconsole/page errors; expected missingconfig/injected503403 diagnostics retained. No product edits. Authfixture adapter and fullrelease limits recorded in worklog/evidence.",
+      "worklog": ".admin-console/worklog/qa-held-checkout-browser.md"
+    },
+    {
+      "id": "ux-held-checkout-browser",
+      "role": "ux-reviewer",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY independent scoped local UI/SQL review:20browser groups pass;0unexpectedconsole/page errors; expected missingconfig/injected503403 diagnostics retained. No product edits. Authfixture adapter and fullrelease limits recorded in worklog/evidence.",
+      "worklog": ".admin-console/worklog/ux-held-checkout-browser.md"
+    },
+    {
+      "id": "harvest-held-checkout",
+      "role": "architect",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY final learning pass using schema architect role; feedback/store/worklog only, no feature review or business authority.",
+      "worklog": ".admin-console/worklog/harvest-held-checkout.md"
     }
   ]
 }

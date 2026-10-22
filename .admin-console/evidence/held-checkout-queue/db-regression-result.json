@@ -1,0 +1,6 @@
+{
+  "command": "node --test --test-concurrency=4 supabase/tests/db/**/*.test.mjs",
+  "exitCode": 0,
+  "output": "db-regression.txt",
+  "captureNote": "Actual owned node process exit captured through read-only Windows process handle before original Python display wrapper encodes console output. No test rerun."
+}

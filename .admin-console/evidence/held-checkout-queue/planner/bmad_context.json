@@ -1,0 +1,63 @@
+{
+  "bmad_present": true,
+  "project_root": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini",
+  "config_path": null,
+  "docs_dir": "docs",
+  "project_name": null,
+  "project_description": null,
+  "prd_path": null,
+  "architecture_path": null,
+  "front_end_spec_path": "docs\\front-end-spec.md",
+  "epic_paths": [],
+  "story_paths": [],
+  "qa_paths": [],
+  "spec_paths": [],
+  "actors": [],
+  "entities": [],
+  "epics": [],
+  "explicit_screens": [
+    {
+      "name": "Salon booking",
+      "route": "/shop/[id]",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 9,
+      "raw": "/shop/[id] — Salon booking"
+    },
+    {
+      "name": "Account sign-in",
+      "route": "/login",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 10,
+      "raw": "/login — Account sign-in"
+    },
+    {
+      "name": "Salon application",
+      "route": "/become-provider",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 11,
+      "raw": "/become-provider — Salon application"
+    },
+    {
+      "name": "Customer profile",
+      "route": "/customer/settings",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 12,
+      "raw": "/customer/settings — Customer profile"
+    }
+  ],
+  "story_triggers": [],
+  "spec_snippets": [
+    {
+      "quote": "Loading, empty and failed queries remain distinct. Guest authentication retains",
+      "story_id": "front-end-spec",
+      "source_file": "docs\\front-end-spec.md",
+      "source_line": 21,
+      "section": "Salon booking"
+    }
+  ],
+  "design_md_path": null,
+  "stitch_metadata_path": null,
+  "site_md_path": null,
+  "brand_hints": {},
+  "warnings": []
+}

@@ -1,0 +1,1 @@
+{"command": ["python", "C:/Users/Yousif's PC/.claude/skills/adminwright/scripts/admin_console_manifest.py", "validate", "--manifest", ".admin-console/manifest.json", "--project-root", ".", "--phase", "release"], "exitCode": 1, "output": "manifest-release.txt", "summary": "Validation complete: 313 error(s), 29 warning(s)"}

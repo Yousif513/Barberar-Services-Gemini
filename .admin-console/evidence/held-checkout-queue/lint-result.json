@@ -1,0 +1,1 @@
+{"command": ["C:\\Program Files\\nodejs\\npm.CMD", "run", "lint", "--workspace=web_platform", "--", "--format", "json", "--output-file", "../.admin-console/evidence/held-checkout-queue/eslint-results.json"], "exitCode": 0, "output": "lint.txt"}

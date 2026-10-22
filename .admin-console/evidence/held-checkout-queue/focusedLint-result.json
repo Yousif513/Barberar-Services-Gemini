@@ -1,0 +1,1 @@
+{"command": ["C:\\Program Files\\nodejs\\npx.CMD", "eslint", "src/app/admin/layout.tsx", "src/app/admin/reconciliation/page.tsx", "src/app/admin/reconciliation/checkouts/page.tsx", "src/lib/held-checkout-client.mjs", "src/lib/held-checkout-client.d.mts", "tests/held-checkout-client.test.mjs"], "exitCode": 0, "output": "focused-lint.txt"}
