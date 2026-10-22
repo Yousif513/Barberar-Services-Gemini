@@ -64,7 +64,20 @@ describe("evaluating the required checks of a commit", () => {
 });
 
 describe("the production build decision", () => {
-  it("always builds a preview deployment", async () => {
+  for (const environment of ["preview", "production", "development"]) {
+    it(`holds the checkout repair branch in ${environment} before any remote check`, async () => {
+      let requests = 0;
+      const verdict = await decide({
+        env: { ...productionEnv, VERCEL_ENV: environment, VERCEL_GIT_COMMIT_REF: "codex-booking-payment-reconciliation" },
+        fetchImpl: async () => { requests++; throw new Error("The held branch must not contact GitHub."); },
+        log: () => {}, ...clock(),
+      });
+      assert.equal(verdict, "skip");
+      assert.equal(requests, 0);
+    });
+  }
+
+  it("builds an unrelated preview deployment", async () => {
     assert.equal(await decide({ env: { VERCEL_ENV: "preview" }, fetchImpl: fakeGitHub([500]), log: () => {} }), "build");
   });
 

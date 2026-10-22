@@ -15,8 +15,8 @@
     },
     "web": {
       "exit_code": 0,
-      "tests": 894,
-      "pass": 894,
+      "tests": 897,
+      "pass": 897,
       "fail": 0,
       "skipped": 0,
       "cancelled": 0,
@@ -101,13 +101,26 @@
     },
     "diff_check": {
       "exit_code": 0
+    },
+    "repair_branch_deployment_hold": {
+      "exit_code": 0,
+      "tests": 19,
+      "pass": 19,
+      "regression_red": "16pass/3fail before implementation",
+      "scope": "exact repair branch skipped for preview/production/development; no bypass; other branches unchanged",
+      "remote_settings_changed": false,
+      "independent_rerun": {
+        "tests": 19,
+        "pass": 19,
+        "exit_code": 0
+      }
     }
   },
   "adminwright": {
     "plan": {
       "exit_code": 0,
       "errors": 0,
-      "warnings": 21
+      "warnings": 22
     },
     "coverage": {
       "exit_code": 0,
@@ -116,7 +129,7 @@
     "release": {
       "exit_code": 1,
       "errors": 249,
-      "warnings": 21,
+      "warnings": 22,
       "errors_by_rule": {
         "crosscutting-flag": 12,
         "crosscutting-evidence": 1,
@@ -138,7 +151,8 @@
     ".admin-console/worklog/security-checkout-durable.md",
     ".admin-console/worklog/qa-checkout-clients.md",
     ".admin-console/worklog/qa-checkout-browser.md",
-    ".admin-console/worklog/qa-volabi-planning.md"
+    ".admin-console/worklog/qa-volabi-planning.md",
+    ".admin-console/worklog/security-checkout-preview-hold.md"
   ],
   "headquarters": {
     "status": "scope/theme proposal; no screens built",
@@ -163,7 +177,8 @@
     "Cross-device business purchase creation is not universally atomic; server checkout dispatch guarantee is per existing payable.",
     "Private-wire privacy lifecycle and minimized unknown-outcome operator recovery are open high release dependencies.",
     "Initial full DB1561/1563 failed2 integration invariants; fixed and final1565/1565 passed.",
-    "Earlier uninjected test helper attempted actual provider endpoint with dummy fixture key. It was rejected as isolation evidence; accepted reruns hard-block/inject transport. No real credentials loaded or real financial transaction."
+    "Earlier uninjected test helper attempted actual provider endpoint with dummy fixture key. It was rejected as isolation evidence; accepted reruns hard-block/inject transport. No real credentials loaded or real financial transaction.",
+    "New clients must not use legacy checkout handler6328543, which ignores recovery actions. Exact repair-branch builds are held by configured Vercel ignore step pending coordinated backend/client acceptance."
   ],
   "holds": {
     "production_deployment": true,
@@ -174,5 +189,6 @@
     "actual_financial_transactions": true,
     "new_paid_services": true
   },
-  "original_dirty_checkout": "Preserved seven tracked changes and untracked work; no original working-tree edits or reset."
+  "original_dirty_checkout": "Preserved seven tracked changes and untracked work; no original working-tree edits or reset.",
+  "implementation_commit": "fcbd3b693d83878d53d82f54073c18e753661cb4"
 }

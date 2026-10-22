@@ -13418,7 +13418,7 @@
       "severity": "high",
       "description": "Durable per-payable checkout and existing-client recovery are implemented locally. Hosted multi-session, real Deno/PostgREST and provider sandbox acceptance are not yet established; operator unknown-outcome resolution and privacy lifecycle remain distinct open gaps.",
       "status": "open",
-      "rationale": "2026-10-22 continuation closes source dispatch duplication/reload defects with immutable persisted request, sole claimant, owner-scoped read-only provider lookup and capture replay. Status stays open until the named integration/release evidence exists; no indefinite provider idempotency assumption or production clearance.",
+      "rationale": "2026-10-22 continuation closes source dispatch duplication/reload defects with immutable persisted request, sole claimant, owner-scoped read-only provider lookup and capture replay. Status stays open until the named integration/release evidence exists; no indefinite provider idempotency assumption or production clearance. Confirmed legacy6328543 handler ignores action:recover. New clients must follow the matching migration/Edge protocol; this exact repair branch is held by the configured build-ignore step in every deployment environment, with no bypass. Coordinated release acceptance/owner approval is required before removing that hold.",
       "evidence": [
         "supabase/migrations/20261022062147_durable_checkout_attempts.sql",
         "supabase/functions/_shared/checkout-attempts.ts",
@@ -13669,6 +13669,17 @@
       "evidence": [
         "mobile_app/tests/pending-package-payments.test.mjs",
         ".admin-console/worklog/qa-checkout-clients.md"
+      ]
+    },
+    {
+      "id": "checkout-repair-branch-deployment-hold",
+      "path": "web_platform/scripts/vercel-ignore-build.mjs#decide",
+      "value": "codex-booking-payment-reconciliation returns skip before preview/production checks.",
+      "reason": "Verified legacy payment handler ignores recovery action; new clients require matching backend. Reversible branch-specific build hold prevents automatic mixed-version exposure while preserving other branch controls.",
+      "approvedBy": "CEO explicit production hold and delegated reversible engineering decisions2026-10-22",
+      "evidence": [
+        "web_platform/tests/vercel-ignore-build.test.mjs",
+        "docs/durable-checkout-recovery-and-volabi.md"
       ]
     }
   ],
@@ -15088,6 +15099,14 @@
       "ownsScreens": [],
       "status": "done",
       "notes": "DEVELOPMENT-ONLY independent browser QA;4/4 isolated local checks; .admin-console/worklog/qa-checkout-browser.md. No business employee activation."
+    },
+    {
+      "id": "security-checkout-preview-hold",
+      "role": "security",
+      "ownsCapabilities": [],
+      "ownsScreens": [],
+      "status": "done",
+      "notes": "DEVELOPMENT-ONLY independent CI/build hold review;19/19 cases; .admin-console/worklog/security-checkout-preview-hold.md. No remote settings or deployment."
     }
   ]
 }

@@ -4,23 +4,23 @@
   "files": [
     {
       "path": "AGENT_PROFILE_CONTRACTS.json",
-      "sha256": "493f4a2830ec75fb970b11c9d137d20f068c8e89fbdd693f8ee7ed34405508d2"
+      "sha256": "60c51f581c4d5724f54d020dabafe35e25a4bdb71763363dcf0d59ff57e9aa34"
     },
     {
       "path": "AGENT_SKILLS_AND_READINESS.md",
-      "sha256": "a845ac2aa0a32faddcde3a8f9d21ebc450f90efce7bb2134df664d312a99236f"
+      "sha256": "98fa95a73544b6d3598718a5ec1dd7cca2581af6453b5c668fe76fe9a5516936"
     },
     {
       "path": "AGENT_SKILL_PROFILE_CONTRACT.json",
-      "sha256": "cb089957ee70efe7759d9a6534aa0cdfcd7574f178a39fc942445e066c6cfdc3"
+      "sha256": "95224663837056d5ed74b41329b5cc652e784f5d21fab0fdccdb26e4b446e86d"
     },
     {
       "path": "CAPABILITY_GAP_MATRIX.json",
-      "sha256": "1ee0c24a0db6d6dd8590b2e710c159a4dbfa2942897181b45daa9333e448d185"
+      "sha256": "ea4e0c4b78230824fd888051f967fa8b7d1181ddeea4820ff6c3af0ea51afeb4"
     },
     {
       "path": "DESIGN.md",
-      "sha256": "021353ecf76a1cc1b0798ccd283d64e4937da639ca291d89bee4171e31ed8d21"
+      "sha256": "11f642da52161db09b91d49bdfa555463403422fd037b401537b0045eec9ff1a"
     },
     {
       "path": "DOMAIN_CLOSURE_CHECK.json",
@@ -36,155 +36,155 @@
     },
     {
       "path": "HQ_SURFACE_INVENTORY.json",
-      "sha256": "ec5f40ff5f88dc1624f3d381f5ce4960aede0eadb0a68fea11bde9194cbeb1f1"
+      "sha256": "fb5eb2b133ebebc01d9cf4136529ddb504d73bbe26c1929fec0111b4effa8b37"
     },
     {
       "path": "LATER_SCOPE.md",
-      "sha256": "b330161686b8f1b63aa780a354aae364f163a563af3cc1eca3ba187c35b5eae1"
+      "sha256": "b87b7e41bed9daf588a20f353c474fb1482072cb26ec3befc81ead012b1f0446"
     },
     {
       "path": "README.md",
-      "sha256": "ec93e8594f29b2e58469f618b8ffaaedb67c4eadca8a36783ab792e77319303d"
+      "sha256": "6ad9be2a87829df667d72457ccde638956947234ff79aa93376b1cd691f71774"
     },
     {
       "path": "REQUIREMENTS_VALIDATION.json",
-      "sha256": "cbba75e16af869eda40e84d50286ba5388ee20ca3419403f9e5a7cab7017a735"
+      "sha256": "45a7d96c70b159e96e580744ea3e605465f3b6dcff3fd7f83541cfeacb5be235"
     },
     {
       "path": "run_planning_phases.py",
-      "sha256": "ec811bf542b6dcbecb15449e024765e9a67ead79cc7b5a387c1aaaaddee7d744"
+      "sha256": "245c89e463058ee332958f6c1522eeeb149f8a06a95b434f5c9dd07cc595776a"
     },
     {
       "path": "SCOPE_AND_THEME_APPROVAL.md",
-      "sha256": "958b1562ef65188f2f4d0925bb8e41bba3a35cb7bacea2a864db71d6eb91edae"
+      "sha256": "2b0a9b926da1f3df439c6a8d2e77cf84655cf90565865c65be136f9ecb0de7dc"
     },
     {
       "path": "STAGED_SKILL_VALIDATION.json",
-      "sha256": "97298ad7293962dbfafab0572654b100992f7fd34669811f48dcff898acb98e4"
+      "sha256": "8af5499e742f725f26a9672fa8e7e6c91341ad185fb05728a9bdfe6881edeb92"
     },
     {
       "path": "THEME_CONTRAST.json",
-      "sha256": "69b81010431d20215f38681cf6a66a1bf183c882ca14468f5b9b2702ba82cb63"
+      "sha256": "c4171476f8526c2af946a3146d4fe8875f4814a49b64e0eace1fb9c563735abc"
     },
     {
-      "path": ".design-architect\\asset_manifest.json",
-      "sha256": "00d9f70ad33d61ff69d24aae7469776b02de017f5f27805bcd2c5e712e42c9b3"
+      "path": ".design-architect/asset_manifest.json",
+      "sha256": "a50c572ce98792f03b590350e9d989e4c87e59dc4a1abc0c226b9565b72ccc24"
     },
     {
-      "path": ".design-architect\\bmad_context.json",
-      "sha256": "c462262af9328f320c60a20113bf9404f81fe859a6d9f3a69618835f06187fb0"
+      "path": ".design-architect/bmad_context.json",
+      "sha256": "23a4ad66361864a1548abb8ae9a15804a1536dc0c9bcf0c460ce082b81a4e497"
     },
     {
-      "path": ".design-architect\\closure.md",
-      "sha256": "498bd95ace725ead63bbdac17b7bd15d29a8e401ac48dfea55a66b204ae54695"
+      "path": ".design-architect/closure.md",
+      "sha256": "a980d605896642b934d5e7b80af53bcc7e60696bfe1a202dd2193f4ca61cecb1"
     },
     {
-      "path": ".design-architect\\component_census.json",
-      "sha256": "fc113e3874007cb12aca44bde4f6e3f91e56992cfdeff14720ca13ed005eb5ee"
+      "path": ".design-architect/component_census.json",
+      "sha256": "1d2fd0b31ea29b381be020c8009f35abc5d4ced88b8cf27b5aedb738e92b788c"
     },
     {
-      "path": ".design-architect\\graph.json",
-      "sha256": "6b29763114170886a3f3ab7cefbeb908ae26bafb2b7f26fa86dc4a11d4733652"
+      "path": ".design-architect/graph.json",
+      "sha256": "f1a70efb7ec45b0681015f5de9246a7f3a3d53bedf48fd23d017504151190add"
     },
     {
-      "path": ".design-architect\\holes.json",
-      "sha256": "f58485d76ba84c357d5a7231399d3ca5b815c4657142ba24d5cfdf29230815d4"
+      "path": ".design-architect/holes.json",
+      "sha256": "7d0d631f6c6c530b37ad56da0273c824882ea90e52fc185874af0a824c3cc30b"
     },
     {
-      "path": ".design-architect\\pages.json",
-      "sha256": "bfc200e67f6d63f1b20a75a90ee6150d2673f170df37797eba35936a9a02ff73"
+      "path": ".design-architect/pages.json",
+      "sha256": "26f64c8f510ba0519bc0ab861760917be3a229d25e42c518d1638b2abb9f9ff2"
     },
     {
-      "path": ".design-architect\\page_graph.json",
-      "sha256": "6c1b767d354782409608622eb08291a30163d29cd0e8deec3695a2628ee8e0b8"
+      "path": ".design-architect/page_graph.json",
+      "sha256": "b37457d88fedab0ad37c27cadbfd32c83ac257ce9c43b2b145ea9b6b9e250f8f"
     },
     {
-      "path": ".design-architect\\PHASE_EXECUTION.json",
-      "sha256": "1c476239147952b0f90ce7462bffda28671fc7fe8b3173d01cdb3f7cfa64a61b"
+      "path": ".design-architect/PHASE_EXECUTION.json",
+      "sha256": "c051c2a144a1deab4ec085fd11ed4a41d55d155ff34be9b8269aed69a201291f"
     },
     {
-      "path": ".design-architect\\plan.html",
-      "sha256": "43f157bf6fefeeecb9d98883d8f5d9af5e39b0cf01f680e46066464cb38582b9"
+      "path": ".design-architect/plan.html",
+      "sha256": "23e756074a87b9c33bc1d3584cb0dfbf0febb8e6e9cff3d789ff323ac25d946b"
     },
     {
-      "path": ".design-architect\\plan.json",
-      "sha256": "c27efc18efad630420031c26bae8429b906d1380ddfde12d13ba7effff2f69db"
+      "path": ".design-architect/plan.json",
+      "sha256": "d2c7d9e37d78328ea8223ecb1a44a47ed7784cbbc2f559674b68bf1d0c520ff5"
     },
     {
-      "path": ".design-architect\\plan.md",
-      "sha256": "849c753b41a9412680e4398fdb3150958819b00927aa16d82e545e4abf3d00ac"
+      "path": ".design-architect/plan.md",
+      "sha256": "66dad9c1eb1faa42f20bda73cdddf4daffb57035160715b5083bc8fe8e225f88"
     },
     {
-      "path": ".design-architect\\plan.mermaid",
-      "sha256": "53b7f71c11ac6198d1d46b0f094d38b63be48c1427a4d9dc25d3542eaf59dbc3"
+      "path": ".design-architect/plan.mermaid",
+      "sha256": "4928b466796e833594bdd9022d34849ae303f2a2f22acf72fb5846a46ee9e1d4"
     },
     {
-      "path": ".design-architect\\theme.json",
-      "sha256": "1d9117fc42b99a3124c6def5665c16fbc9b81baa36559fbfdc42a8c704333ac2"
+      "path": ".design-architect/theme.json",
+      "sha256": "c6c954af4cc76811648e700c88a77ec55098c0b769c1d436ac93a6ff46bd0acc"
     },
     {
-      "path": ".design-architect\\viewgraph.json",
-      "sha256": "3b8cccdd43cdc428b07f3a5ef922f9ed9a008e7208c468fb1394046776768302"
+      "path": ".design-architect/viewgraph.json",
+      "sha256": "adcfbcd5c59c32c6b6eaaaa59fbb14617232f4e08ea099b96239491ced97e47d"
     },
     {
-      "path": "docs\\front-end-spec.md",
-      "sha256": "a0f4e813133e3bee3173506f514701ca35e675deca62f28c2993ec313931cd98"
+      "path": "docs/front-end-spec.md",
+      "sha256": "f76a51b6a87532057c8efb8e5c8fd429bed7406ea9bd97f40e8ed5cd68a023c6"
     },
     {
-      "path": "docs\\prd.md",
-      "sha256": "cee3d57aad41de0793be64e682e60ccf3635759d7bf6b3adb89f7195ef99d8ff"
+      "path": "docs/prd.md",
+      "sha256": "6c95d5e8f553bd01307a2270bd8a6f7d83caba24934606ba677db24528b85352"
     },
     {
-      "path": "source\\AGENT_SKILL_MAP.json",
-      "sha256": "31c02070b3ba1850a05253ca5497b652fac6eb0ab3a203040d74b464c6a67da2"
+      "path": "source/AGENT_SKILL_MAP.json",
+      "sha256": "a3ffea7cfd7ca644f225a9bd00a13f98eea3ec0b80df34e31ed5306603a09498"
     },
     {
-      "path": "source\\BRAND_PROVENANCE.json",
-      "sha256": "775acdf395cbb8d40f7e2ed5a07fbcbae8efc3858eee09427e4ba59a90194bee"
+      "path": "source/BRAND_PROVENANCE.json",
+      "sha256": "7f6f46c31d292a5d6e4e69ca7ab5d51fbd826a05529717e86a8a49dff63a0bae"
     },
     {
-      "path": "source\\MISSING_DESIGN_SKILL_SEARCH.json",
-      "sha256": "52f8ac3ec5ff5bee9ecb7c3a062f2a0dcfcf4ce0dca25b436a204675fc118252"
+      "path": "source/MISSING_DESIGN_SKILL_SEARCH.json",
+      "sha256": "b8d5a7808864de1897024466076dc4b8c83407690c6f894cacad12444dedac52"
     },
     {
-      "path": "source\\ORIGINAL_42_FUNCTIONS.json",
-      "sha256": "f277412dfa0bcfa775434e09772ed5105e42934c7798000199d1ea139273d7b8"
+      "path": "source/ORIGINAL_42_FUNCTIONS.json",
+      "sha256": "afe218cfbfbc54c88373eedd90c451b8abf17b34d0ba50696aad2e5838f7e783"
     },
     {
-      "path": "source\\VERIFIED_SKILL_GAPS.json",
-      "sha256": "f4a6cda6c9cc90862b4c6ac529ac8ddfdc12bea9389644ff24acf9be16e61819"
+      "path": "source/VERIFIED_SKILL_GAPS.json",
+      "sha256": "8c8f9e73a4e4df97ab3b65dba58ef0267ea76b2132f4c634e340ce6244fafa65"
     },
     {
-      "path": "staged-skills\\primora-dashboard-layout\\SKILL.md",
-      "sha256": "a28cf7a893e93b033c38d7d6344a47078aa94c14abb1c044092a1adbe36aa0aa"
+      "path": "staged-skills/primora-dashboard-layout/SKILL.md",
+      "sha256": "f3cff5a3c1ec285a1e2099fe4f02fdc146e257d0a4b3010d13a72d1e976f7f57"
     },
     {
-      "path": "staged-skills\\primora-data-visualization\\SKILL.md",
-      "sha256": "f7b6e4338122a857604ed3e7912552c51361e06d2b24e6671b8fff9ce128ff98"
+      "path": "staged-skills/primora-data-visualization/SKILL.md",
+      "sha256": "cc6ed7ac4a4bdc3ddbeaa6d5233fd260b22f6d42e2b3eb1b96ee121da99f01d5"
     },
     {
-      "path": "staged-skills\\primora-design-system\\SKILL.md",
-      "sha256": "e76a3df36c73d072c04ea10cfe0370fd5158e9b530962be4c014e0b419e4a60a"
+      "path": "staged-skills/primora-design-system/SKILL.md",
+      "sha256": "3f0f5186cb0e524b11e40cb2bdd9d2e39465d4ccd0fb17b4ce4a48e094c42929"
     },
     {
-      "path": "staged-skills\\primora-design-system\\references\\proposal-source.md",
-      "sha256": "fb7b03bbe0d57b030b73b8610f62efd2accf9930fecdb3500fbef24cd18cc4e1"
+      "path": "staged-skills/primora-design-system/references/proposal-source.md",
+      "sha256": "df9ebb8ac1e2cc6015ddaa37f204563b142f693b95f4b9f8c74099e1ead64eca"
     },
     {
-      "path": "staged-skills\\primora-data-visualization\\references\\proposal-source.md",
-      "sha256": "fb7b03bbe0d57b030b73b8610f62efd2accf9930fecdb3500fbef24cd18cc4e1"
+      "path": "staged-skills/primora-data-visualization/references/proposal-source.md",
+      "sha256": "df9ebb8ac1e2cc6015ddaa37f204563b142f693b95f4b9f8c74099e1ead64eca"
     },
     {
-      "path": "staged-skills\\primora-dashboard-layout\\references\\proposal-source.md",
-      "sha256": "fb7b03bbe0d57b030b73b8610f62efd2accf9930fecdb3500fbef24cd18cc4e1"
+      "path": "staged-skills/primora-dashboard-layout/references/proposal-source.md",
+      "sha256": "df9ebb8ac1e2cc6015ddaa37f204563b142f693b95f4b9f8c74099e1ead64eca"
     },
     {
-      "path": ".design-architect\\handoff\\component-map.md",
-      "sha256": "ccab00c49fbd251039e48333163103b957f7a71d3b8641c8e3a16dac3486290c"
+      "path": ".design-architect/handoff/component-map.md",
+      "sha256": "2d1a4ea6cc6e1d769d1c595c53f43184a8241940c55ff397cb84f38bd2f097e7"
     },
     {
       "path": "INDEPENDENT_PLANNING_REVIEW.json",
-      "sha256": "d4c75072f419f41dd7c3f81d9e515d175c1d255550edb1f1696de15d5789070f"
+      "sha256": "ee48bbe8dd55f45461b94a35513d768a3689cf1abe8621c6b48a1df4b7e36a3a"
     }
   ],
   "all_company_identities_inactive": true,
@@ -200,5 +200,6 @@
     "All company identities are inactive; autonomous execution permissions remain held.",
     "Scope/theme and three replacement design skills are proposed, unapproved; independent review still required."
   ],
-  "owned_worklog_sha256": "383255708c87dd1b35a7c657bfe848d019eb00adb3604f0b9fdd2a9cc63a44eb"
+  "owned_worklog_sha256": "383255708c87dd1b35a7c657bfe848d019eb00adb3604f0b9fdd2a9cc63a44eb",
+  "hash_basis": "UTF-8 content with CRLF normalized to LF; independent of Git checkout line endings"
 }

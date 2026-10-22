@@ -7,3 +7,5 @@
 - Installed instructions, assigned bindings, evaluated skill evidence and actual business access remain separate agent-profile records. Development-only audit registrations do not activate employees. The explicit CEO approval resolves that project authorization distinction.
 
 These are project observations from this run, not new global skill rules. The existing guidance already covers audit minimization and review independence; no restatement or agent-specific mistake was promoted as a new global requirement. Existing62 local observations are preserved in .admin-console/lessons/observations.jsonl. This final harvest found0 newly open manifest observations; promote returned0 candidates in the run-local store. No external store sync or global skill edit occurred.
+
+- Do not publish durable-recovery clients against the confirmed legacy handler that ignores recovery actions. Matching backend deployment/acceptance must precede client exposure; this repair branch is explicitly held by its existing build-ignore entry point until approved coordinated release.

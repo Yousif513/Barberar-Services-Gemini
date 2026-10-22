@@ -5,7 +5,8 @@
 //   exit 1  -> go ahead and build
 //   exit 0  -> skip this build (the previous production deployment stays live)
 //
-// Preview deployments are never gated. For production it waits for the required checks of the commit, builds only when
+// The checkout repair branch stays held until a coordinated backend/client release is approved. Other previews build.
+// For production it waits for the required checks of the commit, builds only when
 // every one of them succeeded, and skips otherwise (failure, cancellation, still running at the deadline, or checks that
 // cannot be read). A skipped production build can be redeployed from the Vercel dashboard once CI is green.
 //
@@ -61,6 +62,11 @@ export async function fetchCheckRuns({ owner, repo, sha, token, fetchImpl = fetc
 }
 
 export async function decide({ env, fetchImpl = fetch, sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)), now = () => Date.now(), log = console.log }) {
+  // The legacy checkout handler ignores action:recover. Never expose this branch's new clients to that API.
+  if (env.VERCEL_GIT_COMMIT_REF === "codex-booking-payment-reconciliation") {
+    log("Checkout repair branch deployment is held pending coordinated backend/client acceptance and owner approval.");
+    return "skip";
+  }
   if (env.VERCEL_ENV !== "production") {
     log(`Not a production deployment (${env.VERCEL_ENV ?? "unknown"}): building.`);
     return "build";

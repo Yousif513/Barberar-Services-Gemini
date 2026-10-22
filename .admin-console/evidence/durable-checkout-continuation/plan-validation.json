@@ -5,7 +5,7 @@
   "manifest": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini\\.admin-console\\manifest.json",
   "projectRoot": "C:\\Users\\Yousif's PC\\.codex\\worktrees\\booking-payment-reconciliation\\Barberar Services-Gemini",
   "errors": 0,
-  "warnings": 21,
+  "warnings": 22,
   "findings": [
     {
       "rule": "declared-static-unused",
@@ -132,6 +132,12 @@
       "severity": "warn",
       "path": "declaredStatic",
       "message": "path 'supabase/migrations/20261016210000_f2_customer_lookup_not_an_oracle.sql#privacy_lookup_limit' does not match any scanned manifest field"
+    },
+    {
+      "rule": "declared-static-unused",
+      "severity": "warn",
+      "path": "declaredStatic",
+      "message": "path 'web_platform/scripts/vercel-ignore-build.mjs#decide' does not match any scanned manifest field"
     }
   ]
 }

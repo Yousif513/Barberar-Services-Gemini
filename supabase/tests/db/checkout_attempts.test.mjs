@@ -367,4 +367,3 @@ describe("untrusted gateway status audit minimization",()=>{
     assert.equal(knownAudit[0].details.gateway_status,"INITIATED");
   });
 });
-

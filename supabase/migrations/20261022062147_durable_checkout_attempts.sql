@@ -405,4 +405,3 @@ REVOKE ALL ON FUNCTION public.audit_checkout_admin_write() FROM PUBLIC, anon, au
 DROP TRIGGER IF EXISTS trg_audit_admin_write ON public.payment_checkout_attempts;
 CREATE TRIGGER trg_audit_admin_write AFTER INSERT OR UPDATE OR DELETE ON public.payment_checkout_attempts
   FOR EACH ROW EXECUTE FUNCTION public.audit_checkout_admin_write();
-

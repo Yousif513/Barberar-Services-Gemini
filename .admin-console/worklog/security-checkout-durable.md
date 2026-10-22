@@ -68,4 +68,3 @@ Earlier verification isolation failure: before this independent pass, the implem
 - [Tap idempotency](https://developers.tap.company/docs/idempotency): documented 24-hour idempotency window; this implementation does not assume perpetual replay protection.
 
 No provider request was sent with real credentials. No hosted write, production deploy, business-agent activation or Git commit occurred in this review. Root owns aggregate tests, remaining regulated-console gates and external sandbox acceptance.
-
