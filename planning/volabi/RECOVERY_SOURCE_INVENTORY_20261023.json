@@ -1,0 +1,59 @@
+{
+  "item": "HQ-NEXT-03",
+  "status": "proposed_scope_only",
+  "prepared_on": "2026-10-23",
+  "baseline_commit": "ae2649bb665b9da2797b3621b2ff96392cabfdf3",
+  "hash_convention": "strict UTF-8 decoded text, CRLF pairs normalized to LF, then UTF-8 SHA-256; source payload preservation in the proposed backup is exact and does not use this planning-document normalization",
+  "live_database_read": false,
+  "backup_created": false,
+  "restore_executed": false,
+  "implementation_authorized_by_this_file": false,
+  "sources": [
+    {
+      "path": "web_platform/src/lib/hq/server/local-store.mjs",
+      "sha256": "ec769e05f13eac01f038abab057470dd7f9ef4f0ee8a2bb6286421812905a2bf"
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/handler.mjs",
+      "sha256": "50b6be58de26fefbcab7453bceb318afe6ba11337fcfa36bcc9de87fff79b384"
+    },
+    {
+      "path": "web_platform/src/lib/hq/server/catalog.mjs",
+      "sha256": "c1df3549521371200f5954505c63112a9a0e1ce012c09ab00ee267ba336bc51a"
+    },
+    {
+      "path": "scripts/start-volabi-local.mjs",
+      "sha256": "39c60dcd00a4326f5f6ab9678066d24d240e3b6bd7cac18041fb50ab14ba6ef6"
+    },
+    {
+      "path": "docs/volabi-local-api-contract.md",
+      "sha256": "a30fafb229ff1347c13b267467e759e321c844428729565fc1aa3ec52c6bf089"
+    },
+    {
+      "path": "docs/volabi-council-contract.md",
+      "sha256": "e5b360ab57edf75359f4a626dbb788a18d3c205bdd0f40bfc0008ee65086a776"
+    },
+    {
+      "path": "docs/volabi-projects-contract.md",
+      "sha256": "580fd42b5d8848bc043de6d705c59c296c17b1f8dc85ef447158e3841d374404"
+    },
+    {
+      "path": "planning/volabi/persona-and-skills/PERSONA_REGISTRY.json",
+      "sha256": "7bdd8e081a2527f989aedfc668317ead714cdb298c63d6055e201d50f642caf3"
+    },
+    {
+      "path": "planning/volabi/persona-and-skills/ROLE_AND_FUNCTION_SKILL_MAP.json",
+      "sha256": "eec80d9ec19acb9ae0c0be03e039a18fa9d252efc8e4f77cb42309a7c3632405"
+    },
+    {
+      "path": "planning/volabi/AGENT_PROFILE_CONTRACTS.json",
+      "sha256": "60c51f581c4d5724f54d020dabafe35e25a4bdb71763363dcf0d59ff57e9aa34"
+    },
+    {
+      "path": "planning/volabi/persona-and-skills/FINANCE_CONTROL_SOURCE_EXCERPTS.json",
+      "sha256": "aaf010e8fd6e5fbaa6dd87f15155e74618fce30068faa760b19cd4d2c92aba3b"
+    }
+  ],
+  "scope": "RECOVERY_SCOPE_20261023.md",
+  "scope_sha256": "1713e226613d257ce45bc27fcf4647642c287875aba2ca15daec99f1c895b2e2"
+}

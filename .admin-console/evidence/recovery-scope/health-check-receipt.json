@@ -1,0 +1,20 @@
+{
+  "purpose": "Existing application health checks for documentation-only HQ-NEXT-03 proposal",
+  "raw_log_files": [
+    {
+      "name": "mobile.log",
+      "sha256": "5ba5f82d500ce735184b16d71fdd8685b8d51c91d3e1e17360c3e21bbaf8beb1"
+    },
+    {
+      "name": "web-build.log",
+      "sha256": "ef158940a7202b61f94d22bd612a73bfdc40bcc51f687e899a8f161ffe4f90ed"
+    }
+  ],
+  "archive_sha256": "c6f23d03f4cb8bf13033427bc5668e797fee8383f7874586f4ca73f433bf3311",
+  "preservation": "Exact log bytes archived without changing terminal whitespace",
+  "mobile_exit": 0,
+  "web_build_exit": 0,
+  "known_build_warnings": "Four existing dynamic-filesystem tracing warnings and existing provider sitemap fetch warning; build exit zero.",
+  "recovery_implementation_tested": false,
+  "full_regulated_gate": "Not rerun or waived in this documentation-only change; last recorded release gate remains failed."
+}
